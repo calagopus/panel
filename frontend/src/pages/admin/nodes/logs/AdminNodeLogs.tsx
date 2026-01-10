@@ -131,6 +131,13 @@ export default function AdminNodeLogs({ node }: { node: Node }) {
               defaultLanguage='text'
               options={{
                 readOnly: true,
+                stickyScroll: { enabled: false },
+                minimap: { enabled: false },
+                codeLens: false,
+                scrollBeyondLastLine: false,
+                smoothScrolling: true,
+                // @ts-expect-error this is valid
+                touchScrollEnabled: true,
               }}
             />
           </div>
