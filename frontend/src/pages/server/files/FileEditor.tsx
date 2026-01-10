@@ -121,6 +121,15 @@ export default function FileEditor() {
               theme='vs-dark'
               defaultValue={content}
               path={fileName}
+              options={{
+                stickyScroll: { enabled: false },
+                minimap: { enabled: false },
+                codeLens: false,
+                scrollBeyondLastLine: false,
+                smoothScrolling: true,
+                // @ts-expect-error this is valid
+                touchScrollEnabled: true,
+              }}
               onChange={(value) => setContent(value || '')}
               onMount={(editor, monaco) => {
                 editorRef.current = editor;
