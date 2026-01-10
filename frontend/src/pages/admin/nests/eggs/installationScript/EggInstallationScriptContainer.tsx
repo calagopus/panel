@@ -84,6 +84,15 @@ export default function EggInstallationScriptContainer({
                 height='53vh'
                 theme='vs-dark'
                 value={form.values.content || ''}
+                options={{
+                  stickyScroll: { enabled: false },
+                  minimap: { enabled: false },
+                  codeLens: false,
+                  scrollBeyondLastLine: false,
+                  smoothScrolling: true,
+                  // @ts-expect-error this is valid
+                  touchScrollEnabled: true,
+                }}
                 onChange={(value) => form.setFieldValue('content', value || '')}
                 defaultLanguage='shell'
               />
