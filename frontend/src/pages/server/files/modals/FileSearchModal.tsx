@@ -1,4 +1,5 @@
 import {
+  faArrowTurnDown,
   faChevronDown,
   faFileAlt,
   faFolder,
@@ -7,7 +8,7 @@ import {
   faSliders,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Collapse, Flex, Group, Kbd, ModalProps, Stack, Text, UnstyledButton } from '@mantine/core';
+import { Box, Collapse, Flex, Group, ModalProps, Stack, Text, UnstyledButton } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -180,11 +181,6 @@ export default function FileSearchModal({ opened, onClose, onSearchComplete }: F
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             leftSection={<FontAwesomeIcon icon={faSearch} style={{ color: 'var(--mantine-color-gray-5)' }} />}
-            rightSection={
-              <Kbd size='xs' style={{ opacity: 0.5 }}>
-                Enter
-              </Kbd>
-            }
             size='md'
             autoFocus
           />
@@ -390,11 +386,11 @@ export default function FileSearchModal({ opened, onClose, onSearchComplete }: F
         </Stack>
 
         <Group mt='lg' justify='flex-end'>
-          <Button variant='default' onClick={onClose}>
-            Cancel
-          </Button>
           <Button type='submit' loading={loading} leftSection={<FontAwesomeIcon icon={faSearch} />}>
             Search
+          </Button>
+          <Button variant='default' onClick={onClose}>
+            Cancel
           </Button>
         </Group>
       </form>
