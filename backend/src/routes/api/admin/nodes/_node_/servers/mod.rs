@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod power;
+
 mod get {
     use axum::{extract::Query, http::StatusCode};
     use serde::Serialize;
@@ -82,6 +84,7 @@ mod get {
 
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
+        .nest("/power", power::router(state))
         .routes(routes!(get::route))
         .with_state(state.clone())
 }

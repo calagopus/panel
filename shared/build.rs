@@ -17,6 +17,10 @@ fn main() {
         {
             let head_ref = head.trim_start_matches("ref: ").trim();
             println!("cargo:rerun-if-changed=../.git/{head_ref}");
+            println!(
+                "cargo:rustc-env=CARGO_GIT_BRANCH={}",
+                head_ref.rsplit('/').next().unwrap_or("unknown")
+            );
         }
 
         println!("cargo:rerun-if-changed=../.git/index");

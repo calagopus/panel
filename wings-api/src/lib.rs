@@ -515,6 +515,33 @@ pub mod servers {
         pub type Response = Response200;
     }
 }
+pub mod servers_power {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub servers: Vec<uuid::Uuid>,
+                #[schema(inline)]
+                pub action: ServerPowerAction,
+                #[schema(inline)]
+                pub wait_seconds: Option<u64>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response202 {
+                #[schema(inline)]
+                pub affected: u64,
+            }
+        }
+
+        pub type Response = Response202;
+    }
+}
 pub mod servers_server {
     use super::*;
 

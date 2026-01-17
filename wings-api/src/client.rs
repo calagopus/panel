@@ -156,6 +156,13 @@ impl WingsClient {
         request_impl(self, Method::POST, "/api/servers", Some(data), None).await
     }
 
+    pub async fn post_servers_power(
+        &self,
+        data: &super::servers_power::post::RequestBody,
+    ) -> Result<super::servers_power::post::Response, ApiHttpError> {
+        request_impl(self, Method::POST, "/api/servers/power", Some(data), None).await
+    }
+
     pub async fn get_servers_server(
         &self,
         server: uuid::Uuid,

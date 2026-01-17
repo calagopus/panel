@@ -189,7 +189,15 @@ async fn main() {
         env.sentry_url.clone(),
         sentry::ClientOptions {
             server_name: env.server_name.clone().map(|s| s.into()),
-            release: Some(format!("{}:{}", shared::VERSION, shared::GIT_COMMIT).into()),
+            release: Some(
+                format!(
+                    "{}:{}@{}",
+                    shared::VERSION,
+                    shared::GIT_COMMIT,
+                    shared::GIT_BRANCH
+                )
+                .into(),
+            ),
             traces_sample_rate: 1.0,
             ..Default::default()
         },
@@ -230,7 +238,12 @@ async fn main() {
             Ok(_) => shared::AppContainerType::Unknown,
             Err(_) => shared::AppContainerType::None,
         },
-        version: format!("{}:{}", shared::VERSION, shared::GIT_COMMIT),
+        version: format!(
+            "{}:{}@{}",
+            shared::VERSION,
+            shared::GIT_COMMIT,
+            shared::GIT_BRANCH
+        ),
 
         client: reqwest::ClientBuilder::new()
             .user_agent(format!("github.com/calagopus/panel {}", shared::VERSION))

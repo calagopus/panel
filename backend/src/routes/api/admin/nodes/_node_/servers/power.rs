@@ -6,70 +6,67 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            server::{GetServer, GetServerActivityLogger},
-            user::GetPermissionManager,
+            admin_activity::GetAdminActivityLogger, node::GetNode, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
+    use std::collections::HashSet;
     use utoipa::ToSchema;
 
     #[derive(ToSchema, Deserialize)]
     pub struct Payload {
-        #[serde(alias = "signal")]
+        servers: HashSet<uuid::Uuid>,
         action: wings_api::ServerPowerAction,
     }
 
     #[derive(ToSchema, Serialize)]
-    struct Response {}
+    struct Response {
+        affected: u64,
+    }
 
     #[utoipa::path(post, path = "/", responses(
         (status = OK, body = inline(Response)),
         (status = UNAUTHORIZED, body = ApiError),
     ), params(
         (
-            "server" = uuid::Uuid,
-            description = "The server ID",
+            "node" = uuid::Uuid,
+            description = "The node ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
     ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        server: GetServer,
-        activity_logger: GetServerActivityLogger,
+        node: GetNode,
+        activity_logger: GetAdminActivityLogger,
         axum::Json(data): axum::Json<Payload>,
     ) -> ApiResponseResult {
-        permissions.has_server_permission(match data.action {
-            wings_api::ServerPowerAction::Start => "control.start",
-            wings_api::ServerPowerAction::Stop => "control.stop",
-            wings_api::ServerPowerAction::Kill => "control.kill",
-            wings_api::ServerPowerAction::Restart => "control.restart",
-        })?;
+        permissions.has_admin_permission("nodes.power")?;
 
-        server
-            .node
-            .fetch_cached(&state.database)
-            .await?
+        let response_data = node
             .api_client(&state.database)
-            .post_servers_server_power(
-                server.uuid,
-                &wings_api::servers_server_power::post::RequestBody {
-                    action: data.action,
-                    wait_seconds: None,
-                },
-            )
+            .post_servers_power(&wings_api::servers_power::post::RequestBody {
+                servers: data.servers.iter().cloned().collect(),
+                action: data.action,
+                wait_seconds: None,
+            })
             .await?;
 
         activity_logger
             .log(
-                "server:power.action",
+                "node:servers.power",
                 serde_json::json!({
-                    "action": data.action
+                    "node_uuid": node.uuid,
+                    "servers": if data.servers.is_empty() { None } else { Some(&data.servers) },
+                    "action": data.action,
                 }),
             )
             .await;
 
-        ApiResponse::json(Response {}).ok()
+        ApiResponse::json(Response {
+            affected: response_data.affected,
+        })
+        .ok()
     }
 }
 

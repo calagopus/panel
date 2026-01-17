@@ -15,9 +15,10 @@ impl shared::extensions::commands::CliCommand<VersionArgs> for VersionCommand {
         Box::new(|_env, _arg_matches| {
             Box::pin(async move {
                 println!(
-                    "github.com/calagopus/panel {}:{} ({})",
+                    "github.com/calagopus/panel {}:{}@{} ({})",
                     shared::VERSION,
                     shared::GIT_COMMIT,
+                    shared::GIT_BRANCH,
                     shared::TARGET
                 );
                 println!(
