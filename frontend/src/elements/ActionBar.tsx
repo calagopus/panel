@@ -13,7 +13,7 @@ export default function ActionBar({ opened = false, children }: { opened?: boole
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
         >
-          <Card p='sm' className='grid! grid-cols-2 md:grid-flow-col md:auto-cols-fr gap-2 pointer-events-auto'>
+          <Card p='sm' className='grid! grid-cols-2 w-full md:w-fit md:grid-flow-col gap-2 pointer-events-auto mx-4'>
             {children}
           </Card>
         </motion.div>

@@ -59,12 +59,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
         </Sidebar>
       )}
 
-      <div
-        id='admin-root'
-        className={
-          isNormal ? 'max-w-[100vw] lg:max-w-[calc(100vw-17.5rem)] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto'
-        }
-      >
+      <div id='admin-root' className={isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto'}>
         <Container isNormal={isNormal}>
           <Suspense fallback={<Spinner.Centered />}>
             <Routes>
