@@ -7,8 +7,9 @@ import {
   faMicrochip,
   faPen,
   faSearch,
-faUserLarge,
+  faUserLarge,
 } from '@fortawesome/free-solid-svg-icons';
+import { faChartBar } from '@fortawesome/free-solid-svg-icons/faChartBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
@@ -19,13 +20,12 @@ import ChartBlock from '@/elements/ChartBlock.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import SemiCircleProgress from '@/elements/SemiCircleProgress.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import TitleCard from '@/elements/TitleCard.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { useChart, useChartTickLabel } from '@/lib/chart.ts';
 import { hexToRgba } from '@/lib/color.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
-import TitleCard from '@/elements/TitleCard';
-import { faChartBar } from '@fortawesome/free-solid-svg-icons/faChartBar';
 
 interface NodeStatistics {
   cpu: {
@@ -147,7 +147,7 @@ export default function AdminNodeStatistics({ node }: { node: Node }) {
       ) : (
         <>
           <div className='mt-4'>
-            <TitleCard title={'Resources'} icon={<FontAwesomeIcon icon={faUserLarge}/>}>
+            <TitleCard title='Resources' icon={<FontAwesomeIcon icon={faUserLarge} />}>
               <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
                 <Card className='flex flex-row!'>
                   <SemiCircleProgress
@@ -204,7 +204,7 @@ export default function AdminNodeStatistics({ node }: { node: Node }) {
               </div>
             </TitleCard>
           </div>
-          <div className="mt-4">
+          <div className='mt-4'>
             <TitleCard title='Graphs' icon={<FontAwesomeIcon icon={faChartBar} />}>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <ChartBlock icon={<FontAwesomeIcon icon={faMicrochip} />} title='CPU Load'>

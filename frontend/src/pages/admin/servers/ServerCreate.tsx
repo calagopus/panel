@@ -1,6 +1,6 @@
-import { faReply } from '@fortawesome/free-solid-svg-icons';
+import { faIcons, faReply, faSoccerBall } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ActionIcon, Group, Paper, Stack, Title } from '@mantine/core';
+import { ActionIcon, Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -29,6 +29,7 @@ import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import TitleCard from '@/elements/TitleCard.tsx';
 import VariableContainer from '@/elements/VariableContainer.tsx';
 import { adminServerCreateSchema } from '@/lib/schemas/admin/servers.ts';
 import { formatAllocation } from '@/lib/server.ts';
@@ -188,12 +189,10 @@ export default function ServerCreate() {
             : doCreateOrUpdate(false),
         )}
       >
-        <Stack>
+        <Stack mt='16'>
           <Group grow align='normal'>
-            <Paper withBorder p='md'>
+            <TitleCard title='Basic Information' icon={<FontAwesomeIcon icon={faSoccerBall} />}>
               <Stack>
-                <Title order={3}>Basic Information</Title>
-
                 <Group grow>
                   <TextInput
                     withAsterisk
@@ -215,12 +214,10 @@ export default function ServerCreate() {
                   {...form.getInputProps('description')}
                 />
               </Stack>
-            </Paper>
+            </TitleCard>
 
-            <Paper withBorder p='md'>
+            <TitleCard title='Server Assignment' icon={<FontAwesomeIcon icon={faIcons} />}>
               <Stack>
-                <Title order={3}>Server Assignment</Title>
-
                 <Group grow>
                   <Select
                     withAsterisk
@@ -306,14 +303,12 @@ export default function ServerCreate() {
                   />
                 </Group>
               </Stack>
-            </Paper>
+            </TitleCard>
           </Group>
 
           <Group grow align='normal'>
-            <Paper withBorder p='md'>
+            <TitleCard title='Resource Limits' icon={<FontAwesomeIcon icon={faIcons} />}>
               <Stack>
-                <Title order={3}>Resource Limits</Title>
-
                 <Group grow>
                   <NumberInput
                     withAsterisk
@@ -352,12 +347,10 @@ export default function ServerCreate() {
                   <NumberInput label='IO Weight' {...form.getInputProps('limits.ioWeight')} />
                 </Group>
               </Stack>
-            </Paper>
+            </TitleCard>
 
-            <Paper withBorder p='md'>
+            <TitleCard title='Server Configuration' icon={<FontAwesomeIcon icon={faIcons} />}>
               <Stack>
-                <Title order={3}>Server Configuration</Title>
-
                 <Group grow>
                   <Select
                     withAsterisk
@@ -429,14 +422,12 @@ export default function ServerCreate() {
                   {...form.getInputProps('hugepagesPassthroughEnabled', { type: 'checkbox' })}
                 />
               </Stack>
-            </Paper>
+            </TitleCard>
           </Group>
 
           <Group grow align='normal'>
-            <Paper withBorder p='md'>
+            <TitleCard title='Feature Limits' icon={<FontAwesomeIcon icon={faIcons} />}>
               <Stack>
-                <Title order={3}>Feature Limits</Title>
-
                 <Group grow>
                   <NumberInput
                     withAsterisk
@@ -468,12 +459,10 @@ export default function ServerCreate() {
                   />
                 </Group>
               </Stack>
-            </Paper>
+            </TitleCard>
 
-            <Paper withBorder p='md'>
+            <TitleCard title='Allocations' icon={<FontAwesomeIcon icon={faIcons} />}>
               <Stack>
-                <Title order={3}>Allocations</Title>
-
                 <Group grow>
                   <Select
                     label='Primary Allocation'
@@ -508,13 +497,11 @@ export default function ServerCreate() {
                   />
                 </Group>
               </Stack>
-            </Paper>
+            </TitleCard>
           </Group>
 
-          <Paper withBorder p='md'>
+          <TitleCard title='Variables' icon={<FontAwesomeIcon icon={faIcons} />}>
             <Stack>
-              <Title order={3}>Variables</Title>
-
               {!selectedNestUuid || !form.values.eggUuid ? (
                 <Alert>Please select an egg before you can configure variables.</Alert>
               ) : eggVariablesLoading ? (
@@ -543,7 +530,7 @@ export default function ServerCreate() {
                 </div>
               )}
             </Stack>
-          </Paper>
+          </TitleCard>
 
           <Group>
             <AdminCan action='servers.create' cantSave>
