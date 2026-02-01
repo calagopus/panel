@@ -146,12 +146,12 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
                 <Component key={`server-prepended-component-${i}`} />
               ))}
               {server.status === 'restoring_backup' ? (
-                <Notification className='mb-4' loading>
+                <Notification loading>
                   {t('pages.server.console.notification.restoringBackup', {})}
                   <Progress value={backupRestoreProgress} />
                 </Notification>
               ) : server.status === 'installing' ? (
-                <Notification className='mb-4' loading>
+                <Notification loading>
                   {t('pages.server.console.notification.installing', {})}
                   <ServerCan action='settings.cancel-install'>
                     <Button
