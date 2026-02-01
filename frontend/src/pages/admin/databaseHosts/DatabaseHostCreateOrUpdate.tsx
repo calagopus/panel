@@ -21,6 +21,7 @@ import { databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { adminDatabaseHostCreateSchema, adminDatabaseHostUpdateSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default function DatabaseHostCreateOrUpdate({
   contextDatabaseHost,
@@ -89,7 +90,7 @@ export default function DatabaseHostCreateOrUpdate({
   };
 
   return (
-    <AdminSubContentContainer title={`${contextDatabaseHost ? 'Update' : 'Create'} Database Host`} titleOrder={2}>
+    <AdminContentContainer title={`${contextDatabaseHost ? 'Update' : 'Create'} Database Host`} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -175,6 +176,6 @@ export default function DatabaseHostCreateOrUpdate({
           </Group>
         </Stack>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

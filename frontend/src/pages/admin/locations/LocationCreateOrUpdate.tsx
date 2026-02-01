@@ -20,6 +20,7 @@ import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default ({ contextLocation }: { contextLocation?: Location }) => {
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
@@ -63,7 +64,7 @@ export default ({ contextLocation }: { contextLocation?: Location }) => {
   });
 
   return (
-    <AdminSubContentContainer title={`${contextLocation ? 'Update' : 'Create'} Location`} titleOrder={2}>
+    <AdminContentContainer title={`${contextLocation ? 'Update' : 'Create'} Location`} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -124,6 +125,6 @@ export default ({ contextLocation }: { contextLocation?: Location }) => {
           </Group>
         </Stack>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 };

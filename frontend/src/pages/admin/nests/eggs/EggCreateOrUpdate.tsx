@@ -49,6 +49,7 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import EggMoveModal from './modals/EggMoveModal.tsx';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 
 export default function EggCreateOrUpdate({
   contextNest,
@@ -248,7 +249,7 @@ export default function EggCreateOrUpdate({
   };
 
   return (
-    <AdminSubContentContainer title={`${contextEgg ? 'Update' : 'Create'} Egg`} hideTitleComponent>
+    <AdminContentContainer title={`${contextEgg ? 'Update' : 'Create'} Egg`} hideTitleComponent>
       {contextEgg && (
         <EggMoveModal
           opened={openModal === 'move'}
@@ -671,6 +672,6 @@ export default function EggCreateOrUpdate({
           )}
         </Group>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

@@ -26,6 +26,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: Node }) {
   const { addToast } = useToast();
@@ -107,7 +108,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: Node
   };
 
   return (
-    <AdminSubContentContainer title={`${contextNode ? 'Update' : 'Create'} Node`} titleOrder={2}>
+    <AdminContentContainer title={`${contextNode ? 'Update' : 'Create'} Node`} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -242,6 +243,6 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: Node
           </Group>
         </Stack>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

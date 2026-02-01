@@ -23,6 +23,7 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default function UserCreateOrUpdate({ contextUser }: { contextUser?: User }) {
   const { settings, languages } = useGlobalStore();
@@ -89,7 +90,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: User
   };
 
   return (
-    <AdminSubContentContainer title={`${contextUser ? 'Update' : 'Create'} User`} titleOrder={2}>
+    <AdminContentContainer title={`${contextUser ? 'Update' : 'Create'} User`} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -196,6 +197,6 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: User
           )}
         </Group>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

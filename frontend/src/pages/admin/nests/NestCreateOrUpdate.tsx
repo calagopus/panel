@@ -15,6 +15,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default function NestCreateOrUpdate({ contextNest }: { contextNest?: AdminNest }) {
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
@@ -50,7 +51,7 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: Admi
   }, [contextNest]);
 
   return (
-    <AdminSubContentContainer title={`${contextNest ? 'Update' : 'Create'} Nest`} titleOrder={2}>
+    <AdminContentContainer title={`${contextNest ? 'Update' : 'Create'} Nest`} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -91,6 +92,6 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: Admi
           )}
         </Group>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

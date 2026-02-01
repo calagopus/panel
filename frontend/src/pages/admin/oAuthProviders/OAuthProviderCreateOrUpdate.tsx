@@ -25,6 +25,7 @@ import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default function OAuthProviderCreateOrUpdate({
   contextOAuthProvider,
@@ -148,7 +149,7 @@ export default function OAuthProviderCreateOrUpdate({
   };
 
   return (
-    <AdminSubContentContainer title={`${contextOAuthProvider ? 'Update' : 'Create'} OAuth Provider`} titleOrder={2}>
+    <AdminContentContainer title={`${contextOAuthProvider ? 'Update' : 'Create'} OAuth Provider`} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -321,6 +322,6 @@ export default function OAuthProviderCreateOrUpdate({
           </Group>
         </Stack>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

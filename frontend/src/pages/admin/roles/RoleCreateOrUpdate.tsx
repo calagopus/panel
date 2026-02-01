@@ -19,6 +19,7 @@ import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import { adminRoleSchema } from '@/lib/schemas/admin/roles.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useGlobalStore } from '@/stores/global.ts';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: Role }) {
   const { availablePermissions, setAvailablePermissions } = useGlobalStore();
@@ -68,7 +69,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: Role
   }, []);
 
   return (
-    <AdminSubContentContainer title={`${contextRole ? 'Update' : 'Create'} Role`} titleOrder={2}>
+    <AdminContentContainer title={`${contextRole ? 'Update' : 'Create'} Role`} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -137,6 +138,6 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: Role
           </Group>
         </Stack>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

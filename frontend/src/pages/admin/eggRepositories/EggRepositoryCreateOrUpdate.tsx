@@ -18,6 +18,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default function EggRepositoryCreateOrUpdate({
   contextEggRepository,
@@ -74,7 +75,7 @@ export default function EggRepositoryCreateOrUpdate({
   };
 
   return (
-    <AdminSubContentContainer title={`${contextEggRepository ? 'Update' : 'Create'} Egg Repository`}>
+    <AdminContentContainer title={`${contextEggRepository ? 'Update' : 'Create'} Egg Repository`}>
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -127,6 +128,6 @@ export default function EggRepositoryCreateOrUpdate({
           )}
         </Group>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

@@ -23,6 +23,7 @@ import {
 import BackupRestic from '@/pages/admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '@/pages/admin/backupConfigurations/forms/BackupS3.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 export default function BackupConfigurationCreateOrUpdate({
   contextBackupConfiguration,
@@ -99,7 +100,7 @@ export default function BackupConfigurationCreateOrUpdate({
   }, [contextBackupConfiguration]);
 
   return (
-    <AdminSubContentContainer
+    <AdminContentContainer
       title={`${contextBackupConfiguration ? 'Update' : 'Create'} Backup Config`}
       titleOrder={2}
     >
@@ -179,6 +180,6 @@ export default function BackupConfigurationCreateOrUpdate({
           )}
         </Stack>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }
