@@ -36,6 +36,7 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 const timezones = Object.keys(zones)
   .sort()
@@ -168,7 +169,7 @@ export default function ServerCreate() {
   }, [selectedNestUuid, form.values.eggUuid]);
 
   return (
-    <AdminSubContentContainer title='Create Server' titleOrder={2}>
+    <AdminContentContainer title='Create Server' titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'confirm-no-allocation'}
         onClose={() => setOpenModal(null)}
@@ -557,6 +558,6 @@ export default function ServerCreate() {
           </Group>
         </Stack>
       </form>
-    </AdminSubContentContainer>
+    </AdminContentContainer>
   );
 }

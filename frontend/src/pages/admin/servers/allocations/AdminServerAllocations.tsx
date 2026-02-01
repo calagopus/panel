@@ -12,6 +12,7 @@ import ServerAllocationAddModal from '@/pages/admin/servers/allocations/modals/S
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useAdminStore } from '@/stores/admin.tsx';
 import ServerAllocationRow from './ServerAllocationRow.tsx';
+import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 
 export default function AdminServerAllocations({ server }: { server: AdminServer }) {
   const { serverAllocations, setServerAllocations } = useAdminStore();
@@ -24,7 +25,7 @@ export default function AdminServerAllocations({ server }: { server: AdminServer
   });
 
   return (
-    <AdminContentContainer
+    <AdminSubContentContainer
       title='Server Allocations'
       titleOrder={2}
       search={search}
@@ -53,6 +54,6 @@ export default function AdminServerAllocations({ server }: { server: AdminServer
           ))}
         </Table>
       </ContextMenuProvider>
-    </AdminContentContainer>
+    </AdminSubContentContainer>
   );
 }
