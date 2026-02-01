@@ -16,7 +16,7 @@ export default function EggRepositoryEggs({ contextEggRepository }: { contextEgg
   });
 
   return (
-    <AdminSubContentContainer title='Egg Repository Eggs' search={search} setSearch={setSearch}>
+    <AdminSubContentContainer title='Egg Repository Eggs' search={search} setSearch={setSearch} titleOrder={2}>
       <Table
         columns={eggRepositoryEggTableColumns}
         loading={loading}

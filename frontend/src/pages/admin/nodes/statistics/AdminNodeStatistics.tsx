@@ -7,6 +7,7 @@ import {
   faMicrochip,
   faPen,
   faSearch,
+faUserLarge,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Title } from '@mantine/core';
@@ -23,6 +24,8 @@ import { useChart, useChartTickLabel } from '@/lib/chart.ts';
 import { hexToRgba } from '@/lib/color.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import TitleCard from '@/elements/TitleCard';
+import { faChartBar } from '@fortawesome/free-solid-svg-icons/faChartBar';
 
 interface NodeStatistics {
   cpu: {
@@ -143,99 +146,107 @@ export default function AdminNodeStatistics({ node }: { node: Node }) {
         <Spinner.Centered />
       ) : (
         <>
-          <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mt-4'>
-            <Card className='flex flex-row!'>
-              <SemiCircleProgress
-                value={stats.cpu.used}
-                label={<>{stats.cpu.used.toFixed(1)}%</>}
-                filledSegmentColor={stats.cpu.used >= 90 ? 'red' : undefined}
-                mr='md'
-              />
-              <div className='flex flex-col text-right flex-1'>
-                <Title order={2}>CPU</Title>
-                <h2>{stats.cpu.model}</h2>
+          <div className='mt-4'>
+            <TitleCard title={'Resources'} icon={<FontAwesomeIcon icon={faUserLarge}/>}>
+              <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
+                <Card className='flex flex-row!'>
+                  <SemiCircleProgress
+                    value={stats.cpu.used}
+                    label={<>{stats.cpu.used.toFixed(1)}%</>}
+                    filledSegmentColor={stats.cpu.used >= 90 ? 'red' : undefined}
+                    mr='md'
+                  />
+                  <div className='flex flex-col text-right flex-1'>
+                    <Title order={2}>CPU</Title>
+                    <h2>{stats.cpu.model}</h2>
+                  </div>
+                </Card>
+                <Card className='flex flex-row!'>
+                  <SemiCircleProgress
+                    value={(stats.memory.used / stats.memory.total) * 100}
+                    label={<>{((stats.memory.used / stats.memory.total) * 100).toFixed(1)}%</>}
+                    filledSegmentColor={stats.memory.used / stats.memory.total >= 0.9 ? 'red' : undefined}
+                    mr='md'
+                  />
+                  <div className='flex flex-col text-right flex-1'>
+                    <Title order={2}>Memory</Title>
+                    <h2>
+                      {bytesToString(stats.memory.used)} / {bytesToString(stats.memory.total)}
+                    </h2>
+                    <p className='text-xs'>{bytesToString(stats.memory.usedProcess)} used by Wings</p>
+                  </div>
+                </Card>
+                <Card className='flex flex-row!'>
+                  <SemiCircleProgress
+                    value={(stats.disk.used / stats.disk.total) * 100}
+                    label={<>{((stats.disk.used / stats.disk.total) * 100).toFixed(1)}%</>}
+                    filledSegmentColor={stats.disk.used / stats.disk.total >= 0.9 ? 'red' : undefined}
+                    mr='md'
+                  />
+                  <div className='flex flex-col text-right flex-1'>
+                    <Title order={2}>Disk</Title>
+                    <h2>
+                      {bytesToString(stats.disk.used)} / {bytesToString(stats.disk.total)}
+                    </h2>
+                  </div>
+                </Card>
+                <Card className='flex flex-row!'>
+                  <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' mr='md' />
+                  <div className='flex flex-col text-right flex-1'>
+                    <Title order={2}>Network</Title>
+                    <h2>
+                      In: {bytesToString(stats.network.received)}
+                      <br />
+                      Out: {bytesToString(stats.network.sent)}
+                    </h2>
+                  </div>
+                </Card>
               </div>
-            </Card>
-            <Card className='flex flex-row!'>
-              <SemiCircleProgress
-                value={(stats.memory.used / stats.memory.total) * 100}
-                label={<>{((stats.memory.used / stats.memory.total) * 100).toFixed(1)}%</>}
-                filledSegmentColor={stats.memory.used / stats.memory.total >= 0.9 ? 'red' : undefined}
-                mr='md'
-              />
-              <div className='flex flex-col text-right flex-1'>
-                <Title order={2}>Memory</Title>
-                <h2>
-                  {bytesToString(stats.memory.used)} / {bytesToString(stats.memory.total)}
-                </h2>
-                <p className='text-xs'>{bytesToString(stats.memory.usedProcess)} used by Wings</p>
-              </div>
-            </Card>
-            <Card className='flex flex-row!'>
-              <SemiCircleProgress
-                value={(stats.disk.used / stats.disk.total) * 100}
-                label={<>{((stats.disk.used / stats.disk.total) * 100).toFixed(1)}%</>}
-                filledSegmentColor={stats.disk.used / stats.disk.total >= 0.9 ? 'red' : undefined}
-                mr='md'
-              />
-              <div className='flex flex-col text-right flex-1'>
-                <Title order={2}>Disk</Title>
-                <h2>
-                  {bytesToString(stats.disk.used)} / {bytesToString(stats.disk.total)}
-                </h2>
-              </div>
-            </Card>
-            <Card className='flex flex-row!'>
-              <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' mr='md' />
-              <div className='flex flex-col text-right flex-1'>
-                <Title order={2}>Network</Title>
-                <h2>
-                  In: {bytesToString(stats.network.received)}
-                  <br />
-                  Out: {bytesToString(stats.network.sent)}
-                </h2>
-              </div>
-            </Card>
+            </TitleCard>
           </div>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
-            <ChartBlock icon={<FontAwesomeIcon icon={faMicrochip} />} title='CPU Load'>
-              <Line {...cpu.props} />
-            </ChartBlock>
-            <ChartBlock icon={<FontAwesomeIcon icon={faMemory} />} title='Memory Usage'>
-              <Line {...memory.props} />
-            </ChartBlock>
-            <ChartBlock
-              icon={<FontAwesomeIcon icon={faDatabase} />}
-              title='Disk I/O'
-              legend={
-                <>
-                  <Tooltip label='Disk Read'>
-                    <FontAwesomeIcon icon={faSearch} className='mr-2 h-4 w-4 text-yellow-400' />
-                  </Tooltip>
-                  <Tooltip label='Disk Write'>
-                    <FontAwesomeIcon icon={faPen} className='h-4 w-4 text-cyan-400' />
-                  </Tooltip>
-                </>
-              }
-            >
-              <Line {...disk.props} />
-            </ChartBlock>
-            <ChartBlock
-              icon={<FontAwesomeIcon icon={faCloudDownload} />}
-              title='Network Traffic'
-              legend={
-                <>
-                  <Tooltip label='Inbound'>
-                    <FontAwesomeIcon icon={faCloudArrowDown} className='mr-2 h-4 w-4 text-yellow-400' />
-                  </Tooltip>
-                  <Tooltip label='Outbound'>
-                    <FontAwesomeIcon icon={faCloudArrowUp} className='h-4 w-4 text-cyan-400' />
-                  </Tooltip>
-                </>
-              }
-            >
-              <Line {...network.props} />
-            </ChartBlock>
+          <div className="mt-4">
+            <TitleCard title='Graphs' icon={<FontAwesomeIcon icon={faChartBar} />}>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <ChartBlock icon={<FontAwesomeIcon icon={faMicrochip} />} title='CPU Load'>
+                  <Line {...cpu.props} />
+                </ChartBlock>
+                <ChartBlock icon={<FontAwesomeIcon icon={faMemory} />} title='Memory Usage'>
+                  <Line {...memory.props} />
+                </ChartBlock>
+                <ChartBlock
+                  icon={<FontAwesomeIcon icon={faDatabase} />}
+                  title='Disk I/O'
+                  legend={
+                    <>
+                      <Tooltip label='Disk Read'>
+                        <FontAwesomeIcon icon={faSearch} className='mr-2 h-4 w-4 text-yellow-400' />
+                      </Tooltip>
+                      <Tooltip label='Disk Write'>
+                        <FontAwesomeIcon icon={faPen} className='h-4 w-4 text-cyan-400' />
+                      </Tooltip>
+                    </>
+                  }
+                >
+                  <Line {...disk.props} />
+                </ChartBlock>
+                <ChartBlock
+                  icon={<FontAwesomeIcon icon={faCloudDownload} />}
+                  title='Network Traffic'
+                  legend={
+                    <>
+                      <Tooltip label='Inbound'>
+                        <FontAwesomeIcon icon={faCloudArrowDown} className='mr-2 h-4 w-4 text-yellow-400' />
+                      </Tooltip>
+                      <Tooltip label='Outbound'>
+                        <FontAwesomeIcon icon={faCloudArrowUp} className='h-4 w-4 text-cyan-400' />
+                      </Tooltip>
+                    </>
+                  }
+                >
+                  <Line {...network.props} />
+                </ChartBlock>
+              </div>
+            </TitleCard>
           </div>
         </>
       )}
