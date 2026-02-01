@@ -146,25 +146,29 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
                 <Component key={`server-prepended-component-${i}`} />
               ))}
               {server.status === 'restoring_backup' ? (
-                <Notification loading>
-                  {t('pages.server.console.notification.restoringBackup', {})}
-                  <Progress value={backupRestoreProgress} />
-                </Notification>
+                <div className='pt-2 px-12'>
+                  <Notification loading>
+                    {t('pages.server.console.notification.restoringBackup', {})}
+                    <Progress value={backupRestoreProgress} />
+                  </Notification>
+                </div>
               ) : server.status === 'installing' ? (
-                <Notification loading>
-                  {t('pages.server.console.notification.installing', {})}
-                  <ServerCan action='settings.cancel-install'>
-                    <Button
-                      className='ml-2'
-                      leftSection={<FontAwesomeIcon icon={faCancel} />}
-                      variant='subtle'
-                      loading={abortLoading}
-                      onClick={doAbortInstall}
-                    >
-                      {t('common.button.cancel', {})}
-                    </Button>
-                  </ServerCan>
-                </Notification>
+                <div className='pt-2 px-12'>
+                  <Notification loading>
+                    {t('pages.server.console.notification.installing', {})}
+                    <ServerCan action='settings.cancel-install'>
+                      <Button
+                        className='ml-2'
+                        leftSection={<FontAwesomeIcon icon={faCancel} />}
+                        variant='subtle'
+                        loading={abortLoading}
+                        onClick={doAbortInstall}
+                      >
+                        {t('common.button.cancel', {})}
+                      </Button>
+                    </ServerCan>
+                  </Notification>
+                </div>
               ) : null}
 
               <Suspense fallback={<Spinner.Centered />}>

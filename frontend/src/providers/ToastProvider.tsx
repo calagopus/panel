@@ -115,9 +115,11 @@ export const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
               transition={{ duration: 0.3 }}
               className='w-72'
             >
-              <Notification color={getToastColor(toast.type)} withCloseButton onClose={() => dismissToast(toast.id)}>
-                {toast.message}
-              </Notification>
+              <div className='pt-2 px-12'>
+                <Notification color={getToastColor(toast.type)} withCloseButton onClose={() => dismissToast(toast.id)}>
+                  {toast.message}
+                </Notification>
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
