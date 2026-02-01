@@ -563,6 +563,7 @@ async fn main() {
                     ApiResponse::new(Body::from_stream(tokio_util::io::ReaderStream::new(
                         tokio_file,
                     )))
+                    .with_header("Content-Type", "image/webp")
                     .with_header("Content-Length", size.to_compact_string())
                     .with_header("ETag", file.trim_end_matches(".webp"))
                     .ok()

@@ -53,7 +53,7 @@ export default function OobeNode({ onNext, skipFrom }: OobeComponentProps) {
       .catch((msg) => {
         setError(httpErrorToHuman(msg));
       });
-  }, [t]);
+  }, []);
 
   const onSubmit = async () => {
     setLoading(true);
