@@ -19,7 +19,7 @@ import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
@@ -36,7 +36,6 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
-import AdminContentContainer from '@/elements/containers/AdminContentContainer';
 
 const timezones = Object.keys(zones)
   .sort()
