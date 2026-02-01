@@ -121,7 +121,7 @@ export default function FileEditor() {
               browsingBackup={browsingBackup}
             />
           </div>
-          <div className="relative">
+          <div className='relative'>
             <div className='flex h-[calc(100vh-185px)] lg:h-[calc(100vh-119px)] max-w-full w-full z-1 absolute'>
               <MonacoEditor
                 height='100%'
@@ -157,8 +157,8 @@ export default function FileEditor() {
                 }}
               />
             </div>
-                    </div>
           </div>
+        </div>
       )}
     </ServerContentContainer>
   );
