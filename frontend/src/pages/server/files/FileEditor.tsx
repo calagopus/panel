@@ -121,42 +121,44 @@ export default function FileEditor() {
               browsingBackup={browsingBackup}
             />
           </div>
-          <div className='rounded-md overflow-hidden'>
-            <MonacoEditor
-              height='77vh'
-              theme='vs-dark'
-              defaultValue={content}
-              path={fileName}
-              options={{
-                readOnly: !!browsingBackup || !browsingWritableDirectory,
-                stickyScroll: { enabled: false },
-                minimap: { enabled: false },
-                codeLens: false,
-                scrollBeyondLastLine: false,
-                smoothScrolling: true,
-                // @ts-expect-error this is valid
-                touchScrollEnabled: true,
-              }}
-              onChange={(value) => setContent(value || '')}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
-                editor.onDidChangeModelContent(() => {
-                  contentRef.current = editor.getValue();
-                });
-                editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-                  if (params.action === 'new') {
-                    setNameModalOpen(true);
-                  } else {
-                    saveFile();
-                  }
-                });
-
-                registerTomlLanguage(monaco);
-                registerHoconLanguage(monaco);
-              }}
-            />
+          <div className="relative">
+            <div className='flex h-[calc(100vh-185px)] lg:h-[calc(100vh-119px)] max-w-full w-full z-1 absolute'>
+              <MonacoEditor
+                height='100%'
+                width='100%'
+                theme='vs-dark'
+                defaultValue={content}
+                path={fileName}
+                options={{
+                  readOnly: !!browsingBackup || !browsingWritableDirectory,
+                  stickyScroll: { enabled: false },
+                  minimap: { enabled: false },
+                  codeLens: false,
+                  scrollBeyondLastLine: false,
+                  smoothScrolling: true,
+                  // @ts-expect-error this is valid
+                  touchScrollEnabled: true,
+                }}
+                onChange={(value) => setContent(value || '')}
+                onMount={(editor, monaco) => {
+                  editorRef.current = editor;
+                  editor.onDidChangeModelContent(() => {
+                    contentRef.current = editor.getValue();
+                  });
+                  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+                    if (params.action === 'new') {
+                      setNameModalOpen(true);
+                    } else {
+                      saveFile();
+                    }
+                  });
+                  registerTomlLanguage(monaco);
+                  registerHoconLanguage(monaco);
+                }}
+              />
+            </div>
+                    </div>
           </div>
-        </div>
       )}
     </ServerContentContainer>
   );
