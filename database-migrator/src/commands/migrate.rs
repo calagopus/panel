@@ -1,6 +1,6 @@
 use clap::{Args, FromArgMatches};
 use colored::Colorize;
-use std::sync::Arc;
+use std::{collections::BTreeMap, sync::Arc};
 
 #[derive(Args)]
 pub struct MigrateArgs {
@@ -148,6 +148,117 @@ impl shared::extensions::commands::CliCommand<MigrateArgs> for MigrateCommand {
                 }
 
                 tracing::info!("applied {} new migrations.", ran_migrations);
+
+                let mut extension_migrations = BTreeMap::new();
+                if args.live {
+                    let live_path = match () {
+                        _ if tokio::fs::metadata("extension-migrations").await.is_ok() => {
+                            "extension-migrations"
+                        }
+                        _ if tokio::fs::metadata("database/extension-migrations")
+                            .await
+                            .is_ok() =>
+                        {
+                            "database/extension-migrations"
+                        }
+                        _ if tokio::fs::metadata("../database/extension-migrations")
+                            .await
+                            .is_ok() =>
+                        {
+                            "../database/extension-migrations"
+                        }
+                        _ => {
+                            tracing::error!(
+                                "failed to find live migrations folder, expected one of: ./extension-migrations, ./database/extension-migrations, ../database/extension-migrations"
+                            );
+                            return Ok(1);
+                        }
+                    };
+
+                    tracing::info!("collecting extension migrations from filesystem...");
+
+                    let mut dir_entries = tokio::fs::read_dir(live_path).await?;
+                    while let Some(entry) = dir_entries.next_entry().await? {
+                        let file_type = entry.file_type().await?;
+                        if file_type.is_dir() {
+                            let extension_identifier =
+                                entry.file_name().to_string_lossy().to_string();
+                            let migrations = crate::collect_extension_migrations(
+                                entry.path(),
+                                &extension_identifier,
+                            )
+                            .await?;
+
+                            extension_migrations.insert(extension_identifier, migrations);
+                        }
+                    }
+                } else {
+                    tracing::info!("collecting embedded migrations...");
+
+                    for entry in crate::EXTENSION_MIGRATIONS.dirs() {
+                        let extension_identifier = match entry.path().file_name() {
+                            Some(name) => name.to_string_lossy().to_string(),
+                            None => continue,
+                        };
+                        let migrations =
+                            crate::collect_embedded_extension_migrations(&extension_identifier)?;
+
+                        extension_migrations.insert(extension_identifier, migrations);
+                    }
+                }
+
+                if !extension_migrations.is_empty() {
+                    tracing::info!("applying extension migrations...");
+
+                    for (extension_identifier, migrations) in extension_migrations {
+                        tracing::info!(
+                            extension = %extension_identifier,
+                            count = migrations.len(),
+                            "applying {} migrations for extension",
+                            migrations.len()
+                        );
+
+                        for migration in migrations {
+                            tracing::info!(
+                                name = %migration.name,
+                                "applying migration"
+                            );
+
+                            if args.unsafe_skip_run {
+                                tracing::warn!(
+                                    name = %migration.name,
+                                    "marking migration as applied without running due to --unsafe-skip-run"
+                                );
+                                crate::mark_extension_migration_as_applied(
+                                    database.write(),
+                                    &migration,
+                                )
+                                .await?;
+                            } else if let Err(err) =
+                                crate::run_extension_migration(database.write(), &migration).await
+                            {
+                                if args.force {
+                                    tracing::error!(
+                                        name = %migration.name,
+                                        "failed to apply migration, marking as applied due to --force: {}",
+                                        err
+                                    );
+                                    crate::mark_extension_migration_as_applied(
+                                        database.write(),
+                                        &migration,
+                                    )
+                                    .await?;
+                                } else {
+                                    eprintln!("{}: {}", "failed to apply migration".red(), err);
+                                    return Ok(1);
+                                }
+                            }
+
+                            tracing::info!(name = %migration.name, "successfully applied migration");
+                            tracing::info!("");
+                        }
+                    }
+                }
 
                 Ok(0)
             })

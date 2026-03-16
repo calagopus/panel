@@ -297,6 +297,68 @@ async fn main() {
 
             tracing::info!("applied {} new migrations.", ran_migrations);
 
+            tracing::info!("collecting extension migrations...");
+            for extension in extensions.extensions().await.iter() {
+                let migrations = match database_migrator::collect_embedded_extension_migrations(
+                    &extension.metadata_toml.get_package_identifier(),
+                ) {
+                    Ok(migrations) => migrations,
+                    Err(err) => {
+                        tracing::warn!(
+                            extension = %extension.package_name,
+                            "failed to collect migrations for extension: {:#?}",
+                            err
+                        );
+                        continue;
+                    }
+                };
+
+                tracing::info!(
+                    count = migrations.len(),
+                    extension = %extension.package_name,
+                    "found extension migrations"
+                );
+
+                let mut ran_migrations = 0;
+                for migration in migrations
+                    .into_iter()
+                    .filter(|m| !applied_migrations.iter().any(|am| am.id == m.id))
+                {
+                    tracing::info!(
+                        name = %migration.name,
+                        extension = %extension.package_name,
+                        "applying extension migration"
+                    );
+
+                    if let Err(err) =
+                        database_migrator::run_extension_migration(database.write(), &migration)
+                            .await
+                    {
+                        eprintln!(
+                            "{}: {} (extension: {})",
+                            "failed to apply extension migration".red(),
+                            err,
+                            extension.package_name
+                        );
+                        std::process::exit(1);
+                    }
+
+                    tracing::info!(
+                        name = %migration.name,
+                        extension = %extension.package_name,
+                        "successfully applied extension migration"
+                    );
+
+                    ran_migrations += 1;
+                }
+
+                tracing::info!(
+                    count = ran_migrations,
+                    extension = %extension.package_name,
+                    "applied extension migrations"
+                );
+            }
+
             Ok(())
         };
 

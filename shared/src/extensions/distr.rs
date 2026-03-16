@@ -64,6 +64,94 @@ pub struct PackageJson {
 }
 
 #[derive(Clone)]
+pub struct ExtensionMigration {
+    pub id: uuid::Uuid,
+    pub name: String,
+    pub date: chrono::DateTime<chrono::Utc>,
+    pub sql: String,
+    pub sql_down: String,
+}
+
+impl ExtensionMigration {
+    pub fn from_directory_raw(
+        path: &Path,
+        extension_identifier: &str,
+        mut content_up_raw: impl std::io::Read,
+        mut content_down_raw: impl std::io::Read,
+    ) -> Result<Self, std::io::Error> {
+        let mut content_up = String::new();
+        content_up_raw.read_to_string(&mut content_up)?;
+
+        let mut content_down = String::new();
+        content_down_raw.read_to_string(&mut content_down)?;
+
+        let name = path
+            .file_name()
+            .ok_or_else(|| {
+                std::io::Error::new(
+                    std::io::ErrorKind::InvalidData,
+                    format!(
+                        "invalid migration directory name `{}`: unable to extract directory name.",
+                        path.display()
+                    ),
+                )
+            })?
+            .to_string_lossy()
+            .to_string();
+
+        if !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!(
+                    "invalid migration directory name `{}`: must be ASCII and contain only alphanumeric characters or underscores.",
+                    path.display()
+                ),
+            ));
+        }
+
+        let date = name
+            .split('_')
+            .next()
+            .and_then(|date_str| {
+                chrono::NaiveDateTime::parse_from_str(date_str, "%Y%m%d%H%M%S")
+                    .ok()
+                    .map(|ndt| ndt.and_utc())
+            })
+            .ok_or_else(|| {
+                std::io::Error::new(
+                    std::io::ErrorKind::InvalidData,
+                    format!(
+                        "invalid migration directory name `{}`: unable to parse date from directory name. expected format `yyyymmddhhmmss_description/`.",
+                        path.display()
+                    ),
+                )
+            })?;
+
+        let xxh3 = xxhash_rust::xxh3::xxh3_128(
+            format!(
+                "{}:{}:{}",
+                extension_identifier,
+                name,
+                date.timestamp_millis()
+            )
+            .as_bytes(),
+        );
+        let id = uuid::Builder::from_u128(xxh3)
+            .with_variant(uuid::Variant::RFC4122)
+            .with_version(uuid::Version::Custom)
+            .into_uuid();
+
+        Ok(Self {
+            id,
+            name,
+            date,
+            sql: content_up,
+            sql_down: content_down,
+        })
+    }
+}
+
+#[derive(Clone)]
 pub struct ExtensionDistrFile {
     zip: zip::ZipArchive<Arc<std::fs::File>>,
 
@@ -73,7 +161,7 @@ pub struct ExtensionDistrFile {
 }
 
 impl ExtensionDistrFile {
-    pub fn parse_from_file(file: std::fs::File) -> Result<Self, anyhow::Error> {
+    pub fn parse_from_reader(file: std::fs::File) -> Result<Self, anyhow::Error> {
         let mut zip = zip::ZipArchive::new(Arc::new(file))?;
 
         let mut metadata_toml = zip.by_name("Metadata.toml")?;
@@ -180,17 +268,89 @@ impl ExtensionDistrFile {
         Ok(())
     }
 
-    pub fn has_schema(&mut self) -> bool {
-        self.zip.by_name("schema.ts").is_ok()
+    pub fn has_migrations(&mut self) -> bool {
+        self.zip.by_name("migrations/").is_ok()
     }
 
-    pub fn get_schema(&mut self) -> Result<String, anyhow::Error> {
-        let mut schema_file = self.zip.by_name("schema.ts")?;
-        let mut schema_string = String::new();
-        schema_string.reserve_exact(schema_file.size() as usize);
-        schema_file.read_to_string(&mut schema_string)?;
+    pub fn extract_migrations(&mut self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
+        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
 
-        Ok(schema_string)
+        let mut i = 0;
+        while let Ok(mut entry) = self.zip.by_index(i) {
+            i += 1;
+
+            if !entry.name().starts_with("migrations/") {
+                continue;
+            }
+
+            let clean_path = match entry.enclosed_name() {
+                Some(clean_path) => clean_path,
+                None => continue,
+            };
+            let clean_path = match clean_path.strip_prefix("migrations/") {
+                Ok(clean_path) => clean_path,
+                Err(_) => continue,
+            };
+
+            if entry.is_dir() {
+                filesystem.create_dir_all(clean_path)?;
+            } else if entry.is_file() {
+                let mut file = filesystem.create(clean_path)?;
+
+                std::io::copy(&mut entry, &mut file)?;
+                file.flush()?;
+                file.sync_all()?;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn get_migrations(&mut self) -> Result<Vec<ExtensionMigration>, anyhow::Error> {
+        let mut migrations = Vec::new();
+
+        let mut migration_dirs = Vec::new();
+        let mut i = 0;
+        while let Ok(entry) = self.zip.by_index(i) {
+            i += 1;
+
+            let entry_name = entry.name().to_string();
+            if entry_name.starts_with("migrations/")
+                && entry_name.ends_with("/up.sql")
+                && !entry.is_dir()
+                && let Some(dir_name) = entry_name
+                    .strip_prefix("migrations/")
+                    .and_then(|s| s.strip_suffix("/up.sql"))
+            {
+                migration_dirs.push(dir_name.to_string());
+            }
+        }
+
+        for dir_name in migration_dirs {
+            let up_path = Path::new("migrations").join(&dir_name).join("up.sql");
+            let down_path = Path::new("migrations").join(&dir_name).join("down.sql");
+
+            let mut up_entry = self.zip.by_path(&up_path)?;
+            let mut up_bytes = vec![0; up_entry.size() as usize];
+            up_entry.read_exact(&mut up_bytes)?;
+            drop(up_entry);
+
+            let mut down_entry = self.zip.by_path(&down_path)?;
+            let mut down_bytes = vec![0; down_entry.size() as usize];
+            down_entry.read_exact(&mut down_bytes)?;
+            drop(down_entry);
+
+            let dir_path = Path::new(&dir_name);
+
+            migrations.push(ExtensionMigration::from_directory_raw(
+                dir_path,
+                &self.metadata_toml.get_package_identifier(),
+                &up_bytes[..],
+                &down_bytes[..],
+            )?);
+        }
+
+        Ok(migrations)
     }
 
     pub fn validate(&mut self) -> Result<(), anyhow::Error> {
@@ -303,18 +463,18 @@ impl ExtensionDistrFile {
             index.read_to_string(&mut index_string)?;
             drop(index);
 
-            if !index_string.contains("export default new ") {
+            if !index_string.contains("export default ") {
                 return Err(anyhow::anyhow!(
-                    "unable to find `export default new` in calagopus extension archive frontend/src/index.ts."
+                    "unable to find `export default ` in calagopus extension archive frontend/src/index.ts."
                 ));
             }
         }
 
-        if let Ok(schema_string) = self.get_schema()
-            && !schema_string.contains("export default (definitions: DatabaseDefinitions) =>")
+        if self.has_migrations()
+            && let Err(err) = self.get_migrations()
         {
             return Err(anyhow::anyhow!(
-                "unable to find `export default (definitions: DatabaseDefinitions) =>` in calagopus extension archive schema.ts."
+                "unable to parse migrations in calagopus extension archive. make sure they are formatted as directories `20260125115245_xxx_xxx/` containing `up.sql` and `down.sql`. {err}"
             ));
         }
 
@@ -380,6 +540,7 @@ pub struct ExtensionDistrFileBuilder {
     zip: zip::ZipWriter<std::fs::File>,
     wrote_backend: bool,
     wrote_frontend: bool,
+    wrote_migrations: bool,
 }
 
 impl ExtensionDistrFileBuilder {
@@ -388,6 +549,7 @@ impl ExtensionDistrFileBuilder {
             zip: zip::ZipWriter::new(file),
             wrote_backend: false,
             wrote_frontend: false,
+            wrote_migrations: false,
         }
     }
 
@@ -482,10 +644,40 @@ impl ExtensionDistrFileBuilder {
         Ok(self)
     }
 
-    pub fn add_schema(mut self, schema: &str) -> Result<Self, anyhow::Error> {
-        self.zip
-            .start_file("schema.ts", FileOptions::<()>::default())?;
-        self.zip.write_all(schema.as_bytes())?;
+    pub fn add_migrations(mut self, path: impl AsRef<Path>) -> Result<Self, anyhow::Error> {
+        if self.wrote_migrations {
+            return Err(anyhow::anyhow!(
+                "Cannot write migrations, they have already been written."
+            ));
+        }
+
+        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
+
+        self.zip.add_directory(
+            "migrations",
+            FileOptions::<()>::default().compression_level(Some(9)),
+        )?;
+
+        let mut walker = filesystem.walk_dir(path)?;
+        while let Some(Ok((_, name))) = walker.next_entry() {
+            let metadata = filesystem.metadata(&name)?;
+            let virtual_path = Path::new("migrations").join(&name);
+
+            let options: FileOptions<()> = FileOptions::default().compression_level(Some(9));
+
+            if metadata.is_dir() {
+                self.zip
+                    .add_directory(virtual_path.to_string_lossy(), options)?;
+            } else if metadata.is_file() {
+                self.zip
+                    .start_file(virtual_path.to_string_lossy(), options)?;
+
+                let mut reader = filesystem.open(&name)?;
+                std::io::copy(&mut reader, &mut self.zip)?;
+            }
+        }
+
+        self.wrote_migrations = true;
 
         Ok(self)
     }

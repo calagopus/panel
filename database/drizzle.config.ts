@@ -10,7 +10,7 @@ try {
 
 export default defineConfig({
   dialect: 'postgresql',
-  schema: './src/schema/index.ts',
+  schema: './src/schema.ts',
   out: './migrations',
   breakpoints: false,
   dbCredentials: {

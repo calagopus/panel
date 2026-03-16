@@ -77,8 +77,8 @@ impl shared::extensions::commands::CliCommand<ExportArgs> for ExportCommand {
                     return Ok(1);
                 }
 
-                let schema_path = Path::new("database/src/schema/extensions").join(
-                    MetadataToml::convert_package_name_to_identifier(&args.package_name) + ".ts",
+                let migrations_path = Path::new("database/extension-migrations").join(
+                    MetadataToml::convert_package_name_to_identifier(&args.package_name),
                 );
 
                 tokio::fs::create_dir_all("exported-extensions").await?;
@@ -99,9 +99,8 @@ impl shared::extensions::commands::CliCommand<ExportArgs> for ExportCommand {
                             .add_frontend(frontend_path)?
                             .add_backend(backend_path)?;
 
-                        if schema_path.exists() {
-                            let schema = std::fs::read_to_string(schema_path)?;
-                            builder = builder.add_schema(&schema)?;
+                        if migrations_path.exists() {
+                            builder = builder.add_migrations(migrations_path)?;
                         }
 
                         Ok(builder.write()?)
@@ -110,7 +109,7 @@ impl shared::extensions::commands::CliCommand<ExportArgs> for ExportCommand {
                 file.flush()?;
                 file.sync_all()?;
 
-                let extension_distr = match ExtensionDistrFile::parse_from_file(file) {
+                let extension_distr = match ExtensionDistrFile::parse_from_reader(file) {
                     Ok(extension_distr) => extension_distr,
                     Err(err) => {
                         std::fs::remove_file(output_path)?;

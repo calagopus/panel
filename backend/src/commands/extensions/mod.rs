@@ -3,6 +3,7 @@ use shared::extensions::commands::CliCommandGroupBuilder;
 mod add;
 mod apply;
 mod export;
+mod init;
 mod inspect;
 mod list;
 mod remove;
@@ -19,6 +20,11 @@ pub fn commands(cli: CliCommandGroupBuilder) -> CliCommandGroupBuilder {
         "inspect",
         "Inspects a .c7s.zip extension file for the Panel.",
         inspect::InspectCommand,
+    )
+    .add_command(
+        "init",
+        "Initializes a new extension using a template.",
+        init::InitCommand,
     )
     .add_command(
         "export",

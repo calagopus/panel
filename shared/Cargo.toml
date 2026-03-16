@@ -73,3 +73,4 @@ serde_with = { workspace = true }
 minijinja = { workspace = true }
 sntpc-net-tokio = "1.0.1"
 sntpc = { version = "0.8.1", features = ["std"] }
+xxhash-rust = { version = "0.8.15", features = ["xxh3"] }

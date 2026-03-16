@@ -15,10 +15,8 @@ impl shared::extensions::commands::CliCommand<VersionArgs> for VersionCommand {
         Box::new(|_env, _arg_matches| {
             Box::pin(async move {
                 println!(
-                    "github.com/calagopus/panel(database-migrator) {}:{}@{} ({})",
-                    shared::VERSION,
-                    shared::GIT_COMMIT,
-                    shared::GIT_BRANCH,
+                    "github.com/calagopus/panel(database-migrator) {} ({})",
+                    shared::full_version(),
                     shared::TARGET
                 );
                 println!(

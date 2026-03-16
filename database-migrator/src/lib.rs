@@ -1,5 +1,6 @@
 use futures_util::StreamExt;
 use serde::Deserialize;
+use shared::extensions::distr::ExtensionMigration;
 use sqlx::{Executor, Row};
 use std::{io::Read, path::Path};
 
@@ -228,6 +229,8 @@ impl Migration {
 
 pub static MIGRATIONS: include_dir::Dir<'_> =
     include_dir::include_dir!("$CARGO_MANIFEST_DIR/../database/migrations");
+pub static EXTENSION_MIGRATIONS: include_dir::Dir<'_> =
+    include_dir::include_dir!("$CARGO_MANIFEST_DIR/../database/extension-migrations");
 
 pub fn collect_embedded_migrations() -> Result<Vec<Migration>, std::io::Error> {
     let mut migrations = Vec::new();
@@ -268,6 +271,56 @@ pub fn collect_embedded_migrations() -> Result<Vec<Migration>, std::io::Error> {
     Ok(migrations)
 }
 
+pub fn collect_embedded_extension_migrations(
+    extension_identifier: &str,
+) -> Result<Vec<ExtensionMigration>, std::io::Error> {
+    let mut migrations = Vec::new();
+
+    let dir = match EXTENSION_MIGRATIONS.get_dir(extension_identifier) {
+        Some(dir) => dir,
+        None => return Ok(migrations),
+    };
+
+    for entry in dir.dirs() {
+        let up_sql = match entry.get_file("up.sql") {
+            Some(file) => file.contents(),
+            None => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!(
+                        "up.sql not found in embedded extension migration: {}",
+                        entry.path().display()
+                    ),
+                ));
+            }
+        };
+        let down_sql = match entry.get_file("down.sql") {
+            Some(file) => file.contents(),
+            None => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!(
+                        "down.sql not found in embedded extension migration: {}",
+                        entry.path().display()
+                    ),
+                ));
+            }
+        };
+
+        let migration = ExtensionMigration::from_directory_raw(
+            entry.path(),
+            extension_identifier,
+            up_sql,
+            down_sql,
+        )?;
+        migrations.push(migration);
+    }
+
+    migrations.sort_by_key(|m| m.date);
+
+    Ok(migrations)
+}
+
 pub async fn collect_migrations(path: impl AsRef<Path>) -> Result<Vec<Migration>, std::io::Error> {
     let mut migrations = Vec::new();
 
@@ -276,6 +329,50 @@ pub async fn collect_migrations(path: impl AsRef<Path>) -> Result<Vec<Migration>
         let file_type = entry.file_type().await?;
         if file_type.is_dir() {
             let migration = Migration::from_directory(&entry.path()).await?;
+
+            migrations.push(migration);
+        }
+    }
+
+    migrations.sort_by_key(|m| m.date);
+
+    Ok(migrations)
+}
+
+pub async fn collect_extension_migrations(
+    path: impl AsRef<Path>,
+    extension_identifier: &str,
+) -> Result<Vec<ExtensionMigration>, std::io::Error> {
+    let mut migrations = Vec::new();
+
+    let mut dir_entries = tokio::fs::read_dir(path).await?;
+    while let Some(entry) = dir_entries.next_entry().await? {
+        let file_type = entry.file_type().await?;
+        if file_type.is_dir() {
+            let up_file = tokio::fs::File::open(entry.path().join("up.sql"))
+                .await?
+                .into_std()
+                .await;
+            let down_file = tokio::fs::File::open(entry.path().join("down.sql"))
+                .await?
+                .into_std()
+                .await;
+
+            let migration = tokio::task::spawn_blocking({
+                let path = entry.path();
+                let extension_identifier = extension_identifier.to_string();
+
+                move || {
+                    ExtensionMigration::from_directory_raw(
+                        &path,
+                        &extension_identifier,
+                        up_file,
+                        down_file,
+                    )
+                }
+            })
+            .await??;
+
             migrations.push(migration);
         }
     }
@@ -344,6 +441,24 @@ pub async fn mark_migration_as_applied(
     }
 }
 
+pub async fn mark_extension_migration_as_applied(
+    pool: impl Executor<'_, Database = sqlx::Postgres>,
+    migration: &ExtensionMigration,
+) -> Result<(), sqlx::Error> {
+    match sqlx::query("INSERT INTO migrations (id, name, created, applied) VALUES ($1, $2, $3, $4)")
+        .bind(migration.id)
+        .bind(&migration.name)
+        .bind(migration.date)
+        .bind(chrono::Utc::now())
+        .execute(pool)
+        .await
+    {
+        Ok(_) => Ok(()),
+        Err(sqlx::Error::Database(db)) if db.is_unique_violation() => Ok(()),
+        Err(err) => Err(err),
+    }
+}
+
 /// Runs a single migration within a transaction.
 /// This function ensures that the migration is applied atomically,
 /// meaning that either all changes are applied, or none are.
@@ -359,6 +474,30 @@ pub async fn run_migration(pool: &sqlx::PgPool, migration: &Migration) -> Result
     drop(query_stream);
 
     mark_migration_as_applied(&mut *transaction, migration).await?;
+
+    transaction.commit().await?;
+
+    Ok(())
+}
+
+/// Runs a single extension migration within a transaction.
+/// This function ensures that the migration is applied atomically,
+/// meaning that either all changes are applied, or none are.
+///
+/// If everything goes well, the transaction is committed.
+pub async fn run_extension_migration(
+    pool: &sqlx::PgPool,
+    migration: &ExtensionMigration,
+) -> Result<(), sqlx::Error> {
+    let mut transaction = pool.begin().await?;
+
+    let mut query_stream = (&mut transaction).execute_many(&*migration.sql);
+    while let Some(result) = query_stream.next().await {
+        result?;
+    }
+    drop(query_stream);
+
+    mark_extension_migration_as_applied(&mut *transaction, migration).await?;
 
     transaction.commit().await?;
 

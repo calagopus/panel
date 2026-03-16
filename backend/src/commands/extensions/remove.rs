@@ -87,8 +87,8 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                     return Ok(1);
                 }
 
-                let schema_path = Path::new("database/src/schema/extensions").join(
-                    MetadataToml::convert_package_name_to_identifier(&args.package_name) + ".ts",
+                let migrations_path = Path::new("database/extension-migrations").join(
+                    MetadataToml::convert_package_name_to_identifier(&args.package_name),
                 );
 
                 let cargo_bin = which("cargo")
@@ -211,39 +211,13 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                     );
                 }
 
-                if args.remove_migrations && tokio::fs::metadata(&schema_path).await.is_ok() {
-                    tokio::fs::remove_file(schema_path).await?;
+                if args.remove_migrations && tokio::fs::metadata(&migrations_path).await.is_ok() {
+                    tokio::fs::remove_dir_all(migrations_path).await?;
 
-                    println!("generating database migrations...");
-
-                    println!("installing dependencies...");
-                    let status = Command::new(&pnpm_bin)
-                        .arg("install")
-                        .current_dir("database")
-                        .status()
-                        .await?;
-                    if !status.success() {
-                        eprintln!(
-                            "{} {}",
-                            "pnpm install".bright_red(),
-                            "did not run successfully, aborting process".red()
-                        );
-                        return Ok(1);
-                    }
-
-                    let status = Command::new(&pnpm_bin)
-                        .arg("kit:generate")
-                        .current_dir("database")
-                        .status()
-                        .await?;
-                    if !status.success() {
-                        eprintln!(
-                            "{} {}",
-                            "pnpm kit:generate".bright_red(),
-                            "did not run successfully, aborting process".red()
-                        );
-                        return Ok(1);
-                    }
+                    println!("removed database migrations for this extension");
+                    println!(
+                        "this did NOT run any down migrations, it only removed the migration files from the filesystem, use with caution as this can lead to an inconsistent state if the migrations have already been applied to the database"
+                    );
                 }
 
                 println!("sucessfully removed {}", args.package_name.cyan(),);

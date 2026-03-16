@@ -23,8 +23,8 @@ impl shared::extensions::commands::CliCommand<InspectArgs> for InspectCommand {
 
                 let file = tokio::fs::File::open(&args.file).await?.into_std().await;
                 let metadata = tokio::fs::metadata(args.file).await?;
-                let extension_distr = tokio::task::spawn_blocking(move || {
-                    ExtensionDistrFile::parse_from_file(file)
+                let mut extension_distr = tokio::task::spawn_blocking(move || {
+                    ExtensionDistrFile::parse_from_reader(file)
                         .context("failed to parse calagopus extension archive")
                 })
                 .await??;
@@ -148,6 +148,17 @@ impl shared::extensions::commands::CliCommand<InspectArgs> for InspectCommand {
                     }
                 } else {
                     println!("    dependencies (0)");
+                }
+
+                if extension_distr.has_migrations() {
+                    println!("  database migrations:");
+
+                    let migrations =
+                        tokio::task::spawn_blocking(move || extension_distr.get_migrations())
+                            .await??;
+                    for migration in migrations {
+                        println!("    - {}", migration.name.bright_cyan());
+                    }
                 }
 
                 Ok(0)

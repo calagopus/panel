@@ -33,7 +33,7 @@ impl shared::extensions::commands::CliCommand<AddArgs> for AddCommand {
 
                 let file = tokio::fs::File::open(&args.file).await?.into_std().await;
                 let mut extension_distr = tokio::task::spawn_blocking(move || {
-                    ExtensionDistrFile::parse_from_file(file)
+                    ExtensionDistrFile::parse_from_reader(file)
                         .context("failed to parse calagopus extension archive")
                 })
                 .await??;
@@ -162,52 +162,45 @@ impl shared::extensions::commands::CliCommand<AddArgs> for AddCommand {
                 let backend_path = Path::new("backend-extensions")
                     .join(extension_distr.metadata_toml.get_package_identifier());
                 tokio::fs::create_dir_all(&backend_path).await?;
-                let schema_path = Path::new("database/src/schema/extensions")
-                    .join(extension_distr.metadata_toml.get_package_identifier() + ".ts");
+                let migrations_path = Path::new("database/extension-migrations")
+                    .join(extension_distr.metadata_toml.get_package_identifier());
 
                 let mut extension_distr = tokio::task::spawn_blocking(move || {
                     extension_distr.extract_frontend(frontend_path)?;
                     extension_distr.extract_backend(backend_path)?;
 
-                    if let Ok(schema) = extension_distr.get_schema() {
-                        std::fs::write(schema_path, schema)?;
+                    if extension_distr.has_migrations() {
+                        extension_distr.extract_migrations(migrations_path)?;
                     }
 
                     Ok::<_, anyhow::Error>(extension_distr)
                 })
                 .await??;
 
-                if extension_distr.has_schema() {
-                    println!("generating database migrations...");
+                if extension_distr.has_migrations() {
+                    println!("extension has database migrations...");
 
-                    println!("installing dependencies...");
-                    let status = Command::new(&pnpm_bin)
-                        .arg("install")
-                        .current_dir("database")
-                        .status()
-                        .await?;
-                    if !status.success() {
-                        eprintln!(
-                            "{} {}",
-                            "pnpm install".bright_red(),
-                            "did not run successfully, aborting process".red()
-                        );
-                        return Ok(1);
+                    let (migrations, extension_distr_) = tokio::task::spawn_blocking(move || {
+                        (extension_distr.get_migrations(), extension_distr)
+                    })
+                    .await?;
+                    extension_distr = extension_distr_;
+                    let migrations = migrations?;
+
+                    println!("{} migrations found:", migrations.len());
+                    for migration in migrations {
+                        println!("- {}", migration.name.bright_cyan());
                     }
 
-                    let status = Command::new(&pnpm_bin)
-                        .arg("kit:generate")
-                        .current_dir("database")
-                        .status()
-                        .await?;
-                    if !status.success() {
-                        eprintln!(
-                            "{} {}",
-                            "pnpm kit:generate".bright_red(),
-                            "did not run successfully, aborting process".red()
-                        );
-                        return Ok(1);
-                    }
+                    println!();
+                    println!(
+                        "extracted migrations to {}{}",
+                        "database/extension-migrations/".bright_black(),
+                        extension_distr
+                            .metadata_toml
+                            .get_package_identifier()
+                            .bright_black()
+                    );
                 }
 
                 if let Err(err) = tokio::task::spawn_blocking(|| {
