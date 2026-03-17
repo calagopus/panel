@@ -62,6 +62,14 @@
         "export": "Export",
         "exportAs": "Export as {format}"
       },
+      "alert": {
+        "error": "Error",
+        "warning": "Warning",
+        "success": "Success"
+      },
+      "divider": {
+        "or": "OR"
+      },
       "input": {
         "search": "Search..."
       },
@@ -424,7 +432,126 @@
           "button": "Go to Dashboard"
         }
       },
-      "auth": {},
+      "auth": {
+        "button": {
+          "login": "Login",
+          "loginWith": "Login with {name}"
+        },
+        "login": {
+          "alert": {
+            "clockOffset": "Your system clock is out of sync with the server by more than 5 seconds. This may cause issues with passkey authentication and two-factor authentication. Please sync your clock if issues arise. Current offset: {offset} seconds."
+          },
+          "error": {
+            "usernameRequired": "Please enter a username"
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "Your browser does not support passkeys.",
+              "unexpected": "An unexpected error occurred while using your passkey.",
+              "cancelled": "Passkey request was cancelled.",
+              "dismissed": "You dismissed or did not interact with the passkey prompt. The used key could also be not registered.",
+              "invalidState": "This passkey is not available or already registered.",
+              "notSupportedType": "Your browser or device does not support this type of passkey.",
+              "securityError": "Passkeys can only be used over HTTPS and with a valid domain.",
+              "authenticatorError": "Something went wrong with the authenticator.",
+              "constraintError": "The authenticator could not meet the required constraints."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "Login",
+              "subtitle": "Enter your username to continue",
+              "form": {
+                "usernamePlaceholder": "Enter your username"
+              },
+              "link": {
+                "forgotPassword": "Forgot Password",
+                "notRegistered": "Not registered?",
+                "createAccount": "Create account"
+              },
+              "button": {
+                "oauthLogin": "OAuth Login"
+              }
+            },
+            "passkey": {
+              "title": "Authenticate with Passkey",
+              "subtitle": "We found a passkey associated with {username}",
+              "button": {
+                "usePasskey": "Use Passkey",
+                "usePassword": "Use Password"
+              }
+            },
+            "password": {
+              "title": "Enter Password",
+              "subtitle": "Please enter your password for {username}",
+              "form": {
+                "passwordPlaceholder": "Enter your password"
+              },
+              "button": {
+                "signIn": "Sign In",
+                "forgotPassword": "Forgot Password"
+              }
+            },
+            "totp": {
+              "title": "Two-Factor Authentication",
+              "welcomeBack": "Welcome back {username}!",
+              "enterCode": "Enter the 6-digit code from your authenticator app",
+              "button": {
+                "verify": "Verify Code",
+                "useRecoveryCode": "Use Recovery Code",
+                "useTotp": "Use TOTP"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "Enter a recovery code",
+              "form": {
+                "label": "Recovery Code",
+                "placeholder": "Enter a recovery code"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "Register",
+          "subtitle": "Please enter your details to register",
+          "form": {
+            "email": "Email",
+            "firstName": "First Name",
+            "lastName": "Last Name"
+          },
+          "button": {
+            "register": "Register"
+          }
+        },
+        "forgotPassword": {
+          "title": "Forgot Password",
+          "subtitle": "Enter your email to receive instructions on how to reset your password",
+          "form": {
+            "email": "Email"
+          },
+          "button": {
+            "request": "Request Password Reset"
+          },
+          "success": "An email has been sent to you with instructions on how to reset your password."
+        },
+        "resetPassword": {
+          "title": "Reset Password",
+          "subtitle": "Please enter your new password",
+          "form": {
+            "confirmPassword": "Confirm Password"
+          },
+          "button": {
+            "reset": "Reset Password"
+          },
+          "toast": {
+            "success": "Password has been reset."
+          }
+        },
+        "oauth": {
+          "title": "Authenticate with OAuth",
+          "subtitle": "Choose any of the providers below to login"
+        }
+      },
       "account": {
         "home": {
           "title": "Servers",

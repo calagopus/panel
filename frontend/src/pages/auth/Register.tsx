@@ -15,10 +15,12 @@ import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { authRegisterSchema } from '@/lib/schemas/auth.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AuthWrapper from './AuthWrapper.tsx';
 
 export default function Register() {
   const { doLogin } = useAuth();
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,7 @@ export default function Register() {
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
             color='red'
-            title='Error'
+            title={t('common.alert.error', {})}
             onClose={() => setError('')}
             withCloseButton
           >
@@ -70,27 +72,27 @@ export default function Register() {
 
       <Stack className='w-full'>
         <div>
-          <Title order={2}>Register</Title>
-          <Text className='text-neutral-400!'>Please enter your details to register</Text>
+          <Title order={2}>{t('pages.auth.register.title', {})}</Title>
+          <Text className='text-neutral-400!'>{t('pages.auth.register.subtitle', {})}</Text>
         </div>
 
         <Card>
           <Stack>
-            <TextInput placeholder='Username' {...form.getInputProps('username')} />
-            <TextInput placeholder='Email' {...form.getInputProps('email')} />
-            <TextInput placeholder='First Name' {...form.getInputProps('nameFirst')} />
-            <TextInput placeholder='Last Name' {...form.getInputProps('nameLast')} />
-            <PasswordInput placeholder='Password' {...form.getInputProps('password')} />
+            <TextInput placeholder={t('common.form.username', {})} {...form.getInputProps('username')} />
+            <TextInput placeholder={t('pages.auth.register.form.email', {})} {...form.getInputProps('email')} />
+            <TextInput placeholder={t('pages.auth.register.form.firstName', {})} {...form.getInputProps('nameFirst')} />
+            <TextInput placeholder={t('pages.auth.register.form.lastName', {})} {...form.getInputProps('nameLast')} />
+            <PasswordInput placeholder={t('common.form.password', {})} {...form.getInputProps('password')} />
             <Captcha ref={captchaRef} />
 
             <Button onClick={submit} loading={loading} disabled={!form.isValid()} size='md' fullWidth>
-              Register
+              {t('pages.auth.register.button.register', {})}
             </Button>
 
-            <Divider label='OR' labelPosition='center' />
+            <Divider label={t('common.divider.or', {})} labelPosition='center' />
 
             <Button variant='light' onClick={() => navigate('/auth/login')} size='md' fullWidth>
-              Login
+              {t('pages.auth.button.login', {})}
             </Button>
           </Stack>
         </Card>

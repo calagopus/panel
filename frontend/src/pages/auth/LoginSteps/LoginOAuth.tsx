@@ -8,9 +8,11 @@ import getOAuthProviders from '@/api/auth/getOAuthProviders.ts';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AuthWrapper from '../AuthWrapper.tsx';
 
 export default function LoginOAuth() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const [error, setError] = useState('');
@@ -29,7 +31,7 @@ export default function LoginOAuth() {
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
             color='red'
-            title='Error'
+            title={t('common.alert.error', {})}
             onClose={() => setError('')}
             withCloseButton
           >
@@ -38,8 +40,8 @@ export default function LoginOAuth() {
         )}
 
         <div>
-          <Title order={2}>Authenticate with OAuth</Title>
-          <Text className='text-neutral-400!'>Choose any of the providers below to login</Text>
+          <Title order={2}>{t('pages.auth.oauth.title', {})}</Title>
+          <Text className='text-neutral-400!'>{t('pages.auth.oauth.subtitle', {})}</Text>
         </div>
 
         <Card>
@@ -47,15 +49,15 @@ export default function LoginOAuth() {
             {oAuthProviders.map((oAuthProvider) => (
               <a key={oAuthProvider.uuid} href={`/api/auth/oauth/redirect/${oAuthProvider.uuid}`}>
                 <Button leftSection={<FontAwesomeIcon icon={faFingerprint} />} size='md' fullWidth>
-                  Login with {oAuthProvider.name}
+                  {t('pages.auth.button.loginWith', { name: oAuthProvider.name })}
                 </Button>
               </a>
             ))}
 
-            <Divider label='OR' labelPosition='center' />
+            <Divider label={t('common.divider.or', {})} labelPosition='center' />
 
             <Button variant='light' onClick={() => navigate('/auth/login')} size='md' fullWidth>
-              Back
+              {t('common.button.back', {})}
             </Button>
           </Stack>
         </Card>

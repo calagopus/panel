@@ -29,6 +29,12 @@ if (!difFile) {
 
 const isVerbose = process.argv.includes('--verbose');
 
+const extractVariables = (text) => {
+  if (typeof text !== 'string') return new Set();
+  const matches = text.match(/\{[^}]+\}/g) || [];
+  return new Set(matches);
+};
+
 try {
   const translationContent = JSON.parse(await fs.readFile(difFile, 'utf-8'));
   const translationMapping = getTranslationMapping(translationContent);
@@ -41,6 +47,28 @@ try {
       if (isVerbose) {
         console.log('  Expected:', JSON.stringify(baseMapping[key], null, 2));
         console.log('  Found:     <missing>');
+      }
+    } else {
+      const baseVars = extractVariables(baseMapping[key]);
+      const transVars = extractVariables(translationMapping[key]);
+
+      const missingVars = [...baseVars].filter((v) => !transVars.has(v));
+      const extraVars = [...transVars].filter((v) => !baseVars.has(v));
+
+      if (missingVars.length > 0) {
+        console.log(`Missing variable(s) in key '${key}': ${missingVars.join(', ')}`);
+        if (isVerbose) {
+          console.log('  Base string: ', JSON.stringify(baseMapping[key]));
+          console.log('  Diff string: ', JSON.stringify(translationMapping[key]));
+        }
+      }
+
+      if (extraVars.length > 0) {
+        console.log(`Extra variable(s) in key '${key}': ${extraVars.join(', ')}`);
+        if (isVerbose) {
+          console.log('  Base string: ', JSON.stringify(baseMapping[key]));
+          console.log('  Diff string: ', JSON.stringify(translationMapping[key]));
+        }
       }
     }
   }

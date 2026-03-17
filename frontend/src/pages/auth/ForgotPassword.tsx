@@ -12,9 +12,11 @@ import Button from '@/elements/Button.tsx';
 import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { authForgotPasswordSchema } from '@/lib/schemas/auth.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AuthWrapper from './AuthWrapper.tsx';
 
 export default function ForgotPassword() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -37,7 +39,7 @@ export default function ForgotPassword() {
     captchaRef.current?.getToken().then((token) => {
       forgotPassword(form.values, token)
         .then(() => {
-          setSuccess('An email has been sent to you with instructions on how to reset your password.');
+          setSuccess(t('pages.auth.forgotPassword.success', {}));
           setRequested(true);
         })
         .catch((msg) => {
@@ -54,7 +56,7 @@ export default function ForgotPassword() {
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
             color='red'
-            title='Error'
+            title={t('common.alert.error', {})}
             onClose={() => setError('')}
             withCloseButton
           >
@@ -65,7 +67,7 @@ export default function ForgotPassword() {
           <Alert
             icon={<FontAwesomeIcon icon={faInfoCircle} />}
             color='green'
-            title='Success'
+            title={t('common.alert.success', {})}
             onClose={() => setSuccess('')}
             withCloseButton
           >
@@ -76,25 +78,23 @@ export default function ForgotPassword() {
 
       <Stack className='w-full'>
         <div>
-          <Title order={2}>Forgot Password</Title>
-          <Text className='text-neutral-400!'>
-            Enter your email to receive instructions on how to reset your password
-          </Text>
+          <Title order={2}>{t('pages.auth.forgotPassword.title', {})}</Title>
+          <Text className='text-neutral-400!'>{t('pages.auth.forgotPassword.subtitle', {})}</Text>
         </div>
 
         <Card>
           <Stack>
-            <TextInput placeholder='Email' {...form.getInputProps('email')} />
+            <TextInput placeholder={t('pages.auth.forgotPassword.form.email', {})} {...form.getInputProps('email')} />
             <Captcha ref={captchaRef} />
 
             <Button onClick={submit} loading={loading} disabled={requested || !form.isValid()} size='md' fullWidth>
-              Request Password Reset
+              {t('pages.auth.forgotPassword.button.request', {})}
             </Button>
 
-            <Divider label='OR' labelPosition='center' />
+            <Divider label={t('common.divider.or', {})} labelPosition='center' />
 
             <Button variant='light' onClick={() => navigate('/auth/login')} size='md' fullWidth>
-              Login
+              {t('pages.auth.button.login', {})}
             </Button>
           </Stack>
         </Card>

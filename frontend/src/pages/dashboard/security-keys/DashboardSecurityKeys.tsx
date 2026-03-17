@@ -46,11 +46,11 @@ export default function DashboardSecurityKeys() {
           />
           <ConditionalTooltip
             label={t('pages.account.securityKeys.tooltip.secureContextRequired', {})}
-            enabled={!window.isSecureContext}
+            enabled={!window.navigator.credentials}
           >
             <Button
               onClick={() => setOpenModal('create')}
-              disabled={!window.isSecureContext}
+              disabled={!window.navigator.credentials}
               color='blue'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
             >

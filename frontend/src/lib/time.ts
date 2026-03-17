@@ -8,11 +8,8 @@ export function formatMiliseconds(uptime: number) {
   const minutes = Math.floor((uptimeSeconds % 3600) / 60);
   const seconds = Math.floor(uptimeSeconds % 60);
 
-  const showZeroMinutes = days === 0 && hours === 0;
-
   const formatter = new Intl.DurationFormat(getTranslations().language, {
     style: 'narrow',
-    minutesDisplay: showZeroMinutes ? 'always' : 'auto',
     secondsDisplay: 'always',
   });
 

@@ -22,6 +22,7 @@ import { authPasswordSchema, authTotpSchema, authUsernameSchema } from '@/lib/sc
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
 import { userSchema } from '@/lib/schemas/user.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import AuthWrapper from './AuthWrapper.tsx';
 
@@ -33,6 +34,7 @@ interface TwoFactorInformation {
 export default function Login() {
   const { doLogin } = useAuth();
   const { settings } = useGlobalStore();
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -77,7 +79,7 @@ export default function Login() {
 
   const doSubmitUsername = () => {
     if (!usernameForm.values.username) {
-      setError('Please enter a username');
+      setError(t('pages.auth.login.error.usernameRequired', {}));
       return;
     }
 
@@ -108,7 +110,7 @@ export default function Login() {
     setLoading(true);
 
     if (!window.navigator.credentials) {
-      setError('Your browser does not support passkeys.');
+      setError(t('pages.auth.login.passkey.error.notSupported', {}));
       return;
     }
 
@@ -124,30 +126,29 @@ export default function Login() {
           });
       })
       .catch((err: DOMException) => {
-        let message = 'An unexpected error occurred while using your passkey.';
+        let message = t('pages.auth.login.passkey.error.unexpected', {});
 
         switch (err.name) {
           case 'AbortError':
-            message = 'Passkey request was cancelled.';
+            message = t('pages.auth.login.passkey.error.cancelled', {});
             break;
           case 'NotAllowedError':
-            message =
-              'You dismissed or did not interact with the passkey prompt. The used key could also be not registered.';
+            message = t('pages.auth.login.passkey.error.dismissed', {});
             break;
           case 'InvalidStateError':
-            message = 'This passkey is not available or already registered.';
+            message = t('pages.auth.login.passkey.error.invalidState', {});
             break;
           case 'NotSupportedError':
-            message = 'Your browser or device does not support this type of passkey.';
+            message = t('pages.auth.login.passkey.error.notSupportedType', {});
             break;
           case 'SecurityError':
-            message = 'Passkeys can only be used over HTTPS and with a valid domain.';
+            message = t('pages.auth.login.passkey.error.securityError', {});
             break;
           case 'UnknownError':
-            message = 'Something went wrong with the authenticator.';
+            message = t('pages.auth.login.passkey.error.authenticatorError', {});
             break;
           case 'ConstraintError':
-            message = 'The authenticator could not meet the required constraints.';
+            message = t('pages.auth.login.passkey.error.constraintError', {});
             break;
           default:
             message = `${err.name}: ${err.message}`;
@@ -207,17 +208,19 @@ export default function Login() {
     <AuthWrapper>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
         {(timeOffset > 5000 || timeOffset < -5000) && (
-          <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow' title='Warning'>
-            Your system clock is out of sync with the server by more than 5 seconds. This may cause issues with passkey
-            authentication and two-factor authentication. Please sync your clock if issues arise. Current offset:{' '}
-            {Math.round(timeOffset / 1000)} seconds.
+          <Alert
+            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            color='yellow'
+            title={t('common.alert.warning', {})}
+          >
+            {t('pages.auth.login.alert.clockOffset', { offset: String(Math.round(timeOffset / 1000)) })}
           </Alert>
         )}
         {error && (
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
             color='red'
-            title='Error'
+            title={t('common.alert.error', {})}
             onClose={() => setError('')}
             withCloseButton
           >
@@ -230,15 +233,15 @@ export default function Login() {
         {step === 'username' ? (
           <>
             <div>
-              <Title order={2}>Login</Title>
-              <Text className='text-neutral-400!'>Enter your username to continue</Text>
+              <Title order={2}>{t('pages.auth.login.step.username.title', {})}</Title>
+              <Text className='text-neutral-400!'>{t('pages.auth.login.step.username.subtitle', {})}</Text>
             </div>
             <Card>
               <Stack>
                 <div className='flex flex-col gap-1'>
                   <TextInput
-                    label='Username'
-                    placeholder='Enter your username'
+                    label={t('common.form.username', {})}
+                    placeholder={t('pages.auth.login.step.username.form.usernamePlaceholder', {})}
                     autoComplete='username'
                     onKeyDown={(e) => e.key === 'Enter' && doSubmitUsername()}
                     leftSection={<FontAwesomeIcon icon={faUser} />}
@@ -247,7 +250,7 @@ export default function Login() {
                     {...usernameForm.getInputProps('username')}
                   />
                   <NavLink className='text-neutral-400' to='/auth/forgot-password'>
-                    Forgot Password
+                    {t('pages.auth.login.step.username.link.forgotPassword', {})}
                   </NavLink>
                 </div>
                 <Button
@@ -257,10 +260,10 @@ export default function Login() {
                   size='md'
                   fullWidth
                 >
-                  Continue
+                  {t('common.button.continue', {})}
                 </Button>
                 <Divider
-                  label='OR'
+                  label={t('common.divider.or', {})}
                   labelPosition='center'
                   hidden={oAuthProviders.length === 0 && !settings.app.registrationEnabled}
                 />
@@ -272,7 +275,7 @@ export default function Login() {
                     size='md'
                     fullWidth
                   >
-                    OAuth Login
+                    {t('pages.auth.login.step.username.button.oauthLogin', {})}
                   </Button>
                 ) : (
                   oAuthProviders.length > 0 && (
@@ -280,7 +283,7 @@ export default function Login() {
                       {oAuthProviders.map((oAuthProvider) => (
                         <a key={oAuthProvider.uuid} href={`/api/auth/oauth/redirect/${oAuthProvider.uuid}`}>
                           <Button leftSection={<FontAwesomeIcon icon={faFingerprint} />} size='md' fullWidth>
-                            Login with {oAuthProvider.name}
+                            {t('pages.auth.button.loginWith', { name: oAuthProvider.name })}
                           </Button>
                         </a>
                       ))}
@@ -289,7 +292,8 @@ export default function Login() {
                 )}
                 {settings.app.registrationEnabled && (
                   <NavLink to='/auth/register' className='text-neutral-400 flex gap-1 items-center'>
-                    Not registered? <p>Create account</p>
+                    {t('pages.auth.login.step.username.link.notRegistered', {})}{' '}
+                    <p>{t('pages.auth.login.step.username.link.createAccount', {})}</p>
                   </NavLink>
                 )}
               </Stack>
@@ -298,9 +302,9 @@ export default function Login() {
         ) : step === 'passkey' ? (
           <>
             <div>
-              <Title order={2}>Authenticate with Passkey</Title>
+              <Title order={2}>{t('pages.auth.login.step.passkey.title', {})}</Title>
               <Text className='text-neutral-400!'>
-                We found a passkey associated with <strong>{usernameForm.values.username}</strong>
+                {t('pages.auth.login.step.passkey.subtitle', { username: usernameForm.values.username })}
               </Text>
             </div>
             <Card>
@@ -312,11 +316,11 @@ export default function Login() {
                   size='md'
                   fullWidth
                 >
-                  Use Passkey
+                  {t('pages.auth.login.step.passkey.button.usePasskey', {})}
                 </Button>
-                <Divider label='OR' labelPosition='center' />
+                <Divider label={t('common.divider.or', {})} labelPosition='center' />
                 <Button variant='light' onClick={() => setStep('password')} size='md' fullWidth>
-                  Use Password
+                  {t('pages.auth.login.step.passkey.button.usePassword', {})}
                 </Button>
               </Stack>
             </Card>
@@ -324,16 +328,16 @@ export default function Login() {
         ) : step === 'password' ? (
           <>
             <div>
-              <Title order={2}>Enter Password</Title>
+              <Title order={2}>{t('pages.auth.login.step.password.title', {})}</Title>
               <Text className='text-neutral-400!'>
-                Please enter your password for <strong>{usernameForm.values.username}</strong>
+                {t('pages.auth.login.step.password.subtitle', { username: usernameForm.values.username })}
               </Text>
             </div>
             <Card>
               <Stack>
                 <PasswordInput
-                  label='Password'
-                  placeholder='Enter your password'
+                  label={t('common.form.password', {})}
+                  placeholder={t('pages.auth.login.step.password.form.passwordPlaceholder', {})}
                   autoComplete='current-password'
                   onKeyDown={(e) => e.key === 'Enter' && doSubmitPassword()}
                   size='md'
@@ -348,18 +352,18 @@ export default function Login() {
                   size='md'
                   fullWidth
                 >
-                  Sign In
+                  {t('pages.auth.login.step.password.button.signIn', {})}
                 </Button>
-                <Divider label='OR' labelPosition='center' />
+                <Divider label={t('common.divider.or', {})} labelPosition='center' />
                 <Button variant='light' onClick={() => navigate('/auth/forgot-password')} size='md' fullWidth>
-                  Forgot Password
+                  {t('pages.auth.login.step.password.button.forgotPassword', {})}
                 </Button>
               </Stack>
             </Card>
           </>
         ) : step === 'totp' ? (
           <>
-            <Title order={2}>Two-Factor Authentication</Title>
+            <Title order={2}>{t('pages.auth.login.step.totp.title', {})}</Title>
             <Card>
               <Stack>
                 <div className='flex items-center gap-2'>
@@ -369,10 +373,12 @@ export default function Login() {
                     className='size-14 rounded-full'
                   />
                   <span className='text-neutral-400'>
-                    Welcome back <span className='text-white'>{twoFactorInformation?.user.username}</span>!
+                    {t('pages.auth.login.step.totp.welcomeBack', {
+                      username: twoFactorInformation?.user.username ?? '',
+                    })}
                   </span>
                 </div>
-                <Text className=' text-neutral-400!'>Enter the 6-digit code from your authenticator app</Text>
+                <Text className=' text-neutral-400!'>{t('pages.auth.login.step.totp.enterCode', {})}</Text>
                 <Center>
                   <PinInput
                     length={6}
@@ -385,9 +391,9 @@ export default function Login() {
                   />
                 </Center>
                 <Button onClick={doSubmitTotp} loading={loading} disabled={!totpForm.isValid()} size='md' fullWidth>
-                  Verify Code
+                  {t('pages.auth.login.step.totp.button.verify', {})}
                 </Button>
-                <Divider label='OR' labelPosition='center' />
+                <Divider label={t('common.divider.or', {})} labelPosition='center' />
                 <Button
                   variant='light'
                   onClick={() => {
@@ -397,7 +403,7 @@ export default function Login() {
                   size='md'
                   fullWidth
                 >
-                  Use Recovery Code
+                  {t('pages.auth.login.step.totp.button.useRecoveryCode', {})}
                 </Button>
               </Stack>
             </Card>
@@ -405,23 +411,23 @@ export default function Login() {
         ) : step === 'totp-recovery' ? (
           <>
             <div>
-              <Title order={2}>Two-Factor Authentication</Title>
-              <Text className='text-neutral-400!'>Enter a recovery code</Text>
+              <Title order={2}>{t('pages.auth.login.step.totp.title', {})}</Title>
+              <Text className='text-neutral-400!'>{t('pages.auth.login.step.totpRecovery.subtitle', {})}</Text>
             </div>
             <Card>
               <Stack>
                 <TextInput
-                  label='Recovery Code'
-                  placeholder='Enter a recovery code'
+                  label={t('pages.auth.login.step.totpRecovery.form.label', {})}
+                  placeholder={t('pages.auth.login.step.totpRecovery.form.placeholder', {})}
                   onKeyDown={(e) => e.key === 'Enter' && doSubmitTotp()}
                   size='md'
                   autoFocus
                   {...totpForm.getInputProps('code')}
                 />
                 <Button onClick={doSubmitTotp} loading={loading} disabled={!totpForm.isValid()} size='md' fullWidth>
-                  Verify Code
+                  {t('pages.auth.login.step.totp.button.verify', {})}
                 </Button>
-                <Divider label='OR' labelPosition='center' />
+                <Divider label={t('common.divider.or', {})} labelPosition='center' />
                 <Button
                   variant='light'
                   onClick={() => {
@@ -431,7 +437,7 @@ export default function Login() {
                   size='md'
                   fullWidth
                 >
-                  Use TOTP
+                  {t('pages.auth.login.step.totp.button.useTotp', {})}
                 </Button>
               </Stack>
             </Card>

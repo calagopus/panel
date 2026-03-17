@@ -62,8 +62,21 @@
         "export": "Exportieren",
         "exportAs": "Als {format} exportieren"
       },
+      "alert": {
+        "error": "Fehler",
+        "warning": "Warnung",
+        "success": "Erfolg"
+      },
+      "divider": {
+        "or": "ODER"
+      },
       "input": {
         "search": "Suchen..."
+      },
+      "tooltip": {
+        "resetToDefault": "Auf Standard zurücksetzen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
       },
       "form": {
         "name": "Name",
@@ -92,6 +105,14 @@
           "when": "Wann",
           "command": "Befehl"
         }
+      },
+      "badge": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "successful": "Erfolgreich",
+        "failed": "Fehlgeschlagen"
       },
       "server": {
         "noAllocation": "Keine Allocation",
@@ -139,27 +160,14 @@
       "unlimited": "Unendlich",
       "readOnly": "Schreibgeschützt",
       "na": "N/V",
+      "never": "Nie",
       "yes": "Ja",
       "no": "Nein",
       "web": "Web",
       "api": "API",
       "system": "System",
       "schedule": "Zeitplan",
-      "impersonatedBy": "Impersoniert von {username}",
-      "tooltip": {
-        "resetToDefault": "Auf Standard zurücksetzen",
-        "edit": "Bearbeiten",
-        "delete": "Löschen"
-      },
-      "badge": {
-        "active": "Aktiv",
-        "inactive": "Inaktiv",
-        "enabled": "Aktiviert",
-        "disabled": "Deaktiviert",
-        "successful": "Erfolgreich",
-        "failed": "Fehlgeschlagen"
-      },
-      "never": "Nie"
+      "impersonatedBy": "Impersoniert von {username}"
     },
     "elements": {
       "errorBoundary": {
@@ -176,6 +184,14 @@
           "failed": "Kopieren in die Zwischenablage fehlgeschlagen.",
           "copyManual": "In die Zwischenablage kopieren: Strg+C oder Cmd+C, Eingabe"
         }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "Schätze Fertigstellungszeit...",
+          "estimated": "Geschätzte Fertigstellungszeit: {time}"
+        },
+        "calculating": "ETA: Wird berechnet...",
+        "calculated": "ETA: {time}"
       },
       "container": {
         "alert": {
@@ -246,6 +262,43 @@
         },
         "banner": {
           "retrying": "Erneuter Versuch in {countdown}..."
+        },
+        "listener": {
+          "toast": {
+            "backupCompleted": "Backup erfolgreich abgeschlossen.",
+            "backupFailed": "Backup fehlgeschlagen.",
+            "backupRestoreCompleted": "Backup-Wiederherstellung erfolgreich abgeschlossen.",
+            "installCompleted": "Server-Installation erfolgreich abgeschlossen.",
+            "installFailed": "Server-Installation fehlgeschlagen.",
+            "operations": {
+              "compressing": {
+                "completed": "{files} nach `{path}` komprimiert in {time}.",
+                "failed": "Komprimierung von {files} nach `{path}` fehlgeschlagen:\n{error}"
+              },
+              "decompressing": {
+                "completed": "`{path}` nach `{destination}` entpackt in {time}.",
+                "failed": "Entpacken von `{path}` nach `{destination}` fehlgeschlagen:\n{error}"
+              },
+              "pulling": {
+                "completed": "`{destination}` heruntergeladen in {time}.",
+                "failed": "Herunterladen von `{destination}` fehlgeschlagen:\n{error}"
+              },
+              "copying": {
+                "completed": "`{path}` nach `{destination}` kopiert in {time}.",
+                "failed": "Kopieren von `{path}` nach `{destination}` fehlgeschlagen:\n{error}"
+              },
+              "copyingMany": {
+                "completed": "{files} kopiert in {time}.",
+                "failed": "Kopieren von {files} fehlgeschlagen:\n{error}"
+              },
+              "copyingRemote": {
+                "completedFrom": "{files} vom Remote-Server kopiert in {time}.",
+                "completedTo": "{files} zum Remote-Server kopiert in {time}.",
+                "failedFrom": "Kopieren von {files} vom Remote-Server fehlgeschlagen:\n{error}",
+                "failedTo": "Kopieren von {files} zum Remote-Server fehlgeschlagen:\n{error}"
+              }
+            }
+          }
         }
       }
     },
@@ -379,7 +432,126 @@
           "button": "Zum Dashboard"
         }
       },
-      "auth": {},
+      "auth": {
+        "button": {
+          "login": "Anmelden",
+          "loginWith": "Anmelden mit {name}"
+        },
+        "login": {
+          "alert": {
+            "clockOffset": "Deine Systemuhr weicht um mehr als 5 Sekunden vom Server ab. Dies kann Probleme mit der Passkey-Authentifizierung und der Zwei-Faktor-Authentifizierung verursachen. Bitte synchronisiere deine Uhr, falls Probleme auftreten. Aktuelle Abweichung: {offset} Sekunden."
+          },
+          "error": {
+            "usernameRequired": "Bitte gib einen Benutzernamen ein"
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "Dein Browser unterstützt keine Passkeys.",
+              "unexpected": "Beim Verwenden deines Passkeys ist ein unerwarteter Fehler aufgetreten.",
+              "cancelled": "Passkey-Anfrage wurde abgebrochen.",
+              "dismissed": "Du hast die Passkey-Aufforderung geschlossen oder nicht interagiert. Der verwendete Schlüssel könnte auch nicht registriert sein.",
+              "invalidState": "Dieser Passkey ist nicht verfügbar oder bereits registriert.",
+              "notSupportedType": "Dein Browser oder Gerät unterstützt diesen Passkey-Typ nicht.",
+              "securityError": "Passkeys können nur über HTTPS und mit einer gültigen Domain verwendet werden.",
+              "authenticatorError": "Mit dem Authenticator ist etwas schiefgelaufen.",
+              "constraintError": "Der Authenticator konnte die erforderlichen Bedingungen nicht erfüllen."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "Anmelden",
+              "subtitle": "Gib deinen Benutzernamen ein, um fortzufahren",
+              "form": {
+                "usernamePlaceholder": "Gib deinen Benutzernamen ein"
+              },
+              "link": {
+                "forgotPassword": "Passwort vergessen",
+                "notRegistered": "Noch nicht registriert?",
+                "createAccount": "Account erstellen"
+              },
+              "button": {
+                "oauthLogin": "OAuth-Anmeldung"
+              }
+            },
+            "passkey": {
+              "title": "Mit Passkey authentifizieren",
+              "subtitle": "Wir haben einen Passkey für {username} gefunden",
+              "button": {
+                "usePasskey": "Passkey verwenden",
+                "usePassword": "Passwort verwenden"
+              }
+            },
+            "password": {
+              "title": "Passwort eingeben",
+              "subtitle": "Bitte gib dein Passwort für {username} ein",
+              "form": {
+                "passwordPlaceholder": "Gib dein Passwort ein"
+              },
+              "button": {
+                "signIn": "Anmelden",
+                "forgotPassword": "Passwort vergessen"
+              }
+            },
+            "totp": {
+              "title": "Zwei-Faktor-Authentifizierung",
+              "welcomeBack": "Willkommen zurück, {username}!",
+              "enterCode": "Gib den 6-stelligen Code aus deiner Authenticator-App ein",
+              "button": {
+                "verify": "Code überprüfen",
+                "useRecoveryCode": "Wiederherstellungscode verwenden",
+                "useTotp": "TOTP verwenden"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "Gib einen Wiederherstellungscode ein",
+              "form": {
+                "label": "Wiederherstellungscode",
+                "placeholder": "Gib einen Wiederherstellungscode ein"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "Registrieren",
+          "subtitle": "Bitte gib deine Daten ein, um dich zu registrieren",
+          "form": {
+            "email": "E-Mail",
+            "firstName": "Vorname",
+            "lastName": "Nachname"
+          },
+          "button": {
+            "register": "Registrieren"
+          }
+        },
+        "forgotPassword": {
+          "title": "Passwort vergessen",
+          "subtitle": "Gib deine E-Mail-Adresse ein, um Anweisungen zum Zurücksetzen deines Passworts zu erhalten",
+          "form": {
+            "email": "E-Mail"
+          },
+          "button": {
+            "request": "Passwort-Zurücksetzung anfordern"
+          },
+          "success": "Eine E-Mail mit Anweisungen zum Zurücksetzen deines Passworts wurde an dich gesendet."
+        },
+        "resetPassword": {
+          "title": "Passwort zurücksetzen",
+          "subtitle": "Bitte gib dein neues Passwort ein",
+          "form": {
+            "confirmPassword": "Passwort bestätigen"
+          },
+          "button": {
+            "reset": "Passwort zurücksetzen"
+          },
+          "toast": {
+            "success": "Passwort wurde zurückgesetzt."
+          }
+        },
+        "oauth": {
+          "title": "Mit OAuth authentifizieren",
+          "subtitle": "Wähle einen der unten stehenden Anbieter, um dich anzumelden"
+        }
+      },
       "account": {
         "home": {
           "title": "Servers",
@@ -552,6 +724,14 @@
         },
         "securityKeys": {
           "title": "Sicherheitsschlüssel",
+          "table": {
+            "columns": {
+              "credentialId": "Credential-ID"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "Ein sicherer Kontext (HTTPS) ist erforderlich, um Sicherheitsschlüssel zu verwenden."
+          },
           "modal": {
             "createSecurityKey": {
               "title": "Sicherheitsschlüssel erstellen",
@@ -573,14 +753,6 @@
                 "deleted": "Sicherheitsschlüssel erfolgreich gelöscht."
               }
             }
-          },
-          "table": {
-            "columns": {
-              "credentialId": "Credential-ID"
-            }
-          },
-          "tooltip": {
-            "secureContextRequired": "Ein sicherer Kontext (HTTPS) ist erforderlich, um Sicherheitsschlüssel zu verwenden."
           }
         },
         "sessions": {
@@ -688,6 +860,39 @@
             }
           }
         },
+        "commandSnippets": {
+          "title": "Befehlskürzel",
+          "table": {
+            "columns": {
+              "eggs": "Eggs"
+            }
+          },
+          "form": {
+            "eggs": "Eggs",
+            "command": "Befehl"
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "Befehlskürzel erstellen",
+              "toast": {
+                "created": "Befehlskürzel erstellt."
+              }
+            },
+            "editCommandSnippet": {
+              "title": "Befehlskürzel bearbeiten",
+              "toast": {
+                "updated": "Befehlskürzel aktualisiert."
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "Löschen des Befehlskürzels bestätigen",
+              "content": "Bist du sicher, dass du **{name}** von deinem Account löschen möchtest?",
+              "toast": {
+                "removed": "Befehlskürzel entfernt."
+              }
+            }
+          }
+        },
         "oauthLinks": {
           "title": "OAuth-Verknüpfungen",
           "button": {
@@ -753,39 +958,6 @@
         },
         "activity": {
           "title": "Aktivität"
-        },
-        "commandSnippets": {
-          "title": "Befehlskürzel",
-          "table": {
-            "columns": {
-              "eggs": "Eggs"
-            }
-          },
-          "form": {
-            "eggs": "Eggs",
-            "command": "Befehl"
-          },
-          "modal": {
-            "createCommandSnippet": {
-              "title": "Befehlskürzel erstellen",
-              "toast": {
-                "created": "Befehlskürzel erstellt."
-              }
-            },
-            "editCommandSnippet": {
-              "title": "Befehlskürzel bearbeiten",
-              "toast": {
-                "updated": "Befehlskürzel aktualisiert."
-              }
-            },
-            "deleteCommandSnippet": {
-              "title": "Löschen des Befehlskürzels bestätigen",
-              "content": "Bist du sicher, dass du **{name}** von deinem Account löschen möchtest?",
-              "toast": {
-                "removed": "Befehlskürzel entfernt."
-              }
-            }
-          }
         }
       },
       "admin": {},
@@ -802,28 +974,43 @@
           "toast": {
             "installCancelled": "Server-Installation abgebrochen."
           },
+          "modal": {
+            "sshDetails": {
+              "title": "SSH-Details",
+              "form": {
+                "protocol": "Protokoll",
+                "port": "Port",
+                "host": "Host",
+                "username": "Benutzername",
+                "password": "Passwort",
+                "yourPassword": "Dein Control Panel Passwort",
+                "command": "SSH-Befehl"
+              },
+              "launch": "Starten"
+            }
+          },
           "notification": {
-            "restoringBackup": "Dein Server stellt gerade ein Backup wieder her. Bitte warten...",
-            "installing": "Dein Server wird gerade installiert. Bitte warten...",
             "nodeMaintenance": "Dein Server befindet sich auf einer Node, die derzeit gewartet wird.",
-            "transferring": "Dein Server wird derzeit auf eine andere Node übertragen."
+            "transferring": "Dein Server wird derzeit auf eine andere Node übertragen.",
+            "restoringBackup": "Dein Server stellt gerade ein Backup wieder her. Bitte warten...",
+            "installing": "Dein Server wird gerade installiert. Bitte warten..."
           },
           "message": {
             "serverMarkedAs": "Server markiert als {state}...",
+            "installFailed": "Installation ist fehlgeschlagen.",
+            "installCompleted": "Installation wurde erfolgreich abgeschlossen.",
             "transferFailed": "Übertragung fehlgeschlagen.",
             "pullingImage": "Dein Server lädt gerade sein Docker-Image herunter. Bitte warten...",
             "pulling": "Wird heruntergeladen",
             "extracting": "Wird entpackt",
-            "layer": "Layer",
-            "installFailed": "Installation ist fehlgeschlagen.",
-            "installCompleted": "Installation wurde erfolgreich abgeschlossen."
+            "layer": "Layer"
           },
           "tooltip": {
             "search": "Suchen",
+            "sshDetails": "SSH-Details",
             "commandHistory": "Befehlsverlauf",
             "decreaseFontSize": "Schriftgröße verringern",
-            "increaseFontSize": "Schriftgröße erhöhen",
-            "sshDetails": "SSH-Details"
+            "increaseFontSize": "Schriftgröße erhöhen"
           },
           "drawer": {
             "commandHistory": {
@@ -879,22 +1066,7 @@
             "outbound": "Ausgehend"
           },
           "socketConnected": "Verbunden ({ping}ms ping)",
-          "socketDisconnected": "Getrennt",
-          "modal": {
-            "sshDetails": {
-              "title": "SSH-Details",
-              "form": {
-                "protocol": "Protokoll",
-                "port": "Port",
-                "host": "Host",
-                "username": "Benutzername",
-                "password": "Passwort",
-                "yourPassword": "Dein Control Panel Passwort",
-                "command": "SSH-Befehl"
-              },
-              "launch": "Starten"
-            }
-          }
+          "socketDisconnected": "Getrennt"
         },
         "files": {
           "title": "Dateien",
@@ -910,12 +1082,15 @@
             "new": "Neu",
             "sftpDetails": "SFTP-Details",
             "openInNewWindow": "In neuem Fenster öffnen",
+            "details": "Details",
             "rename": "Umbenennen",
             "copy": "Kopieren",
             "move": "Verschieben",
+            "fingerprint": "Fingerabdruck",
             "permissions": "Berechtigungen",
             "unarchive": "Entpacken",
             "archive": "Archivieren",
+            "more": "Mehr",
             "remoteCopy": "Remote-Kopie",
             "search": "Suchen",
             "exitBackup": "Backup verlassen",
@@ -923,8 +1098,7 @@
             "directory": "Verzeichnis",
             "fileFromPull": "Datei aus Pull",
             "fileFromUpload": "Datei aus Upload",
-            "directoryFromUpload": "Verzeichnis aus Upload",
-            "details": "Details"
+            "directoryFromUpload": "Verzeichnis aus Upload"
           },
           "actionBar": {
             "copyHere": "Kopiere {files} hierhin",
@@ -945,18 +1119,22 @@
             "uploading": "Wird hochgeladen: ",
             "compressing": "Komprimiere {files} von {path}",
             "decompressing": "Entpacke {path}",
-            "pulling": "Lade {path} herunter",
+            "pulling": "Lade {destination} herunter",
             "copying": "Kopiere {path} nach {destination}",
             "copyingMany": "Kopiere {files}",
             "receivingRemote": "Empfange {files} vom Remote-Server",
             "sendingRemote": "Sende {files} an Remote-Server"
           },
+          "dropzone": {
+            "title": "Dateien hier ablegen, um sie hochzuladen",
+            "subtitle": "Loslassen, um den Upload zu starten"
+          },
           "settings": {
             "clickOnce": "Klicke einmal auf eine Datei oder ein Verzeichnis, um es zu öffnen",
+            "preferPhysicalSize": "Physische Größe statt logischer Größe anzeigen",
             "editorMinimap": "Datei Minimap",
             "editorLineOverflow": "Zeilenumbruch für lange Zeilen im Editor",
-            "imageViewerSmoothing": "Bildglättung (Anti-Aliasing)",
-            "preferPhysicalSize": "Physische Größe statt logischer Größe anzeigen"
+            "imageViewerSmoothing": "Bildglättung (Anti-Aliasing)"
           },
           "toast": {
             "operationCancelled": "Vorgang abgebrochen",
@@ -1019,6 +1197,16 @@
               },
               "createdAs": "Diese Dateien werden auf dem Remote-Server erstellt unter "
             },
+            "fileFingerprints": {
+              "title": "Datei-Fingerabdruck",
+              "form": {
+                "algorithm": "Algorithmus",
+                "fingerprint": "Fingerabdruck"
+              },
+              "button": {
+                "calculate": "Fingerabdruck berechnen"
+              }
+            },
             "deleteFile": {
               "title": "Datei löschen",
               "singleFileWarning": "Du wirst den Inhalt von {file} nach dem Löschen nicht mehr wiederherstellen können.",
@@ -1029,6 +1217,16 @@
               "form": {
                 "fileName": "Dateiname"
               }
+            },
+            "details": {
+              "title": "Dateidetails",
+              "path": "Pfad",
+              "mode": "Modus",
+              "logicalSize": "Logische Größe",
+              "physicalSize": "Physische Größe",
+              "mimeType": "MIME-Typ",
+              "lastModifiedAt": "Zuletzt geändert am",
+              "createdAt": "Erstellt am"
             },
             "filePermissions": {
               "title": "Dateiberechtigungen",
@@ -1086,21 +1284,7 @@
                 "yourPassword": "Dein Control Panel Passwort"
               },
               "launch": "Starten"
-            },
-            "details": {
-              "title": "Dateidetails",
-              "path": "Pfad",
-              "mode": "Modus",
-              "logicalSize": "Logische Größe",
-              "physicalSize": "Physische Größe",
-              "mimeType": "MIME-Typ",
-              "lastModifiedAt": "Zuletzt geändert am",
-              "createdAt": "Erstellt am"
             }
-          },
-          "dropzone": {
-            "title": "Dateien hier ablegen, um sie hochzuladen",
-            "subtitle": "Loslassen, um den Upload zu starten"
           }
         },
         "databases": {
@@ -1307,8 +1491,44 @@
             "variablesUpdated": "Variablen aktualisiert."
           }
         },
+        "mounts": {
+          "title": "Mounts",
+          "table": {
+            "columns": {
+              "target": "Ziel",
+              "mounted": "Eingebunden",
+              "readOnly": "Schreibgeschützt"
+            }
+          },
+          "modal": {
+            "attachMount": {
+              "title": "Mount einbinden",
+              "content": "Möchtest du **{name}** in `{target}` einbinden?",
+              "confirm": "Einbinden",
+              "toast": {
+                "attached": "{name} wurde in deinen Server eingebunden."
+              }
+            },
+            "detachMount": {
+              "title": "Mount trennen",
+              "content": "Möchtest du **{name}** von `{target}` trennen?",
+              "confirm": "Trennen",
+              "toast": {
+                "detached": "{name} wurde von deinem Server getrennt."
+              }
+            }
+          }
+        },
         "settings": {
           "title": "Einstellungen",
+          "debugInformation": {
+            "title": "Debug-Informationen",
+            "form": {
+              "nodeName": "Node (UUID)",
+              "locationName": "Standort (UUID)",
+              "serverUuid": "Server UUID"
+            }
+          },
           "rename": {
             "title": "Server umbenennen",
             "form": {
@@ -1358,46 +1578,10 @@
                 "reinstalling": "Server wird neu installiert..."
               }
             }
-          },
-          "debugInformation": {
-            "title": "Debug-Informationen",
-            "form": {
-              "nodeName": "Node (UUID)",
-              "locationName": "Standort (UUID)",
-              "serverUuid": "Server UUID"
-            }
           }
         },
         "activity": {
           "title": "Aktivität"
-        },
-        "mounts": {
-          "title": "Mounts",
-          "table": {
-            "columns": {
-              "target": "Ziel",
-              "mounted": "Eingebunden",
-              "readOnly": "Schreibgeschützt"
-            }
-          },
-          "modal": {
-            "attachMount": {
-              "title": "Mount einbinden",
-              "content": "Möchtest du **{name}** in `{target}` einbinden?",
-              "confirm": "Einbinden",
-              "toast": {
-                "attached": "{name} wurde in deinen Server eingebunden."
-              }
-            },
-            "detachMount": {
-              "title": "Mount trennen",
-              "content": "Möchtest du **{name}** von `{target}` trennen?",
-              "confirm": "Trennen",
-              "toast": {
-                "detached": "{name} wurde von deinem Server getrennt."
-              }
-            }
-          }
         }
       }
     }

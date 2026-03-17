@@ -13,10 +13,12 @@ import Card from '@/elements/Card.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import { authResetPasswordSchema } from '@/lib/schemas/auth.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AuthWrapper from './AuthWrapper.tsx';
 
 export default function ResetPassword() {
   const { addToast } = useToast();
+  const { t } = useTranslations();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -44,7 +46,7 @@ export default function ResetPassword() {
 
     resetPassword(token!, form.values)
       .then(() => {
-        addToast('Password has been reset.', 'success');
+        addToast(t('pages.auth.resetPassword.toast.success', {}), 'success');
         navigate('/auth/login');
       })
       .catch((msg) => {
@@ -60,7 +62,7 @@ export default function ResetPassword() {
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
             color='red'
-            title='Error'
+            title={t('common.alert.error', {})}
             onClose={() => setError('')}
             withCloseButton
           >
@@ -71,16 +73,19 @@ export default function ResetPassword() {
 
       <Stack className='w-full'>
         <div>
-          <Title order={2}>Reset Password</Title>
-          <Text className='text-neutral-400!'>Please enter your new password</Text>
+          <Title order={2}>{t('pages.auth.resetPassword.title', {})}</Title>
+          <Text className='text-neutral-400!'>{t('pages.auth.resetPassword.subtitle', {})}</Text>
         </div>
         <Card>
           <Stack>
-            <PasswordInput placeholder='Password' {...form.getInputProps('password')} />
-            <PasswordInput placeholder='Confirm Password' {...form.getInputProps('confirmPassword')} />
+            <PasswordInput placeholder={t('common.form.password', {})} {...form.getInputProps('password')} />
+            <PasswordInput
+              placeholder={t('pages.auth.resetPassword.form.confirmPassword', {})}
+              {...form.getInputProps('confirmPassword')}
+            />
 
             <Button onClick={submit} loading={loading} disabled={!token || !form.isValid()} size='md' fullWidth>
-              Reset Password
+              {t('pages.auth.resetPassword.button.reset', {})}
             </Button>
           </Stack>
         </Card>
