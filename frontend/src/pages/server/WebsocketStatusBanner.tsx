@@ -10,6 +10,7 @@ import { useServerStore } from '@/stores/server.ts';
 export default function WebsocketStatusBanner() {
   const { t } = useTranslations();
   const socketError = useServerStore((state) => state.socketError);
+  const serverIsTransferring = useServerStore((state) => state.server.isTransferring);
   const [countdown, setCountdown] = useState<number | null>(null);
 
   useEffect(() => {
@@ -42,8 +43,13 @@ export default function WebsocketStatusBanner() {
 
   const getMessage = () => {
     switch (socketError.type) {
-      case SocketErrorType.AUTH_FAILED:
       case SocketErrorType.PERMISSION_DENIED:
+        if (serverIsTransferring) {
+          return null;
+        }
+        return socketError.message;
+
+      case SocketErrorType.AUTH_FAILED:
       case SocketErrorType.DAEMON_ERROR:
         return socketError.message;
 
@@ -67,13 +73,19 @@ export default function WebsocketStatusBanner() {
     }
   };
 
+  const message = getMessage();
+
+  if (!message) {
+    return null;
+  }
+
   return (
     <Alert
       icon={<FontAwesomeIcon icon={isRecoverable ? faExclamationTriangle : faTimesCircle} />}
       color={isRecoverable ? 'yellow' : 'red'}
       className='mt-2 mx-2 mb-4'
     >
-      {getMessage()}
+      {message}
     </Alert>
   );
 }

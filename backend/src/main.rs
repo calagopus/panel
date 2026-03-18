@@ -44,15 +44,10 @@ async fn handle_request(
     req.extensions_mut().insert(ip);
 
     tracing::info!(
-        "http {} {}{}",
+        path = req.uri().path(),
+        query = req.uri().query().unwrap_or_default(),
+        "http {}",
         req.method().to_string().to_lowercase(),
-        req.uri().path().cyan(),
-        if let Some(query) = req.uri().query() {
-            format!("?{query}")
-        } else {
-            "".to_string()
-        }
-        .bright_cyan()
     );
 
     Ok(shared::response::APP_DEBUG
@@ -220,11 +215,8 @@ async fn main() {
             tracing::info!(" | .__/ \\__,_|_| |_|\\___|_|____");
             tracing::info!(" | |                  | '__/ __|");
             tracing::info!(" |_|                  | |  \\__ \\");
-            tracing::info!(
-                "{: >21} |_|  |___/",
-                format!("{} (git-{})", shared::VERSION, shared::GIT_COMMIT)
-            );
-            tracing::info!("github.com/calagopus/panel\n");
+            tracing::info!("{: >21} |_|  |___/", shared::VERSION);
+            tracing::info!("github.com/calagopus/panel#{}\n", shared::GIT_COMMIT);
         }
     }
 
@@ -952,15 +944,10 @@ async fn main() {
     };
 
     tracing::info!(
-        "{} listening on {} {}",
-        "http server".bright_red(),
-        state.env.bind.cyan(),
-        format!(
-            "(app@{}, {}ms)",
-            shared::VERSION,
-            state.start_time.elapsed().as_millis()
-        )
-        .bright_black()
+        "http server listening on {} (app@{}, {}ms)",
+        state.env.bind,
+        shared::VERSION,
+        state.start_time.elapsed().as_millis()
     );
 
     let http_server = async {

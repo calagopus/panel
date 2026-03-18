@@ -1,6 +1,5 @@
 use crate::{env::RedisMode, response::ApiResponse};
 use axum::http::StatusCode;
-use colored::Colorize;
 use compact_str::ToCompactString;
 use rustis::{
     client::Client,
@@ -137,15 +136,10 @@ impl Cache {
             .unwrap_or_else(|_| "unknown".into());
 
         tracing::info!(
-            "{} connected {}",
-            "cache".bright_yellow(),
-            format!(
-                "(redis@{}, {}ms, moka_enabled={})",
-                version,
-                start.elapsed().as_millis(),
-                env.app_use_internal_cache
-            )
-            .bright_black()
+            "cache connected (redis@{}, {}ms, moka_enabled={})",
+            version,
+            start.elapsed().as_millis(),
+            env.app_use_internal_cache
         );
 
         instance
@@ -205,7 +199,6 @@ impl Cache {
                 .with_status(StatusCode::TOO_MANY_REQUESTS));
             }
         } else {
-            // Memory Fallback
             let mut current_count = 0;
             let mut expire_unix = now as u64 + limit_window;
 

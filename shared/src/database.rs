@@ -1,4 +1,3 @@
-use colored::Colorize;
 use sqlx::postgres::PgPoolOptions;
 use std::{collections::HashMap, fmt::Display, pin::Pin, sync::Arc};
 use tokio::sync::Mutex;
@@ -65,14 +64,9 @@ impl Database {
             .unwrap_or_else(|_| "unknown".into());
 
         tracing::info!(
-            "{} connected {}",
-            "database".bright_cyan(),
-            format!(
-                "(postgres@{}, {}ms)",
-                version.bright_black(),
-                start.elapsed().as_millis()
-            )
-            .bright_black()
+            "database connected (postgres@{}, {}ms)",
+            version,
+            start.elapsed().as_millis()
         );
 
         tokio::spawn({
@@ -84,15 +78,11 @@ impl Database {
 
                     let mut actions = batch_actions.lock().await;
                     for (key, action) in actions.drain() {
-                        tracing::debug!(
-                            "executing batch action for {}:{}",
-                            key.0.bright_cyan(),
-                            key.1
-                        );
+                        tracing::debug!("executing batch action for {}:{}", key.0, key.1);
                         if let Err(err) = action.await {
                             tracing::error!(
                                 "error executing batch action for {}:{} - {:?}",
-                                key.0.bright_cyan(),
+                                key.0,
                                 key.1,
                                 err
                             );
@@ -109,15 +99,11 @@ impl Database {
     pub async fn flush_batch_actions(&self) {
         let mut actions = self.batch_actions.lock().await;
         for (key, action) in actions.drain() {
-            tracing::debug!(
-                "executing batch action for {}:{}",
-                key.0.bright_cyan(),
-                key.1
-            );
+            tracing::debug!("executing batch action for {}:{}", key.0, key.1);
             if let Err(err) = action.await {
                 tracing::error!(
                     "error executing batch action for {}:{} - {:?}",
-                    key.0.bright_cyan(),
+                    key.0,
                     key.1,
                     err
                 );

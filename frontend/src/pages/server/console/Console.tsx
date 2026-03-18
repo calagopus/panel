@@ -34,6 +34,7 @@ import SshDetailsModal from './modals/SshDetailsModal.tsx';
 
 import '@xterm/xterm/css/xterm.css';
 import './xterm.css';
+import getServer from '@/api/server/getServer.ts';
 import Autocomplete from '@/elements/input/Autocomplete.tsx';
 
 const RAW_PRELUDE = '\u001b[1m\u001b[33mcontainer@calagopus~ \u001b[0m';
@@ -52,7 +53,8 @@ const commandSnippetFilter: OptionsFilter = ({ options, search }) => {
 
 export default function Terminal() {
   const { t } = useTranslations();
-  const { server, commandSnippets, imagePulls, socketConnected, socketInstance, state } = useServerStore();
+  const { server, updateServer, commandSnippets, imagePulls, socketConnected, socketInstance, state } =
+    useServerStore();
 
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -274,7 +276,7 @@ export default function Terminal() {
   useEffect(() => {
     if (!socketConnected || !socketInstance || !xtermInstance.current) return;
 
-    xtermInstance.current.clear();
+    xtermInstance.current.reset();
     setIsAtBottom(true);
     isFirstLine.current = true;
 
@@ -304,6 +306,14 @@ export default function Terminal() {
       [SocketEvent.TRANSFER_LOGS]: (l) => addLine(l),
       [SocketEvent.TRANSFER_STATUS]: (s) => {
         if (s === 'failure') addLine(t('pages.server.console.message.transferFailed', {}), true);
+        else if (s === 'completed') {
+          addLine(t('pages.server.console.message.transferCompleted', {}), true);
+          setTimeout(() => {
+            getServer(server.uuid).then(updateServer);
+          }, 5000);
+        } else {
+          updateServer({ isTransferring: true });
+        }
       },
       [SocketEvent.DAEMON_MESSAGE]: (l) => addLine(l, true),
       [SocketEvent.DAEMON_ERROR]: (l) => addLine(`\u001b[1m\u001b[41m${l}\u001b[0m`, true),

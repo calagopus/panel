@@ -11,6 +11,7 @@ const MAX_TOKEN_REFRESH_FAILURES = 3;
 
 export default function WebsocketHandler() {
   const uuid = useServerStore((state) => state.server.uuid);
+  const isTransferring = useServerStore((state) => state.server.isTransferring);
   const { t } = useTranslations();
   const { setSocketInstance, setSocketConnectionState, setSocketError, setState } = useServerStore();
   const { addToast } = useToast();
@@ -173,7 +174,7 @@ export default function WebsocketHandler() {
       updatingTokenRef.current = false;
       tokenRefreshFailuresRef.current = 0;
     };
-  }, [uuid]);
+  }, [uuid, isTransferring]);
 
   useEffect(() => {
     if (!uuid || socketRef.current) {
@@ -181,7 +182,7 @@ export default function WebsocketHandler() {
     }
 
     connect(uuid);
-  }, [uuid]);
+  }, [uuid, isTransferring]);
 
   return null;
 }

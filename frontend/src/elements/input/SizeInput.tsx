@@ -64,7 +64,7 @@ export default function SizeInput({ mode, min, value, onChange, ...rest }: SizeI
 
   const handleValueChange = (v: ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(v.target.value, 10);
-    if (isNaN(newValue)) return;
+    if (Number.isNaN(newValue)) return;
 
     setDisplayValue(newValue);
 
@@ -85,7 +85,7 @@ export default function SizeInput({ mode, min, value, onChange, ...rest }: SizeI
       min={min}
       value={displayValue}
       onChange={handleValueChange}
-      rightSectionWidth={92}
+      rightSectionWidth={72}
       rightSection={
         <Select
           data={availableUnits}
@@ -96,9 +96,8 @@ export default function SizeInput({ mode, min, value, onChange, ...rest }: SizeI
               fontWeight: 500,
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
-              width: 92,
+              width: 72,
               marginRight: -2,
-              marginTop: -5,
             },
           }}
           rightSectionWidth={28}

@@ -996,6 +996,7 @@ const baseTranslations = defineTranslations({
             installFailed: 'Installation has failed.',
             installCompleted: 'Installation has completed successfully.',
             transferFailed: 'Transfer has failed.',
+            transferCompleted: 'Transfer has completed successfully. Reconnecting to server...',
             pullingImage: "Your Server is currently pulling it's docker image. Please wait...",
             pulling: 'Pulling',
             extracting: 'Extracting',
