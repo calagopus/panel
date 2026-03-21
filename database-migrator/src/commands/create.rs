@@ -102,6 +102,18 @@ impl shared::extensions::commands::CliCommand<CreateArgs> for CreateCommand {
                 )
                 .await?;
 
+                println!(
+                    "{} {} {}",
+                    "created new migration".green(),
+                    migration_name.bright_blue(),
+                    "successfully.".green()
+                );
+                println!(
+                    "{} {}",
+                    "view the new migration at".green(),
+                    format!("database/extension-migrations/{}/", migration_name).bright_blue()
+                );
+
                 Ok(0)
             })
         })

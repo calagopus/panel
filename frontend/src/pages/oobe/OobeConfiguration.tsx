@@ -65,6 +65,7 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
       twoFactorRequirement: 'none',
       telemetryEnabled: form.values.applicationTelemetry,
       registrationEnabled: form.values.applicationRegistration,
+      languageChangeEnabled: true,
     })
       .then(() => {
         setLanguage(form.values.applicationLanguage);

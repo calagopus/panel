@@ -930,6 +930,11 @@ pub struct UpdateUserOptions {
     pub password: Option<Option<compact_str::CompactString>>,
 
     #[garde(skip)]
+    pub toast_position: Option<UserToastPosition>,
+    #[garde(skip)]
+    pub start_on_grouped_servers: Option<bool>,
+
+    #[garde(skip)]
     pub admin: Option<bool>,
 
     #[garde(
@@ -994,6 +999,8 @@ impl UpdatableModel for User {
             .set("name_last", options.name_last.as_ref())
             .set("admin", options.admin)
             .set("language", options.language.as_ref())
+            .set("toast_position", options.toast_position.as_ref())
+            .set("start_on_grouped_servers", options.start_on_grouped_servers)
             .where_eq("uuid", self.uuid);
 
         query_builder.execute(&mut *transaction).await?;
@@ -1015,6 +1022,12 @@ impl UpdatableModel for User {
         }
         if let Some(name_last) = options.name_last {
             self.name_last = name_last;
+        }
+        if let Some(toast_position) = options.toast_position {
+            self.toast_position = toast_position;
+        }
+        if let Some(start_on_grouped_servers) = options.start_on_grouped_servers {
+            self.start_on_grouped_servers = start_on_grouped_servers;
         }
         if let Some(admin) = options.admin {
             self.admin = admin;

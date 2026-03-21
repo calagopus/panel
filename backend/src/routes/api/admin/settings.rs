@@ -61,6 +61,8 @@ mod put {
         telemetry_enabled: Option<bool>,
         #[garde(skip)]
         registration_enabled: Option<bool>,
+        #[garde(skip)]
+        language_change_enabled: Option<bool>,
     }
 
     #[derive(ToSchema, Validate, Deserialize)]
@@ -194,6 +196,9 @@ mod put {
             }
             if let Some(registration_enabled) = app.registration_enabled {
                 settings.app.registration_enabled = registration_enabled;
+            }
+            if let Some(language_change_enabled) = app.language_change_enabled {
+                settings.app.language_change_enabled = language_change_enabled;
             }
         }
         if let Some(webauthn) = data.webauthn {

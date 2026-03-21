@@ -43,6 +43,7 @@ export default function ApplicationContainer() {
       twoFactorRequirement: 'none',
       telemetryEnabled: true,
       registrationEnabled: true,
+      languageChangeEnabled: true,
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(adminSettingsApplicationSchema),
@@ -194,6 +195,13 @@ export default function ApplicationContainer() {
               }}
             />
           </Group>
+
+          <Switch
+            label='Allow Users to Change Language'
+            name='languageChangeEnabled'
+            key={form.key('languageChangeEnabled')}
+            {...form.getInputProps('languageChangeEnabled', { type: 'checkbox' })}
+          />
         </Stack>
 
         <Group mt='md'>

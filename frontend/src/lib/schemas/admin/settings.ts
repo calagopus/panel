@@ -10,6 +10,7 @@ export const adminSettingsApplicationSchema = z.object({
   twoFactorRequirement: z.enum(['admins', 'all_users', 'none']),
   telemetryEnabled: z.boolean(),
   registrationEnabled: z.boolean(),
+  languageChangeEnabled: z.boolean(),
 });
 
 export const adminSettingsCaptchaProviderNoneSchema = z.object({

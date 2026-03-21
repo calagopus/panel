@@ -48,7 +48,8 @@ mod patch {
     use shared::{
         ApiError, GetState,
         models::{
-            user::{GetUser, UserToastPosition},
+            UpdatableModel,
+            user::{GetUser, UpdateUserOptions, UserToastPosition},
             user_activity::GetUserActivityLogger,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -90,7 +91,7 @@ mod patch {
         state: GetState,
         mut user: GetUser,
         activity_logger: GetUserActivityLogger,
-        shared::Payload(data): shared::Payload<Payload>,
+        shared::Payload(mut data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         if let Err(errors) = shared::utils::validate_data(&data) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
@@ -98,38 +99,22 @@ mod patch {
                 .ok();
         }
 
-        if let Some(username) = data.username {
-            user.username = username;
-        }
-        if let Some(name_first) = data.name_first {
-            user.name_first = name_first;
-        }
-        if let Some(name_last) = data.name_last {
-            user.name_last = name_last;
-        }
-        if let Some(language) = data.language {
-            user.language = language;
-        }
-        if let Some(toast_position) = data.toast_position {
-            user.toast_position = toast_position;
-        }
-        if let Some(start_on_grouped_servers) = data.start_on_grouped_servers {
-            user.start_on_grouped_servers = start_on_grouped_servers;
+        if !state.settings.get().await?.app.language_change_enabled {
+            data.language = None;
         }
 
-        sqlx::query!(
-            "UPDATE users
-            SET username = $2, name_first = $3, name_last = $4, language = $5, toast_position = $6, start_on_grouped_servers = $7
-            WHERE users.uuid = $1",
-            user.uuid,
-            &user.username,
-            &user.name_first,
-            &user.name_last,
-            &user.language,
-            user.toast_position as UserToastPosition,
-            user.start_on_grouped_servers,
+        user.update(
+            &state,
+            UpdateUserOptions {
+                username: data.username,
+                name_first: data.name_first,
+                name_last: data.name_last,
+                language: data.language,
+                toast_position: data.toast_position,
+                start_on_grouped_servers: data.start_on_grouped_servers,
+                ..Default::default()
+            },
         )
-        .execute(state.database.write())
         .await?;
 
         activity_logger

@@ -24,7 +24,7 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
-  const { languages } = useGlobalStore();
+  const { languages, settings } = useGlobalStore();
 
   const [loading, setLoading] = useState(false);
 
@@ -104,16 +104,18 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
               autoComplete='username'
               {...form.getInputProps('username')}
             />
-            <Select
-              withAsterisk
-              label={t('pages.account.account.containers.account.form.language', {})}
-              placeholder={t('pages.account.account.containers.account.form.language', {})}
-              data={languages.map((language) => ({
-                label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
-                value: language,
-              }))}
-              {...form.getInputProps('language')}
-            />
+            {settings.app.languageChangeEnabled && (
+              <Select
+                withAsterisk
+                label={t('pages.account.account.containers.account.form.language', {})}
+                placeholder={t('pages.account.account.containers.account.form.language', {})}
+                data={languages.map((language) => ({
+                  label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
+                  value: language,
+                }))}
+                {...form.getInputProps('language')}
+              />
+            )}
           </Group>
           <Group grow>
             <Select

@@ -16,6 +16,7 @@ mod get {
         name: &'a str,
         language: &'a str,
         registration_enabled: bool,
+        language_change_enabled: bool,
         debug: bool,
     }
 
@@ -60,6 +61,7 @@ mod get {
                 name: &settings.app.name,
                 language: &settings.app.language,
                 registration_enabled: settings.app.registration_enabled,
+                language_change_enabled: settings.app.language_change_enabled,
                 debug: state.env.is_debug(),
             },
             server: ResponseServer {
