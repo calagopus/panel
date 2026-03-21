@@ -24,6 +24,7 @@ export function formatDateTime(timestamp: string | number | Date, precise?: bool
     hour: 'numeric',
     minute: 'numeric',
     second: precise ? 'numeric' : undefined,
+    timeZoneName: 'short',
   });
 }
 
