@@ -1,16 +1,24 @@
-FROM node:24-alpine AS node_source
+FROM node:24-bookworm-slim AS node_source
 
 # ---
-FROM rust:alpine AS planner
-RUN apk add --no-cache build-base && cargo install cargo-chef
+FROM rust:bookworm AS planner
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
+RUN cargo install cargo-chef
 COPY . /app/repo
 WORKDIR /app/repo
 RUN cargo chef prepare --recipe-path recipe.json
 
 # ---
-FROM rust:alpine AS builder
+FROM rust:bookworm AS builder
 
-RUN apk add --no-cache libstdc++ inotify-tools git perl build-base mold clang
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    inotify-tools \
+    git \
+    perl \
+    build-essential \
+    mold \
+    clang \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=node_source /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node_source /usr/local/bin/node /usr/local/bin/node
@@ -24,7 +32,7 @@ WORKDIR /app/repo
 
 COPY --from=planner /app/repo/recipe.json recipe.json
 RUN mkdir -p .cargo && \
-    printf '[target."x86_64-unknown-linux-musl"]\nlinker = "clang"\nrustflags = ["-C", "link-arg=-fuse-ld=mold"]\n' > .cargo/config.toml
+    printf '[target."x86_64-unknown-linux-gnu"]\nlinker = "clang"\nrustflags = ["-C", "link-arg=-fuse-ld=mold"]\n' > .cargo/config.toml
 RUN cargo chef cook --profile heavy-release --recipe-path recipe.json
 
 COPY . /app/repo
@@ -32,9 +40,10 @@ RUN cd frontend && pnpm install --frozen-lockfile && pnpm build:ci
 RUN cargo build --profile heavy-release
 
 COPY entrypoint.heavy.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENV OCI_CONTAINER=official-heavy
 ENV CARGO_BUILD_PROFILE=balanced
 ENV CARGO_TARGET_PROFILE=heavy-release
 
-ENTRYPOINT ["/bin/ash", "/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

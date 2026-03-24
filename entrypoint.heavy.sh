@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 
 REPO_DIR="/app/repo"
 cd "$REPO_DIR" || exit 1
@@ -31,7 +31,7 @@ fi
 PROFILE=${CARGO_BUILD_PROFILE:-balanced}
 PROFILE_PATH=${CARGO_TARGET_PROFILE:-heavy-release}
 
-cp -R /app/translations/* /app/repo/frontend/public/translations/
+cp -R /app/translations/* /app/repo/frontend/public/translations/ 2>/dev/null || true
 
 # calculate the combined sha256 hash of all arguments' contents
 hash_many() {
@@ -54,7 +54,7 @@ start_panel() {
 	if [ -n "$PANEL_PID" ]; then
 		echo "Stopping existing panel-rs with PID: $PANEL_PID"
 		kill "$PANEL_PID"
-		wait "$PANEL_PID"
+		wait "$PANEL_PID" 2>/dev/null
 		PANEL_PID=""
 	fi
 
@@ -67,18 +67,33 @@ PANEL_VERSION=$(/app/repo/target/$PROFILE_PATH/panel-rs version)
 PANEL_VERSION=$(echo $PANEL_VERSION | awk '{print $2}')
 
 execute_build() {
+	local EXT_HASH=$(hash_many /app/extensions/*.c7s.zip)
+	local BINARY_PATH="/app/binaries/$PANEL_VERSION/$EXT_HASH/panel-rs"
+
+	# Check if another process is building
 	if [ -f "$EXTENSION_BUILD_LOCK" ]; then
-		echo "Extension build already in progress. spin looping."
+		echo "Extension build already in progress. Waiting..."
 		while [ -f "$EXTENSION_BUILD_LOCK" ]; do
 			sleep 1
 		done
-		echo "Extension build completed by another process."
+		
+		# If the lock is gone, check if the binary we need was just built
+		if [ -f "$BINARY_PATH" ]; then
+			echo "Extension build completed by another process."
+			start_panel "$BINARY_PATH"
+			return 0
+		fi
+	fi
+
+	# Idempotency check: Don't rebuild if nothing changed
+	if [ -f "$BINARY_PATH" ]; then
+		echo "Binary for current extensions already exists. Skipping redundant build."
+		# Ensure the panel is actually running on this binary
+		start_panel "$BINARY_PATH"
+		return 0
 	fi
 
 	touch "$EXTENSION_BUILD_LOCK"
-
-	local EXT_HASH=$(hash_many /app/extensions/*.c7s.zip)
-	BINARY_PATH="/app/binaries/$PANEL_VERSION/$EXT_HASH/panel-rs"
 
 	echo "Building new binary with current extensions..."
 
@@ -90,6 +105,8 @@ execute_build() {
 
 	# loop over all extension files
 	for ext_file in /app/extensions/*.c7s.zip; do
+		# Ignore if no files match the glob
+		[ -e "$ext_file" ] || continue
 		echo "Adding extension: $ext_file"
 		/app/repo/target/$PROFILE_PATH/panel-rs extensions add "$ext_file" --skip-version-check >> "$EXTENSION_LOG" 2>&1
 	done
@@ -103,7 +120,7 @@ execute_build() {
 
 	local EXIT_CODE=$?
 
-	cp -R /app/repo/frontend/public/translations/* /app/translations/
+	cp -R /app/repo/frontend/public/translations/* /app/translations/ 2>/dev/null || true
 
 	# check status of extensions apply
 	if [ $EXIT_CODE -eq 0 ]; then
@@ -115,6 +132,10 @@ execute_build() {
 		# copy new binary to binaries directory
 		cp "/app/repo/target/$PROFILE_PATH/panel-rs" "$BINARY_PATH"
 
+		# Storage optimization: clean up old extension hashes for this panel version
+		echo "Cleaning up outdated binaries to reclaim storage space..."
+		find "/app/binaries/$PANEL_VERSION" -mindepth 1 -maxdepth 1 -type d ! -name "$EXT_HASH" -exec rm -rf {} +
+
 		# restart panel with new binary
 		echo "Restarting panel-rs with new binary."
 		start_panel "$BINARY_PATH"
@@ -123,14 +144,13 @@ execute_build() {
 		echo $EXIT_CODE > /tmp/extension_build.exitcode
 	fi
 
-	rm "$EXTENSION_BUILD_LOCK"
+	rm -f "$EXTENSION_BUILD_LOCK"
 }
 
-# get combined hash of all extension files
+# Initial boot
 EXT_HASH=$(hash_many /app/extensions/*.c7s.zip)
-
-# check if binary with this hash exists
 BINARY_PATH="/app/binaries/$PANEL_VERSION/$EXT_HASH/panel-rs"
+
 if [ -f "$BINARY_PATH" ]; then
 	echo "Found existing binary for current extensions."
 	start_panel "$BINARY_PATH"
@@ -139,7 +159,7 @@ else
 	start_panel "/app/repo/target/$PROFILE_PATH/panel-rs"
 
 	# execute build if extensions directory is not empty
-	if [ "$(ls -A /app/extensions)" ]; then
+	if [ -n "$(ls -A /app/extensions/*.c7s.zip 2>/dev/null)" ]; then
 		execute_build
 	else
 		echo "No extensions found in /app/extensions. Skipping build."
@@ -147,7 +167,7 @@ else
 fi
 
 # watch for changes in /tmp/rebuild_trigger
-inotifywait -m -e create,modify /tmp/rebuild_trigger | while read -r directory events filename; do
+inotifywait -m -e close_write,attrib /tmp/rebuild_trigger | while read -r directory events filename; do
 	echo "Rebuild trigger detected: $events on $filename"
 	execute_build
 done
