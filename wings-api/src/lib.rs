@@ -102,7 +102,7 @@ nestify::nest! {
         #[serde(default = "true_fn")]
         pub editable: bool,
         #[schema(inline)]
-        #[schema(default)]
+        #[serde(default)]
         pub inner_editable: bool,
         #[schema(inline)]
         pub directory: bool,
