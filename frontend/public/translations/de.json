@@ -231,7 +231,10 @@
       "sidebar": {
         "button": {
           "logout": "Abmelden",
-          "stopImpersonating": "Impersonierung beenden"
+          "stopImpersonating": "Impersonierung beenden",
+          "openInVirtualWindow": "In virtuellem Fenster öffnen",
+          "openInPopup": "In Popup öffnen",
+          "openInNewTab": "In neuem Tab öffnen"
         }
       },
       "permissionSelector": {
@@ -343,6 +346,13 @@
             }
           }
         }
+      },
+      "fileUpload": {
+        "toast": {
+          "uploading": "Hochladen von {files} gestartet...",
+          "cancelledFile": "Upload von `{file}` erfolgreich abgebrochen.",
+          "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen."
+        }
       }
     },
     "pages": {
@@ -442,6 +452,17 @@
             "create": "Erstellen & Weiter"
           }
         },
+        "nodeConfiguration": {
+          "title": "Node-Konfiguration",
+          "error": {
+            "noNodes": "Etwas ist schiefgelaufen. Es wurden keine Nodes gefunden.",
+            "connectionError": "Etwas ist schiefgelaufen. Verbindungsfehler."
+          },
+          "successMessage": "Die Verbindung zu deiner Node wurde erfolgreich verifiziert. Du kannst nun fortfahren.",
+          "button": {
+            "continue": "Weiter"
+          }
+        },
         "configuration": {
           "title": "Anwendungseinstellungen",
           "form": {
@@ -481,6 +502,25 @@
             "submit": "Importieren"
           }
         },
+        "server": {
+          "title": "Server",
+          "egg": {
+            "title": "Egg",
+            "description": "Lass uns deinen ersten Server zum Laufen bringen. Welches Egg möchtest du verwenden?",
+            "nestDescription": "Um dieses Egg zu verwenden, musst du ein Nest erstellen. Nester sind Sammlungen von Eggs. Gib ihm einen Namen:"
+          },
+          "server": {
+            "title": "Server",
+            "nestDescription": "Um dieses Egg zu verwenden, musst du ein Nest erstellen. Nester sind Sammlungen von Eggs. Gib ihm einen Namen:"
+          },
+          "error": {
+            "noNodes": "Etwas ist schiefgelaufen. Es wurden keine Nodes gefunden."
+          },
+          "button": {
+            "submit": "Importieren",
+            "create": "Erstellen & Weiter"
+          }
+        },
         "finished": {
           "title": "Einrichtung abgeschlossen!",
           "subtitle": "Dein Calagopus-Panel ist einsatzbereit",
@@ -491,8 +531,13 @@
               "title": "System-Konfiguration",
               "subtitle": "Paneleinstellungen und Präferenzen konfiguriert"
             },
+            "eggRepositories": {
+              "title": "Egg-Repositories",
+              "subtitle": "{count} Repositories"
+            },
             "location": "Standort",
-            "node": "Node"
+            "node": "Node",
+            "server": "Server"
           },
           "badge": {
             "skipped": "Übersprungen"
