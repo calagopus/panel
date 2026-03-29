@@ -1225,7 +1225,7 @@
             "max": "Макс.:"
           },
           "operations": {
-            "uploadingFolder": "Загрузка папки: {folder} ({current}/{total} файлов)",
+            "uploadingFolder": "Загрузка папки: {folder} ({files})",
             "waiting": "Ожидание: ",
             "uploading": "Загрузка: ",
             "compressing": "Сжатие {files} из {path}",
