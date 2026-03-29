@@ -1,0 +1,2135 @@
+{
+  "items": {
+    "byte": {
+      "zero": "{count} байт",
+      "one": "{count} байт",
+      "two": "{count} байта",
+      "few": "{count} байта",
+      "many": "{count} байт",
+      "other": "{count} байт"
+    },
+    "user": {
+      "zero": "{count} пользователей",
+      "one": "{count} пользователь",
+      "two": "{count} пользователя",
+      "few": "{count} пользователя",
+      "many": "{count} пользователей",
+      "other": "{count} пользователей"
+    },
+    "file": {
+      "zero": "{count} файлов",
+      "one": "{count} файл",
+      "two": "{count} файла",
+      "few": "{count} файла",
+      "many": "{count} файлов",
+      "other": "{count} файлов"
+    },
+    "server": {
+      "zero": "{count} серверов",
+      "one": "{count} сервер",
+      "two": "{count} сервера",
+      "few": "{count} сервера",
+      "many": "{count} серверов",
+      "other": "{count} серверов"
+    },
+    "sshKey": {
+      "zero": "{count} SSH-ключей",
+      "one": "{count} SSH-ключ",
+      "two": "{count} SSH-ключа",
+      "few": "{count} SSH-ключа",
+      "many": "{count} SSH-ключей",
+      "other": "{count} SSH-ключей"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "Создать",
+        "add": "Добавить",
+        "save": "Сохранить",
+        "saveAndStay": "Сохранить и остаться",
+        "edit": "Редактировать",
+        "delete": "Удалить",
+        "remove": "Убрать",
+        "enable": "Включить",
+        "disable": "Отключить",
+        "update": "Обновить",
+        "close": "Закрыть",
+        "cancel": "Отмена",
+        "continue": "Продолжить",
+        "skip": "Пропустить",
+        "okay": "Ок",
+        "back": "Назад",
+        "next": "Далее",
+        "install": "Установить",
+        "selectAll": "Выбрать все",
+        "deselectAll": "Снять выделение",
+        "restore": "Восстановить",
+        "download": "Скачать",
+        "downloadAs": "Скачать как {format}",
+        "export": "Экспорт",
+        "exportAs": "Экспорт как {format}"
+      },
+      "alert": {
+        "error": "Ошибка",
+        "warning": "Предупреждение",
+        "success": "Успешно",
+        "clockOffset": "Системные часы рассинхронизированы с сервером более чем на 5 секунд. Это может вызвать проблемы с аутентификацией по ключам доступа и двухфакторной аутентификацией. Пожалуйста, синхронизируйте часы при возникновении проблем. Текущее смещение: {offset} секунд(ы)."
+      },
+      "divider": {
+        "or": "ИЛИ"
+      },
+      "input": {
+        "search": "Поиск..."
+      },
+      "tooltip": {
+        "resetToDefault": "Сбросить по умолчанию",
+        "edit": "Редактировать",
+        "delete": "Удалить"
+      },
+      "form": {
+        "name": "Имя",
+        "description": "Описание",
+        "password": "Пароль",
+        "host": "Хост",
+        "username": "Имя пользователя",
+        "server": "Сервер",
+        "truncateDirectory": "Вы хотите удалить все файлы этого сервера перед выполнением этого действия? Это действие необратимо."
+      },
+      "table": {
+        "pagination": {
+          "results": "Показано с {start} по {end} из {total} результатов.",
+          "empty": "Ничего не найдено, как будто они прячутся."
+        },
+        "columns": {
+          "name": "Имя",
+          "description": "Описание",
+          "username": "Имя пользователя",
+          "size": "Размер",
+          "lastUsed": "Последнее использование",
+          "created": "Создано",
+          "actor": "Инициатор",
+          "event": "Событие",
+          "ip": "IP",
+          "when": "Когда",
+          "command": "Команда"
+        }
+      },
+      "badge": {
+        "active": "Активен",
+        "inactive": "Неактивен",
+        "enabled": "Включено",
+        "disabled": "Отключено",
+        "successful": "Успешно",
+        "failed": "Ошибка"
+      },
+      "server": {
+        "noAllocation": "Нет выделения",
+        "state": {
+          "suspended": "Приостановлен",
+          "transferring": "Сервер переносится",
+          "nodeMaintenance": "Узел на обслуживании",
+          "restoringBackup": "Восстановление резервной копии",
+          "installing": "Установка",
+          "installFailed": "Ошибка установки"
+        }
+      },
+      "enum": {
+        "userToastPosition": {
+          "topLeft": "Сверху слева",
+          "topCenter": "Сверху по центру",
+          "topRight": "Сверху справа",
+          "bottomLeft": "Снизу слева",
+          "bottomCenter": "Снизу по центру",
+          "bottomRight": "Снизу справа"
+        },
+        "serverState": {
+          "unknown": "Неизвестно",
+          "offline": "Выключен",
+          "running": "Работает",
+          "starting": "Запускается",
+          "stopping": "Останавливается"
+        },
+        "connectionStatus": {
+          "connected": "Подключён",
+          "offline": "Не в сети"
+        },
+        "serverAutoStartBehavior": {
+          "always": "Всегда",
+          "unlessStopped": "Если не остановлен",
+          "never": "Никогда"
+        },
+        "bulkActionServerAction": {
+          "started": "Запущен",
+          "stopped": "Остановлен",
+          "restarted": "Перезапущен",
+          "killed": "Принудительно остановлен"
+        },
+        "serverPowerAction": {
+          "start": "Запуск",
+          "stop": "Остановка",
+          "restart": "Перезапуск",
+          "kill": "Принудительная остановка"
+        },
+        "serverBackupStatus": {
+          "starting": "Запускается",
+          "finished": "Завершено",
+          "failed": "Ошибка"
+        }
+      },
+      "unit": {
+        "bytes": {
+          "bytes": "Б",
+          "kibibytes": "КиБ",
+          "mebibytes": "МиБ",
+          "gibibytes": "ГиБ",
+          "tebibytes": "ТиБ",
+          "pebibytes": "ПиБ"
+        }
+      },
+      "unlimited": "Безлимитно",
+      "readOnly": "Только чтение",
+      "na": "Н/Д",
+      "never": "Никогда",
+      "yes": "Да",
+      "no": "Нет",
+      "web": "Веб",
+      "api": "API",
+      "system": "Система",
+      "schedule": "Расписание",
+      "impersonatedBy": "Имитация от имени {username}"
+    },
+    "elements": {
+      "errorBoundary": {
+        "message": "При отображении этой страницы произошла ошибка. Попробуйте обновить страницу.",
+        "hideDetails": "Скрыть подробности",
+        "showDetails": "Показать подробности",
+        "errorMessage": "Сообщение об ошибке:",
+        "stackTrace": "Стек вызовов:",
+        "componentStack": "Стек компонентов:"
+      },
+      "selectInput": {
+        "noResults": "Результаты не найдены."
+      },
+      "scheduleDynamicInput": {
+        "enterVariable": "Пожалуйста, введите имя переменной для вычисления.",
+        "enterData": "Пожалуйста, введите данные для отправки.",
+        "inputType": "Тип ввода",
+        "dataType": "Тип данных для отправки",
+        "selectType": "Выбрать тип",
+        "none": "Нет",
+        "rawString": "Строка",
+        "variable": "Переменная"
+      },
+      "copyOnClick": {
+        "toast": {
+          "copied": "Скопировано в буфер обмена.",
+          "failed": "Не удалось скопировать в буфер обмена.",
+          "copyManual": "Скопировать в буфер обмена: Ctrl+C или Command+C, Enter"
+        }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "Расчёт времени завершения...",
+          "estimated": "Расчётное время завершения: {time}"
+        },
+        "calculating": "Осталось: Расчёт...",
+        "calculated": "Осталось: {time}"
+      },
+      "container": {
+        "alert": {
+          "impersonating": "Вы сейчас действуете от имени другого пользователя. Обратите внимание, что ваши действия могут повлиять на аккаунт этого пользователя. Чтобы выйти из режима имитации, нажмите кнопку «Прекратить имитацию» в левом нижнем углу."
+        }
+      },
+      "sidebar": {
+        "button": {
+          "logout": "Выйти",
+          "stopImpersonating": "Прекратить имитацию",
+          "openInVirtualWindow": "Открыть в виртуальном окне",
+          "openInPopup": "Открыть во всплывающем окне",
+          "openInNewTab": "Открыть в новой вкладке"
+        }
+      },
+      "permissionSelector": {
+        "selectedPermissions": "Выбранные разрешения ({count})",
+        "noPermissions": "Разрешения не выбраны."
+      },
+      "can": {
+        "tooltip": {
+          "cantSave": "У вас нет разрешения на сохранение.",
+          "cantDelete": "У вас нет разрешения на удаление."
+        }
+      },
+      "activityInfoButton": {
+        "modal": {
+          "info": {
+            "title": "Детали активности"
+          }
+        }
+      },
+      "screenBlock": {
+        "permissionDenied": {
+          "title": "Доступ запрещён",
+          "content": "У вас нет разрешения на доступ к этой странице."
+        },
+        "notFound": {
+          "title": "Не найдено",
+          "content": "Запрашиваемая страница не найдена."
+        },
+        "serverConflict": {
+          "title": "Конфликт состояния сервера",
+          "contentSuspended": "Этот сервер приостановлен и недоступен.",
+          "contentNodeMaintenance": "Этот сервер находится на узле, который сейчас на обслуживании, и недоступен.",
+          "contentTransferring": "Этот сервер сейчас переносится и будет недоступен до завершения переноса.",
+          "contentInstallFailed": "Установка этого сервера не удалась, и он будет недоступен до подтверждения.",
+          "contentInstalling": "Этот сервер сейчас устанавливается и будет недоступен до завершения.",
+          "contentRestoringBackup": "Этот сервер сейчас восстанавливается из резервной копии и будет недоступен до завершения.",
+          "button": {
+            "viewInstallLogs": "Просмотреть логи установки",
+            "acknowledgeFailure": "Подтвердить сбой"
+          },
+          "modal": {
+            "acknowledgeFailure": {
+              "title": "Подтвердить сбой установки",
+              "content": "Подтверждая сбой установки, вы подтверждаете, что знаете о неудачной установке и предприняли необходимые шаги для решения проблемы. Это позволит вам восстановить контроль над сервером."
+            }
+          }
+        }
+      },
+      "serverWebsocket": {
+        "error": {
+          "connectionFailed": "Не удалось подключиться после нескольких попыток. Пожалуйста, обновите страницу.",
+          "connectionClosed": "Соединение с сервером было закрыто. Попытка переподключения...",
+          "connectionRetry": "Соединение потеряно. Повторная попытка (попытка {attempt})...",
+          "authFailed": "Ошибка аутентификации. Попытка обновить учётные данные...",
+          "authRefreshFailed": "Не удалось обновить учётные данные. Пожалуйста, обновите страницу.",
+          "permissionRevoked": "Соединение закрыто: ваш доступ к этому серверу был отозван.",
+          "tokenRefreshLoop": "Обнаружен цикл аутентификации. Пожалуйста, обновите страницу."
+        },
+        "banner": {
+          "retrying": "Повторная попытка через {countdown}..."
+        },
+        "listener": {
+          "toast": {
+            "backupCompleted": "Резервное копирование завершено успешно.",
+            "backupFailed": "Ошибка резервного копирования.",
+            "backupRestoreCompleted": "Восстановление из резервной копии завершено успешно.",
+            "installCompleted": "Установка сервера завершена успешно.",
+            "installFailed": "Ошибка установки сервера.",
+            "operations": {
+              "compressing": {
+                "completed": "Сжатие {files} в `{path}` выполнено за {time}.",
+                "failed": "Не удалось сжать {files} в `{path}`:\n{error}"
+              },
+              "decompressing": {
+                "completed": "Распаковка `{path}` в `{destination}` выполнена за {time}.",
+                "failed": "Не удалось распаковать `{path}` в `{destination}`:\n{error}"
+              },
+              "pulling": {
+                "completed": "Загрузка `{destination}` выполнена за {time}.",
+                "failed": "Не удалось загрузить `{destination}`:\n{error}"
+              },
+              "copying": {
+                "completed": "Копирование `{path}` в `{destination}` выполнено за {time}.",
+                "failed": "Не удалось скопировать `{path}` в `{destination}`:\n{error}"
+              },
+              "copyingMany": {
+                "completed": "Скопировано {files} за {time}.",
+                "failed": "Не удалось скопировать {files}:\n{error}"
+              },
+              "copyingRemote": {
+                "completedFrom": "Скопировано {files} с удалённого сервера за {time}.",
+                "completedTo": "Скопировано {files} на удалённый сервер за {time}.",
+                "failedFrom": "Не удалось скопировать {files} с удалённого сервера:\n{error}",
+                "failedTo": "Не удалось скопировать {files} на удалённый сервер:\n{error}"
+              }
+            }
+          }
+        }
+      },
+      "fileUpload": {
+        "toast": {
+          "uploading": "Начата загрузка {files}...",
+          "cancelledFile": "Загрузка `{file}` успешно отменена.",
+          "cancelledFolder": "Загрузка `{folder}` ({files}) успешно отменена."
+        }
+      }
+    },
+    "pages": {
+      "oobe": {
+        "welcome": {
+          "title": "Добро пожаловать в Calagopus",
+          "subtitle": "Давайте настроим вашу систему управления игровыми серверами!",
+          "wizardIntro": "Мастер настройки проведёт вас через:",
+          "steps": {
+            "account": "Создание учётной записи администратора",
+            "settings": "Настройка основных параметров системы",
+            "location": "Настройка локации сервера",
+            "node": "Добавление первого узла",
+            "server": "Развёртывание первого игрового сервера"
+          },
+          "button": {
+            "start": "Начать"
+          }
+        },
+        "register": {
+          "title": "Создание учётной записи администратора",
+          "alert": {
+            "title": "Уведомление о безопасности",
+            "description": "Выберите надёжный пароль. Эта учётная запись будет иметь полный административный доступ ко всем серверам и настройкам."
+          },
+          "form": {
+            "username": "Имя пользователя",
+            "usernamePlaceholder": "admin",
+            "email": "Адрес электронной почты",
+            "emailPlaceholder": "admin@example.com",
+            "firstName": "Имя",
+            "firstNamePlaceholder": "Иван",
+            "lastName": "Фамилия",
+            "lastNamePlaceholder": "Иванов",
+            "password": "Пароль",
+            "passwordPlaceholder": "Введите надёжный пароль",
+            "confirmPassword": "Подтверждение пароля",
+            "confirmPasswordPlaceholder": "Введите пароль повторно"
+          },
+          "button": {
+            "create": "Создать аккаунт и продолжить"
+          }
+        },
+        "login": {
+          "title": "Войти снова",
+          "alert": "Вы были разлогинены во время настройки. Пожалуйста, войдите снова, чтобы продолжить с того места, где остановились.",
+          "form": {
+            "username": "Имя пользователя",
+            "usernamePlaceholder": "admin",
+            "password": "Пароль",
+            "passwordPlaceholder": "Введите надёжный пароль"
+          },
+          "button": {
+            "login": "Войти и продолжить"
+          }
+        },
+        "location": {
+          "title": "Настройка локации",
+          "form": {
+            "locationName": "Название локации",
+            "locationNamePlaceholder": "Мой дом",
+            "backupName": "Название конфигурации резервного копирования",
+            "backupNamePlaceholder": "Гараж #1",
+            "backupDisk": "Диск для резервных копий",
+            "backupDiskPlaceholder": "Диск для резервных копий"
+          },
+          "button": {
+            "create": "Создать и продолжить"
+          }
+        },
+        "node": {
+          "title": "Настройка узла",
+          "allocationsTitle": "Настройка портов",
+          "form": {
+            "name": "Имя",
+            "namePlaceholder": "Мой сервер",
+            "url": "URL",
+            "urlPlaceholder": "URL",
+            "urlDescription": "используется для внутренней связи с узлом",
+            "publicUrl": "Публичный URL",
+            "publicUrlPlaceholder": "URL",
+            "publicUrlDescription": "используется для websocket/скачивания",
+            "sftpHost": "SFTP-хост",
+            "sftpHostPlaceholder": "SFTP-хост",
+            "sftpPort": "SFTP-порт",
+            "sftpPortPlaceholder": "SFTP-порт",
+            "memory": "Память",
+            "disk": "Диск",
+            "ip": "IP",
+            "portRanges": "Диапазоны портов",
+            "portRangesPlaceholder": "Диапазоны портов (напр. 3000-4000)"
+          },
+          "error": {
+            "noLocations": "Что-то пошло не так. Локации не найдены."
+          },
+          "button": {
+            "create": "Создать и продолжить"
+          }
+        },
+        "nodeConfiguration": {
+          "title": "Настройка узла",
+          "error": {
+            "noNodes": "Что-то пошло не так. Узлы не найдены.",
+            "connectionError": "Что-то пошло не так. Ошибка подключения."
+          },
+          "successMessage": "Соединение с вашим узлом успешно проверено. Вы можете продолжить.",
+          "button": {
+            "continue": "Продолжить"
+          }
+        },
+        "configuration": {
+          "title": "Настройки приложения",
+          "form": {
+            "applicationName": "Название приложения",
+            "applicationNamePlaceholder": "Calagopus",
+            "language": "Язык",
+            "languagePlaceholder": "Язык",
+            "applicationUrl": "URL приложения",
+            "applicationUrlPlaceholder": "https://calagop.us",
+            "telemetry": "Включить телеметрию",
+            "telemetryDescription": "Разрешить Calagopus собирать ограниченные и анонимные данные об использовании для улучшения приложения.",
+            "registration": "Включить регистрацию",
+            "registrationDescription": "Разрешить новым пользователям создавать собственные учётные записи."
+          },
+          "button": {
+            "submit": "Обновить настройки и продолжить"
+          }
+        },
+        "finished": {
+          "title": "Настройка завершена!",
+          "subtitle": "Ваша панель Calagopus готова к использованию",
+          "setupTitle": "Что мы настроили",
+          "items": {
+            "account": "Учётная запись администратора",
+            "configuration": {
+              "title": "Конфигурация системы",
+              "subtitle": "Настройки и параметры панели сконфигурированы"
+            },
+            "eggRepositories": {
+              "title": "Репозитории яиц",
+              "subtitle": "{count} репозиториев"
+            },
+            "location": "Локация",
+            "node": "Узел",
+            "server": "Сервер"
+          },
+          "badge": {
+            "skipped": "Пропущено"
+          },
+          "button": "Перейти к панели управления"
+        },
+        "eggRepositories": {
+          "title": "Репозитории яиц",
+          "description": "Это исходные репозитории ваших яиц. Вы можете изменить эти репозитории в любое время.",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "Игровые яйца Pterodactyl",
+              "description": "Яйца для игр, таких как Minecraft, Terraria и многих других."
+            },
+            "pterodactylApplication": {
+              "title": "Яйца приложений Pterodactyl",
+              "description": "Яйца для приложений, таких как Grafana, Meilisearch и различных баз данных."
+            },
+            "pterodactylGeneral": {
+              "title": "Общие яйца Pterodactyl",
+              "description": "Яйца для универсальных сред выполнения, таких как Node JS, Java и Rust."
+            }
+          },
+          "button": {
+            "submit": "Импортировать"
+          }
+        },
+        "server": {
+          "title": "Сервер",
+          "egg": {
+            "title": "Яйцо",
+            "description": "Давайте запустим ваш первый сервер. Какое яйцо вы хотите использовать?",
+            "nestDescription": "Чтобы использовать это яйцо, вам нужно создать гнездо — коллекцию яиц. Дайте ему имя:"
+          },
+          "server": {
+            "title": "Сервер",
+            "nestDescription": "Чтобы использовать это яйцо, вам нужно создать гнездо — коллекцию яиц. Дайте ему имя:"
+          },
+          "error": {
+            "noNodes": "Что-то пошло не так. Узлы не найдены."
+          },
+          "button": {
+            "submit": "Импортировать",
+            "create": "Создать и продолжить"
+          }
+        }
+      },
+      "auth": {
+        "button": {
+          "login": "Войти",
+          "loginWith": "Войти через {name}"
+        },
+        "login": {
+          "error": {
+            "usernameRequired": "Пожалуйста, введите имя пользователя"
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "Ваш браузер не поддерживает ключи доступа.",
+              "unexpected": "Произошла непредвиденная ошибка при использовании ключа доступа.",
+              "cancelled": "Запрос ключа доступа был отменён.",
+              "dismissed": "Вы закрыли или не взаимодействовали с запросом ключа доступа. Также возможно, что ключ не зарегистрирован.",
+              "invalidState": "Этот ключ доступа недоступен или уже зарегистрирован.",
+              "notSupportedType": "Ваш браузер или устройство не поддерживает этот тип ключа доступа.",
+              "securityError": "Ключи доступа можно использовать только через HTTPS с действительным доменом.",
+              "authenticatorError": "Что-то пошло не так с аутентификатором.",
+              "constraintError": "Аутентификатор не смог выполнить требуемые ограничения."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "Вход",
+              "subtitle": "Введите имя пользователя для продолжения",
+              "form": {
+                "usernamePlaceholder": "Введите имя пользователя"
+              },
+              "link": {
+                "forgotPassword": "Забыли пароль",
+                "notRegistered": "Нет аккаунта?",
+                "createAccount": "Создать аккаунт"
+              },
+              "button": {
+                "oauthLogin": "Вход через OAuth"
+              }
+            },
+            "passkey": {
+              "title": "Аутентификация ключом доступа",
+              "subtitle": "Мы нашли ключ доступа, связанный с {username}",
+              "button": {
+                "usePasskey": "Использовать ключ доступа",
+                "usePassword": "Использовать пароль"
+              }
+            },
+            "password": {
+              "title": "Введите пароль",
+              "subtitle": "Пожалуйста, введите пароль для {username}",
+              "form": {
+                "passwordPlaceholder": "Введите ваш пароль"
+              },
+              "button": {
+                "signIn": "Войти",
+                "forgotPassword": "Забыли пароль"
+              }
+            },
+            "totp": {
+              "title": "Двухфакторная аутентификация",
+              "welcomeBack": "С возвращением, {username}!",
+              "enterCode": "Введите 6-значный код из вашего приложения-аутентификатора",
+              "button": {
+                "verify": "Подтвердить код",
+                "useRecoveryCode": "Использовать код восстановления",
+                "useTotp": "Использовать TOTP"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "Введите код восстановления",
+              "form": {
+                "label": "Код восстановления",
+                "placeholder": "Введите код восстановления"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "Регистрация",
+          "subtitle": "Пожалуйста, введите свои данные для регистрации",
+          "form": {
+            "email": "Электронная почта",
+            "firstName": "Имя",
+            "lastName": "Фамилия"
+          },
+          "button": {
+            "register": "Зарегистрироваться"
+          }
+        },
+        "forgotPassword": {
+          "title": "Забыли пароль",
+          "subtitle": "Введите ваш email для получения инструкций по сбросу пароля",
+          "form": {
+            "email": "Электронная почта"
+          },
+          "button": {
+            "request": "Запросить сброс пароля"
+          },
+          "success": "На ваш email отправлено письмо с инструкциями по сбросу пароля."
+        },
+        "resetPassword": {
+          "title": "Сброс пароля",
+          "subtitle": "Пожалуйста, введите новый пароль",
+          "form": {
+            "confirmPassword": "Подтверждение пароля"
+          },
+          "button": {
+            "reset": "Сбросить пароль"
+          },
+          "toast": {
+            "success": "Пароль был сброшен."
+          }
+        },
+        "oauth": {
+          "title": "Аутентификация через OAuth",
+          "subtitle": "Выберите любого из провайдеров ниже для входа"
+        }
+      },
+      "account": {
+        "home": {
+          "title": "Серверы",
+          "tooltip": {
+            "removeFromGroup": "Убрать из группы",
+            "addToGroup": "Добавить в группу",
+            "addServerToGroup": "Добавить сервер в группу",
+            "groupActions": "Действия с группой",
+            "noGroups": "Нет доступных групп для добавления сервера",
+            "noGroup": "Этот сервер не входит ни в одну группу"
+          },
+          "tabs": {
+            "groupedServers": {
+              "title": "Сгруппированные серверы",
+              "page": {
+                "button": {
+                  "createGroup": "Создать группу"
+                },
+                "modal": {
+                  "createServerGroup": {
+                    "title": "Создать группу серверов",
+                    "toast": {
+                      "created": "Группа серверов создана."
+                    }
+                  },
+                  "editServerGroup": {
+                    "title": "Редактировать группу серверов",
+                    "toast": {
+                      "updated": "Группа серверов обновлена."
+                    }
+                  },
+                  "deleteServerGroup": {
+                    "title": "Подтверждение удаления группы серверов",
+                    "content": "Вы уверены, что хотите удалить **{group}** из вашего аккаунта?",
+                    "toast": {
+                      "deleted": "Группа серверов удалена."
+                    }
+                  },
+                  "addServerToGroup": {
+                    "title": "Добавить сервер в {group}",
+                    "noServers": "Все серверы уже в этой группе.",
+                    "toast": {
+                      "added": "Сервер добавлен в группу."
+                    }
+                  }
+                },
+                "noGroups": "Группы не найдены, время создать одну?"
+              }
+            },
+            "allServers": {
+              "title": "Все серверы",
+              "page": {
+                "input": {
+                  "showOtherUsersServers": "Показать серверы других пользователей"
+                },
+                "modal": {
+                  "addToServerGroup": {
+                    "title": "Добавить {server} в группу серверов",
+                    "form": {
+                      "serverGroup": "Группа серверов"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "bulkActions": {
+            "selectionMode": "Режим выделения",
+            "select": "Выбрать сервер",
+            "deselect": "Снять выделение сервера",
+            "success": "Успешно {action} {servers}.",
+            "partial": "Успешно {action} {successfulServers}. {failedServers} не удалось.",
+            "groupActions": "Действия с группой"
+          },
+          "noServers": "Серверы не найдены, время добавить один?"
+        },
+        "admin": {
+          "title": "Администрирование"
+        },
+        "account": {
+          "title": "Аккаунт",
+          "alert": {
+            "requireTwoFactor": {
+              "title": "Требуется двухфакторная аутентификация",
+              "description": "Для вашей учётной записи требуется двухфакторная аутентификация. Пожалуйста, настройте её ниже, чтобы продолжить использование панели."
+            }
+          },
+          "containers": {
+            "password": {
+              "title": "Пароль",
+              "toast": {
+                "updated": "Пароль успешно обновлён."
+              },
+              "form": {
+                "currentPassword": "Текущий пароль",
+                "newPassword": "Новый пароль",
+                "confirmNewPassword": "Подтверждение нового пароля"
+              }
+            },
+            "email": {
+              "title": "Электронная почта",
+              "toast": {
+                "updated": "Электронная почта успешно обновлена."
+              },
+              "form": {
+                "newEmail": "Новый email",
+                "currentPassword": "Текущий пароль"
+              }
+            },
+            "twoFactor": {
+              "title": "Двухфакторная аутентификация",
+              "toast": {
+                "disabled": "Двухфакторная аутентификация успешно отключена.",
+                "enabled": "Двухфакторная аутентификация успешно включена. Пожалуйста, скопируйте коды восстановления."
+              },
+              "modal": {
+                "disableTwoFactor": {
+                  "title": "Отключить двухфакторную аутентификацию",
+                  "description": "Отключение двухфакторной аутентификации сделает ваш аккаунт менее защищённым.",
+                  "form": {
+                    "code": "Код аутентификации"
+                  }
+                },
+                "setupTwoFactor": {
+                  "title": "Настройка двухфакторной аутентификации",
+                  "description": "Помогите защитить вашу учётную запись от несанкционированного доступа. При каждом входе вам будет предложено ввести код подтверждения.",
+                  "descriptionQR": "Отсканируйте QR-код выше с помощью вашего приложения для двухфакторной аутентификации. Затем введите сгенерированный 6-значный код в поле ниже.",
+                  "form": {
+                    "code": "Код аутентификации"
+                  }
+                },
+                "recoveryCodes": {
+                  "title": "Коды восстановления",
+                  "description": "Ниже представлены ваши коды восстановления. Сохраните их в безопасном месте. Если вы потеряете доступ к устройству аутентификации, вы можете использовать эти коды для восстановления доступа к аккаунту."
+                }
+              },
+              "button": {
+                "disableTwoFactor": "Отключить двухфакторную",
+                "setupTwoFactor": "Настроить двухфакторную"
+              },
+              "twoFactorEnabled": "Двухфакторная аутентификация в настоящее время включена.",
+              "twoFactorDisabled": "Двухфакторная аутентификация не включена для вашего аккаунта. Нажмите кнопку ниже, чтобы начать настройку.",
+              "twoFactorLastUsed": "Последнее использование: {timestamp}"
+            },
+            "account": {
+              "title": "Данные аккаунта",
+              "toast": {
+                "updated": "Данные аккаунта успешно обновлены."
+              },
+              "form": {
+                "nameFirst": "Имя",
+                "nameLast": "Фамилия",
+                "username": "Имя пользователя",
+                "language": "Язык",
+                "toastPosition": "Позиция уведомлений",
+                "startOnGroupedServers": "Начинать на странице сгруппированных серверов"
+              }
+            },
+            "avatar": {
+              "title": "Аватар",
+              "toast": {
+                "updated": "Аватар успешно обновлён.",
+                "removed": "Аватар успешно удалён."
+              },
+              "form": {
+                "avatar": "Аватар"
+              }
+            }
+          }
+        },
+        "securityKeys": {
+          "title": "Ключи безопасности",
+          "table": {
+            "columns": {
+              "credentialId": "ID учётных данных"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "Для использования ключей безопасности требуется безопасное соединение (HTTPS)."
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "Создать ключ безопасности",
+              "toast": {
+                "created": "Ключ безопасности успешно создан.",
+                "aborted": "Создание ключа безопасности отменено."
+              }
+            },
+            "editSecurityKey": {
+              "title": "Редактировать ключ безопасности",
+              "toast": {
+                "updated": "Ключ безопасности успешно обновлён."
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "Подтверждение удаления ключа безопасности",
+              "content": "Вы уверены, что хотите удалить **{key}** из вашего аккаунта?",
+              "toast": {
+                "deleted": "Ключ безопасности успешно удалён."
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "Сессии",
+          "table": {
+            "columns": {
+              "ip": "IP",
+              "thisDevice": "Это устройство?",
+              "userAgent": "User Agent"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "Подтверждение удаления сессии",
+              "content": "Вы уверены, что хотите удалить сессию **{ip}** из вашего аккаунта?",
+              "toast": {
+                "deleted": "Сессия удалена."
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "Горячие клавиши",
+          "description": "Используйте эти горячие клавиши для более эффективной навигации и работы с панелью.",
+          "detectedMac": "Обнаружена macOS",
+          "detectedWindows": "Обнаружена Windows/Linux",
+          "fileManager": {
+            "title": "Файловый менеджер",
+            "selectAll": "Выбрать все файлы",
+            "cutFiles": "Вырезать выбранные файлы",
+            "copyFiles": "Копировать выбранные файлы",
+            "duplicateFile": "Дублировать выбранный файл",
+            "pasteFiles": "Вставить файлы",
+            "searchFiles": "Поиск файлов",
+            "moveUpDirectory": "Перейти в родительскую директорию",
+            "moveUpSelection": "Переместить выделение вверх",
+            "moveDownSelection": "Переместить выделение вниз",
+            "renameFile": "Переименовать файл",
+            "deselectAll": "Снять выделение со всех файлов",
+            "deleteFiles": "Удалить выбранные файлы"
+          },
+          "table": {
+            "title": "Навигация по таблице",
+            "previousPage": "Предыдущая страница",
+            "nextPage": "Следующая страница",
+            "firstPage": "Первая страница",
+            "lastPage": "Последняя страница"
+          },
+          "console": {
+            "title": "Консоль сервера",
+            "searchContent": "Поиск в консоли",
+            "previousCommand": "Предыдущая команда в истории",
+            "nextCommand": "Следующая команда в истории"
+          },
+          "serverList": {
+            "title": "Список серверов",
+            "selectServer": "Удерживайте S и нажмите, чтобы выбрать/снять выделение сервера"
+          }
+        },
+        "sshKeys": {
+          "title": "SSH-ключи",
+          "button": {
+            "import": "Импорт"
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "Отпечаток"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "Создать SSH-ключ",
+              "toast": {
+                "created": "SSH-ключ создан."
+              },
+              "button": {
+                "uploadKeyFile": "Загрузить файл ключа"
+              },
+              "form": {
+                "publicKey": "Публичный ключ"
+              }
+            },
+            "editSshKey": {
+              "title": "Редактировать SSH-ключ",
+              "toast": {
+                "updated": "SSH-ключ обновлён."
+              }
+            },
+            "importSshKeys": {
+              "title": "Импорт SSH-ключей",
+              "toast": {
+                "created": "{sshKeys} создано."
+              },
+              "form": {
+                "provider": "Провайдер",
+                "username": "Имя пользователя"
+              }
+            },
+            "deleteSshKey": {
+              "title": "Подтверждение удаления SSH-ключа",
+              "content": "Вы уверены, что хотите удалить **{name}** из вашего аккаунта?",
+              "toast": {
+                "removed": "SSH-ключ удалён."
+              }
+            }
+          }
+        },
+        "commandSnippets": {
+          "title": "Шаблоны команд",
+          "table": {
+            "columns": {
+              "eggs": "Яйца"
+            }
+          },
+          "form": {
+            "eggs": "Яйца",
+            "command": "Команда"
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "Создать шаблон команды",
+              "toast": {
+                "created": "Шаблон команды создан."
+              }
+            },
+            "editCommandSnippet": {
+              "title": "Редактировать шаблон команды",
+              "toast": {
+                "updated": "Шаблон команды обновлён."
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "Подтверждение удаления шаблона команды",
+              "content": "Вы уверены, что хотите удалить **{name}** из вашего аккаунта?",
+              "toast": {
+                "removed": "Шаблон команды удалён."
+              }
+            }
+          }
+        },
+        "oauthLinks": {
+          "title": "Привязка OAuth",
+          "button": {
+            "connect": "Подключить",
+            "connectTo": "Подключить к {provider}"
+          },
+          "table": {
+            "columns": {
+              "providerName": "Название провайдера",
+              "identifier": "Идентификатор"
+            }
+          },
+          "modal": {
+            "deleteOAuthLink": {
+              "title": "Подтверждение удаления связи OAuth",
+              "content": "Вы уверены, что хотите удалить подключение **{provider}** из вашего аккаунта?",
+              "toast": {
+                "removed": "Связь OAuth удалена."
+              }
+            }
+          }
+        },
+        "apiKeys": {
+          "title": "API-ключи",
+          "button": {
+            "apiDocumentation": "Документация API"
+          },
+          "table": {
+            "columns": {
+              "key": "Ключ",
+              "permissions": "Пользователь / Сервер / Админ права",
+              "expires": "Истекает"
+            }
+          },
+          "modal": {
+            "createApiKey": {
+              "title": "Создать API-ключ",
+              "toast": {
+                "created": "API-ключ создан."
+              }
+            },
+            "updateApiKey": {
+              "title": "Обновить API-ключ",
+              "toast": {
+                "updated": "API-ключ обновлён."
+              }
+            },
+            "deleteApiKey": {
+              "title": "Подтверждение удаления API-ключа",
+              "content": "Вы уверены, что хотите удалить **{name}** из вашего аккаунта?",
+              "toast": {
+                "removed": "API-ключ удалён."
+              }
+            }
+          },
+          "form": {
+            "allowedIps": "Разрешённые IP",
+            "allowedIpsPlaceholder": "например, 192.168.1.1, 2001:db8::1",
+            "userPermissions": "Пользовательские разрешения",
+            "serverPermissions": "Серверные разрешения",
+            "adminPermissions": "Административные разрешения"
+          }
+        },
+        "activity": {
+          "title": "Активность"
+        }
+      },
+      "admin": {},
+      "server": {
+        "viewAdmin": {
+          "title": "Вид администратора"
+        },
+        "console": {
+          "title": "Консоль",
+          "input": {
+            "placeholder": "Введите команду...",
+            "ariaLabel": "Поле ввода команды консоли."
+          },
+          "toast": {
+            "installCancelled": "Установка сервера отменена."
+          },
+          "modal": {
+            "sshDetails": {
+              "title": "Данные SSH",
+              "form": {
+                "protocol": "Протокол",
+                "port": "Порт",
+                "host": "Хост",
+                "username": "Имя пользователя",
+                "password": "Пароль",
+                "yourPassword": "Ваш пароль от панели управления",
+                "command": "Команда SSH"
+              },
+              "launch": "Запустить"
+            }
+          },
+          "notification": {
+            "nodeMaintenance": "Ваш сервер находится на узле, который сейчас на обслуживании.",
+            "transferring": "Ваш сервер сейчас переносится на другой узел.",
+            "restoringBackup": "Ваш сервер сейчас восстанавливается из резервной копии. Пожалуйста, подождите...",
+            "installing": "Ваш сервер сейчас устанавливается. Пожалуйста, подождите..."
+          },
+          "message": {
+            "serverMarkedAs": "Сервер отмечен как {state}...",
+            "installFailed": "Установка не удалась.",
+            "installCompleted": "Установка успешно завершена.",
+            "transferFailed": "Перенос не удался.",
+            "transferCompleted": "Перенос успешно завершён. Переподключение к серверу...",
+            "pullingImage": "Ваш сервер сейчас загружает Docker-образ. Пожалуйста, подождите...",
+            "pulling": "Загрузка",
+            "extracting": "Распаковка",
+            "layer": "Слой"
+          },
+          "tooltip": {
+            "search": "Поиск",
+            "sshDetails": "Данные SSH",
+            "commandHistory": "История команд",
+            "decreaseFontSize": "Уменьшить размер шрифта",
+            "increaseFontSize": "Увеличить размер шрифта"
+          },
+          "drawer": {
+            "commandHistory": {
+              "title": "История команд",
+              "detailTitle": "Детали команды",
+              "noCommands": "Команды не найдены.",
+              "copyButton": "Копировать команду",
+              "sendButton": "Отправить команду",
+              "commandSent": "Команда успешно отправлена."
+            }
+          },
+          "feature": {
+            "eula": {
+              "title": "Соглашение Minecraft EULA",
+              "content": "Для запуска сервера Minecraft требуется принять [Лицензионное соглашение Minecraft](https://minecraft.net/eula).",
+              "contentDetails": "Нажимая «Принять EULA», вы соглашаетесь с условиями Minecraft EULA, и файл **eula.txt** будет обновлён на **eula=true**.",
+              "toast": {
+                "accepted": "EULA успешно принято."
+              },
+              "button": {
+                "accept": "Принять EULA"
+              }
+            }
+          },
+          "details": {
+            "address": "Адрес",
+            "port": "Порт",
+            "uptime": "Время работы",
+            "cpuLoad": "Нагрузка ЦП",
+            "memoryLoad": "Нагрузка памяти",
+            "diskUsage": "Использование диска",
+            "networkIn": "Сеть (входящий)",
+            "networkOut": "Сеть (исходящий)",
+            "normalizeCpuLoad": "Нормализовать нагрузку ЦП (приведено к макс. 100%)"
+          },
+          "power": {
+            "start": "Запустить",
+            "stop": "Остановить",
+            "restart": "Перезапустить",
+            "kill": "Принудительно остановить",
+            "modal": {
+              "forceStop": {
+                "title": "Принудительная остановка процесса",
+                "content": "Принудительная остановка сервера может привести к повреждению данных."
+              }
+            }
+          },
+          "stats": {
+            "cpuLoad": "Нагрузка ЦП",
+            "memoryLoad": "Нагрузка памяти",
+            "network": "Сеть",
+            "inbound": "Входящий",
+            "outbound": "Исходящий"
+          },
+          "socketConnected": "Подключён ({ping}мс пинг)",
+          "socketDisconnected": "Отключён"
+        },
+        "files": {
+          "title": "Файлы",
+          "titleEditorViewing": "Просмотр {file}",
+          "titleEditorEditing": "Редактирование {file}",
+          "titleEditorNew": "Новый файл",
+          "table": {
+            "columns": {
+              "modified": "Изменён"
+            }
+          },
+          "button": {
+            "new": "Создать",
+            "sftpDetails": "Данные SFTP",
+            "openInNewWindow": "Открыть в новом окне",
+            "details": "Подробности",
+            "rename": "Переименовать",
+            "copy": "Копировать",
+            "move": "Переместить",
+            "fingerprint": "Отпечаток",
+            "permissions": "Права доступа",
+            "unarchive": "Распаковать",
+            "archive": "Архивировать",
+            "more": "Ещё",
+            "remoteCopy": "Удалённое копирование",
+            "search": "Поиск",
+            "exitBackup": "Выйти из резервной копии",
+            "fileFromEditor": "Файл из редактора",
+            "directory": "Директория",
+            "fileFromPull": "Файл из загрузки",
+            "fileFromUpload": "Файл из загрузки",
+            "directoryFromUpload": "Директория из загрузки"
+          },
+          "actionBar": {
+            "copyHere": "Копировать {files} сюда",
+            "moveHere": "Переместить {files} сюда"
+          },
+          "searchBanner": {
+            "resultsTitle": "Результаты поиска (найдено {files})",
+            "query": "Запрос:",
+            "excluded": "Исключено:",
+            "content": "Содержимое:",
+            "size": "Размер:",
+            "min": "Мин.:",
+            "max": "Макс.:"
+          },
+          "operations": {
+            "uploadingFolder": "Загрузка папки: {folder} ({current}/{total} файлов)",
+            "waiting": "Ожидание: ",
+            "uploading": "Загрузка: ",
+            "compressing": "Сжатие {files} из {path}",
+            "decompressing": "Распаковка {path}",
+            "pulling": "Загрузка {destination}",
+            "copying": "Копирование {path} в {destination}",
+            "copyingMany": "Копирование {files}",
+            "receivingRemote": "Получение {files} с удалённого сервера",
+            "sendingRemote": "Отправка {files} на удалённый сервер"
+          },
+          "dropzone": {
+            "title": "Перетащите файлы сюда для загрузки",
+            "subtitle": "Отпустите, чтобы начать загрузку"
+          },
+          "settings": {
+            "clickOnce": "Открывать файл или папку одним кликом",
+            "preferPhysicalSize": "Показывать физический размер вместо логического",
+            "editorMinimap": "Показывать мини-карту файла",
+            "editorLineOverflow": "Перенос длинных строк",
+            "imageViewerSmoothing": "Сглаживание изображений (антиалиасинг)"
+          },
+          "toast": {
+            "operationCancelled": "Операция отменена",
+            "copyingStarted": "Копирование {files} начато.",
+            "filesCouldNotBeMoved": "Не удалось переместить файлы.",
+            "filesMoved": "{files} перемещено.",
+            "downloadStarted": "Скачивание начато.",
+            "filesDeleted": "Файлы удалены.",
+            "archiveCreationStarted": "Создание архива начато.",
+            "fileCopyingStarted": "Копирование файла начато.",
+            "fileInfoRetrieved": "Информация о файле успешно получена.",
+            "filePullingStarted": "Загрузка файла начата.",
+            "fileRenamed": "Файл переименован.",
+            "fileCouldNotBeRenamed": "Не удалось переименовать файл.",
+            "permissionsUpdated": "Права доступа обновлены.",
+            "fileSaved": "Файл сохранён."
+          },
+          "modal": {
+            "activeUploads": {
+              "title": "Активные загрузки",
+              "content": "Вы уверены, что хотите покинуть эту страницу? У вас {files} активных загрузок файлов. Если вы покинете страницу, загрузки будут прерваны.",
+              "button": {
+                "leave": "Покинуть страницу"
+              }
+            },
+            "unsavedChanges": {
+              "title": "Несохранённые изменения",
+              "content": "У вас есть несохранённые изменения в редакторе файлов. Вы уверены, что хотите покинуть эту страницу? При выходе ваши изменения будут потеряны.",
+              "button": {
+                "leave": "Покинуть страницу"
+              }
+            },
+            "createArchive": {
+              "title": "Создать архив",
+              "form": {
+                "archiveName": "Имя архива",
+                "format": "Формат"
+              },
+              "createdAs": "Этот архив будет создан как "
+            },
+            "createDirectory": {
+              "title": "Создать директорию",
+              "form": {
+                "directoryName": "Имя директории"
+              },
+              "createdAs": "Эта директория будет создана как "
+            },
+            "copyFile": {
+              "title": "Копировать файл",
+              "form": {
+                "fileName": "Имя файла"
+              },
+              "createdAs": "Этот файл будет создан как "
+            },
+            "copyRemote": {
+              "title": "Удалённое копирование файлов",
+              "form": {
+                "server": "Сервер",
+                "destination": "Назначение"
+              },
+              "createdAs": "Эти файлы будут созданы на удалённом сервере в "
+            },
+            "fileFingerprints": {
+              "title": "Отпечаток файла",
+              "form": {
+                "algorithm": "Алгоритм",
+                "fingerprint": "Отпечаток"
+              },
+              "button": {
+                "calculate": "Вычислить отпечаток"
+              }
+            },
+            "deleteFile": {
+              "title": "Удалить файл",
+              "singleFileWarning": "Вы не сможете восстановить содержимое {file} после удаления.",
+              "multipleFilesWarning": "Вы не сможете восстановить содержимое следующих файлов после удаления."
+            },
+            "createFile": {
+              "title": "Создать файл",
+              "form": {
+                "fileName": "Имя файла"
+              }
+            },
+            "details": {
+              "title": "Детали файла",
+              "path": "Путь",
+              "mode": "Режим",
+              "logicalSize": "Логический размер",
+              "physicalSize": "Физический размер",
+              "mimeType": "MIME-тип",
+              "lastModifiedAt": "Последнее изменение",
+              "createdAt": "Создано"
+            },
+            "filePermissions": {
+              "title": "Права доступа к файлу",
+              "symbolic": "Символьные:",
+              "octal": "Восьмеричные:",
+              "owner": "Владелец",
+              "group": "Группа",
+              "other": "Другие",
+              "breakdown": "Разбивка прав доступа",
+              "readPermission": "Право на чтение (4)",
+              "writePermission": "Право на запись (2)",
+              "executePermission": "Право на выполнение (1)"
+            },
+            "renameFile": {
+              "title": "Переименовать файл",
+              "form": {
+                "fileName": "Имя файла"
+              }
+            },
+            "searchFiles": {
+              "title": "Поиск файлов",
+              "placeholder": "Искать файлы...",
+              "advancedFilters": "Расширенные фильтры",
+              "pathPatterns": "Шаблоны путей",
+              "include": "Включить",
+              "exclude": "Исключить",
+              "caseInsensitive": "Без учёта регистра",
+              "fileContent": "Содержимое файла",
+              "searchText": "Текст поиска",
+              "maxFileSize": "Макс. размер файла",
+              "includeOversized": "Включить слишком большие файлы",
+              "includeOversizedDescription": "Включить файлы, соответствующие другим фильтрам, но слишком большие для поиска",
+              "fileSize": "Размер файла",
+              "minimum": "Минимум",
+              "maximum": "Максимум"
+            },
+            "pullFile": {
+              "title": "Загрузить файл",
+              "form": {
+                "fileUrl": "URL файла",
+                "query": "Запрос",
+                "fileName": "Имя файла"
+              },
+              "createdAs": "Этот файл будет создан как ",
+              "pull": "Загрузить"
+            },
+            "sftpDetails": {
+              "title": "Данные SFTP",
+              "form": {
+                "protocol": "Протокол",
+                "port": "Порт",
+                "host": "Хост",
+                "username": "Имя пользователя",
+                "password": "Пароль",
+                "yourPassword": "Ваш пароль от панели управления"
+              },
+              "launch": "Запустить"
+            }
+          }
+        },
+        "databases": {
+          "title": "Базы данных",
+          "subtitle": "Создано {current} из {max} максимальных баз данных.",
+          "tooltip": {
+            "limitReached": "Этот сервер ограничен {max} базами данных."
+          },
+          "table": {
+            "columns": {
+              "type": "Тип",
+              "address": "Адрес",
+              "locked": "Заблокировано?"
+            }
+          },
+          "button": {
+            "details": "Подробности",
+            "rotatePassword": "Сменить пароль"
+          },
+          "modal": {
+            "createDatabase": {
+              "title": "Создать базу данных",
+              "toast": {
+                "created": "База данных создана."
+              },
+              "form": {
+                "databaseName": "Имя базы данных",
+                "databaseHost": "Хост базы данных",
+                "noHostsFound": "Хосты не найдены"
+              }
+            },
+            "editDatabase": {
+              "title": "Редактировать базу данных",
+              "toast": {
+                "updated": "База данных обновлена."
+              },
+              "form": {
+                "locked": "Заблокировано"
+              }
+            },
+            "databaseDetails": {
+              "title": "Данные для подключения к базе данных",
+              "toast": {
+                "passwordRotated": "Пароль был сменён."
+              },
+              "form": {
+                "jdbcConnectionString": "Строка подключения JDBC"
+              }
+            },
+            "deleteDatabase": {
+              "title": "Подтверждение удаления базы данных",
+              "content": "Удаление базы данных — необратимое действие. Это навсегда удалит базу данных **{name}** и все связанные данные.",
+              "toast": {
+                "deleted": "База данных удалена."
+              }
+            }
+          }
+        },
+        "schedules": {
+          "title": "Расписания",
+          "subtitle": "Создано {current} из {max} максимальных расписаний.",
+          "dropzone": {
+            "title": "Перетащите файлы сюда для импорта в качестве расписаний",
+            "subtitle": "Отпустите, чтобы начать импорт"
+          },
+          "tooltip": {
+            "limitReached": "Этот сервер ограничен {max} расписаниями."
+          },
+          "table": {
+            "columns": {
+              "lastRun": "Последний запуск",
+              "lastFailure": "Последняя ошибка",
+              "status": "Статус"
+            }
+          },
+          "button": {
+            "import": "Импорт",
+            "trigger": "Запустить",
+            "triggerWithCondition": "Запустить (не пропускать условие)",
+            "triggerSkipCondition": "Запустить (пропустить условие)",
+            "addTrigger": "Добавить триггер",
+            "addCondition": "Добавить условие",
+            "addStep": "Добавить шаг",
+            "createFirstStep": "Создать первый шаг",
+            "addOutput": "Добавить вывод",
+            "addFile": "Добавить файл",
+            "exitEditor": "Выйти из редактора"
+          },
+          "toast": {
+            "imported": "Расписание импортировано.",
+            "created": "Расписание создано.",
+            "updated": "Расписание обновлено.",
+            "deleted": "Расписание удалено.",
+            "triggered": "Расписание запущено.",
+            "exported": "Расписание экспортировано.",
+            "parseError": "Не удалось разобрать расписание: {error}",
+            "step": {
+              "created": "Шаг расписания создан.",
+              "updated": "Шаг расписания обновлён.",
+              "deleted": "Шаг расписания удалён."
+            }
+          },
+          "enum": {
+            "schedulePreConditionType": {
+              "none": "Нет",
+              "and": "И (Все должны быть истинны)",
+              "or": "ИЛИ (Любое должно быть истинно)",
+              "not": "НЕ (Не должно быть истинно)",
+              "serverState": "Состояние сервера",
+              "uptime": "Время работы",
+              "cpuUsage": "Нагрузка ЦП",
+              "memoryUsage": "Нагрузка памяти",
+              "diskUsage": "Использование диска",
+              "fileExists": "Файл существует"
+            },
+            "scheduleConditionType": {
+              "none": "Нет",
+              "and": "И (Все должны быть истинны)",
+              "or": "ИЛИ (Любое должно быть истинно)",
+              "not": "НЕ (Не должно быть истинно)",
+              "variableExists": "Переменная существует",
+              "variableContains": "Переменная содержит",
+              "variableEquals": "Переменная равна",
+              "variableStartsWith": "Переменная начинается с",
+              "variableEndsWith": "Переменная заканчивается на"
+            },
+            "scheduleComparator": {
+              "smallerThan": "Меньше",
+              "smallerThanOrEqual": "Меньше или равно",
+              "equal": "Равно",
+              "greaterThanOrEqual": "Больше или равно",
+              "greaterThan": "Больше"
+            }
+          },
+          "modal": {
+            "createSchedule": {
+              "title": "Создать расписание"
+            },
+            "updateSchedule": {
+              "title": "Обновить расписание"
+            },
+            "deleteSchedule": {
+              "title": "Подтверждение удаления расписания",
+              "content": "Вы уверены, что хотите удалить {name} с этого сервера?"
+            },
+            "createStep": {
+              "title": "Создать шаг расписания"
+            },
+            "editStep": {
+              "title": "Редактировать шаг расписания"
+            },
+            "deleteStep": {
+              "title": "Подтверждение удаления шага расписания",
+              "content": "Вы уверены, что хотите удалить этот шаг расписания?"
+            }
+          },
+          "view": {
+            "badge": {
+              "running": "Выполняется"
+            },
+            "tooltip": {
+              "cannotTrigger": "Невозможно запустить отключённое расписание"
+            },
+            "tabs": {
+              "actions": "Действия",
+              "conditions": "Условия",
+              "triggers": "Триггеры"
+            },
+            "sections": {
+              "actions": "Действия расписания",
+              "preConditions": "Предусловия расписания",
+              "triggers": "Триггеры расписания"
+            },
+            "alert": {
+              "noActions": "Для этого расписания не настроены действия",
+              "noTriggers": "Для этого расписания не настроены триггеры"
+            }
+          },
+          "form": {
+            "scheduleName": "Название расписания",
+            "enabled": "Включено",
+            "triggersList": "Триггеры",
+            "triggerNumber": "Триггер {number}",
+            "actionType": "Тип действия",
+            "conditionType": "Тип условия",
+            "serverState": "Состояние сервера",
+            "comparator": "Оператор сравнения",
+            "rootPath": "Корневой путь",
+            "outputInto": "Вывод в",
+            "caseInsensitive": "Без учёта регистра",
+            "ignoreFailure": "Игнорировать ошибки",
+            "runInForeground": "Выполнять на переднем плане"
+          },
+          "condition": {
+            "variable": "Переменная",
+            "equals": "Равно",
+            "contains": "Содержит",
+            "startsWith": "Начинается с",
+            "endsWith": "Заканчивается на",
+            "allMustBeTrue": "Все условия должны быть истинны:",
+            "anyMustBeTrue": "Любое условие должно быть истинно:",
+            "mustNotBeTrue": "Условие не должно быть истинно:"
+          },
+          "preCondition": {
+            "valueSeconds": "Значение (секунды)",
+            "valuePercent": "Значение (%)",
+            "value": "Значение",
+            "filePath": "Путь к файлу"
+          },
+          "triggers": {
+            "cron": {
+              "title": "Cron",
+              "form": {
+                "cronSchedule": "Расписание Cron"
+              },
+              "card": {
+                "content": "По cron-интервалу `{schedule}`, следующий запуск {timestamp} — последний запуск {lastTimestamp}."
+              }
+            },
+            "powerAction": {
+              "title": "Действие питания",
+              "form": {
+                "powerAction": "Действие питания"
+              },
+              "card": {
+                "content": "При запросе действия питания `{action}`."
+              }
+            },
+            "serverState": {
+              "title": "Состояние сервера",
+              "card": {
+                "content": "При достижении состояния сервера `{state}`."
+              }
+            },
+            "backupStatus": {
+              "title": "Статус резервной копии",
+              "form": {
+                "backupStatus": "Статус резервной копии"
+              },
+              "card": {
+                "content": "Когда резервная копия достигает статуса `{status}`."
+              }
+            },
+            "consoleLine": {
+              "title": "Строка консоли",
+              "form": {
+                "lineContains": "Строка содержит"
+              },
+              "card": {
+                "content": "Когда вывод консоли содержит строку `{contains}`"
+              }
+            },
+            "crash": {
+              "title": "Сбой",
+              "card": {
+                "content": "При сбое сервера."
+              }
+            }
+          },
+          "renderer": {
+            "noActionSelected": "Выберите тип действия для настройки",
+            "noActionDetails": "Детали действия недоступны",
+            "ignoreFailure": "Игнорировать ошибки: {value}",
+            "foreground": "Передний план: {value}"
+          },
+          "steps": {
+            "empty": {
+              "title": "Шаги не настроены",
+              "description": "В этом расписании пока нет шагов. Добавьте действия для начала работы."
+            },
+            "sleep": {
+              "title": "Ожидание",
+              "form": {
+                "duration": "Длительность (миллисекунды)"
+              },
+              "renderer": {
+                "compact": "Ожидание {duration}мс"
+              }
+            },
+            "ensure": {
+              "title": "Проверка",
+              "renderer": {
+                "compact": "Проверить соответствие условию"
+              }
+            },
+            "format": {
+              "title": "Форматирование",
+              "form": {
+                "formatString": "Строка формата",
+                "formatStringDescription": "Строка формата, может включать переменные, обёрнутые в {wrapper}"
+              },
+              "renderer": {
+                "compact": "Форматировать строку в {outputInto}"
+              }
+            },
+            "matchRegex": {
+              "title": "Совпадение регулярного выражения",
+              "form": {
+                "input": "Ввод",
+                "regex": "Регулярное выражение",
+                "outputs": "Выводы",
+                "outputNumber": "Вывод {number}"
+              },
+              "renderer": {
+                "compact": "Сопоставить {input} с регулярным выражением {regex}"
+              }
+            },
+            "waitForConsoleLine": {
+              "title": "Ожидание строки консоли",
+              "form": {
+                "lineContains": "Строка содержит",
+                "timeout": "Тайм-аут (миллисекунды)"
+              },
+              "renderer": {
+                "compact": "Ожидать {timeout} строку консоли, содержащую {contains}",
+                "detail": {
+                  "lineContains": "Строка должна содержать: {contains}",
+                  "caseInsensitive": "Без учёта регистра: {value}",
+                  "timeout": "Тайм-аут: {timeout}"
+                }
+              }
+            },
+            "sendCommand": {
+              "title": "Отправить команду",
+              "form": {
+                "command": "Команда"
+              },
+              "renderer": {
+                "compact": "Выполнить {command}",
+                "detail": {
+                  "command": "Команда: {command}"
+                }
+              }
+            },
+            "sendPower": {
+              "title": "Отправить сигнал питания",
+              "form": {
+                "powerAction": "Действие питания"
+              },
+              "renderer": {
+                "compact": "Выполнить {action}",
+                "detail": {
+                  "powerAction": "Действие питания: {action}"
+                }
+              }
+            },
+            "createBackup": {
+              "title": "Создать резервную копию",
+              "form": {
+                "backupName": "Имя резервной копии",
+                "ignoredFiles": "Игнорируемые файлы"
+              },
+              "renderer": {
+                "compact": "Создать {name}",
+                "detail": {
+                  "backupName": "Имя резервной копии: {name}",
+                  "ignoredFiles": "Игнорируемые файлы: {files}"
+                }
+              }
+            },
+            "createDirectory": {
+              "title": "Создать директорию",
+              "form": {
+                "directoryName": "Имя директории"
+              },
+              "renderer": {
+                "compact": "Создать {name} в {root}",
+                "detail": {
+                  "directory": "Директория: {name}",
+                  "root": "Корень: {root}"
+                }
+              }
+            },
+            "writeFile": {
+              "title": "Записать файл",
+              "form": {
+                "filePath": "Путь к файлу",
+                "content": "Содержимое",
+                "appendToFile": "Дописать в файл"
+              },
+              "renderer": {
+                "compact": "Записать в {file}",
+                "detail": {
+                  "file": "Файл: {file}",
+                  "append": "Дописать: {value}"
+                }
+              }
+            },
+            "copyFile": {
+              "title": "Копировать файл",
+              "form": {
+                "sourceFile": "Исходный файл",
+                "destination": "Назначение"
+              },
+              "renderer": {
+                "compact": "Копировать {file} в {destination}",
+                "detail": {
+                  "from": "Откуда: {file}",
+                  "to": "Куда: {destination}"
+                }
+              }
+            },
+            "deleteFiles": {
+              "title": "Удалить файлы",
+              "form": {
+                "filesToDelete": "Файлы для удаления"
+              },
+              "renderer": {
+                "compact": "Удалить {files}",
+                "detail": {
+                  "root": "Корень: {root}",
+                  "files": "Файлы: {files}"
+                }
+              }
+            },
+            "renameFiles": {
+              "title": "Переименовать файлы",
+              "form": {
+                "files": "Файлы",
+                "from": "из",
+                "to": "в"
+              },
+              "renderer": {
+                "compact": "Переименовать {files}",
+                "detail": {
+                  "root": "Корень: {root}",
+                  "files": "Файлы: {files}"
+                }
+              }
+            },
+            "compressFiles": {
+              "title": "Сжать файлы",
+              "form": {
+                "filesToCompress": "Файлы для сжатия",
+                "archiveFormat": "Формат архива",
+                "archiveName": "Имя архива"
+              },
+              "renderer": {
+                "compact": "Сжать {files} из {root} в {name}",
+                "detail": {
+                  "output": "Результат: {name}",
+                  "root": "Корень: {root}",
+                  "format": "Формат: {format}",
+                  "files": "Файлы: {files}"
+                }
+              }
+            },
+            "decompressFile": {
+              "title": "Распаковать файл",
+              "form": {
+                "file": "Файл"
+              },
+              "renderer": {
+                "compact": "Распаковать {file} в {root}",
+                "detail": {
+                  "file": "Файл: {file}",
+                  "root": "Корень: {root}"
+                }
+              }
+            },
+            "updateStartupVariable": {
+              "title": "Обновить переменную запуска",
+              "form": {
+                "envVariable": "Переменная окружения",
+                "value": "Значение"
+              },
+              "renderer": {
+                "compact": "Установить {variable} в {value}",
+                "detail": {
+                  "variable": "Переменная: {variable}",
+                  "value": "Значение: {value}"
+                }
+              }
+            },
+            "updateStartupCommand": {
+              "title": "Обновить команду запуска",
+              "form": {
+                "startupCommand": "Команда запуска"
+              },
+              "renderer": {
+                "compact": "Установить {command}",
+                "detail": {
+                  "command": "Команда: {command}"
+                }
+              }
+            },
+            "updateStartupDockerImage": {
+              "title": "Обновить Docker-образ",
+              "form": {
+                "dockerImage": "Docker-образ"
+              },
+              "renderer": {
+                "compact": "Установить {image}",
+                "detail": {
+                  "image": "Образ: {image}"
+                }
+              }
+            }
+          }
+        },
+        "subusers": {
+          "title": "Субпользователи",
+          "table": {
+            "columns": {
+              "twoFactorEnabled": "2FA включена",
+              "permissions": "Разрешения",
+              "ignoredFiles": "Игнорируемые файлы"
+            }
+          },
+          "modal": {
+            "createSubuser": {
+              "title": "Создать субпользователя",
+              "toast": {
+                "created": "Субпользователь создан."
+              },
+              "form": {
+                "email": "Email",
+                "emailPlaceholder": "Введите email для сохранения субпользователя.",
+                "permissions": "Разрешения",
+                "ignoredFiles": "Игнорируемые файлы"
+              }
+            },
+            "updateSubuser": {
+              "title": "Обновить субпользователя",
+              "toast": {
+                "updated": "Субпользователь обновлён."
+              }
+            },
+            "removeSubuser": {
+              "title": "Подтверждение удаления субпользователя",
+              "content": "Вы уверены, что хотите удалить **{username}** с этого сервера?",
+              "toast": {
+                "removed": "Субпользователь удалён."
+              }
+            }
+          }
+        },
+        "backups": {
+          "title": "Резервные копии",
+          "subtitle": "Создано {current} из {max} максимальных резервных копий.",
+          "tooltip": {
+            "limitReached": "Этот сервер ограничен {max} резервными копиями."
+          },
+          "table": {
+            "columns": {
+              "checksum": "Контрольная сумма",
+              "files": "Файлы",
+              "locked": "Заблокировано?"
+            }
+          },
+          "button": {
+            "browse": "Обзор"
+          },
+          "toast": {
+            "downloadStarted": "Скачивание начато.",
+            "restoringBackup": "Восстановление резервной копии..."
+          },
+          "modal": {
+            "createBackup": {
+              "title": "Создать резервную копию",
+              "toast": {
+                "created": "Резервная копия создана."
+              },
+              "form": {
+                "ignoredFiles": "Игнорируемые файлы"
+              }
+            },
+            "editBackup": {
+              "title": "Редактировать резервную копию",
+              "toast": {
+                "updated": "Резервная копия обновлена."
+              },
+              "form": {
+                "locked": "Заблокировано"
+              }
+            },
+            "restoreBackup": {
+              "title": "Восстановить резервную копию"
+            },
+            "deleteBackup": {
+              "title": "Подтверждение удаления резервной копии",
+              "content": "Вы уверены, что хотите удалить **{name}** с этого сервера?",
+              "toast": {
+                "deleted": "Резервная копия удалена."
+              }
+            }
+          }
+        },
+        "network": {
+          "title": "Сеть",
+          "subtitle": "Назначено {current} из {max} максимальных портов.",
+          "tooltip": {
+            "limitReached": "Этот сервер ограничен {max} портами.",
+            "primary": "Основной"
+          },
+          "table": {
+            "columns": {
+              "hostname": "Имя хоста",
+              "port": "Порт",
+              "notes": "Заметки"
+            }
+          },
+          "button": {
+            "setPrimary": "Сделать основным",
+            "unsetPrimary": "Убрать основной"
+          },
+          "toast": {
+            "created": "Порт создан.",
+            "updated": "Порт обновлён.",
+            "removed": "Порт удалён.",
+            "setPrimary": "Порт назначен основным.",
+            "unsetPrimary": "Порт снят с основного."
+          },
+          "modal": {
+            "editAllocation": {
+              "title": "Редактировать порт",
+              "form": {
+                "notes": "Заметки"
+              }
+            },
+            "removeAllocation": {
+              "title": "Подтверждение удаления порта",
+              "content": "Вы уверены, что хотите удалить **{allocation}** с этого сервера?"
+            }
+          }
+        },
+        "startup": {
+          "title": "Запуск",
+          "form": {
+            "startupCommand": "Команда запуска",
+            "dockerImage": "Docker-образ"
+          },
+          "variables": "Переменные",
+          "dockerImageDescription": "Docker-образ, используемый для запуска этого сервера. Его можно изменить для использования другого образа.",
+          "dockerImageDescriptionCustom": "Docker-образ, используемый для запуска этого сервера. Он был установлен администратором и не может быть изменён.",
+          "toast": {
+            "startupCommandUpdated": "Команда запуска обновлена.",
+            "dockerImageUpdated": "Docker-образ обновлён.",
+            "variablesUpdated": "Переменные обновлены."
+          }
+        },
+        "mounts": {
+          "title": "Маунты",
+          "table": {
+            "columns": {
+              "target": "Цель",
+              "mounted": "Смонтировано",
+              "readOnly": "Только чтение"
+            }
+          },
+          "modal": {
+            "attachMount": {
+              "title": "Подключить с",
+              "content": "Вы хотите подключить **{name}** к `{target}`?",
+              "confirm": "Подключить",
+              "toast": {
+                "attached": "{name} был подключен к вашему серверу."
+              }
+            },
+            "detachMount": {
+              "title": "Отключить раздел",
+              "content": "Вы хотите отключить **{name}** от `{target}`?",
+              "confirm": "Отключить",
+              "toast": {
+                "detached": "{name} был отключен от вашего сервера."
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Настройки",
+          "debugInformation": {
+            "title": "Отладочная информация",
+            "form": {
+              "nodeName": "Узел (UUID)",
+              "locationName": "Локация (UUID)",
+              "serverUuid": "UUID сервера"
+            }
+          },
+          "rename": {
+            "title": "Переименовать сервер",
+            "form": {
+              "serverName": "Имя сервера"
+            },
+            "toast": {
+              "renamed": "Сервер переименован."
+            }
+          },
+          "timezone": {
+            "title": "Часовой пояс",
+            "form": {
+              "timezone": "Часовой пояс",
+              "system": "Системный"
+            },
+            "toast": {
+              "updated": "Часовой пояс сервера обновлён."
+            }
+          },
+          "autokill": {
+            "title": "Авто-остановка",
+            "form": {
+              "enabled": "Включено",
+              "secondsUntilAutoKill": "Секунд до авто-остановки"
+            },
+            "toast": {
+              "updated": "Авто-остановка сервера обновлена."
+            }
+          },
+          "autostart": {
+            "title": "Авто-запуск",
+            "form": {
+              "behavior": "Поведение"
+            },
+            "toast": {
+              "updated": "Поведение авто-запуска сервера обновлено."
+            }
+          },
+          "reinstall": {
+            "title": "Переустановить сервер",
+            "button": "Переустановить сервер",
+            "content": "Переустановка сервера остановит его, а затем повторно запустит скрипт установки, который его изначально настроил. **Некоторые файлы могут быть удалены или изменены в процессе, пожалуйста, сделайте резервную копию перед продолжением.**",
+            "modal": {
+              "title": "Переустановить сервер",
+              "button": "Переустановить",
+              "toast": {
+                "reinstalling": "Переустановка сервера..."
+              }
+            }
+          }
+        },
+        "activity": {
+          "title": "Активность"
+        }
+      }
+    }
+  }
+}
