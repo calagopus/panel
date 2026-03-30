@@ -390,9 +390,13 @@ impl NestEgg {
         )
         .await?;
 
-        for variable in exported_egg.variables {
+        for mut variable in exported_egg.variables {
             if rule_validator::validate_rules(&variable.rules, &()).is_err() {
                 continue;
+            }
+
+            if variable.description.as_ref().is_some_and(|d| d.is_empty()) {
+                variable.description = None;
             }
 
             if let Err(err) = super::nest_egg_variable::NestEggVariable::create(
@@ -423,7 +427,7 @@ impl NestEgg {
     pub async fn import_update(
         &self,
         database: &crate::database::Database,
-        exported_egg: ExportedNestEgg,
+        mut exported_egg: ExportedNestEgg,
     ) -> Result<(), crate::database::DatabaseError> {
         sqlx::query!(
             "UPDATE nest_eggs
@@ -486,9 +490,13 @@ impl NestEgg {
         .fetch_all(database.read())
         .await?;
 
-        for (i, variable) in exported_egg.variables.iter().enumerate() {
+        for (i, variable) in exported_egg.variables.iter_mut().enumerate() {
             if rule_validator::validate_rules(&variable.rules, &()).is_err() {
                 continue;
+            }
+
+            if variable.description.as_ref().is_some_and(|d| d.is_empty()) {
+                variable.description = None;
             }
 
             if let Err(err) = sqlx::query!(
