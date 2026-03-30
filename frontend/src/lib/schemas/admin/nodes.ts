@@ -57,7 +57,7 @@ export const adminNodeAllocationSchema = z.object({
 
 export const adminNodeAllocationsSchema = z.object({
   ip: z.string(),
-  ipAlias: z.string().min(1).max(255).nullable(),
+  ipAlias: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   ports: z.array(z.string()),
 });
 
