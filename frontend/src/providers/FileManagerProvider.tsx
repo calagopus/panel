@@ -9,7 +9,7 @@ import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useFileUpload } from '@/plugins/useFileUpload.ts';
-import { ActingFileMode, FileManagerContext, ModalType, SearchInfo } from '@/providers/contexts/fileManagerContext.ts';
+import { ActingFileMode, DEFAULT_VISIBLE_COLUMNS, FileManagerContext, FileSortColumn, FileSortDirection, ModalType, SearchInfo } from '@/providers/contexts/fileManagerContext.ts';
 import { useServerStore } from '@/stores/server.ts';
 
 const FileManagerProvider = ({ children }: { children: ReactNode }) => {
@@ -39,6 +39,29 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const [openModal, setOpenModal] = useState<ModalType>(null);
   const [modalDirectoryEntries, setModalDirectoryEntries] = useState<z.infer<typeof serverDirectoryEntrySchema>[]>([]);
   const [searchInfo, setSearchInfo] = useState<SearchInfo | null>(null);
+  const [sortColumn, setSortColumn] = useState<FileSortColumn | null>(
+    (localStorage.getItem('file_sort_column') as FileSortColumn) || null,
+  );
+  const [sortDirection, setSortDirection] = useState<FileSortDirection>(
+    (localStorage.getItem('file_sort_direction') as FileSortDirection) || 'asc',
+  );
+  const [visibleColumns, setVisibleColumns] = useState<FileSortColumn[]>(() => {
+    const stored = localStorage.getItem('file_visible_columns');
+    return stored ? JSON.parse(stored) : DEFAULT_VISIBLE_COLUMNS;
+  });
+
+  const toggleColumn = (column: FileSortColumn) => {
+    setVisibleColumns((prev) => {
+      if (column === 'name') return prev; // Name is always visible
+      const isRemoving = prev.includes(column);
+      if (isRemoving && sortColumn === column) {
+        setSortColumn(null);
+        setSortDirection('asc');
+      }
+      return isRemoving ? prev.filter((c) => c !== column) : [...prev, column];
+    });
+  };
+
   const [clickOnce, setClickOnce] = useState(localStorage.getItem('file_click_once') !== 'false');
   const [preferPhysicalSize, setPreferPhysicalSize] = useState(
     localStorage.getItem('file_prefer_physical_size') === 'true',
@@ -110,6 +133,22 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    if (sortColumn) {
+      localStorage.setItem('file_sort_column', sortColumn);
+    } else {
+      localStorage.removeItem('file_sort_column');
+    }
+  }, [sortColumn]);
+
+  useEffect(() => {
+    localStorage.setItem('file_sort_direction', sortDirection);
+  }, [sortDirection]);
+
+  useEffect(() => {
+    localStorage.setItem('file_visible_columns', JSON.stringify(visibleColumns));
+  }, [visibleColumns]);
+
+  useEffect(() => {
     setBrowsingDirectory(searchParams.get('directory') || '/');
     setPage(Number(searchParams.get('page')) || 1);
   }, [searchParams]);
@@ -146,6 +185,15 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         setModalDirectoryEntries,
         searchInfo,
         setSearchInfo,
+
+        visibleColumns,
+        setVisibleColumns,
+        toggleColumn,
+
+        sortColumn,
+        setSortColumn,
+        sortDirection,
+        setSortDirection,
 
         clickOnce,
         setClickOnce,

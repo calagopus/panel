@@ -6,6 +6,7 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { isEditableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import { type FileSortColumn } from '@/providers/contexts/fileManagerContext.ts';
 import { bytesToString } from '@/lib/size.ts';
 import FileRowContextMenu from '@/pages/server/files/FileRowContextMenu.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
@@ -19,10 +20,11 @@ interface FileRowProps {
   isSelected: boolean;
   isActing: boolean;
   multipleSelected: boolean;
+  visibleColumns: FileSortColumn[];
 }
 
 const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
-  { file, handleOpen, isSelected, isActing, multipleSelected },
+  { file, handleOpen, isSelected, isActing, multipleSelected, visibleColumns },
   ref,
 ) {
   const canOpenActionBar = useServerCan(['files.read-content', 'files.archive', 'files.update', 'files.delete'], true);
@@ -132,15 +134,45 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
                 </span>
               </TableData>
 
-              <TableData>
-                <span className='flex items-center gap-4 leading-[100%]'>
-                  {bytesToString(preferPhysicalSize ? file.sizePhysical : file.size)}
-                </span>
-              </TableData>
+              {visibleColumns.includes('size') && (
+                <TableData>
+                  <span className='flex items-center gap-4 leading-[100%]'>
+                    {bytesToString(preferPhysicalSize ? file.sizePhysical : file.size)}
+                  </span>
+                </TableData>
+              )}
 
-              <TableData className='hidden md:table-cell'>
-                <FormattedTimestamp timestamp={file.modified} />
-              </TableData>
+              {visibleColumns.includes('modified') && (
+                <TableData className='hidden md:table-cell'>
+                  <FormattedTimestamp timestamp={file.modified} />
+                </TableData>
+              )}
+
+              {visibleColumns.includes('created') && (
+                <TableData className='hidden md:table-cell'>
+                  <FormattedTimestamp timestamp={file.created} />
+                </TableData>
+              )}
+
+              {visibleColumns.includes('type') && (
+                <TableData className='hidden md:table-cell'>
+                  <span className='text-gray-400 text-xs uppercase'>
+                    {file.directory ? 'Folder' : file.name.includes('.') ? file.name.split('.').pop() : '—'}
+                  </span>
+                </TableData>
+              )}
+
+              {visibleColumns.includes('mime') && (
+                <TableData className='hidden md:table-cell'>
+                  <span className='text-gray-400 text-xs'>{file.mime}</span>
+                </TableData>
+              )}
+
+              {visibleColumns.includes('permissions') && (
+                <TableData className='hidden md:table-cell'>
+                  <span className='text-gray-400 text-xs font-mono'>{file.mode}</span>
+                </TableData>
+              )}
 
               <ContextMenuToggle items={items} openMenu={openMenu} />
             </TableRow>

@@ -5,6 +5,28 @@ import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { serverDirectoryEntrySchema, serverFilesSearchSchema } from '@/lib/schemas/server/files.ts';
 import { FileUploader } from '@/plugins/useFileUpload.ts';
 
+export type FileSortColumn = 'name' | 'size' | 'modified' | 'created' | 'type' | 'mime' | 'permissions';
+export type FileSortDirection = 'asc' | 'desc';
+
+export interface FileColumnConfig {
+  key: FileSortColumn;
+  label: string;
+  sortable: boolean;
+  alwaysVisible?: boolean;
+}
+
+export const FILE_COLUMNS: FileColumnConfig[] = [
+  { key: 'name', label: 'Name', sortable: true, alwaysVisible: true },
+  { key: 'size', label: 'Size', sortable: true },
+  { key: 'modified', label: 'Modified', sortable: true },
+  { key: 'created', label: 'Created', sortable: true },
+  { key: 'type', label: 'Type', sortable: true },
+  { key: 'mime', label: 'MIME Type', sortable: true },
+  { key: 'permissions', label: 'Permissions', sortable: true },
+];
+
+export const DEFAULT_VISIBLE_COLUMNS: FileSortColumn[] = ['name', 'size', 'modified'];
+
 export type ModalType =
   | 'rename'
   | 'copy'
@@ -53,6 +75,14 @@ export interface FileManagerContextType {
   setModalDirectoryEntries: (files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
   searchInfo: SearchInfo | null;
   setSearchInfo: (info: SearchInfo | null) => void;
+
+  sortColumn: FileSortColumn | null;
+  setSortColumn: (column: FileSortColumn | null) => void;
+  sortDirection: FileSortDirection;
+  setSortDirection: (direction: FileSortDirection) => void;
+  visibleColumns: FileSortColumn[];
+  setVisibleColumns: (columns: FileSortColumn[]) => void;
+  toggleColumn: (column: FileSortColumn) => void;
 
   clickOnce: boolean;
   setClickOnce: (state: boolean) => void;

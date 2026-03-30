@@ -141,14 +141,16 @@ export const NoItems = () => {
 
 interface TableProps {
   columns: string[];
+  columnHeaders?: (ReactNode | undefined)[];
   loading?: boolean;
   pagination?: Pagination<unknown>;
   onPageSelect?: (page: number) => void;
+  onHeaderContextMenu?: (e: React.MouseEvent) => void;
   allowSelect?: boolean;
   children: ReactNode;
 }
 
-export default ({ columns, loading, pagination, onPageSelect, allowSelect = true, children }: TableProps) => {
+export default ({ columns, columnHeaders, loading, pagination, onPageSelect, onHeaderContextMenu, allowSelect = true, children }: TableProps) => {
   return (
     <Paper withBorder radius='md' className='overflow-x-auto'>
       {pagination && onPageSelect && pagination.total > pagination.perPage && (
@@ -162,7 +164,9 @@ export default ({ columns, loading, pagination, onPageSelect, allowSelect = true
       >
         <TableHead>
           {columns.map((column, index) => (
-            <TableHeader key={`column-${index}`} name={column} />
+            columnHeaders?.[index] !== undefined
+              ? <Table.Th key={`column-${index}`} className='font-normal!' onContextMenu={onHeaderContextMenu}>{columnHeaders[index]}</Table.Th>
+              : <TableHeader key={`column-${index}`} name={column} />
           ))}
         </TableHead>
         <Table.Tbody>

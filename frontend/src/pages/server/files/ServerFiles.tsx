@@ -1,7 +1,9 @@
-import { Group, Title } from '@mantine/core';
+import { faCheck, faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Group, Menu, Title, UnstyledButton } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { join } from 'pathe';
-import { type Ref, useCallback, useEffect, useRef } from 'react';
+import { type Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -14,6 +16,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import Table from '@/elements/Table.tsx';
 import { isEditableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import { FILE_COLUMNS, type FileSortColumn } from '@/providers/contexts/fileManagerContext.ts';
 import FileActionBar from '@/pages/server/files/FileActionBar.tsx';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
 import FileModals from '@/pages/server/files/FileModals.tsx';
@@ -32,6 +35,33 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
 
+function SortableHeader({
+  column,
+  label,
+  active,
+  direction,
+  onSort,
+}: {
+  column: FileSortColumn;
+  label: string;
+  active: FileSortColumn | null;
+  direction: 'asc' | 'desc';
+  onSort: (column: FileSortColumn) => void;
+}) {
+  const isActive = active === column;
+
+  return (
+    <UnstyledButton onClick={() => onSort(column)} className='flex items-center gap-1 w-full font-normal'>
+      <span>{label}</span>
+      <FontAwesomeIcon
+        icon={isActive ? (direction === 'asc' ? faSortUp : faSortDown) : faSort}
+        size='sm'
+        className={isActive ? 'text-white' : 'text-gray-500'}
+      />
+    </UnstyledButton>
+  );
+}
+
 function ServerFilesComponent() {
   const { t } = useTranslations();
   const { settings } = useGlobalStore();
@@ -46,6 +76,12 @@ function ServerFilesComponent() {
     openModal,
     browsingFastDirectory,
     browsingWritableDirectory,
+    sortColumn,
+    setSortColumn,
+    sortDirection,
+    setSortDirection,
+    visibleColumns,
+    toggleColumn,
     doSelectFiles,
     setBrowsingEntries,
     setBrowsingWritableDirectory,
@@ -58,6 +94,59 @@ function ServerFilesComponent() {
   const canOpenFile = useServerCan('files.read-content');
   const typeAheadBuffer = useRef('');
   const typeAheadTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+  const [columnMenu, setColumnMenu] = useState<{ opened: boolean; x: number; y: number }>({ opened: false, x: 0, y: 0 });
+
+  const handleSort = (column: FileSortColumn) => {
+    if (sortColumn === column) {
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else {
+        // Third click — disable sorting
+        setSortColumn(null);
+        setSortDirection('asc');
+      }
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedEntries = sortColumn
+    ? [...browsingEntries.data].sort((a, b) => {
+        // Directories always come first
+        if (a.directory !== b.directory) return a.directory ? -1 : 1;
+
+        let cmp = 0;
+        switch (sortColumn) {
+          case 'name':
+            cmp = a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+            break;
+          case 'size':
+            cmp = a.size - b.size;
+            break;
+          case 'modified':
+            cmp = new Date(a.modified).getTime() - new Date(b.modified).getTime();
+            break;
+          case 'created':
+            cmp = new Date(a.created).getTime() - new Date(b.created).getTime();
+            break;
+          case 'type': {
+            const extA = a.directory ? '' : (a.name.includes('.') ? a.name.split('.').pop()! : '');
+            const extB = b.directory ? '' : (b.name.includes('.') ? b.name.split('.').pop()! : '');
+            cmp = extA.localeCompare(extB, undefined, { sensitivity: 'base' });
+            break;
+          }
+          case 'mime':
+            cmp = a.mime.localeCompare(b.mime, undefined, { sensitivity: 'base' });
+            break;
+          case 'permissions':
+            cmp = a.mode.localeCompare(b.mode);
+            break;
+        }
+
+        return sortDirection === 'asc' ? cmp : -cmp;
+      })
+    : browsingEntries.data;
 
   const { data, isLoading } = useQuery({
     queryKey: ['server', server.uuid, 'files', { browsingDirectory, page }],
@@ -281,19 +370,30 @@ function ServerFilesComponent() {
               columns={
                 window.innerWidth < 768
                   ? ['', t('common.table.columns.name', {}), t('common.table.columns.size', {}), '']
+                  : ['', ...FILE_COLUMNS.filter((c) => visibleColumns.includes(c.key)).map((c) => c.label), '']
+              }
+              columnHeaders={
+                window.innerWidth < 768
+                  ? undefined
                   : [
-                      '',
-                      t('common.table.columns.name', {}),
-                      t('common.table.columns.size', {}),
-                      t('pages.server.files.table.columns.modified', {}),
-                      '',
+                      undefined,
+                      ...FILE_COLUMNS.filter((c) => visibleColumns.includes(c.key)).map((c) =>
+                        c.sortable ? (
+                          <SortableHeader key={c.key} column={c.key} label={c.label} active={sortColumn} direction={sortDirection} onSort={handleSort} />
+                        ) : undefined,
+                      ),
+                      undefined,
                     ]
               }
               pagination={browsingEntries}
               onPageSelect={onPageSelect}
+              onHeaderContextMenu={(e) => {
+                e.preventDefault();
+                setColumnMenu({ opened: true, x: e.clientX, y: e.clientY });
+              }}
               allowSelect={false}
             >
-              {browsingEntries.data.map((entry) => (
+              {sortedEntries.map((entry) => (
                 <SelectionArea.Selectable key={entry.name} item={entry}>
                   {(innerRef: Ref<HTMLElement>) => (
                     <FileRow
@@ -303,6 +403,7 @@ function ServerFilesComponent() {
                       isSelected={selectedFiles.has(entry)}
                       isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
                       multipleSelected={selectedFiles.size > 1}
+                      visibleColumns={visibleColumns}
                     />
                   )}
                 </SelectionArea.Selectable>
@@ -311,6 +412,48 @@ function ServerFilesComponent() {
           </ContextMenuProvider>
         </SelectionArea>
       )}
+
+      <Menu
+        opened={columnMenu.opened}
+        onClose={() => setColumnMenu((s) => ({ ...s, opened: false }))}
+        shadow='md'
+        width={200}
+        withinPortal
+        closeOnClickOutside
+        transitionProps={{ transition: 'scale-y', duration: 200 }}
+      >
+        <Menu.Target>
+          <div
+            style={{
+              position: 'fixed',
+              top: columnMenu.y,
+              left: columnMenu.x,
+              width: 1,
+              height: 1,
+              pointerEvents: 'none',
+            }}
+          />
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>Visible Columns</Menu.Label>
+          {FILE_COLUMNS.map((col) => (
+            <Menu.Item
+              key={col.key}
+              disabled={col.alwaysVisible}
+              leftSection={
+                visibleColumns.includes(col.key) ? (
+                  <FontAwesomeIcon icon={faCheck} size='sm' />
+                ) : (
+                  <span className='w-[14px]' />
+                )
+              }
+              onClick={() => toggleColumn(col.key)}
+            >
+              {col.label}
+            </Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
     </div>
   );
 }
