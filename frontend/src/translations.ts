@@ -441,8 +441,9 @@ const baseTranslations = defineTranslations({
             connectionError: 'Something went wrong. Connection Error.',
           },
           successMessage: 'The connection to your node was successfully verified. You may now continue.',
+          configurationDescription: 'Place this into the configuration file at `{file}` or run:',
           button: {
-            continue: 'Continue',
+            verify: 'Verify Connection',
           },
         },
         configuration: {

@@ -1,3 +1,5 @@
+import { faGlobe } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -10,6 +12,7 @@ import deleteNode from '@/api/admin/nodes/deleteNode.ts';
 import resetNodeToken from '@/api/admin/nodes/resetNodeToken.ts';
 import updateNode from '@/api/admin/nodes/updateNode.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Code from '@/elements/Code.tsx';
@@ -21,6 +24,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNodeSchema, adminNodeUpdateSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -172,6 +176,20 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
               description='used for websocket/downloads'
               placeholder='URL'
               key={form.key('publicUrl')}
+              rightSection={
+                <Tooltip label='Use Wings Proxy URL'>
+                  <ActionIcon
+                    variant='subtle'
+                    onClick={() =>
+                      form.setFieldValue('publicUrl', `${window.location.origin}/wings-proxy/${contextNode?.uuid}`)
+                    }
+                    disabled={!contextNode}
+                    size='lg'
+                  >
+                    <FontAwesomeIcon icon={faGlobe} />
+                  </ActionIcon>
+                </Tooltip>
+              }
               {...form.getInputProps('publicUrl')}
             />
           </Group>

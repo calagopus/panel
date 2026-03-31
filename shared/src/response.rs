@@ -165,6 +165,15 @@ impl ApiResponse {
     }
 
     #[inline]
+    pub fn with_headers(mut self, headers: &axum::http::HeaderMap) -> Self {
+        for (key, value) in headers.iter() {
+            self.headers.insert(key, value.clone());
+        }
+
+        self
+    }
+
+    #[inline]
     pub fn ok(self) -> ApiResponseResult {
         Ok(self)
     }

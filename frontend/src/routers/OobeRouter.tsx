@@ -104,7 +104,7 @@ export default function OobeRouter() {
                 ))}
               </Stepper>
             )}
-            <Box>
+            <Box className='max-w-[calc(100%-40px)] w-full mx-auto'>
               <Routes>
                 {steps.map(({ component: Component, ...step }, index) => (
                   <Route key={index} path={step.path} element={<Component onNext={onNext} skipFrom={skipFrom} />} />

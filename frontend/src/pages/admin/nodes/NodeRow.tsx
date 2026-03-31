@@ -9,6 +9,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { getNodeUrl } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { parseVersion } from '@/lib/version.ts';
 import { useAdminStore } from '@/stores/admin.tsx';
@@ -20,7 +21,7 @@ export default function NodeRow({ node }: { node: z.infer<typeof adminNodeSchema
 
   useEffect(() => {
     axiosInstance
-      .get(`${new URL(node.publicUrl ?? node.url).origin}/api/system`, {
+      .get(getNodeUrl(node, '/api/system'), {
         headers: {
           Authorization: `Bearer ${node.token}`,
         },

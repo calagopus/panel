@@ -8,6 +8,7 @@ import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import { getNodeUrl } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -29,7 +30,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
 
   useEffect(() => {
     axiosInstance
-      .get(`${new URL(node.publicUrl ?? node.url).origin}/api/system/logs`, {
+      .get(getNodeUrl(node, '/api/system/logs'), {
         headers: {
           Authorization: `Bearer ${node.token}`,
         },
@@ -56,7 +57,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
     setLoading(true);
 
     axiosInstance
-      .get(`${new URL(node.publicUrl ?? node.url).origin}/api/system/logs/${selectedLog.name}`, {
+      .get(getNodeUrl(node, `/api/system/logs/${selectedLog.name}`), {
         headers: {
           Authorization: `Bearer ${node.token}`,
         },
@@ -85,7 +86,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
     setLoading(true);
 
     axiosInstance
-      .get(`${new URL(node.publicUrl ?? node.url).origin}/api/system/logs/${selectedLog.name}?lines=${lines}`, {
+      .get(getNodeUrl(node, `/api/system/logs/${selectedLog.name}?lines=${lines}`), {
         headers: {
           Authorization: `Bearer ${node.token}`,
         },

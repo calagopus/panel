@@ -1200,8 +1200,7 @@ impl Server {
 
         transaction.commit().await?;
 
-        let mut url = options.destination_node.url.clone();
-        url.set_path("/api/transfers");
+        let url = options.destination_node.url("/api/transfers");
 
         self.node
             .fetch_cached(&state.database)

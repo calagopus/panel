@@ -39,3 +39,13 @@ export const getNodeConfiguration = ({ node, remote, apiPort, sftpPort }: NodeCo
 export const getNodeConfigurationCommand = ({ node, remote, apiPort, sftpPort }: NodeConfigurationParams) => {
   return `wings configure --join-data ${btoa(jsYaml.dump(getNodeConfiguration({ node, remote, apiPort, sftpPort }), { condenseFlow: true, indent: 1, noArrayIndent: true }))}`;
 };
+
+export const getNodeUrl = (node: z.infer<typeof adminNodeSchema>, path: string = '') => {
+  try {
+    return new URL(path, node.publicUrl ?? node.url).toString();
+  } catch {
+    const url = new URL(`${node.publicUrl ?? node.url}${path}`);
+    url.pathname = url.pathname.replace(/\/{2,}/g, '/');
+    return url.toString();
+  }
+};

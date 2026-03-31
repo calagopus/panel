@@ -43,6 +43,7 @@ pub struct Env {
 
     pub app_primary: bool,
     pub app_debug: AtomicBool,
+    pub app_enable_wings_proxy: bool,
     pub app_use_decryption_cache: bool,
     pub app_use_internal_cache: bool,
     pub app_trusted_proxies: Vec<cidr::IpCidr>,
@@ -121,6 +122,11 @@ impl Env {
                     .parse()
                     .context("Invalid APP_DEBUG value")?,
             ),
+            app_enable_wings_proxy: std::env::var("APP_ENABLE_WINGS_PROXY")
+                .unwrap_or("false".to_string())
+                .trim_matches('"')
+                .parse()
+                .context("Invalid APP_ENABLE_WINGS_PROXY value")?,
             app_use_decryption_cache: std::env::var("APP_USE_DECRYPTION_CACHE")
                 .unwrap_or("false".to_string())
                 .trim_matches('"')

@@ -122,8 +122,7 @@ mod post {
             },
         )?;
 
-        let mut url = destination_node.url;
-        url.set_path("/api/transfers/files");
+        let url = destination_node.url("/api/transfers/files");
 
         let request_body = wings_api::servers_server_files_copy_remote::post::RequestBody {
             url: if server.node.uuid == destination_node.uuid {

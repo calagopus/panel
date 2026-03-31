@@ -61,8 +61,7 @@ mod get {
             },
         )?;
 
-        let mut url = node.public_url();
-        url.set_path(&format!("/api/servers/{}/ws", server.uuid));
+        let mut url = node.public_url(&format!("/api/servers/{}/ws", server.uuid));
         if url.scheme() == "http" {
             url.set_scheme("ws").unwrap();
         } else if url.scheme() == "https" {

@@ -13,8 +13,18 @@ export const adminNodeSchema = z.object({
   deploymentEnabled: z.boolean(),
   maintenanceEnabled: z.boolean(),
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),
-  publicUrl: z.preprocess(nullableString, z.httpUrl().min(3).max(255).nullable()),
-  url: z.httpUrl().min(3).max(255),
+  publicUrl: z.preprocess(
+    nullableString,
+    z
+      .url({ protocol: /^https?$/ })
+      .min(3)
+      .max(255)
+      .nullable(),
+  ),
+  url: z
+    .url({ protocol: /^https?$/ })
+    .min(3)
+    .max(255),
   sftpHost: z.preprocess(nullableString, z.string().min(3).max(255).nullable()),
   sftpPort: z.number().min(0).max(65535),
   memory: z.number().min(0),

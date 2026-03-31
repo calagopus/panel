@@ -10,12 +10,10 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Alert from '@/elements/Alert.tsx';
 import AlertError from '@/elements/alerts/AlertError.tsx';
 import Button from '@/elements/Button.tsx';
-import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import HljsCode from '@/elements/HljsCode.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
-import { getNodeConfiguration, getNodeConfigurationCommand } from '@/lib/node.ts';
+import { getNodeConfiguration, getNodeConfigurationCommand, getNodeUrl } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -65,7 +63,7 @@ export default function OobeNodeConfigure({ onNext, skipFrom }: OobeComponentPro
     setIsVerified(false);
 
     axiosInstance
-      .get(`${new URL(node.publicUrl ?? node.url).origin}/api/system`, {
+      .get(getNodeUrl(node, '/api/system'), {
         headers: {
           Authorization: `Bearer ${node.token}`,
         },
@@ -87,7 +85,7 @@ export default function OobeNodeConfigure({ onNext, skipFrom }: OobeComponentPro
     <Stack gap='lg'>
       <Title order={2}>{t('pages.oobe.nodeConfiguration.title', {})}</Title>
 
-      <div className='max-w-2xl flex flex-col mx-auto gap-4'>
+      <div className='max-w-2xl flex flex-col gap-4 self-end'>
         {error && <AlertError error={error} setError={setError} />}
         {isVerified && !error && (
           <Alert icon={<FontAwesomeIcon icon={faCheck} />} color='green' title={t('common.alert.success', {})}>
@@ -95,35 +93,29 @@ export default function OobeNodeConfigure({ onNext, skipFrom }: OobeComponentPro
           </Alert>
         )}
 
-        <Card>
-          <div className='flex flex-col md:col-span-3'>
-            <HljsCode
-              languageName='yaml'
-              language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
-            >
-              {jsYaml.dump(nodeConfiguration)}
-            </HljsCode>
+        <div className='flex flex-col min-w-0'>
+          <HljsCode
+            languageName='yaml'
+            language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
+          >
+            {jsYaml.dump(nodeConfiguration)}
+          </HljsCode>
 
-            <div className='mt-2'>
-              <p>
-                Place this into the configuration file at <Code>/etc/pterodactyl/config.yml</Code> or run
-              </p>
-              <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
-                <Code block className='flex-1'>
-                  {command}
-                </Code>
-                <Tooltip label='Copy command'>
-                  <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
-                    <FontAwesomeIcon icon={faCopy} />
-                  </ActionIcon>
-                </Tooltip>
-              </Group>
-            </div>
+          <div className='mt-2'>
+            {t('pages.oobe.nodeConfiguration.configurationDescription', { file: '/etc/pterodactyl/config.yml' }).md()}
+            <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
+              <Code block className='flex-1 overflow-x-auto'>
+                {command}
+              </Code>
+              <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
+                <FontAwesomeIcon icon={faCopy} />
+              </ActionIcon>
+            </Group>
           </div>
-        </Card>
+        </div>
 
         <Button loading={loading} leftSection={<FontAwesomeIcon icon={faCheck} />} onClick={() => verifyNode()}>
-          Verify
+          {t('pages.oobe.nodeConfiguration.button.verify', {})}
         </Button>
       </div>
 
@@ -134,7 +126,7 @@ export default function OobeNodeConfigure({ onNext, skipFrom }: OobeComponentPro
           </Button>
         )}
         <Button disabled={!isVerified} loading={loading} onClick={() => onNext()}>
-          {t('pages.oobe.nodeConfiguration.button.continue', {})}
+          {t('common.button.continue', {})}
         </Button>
       </Group>
     </Stack>

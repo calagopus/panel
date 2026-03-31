@@ -11,6 +11,7 @@ services:
       - APP_DEBUG=false
       - APP_LOG_DIRECTORY=/var/log/calagopus
       - APP_PRIMARY=true # sets whether this panel instance is responsible for running background tasks (e.g. cleanup)
+      - APP_ENABLE_WINGS_PROXY=true # enables the wings proxy feature, allowing the panel to proxy user requests to wings nodes, simplifies home network setups, not recommended for many nodes or high traffic setups
       - APP_ENCRYPTION_KEY=CHANGEME
       - APP_USE_DECRYPTION_CACHE=true # caches decrypted values in memory to improve performance, can be considered less secure
       - APP_USE_INTERNAL_CACHE=true

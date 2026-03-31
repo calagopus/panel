@@ -25,6 +25,7 @@ import TitleCard from '@/elements/TitleCard.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { useChart, useChartTickLabel } from '@/lib/chart.ts';
 import { hexToRgba } from '@/lib/color.ts';
+import { getNodeUrl } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -111,7 +112,7 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
   useEffect(() => {
     const run = () => {
       axiosInstance
-        .get(`${new URL(node.publicUrl ?? node.url).origin}/api/system/stats`, {
+        .get(getNodeUrl(node, '/api/system/stats'), {
           headers: {
             Authorization: `Bearer ${node.token}`,
           },

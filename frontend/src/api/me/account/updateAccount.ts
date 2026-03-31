@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
 import { dashboardAccountSchema } from '@/lib/schemas/dashboard.ts';
 
-export default async (data: z.infer<typeof dashboardAccountSchema>): Promise<void> => {
+export default async (data: Partial<z.infer<typeof dashboardAccountSchema>>): Promise<void> => {
   return new Promise((resolve, reject) => {
     axiosInstance
       .patch('/api/client/account', {

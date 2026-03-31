@@ -5,7 +5,7 @@ import { nullableString } from '@/lib/transformers.ts';
 export const adminSettingsApplicationSchema = z.object({
   name: z.string().min(1).max(64),
   icon: z.string().min(1).max(255),
-  url: z.httpUrl().max(255),
+  url: z.url({ protocol: /^https?$/ }).max(255),
   language: z.string(),
   twoFactorRequirement: z.enum(['admins', 'all_users', 'none']),
   telemetryEnabled: z.boolean(),
@@ -121,7 +121,7 @@ export const adminSettingsStorageS3Schema = z.object({
   secretKey: z.string().min(1).max(512),
   bucket: z.string().min(1).max(63),
   region: z.string().min(1).max(63),
-  publicUrl: z.httpUrl().max(255),
+  publicUrl: z.url({ protocol: /^https?$/ }).max(255),
   endpoint: z.string().min(1).max(255),
   pathStyle: z.boolean(),
 });
@@ -133,7 +133,7 @@ export const adminSettingsStorageSchema = z.discriminatedUnion('type', [
 
 export const adminSettingsWebauthnSchema = z.object({
   rpId: z.string().min(1).max(255),
-  rpOrigin: z.httpUrl().max(255),
+  rpOrigin: z.url({ protocol: /^https?$/ }).max(255),
 });
 
 export const twoFactorRequirement = z.enum(['admins', 'all_users', 'none']);

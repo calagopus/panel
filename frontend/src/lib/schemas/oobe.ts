@@ -9,7 +9,7 @@ export const oobeStepKey = z
 export const oobeConfigurationSchema = z.object({
   applicationName: z.string().min(3).max(255),
   applicationLanguage: z.string(),
-  applicationUrl: z.httpUrl(),
+  applicationUrl: z.url({ protocol: /^https?$/ }),
   applicationTelemetry: z.boolean(),
   applicationRegistration: z.boolean(),
 });
@@ -27,8 +27,18 @@ export const oobeLoginSchema = z.object({
 
 export const oobeNodeSchema = z.object({
   name: z.string().min(3).max(255),
-  publicUrl: z.preprocess(nullableString, z.httpUrl().min(3).max(255).nullable()),
-  url: z.httpUrl().min(3).max(255),
+  publicUrl: z.preprocess(
+    nullableString,
+    z
+      .url({ protocol: /^https?$/ })
+      .min(3)
+      .max(255)
+      .nullable(),
+  ),
+  url: z
+    .url({ protocol: /^https?$/ })
+    .min(3)
+    .max(255),
   sftpHost: z.preprocess(nullableString, z.string().min(3).max(255).nullable()),
   sftpPort: z.number().min(1).max(65535),
   memory: z.number(),

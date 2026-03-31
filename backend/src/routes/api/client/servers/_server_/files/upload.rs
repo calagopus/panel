@@ -72,8 +72,7 @@ mod get {
             },
         )?;
 
-        let mut url = node.public_url();
-        url.set_path("/upload/file");
+        let mut url = node.public_url("/upload/file");
         url.set_query(Some(&format!("token={}", urlencoding::encode(&token))));
 
         ApiResponse::new_serialized(Response {

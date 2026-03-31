@@ -24,7 +24,7 @@ export const serverFilesNameSchema = z.object({
 });
 
 export const serverFilesPullSchema = z.object({
-  url: z.httpUrl(),
+  url: z.url({ protocol: /^https?$/ }),
   name: z.string().nullable(),
 });
 

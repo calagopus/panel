@@ -5,7 +5,7 @@ export const adminEggRepositorySchema = z.object({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),
-  gitRepository: z.httpUrl(),
+  gitRepository: z.url({ protocol: /^https?$/ }),
   created: z.date(),
 });
 

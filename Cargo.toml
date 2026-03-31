@@ -4,7 +4,7 @@ members = ["backend", "database-migrator", "rule-validator", "wings-api", "share
 default-members = ["backend"]
 package.rust-version = "1.93.0"
 package.license = "MIT"
-package.version = "1.0.0"
+package.version = "1.0.1"
 package.edition = "2024"
 
 [workspace.dependencies]
@@ -50,7 +50,7 @@ cron = { version = "0.15.0", features = ["serde"] }
 webauthn-rs = { version = "0.5.2", features = ["danger-allow-state-serialisation"] }
 sha2 = "0.10.8"
 colored = "3.0.0"
-russh = "0.58.0"
+russh = "0.59.0"
 futures-util = "0.3.31"
 clap = { version = "4.5.37", features = ["derive"] }
 rust-s3 = { version = "0.37.0", default-features = false, features = ["tokio-rustls-tls"] }

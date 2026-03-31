@@ -14,7 +14,9 @@ use rand::Rng;
 use sentry_tower::SentryHttpLayer;
 use sha2::Digest;
 use shared::{
-    ApiError, FRONTEND_ASSETS, GetState, extensions::commands::CliCommandGroupBuilder,
+    ApiError, FRONTEND_ASSETS, GetState,
+    extensions::commands::CliCommandGroupBuilder,
+    models::{ByUuid, node::Node},
     response::ApiResponse,
 };
 use std::{
@@ -715,9 +717,105 @@ async fn main() {
                 },
             ),
         )
-        .fallback(|state: GetState, req: Request<Body>| async move {
-            if !req.uri().path().starts_with("/api") {
-                let path = &req.uri().path()[1.min(req.uri().path().len())..];
+        .fallback(|state: GetState, mut req: Request<Body>| async move {
+            let is_upgrade = req
+                .headers()
+                .get(axum::http::header::UPGRADE)
+                .is_some_and(|v| v.as_bytes().eq_ignore_ascii_case(b"websocket"));
+
+            let on_upgrade = if is_upgrade {
+                Some(hyper::upgrade::on(&mut req))
+            } else {
+                None
+            };
+
+            let (parts, body) = req.into_parts();
+            let path = parts.uri.path();
+
+            'proxy: {
+                if !state.env.app_enable_wings_proxy {
+                    break 'proxy;
+                }
+
+                if path.starts_with("/wings-proxy") {
+                    let node = match path.strip_prefix("/wings-proxy/") {
+                        Some(node) => node,
+                        None => break 'proxy,
+                    };
+                    let (node, path) = match node.split_once('/') {
+                        Some((node, path)) => (node, path),
+                        None => break 'proxy,
+                    };
+                    let node = match uuid::Uuid::parse_str(node) {
+                        Ok(node) => node,
+                        Err(_) => break 'proxy,
+                    };
+
+                    let node = match Node::by_uuid_optional_cached(&state.database, node).await? {
+                        Some(node) => node,
+                        None => break 'proxy,
+                    };
+
+                    let mut url = node.url(path);
+                    url.set_query(parts.uri.query());
+
+                    let mut request = reqwest::Request::new(parts.method, url);
+                    *request.headers_mut() = parts.headers;
+                    *request.body_mut() = Some(reqwest::Body::wrap_stream(body.into_data_stream()));
+
+                    let response = match tokio::time::timeout(
+                        std::time::Duration::from_secs(30),
+                        state.client.execute(request),
+                    )
+                    .await
+                    {
+                        Ok(Ok(response)) => response,
+                        Ok(Err(_)) => break 'proxy,
+                        Err(_) => {
+                            return ApiResponse::error("upstream request timed out")
+                                .with_status(StatusCode::GATEWAY_TIMEOUT)
+                                .ok();
+                        }
+                    };
+
+                    let status = response.status();
+                    let headers = response.headers().clone();
+
+                    if status == axum::http::StatusCode::SWITCHING_PROTOCOLS && is_upgrade {
+                        if let Some(on_upgrade) = on_upgrade {
+                            tokio::spawn(async move {
+                                let (client_stream_raw, mut upstream_stream) =
+                                    match tokio::join!(on_upgrade, response.upgrade()) {
+                                        (Ok(c), Ok(u)) => (c, u),
+                                        _ => return,
+                                    };
+
+                                let mut client_stream =
+                                    hyper_util::rt::TokioIo::new(client_stream_raw);
+
+                                let _ = tokio::io::copy_bidirectional(
+                                    &mut client_stream,
+                                    &mut upstream_stream,
+                                )
+                                .await;
+                            });
+
+                            return ApiResponse::new(Body::empty())
+                                .with_status(status)
+                                .with_headers(&headers)
+                                .ok();
+                        }
+                    }
+
+                    return ApiResponse::new(Body::from_stream(response.bytes_stream()))
+                        .with_status(status)
+                        .with_headers(&headers)
+                        .ok();
+                }
+            }
+
+            if !path.starts_with("/api") {
+                let path = &path[1.min(path.len())..];
 
                 let (is_index, entry) = match FRONTEND_ASSETS.get_entry(path) {
                     Some(entry) => (false, entry),

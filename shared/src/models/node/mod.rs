@@ -446,8 +446,21 @@ impl Node {
     }
 
     #[inline]
-    pub fn public_url(&self) -> reqwest::Url {
-        self.public_url.clone().unwrap_or(self.url.clone())
+    pub fn url(&self, path: &str) -> reqwest::Url {
+        let mut url = self.url.clone();
+        url.path_segments_mut()
+            .unwrap()
+            .extend(path.trim_start_matches('/').split('/'));
+        url
+    }
+
+    #[inline]
+    pub fn public_url(&self, path: &str) -> reqwest::Url {
+        let mut url = self.public_url.clone().unwrap_or(self.url.clone());
+        url.path_segments_mut()
+            .unwrap()
+            .extend(path.trim_start_matches('/').split('/'));
+        url
     }
 
     #[inline]

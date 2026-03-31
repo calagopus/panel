@@ -591,8 +591,7 @@ impl ServerBackup {
             },
         )?;
 
-        let mut url = node.public_url();
-        url.set_path("/download/backup");
+        let mut url = node.public_url("/download/backup");
         url.set_query(Some(&format!(
             "token={}&archive_format={}",
             urlencoding::encode(&token),

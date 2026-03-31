@@ -7,6 +7,7 @@ import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 
 export default function OobeWelcome({ onNext }: OobeComponentProps) {
   const { t } = useTranslations();
+
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex flex-col gap-2'>

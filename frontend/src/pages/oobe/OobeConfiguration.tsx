@@ -8,6 +8,7 @@ import { z } from 'zod';
 import getSettings from '@/api/admin/settings/getSettings.ts';
 import updateApplicationSettings from '@/api/admin/settings/updateApplicationSettings.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import updateAccount from '@/api/me/account/updateAccount.ts';
 import AlertError from '@/elements/alerts/AlertError.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
@@ -15,6 +16,7 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { oobeConfigurationSchema } from '@/lib/schemas/oobe.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -22,6 +24,7 @@ import { useGlobalStore } from '@/stores/global.ts';
 export default function OobeConfiguration({ onNext }: OobeComponentProps) {
   const { t, setLanguage } = useTranslations();
   const { languages } = useGlobalStore();
+  const { user, setUser } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -46,13 +49,17 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
         form.setValues({
           applicationName: settings.app.name,
           applicationLanguage: settings.app.language,
-          applicationUrl: settings.app.url,
+          applicationUrl: window.location.origin,
           applicationTelemetry: true,
           applicationRegistration: false,
         });
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    setLanguage(form.values.applicationLanguage);
+  }, [form.values.applicationLanguage]);
 
   const onSubmit = async () => {
     setLoading(true);
@@ -68,13 +75,22 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
       languageChangeEnabled: true,
     })
       .then(() => {
-        setLanguage(form.values.applicationLanguage);
         onNext();
       })
       .catch((msg) => {
         setError(httpErrorToHuman(msg));
       })
       .finally(() => setLoading(false));
+
+    if (form.values.applicationLanguage !== 'en') {
+      updateAccount({
+        language: form.values.applicationLanguage,
+      }).catch((msg) => {
+        console.error('Failed to update account language', msg);
+      });
+
+      setUser({ ...user!, language: form.values.applicationLanguage });
+    }
   };
 
   return (
