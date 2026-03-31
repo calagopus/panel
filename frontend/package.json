@@ -33,7 +33,7 @@
     "@hcaptcha/react-hcaptcha": "^2.0.2",
     "@mantine/core": "^9.0.0",
     "@mantine/dates": "^9.0.0",
-    "@mantine/form": "^9.0.0",
+    "@mantine/form": "9.0.0-alpha.6",
     "@mantine/hooks": "^9.0.0",
     "@marsidev/react-turnstile": "^1.5.0",
     "@monaco-editor/react": "^4.7.0",
