@@ -124,7 +124,7 @@
         "failed": "Mislukt"
       },
       "server": {
-        "noAllocation": "Geen toewijzing",
+        "noAllocation": "Geen allocatie",
         "state": {
           "suspended": "Opgeschort",
           "transferring": "Server wordt overgedragen",
@@ -425,7 +425,7 @@
         },
         "node": {
           "title": "Nodeconfiguratie",
-          "allocationsTitle": "Toewijzingsconfiguratie",
+          "allocationsTitle": "Allocatiesconfiguratie",
           "form": {
             "name": "Naam",
             "namePlaceholder": "Mijn server",
@@ -1993,9 +1993,9 @@
         },
         "network": {
           "title": "Netwerk",
-          "subtitle": "{current} van {max} maximale toewijzingen toegewezen.",
+          "subtitle": "{current} van {max} maximale allocatieen toegewezen.",
           "tooltip": {
-            "limitReached": "Deze server is beperkt tot {max} toewijzingen.",
+            "limitReached": "Deze server is beperkt tot {max} allocatieen.",
             "primary": "Primair"
           },
           "table": {
@@ -2010,21 +2010,21 @@
             "unsetPrimary": "Primair verwijderen"
           },
           "toast": {
-            "created": "Toewijzing aangemaakt.",
-            "updated": "Toewijzing bijgewerkt.",
-            "removed": "Toewijzing verwijderd.",
-            "setPrimary": "Toewijzing ingesteld als primair.",
-            "unsetPrimary": "Primaire instelling van toewijzing verwijderd."
+            "created": "Allocatie aangemaakt.",
+            "updated": "Allocatie bijgewerkt.",
+            "removed": "Allocatie verwijderd.",
+            "setPrimary": "Allocatie ingesteld als primair.",
+            "unsetPrimary": "Primaire instelling van allocatie verwijderd."
           },
           "modal": {
             "editAllocation": {
-              "title": "Toewijzing bewerken",
+              "title": "Allocatie bewerken",
               "form": {
                 "notes": "Notities"
               }
             },
             "removeAllocation": {
-              "title": "Verwijderen van toewijzing bevestigen",
+              "title": "Verwijderen van allocatie bevestigen",
               "content": "Weet u zeker dat u **{allocation}** wilt verwijderen van deze server?"
             }
           }
