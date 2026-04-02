@@ -1,5 +1,5 @@
 import { faGraduationCap, faServer } from '@fortawesome/free-solid-svg-icons';
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import { NavLink, Route, Routes } from 'react-router';
 import Container from '@/elements/Container.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
@@ -21,6 +21,16 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
   const { user } = useAuth();
   const { settings } = useGlobalStore();
 
+  const allAccountRoutes = useMemo(() => {
+    const routes = [...accountRoutes, ...window.extensionContext.extensionRegistry.routes.accountRoutes];
+
+    for (const interceptor of window.extensionContext.extensionRegistry.routes.accountRouteInterceptors) {
+      interceptor(routes);
+    }
+
+    return routes;
+  }, []);
+
   return (
     <div className='lg:flex h-full'>
       {isNormal && (
@@ -41,7 +51,7 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
 
           <Sidebar.Divider />
 
-          {[...accountRoutes, ...window.extensionContext.extensionRegistry.routes.accountRoutes]
+          {allAccountRoutes
             .filter((route) => !!route.name && (!route.filter || route.filter()))
             .map((route) => (
               <Sidebar.Link
@@ -79,7 +89,7 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                   <Route path='/grouped' element={<DashboardHomeGrouped />} />
                 </>
               )}
-              {[...accountRoutes, ...window.extensionContext.extensionRegistry.routes.accountRoutes]
+              {allAccountRoutes
                 .filter((route) => !route.filter || route.filter())
                 .map(({ path, element: Element }) => (
                   <Route key={path} path={`/account/${path}`.replace('//', '/')} element={<Element />} />

@@ -1,5 +1,5 @@
 import { faReply } from '@fortawesome/free-solid-svg-icons';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { NavLink, Route, Routes } from 'react-router';
 import getLatest from '@/api/admin/system/getLatest.ts';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -24,6 +24,16 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
     getLatest().then(setLatestVersions);
   }, []);
 
+  const allAdminRoutes = useMemo(() => {
+    const routes = [...adminRoutes, ...window.extensionContext.extensionRegistry.routes.adminRoutes];
+
+    for (const interceptor of window.extensionContext.extensionRegistry.routes.adminRouteInterceptors) {
+      interceptor(routes);
+    }
+
+    return routes;
+  }, []);
+
   return (
     <div className='lg:flex h-full'>
       {isNormal && (
@@ -41,7 +51,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
 
           <Sidebar.Divider />
 
-          {[...adminRoutes, ...window.extensionContext.extensionRegistry.routes.adminRoutes]
+          {allAdminRoutes
             .filter((route) => !!route.name && (!route.filter || route.filter()))
             .map((route) =>
               route.permission ? (
@@ -73,7 +83,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
         <Container isNormal={isNormal}>
           <Suspense fallback={<Spinner.Centered />}>
             <Routes>
-              {[...adminRoutes, ...window.extensionContext.extensionRegistry.routes.adminRoutes]
+              {allAdminRoutes
                 .filter((route) => !route.filter || route.filter())
                 .map(({ path, element: Element, permission }) => (
                   <Route key={path} element={<AdminPermissionGuard permission={permission ?? []} />}>

@@ -40,10 +40,15 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   const setServer = useServerStore((state) => state.setServer);
   const setCommandSnippets = useServerStore((state) => state.setCommandSnippets);
 
-  const allServerRoutes = useMemo(
-    () => [...serverRoutes, ...window.extensionContext.extensionRegistry.routes.serverRoutes],
-    [],
-  );
+  const allServerRoutes = useMemo(() => {
+    const routes = [...serverRoutes, ...window.extensionContext.extensionRegistry.routes.serverRoutes];
+
+    for (const interceptor of window.extensionContext.extensionRegistry.routes.serverRouteInterceptors) {
+      interceptor(routes);
+    }
+
+    return routes;
+  }, []);
 
   const sidebarItems = useMemo(() => {
     const routeOrder = server.eggConfiguration?.routeOrder;

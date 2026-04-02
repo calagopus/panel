@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { Route, Routes } from 'react-router';
 import Spinner from './elements/Spinner.tsx';
 import { AuthProvider } from './providers/AuthProvider.tsx';
@@ -47,6 +47,16 @@ function RelativePageListener() {
 export default function RouterRoutes({ isNormal }: { isNormal: boolean }) {
   const { t } = useTranslations();
 
+  const allGlobalRoutes = useMemo(() => {
+    const routes = [...globalRoutes, ...window.extensionContext.extensionRegistry.routes.globalRoutes];
+
+    for (const interceptor of window.extensionContext.extensionRegistry.routes.globalRouteInterceptors) {
+      interceptor(routes);
+    }
+
+    return routes;
+  }, []);
+
   return (
     <RelativePageStoreContextProvider createStore={createRelativePageStore}>
       <AdminStoreContextProvider createStore={createAdminStore}>
@@ -58,12 +68,7 @@ export default function RouterRoutes({ isNormal }: { isNormal: boolean }) {
 
             <Suspense fallback={<Spinner.Centered />}>
               <Routes>
-                {globalRoutes
-                  .filter((route) => !route.filter || route.filter())
-                  .map(({ path, element: Element }) => (
-                    <Route key={path} path={path} element={<Element />} />
-                  ))}
-                {window.extensionContext.extensionRegistry.routes.globalRoutes
+                {allGlobalRoutes
                   .filter((route) => !route.filter || route.filter())
                   .map(({ path, element: Element }) => (
                     <Route key={path} path={path} element={<Element />} />
