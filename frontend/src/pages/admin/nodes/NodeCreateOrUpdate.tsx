@@ -201,8 +201,8 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
               key={form.key('sftpHost')}
               {...form.getInputProps('sftpHost')}
               onChange={(event) => {
-               const value = event.currentTarget.value.replace(/:/g, '');
-               form.setFieldValue('sftpHost', value);
+                const value = event.currentTarget.value.replace(/:/g, '');
+                form.setFieldValue('sftpHost', value);
               }}
             />
             <NumberInput
