@@ -16,42 +16,48 @@ import { hexToRgba } from '@/lib/color.ts';
 
 ChartJS.register(LineElement, PointElement, Filler, LinearScale, StreamingPlugin);
 
-const defaultOptions: ChartOptions<'line'> = {
-  responsive: true,
-  plugins: {
-    legend: { display: false },
-    title: { display: false },
-    tooltip: { enabled: true },
-  },
-  scales: {
-    x: {
-      type: 'realtime',
-      realtime: {
-        duration: 20000,
-        delay: 2000,
-      },
-      ticks: {
-        display: false,
-      },
-      grid: { display: false },
+function getThemeColor(varName: string, fallback: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || fallback;
+}
+
+function buildDefaultOptions(): ChartOptions<'line'> {
+  return {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: false },
+      tooltip: { enabled: true },
     },
-    y: {
-      type: 'linear',
-      min: 0,
-      grid: { display: true, color: '#424242' },
-      ticks: { color: '#f3f4f6', count: 3, font: { size: 11, weight: 'lighter' } },
-      border: { color: '#424242' },
+    scales: {
+      x: {
+        type: 'realtime',
+        realtime: {
+          duration: 20000,
+          delay: 2000,
+        },
+        ticks: {
+          display: false,
+        },
+        grid: { display: false },
+      },
+      y: {
+        type: 'linear',
+        min: 0,
+        grid: { display: true, color: getThemeColor('--mantine-color-default-border', '#424242') },
+        ticks: { color: getThemeColor('--mantine-color-dimmed', '#f3f4f6'), count: 3, font: { size: 11, weight: 'lighter' } },
+        border: { color: getThemeColor('--mantine-color-default-border', '#424242') },
+      },
     },
-  },
-  elements: {
-    point: { radius: 0 },
-    line: { tension: 0.4, cubicInterpolationMode: 'monotone' },
-  },
-  layout: { padding: 0 },
-};
+    elements: {
+      point: { radius: 0 },
+      line: { tension: 0.4, cubicInterpolationMode: 'monotone' },
+    },
+    layout: { padding: 0 },
+  };
+}
 
 function getOptions(opts?: Partial<ChartOptions<'line'>>): ChartOptions<'line'> {
-  return deepmerge(defaultOptions, opts ?? {});
+  return deepmerge(buildDefaultOptions(), opts ?? {});
 }
 
 type ChartDatasetCallback = (value: ChartDataset<'line'>, index: number) => ChartDataset<'line'>;
