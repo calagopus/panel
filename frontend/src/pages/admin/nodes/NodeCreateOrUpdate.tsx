@@ -200,6 +200,10 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
               placeholder='SFTP Host'
               key={form.key('sftpHost')}
               {...form.getInputProps('sftpHost')}
+              onChange={(event) => {
+                const value = event.currentTarget.value.replace(/:/g, '');
+                form.setFieldValue('sftpHost', value);
+              }}
             />
             <NumberInput
               withAsterisk
