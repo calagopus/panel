@@ -113,6 +113,12 @@
           "starting": "Démarrage",
           "stopping": "Arrêt"
         },
+        "serverPowerAction": {
+          "start": "Démarrer",
+          "stop": "Arrêter",
+          "restart": "Redémarrer",
+          "kill": "Tuer"
+        },
         "connectionStatus": {
           "connected": "Connecté",
           "offline": "Déconnecté"
@@ -370,7 +376,7 @@
                 },
                 "modal": {
                   "addToServerGroup": {
-                    "title": "Ajouter {serveur} au groupe de serveur",
+                    "title": "Ajouter {server} au groupe de serveur",
                     "form": {
                       "serverGroup": "Groupe de serveur"
                     }
@@ -746,10 +752,6 @@
             "normalizeCpuLoad": "Normaliser la charge CPU (max 100%)"
           },
           "power": {
-            "start": "Démarrer",
-            "stop": "Arrêter",
-            "restart": "Redémarrer",
-            "kill": "Tuer",
             "modal": {
               "forceStop": {
                 "title": "Stopper le processus de force",
@@ -810,12 +812,12 @@
             "max": "Max :"
           },
           "operations": {
-            "uploadingFolder": "Téléversement du dossier : {folder} ({current}/{total} fichiers)",
+            "uploadingFolder": "Téléversement du dossier : {folder} ({files} fichiers)",
             "waiting": "En attente : ",
             "uploading": "Téléversement : ",
             "compressing": "Compression de {files} de {path}",
             "decompressing": "Décompression de {path}",
-            "pulling": "Récupération de {path}",
+            "pulling": "Récupération de {destination}",
             "copying": "Copie de {path} vers {destination}",
             "copyingMany": "Copie de {files}",
             "receivingRemote": "Réception de {files} depuis serveur distant",
@@ -975,6 +977,9 @@
             "details": "Détails",
             "rotatePassword": "Régénérer mot de passe"
           },
+          "form": {
+            "databaseName": "Nom de base de données"
+          },
           "modal": {
             "createDatabase": {
               "title": "Créer base de données",
@@ -982,7 +987,6 @@
                 "created": "Base de données créée."
               },
               "form": {
-                "databaseName": "Nom de base de données",
                 "databaseHost": "Hôte de base de données",
                 "noHostsFound": "Pas d'hôtes trouvés"
               }
@@ -1007,7 +1011,7 @@
             },
             "deleteDatabase": {
               "title": "Confirmer la suppression de base de données",
-              "content": "Supprimer une base de données est une action permanente, elle ne peut pas être défaite. Ceci supprimera la base de données **name** et toutes données associées de manière permanente.",
+              "content": "Supprimer une base de données est une action permanente, elle ne peut pas être défaite. Ceci supprimera la base de données **{name}** et toutes données associées de manière permanente.",
               "toast": {
                 "deleted": "Base de données supprimée."
               }
