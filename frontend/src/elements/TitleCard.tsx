@@ -29,14 +29,12 @@ function TitleCard({
   return (
     <Card withBorder radius='md' p={0} bg='dark.7' className={className}>
       <Box
-        px='md'
-        py='sm'
         style={{
           borderBottom: '1px solid var(--mantine-color-dark-5)',
           background: 'var(--mantine-color-dark-6)',
         }}
       >
-        <Group gap='sm' className={titleClassName}>
+        <Group px='md' py='sm' gap='sm' className={titleClassName}>
           {leftSection}
           <Box
             style={{
@@ -57,7 +55,7 @@ function TitleCard({
           {rightSection}
         </Group>
       </Box>
-      <div className={classNames('p-4', wrapperClassName)}>{children}</div>
+      <div className={classNames('p-4 h-full', wrapperClassName)}>{children}</div>
     </Card>
   );
 }

@@ -130,13 +130,13 @@ export default function ServerAllocationRow({
               openMenu(e.pageX, e.pageY);
             }}
           >
-            <td className='relative w-10 text-center'>
+            <TableData className='relative w-10 text-center'>
               {allocation.isPrimary && (
                 <Tooltip label='Primary'>
-                  <FontAwesomeIcon icon={faStar} className='text-yellow-500 ml-3' />
+                  <FontAwesomeIcon icon={faStar} className='text-yellow-500' />
                 </Tooltip>
               )}
-            </td>
+            </TableData>
 
             <TableData>
               <Code>{allocation.ip}</Code>

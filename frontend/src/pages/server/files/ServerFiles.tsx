@@ -309,7 +309,7 @@ function ServerFilesComponent() {
         </Group>
       </Group>
 
-      <div className='bg-[#282828] border border-[#424242] rounded-lg mb-2 p-4'>
+      <div className='bg-[#282828] border border-[#424242] rounded-lg mb-2 p-4' id='file-manager-card'>
         <FileBreadcrumbs path={decodeURIComponent(browsingDirectory)} />
       </div>
 

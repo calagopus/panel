@@ -5,7 +5,6 @@ import {
   Group,
   GroupProps,
   Pagination as MantinePagination,
-  Paper,
   Stack,
   Table,
   TableTdProps,
@@ -154,7 +153,15 @@ interface TableProps {
 
 export default ({ columns, loading, pagination, onPageSelect, allowSelect = true, children }: TableProps) => {
   return (
-    <Paper withBorder radius='md' className='overflow-x-auto'>
+    <Table.ScrollContainer
+      minWidth={0}
+      type='native'
+      style={{
+        borderRadius: 'var(--mantine-radius-md)',
+        border: '1px solid var(--mantine-color-default-border)',
+        background: 'var(--mantine-color-body)',
+      }}
+    >
       {pagination && onPageSelect && pagination.total > pagination.perPage && (
         <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} />
       )}
@@ -196,6 +203,6 @@ export default ({ columns, loading, pagination, onPageSelect, allowSelect = true
       </Table>
 
       {pagination && onPageSelect && <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} />}
-    </Paper>
+    </Table.ScrollContainer>
   );
 };

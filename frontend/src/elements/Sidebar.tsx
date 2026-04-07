@@ -57,7 +57,11 @@ function Sidebar({ children }: SidebarProps) {
           <div className='h-full flex flex-col overflow-y-auto'>{children}</div>
         </Drawer>
 
-        <Card className='mt-2 top-2 ml-2 sticky! hidden! lg:block! h-[calc(100vh-1rem)] min-w-64!' p='sm'>
+        <Card
+          className='mt-2 top-2 ml-2 sticky! hidden! lg:block! h-[calc(100vh-1rem)] min-w-64!'
+          p='sm'
+          id='sidebar-desktop'
+        >
           <div className='h-full flex flex-col overflow-y-auto'>{children}</div>
         </Card>
       </ContextMenuProvider>
@@ -127,7 +131,7 @@ function Link({ to, end, icon, name, title = name }: LinkProps) {
           {({ isActive }) => (
             <Button
               color={isActive ? 'blue' : 'gray'}
-              className={isActive ? 'cursor-default!' : undefined}
+              className={isActive ? 'cursor-default! active' : undefined}
               variant='subtle'
               fullWidth
               styles={{ label: { width: '100%' } }}
@@ -156,7 +160,10 @@ function Footer() {
 
   return (
     <>
-      <div className='border border-neutral-700 rounded-lg mt-auto p-2 flex flex-row justify-between items-center min-h-fit'>
+      <div
+        className='border border-neutral-700 rounded-lg mt-auto p-2 flex flex-row justify-between items-center min-h-fit'
+        id='sidebar-account-card'
+      >
         <NavLink
           to='/account'
           className='flex items-center flex-1 min-w-0'
