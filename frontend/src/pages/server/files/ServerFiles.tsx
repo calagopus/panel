@@ -325,40 +325,40 @@ function ServerFilesComponent() {
               columns={
                 window.innerWidth < 768
                   ? [
-                    { name: '' },
-                    {
-                      name: t('common.table.columns.name', {}),
-                      rightSection: <ServerFilesColumnRightSection name='name' />,
-                      onClick: columnOnClick('name', sortMode, setSortMode),
-                    },
-                    {
-                      name: t('common.table.columns.size', {}),
-                      rightSection: (
-                        <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
-                      ),
-                      onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
-                    },
-                  ]
+                      { name: '' },
+                      {
+                        name: t('common.table.columns.name', {}),
+                        rightSection: <ServerFilesColumnRightSection name='name' />,
+                        onClick: columnOnClick('name', sortMode, setSortMode),
+                      },
+                      {
+                        name: t('common.table.columns.size', {}),
+                        rightSection: (
+                          <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
+                        ),
+                        onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
+                      },
+                    ]
                   : [
-                    { name: '' },
-                    {
-                      name: t('common.table.columns.name', {}),
-                      rightSection: <ServerFilesColumnRightSection name='name' />,
-                      onClick: columnOnClick('name', sortMode, setSortMode),
-                    },
-                    {
-                      name: t('common.table.columns.size', {}),
-                      rightSection: (
-                        <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
-                      ),
-                      onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
-                    },
-                    {
-                      name: t('pages.server.files.table.columns.modified', {}),
-                      rightSection: <ServerFilesColumnRightSection name='modified' />,
-                    },
-                    { name: '' },
-                  ]
+                      { name: '' },
+                      {
+                        name: t('common.table.columns.name', {}),
+                        rightSection: <ServerFilesColumnRightSection name='name' />,
+                        onClick: columnOnClick('name', sortMode, setSortMode),
+                      },
+                      {
+                        name: t('common.table.columns.size', {}),
+                        rightSection: (
+                          <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
+                        ),
+                        onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
+                      },
+                      {
+                        name: t('pages.server.files.table.columns.modified', {}),
+                        rightSection: <ServerFilesColumnRightSection name='modified' />,
+                      },
+                      { name: '' },
+                    ]
               }
               pagination={browsingEntries}
               onPageSelect={onPageSelect}
