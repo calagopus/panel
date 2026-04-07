@@ -41,6 +41,7 @@ export const publicSettingsSchema = z.object({
   app: z.object({
     url: z.string(),
     icon: z.string(),
+    banner: z.string().nullable(),
     name: z.string(),
     language: z.string(),
     registrationEnabled: z.boolean(),

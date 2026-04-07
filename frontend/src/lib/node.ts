@@ -41,11 +41,7 @@ export const getNodeConfigurationCommand = ({ node, remote, apiPort, sftpPort }:
 };
 
 export const getNodeUrl = (node: z.infer<typeof adminNodeSchema>, path: string = '') => {
-  try {
-    return new URL(path, node.publicUrl ?? node.url).toString();
-  } catch {
-    const url = new URL(`${node.publicUrl ?? node.url}${path}`);
-    url.pathname = url.pathname.replace(/\/{2,}/g, '/');
-    return url.toString();
-  }
+  const url = new URL(`${node.publicUrl ?? node.url}${path}`);
+  url.pathname = url.pathname.replace(/\/{2,}/g, '/');
+  return url.toString();
 };

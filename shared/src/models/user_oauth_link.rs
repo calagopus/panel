@@ -266,7 +266,7 @@ impl UserOAuthLink {
                 .user
                 .fetch_cached(database)
                 .await?
-                .into_api_full_object(storage_url_retriever),
+                .into_admin_api_object(storage_url_retriever),
             identifier: self.identifier,
             last_used: self.last_used.map(|dt| dt.and_utc()),
             created: self.created.and_utc(),
@@ -394,7 +394,7 @@ impl DeletableModel for UserOAuthLink {
 #[schema(title = "AdminUserOAuthLink")]
 pub struct AdminApiUserOAuthLink {
     pub uuid: uuid::Uuid,
-    pub user: super::user::ApiFullUser,
+    pub user: super::user::AdminApiUser,
 
     pub identifier: compact_str::CompactString,
 

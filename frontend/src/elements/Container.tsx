@@ -33,7 +33,13 @@ function Container({ children, isNormal }: LayoutProps) {
 
         {children}
       </div>
-      <div className='my-2 text-xs transition-all text-gray-400 mr-12'>
+      <div className='my-2 text-xs transition-all flex flex-col text-gray-400 mr-12'>
+        {window.extensionContext.extensionRegistry.pages.global.copyright.prependedComponents.map(
+          (Component, index) => (
+            <Component key={`global-copyright-prepended-${index}`} />
+          ),
+        )}
+
         <span className='flex flex-row justify-end gap-2'>
           <Tooltip label={settings.version}>
             <a href='https://calagopus.com' target='_blank' rel='noopener noreferrer' className='underline'>
@@ -42,6 +48,10 @@ function Container({ children, isNormal }: LayoutProps) {
           </Tooltip>
           © 2025 - {new Date().getFullYear()}
         </span>
+
+        {window.extensionContext.extensionRegistry.pages.global.copyright.appendedComponents.map((Component, index) => (
+          <Component key={`global-copyright-appended-${index}`} />
+        ))}
       </div>
     </div>
   );

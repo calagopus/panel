@@ -32,6 +32,7 @@ export interface SearchInfo {
 export type ActingFileMode = 'copy' | 'move';
 
 export interface FileManagerContextType {
+  isLoading: boolean;
   fileInputRef: RefObject<HTMLInputElement | null>;
   folderInputRef: RefObject<HTMLInputElement | null>;
 
@@ -71,6 +72,7 @@ export interface FileManagerContextType {
   imageViewerSmoothing: boolean;
   setImageViewerSmoothing: (state: boolean) => void;
 
+  resetEntries: () => void;
   invalidateFilemanager: () => void;
   fileUploader: FileUploader;
   doActFiles: (mode: ActingFileMode | null, files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
@@ -88,6 +90,14 @@ export const useFileManager = () => {
   const context = useContext(FileManagerContext);
   if (!context) {
     throw new Error('useFileManager must be used within a FileManagerProvider');
+  }
+  return context;
+};
+
+export const getFileManager = (): FileManagerContextType => {
+  const context = (FileManagerContext as never)['_currentValue'] as FileManagerContextType | undefined;
+  if (!context) {
+    throw new Error('getFileManager must be used within a FileManagerProvider');
   }
   return context;
 };

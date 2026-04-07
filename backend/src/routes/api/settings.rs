@@ -13,6 +13,7 @@ mod get {
     struct ResponseApp<'a> {
         url: &'a str,
         icon: &'a str,
+        banner: Option<&'a str>,
         name: &'a str,
         language: &'a str,
         registration_enabled: bool,
@@ -58,6 +59,7 @@ mod get {
             app: ResponseApp {
                 url: &settings.app.url,
                 icon: &settings.app.icon,
+                banner: settings.app.banner.as_deref(),
                 name: &settings.app.name,
                 language: &settings.app.language,
                 registration_enabled: settings.app.registration_enabled,

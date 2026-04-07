@@ -79,6 +79,12 @@
           "bottomLeft": "Stânga jos",
           "bottomCenter": "Centru jos",
           "bottomRight": "Dreapta jos"
+        },
+        "serverPowerAction": {
+          "start": "Pornește",
+          "stop": "Oprește",
+          "restart": "Repornește",
+          "kill": "Termină"
         }
       },
       "unlimited": "Nelimitat",
@@ -545,10 +551,6 @@
             "normalizeCpuLoad": "Normalizează încărcarea CPU (schimbat la maxim 100%)"
           },
           "power": {
-            "start": "Pornește",
-            "stop": "Oprește",
-            "restart": "Repornește",
-            "kill": "Termină",
             "modal": {
               "forceStop": {
                 "title": "Oprește forțat procesul",
@@ -581,6 +583,9 @@
             "details": "Detalii",
             "rotatePassword": "Rotește parola"
           },
+          "form": {
+            "databaseName": "Nume bază de date"
+          },
           "modal": {
             "createDatabase": {
               "title": "Creează bază de date",
@@ -588,7 +593,6 @@
                 "created": "Bază de date creată."
               },
               "form": {
-                "databaseName": "Nume bază de date",
                 "databaseHost": "Gazdă bază de date",
                 "noHostsFound": "Nicio gazdă găsită"
               }

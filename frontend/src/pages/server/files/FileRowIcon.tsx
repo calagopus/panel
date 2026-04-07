@@ -2,12 +2,15 @@ import { faFile, faFilePen, faFolder, faFolderTree, faImage, IconDefinition } fr
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { memo } from 'react';
 import { z } from 'zod';
-import { isEditableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
+import { isOpenableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import { getFileManager } from '@/providers/contexts/fileManagerContext.ts';
 
 function getFileIcon(file: z.infer<typeof serverDirectoryEntrySchema>): IconDefinition {
+  const fileManagerContext = getFileManager();
+
   for (const handler of window.extensionContext.extensionRegistry.pages.server.files.fileIconHandlers) {
-    const icon = handler(file);
+    const icon = handler(file, fileManagerContext);
     if (icon) {
       return icon;
     }
@@ -19,9 +22,9 @@ function getFileIcon(file: z.infer<typeof serverDirectoryEntrySchema>): IconDefi
 
   if (isViewableImage(file)) {
     return faImage;
-  } else if (isViewableArchive(file)) {
+  } else if (isViewableArchive(file, fileManagerContext)) {
     return faFolderTree;
-  } else if (isEditableFile(file)) {
+  } else if (isOpenableFile(file, fileManagerContext).openable) {
     return faFilePen;
   }
 

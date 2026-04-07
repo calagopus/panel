@@ -1014,6 +1014,25 @@ impl Server {
         .unwrap_or(0)
     }
 
+    /// Fetches the current status of the server from the database. This is the most up-to-date status, as opposed to the potentially cached status in the `Server` struct.
+    pub async fn fetch_status(
+        &self,
+        database: &crate::database::Database,
+    ) -> Result<Option<ServerStatus>, crate::database::DatabaseError> {
+        let status = sqlx::query_scalar(
+            r#"
+            SELECT status
+            FROM servers
+            WHERE servers.uuid = $1
+            "#,
+        )
+        .bind(self.uuid)
+        .fetch_one(database.read())
+        .await?;
+
+        Ok(status)
+    }
+
     pub async fn sync(self, database: &crate::database::Database) -> Result<(), anyhow::Error> {
         self.node
             .fetch_cached(database)

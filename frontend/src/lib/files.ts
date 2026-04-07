@@ -1,5 +1,7 @@
+import { FileOpenMode } from 'shared/src/registries/pages/server/files.ts';
 import { z } from 'zod';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import { FileManagerContextType } from '@/providers/contexts/fileManagerContext.ts';
 import { getGlobalStore } from '@/stores/global.ts';
 
 export function isArchiveType(file: z.infer<typeof serverDirectoryEntrySchema>) {
@@ -22,10 +24,14 @@ export function isArchiveType(file: z.infer<typeof serverDirectoryEntrySchema>) 
   );
 }
 
-export function isViewableArchive(file: z.infer<typeof serverDirectoryEntrySchema>) {
+export function isViewableArchive(
+  file: z.infer<typeof serverDirectoryEntrySchema>,
+  fileManagerContext: FileManagerContextType,
+) {
   const validExtensions = ['.zip', '.7z', '.ddup'];
 
   return (
+    fileManagerContext.browsingFastDirectory &&
     (['application/zip', 'application/x-7z-compressed'].includes(file.mime) || file.name.endsWith('.ddup')) &&
     validExtensions.some((ext) => file.name.endsWith(ext))
   );
@@ -39,9 +45,37 @@ export function isViewableImage(file: z.infer<typeof serverDirectoryEntrySchema>
   return file.mime.startsWith('image/') && /^image\/(?!svg\+xml)/.test(file.mime);
 }
 
-export function isEditableFile(file: z.infer<typeof serverDirectoryEntrySchema>) {
+export function isOpenableFile(
+  file: z.infer<typeof serverDirectoryEntrySchema>,
+  fileManagerContext: FileManagerContextType,
+): FileOpenMode {
+  if (file.directory || isViewableArchive(file, fileManagerContext)) {
+    return {
+      openable: true,
+      handleOpen: ({ handleDirectoryOpen }) => {
+        handleDirectoryOpen(file.name);
+      },
+    };
+  }
+
+  for (const handler of window.extensionContext.extensionRegistry.pages.server.files.fileOpenableHandlers) {
+    const result = handler(file, fileManagerContext);
+    if (result.openable) {
+      return result;
+    }
+  }
+
   if (file.size > getGlobalStore().settings.server.maxFileManagerViewSize) {
-    return false;
+    return { openable: false };
+  }
+
+  if (isViewableImage(file)) {
+    return {
+      openable: true,
+      handleOpen: ({ handleFileOpen }) => {
+        handleFileOpen(file.name, 'image', {});
+      },
+    };
   }
 
   const matches = [
@@ -52,9 +86,16 @@ export function isEditableFile(file: z.infer<typeof serverDirectoryEntrySchema>)
     /^image\/(?!svg\+xml)/,
   ];
 
-  if (isArchiveType(file) && !file.innerEditable) return false;
+  if (isArchiveType(file) && !file.innerEditable) return { openable: false };
 
-  return (file.editable || file.innerEditable) && matches.every((m) => !file.mime.match(m));
+  return (file.editable || file.innerEditable) && matches.every((m) => !file.mime.match(m))
+    ? {
+        openable: true,
+        handleOpen: ({ handleFileOpen }) => {
+          handleFileOpen(file.name, 'edit', {});
+        },
+      }
+    : { openable: false };
 }
 
 export function permissionStringToNumber(mode: string) {

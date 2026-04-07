@@ -5,6 +5,7 @@ import { nullableString } from '@/lib/transformers.ts';
 
 export const adminUserSchema = z.object({
   uuid: z.string(),
+  externalId: z.preprocess(nullableString, z.string().nullable()),
   username: z.string(),
   email: z.email(),
   nameFirst: z.string(),

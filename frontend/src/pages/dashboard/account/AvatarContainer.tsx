@@ -64,7 +64,7 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
       title={t('pages.account.account.containers.avatar.title', {})}
       icon={<FontAwesomeIcon icon={faImage} />}
       className={classNames(
-        'h-full order-50 col-span-2',
+        'h-full order-50 md:col-span-2',
         requireTwoFactorActivation && 'blur-xs pointer-events-none select-none',
       )}
     >

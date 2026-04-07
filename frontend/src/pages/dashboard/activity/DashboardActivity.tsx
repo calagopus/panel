@@ -82,7 +82,7 @@ export default function DashboardActivity() {
             </TableData>
 
             <TableData>
-              <Code>{activity.ip}</Code>
+              <Code>{activity.ip ? activity.ip : t('common.na', {})}</Code>
             </TableData>
 
             <TableData>

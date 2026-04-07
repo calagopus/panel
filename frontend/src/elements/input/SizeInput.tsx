@@ -1,3 +1,4 @@
+import { Box } from '@mantine/core';
 import { startTransition, useEffect, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import { closestUnit, formatUnitBytes, mapUnitToLocale, mbToBytes, UNITS, unitToBytes } from '@/lib/size.ts';
@@ -80,35 +81,33 @@ function SizeInput({ mode, min, value, onChange, ...rest }: SizeInputProps) {
   };
 
   return (
-    <NumberInput
-      {...rest}
-      min={min}
-      value={displayValue}
-      onChange={handleValueChange}
-      rightSectionWidth={72}
-      rightSection={
-        <Select
-          data={availableUnits.map((u) => ({
-            label: mapUnitToLocale(u),
-            value: u,
-          }))}
-          value={unit}
-          onChange={handleUnitChange}
-          styles={{
-            input: {
-              fontWeight: 500,
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              width: 72,
-              marginTop: -5,
-              marginRight: -2,
-            },
-          }}
-          rightSectionWidth={28}
-          disabled={displayValue === -1}
-        />
-      }
-    />
+    <Box pos='relative'>
+      <NumberInput {...rest} min={min} value={displayValue} onChange={handleValueChange} hideControls />
+      <Select
+        data={availableUnits.map((u) => ({
+          label: mapUnitToLocale(u),
+          value: u,
+        }))}
+        value={unit}
+        onChange={handleUnitChange}
+        size='sm'
+        w={80}
+        comboboxProps={{ withinPortal: true }}
+        disabled={displayValue === -1}
+        aria-label='Unit'
+        styles={{
+          input: {
+            fontWeight: 500,
+            fontSize: 'var(--mantine-font-size-xs)',
+          },
+        }}
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+        }}
+      />
+    </Box>
   );
 }
 

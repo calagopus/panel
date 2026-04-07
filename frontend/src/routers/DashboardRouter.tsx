@@ -1,6 +1,7 @@
 import { faGraduationCap, faServer } from '@fortawesome/free-solid-svg-icons';
 import { Suspense, useMemo } from 'react';
 import { NavLink, Route, Routes } from 'react-router';
+import AppIcon from '@/elements/AppIcon.tsx';
 import Container from '@/elements/Container.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
@@ -14,12 +15,10 @@ import DashboardHomeGrouped from '@/pages/dashboard/home/DashboardHomeGrouped.ts
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import accountRoutes from '@/routers/routes/accountRoutes.ts';
-import { useGlobalStore } from '@/stores/global.ts';
 
 export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
   const { t } = useTranslations();
   const { user } = useAuth();
-  const { settings } = useGlobalStore();
 
   const allAccountRoutes = useMemo(() => {
     const routes = [...accountRoutes, ...window.extensionContext.extensionRegistry.routes.accountRoutes];
@@ -36,10 +35,7 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
       {isNormal && (
         <Sidebar>
           <NavLink to='/' className='w-full'>
-            <div className='h-16 w-full flex flex-row items-center justify-between mt-1 select-none cursor-pointer'>
-              <img src={settings.app.icon} className='h-12 w-12' alt='Calagopus Icon' />
-              <h1 className='grow text-md font-bold! ml-2'>{settings.app.name}</h1>
-            </div>
+            <AppIcon />
           </NavLink>
 
           <Sidebar.Divider />

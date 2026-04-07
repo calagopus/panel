@@ -38,7 +38,9 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_server_permission("settings.cancel-install")?;
 
-        if server.status == Some(shared::models::server::ServerStatus::InstallFailed) {
+        let status = server.fetch_status(&state.database).await?;
+
+        if status == Some(shared::models::server::ServerStatus::InstallFailed) {
             if !state
                 .settings
                 .get()
@@ -51,7 +53,7 @@ mod post {
                     .with_status(StatusCode::FORBIDDEN)
                     .ok();
             }
-        } else if server.status != Some(shared::models::server::ServerStatus::Installing) {
+        } else if status != Some(shared::models::server::ServerStatus::Installing) {
             return ApiResponse::error("server is not installing")
                 .with_status(StatusCode::CONFLICT)
                 .ok();

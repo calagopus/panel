@@ -210,7 +210,7 @@
       },
       "copyOnClick": {
         "toast": {
-          "Đã sao chép": "Đã sao chép vào bộ nhớ tạm.",
+          "copied": "Đã sao chép vào bộ nhớ tạm.",
           "failed": "Thất bại khi sao chép vào bộ nhớ tạm.",
           "copyManual": "Sao chép: Ctrl+C hoặc Command+C, Enter"
         }
@@ -459,10 +459,7 @@
             "connectionError": "Đã xảy ra lỗi. Lỗi kết nối."
           },
           "successMessage": "Kết nối với node đã hoàn thành xác minh. Bạn có thể tiếp tục.",
-          "configurationDescription": "Thêm đoạn mã này vào tệp cấu hình tại `{file}` hoặc chạy lệnh sau:",
-          "button": {
-            "continue": "Tiếp tục"
-          }
+          "configurationDescription": "Thêm đoạn mã này vào tệp cấu hình tại `{file}` hoặc chạy lệnh sau:"
         },
         "configuration": {
           "title": "Cấu hình Ứng dụng",
@@ -831,1299 +828,1301 @@
                 "avatar": "Hình Đại Diện"
               }
             }
-          },
-          "securityKeys": {
-            "title": "Khóa Bảo Mật",
-            "table": {
-              "columns": {
-                "credentialId": "ID Thông tin Xác thực"
-              }
-            },
-            "tooltip": {
-              "secureContextRequired": "Cần có ngữ cảnh bảo mật (HTTPS) để sử dụng khóa bảo mật."
-            },
-            "modal": {
-              "createSecurityKey": {
-                "title": "Tạo Khóa Bảo Mật",
-                "toast": {
-                  "created": "Khóa bảo mật đã được tạo thành công.",
-                  "aborted": "Tạo khóa bảo mật đã bị hủy."
-                }
-              },
-              "editSecurityKey": {
-                "title": "Chỉnh sửa Khóa Bảo Mật",
-                "toast": {
-                  "updated": "Khóa bảo mật đã được cập nhật thành công."
-                }
-              },
-              "deleteSecurityKey": {
-                "title": "Xác nhận Xóa Khóa Bảo Mật",
-                "content": "Bạn có chắc muốn xóa **{key}** khỏi tài khoản của bạn không?",
-                "toast": {
-                  "deleted": "Khóa bảo mật đã được xóa thành công."
-                }
-              }
-            }
-          },
-          "sessions": {
-            "title": "Phiên Làm Việc",
-            "table": {
-              "columns": {
-                "ip": "IP",
-                "thisDevice": "Thiết bị Này?",
-                "userAgent": "User Agent"
-              }
-            },
-            "modal": {
-              "deleteSession": {
-                "title": "Xác nhận Xóa Phiên Làm Việc",
-                "content": "Bạn có chắc muốn xóa phiên làm việc **{ip}** khỏi tài khoản của bạn không?",
-                "toast": {
-                  "deleted": "Phiên làm việc đã được xóa."
-                }
-              }
-            }
-          },
-          "shortcuts": {
-            "title": "Phím Tắt Bàn Phím",
-            "description": "Sử dụng các phím tắt này để điều hướng và tương tác với bảng điều khiển hiệu quả hơn.",
-            "detectedMac": "Đã phát hiện macOS",
-            "detectedWindows": "Đã phát hiện Windows/Linux",
-            "fileManager": {
-              "title": "Trình Quản Lý Tệp",
-              "selectAll": "Chọn tất cả tệp",
-              "cutFiles": "Cắt các tệp đã chọn",
-              "copyFiles": "Sao chép các tệp đã chọn",
-              "duplicateFile": "Nhân đôi tệp đã chọn",
-              "pasteFiles": "Dán tệp",
-              "searchFiles": "Tìm kiếm tệp",
-              "moveUpDirectory": "Di chuyển lên một thư mục",
-              "moveUpSelection": "Di chuyển lên lựa chọn",
-              "moveDownSelection": "Di chuyển xuống lựa chọn",
-              "renameFile": "Đổi tên tệp",
-              "deselectAll": "Bỏ chọn tất cả tệp",
-              "deleteFiles": "Xóa các tệp đã chọn"
-            },
-            "table": {
-              "title": "Điều Hướng Bảng",
-              "previousPage": "Trang trước",
-              "nextPage": "Trang tiếp theo",
-              "firstPage": "Trang đầu tiên",
-              "lastPage": "Trang cuối cùng"
-            },
-            "console": {
-              "title": "Bảng điều khiển Máy chủ",
-              "searchContent": "Tìm kiếm trong đầu ra bảng điều khiển",
-              "previousCommand": "Lệnh trước trong lịch sử",
-              "nextCommand": "Lệnh tiếp theo trong lịch sử"
-            },
-            "serverList": {
-              "title": "Danh Sách Máy chủ",
-              "selectServer": "Giữ S và nhấp để chọn/bỏ chọn máy chủ"
-            }
-          },
-          "sshKeys": {
-            "title": "Khóa SSH",
-            "button": {
-              "import": "Nhập"
-            },
-            "table": {
-              "columns": {
-                "fingerprint": "Dấu Vân Tay"
-              }
-            },
-            "modal": {
-              "createSshKey": {
-                "title": "Tạo Khóa SSH",
-                "toast": {
-                  "created": "Khóa SSH đã được tạo."
-                },
-                "button": {
-                  "uploadKeyFile": "Tải Lên Tệp Khóa"
-                },
-                "form": {
-                  "publicKey": "Khóa Công Khai"
-                }
-              },
-              "editSshKey": {
-                "title": "Chỉnh Sửa Khóa SSH",
-                "toast": {
-                  "updated": "Khóa SSH đã được cập nhật."
-                }
-              },
-              "importSshKeys": {
-                "title": "Nhập Khóa SSH",
-                "toast": {
-                  "created": "{sshKeys} đã được tạo."
-                },
-                "form": {
-                  "provider": "Nhà Cung Cấp",
-                  "username": "Tên Người Dùng"
-                }
-              },
-              "deleteSshKey": {
-                "title": "Xác Nhận Xóa Khóa SSH",
-                "content": "Bạn có chắc muốn xóa **{name}** khỏi tài khoản của bạn không?",
-                "toast": {
-                  "removed": "Khóa SSH đã được xóa."
-                }
-              }
-            }
-          },
-          "commandSnippets": {
-            "title": "Đoạn Lệnh",
-            "table": {
-              "columns": {
-                "eggs": "Eggs"
-              }
-            },
-            "form": {
-              "eggs": "Eggs",
-              "command": "Lệnh"
-            },
-            "modal": {
-              "createCommandSnippet": {
-                "title": "Tạo Đoạn Lệnh",
-                "toast": {
-                  "created": "Đoạn lệnh đã được tạo."
-                }
-              },
-              "editCommandSnippet": {
-                "title": "Chỉnh Sửa Đoạn Lệnh",
-                "toast": {
-                  "updated": "Đoạn lệnh đã được cập nhật."
-                }
-              },
-              "deleteCommandSnippet": {
-                "title": "Xác Nhận Xóa Đoạn Lệnh",
-                "content": "Bạn có chắc muốn xóa **{name}** khỏi tài khoản của bạn không?",
-                "toast": {
-                  "removed": "Đoạn lệnh đã được xóa."
-                }
-              }
-            }
-          },
-          "oauthLinks": {
-            "title": "Liên Kết OAuth",
-            "button": {
-              "connect": "Kết Nối",
-              "connectTo": "Kết Nối với {provider}"
-            },
-            "table": {
-              "columns": {
-                "providerName": "Tên Nhà Cung Cấp",
-                "identifier": "Định Danh"
-              }
-            },
-            "modal": {
-              "deleteOAuthLink": {
-                "title": "Xác Nhận Xóa Liên Kết OAuth",
-                "content": "Bạn có chắc muốn xóa kết nối **{provider}** khỏi tài khoản của bạn không?",
-                "toast": {
-                  "removed": "Liên kết OAuth đã được xóa."
-                }
-              }
-            }
-          },
-          "apiKeys": {
-            "title": "Khóa API",
-            "button": {
-              "apiDocumentation": "Tài Liệu API"
-            },
-            "table": {
-              "columns": {
-                "key": "Khóa",
-                "permissions": "Quyền Người Dùng / Máy Chủ / Admin",
-                "expires": "Hết Hạn"
-              }
-            },
-            "modal": {
-              "createApiKey": {
-                "title": "Tạo Khóa API",
-                "toast": {
-                  "created": "Khóa API đã được tạo."
-                }
-              },
-              "updateApiKey": {
-                "title": "Cập Nhật Khóa API",
-                "toast": {
-                  "updated": "Khóa API đã được cập nhật."
-                }
-              },
-              "deleteApiKey": {
-                "title": "Xác Nhận Xóa Khóa API",
-                "content": "Bạn có chắc muốn xóa **{name}** khỏi tài khoản của bạn không?",
-                "toast": {
-                  "removed": "Khóa API đã được xóa."
-                }
-              }
-            },
-            "form": {
-              "allowedIps": "IP Được Phép",
-              "allowedIpsPlaceholder": "vd. 192.168.1.1, 2001:db8::1",
-              "userPermissions": "Quyền Người Dùng",
-              "serverPermissions": "Quyền Máy Chủ",
-              "adminPermissions": "Quyền Admin"
-            }
-          },
-          "activity": {
-            "title": "Hoạt Động"
           }
         },
-        "server": {
-          "viewAdmin": {
-            "title": "Xem admin"
+        "securityKeys": {
+          "title": "Khóa Bảo Mật",
+          "table": {
+            "columns": {
+              "credentialId": "ID Thông tin Xác thực"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "Cần có ngữ cảnh bảo mật (HTTPS) để sử dụng khóa bảo mật."
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "Tạo Khóa Bảo Mật",
+              "toast": {
+                "created": "Khóa bảo mật đã được tạo thành công.",
+                "aborted": "Tạo khóa bảo mật đã bị hủy."
+              }
+            },
+            "editSecurityKey": {
+              "title": "Chỉnh sửa Khóa Bảo Mật",
+              "toast": {
+                "updated": "Khóa bảo mật đã được cập nhật thành công."
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "Xác nhận Xóa Khóa Bảo Mật",
+              "content": "Bạn có chắc muốn xóa **{key}** khỏi tài khoản của bạn không?",
+              "toast": {
+                "deleted": "Khóa bảo mật đã được xóa thành công."
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "Phiên Làm Việc",
+          "table": {
+            "columns": {
+              "ip": "IP",
+              "thisDevice": "Thiết bị Này?",
+              "userAgent": "User Agent"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "Xác nhận Xóa Phiên Làm Việc",
+              "content": "Bạn có chắc muốn xóa phiên làm việc **{ip}** khỏi tài khoản của bạn không?",
+              "toast": {
+                "deleted": "Phiên làm việc đã được xóa."
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "Phím Tắt Bàn Phím",
+          "description": "Sử dụng các phím tắt này để điều hướng và tương tác với bảng điều khiển hiệu quả hơn.",
+          "detectedMac": "Đã phát hiện macOS",
+          "detectedWindows": "Đã phát hiện Windows/Linux",
+          "fileManager": {
+            "title": "Trình Quản Lý Tệp",
+            "selectAll": "Chọn tất cả tệp",
+            "cutFiles": "Cắt các tệp đã chọn",
+            "copyFiles": "Sao chép các tệp đã chọn",
+            "duplicateFile": "Nhân đôi tệp đã chọn",
+            "pasteFiles": "Dán tệp",
+            "searchFiles": "Tìm kiếm tệp",
+            "moveUpDirectory": "Di chuyển lên một thư mục",
+            "moveUpSelection": "Di chuyển lên lựa chọn",
+            "moveDownSelection": "Di chuyển xuống lựa chọn",
+            "renameFile": "Đổi tên tệp",
+            "deselectAll": "Bỏ chọn tất cả tệp",
+            "deleteFiles": "Xóa các tệp đã chọn"
+          },
+          "table": {
+            "title": "Điều Hướng Bảng",
+            "previousPage": "Trang trước",
+            "nextPage": "Trang tiếp theo",
+            "firstPage": "Trang đầu tiên",
+            "lastPage": "Trang cuối cùng"
           },
           "console": {
-            "title": "Bảng Điều Khiển",
-            "input": {
-              "placeholder": "Nhập một lệnh...",
-              "ariaLabel": "Nhập lệnh bảng điều khiển."
+            "title": "Bảng điều khiển Máy chủ",
+            "searchContent": "Tìm kiếm trong đầu ra bảng điều khiển",
+            "previousCommand": "Lệnh trước trong lịch sử",
+            "nextCommand": "Lệnh tiếp theo trong lịch sử"
+          },
+          "serverList": {
+            "title": "Danh Sách Máy chủ",
+            "selectServer": "Giữ S và nhấp để chọn/bỏ chọn máy chủ"
+          }
+        },
+        "sshKeys": {
+          "title": "Khóa SSH",
+          "button": {
+            "import": "Nhập"
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "Dấu Vân Tay"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "Tạo Khóa SSH",
+              "toast": {
+                "created": "Khóa SSH đã được tạo."
+              },
+              "button": {
+                "uploadKeyFile": "Tải Lên Tệp Khóa"
+              },
+              "form": {
+                "publicKey": "Khóa Công Khai"
+              }
             },
-            "toast": {
-              "installCancelled": "Cài đặt máy chủ đã bị hủy."
+            "editSshKey": {
+              "title": "Chỉnh Sửa Khóa SSH",
+              "toast": {
+                "updated": "Khóa SSH đã được cập nhật."
+              }
             },
+            "importSshKeys": {
+              "title": "Nhập Khóa SSH",
+              "toast": {
+                "created": "{sshKeys} đã được tạo."
+              },
+              "form": {
+                "provider": "Nhà Cung Cấp",
+                "username": "Tên Người Dùng"
+              }
+            },
+            "deleteSshKey": {
+              "title": "Xác Nhận Xóa Khóa SSH",
+              "content": "Bạn có chắc muốn xóa **{name}** khỏi tài khoản của bạn không?",
+              "toast": {
+                "removed": "Khóa SSH đã được xóa."
+              }
+            }
+          }
+        },
+        "commandSnippets": {
+          "title": "Đoạn Lệnh",
+          "table": {
+            "columns": {
+              "eggs": "Eggs"
+            }
+          },
+          "form": {
+            "eggs": "Eggs",
+            "command": "Lệnh"
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "Tạo Đoạn Lệnh",
+              "toast": {
+                "created": "Đoạn lệnh đã được tạo."
+              }
+            },
+            "editCommandSnippet": {
+              "title": "Chỉnh Sửa Đoạn Lệnh",
+              "toast": {
+                "updated": "Đoạn lệnh đã được cập nhật."
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "Xác Nhận Xóa Đoạn Lệnh",
+              "content": "Bạn có chắc muốn xóa **{name}** khỏi tài khoản của bạn không?",
+              "toast": {
+                "removed": "Đoạn lệnh đã được xóa."
+              }
+            }
+          }
+        },
+        "oauthLinks": {
+          "title": "Liên Kết OAuth",
+          "button": {
+            "connect": "Kết Nối",
+            "connectTo": "Kết Nối với {provider}"
+          },
+          "table": {
+            "columns": {
+              "providerName": "Tên Nhà Cung Cấp",
+              "identifier": "Định Danh"
+            }
+          },
+          "modal": {
+            "deleteOAuthLink": {
+              "title": "Xác Nhận Xóa Liên Kết OAuth",
+              "content": "Bạn có chắc muốn xóa kết nối **{provider}** khỏi tài khoản của bạn không?",
+              "toast": {
+                "removed": "Liên kết OAuth đã được xóa."
+              }
+            }
+          }
+        },
+        "apiKeys": {
+          "title": "Khóa API",
+          "button": {
+            "apiDocumentation": "Tài Liệu API"
+          },
+          "table": {
+            "columns": {
+              "key": "Khóa",
+              "permissions": "Quyền Người Dùng / Máy Chủ / Admin",
+              "expires": "Hết Hạn"
+            }
+          },
+          "modal": {
+            "createApiKey": {
+              "title": "Tạo Khóa API",
+              "toast": {
+                "created": "Khóa API đã được tạo."
+              }
+            },
+            "updateApiKey": {
+              "title": "Cập Nhật Khóa API",
+              "toast": {
+                "updated": "Khóa API đã được cập nhật."
+              }
+            },
+            "deleteApiKey": {
+              "title": "Xác Nhận Xóa Khóa API",
+              "content": "Bạn có chắc muốn xóa **{name}** khỏi tài khoản của bạn không?",
+              "toast": {
+                "removed": "Khóa API đã được xóa."
+              }
+            }
+          },
+          "form": {
+            "allowedIps": "IP Được Phép",
+            "allowedIpsPlaceholder": "vd. 192.168.1.1, 2001:db8::1",
+            "userPermissions": "Quyền Người Dùng",
+            "serverPermissions": "Quyền Máy Chủ",
+            "adminPermissions": "Quyền Admin"
+          }
+        },
+        "activity": {
+          "title": "Hoạt Động"
+        }
+      },
+      "server": {
+        "viewAdmin": {
+          "title": "Xem admin"
+        },
+        "console": {
+          "title": "Bảng Điều Khiển",
+          "input": {
+            "placeholder": "Nhập một lệnh...",
+            "ariaLabel": "Nhập lệnh bảng điều khiển."
+          },
+          "toast": {
+            "installCancelled": "Cài đặt máy chủ đã bị hủy."
+          },
+          "modal": {
+            "sshDetails": {
+              "title": "Chi Tiết SSH",
+              "form": {
+                "protocol": "Giao Thức",
+                "port": "Cổng",
+                "host": "Máy Chủ",
+                "username": "Tên Người Dùng",
+                "password": "Mật Khẩu",
+                "yourPassword": "Mật Khẩu Bảng Điều Khiển Của Bạn",
+                "command": "Lệnh SSH"
+              },
+              "launch": "Khởi Chạy"
+            }
+          },
+          "notification": {
+            "nodeMaintenance": "Máy chủ của bạn đang trên một nút đang được bảo trì.",
+            "transferring": "Máy chủ của bạn hiện đang được chuyển sang nút khác.",
+            "restoringBackup": "Máy chủ của bạn hiện đang khôi phục từ bản sao lưu. Vui lòng chờ...",
+            "installing": "Máy chủ của bạn hiện đang được cài đặt. Vui lòng chờ..."
+          },
+          "message": {
+            "serverMarkedAs": "Máy chủ được đánh dấu là {state}...",
+            "installFailed": "Cài đặt đã thất bại.",
+            "installCompleted": "Cài đặt đã hoàn tất thành công.",
+            "transferFailed": "Chuyển giao đã thất bại.",
+            "transferCompleted": "Chuyển giao đã hoàn tất thành công. Kết nối lại với máy chủ...",
+            "pullingImage": "Máy chủ của bạn hiện đang kéo hình ảnh docker của nó. Vui lòng chờ...",
+            "pulling": "Đang Kéo",
+            "extracting": "Đang Trích Xuất",
+            "layer": "Lớp"
+          },
+          "tooltip": {
+            "search": "Tìm Kiếm",
+            "sshDetails": "Chi Tiết SSH",
+            "commandHistory": "Lịch Sử Lệnh",
+            "decreaseFontSize": "Giảm Kích Thước Font",
+            "increaseFontSize": "Tăng Kích Thước Font"
+          },
+          "drawer": {
+            "commandHistory": {
+              "title": "Lịch Sử Lệnh",
+              "detailTitle": "Chi Tiết Lệnh",
+              "noCommands": "Không tìm thấy lệnh nào.",
+              "copyButton": "Sao Chép Lệnh",
+              "sendButton": "Gửi Lệnh",
+              "commandSent": "Lệnh được gửi thành công."
+            }
+          },
+          "feature": {
+            "eula": {
+              "title": "Thỏa Thuận EULA Minecraft",
+              "content": "Máy chủ Minecraft yêu cầu bạn chấp nhận [Thỏa Thuận Cấp Phép Người Dùng Cuối Minecraft](https://minecraft.net/eula) trước khi nó có thể khởi động.",
+              "contentDetails": "Bằng cách nhấp vào \"Chấp Nhận EULA\", bạn đồng ý với các điều khoản của EULA Minecraft và tệp **eula.txt** sẽ được cập nhật thành **eula=true**.",
+              "toast": {
+                "accepted": "EULA đã được chấp nhận thành công."
+              },
+              "button": {
+                "accept": "Chấp Nhận EULA"
+              }
+            }
+          },
+          "details": {
+            "address": "Địa Chỉ",
+            "port": "Cổng",
+            "uptime": "Thời Gian Hoạt Động",
+            "cpuLoad": "Tải CPU",
+            "memoryLoad": "Tải Bộ Nhớ",
+            "diskUsage": "Sử Dụng Đĩa",
+            "networkIn": "Mạng (Vào)",
+            "networkOut": "Mạng (Ra)",
+            "normalizeCpuLoad": "Chuẩn Hóa Tải CPU (dịch chuyển tới tối đa 100%)"
+          },
+          "power": {
             "modal": {
-              "sshDetails": {
-                "title": "Chi Tiết SSH",
-                "form": {
-                  "protocol": "Giao Thức",
-                  "port": "Cổng",
-                  "host": "Máy Chủ",
-                  "username": "Tên Người Dùng",
-                  "password": "Mật Khẩu",
-                  "yourPassword": "Mật Khẩu Bảng Điều Khiển Của Bạn",
-                  "command": "Lệnh SSH"
-                },
-                "launch": "Khởi Chạy"
+              "forceStop": {
+                "title": "Buộc Dừng Quá Trình",
+                "content": "Buộc dừng máy chủ có thể dẫn đến hỏng dữ liệu."
+              }
+            }
+          },
+          "stats": {
+            "cpuLoad": "Tải CPU",
+            "memoryLoad": "Tải Bộ Nhớ",
+            "network": "Mạng",
+            "inbound": "Đến",
+            "outbound": "Đi"
+          },
+          "socketConnected": "Đã Kết Nối ({ping}ms ping)",
+          "socketDisconnected": "Ngắt Kết Nối"
+        },
+        "files": {
+          "title": "Tệp",
+          "titleEditorViewing": "Xem {file}",
+          "titleEditorEditing": "Chỉnh Sửa {file}",
+          "titleEditorNew": "Tệp Mới",
+          "table": {
+            "columns": {
+              "modified": "Đã Sửa Đổi"
+            }
+          },
+          "button": {
+            "new": "Mới",
+            "sftpDetails": "Chi Tiết SFTP",
+            "openInNewWindow": "Mở Trong Cửa Sổ Mới",
+            "details": "Chi Tiết",
+            "rename": "Đổi Tên",
+            "copy": "Sao Chép",
+            "move": "Di Chuyển",
+            "fingerprint": "Dấu Vân Tay",
+            "permissions": "Quyền",
+            "unarchive": "Giải Nén",
+            "archive": "Nén",
+            "more": "Thêm",
+            "remoteCopy": "Sao Chép Máy Chủ Điều Khiển",
+            "search": "Tìm Kiếm",
+            "exitBackup": "Thoát Sao Lưu",
+            "fileFromEditor": "Tệp Từ Trình Soạn Thảo",
+            "directory": "Thư Mục",
+            "fileFromPull": "Tệp Từ Kéo",
+            "fileFromUpload": "Tệp Từ Tải Lên",
+            "directoryFromUpload": "Thư Mục Từ Tải Lên"
+          },
+          "actionBar": {
+            "copyHere": "Sao Chép {files} ở đây",
+            "moveHere": "Di Chuyển {files} ở đây"
+          },
+          "searchBanner": {
+            "resultsTitle": "Kết Quả Tìm Kiếm ({files} tìm thấy)",
+            "query": "Truy Vấn:",
+            "excluded": "Loại Trừ:",
+            "content": "Nội Dung:",
+            "size": "Kích Thước:",
+            "min": "Tối Thiểu:",
+            "max": "Tối Đa:"
+          },
+          "operations": {
+            "uploadingFolder": "Đang Tải Lên Thư Mục: {folder} ({files})",
+            "waiting": "Đang Chờ: ",
+            "uploading": "Đang Tải Lên: ",
+            "compressing": "Đang Nén {files} từ {path}",
+            "decompressing": "Đang Giải Nén {path}",
+            "pulling": "Đang Kéo {destination}",
+            "copying": "Đang Sao Chép {path} tới {destination}",
+            "copyingMany": "Đang Sao Chép {files}",
+            "receivingRemote": "Đang Nhận {files} Từ máy chủ điều khiển",
+            "sendingRemote": "Đang Gửi {files}  tới máy chủ điều khiển"
+          },
+          "dropzone": {
+            "title": "Thả tệp ở đây để tải lên",
+            "subtitle": "Thả để bắt đầu tải lên"
+          },
+          "settings": {
+            "clickOnce": "Nhấp một lần để mở tệp hoặc thư mục",
+            "preferPhysicalSize": "Hiển thị kích thước vật lý thay vì kích thước logic",
+            "editorMinimap": "Hiển thị Minimap Tệp",
+            "editorLineOverflow": "Bao Ngoặc Dòng Tràn",
+            "imageViewerSmoothing": "Làm Mịn Hình Ảnh (Anti-Aliasing)"
+          },
+          "toast": {
+            "operationCancelled": "Hoạt động đã bị hủy",
+            "copyingStarted": "{files} bắt đầu sao chép.",
+            "filesCouldNotBeMoved": "Tệp không thể được di chuyển.",
+            "filesMoved": "{files} đã được di chuyển.",
+            "downloadStarted": "Tải xuống đã bắt đầu.",
+            "filesDeleted": "Tệp đã được xóa.",
+            "archiveCreationStarted": "Tạo kho lưu trữ đã bắt đầu.",
+            "fileCopyingStarted": "Sao chép tệp đã bắt đầu.",
+            "fileInfoRetrieved": "Thông tin tệp được truy xuất thành công.",
+            "filePullingStarted": "Kéo tệp đã bắt đầu.",
+            "fileRenamed": "Tệp đã được đổi tên.",
+            "fileCouldNotBeRenamed": "Tệp không thể được đổi tên.",
+            "permissionsUpdated": "Quyền đã được cập nhật.",
+            "fileSaved": "Tệp đã được lưu."
+          },
+          "modal": {
+            "activeUploads": {
+              "title": "Tải Lên Đang Hoạt Động",
+              "content": "Bạn có chắc muốn rời khỏi trang này không? Bạn có {files} tệp tải lên đang hoạt động. Nếu bạn rời khỏi trang này, tệp tải lên sẽ bị hủy.",
+              "button": {
+                "leave": "Rời Khỏi Trang"
               }
             },
-            "notification": {
-              "nodeMaintenance": "Máy chủ của bạn đang trên một nút đang được bảo trì.",
-              "transferring": "Máy chủ của bạn hiện đang được chuyển sang nút khác.",
-              "restoringBackup": "Máy chủ của bạn hiện đang khôi phục từ bản sao lưu. Vui lòng chờ...",
-              "installing": "Máy chủ của bạn hiện đang được cài đặt. Vui lòng chờ..."
-            },
-            "message": {
-              "serverMarkedAs": "Máy chủ được đánh dấu là {state}...",
-              "installFailed": "Cài đặt đã thất bại.",
-              "installCompleted": "Cài đặt đã hoàn tất thành công.",
-              "transferFailed": "Chuyển giao đã thất bại.",
-              "transferCompleted": "Chuyển giao đã hoàn tất thành công. Kết nối lại với máy chủ...",
-              "pullingImage": "Máy chủ của bạn hiện đang kéo hình ảnh docker của nó. Vui lòng chờ...",
-              "pulling": "Đang Kéo",
-              "extracting": "Đang Trích Xuất",
-              "layer": "Lớp"
-            },
-            "tooltip": {
-              "search": "Tìm Kiếm",
-              "sshDetails": "Chi Tiết SSH",
-              "commandHistory": "Lịch Sử Lệnh",
-              "decreaseFontSize": "Giảm Kích Thước Font",
-              "increaseFontSize": "Tăng Kích Thước Font"
-            },
-            "drawer": {
-              "commandHistory": {
-                "title": "Lịch Sử Lệnh",
-                "detailTitle": "Chi Tiết Lệnh",
-                "noCommands": "Không tìm thấy lệnh nào.",
-                "copyButton": "Sao Chép Lệnh",
-                "sendButton": "Gửi Lệnh",
-                "commandSent": "Lệnh được gửi thành công."
+            "unsavedChanges": {
+              "title": "Thay Đổi Chưa Lưu",
+              "content": "Bạn có thay đổi chưa lưu trong trình soạn thảo tệp. Bạn có chắc muốn rời khỏi trang này không? Nếu bạn rời khỏi, thay đổi của bạn sẽ bị mất.",
+              "button": {
+                "leave": "Rời Khỏi Trang"
               }
             },
-            "feature": {
-              "eula": {
-                "title": "Thỏa Thuận EULA Minecraft",
-                "content": "Máy chủ Minecraft yêu cầu bạn chấp nhận [Thỏa Thuận Cấp Phép Người Dùng Cuối Minecraft](https://minecraft.net/eula) trước khi nó có thể khởi động.",
-                "contentDetails": "Bằng cách nhấp vào \"Chấp Nhận EULA\", bạn đồng ý với các điều khoản của EULA Minecraft và tệp **eula.txt** sẽ được cập nhật thành **eula=true**.",
-                "toast": {
-                  "accepted": "EULA đã được chấp nhận thành công."
-                },
-                "button": {
-                  "accept": "Chấp Nhận EULA"
-                }
+            "createArchive": {
+              "title": "Tạo Kho Lưu Trữ",
+              "form": {
+                "archiveName": "Tên Kho Lưu Trữ",
+                "format": "Định Dạng"
+              },
+              "createdAs": "Kho lưu trữ này sẽ được tạo dưới dạng "
+            },
+            "createDirectory": {
+              "title": "Tạo Thư Mục",
+              "form": {
+                "directoryName": "Tên Thư Mục"
+              },
+              "createdAs": "Thư mục này sẽ được tạo dưới dạng "
+            },
+            "copyFile": {
+              "title": "Sao Chép Tệp",
+              "form": {
+                "fileName": "Tên Tệp"
+              },
+              "createdAs": "Tệp này sẽ được tạo dưới dạng "
+            },
+            "copyRemote": {
+              "title": "Sao Chép Tệp Máy Chủ Điều Khiển",
+              "form": {
+                "server": "Máy Chủ",
+                "destination": "Đích Đến"
+              },
+              "createdAs": "Những tệp này sẽ được tạo trên máy chủ điều khiển dưới "
+            },
+            "fileFingerprints": {
+              "title": "Dấu Vân Tay Tệp",
+              "form": {
+                "algorithm": "Thuật Toán",
+                "fingerprint": "Dấu Vân Tay"
+              },
+              "button": {
+                "calculate": "Tính Toán Dấu Vân Tay"
+              }
+            },
+            "deleteFile": {
+              "title": "Xóa Tệp",
+              "singleFileWarning": "Bạn sẽ không thể khôi phục nội dung của {file} sau khi xóa.",
+              "multipleFilesWarning": "Bạn sẽ không thể khôi phục nội dung của các tệp sau đây sau khi xóa."
+            },
+            "createFile": {
+              "title": "Tạo Tệp",
+              "form": {
+                "fileName": "Tên Tệp"
               }
             },
             "details": {
-              "address": "Địa Chỉ",
-              "port": "Cổng",
-              "uptime": "Thời Gian Hoạt Động",
-              "cpuLoad": "Tải CPU",
-              "memoryLoad": "Tải Bộ Nhớ",
-              "diskUsage": "Sử Dụng Đĩa",
-              "networkIn": "Mạng (Vào)",
-              "networkOut": "Mạng (Ra)",
-              "normalizeCpuLoad": "Chuẩn Hóa Tải CPU (dịch chuyển tới tối đa 100%)"
+              "title": "Chi Tiết Tệp",
+              "path": "Đường Dẫn",
+              "mode": "Chế Độ",
+              "logicalSize": "Kích Thước Hợp Lý",
+              "physicalSize": "Kích Thước Vật Lý",
+              "mimeType": "Loại MIME",
+              "lastModifiedAt": "Lần Sửa Đổi Cuối",
+              "createdAt": "Ngày Tạo"
             },
-            "power": {
-              "modal": {
-                "forceStop": {
-                  "title": "Buộc Dừng Quá Trình",
-                  "content": "Buộc dừng máy chủ có thể dẫn đến hỏng dữ liệu."
-                }
+            "filePermissions": {
+              "title": "Quyền Tệp",
+              "symbolic": "Ký Hiệu:",
+              "octal": "Bát Phân:",
+              "owner": "Chủ Sở Hữu",
+              "group": "Nhóm",
+              "other": "Khác",
+              "breakdown": "Chi Tiết Quyền",
+              "readPermission": "Quyền Đọc (4)",
+              "writePermission": "Quyền Ghi (2)",
+              "executePermission": "Quyền Thực Thi (1)"
+            },
+            "renameFile": {
+              "title": "Đổi Tên Tệp",
+              "form": {
+                "fileName": "Tên Tệp"
               }
             },
-            "stats": {
-              "cpuLoad": "Tải CPU",
-              "memoryLoad": "Tải Bộ Nhớ",
-              "network": "Mạng",
-              "inbound": "Đến",
-              "outbound": "Đi"
-            },
-            "socketConnected": "Đã Kết Nối ({ping}ms ping)",
-            "socketDisconnected": "Ngắt Kết Nối"
-          },
-          "files": {
-            "title": "Tệp",
-            "titleEditorViewing": "Xem {file}",
-            "titleEditorEditing": "Chỉnh Sửa {file}",
-            "titleEditorNew": "Tệp Mới",
-            "table": {
-              "columns": {
-                "modified": "Đã Sửa Đổi"
-              }
-            },
-            "button": {
-              "new": "Mới",
-              "sftpDetails": "Chi Tiết SFTP",
-              "openInNewWindow": "Mở Trong Cửa Sổ Mới",
-              "details": "Chi Tiết",
-              "rename": "Đổi Tên",
-              "copy": "Sao Chép",
-              "move": "Di Chuyển",
-              "fingerprint": "Dấu Vân Tay",
-              "permissions": "Quyền",
-              "unarchive": "Giải Nén",
-              "archive": "Nén",
-              "more": "Thêm",
-              "remoteCopy": "Sao Chép Máy Chủ Điều Khiển",
-              "search": "Tìm Kiếm",
-              "exitBackup": "Thoát Sao Lưu",
-              "fileFromEditor": "Tệp Từ Trình Soạn Thảo",
-              "directory": "Thư Mục",
-              "fileFromPull": "Tệp Từ Kéo",
-              "fileFromUpload": "Tệp Từ Tải Lên",
-              "directoryFromUpload": "Thư Mục Từ Tải Lên"
-            },
-            "actionBar": {
-              "copyHere": "Sao Chép {files} ở đây",
-              "moveHere": "Di Chuyển {files} ở đây"
-            },
-            "searchBanner": {
-              "resultsTitle": "Kết Quả Tìm Kiếm ({files} tìm thấy)",
-              "query": "Truy Vấn:",
-              "excluded": "Loại Trừ:",
-              "content": "Nội Dung:",
-              "size": "Kích Thước:",
-              "min": "Tối Thiểu:",
-              "max": "Tối Đa:"
-            },
-            "operations": {
-              "uploadingFolder": "Đang Tải Lên Thư Mục: {folder} ({files})",
-              "waiting": "Đang Chờ: ",
-              "uploading": "Đang Tải Lên: ",
-              "compressing": "Đang Nén {files} từ {path}",
-              "decompressing": "Đang Giải Nén {path}",
-              "pulling": "Đang Kéo {destination}",
-              "copying": "Đang Sao Chép {path} tới {destination}",
-              "copyingMany": "Đang Sao Chép {files}",
-              "receivingRemote": "Đang Nhận {files} Từ máy chủ điều khiển",
-              "sendingRemote": "Đang Gửi {files}  tới máy chủ điều khiển"
-            },
-            "dropzone": {
-              "title": "Thả tệp ở đây để tải lên",
-              "subtitle": "Thả để bắt đầu tải lên"
-            },
-            "settings": {
-              "clickOnce": "Nhấp một lần để mở tệp hoặc thư mục",
-              "preferPhysicalSize": "Hiển thị kích thước vật lý thay vì kích thước logic",
-              "editorMinimap": "Hiển thị Minimap Tệp",
-              "editorLineOverflow": "Bao Ngoặc Dòng Tràn",
-              "imageViewerSmoothing": "Làm Mịn Hình Ảnh (Anti-Aliasing)"
-            },
-            "toast": {
-              "operationCancelled": "Hoạt động đã bị hủy",
-              "copyingStarted": "{files} bắt đầu sao chép.",
-              "filesCouldNotBeMoved": "Tệp không thể được di chuyển.",
-              "filesMoved": "{files} đã được di chuyển.",
-              "downloadStarted": "Tải xuống đã bắt đầu.",
-              "filesDeleted": "Tệp đã được xóa.",
-              "archiveCreationStarted": "Tạo kho lưu trữ đã bắt đầu.",
-              "fileCopyingStarted": "Sao chép tệp đã bắt đầu.",
-              "fileInfoRetrieved": "Thông tin tệp được truy xuất thành công.",
-              "filePullingStarted": "Kéo tệp đã bắt đầu.",
-              "fileRenamed": "Tệp đã được đổi tên.",
-              "fileCouldNotBeRenamed": "Tệp không thể được đổi tên.",
-              "permissionsUpdated": "Quyền đã được cập nhật.",
-              "fileSaved": "Tệp đã được lưu."
-            },
-            "modal": {
-              "activeUploads": {
-                "title": "Tải Lên Đang Hoạt Động",
-                "content": "Bạn có chắc muốn rời khỏi trang này không? Bạn có {files} tệp tải lên đang hoạt động. Nếu bạn rời khỏi trang này, tệp tải lên sẽ bị hủy.",
-                "button": {
-                  "leave": "Rời Khỏi Trang"
-                }
-              },
-              "unsavedChanges": {
-                "title": "Thay Đổi Chưa Lưu",
-                "content": "Bạn có thay đổi chưa lưu trong trình soạn thảo tệp. Bạn có chắc muốn rời khỏi trang này không? Nếu bạn rời khỏi, thay đổi của bạn sẽ bị mất.",
-                "button": {
-                  "leave": "Rời Khỏi Trang"
-                }
-              },
-              "createArchive": {
-                "title": "Tạo Kho Lưu Trữ",
-                "form": {
-                  "archiveName": "Tên Kho Lưu Trữ",
-                  "format": "Định Dạng"
-                },
-                "createdAs": "Kho lưu trữ này sẽ được tạo dưới dạng "
-              },
-              "createDirectory": {
-                "title": "Tạo Thư Mục",
-                "form": {
-                  "directoryName": "Tên Thư Mục"
-                },
-                "createdAs": "Thư mục này sẽ được tạo dưới dạng "
-              },
-              "copyFile": {
-                "title": "Sao Chép Tệp",
-                "form": {
-                  "fileName": "Tên Tệp"
-                },
-                "createdAs": "Tệp này sẽ được tạo dưới dạng "
-              },
-              "copyRemote": {
-                "title": "Sao Chép Tệp Máy Chủ Điều Khiển",
-                "form": {
-                  "server": "Máy Chủ",
-                  "destination": "Đích Đến"
-                },
-                "createdAs": "Những tệp này sẽ được tạo trên máy chủ điều khiển dưới "
-              },
-              "fileFingerprints": {
-                "title": "Dấu Vân Tay Tệp",
-                "form": {
-                  "algorithm": "Thuật Toán",
-                  "fingerprint": "Dấu Vân Tay"
-                },
-                "button": {
-                  "calculate": "Tính Toán Dấu Vân Tay"
-                }
-              },
-              "deleteFile": {
-                "title": "Xóa Tệp",
-                "singleFileWarning": "Bạn sẽ không thể khôi phục nội dung của {file} sau khi xóa.",
-                "multipleFilesWarning": "Bạn sẽ không thể khôi phục nội dung của các tệp sau đây sau khi xóa."
-              },
-              "createFile": {
-                "title": "Tạo Tệp",
-                "form": {
-                  "fileName": "Tên Tệp"
-                }
-              },
-              "details": {
-                "title": "Chi Tiết Tệp",
-                "path": "Đường Dẫn",
-                "mode": "Chế Độ",
-                "logicalSize": "Kích Thước Hợp Lý",
-                "physicalSize": "Kích Thước Vật Lý",
-                "mimeType": "Loại MIME",
-                "lastModifiedAt": "Lần Sửa Đổi Cuối",
-                "createdAt": "Ngày Tạo"
-              },
-              "filePermissions": {
-                "title": "Quyền Tệp",
-                "symbolic": "Ký Hiệu:",
-                "octal": "Bát Phân:",
-                "owner": "Chủ Sở Hữu",
-                "group": "Nhóm",
-                "other": "Khác",
-                "breakdown": "Chi Tiết Quyền",
-                "readPermission": "Quyền Đọc (4)",
-                "writePermission": "Quyền Ghi (2)",
-                "executePermission": "Quyền Thực Thi (1)"
-              },
-              "renameFile": {
-                "title": "Đổi Tên Tệp",
-                "form": {
-                  "fileName": "Tên Tệp"
-                }
-              },
-              "searchFiles": {
-                "title": "Tìm Kiếm Tệp",
-                "placeholder": "Tìm kiếm tệp...",
-                "advancedFilters": "Bộ Lọc Nâng Cao",
-                "pathPatterns": "Mẫu Đường Dẫn",
-                "include": "Bao Gồm",
-                "exclude": "Loại Trừ",
-                "caseInsensitive": "Không Phân Biệt Hoa Thường",
-                "fileContent": "Nội Dung Tệp",
-                "searchText": "Văn Bản Tìm Kiếm",
-                "maxFileSize": "Kích Thước Tệp Tối Đa",
-                "includeOversized": "Bao Gồm Tệp Quá Lớn",
-                "includeOversizedDescription": "Bao gồm các tệp khớp với các bộ lọc khác nhưng quá lớn để tìm kiếm",
-                "fileSize": "Kích Thước Tệp",
-                "minimum": "Tối Thiểu",
-                "maximum": "Tối Đa"
-              },
-              "pullFile": {
-                "title": "Kéo Tệp",
-                "form": {
-                  "fileUrl": "URL Tệp",
-                  "query": "Truy Vấn",
-                  "fileName": "Tên Tệp"
-                },
-                "createdAs": "Tệp này sẽ được tạo dưới dạng ",
-                "pull": "Kéo"
-              },
-              "sftpDetails": {
-                "title": "Chi Tiết SFTP",
-                "form": {
-                  "protocol": "Giao Thức",
-                  "port": "Cổng",
-                  "host": "Máy Chủ",
-                  "username": "Tên Người Dùng",
-                  "password": "Mật Khẩu",
-                  "yourPassword": "Mật Khẩu Bảng Điều Khiển Của Bạn"
-                },
-                "launch": "Khởi Chạy"
-              }
-            }
-          },
-          "databases": {
-            "title": "Cơ Sở Dữ Liệu",
-            "subtitle": "{current} của {max} cơ sở dữ liệu tối đa được tạo.",
-            "tooltip": {
-              "limitReached": "Máy chủ này được giới hạn ở {max} cơ sở dữ liệu."
-            },
-            "table": {
-              "columns": {
-                "type": "Loại",
-                "address": "Địa Chỉ",
-                "locked": "Khóa?"
-              }
-            },
-            "button": {
-              "details": "Chi Tiết",
-              "rotatePassword": "Xoay Mật Khẩu"
-            },
-            "modal": {
-              "createDatabase": {
-                "title": "Tạo Cơ Sở Dữ Liệu",
-                "toast": {
-                  "created": "Cơ sở dữ liệu đã được tạo."
-                },
-                "form": {
-                  "databaseName": "Tên Cơ Sở Dữ Liệu",
-                  "databaseHost": "Máy Chủ Cơ Sở Dữ Liệu",
-                  "noHostsFound": "Không tìm thấy máy chủ nào"
-                }
-              },
-              "editDatabase": {
-                "title": "Chỉnh Sửa Cơ Sở Dữ Liệu",
-                "toast": {
-                  "updated": "Cơ sở dữ liệu đã được cập nhật."
-                },
-                "form": {
-                  "locked": "Khóa"
-                }
-              },
-              "databaseDetails": {
-                "title": "Chi tiết kết nối cơ sở dữ liệu",
-                "toast": {
-                  "passwordRotated": "Mật khẩu đã được xoay."
-                },
-                "form": {
-                  "jdbcConnectionString": "Chuỗi Kết Nối JDBC"
-                }
-              },
-              "deleteDatabase": {
-                "title": "Xác Nhận Xóa Cơ Sở Dữ Liệu",
-                "content": "Xóa cơ sở dữ liệu là một hành động vĩnh viễn, không thể hoàn tác. Điều này sẽ xóa vĩnh viễn cơ sở dữ liệu **{name}** và loại bỏ tất cả các dữ liệu liên quan.",
-                "toast": {
-                  "deleted": "Cơ sở dữ liệu đã được xóa."
-                }
-              }
-            }
-          },
-          "schedules": {
-            "title": "Lịch Trình",
-            "subtitle": "{current} của {max} lịch trình tối đa đã được tạo.",
-            "dropzone": {
-              "title": "Thả một số tệp ở đây để Nhập chúng dưới dạng Lịch Trình",
-              "subtitle": "Nhả để bắt đầu Nhập"
-            },
-            "tooltip": {
-              "limitReached": "Máy chủ này được giới hạn ở {max} lịch trình."
-            },
-            "table": {
-              "columns": {
-                "lastRun": "Lần Chạy Cuối",
-                "lastFailure": "Lần Thất Bại Cuối",
-                "status": "Trạng Thái"
-              }
-            },
-            "button": {
-              "import": "Nhập",
-              "trigger": "Kích Hoạt",
-              "triggerWithCondition": "Kích Hoạt (không bỏ qua điều kiện)",
-              "triggerSkipCondition": "Kích Hoạt (bỏ qua điều kiện)",
-              "addTrigger": "Thêm Trình Kích Hoạt",
-              "addCondition": "Thêm Điều Kiện",
-              "addStep": "Thêm Bước",
-              "createFirstStep": "Tạo Bước Đầu Tiên",
-              "addOutput": "Thêm Đầu Ra",
-              "addFile": "Thêm Tệp",
-              "exitEditor": "Thoát Trình Soạn Thảo"
-            },
-            "toast": {
-              "imported": "Lịch trình đã được nhập.",
-              "created": "Lịch trình đã được tạo.",
-              "updated": "Lịch trình đã được cập nhật.",
-              "deleted": "Lịch trình đã được xóa.",
-              "triggered": "Lịch trình đã được kích hoạt.",
-              "exported": "Lịch trình đã được xuất.",
-              "parseError": "Không thể phân tích lịch trình: {error}",
-              "step": {
-                "created": "Bước lịch trình đã được tạo.",
-                "updated": "Bước lịch trình đã được cập nhật.",
-                "deleted": "Bước lịch trình đã được xóa."
-              }
-            },
-            "enum": {
-              "schedulePreConditionType": {
-                "none": "Không",
-                "and": "AND (Tất cả phải đúng)",
-                "or": "OR (Bất kỳ cái nào phải đúng)",
-                "not": "NOT (Phải không đúng)",
-                "serverState": "Trạng Thái Máy Chủ",
-                "uptime": "Thời Gian Hoạt Động",
-                "cpuUsage": "Sử Dụng CPU",
-                "memoryUsage": "Sử Dụng Bộ Nhớ",
-                "diskUsage": "Sử Dụng Đĩa",
-                "fileExists": "Tệp Tồn Tại"
-              },
-              "scheduleConditionType": {
-                "none": "Không",
-                "and": "AND (Tất cả phải đúng)",
-                "or": "OR (Bất kỳ cái nào phải đúng)",
-                "not": "NOT (Phải không đúng)",
-                "variableExists": "Biến Tồn Tại",
-                "variableContains": "Biến Chứa",
-                "variableEquals": "Biến Bằng",
-                "variableStartsWith": "Biến Bắt Đầu Với",
-                "variableEndsWith": "Biến Kết Thúc Với"
-              },
-              "scheduleComparator": {
-                "smallerThan": "Nhỏ hơn",
-                "smallerThanOrEqual": "Nhỏ hơn hoặc bằng",
-                "equal": "Bằng",
-                "greaterThanOrEqual": "Lớn hơn hoặc bằng",
-                "greaterThan": "Lớn hơn"
-              }
-            },
-            "modal": {
-              "createSchedule": {
-                "title": "Tạo Lịch Trình"
-              },
-              "updateSchedule": {
-                "title": "Cập Nhật Lịch Trình"
-              },
-              "deleteSchedule": {
-                "title": "Xác Nhận Xóa Lịch Trình",
-                "content": "Bạn có chắc muốn xóa {name} khỏi máy chủ này không?"
-              },
-              "createStep": {
-                "title": "Tạo Bước Lịch Trình"
-              },
-              "editStep": {
-                "title": "Chỉnh Sửa Bước Lịch Trình"
-              },
-              "deleteStep": {
-                "title": "Xác Nhận Xóa Bước Lịch Trình",
-                "content": "Bạn có chắc muốn xóa bước lịch trình này không?"
-              }
-            },
-            "view": {
-              "badge": {
-                "running": "Đang Chạy"
-              },
-              "tooltip": {
-                "cannotTrigger": "Không thể kích hoạt lịch trình bị vô hiệu hóa"
-              },
-              "tabs": {
-                "actions": "Hành Động",
-                "conditions": "Điều Kiện",
-                "triggers": "Trình Kích Hoạt"
-              },
-              "sections": {
-                "actions": "Hành Động Lịch Trình",
-                "preConditions": "Điều Kiện Trước Lịch Trình",
-                "triggers": "Trình Kích Hoạt Lịch Trình"
-              },
-              "alert": {
-                "noActions": "Không có hành động nào được cấu hình cho lịch trình này",
-                "noTriggers": "Không có trình kích hoạt nào được cấu hình cho lịch trình này"
-              }
-            },
-            "form": {
-              "scheduleName": "Tên Lịch Trình",
-              "enabled": "Bật",
-              "triggersList": "Trình Kích Hoạt",
-              "triggerNumber": "Trình Kích Hoạt {number}",
-              "actionType": "Loại Hành Động",
-              "conditionType": "Loại Điều Kiện",
-              "serverState": "Trạng Thái Máy Chủ",
-              "comparator": "Bộ So Sánh",
-              "rootPath": "Đường Dẫn Root",
-              "outputInto": "Đầu Ra Thành",
+            "searchFiles": {
+              "title": "Tìm Kiếm Tệp",
+              "placeholder": "Tìm kiếm tệp...",
+              "advancedFilters": "Bộ Lọc Nâng Cao",
+              "pathPatterns": "Mẫu Đường Dẫn",
+              "include": "Bao Gồm",
+              "exclude": "Loại Trừ",
               "caseInsensitive": "Không Phân Biệt Hoa Thường",
-              "ignoreFailure": "Bỏ Qua Lỗi",
-              "runInForeground": "Chạy Ở Nền Trước"
+              "fileContent": "Nội Dung Tệp",
+              "searchText": "Văn Bản Tìm Kiếm",
+              "maxFileSize": "Kích Thước Tệp Tối Đa",
+              "includeOversized": "Bao Gồm Tệp Quá Lớn",
+              "includeOversizedDescription": "Bao gồm các tệp khớp với các bộ lọc khác nhưng quá lớn để tìm kiếm",
+              "fileSize": "Kích Thước Tệp",
+              "minimum": "Tối Thiểu",
+              "maximum": "Tối Đa"
             },
-            "condition": {
-              "variable": "Biến",
-              "equals": "Bằng",
-              "contains": "Chứa",
-              "startsWith": "Bắt Đầu Với",
-              "endsWith": "Kết Thúc Với",
-              "allMustBeTrue": "Tất cả điều kiện phải đúng:",
-              "anyMustBeTrue": "Bất kỳ điều kiện nào phải đúng:",
-              "mustNotBeTrue": "Điều kiện phải không đúng:"
+            "pullFile": {
+              "title": "Kéo Tệp",
+              "form": {
+                "fileUrl": "URL Tệp",
+                "query": "Truy Vấn",
+                "fileName": "Tên Tệp"
+              },
+              "createdAs": "Tệp này sẽ được tạo dưới dạng ",
+              "pull": "Kéo"
             },
-            "preCondition": {
-              "valueSeconds": "Giá Trị (giây)",
-              "valuePercent": "Giá Trị (%)",
-              "value": "Giá Trị",
-              "filePath": "Đường Dẫn Tệp"
-            },
-            "triggers": {
-              "cron": {
-                "title": "Cron",
-                "form": {
-                  "cronSchedule": "Lịch Trình Cron"
-                },
-                "card": {
-                  "content": "Trên Khoảng Thời Gian Cron `{schedule}`, Lần Chạy Tiếp Theo Là {timestamp} - Lần Chạy Cuối Là {lastTimestamp}."
-                }
+            "sftpDetails": {
+              "title": "Chi Tiết SFTP",
+              "form": {
+                "protocol": "Giao Thức",
+                "port": "Cổng",
+                "host": "Máy Chủ",
+                "username": "Tên Người Dùng",
+                "password": "Mật Khẩu",
+                "yourPassword": "Mật Khẩu Bảng Điều Khiển Của Bạn"
               },
-              "powerAction": {
-                "title": "Hành Động Nguồn Điện",
-                "form": {
-                  "powerAction": "Hành Động Nguồn Điện"
-                },
-                "card": {
-                  "content": "Khi Hành Động Nguồn Điện `{action}` được yêu cầu."
-                }
+              "launch": "Khởi Chạy"
+            }
+          }
+        },
+        "databases": {
+          "title": "Cơ Sở Dữ Liệu",
+          "subtitle": "{current} của {max} cơ sở dữ liệu tối đa được tạo.",
+          "tooltip": {
+            "limitReached": "Máy chủ này được giới hạn ở {max} cơ sở dữ liệu."
+          },
+          "table": {
+            "columns": {
+              "type": "Loại",
+              "address": "Địa Chỉ",
+              "locked": "Khóa?"
+            }
+          },
+          "button": {
+            "details": "Chi Tiết",
+            "rotatePassword": "Xoay Mật Khẩu"
+          },
+          "form": {
+            "databaseName": "Tên Cơ Sở Dữ Liệu"
+          },
+          "modal": {
+            "createDatabase": {
+              "title": "Tạo Cơ Sở Dữ Liệu",
+              "toast": {
+                "created": "Cơ sở dữ liệu đã được tạo."
               },
-              "serverState": {
-                "title": "Trạng Thái Máy Chủ",
-                "card": {
-                  "content": "Khi Trạng Thái Máy Chủ `{state}` được đạt tới."
-                }
-              },
-              "backupStatus": {
-                "title": "Trạng Thái Sao Lưu",
-                "form": {
-                  "backupStatus": "Trạng Thái Sao Lưu"
-                },
-                "card": {
-                  "content": "Khi Sao Lưu Đạt Tới Trạng Thái `{status}`."
-                }
-              },
-              "consoleLine": {
-                "title": "Dòng Bảng Điều Khiển",
-                "form": {
-                  "lineContains": "Dòng Chứa"
-                },
-                "card": {
-                  "content": "Khi Đầu Ra Bảng Điều Khiển Đạt Tới Dòng Chứa `{contains}`"
-                }
-              },
-              "crash": {
-                "title": "Sự Cố",
-                "card": {
-                  "content": "Khi Máy Chủ Bị Sự Cố."
-                }
+              "form": {
+                "databaseHost": "Máy Chủ Cơ Sở Dữ Liệu",
+                "noHostsFound": "Không tìm thấy máy chủ nào"
               }
             },
-            "renderer": {
-              "noActionSelected": "Chọn loại hành động để cấu hình",
-              "noActionDetails": "Chi tiết hành động không khả dụng",
-              "ignoreFailure": "Bỏ Qua Lỗi: {value}",
-              "foreground": "Nền Trước: {value}"
+            "editDatabase": {
+              "title": "Chỉnh Sửa Cơ Sở Dữ Liệu",
+              "toast": {
+                "updated": "Cơ sở dữ liệu đã được cập nhật."
+              },
+              "form": {
+                "locked": "Khóa"
+              }
             },
-            "steps": {
-              "empty": {
-                "title": "Không có Bước nào Được Cấu Hình",
-                "description": "Lịch trình này chưa có bước nào. Thêm một số hành động để bắt đầu."
+            "databaseDetails": {
+              "title": "Chi tiết kết nối cơ sở dữ liệu",
+              "toast": {
+                "passwordRotated": "Mật khẩu đã được xoay."
               },
-              "sleep": {
-                "title": "Ngủ",
-                "form": {
-                  "duration": "Thời lượng (miligiây)"
-                },
-                "renderer": {
-                  "compact": "Ngủ trong {duration}ms"
-                }
+              "form": {
+                "jdbcConnectionString": "Chuỗi Kết Nối JDBC"
+              }
+            },
+            "deleteDatabase": {
+              "title": "Xác Nhận Xóa Cơ Sở Dữ Liệu",
+              "content": "Xóa cơ sở dữ liệu là một hành động vĩnh viễn, không thể hoàn tác. Điều này sẽ xóa vĩnh viễn cơ sở dữ liệu **{name}** và loại bỏ tất cả các dữ liệu liên quan.",
+              "toast": {
+                "deleted": "Cơ sở dữ liệu đã được xóa."
+              }
+            }
+          }
+        },
+        "schedules": {
+          "title": "Lịch Trình",
+          "subtitle": "{current} của {max} lịch trình tối đa đã được tạo.",
+          "dropzone": {
+            "title": "Thả một số tệp ở đây để Nhập chúng dưới dạng Lịch Trình",
+            "subtitle": "Nhả để bắt đầu Nhập"
+          },
+          "tooltip": {
+            "limitReached": "Máy chủ này được giới hạn ở {max} lịch trình."
+          },
+          "table": {
+            "columns": {
+              "lastRun": "Lần Chạy Cuối",
+              "lastFailure": "Lần Thất Bại Cuối",
+              "status": "Trạng Thái"
+            }
+          },
+          "button": {
+            "import": "Nhập",
+            "trigger": "Kích Hoạt",
+            "triggerWithCondition": "Kích Hoạt (không bỏ qua điều kiện)",
+            "triggerSkipCondition": "Kích Hoạt (bỏ qua điều kiện)",
+            "addTrigger": "Thêm Trình Kích Hoạt",
+            "addCondition": "Thêm Điều Kiện",
+            "addStep": "Thêm Bước",
+            "createFirstStep": "Tạo Bước Đầu Tiên",
+            "addOutput": "Thêm Đầu Ra",
+            "addFile": "Thêm Tệp",
+            "exitEditor": "Thoát Trình Soạn Thảo"
+          },
+          "toast": {
+            "imported": "Lịch trình đã được nhập.",
+            "created": "Lịch trình đã được tạo.",
+            "updated": "Lịch trình đã được cập nhật.",
+            "deleted": "Lịch trình đã được xóa.",
+            "triggered": "Lịch trình đã được kích hoạt.",
+            "exported": "Lịch trình đã được xuất.",
+            "parseError": "Không thể phân tích lịch trình: {error}",
+            "step": {
+              "created": "Bước lịch trình đã được tạo.",
+              "updated": "Bước lịch trình đã được cập nhật.",
+              "deleted": "Bước lịch trình đã được xóa."
+            }
+          },
+          "enum": {
+            "schedulePreConditionType": {
+              "none": "Không",
+              "and": "AND (Tất cả phải đúng)",
+              "or": "OR (Bất kỳ cái nào phải đúng)",
+              "not": "NOT (Phải không đúng)",
+              "serverState": "Trạng Thái Máy Chủ",
+              "uptime": "Thời Gian Hoạt Động",
+              "cpuUsage": "Sử Dụng CPU",
+              "memoryUsage": "Sử Dụng Bộ Nhớ",
+              "diskUsage": "Sử Dụng Đĩa",
+              "fileExists": "Tệp Tồn Tại"
+            },
+            "scheduleConditionType": {
+              "none": "Không",
+              "and": "AND (Tất cả phải đúng)",
+              "or": "OR (Bất kỳ cái nào phải đúng)",
+              "not": "NOT (Phải không đúng)",
+              "variableExists": "Biến Tồn Tại",
+              "variableContains": "Biến Chứa",
+              "variableEquals": "Biến Bằng",
+              "variableStartsWith": "Biến Bắt Đầu Với",
+              "variableEndsWith": "Biến Kết Thúc Với"
+            },
+            "scheduleComparator": {
+              "smallerThan": "Nhỏ hơn",
+              "smallerThanOrEqual": "Nhỏ hơn hoặc bằng",
+              "equal": "Bằng",
+              "greaterThanOrEqual": "Lớn hơn hoặc bằng",
+              "greaterThan": "Lớn hơn"
+            }
+          },
+          "modal": {
+            "createSchedule": {
+              "title": "Tạo Lịch Trình"
+            },
+            "updateSchedule": {
+              "title": "Cập Nhật Lịch Trình"
+            },
+            "deleteSchedule": {
+              "title": "Xác Nhận Xóa Lịch Trình",
+              "content": "Bạn có chắc muốn xóa {name} khỏi máy chủ này không?"
+            },
+            "createStep": {
+              "title": "Tạo Bước Lịch Trình"
+            },
+            "editStep": {
+              "title": "Chỉnh Sửa Bước Lịch Trình"
+            },
+            "deleteStep": {
+              "title": "Xác Nhận Xóa Bước Lịch Trình",
+              "content": "Bạn có chắc muốn xóa bước lịch trình này không?"
+            }
+          },
+          "view": {
+            "badge": {
+              "running": "Đang Chạy"
+            },
+            "tooltip": {
+              "cannotTrigger": "Không thể kích hoạt lịch trình bị vô hiệu hóa"
+            },
+            "tabs": {
+              "actions": "Hành Động",
+              "conditions": "Điều Kiện",
+              "triggers": "Trình Kích Hoạt"
+            },
+            "sections": {
+              "actions": "Hành Động Lịch Trình",
+              "preConditions": "Điều Kiện Trước Lịch Trình",
+              "triggers": "Trình Kích Hoạt Lịch Trình"
+            },
+            "alert": {
+              "noActions": "Không có hành động nào được cấu hình cho lịch trình này",
+              "noTriggers": "Không có trình kích hoạt nào được cấu hình cho lịch trình này"
+            }
+          },
+          "form": {
+            "scheduleName": "Tên Lịch Trình",
+            "enabled": "Bật",
+            "triggersList": "Trình Kích Hoạt",
+            "triggerNumber": "Trình Kích Hoạt {number}",
+            "actionType": "Loại Hành Động",
+            "conditionType": "Loại Điều Kiện",
+            "serverState": "Trạng Thái Máy Chủ",
+            "comparator": "Bộ So Sánh",
+            "rootPath": "Đường Dẫn Root",
+            "outputInto": "Đầu Ra Thành",
+            "caseInsensitive": "Không Phân Biệt Hoa Thường",
+            "ignoreFailure": "Bỏ Qua Lỗi",
+            "runInForeground": "Chạy Ở Nền Trước"
+          },
+          "condition": {
+            "variable": "Biến",
+            "equals": "Bằng",
+            "contains": "Chứa",
+            "startsWith": "Bắt Đầu Với",
+            "endsWith": "Kết Thúc Với",
+            "allMustBeTrue": "Tất cả điều kiện phải đúng:",
+            "anyMustBeTrue": "Bất kỳ điều kiện nào phải đúng:",
+            "mustNotBeTrue": "Điều kiện phải không đúng:"
+          },
+          "preCondition": {
+            "valueSeconds": "Giá Trị (giây)",
+            "valuePercent": "Giá Trị (%)",
+            "value": "Giá Trị",
+            "filePath": "Đường Dẫn Tệp"
+          },
+          "triggers": {
+            "cron": {
+              "title": "Cron",
+              "form": {
+                "cronSchedule": "Lịch Trình Cron"
               },
-              "ensure": {
-                "title": "Đảm Bảo",
-                "renderer": {
-                  "compact": "Đảm bảo một điều kiện khớp"
-                }
+              "card": {
+                "content": "Trên Khoảng Thời Gian Cron `{schedule}`, Lần Chạy Tiếp Theo Là {timestamp} - Lần Chạy Cuối Là {lastTimestamp}."
+              }
+            },
+            "powerAction": {
+              "title": "Hành Động Nguồn Điện",
+              "form": {
+                "powerAction": "Hành Động Nguồn Điện"
               },
-              "format": {
-                "title": "Định Dạng",
-                "form": {
-                  "formatString": "Chuỗi Định Dạng",
-                  "formatStringDescription": "Chuỗi định dạng, có thể bao gồm các biến bằng cách bao bọc bên trong {wrapper}"
-                },
-                "renderer": {
-                  "compact": "Định dạng chuỗi thành {outputInto}"
-                }
+              "card": {
+                "content": "Khi Hành Động Nguồn Điện `{action}` được yêu cầu."
+              }
+            },
+            "serverState": {
+              "title": "Trạng Thái Máy Chủ",
+              "card": {
+                "content": "Khi Trạng Thái Máy Chủ `{state}` được đạt tới."
+              }
+            },
+            "backupStatus": {
+              "title": "Trạng Thái Sao Lưu",
+              "form": {
+                "backupStatus": "Trạng Thái Sao Lưu"
               },
-              "matchRegex": {
-                "title": "Khớp Regex",
-                "form": {
-                  "input": "Đầu Vào",
-                  "regex": "Regex",
-                  "outputs": "Đầu Ra",
-                  "outputNumber": "Đầu Ra {number}"
-                },
-                "renderer": {
-                  "compact": "Khớp {input} với regex {regex}"
-                }
+              "card": {
+                "content": "Khi Sao Lưu Đạt Tới Trạng Thái `{status}`."
+              }
+            },
+            "consoleLine": {
+              "title": "Dòng Bảng Điều Khiển",
+              "form": {
+                "lineContains": "Dòng Chứa"
               },
-              "waitForConsoleLine": {
-                "title": "Chờ Dòng Bảng Điều Khiển",
-                "form": {
-                  "lineContains": "Dòng chứa",
-                  "timeout": "Thời gian chờ (miligiây)"
-                },
-                "renderer": {
-                  "compact": "Chờ {timeout} cho dòng bảng điều khiển chứa {contains}",
-                  "detail": {
-                    "lineContains": "Dòng phải chứa: {contains}",
-                    "caseInsensitive": "Không phân biệt hoa thường: {value}",
-                    "timeout": "Thời gian chờ: {timeout}"
-                  }
-                }
-              },
-              "sendCommand": {
-                "title": "Gửi Lệnh",
-                "form": {
-                  "command": "Lệnh"
-                },
-                "renderer": {
-                  "compact": "Chạy {command}",
-                  "detail": {
-                    "command": "Lệnh: {command}"
-                  }
-                }
-              },
-              "sendPower": {
-                "title": "Gửi Tín Hiệu Nguồn Điện",
-                "form": {
-                  "powerAction": "Hành Động Nguồn Điện"
-                },
-                "renderer": {
-                  "compact": "Thực hiện {action}",
-                  "detail": {
-                    "powerAction": "Hành Động Nguồn Điện: {action}"
-                  }
-                }
-              },
-              "createBackup": {
-                "title": "Tạo Sao Lưu",
-                "form": {
-                  "backupName": "Tên Sao Lưu",
-                  "ignoredFiles": "Tệp Bị Bỏ Qua"
-                },
-                "renderer": {
-                  "compact": "Tạo {name}",
-                  "detail": {
-                    "backupName": "Tên Sao Lưu: {name}",
-                    "ignoredFiles": "Tệp Bị Bỏ Qua: {files}"
-                  }
-                }
-              },
-              "createDirectory": {
-                "title": "Tạo Thư Mục",
-                "form": {
-                  "directoryName": "Tên Thư Mục"
-                },
-                "renderer": {
-                  "compact": "Tạo {name} trong {root}",
-                  "detail": {
-                    "directory": "Thư Mục: {name}",
-                    "root": "Root: {root}"
-                  }
-                }
-              },
-              "writeFile": {
-                "title": "Ghi Tệp",
-                "form": {
-                  "filePath": "Đường Dẫn Tệp",
-                  "content": "Nội Dung",
-                  "appendToFile": "Nối Vào Tệp"
-                },
-                "renderer": {
-                  "compact": "Ghi vào {file}",
-                  "detail": {
-                    "file": "Tệp: {file}",
-                    "append": "Nối: {value}"
-                  }
-                }
-              },
-              "copyFile": {
-                "title": "Sao Chép Tệp",
-                "form": {
-                  "sourceFile": "Tệp Nguồn",
-                  "destination": "Đích Đến"
-                },
-                "renderer": {
-                  "compact": "Sao chép {file} tới {destination}",
-                  "detail": {
-                    "from": "Từ: {file}",
-                    "to": "Tới: {destination}"
-                  }
-                }
-              },
-              "deleteFiles": {
-                "title": "Xóa Tệp",
-                "form": {
-                  "filesToDelete": "Tệp Để Xóa"
-                },
-                "renderer": {
-                  "compact": "Xóa {files}",
-                  "detail": {
-                    "root": "Root: {root}",
-                    "files": "Tệp: {files}"
-                  }
-                }
-              },
-              "renameFiles": {
-                "title": "Đổi Tên Tệp",
-                "form": {
-                  "files": "Tệp",
-                  "from": "từ",
-                  "to": "tới"
-                },
-                "renderer": {
-                  "compact": "Đổi tên {files}",
-                  "detail": {
-                    "root": "Root: {root}",
-                    "files": "Tệp: {files}"
-                  }
-                }
-              },
-              "compressFiles": {
-                "title": "Nén Tệp",
-                "form": {
-                  "filesToCompress": "Tệp Để Nén",
-                  "archiveFormat": "Định Dạng Kho Lưu Trữ",
-                  "archiveName": "Tên Kho Lưu Trữ"
-                },
-                "renderer": {
-                  "compact": "Nén {files} trong {root} thành {name}",
-                  "detail": {
-                    "output": "Đầu Ra: {name}",
-                    "root": "Root: {root}",
-                    "format": "Định Dạng: {format}",
-                    "files": "Tệp: {files}"
-                  }
-                }
-              },
-              "decompressFile": {
-                "title": "Giải Nén Tệp",
-                "form": {
-                  "file": "Tệp"
-                },
-                "renderer": {
-                  "compact": "Giải nén {file} tới {root}",
-                  "detail": {
-                    "file": "Tệp: {file}",
-                    "root": "Root: {root}"
-                  }
-                }
-              },
-              "updateStartupVariable": {
-                "title": "Cập Nhật Biến Khởi Động",
-                "form": {
-                  "envVariable": "Biến Môi Trường",
-                  "value": "Giá Trị"
-                },
-                "renderer": {
-                  "compact": "Đặt {variable} thành {value}",
-                  "detail": {
-                    "variable": "Biến: {variable}",
-                    "value": "Giá Trị: {value}"
-                  }
-                }
-              },
-              "updateStartupCommand": {
-                "title": "Cập Nhật Lệnh Khởi Động",
-                "form": {
-                  "startupCommand": "Lệnh Khởi Động"
-                },
-                "renderer": {
-                  "compact": "Đặt thành {command}",
-                  "detail": {
-                    "command": "Lệnh: {command}"
-                  }
-                }
-              },
-              "updateStartupDockerImage": {
-                "title": "Cập Nhật Hình Ảnh Docker",
-                "form": {
-                  "dockerImage": "Hình Ảnh Docker"
-                },
-                "renderer": {
-                  "compact": "Đặt thành {image}",
-                  "detail": {
-                    "image": "Hình Ảnh: {image}"
-                  }
-                }
+              "card": {
+                "content": "Khi Đầu Ra Bảng Điều Khiển Đạt Tới Dòng Chứa `{contains}`"
+              }
+            },
+            "crash": {
+              "title": "Sự Cố",
+              "card": {
+                "content": "Khi Máy Chủ Bị Sự Cố."
               }
             }
           },
-          "subusers": {
-            "title": "Người dùng phụ",
-            "table": {
-              "columns": {
-                "twoFactorEnabled": "Xác thực Hai Lớp Được Bật",
+          "renderer": {
+            "noActionSelected": "Chọn loại hành động để cấu hình",
+            "noActionDetails": "Chi tiết hành động không khả dụng",
+            "ignoreFailure": "Bỏ Qua Lỗi: {value}",
+            "foreground": "Nền Trước: {value}"
+          },
+          "steps": {
+            "empty": {
+              "title": "Không có Bước nào Được Cấu Hình",
+              "description": "Lịch trình này chưa có bước nào. Thêm một số hành động để bắt đầu."
+            },
+            "sleep": {
+              "title": "Ngủ",
+              "form": {
+                "duration": "Thời lượng (miligiây)"
+              },
+              "renderer": {
+                "compact": "Ngủ trong {duration}ms"
+              }
+            },
+            "ensure": {
+              "title": "Đảm Bảo",
+              "renderer": {
+                "compact": "Đảm bảo một điều kiện khớp"
+              }
+            },
+            "format": {
+              "title": "Định Dạng",
+              "form": {
+                "formatString": "Chuỗi Định Dạng",
+                "formatStringDescription": "Chuỗi định dạng, có thể bao gồm các biến bằng cách bao bọc bên trong {wrapper}"
+              },
+              "renderer": {
+                "compact": "Định dạng chuỗi thành {outputInto}"
+              }
+            },
+            "matchRegex": {
+              "title": "Khớp Regex",
+              "form": {
+                "input": "Đầu Vào",
+                "regex": "Regex",
+                "outputs": "Đầu Ra",
+                "outputNumber": "Đầu Ra {number}"
+              },
+              "renderer": {
+                "compact": "Khớp {input} với regex {regex}"
+              }
+            },
+            "waitForConsoleLine": {
+              "title": "Chờ Dòng Bảng Điều Khiển",
+              "form": {
+                "lineContains": "Dòng chứa",
+                "timeout": "Thời gian chờ (miligiây)"
+              },
+              "renderer": {
+                "compact": "Chờ {timeout} cho dòng bảng điều khiển chứa {contains}",
+                "detail": {
+                  "lineContains": "Dòng phải chứa: {contains}",
+                  "caseInsensitive": "Không phân biệt hoa thường: {value}",
+                  "timeout": "Thời gian chờ: {timeout}"
+                }
+              }
+            },
+            "sendCommand": {
+              "title": "Gửi Lệnh",
+              "form": {
+                "command": "Lệnh"
+              },
+              "renderer": {
+                "compact": "Chạy {command}",
+                "detail": {
+                  "command": "Lệnh: {command}"
+                }
+              }
+            },
+            "sendPower": {
+              "title": "Gửi Tín Hiệu Nguồn Điện",
+              "form": {
+                "powerAction": "Hành Động Nguồn Điện"
+              },
+              "renderer": {
+                "compact": "Thực hiện {action}",
+                "detail": {
+                  "powerAction": "Hành Động Nguồn Điện: {action}"
+                }
+              }
+            },
+            "createBackup": {
+              "title": "Tạo Sao Lưu",
+              "form": {
+                "backupName": "Tên Sao Lưu",
+                "ignoredFiles": "Tệp Bị Bỏ Qua"
+              },
+              "renderer": {
+                "compact": "Tạo {name}",
+                "detail": {
+                  "backupName": "Tên Sao Lưu: {name}",
+                  "ignoredFiles": "Tệp Bị Bỏ Qua: {files}"
+                }
+              }
+            },
+            "createDirectory": {
+              "title": "Tạo Thư Mục",
+              "form": {
+                "directoryName": "Tên Thư Mục"
+              },
+              "renderer": {
+                "compact": "Tạo {name} trong {root}",
+                "detail": {
+                  "directory": "Thư Mục: {name}",
+                  "root": "Root: {root}"
+                }
+              }
+            },
+            "writeFile": {
+              "title": "Ghi Tệp",
+              "form": {
+                "filePath": "Đường Dẫn Tệp",
+                "content": "Nội Dung",
+                "appendToFile": "Nối Vào Tệp"
+              },
+              "renderer": {
+                "compact": "Ghi vào {file}",
+                "detail": {
+                  "file": "Tệp: {file}",
+                  "append": "Nối: {value}"
+                }
+              }
+            },
+            "copyFile": {
+              "title": "Sao Chép Tệp",
+              "form": {
+                "sourceFile": "Tệp Nguồn",
+                "destination": "Đích Đến"
+              },
+              "renderer": {
+                "compact": "Sao chép {file} tới {destination}",
+                "detail": {
+                  "from": "Từ: {file}",
+                  "to": "Tới: {destination}"
+                }
+              }
+            },
+            "deleteFiles": {
+              "title": "Xóa Tệp",
+              "form": {
+                "filesToDelete": "Tệp Để Xóa"
+              },
+              "renderer": {
+                "compact": "Xóa {files}",
+                "detail": {
+                  "root": "Root: {root}",
+                  "files": "Tệp: {files}"
+                }
+              }
+            },
+            "renameFiles": {
+              "title": "Đổi Tên Tệp",
+              "form": {
+                "files": "Tệp",
+                "from": "từ",
+                "to": "tới"
+              },
+              "renderer": {
+                "compact": "Đổi tên {files}",
+                "detail": {
+                  "root": "Root: {root}",
+                  "files": "Tệp: {files}"
+                }
+              }
+            },
+            "compressFiles": {
+              "title": "Nén Tệp",
+              "form": {
+                "filesToCompress": "Tệp Để Nén",
+                "archiveFormat": "Định Dạng Kho Lưu Trữ",
+                "archiveName": "Tên Kho Lưu Trữ"
+              },
+              "renderer": {
+                "compact": "Nén {files} trong {root} thành {name}",
+                "detail": {
+                  "output": "Đầu Ra: {name}",
+                  "root": "Root: {root}",
+                  "format": "Định Dạng: {format}",
+                  "files": "Tệp: {files}"
+                }
+              }
+            },
+            "decompressFile": {
+              "title": "Giải Nén Tệp",
+              "form": {
+                "file": "Tệp"
+              },
+              "renderer": {
+                "compact": "Giải nén {file} tới {root}",
+                "detail": {
+                  "file": "Tệp: {file}",
+                  "root": "Root: {root}"
+                }
+              }
+            },
+            "updateStartupVariable": {
+              "title": "Cập Nhật Biến Khởi Động",
+              "form": {
+                "envVariable": "Biến Môi Trường",
+                "value": "Giá Trị"
+              },
+              "renderer": {
+                "compact": "Đặt {variable} thành {value}",
+                "detail": {
+                  "variable": "Biến: {variable}",
+                  "value": "Giá Trị: {value}"
+                }
+              }
+            },
+            "updateStartupCommand": {
+              "title": "Cập Nhật Lệnh Khởi Động",
+              "form": {
+                "startupCommand": "Lệnh Khởi Động"
+              },
+              "renderer": {
+                "compact": "Đặt thành {command}",
+                "detail": {
+                  "command": "Lệnh: {command}"
+                }
+              }
+            },
+            "updateStartupDockerImage": {
+              "title": "Cập Nhật Hình Ảnh Docker",
+              "form": {
+                "dockerImage": "Hình Ảnh Docker"
+              },
+              "renderer": {
+                "compact": "Đặt thành {image}",
+                "detail": {
+                  "image": "Hình Ảnh: {image}"
+                }
+              }
+            }
+          }
+        },
+        "subusers": {
+          "title": "Người dùng phụ",
+          "table": {
+            "columns": {
+              "twoFactorEnabled": "Xác thực Hai Lớp Được Bật",
+              "permissions": "Quyền",
+              "ignoredFiles": "Tệp Bị Bỏ Qua"
+            }
+          },
+          "modal": {
+            "createSubuser": {
+              "title": "Tạo Người Dùng Phụ",
+              "toast": {
+                "created": "Người dùng phụ đã được tạo."
+              },
+              "form": {
+                "email": "Email",
+                "emailPlaceholder": "Nhập email mà người dùng phụ này nên được lưu.",
                 "permissions": "Quyền",
                 "ignoredFiles": "Tệp Bị Bỏ Qua"
               }
             },
-            "modal": {
-              "createSubuser": {
-                "title": "Tạo Người Dùng Phụ",
-                "toast": {
-                  "created": "Người dùng phụ đã được tạo."
-                },
-                "form": {
-                  "email": "Email",
-                  "emailPlaceholder": "Nhập email mà người dùng phụ này nên được lưu.",
-                  "permissions": "Quyền",
-                  "ignoredFiles": "Tệp Bị Bỏ Qua"
-                }
-              },
-              "updateSubuser": {
-                "title": "Cập Nhật Người Dùng Phụ",
-                "toast": {
-                  "updated": "Người dùng phụ đã được cập nhật."
-                }
-              },
-              "removeSubuser": {
-                "title": "Xác Nhận Xóa Người Dùng Phụ",
-                "content": "Bạn có chắc muốn xóa **{username}** khỏi máy chủ này không?",
-                "toast": {
-                  "removed": "Người dùng phụ đã được xóa."
-                }
+            "updateSubuser": {
+              "title": "Cập Nhật Người Dùng Phụ",
+              "toast": {
+                "updated": "Người dùng phụ đã được cập nhật."
+              }
+            },
+            "removeSubuser": {
+              "title": "Xác Nhận Xóa Người Dùng Phụ",
+              "content": "Bạn có chắc muốn xóa **{username}** khỏi máy chủ này không?",
+              "toast": {
+                "removed": "Người dùng phụ đã được xóa."
               }
             }
+          }
+        },
+        "backups": {
+          "title": "Sao Lưu",
+          "subtitle": "{current} của {max} sao lưu tối đa đã được tạo.",
+          "tooltip": {
+            "limitReached": "Máy chủ này được giới hạn ở {max} sao lưu."
           },
-          "backups": {
-            "title": "Sao Lưu",
-            "subtitle": "{current} của {max} sao lưu tối đa đã được tạo.",
-            "tooltip": {
-              "limitReached": "Máy chủ này được giới hạn ở {max} sao lưu."
-            },
-            "table": {
-              "columns": {
-                "checksum": "Tổng Kiểm Tra",
-                "files": "Tệp",
-                "locked": "Khóa?"
-              }
-            },
-            "button": {
-              "browse": "Duyệt"
-            },
-            "toast": {
-              "downloadStarted": "Tải xuống đã bắt đầu.",
-              "restoringBackup": "Đang khôi phục sao lưu..."
-            },
-            "modal": {
-              "createBackup": {
-                "title": "Tạo Sao Lưu",
-                "toast": {
-                  "created": "Sao lưu đã được tạo."
-                },
-                "form": {
-                  "ignoredFiles": "Tệp Bị Bỏ Qua"
-                }
-              },
-              "editBackup": {
-                "title": "Chỉnh Sửa Sao Lưu",
-                "toast": {
-                  "updated": "Sao lưu đã được cập nhật."
-                },
-                "form": {
-                  "locked": "Khóa"
-                }
-              },
-              "restoreBackup": {
-                "title": "Khôi Phục Sao Lưu"
-              },
-              "deleteBackup": {
-                "title": "Xác Nhận Xóa Sao Lưu",
-                "content": "Bạn có chắc muốn xóa **{name}** khỏi máy chủ này không?",
-                "toast": {
-                  "deleted": "Sao lưu đã được xóa."
-                }
-              }
+          "table": {
+            "columns": {
+              "checksum": "Tổng Kiểm Tra",
+              "files": "Tệp",
+              "locked": "Khóa?"
             }
           },
-          "network": {
-            "title": "Mạng",
-            "subtitle": "{current} của {max} phân bổ tối đa được gán.",
-            "tooltip": {
-              "limitReached": "Máy chủ này được giới hạn ở {max} phân bổ.",
-              "primary": "Chính"
+          "button": {
+            "browse": "Duyệt"
+          },
+          "toast": {
+            "downloadStarted": "Tải xuống đã bắt đầu.",
+            "restoringBackup": "Đang khôi phục sao lưu..."
+          },
+          "modal": {
+            "createBackup": {
+              "title": "Tạo Sao Lưu",
+              "toast": {
+                "created": "Sao lưu đã được tạo."
+              },
+              "form": {
+                "ignoredFiles": "Tệp Bị Bỏ Qua"
+              }
             },
-            "table": {
-              "columns": {
-                "hostname": "Tên Máy Chủ",
-                "port": "Cổng",
+            "editBackup": {
+              "title": "Chỉnh Sửa Sao Lưu",
+              "toast": {
+                "updated": "Sao lưu đã được cập nhật."
+              },
+              "form": {
+                "locked": "Khóa"
+              }
+            },
+            "restoreBackup": {
+              "title": "Khôi Phục Sao Lưu"
+            },
+            "deleteBackup": {
+              "title": "Xác Nhận Xóa Sao Lưu",
+              "content": "Bạn có chắc muốn xóa **{name}** khỏi máy chủ này không?",
+              "toast": {
+                "deleted": "Sao lưu đã được xóa."
+              }
+            }
+          }
+        },
+        "network": {
+          "title": "Mạng",
+          "subtitle": "{current} của {max} phân bổ tối đa được gán.",
+          "tooltip": {
+            "limitReached": "Máy chủ này được giới hạn ở {max} phân bổ.",
+            "primary": "Chính"
+          },
+          "table": {
+            "columns": {
+              "hostname": "Tên Máy Chủ",
+              "port": "Cổng",
+              "notes": "Ghi Chú"
+            }
+          },
+          "button": {
+            "setPrimary": "Đặt làm Chính",
+            "unsetPrimary": "Bỏ Chính"
+          },
+          "toast": {
+            "created": "Phân bổ đã được tạo.",
+            "updated": "Phân bổ đã được cập nhật.",
+            "removed": "Phân bổ đã được xóa.",
+            "setPrimary": "Phân bổ được đặt làm chính.",
+            "unsetPrimary": "Phân bổ được bỏ chính."
+          },
+          "modal": {
+            "editAllocation": {
+              "title": "Chỉnh Sửa Phân Bổ",
+              "form": {
                 "notes": "Ghi Chú"
               }
             },
-            "button": {
-              "setPrimary": "Đặt làm Chính",
-              "unsetPrimary": "Bỏ Chính"
-            },
-            "toast": {
-              "created": "Phân bổ đã được tạo.",
-              "updated": "Phân bổ đã được cập nhật.",
-              "removed": "Phân bổ đã được xóa.",
-              "setPrimary": "Phân bổ được đặt làm chính.",
-              "unsetPrimary": "Phân bổ được bỏ chính."
-            },
-            "modal": {
-              "editAllocation": {
-                "title": "Chỉnh Sửa Phân Bổ",
-                "form": {
-                  "notes": "Ghi Chú"
-                }
-              },
-              "removeAllocation": {
-                "title": "Xác Nhận Xóa Phân Bổ",
-                "content": "Bạn có chắc muốn xóa **{allocation}** khỏi máy chủ này không?"
-              }
+            "removeAllocation": {
+              "title": "Xác Nhận Xóa Phân Bổ",
+              "content": "Bạn có chắc muốn xóa **{allocation}** khỏi máy chủ này không?"
             }
-          },
-          "startup": {
-            "title": "Khởi Động",
-            "form": {
-              "startupCommand": "Lệnh Khởi Động",
-              "dockerImage": "Hình Ảnh Docker"
-            },
-            "variables": "Biến",
-            "dockerImageDescription": "Hình ảnh Docker được sử dụng để chạy máy chủ này. Điều này có thể được thay đổi để sử dụng một hình ảnh khác.",
-            "dockerImageDescriptionCustom": "Hình ảnh Docker được sử dụng để chạy máy chủ này. Điều này đã được đặt bởi quản trị viên và không thể thay đổi.",
-            "toast": {
-              "startupCommandUpdated": "Lệnh khởi động đã được cập nhật.",
-              "dockerImageUpdated": "Hình ảnh Docker đã được cập nhật.",
-              "variablesUpdated": "Biến đã được cập nhật."
-            }
-          },
-          "mounts": {
-            "title": "Điểm Gắn",
-            "table": {
-              "columns": {
-                "target": "Đích Đến",
-                "mounted": "Đã Gắn",
-                "readOnly": "Chỉ Đọc"
-              }
-            },
-            "modal": {
-              "attachMount": {
-                "title": "Gắn Điểm Gắn",
-                "content": "Bạn có muốn gắn **{name}** vào `{target}` không?",
-                "confirm": "Gắn",
-                "toast": {
-                  "attached": "{name} đã được gắn vào máy chủ của bạn."
-                }
-              },
-              "detachMount": {
-                "title": "Tháo Điểm Gắn",
-                "content": "Bạn có muốn tháo **{name}** từ `{target}` không?",
-                "confirm": "Tháo",
-                "toast": {
-                  "detached": "{name} đã được xóa khỏi máy chủ của bạn."
-                }
-              }
-            }
-          },
-          "settings": {
-            "title": "Cài đặt",
-            "debugInformation": {
-              "title": "Chi tiết",
-              "form": {
-                "nodeName": "Node (UUID)",
-                "locationName": "Vị trí (UUID)",
-                "serverUuid": "UUID Máy Chủ"
-              }
-            },
-            "rename": {
-              "title": "Đổi Tên Máy Chủ",
-              "form": {
-                "serverName": "Tên Máy Chủ"
-              },
-              "toast": {
-                "renamed": "Tên máy chủ đã được đổi."
-              }
-            },
-            "timezone": {
-              "title": "Múi Giờ",
-              "form": {
-                "timezone": "Múi Giờ",
-                "system": "Hệ Thống"
-              },
-              "toast": {
-                "updated": "Múi giờ máy chủ đã được cập nhật."
-              }
-            },
-            "autokill": {
-              "title": "Tự động dừng",
-              "form": {
-                "enabled": "Bật",
-                "secondsUntilAutoKill": "Giây cho đến khi tự động dừng"
-              },
-              "toast": {
-                "updated": "Tự động dừng máy chủ đã được cập nhật."
-              }
-            },
-            "autostart": {
-              "title": "Tự khởi chạy",
-              "form": {
-                "behavior": "Hành vi tự khởi chạy"
-              },
-              "toast": {
-                "updated": "Hành vi tự khởi chạy máy chủ đã được cập nhật."
-              }
-            },
-            "reinstall": {
-              "title": "Cài đặt lại Máy Chủ",
-              "button": "Cài đặt lại Máy Chủ",
-              "content": "Cài đặt lại máy chủ sẽ xóa **tất cả dữ liệu hiện có trên máy chủ và cài đặt lại nó về trạng thái ban đầu**. Bạn có chắc muốn tiếp tục không?",
-              "modal": {
-                "title": "Xác Nhận Cài Đặt Lại Máy Chủ",
-                "button": "Cài đặt lại",
-                "toast": {
-                  "reinstalling": "Đang cài đặt lại máy chủ..."
-                }
-              }
-            }
-          },
-          "activity": {
-            "title": "Hoạt động"
           }
+        },
+        "startup": {
+          "title": "Khởi Động",
+          "form": {
+            "startupCommand": "Lệnh Khởi Động",
+            "dockerImage": "Hình Ảnh Docker"
+          },
+          "variables": "Biến",
+          "dockerImageDescription": "Hình ảnh Docker được sử dụng để chạy máy chủ này. Điều này có thể được thay đổi để sử dụng một hình ảnh khác.",
+          "dockerImageDescriptionCustom": "Hình ảnh Docker được sử dụng để chạy máy chủ này. Điều này đã được đặt bởi quản trị viên và không thể thay đổi.",
+          "toast": {
+            "startupCommandUpdated": "Lệnh khởi động đã được cập nhật.",
+            "dockerImageUpdated": "Hình ảnh Docker đã được cập nhật.",
+            "variablesUpdated": "Biến đã được cập nhật."
+          }
+        },
+        "mounts": {
+          "title": "Điểm Gắn",
+          "table": {
+            "columns": {
+              "target": "Đích Đến",
+              "mounted": "Đã Gắn",
+              "readOnly": "Chỉ Đọc"
+            }
+          },
+          "modal": {
+            "attachMount": {
+              "title": "Gắn Điểm Gắn",
+              "content": "Bạn có muốn gắn **{name}** vào `{target}` không?",
+              "confirm": "Gắn",
+              "toast": {
+                "attached": "{name} đã được gắn vào máy chủ của bạn."
+              }
+            },
+            "detachMount": {
+              "title": "Tháo Điểm Gắn",
+              "content": "Bạn có muốn tháo **{name}** từ `{target}` không?",
+              "confirm": "Tháo",
+              "toast": {
+                "detached": "{name} đã được xóa khỏi máy chủ của bạn."
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Cài đặt",
+          "debugInformation": {
+            "title": "Chi tiết",
+            "form": {
+              "nodeName": "Node (UUID)",
+              "locationName": "Vị trí (UUID)",
+              "serverUuid": "UUID Máy Chủ"
+            }
+          },
+          "rename": {
+            "title": "Đổi Tên Máy Chủ",
+            "form": {
+              "serverName": "Tên Máy Chủ"
+            },
+            "toast": {
+              "renamed": "Tên máy chủ đã được đổi."
+            }
+          },
+          "timezone": {
+            "title": "Múi Giờ",
+            "form": {
+              "timezone": "Múi Giờ",
+              "system": "Hệ Thống"
+            },
+            "toast": {
+              "updated": "Múi giờ máy chủ đã được cập nhật."
+            }
+          },
+          "autokill": {
+            "title": "Tự động dừng",
+            "form": {
+              "enabled": "Bật",
+              "secondsUntilAutoKill": "Giây cho đến khi tự động dừng"
+            },
+            "toast": {
+              "updated": "Tự động dừng máy chủ đã được cập nhật."
+            }
+          },
+          "autostart": {
+            "title": "Tự khởi chạy",
+            "form": {
+              "behavior": "Hành vi tự khởi chạy"
+            },
+            "toast": {
+              "updated": "Hành vi tự khởi chạy máy chủ đã được cập nhật."
+            }
+          },
+          "reinstall": {
+            "title": "Cài đặt lại Máy Chủ",
+            "button": "Cài đặt lại Máy Chủ",
+            "content": "Cài đặt lại máy chủ sẽ xóa **tất cả dữ liệu hiện có trên máy chủ và cài đặt lại nó về trạng thái ban đầu**. Bạn có chắc muốn tiếp tục không?",
+            "modal": {
+              "title": "Xác Nhận Cài Đặt Lại Máy Chủ",
+              "button": "Cài đặt lại",
+              "toast": {
+                "reinstalling": "Đang cài đặt lại máy chủ..."
+              }
+            }
+          }
+        },
+        "activity": {
+          "title": "Hoạt động"
         }
       }
     }

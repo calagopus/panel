@@ -221,7 +221,7 @@ export default defineConfig({
     emptyOutDir: true,
     chunkSizeWarningLimit: 1024,
     target: 'es2020',
-    cssCodeSplit: false,
+    cssCodeSplit: true,
     rolldownOptions: {
       external: ['monaco-editor'],
       output: {

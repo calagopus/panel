@@ -4,6 +4,7 @@ import { NavLink, Route, Routes, useParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getEggCommandSnippets from '@/api/me/servers/eggs/getEggCommandSnippets.ts';
 import getServer from '@/api/server/getServer.ts';
+import AppIcon from '@/elements/AppIcon.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import Container from '@/elements/Container.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
@@ -22,13 +23,11 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ServerPermissionGuard from '@/routers/guards/ServerPermissionGuard.tsx';
 import serverRoutes from '@/routers/routes/serverRoutes.ts';
-import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
 import ServerStateGuard from './guards/ServerStateGuard.tsx';
 
 export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   const { t, language } = useTranslations();
-  const { settings } = useGlobalStore();
   const { user } = useAuth();
   const { addToast } = useToast();
 
@@ -119,10 +118,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
       {isNormal && (
         <Sidebar>
           <NavLink to='/' className='w-full'>
-            <div className='h-16 w-full flex flex-row items-center justify-between mt-1 select-none cursor-pointer'>
-              <img src={settings.app.icon} className='h-12 w-12' alt='Calagopus Icon' />
-              <h1 className='grow text-md font-bold! ml-2'>{settings.app.name}</h1>
-            </div>
+            <AppIcon />
           </NavLink>
 
           <div className='flex flex-col gap-2 mt-2 mb-1'>

@@ -795,6 +795,37 @@ impl User {
             created: self.created.and_utc(),
         }
     }
+
+    #[inline]
+    pub fn into_admin_api_object(
+        self,
+        storage_url_retriever: &StorageUrlRetriever<'_>,
+    ) -> AdminApiUser {
+        let require_two_factor = self.require_two_factor(storage_url_retriever.get_settings());
+
+        AdminApiUser {
+            uuid: self.uuid,
+            external_id: self.external_id,
+            username: self.username,
+            role: self.role.map(|r| r.into_admin_api_object()),
+            avatar: self
+                .avatar
+                .as_ref()
+                .map(|a| storage_url_retriever.get_url(a)),
+            email: self.email,
+            name_first: self.name_first,
+            name_last: self.name_last,
+            admin: self.admin,
+            totp_enabled: self.totp_enabled,
+            totp_last_used: self.totp_last_used.map(|dt| dt.and_utc()),
+            require_two_factor,
+            language: self.language,
+            toast_position: self.toast_position,
+            start_on_grouped_servers: self.start_on_grouped_servers,
+            has_password: self.has_password,
+            created: self.created.and_utc(),
+        }
+    }
 }
 
 #[derive(ToSchema, Deserialize, Validate)]
@@ -1126,6 +1157,34 @@ pub struct ApiUser {
 #[schema(title = "FullUser")]
 pub struct ApiFullUser {
     pub uuid: uuid::Uuid,
+
+    pub username: compact_str::CompactString,
+    pub role: Option<super::role::AdminApiRole>,
+    pub avatar: Option<String>,
+    pub email: compact_str::CompactString,
+
+    pub name_first: compact_str::CompactString,
+    pub name_last: compact_str::CompactString,
+
+    pub admin: bool,
+    pub totp_enabled: bool,
+    pub totp_last_used: Option<chrono::DateTime<chrono::Utc>>,
+    pub require_two_factor: bool,
+
+    pub language: compact_str::CompactString,
+    pub toast_position: UserToastPosition,
+    pub start_on_grouped_servers: bool,
+
+    pub has_password: bool,
+
+    pub created: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(ToSchema, Serialize)]
+#[schema(title = "AdminUser")]
+pub struct AdminApiUser {
+    pub uuid: uuid::Uuid,
+    pub external_id: Option<compact_str::CompactString>,
 
     pub username: compact_str::CompactString,
     pub role: Option<super::role::AdminApiRole>,

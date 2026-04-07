@@ -82,7 +82,7 @@ function LocalizedTextInput({
         value={selectedLang}
         onChange={(v) => setSelectedLang(v ?? EN)}
         allowDeselect={false}
-        size={label ? 'xs' : 'sm'}
+        size='sm'
         w={130}
         comboboxProps={{ withinPortal: true }}
         disabled={disabled}

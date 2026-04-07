@@ -51,7 +51,7 @@ interface DeploymentItemEditorProps {
 function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentItemEditorProps) {
   const handleTypeChange = (type: DeploymentModeType | null) => {
     if (!type) return;
-    onChange({ mode: eggConfigurationDeploymentDefaultMapping[type] });
+    onChange({ mode: eggConfigurationDeploymentDefaultMapping[type], assignToVariable: value.assignToVariable });
   };
 
   return (
@@ -87,6 +87,7 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
             value={value.mode.startPort}
             onChange={(v) =>
               onChange({
+                ...value,
                 mode: { ...value.mode, startPort: Number(v) } as z.infer<
                   typeof adminEggConfigurationDeploymentRangeSchema
                 >,
@@ -101,6 +102,7 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
             value={value.mode.endPort}
             onChange={(v) =>
               onChange({
+                ...value,
                 mode: { ...value.mode, endPort: Number(v) } as z.infer<
                   typeof adminEggConfigurationDeploymentRangeSchema
                 >,
@@ -119,6 +121,7 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
             value={value.mode.value}
             onChange={(v) =>
               onChange({
+                ...value,
                 mode: { ...value.mode, value: Number(v) } as z.infer<
                   typeof adminEggConfigurationDeploymentAddPrimarySchema
                 >,
@@ -127,6 +130,19 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
           />
         )
       )}
+
+      <TextInput
+        label='Assign to Variable'
+        description='Optional environment variable to receive the assigned port from this rule.'
+        placeholder='e.g. SERVER_PORT'
+        value={value.assignToVariable ?? ''}
+        onChange={(e) =>
+          onChange({
+            ...value,
+            assignToVariable: e.currentTarget.value.toUpperCase() || null,
+          })
+        }
+      />
     </Stack>
   );
 }
@@ -233,7 +249,7 @@ export default function EggConfigurationCreateOrUpdate({
   const handleAddDeployment = () => {
     const next: EggConfigurationDeployment[] = [
       ...additionalDeployments,
-      { mode: eggConfigurationDeploymentDefaultMapping['random'] },
+      { mode: eggConfigurationDeploymentDefaultMapping['random'], assignToVariable: null },
     ];
     form.setFieldValue('configAllocations.deployment.additional', next);
   };
@@ -421,6 +437,12 @@ export default function EggConfigurationCreateOrUpdate({
                       placeholder='e.g. SERVER_PORT'
                       key={form.key('configAllocations.deployment.primary.assignToVariable')}
                       {...form.getInputProps('configAllocations.deployment.primary.assignToVariable')}
+                      onChange={(e) =>
+                        form.setFieldValue(
+                          'configAllocations.deployment.primary.assignToVariable',
+                          e.currentTarget.value.toUpperCase() || null,
+                        )
+                      }
                     />
                   </Stack>
                 )}

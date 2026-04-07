@@ -7,6 +7,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelServerInstall from '@/api/server/settings/cancelServerInstall.ts';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { bytesToString } from '@/lib/size.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -53,6 +54,7 @@ export default function ServerContentContainer(props: Props) {
     backupRestoreTotal,
     transferProgressTotal,
   } = useServerStore();
+  const { user } = useAuth();
   const { id } = useCurrentWindow();
   const { addToast } = useToast();
 
@@ -74,7 +76,10 @@ export default function ServerContentContainer(props: Props) {
           updateServer({ status: null });
         }
       })
-      .catch((err) => addToast(httpErrorToHuman(err), 'error'));
+      .catch((err) => {
+        addToast(httpErrorToHuman(err), 'error');
+        setAbortLoading(false);
+      });
   };
 
   return (
@@ -95,6 +100,14 @@ export default function ServerContentContainer(props: Props) {
                 value={transferProgressArchive > 0 ? (transferProgressArchive / transferProgressTotal) * 100 : 0}
               />
             </Tooltip>
+          </Notification>
+        </div>
+      ) : server.isSuspended ? (
+        <div className='mt-2 px-4 lg:px-6 mb-4'>
+          <Notification color='red'>
+            {user?.admin
+              ? t('pages.server.console.notification.suspendedAdmin', {})
+              : t('pages.server.console.notification.suspended', {})}
           </Notification>
         </div>
       ) : server.status === 'restoring_backup' ? (

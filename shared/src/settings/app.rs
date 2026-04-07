@@ -1,3 +1,5 @@
+use crate::prelude::StringExt;
+
 use super::{
     ExtensionSettings, SettingsDeserializeExt, SettingsDeserializer, SettingsSerializeExt,
     SettingsSerializer,
@@ -18,6 +20,7 @@ pub enum TwoFactorRequirement {
 pub struct AppSettingsApp {
     pub name: compact_str::CompactString,
     pub icon: compact_str::CompactString,
+    pub banner: Option<compact_str::CompactString>,
     pub url: compact_str::CompactString,
     pub language: compact_str::CompactString,
     pub two_factor_requirement: TwoFactorRequirement,
@@ -36,6 +39,7 @@ impl SettingsSerializeExt for AppSettingsApp {
         Ok(serializer
             .write_raw_setting("name", &*self.name)
             .write_raw_setting("icon", &*self.icon)
+            .write_raw_setting("banner", self.banner.as_deref().unwrap_or(""))
             .write_raw_setting("url", &*self.url)
             .write_raw_setting("language", &*self.language)
             .write_raw_setting(
@@ -76,6 +80,9 @@ impl SettingsDeserializeExt for AppSettingsAppDeserializer {
             icon: deserializer
                 .take_raw_setting("icon")
                 .unwrap_or_else(|| "/icon.svg".into()),
+            banner: deserializer
+                .take_raw_setting("banner")
+                .and_then(|s| s.into_optional()),
             url: deserializer
                 .take_raw_setting("url")
                 .unwrap_or_else(|| "http://localhost:8000".into()),

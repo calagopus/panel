@@ -10,6 +10,7 @@ export interface SettingsSlice {
 
   setServerListShowOthers: (show: boolean) => void;
   setSettings: (settings: z.infer<typeof publicSettingsSchema>) => void;
+  updateSettings: (settings: Partial<z.infer<typeof publicSettingsSchema>>) => void;
   setLanguages: (languages: string[]) => void;
 }
 
@@ -20,5 +21,6 @@ export const createSettingsSlice: StateCreator<GlobalStore, [], [], SettingsSlic
 
   setServerListShowOthers: (value) => set((state) => ({ ...state, serverListShowOthers: value })),
   setSettings: (value) => set((state) => ({ ...state, settings: value })),
+  updateSettings: (value) => set((state) => ({ ...state, settings: { ...state.settings, ...value } })),
   setLanguages: (value) => set((state) => ({ ...state, languages: value })),
 });

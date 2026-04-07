@@ -1,12 +1,74 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import React from 'react';
+import { NavigateFunction, SetURLSearchParams } from 'react-router';
 import { ContainerRegistry, Registry } from 'shared';
 import { z } from 'zod';
 import type { Props as ContainerProps } from '@/elements/containers/ServerContentContainer.tsx';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import { serverSchema } from '@/lib/schemas/server/server.ts';
+import { FileManagerContextType } from '@/providers/contexts/fileManagerContext.ts';
 import { ComponentListRegistry } from '../../slices/componentList.ts';
 import { ContextMenuRegistry } from '../../slices/contextMenu.ts';
 
-type FileIconHandler = (file: z.infer<typeof serverDirectoryEntrySchema>) => IconDefinition | undefined;
+type HandleOpenProps = {
+  server: z.infer<typeof serverSchema>;
+  fileManagerContext: FileManagerContextType;
+  navigate: NavigateFunction;
+  setSearchParams: SetURLSearchParams;
+
+  handleDirectoryOpen: (path: string) => void;
+  handleFileOpen: (file: string, action: string, params: Record<string, string>) => void;
+};
+
+export type FileOpenMode =
+  | {
+      openable: false;
+    }
+  | {
+      openable: true;
+      handleOpen: (props: HandleOpenProps) => void;
+    };
+
+interface FileEditorActionBase {
+  name: string;
+  title: (file: string) => string;
+  header: {
+    settings?: React.FC;
+    rightSection?: React.FC;
+  };
+}
+
+type FileEditorActionContent =
+  | {
+      contentType: 'string';
+
+      content: React.FC<{
+        content: string;
+        setContent: (content: string) => void;
+        dirty: boolean;
+        setDirty: (dirty: boolean) => void;
+      }>;
+    }
+  | {
+      contentType: 'blob';
+
+      content: React.FC<{
+        content: Blob;
+        setContent: (content: Blob) => void;
+        dirty: boolean;
+        setDirty: (dirty: boolean) => void;
+      }>;
+    };
+
+type FileIconHandler = (
+  file: z.infer<typeof serverDirectoryEntrySchema>,
+  fileManagerContext: FileManagerContextType,
+) => IconDefinition | undefined;
+type FileOpenableHandler = (
+  file: z.infer<typeof serverDirectoryEntrySchema>,
+  fileManagerContext: FileManagerContextType,
+) => FileOpenMode;
+type FileEditorAction = FileEditorActionBase & FileEditorActionContent;
 
 export class FilesRegistry implements Registry {
   public mergeFrom(other: this): this {
@@ -22,6 +84,8 @@ export class FilesRegistry implements Registry {
     this.fileContextMenu.mergeFrom(other.fileContextMenu);
 
     this.fileIconHandlers.push(...other.fileIconHandlers);
+    this.fileOpenableHandlers.push(...other.fileOpenableHandlers);
+    this.fileEditorActions.push(...other.fileEditorActions);
 
     return this;
   }
@@ -40,9 +104,21 @@ export class FilesRegistry implements Registry {
   public fileMassContextMenu: ContextMenuRegistry = new ContextMenuRegistry();
 
   public fileIconHandlers: FileIconHandler[] = [];
+  public fileOpenableHandlers: FileOpenableHandler[] = [];
+  public fileEditorActions: FileEditorAction[] = [];
 
   public addFileIconHandler(handler: FileIconHandler): this {
     this.fileIconHandlers.push(handler);
+    return this;
+  }
+
+  public addFileOpenableHandler(handler: FileOpenableHandler): this {
+    this.fileOpenableHandlers.push(handler);
+    return this;
+  }
+
+  public addFileEditorAction(action: FileEditorAction): this {
+    this.fileEditorActions.push(action);
     return this;
   }
 

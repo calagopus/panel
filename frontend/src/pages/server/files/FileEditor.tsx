@@ -1,9 +1,10 @@
 import { Group, Title } from '@mantine/core';
 import { type OnMount } from '@monaco-editor/react';
 import { join } from 'pathe';
-import { startTransition, useEffect, useRef, useState } from 'react';
+import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { createSearchParams, useNavigate, useParams, useSearchParams } from 'react-router';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
 import saveFileContent from '@/api/server/files/saveFileContent.ts';
 import Button from '@/elements/Button.tsx';
@@ -27,6 +28,16 @@ import FileNameModal from './modals/FileNameModal.tsx';
 function FileEditorComponent() {
   const params = useParams<'action'>();
 
+  const matchedFileEditorAction = useMemo(() => {
+    if (!params.action) return null;
+
+    return (
+      window.extensionContext.extensionRegistry.pages.server.files.fileEditorActions.find(
+        (action) => action.name === params.action,
+      ) || null
+    );
+  }, [params.action]);
+
   const { t } = useTranslations();
   const [searchParams, _] = useSearchParams();
   const navigate = useNavigate();
@@ -47,10 +58,10 @@ function FileEditorComponent() {
   const [nameModalOpen, setNameModalOpen] = useState(false);
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
+  const [blobContent, setBlobContent] = useState(new Blob());
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const contentRef = useRef(content);
-
   const blocker = useBlocker(dirty);
 
   useEffect(() => {
@@ -64,12 +75,31 @@ function FileEditorComponent() {
 
     setLoading(true);
     getFileContent(server.uuid, join(browsingDirectory, fileName))
-      .then((content) => (params.action === 'image' ? URL.createObjectURL(content) : content.text()))
+      .then((content) => {
+        if (matchedFileEditorAction?.contentType === 'blob') {
+          return content;
+        }
+
+        if (params.action === 'image') {
+          return URL.createObjectURL(content);
+        } else {
+          return content.text();
+        }
+      })
       .then((content) => {
         startTransition(() => {
-          setContent(content);
+          if (typeof content === 'string') {
+            setContent(content);
+          } else {
+            setBlobContent(content);
+          }
+
           setLoading(false);
         });
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+        setLoading(false);
       });
   }, [fileName]);
 
@@ -85,26 +115,31 @@ function FileEditorComponent() {
     const currentContent = editorRef.current.getValue();
     setSaving(true);
 
-    saveFileContent(server.uuid, join(browsingDirectory, name ?? fileName), currentContent).then(() => {
-      startTransition(() => {
+    saveFileContent(server.uuid, join(browsingDirectory, name ?? fileName), currentContent)
+      .then(() => {
+        startTransition(() => {
+          setSaving(false);
+          setNameModalOpen(false);
+        });
+
+        addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
+
+        if (name) {
+          navigate(
+            `/server/${server.uuidShort}/files/edit?${createSearchParams({
+              directory: browsingDirectory,
+              file: name,
+            })}`,
+          );
+        }
+      })
+      .catch((msg) => {
         setSaving(false);
-        setNameModalOpen(false);
+        addToast(httpErrorToHuman(msg), 'error');
       });
-
-      addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
-
-      if (name) {
-        navigate(
-          `/server/${server.uuidShort}/files/edit?${createSearchParams({
-            directory: browsingDirectory,
-            file: name,
-          })}`,
-        );
-      }
-    });
   };
 
-  if (!['new', 'edit', 'image'].includes(params.action!)) {
+  if (!matchedFileEditorAction && !['new', 'edit', 'image'].includes(params.action!)) {
     return (
       <ServerContentContainer title='Not found' hideTitleComponent>
         <ScreenBlock title='404' content='Editor not found' />
@@ -112,11 +147,13 @@ function FileEditorComponent() {
     );
   }
 
-  const title = fileName
-    ? params.action === 'image'
-      ? t('pages.server.files.titleEditorViewing', { file: fileName })
-      : t('pages.server.files.titleEditorEditing', { file: fileName })
-    : t('pages.server.files.titleEditorNew', {});
+  const title = matchedFileEditorAction
+    ? matchedFileEditorAction.title(fileName)
+    : fileName
+      ? params.action === 'image'
+        ? t('pages.server.files.titleEditorViewing', { file: fileName })
+        : t('pages.server.files.titleEditorEditing', { file: fileName })
+      : t('pages.server.files.titleEditorNew', {});
 
   return (
     <ServerContentContainer
@@ -129,27 +166,33 @@ function FileEditorComponent() {
         <Group>
           <Title>{title}</Title>
 
-          {params.action === 'new' || params.action === 'edit' ? (
+          {matchedFileEditorAction?.header.settings ? (
+            <matchedFileEditorAction.header.settings />
+          ) : params.action === 'new' || params.action === 'edit' ? (
             <FileEditorSettings />
           ) : params.action === 'image' ? (
             <FileImageViewerSettings />
           ) : null}
         </Group>
-        <div hidden={!browsingWritableDirectory || params.action === 'image'}>
-          {params.action === 'edit' ? (
-            <ServerCan action='files.update'>
-              <Button loading={saving} onClick={() => saveFile()}>
-                {t('common.button.save', {})}
-              </Button>
-            </ServerCan>
-          ) : (
-            <ServerCan action='files.create'>
-              <Button loading={saving} onClick={() => setNameModalOpen(true)}>
-                {t('common.button.create', {})}
-              </Button>
-            </ServerCan>
-          )}
-        </div>
+        {matchedFileEditorAction?.header.rightSection ? (
+          <matchedFileEditorAction.header.rightSection />
+        ) : (
+          <div hidden={!browsingWritableDirectory || params.action === 'image'}>
+            {params.action === 'edit' ? (
+              <ServerCan action='files.update'>
+                <Button loading={saving} onClick={() => saveFile()}>
+                  {t('common.button.save', {})}
+                </Button>
+              </ServerCan>
+            ) : (
+              <ServerCan action='files.create'>
+                <Button loading={saving} onClick={() => setNameModalOpen(true)}>
+                  {t('common.button.create', {})}
+                </Button>
+              </ServerCan>
+            )}
+          </div>
+        )}
       </div>
 
       <ConfirmationModal
@@ -184,7 +227,21 @@ function FileEditorComponent() {
               }}
               className='flex max-w-full w-full z-1 absolute'
             >
-              {params.action === 'image' ? (
+              {matchedFileEditorAction?.contentType === 'string' ? (
+                <matchedFileEditorAction.content
+                  content={content}
+                  setContent={setContent}
+                  dirty={dirty}
+                  setDirty={setDirty}
+                />
+              ) : matchedFileEditorAction?.contentType === 'blob' ? (
+                <matchedFileEditorAction.content
+                  content={blobContent}
+                  setContent={setBlobContent}
+                  dirty={dirty}
+                  setDirty={setDirty}
+                />
+              ) : params.action === 'image' ? (
                 <div className='h-full w-full flex flex-row justify-center'>
                   <TransformWrapper minScale={0.5}>
                     <TransformComponent wrapperClass='w-[calc(100%-4rem)]! h-7/8! rounded-md'>

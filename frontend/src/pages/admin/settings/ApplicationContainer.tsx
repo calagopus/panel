@@ -27,7 +27,7 @@ import TelemetryPreviewModal from './modals/TelemetryPreviewModal.tsx';
 export default function ApplicationContainer() {
   const { addToast } = useToast();
   const { app } = useAdminStore();
-  const { languages } = useGlobalStore();
+  const { languages, settings, updateSettings } = useGlobalStore();
 
   const [loading, setLoading] = useState(false);
   const [telemetryData, setTelemetryData] = useState<object | null>(null);
@@ -38,6 +38,7 @@ export default function ApplicationContainer() {
     initialValues: {
       name: '',
       icon: '',
+      banner: null,
       url: '',
       language: 'en',
       twoFactorRequirement: 'none',
@@ -65,6 +66,7 @@ export default function ApplicationContainer() {
     updateApplicationSettings(adminSettingsApplicationSchema.parse(form.getValues()))
       .then(() => {
         addToast('Application settings updated.', 'success');
+        updateSettings({ app: { ...settings.app, ...form.getValues() } });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -129,17 +131,6 @@ export default function ApplicationContainer() {
               key={form.key('name')}
               {...form.getInputProps('name')}
             />
-            <Autocomplete
-              withAsterisk
-              label='Icon'
-              placeholder='Icon'
-              data={assets.items.map((asset) => asset.url)}
-              key={form.key('icon')}
-              {...form.getInputProps('icon')}
-            />
-          </Group>
-
-          <Group grow>
             <Select
               withAsterisk
               label='Language'
@@ -152,20 +143,40 @@ export default function ApplicationContainer() {
               key={form.key('language')}
               {...form.getInputProps('language')}
             />
-            <TextInput withAsterisk label='URL' placeholder='URL' {...form.getInputProps('url')} />
           </Group>
 
-          <Select
-            withAsterisk
-            label='Two-Factor Authentication Requirement'
-            data={[
-              { label: 'Admins', value: 'admins' },
-              { label: 'All Users', value: 'all_users' },
-              { label: 'None', value: 'none' },
-            ]}
-            key={form.key('twoFactorRequirement')}
-            {...form.getInputProps('twoFactorRequirement')}
-          />
+          <Group grow>
+            <Autocomplete
+              withAsterisk
+              label='Icon'
+              placeholder='Icon'
+              data={assets.items.map((asset) => asset.url)}
+              key={form.key('icon')}
+              {...form.getInputProps('icon')}
+            />
+            <Autocomplete
+              label='Banner'
+              placeholder='Banner'
+              data={assets.items.map((asset) => asset.url)}
+              key={form.key('banner')}
+              {...form.getInputProps('banner')}
+            />
+          </Group>
+
+          <Group grow>
+            <TextInput withAsterisk label='URL' placeholder='URL' {...form.getInputProps('url')} />
+            <Select
+              withAsterisk
+              label='Two-Factor Authentication Requirement'
+              data={[
+                { label: 'Admins', value: 'admins' },
+                { label: 'All Users', value: 'all_users' },
+                { label: 'None', value: 'none' },
+              ]}
+              key={form.key('twoFactorRequirement')}
+              {...form.getInputProps('twoFactorRequirement')}
+            />
+          </Group>
 
           <Group grow>
             <Switch

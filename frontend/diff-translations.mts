@@ -28,6 +28,8 @@ if (!difFile) {
 }
 
 const isVerbose = process.argv.includes('--verbose');
+const isChecking = process.argv.includes('--check');
+let failedCheck = false;
 
 const extractVariables = (text) => {
   if (typeof text !== 'string') return new Set();
@@ -57,6 +59,7 @@ try {
 
       if (missingVars.length > 0) {
         console.log(`Missing variable(s) in key '${key}': ${missingVars.join(', ')}`);
+        failedCheck = true;
         if (isVerbose) {
           console.log('  Base string: ', JSON.stringify(baseMapping[key]));
           console.log('  Diff string: ', JSON.stringify(translationMapping[key]));
@@ -65,6 +68,7 @@ try {
 
       if (extraVars.length > 0) {
         console.log(`Extra variable(s) in key '${key}': ${extraVars.join(', ')}`);
+        failedCheck = true;
         if (isVerbose) {
           console.log('  Base string: ', JSON.stringify(baseMapping[key]));
           console.log('  Diff string: ', JSON.stringify(translationMapping[key]));
@@ -76,7 +80,13 @@ try {
   for (const key in translationMapping) {
     if (!(key in baseMapping)) {
       console.log(`Extra translation key: ${key}`);
+      failedCheck = true;
     }
+  }
+
+  if (isChecking && failedCheck) {
+    console.error('Diff failed inspection check');
+    process.exit(1);
   }
 } catch (error) {
   console.error('Error reading or parsing diff file:', error);

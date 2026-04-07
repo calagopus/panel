@@ -48,6 +48,9 @@ mod put {
         name: Option<compact_str::CompactString>,
         #[garde(length(chars, min = 1, max = 255))]
         icon: Option<compact_str::CompactString>,
+        #[garde(length(chars, min = 1, max = 255))]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        banner: Option<Option<compact_str::CompactString>>,
         #[garde(url)]
         url: Option<compact_str::CompactString>,
         #[garde(
@@ -176,6 +179,9 @@ mod put {
             }
             if let Some(icon) = app.icon {
                 settings.app.icon = icon;
+            }
+            if let Some(banner) = app.banner {
+                settings.app.banner = banner;
             }
             if let Some(url) = app.url {
                 settings.app.url = url;

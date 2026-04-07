@@ -2,6 +2,7 @@ import { faReply } from '@fortawesome/free-solid-svg-icons';
 import { Suspense, useEffect, useMemo } from 'react';
 import { NavLink, Route, Routes } from 'react-router';
 import getLatest from '@/api/admin/system/getLatest.ts';
+import AppIcon from '@/elements/AppIcon.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Container from '@/elements/Container.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -13,11 +14,9 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import adminRoutes from '@/routers/routes/adminRoutes.ts';
 import { useAdminStore } from '@/stores/admin.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 
 export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
   const { t } = useTranslations();
-  const { settings } = useGlobalStore();
   const { setLatestVersions } = useAdminStore();
 
   useEffect(() => {
@@ -39,10 +38,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
       {isNormal && (
         <Sidebar>
           <NavLink to='/' className='w-full'>
-            <div className='h-16 w-full flex flex-row items-center justify-between mt-1 select-none cursor-pointer'>
-              <img src={settings.app.icon} className='h-12 w-12' alt='Calagopus Icon' />
-              <h1 className='grow text-md font-bold! ml-2'>{settings.app.name}</h1>
-            </div>
+            <AppIcon />
           </NavLink>
 
           <Sidebar.Divider />

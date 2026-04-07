@@ -71,7 +71,9 @@ export default function ServerActivity() {
               <Code>{activity.event}</Code>
             </TableData>
 
-            <TableData>{activity.ip && <Code>{activity.ip}</Code>}</TableData>
+            <TableData>
+              <Code>{activity.ip ? activity.ip : t('common.na', {})}</Code>
+            </TableData>
 
             <TableData>
               <FormattedTimestamp timestamp={activity.created} />

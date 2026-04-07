@@ -71,21 +71,23 @@ export default function FileCopyRemoteModal({ files, opened, onClose }: Props) {
             withAsterisk
             label={t('pages.server.files.modal.copyRemote.form.server', {})}
             placeholder={t('pages.server.files.modal.copyRemote.form.server', {})}
-            data={servers.items.reduce(
-              (acc, server) => {
-                const group = acc.find((g) => g.group === server.nodeName);
-                const serverItem = { label: server.name, value: server.uuid };
+            data={servers.items
+              .filter((s) => s.uuid !== server.uuid)
+              .reduce(
+                (acc, server) => {
+                  const group = acc.find((g) => g.group === server.nodeName);
+                  const serverItem = { label: server.name, value: server.uuid };
 
-                if (group) {
-                  group.items.push(serverItem);
-                } else {
-                  acc.push({ group: server.nodeName, items: [serverItem] });
-                }
+                  if (group) {
+                    group.items.push(serverItem);
+                  } else {
+                    acc.push({ group: server.nodeName, items: [serverItem] });
+                  }
 
-                return acc;
-              },
-              [] as Array<{ group: string; items: Array<{ label: string; value: string }> }>,
-            )}
+                  return acc;
+                },
+                [] as Array<{ group: string; items: Array<{ label: string; value: string }> }>,
+              )}
             searchable
             searchValue={servers.search}
             onSearchChange={servers.setSearch}

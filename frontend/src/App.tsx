@@ -18,6 +18,7 @@ import { useGlobalStore } from './stores/global.ts';
 
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
+import '@gfazioli/mantine-window/styles.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,16 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
       setLanguages(languages);
     });
   }, []);
+
+  useEffect(() => {
+    if (settings?.app?.icon) {
+      const icons = document.getElementsByClassName('app-icon');
+
+      for (const icon of icons) {
+        (icon as HTMLLinkElement).href = settings.app.icon;
+      }
+    }
+  }, [settings?.app?.icon]);
 
   return Object.keys(settings).length > 0 ? (
     <ErrorBoundary>

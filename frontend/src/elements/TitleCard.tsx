@@ -10,6 +10,7 @@ export interface TitleCardProps {
   children: React.ReactNode;
   className?: string;
   titleClassName?: string;
+  headerClassName?: string;
   wrapperClassName?: string;
 
   leftSection?: ReactNode;
@@ -22,6 +23,7 @@ function TitleCard({
   children,
   className,
   titleClassName,
+  headerClassName,
   wrapperClassName,
   leftSection,
   rightSection,
@@ -29,12 +31,16 @@ function TitleCard({
   return (
     <Card withBorder radius='md' p={0} bg='dark.7' className={className}>
       <Box
+        id='title-card-header'
+        px='md'
+        py='sm'
         style={{
           borderBottom: '1px solid var(--mantine-color-dark-5)',
           background: 'var(--mantine-color-dark-6)',
         }}
+        className={headerClassName}
       >
-        <Group px='md' py='sm' gap='sm' className={titleClassName}>
+        <Group gap='sm' className={titleClassName}>
           {leftSection}
           <Box
             style={{
@@ -55,7 +61,7 @@ function TitleCard({
           {rightSection}
         </Group>
       </Box>
-      <div className={classNames('p-4 h-full', wrapperClassName)}>{children}</div>
+      <div className={classNames('p-4', wrapperClassName)}>{children}</div>
     </Card>
   );
 }

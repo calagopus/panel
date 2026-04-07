@@ -1,9 +1,5 @@
-import { faX, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Window } from '@gfazioli/mantine-window';
 import { FC, ReactNode, startTransition, useCallback, useMemo, useRef, useState } from 'react';
-import { Rnd } from 'react-rnd';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
 import { CurrentWindowProvider } from '@/providers/CurrentWindowProvider.tsx';
 import { WindowContext } from '@/providers/contexts/windowContext.ts';
 
@@ -12,7 +8,6 @@ const BASE_Z_INDEX = 100;
 
 interface WindowType {
   id: number;
-  icon: IconDefinition;
   title: string;
   component: ReactNode;
   zIndex: number;
@@ -31,13 +26,13 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
   }, []);
 
   const addWindow = useCallback(
-    (icon: IconDefinition, title: string, component: ReactNode) => {
+    (title: string, component: ReactNode) => {
       if (windows.length >= MAX_WINDOWS) return -1;
 
       const id = windowId.current++;
 
       startTransition(() => {
-        setWindows((prev) => [...prev, { id, icon, title, component, zIndex: BASE_Z_INDEX + prev.length }]);
+        setWindows((prev) => [...prev, { id, title, component, zIndex: BASE_Z_INDEX + prev.length }]);
       });
 
       return id;
@@ -49,7 +44,7 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, title } : w)));
   }, []);
 
-  const bringToFront = useCallback((id: number) => {
+  const _bringToFront = useCallback((id: number) => {
     startTransition(() => {
       setWindows((prev) => {
         const target = prev.find((w) => w.id === id);
@@ -82,56 +77,23 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <WindowContext.Provider value={contextValue}>
       {children}
-      {windows.map((w) => (
-        <Rnd
-          key={`window_${w.id}`}
-          default={{
-            x: window.innerWidth / 4,
-            y: window.innerHeight / 4,
-            width: window.innerWidth / 2,
-            height: window.innerHeight / 2,
-          }}
-          minWidth={window.innerWidth / 4}
-          minHeight={window.innerHeight / 8}
-          bounds='body'
-          dragHandleClassName={`window_${w.id}_drag`}
-          style={{ zIndex: w.zIndex }}
-          onMouseDown={() => bringToFront(w.id)}
-          enableResizing={{
-            left: true,
-            right: true,
-            top: true,
-            bottom: true,
-            bottomLeft: true,
-            bottomRight: true,
-            topLeft: true,
-            topRight: true,
-          }}
-        >
-          <TitleCard
-            key={`window_${w.id}_card`}
-            className={`h-full window_${w.id}_card`}
-            titleClassName={`window_${w.id}_drag cursor-grab select-none`}
-            wrapperClassName='h-full pb-16'
-            icon={<FontAwesomeIcon icon={w.icon} />}
+      <Window.Group withinPortal>
+        {windows.map((w) => (
+          <Window
+            id={`window_${w.id}`}
+            key={`window_${w.id}`}
             title={w.title}
-            rightSection={
-              <ActionIcon
-                variant='subtle'
-                className='ml-auto self-end'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeWindow(w.id);
-                }}
-              >
-                <FontAwesomeIcon icon={faX} />
-              </ActionIcon>
-            }
+            controlsPosition={navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? 'left' : 'right'}
+            draggable='header'
+            opened
+            onClose={() => closeWindow(w.id)}
+            defaultWidth='50%'
+            defaultHeight='50%'
           >
             <CurrentWindowProvider id={w.id}>{w.component}</CurrentWindowProvider>
-          </TitleCard>
-        </Rnd>
-      ))}
+          </Window>
+        ))}
+      </Window.Group>
     </WindowContext.Provider>
   );
 };

@@ -1,10 +1,11 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosRequestConfig } from 'axios';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 import { axiosInstance, getEmptyPaginationSet } from '@/api/axios.ts';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl.ts';
+import loadDirectory from '@/api/server/files/loadDirectory.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
@@ -53,6 +54,25 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const [imageViewerSmoothing, setImageViewerSmoothing] = useState(
     localStorage.getItem('file_image_viewer_smoothing') !== 'false',
   );
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['server', server.uuid, 'files', { browsingDirectory, page, sortMode }],
+    queryFn: () => loadDirectory(server.uuid, browsingDirectory, page, sortMode),
+  });
+
+  useEffect(() => {
+    if (!data) return;
+
+    setBrowsingEntries(data.entries);
+    setBrowsingWritableDirectory(data.isFilesystemWritable);
+    setBrowsingFastDirectory(data.isFilesystemFast);
+  }, [data]);
+
+  const resetEntries = () => {
+    if (!data) return;
+
+    setBrowsingEntries(data.entries);
+  };
 
   const invalidateFilemanager = () => {
     queryClient
@@ -148,6 +168,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   return (
     <FileManagerContext.Provider
       value={{
+        isLoading,
         fileInputRef,
         folderInputRef,
 
@@ -187,6 +208,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         imageViewerSmoothing,
         setImageViewerSmoothing,
 
+        resetEntries,
         invalidateFilemanager,
         fileUploader,
         doActFiles,

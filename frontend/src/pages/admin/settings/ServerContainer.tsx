@@ -14,10 +14,12 @@ import Switch from '@/elements/input/Switch.tsx';
 import { adminSettingsServerSchema } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 
 export default function ServerContainer() {
   const { addToast } = useToast();
   const { server } = useAdminStore();
+  const { updateSettings } = useGlobalStore();
 
   const [loading, setLoading] = useState(false);
 
@@ -49,6 +51,7 @@ export default function ServerContainer() {
     updateServerSettings(adminSettingsServerSchema.parse(form.getValues()))
       .then(() => {
         addToast('Server settings updated.', 'success');
+        updateSettings({ server: { ...form.getValues() } });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

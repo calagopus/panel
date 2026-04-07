@@ -11,8 +11,11 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { userActivitySchema } from '@/lib/schemas/user/activity.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminUserActivity({ user }: { user: z.infer<typeof fullUserSchema> }) {
+  const { t } = useTranslations();
+
   const [userActivity, setUserActivity] = useState<Pagination<z.infer<typeof userActivitySchema>>>(
     getEmptyPaginationSet(),
   );
@@ -39,7 +42,7 @@ export default function AdminUserActivity({ user }: { user: z.infer<typeof fullU
             </TableData>
 
             <TableData>
-              <Code>{activity.ip}</Code>
+              <Code>{activity.ip ? activity.ip : t('common.na', {})}</Code>
             </TableData>
 
             <TableData>

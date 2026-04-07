@@ -2,26 +2,26 @@ import {
   faAnglesUp,
   faCopy,
   faEnvelopesBulk,
-  faFile,
   faFileArrowDown,
   faFilePen,
   faFileShield,
   faFileZipper,
   faFingerprint,
-  faFolder,
   faInfoCircle,
   faListDots,
   faTrash,
   faWindowRestore,
 } from '@fortawesome/free-solid-svg-icons';
+import { join } from 'pathe';
 import { createSearchParams, MemoryRouter } from 'react-router';
+import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import decompressFile from '@/api/server/files/decompressFile.ts';
 import downloadFiles from '@/api/server/files/downloadFiles.ts';
 import ContextMenu, { ContextMenuItem } from '@/elements/ContextMenu.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
-import { isArchiveType, isEditableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
+import { isArchiveType } from '@/lib/files.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
@@ -34,18 +34,20 @@ import { useServerStore } from '@/stores/server.ts';
 
 interface FileRowContextMenuProps {
   file: z.infer<typeof serverDirectoryEntrySchema>;
+  openMode: FileOpenMode;
   children: (props: { items: ContextMenuItem[]; openMenu: (x: number, y: number) => void }) => React.ReactNode;
 }
 
-export default function FileRowContextMenu({ file, children }: FileRowContextMenuProps) {
+export default function FileRowContextMenu({ file, openMode, children }: FileRowContextMenuProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { addWindow } = useWindows();
   const { server } = useServerStore();
-  const { browsingDirectory, browsingWritableDirectory, browsingFastDirectory, doOpenModal, doActFiles } =
-    useFileManager();
+  const fileManagerContext = useFileManager();
   const canCreate = useServerCan('files.create');
   const canArchive = useServerCan('files.archive');
+
+  const { browsingDirectory, browsingWritableDirectory, doOpenModal, doActFiles } = fileManagerContext;
 
   const doUnarchive = () => {
     decompressFile(server.uuid, browsingDirectory, file.name).catch((msg) => {
@@ -70,30 +72,47 @@ export default function FileRowContextMenu({ file, children }: FileRowContextMen
         {
           icon: faWindowRestore,
           label: t('pages.server.files.button.openInNewWindow', {}),
-          hidden:
-            !matchMedia('(pointer: fine)').matches ||
-            !(isEditableFile(file) || isViewableImage(file) || file.directory),
-          onClick: () =>
+          hidden: !matchMedia('(pointer: fine)').matches || !openMode.openable,
+          onClick: () => {
+            if (!openMode.openable) return;
+
+            let url = new URL(window.location.href);
+            openMode.handleOpen({
+              fileManagerContext,
+              server,
+              setSearchParams(params) {
+                url.search = createSearchParams(
+                  typeof params === 'function' ? params(new URLSearchParams(url.search)) : params,
+                ).toString();
+              },
+              navigate(path) {
+                if (typeof path !== 'string') return;
+
+                url = new URL(path, url);
+              },
+              handleDirectoryOpen(path) {
+                url.search = createSearchParams({
+                  directory: join(fileManagerContext.browsingDirectory, path),
+                }).toString();
+              },
+              handleFileOpen(file, action, params) {
+                const searchParams = createSearchParams({
+                  directory: fileManagerContext.browsingDirectory,
+                  file,
+                  ...params,
+                });
+
+                url = new URL(`/server/${server.uuidShort}/files/${action}?${searchParams}`, window.location.origin);
+              },
+            });
+
             addWindow(
-              file.file ? faFile : faFolder,
               file.name,
-              <MemoryRouter
-                initialEntries={[
-                  file.directory || (isViewableArchive(file) && browsingFastDirectory)
-                    ? `/server/${server.uuidShort}/files?${createSearchParams({
-                        directory: `${browsingDirectory}/${file.name}`.replace('//', '/'),
-                      })}`
-                    : `/server/${server.uuidShort}/files/${isViewableImage(file) ? 'image' : 'edit'}?${createSearchParams(
-                        {
-                          directory: browsingDirectory,
-                          file: file.name,
-                        },
-                      )}`,
-                ]}
-              >
+              <MemoryRouter initialEntries={[url.pathname + url.search]}>
                 <RouterRoutes isNormal={false} />
               </MemoryRouter>,
-            ),
+            );
+          },
           canAccess: useServerCan('files.read-content'),
         },
         {

@@ -20,7 +20,7 @@ mod get {
     #[derive(ToSchema, Serialize)]
     struct Response {
         #[schema(inline)]
-        users: Pagination<shared::models::user::ApiFullUser>,
+        users: Pagination<shared::models::user::AdminApiUser>,
     }
 
     #[utoipa::path(get, path = "/", responses(
@@ -72,7 +72,7 @@ mod get {
                 data: users
                     .data
                     .into_iter()
-                    .map(|user| user.into_api_full_object(&storage_url_retriever))
+                    .map(|user| user.into_admin_api_object(&storage_url_retriever))
                     .collect(),
             },
         })

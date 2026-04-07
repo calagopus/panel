@@ -13,10 +13,12 @@ import Button from '@/elements/Button.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import VariableContainer from '@/elements/VariableContainer.tsx';
+import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -36,6 +38,7 @@ export default function ServerStartup() {
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [variablesLoading, setVariablesLoading] = useState(true);
+  const blocker = useBlocker(Object.keys(values).length > 0);
 
   const setDebouncedCommand = useCallback(
     debounce((command: string) => {
@@ -116,6 +119,16 @@ export default function ServerStartup() {
       title={t('pages.server.startup.title', {})}
       registry={window.extensionContext.extensionRegistry.pages.server.startup.container}
     >
+      <ConfirmationModal
+        title={t('pages.server.startup.modal.unsavedChanges.title', {})}
+        opened={blocker.state === 'blocked'}
+        onClose={() => blocker.reset()}
+        onConfirmed={() => blocker.proceed()}
+        confirm={t('pages.server.startup.modal.unsavedChanges.button.leave', {})}
+      >
+        {t('pages.server.startup.modal.unsavedChanges.content', {}).md()}
+      </ConfirmationModal>
+
       <div className='flex flex-col md:grid md:grid-cols-3 gap-4 mt-2.5'>
         <TitleCard
           title={t('pages.server.startup.form.startupCommand', {})}

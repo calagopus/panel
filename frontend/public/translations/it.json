@@ -79,6 +79,12 @@
           "bottomLeft": "In basso a sinistra",
           "bottomCenter": "In basso al centro",
           "bottomRight": "In basso a destra"
+        },
+        "serverPowerAction": {
+          "start": "Avvia",
+          "stop": "Ferma",
+          "restart": "Riavvia",
+          "kill": "Termina"
         }
       },
       "unlimited": "Illimitato",
@@ -545,10 +551,6 @@
             "normalizeCpuLoad": "Normalizza carico CPU (spostato al massimo 100%)"
           },
           "power": {
-            "start": "Avvia",
-            "stop": "Ferma",
-            "restart": "Riavvia",
-            "kill": "Termina",
             "modal": {
               "forceStop": {
                 "title": "Termina forzatamente processo",
@@ -581,6 +583,9 @@
             "details": "Dettagli",
             "rotatePassword": "Ruota password"
           },
+          "form": {
+            "databaseName": "Nome database"
+          },
           "modal": {
             "createDatabase": {
               "title": "Crea database",
@@ -588,7 +593,6 @@
                 "created": "Database creato."
               },
               "form": {
-                "databaseName": "Nome database",
                 "databaseHost": "Host database",
                 "noHostsFound": "Nessun host trovato"
               }

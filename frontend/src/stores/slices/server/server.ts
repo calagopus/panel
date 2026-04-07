@@ -37,13 +37,13 @@ export const createServerSlice: StateCreator<ServerStore, [], [], ServerSlice> =
   setImagePull: (uuid, progress) =>
     set((state) => {
       const prev = new Map(state.imagePulls);
-      state.imagePulls.set(uuid, progress);
+      prev.set(uuid, progress);
       return { ...state, imagePulls: prev };
     }),
   removeImagePull: (uuid) =>
     set((state) => {
       const prev = new Map(state.imagePulls);
-      state.imagePulls.delete(uuid);
+      prev.delete(uuid);
       return { ...state, imagePulls: prev };
     }),
   clearImagePulls: () =>

@@ -219,7 +219,7 @@ const ContextMenuToggle = memo(
 
     return (
       <td
-        className='relative cursor-pointer w-10 text-center'
+        className='relative cursor-pointer min-w-10 text-center'
         onClick={(e) => {
           e.stopPropagation();
 

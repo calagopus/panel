@@ -459,8 +459,9 @@
             "connectionError": "Etwas ist schiefgelaufen. Verbindungsfehler."
           },
           "successMessage": "Die Verbindung zu deiner Node wurde erfolgreich verifiziert. Du kannst nun fortfahren.",
+          "configurationDescription": "Füge dies in die Konfigurationsdatei unter `{file}` ein oder führe Folgendes aus:",
           "button": {
-            "continue": "Weiter"
+            "verify": "Verbindung verifizieren"
           }
         },
         "configuration": {
@@ -1409,7 +1410,11 @@
           },
           "button": {
             "details": "Details",
+            "recreate": "Neu erstellen",
             "rotatePassword": "Passwort rotieren"
+          },
+          "form": {
+            "databaseName": "Datenbank Name"
           },
           "modal": {
             "createDatabase": {
@@ -1418,7 +1423,6 @@
                 "created": "Datenbank erstellt."
               },
               "form": {
-                "databaseName": "Datenbank Name",
                 "databaseHost": "Datenbank Host",
                 "noHostsFound": "Keine Hosts gefunden"
               }
@@ -1439,6 +1443,13 @@
               },
               "form": {
                 "jdbcConnectionString": "JDBC-Verbindungszeichenfolge"
+              }
+            },
+            "recreateDatabase": {
+              "title": "Neuerstellung der Datenbank bestätigen",
+              "content": "Die Neuerstellung einer Datenbank löscht dauerhaft alle Daten in der Datenbank **{name}** und erstellt eine neue mit denselben Verbindungsdetails.",
+              "toast": {
+                "recreated": "Datenbank neu erstellt."
               }
             },
             "deleteDatabase": {
@@ -2031,7 +2042,17 @@
             "startupCommandUpdated": "Startbefehl aktualisiert.",
             "dockerImageUpdated": "Docker Image aktualisiert.",
             "variablesUpdated": "Variablen aktualisiert."
-          }
+          },
+          "modal": {
+            "unsavedChanges": {
+              "title": "Ungespeicherte Änderungen",
+              "content": "Du hast ungespeicherte Änderungen an deinen Startvariablen. Bist du sicher, dass du diese Seite verlassen möchtest? Wenn du die Seite verlässt, gehen deine Änderungen verloren.",
+              "button": {
+                "leave": "Seite verlassen"
+              }
+            }
+          },
+          "noVariables": "Keine Startvariablen für diesen Server gefunden."
         },
         "mounts": {
           "title": "Mounts",

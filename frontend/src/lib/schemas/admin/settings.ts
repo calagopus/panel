@@ -5,6 +5,7 @@ import { nullableString } from '@/lib/transformers.ts';
 export const adminSettingsApplicationSchema = z.object({
   name: z.string().min(1).max(64),
   icon: z.string().min(1).max(255),
+  banner: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   url: z.url({ protocol: /^https?$/ }).max(255),
   language: z.string(),
   twoFactorRequirement: z.enum(['admins', 'all_users', 'none']),

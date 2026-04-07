@@ -40,6 +40,7 @@ export interface EggConfigurationDeployment {
     | z.infer<typeof adminEggConfigurationDeploymentSubtractPrimarySchema>
     | z.infer<typeof adminEggConfigurationDeploymentMultiplyPrimarySchema>
     | z.infer<typeof adminEggConfigurationDeploymentDividePrimarySchema>;
+  assignToVariable: string | null;
 }
 
 export const adminEggConfigurationDeploymentSchema: ZodType<EggConfigurationDeployment> = z.lazy(() =>
@@ -52,6 +53,7 @@ export const adminEggConfigurationDeploymentSchema: ZodType<EggConfigurationDepl
       adminEggConfigurationDeploymentMultiplyPrimarySchema,
       adminEggConfigurationDeploymentDividePrimarySchema,
     ]),
+    assignToVariable: z.preprocess(nullableString, z.string().max(255).nullable()),
   }),
 );
 

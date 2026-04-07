@@ -13,7 +13,7 @@ mod get {
 
     #[derive(ToSchema, Serialize)]
     struct Response {
-        user: shared::models::user::ApiFullUser,
+        user: shared::models::user::AdminApiUser,
     }
 
     #[utoipa::path(get, path = "/", responses(
@@ -43,7 +43,7 @@ mod get {
         };
 
         ApiResponse::new_serialized(Response {
-            user: user.into_api_full_object(&state.storage.retrieve_urls().await?),
+            user: user.into_admin_api_object(&state.storage.retrieve_urls().await?),
         })
         .ok()
     }

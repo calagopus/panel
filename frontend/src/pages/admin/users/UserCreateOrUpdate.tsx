@@ -18,7 +18,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/users.ts';
-import { fullUserSchema, roleSchema } from '@/lib/schemas/user.ts';
+import { roleSchema } from '@/lib/schemas/user.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -26,7 +26,7 @@ import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
-export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.infer<typeof fullUserSchema> }) {
+export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.infer<typeof adminFullUserSchema> }) {
   const { doImpersonate } = useAuth();
   const { settings, languages } = useGlobalStore();
   const { addToast } = useToast();
@@ -38,6 +38,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
 
   const form = useForm<z.infer<typeof adminUserUpdateSchema>>({
     initialValues: {
+      externalId: null,
       username: '',
       email: '',
       nameFirst: '',
@@ -67,6 +68,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
   useEffect(() => {
     if (contextUser) {
       form.setValues({
+        externalId: contextUser.externalId,
         username: contextUser.username,
         email: contextUser.email,
         nameFirst: contextUser.nameFirst,
@@ -222,14 +224,22 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
             />
           </Group>
 
-          <TextInput
-            withAsterisk={!contextUser}
-            label='Password'
-            placeholder='Password'
-            type='password'
-            key={form.key('password')}
-            {...form.getInputProps('password')}
-          />
+          <Group grow>
+            <TextInput
+              label='External ID'
+              placeholder='External ID'
+              key={form.key('externalId')}
+              {...form.getInputProps('externalId')}
+            />
+            <TextInput
+              withAsterisk={!contextUser}
+              label='Password'
+              placeholder='Password'
+              type='password'
+              key={form.key('password')}
+              {...form.getInputProps('password')}
+            />
+          </Group>
 
           <Switch label='Admin' key={form.key('admin')} {...form.getInputProps('admin', { type: 'checkbox' })} />
         </Stack>

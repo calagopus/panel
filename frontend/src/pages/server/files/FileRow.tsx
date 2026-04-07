@@ -1,34 +1,64 @@
-import { forwardRef, memo, useRef } from 'react';
+import { forwardRef, memo, RefObject, useMemo, useRef } from 'react';
+import { FileOpenMode } from 'shared/src/registries/pages/server/files.ts';
 import { z } from 'zod';
 import { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { isEditableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
+import { isOpenableFile } from '@/lib/files.ts';
+import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { bytesToString } from '@/lib/size.ts';
 import FileRowContextMenu from '@/pages/server/files/FileRowContextMenu.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useFileManager } from '@/providers/FileManagerProvider.tsx';
+import { getFileManager, useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import FileMassContextMenu from './FileMassContextMenu.tsx';
 import FileRowIcon from './FileRowIcon.tsx';
 
+function FileRowCheckbox({
+  file,
+  isSelected,
+  toggleSelected,
+}: {
+  file: z.infer<typeof serverDirectoryEntrySchema>;
+  isSelected: boolean;
+  toggleSelected: () => void;
+}) {
+  const { actingFiles } = useFileManager();
+
+  return (
+    <td className='pl-4 relative cursor-pointer w-10 text-center py-2'>
+      <Checkbox
+        id={file.name}
+        checked={isSelected}
+        classNames={{ input: 'cursor-pointer!' }}
+        disabled={actingFiles.size > 0}
+        onChange={toggleSelected}
+        onClick={(e) => e.stopPropagation()}
+      />
+    </td>
+  );
+}
+
 interface FileRowProps {
   file: z.infer<typeof serverDirectoryEntrySchema>;
-  handleOpen: () => void;
+  handleOpen: (openMode: FileOpenMode) => void;
   isSelected: boolean;
   isActing: boolean;
-  multipleSelected: boolean;
+  multipleSelectedRef: RefObject<boolean>;
+  actingFilesRef: RefObject<ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>>;
+  clickOnce: boolean;
+  preferPhysicalSize: boolean;
 }
 
 const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
-  { file, handleOpen, isSelected, isActing, multipleSelected },
+  { file, handleOpen, isSelected, isActing, multipleSelectedRef, actingFilesRef, clickOnce, preferPhysicalSize },
   ref,
 ) {
   const canOpenActionBar = useServerCan(['files.read-content', 'files.archive', 'files.update', 'files.delete'], true);
-  const { browsingFastDirectory, doSelectFiles, addSelectedFile, removeSelectedFile, clickOnce, preferPhysicalSize } =
-    useFileManager();
   const canOpenFile = useServerCan('files.read-content');
+  const openMode = useMemo(() => isOpenableFile(file, getFileManager()), [file]);
+  const { doSelectFiles, addSelectedFile, removeSelectedFile } = getFileManager();
 
   const toggleSelected = () => (isSelected ? removeSelectedFile(file) : addSelectedFile(file));
 
@@ -40,21 +70,23 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
 
     if (clickTimer.current) return;
 
-    if (e.shiftKey) {
-      addSelectedFile(file);
-    } else if (isSelected) {
-      if (multipleSelected) {
-        doSelectFiles([file]);
+    if (actingFilesRef.current.size === 0) {
+      if (e.shiftKey) {
+        addSelectedFile(file);
+      } else if (isSelected) {
+        if (multipleSelectedRef.current) {
+          doSelectFiles([file]);
+        } else {
+          removeSelectedFile(file);
+        }
       } else {
-        removeSelectedFile(file);
+        doSelectFiles([file]);
       }
-    } else {
-      doSelectFiles([file]);
     }
 
     clickTimer.current = setTimeout(() => {
-      if (clickCount.current >= 2) {
-        handleOpen();
+      if (clickCount.current >= 2 && canOpenFile) {
+        handleOpen(openMode);
       }
 
       clickCount.current = 0;
@@ -62,7 +94,6 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
     }, 250);
   };
 
-  // Determine background color based on state
   const getBgColor = () => {
     // if (isOver && isValidDropTarget) {
     //   return 'var(--mantine-color-green-light)';
@@ -79,20 +110,11 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
   return (
     <FileMassContextMenu>
       {({ openMassMenu }) => (
-        <FileRowContextMenu file={file}>
+        <FileRowContextMenu file={file} openMode={openMode}>
           {({ items, openMenu }) => (
             <TableRow
               ref={ref}
-              className={
-                clickOnce &&
-                canOpenFile &&
-                (isEditableFile(file) ||
-                  isViewableImage(file) ||
-                  file.directory ||
-                  (isViewableArchive(file) && browsingFastDirectory))
-                  ? 'cursor-pointer select-none'
-                  : 'select-none'
-              }
+              className={clickOnce && canOpenFile && openMode.openable ? 'cursor-pointer select-none' : 'select-none'}
               bg={getBgColor()}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -104,41 +126,33 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
               }}
               onClick={(e) => {
                 e.preventDefault();
-                if (clickOnce) {
-                  handleOpen();
+                if (clickOnce && canOpenFile) {
+                  handleOpen(openMode);
                 } else {
                   handleClick(e);
                 }
               }}
             >
               {canOpenActionBar ? (
-                <td className='pl-4 relative cursor-pointer w-10 text-center py-2'>
-                  <Checkbox
-                    id={file.name}
-                    checked={isSelected}
-                    classNames={{ input: 'cursor-pointer!' }}
-                    onChange={toggleSelected}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </td>
+                <FileRowCheckbox file={file} isSelected={isSelected || isActing} toggleSelected={toggleSelected} />
               ) : (
                 <td className='w-0'></td>
               )}
 
-              <TableData>
-                <span className='flex items-center gap-4 leading-[100%]'>
-                  <FileRowIcon className='text-gray-400' file={file} />
-                  {file.name}
+              <TableData className='w-full max-w-0'>
+                <span className='flex items-center gap-4 leading-[100%] min-w-0' title={file.name}>
+                  <FileRowIcon className='shrink-0 text-gray-400' file={file} />
+                  <span className='truncate'>{file.name}</span>
                 </span>
               </TableData>
 
               <TableData>
-                <span className='flex items-center gap-4 leading-[100%]'>
+                <span className='flex items-center gap-4 leading-[100%] min-w-fit text-nowrap'>
                   {bytesToString(preferPhysicalSize ? file.sizePhysical : file.size)}
                 </span>
               </TableData>
 
-              <TableData className='hidden md:table-cell'>
+              <TableData className='hidden md:table-cell min-w-fit text-nowrap'>
                 <FormattedTimestamp timestamp={file.modified} />
               </TableData>
 

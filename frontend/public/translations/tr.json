@@ -1,0 +1,2143 @@
+{
+  "items": {
+    "byte": {
+      "zero": "{count} Bayt",
+      "one": "{count} Bayt",
+      "two": "{count} Bayt",
+      "few": "{count} Bayt",
+      "many": "{count} Bayt",
+      "other": "{count} Bayt"
+    },
+    "user": {
+      "zero": "{count} Kullanıcı",
+      "one": "{count} Kullanıcı",
+      "two": "{count} Kullanıcı",
+      "few": "{count} Kullanıcı",
+      "many": "{count} Kullanıcı",
+      "other": "{count} Kullanıcı"
+    },
+    "file": {
+      "zero": "{count} Dosya",
+      "one": "{count} Dosya",
+      "two": "{count} Dosya",
+      "few": "{count} Dosya",
+      "many": "{count} Dosya",
+      "other": "{count} Dosya"
+    },
+    "server": {
+      "zero": "{count} Sunucu",
+      "one": "{count} Sunucu",
+      "two": "{count} Sunucu",
+      "few": "{count} Sunucu",
+      "many": "{count} Sunucu",
+      "other": "{count} Sunucu"
+    },
+    "sshKey": {
+      "zero": "{count} SSH Anahtarı",
+      "one": "{count} SSH Anahtarı",
+      "two": "{count} SSH Anahtarı",
+      "few": "{count} SSH Anahtarı",
+      "many": "{count} SSH Anahtarı",
+      "other": "{count} SSH Anahtarı"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "Oluştur",
+        "add": "Ekle",
+        "save": "Kaydet",
+        "saveAndStay": "Kaydet ve Kal",
+        "edit": "Düzenle",
+        "delete": "Sil",
+        "remove": "Kaldır",
+        "enable": "Etkinleştir",
+        "disable": "Devre Dışı Bırak",
+        "update": "Güncelle",
+        "close": "Kapat",
+        "cancel": "İptal Et",
+        "continue": "Devam Et",
+        "skip": "Atla",
+        "okay": "Tamam",
+        "back": "Geri",
+        "next": "İleri",
+        "install": "Kur",
+        "selectAll": "Tümünü Seç",
+        "deselectAll": "Seçimi Kaldır",
+        "restore": "Geri Yükle",
+        "download": "İndir",
+        "downloadAs": "{format} olarak indir",
+        "export": "Dışa Aktar",
+        "exportAs": "{format} olarak dışa aktar"
+      },
+      "alert": {
+        "error": "Hata",
+        "warning": "Uyarı",
+        "success": "Başarılı",
+        "clockOffset": "Sistem saatiniz sunucu ile 5 saniyeden fazla uyumsuz. Bu durum geçiş anahtarı ve iki faktörlü kimlik doğrulama ile sorunlara neden olabilir. Lütfen saatinizi senkronize edin. Mevcut fark: {offset} saniye."
+      },
+      "divider": {
+        "or": "VEYA"
+      },
+      "input": {
+        "search": "Ara..."
+      },
+      "tooltip": {
+        "resetToDefault": "Varsayılana sıfırla",
+        "edit": "Düzenle",
+        "delete": "Sil"
+      },
+      "form": {
+        "name": "İsim",
+        "description": "Açıklama",
+        "password": "Şifre",
+        "host": "Host",
+        "username": "Kullanıcı Adı",
+        "server": "Sunucu",
+        "truncateDirectory": "Bu işlemi yapmadan önce bu sunucudaki tüm dosyaları silmek istiyor musunuz? Bu işlem geri alınamaz."
+      },
+      "table": {
+        "pagination": {
+          "results": "{total} sonuçtan {start} ile {end} arası gösteriliyor.",
+          "empty": "Hiçbir öğe bulunamadı, sanki saklanıyorlar."
+        },
+        "columns": {
+          "name": "İsim",
+          "description": "Açıklama",
+          "username": "Kullanıcı Adı",
+          "size": "Boyut",
+          "lastUsed": "Son Kullanım Tarihi",
+          "created": "Oluşturulma",
+          "actor": "Olayı Gerçekleştiren",
+          "event": "Yapılan İşlem",
+          "ip": "İşlemi Gerçekleştiren IP Adresi",
+          "when": "İşlemin Gerçekleştiği Zaman",
+          "command": "Komut"
+        }
+      },
+      "badge": {
+        "active": "Aktif",
+        "inactive": "Pasif",
+        "enabled": "Etkin",
+        "disabled": "Devre Dışı",
+        "successful": "Başarılı",
+        "failed": "Hata"
+      },
+      "server": {
+        "noAllocation": "Tahsis Yok",
+        "state": {
+          "suspended": "Askıya Alındı",
+          "transferring": "Sunucu taşınıyor",
+          "nodeMaintenance": "Node Bakımda",
+          "restoringBackup": "Yedek Geri Yükleniyor",
+          "installing": "Kuruluyor",
+          "installFailed": "Kurulum Başarısız"
+        }
+      },
+      "enum": {
+        "userToastPosition": {
+          "topLeft": "Sol Üst",
+          "topCenter": "Üst Orta",
+          "topRight": "Sağ Üst",
+          "bottomLeft": "Sol Alt",
+          "bottomCenter": "Alt Orta",
+          "bottomRight": "Sağ Alt"
+        },
+        "serverState": {
+          "unknown": "Bilinmiyor",
+          "offline": "Çevrimdışı",
+          "running": "Çalışıyor",
+          "starting": "Başlatılıyor",
+          "stopping": "Durduruluyor"
+        },
+        "serverPowerAction": {
+          "start": "Başlat",
+          "stop": "Durdur",
+          "restart": "Yeniden Başlat",
+          "kill": "Zorla Durdur (Kill)"
+        },
+        "serverBackupStatus": {
+          "starting": "Başlatılıyor",
+          "finished": "Tamamlandı",
+          "failed": "Başarısız"
+        },
+        "connectionStatus": {
+          "connected": "Bağlı",
+          "offline": "Çevrimdışı"
+        },
+        "serverAutoStartBehavior": {
+          "always": "Her Zaman",
+          "unlessStopped": "Durdurulmadığı Sürece",
+          "never": "Asla"
+        },
+        "bulkActionServerAction": {
+          "started": "Başlatıldı",
+          "stopped": "Durduruldu",
+          "restarted": "Yeniden Başlatıldı",
+          "killed": "Zorla Durduruldu"
+        }
+      },
+      "unit": {
+        "bytes": {
+          "bytes": "B",
+          "kibibytes": "KiB",
+          "mebibytes": "MiB",
+          "gibibytes": "GiB",
+          "tebibytes": "TiB",
+          "pebibytes": "PiB"
+        }
+      },
+      "unlimited": "Sınırsız",
+      "readOnly": "Salt Okunur",
+      "na": "N/A",
+      "never": "Asla",
+      "yes": "Evet",
+      "no": "Hayır",
+      "web": "Web",
+      "api": "API",
+      "system": "Sistem",
+      "schedule": "Zamanlayıcı",
+      "impersonatedBy": "{username} tarafından taklit ediliyor"
+    },
+    "elements": {
+      "errorBoundary": {
+        "message": "Uygulama bu görünümü işlerken bir hatayla karşılaştı. Sayfayı yenilemeyi deneyin.",
+        "hideDetails": "Detayları Gizle",
+        "showDetails": "Detayları Göster",
+        "errorMessage": "Hata Mesajı:",
+        "stackTrace": "Yığın İzleme (Stack Trace):",
+        "componentStack": "Bileşen Yığını:"
+      },
+      "copyOnClick": {
+        "toast": {
+          "copied": "Panoya kopyalandı.",
+          "failed": "Panoya kopyalanamadı.",
+          "copyManual": "Panoya kopyalayın: Ctrl+C veya Command+C, Enter"
+        }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "Tamamlanma süresi hesaplanıyor...",
+          "estimated": "Tahmini tamamlanma süresi: {time}"
+        },
+        "calculating": "Tahmini Süre: Hesaplanıyor...",
+        "calculated": "Tahmini Süre: {time}"
+      },
+      "container": {
+        "alert": {
+          "impersonating": "Şu anda bir kullanıcıyı taklit ediyorsunuz. Eylemlerinizin kullanıcının hesabını etkileyebileceğini unutmayın. Moddan çıkmak için sol alttaki \"Taklit Etmeyi Durdur\" butonuna tıklayın."
+        }
+      },
+      "sidebar": {
+        "button": {
+          "logout": "Çıkış Yap",
+          "stopImpersonating": "Taklit Etmeyi Durdur",
+          "openInVirtualWindow": "Sanal Pencerede Aç",
+          "openInPopup": "Popup Olarak Aç",
+          "openInNewTab": "Yeni Sekmede Aç"
+        }
+      },
+      "permissionSelector": {
+        "selectedPermissions": "Seçili Yetkiler ({count})",
+        "noPermissions": "Hiçbir yetki seçilmedi."
+      },
+      "selectInput": {
+        "noResults": "Sonuç bulunamadı."
+      },
+      "can": {
+        "tooltip": {
+          "cantSave": "Kaydetme yetkiniz yok.",
+          "cantDelete": "Silme yetkiniz yok."
+        }
+      },
+      "activityInfoButton": {
+        "modal": {
+          "info": {
+            "title": "Aktivite Detayları"
+          }
+        }
+      },
+      "screenBlock": {
+        "permissionDenied": {
+          "title": "Yetki Reddedildi",
+          "content": "Bu sayfaya erişim yetkiniz bulunmuyor."
+        },
+        "notFound": {
+          "title": "Bulunamadı",
+          "content": "Aradığınız sayfa bulunamadı."
+        },
+        "serverConflict": {
+          "title": "Çakışan Sunucu Durumu",
+          "contentSuspended": "Bu sunucu askıya alınmış ve erişilemez.",
+          "contentNodeMaintenance": "Bu sunucu bakımda olan bir node üzerinde ve erişilemez.",
+          "contentTransferring": "Bu sunucu şu anda taşınıyor ve işlem bitene kadar erişilemez.",
+          "contentInstallFailed": "Bu sunucunun kurulumu başarısız oldu, onaylanana kadar erişilemez.",
+          "contentInstalling": "Bu sunucu şu anda kuruluyor ve bitene kadar erişilemez.",
+          "contentRestoringBackup": "Bu sunucu şu anda yedekten geri yükleniyor ve bitene kadar erişilemez.",
+          "button": {
+            "viewInstallLogs": "Kurulum Loglarını Görüntüle",
+            "acknowledgeFailure": "Hatayı Onayla"
+          },
+          "modal": {
+            "acknowledgeFailure": {
+              "title": "Kurulum Hatasını Onayla",
+              "content": "Bu kurulum hatasını onaylayarak, başarısız kurulumun farkında olduğunuzu ve sorunu çözmek için gerekli adımları attığınızı onaylamış olursunuz. Bu, sunucu üzerindeki kontrolünüzü geri almanızı sağlar."
+            }
+          }
+        }
+      },
+      "scheduleDynamicInput": {
+        "enterVariable": "Lütfen değerlendirilecek değişken adını girin.",
+        "enterData": "Lütfen gönderilecek veriyi girin.",
+        "inputType": "Giriş Tipi",
+        "dataType": "Gönderilecek veri tipi",
+        "selectType": "Tip Seçin",
+        "none": "Yok",
+        "rawString": "Ham Metin (Raw String)",
+        "variable": "Değişken"
+      },
+      "serverWebsocket": {
+        "error": {
+          "connectionFailed": "Birden fazla denemeden sonra bağlanılamadı. Lütfen sayfayı yenileyin.",
+          "connectionClosed": "Sunucu bağlantısı kesildi. Yeniden bağlanmaya çalışılıyor...",
+          "connectionRetry": "Bağlantı koptu. Yeniden deneniyor (deneme {attempt})...",
+          "authFailed": "Kimlik doğrulama başarısız. Kimlik bilgileri yenilenmeye çalışılıyor... ({error})",
+          "authRefreshFailed": "Kimlik bilgileri yenilenemedi. Yeniden denemek için lütfen sayfayı yenileyin.",
+          "permissionRevoked": "Bağlantı kapatıldı: bu sunucuya erişim yetkiniz iptal edildi.",
+          "tokenRefreshLoop": "Kimlik doğrulama döngüsü tespit edildi. Yeniden denemek için lütfen sayfayı yenileyin."
+        },
+        "banner": {
+          "retrying": "{countdown} içinde yeniden deneniyor..."
+        },
+        "listener": {
+          "toast": {
+            "backupCompleted": "Yedekleme başarıyla tamamlandı.",
+            "backupFailed": "Yedekleme başarısız oldu.",
+            "backupRestoreCompleted": "Yedek geri yükleme başarıyla tamamlandı.",
+            "installCompleted": "Sunucu kurulumu başarıyla tamamlandı.",
+            "installFailed": "Sunucu kurulumu başarısız oldu.",
+            "operations": {
+              "compressing": {
+                "completed": "{files} dosyası `{path}` konumuna {time} içinde sıkıştırıldı.",
+                "failed": "{files} dosyası `{path}` konumuna sıkıştırılamadı:\n{error}"
+              },
+              "decompressing": {
+                "completed": "`{path}` dosyası `{destination}` konumuna {time} içinde çıkartıldı.",
+                "failed": "`{path}` dosyası `{destination}` konumuna çıkartılamadı:\n{error}"
+              },
+              "pulling": {
+                "completed": "`{destination}` başarıyla çekildi ({time}).",
+                "failed": "`{destination}` çekilemedi:\n{error}"
+              },
+              "copying": {
+                "completed": "`{path}` dosyası `{destination}` konumuna {time} içinde kopyalandı.",
+                "failed": "`{path}` dosyası `{destination}` konumuna kopyalanamadı:\n{error}"
+              },
+              "copyingMany": {
+                "completed": "{files} dosyası {time} içinde kopyalandı.",
+                "failed": "{files} kopyalanamadı:\n{error}"
+              },
+              "copyingRemote": {
+                "completedFrom": "{files} uzak sunucudan {time} içinde kopyalandı.",
+                "completedTo": "{files} uzak sunucuya {time} içinde kopyalandı.",
+                "failedFrom": "{files} uzak sunucudan kopyalanamadı:\n{error}",
+                "failedTo": "{files} uzak sunucuya kopyalanamadı:\n{error}"
+              }
+            }
+          }
+        }
+      },
+      "fileUpload": {
+        "toast": {
+          "uploading": "{files} yüklenmeye başlandı...",
+          "cancelledFile": "`{file}` yüklemesi başarıyla iptal edildi.",
+          "cancelledFolder": "`{folder}` ({files}) yüklemesi başarıyla iptal edildi."
+        }
+      }
+    },
+    "pages": {
+      "oobe": {
+        "welcome": {
+          "title": "Calagopus'a Hoş Geldiniz",
+          "subtitle": "Oyun sunucusu yönetim sisteminizi kuralım ve çalıştıralım!",
+          "wizardIntro": "Bu kurulum sihirbazı size şunlarda rehberlik edecek:",
+          "steps": {
+            "account": "Yönetici hesabınızı oluşturma",
+            "settings": "Temel sistem ayarlarını yapılandırma",
+            "location": "Sunucu lokasyonunuzu ayarlama",
+            "node": "İlk node'unuzu ekleme",
+            "server": "İlk oyun sunucunuzu kurma"
+          },
+          "button": {
+            "start": "Başlayın"
+          }
+        },
+        "register": {
+          "title": "Yönetici Hesabı Oluştur",
+          "alert": {
+            "title": "Güvenlik Uyarısı",
+            "description": "Güçlü bir şifre seçin. Bu hesap tüm sunuculara ve ayarlara tam yönetici erişimine sahip olacaktır."
+          },
+          "form": {
+            "username": "Kullanıcı Adı",
+            "usernamePlaceholder": "admin",
+            "email": "E-posta Adresi",
+            "emailPlaceholder": "admin@ornek.com",
+            "firstName": "Ad",
+            "firstNamePlaceholder": "Alan",
+            "lastName": "Soyad",
+            "lastNamePlaceholder": "Turing",
+            "password": "Şifre",
+            "passwordPlaceholder": "Güçlü bir şifre girin",
+            "confirmPassword": "Şifreyi Onayla",
+            "confirmPasswordPlaceholder": "Şifrenizi tekrar girin"
+          },
+          "button": {
+            "create": "Hesap Oluştur ve Devam Et"
+          }
+        },
+        "login": {
+          "title": "Yeniden Giriş Yap",
+          "alert": "Kurulum sırasında oturumunuz kapandı. Kaldığınız yerden devam etmek için lütfen tekrar giriş yapın.",
+          "form": {
+            "username": "Kullanıcı Adı",
+            "usernamePlaceholder": "admin",
+            "password": "Şifre",
+            "passwordPlaceholder": "Şifrenizi girin"
+          },
+          "button": {
+            "login": "Giriş Yap ve Devam Et"
+          }
+        },
+        "location": {
+          "title": "Lokasyon Yapılandırması",
+          "form": {
+            "locationName": "Lokasyon Adı",
+            "locationNamePlaceholder": "Evim",
+            "backupName": "Yedekleme Yapılandırma Adı",
+            "backupNamePlaceholder": "Bulut Yedek",
+            "backupDisk": "Yedekleme Diski",
+            "backupDiskPlaceholder": "Yedekleme Diski"
+          },
+          "button": {
+            "create": "Oluştur ve Devam Et"
+          }
+        },
+        "node": {
+          "title": "Node Yapılandırması",
+          "allocationsTitle": "Tahsis (Allocations) Yapılandırması",
+          "form": {
+            "name": "İsim",
+            "namePlaceholder": "Sunucum",
+            "url": "URL",
+            "urlPlaceholder": "URL",
+            "urlDescription": "Node ile dahili iletişim için kullanılır",
+            "publicUrl": "Genel URL",
+            "publicUrlPlaceholder": "URL",
+            "publicUrlDescription": "Websocket ve indirmeler için kullanılır",
+            "sftpHost": "SFTP Host",
+            "sftpHostPlaceholder": "SFTP Host",
+            "sftpPort": "SFTP Port",
+            "sftpPortPlaceholder": "SFTP Port",
+            "memory": "Bellek (RAM)",
+            "disk": "Disk",
+            "ip": "IP",
+            "portRanges": "Port Aralıkları",
+            "portRangesPlaceholder": "Port Aralıkları (ör. 3000-4000)"
+          },
+          "error": {
+            "noLocations": "Bir şeyler ters gitti. Lokasyon bulunamadı."
+          },
+          "button": {
+            "create": "Oluştur ve Devam Et"
+          }
+        },
+        "nodeConfiguration": {
+          "title": "Node Yapılandırması",
+          "error": {
+            "noNodes": "Bir şeyler ters gitti. Node bulunamadı.",
+            "connectionError": "Bir şeyler ters gitti. Bağlantı hatası."
+          },
+          "successMessage": "Node bağlantınız başarıyla doğrulandı. Artık devam edebilirsiniz.",
+          "configurationDescription": "Bunu `{file}` adresindeki yapılandırma dosyasına yerleştirin veya çalıştırın:",
+          "button": {
+            "verify": "Bağlantıyı Doğrula"
+          }
+        },
+        "configuration": {
+          "title": "Uygulama Ayarları",
+          "form": {
+            "applicationName": "Uygulama Adı",
+            "applicationNamePlaceholder": "Calagopus",
+            "language": "Dil",
+            "languagePlaceholder": "Dil",
+            "applicationUrl": "Uygulama URL'si",
+            "applicationUrlPlaceholder": "https://calagop.us",
+            "telemetry": "Telemetriyi Etkinleştir",
+            "telemetryDescription": "Calagopus'un uygulamayı geliştirmeye yardımcı olması için sınırlı ve anonim kullanım verileri toplamasına izin verin.",
+            "registration": "Kaydı Etkinleştir",
+            "registrationDescription": "Yeni kullanıcıların kendi hesaplarını kaydetmelerine izin verin."
+          },
+          "button": {
+            "submit": "Ayarları Güncelle ve Devam Et"
+          }
+        },
+        "eggRepositories": {
+          "title": "Egg Repoları",
+          "description": "Bunlar Egg'lerinizin kaynak depolarıdır. Bu depoları istediğiniz zaman değiştirebilirsiniz.",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "Pterodactyl Oyun Egg'leri",
+              "description": "Minecraft, Terraria ve çok daha fazlası gibi oyunlar için Egg'ler."
+            },
+            "pterodactylApplication": {
+              "title": "Pterodactyl Uygulama Egg'leri",
+              "description": "Grafana, Meilisearch ve çeşitli veritabanları gibi uygulamalar için Egg'ler."
+            },
+            "pterodactylGeneral": {
+              "title": "Pterodactyl Genel Egg'ler",
+              "description": "Node JS, Java ve Rust gibi genel uygulama çalışma ortamları için Egg'ler."
+            }
+          },
+          "button": {
+            "submit": "İçe Aktar"
+          }
+        },
+        "server": {
+          "title": "Sunucu",
+          "egg": {
+            "title": "Egg",
+            "description": "İlk sunucunuzu kuralım. Hangi Egg'i kullanmak istersiniz?",
+            "nestDescription": "Bu Egg'i kullanmaya başlamak için bir Nest oluşturmanız gerekir. Nest'ler Egg koleksiyonlarıdır. Bir isim verin:"
+          },
+          "server": {
+            "title": "Sunucu",
+            "nestDescription": "Bu Egg'i kullanmaya başlamak için bir Nest oluşturmanız gerekir. Nest'ler Egg koleksiyonlarıdır. Bir isim verin:"
+          },
+          "error": {
+            "noNodes": "Bir şeyler ters gitti. Node bulunamadı."
+          },
+          "button": {
+            "submit": "İçe Aktar",
+            "create": "Oluştur ve Devam Et"
+          }
+        },
+        "finished": {
+          "title": "Kurulum Tamamlandı!",
+          "subtitle": "Calagopus paneliniz kullanıma hazır",
+          "setupTitle": "Neleri Kurduk",
+          "items": {
+            "account": "Yönetici Hesabı",
+            "configuration": {
+              "title": "Sistem Yapılandırması",
+              "subtitle": "Panel ayarları ve tercihleri yapılandırıldı"
+            },
+            "eggRepositories": {
+              "title": "Egg Repoları",
+              "subtitle": "{count} depo"
+            },
+            "location": "Lokasyon",
+            "node": "Node",
+            "server": "Sunucu"
+          },
+          "badge": {
+            "skipped": "Atlandı"
+          },
+          "button": "Panel'e Git"
+        }
+      },
+      "auth": {
+        "button": {
+          "login": "Giriş Yap",
+          "loginWith": "{name} ile Giriş Yap"
+        },
+        "login": {
+          "error": {
+            "usernameRequired": "Lütfen bir kullanıcı adı girin"
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "Tarayıcınız geçiş anahtarlarını (passkeys) desteklemiyor.",
+              "unexpected": "Geçiş anahtarınız kullanılırken beklenmedik bir hata oluştu.",
+              "cancelled": "Geçiş anahtarı isteği iptal edildi.",
+              "dismissed": "Geçiş anahtarı istemini kapattınız veya etkileşime girmediniz. Kullanılan anahtar kayıtlı olmayabilir.",
+              "invalidState": "Bu geçiş anahtarı mevcut değil veya zaten kayıtlı.",
+              "notSupportedType": "Tarayıcınız veya cihazınız bu tip geçiş anahtarını desteklemiyor.",
+              "securityError": "Geçiş anahtarları yalnızca HTTPS üzerinden ve geçerli bir alan adıyla kullanılabilir.",
+              "authenticatorError": "Kimlik doğrulayıcı ile ilgili bir sorun oluştu.",
+              "constraintError": "Kimlik doğrulayıcı gerekli kısıtlamaları karşılayamadı."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "Giriş Yap",
+              "subtitle": "Devam etmek için kullanıcı adınızı girin",
+              "form": {
+                "usernamePlaceholder": "Kullanıcı adınızı girin"
+              },
+              "link": {
+                "forgotPassword": "Şifremi Unuttum",
+                "notRegistered": "Kayıtlı değil misiniz?",
+                "createAccount": "Hesap oluştur"
+              },
+              "button": {
+                "oauthLogin": "OAuth Girişi"
+              }
+            },
+            "passkey": {
+              "title": "Geçiş Anahtarı ile Doğrula",
+              "subtitle": "{username} ile ilişkili bir geçiş anahtarı bulduk",
+              "button": {
+                "usePasskey": "Geçiş Anahtarı Kullan",
+                "usePassword": "Şifre Kullan"
+              }
+            },
+            "password": {
+              "title": "Şifre Girin",
+              "subtitle": "Lütfen {username} için şifrenizi girin",
+              "form": {
+                "passwordPlaceholder": "Şifrenizi girin"
+              },
+              "button": {
+                "signIn": "Giriş Yap",
+                "forgotPassword": "Şifremi Unuttum"
+              }
+            },
+            "totp": {
+              "title": "İki Faktörlü Doğrulama",
+              "welcomeBack": "Hoş geldin {username}!",
+              "enterCode": "Kimlik doğrulama uygulamanızdaki 6 haneli kodu girin",
+              "button": {
+                "verify": "Kodu Doğrula",
+                "useRecoveryCode": "Kurtarma Kodu Kullan",
+                "useTotp": "TOTP Kullan"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "Bir kurtarma kodu girin",
+              "form": {
+                "label": "Kurtarma Kodu",
+                "placeholder": "Kurtarma kodunu girin"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "Kayıt Ol",
+          "subtitle": "Kayıt olmak için lütfen bilgilerinizi girin",
+          "form": {
+            "email": "E-posta",
+            "firstName": "Ad",
+            "lastName": "Soyad"
+          },
+          "button": {
+            "register": "Kayıt Ol"
+          }
+        },
+        "forgotPassword": {
+          "title": "Şifremi Unuttum",
+          "subtitle": "Şifrenizi nasıl sıfırlayacağınıza dair talimatları almak için e-postanızı girin",
+          "form": {
+            "email": "E-posta"
+          },
+          "button": {
+            "request": "Şifre Sıfırlama İste"
+          },
+          "success": "Şifrenizi nasıl sıfırlayacağınıza dair talimatları içeren bir e-posta gönderildi."
+        },
+        "resetPassword": {
+          "title": "Şifreyi Sıfırla",
+          "subtitle": "Lütfen yeni şifrenizi girin",
+          "form": {
+            "confirmPassword": "Şifreyi Onayla"
+          },
+          "button": {
+            "reset": "Şifreyi Sıfırla"
+          },
+          "toast": {
+            "success": "Şifre sıfırlandı."
+          }
+        },
+        "oauth": {
+          "title": "OAuth ile Doğrula",
+          "subtitle": "Giriş yapmak için aşağıdaki sağlayıcılardan birini seçin"
+        }
+      },
+      "account": {
+        "home": {
+          "title": "Sunucular",
+          "tooltip": {
+            "removeFromGroup": "Gruptan Kaldır",
+            "addToGroup": "Gruba Ekle",
+            "addServerToGroup": "Sunucuyu Gruba Ekle",
+            "groupActions": "Grup Eylemleri",
+            "noGroups": "Sunucu eklenecek grup bulunmuyor",
+            "noGroup": "Bu sunucu herhangi bir grupta değil"
+          },
+          "tabs": {
+            "groupedServers": {
+              "title": "Gruplandırılmış Sunucular",
+              "page": {
+                "button": {
+                  "createGroup": "Grup Oluştur"
+                },
+                "modal": {
+                  "createServerGroup": {
+                    "title": "Sunucu Grubu Oluştur",
+                    "toast": {
+                      "created": "Sunucu grubu oluşturuldu."
+                    }
+                  },
+                  "editServerGroup": {
+                    "title": "Sunucu Grubunu Düzenle",
+                    "toast": {
+                      "updated": "Sunucu grubu güncellendi."
+                    }
+                  },
+                  "deleteServerGroup": {
+                    "title": "Sunucu Grubu Silme Onayı",
+                    "content": "**{group}** grubunu hesabınızdan silmek istediğinize emin misiniz?",
+                    "toast": {
+                      "deleted": "Sunucu grubu silindi."
+                    }
+                  },
+                  "addServerToGroup": {
+                    "title": "Sunucuyu {group} Grubuna Ekle",
+                    "noServers": "Tüm sunucular zaten bu grupta.",
+                    "toast": {
+                      "added": "Sunucu gruba eklendi."
+                    }
+                  }
+                },
+                "noGroups": "Hiç grup bulunamadı, bir tane oluşturmaya ne dersiniz?"
+              }
+            },
+            "allServers": {
+              "title": "Tüm Sunucular",
+              "page": {
+                "input": {
+                  "showOtherUsersServers": "Diğer kullanıcıların sunucularını göster"
+                },
+                "modal": {
+                  "addToServerGroup": {
+                    "title": "{server} Sunucusunu Gruba Ekle",
+                    "form": {
+                      "serverGroup": "Sunucu Grubu"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "bulkActions": {
+            "selectionMode": "Seçim Modu",
+            "select": "Sunucu seç",
+            "deselect": "Seçimi kaldır",
+            "success": "{servers} üzerinde {action} işlemi başarıyla tamamlandı.",
+            "partial": "{successfulServers} üzerinde {action} başarılı. {failedServers} başarısız.",
+            "groupActions": "Grup Eylemleri"
+          },
+          "noServers": "Hiç sunucu bulunamadı, bir tane eklemeye ne dersiniz?"
+        },
+        "admin": {
+          "title": "Yönetici"
+        },
+        "account": {
+          "title": "Hesap",
+          "alert": {
+            "requireTwoFactor": {
+              "title": "İki Faktörlü Doğrulama Gerekli",
+              "description": "Hesabınızda İki Faktörlü Doğrulama gereklidir. Paneli kullanmaya devam etmek için lütfen aşağıdan kurulumu yapın."
+            }
+          },
+          "containers": {
+            "password": {
+              "title": "Şifre",
+              "toast": {
+                "updated": "Şifre başarıyla güncellendi."
+              },
+              "form": {
+                "currentPassword": "Mevcut Şifre",
+                "newPassword": "Yeni Şifre",
+                "confirmNewPassword": "Yeni Şifreyi Onayla"
+              }
+            },
+            "email": {
+              "title": "E-posta",
+              "toast": {
+                "updated": "E-posta başarıyla güncellendi."
+              },
+              "form": {
+                "newEmail": "Yeni E-posta",
+                "currentPassword": "Mevcut Şifre"
+              }
+            },
+            "twoFactor": {
+              "title": "İki Faktörlü Doğrulama",
+              "toast": {
+                "disabled": "İki faktörlü doğrulama başarıyla devre dışı bırakıldı.",
+                "enabled": "İki faktörlü doğrulama başarıyla etkinleştirildi. Lütfen kurtarma kodlarınızı kopyalayın."
+              },
+              "modal": {
+                "disableTwoFactor": {
+                  "title": "İki Faktörlü Doğrulamayı Devre Dışı Bırak",
+                  "description": "İki faktörlü doğrulamayı devre dışı bırakmak hesabınızı daha az güvenli hale getirecektir.",
+                  "form": {
+                    "code": "Doğrulama Kodu"
+                  }
+                },
+                "setupTwoFactor": {
+                  "title": "İki Faktörlü Doğrulamayı Kur",
+                  "description": "Hesabınızı yetkisiz erişimden korumaya yardımcı olun. Her giriş yaptığınızda bir doğrulama kodu istenecektir.",
+                  "descriptionQR": "Tercih ettiğiniz iki faktörlü kimlik doğrulama uygulamasını kullanarak yukarıdaki QR kodu tarayın. Ardından, oluşturulan 6 haneli kodu aşağıdaki alana girin.",
+                  "form": {
+                    "code": "Doğrulama Kodu"
+                  }
+                },
+                "recoveryCodes": {
+                  "title": "Kurtarma Kodları",
+                  "description": "Aşağıda kurtarma kodlarınız bulunmaktadır. Bunları güvenli bir yerde saklayın. Kimlik doğrulama cihazınıza erişiminizi kaybederseniz, hesabınıza tekrar erişmek için bu kodları kullanabilirsiniz."
+                }
+              },
+              "button": {
+                "disableTwoFactor": "2FA'yı Devre Dışı Bırak",
+                "setupTwoFactor": "2FA'yı Kur"
+              },
+              "twoFactorEnabled": "İki Faktörlü Doğrulama şu anda etkin.",
+              "twoFactorDisabled": "Hesabınızda şu anda iki faktörlü doğrulama etkin değil. Yapılandırmaya başlamak için aşağıdaki butona tıklayın.",
+              "twoFactorLastUsed": "Son kullanım: {timestamp}"
+            },
+            "account": {
+              "title": "Hesap Detayları",
+              "toast": {
+                "updated": "Hesap detayları başarıyla güncellendi."
+              },
+              "form": {
+                "nameFirst": "Ad",
+                "nameLast": "Soyad",
+                "username": "Kullanıcı Adı",
+                "language": "Dil",
+                "toastPosition": "Bildirim (Toast) Pozisyonu",
+                "startOnGroupedServers": "Gruplanmış Sunucular sayfasından başla"
+              }
+            },
+            "avatar": {
+              "title": "Avatar",
+              "toast": {
+                "updated": "Avatar başarıyla güncellendi.",
+                "removed": "Avatar başarıyla kaldırıldı."
+              },
+              "form": {
+                "avatar": "Avatar"
+              }
+            }
+          }
+        },
+        "securityKeys": {
+          "title": "Güvenlik Anahtarları",
+          "table": {
+            "columns": {
+              "credentialId": "Kimlik Bilgisi (Credential) ID"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "Güvenlik anahtarlarını kullanmak için güvenli bir bağlam (HTTPS) gereklidir."
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "Güvenlik Anahtarı Oluştur",
+              "toast": {
+                "created": "Güvenlik anahtarı başarıyla oluşturuldu.",
+                "aborted": "Güvenlik anahtarı oluşturma iptal edildi."
+              }
+            },
+            "editSecurityKey": {
+              "title": "Güvenlik Anahtarını Düzenle",
+              "toast": {
+                "updated": "Güvenlik anahtarı başarıyla güncellendi."
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "Güvenlik Anahtarı Silme Onayı",
+              "content": "**{key}** anahtarını hesabınızdan silmek istediğinize emin misiniz?",
+              "toast": {
+                "deleted": "Güvenlik anahtarı başarıyla silindi."
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "Oturumlar",
+          "table": {
+            "columns": {
+              "ip": "Oturumu Açan IP Adresi",
+              "thisDevice": "Oturumu Açan Bu Cihaz mı?",
+              "userAgent": "User Agent Bilgisi"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "Oturum Silme Onayı",
+              "content": "**{ip}** oturumunu hesabınızdan silmek istediğinize emin misiniz?",
+              "toast": {
+                "deleted": "Oturum silindi."
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "Klavye Kısayolları",
+          "description": "Panelde daha verimli gezinmek ve etkileşimde bulunmak için bu klavye kısayollarını kullanın.",
+          "detectedMac": "macOS algılandı",
+          "detectedWindows": "Windows/Linux algılandı",
+          "fileManager": {
+            "title": "Dosya Yöneticisi",
+            "selectAll": "Tüm dosyaları seç",
+            "cutFiles": "Seçili dosyaları kes",
+            "copyFiles": "Seçili dosyaları kopyala",
+            "duplicateFile": "Seçili dosyayı çoğalt",
+            "pasteFiles": "Dosyaları yapıştır",
+            "searchFiles": "Dosyaları ara",
+            "moveUpDirectory": "Bir üst dizine git",
+            "moveUpSelection": "Seçimi yukarı taşı",
+            "moveDownSelection": "Seçimi aşağı taşı",
+            "renameFile": "Dosyayı yeniden adlandır",
+            "deselectAll": "Tüm seçimleri kaldır",
+            "deleteFiles": "Seçili dosyaları sil"
+          },
+          "table": {
+            "title": "Tablo Gezinme",
+            "previousPage": "Önceki sayfa",
+            "nextPage": "Sonraki sayfa",
+            "firstPage": "İlk sayfa",
+            "lastPage": "Son sayfa"
+          },
+          "console": {
+            "title": "Sunucu Konsolu",
+            "searchContent": "Konsol çıktısında ara",
+            "previousCommand": "Geçmişteki önceki komut",
+            "nextCommand": "Geçmişteki sonraki komut"
+          },
+          "serverList": {
+            "title": "Sunucu Listesi",
+            "selectServer": "S tuşuna basılı tutun ve sunucu seçmek/kaldırmak için tıklayın"
+          }
+        },
+        "sshKeys": {
+          "title": "SSH Anahtarları",
+          "button": {
+            "import": "İçe Aktar"
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "Parmak İzi"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "SSH Anahtarı Oluştur",
+              "toast": {
+                "created": "SSH anahtarı oluşturuldu."
+              },
+              "button": {
+                "uploadKeyFile": "Anahtar Dosyası Yükle"
+              },
+              "form": {
+                "publicKey": "Public Key"
+              }
+            },
+            "editSshKey": {
+              "title": "SSH Anahtarını Düzenle",
+              "toast": {
+                "updated": "SSH anahtarı güncellendi."
+              }
+            },
+            "importSshKeys": {
+              "title": "SSH Anahtarlarını İçe Aktar",
+              "toast": {
+                "created": "{sshKeys} oluşturuldu."
+              },
+              "form": {
+                "provider": "Sağlayıcı",
+                "username": "Kullanıcı Adı"
+              }
+            },
+            "deleteSshKey": {
+              "title": "SSH Anahtarı Silme Onayı",
+              "content": "**{name}** anahtarını hesabınızdan silmek istediğinize emin misiniz?",
+              "toast": {
+                "removed": "SSH anahtarı kaldırıldı."
+              }
+            }
+          }
+        },
+        "commandSnippets": {
+          "title": "Komut Parçacıkları (Snippets)",
+          "table": {
+            "columns": {
+              "eggs": "Egg'ler"
+            }
+          },
+          "form": {
+            "eggs": "Egg'ler",
+            "command": "Komut"
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "Komut Parçacığı Oluştur",
+              "toast": {
+                "created": "Komut parçacığı oluşturuldu."
+              }
+            },
+            "editCommandSnippet": {
+              "title": "Komut Parçacığını Düzenle",
+              "toast": {
+                "updated": "Komut parçacığı güncellendi."
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "Komut Parçacığı Silme Onayı",
+              "content": "**{name}** parçasını hesabınızdan silmek istediğinize emin misiniz?",
+              "toast": {
+                "removed": "Komut parçacığı kaldırıldı."
+              }
+            }
+          }
+        },
+        "oauthLinks": {
+          "title": "OAuth Bağlantıları",
+          "button": {
+            "connect": "Bağla",
+            "connectTo": "{provider} ile Bağla"
+          },
+          "table": {
+            "columns": {
+              "providerName": "Sağlayıcı Adı",
+              "identifier": "Tanımlayıcı"
+            }
+          },
+          "modal": {
+            "deleteOAuthLink": {
+              "title": "OAuth Bağlantısı Silme Onayı",
+              "content": "**{provider}** bağlantısını hesabınızdan silmek istediğinize emin misiniz?",
+              "toast": {
+                "removed": "OAuth bağlantısı kaldırıldı."
+              }
+            }
+          }
+        },
+        "apiKeys": {
+          "title": "API Anahtarları",
+          "button": {
+            "apiDocumentation": "API Dokümantasyonu"
+          },
+          "table": {
+            "columns": {
+              "key": "Anahtar",
+              "permissions": "Kullanıcı / Sunucu / Yönetici Yetkileri",
+              "expires": "Son Kullanılan Tarih"
+            }
+          },
+          "modal": {
+            "createApiKey": {
+              "title": "API Anahtarı Oluştur",
+              "toast": {
+                "created": "API anahtarı oluşturuldu."
+              }
+            },
+            "updateApiKey": {
+              "title": "API Anahtarını Güncelle",
+              "toast": {
+                "updated": "API anahtarı güncellendi."
+              }
+            },
+            "deleteApiKey": {
+              "title": "API Anahtarı Silme Onayı",
+              "content": "**{name}** anahtarını hesabınızdan silmek istediğinize emin misiniz?",
+              "toast": {
+                "removed": "API anahtarı kaldırıldı."
+              }
+            }
+          },
+          "form": {
+            "allowedIps": "İzin Verilen IP'ler",
+            "allowedIpsPlaceholder": "ör. 192.168.1.1, 2001:db8::1",
+            "userPermissions": "Kullanıcı Yetkileri",
+            "serverPermissions": "Sunucu Yetkileri",
+            "adminPermissions": "Yönetici Yetkileri"
+          }
+        },
+        "activity": {
+          "title": "Aktivite"
+        }
+      },
+      "admin": {},
+      "server": {
+        "viewAdmin": {
+          "title": "Yönetici görünümü"
+        },
+        "console": {
+          "title": "Konsol",
+          "input": {
+            "placeholder": "Bir komut yazın...",
+            "ariaLabel": "Konsol komut girişi."
+          },
+          "toast": {
+            "installCancelled": "Sunucu kurulumu iptal edildi."
+          },
+          "modal": {
+            "sshDetails": {
+              "title": "SSH Detayları",
+              "form": {
+                "protocol": "Protokol",
+                "port": "Port",
+                "host": "Host",
+                "username": "Kullanıcı Adı",
+                "password": "Şifre",
+                "yourPassword": "Kontrol Paneli Şifreniz",
+                "command": "SSH Komutu"
+              },
+              "launch": "Başlat"
+            }
+          },
+          "notification": {
+            "nodeMaintenance": "Sunucunuz şu anda bakımda olan bir node üzerinde bulunuyor.",
+            "transferring": "Sunucunuz şu anda başka bir node'a taşınıyor.",
+            "restoringBackup": "Sunucunuz şu anda bir yedekten geri yükleniyor. Lütfen bekleyin...",
+            "installing": "Sunucunuz şu anda kuruluyor. Lütfen bekleyin..."
+          },
+          "message": {
+            "serverMarkedAs": "Sunucu {state} olarak işaretlendi...",
+            "installFailed": "Kurulum başarısız oldu.",
+            "installCompleted": "Kurulum başarıyla tamamlandı.",
+            "transferFailed": "Taşıma başarısız oldu.",
+            "transferCompleted": "Taşıma başarıyla tamamlandı. Sunucuya yeniden bağlanılıyor...",
+            "pullingImage": "Sunucunuz docker imajını çekiyor. Lütfen bekleyin...",
+            "pulling": "Çekiliyor",
+            "extracting": "Çıkartılıyor",
+            "layer": "Katman"
+          },
+          "tooltip": {
+            "search": "Ara",
+            "sshDetails": "SSH Detayları",
+            "commandHistory": "Komut Geçmişi",
+            "decreaseFontSize": "Yazı Boyutunu Azalt",
+            "increaseFontSize": "Yazı Boyutunu Artır"
+          },
+          "drawer": {
+            "commandHistory": {
+              "title": "Komut Geçmişi",
+              "detailTitle": "Komut Detayları",
+              "noCommands": "Komut bulunamadı.",
+              "copyButton": "Komutu Kopyala",
+              "sendButton": "Komutu Gönder",
+              "commandSent": "Komut başarıyla gönderildi."
+            }
+          },
+          "feature": {
+            "eula": {
+              "title": "Minecraft EULA Sözleşmesi",
+              "content": "Minecraft sunucusu başlamadan önce [Minecraft Son Kullanıcı Lisans Sözleşmesi](https://minecraft.net/eula)'ni kabul etmenizi gerektirir.",
+              "contentDetails": "\"EULA'yı Kabul Et\" seçeneğine tıklayarak Minecraft EULA şartlarını kabul etmiş olursunuz ve **eula.txt** dosyası **eula=true** olarak güncellenir.",
+              "toast": {
+                "accepted": "EULA başarıyla kabul edildi."
+              },
+              "button": {
+                "accept": "EULA'yı Kabul Et"
+              }
+            }
+          },
+          "details": {
+            "address": "Adres",
+            "port": "Port",
+            "uptime": "Çalışma Süresi",
+            "cpuLoad": "İşlemci Kullanımı",
+            "memoryLoad": "Bellek Kullanımı",
+            "diskUsage": "Disk Kullanımı",
+            "networkIn": "Ağ (Giriş)",
+            "networkOut": "Ağ (Çıkış)",
+            "normalizeCpuLoad": "İşlemci Kullanımını %100 Üzerinden Göster"
+          },
+          "power": {
+            "modal": {
+              "forceStop": {
+                "title": "İşlemi Zorla Durdur",
+                "content": "Bir sunucuyu zorla durdurmak veri kaybına veya bozulmasına yol açabilir."
+              }
+            }
+          },
+          "stats": {
+            "cpuLoad": "CPU Yükü",
+            "memoryLoad": "Bellek Yükü",
+            "network": "Ağ",
+            "inbound": "Gelen",
+            "outbound": "Giden"
+          },
+          "socketConnected": "Bağlı ({ping}ms gecikme)",
+          "socketDisconnected": "Bağlantı Kesildi"
+        },
+        "files": {
+          "title": "Dosyalar",
+          "titleEditorViewing": "{file} Görüntüleniyor",
+          "titleEditorEditing": "{file} Düzenleniyor",
+          "titleEditorNew": "Yeni Dosya",
+          "table": {
+            "columns": {
+              "modified": "Değiştirilme"
+            }
+          },
+          "button": {
+            "new": "Yeni",
+            "sftpDetails": "SFTP Detayları",
+            "openInNewWindow": "Yeni Pencerede Aç",
+            "details": "Detaylar",
+            "rename": "Yeniden Adlandır",
+            "copy": "Kopyala",
+            "move": "Taşı",
+            "fingerprint": "Parmak İzi",
+            "permissions": "İzinler",
+            "unarchive": "Arşivi Aç",
+            "archive": "Arşivle",
+            "more": "Daha Fazla",
+            "remoteCopy": "Uzak Kopyalama",
+            "search": "Ara",
+            "exitBackup": "Yedekten Çık",
+            "fileFromEditor": "Editörden Dosya",
+            "directory": "Dizin",
+            "fileFromPull": "URL'den Dosya Çek",
+            "fileFromUpload": "Dosya Yükle",
+            "directoryFromUpload": "Klasör Yükle"
+          },
+          "actionBar": {
+            "copyHere": "{files} buraya kopyala",
+            "moveHere": "{files} buraya taşı"
+          },
+          "searchBanner": {
+            "resultsTitle": "Arama Sonuçları ({files} bulundu)",
+            "query": "Sorgu:",
+            "excluded": "Hariç Tutulan:",
+            "content": "İçerik:",
+            "size": "Boyut:",
+            "min": "Min:",
+            "max": "Max:"
+          },
+          "operations": {
+            "uploadingFolder": "Klasör yükleniyor: {folder} ({files})",
+            "waiting": "Bekliyor: ",
+            "uploading": "Yükleniyor: ",
+            "compressing": "{path} konumundaki {files} sıkıştırılıyor",
+            "decompressing": "{path} arşivi açılıyor",
+            "pulling": "{destination} çekiliyor",
+            "copying": "{path} -> {destination} kopyalanıyor",
+            "copyingMany": "{files} kopyalanıyor",
+            "receivingRemote": "Uzak sunucudan {files} alınıyor",
+            "sendingRemote": "{files} uzak sunucuya gönderiliyor"
+          },
+          "dropzone": {
+            "title": "Yüklemek için dosyaları buraya bırakın",
+            "subtitle": "Yüklemeyi başlatmak için bırakın"
+          },
+          "settings": {
+            "clickOnce": "Dosya veya klasörü açmak için tek tıkla",
+            "preferPhysicalSize": "Mantıksal boyut yerine fiziksel boyutu göster",
+            "editorMinimap": "Dosya Minimap'ini Göster",
+            "editorLineOverflow": "Satır Taşmasını Kaydır",
+            "imageViewerSmoothing": "Görüntü Yumuşatma (Anti-Aliasing)"
+          },
+          "toast": {
+            "operationCancelled": "İşlem iptal edildi",
+            "copyingStarted": "{files} kopyalanmaya başlandı.",
+            "filesCouldNotBeMoved": "Dosyalar taşınamadı.",
+            "filesMoved": "{files} taşındı.",
+            "downloadStarted": "İndirme başlatıldı.",
+            "filesDeleted": "Dosyalar silindi.",
+            "archiveCreationStarted": "Arşiv oluşturma başladı.",
+            "fileCopyingStarted": "Dosya kopyalama başladı.",
+            "fileInfoRetrieved": "Dosya bilgileri başarıyla alındı.",
+            "filePullingStarted": "Dosya çekme işlemi başladı.",
+            "fileRenamed": "Dosya yeniden adlandırıldı.",
+            "fileCouldNotBeRenamed": "Dosya yeniden adlandırılamadı.",
+            "permissionsUpdated": "İzinler güncellendi.",
+            "fileSaved": "Dosya kaydedildi."
+          },
+          "modal": {
+            "activeUploads": {
+              "title": "Aktif Yüklemeler",
+              "content": "Bu sayfadan ayrılmak istediğinize emin misiniz? {files} adet aktif dosya yüklemeniz var. Ayrılırsanız yüklemeler iptal edilecektir.",
+              "button": {
+                "leave": "Sayfadan Ayrıl"
+              }
+            },
+            "unsavedChanges": {
+              "title": "Kaydedilmemiş Değişiklikler",
+              "content": "Dosya editöründe kaydedilmemiş değişiklikleriniz var. Sayfadan ayrılmak istediğinize emin misiniz? Ayrılırsanız değişiklikleriniz kaybolacaktır.",
+              "button": {
+                "leave": "Sayfadan Ayrıl"
+              }
+            },
+            "createArchive": {
+              "title": "Arşiv Oluştur",
+              "form": {
+                "archiveName": "Arşiv Adı",
+                "format": "Format"
+              },
+              "createdAs": "Bu arşiv şu isimle oluşturulacak: "
+            },
+            "createDirectory": {
+              "title": "Dizin Oluştur",
+              "form": {
+                "directoryName": "Dizin Adı"
+              },
+              "createdAs": "Bu dizin şu isimle oluşturulacak: "
+            },
+            "copyFile": {
+              "title": "Dosyayı Kopyala",
+              "form": {
+                "fileName": "Dosya Adı"
+              },
+              "createdAs": "Bu dosya şu isimle oluşturulacak: "
+            },
+            "copyRemote": {
+              "title": "Dosyaları Uzaktan Kopyala",
+              "form": {
+                "server": "Sunucu",
+                "destination": "Hedef"
+              },
+              "createdAs": "Bu dosyalar uzak sunucuda şu dizin altında oluşturulacak: "
+            },
+            "fileFingerprints": {
+              "title": "Dosya Parmak İzi",
+              "form": {
+                "algorithm": "Algoritma",
+                "fingerprint": "Parmak İzi"
+              },
+              "button": {
+                "calculate": "Parmak İzini Hesapla"
+              }
+            },
+            "deleteFile": {
+              "title": "Dosyayı Sil",
+              "singleFileWarning": "{file} içeriğini sildikten sonra geri kurtaramazsınız.",
+              "multipleFilesWarning": "Aşağıdaki dosyaların içeriğini sildikten sonra geri kurtaramazsınız."
+            },
+            "createFile": {
+              "title": "Dosya Oluştur",
+              "form": {
+                "fileName": "Dosya Adı"
+              }
+            },
+            "details": {
+              "title": "Dosya Detayları",
+              "path": "Yol",
+              "mode": "Mod",
+              "logicalSize": "Mantıksal Boyut",
+              "physicalSize": "Fiziksel Boyut",
+              "mimeType": "MIME Türü",
+              "lastModifiedAt": "Son Değiştirilme",
+              "createdAt": "Oluşturulma"
+            },
+            "filePermissions": {
+              "title": "Dosya İzinleri",
+              "symbolic": "Sembolik:",
+              "octal": "Sekizlik (Octal):",
+              "owner": "Sahip",
+              "group": "Grup",
+              "other": "Diğer",
+              "breakdown": "İzin Dağılımı",
+              "readPermission": "Okuma izni (4)",
+              "writePermission": "Yazma izni (2)",
+              "executePermission": "Çalıştırma izni (1)"
+            },
+            "renameFile": {
+              "title": "Dosyayı Yeniden Adlandır",
+              "form": {
+                "fileName": "Dosya Adı"
+              }
+            },
+            "searchFiles": {
+              "title": "Dosya Ara",
+              "placeholder": "Dosyaları ara...",
+              "advancedFilters": "Gelişmiş Filtreler",
+              "pathPatterns": "Yol Desenleri",
+              "include": "Dahil Et",
+              "exclude": "Hariç Tut",
+              "caseInsensitive": "Büyük/küçük harf duyarsız",
+              "fileContent": "Dosya İçeriği",
+              "searchText": "Metni ara",
+              "maxFileSize": "Maksimum dosya boyutu",
+              "includeOversized": "Aşırı büyük dosyaları dahil et",
+              "includeOversizedDescription": "Diğer filtrelere uyan ancak aranmak için çok büyük olan dosyaları dahil et",
+              "fileSize": "Dosya Boyutu",
+              "minimum": "Minimum",
+              "maximum": "Maksimum"
+            },
+            "pullFile": {
+              "title": "URL'den Dosya Çek",
+              "form": {
+                "fileUrl": "Dosya URL'si",
+                "query": "Sorgu",
+                "fileName": "Dosya Adı"
+              },
+              "createdAs": "Bu dosya şu isimle oluşturulacak: ",
+              "pull": "Çek (Pull)"
+            },
+            "sftpDetails": {
+              "title": "SFTP Detayları",
+              "form": {
+                "protocol": "Protokol",
+                "port": "Port",
+                "host": "Host",
+                "username": "Kullanıcı Adı",
+                "password": "Şifre",
+                "yourPassword": "Kontrol Paneli Şifreniz"
+              },
+              "launch": "Başlat"
+            }
+          }
+        },
+        "databases": {
+          "title": "Veritabanları",
+          "subtitle": "Maksimum {max} veritabanından {current} tanesi oluşturuldu.",
+          "tooltip": {
+            "limitReached": "Bu sunucu {max} veritabanı ile sınırlıdır."
+          },
+          "table": {
+            "columns": {
+              "type": "Tür",
+              "address": "Adres",
+              "locked": "Kilitli?"
+            }
+          },
+          "button": {
+            "details": "Detaylar",
+            "recreate": "Yeniden Oluştur",
+            "rotatePassword": "Şifreyi Yenile"
+          },
+          "form": {
+            "databaseName": "Veritabanı Adı"
+          },
+          "modal": {
+            "createDatabase": {
+              "title": "Veritabanı Oluştur",
+              "toast": {
+                "created": "Veritabanı oluşturuldu."
+              },
+              "form": {
+                "databaseHost": "Veritabanı Hostu",
+                "noHostsFound": "Host bulunamadı"
+              }
+            },
+            "editDatabase": {
+              "title": "Veritabanını Düzenle",
+              "toast": {
+                "updated": "Veritabanı güncellendi."
+              },
+              "form": {
+                "locked": "Kilitli"
+              }
+            },
+            "databaseDetails": {
+              "title": "Veritabanı bağlantı detayları",
+              "toast": {
+                "passwordRotated": "Şifre yenilendi."
+              },
+              "form": {
+                "jdbcConnectionString": "JDBC Bağlantı Dizesi"
+              }
+            },
+            "recreateDatabase": {
+              "title": "Veritabanı Yeniden Oluşturma Onayı",
+              "content": "Veritabanını yeniden oluşturmak, **{name}** veritabanındaki tüm verileri kalıcı olarak silecek ve aynı bağlantı detaylarıyla yeni bir tane oluşturacaktır.",
+              "toast": {
+                "recreated": "Veritabanı yeniden oluşturuldu."
+              }
+            },
+            "deleteDatabase": {
+              "title": "Veritabanı Silme Onayı",
+              "content": "Bir veritabanını silmek kalıcı bir eylemdir ve geri alınamaz. Bu işlem **{name}** veritabanını ve ilişkili tüm verileri kalıcı olarak silecektir.",
+              "toast": {
+                "deleted": "Veritabanı silindi."
+              }
+            }
+          }
+        },
+        "schedules": {
+          "title": "Zamanlayıcılar",
+          "subtitle": "Maksimum {max} zamanlayıcıdan {current} tanesi oluşturuldu.",
+          "dropzone": {
+            "title": "Zamanlayıcı olarak içe aktarmak için dosyaları buraya bırakın",
+            "subtitle": "İçe aktarmayı başlatmak için bırakın"
+          },
+          "tooltip": {
+            "limitReached": "Bu sunucu {max} zamanlayıcı ile sınırlıdır."
+          },
+          "table": {
+            "columns": {
+              "lastRun": "Son Çalışma",
+              "lastFailure": "Son Hata",
+              "status": "Durum"
+            }
+          },
+          "button": {
+            "import": "İçe Aktar",
+            "trigger": "Tetikle",
+            "triggerWithCondition": "Tetikle (koşulu atlama)",
+            "triggerSkipCondition": "Tetikle (koşulu atla)",
+            "addTrigger": "Tetikleyici Ekle",
+            "addCondition": "Koşul Ekle",
+            "addStep": "Adım Ekle",
+            "createFirstStep": "İlk Adımı Oluştur",
+            "addOutput": "Çıktı Ekle",
+            "addFile": "Dosya Ekle",
+            "exitEditor": "Editörden Çık"
+          },
+          "toast": {
+            "imported": "Zamanlayıcı içe aktarıldı.",
+            "created": "Zamanlayıcı oluşturuldu.",
+            "updated": "Zamanlayıcı güncellendi.",
+            "deleted": "Zamanlayıcı silindi.",
+            "triggered": "Zamanlayıcı tetiklendi.",
+            "exported": "Zamanlayıcı dışa aktarıldı.",
+            "parseError": "Zamanlayıcı ayrıştırılamadı: {error}",
+            "step": {
+              "created": "Zamanlayıcı adımı oluşturuldu.",
+              "updated": "Zamanlayıcı adımı güncellendi.",
+              "deleted": "Zamanlayıcı adımı silindi."
+            }
+          },
+          "enum": {
+            "schedulePreConditionType": {
+              "none": "Yok",
+              "and": "VE (Hepsi doğru olmalı)",
+              "or": "VEYA (Herhangi biri doğru olmalı)",
+              "not": "DEĞİL (Doğru olmamalı)",
+              "serverState": "Sunucu Durumu",
+              "uptime": "Çalışma Süresi",
+              "cpuUsage": "CPU Kullanımı",
+              "memoryUsage": "Bellek Kullanımı",
+              "diskUsage": "Disk Kullanımı",
+              "fileExists": "Dosya Mevcut"
+            },
+            "scheduleConditionType": {
+              "none": "Yok",
+              "and": "VE (Hepsi doğru olmalı)",
+              "or": "VEYA (Herhangi biri doğru olmalı)",
+              "not": "DEĞİL (Doğru olmamalı)",
+              "variableExists": "Değişken Mevcut",
+              "variableContains": "Değişken Şunu İçeriyor",
+              "variableEquals": "Değişken Şuna Eşit",
+              "variableStartsWith": "Değişken Şununla Başlıyor",
+              "variableEndsWith": "Değişken Şununla Bitiyor"
+            },
+            "scheduleComparator": {
+              "smallerThan": "Küçüktür",
+              "smallerThanOrEqual": "Küçük eşittir",
+              "equal": "Eşittir",
+              "greaterThanOrEqual": "Büyük eşittir",
+              "greaterThan": "Büyüktür"
+            }
+          },
+          "modal": {
+            "createSchedule": {
+              "title": "Zamanlayıcı Oluştur"
+            },
+            "updateSchedule": {
+              "title": "Zamanlayıcıyı Güncelle"
+            },
+            "deleteSchedule": {
+              "title": "Zamanlayıcı Silme Onayı",
+              "content": "{name} zamanlayıcısını bu sunucudan silmek istediğinize emin misiniz?"
+            },
+            "createStep": {
+              "title": "Zamanlayıcı Adımı Oluştur"
+            },
+            "editStep": {
+              "title": "Zamanlayıcı Adımını Düzenle"
+            },
+            "deleteStep": {
+              "title": "Zamanlayıcı Adımı Silme Onayı",
+              "content": "Bu zamanlayıcı adımını silmek istediğinize emin misiniz?"
+            }
+          },
+          "view": {
+            "badge": {
+              "running": "Çalışıyor"
+            },
+            "tooltip": {
+              "cannotTrigger": "Devre dışı bırakılmış bir zamanlayıcı tetiklenemez"
+            },
+            "tabs": {
+              "actions": "Eylemler",
+              "conditions": "Koşullar",
+              "triggers": "Tetikleyiciler"
+            },
+            "sections": {
+              "actions": "Zamanlayıcı Eylemleri",
+              "preConditions": "Zamanlayıcı Ön Koşulları",
+              "triggers": "Zamanlayıcı Tetikleyicileri"
+            },
+            "alert": {
+              "noActions": "Bu zamanlayıcı için yapılandırılmış eylem yok",
+              "noTriggers": "Bu zamanlayıcı için yapılandırılmış tetikleyici yok"
+            }
+          },
+          "form": {
+            "scheduleName": "Zamanlayıcı Adı",
+            "enabled": "Etkin",
+            "triggersList": "Tetikleyiciler",
+            "triggerNumber": "Tetikleyici {number}",
+            "actionType": "Eylem Tipi",
+            "conditionType": "Koşul Tipi",
+            "serverState": "Sunucu Durumu",
+            "comparator": "Karşılaştırıcı",
+            "rootPath": "Kök Yol",
+            "outputInto": "Çıktı konumu",
+            "caseInsensitive": "Büyük/Küçük Harf Duyarsız",
+            "ignoreFailure": "Hatayı Yoksay",
+            "runInForeground": "Ön Planda Çalıştır"
+          },
+          "condition": {
+            "variable": "Değişken",
+            "equals": "Eşittir",
+            "contains": "İçerir",
+            "startsWith": "Başlar",
+            "endsWith": "Biter",
+            "allMustBeTrue": "Tüm koşullar doğru olmalıdır:",
+            "anyMustBeTrue": "Herhangi bir koşul doğru olmalıdır:",
+            "mustNotBeTrue": "Koşul doğru olmamalıdır:"
+          },
+          "preCondition": {
+            "valueSeconds": "Değer (saniye)",
+            "valuePercent": "Değer (%)",
+            "value": "Değer",
+            "filePath": "Dosya Yolu"
+          },
+          "triggers": {
+            "cron": {
+              "title": "Cron",
+              "form": {
+                "cronSchedule": "Cron Zamanlaması"
+              },
+              "card": {
+                "content": "`{schedule}` Cron aralığında, Sonraki çalışma: {timestamp} - Son çalışma: {lastTimestamp}."
+              }
+            },
+            "powerAction": {
+              "title": "Güç Eylemi",
+              "form": {
+                "powerAction": "Güç Eylemi"
+              },
+              "card": {
+                "content": "`{action}` güç eylemi istendiğinde."
+              }
+            },
+            "serverState": {
+              "title": "Sunucu Durumu",
+              "card": {
+                "content": "Sunucu `{state}` durumuna ulaştığında."
+              }
+            },
+            "backupStatus": {
+              "title": "Yedek Durumu",
+              "form": {
+                "backupStatus": "Yedek Durumu"
+              },
+              "card": {
+                "content": "Yedek `{status}` durumuna ulaştığında."
+              }
+            },
+            "consoleLine": {
+              "title": "Konsol Satırı",
+              "form": {
+                "lineContains": "Satır Şunu İçerdiğinde"
+              },
+              "card": {
+                "content": "Konsol çıktısı `{contains}` içeren bir satıra ulaştığında."
+              }
+            },
+            "crash": {
+              "title": "Çökme",
+              "card": {
+                "content": "Sunucu çöktüğünde."
+              }
+            }
+          },
+          "renderer": {
+            "noActionSelected": "Yapılandırmak için bir eylem tipi seçin",
+            "noActionDetails": "Eylem detayları mevcut değil",
+            "ignoreFailure": "Hatayı Yoksay: {value}",
+            "foreground": "Ön Plan: {value}"
+          },
+          "steps": {
+            "empty": {
+              "title": "Adım Yapılandırılmadı",
+              "description": "bu zamanlayıcının henüz hiç adımı yok. Başlamak için bazı eylemler ekleyin."
+            },
+            "sleep": {
+              "title": "Uyut/Beklet (Sleep)",
+              "form": {
+                "duration": "Süre (milisaniye)"
+              },
+              "renderer": {
+                "compact": "{duration}ms boyunca bekle"
+              }
+            },
+            "ensure": {
+              "title": "Doğrula (Ensure)",
+              "renderer": {
+                "compact": "Bir koşulun eşleştiğini doğrula"
+              }
+            },
+            "format": {
+              "title": "Formatla",
+              "form": {
+                "formatString": "Format Dizgesi",
+                "formatStringDescription": "Format dizgesi, {wrapper} içine alarak değişkenleri içerebilir"
+              },
+              "renderer": {
+                "compact": "Bir dizgeyi {outputInto} içine formatla"
+              }
+            },
+            "matchRegex": {
+              "title": "Regex Eşleştir",
+              "form": {
+                "input": "Girdi",
+                "regex": "Regex",
+                "outputs": "Çıktılar",
+                "outputNumber": "Çıktı {number}"
+              },
+              "renderer": {
+                "compact": "{input} girdisini {regex} regex'i ile eşleştir"
+              }
+            },
+            "waitForConsoleLine": {
+              "title": "Konsol Satırını Bekle",
+              "form": {
+                "lineContains": "Satır şunu içerir",
+                "timeout": "Zaman aşımı (milisaniye)"
+              },
+              "renderer": {
+                "compact": "{contains} içeren konsol satırı için {timeout} bekle",
+                "detail": {
+                  "lineContains": "Satır içermeli: {contains}",
+                  "caseInsensitive": "Büyük/küçük harf duyarsız: {value}",
+                  "timeout": "Zaman aşımı: {timeout}"
+                }
+              }
+            },
+            "sendCommand": {
+              "title": "Komut Gönder",
+              "form": {
+                "command": "Komut"
+              },
+              "renderer": {
+                "compact": "{command} komutunu çalıştır",
+                "detail": {
+                  "command": "Komut: {command}"
+                }
+              }
+            },
+            "sendPower": {
+              "title": "Güç Sinyali Gönder",
+              "form": {
+                "powerAction": "Güç Eylemi"
+              },
+              "renderer": {
+                "compact": "{action} işlemini yap",
+                "detail": {
+                  "powerAction": "Güç Eylemi: {action}"
+                }
+              }
+            },
+            "createBackup": {
+              "title": "Yedek Oluştur",
+              "form": {
+                "backupName": "Yedek Adı",
+                "ignoredFiles": "Yoksayılan Dosyalar"
+              },
+              "renderer": {
+                "compact": "{name} yedeğini oluştur",
+                "detail": {
+                  "backupName": "Yedek Adı: {name}",
+                  "ignoredFiles": "Yoksayılan Dosyalar: {files}"
+                }
+              }
+            },
+            "createDirectory": {
+              "title": "Dizin Oluştur",
+              "form": {
+                "directoryName": "Dizin Adı"
+              },
+              "renderer": {
+                "compact": "{root} içinde {name} oluştur",
+                "detail": {
+                  "directory": "Dizin: {name}",
+                  "root": "Kök: {root}"
+                }
+              }
+            },
+            "writeFile": {
+              "title": "Dosya Yaz",
+              "form": {
+                "filePath": "Dosya Yolu",
+                "content": "İçerik",
+                "appendToFile": "Dosyanın Sonuna Ekle"
+              },
+              "renderer": {
+                "compact": "{file} dosyasına yaz",
+                "detail": {
+                  "file": "Dosya: {file}",
+                  "append": "Sonuna ekle: {value}"
+                }
+              }
+            },
+            "copyFile": {
+              "title": "Dosyayı Kopyala",
+              "form": {
+                "sourceFile": "Kaynak Dosya",
+                "destination": "Hedef"
+              },
+              "renderer": {
+                "compact": "{file} dosyasını {destination} konumuna kopyala",
+                "detail": {
+                  "from": "Kaynak: {file}",
+                  "to": "Hedef: {destination}"
+                }
+              }
+            },
+            "deleteFiles": {
+              "title": "Dosyaları Sil",
+              "form": {
+                "filesToDelete": "Silinecek Dosyalar"
+              },
+              "renderer": {
+                "compact": "{files} dosyalarını sil",
+                "detail": {
+                  "root": "Kök: {root}",
+                  "files": "Dosyalar: {files}"
+                }
+              }
+            },
+            "renameFiles": {
+              "title": "Dosyaları Yeniden Adlandır",
+              "form": {
+                "files": "Dosyalar",
+                "from": "Kaynak",
+                "to": "Hedef"
+              },
+              "renderer": {
+                "compact": "{files} dosyalarını yeniden adlandır",
+                "detail": {
+                  "root": "Kök: {root}",
+                  "files": "Dosyalar: {files}"
+                }
+              }
+            },
+            "compressFiles": {
+              "title": "Dosyaları Sıkıştır",
+              "form": {
+                "filesToCompress": "Sıkıştırılacak Dosyalar",
+                "archiveFormat": "Arşiv Formatı",
+                "archiveName": "Arşiv Adı"
+              },
+              "renderer": {
+                "compact": "{root} içindeki {files} dosyalarını {name} olarak sıkıştır",
+                "detail": {
+                  "output": "Çıktı: {name}",
+                  "root": "Kök: {root}",
+                  "format": "Format: {format}",
+                  "files": "Dosyalar: {files}"
+                }
+              }
+            },
+            "decompressFile": {
+              "title": "Arşivi Aç",
+              "form": {
+                "file": "Dosya"
+              },
+              "renderer": {
+                "compact": "{file} arşivini {root} içine aç",
+                "detail": {
+                  "file": "Dosya: {file}",
+                  "root": "Kök: {root}"
+                }
+              }
+            },
+            "updateStartupVariable": {
+              "title": "Başlangıç Değişkenini Güncelle",
+              "form": {
+                "envVariable": "Environment Değişkeni",
+                "value": "Değer"
+              },
+              "renderer": {
+                "compact": "{variable} değişkenini {value} yap",
+                "detail": {
+                  "variable": "Değişken: {variable}",
+                  "value": "Değer: {value}"
+                }
+              }
+            },
+            "updateStartupCommand": {
+              "title": "Başlangıç Komutunu Güncelle",
+              "form": {
+                "startupCommand": "Başlangıç Komutu"
+              },
+              "renderer": {
+                "compact": "{command} olarak ayarla",
+                "detail": {
+                  "command": "Komut: {command}"
+                }
+              }
+            },
+            "updateStartupDockerImage": {
+              "title": "Docker İmajını Güncelle",
+              "form": {
+                "dockerImage": "Docker İmajı"
+              },
+              "renderer": {
+                "compact": "{image} olarak ayarla",
+                "detail": {
+                  "image": "İmaj: {image}"
+                }
+              }
+            }
+          }
+        },
+        "subusers": {
+          "title": "Alt Kullanıcılar",
+          "table": {
+            "columns": {
+              "twoFactorEnabled": "2FA Etkin",
+              "permissions": "Yetkiler",
+              "ignoredFiles": "Yoksayılan Dosyalar"
+            }
+          },
+          "modal": {
+            "createSubuser": {
+              "title": "Alt Kullanıcı Oluştur",
+              "toast": {
+                "created": "Alt kullanıcı oluşturuldu."
+              },
+              "form": {
+                "email": "E-posta",
+                "emailPlaceholder": "Alt kullanıcının kaydedileceği e-posta adresini girin.",
+                "permissions": "Yetkiler",
+                "ignoredFiles": "Yoksayılan Dosyalar"
+              }
+            },
+            "updateSubuser": {
+              "title": "Alt Kullanıcıyı Güncelle",
+              "toast": {
+                "updated": "Alt kullanıcı güncellendi."
+              }
+            },
+            "removeSubuser": {
+              "title": "Alt Kullanıcı Kaldırma Onayı",
+              "content": "**{username}** kullanıcısını bu sunucudan kaldırmak istediğinize emin misiniz?",
+              "toast": {
+                "removed": "Alt kullanıcı kaldırıldı."
+              }
+            }
+          }
+        },
+        "backups": {
+          "title": "Yedekler",
+          "subtitle": "Maksimum {max} yedekten {current} tanesi oluşturuldu.",
+          "tooltip": {
+            "limitReached": "Bu sunucu {max} yedek ile sınırlıdır."
+          },
+          "table": {
+            "columns": {
+              "checksum": "Checksum (Sağlama)",
+              "files": "Dosyalar",
+              "locked": "Kilitli?"
+            }
+          },
+          "button": {
+            "browse": "Göz At"
+          },
+          "toast": {
+            "downloadStarted": "İndirme başlatıldı.",
+            "restoringBackup": "Yedek geri yükleniyor..."
+          },
+          "modal": {
+            "createBackup": {
+              "title": "Yedek Oluştur",
+              "toast": {
+                "created": "Yedek oluşturuldu."
+              },
+              "form": {
+                "ignoredFiles": "Yoksayılan Dosyalar"
+              }
+            },
+            "editBackup": {
+              "title": "Yedeği Düzenle",
+              "toast": {
+                "updated": "Yedek güncellendi."
+              },
+              "form": {
+                "locked": "Kilitli"
+              }
+            },
+            "restoreBackup": {
+              "title": "Yedeği Geri Yükle"
+            },
+            "deleteBackup": {
+              "title": "Yedek Silme Onayı",
+              "content": "**{name}** yedeğini bu sunucudan silmek istediğinize emin misiniz?",
+              "toast": {
+                "deleted": "Yedek silindi."
+              }
+            }
+          }
+        },
+        "network": {
+          "title": "Ağ",
+          "subtitle": "Maksimum {max} tahsisten {current} tanesi atandı.",
+          "tooltip": {
+            "limitReached": "Bu sunucu {max} tahsis ile sınırlıdır.",
+            "primary": "Birincil"
+          },
+          "table": {
+            "columns": {
+              "hostname": "Hostname",
+              "port": "Port",
+              "notes": "Notlar"
+            }
+          },
+          "button": {
+            "setPrimary": "Birincil Yap",
+            "unsetPrimary": "Birincilliği Kaldır"
+          },
+          "toast": {
+            "created": "Tahsis oluşturuldu.",
+            "updated": "Tahsis güncellendi.",
+            "removed": "Tahsis kaldırıldı.",
+            "setPrimary": "Tahsis birincil olarak ayarlandı.",
+            "unsetPrimary": "Tahsis artık birincil değil."
+          },
+          "modal": {
+            "editAllocation": {
+              "title": "Tahsisi Düzenle",
+              "form": {
+                "notes": "Notlar"
+              }
+            },
+            "removeAllocation": {
+              "title": "Tahsis Kaldırma Onayı",
+              "content": "**{allocation}** tahsisini bu sunucudan kaldırmak istediğinize emin misiniz?"
+            }
+          }
+        },
+        "startup": {
+          "title": "Başlangıç",
+          "form": {
+            "startupCommand": "Sunucuyu Başlatırken Kullanılacak Komut",
+            "dockerImage": "Sunucuyu Başlatırken Kullanılacak Docker İmajı"
+          },
+          "variables": "Sunucu Ortam Değişkenleri",
+          "dockerImageDescription": "Bu sunucuyu çalıştırmak için kullanılan Docker imajı. Farklı bir imajla değiştirilebilir.",
+          "dockerImageDescriptionCustom": "Bu sunucuyu çalıştırmak için kullanılan Docker imajı. Bu bir yönetici tarafından ayarlanmıştır ve değiştirilemez.",
+          "toast": {
+            "startupCommandUpdated": "Başlangıç komutu güncellendi.",
+            "dockerImageUpdated": "Docker imajı güncellendi.",
+            "variablesUpdated": "Değişkenler güncellendi."
+          },
+          "noVariables": "Bu sunucu için başlangıç değişkeni bulunamadı."
+        },
+        "mounts": {
+          "title": "Bağlama Noktaları (Mounts)",
+          "table": {
+            "columns": {
+              "target": "Hedef",
+              "mounted": "Bağlı",
+              "readOnly": "Salt Okunur"
+            }
+          },
+          "modal": {
+            "attachMount": {
+              "title": "Mount Ekle",
+              "content": "**{name}** öğesini `{target}` konumuna bağlamak istiyor musunuz?",
+              "confirm": "Bağla",
+              "toast": {
+                "attached": "{name} sunucunuza bağlandı."
+              }
+            },
+            "detachMount": {
+              "title": "Mount Kaldır",
+              "content": "**{name}** öğesini `{target}` konumundan ayırmak istiyor musunuz?",
+              "confirm": "Ayır",
+              "toast": {
+                "detached": "{name} sunucunuzdan kaldırıldı."
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Ayarlar",
+          "debugInformation": {
+            "title": "Hata Ayıklama Bilgileri",
+            "form": {
+              "nodeName": "Node (UUID)",
+              "locationName": "Lokasyon (UUID)",
+              "serverUuid": "Sunucu UUID"
+            }
+          },
+          "rename": {
+            "title": "Sunucuyu Yeniden Adlandır",
+            "form": {
+              "serverName": "Sunucu Adı"
+            },
+            "toast": {
+              "renamed": "Sunucu yeniden adlandırıldı."
+            }
+          },
+          "timezone": {
+            "title": "Zaman Dilimi",
+            "form": {
+              "timezone": "Zaman Dilimi",
+              "system": "Sistem"
+            },
+            "toast": {
+              "updated": "Sunucu zaman dilimi güncellendi."
+            }
+          },
+          "autokill": {
+            "title": "Otomatik Kapatma (Auto-Kill)",
+            "form": {
+              "enabled": "Etkin",
+              "secondsUntilAutoKill": "Kapatılana kadar saniye"
+            },
+            "toast": {
+              "updated": "Sunucu otomatik kapatma ayarı güncellendi."
+            }
+          },
+          "autostart": {
+            "title": "Otomatik Başlatma",
+            "form": {
+              "behavior": "Davranış"
+            },
+            "toast": {
+              "updated": "Sunucu otomatik başlatma davranışı güncellendi."
+            }
+          },
+          "reinstall": {
+            "title": "Sunucuyu Yeniden Kur",
+            "button": "Sunucuyu Yeniden Kur",
+            "content": "Sunucunuzu yeniden kurmak onu durduracak ve ardından ilk kurulum scriptini tekrar çalıştıracaktır. **Bu işlem sırasında bazı dosyalar silinebilir veya değiştirilebilir, lütfen devam etmeden önce verilerinizi yedekleyin.**",
+            "modal": {
+              "title": "Sunucuyu Yeniden Kur",
+              "button": "Yeniden Kur",
+              "toast": {
+                "reinstalling": "Sunucu yeniden kuruluyor..."
+              }
+            }
+          }
+        },
+        "activity": {
+          "title": "Aktivite"
+        }
+      }
+    }
+  }
+}
