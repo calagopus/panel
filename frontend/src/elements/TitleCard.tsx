@@ -10,9 +10,8 @@ export interface TitleCardProps {
   children: React.ReactNode;
   className?: string;
   titleClassName?: string;
-  headerClassName?: string;
   wrapperClassName?: string;
-
+  iconClassName?: string;
   leftSection?: ReactNode;
   rightSection?: ReactNode;
 }
@@ -23,45 +22,46 @@ function TitleCard({
   children,
   className,
   titleClassName,
-  headerClassName,
+  iconClassName,
   wrapperClassName,
   leftSection,
   rightSection,
 }: TitleCardProps) {
   return (
     <Card withBorder radius='md' p={0} bg='dark.7' className={className}>
-      <Box
+      <Group
         id='title-card-header'
-        px='md'
-        py='sm'
+        className={titleClassName}
         style={{
           borderBottom: '1px solid var(--mantine-color-dark-5)',
           background: 'var(--mantine-color-dark-6)',
         }}
-        className={headerClassName}
+        gap='sm'
+        px='md'
+        py='sm'
       >
-        <Group gap='sm' className={titleClassName}>
-          {leftSection}
-          <Box
-            style={{
-              width: 28,
-              height: 28,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 6,
-              background: 'var(--mantine-color-dark-5)',
-            }}
-          >
-            {icon}
-          </Box>
-          <Title order={5} c='gray.2' fw={600}>
-            {title}
-          </Title>
-          {rightSection}
-        </Group>
-      </Box>
-      <div className={classNames('p-4', wrapperClassName)}>{children}</div>
+        {leftSection}
+        <Box
+          id='title-card-icon'
+          className={iconClassName}
+          style={{
+            width: 28,
+            height: 28,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 6,
+            background: 'var(--mantine-color-dark-5)',
+          }}
+        >
+          {icon}
+        </Box>
+        <Title order={5} c='gray.2' fw={600}>
+          {title}
+        </Title>
+        {rightSection}
+      </Group>
+      <div className={classNames('p-4 h-full', wrapperClassName)}>{children}</div>
     </Card>
   );
 }

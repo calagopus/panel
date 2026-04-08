@@ -13,7 +13,7 @@ export interface ShortcutSectionProps {
 export default function ShortcutSection({ title, icon, shortcuts }: ShortcutSectionProps) {
   return (
     <TitleCard title={title} icon={<FontAwesomeIcon icon={icon} size='sm' />}>
-      <Stack gap={0} px='sm'>
+      <Stack gap={0}>
         {shortcuts.map((shortcut, index) => (
           <ShortcutItem key={index} {...shortcut} hideBorder={index === shortcuts.length - 1} />
         ))}
