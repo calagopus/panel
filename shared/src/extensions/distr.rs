@@ -807,6 +807,12 @@ pub fn resync_extension_list() -> Result<(), anyhow::Error> {
         ));
     }
 
+    let exts_vec = if exts.is_empty() {
+        "vec![]".to_string()
+    } else {
+        format!("vec![{}\n    ]", exts)
+    };
+
     std::fs::write(
         internal_list_extension.join("src/lib.rs"),
         format!(
@@ -817,11 +823,10 @@ use shared::extensions::{{ConstructedExtension, distr::MetadataToml}};
 use std::sync::Arc;
 
 pub fn list() -> Vec<ConstructedExtension> {{
-    vec![{}
-    ]
+    {}
 }}
 "#,
-            exts,
+            exts_vec,
         ),
     )?;
 

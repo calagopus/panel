@@ -211,7 +211,7 @@ export default function ServerCreate() {
         )}
       >
         <Stack mt='16'>
-          <Group grow align='normal'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <TitleCard title='Basic Information' icon={<FontAwesomeIcon icon={faInfoCircle} />}>
               <Stack>
                 <Group grow>
@@ -333,9 +333,7 @@ export default function ServerCreate() {
                 </Group>
               </Stack>
             </TitleCard>
-          </Group>
 
-          <Group grow align='normal'>
             <TitleCard title='Resource Limits' icon={<FontAwesomeIcon icon={faStopwatch} />}>
               <Stack>
                 <Group grow>
@@ -500,9 +498,7 @@ export default function ServerCreate() {
                 />
               </Stack>
             </TitleCard>
-          </Group>
 
-          <Group grow align='normal'>
             <TitleCard title='Feature Limits' icon={<FontAwesomeIcon icon={faIcons} />}>
               <Stack>
                 <Group grow>
@@ -581,43 +577,43 @@ export default function ServerCreate() {
                 </Group>
               </Stack>
             </TitleCard>
-          </Group>
 
-          <TitleCard title='Variables' icon={<FontAwesomeIcon icon={faPlay} />}>
-            <Stack>
-              {!selectedNestUuid || !form.getValues().eggUuid ? (
-                <Alert>Please select an egg before you can configure variables.</Alert>
-              ) : eggVariablesLoading ? (
-                <Spinner.Centered />
-              ) : (
-                <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
-                  {eggVariables.map((variable) => (
-                    <VariableContainer
-                      key={variable.envVariable}
-                      variable={{
-                        ...variable,
-                        value: '',
-                        isEditable: variable.userEditable,
-                      }}
-                      loading={loading}
-                      overrideReadonly
-                      value={
-                        form.getValues().variables.find((v) => v.envVariable === variable.envVariable)?.value ??
-                        variable.defaultValue ??
-                        ''
-                      }
-                      setValue={(value) =>
-                        form.setFieldValue('variables', (prev) => [
-                          ...prev.filter((v) => v.envVariable !== variable.envVariable),
-                          { envVariable: variable.envVariable, value },
-                        ])
-                      }
-                    />
-                  ))}
-                </div>
-              )}
-            </Stack>
-          </TitleCard>
+            <TitleCard title='Variables' icon={<FontAwesomeIcon icon={faPlay} />} className='col-span-full'>
+              <Stack>
+                {!selectedNestUuid || !form.getValues().eggUuid ? (
+                  <Alert>Please select an egg before you can configure variables.</Alert>
+                ) : eggVariablesLoading ? (
+                  <Spinner.Centered />
+                ) : (
+                  <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
+                    {eggVariables.map((variable) => (
+                      <VariableContainer
+                        key={variable.envVariable}
+                        variable={{
+                          ...variable,
+                          value: '',
+                          isEditable: variable.userEditable,
+                        }}
+                        loading={loading}
+                        overrideReadonly
+                        value={
+                          form.getValues().variables.find((v) => v.envVariable === variable.envVariable)?.value ??
+                          variable.defaultValue ??
+                          ''
+                        }
+                        setValue={(value) =>
+                          form.setFieldValue('variables', (prev) => [
+                            ...prev.filter((v) => v.envVariable !== variable.envVariable),
+                            { envVariable: variable.envVariable, value },
+                          ])
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+              </Stack>
+            </TitleCard>
+          </div>
 
           <Group>
             <AdminCan action='servers.create' cantSave>

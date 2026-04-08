@@ -30,6 +30,6 @@ export const adminDatabaseHostUpdateSchema = z.lazy(() =>
       created: true,
     })
     .extend({
-      password: adminDatabaseHostSchema.shape.password.nullable(),
+      password: z.preprocess(nullableString, adminDatabaseHostSchema.shape.password.nullable()),
     }),
 );

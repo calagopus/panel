@@ -2,7 +2,7 @@ import { MantineProvider, type MantineThemeOverride, v8CssVariablesResolver } fr
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createBrowserHistory } from 'history';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router';
 import getLanguages from './api/getLanguages.ts';
 import getSettings from './api/getSettings.ts';
@@ -31,14 +31,45 @@ const queryClient = new QueryClient({
 
 const browserHistory = createBrowserHistory();
 
+const MAX_RETRIES = 10;
+
 export default function App({ theme }: { theme: MantineThemeOverride }) {
   const { settings, setSettings, setLanguages } = useGlobalStore();
+  const [loadWarning, setLoadWarning] = useState(false);
+  const retryCount = useRef(0);
 
   useEffect(() => {
-    Promise.all([getSettings(), getLanguages()]).then(([settings, languages]) => {
-      setSettings(settings);
-      setLanguages(languages);
-    });
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const loadData = () => {
+      Promise.all([getSettings(), getLanguages()])
+        .then(([settings, languages]) => {
+          if (cancelled) return;
+          setSettings(settings);
+          setLanguages(languages);
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          retryCount.current++;
+          console.error(`Failed to load app data (attempt ${retryCount.current}):`, err);
+
+          if (retryCount.current >= 2) {
+            setLoadWarning(true);
+          }
+
+          if (retryCount.current < MAX_RETRIES) {
+            timer = setTimeout(loadData, Math.min(retryCount.current * 2000, 10000));
+          }
+        });
+    };
+
+    loadData();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -65,7 +96,7 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
                     </HistoryRouter>
                   </HistoryContext.Provider>
 
-                  <ReactQueryDevtools initialIsOpen={false} />
+                  <ReactQueryDevtools initialIsOpen={false} theme='dark' />
                 </CurrentWindowProvider>
               </WindowProvider>
             </ToastProvider>
@@ -74,6 +105,11 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
       </MantineProvider>
     </ErrorBoundary>
   ) : (
-    <Spinner.Centered />
+    <>
+      <Spinner.Centered />
+      {loadWarning && (
+        <p className='text-center text-sm text-slate-400 -mt-4'>Having trouble connecting to the server. Retrying...</p>
+      )}
+    </>
   );
 }

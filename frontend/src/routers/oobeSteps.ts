@@ -33,6 +33,7 @@ export interface OobeStep {
   preAuth?: boolean;
   skipTo?: z.infer<typeof oobeStepKey>;
 }
+
 export const steps: OobeStep[] = [
   {
     path: '',

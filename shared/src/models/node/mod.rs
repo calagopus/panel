@@ -350,6 +350,26 @@ impl Node {
             .try_collect_vec()
     }
 
+    pub async fn by_name(
+        database: &crate::database::Database,
+        name: &str,
+    ) -> Result<Option<Self>, crate::database::DatabaseError> {
+        let row = sqlx::query(&format!(
+            r#"
+            SELECT {}
+            FROM nodes
+            JOIN locations ON locations.uuid = nodes.location_uuid
+            WHERE nodes.name = $1
+            "#,
+            Self::columns_sql(None)
+        ))
+        .bind(name)
+        .fetch_optional(database.read())
+        .await?;
+
+        row.try_map(|row| Self::map(None, &row))
+    }
+
     pub async fn count_by_location_uuid(
         database: &crate::database::Database,
         location_uuid: uuid::Uuid,

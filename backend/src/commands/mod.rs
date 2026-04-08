@@ -4,6 +4,7 @@ mod diagnostics;
 mod extensions;
 mod import;
 mod nests;
+mod nodes;
 mod service_install;
 mod users;
 mod version;
@@ -26,6 +27,7 @@ pub fn commands(cli: CliCommandGroupBuilder) -> CliCommandGroupBuilder {
     )
     .add_group("users", "Manage users within the Panel.", users::commands)
     .add_group("nests", "Manage nests within the Panel.", nests::commands)
+    .add_group("nodes", "Manage nodes within the Panel.", nodes::commands)
     .add_group(
         "import",
         "Import data from other panel software into Calagopus.",

@@ -177,7 +177,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
             </Alert>
           )}
 
-          <Group grow align='normal'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <TitleCard title='Basic Information' icon={<FontAwesomeIcon icon={faInfoCircle} />}>
               <Stack>
                 <Group grow>
@@ -280,9 +280,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 </Group>
               </Stack>
             </TitleCard>
-          </Group>
 
-          <Group grow align='normal'>
             <TitleCard title='Resource Limits' icon={<FontAwesomeIcon icon={faStopwatch} />}>
               <Stack>
                 <Group grow>
@@ -435,9 +433,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
               </Stack>
             </TitleCard>
-          </Group>
 
-          <Group grow align='normal'>
             <TitleCard title='Feature Limits' icon={<FontAwesomeIcon icon={faIcons} />}>
               <Stack>
                 <Group grow>
@@ -476,7 +472,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 </Group>
               </Stack>
             </TitleCard>
-          </Group>
+          </div>
 
           <Group>
             <AdminCan action='servers.update' cantSave>

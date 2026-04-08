@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { archiveFormatLabelMapping } from '@/lib/enums.ts';
+import { nullableString } from '@/lib/transformers.ts';
 
 export const serverFilesArchiveCreateSchema = z.object({
   name: z.string().nullable(),
@@ -7,25 +8,25 @@ export const serverFilesArchiveCreateSchema = z.object({
 });
 
 export const serverFilesDirectoryCreateSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1).max(255),
 });
 
 export const serverFilesCopySchema = z.object({
-  name: z.string(),
+  name: z.string().min(1).max(255),
 });
 
 export const serverFilesCopyRemoteSchema = z.object({
-  destination: z.string(),
+  destination: z.string().min(1).max(255),
   destinationServer: z.uuid(),
 });
 
 export const serverFilesNameSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1).max(255),
 });
 
 export const serverFilesPullSchema = z.object({
   url: z.url({ protocol: /^https?$/ }),
-  name: z.string().nullable(),
+  name: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
 });
 
 export const serverFilesFingerprintSchema = z.object({

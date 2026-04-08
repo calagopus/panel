@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faChartBar } from '@fortawesome/free-solid-svg-icons/faChartBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Title } from '@mantine/core';
+import { Group, Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { z } from 'zod';
@@ -152,57 +152,67 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
           <div className='mt-4'>
             <TitleCard title='Resources' icon={<FontAwesomeIcon icon={faUserLarge} />}>
               <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
-                <Card className='flex flex-row!'>
-                  <SemiCircleProgress
-                    value={stats.cpu.used}
-                    label={<>{stats.cpu.used.toFixed(1)}%</>}
-                    filledSegmentColor={stats.cpu.used >= 90 ? 'red' : undefined}
-                    mr='md'
-                  />
-                  <div className='flex flex-col text-right flex-1'>
-                    <Title order={2}>CPU</Title>
-                    <h2>{stats.cpu.model}</h2>
-                  </div>
+                <Card>
+                  <Group grow>
+                    <SemiCircleProgress
+                      value={stats.cpu.used}
+                      label={<>{stats.cpu.used.toFixed(1)}%</>}
+                      filledSegmentColor={stats.cpu.used >= 90 ? 'red' : undefined}
+                      mr='md'
+                    />
+                    <div className='flex flex-col text-right flex-1'>
+                      <Title order={2}>CPU</Title>
+                      <h2>
+                        {stats.cpu.model} ({stats.cpu.threads} threads)
+                      </h2>
+                    </div>
+                  </Group>
                 </Card>
-                <Card className='flex flex-row!'>
-                  <SemiCircleProgress
-                    value={(stats.memory.used / stats.memory.total) * 100}
-                    label={<>{((stats.memory.used / stats.memory.total) * 100).toFixed(1)}%</>}
-                    filledSegmentColor={stats.memory.used / stats.memory.total >= 0.9 ? 'red' : undefined}
-                    mr='md'
-                  />
-                  <div className='flex flex-col text-right flex-1'>
-                    <Title order={2}>Memory</Title>
-                    <h2>
-                      {bytesToString(stats.memory.used)} / {bytesToString(stats.memory.total)}
-                    </h2>
-                    <p className='text-xs'>{bytesToString(stats.memory.usedProcess)} used by Wings</p>
-                  </div>
+                <Card>
+                  <Group grow>
+                    <SemiCircleProgress
+                      value={(stats.memory.used / stats.memory.total) * 100}
+                      label={<>{((stats.memory.used / stats.memory.total) * 100).toFixed(1)}%</>}
+                      filledSegmentColor={stats.memory.used / stats.memory.total >= 0.9 ? 'red' : undefined}
+                      mr='md'
+                    />
+                    <div className='flex flex-col text-right flex-1'>
+                      <Title order={2}>Memory</Title>
+                      <h2>
+                        {bytesToString(stats.memory.used)} / {bytesToString(stats.memory.total)}
+                      </h2>
+                      <p className='text-xs'>{bytesToString(stats.memory.usedProcess)} used by Wings</p>
+                    </div>
+                  </Group>
                 </Card>
-                <Card className='flex flex-row!'>
-                  <SemiCircleProgress
-                    value={(stats.disk.used / stats.disk.total) * 100}
-                    label={<>{((stats.disk.used / stats.disk.total) * 100).toFixed(1)}%</>}
-                    filledSegmentColor={stats.disk.used / stats.disk.total >= 0.9 ? 'red' : undefined}
-                    mr='md'
-                  />
-                  <div className='flex flex-col text-right flex-1'>
-                    <Title order={2}>Disk</Title>
-                    <h2>
-                      {bytesToString(stats.disk.used)} / {bytesToString(stats.disk.total)}
-                    </h2>
-                  </div>
+                <Card>
+                  <Group grow>
+                    <SemiCircleProgress
+                      value={(stats.disk.used / stats.disk.total) * 100}
+                      label={<>{((stats.disk.used / stats.disk.total) * 100).toFixed(1)}%</>}
+                      filledSegmentColor={stats.disk.used / stats.disk.total >= 0.9 ? 'red' : undefined}
+                      mr='md'
+                    />
+                    <div className='flex flex-col text-right flex-1'>
+                      <Title order={2}>Disk</Title>
+                      <h2>
+                        {bytesToString(stats.disk.used)} / {bytesToString(stats.disk.total)}
+                      </h2>
+                    </div>
+                  </Group>
                 </Card>
-                <Card className='flex flex-row!'>
-                  <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' mr='md' />
-                  <div className='flex flex-col text-right flex-1'>
-                    <Title order={2}>Network</Title>
-                    <h2>
-                      In: {bytesToString(stats.network.received)}
-                      <br />
-                      Out: {bytesToString(stats.network.sent)}
-                    </h2>
-                  </div>
+                <Card>
+                  <Group grow>
+                    <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' mr='md' />
+                    <div className='flex flex-col text-right flex-1'>
+                      <Title order={2}>Network</Title>
+                      <h2>
+                        In: {bytesToString(stats.network.received)}
+                        <br />
+                        Out: {bytesToString(stats.network.sent)}
+                      </h2>
+                    </div>
+                  </Group>
                 </Card>
               </div>
             </TitleCard>
