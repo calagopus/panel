@@ -5,6 +5,7 @@ use openssl::symm::Cipher;
 use serde::Deserialize;
 use shared::extensions::commands::CliCommandGroupBuilder;
 
+mod pelican;
 mod pterodactyl;
 
 static BASE64_ENGINE: base64::engine::general_purpose::GeneralPurpose =
@@ -174,11 +175,15 @@ pub async fn process_table<T, Fut: Future<Output = Result<T, anyhow::Error>>>(
 
     Ok(results)
 }
-
 pub fn commands(cli: CliCommandGroupBuilder) -> CliCommandGroupBuilder {
     cli.add_command(
         "pterodactyl",
         "Imports data from a Pterodactyl panel.",
         pterodactyl::PterodactylCommand,
+    )
+    .add_command(
+        "pelican",
+        "Imports data from a Pelican panel.",
+        pelican::PelicanCommand,
     )
 }
