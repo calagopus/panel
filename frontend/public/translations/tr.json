@@ -68,7 +68,8 @@
         "download": "İndir",
         "downloadAs": "{format} olarak indir",
         "export": "Dışa Aktar",
-        "exportAs": "{format} olarak dışa aktar"
+        "exportAs": "{format} olarak dışa aktar",
+        "recreate": "Yeniden Oluştur"
       },
       "alert": {
         "error": "Hata",
@@ -1410,7 +1411,6 @@
           },
           "button": {
             "details": "Detaylar",
-            "recreate": "Yeniden Oluştur",
             "rotatePassword": "Şifreyi Yenile"
           },
           "form": {

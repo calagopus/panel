@@ -68,7 +68,8 @@
         "download": "Downloaden",
         "downloadAs": "Downloaden als {format}",
         "export": "Exporteren",
-        "exportAs": "Exporteren als {format}"
+        "exportAs": "Exporteren als {format}",
+        "recreate": "Opnieuw aanmaken"
       },
       "alert": {
         "error": "Fout",
@@ -1410,7 +1411,6 @@
           },
           "button": {
             "details": "Details",
-            "recreate": "Opnieuw aanmaken",
             "rotatePassword": "Wachtwoord roteren"
           },
           "form": {
