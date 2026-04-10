@@ -1115,8 +1115,7 @@
             "transferCompleted": "Overdracht succesvol voltooid. Opnieuw verbinden met server...",
             "pullingImage": "Uw server haalt momenteel zijn Docker-image op. Een moment geduld...",
             "pulling": "Ophalen",
-            "extracting": "Uitpakken",
-            "layer": "Laag"
+            "extracting": "Uitpakken"
           },
           "tooltip": {
             "search": "Zoeken",

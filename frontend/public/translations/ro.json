@@ -536,8 +536,7 @@
             "transferFailed": "Transferul a eșuat.",
             "pullingImage": "Serverul tău descarcă în prezent imaginea docker. Te rugăm să aștepți...",
             "pulling": "Descărcare",
-            "extracting": "Extragere",
-            "layer": "Strat"
+            "extracting": "Extragere"
           },
           "details": {
             "address": "Adresă",

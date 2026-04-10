@@ -536,8 +536,7 @@
             "transferFailed": "Il trasferimento è fallito.",
             "pullingImage": "Il tuo server sta attualmente scaricando la sua immagine docker. Attendere prego...",
             "pulling": "Download",
-            "extracting": "Estrazione",
-            "layer": "Layer"
+            "extracting": "Estrazione"
           },
           "details": {
             "address": "Indirizzo",

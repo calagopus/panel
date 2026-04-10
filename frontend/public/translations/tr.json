@@ -1115,8 +1115,7 @@
             "transferCompleted": "Taşıma başarıyla tamamlandı. Sunucuya yeniden bağlanılıyor...",
             "pullingImage": "Sunucunuz docker imajını çekiyor. Lütfen bekleyin...",
             "pulling": "Çekiliyor",
-            "extracting": "Çıkartılıyor",
-            "layer": "Katman"
+            "extracting": "Çıkartılıyor"
           },
           "tooltip": {
             "search": "Ara",

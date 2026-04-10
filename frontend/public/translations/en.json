@@ -1124,8 +1124,7 @@
             "transferCompleted": "Transfer has completed successfully. Reconnecting to server...",
             "pullingImage": "Your Server is currently pulling it's docker image. Please wait...",
             "pulling": "Pulling",
-            "extracting": "Extracting",
-            "layer": "Layer"
+            "extracting": "Extracting"
           },
           "tooltip": {
             "search": "Search",
