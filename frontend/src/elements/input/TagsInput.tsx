@@ -1,6 +1,6 @@
 import { faCheck, faGripVertical, faPencil, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Input, Stack, Text } from '@mantine/core';
+import { Center, Group, Input, Stack, Text } from '@mantine/core';
 import { ComponentProps, startTransition, useEffect, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import ActionIcon from '@/elements/ActionIcon.tsx';
@@ -130,9 +130,9 @@ function TagsInput({
   };
 
   const renderItem = (item: DndTag, index: number, dragHandleProps?: ComponentProps<'button'>) => (
-    <Card p={6}>
+    <Card p={6} className='h-11'>
       {editingIndex === index ? (
-        <Group gap={4} wrap='nowrap'>
+        <Group gap={4} wrap='nowrap' h='100%' align='center'>
           <ActionIcon size='sm' variant='subtle' color='gray' {...dragHandleProps} hidden={!allowReordering}>
             <FontAwesomeIcon icon={faGripVertical} size='xs' />
           </ActionIcon>
@@ -153,11 +153,11 @@ function TagsInput({
           </ActionIcon>
         </Group>
       ) : (
-        <Group gap={6} wrap='nowrap'>
+        <Group gap={6} wrap='nowrap' h='100%' align='center'>
           <ActionIcon size='sm' variant='subtle' color='gray' {...dragHandleProps} hidden={!allowReordering}>
             <FontAwesomeIcon icon={faGripVertical} size='xs' />
           </ActionIcon>
-          <Text variant='light' color='gray' size='sm' className='normal-case! flex-1'>
+          <Text size='xs' truncate className='flex-1'>
             {item.value}
           </Text>
           <ActionIcon size='sm' variant='subtle' color='blue' onClick={() => handleStartEdit(index)}>
