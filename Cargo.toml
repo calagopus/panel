@@ -23,7 +23,7 @@ sentry-anyhow = "0.47.0"
 axum = { version = "0.8.1", features = ["multipart"] }
 axum-extra = { version = "0.12.1", features = ["query"] }
 include_dir = "0.7.4"
-sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "mysql", "chrono", "ipnetwork", "uuid"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "mysql", "sqlite", "any", "chrono", "ipnetwork", "uuid"] }
 mongodb = "3.5.2"
 tokio = { version = "1.43.0", features = ["full"] }
 tokio-util = { version = "0.7.16", features = ["full"] }
