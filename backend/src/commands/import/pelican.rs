@@ -45,16 +45,15 @@ fn derive_name_parts(username: &str) -> (compact_str::CompactString, compact_str
 }
 
 #[inline]
-fn source_connection() -> String {
-    std::env::var("DB_CONNECTION")
-        .unwrap_or_else(|_| "mysql".to_string())
-        .trim_matches('"')
-        .to_ascii_lowercase()
-}
-
-#[inline]
 fn is_sqlite_source() -> bool {
-    matches!(source_connection().as_str(), "sqlite" | "sqlite3")
+    matches!(
+        std::env::var("DB_CONNECTION")
+            .unwrap_or_else(|_| "mysql".to_string())
+            .trim_matches('"')
+            .to_ascii_lowercase()
+            .as_str(),
+        "sqlite" | "sqlite3"
+    )
 }
 
 #[inline]
@@ -74,55 +73,64 @@ fn is_datetime_column(column: &str) -> bool {
 async fn connect_source_database_any(environment_path: &str) -> Result<SourcePool, anyhow::Error> {
     sqlx::any::install_default_drivers();
 
-    let connection = source_connection();
+    let connection = std::env::var("DB_CONNECTION")
+        .unwrap_or_else(|_| "mysql".to_string())
+        .trim_matches('"')
+        .to_ascii_lowercase();
 
     let database_url = match connection.as_str() {
         "mysql" | "mariadb" => {
-            let host =
+            let source_database_host =
                 std::env::var("DB_HOST").context("failed to read pelican environment DB_HOST")?;
-            let port = std::env::var("DB_PORT")
+            let source_database_port = std::env::var("DB_PORT")
                 .unwrap_or_else(|_| "3306".to_string())
                 .parse::<u16>()
                 .context("failed to parse pelican environment DB_PORT")?;
-            let database = std::env::var("DB_DATABASE")
+            let source_database_database = std::env::var("DB_DATABASE")
                 .context("failed to read pelican environment DB_DATABASE")?;
-            let username = std::env::var("DB_USERNAME")
+            let source_database_username = std::env::var("DB_USERNAME")
                 .context("failed to read pelican environment DB_USERNAME")?;
-            let password = std::env::var("DB_PASSWORD")
+            let source_database_password = std::env::var("DB_PASSWORD")
                 .context("failed to read pelican environment DB_PASSWORD")?;
 
             let mut url = reqwest::Url::parse("mysql://localhost")
                 .context("failed to construct pelican mysql database url")?;
-            url.set_host(Some(host.trim_matches('"')))
+            url.set_host(Some(source_database_host.trim_matches('"')))
                 .context("failed to set pelican mysql database host")?;
-            url.set_port(Some(port))
+            url.set_port(Some(source_database_port))
                 .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database port"))?;
-            url.set_username(username.trim_matches('"'))
+            url.set_username(source_database_username.trim_matches('"'))
                 .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database username"))?;
-            url.set_password(Some(password.trim_matches('"')))
+            url.set_password(Some(source_database_password.trim_matches('"')))
                 .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database password"))?;
-            url.set_path(database.trim_matches('"'));
+            url.set_path(source_database_database.trim_matches('"'));
             url.to_string()
         }
         "sqlite" | "sqlite3" => {
-            let database = std::env::var("DB_DATABASE")
+            let source_database_database = std::env::var("DB_DATABASE")
                 .context("failed to read pelican environment DB_DATABASE")?;
-            let database = database.trim_matches('"');
+            let source_database_database = source_database_database.trim_matches('"');
 
-            if matches!(database, ":memory:" | "file::memory:") {
-                "sqlite::memory:".to_string()
-            } else {
-                let database_path = Path::new(database);
-                let database_path: PathBuf = if database_path.is_absolute() {
-                    database_path.to_path_buf()
-                } else {
-                    Path::new(environment_path)
-                        .parent()
-                        .unwrap_or_else(|| Path::new("."))
-                        .join(database_path)
-                };
+            match source_database_database {
+                ":memory:" | "file::memory:" => {
+                    return Err(anyhow::anyhow!(
+                        "refusing to import from an in-memory sqlite database"
+                    ));
+                }
+                _ => {
+                    let source_database_database = Path::new(source_database_database);
+                    let source_database_database: PathBuf =
+                        if source_database_database.is_absolute() {
+                            source_database_database.to_path_buf()
+                        } else {
+                            Path::new(environment_path)
+                                .parent()
+                                .unwrap_or_else(|| Path::new("."))
+                                .join(source_database_database)
+                        };
 
-                format!("sqlite://{}", database_path.to_string_lossy())
+                    format!("sqlite://{}", source_database_database.to_string_lossy())
+                }
             }
         }
         _ => {
@@ -588,23 +596,6 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         return Ok(1);
                     }
                 };
-
-                {
-                    let mut settings = settings.get_mut().await?;
-                    settings.app.url = source_app_url.to_compact_string();
-                    settings.oobe_step = None;
-                    settings.save().await?;
-                }
-
-                sqlx::query(
-                    r#"
-                    INSERT INTO settings (key, value)
-                    VALUES ('oobe_step', '')
-                    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
-                    "#,
-                )
-                .execute(database.write())
-                .await?;
 
                 if let Err(err) = process_table(
                     &source_database,
@@ -2067,23 +2058,6 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                     tracing::error!("failed to process allocations table: {:?}", err);
                     return Ok(1);
                 }
-
-                {
-                    let mut settings = settings.get_mut().await?;
-                    settings.app.url = source_app_url.to_compact_string();
-                    settings.oobe_step = None;
-                    settings.save().await?;
-                }
-
-                sqlx::query(
-                    r#"
-                    INSERT INTO settings (key, value)
-                    VALUES ('oobe_step', '')
-                    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
-                    "#,
-                )
-                .execute(database.write())
-                .await?;
 
                 tracing::info!(
                     "finished processing import, took {:.2} seconds",
