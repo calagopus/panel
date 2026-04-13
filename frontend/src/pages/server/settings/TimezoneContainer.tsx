@@ -1,6 +1,6 @@
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Stack, Text } from '@mantine/core';
+import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import { serverSettingsTimezoneSchema } from '@/lib/schemas/server/settings.ts';
+import { formatDateTimeAsTimezone } from '@/lib/time.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -24,12 +25,12 @@ const timezones = Object.keys(zones)
   }));
 
 export default function TimezoneContainer() {
-  const { t, language } = useTranslations();
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
 
   const [loading, setLoading] = useState(false);
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof serverSettingsTimezoneSchema>>({
     initialValues: {
@@ -53,13 +54,15 @@ export default function TimezoneContainer() {
 
   useEffect(() => {
     if (form.values.timezone) {
-      setTime(new Date().toLocaleString(language, { timeZone: form.values.timezone }));
+      setTime(formatDateTimeAsTimezone(new Date(), form.values.timezone, true));
 
       const interval = setInterval(() => {
-        setTime(new Date().toLocaleString(language, { timeZone: form.values.timezone! }));
+        setTime(formatDateTimeAsTimezone(new Date(), form.values.timezone!, true));
       }, 1000);
 
       return () => clearInterval(interval);
+    } else {
+      setTime(null);
     }
   }, [form.values.timezone]);
 
@@ -82,7 +85,7 @@ export default function TimezoneContainer() {
               searchable
               {...form.getInputProps('timezone')}
             />
-            <Text>{time}</Text>
+            {time && <p>{time}</p>}
           </Stack>
 
           <Group mt='auto'>

@@ -1,5 +1,4 @@
 import { ModalProps } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
 import { useState } from 'react';
@@ -12,6 +11,7 @@ import Code from '@/elements/Code.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverFilesDirectoryCreateSchema } from '@/lib/schemas/server/files.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -26,20 +26,23 @@ export default function DirectoryNameModal({ opened, onClose }: ModalProps) {
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverFilesDirectoryCreateSchema>>({
-    initialValues: {
-      name: '',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverFilesDirectoryCreateSchema>>(
+    {
+      initialValues: {
+        name: '',
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverFilesDirectoryCreateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverFilesDirectoryCreateSchema),
-  });
+    onClose,
+  );
 
   const makeDirectory = () => {
     setLoading(true);
 
     createDirectory(server.uuid, browsingDirectory, form.values.name)
       .then(() => {
-        onClose();
+        handleClose();
         setSearchParams({ directory: join(browsingDirectory, form.values.name) });
       })
       .catch((msg) => {
@@ -49,7 +52,7 @@ export default function DirectoryNameModal({ opened, onClose }: ModalProps) {
   };
 
   return (
-    <Modal title={t('pages.server.files.modal.createDirectory.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.files.modal.createDirectory.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => makeDirectory())}>
         <TextInput
           withAsterisk
@@ -73,7 +76,7 @@ export default function DirectoryNameModal({ opened, onClose }: ModalProps) {
           <Button type='submit' loading={loading} disabled={!form.isValid()}>
             {t('common.button.create', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

@@ -118,7 +118,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
             {...form.getInputProps('requireTwoFactor', { type: 'checkbox' })}
           />
 
-          <Group grow align='normal'>
+          <Stack>
             {availablePermissions?.serverPermissions && (
               <PermissionSelector
                 label='Server Permissions'
@@ -137,7 +137,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
                 setSelectedPermissions={(permissions) => form.setFieldValue('adminPermissions', permissions)}
               />
             )}
-          </Group>
+          </Stack>
 
           <Group>
             <AdminCan action={contextRole ? 'roles.update' : 'roles.create'} cantSave>

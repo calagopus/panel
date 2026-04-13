@@ -2,6 +2,7 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod get {
+    use futures_util::StreamExt;
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
@@ -46,11 +47,22 @@ mod get {
         )
         .await?;
 
-        ApiResponse::new_serialized(Response {
-            database_hosts: database_hosts
+        let mut response_database_hosts = Vec::new();
+        response_database_hosts.reserve_exact(database_hosts.len());
+
+        let mut stream = futures_util::stream::iter(
+            database_hosts
                 .into_iter()
-                .map(|host| host.database_host.into_api_object())
-                .collect(),
+                .map(|database_host| database_host.database_host.into_api_object(&state.database)),
+        )
+        .buffered(10);
+
+        while let Some(database_host) = stream.next().await {
+            response_database_hosts.push(database_host?);
+        }
+
+        ApiResponse::new_serialized(Response {
+            database_hosts: response_database_hosts,
         })
         .ok()
     }

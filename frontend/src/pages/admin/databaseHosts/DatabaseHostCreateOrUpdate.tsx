@@ -1,5 +1,7 @@
+import { faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { UseFormReturnType, useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -11,20 +13,25 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Code from '@/elements/Code.tsx';
+import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { databaseTypeLabelMapping } from '@/lib/enums.ts';
+import { databaseCredentialTypeLabelMapping, databaseTypeLabelMapping } from '@/lib/enums.ts';
 import {
+  adminDatabaseCredentialsConnectionStringSchema,
+  adminDatabaseCredentialsDetailsSchema,
   adminDatabaseHostCreateSchema,
   adminDatabaseHostSchema,
   adminDatabaseHostUpdateSchema,
 } from '@/lib/schemas/admin/databaseHosts.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import CredentialConnectionString from './forms/CredentialConnectionString.tsx';
+import CredentialDetails from './forms/CredentialDetails.tsx';
 
 export default function DatabaseHostCreateOrUpdate({
   contextDatabaseHost,
@@ -38,15 +45,12 @@ export default function DatabaseHostCreateOrUpdate({
   const form = useForm<z.infer<typeof adminDatabaseHostUpdateSchema>>({
     initialValues: {
       name: '',
-      username: '',
-      password: '',
-      host: '',
-      port: 3306,
+      type: 'mysql',
       deploymentEnabled: true,
       maintenanceEnabled: false,
       publicHost: null,
       publicPort: null,
-      type: 'mysql',
+      credentials: undefined,
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(contextDatabaseHost ? adminDatabaseHostUpdateSchema : adminDatabaseHostCreateSchema),
@@ -71,15 +75,19 @@ export default function DatabaseHostCreateOrUpdate({
     if (contextDatabaseHost) {
       form.setValues({
         name: contextDatabaseHost.name,
-        username: contextDatabaseHost.username,
-        password: null,
-        host: contextDatabaseHost.host,
-        port: contextDatabaseHost.port,
+        type: contextDatabaseHost.type,
         deploymentEnabled: contextDatabaseHost.deploymentEnabled,
         maintenanceEnabled: contextDatabaseHost.maintenanceEnabled,
         publicHost: contextDatabaseHost.publicHost,
         publicPort: contextDatabaseHost.publicPort,
-        type: contextDatabaseHost.type,
+        credentials: undefined,
+      });
+    } else {
+      form.setValues({
+        credentials: {
+          type: 'connection_string',
+          connectionString: '',
+        },
       });
     }
   }, [contextDatabaseHost]);
@@ -142,42 +150,6 @@ export default function DatabaseHostCreateOrUpdate({
 
           <Group grow>
             <TextInput
-              withAsterisk
-              label='Username'
-              placeholder='Username'
-              key={form.key('username')}
-              {...form.getInputProps('username')}
-            />
-            <TextInput
-              withAsterisk={!contextDatabaseHost}
-              label='Password'
-              placeholder='Password'
-              type='password'
-              key={form.key('password')}
-              {...form.getInputProps('password')}
-            />
-          </Group>
-
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Host'
-              placeholder='Host'
-              key={form.key('host')}
-              {...form.getInputProps('host')}
-            />
-            <NumberInput
-              withAsterisk
-              label='Port'
-              placeholder='Port'
-              min={0}
-              key={form.key('port')}
-              {...form.getInputProps('port')}
-            />
-          </Group>
-
-          <Group grow>
-            <TextInput
               label='Public Host'
               placeholder='Public Host'
               key={form.key('publicHost')}
@@ -186,11 +158,54 @@ export default function DatabaseHostCreateOrUpdate({
             <NumberInput
               label='Public Port'
               placeholder='Public Port'
-              min={0}
               key={form.key('publicPort')}
               {...form.getInputProps('publicPort')}
             />
           </Group>
+
+          <CollapsibleSection
+            icon={<FontAwesomeIcon icon={faUnlockKeyhole} />}
+            enabled={!!form.values.credentials}
+            onToggle={(enabled) =>
+              enabled
+                ? form.setValues({
+                    credentials: contextDatabaseHost
+                      ? contextDatabaseHost.credentials
+                      : { type: 'connection_string', connectionString: '' },
+                  })
+                : form.setValues({ credentials: undefined })
+            }
+            title='Connection Credentials'
+          >
+            <Select
+              withAsterisk
+              label='Credential Type'
+              data={Object.entries(databaseCredentialTypeLabelMapping).map(([value, label]) => ({
+                value,
+                label,
+              }))}
+              key={form.key('credentials.type')}
+              {...form.getInputProps('credentials.type')}
+            />
+
+            {form.values.credentials?.type === 'connection_string' ? (
+              <CredentialConnectionString
+                form={
+                  form as UseFormReturnType<{
+                    credentials: z.infer<typeof adminDatabaseCredentialsConnectionStringSchema>;
+                  }>
+                }
+              />
+            ) : form.values.credentials?.type === 'details' ? (
+              <CredentialDetails
+                form={
+                  form as UseFormReturnType<{
+                    credentials: z.infer<typeof adminDatabaseCredentialsDetailsSchema>;
+                  }>
+                }
+              />
+            ) : null}
+          </CollapsibleSection>
 
           <Group grow>
             <Switch

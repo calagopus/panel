@@ -1,8 +1,9 @@
-import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPencil, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteApiKey from '@/api/me/api-keys/deleteApiKey.ts';
+import recreateApiKey from '@/api/me/api-keys/recreateApiKey.ts';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
@@ -18,9 +19,21 @@ import { useUserStore } from '@/stores/user.ts';
 export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKeySchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeApiKey } = useUserStore();
+  const { updateApiKey, removeApiKey } = useUserStore();
 
-  const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'edit' | 'recreate' | 'delete' | null>(null);
+
+  const doRecreate = async () => {
+    await recreateApiKey(apiKey.uuid)
+      .then((newKey) => {
+        updateApiKey(apiKey.uuid, { keyStart: newKey });
+        addToast(t('pages.account.apiKeys.modal.recreateApiKey.toast.recreated', {}), 'success');
+        setOpenModal(null);
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
+  };
 
   const doDelete = async () => {
     await deleteApiKey(apiKey.uuid)
@@ -41,6 +54,15 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
         onClose={() => setOpenModal(null)}
       />
       <ConfirmationModal
+        opened={openModal === 'recreate'}
+        onClose={() => setOpenModal(null)}
+        title={t('pages.account.apiKeys.modal.recreateApiKey.title', {})}
+        confirm={t('common.button.recreate', {})}
+        onConfirmed={doRecreate}
+      >
+        {t('pages.account.apiKeys.modal.recreateApiKey.content', { name: apiKey.name }).md()}
+      </ConfirmationModal>
+      <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
         title={t('pages.account.apiKeys.modal.deleteApiKey.title', {})}
@@ -53,6 +75,12 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
       <ContextMenu
         items={[
           { icon: faPencil, label: t('common.button.edit', {}), onClick: () => setOpenModal('edit'), color: 'gray' },
+          {
+            icon: faRefresh,
+            label: t('common.button.recreate', {}),
+            onClick: () => setOpenModal('recreate'),
+            color: 'red',
+          },
           { icon: faTrash, label: t('common.button.remove', {}), onClick: () => setOpenModal('delete'), color: 'red' },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.dashboard.apiKeys.apiKeyContextMenu}

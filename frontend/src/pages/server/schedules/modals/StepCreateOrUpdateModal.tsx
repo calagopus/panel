@@ -1,7 +1,6 @@
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Divider, ModalProps, Stack, Text } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -18,6 +17,7 @@ import {
   serverScheduleStepSchema,
   serverScheduleStepUpdateSchema,
 } from '@/lib/schemas/server/schedules.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -63,14 +63,17 @@ export default function StepCreateOrUpdateModal({
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverScheduleStepUpdateSchema>>({
-    initialValues: {
-      order: nextStepOrder ?? 1,
-      action: scheduleStepDefaultMapping.sleep,
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverScheduleStepUpdateSchema>>(
+    {
+      initialValues: {
+        order: nextStepOrder ?? 1,
+        action: scheduleStepDefaultMapping.sleep,
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverScheduleStepSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverScheduleStepSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     if (propStep) {
@@ -87,7 +90,7 @@ export default function StepCreateOrUpdateModal({
     if (propStep) {
       updateScheduleStep(server.uuid, schedule.uuid, propStep.uuid, form.values)
         .then(() => {
-          onClose();
+          handleClose();
           addToast(t('pages.server.schedules.toast.step.updated', {}), 'success');
           onStepUpdate?.({ ...propStep, ...form.values });
         })
@@ -98,7 +101,7 @@ export default function StepCreateOrUpdateModal({
     } else {
       createScheduleStep(server.uuid, schedule.uuid, form.values)
         .then((step) => {
-          onClose();
+          handleClose();
           addToast(t('pages.server.schedules.toast.step.created', {}), 'success');
           onStepCreate?.(step);
         })
@@ -112,7 +115,7 @@ export default function StepCreateOrUpdateModal({
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       title={
         propStep
           ? t('pages.server.schedules.modal.editStep.title', {})
@@ -182,7 +185,7 @@ export default function StepCreateOrUpdateModal({
           <Button onClick={doCreateOrUpdate} leftSection={<FontAwesomeIcon icon={faSave} />} loading={loading}>
             {propStep ? t('common.button.update', {}) : t('common.button.create', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.cancel', {})}
           </Button>
         </ModalFooter>

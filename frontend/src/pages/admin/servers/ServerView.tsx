@@ -31,7 +31,10 @@ export default function ServerView() {
   return isLoading || !server ? (
     <Spinner.Centered />
   ) : (
-    <AdminContentContainer title={server.name}>
+    <AdminContentContainer
+      title={server.name}
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.container}
+    >
       <SubNavigation
         baseUrl={`/admin/servers/${params.id}`}
         items={[
@@ -82,6 +85,8 @@ export default function ServerView() {
             permission: 'servers.read',
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.subNavigation}
+        registryProps={{ server }}
       />
     </AdminContentContainer>
   );

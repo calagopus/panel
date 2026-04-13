@@ -708,8 +708,7 @@
             "transferFailed": "Le transfert a échoué.",
             "pullingImage": "Votre serveur est entrain de récupérer son image Docker. Veuillez patienter...",
             "pulling": "Récupération",
-            "extracting": "Extraction",
-            "layer": "Couche"
+            "extracting": "Extraction"
           },
           "tooltip": {
             "search": "Rechercher",

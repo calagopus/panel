@@ -1,5 +1,4 @@
 import { ModalProps } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -10,6 +9,7 @@ import Button from '@/elements/Button.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverSettingsReinstallSchema } from '@/lib/schemas/server/settings.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -22,13 +22,16 @@ export default function SettingsReinstallModal({ opened, onClose }: ModalProps) 
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverSettingsReinstallSchema>>({
-    initialValues: {
-      truncateDirectory: false,
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverSettingsReinstallSchema>>(
+    {
+      initialValues: {
+        truncateDirectory: false,
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverSettingsReinstallSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverSettingsReinstallSchema),
-  });
+    onClose,
+  );
 
   const doReinstall = () => {
     setLoading(true);
@@ -47,7 +50,7 @@ export default function SettingsReinstallModal({ opened, onClose }: ModalProps) 
   };
 
   return (
-    <Modal title={t('pages.server.settings.reinstall.modal.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.settings.reinstall.modal.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doReinstall())}>
         <Switch
           label={t('common.form.truncateDirectory', {})}
@@ -59,7 +62,7 @@ export default function SettingsReinstallModal({ opened, onClose }: ModalProps) 
           <Button color='red' type='submit' loading={loading} disabled={!form.isValid()}>
             {t('pages.server.settings.reinstall.modal.button', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

@@ -1,5 +1,4 @@
 import { ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -13,6 +12,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverEggSchema } from '@/lib/schemas/server/server.ts';
 import { userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -29,15 +29,18 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
     fetcher: (search) => getUserEggs(1, search),
   });
 
-  const form = useForm<z.infer<typeof userCommandSnippetUpdateSchema>>({
-    initialValues: {
-      name: '',
-      eggs: [],
-      command: 'say hello world',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof userCommandSnippetUpdateSchema>>(
+    {
+      initialValues: {
+        name: '',
+        eggs: [],
+        command: 'say hello world',
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(userCommandSnippetUpdateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(userCommandSnippetUpdateSchema),
-  });
+    onClose,
+  );
 
   const doCreate = () => {
     setLoading(true);
@@ -46,7 +49,7 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
       .then((snippet) => {
         addToast(t('pages.account.commandSnippets.modal.createCommandSnippet.toast.created', {}), 'success');
 
-        onClose();
+        handleClose();
         addCommandSnippet(snippet);
       })
       .catch((msg) => {
@@ -58,7 +61,7 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
   return (
     <Modal
       title={t('pages.account.commandSnippets.modal.createCommandSnippet.title', {})}
-      onClose={onClose}
+      onClose={handleClose}
       opened={opened}
     >
       <Stack>
@@ -96,7 +99,7 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
           <Button onClick={doCreate} loading={loading} disabled={!form.isValid()}>
             {t('common.button.create', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

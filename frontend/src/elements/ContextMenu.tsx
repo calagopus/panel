@@ -177,7 +177,7 @@ type ContextMenuProps<P = unknown> = {
     openMenu: (x: number, y: number) => void;
     hideMenu: () => void;
   }) => ReactNode;
-} & ({ registry: ContextMenuRegistry<P>; registryProps: P } | { registry?: never; registryProps?: never }); // Discriminated union: If registry is provided, registryProps is required.
+} & ({ registry: ContextMenuRegistry<P>; registryProps: P } | { registry?: never; registryProps?: never });
 
 function ContextMenuBase<P>({ items: rawItems = [], registry, registryProps, children }: ContextMenuProps<P>) {
   const context = useContext(ContextMenuContext);

@@ -190,6 +190,8 @@ mod patch {
             Err(err) => return ApiResponse::from(err).ok(),
         }
 
+        database_host.credentials.censor();
+
         activity_logger
             .log(
                 "database-host:update",
@@ -200,11 +202,9 @@ mod patch {
                     "maintenance_enabled": database_host.maintenance_enabled,
 
                     "public_host": database_host.public_host,
-                    "host": database_host.host,
                     "public_port": database_host.public_port,
-                    "port": database_host.port,
 
-                    "username": database_host.username,
+                    "credentials": database_host.credentials,
                 }),
             )
             .await;

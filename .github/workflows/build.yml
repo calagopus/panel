@@ -8,7 +8,6 @@ on:
 env:
   BIN_NAME: panel-rs
   PROJECT_NAME: panel-rs
-  REPO_NAME: calagopus/panel
 
 jobs:
   build-frontend:
@@ -203,7 +202,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
-          tags: ghcr.io/${{ env.REPO_NAME }}:nightly
+          tags: ghcr.io/${{ github.repository }}:nightly
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -245,7 +244,7 @@ jobs:
           file: Dockerfile.heavy
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ghcr.io/${{ env.REPO_NAME }}:nightly-heavy-${{ matrix.tag_suffix }}
+          tags: ghcr.io/${{ github.repository }}:nightly-heavy-${{ matrix.tag_suffix }}
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
 
@@ -267,6 +266,6 @@ jobs:
 
       - name: Create and push multi-arch manifest
         run: |
-          docker buildx imagetools create -t ghcr.io/${{ env.REPO_NAME }}:nightly-heavy \
-            ghcr.io/${{ env.REPO_NAME }}:nightly-heavy-amd64 \
-            ghcr.io/${{ env.REPO_NAME }}:nightly-heavy-arm64
+          docker buildx imagetools create -t ghcr.io/${{ github.repository }}:nightly-heavy \
+            ghcr.io/${{ github.repository }}:nightly-heavy-amd64 \
+            ghcr.io/${{ github.repository }}:nightly-heavy-arm64

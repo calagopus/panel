@@ -1,13 +1,14 @@
 import { z } from 'zod';
 import { StateCreator } from 'zustand';
 import { adminSettingsSchema } from '@/lib/schemas/admin/settings.ts';
+import { adminUpdateInformationSchema } from '@/lib/schemas/admin/updates.ts';
 import { AdminStore } from '@/stores/admin.tsx';
 
 export interface SettingsSlice extends z.infer<typeof adminSettingsSchema> {
-  latestVersions: Record<'panel' | 'wings' | 'fusequota', string> | null;
+  updateInformation: z.infer<typeof adminUpdateInformationSchema> | null;
 
   setSettings: (settings: z.infer<typeof adminSettingsSchema>) => void;
-  setLatestVersions: (versions: Record<'panel' | 'wings' | 'fusequota', string>) => void;
+  setUpdateInformation: (updateInformation: z.infer<typeof adminUpdateInformationSchema> | null) => void;
 }
 
 export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice> = (set): SettingsSlice => ({
@@ -54,7 +55,7 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     serverLogScheduleActivity: true,
   },
 
-  latestVersions: null,
+  updateInformation: null,
 
   setSettings: (value) =>
     set((state) => {
@@ -67,5 +68,5 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
       state.activity = value.activity;
       return state;
     }),
-  setLatestVersions: (value) => set((state) => ({ ...state, latestVersions: value })),
+  setUpdateInformation: (value) => set((state) => ({ ...state, updateInformation: value })),
 });

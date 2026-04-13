@@ -68,7 +68,8 @@
         "download": "İndir",
         "downloadAs": "{format} olarak indir",
         "export": "Dışa Aktar",
-        "exportAs": "{format} olarak dışa aktar"
+        "exportAs": "{format} olarak dışa aktar",
+        "recreate": "Yeniden Oluştur"
       },
       "alert": {
         "error": "Hata",
@@ -1114,8 +1115,7 @@
             "transferCompleted": "Taşıma başarıyla tamamlandı. Sunucuya yeniden bağlanılıyor...",
             "pullingImage": "Sunucunuz docker imajını çekiyor. Lütfen bekleyin...",
             "pulling": "Çekiliyor",
-            "extracting": "Çıkartılıyor",
-            "layer": "Katman"
+            "extracting": "Çıkartılıyor"
           },
           "tooltip": {
             "search": "Ara",
@@ -1410,7 +1410,6 @@
           },
           "button": {
             "details": "Detaylar",
-            "recreate": "Yeniden Oluştur",
             "rotatePassword": "Şifreyi Yenile"
           },
           "form": {

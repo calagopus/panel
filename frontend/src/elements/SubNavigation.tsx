@@ -1,15 +1,16 @@
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tabs } from '@mantine/core';
-import { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { NavLink, Route, Routes, useLocation } from 'react-router';
-import { makeComponentHookable } from 'shared';
+import { HookableComponentBase, makeComponentHookable } from 'shared';
+import { SubNavigationRegistry } from 'shared/src/registries/slices/subNavigation.ts';
 import { to } from '@/lib/routes.ts';
 import { useAdminPermissions, useCan } from '@/plugins/usePermissions.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 
 interface BaseItemProp {
-  name: string;
+  name: string | (() => string);
   icon: IconDefinition;
   permission?: string;
   end?: boolean;
@@ -29,10 +30,10 @@ interface LinkItem extends BaseItemProp {
 
 export type ItemProp = RouteItem | LinkItem;
 
-interface Props {
+type SubNavigationProps<P = unknown> = {
   baseUrl: string;
   items: ItemProp[];
-}
+} & ({ registry: SubNavigationRegistry<P>; registryProps: P } | { registry?: never; registryProps?: never });
 
 function SubNavigationItem({ baseUrl, item }: { baseUrl: string; item: ItemProp }) {
   const permissionMatrix = useAdminPermissions(item.permission ?? []);
@@ -41,16 +42,37 @@ function SubNavigationItem({ baseUrl, item }: { baseUrl: string; item: ItemProp 
   if (item.permission && !canAccess) return null;
 
   return (
-    <NavLink key={item.name} to={item.link ?? to(item.path, baseUrl)} end={item.end ?? true}>
-      <Tabs.Tab key={item.name} value={item.name} leftSection={<FontAwesomeIcon icon={item.icon} />}>
-        {item.name}
+    <NavLink
+      key={typeof item.name === 'string' ? item.name : item.name()}
+      to={item.link ?? to(item.path, baseUrl)}
+      end={item.end ?? true}
+    >
+      <Tabs.Tab
+        key={typeof item.name === 'string' ? item.name : item.name()}
+        value={typeof item.name === 'string' ? item.name : item.name()}
+        leftSection={<FontAwesomeIcon icon={item.icon} />}
+      >
+        {typeof item.name === 'string' ? item.name : item.name()}
       </Tabs.Tab>
     </NavLink>
   );
 }
 
-function SubNavigation({ baseUrl, items }: Props) {
+function SubNavigation<P>({ baseUrl, items: baseItems, registry, registryProps }: SubNavigationProps<P>) {
   const location = useLocation();
+
+  const items = useMemo(() => {
+    const items = [...baseItems];
+
+    if (registry) {
+      for (const interceptor of registry.itemInterceptors) {
+        interceptor(items, registryProps);
+      }
+    }
+
+    return items;
+  }, [baseItems, registry, registryProps]);
+
   const activeItem =
     items
       .filter((item) => {
@@ -74,10 +96,21 @@ function SubNavigation({ baseUrl, items }: Props) {
 
   return (
     <>
-      <Tabs my='xs' value={activeItem?.name ?? items[0].name}>
+      <Tabs
+        my='xs'
+        value={
+          typeof activeItem?.name === 'string'
+            ? activeItem?.name
+            : (activeItem?.name() ?? (typeof items[0].name === 'string' ? items[0].name : items[0].name()))
+        }
+      >
         <Tabs.List>
           {items.map((item) => (
-            <SubNavigationItem key={item.name} baseUrl={baseUrl} item={item} />
+            <SubNavigationItem
+              key={typeof item.name === 'string' ? item.name : item.name()}
+              baseUrl={baseUrl}
+              item={item}
+            />
           ))}
         </Tabs.List>
       </Tabs>
@@ -94,4 +127,5 @@ function SubNavigation({ baseUrl, items }: Props) {
   );
 }
 
-export default makeComponentHookable(SubNavigation);
+export default makeComponentHookable(SubNavigation) as typeof SubNavigation &
+  HookableComponentBase<React.ComponentProps<typeof SubNavigation>>;

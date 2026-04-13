@@ -185,7 +185,7 @@ export default function OobeNode({ onNext, skipFrom }: OobeComponentProps) {
             </Group>
             <Card>
               <Title order={4}>{t('pages.oobe.node.allocationsTitle', {})}</Title>
-              <Group grow>
+              <Group grow align='top'>
                 <TextInput
                   withAsterisk
                   label={t('pages.oobe.node.form.ip', {})}

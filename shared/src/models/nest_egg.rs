@@ -36,8 +36,7 @@ fn true_fn() -> bool {
 }
 
 #[derive(ToSchema, Serialize, Deserialize, Clone, Copy)]
-#[serde(rename_all = "lowercase")]
-#[schema(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 pub enum ServerConfigurationFileParser {
     File,
     Yaml,

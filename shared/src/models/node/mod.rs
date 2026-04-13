@@ -500,7 +500,7 @@ impl Node {
         database: &crate::database::Database,
         jwt: &crate::jwt::Jwt,
         payload: &T,
-    ) -> Result<String, jwt::Error> {
+    ) -> Result<String, jsonwebtoken::errors::Error> {
         jwt.create_custom(
             database.blocking_decrypt(&self.token).unwrap().as_bytes(),
             payload,

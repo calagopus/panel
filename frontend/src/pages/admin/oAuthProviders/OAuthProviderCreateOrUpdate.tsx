@@ -247,7 +247,7 @@ export default function OAuthProviderCreateOrUpdate({
             />
           </Group>
 
-          <Group grow>
+          <Group grow align='top'>
             <TagsInput
               label='Scopes'
               placeholder='Scopes'

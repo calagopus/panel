@@ -1,5 +1,4 @@
 import { ModalProps } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -9,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverDirectoryEntrySchema, serverFilesNameSchema } from '@/lib/schemas/server/files.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -27,13 +27,16 @@ export default function FileRenameModal({ file, opened, onClose }: Props) {
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverFilesNameSchema>>({
-    initialValues: {
-      name: '',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverFilesNameSchema>>(
+    {
+      initialValues: {
+        name: '',
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverFilesNameSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverFilesNameSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     if (file) {
@@ -71,7 +74,7 @@ export default function FileRenameModal({ file, opened, onClose }: Props) {
           file.name = form.values.name;
           addSelectedFile(file);
         }
-        onClose();
+        handleClose();
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -80,7 +83,7 @@ export default function FileRenameModal({ file, opened, onClose }: Props) {
   };
 
   return (
-    <Modal title={t('pages.server.files.modal.renameFile.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.files.modal.renameFile.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doRename())}>
         <TextInput
           withAsterisk
@@ -94,7 +97,7 @@ export default function FileRenameModal({ file, opened, onClose }: Props) {
           <Button type='submit' loading={loading}>
             {t('pages.server.files.button.rename', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

@@ -194,7 +194,11 @@ export default function ServerCreate() {
   }, [selectedNestUuid, form.getValues().eggUuid]);
 
   return (
-    <AdminContentContainer title='Create Server' titleOrder={2}>
+    <AdminContentContainer
+      title='Create Server'
+      titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.create.container}
+    >
       <ConfirmationModal
         opened={openModal === 'confirm-no-allocation'}
         onClose={() => setOpenModal(null)}

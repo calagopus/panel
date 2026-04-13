@@ -1,6 +1,14 @@
+use base64::Engine;
 use sqlx::postgres::PgPoolOptions;
 use std::{collections::HashMap, fmt::Display, pin::Pin, sync::Arc};
 use tokio::sync::Mutex;
+
+pub static BASE64_ENGINE: base64::engine::GeneralPurpose = base64::engine::GeneralPurpose::new(
+    &base64::alphabet::STANDARD,
+    base64::engine::GeneralPurposeConfig::new()
+        .with_decode_allow_trailing_bits(true)
+        .with_decode_padding_mode(base64::engine::DecodePaddingMode::Indifferent),
+);
 
 type BatchFuture = Pin<Box<dyn Future<Output = Result<(), anyhow::Error>> + Send>>;
 
@@ -151,9 +159,26 @@ impl Database {
         .await?
     }
 
+    pub async fn encrypt_base64(
+        &self,
+        data: impl AsRef<[u8]> + Send + 'static,
+    ) -> Result<compact_str::CompactString, anyhow::Error> {
+        let encrypted = self.encrypt(data).await?;
+        Ok(BASE64_ENGINE.encode(&encrypted).into())
+    }
+
     #[inline]
     pub fn blocking_encrypt(&self, data: impl AsRef<[u8]>) -> Result<Vec<u8>, anyhow::Error> {
         simple_crypt::encrypt(data.as_ref(), self.encryption_key.as_bytes())
+    }
+
+    #[inline]
+    pub fn blocking_encrypt_base64(
+        &self,
+        data: impl AsRef<[u8]>,
+    ) -> Result<compact_str::CompactString, anyhow::Error> {
+        let encrypted = self.blocking_encrypt(data)?;
+        Ok(BASE64_ENGINE.encode(&encrypted).into())
     }
 
     pub async fn decrypt(
@@ -191,6 +216,24 @@ impl Database {
         }
     }
 
+    pub async fn decrypt_base64(
+        &self,
+        data: impl AsRef<str>,
+    ) -> Result<compact_str::CompactString, anyhow::Error> {
+        let decoded = BASE64_ENGINE.decode(data.as_ref())?;
+        self.decrypt(decoded).await
+    }
+
+    pub async fn decrypt_base64_optional(
+        &self,
+        data: impl AsRef<str>,
+    ) -> Result<Option<compact_str::CompactString>, anyhow::Error> {
+        match BASE64_ENGINE.decode(data.as_ref()) {
+            Ok(decoded) => Ok(Some(self.decrypt(decoded).await?)),
+            Err(_) => Ok(None),
+        }
+    }
+
     #[inline]
     pub fn blocking_decrypt(
         &self,
@@ -198,6 +241,15 @@ impl Database {
     ) -> Result<compact_str::CompactString, anyhow::Error> {
         simple_crypt::decrypt(data.as_ref(), self.encryption_key.as_bytes())
             .map(|s| compact_str::CompactString::from_utf8_lossy(&s))
+    }
+
+    #[inline]
+    pub fn blocking_decrypt_base64(
+        &self,
+        data: impl AsRef<str>,
+    ) -> Result<compact_str::CompactString, anyhow::Error> {
+        let decoded = BASE64_ENGINE.decode(data.as_ref())?;
+        self.blocking_decrypt(decoded)
     }
 
     #[inline]
@@ -215,6 +267,7 @@ impl Database {
 #[derive(Debug)]
 pub enum DatabaseError {
     Sqlx(sqlx::Error),
+    Mongodb(mongodb::error::Error),
     Serde(serde_json::Error),
     Any(anyhow::Error),
     Validation(garde::Report),
@@ -225,6 +278,7 @@ impl Display for DatabaseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Sqlx(sqlx_value) => sqlx_value.fmt(f),
+            Self::Mongodb(mongodb_value) => mongodb_value.fmt(f),
             Self::Serde(serde_value) => serde_value.fmt(f),
             Self::Any(any_value) => any_value.fmt(f),
             Self::Validation(validation_value) => validation_value.fmt(f),
@@ -258,6 +312,13 @@ impl From<sqlx::Error> for DatabaseError {
     #[inline]
     fn from(value: sqlx::Error) -> Self {
         Self::Sqlx(value)
+    }
+}
+
+impl From<mongodb::error::Error> for DatabaseError {
+    #[inline]
+    fn from(value: mongodb::error::Error) -> Self {
+        Self::Mongodb(value)
     }
 }
 

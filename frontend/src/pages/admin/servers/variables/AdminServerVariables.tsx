@@ -66,6 +66,8 @@ export default function AdminServerVariables({ server }: { server: z.infer<typeo
           Save
         </Button>
       }
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.variables.subContainer}
+      registryProps={{ server }}
     >
       <div className='grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4'>
         {serverVariables.map((variable) => (

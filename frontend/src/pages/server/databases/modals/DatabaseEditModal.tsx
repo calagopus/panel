@@ -1,5 +1,4 @@
 import { ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -9,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverDatabaseEditSchema, serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -24,13 +24,16 @@ export default function DatabaseEditModal({ database, opened, onClose }: Props) 
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverDatabaseEditSchema>>({
-    initialValues: {
-      locked: database.isLocked,
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverDatabaseEditSchema>>(
+    {
+      initialValues: {
+        locked: database.isLocked,
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverDatabaseEditSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverDatabaseEditSchema),
-  });
+    onClose,
+  );
 
   const doUpdate = () => {
     setLoading(true);
@@ -38,7 +41,7 @@ export default function DatabaseEditModal({ database, opened, onClose }: Props) 
     updateDatabase(server.uuid, database.uuid, form.values)
       .then(() => {
         database.isLocked = form.values.locked;
-        onClose();
+        handleClose();
         addToast(t('pages.server.databases.modal.editDatabase.toast.updated', {}), 'success');
       })
       .catch((msg) => {
@@ -48,7 +51,7 @@ export default function DatabaseEditModal({ database, opened, onClose }: Props) 
   };
 
   return (
-    <Modal title={t('pages.server.databases.modal.editDatabase.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.databases.modal.editDatabase.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
         <Stack>
           <Switch
@@ -61,7 +64,7 @@ export default function DatabaseEditModal({ database, opened, onClose }: Props) 
             <Button type='submit' loading={loading}>
               {t('common.button.save', {})}
             </Button>
-            <Button variant='default' onClick={onClose}>
+            <Button variant='default' onClick={handleClose}>
               {t('common.button.close', {})}
             </Button>
           </ModalFooter>

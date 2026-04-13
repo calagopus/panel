@@ -10,11 +10,10 @@ use axum::{
 };
 use colored::Colorize;
 use compact_str::ToCompactString;
-use rand::Rng;
 use sentry_tower::SentryHttpLayer;
 use sha2::Digest;
 use shared::{
-    ApiError, FRONTEND_ASSETS, GetState,
+    ApiError, FRONTEND_ASSETS, GetIp, GetState,
     extensions::commands::CliCommandGroupBuilder,
     models::{ByUuid, node::Node},
     response::ApiResponse,
@@ -117,7 +116,7 @@ async fn handle_postprocessing(req: Request, next: Next) -> Result<Response, Sta
 
         let mut hash = sha2::Sha256::new();
         hash.update(body_bytes.as_ref());
-        let hash = format!("{:x}", hash.finalize());
+        let hash = hex::encode(hash.finalize());
 
         parts.headers.insert("ETag", hash.parse().unwrap());
 
@@ -401,6 +400,7 @@ async fn main() {
             .unwrap(),
 
         extensions: extensions.clone(),
+        updates: Arc::new(shared::updates::UpdateManager::default()),
         background_tasks: background_tasks.clone(),
         shutdown_handlers: shutdown_handlers.clone(),
         settings: settings.clone(),
@@ -413,6 +413,8 @@ async fn main() {
         cache: cache.clone(),
         env,
     });
+
+    state.updates.init(state.clone());
 
     let (routes, background_task_builder, shutdown_handler_builder) =
         extensions.init(state.clone()).await;
@@ -485,167 +487,7 @@ async fn main() {
         );
     }
 
-    background_task_builder
-        .add_task("collect_telemetry", async |state| {
-            fn generate_randomized_cron_schedule() -> cron::Schedule {
-                let mut rng = rand::rng();
-                let seconds: u8 = rng.random_range(0..60);
-                let minutes: u8 = rng.random_range(0..60);
-                let hours: u8 = rng.random_range(0..24);
-
-                format!("{} {} {} * * *", seconds, minutes, hours)
-                    .parse()
-                    .unwrap()
-            }
-
-            let settings = state.settings.get().await?;
-            if !settings.app.telemetry_enabled {
-                drop(settings);
-                tokio::time::sleep(std::time::Duration::from_mins(60)).await;
-
-                return Ok(());
-            }
-            let cron_schedule = settings
-                .telemetry_cron_schedule
-                .clone()
-                .unwrap_or_else(generate_randomized_cron_schedule);
-            if settings.telemetry_cron_schedule.is_none() {
-                drop(settings);
-                let mut new_settings = state.settings.get_mut().await?;
-                new_settings.telemetry_cron_schedule = Some(cron_schedule.clone());
-                new_settings.save().await?;
-            } else {
-                drop(settings);
-            }
-
-            let schedule_iter = cron_schedule.upcoming(chrono::Utc);
-
-            for target_datetime in schedule_iter {
-                let target_timestamp = target_datetime.timestamp();
-                let now_timestamp = chrono::Utc::now().timestamp();
-                let sleep_duration = target_timestamp - now_timestamp;
-                if sleep_duration <= 0 {
-                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-                    continue;
-                }
-
-                tokio::time::sleep(std::time::Duration::from_secs(sleep_duration as u64)).await;
-
-                let telemetry_data = match shared::telemetry::TelemetryData::collect(&state).await {
-                    Ok(data) => data,
-                    Err(err) => {
-                        tracing::error!("failed to collect telemetry data: {:#?}", err);
-                        continue;
-                    }
-                };
-
-                if let Err(err) = state
-                    .client
-                    .post("https://calagopus.com/api/telemetry")
-                    .json(&telemetry_data)
-                    .send()
-                    .await
-                {
-                    tracing::error!("failed to send telemetry data: {:#?}", err);
-                } else {
-                    tracing::info!("successfully sent telemetry data");
-                }
-            }
-
-            Ok(())
-        })
-        .await;
-    background_task_builder
-        .add_task("delete_expired_sessions", async |state| {
-            tokio::time::sleep(std::time::Duration::from_mins(5)).await;
-
-            let deleted_sessions =
-                shared::models::user_session::UserSession::delete_unused(&state.database).await?;
-            if deleted_sessions > 0 {
-                tracing::info!("deleted {} expired user sessions", deleted_sessions);
-            }
-
-            Ok(())
-        })
-        .await;
-    background_task_builder
-        .add_task("delete_expired_api_keys", async |state| {
-            tokio::time::sleep(std::time::Duration::from_mins(30)).await;
-
-            let deleted_api_keys =
-                shared::models::user_api_key::UserApiKey::delete_expired(&state.database).await?;
-            if deleted_api_keys > 0 {
-                tracing::info!("deleted {} expired user api keys", deleted_api_keys);
-            }
-
-            Ok(())
-        })
-        .await;
-    background_task_builder
-        .add_task("delete_unconfigured_security_keys", async |state| {
-            tokio::time::sleep(std::time::Duration::from_mins(30)).await;
-
-            let deleted_security_keys =
-                shared::models::user_security_key::UserSecurityKey::delete_unconfigured(
-                    &state.database,
-                )
-                .await?;
-            if deleted_security_keys > 0 {
-                tracing::info!(
-                    "deleted {} unconfigured user security keys",
-                    deleted_security_keys
-                );
-            }
-
-            Ok(())
-        })
-        .await;
-    background_task_builder
-        .add_task("delete_old_activity", async |state| {
-            tokio::time::sleep(std::time::Duration::from_hours(1)).await;
-
-            let settings = state.settings.get().await?;
-            let admin_retention_days = settings.activity.admin_log_retention_days;
-            let user_retention_days = settings.activity.user_log_retention_days;
-            let server_retention_days = settings.activity.server_log_retention_days;
-            drop(settings);
-
-            let deleted_admin_activity =
-                shared::models::admin_activity::AdminActivity::delete_older_than(
-                    &state.database,
-                    chrono::Utc::now() - chrono::Duration::days(admin_retention_days as i64),
-                )
-                .await?;
-            if deleted_admin_activity > 0 {
-                tracing::info!("deleted {} old admin activity logs", deleted_admin_activity);
-            }
-
-            let deleted_user_activity =
-                shared::models::user_activity::UserActivity::delete_older_than(
-                    &state.database,
-                    chrono::Utc::now() - chrono::Duration::days(user_retention_days as i64),
-                )
-                .await?;
-            if deleted_user_activity > 0 {
-                tracing::info!("deleted {} old user activity logs", deleted_user_activity);
-            }
-
-            let deleted_server_activity =
-                shared::models::server_activity::ServerActivity::delete_older_than(
-                    &state.database,
-                    chrono::Utc::now() - chrono::Duration::days(server_retention_days as i64),
-                )
-                .await?;
-            if deleted_server_activity > 0 {
-                tracing::info!(
-                    "deleted {} old server activity logs",
-                    deleted_server_activity
-                );
-            }
-
-            Ok(())
-        })
-        .await;
+    panel_rs::tasks::define_background_tasks(&background_task_builder).await;
 
     background_tasks
         .merge_builder(background_task_builder)
@@ -717,237 +559,249 @@ async fn main() {
                 },
             ),
         )
-        .fallback(|state: GetState, mut req: Request<Body>| async move {
-            let is_upgrade = req
-                .headers()
-                .get(axum::http::header::UPGRADE)
-                .is_some_and(|v| v.as_bytes().eq_ignore_ascii_case(b"websocket"));
+        .fallback(
+            |state: GetState, ip: GetIp, mut req: Request<Body>| async move {
+                let is_upgrade = req
+                    .headers()
+                    .get(axum::http::header::UPGRADE)
+                    .is_some_and(|v| v.as_bytes().eq_ignore_ascii_case(b"websocket"));
 
-            let on_upgrade = if is_upgrade {
-                Some(hyper::upgrade::on(&mut req))
-            } else {
-                None
-            };
+                let on_upgrade = if is_upgrade {
+                    Some(hyper::upgrade::on(&mut req))
+                } else {
+                    None
+                };
 
-            let (parts, body) = req.into_parts();
-            let path = parts.uri.path();
+                let (parts, body) = req.into_parts();
+                let path = parts.uri.path();
 
-            'proxy: {
-                if !state.env.app_enable_wings_proxy {
-                    break 'proxy;
-                }
+                'proxy: {
+                    if !state.env.app_enable_wings_proxy {
+                        break 'proxy;
+                    }
 
-                if path.starts_with("/wings-proxy") {
-                    let node = match path.strip_prefix("/wings-proxy/") {
-                        Some(node) => node,
-                        None => break 'proxy,
-                    };
-                    let (node, path) = match node.split_once('/') {
-                        Some((node, path)) => (node, path),
-                        None => break 'proxy,
-                    };
-                    let node = match uuid::Uuid::parse_str(node) {
-                        Ok(node) => node,
-                        Err(_) => break 'proxy,
-                    };
+                    if path.starts_with("/wings-proxy") {
+                        let node = match path.strip_prefix("/wings-proxy/") {
+                            Some(node) => node,
+                            None => break 'proxy,
+                        };
+                        let (node, path) = match node.split_once('/') {
+                            Some((node, path)) => (node, path),
+                            None => (node, ""),
+                        };
+                        let node = match uuid::Uuid::parse_str(node) {
+                            Ok(node) => node,
+                            Err(_) => break 'proxy,
+                        };
 
-                    let node = match Node::by_uuid_optional_cached(&state.database, node).await? {
-                        Some(node) => node,
-                        None => break 'proxy,
-                    };
+                        let node =
+                            match Node::by_uuid_optional_cached(&state.database, node).await? {
+                                Some(node) => node,
+                                None => break 'proxy,
+                            };
 
-                    let mut url = node.url(path);
-                    url.set_query(parts.uri.query());
+                        let mut url = node.url(path);
+                        url.set_query(parts.uri.query());
 
-                    let mut request = reqwest::Request::new(parts.method, url);
-                    *request.headers_mut() = parts.headers;
-                    *request.body_mut() = Some(reqwest::Body::wrap_stream(body.into_data_stream()));
+                        let mut request = reqwest::Request::new(parts.method, url);
+                        *request.headers_mut() = parts.headers;
+                        *request.body_mut() =
+                            Some(reqwest::Body::wrap_stream(body.into_data_stream()));
 
-                    let response = match tokio::time::timeout(
-                        std::time::Duration::from_secs(30),
-                        state.client.execute(request),
-                    )
-                    .await
-                    {
-                        Ok(Ok(response)) => response,
-                        Ok(Err(_)) => break 'proxy,
-                        Err(_) => {
-                            return ApiResponse::error("upstream request timed out")
-                                .with_status(StatusCode::GATEWAY_TIMEOUT)
+                        request.headers_mut().remove(axum::http::header::HOST);
+                        request.headers_mut().remove("X-Forwarded-For");
+                        request
+                            .headers_mut()
+                            .insert("X-Real-Ip", ip.to_string().parse()?);
+
+                        let response = match tokio::time::timeout(
+                            std::time::Duration::from_secs(30),
+                            state.client.execute(request),
+                        )
+                        .await
+                        {
+                            Ok(Ok(response)) => response,
+                            Ok(Err(_)) => break 'proxy,
+                            Err(_) => {
+                                return ApiResponse::error("upstream request timed out")
+                                    .with_status(StatusCode::GATEWAY_TIMEOUT)
+                                    .ok();
+                            }
+                        };
+
+                        let status = response.status();
+                        let headers = response.headers().clone();
+
+                        if status == axum::http::StatusCode::SWITCHING_PROTOCOLS
+                            && is_upgrade
+                            && let Some(on_upgrade) = on_upgrade
+                        {
+                            tokio::spawn(async move {
+                                let (client_stream_raw, mut upstream_stream) =
+                                    match tokio::join!(on_upgrade, response.upgrade()) {
+                                        (Ok(c), Ok(u)) => (c, u),
+                                        _ => return,
+                                    };
+
+                                let mut client_stream =
+                                    hyper_util::rt::TokioIo::new(client_stream_raw);
+
+                                let _ = tokio::io::copy_bidirectional(
+                                    &mut client_stream,
+                                    &mut upstream_stream,
+                                )
+                                .await;
+                            });
+
+                            return ApiResponse::new(Body::empty())
+                                .with_status(status)
+                                .with_headers(&headers)
                                 .ok();
                         }
-                    };
 
-                    let status = response.status();
-                    let headers = response.headers().clone();
-
-                    if status == axum::http::StatusCode::SWITCHING_PROTOCOLS
-                        && is_upgrade
-                        && let Some(on_upgrade) = on_upgrade
-                    {
-                        tokio::spawn(async move {
-                            let (client_stream_raw, mut upstream_stream) =
-                                match tokio::join!(on_upgrade, response.upgrade()) {
-                                    (Ok(c), Ok(u)) => (c, u),
-                                    _ => return,
-                                };
-
-                            let mut client_stream = hyper_util::rt::TokioIo::new(client_stream_raw);
-
-                            let _ = tokio::io::copy_bidirectional(
-                                &mut client_stream,
-                                &mut upstream_stream,
-                            )
-                            .await;
-                        });
-
-                        return ApiResponse::new(Body::empty())
+                        return ApiResponse::new(Body::from_stream(response.bytes_stream()))
                             .with_status(status)
                             .with_headers(&headers)
                             .ok();
                     }
-
-                    return ApiResponse::new(Body::from_stream(response.bytes_stream()))
-                        .with_status(status)
-                        .with_headers(&headers)
-                        .ok();
-                }
-            }
-
-            if !path.starts_with("/api") {
-                let path = &path[1.min(path.len())..];
-
-                let (is_index, entry) = match FRONTEND_ASSETS.get_entry(path) {
-                    Some(entry) => (false, entry),
-                    None => (true, FRONTEND_ASSETS.get_entry("index.html").unwrap()),
-                };
-
-                if (entry.as_file().is_none() || is_index) && path.starts_with("assets") {
-                    // technically not needed (cap filesystem) but never hurts
-                    if path.contains("..") {
-                        return ApiResponse::error("file not found")
-                            .with_status(StatusCode::NOT_FOUND)
-                            .ok();
-                    }
-
-                    let settings = state.settings.get().await?;
-
-                    let base_filesystem = match settings.storage_driver.get_cap_filesystem().await {
-                        Some(filesystem) => filesystem?,
-                        None => {
-                            return ApiResponse::error("file not found")
-                                .with_status(StatusCode::NOT_FOUND)
-                                .ok();
-                        }
-                    };
-                    drop(settings);
-
-                    let path = urlencoding::decode(path)?;
-
-                    let metadata = match base_filesystem.async_metadata(&*path).await {
-                        Ok(metadata) => metadata,
-                        Err(_) => {
-                            return ApiResponse::error("file not found")
-                                .with_status(StatusCode::NOT_FOUND)
-                                .ok();
-                        }
-                    };
-
-                    let tokio_file = match base_filesystem.async_open(&*path).await {
-                        Ok(file) => file,
-                        Err(_) => {
-                            return ApiResponse::error("file not found")
-                                .with_status(StatusCode::NOT_FOUND)
-                                .ok();
-                        }
-                    };
-
-                    let modified = if let Ok(modified) = metadata.modified() {
-                        let modified = chrono::DateTime::from_timestamp(
-                            modified
-                                .into_std()
-                                .duration_since(std::time::UNIX_EPOCH)
-                                .unwrap_or_default()
-                                .as_secs() as i64,
-                            0,
-                        )
-                        .unwrap_or_default();
-
-                        Some(modified.to_rfc2822())
-                    } else {
-                        None
-                    };
-
-                    return ApiResponse::new(Body::from_stream(tokio_util::io::ReaderStream::new(
-                        tokio_file,
-                    )))
-                    .with_header("Content-Length", metadata.len().to_compact_string())
-                    .with_optional_header("Last-Modified", modified.as_deref())
-                    .ok();
                 }
 
-                let (is_index, file) = match entry {
-                    include_dir::DirEntry::File(file) => (is_index, file),
-                    include_dir::DirEntry::Dir(dir) => match dir.get_file("index.html") {
-                        Some(index_file) => (true, index_file),
-                        None => (true, FRONTEND_ASSETS.get_file("index.html").unwrap()),
-                    },
-                };
+                if !path.starts_with("/api") {
+                    let path = &path[1.min(path.len())..];
 
-                return ApiResponse::new(Body::from(file.contents()))
-                    .with_header(
-                        "Content-Type",
-                        match infer::get(file.contents()) {
-                            Some(kind) => kind.mime_type(),
-                            _ => match file.path().extension() {
-                                Some(ext) => match ext.to_str() {
-                                    Some("html") => "text/html",
-                                    Some("js") => "application/javascript",
-                                    Some("css") => "text/css",
-                                    Some("json") => "application/json",
-                                    Some("svg") => "image/svg+xml",
-                                    _ => "application/octet-stream",
-                                },
-                                None => "application/octet-stream",
-                            },
-                        },
-                    )
-                    .with_optional_header(
-                        "Content-Security-Policy",
-                        if is_index {
-                            let settings = state.settings.get().await?;
-                            let script_csp = settings.captcha_provider.to_csp_script_src();
-                            let frame_csp = settings.captcha_provider.to_csp_frame_src();
-                            let style_csp = settings.captcha_provider.to_csp_style_src();
-                            drop(settings);
+                    let (is_index, entry) = match FRONTEND_ASSETS.get_entry(path) {
+                        Some(entry) => (false, entry),
+                        None => (true, FRONTEND_ASSETS.get_entry("index.html").unwrap()),
+                    };
 
-                            Some(format!(
-                                "default-src 'self'; \
-                                script-src 'self' blob: {script_csp}; \
-                                frame-src 'self' {frame_csp}; \
-                                style-src 'self' 'unsafe-inline' {style_csp}; \
-                                connect-src *; \
-                                font-src 'self' blob: data:; \
-                                img-src * blob: data:; \
-                                media-src 'self' blob: data:; \
-                                object-src 'none' blob: data:; \
-                                base-uri 'self'; \
-                                form-action 'self'; \
-                                frame-ancestors 'self';"
-                            ))
+                    if (entry.as_file().is_none() || is_index) && path.starts_with("assets") {
+                        // technically not needed (cap filesystem) but never hurts
+                        if path.contains("..") {
+                            return ApiResponse::error("file not found")
+                                .with_status(StatusCode::NOT_FOUND)
+                                .ok();
+                        }
+
+                        let settings = state.settings.get().await?;
+
+                        let base_filesystem =
+                            match settings.storage_driver.get_cap_filesystem().await {
+                                Some(filesystem) => filesystem?,
+                                None => {
+                                    return ApiResponse::error("file not found")
+                                        .with_status(StatusCode::NOT_FOUND)
+                                        .ok();
+                                }
+                            };
+                        drop(settings);
+
+                        let path = urlencoding::decode(path)?;
+
+                        let metadata = match base_filesystem.async_metadata(&*path).await {
+                            Ok(metadata) => metadata,
+                            Err(_) => {
+                                return ApiResponse::error("file not found")
+                                    .with_status(StatusCode::NOT_FOUND)
+                                    .ok();
+                            }
+                        };
+
+                        let tokio_file = match base_filesystem.async_open(&*path).await {
+                            Ok(file) => file,
+                            Err(_) => {
+                                return ApiResponse::error("file not found")
+                                    .with_status(StatusCode::NOT_FOUND)
+                                    .ok();
+                            }
+                        };
+
+                        let modified = if let Ok(modified) = metadata.modified() {
+                            let modified = chrono::DateTime::from_timestamp(
+                                modified
+                                    .into_std()
+                                    .duration_since(std::time::UNIX_EPOCH)
+                                    .unwrap_or_default()
+                                    .as_secs() as i64,
+                                0,
+                            )
+                            .unwrap_or_default();
+
+                            Some(modified.to_rfc2822())
                         } else {
                             None
-                        },
-                    )
-                    .with_header("X-Content-Type-Options", "nosniff")
-                    .with_header("X-Frame-Options", "SAMEORIGIN")
-                    .ok();
-            }
+                        };
 
-            ApiResponse::error("route not found")
-                .with_status(StatusCode::NOT_FOUND)
-                .ok()
-        })
+                        return ApiResponse::new(Body::from_stream(
+                            tokio_util::io::ReaderStream::new(tokio_file),
+                        ))
+                        .with_header("Content-Length", metadata.len().to_compact_string())
+                        .with_optional_header("Last-Modified", modified.as_deref())
+                        .ok();
+                    }
+
+                    let (is_index, file) = match entry {
+                        include_dir::DirEntry::File(file) => (is_index, file),
+                        include_dir::DirEntry::Dir(dir) => match dir.get_file("index.html") {
+                            Some(index_file) => (true, index_file),
+                            None => (true, FRONTEND_ASSETS.get_file("index.html").unwrap()),
+                        },
+                    };
+
+                    return ApiResponse::new(Body::from(file.contents()))
+                        .with_header(
+                            "Content-Type",
+                            match infer::get(file.contents()) {
+                                Some(kind) => kind.mime_type(),
+                                _ => match file.path().extension() {
+                                    Some(ext) => match ext.to_str() {
+                                        Some("html") => "text/html",
+                                        Some("js") => "application/javascript",
+                                        Some("css") => "text/css",
+                                        Some("json") => "application/json",
+                                        Some("svg") => "image/svg+xml",
+                                        _ => "application/octet-stream",
+                                    },
+                                    None => "application/octet-stream",
+                                },
+                            },
+                        )
+                        .with_optional_header(
+                            "Content-Security-Policy",
+                            if is_index {
+                                let settings = state.settings.get().await?;
+                                let script_csp = settings.captcha_provider.to_csp_script_src();
+                                let frame_csp = settings.captcha_provider.to_csp_frame_src();
+                                let style_csp = settings.captcha_provider.to_csp_style_src();
+                                drop(settings);
+
+                                Some(format!(
+                                    "default-src 'self'; \
+                                    script-src 'self' blob: {script_csp}; \
+                                    frame-src 'self' {frame_csp}; \
+                                    style-src 'self' 'unsafe-inline' {style_csp}; \
+                                    connect-src *; \
+                                    font-src 'self' blob: data:; \
+                                    img-src * blob: data:; \
+                                    media-src 'self' blob: data:; \
+                                    object-src 'none' blob: data:; \
+                                    base-uri 'self'; \
+                                    form-action 'self'; \
+                                    frame-ancestors 'self';"
+                                ))
+                            } else {
+                                None
+                            },
+                        )
+                        .with_header("X-Content-Type-Options", "nosniff")
+                        .with_header("X-Frame-Options", "SAMEORIGIN")
+                        .ok();
+                }
+
+                ApiResponse::error("route not found")
+                    .with_status(StatusCode::NOT_FOUND)
+                    .ok()
+            },
+        )
         .layer(axum::middleware::from_fn_with_state(
             state.clone(),
             handle_request,
@@ -1049,11 +903,10 @@ async fn main() {
     );
 
     let http_server = async {
-        if state.env.bind.parse::<IpAddr>().is_ok() {
-            let listener =
-                tokio::net::TcpListener::bind(format!("{}:{}", &state.env.bind, state.env.port))
-                    .await
-                    .unwrap();
+        if let Ok(ip_addr) = state.env.bind.parse::<IpAddr>() {
+            let listener = tokio::net::TcpListener::bind(SocketAddr::new(ip_addr, state.env.port))
+                .await
+                .unwrap();
             axum::serve(
                 listener,
                 ServiceExt::<Request>::into_make_service_with_connect_info::<SocketAddr>(

@@ -46,7 +46,7 @@ export const bytea = customType<{
   },
 });
 
-export const databaseTypeEnum = pgEnum('database_type', ['MYSQL', 'POSTGRES']);
+export const databaseTypeEnum = pgEnum('database_type', ['MYSQL', 'POSTGRES', 'MONGODB']);
 export const serverStatusEnum = pgEnum('server_status', ['INSTALLING', 'INSTALL_FAILED', 'RESTORING_BACKUP']);
 export const serverAutoStartBehaviorEnum = pgEnum('server_auto_start_behavior', ['ALWAYS', 'UNLESS_STOPPED', 'NEVER']);
 export const backupDiskEnum = pgEnum('backup_disk', ['LOCAL', 'S3', 'DDUP_BAK', 'BTRFS', 'ZFS', 'RESTIC']);
@@ -626,16 +626,12 @@ export const databaseHostsTable = pgTable(
     maintenance_enabled: boolean().default(false).notNull(),
     type: databaseTypeEnum().notNull(),
     public_host: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }),
-    host: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     public_port: integer(),
-    port: integer().notNull(),
-    username: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
-    password: bytea().notNull(),
+    credentials: jsonb().notNull(),
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
     uniqueIndex('database_hosts_name_idx').on(cols.name),
-    uniqueIndex('database_hosts_host_port_idx').on(cols.host, cols.port),
   ],
 );
 

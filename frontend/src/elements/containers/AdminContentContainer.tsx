@@ -7,29 +7,31 @@ import { useGlobalStore } from '@/stores/global.ts';
 import TextInput from '../input/TextInput.tsx';
 import ContentContainer from './ContentContainer.tsx';
 
-interface Props {
+export interface Props {
   title: string;
   hideTitleComponent?: boolean;
   titleOrder?: TitleOrder;
   search?: string;
   setSearch?: Dispatch<SetStateAction<string>>;
   contentRight?: ReactNode;
-  registry?: ContainerRegistry;
+  registry?: ContainerRegistry<Props>;
   fullscreen?: boolean;
   children: ReactNode;
 }
 
-export default function AdminContentContainer({
-  title,
-  hideTitleComponent = false,
-  titleOrder = 1,
-  search,
-  setSearch,
-  contentRight,
-  registry,
-  fullscreen = false,
-  children,
-}: Props) {
+export default function AdminContentContainer(props: Props) {
+  const {
+    title,
+    hideTitleComponent = false,
+    titleOrder = 1,
+    search,
+    setSearch,
+    contentRight,
+    registry,
+    fullscreen = false,
+    children,
+  } = props;
+
   const { t } = useTranslations();
   const { settings } = useGlobalStore();
   const { id } = useCurrentWindow();
@@ -38,7 +40,7 @@ export default function AdminContentContainer({
     <ContentContainer title={`${title} | ${settings.app.name}`}>
       <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6'}`}>
         {registry?.prependedComponents.map((Component, index) => (
-          <Component key={`prepended-${index}`} />
+          <Component key={`prepended-${index}`} {...props} />
         ))}
 
         {hideTitleComponent ? null : setSearch ? (
@@ -69,13 +71,13 @@ export default function AdminContentContainer({
           </Title>
         )}
         {registry?.prependedContentComponents.map((Component, index) => (
-          <Component key={`prepended-content-${index}`} />
+          <Component key={`prepended-content-${index}`} {...props} />
         ))}
 
         {children}
 
         {registry?.appendedContentComponents.map((Component, index) => (
-          <Component key={`appended-content-${index}`} />
+          <Component key={`appended-content-${index}`} {...props} />
         ))}
       </div>
     </ContentContainer>

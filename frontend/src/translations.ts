@@ -43,6 +43,7 @@ const baseTranslations = defineTranslations({
         downloadAs: 'Download as {format}',
         export: 'Export',
         exportAs: 'Export as {format}',
+        recreate: 'Recreate',
       },
       alert: {
         error: 'Error',
@@ -1042,6 +1043,14 @@ const baseTranslations = defineTranslations({
                 updated: 'API key updated.',
               },
             },
+            recreateApiKey: {
+              title: 'Recreate API Key',
+              content:
+                'Recreating an API key will generate a new key and invalidate the old one. Are you sure you want to recreate the API key **{name}**?',
+              toast: {
+                recreated: 'API key recreated.',
+              },
+            },
             deleteApiKey: {
               title: 'Confirm API Key Deletion',
               content: 'Are you sure you want to delete **{name}** from your account?',
@@ -1110,7 +1119,6 @@ const baseTranslations = defineTranslations({
             pullingImage: "Your Server is currently pulling it's docker image. Please wait...",
             pulling: 'Pulling',
             extracting: 'Extracting',
-            layer: 'Layer',
           },
           tooltip: {
             search: 'Search',
@@ -1409,7 +1417,6 @@ const baseTranslations = defineTranslations({
           },
           button: {
             details: 'Details',
-            recreate: 'Recreate',
             rotatePassword: 'Rotate Password',
           },
           form: {

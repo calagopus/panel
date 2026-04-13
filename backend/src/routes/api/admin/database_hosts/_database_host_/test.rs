@@ -29,21 +29,28 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        database_host: GetDatabaseHost,
+        mut database_host: GetDatabaseHost,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("database-hosts.test")?;
 
         match database_host.get_connection(&state.database).await {
             Ok(pool) => match pool {
                 shared::models::database_host::DatabasePool::Mysql(pool) => {
-                    if let Err(err) = sqlx::query("SELECT 1").execute(pool.as_ref()).await {
+                    if let Err(err) = sqlx::query("SELECT 1").execute(&pool).await {
                         return ApiResponse::error(err.to_string())
                             .with_status(StatusCode::EXPECTATION_FAILED)
                             .ok();
                     }
                 }
                 shared::models::database_host::DatabasePool::Postgres(pool) => {
-                    if let Err(err) = sqlx::query("SELECT 1").execute(pool.as_ref()).await {
+                    if let Err(err) = sqlx::query("SELECT 1").execute(&pool).await {
+                        return ApiResponse::error(err.to_string())
+                            .with_status(StatusCode::EXPECTATION_FAILED)
+                            .ok();
+                    }
+                }
+                shared::models::database_host::DatabasePool::Mongodb(client) => {
+                    if let Err(err) = client.list_databases().await {
                         return ApiResponse::error(err.to_string())
                             .with_status(StatusCode::EXPECTATION_FAILED)
                             .ok();

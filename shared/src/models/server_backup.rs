@@ -17,7 +17,6 @@ use utoipa::ToSchema;
 
 #[derive(Debug, ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
 #[serde(rename_all = "kebab-case")]
-#[schema(rename_all = "kebab-case")]
 #[sqlx(type_name = "backup_disk", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum BackupDisk {
     Local,

@@ -1,7 +1,7 @@
 import { faReply } from '@fortawesome/free-solid-svg-icons';
 import { Suspense, useEffect, useMemo } from 'react';
 import { NavLink, Route, Routes } from 'react-router';
-import getLatest from '@/api/admin/system/getLatest.ts';
+import getUpdates from '@/api/admin/system/updates/getUpdates.ts';
 import AppIcon from '@/elements/AppIcon.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Container from '@/elements/Container.tsx';
@@ -17,10 +17,10 @@ import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
   const { t } = useTranslations();
-  const { setLatestVersions } = useAdminStore();
+  const { setUpdateInformation } = useAdminStore();
 
   useEffect(() => {
-    getLatest().then(setLatestVersions);
+    getUpdates().then(setUpdateInformation).catch(console.error);
   }, []);
 
   const allAdminRoutes = useMemo(() => {
@@ -77,6 +77,10 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
 
       <div id='admin-root' className={isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto'}>
         <Container isNormal={isNormal}>
+          {window.extensionContext.extensionRegistry.pages.admin.prependedComponents.map((Component, i) => (
+            <Component key={`admin-prepended-component-${i}`} />
+          ))}
+
           <Suspense fallback={<Spinner.Centered />}>
             <Routes>
               {allAdminRoutes
@@ -99,6 +103,10 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
               />
             </Routes>
           </Suspense>
+
+          {window.extensionContext.extensionRegistry.pages.admin.appendedComponents.map((Component, i) => (
+            <Component key={`admin-appended-component-${i}`} />
+          ))}
         </Container>
       </div>
     </div>

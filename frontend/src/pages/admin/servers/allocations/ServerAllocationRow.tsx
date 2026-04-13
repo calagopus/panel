@@ -122,6 +122,8 @@ export default function ServerAllocationRow({
           },
           { icon: faTrash, label: 'Remove', onClick: () => setOpenModal('remove'), color: 'red' },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.allocations.contextMenu}
+        registryProps={{ server, allocation }}
       >
         {({ items, openMenu }) => (
           <TableRow

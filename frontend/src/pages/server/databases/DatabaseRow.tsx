@@ -28,16 +28,23 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
   const host = `${database.host}:${database.port}`;
 
   useEffect(() => {
+    if (!sizeLoading) return;
+
     getDatabaseSize(server.uuid, database.uuid)
       .then(setSize)
       .finally(() => setSizeLoading(false));
-  }, []);
+  }, [sizeLoading]);
 
   return (
     <>
       <DatabaseEditModal database={database} opened={openModal === 'edit'} onClose={() => setOpenModal(null)} />
       <DatabaseDetailsModal database={database} opened={openModal === 'details'} onClose={() => setOpenModal(null)} />
-      <DatabaseRecreateModal database={database} opened={openModal === 'recreate'} onClose={() => setOpenModal(null)} />
+      <DatabaseRecreateModal
+        database={database}
+        opened={openModal === 'recreate'}
+        onClose={() => setOpenModal(null)}
+        setSizeLoading={setSizeLoading}
+      />
       <DatabaseDeleteModal database={database} opened={openModal === 'delete'} onClose={() => setOpenModal(null)} />
 
       <ContextMenu
@@ -58,7 +65,7 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
           },
           {
             icon: faRefresh,
-            label: t('pages.server.databases.button.recreate', {}),
+            label: t('common.button.recreate', {}),
             disabled: database.isLocked,
             onClick: () => setOpenModal('recreate'),
             color: 'red',

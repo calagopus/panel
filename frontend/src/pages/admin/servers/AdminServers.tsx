@@ -39,6 +39,7 @@ function ServersContainer() {
           </Button>
         </AdminCan>
       }
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.container}
     >
       <Table columns={serverTableColumns} loading={loading} pagination={servers} onPageSelect={setPage}>
         {servers.data.map((server) => (

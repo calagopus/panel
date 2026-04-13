@@ -55,11 +55,13 @@ export function makeFunctionHookable<Fn extends (...args: unknown[]) => unknown>
   return hookableFunction;
 }
 
-export type HookableComponent<P extends object> = React.FC<P> & {
+export type HookableComponentBase<P> = {
   addPropsInterceptor(interceptor: (props: P) => P): void;
   addRenderInterceptor(interceptor: (element: React.ReactElement<P>, props: P) => React.ReactElement<P>): void;
   replaceBaseComponent(newComponent: React.ComponentType<P>): void;
 };
+
+export type HookableComponent<P extends object> = React.FC<P> & HookableComponentBase<P>;
 
 export function makeComponentHookable<
   P extends object,

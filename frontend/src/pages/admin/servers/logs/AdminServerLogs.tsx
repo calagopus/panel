@@ -34,7 +34,12 @@ export default function AdminServerLogs({ server }: { server: z.infer<typeof adm
   };
 
   return (
-    <AdminSubContentContainer title='Server Logs' titleOrder={2}>
+    <AdminSubContentContainer
+      title='Server Logs'
+      titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.logs.subContainer}
+      registryProps={{ server }}
+    >
       <div className='flex flex-col'>
         <div className='grid md:grid-cols-3 grid-cols-2 grid-rows-1 gap-2'>
           <div className='flex flex-row space-x-2 col-span-2'>

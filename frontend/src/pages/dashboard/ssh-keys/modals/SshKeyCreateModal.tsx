@@ -1,7 +1,6 @@
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { ChangeEvent, useRef, useState } from 'react';
 import { z } from 'zod';
@@ -11,6 +10,7 @@ import Button from '@/elements/Button.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useUserStore } from '@/stores/user.ts';
@@ -28,14 +28,17 @@ export default function SshKeyCreateModal({ opened, onClose }: ModalProps) {
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof schema>>({
-    initialValues: {
-      name: '',
-      publicKey: '',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof schema>>(
+    {
+      initialValues: {
+        name: '',
+        publicKey: '',
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(schema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(schema),
-  });
+    onClose,
+  );
 
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,7 +65,7 @@ export default function SshKeyCreateModal({ opened, onClose }: ModalProps) {
       .then((key) => {
         addToast(t('pages.account.sshKeys.modal.createSshKey.toast.created', {}), 'success');
 
-        onClose();
+        handleClose();
         addSshKey(key);
       })
       .catch((msg) => {
@@ -72,7 +75,7 @@ export default function SshKeyCreateModal({ opened, onClose }: ModalProps) {
   };
 
   return (
-    <Modal title={t('pages.account.sshKeys.modal.createSshKey.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.account.sshKeys.modal.createSshKey.title', {})} onClose={handleClose} opened={opened}>
       <Stack>
         <TextInput
           withAsterisk
@@ -109,7 +112,7 @@ export default function SshKeyCreateModal({ opened, onClose }: ModalProps) {
           <Button onClick={doCreate} loading={loading} disabled={!form.isValid()}>
             {t('common.button.create', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

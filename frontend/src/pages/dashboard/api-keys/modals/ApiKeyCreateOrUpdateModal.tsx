@@ -1,5 +1,4 @@
 import { Group, ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -14,6 +13,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import { userApiKeySchema, userApiKeyUpdateSchema } from '@/lib/schemas/user/apiKeys.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -32,18 +32,21 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
   const { user } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const form = useForm<z.infer<typeof userApiKeyUpdateSchema>>({
-    initialValues: {
-      name: '',
-      allowedIps: [],
-      userPermissions: [],
-      serverPermissions: [],
-      adminPermissions: [],
-      expires: null,
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof userApiKeyUpdateSchema>>(
+    {
+      initialValues: {
+        name: '',
+        allowedIps: [],
+        userPermissions: [],
+        serverPermissions: [],
+        adminPermissions: [],
+        expires: null,
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(userApiKeyUpdateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(userApiKeyUpdateSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     if (contextApiKey) {
@@ -72,7 +75,7 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
       updateApiKey(contextApiKey.uuid, form.values)
         .then(() => {
           addToast(t('pages.account.apiKeys.modal.updateApiKey.toast.updated', {}), 'success');
-          onClose();
+          handleClose();
           updateStateApiKey(contextApiKey.uuid, form.values);
         })
         .catch((msg) => {
@@ -85,7 +88,7 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
       createApiKey(form.values)
         .then((key) => {
           addToast(t('pages.account.apiKeys.modal.createApiKey.toast.created', {}), 'success');
-          onClose();
+          handleClose();
           addApiKey({ ...key.apiKey, keyStart: key.key });
         })
         .catch((msg) => {
@@ -104,9 +107,9 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
           ? t('pages.account.apiKeys.modal.updateApiKey.title', {})
           : t('pages.account.apiKeys.modal.createApiKey.title', {})
       }
-      onClose={onClose}
+      onClose={handleClose}
       opened={opened}
-      size='xl'
+      size='95%'
     >
       <Stack>
         <Group grow>
@@ -164,7 +167,7 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
           <Button onClick={doCreateOrUpdate} loading={loading} disabled={!form.isValid()}>
             {t('common.button.save', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

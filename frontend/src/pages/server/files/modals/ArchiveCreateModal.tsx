@@ -1,5 +1,4 @@
 import { ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
 import { useState } from 'react';
@@ -18,6 +17,7 @@ import {
   serverDirectoryEntrySchema,
   serverFilesArchiveCreateSchema,
 } from '@/lib/schemas/server/files.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -35,14 +35,17 @@ export default function ArchiveCreateModal({ files, opened, onClose }: Props) {
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverFilesArchiveCreateSchema>>({
-    initialValues: {
-      name: '',
-      format: 'tar_gz',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverFilesArchiveCreateSchema>>(
+    {
+      initialValues: {
+        name: '',
+        format: 'tar_gz',
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverFilesArchiveCreateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverFilesArchiveCreateSchema),
-  });
+    onClose,
+  );
 
   const doArchive = () => {
     setLoading(true);
@@ -58,7 +61,7 @@ export default function ArchiveCreateModal({ files, opened, onClose }: Props) {
       .then(() => {
         doSelectFiles([]);
         addToast(t('pages.server.files.toast.archiveCreationStarted', {}), 'success');
-        onClose();
+        handleClose();
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -67,7 +70,7 @@ export default function ArchiveCreateModal({ files, opened, onClose }: Props) {
   };
 
   return (
-    <Modal title={t('pages.server.files.modal.createArchive.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.files.modal.createArchive.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doArchive())}>
         <Stack>
           <TextInput
@@ -108,7 +111,7 @@ export default function ArchiveCreateModal({ files, opened, onClose }: Props) {
             <Button type='submit' loading={loading}>
               {t('common.button.create', {})}
             </Button>
-            <Button variant='default' onClick={onClose}>
+            <Button variant='default' onClick={handleClose}>
               {t('common.button.close', {})}
             </Button>
           </ModalFooter>

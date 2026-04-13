@@ -15,6 +15,21 @@ pub fn slice_up_to(s: &str, max_len: usize) -> &str {
     &s[..idx]
 }
 
+#[inline]
+pub fn truncate_up_to(mut s: String, max_len: usize) -> String {
+    if max_len >= s.len() || s.is_empty() {
+        return s;
+    }
+
+    let mut idx = max_len;
+    while !s.is_char_boundary(idx) {
+        idx -= 1;
+    }
+
+    s.truncate(idx);
+    s
+}
+
 pub fn validate_language(
     language: &compact_str::CompactString,
     _context: &(),

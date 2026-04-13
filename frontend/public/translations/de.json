@@ -68,7 +68,8 @@
         "download": "Herunterladen",
         "downloadAs": "Als {format} herunterladen",
         "export": "Exportieren",
-        "exportAs": "Als {format} exportieren"
+        "exportAs": "Als {format} exportieren",
+        "recreate": "Neu erstellen"
       },
       "alert": {
         "error": "Fehler",
@@ -1114,8 +1115,7 @@
             "transferCompleted": "Übertragung wurde erfolgreich abgeschlossen. Verbindung zum Server wird wiederhergestellt...",
             "pullingImage": "Dein Server lädt gerade sein Docker-Image herunter. Bitte warten...",
             "pulling": "Wird heruntergeladen",
-            "extracting": "Wird entpackt",
-            "layer": "Layer"
+            "extracting": "Wird entpackt"
           },
           "tooltip": {
             "search": "Suchen",
@@ -1410,7 +1410,6 @@
           },
           "button": {
             "details": "Details",
-            "recreate": "Neu erstellen",
             "rotatePassword": "Passwort rotieren"
           },
           "form": {

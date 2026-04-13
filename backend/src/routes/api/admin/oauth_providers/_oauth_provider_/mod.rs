@@ -19,7 +19,7 @@ pub type GetOAuthProvider = shared::extract::ConsumingExtension<OAuthProvider>;
 pub async fn auth(
     state: GetState,
     permissions: GetPermissionManager,
-    Path(database_host): Path<uuid::Uuid>,
+    Path(oauth_provider): Path<Vec<String>>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
@@ -27,9 +27,17 @@ pub async fn auth(
         return Ok(err.into_response());
     }
 
-    let database_host = OAuthProvider::by_uuid_optional(&state.database, database_host).await;
-    let database_host = match database_host {
-        Ok(Some(database_host)) => database_host,
+    let oauth_provider = match uuid::Uuid::parse_str(&oauth_provider[0]) {
+        Ok(uuid) => uuid,
+        Err(_) => {
+            return Ok(ApiResponse::error("invalid oauth provider uuid")
+                .with_status(StatusCode::BAD_REQUEST)
+                .into_response());
+        }
+    };
+    let oauth_provider = OAuthProvider::by_uuid_optional(&state.database, oauth_provider).await;
+    let oauth_provider = match oauth_provider {
+        Ok(Some(oauth_provider)) => oauth_provider,
         Ok(None) => {
             return Ok(ApiResponse::error("oauth provider not found")
                 .with_status(StatusCode::NOT_FOUND)
@@ -38,7 +46,7 @@ pub async fn auth(
         Err(err) => return Ok(ApiResponse::from(err).into_response()),
     };
 
-    req.extensions_mut().insert(database_host);
+    req.extensions_mut().insert(oauth_provider);
 
     Ok(next.run(req).await)
 }

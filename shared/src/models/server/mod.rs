@@ -75,7 +75,6 @@ impl ServerActivityLogger {
 
 #[derive(ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
-#[schema(rename_all = "snake_case")]
 #[sqlx(type_name = "server_status", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ServerStatus {
     Installing,
@@ -85,7 +84,6 @@ pub enum ServerStatus {
 
 #[derive(ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
-#[schema(rename_all = "snake_case")]
 #[sqlx(
     type_name = "server_auto_start_behavior",
     rename_all = "SCREAMING_SNAKE_CASE"

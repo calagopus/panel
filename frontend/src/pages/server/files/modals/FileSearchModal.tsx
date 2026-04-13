@@ -8,7 +8,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Collapse, Flex, Group, ModalProps, Stack, Text, UnstyledButton } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { startTransition, useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -22,6 +21,7 @@ import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverFilesSearchSchema } from '@/lib/schemas/server/files.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -46,15 +46,18 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
   const [query, setQuery] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const form = useForm<z.infer<typeof serverFilesSearchSchema>>({
-    initialValues: {
-      pathFilter: null,
-      sizeFilter: null,
-      contentFilter: null,
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverFilesSearchSchema>>(
+    {
+      initialValues: {
+        pathFilter: null,
+        sizeFilter: null,
+        contentFilter: null,
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverFilesSearchSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverFilesSearchSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     if (
@@ -100,7 +103,7 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
           doSelectFiles([]);
           clearActingFiles();
         });
-        onClose();
+        handleClose();
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -109,7 +112,7 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
   };
 
   return (
-    <Modal title={t('pages.server.files.modal.searchFiles.title', {})} onClose={onClose} opened={opened} size='lg'>
+    <Modal title={t('pages.server.files.modal.searchFiles.title', {})} onClose={handleClose} opened={opened} size='lg'>
       <form onSubmit={form.onSubmit(() => doSearch())}>
         <Stack gap='md'>
           <TextInput
@@ -199,7 +202,6 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
                     <TagsInput
                       label={t('pages.server.files.modal.searchFiles.include', {})}
                       placeholder='e.g., *.js, src/**'
-                      size='sm'
                       value={form.values.pathFilter?.include ?? []}
                       onChange={(value) =>
                         form.setFieldValue('pathFilter', {
@@ -212,7 +214,6 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
                     <TagsInput
                       label={t('pages.server.files.modal.searchFiles.exclude', {})}
                       placeholder='e.g., node_modules/**'
-                      size='sm'
                       value={form.values.pathFilter?.exclude ?? []}
                       onChange={(value) =>
                         form.setFieldValue('pathFilter', {
@@ -320,7 +321,7 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
           <Button type='submit' loading={loading}>
             {t('pages.server.files.button.search', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.cancel', {})}
           </Button>
         </ModalFooter>

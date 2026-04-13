@@ -8,6 +8,7 @@ use sqlx::{Row, postgres::PgRow, prelude::Type};
 use std::{
     collections::{BTreeMap, HashMap},
     hash::Hash,
+    str::FromStr,
     sync::{Arc, LazyLock},
 };
 use tokio::sync::Mutex;
@@ -17,14 +18,16 @@ pub enum DatabaseTransaction<'a> {
     Mysql(sqlx::Transaction<'a, sqlx::MySql>),
     Postgres(
         sqlx::Transaction<'a, sqlx::Postgres>,
-        Arc<sqlx::Pool<sqlx::Postgres>>,
+        sqlx::Pool<sqlx::Postgres>,
     ),
+    Mongodb(mongodb::Client),
 }
 
 #[derive(Clone)]
 pub enum DatabasePool {
-    Mysql(Arc<sqlx::Pool<sqlx::MySql>>),
-    Postgres(Arc<sqlx::Pool<sqlx::Postgres>>),
+    Mysql(sqlx::Pool<sqlx::MySql>),
+    Postgres(sqlx::Pool<sqlx::Postgres>),
+    Mongodb(mongodb::Client),
 }
 
 type DatabasePoolValue = (std::time::Instant, DatabasePool);
@@ -36,12 +39,20 @@ static DATABASE_CLIENTS: LazyLock<Arc<Mutex<HashMap<uuid::Uuid, DatabasePoolValu
             let clients = Arc::clone(&clients);
             async move {
                 loop {
-                    tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+                    tokio::time::sleep(std::time::Duration::from_mins(1)).await;
 
                     let mut clients = clients.lock().await;
+                    let before_len = clients.len();
                     clients.retain(|_, &mut (last_used, _)| {
-                        last_used.elapsed() < std::time::Duration::from_secs(300)
+                        last_used.elapsed() < std::time::Duration::from_mins(5)
                     });
+
+                    if clients.len() != before_len {
+                        tracing::info!(
+                            "cleaned up {} idle database connections",
+                            before_len - clients.len()
+                        );
+                    }
                 }
             }
         });
@@ -50,12 +61,163 @@ static DATABASE_CLIENTS: LazyLock<Arc<Mutex<HashMap<uuid::Uuid, DatabasePoolValu
     });
 
 #[derive(ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
-#[serde(rename_all = "lowercase")]
-#[schema(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "database_type", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum DatabaseType {
     Mysql,
     Postgres,
+    Mongodb,
+}
+
+impl DatabaseType {
+    pub fn from_url_scheme(scheme: &str) -> Result<Self, anyhow::Error> {
+        match scheme {
+            "mysql" | "mariadb" => Ok(Self::Mysql),
+            "postgres" | "postgresql" => Ok(Self::Postgres),
+            "mongodb" => Ok(Self::Mongodb),
+            _ => Err(anyhow::anyhow!("Unsupported database type: {}", scheme)),
+        }
+    }
+
+    pub const fn default_port(self) -> u16 {
+        match self {
+            DatabaseType::Mysql => 3306,
+            DatabaseType::Postgres => 5432,
+            DatabaseType::Mongodb => 27017,
+        }
+    }
+}
+
+fn validate_connection_string(connection_string: &str, _context: &()) -> Result<(), garde::Error> {
+    if connection_string.trim().is_empty() {
+        return Err(garde::Error::new("connection string cannot be empty"));
+    }
+
+    let url = reqwest::Url::parse(connection_string)
+        .map_err(|err| garde::Error::new(format!("Invalid connection string: {err}")))?;
+
+    DatabaseType::from_url_scheme(url.scheme())
+        .map_err(|err| garde::Error::new(format!("Invalid connection string: {err}")))?;
+
+    Ok(())
+}
+
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum DatabaseCredentials {
+    ConnectionString {
+        #[garde(length(chars, min = 1, max = 255), custom(validate_connection_string))]
+        #[schema(min_length = 1, max_length = 255)]
+        connection_string: compact_str::CompactString,
+    },
+    Details {
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
+        host: compact_str::CompactString,
+        #[garde(range(min = 1))]
+        #[schema(minimum = 1)]
+        port: u16,
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
+        username: compact_str::CompactString,
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
+        password: compact_str::CompactString,
+    },
+}
+
+#[derive(ToSchema, Serialize)]
+pub struct ParsedConnectionDetails {
+    pub host: compact_str::CompactString,
+    pub port: u16,
+    pub username: compact_str::CompactString,
+}
+
+impl DatabaseCredentials {
+    pub async fn encrypt(
+        &mut self,
+        database: &crate::database::Database,
+    ) -> Result<(), anyhow::Error> {
+        match self {
+            DatabaseCredentials::ConnectionString { connection_string } => {
+                *connection_string = database.encrypt_base64(connection_string.clone()).await?;
+            }
+            DatabaseCredentials::Details { password, .. } => {
+                *password = database.encrypt_base64(password.clone()).await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub async fn decrypt(
+        &mut self,
+        database: &crate::database::Database,
+    ) -> Result<(), anyhow::Error> {
+        match self {
+            DatabaseCredentials::ConnectionString { connection_string } => {
+                if let Some(decrypted) =
+                    database.decrypt_base64_optional(&connection_string).await?
+                {
+                    *connection_string = decrypted;
+                }
+            }
+            DatabaseCredentials::Details { password, .. } => {
+                if let Some(decrypted) = database.decrypt_base64_optional(&password).await? {
+                    *password = decrypted;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn censor(&mut self) {
+        match self {
+            DatabaseCredentials::ConnectionString { connection_string } => {
+                *connection_string = "".into();
+            }
+            DatabaseCredentials::Details { password, .. } => {
+                *password = "".into();
+            }
+        }
+    }
+
+    pub async fn parse_connection_details(
+        &self,
+        database: &crate::database::Database,
+    ) -> Result<ParsedConnectionDetails, anyhow::Error> {
+        match self {
+            DatabaseCredentials::ConnectionString { connection_string } => {
+                let connection_string = database.decrypt_base64(connection_string).await?;
+                let url = reqwest::Url::parse(connection_string.as_str())?;
+                let database_type = DatabaseType::from_url_scheme(url.scheme())?;
+
+                let host = url
+                    .host_str()
+                    .ok_or_else(|| anyhow::anyhow!("Invalid host"))?
+                    .into();
+                let port = url.port().unwrap_or_else(|| database_type.default_port());
+                let username = url.username().into();
+
+                Ok(ParsedConnectionDetails {
+                    host,
+                    port,
+                    username,
+                })
+            }
+            DatabaseCredentials::Details {
+                host,
+                port,
+                username,
+                ..
+            } => Ok(ParsedConnectionDetails {
+                host: host.clone(),
+                port: *port,
+                username: username.clone(),
+            }),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -69,12 +231,9 @@ pub struct DatabaseHost {
     pub maintenance_enabled: bool,
 
     pub public_host: Option<compact_str::CompactString>,
-    pub host: compact_str::CompactString,
     pub public_port: Option<i32>,
-    pub port: i32,
 
-    pub username: compact_str::CompactString,
-    pub password: Vec<u8>,
+    pub credentials: DatabaseCredentials,
 
     pub created: chrono::NaiveDateTime,
 }
@@ -112,24 +271,12 @@ impl BaseModel for DatabaseHost {
                 compact_str::format_compact!("{prefix}public_host"),
             ),
             (
-                "database_hosts.host",
-                compact_str::format_compact!("{prefix}host"),
-            ),
-            (
                 "database_hosts.public_port",
                 compact_str::format_compact!("{prefix}public_port"),
             ),
             (
-                "database_hosts.port",
-                compact_str::format_compact!("{prefix}port"),
-            ),
-            (
-                "database_hosts.username",
-                compact_str::format_compact!("{prefix}username"),
-            ),
-            (
-                "database_hosts.password",
-                compact_str::format_compact!("{prefix}password"),
+                "database_hosts.credentials",
+                compact_str::format_compact!("{prefix}credentials"),
             ),
             (
                 "database_hosts.created",
@@ -152,12 +299,11 @@ impl BaseModel for DatabaseHost {
                 .try_get(compact_str::format_compact!("{prefix}maintenance_enabled").as_str())?,
             public_host: row
                 .try_get(compact_str::format_compact!("{prefix}public_host").as_str())?,
-            host: row.try_get(compact_str::format_compact!("{prefix}host").as_str())?,
             public_port: row
                 .try_get(compact_str::format_compact!("{prefix}public_port").as_str())?,
-            port: row.try_get(compact_str::format_compact!("{prefix}port").as_str())?,
-            username: row.try_get(compact_str::format_compact!("{prefix}username").as_str())?,
-            password: row.try_get(compact_str::format_compact!("{prefix}password").as_str())?,
+            credentials: serde_json::from_value(
+                row.try_get(compact_str::format_compact!("{prefix}credentials").as_str())?,
+            )?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
         })
     }
@@ -165,7 +311,7 @@ impl BaseModel for DatabaseHost {
 
 impl DatabaseHost {
     pub async fn get_connection(
-        &self,
+        &mut self,
         database: &crate::database::Database,
     ) -> Result<DatabasePool, crate::database::DatabaseError> {
         let mut clients = DATABASE_CLIENTS.lock().await;
@@ -178,29 +324,88 @@ impl DatabaseHost {
 
         drop(clients);
 
-        let password = database.decrypt(self.password.clone()).await?;
+        self.credentials.decrypt(database).await?;
 
         let pool = match self.r#type {
             DatabaseType::Mysql => {
-                let options = sqlx::mysql::MySqlConnectOptions::new()
-                    .host(&self.host)
-                    .port(self.port as u16)
-                    .username(&self.username)
-                    .password(&password);
+                let options = match &self.credentials {
+                    DatabaseCredentials::ConnectionString { connection_string } => {
+                        sqlx::mysql::MySqlConnectOptions::from_str(connection_string).map_err(
+                            |err| anyhow::anyhow!("failed to parse MySQL connection string: {err}"),
+                        )?
+                    }
+                    DatabaseCredentials::Details {
+                        host,
+                        port,
+                        username,
+                        password,
+                    } => sqlx::mysql::MySqlConnectOptions::new()
+                        .host(host)
+                        .port(*port)
+                        .username(username)
+                        .password(password),
+                };
 
                 let pool = sqlx::Pool::connect_with(options).await?;
-                DatabasePool::Mysql(Arc::new(pool))
+                DatabasePool::Mysql(pool)
             }
             DatabaseType::Postgres => {
-                let options = sqlx::postgres::PgConnectOptions::new()
-                    .host(&self.host)
-                    .port(self.port as u16)
-                    .username(&self.username)
-                    .password(&password)
-                    .database("postgres");
+                let options = match &self.credentials {
+                    DatabaseCredentials::ConnectionString { connection_string } => {
+                        sqlx::postgres::PgConnectOptions::from_str(connection_string).map_err(
+                            |err| {
+                                anyhow::anyhow!("failed to parse Postgres connection string: {err}")
+                            },
+                        )?
+                    }
+                    DatabaseCredentials::Details {
+                        host,
+                        port,
+                        username,
+                        password,
+                    } => sqlx::postgres::PgConnectOptions::new()
+                        .host(host)
+                        .port(*port)
+                        .username(username)
+                        .password(password)
+                        .database("postgres"),
+                };
 
                 let pool = sqlx::Pool::connect_with(options).await?;
-                DatabasePool::Postgres(Arc::new(pool))
+                DatabasePool::Postgres(pool)
+            }
+            DatabaseType::Mongodb => {
+                let options = match &self.credentials {
+                    DatabaseCredentials::ConnectionString { connection_string } => {
+                        mongodb::options::ClientOptions::parse(connection_string.as_str())
+                            .await
+                            .map_err(|err| {
+                                anyhow::anyhow!("failed to parse MongoDB connection string: {err}")
+                            })?
+                    }
+                    DatabaseCredentials::Details {
+                        host,
+                        port,
+                        username,
+                        password,
+                    } => {
+                        let mut options = mongodb::options::ClientOptions::default();
+                        options.hosts.push(mongodb::options::ServerAddress::Tcp {
+                            host: host.to_string(),
+                            port: Some(*port),
+                        });
+                        options.credential = Some(
+                            mongodb::options::Credential::builder()
+                                .username(username.to_string())
+                                .password(password.to_string())
+                                .build(),
+                        );
+                        options
+                    }
+                };
+
+                let client = mongodb::Client::with_options(options)?;
+                DatabasePool::Mongodb(client)
             }
         };
 
@@ -271,7 +476,9 @@ impl DatabaseHost {
     }
 
     #[inline]
-    pub fn into_admin_api_object(self) -> AdminApiDatabaseHost {
+    pub fn into_admin_api_object(mut self) -> AdminApiDatabaseHost {
+        self.credentials.censor();
+
         AdminApiDatabaseHost {
             uuid: self.uuid,
             name: self.name,
@@ -279,24 +486,27 @@ impl DatabaseHost {
             deployment_enabled: self.deployment_enabled,
             maintenance_enabled: self.maintenance_enabled,
             public_host: self.public_host,
-            host: self.host,
             public_port: self.public_port,
-            port: self.port,
-            username: self.username,
+            credentials: self.credentials,
             created: self.created.and_utc(),
         }
     }
 
     #[inline]
-    pub fn into_api_object(self) -> ApiDatabaseHost {
-        ApiDatabaseHost {
+    pub async fn into_api_object(
+        self,
+        database: &crate::database::Database,
+    ) -> Result<ApiDatabaseHost, anyhow::Error> {
+        let details = self.credentials.parse_connection_details(database).await?;
+
+        Ok(ApiDatabaseHost {
             uuid: self.uuid,
             name: self.name,
             maintenance_enabled: self.maintenance_enabled,
             r#type: self.r#type,
-            host: self.public_host.unwrap_or(self.host),
-            port: self.public_port.unwrap_or(self.port),
-        }
+            host: self.public_host.unwrap_or(details.host),
+            port: self.public_port.unwrap_or(details.port as i32),
+        })
     }
 }
 
@@ -338,22 +548,12 @@ pub struct CreateDatabaseHostOptions {
     #[garde(length(chars, min = 3, max = 255))]
     #[schema(min_length = 3, max_length = 255)]
     pub public_host: Option<compact_str::CompactString>,
-    #[garde(length(chars, min = 3, max = 255))]
-    #[schema(min_length = 3, max_length = 255)]
-    pub host: compact_str::CompactString,
     #[garde(range(min = 1))]
     #[schema(minimum = 1)]
     pub public_port: Option<u16>,
-    #[garde(range(min = 1))]
-    #[schema(minimum = 1)]
-    pub port: u16,
 
-    #[garde(length(chars, min = 3, max = 255))]
-    #[schema(min_length = 3, max_length = 255)]
-    pub username: compact_str::CompactString,
-    #[garde(length(chars, min = 1, max = 512))]
-    #[schema(min_length = 1, max_length = 512)]
-    pub password: compact_str::CompactString,
+    #[garde(dive)]
+    pub credentials: DatabaseCredentials,
 }
 
 #[async_trait::async_trait]
@@ -381,20 +581,16 @@ impl CreatableModel for DatabaseHost {
         Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
             .await?;
 
+        options.credentials.encrypt(&state.database).await?;
+
         query_builder
             .set("name", &options.name)
             .set("type", options.r#type)
             .set("deployment_enabled", options.deployment_enabled)
             .set("maintenance_enabled", options.maintenance_enabled)
             .set("public_host", &options.public_host)
-            .set("host", &options.host)
             .set("public_port", options.public_port.map(|p| p as i32))
-            .set("port", options.port as i32)
-            .set("username", &options.username)
-            .set(
-                "password",
-                state.database.encrypt(options.password.to_string()).await?,
-            );
+            .set("credentials", serde_json::to_value(&options.credentials)?);
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
@@ -412,12 +608,12 @@ impl CreatableModel for DatabaseHost {
 pub struct UpdateDatabaseHostOptions {
     #[garde(length(chars, min = 1, max = 255))]
     #[schema(min_length = 1, max_length = 255)]
-    name: Option<compact_str::CompactString>,
+    pub name: Option<compact_str::CompactString>,
 
     #[garde(skip)]
-    deployment_enabled: Option<bool>,
+    pub deployment_enabled: Option<bool>,
     #[garde(skip)]
-    maintenance_enabled: Option<bool>,
+    pub maintenance_enabled: Option<bool>,
 
     #[garde(length(max = 255))]
     #[schema(max_length = 255)]
@@ -426,10 +622,7 @@ pub struct UpdateDatabaseHostOptions {
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    public_host: Option<Option<compact_str::CompactString>>,
-    #[garde(length(chars, min = 3, max = 255))]
-    #[schema(min_length = 3, max_length = 255)]
-    host: Option<compact_str::CompactString>,
+    pub public_host: Option<Option<compact_str::CompactString>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -437,17 +630,10 @@ pub struct UpdateDatabaseHostOptions {
     )]
     #[garde(range(min = 1))]
     #[schema(minimum = 1)]
-    public_port: Option<Option<u16>>,
-    #[garde(range(min = 1))]
-    #[schema(minimum = 1)]
-    port: Option<u16>,
+    pub public_port: Option<Option<u16>>,
 
-    #[garde(length(chars, min = 3, max = 255))]
-    #[schema(min_length = 3, max_length = 255)]
-    username: Option<compact_str::CompactString>,
-    #[garde(length(chars, min = 1, max = 512))]
-    #[schema(min_length = 1, max_length = 512)]
-    password: Option<compact_str::CompactString>,
+    #[garde(dive)]
+    pub credentials: Option<DatabaseCredentials>,
 }
 
 #[async_trait::async_trait]
@@ -481,18 +667,15 @@ impl UpdatableModel for DatabaseHost {
         )
         .await?;
 
-        let password = if let Some(password) = options.password {
-            Some(state.database.encrypt(password.to_string()).await?)
-        } else {
-            None
-        };
+        if let Some(credentials) = &mut options.credentials {
+            credentials.encrypt(&state.database).await?;
+        }
 
         query_builder
             .set("name", options.name.as_ref())
             .set("deployment_enabled", options.deployment_enabled)
             .set("maintenance_enabled", options.maintenance_enabled)
             .set("public_host", options.public_host.as_ref())
-            .set("host", options.host.as_ref())
             .set(
                 "public_port",
                 options
@@ -500,9 +683,14 @@ impl UpdatableModel for DatabaseHost {
                     .as_ref()
                     .map(|p| p.as_ref().map(|port| *port as i32)),
             )
-            .set("port", options.port.as_ref().map(|p| *p as i32))
-            .set("username", options.username.as_ref())
-            .set("password", password.as_ref())
+            .set(
+                "credentials",
+                options
+                    .credentials
+                    .as_ref()
+                    .map(serde_json::to_value)
+                    .transpose()?,
+            )
             .where_eq("uuid", self.uuid);
 
         query_builder.execute(&mut *transaction).await?;
@@ -519,20 +707,11 @@ impl UpdatableModel for DatabaseHost {
         if let Some(public_host) = options.public_host {
             self.public_host = public_host;
         }
-        if let Some(host) = options.host {
-            self.host = host;
-        }
         if let Some(public_port) = options.public_port {
             self.public_port = public_port.map(|port| port as i32);
         }
-        if let Some(port) = options.port {
-            self.port = port as i32;
-        }
-        if let Some(username) = options.username {
-            self.username = username;
-        }
-        if let Some(password) = password {
-            self.password = password;
+        if let Some(credentials) = options.credentials {
+            self.credentials = credentials;
         }
 
         transaction.commit().await?;
@@ -589,11 +768,9 @@ pub struct AdminApiDatabaseHost {
     pub r#type: DatabaseType,
 
     pub public_host: Option<compact_str::CompactString>,
-    pub host: compact_str::CompactString,
     pub public_port: Option<i32>,
-    pub port: i32,
 
-    pub username: compact_str::CompactString,
+    pub credentials: DatabaseCredentials,
 
     pub created: chrono::DateTime<chrono::Utc>,
 }

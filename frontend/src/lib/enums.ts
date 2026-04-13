@@ -61,6 +61,7 @@ import { serverBackupStatus, serverPowerAction, serverPowerState } from '@/lib/s
 import { publicSettingsCaptchaProviderSchema } from '@/lib/schemas/settings.ts';
 import { userSshKeyProvider } from '@/lib/schemas/user/sshKeys.ts';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
+import { adminDatabaseCredentialsSchema } from './schemas/admin/databaseHosts.ts';
 
 export const captchaProviderTypeLabelMapping: Record<
   z.infer<typeof publicSettingsCaptchaProviderSchema>['type'],
@@ -96,6 +97,15 @@ export const processConfigurationParserLabelMapping: Record<
 export const databaseTypeLabelMapping: Record<z.infer<typeof databaseType>, string> = {
   mysql: 'MySQL',
   postgres: 'PostgreSQL',
+  mongodb: 'MongoDB',
+};
+
+export const databaseCredentialTypeLabelMapping: Record<
+  z.infer<typeof adminDatabaseCredentialsSchema>['type'],
+  string
+> = {
+  connection_string: 'Connection String',
+  details: 'Details',
 };
 
 export const backupDiskLabelMapping: Record<z.infer<typeof adminBackupConfigurationSchema>['backupDisk'], string> = {

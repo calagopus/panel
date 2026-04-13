@@ -21,6 +21,7 @@ mod post {
         #[schema(default = "/")]
         root: compact_str::CompactString,
 
+        #[schema(inline)]
         files: Vec<wings_api::servers_server_files_copy_many::post::RequestBodyFiles>,
 
         #[serde(default)]

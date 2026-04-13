@@ -36,6 +36,7 @@ pub mod response;
 pub mod settings;
 pub mod storage;
 pub mod telemetry;
+pub mod updates;
 pub mod utils;
 
 pub use payload::Payload;
@@ -103,6 +104,7 @@ pub struct AppState {
     pub client: reqwest::Client,
 
     pub extensions: Arc<extensions::manager::ExtensionManager>,
+    pub updates: Arc<updates::UpdateManager>,
     pub background_tasks: Arc<extensions::background_tasks::BackgroundTaskManager>,
     pub shutdown_handlers: Arc<extensions::shutdown_handlers::ShutdownHandlerManager>,
     pub settings: Arc<settings::Settings>,
@@ -163,6 +165,7 @@ impl AppState {
                 .unwrap(),
 
             extensions: Arc::new(extensions::manager::ExtensionManager::new(vec![])),
+            updates: Arc::new(updates::UpdateManager::default()),
             background_tasks: background_tasks.clone(),
             shutdown_handlers: shutdown_handlers.clone(),
             settings: settings.clone(),

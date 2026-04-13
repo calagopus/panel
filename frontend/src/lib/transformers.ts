@@ -67,4 +67,4 @@ export const base64ToArrayBuffer = (base64String: string): ArrayBuffer => {
 
 export const nullableString = (v: unknown) => (v === '' ? null : v);
 
-export const nullableNumber = (v: unknown) => (v === '' ? null : Number(v));
+export const nullableNumber = (v: unknown) => (v === '' || v === null ? null : Number(v));

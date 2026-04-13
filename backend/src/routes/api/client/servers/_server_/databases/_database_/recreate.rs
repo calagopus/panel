@@ -39,7 +39,7 @@ mod post {
         state: GetState,
         permissions: GetPermissionManager,
         server: GetServer,
-        database: GetServerDatabase,
+        mut database: GetServerDatabase,
         activity_logger: GetServerActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_server_permission("databases.recreate")?;

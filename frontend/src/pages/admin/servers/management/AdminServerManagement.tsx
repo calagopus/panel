@@ -20,7 +20,12 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
   );
 
   return (
-    <AdminSubContentContainer title='Server Management' hideTitleComponent>
+    <AdminSubContentContainer
+      title='Server Management'
+      hideTitleComponent
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.management.subContainer}
+      registryProps={{ server }}
+    >
       {canTransfer && (
         <ServerTransferModal server={server} opened={openModal === 'transfer'} onClose={() => setOpenModal(null)} />
       )}
@@ -30,7 +35,13 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
       <ServerDeleteModal server={server} opened={openModal === 'delete'} onClose={() => setOpenModal(null)} />
 
       <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
-        <Card className='h-fit!'>
+        {window.extensionContext.extensionRegistry.pages.admin.servers.view.management.managementContainers.prependedComponents.map(
+          (Component, i) => (
+            <Component key={`management-managementContainer-prepended-${i}`} server={server} />
+          ),
+        )}
+
+        <Card className='h-fit! order-10'>
           <Stack gap='xs'>
             <Title order={2}>Transfer</Title>
             <Text size='sm'>Move this server to another node within this system.</Text>
@@ -43,7 +54,7 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
             )}
           </Stack>
         </Card>
-        <Card className='h-fit!'>
+        <Card className='h-fit! order-20'>
           <Stack gap='xs'>
             {server.isSuspended ? (
               <>
@@ -70,7 +81,7 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
             )}
           </Stack>
         </Card>
-        <Card className='h-fit!'>
+        <Card className='h-fit! order-30'>
           <Stack gap='xs'>
             <Title order={2}>Clear State</Title>
             <Text size='sm'>This will clear the server state known by the panel.</Text>
@@ -79,7 +90,7 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
             </Button>
           </Stack>
         </Card>
-        <Card className='h-fit!'>
+        <Card className='h-fit! order-40'>
           <Stack gap='xs'>
             <Title order={2}>Delete</Title>
             <Text size='sm'>This will delete the server and all of its data. This action cannot be undone.</Text>
@@ -88,6 +99,12 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
             </Button>
           </Stack>
         </Card>
+
+        {window.extensionContext.extensionRegistry.pages.admin.servers.view.management.managementContainers.appendedComponents.map(
+          (Component, i) => (
+            <Component key={`management-managementContainer-appended-${i}`} server={server} />
+          ),
+        )}
       </div>
     </AdminSubContentContainer>
   );

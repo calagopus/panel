@@ -68,7 +68,8 @@
         "download": "Downloaden",
         "downloadAs": "Downloaden als {format}",
         "export": "Exporteren",
-        "exportAs": "Exporteren als {format}"
+        "exportAs": "Exporteren als {format}",
+        "recreate": "Opnieuw aanmaken"
       },
       "alert": {
         "error": "Fout",
@@ -1114,8 +1115,7 @@
             "transferCompleted": "Overdracht succesvol voltooid. Opnieuw verbinden met server...",
             "pullingImage": "Uw server haalt momenteel zijn Docker-image op. Een moment geduld...",
             "pulling": "Ophalen",
-            "extracting": "Uitpakken",
-            "layer": "Laag"
+            "extracting": "Uitpakken"
           },
           "tooltip": {
             "search": "Zoeken",
@@ -1410,7 +1410,6 @@
           },
           "button": {
             "details": "Details",
-            "recreate": "Opnieuw aanmaken",
             "rotatePassword": "Wachtwoord roteren"
           },
           "form": {

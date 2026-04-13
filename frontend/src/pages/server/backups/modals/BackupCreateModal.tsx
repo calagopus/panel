@@ -1,5 +1,4 @@
 import { ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -11,6 +10,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverBackupCreateSchema } from '@/lib/schemas/server/backups.ts';
 import { generateBackupName } from '@/lib/server.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -22,14 +22,17 @@ export default function BackupCreateModal({ opened, onClose }: ModalProps) {
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverBackupCreateSchema>>({
-    initialValues: {
-      name: '',
-      ignoredFiles: [],
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverBackupCreateSchema>>(
+    {
+      initialValues: {
+        name: '',
+        ignoredFiles: [],
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverBackupCreateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverBackupCreateSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     form.setValues({
@@ -45,7 +48,7 @@ export default function BackupCreateModal({ opened, onClose }: ModalProps) {
       .then((backup) => {
         addBackup(backup);
         addToast(t('pages.server.backups.modal.createBackup.toast.created', {}), 'success');
-        onClose();
+        handleClose();
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -54,7 +57,7 @@ export default function BackupCreateModal({ opened, onClose }: ModalProps) {
   };
 
   return (
-    <Modal title={t('pages.server.backups.modal.createBackup.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.backups.modal.createBackup.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doCreate())}>
         <Stack>
           <TextInput
@@ -74,7 +77,7 @@ export default function BackupCreateModal({ opened, onClose }: ModalProps) {
             <Button type='submit' loading={loading} disabled={!form.isValid()}>
               {t('common.button.create', {})}
             </Button>
-            <Button variant='default' onClick={onClose}>
+            <Button variant='default' onClick={handleClose}>
               {t('common.button.close', {})}
             </Button>
           </ModalFooter>

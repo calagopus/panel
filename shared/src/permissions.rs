@@ -111,6 +111,7 @@ pub(crate) static BASE_USER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permiss
                         ("read", "Allows viewing API keys and their permissions."),
                         ("update", "Allows modifying other API keys."),
                         ("delete", "Allows deleting API keys."),
+                        ("recreate", "Allows recreating API keys."),
                     ]),
                 },
             ),

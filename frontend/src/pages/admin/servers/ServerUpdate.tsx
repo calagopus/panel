@@ -168,7 +168,12 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
   }, [form.getValues().eggUuid, eggs.items, contextServer]);
 
   return (
-    <AdminSubContentContainer title='Update Server' titleOrder={2}>
+    <AdminSubContentContainer
+      title='Update Server'
+      titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.update.subContainer}
+      registryProps={{ server: contextServer }}
+    >
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'servers']))}>
         <Stack>
           {contextServer.isSuspended && (

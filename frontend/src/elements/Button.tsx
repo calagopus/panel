@@ -1,5 +1,4 @@
 import { Button as MantineButton, ButtonProps as MantineButtonProps } from '@mantine/core';
-import classNames from 'classnames';
 import { forwardRef, MouseEvent as ReactMouseEvent } from 'react';
 import { makeComponentHookable } from 'shared';
 
@@ -14,17 +13,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <MantineButton
         ref={ref}
         type={type}
-        className={classNames(
-          className,
-          loading ? 'cursor-wait!' : null,
-          'font-normal!',
-          disabled && 'border! border-(--mantine-color-dark-4)! text-(--mantine-color-dimmed)!',
-        )}
+        className={className}
         onClick={onClick}
         loading={disabled ? false : loading}
         disabled={disabled}
         variant={variant}
         {...rest}
+        style={{
+          cursor: loading ? 'wait' : undefined,
+          fontWeight: 'normal',
+          border: disabled ? '1px solid var(--mantine-color-dark-4)' : undefined,
+          color: disabled ? 'var(--mantine-color-dimmed)' : undefined,
+          ...rest.style,
+        }}
       >
         {children}
       </MantineButton>

@@ -7,6 +7,7 @@ import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -21,7 +22,13 @@ export default function DatabaseDeleteModal({ database, opened, onClose }: Props
   const server = useServerStore((state) => state.server);
   const { removeDatabase } = useServerStore();
 
-  const [enteredName, setEnteredName] = useState('');
+  const { form, onClose: handleClose } = useModalForm(
+    {
+      name: '',
+    },
+    onClose,
+  );
+
   const [loading, setLoading] = useState(false);
 
   const doDelete = () => {
@@ -30,7 +37,7 @@ export default function DatabaseDeleteModal({ database, opened, onClose }: Props
     deleteDatabase(server.uuid, database.uuid)
       .then(() => {
         addToast(t('pages.server.databases.modal.deleteDatabase.toast.deleted', {}), 'success');
-        onClose();
+        handleClose();
         removeDatabase(database);
       })
       .catch((error) => {
@@ -41,7 +48,7 @@ export default function DatabaseDeleteModal({ database, opened, onClose }: Props
   };
 
   return (
-    <Modal title={t('pages.server.databases.modal.deleteDatabase.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.databases.modal.deleteDatabase.title', {})} onClose={handleClose} opened={opened}>
       <Stack>
         <Text>{t('pages.server.databases.modal.deleteDatabase.content', { name: database.name }).md()}</Text>
 
@@ -49,15 +56,14 @@ export default function DatabaseDeleteModal({ database, opened, onClose }: Props
           withAsterisk
           label={t('pages.server.databases.form.databaseName', {})}
           placeholder={t('pages.server.databases.form.databaseName', {})}
-          value={enteredName}
-          onChange={(e) => setEnteredName(e.target.value)}
+          {...form.getInputProps('name')}
         />
 
         <ModalFooter>
-          <Button color='red' onClick={doDelete} loading={loading} disabled={database.name !== enteredName}>
+          <Button color='red' onClick={doDelete} loading={loading} disabled={database.name !== form.getValues().name}>
             {t('common.button.delete', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

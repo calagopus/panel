@@ -59,6 +59,8 @@ export default function ServerMountRow({
             color: 'red',
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.mounts.contextMenu}
+        registryProps={{ server, mount }}
       >
         {({ items, openMenu }) => (
           <TableRow

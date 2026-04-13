@@ -1,5 +1,4 @@
 import { ModalProps, Stack, TagsInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useRef } from 'react';
 import { z } from 'zod';
@@ -9,6 +8,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import { serverSubuserCreateSchema, serverSubuserSchema } from '@/lib/schemas/server/subusers.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
@@ -24,15 +24,18 @@ export default function SubuserCreateOrUpdateModal({ subuser, onCreate, onUpdate
 
   const captchaRef = useRef<CaptchaRef>(null);
 
-  const form = useForm<z.infer<typeof serverSubuserCreateSchema>>({
-    initialValues: {
-      email: '',
-      permissions: [],
-      ignoredFiles: [],
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverSubuserCreateSchema>>(
+    {
+      initialValues: {
+        email: '',
+        permissions: [],
+        ignoredFiles: [],
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverSubuserCreateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverSubuserCreateSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     if (subuser) {
@@ -62,9 +65,9 @@ export default function SubuserCreateOrUpdateModal({ subuser, onCreate, onUpdate
           ? t('pages.server.subusers.modal.updateSubuser.title', {})
           : t('pages.server.subusers.modal.createSubuser.title', {})
       }
-      onClose={onClose}
+      onClose={handleClose}
       opened={opened}
-      size='xl'
+      size='95%'
     >
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate())}>
         <Stack>
@@ -105,7 +108,7 @@ export default function SubuserCreateOrUpdateModal({ subuser, onCreate, onUpdate
             <Button type='submit' disabled={!form.isValid()}>
               {subuser ? t('common.button.update', {}) : t('common.button.create', {})}
             </Button>
-            <Button variant='default' onClick={onClose}>
+            <Button variant='default' onClick={handleClose}>
               {t('common.button.close', {})}
             </Button>
           </ModalFooter>

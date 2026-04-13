@@ -37,7 +37,7 @@ mod get {
         state: GetState,
         permissions: GetPermissionManager,
         server: GetServer,
-        database: GetServerDatabase,
+        mut database: GetServerDatabase,
     ) -> ApiResponseResult {
         permissions.has_server_permission("databases.read")?;
 

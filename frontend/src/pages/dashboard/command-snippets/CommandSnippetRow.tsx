@@ -42,7 +42,6 @@ export default function CommandSnippetRow({
         opened={openModal === 'edit'}
         onClose={() => setOpenModal(null)}
       />
-
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -68,7 +67,7 @@ export default function CommandSnippetRow({
               openMenu(e.pageX, e.pageY);
             }}
           >
-            <TableData>{commandSnippet.name}</TableData>
+            <TableData>!{commandSnippet.name}</TableData>
 
             <TableData>{commandSnippet.eggs.length}</TableData>
 

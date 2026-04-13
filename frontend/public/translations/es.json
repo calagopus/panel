@@ -1,0 +1,2160 @@
+{
+  "items": {
+    "byte": {
+      "zero": "{count} bytes",
+      "one": "{count} byte",
+      "two": "{count} bytes",
+      "few": "{count} bytes",
+      "many": "{count} bytes",
+      "other": "{count} bytes"
+    },
+    "user": {
+      "zero": "{count} usuarios",
+      "one": "{count} usuario",
+      "two": "{count} usuarios",
+      "few": "{count} usuarios",
+      "many": "{count} usuarios",
+      "other": "{count} usuarios"
+    },
+    "file": {
+      "zero": "{count} archivos",
+      "one": "{count} archivo",
+      "two": "{count} archivos",
+      "few": "{count} archivos",
+      "many": "{count} archivos",
+      "other": "{count} archivos"
+    },
+    "server": {
+      "zero": "{count} servidores",
+      "one": "{count} servidor",
+      "two": "{count} servidores",
+      "few": "{count} servidores",
+      "many": "{count} servidores",
+      "other": "{count} servidores"
+    },
+    "sshKey": {
+      "zero": "{count} claves SSH",
+      "one": "{count} clave SSH",
+      "two": "{count} claves SSH",
+      "few": "{count} claves SSH",
+      "many": "{count} claves SSH",
+      "other": "{count} claves SSH"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "Crear",
+        "add": "Añadir",
+        "save": "Guardar",
+        "saveAndStay": "Guardar y permanecer",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "remove": "Quitar",
+        "enable": "Activar",
+        "disable": "Desactivar",
+        "update": "Actualizar",
+        "close": "Cerrar",
+        "cancel": "Cancelar",
+        "continue": "Continuar",
+        "skip": "Omitir",
+        "okay": "Aceptar",
+        "back": "Atrás",
+        "next": "Siguiente",
+        "install": "Instalar",
+        "selectAll": "Seleccionar todo",
+        "deselectAll": "Deseleccionar todo",
+        "restore": "Restaurar",
+        "download": "Descargar",
+        "downloadAs": "Descargar como {format}",
+        "export": "Exportar",
+        "exportAs": "Exportar como {format}",
+        "recreate": "Volver a crear"
+      },
+      "alert": {
+        "error": "Error",
+        "warning": "Advertencia",
+        "success": "Éxito",
+        "clockOffset": "El reloj de tu sistema está desincronizado con el servidor por más de 5 segundos. Esto puede causar problemas con la autenticación por passkey y la autenticación de dos factores. Sincroniza tu reloj si aparecen problemas. Diferencia actual: {offset} segundo(s)."
+      },
+      "divider": {
+        "or": "O"
+      },
+      "input": {
+        "search": "Buscar..."
+      },
+      "tooltip": {
+        "resetToDefault": "Restablecer al valor predeterminado",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "form": {
+        "name": "Nombre",
+        "description": "Descripción",
+        "password": "Contraseña",
+        "host": "Host",
+        "username": "Usuario",
+        "server": "Servidor",
+        "truncateDirectory": "¿Quieres eliminar todos los archivos de este servidor antes de realizar esta acción? Esto no se puede deshacer."
+      },
+      "table": {
+        "pagination": {
+          "results": "Mostrando {start} a {end} de {total} resultados.",
+          "empty": "No se encontró ningún elemento; casi parece que se están escondiendo."
+        },
+        "columns": {
+          "name": "Nombre",
+          "description": "Descripción",
+          "username": "Usuario",
+          "size": "Tamaño",
+          "lastUsed": "Último uso",
+          "created": "Creado",
+          "actor": "Actor",
+          "event": "Evento",
+          "ip": "IP",
+          "when": "Cuándo",
+          "command": "Comando"
+        }
+      },
+      "badge": {
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "enabled": "Activado",
+        "disabled": "Desactivado",
+        "successful": "Correcto",
+        "failed": "Fallido"
+      },
+      "server": {
+        "noAllocation": "Sin asignación",
+        "state": {
+          "suspended": "Suspendido",
+          "transferring": "El servidor se está transfiriendo",
+          "nodeMaintenance": "El nodo está en mantenimiento",
+          "restoringBackup": "Restaurando copia de seguridad",
+          "installing": "Instalando",
+          "installFailed": "Instalación fallida"
+        }
+      },
+      "enum": {
+        "userToastPosition": {
+          "topLeft": "Arriba a la izquierda",
+          "topCenter": "Arriba al centro",
+          "topRight": "Arriba a la derecha",
+          "bottomLeft": "Abajo a la izquierda",
+          "bottomCenter": "Abajo al centro",
+          "bottomRight": "Abajo a la derecha"
+        },
+        "serverState": {
+          "unknown": "Desconocido",
+          "offline": "Apagado",
+          "running": "En ejecución",
+          "starting": "Iniciando",
+          "stopping": "Deteniendo"
+        },
+        "serverPowerAction": {
+          "start": "Iniciar",
+          "stop": "Detener",
+          "restart": "Reiniciar",
+          "kill": "Forzar apagado"
+        },
+        "serverBackupStatus": {
+          "starting": "Iniciando",
+          "finished": "Finalizado",
+          "failed": "Fallido"
+        },
+        "connectionStatus": {
+          "connected": "Conectado",
+          "offline": "Desconectado"
+        },
+        "serverAutoStartBehavior": {
+          "always": "Siempre",
+          "unlessStopped": "A menos que se detenga",
+          "never": "Nunca"
+        },
+        "bulkActionServerAction": {
+          "started": "Iniciado",
+          "stopped": "Detenido",
+          "restarted": "Reiniciado",
+          "killed": "Forzado"
+        }
+      },
+      "unit": {
+        "bytes": {
+          "bytes": "B",
+          "kibibytes": "KiB",
+          "mebibytes": "MiB",
+          "gibibytes": "GiB",
+          "tebibytes": "TiB",
+          "pebibytes": "PiB"
+        }
+      },
+      "unlimited": "Ilimitado",
+      "readOnly": "Solo lectura",
+      "na": "N/A",
+      "never": "Nunca",
+      "yes": "Sí",
+      "no": "No",
+      "web": "Web",
+      "api": "API",
+      "system": "Sistema",
+      "schedule": "Programación",
+      "impersonatedBy": "Suplantado por {username}"
+    },
+    "elements": {
+      "errorBoundary": {
+        "message": "La aplicación encontró un error al renderizar esta vista. Prueba a recargar la página.",
+        "hideDetails": "Ocultar detalles",
+        "showDetails": "Mostrar detalles",
+        "errorMessage": "Mensaje de error:",
+        "stackTrace": "Traza de pila:",
+        "componentStack": "Pila de componentes:"
+      },
+      "copyOnClick": {
+        "toast": {
+          "copied": "Copiado al portapapeles.",
+          "failed": "No se pudo copiar al portapapeles.",
+          "copyManual": "Copiar al portapapeles: Ctrl+C o Command+C, Enter"
+        }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "Calculando el tiempo de finalización...",
+          "estimated": "Tiempo estimado de finalización: {time}"
+        },
+        "calculating": "ETA: Calculando...",
+        "calculated": "ETA: {time}"
+      },
+      "container": {
+        "alert": {
+          "impersonating": "Actualmente estás suplantando a un usuario. Ten en cuenta que tus acciones pueden afectar a la cuenta del usuario suplantado. Para salir del modo suplantación, haz clic en el botón \"Dejar de suplantar\" en la esquina inferior izquierda."
+        }
+      },
+      "sidebar": {
+        "button": {
+          "logout": "Cerrar sesión",
+          "stopImpersonating": "Dejar de suplantar",
+          "openInVirtualWindow": "Abrir en ventana virtual",
+          "openInPopup": "Abrir en ventana emergente",
+          "openInNewTab": "Abrir en una nueva pestaña"
+        }
+      },
+      "permissionSelector": {
+        "selectedPermissions": "Permisos seleccionados ({count})",
+        "noPermissions": "No hay permisos seleccionados."
+      },
+      "selectInput": {
+        "noResults": "No se encontraron resultados."
+      },
+      "can": {
+        "tooltip": {
+          "cantSave": "No tienes permiso para guardar.",
+          "cantDelete": "No tienes permiso para eliminar."
+        }
+      },
+      "activityInfoButton": {
+        "modal": {
+          "info": {
+            "title": "Detalles de actividad"
+          }
+        }
+      },
+      "screenBlock": {
+        "permissionDenied": {
+          "title": "Permiso denegado",
+          "content": "No tienes permiso para acceder a esta página."
+        },
+        "notFound": {
+          "title": "No encontrado",
+          "content": "No se pudo encontrar la página que buscas."
+        },
+        "serverConflict": {
+          "title": "Estado del servidor en conflicto",
+          "contentSuspended": "Este servidor está suspendido y no se puede acceder.",
+          "contentNodeMaintenance": "Este servidor está en un nodo que actualmente está en mantenimiento y no se puede acceder.",
+          "contentTransferring": "Este servidor se está transfiriendo y no se puede acceder hasta que se complete la transferencia.",
+          "contentInstallFailed": "La instalación de este servidor falló y no se puede acceder hasta que se reconozca.",
+          "contentInstalling": "Este servidor se está instalando y no se puede acceder hasta que finalice.",
+          "contentRestoringBackup": "Este servidor se está restaurando desde una copia de seguridad y no se puede acceder hasta que finalice.",
+          "button": {
+            "viewInstallLogs": "Ver registros de instalación",
+            "acknowledgeFailure": "Reconocer fallo"
+          },
+          "modal": {
+            "acknowledgeFailure": {
+              "title": "Reconocer fallo de instalación",
+              "content": "Al reconocer este fallo de instalación, confirmas que estás al tanto de que la instalación ha fallado y que has tomado las medidas necesarias para resolver el problema. Esto te permitirá recuperar el control del servidor."
+            }
+          }
+        }
+      },
+      "scheduleDynamicInput": {
+        "enterVariable": "Introduce el nombre de la variable a evaluar.",
+        "enterData": "Introduce los datos a enviar.",
+        "inputType": "Tipo de entrada",
+        "dataType": "Tipo de dato a enviar",
+        "selectType": "Seleccionar tipo",
+        "none": "Ninguno",
+        "rawString": "Cadena sin procesar",
+        "variable": "Variable"
+      },
+      "serverWebsocket": {
+        "error": {
+          "connectionFailed": "No se pudo conectar tras varios intentos. Recarga la página.",
+          "connectionClosed": "Se cerró la conexión con el servidor. Intentando reconectar...",
+          "connectionRetry": "Conexión perdida. Reintentando (intento {attempt})...",
+          "authFailed": "Falló la autenticación. Intentando actualizar credenciales... ({error})",
+          "authRefreshFailed": "No se pudieron actualizar las credenciales. Recarga la página para intentarlo de nuevo.",
+          "permissionRevoked": "Conexión cerrada: tu acceso a este servidor ha sido revocado.",
+          "tokenRefreshLoop": "Se detectó un bucle de autenticación. Recarga la página para intentarlo de nuevo."
+        },
+        "banner": {
+          "retrying": "Reintentando en {countdown}..."
+        },
+        "listener": {
+          "toast": {
+            "backupCompleted": "La copia de seguridad se completó correctamente.",
+            "backupFailed": "La copia de seguridad falló.",
+            "backupRestoreCompleted": "La restauración de la copia de seguridad se completó correctamente.",
+            "installCompleted": "La instalación del servidor se completó correctamente.",
+            "installFailed": "La instalación del servidor falló.",
+            "operations": {
+              "compressing": {
+                "completed": "Se comprimió {files} en `{path}` en {time}.",
+                "failed": "No se pudo comprimir {files} en `{path}`:\n{error}"
+              },
+              "decompressing": {
+                "completed": "Se descomprimió `{path}` en `{destination}` en {time}.",
+                "failed": "No se pudo descomprimir `{path}` en `{destination}`:\n{error}"
+              },
+              "pulling": {
+                "completed": "Se descargó `{destination}` en {time}.",
+                "failed": "No se pudo descargar `{destination}`:\n{error}"
+              },
+              "copying": {
+                "completed": "Se copió `{path}` a `{destination}` en {time}.",
+                "failed": "No se pudo copiar `{path}` a `{destination}`:\n{error}"
+              },
+              "copyingMany": {
+                "completed": "Se copiaron {files} en {time}.",
+                "failed": "No se pudieron copiar {files}:\n{error}"
+              },
+              "copyingRemote": {
+                "completedFrom": "Se copiaron {files} desde el servidor remoto en {time}.",
+                "completedTo": "Se copiaron {files} al servidor remoto en {time}.",
+                "failedFrom": "No se pudieron copiar {files} desde el servidor remoto:\n{error}",
+                "failedTo": "No se pudieron copiar {files} al servidor remoto:\n{error}"
+              }
+            }
+          }
+        }
+      },
+      "fileUpload": {
+        "toast": {
+          "uploading": "Se inició la subida de {files}...",
+          "cancelledFile": "Se canceló correctamente la subida de `{file}`.",
+          "cancelledFolder": "Se canceló correctamente la subida de `{folder}` ({files})."
+        }
+      }
+    },
+    "pages": {
+      "oobe": {
+        "welcome": {
+          "title": "Bienvenido a Calagopus",
+          "subtitle": "¡Vamos a poner en marcha tu sistema de gestión de servidores de juego!",
+          "wizardIntro": "Este asistente de configuración te guiará por:",
+          "steps": {
+            "account": "Crear tu cuenta de administrador",
+            "settings": "Configurar los ajustes esenciales del sistema",
+            "location": "Configurar la ubicación de tu servidor",
+            "node": "Añadir tu primer nodo",
+            "server": "Desplegar tu primer servidor de juego"
+          },
+          "button": {
+            "start": "Empezar"
+          }
+        },
+        "register": {
+          "title": "Crear cuenta de administrador",
+          "alert": {
+            "title": "Aviso de seguridad",
+            "description": "Elige una contraseña segura. Esta cuenta tendrá acceso administrativo completo a todos los servidores y ajustes."
+          },
+          "form": {
+            "username": "Usuario",
+            "usernamePlaceholder": "admin",
+            "email": "Dirección de correo",
+            "emailPlaceholder": "admin@example.com",
+            "firstName": "Nombre",
+            "firstNamePlaceholder": "Alan",
+            "lastName": "Apellidos",
+            "lastNamePlaceholder": "Turing",
+            "password": "Contraseña",
+            "passwordPlaceholder": "Introduce una contraseña segura",
+            "confirmPassword": "Confirmar contraseña",
+            "confirmPasswordPlaceholder": "Vuelve a introducir tu contraseña"
+          },
+          "button": {
+            "create": "Crear cuenta y continuar"
+          }
+        },
+        "login": {
+          "title": "Volver a iniciar sesión",
+          "alert": "Se cerró tu sesión durante el proceso de configuración. Vuelve a iniciar sesión para continuar donde lo dejaste.",
+          "form": {
+            "username": "Usuario",
+            "usernamePlaceholder": "admin",
+            "password": "Contraseña",
+            "passwordPlaceholder": "Introduce una contraseña segura"
+          },
+          "button": {
+            "login": "Iniciar sesión y continuar"
+          }
+        },
+        "location": {
+          "title": "Configuración de ubicación",
+          "form": {
+            "locationName": "Nombre de la ubicación",
+            "locationNamePlaceholder": "Mi casa",
+            "backupName": "Nombre de la configuración de copias de seguridad",
+            "backupNamePlaceholder": "Unicorn Cloud",
+            "backupDisk": "Disco de copias de seguridad",
+            "backupDiskPlaceholder": "Disco de copias de seguridad"
+          },
+          "button": {
+            "create": "Crear y continuar"
+          }
+        },
+        "node": {
+          "title": "Configuración del nodo",
+          "allocationsTitle": "Configuración de asignaciones",
+          "form": {
+            "name": "Nombre",
+            "namePlaceholder": "Mi servidor",
+            "url": "URL",
+            "urlPlaceholder": "URL",
+            "urlDescription": "se usa para la comunicación interna con el nodo",
+            "publicUrl": "URL pública",
+            "publicUrlPlaceholder": "URL",
+            "publicUrlDescription": "se usa para websockets/descargas",
+            "sftpHost": "Host SFTP",
+            "sftpHostPlaceholder": "Host SFTP",
+            "sftpPort": "Puerto SFTP",
+            "sftpPortPlaceholder": "Puerto SFTP",
+            "memory": "Memoria",
+            "disk": "Disco",
+            "ip": "IP",
+            "portRanges": "Rangos de puertos",
+            "portRangesPlaceholder": "Rangos de puertos (p. ej. 3000-4000)"
+          },
+          "error": {
+            "noLocations": "Algo salió mal. No se encontraron ubicaciones."
+          },
+          "button": {
+            "create": "Crear y continuar"
+          }
+        },
+        "nodeConfiguration": {
+          "title": "Configuración del nodo",
+          "error": {
+            "noNodes": "Algo salió mal. No se encontraron nodos.",
+            "connectionError": "Algo salió mal. Error de conexión."
+          },
+          "successMessage": "La conexión con tu nodo se verificó correctamente. Ya puedes continuar.",
+          "configurationDescription": "Pega esto en el archivo de configuración en `{file}` o ejecuta:",
+          "button": {
+            "verify": "Verificar conexión"
+          }
+        },
+        "configuration": {
+          "title": "Ajustes de la aplicación",
+          "form": {
+            "applicationName": "Nombre de la aplicación",
+            "applicationNamePlaceholder": "Calagopus",
+            "language": "Idioma",
+            "languagePlaceholder": "Idioma",
+            "applicationUrl": "URL de la aplicación",
+            "applicationUrlPlaceholder": "https://calagop.us",
+            "telemetry": "Activar telemetría",
+            "telemetryDescription": "Permite que Calagopus recopile datos de uso limitados y anónimos para ayudar a mejorar la aplicación.",
+            "registration": "Activar registro",
+            "registrationDescription": "Permite que los nuevos usuarios registren su propia cuenta."
+          },
+          "button": {
+            "submit": "Actualizar ajustes y continuar"
+          }
+        },
+        "eggRepositories": {
+          "title": "Repositorios de eggs",
+          "description": "Estos son los repositorios de origen de tus eggs. Puedes cambiarlos en cualquier momento.",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "Pterodactyl Game Eggs",
+              "description": "Eggs para juegos como Minecraft, Terraria y muchos más."
+            },
+            "pterodactylApplication": {
+              "title": "Pterodactyl Application Eggs",
+              "description": "Eggs para aplicaciones como Grafana, Meilisearch y varias bases de datos."
+            },
+            "pterodactylGeneral": {
+              "title": "Pterodactyl Generic Eggs",
+              "description": "Eggs para entornos genéricos como Node JS, Java y Rust."
+            }
+          },
+          "button": {
+            "submit": "Importar"
+          }
+        },
+        "server": {
+          "title": "Servidor",
+          "egg": {
+            "title": "Egg",
+            "description": "Vamos a poner en marcha tu primer servidor. ¿Qué egg te gustaría usar?",
+            "nestDescription": "Para empezar a usar este egg, tendrás que crear un nest; los nests son colecciones de eggs. Ponle un nombre:"
+          },
+          "server": {
+            "title": "Servidor",
+            "nestDescription": "Para empezar a usar este egg, tendrás que crear un nest; los nests son colecciones de eggs. Ponle un nombre:"
+          },
+          "error": {
+            "noNodes": "Algo salió mal. No se encontraron nodos."
+          },
+          "button": {
+            "submit": "Importar",
+            "create": "Crear y continuar"
+          }
+        },
+        "finished": {
+          "title": "¡Configuración completa!",
+          "subtitle": "Tu panel de Calagopus está listo para usarse",
+          "setupTitle": "Lo que hemos configurado",
+          "items": {
+            "account": "Cuenta de administrador",
+            "configuration": {
+              "title": "Configuración del sistema",
+              "subtitle": "Ajustes y preferencias del panel configurados"
+            },
+            "eggRepositories": {
+              "title": "Repositorios de eggs",
+              "subtitle": "{count} repositorios"
+            },
+            "location": "Ubicación",
+            "node": "Nodo",
+            "server": "Servidor"
+          },
+          "badge": {
+            "skipped": "Omitido"
+          },
+          "button": "Ir al panel"
+        }
+      },
+      "auth": {
+        "button": {
+          "login": "Iniciar sesión",
+          "loginWith": "Iniciar sesión con {name}"
+        },
+        "login": {
+          "error": {
+            "usernameRequired": "Introduce un usuario"
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "Tu navegador no es compatible con passkeys.",
+              "unexpected": "Ocurrió un error inesperado al usar tu passkey.",
+              "cancelled": "La solicitud de passkey fue cancelada.",
+              "dismissed": "Cerraste o no interactuaste con el aviso de passkey. La clave usada también podría no estar registrada.",
+              "invalidState": "Esta passkey no está disponible o ya está registrada.",
+              "notSupportedType": "Tu navegador o dispositivo no es compatible con este tipo de passkey.",
+              "securityError": "Las passkeys solo pueden usarse por HTTPS y con un dominio válido.",
+              "authenticatorError": "Algo salió mal con el autenticador.",
+              "constraintError": "El autenticador no pudo cumplir las restricciones requeridas."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "Iniciar sesión",
+              "subtitle": "Introduce tu usuario para continuar",
+              "form": {
+                "usernamePlaceholder": "Introduce tu usuario"
+              },
+              "link": {
+                "forgotPassword": "Olvidé mi contraseña",
+                "notRegistered": "¿No estás registrado?",
+                "createAccount": "Crear cuenta"
+              },
+              "button": {
+                "oauthLogin": "Iniciar sesión con OAuth"
+              }
+            },
+            "passkey": {
+              "title": "Autenticar con passkey",
+              "subtitle": "Encontramos una passkey asociada a {username}",
+              "button": {
+                "usePasskey": "Usar passkey",
+                "usePassword": "Usar contraseña"
+              }
+            },
+            "password": {
+              "title": "Introduce la contraseña",
+              "subtitle": "Introduce tu contraseña para {username}",
+              "form": {
+                "passwordPlaceholder": "Introduce tu contraseña"
+              },
+              "button": {
+                "signIn": "Entrar",
+                "forgotPassword": "Olvidé mi contraseña"
+              }
+            },
+            "totp": {
+              "title": "Autenticación en dos factores",
+              "welcomeBack": "¡Bienvenido de nuevo, {username}!",
+              "enterCode": "Introduce el código de 6 dígitos de tu app de autenticación",
+              "button": {
+                "verify": "Verificar código",
+                "useRecoveryCode": "Usar código de recuperación",
+                "useTotp": "Usar TOTP"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "Introduce un código de recuperación",
+              "form": {
+                "label": "Código de recuperación",
+                "placeholder": "Introduce un código de recuperación"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "Registrarse",
+          "subtitle": "Introduce tus datos para registrarte",
+          "form": {
+            "email": "Correo",
+            "firstName": "Nombre",
+            "lastName": "Apellidos"
+          },
+          "button": {
+            "register": "Registrarse"
+          }
+        },
+        "forgotPassword": {
+          "title": "Olvidé mi contraseña",
+          "subtitle": "Introduce tu correo para recibir instrucciones sobre cómo restablecer tu contraseña",
+          "form": {
+            "email": "Correo"
+          },
+          "button": {
+            "request": "Solicitar restablecimiento de contraseña"
+          },
+          "success": "Se te ha enviado un correo con instrucciones sobre cómo restablecer tu contraseña."
+        },
+        "resetPassword": {
+          "title": "Restablecer contraseña",
+          "subtitle": "Introduce tu nueva contraseña",
+          "form": {
+            "confirmPassword": "Confirmar contraseña"
+          },
+          "button": {
+            "reset": "Restablecer contraseña"
+          },
+          "toast": {
+            "success": "La contraseña se ha restablecido."
+          }
+        },
+        "oauth": {
+          "title": "Autenticar con OAuth",
+          "subtitle": "Elige cualquiera de los proveedores de abajo para iniciar sesión"
+        }
+      },
+      "account": {
+        "home": {
+          "title": "Servidores",
+          "tooltip": {
+            "removeFromGroup": "Quitar del grupo",
+            "addToGroup": "Añadir al grupo",
+            "addServerToGroup": "Añadir servidor al grupo",
+            "groupActions": "Acciones del grupo",
+            "noGroups": "No hay grupos disponibles a los que añadir el servidor",
+            "noGroup": "Este servidor no está en ningún grupo"
+          },
+          "tabs": {
+            "groupedServers": {
+              "title": "Servidores agrupados",
+              "page": {
+                "button": {
+                  "createGroup": "Crear grupo"
+                },
+                "modal": {
+                  "createServerGroup": {
+                    "title": "Crear grupo de servidores",
+                    "toast": {
+                      "created": "Grupo de servidores creado."
+                    }
+                  },
+                  "editServerGroup": {
+                    "title": "Editar grupo de servidores",
+                    "toast": {
+                      "updated": "Grupo de servidores actualizado."
+                    }
+                  },
+                  "deleteServerGroup": {
+                    "title": "Confirmar eliminación del grupo de servidores",
+                    "content": "¿Seguro que quieres eliminar **{group}** de tu cuenta?",
+                    "toast": {
+                      "deleted": "Grupo de servidores eliminado."
+                    }
+                  },
+                  "addServerToGroup": {
+                    "title": "Añadir servidor a {group}",
+                    "noServers": "Todos los servidores ya están en este grupo.",
+                    "toast": {
+                      "added": "Servidor añadido al grupo."
+                    }
+                  }
+                },
+                "noGroups": "No se encontraron grupos; ¿hora de crear uno?"
+              }
+            },
+            "allServers": {
+              "title": "Todos los servidores",
+              "page": {
+                "input": {
+                  "showOtherUsersServers": "Mostrar servidores de otros usuarios"
+                },
+                "modal": {
+                  "addToServerGroup": {
+                    "title": "Añadir {server} a un grupo de servidores",
+                    "form": {
+                      "serverGroup": "Grupo de servidores"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "bulkActions": {
+            "selectionMode": "Modo de selección",
+            "select": "Seleccionar servidor",
+            "deselect": "Deseleccionar servidor",
+            "success": "Se {action} correctamente {servers}.",
+            "partial": "Se {action} correctamente {successfulServers}. Fallaron {failedServers}.",
+            "groupActions": "Acciones del grupo"
+          },
+          "noServers": "No se encontraron servidores; ¿hora de añadir uno?"
+        },
+        "admin": {
+          "title": "Administración"
+        },
+        "account": {
+          "title": "Cuenta",
+          "alert": {
+            "requireTwoFactor": {
+              "title": "Se requiere autenticación en dos factores",
+              "description": "Se requiere autenticación en dos factores en tu cuenta. Configúrala abajo para seguir usando el panel."
+            }
+          },
+          "containers": {
+            "password": {
+              "title": "Contraseña",
+              "toast": {
+                "updated": "Contraseña actualizada correctamente."
+              },
+              "form": {
+                "currentPassword": "Contraseña actual",
+                "newPassword": "Nueva contraseña",
+                "confirmNewPassword": "Confirmar nueva contraseña"
+              }
+            },
+            "email": {
+              "title": "Correo",
+              "toast": {
+                "updated": "Correo actualizado correctamente."
+              },
+              "form": {
+                "newEmail": "Nuevo correo",
+                "currentPassword": "Contraseña actual"
+              }
+            },
+            "twoFactor": {
+              "title": "Autenticación en dos factores",
+              "toast": {
+                "disabled": "La autenticación de dos factores se desactivó correctamente.",
+                "enabled": "La autenticación de dos factores se activó correctamente. Copia tus códigos de recuperación."
+              },
+              "modal": {
+                "disableTwoFactor": {
+                  "title": "Desactivar autenticación de dos factores",
+                  "description": "Desactivar la autenticación de dos factores hará que tu cuenta sea menos segura.",
+                  "form": {
+                    "code": "Código de autenticación"
+                  }
+                },
+                "setupTwoFactor": {
+                  "title": "Configurar autenticación de dos factores",
+                  "description": "Ayuda a proteger tu cuenta de accesos no autorizados. Se te pedirá un código de verificación cada vez que inicies sesión.",
+                  "descriptionQR": "Escanea el código QR de arriba con la app de autenticación en dos factores que prefieras. Después, introduce el código de 6 dígitos generado en el campo de abajo.",
+                  "form": {
+                    "code": "Código de autenticación"
+                  }
+                },
+                "recoveryCodes": {
+                  "title": "Códigos de recuperación",
+                  "description": "Estos son tus códigos de recuperación. Guárdalos en un lugar seguro. Si pierdes acceso a tu dispositivo de autenticación, puedes usar estos códigos para recuperar el acceso a tu cuenta."
+                }
+              },
+              "button": {
+                "disableTwoFactor": "Desactivar dos factores",
+                "setupTwoFactor": "Configurar dos factores"
+              },
+              "twoFactorEnabled": "La verificación en dos factores está activada.",
+              "twoFactorDisabled": "Actualmente no tienes activada la verificación en dos factores en tu cuenta. Haz clic en el botón de abajo para empezar a configurarla.",
+              "twoFactorLastUsed": "Último uso: {timestamp}"
+            },
+            "account": {
+              "title": "Detalles de la cuenta",
+              "toast": {
+                "updated": "Los detalles de la cuenta se actualizaron correctamente."
+              },
+              "form": {
+                "nameFirst": "Nombre",
+                "nameLast": "Apellidos",
+                "username": "Usuario",
+                "language": "Idioma",
+                "toastPosition": "Posición de los avisos",
+                "startOnGroupedServers": "Iniciar en la página de servidores agrupados"
+              }
+            },
+            "avatar": {
+              "title": "Avatar",
+              "toast": {
+                "updated": "El avatar se actualizó correctamente.",
+                "removed": "El avatar se eliminó correctamente."
+              },
+              "form": {
+                "avatar": "Avatar"
+              }
+            }
+          }
+        },
+        "securityKeys": {
+          "title": "Claves de seguridad",
+          "table": {
+            "columns": {
+              "credentialId": "ID de credencial"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "Se requiere un contexto seguro (HTTPS) para usar claves de seguridad."
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "Crear clave de seguridad",
+              "toast": {
+                "created": "La clave de seguridad se creó correctamente.",
+                "aborted": "Se canceló la creación de la clave de seguridad."
+              }
+            },
+            "editSecurityKey": {
+              "title": "Editar clave de seguridad",
+              "toast": {
+                "updated": "La clave de seguridad se actualizó correctamente."
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "Confirmar eliminación de la clave de seguridad",
+              "content": "¿Seguro que quieres eliminar **{key}** de tu cuenta?",
+              "toast": {
+                "deleted": "La clave de seguridad se eliminó correctamente."
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "Sesiones",
+          "table": {
+            "columns": {
+              "ip": "IP",
+              "thisDevice": "¿Este dispositivo?",
+              "userAgent": "Agente de usuario"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "Confirmar eliminación de la sesión",
+              "content": "¿Seguro que quieres eliminar la sesión **{ip}** de tu cuenta?",
+              "toast": {
+                "deleted": "Sesión eliminada."
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "Atajos de teclado",
+          "description": "Usa estos atajos de teclado para navegar e interactuar con el panel de forma más eficiente.",
+          "detectedMac": "macOS detectado",
+          "detectedWindows": "Windows/Linux detectado",
+          "fileManager": {
+            "title": "Gestor de archivos",
+            "selectAll": "Seleccionar todos los archivos",
+            "cutFiles": "Cortar archivos seleccionados",
+            "copyFiles": "Copiar archivos seleccionados",
+            "duplicateFile": "Duplicar archivo seleccionado",
+            "pasteFiles": "Pegar archivos",
+            "searchFiles": "Buscar archivos",
+            "moveUpDirectory": "Subir un directorio",
+            "moveUpSelection": "Mover la selección hacia arriba",
+            "moveDownSelection": "Mover la selección hacia abajo",
+            "renameFile": "Renombrar archivo",
+            "deselectAll": "Deseleccionar todos los archivos",
+            "deleteFiles": "Eliminar archivos seleccionados"
+          },
+          "table": {
+            "title": "Navegación de tablas",
+            "previousPage": "Página anterior",
+            "nextPage": "Página siguiente",
+            "firstPage": "Primera página",
+            "lastPage": "Última página"
+          },
+          "console": {
+            "title": "Consola del servidor",
+            "searchContent": "Buscar en la salida de la consola",
+            "previousCommand": "Comando anterior en el historial",
+            "nextCommand": "Siguiente comando en el historial"
+          },
+          "serverList": {
+            "title": "Lista de servidores",
+            "selectServer": "Mantén pulsada S y haz clic para seleccionar/deseleccionar el servidor"
+          }
+        },
+        "sshKeys": {
+          "title": "Claves SSH",
+          "button": {
+            "import": "Importar"
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "Huella"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "Crear clave SSH",
+              "toast": {
+                "created": "Clave SSH creada."
+              },
+              "button": {
+                "uploadKeyFile": "Subir archivo de clave"
+              },
+              "form": {
+                "publicKey": "Clave pública"
+              }
+            },
+            "editSshKey": {
+              "title": "Editar clave SSH",
+              "toast": {
+                "updated": "Clave SSH actualizada."
+              }
+            },
+            "importSshKeys": {
+              "title": "Importar claves SSH",
+              "toast": {
+                "created": "{sshKeys} creadas."
+              },
+              "form": {
+                "provider": "Proveedor",
+                "username": "Usuario"
+              }
+            },
+            "deleteSshKey": {
+              "title": "Confirmar eliminación de la clave SSH",
+              "content": "¿Seguro que quieres eliminar **{name}** de tu cuenta?",
+              "toast": {
+                "removed": "Clave SSH eliminada."
+              }
+            }
+          }
+        },
+        "commandSnippets": {
+          "title": "Fragmentos de comandos",
+          "table": {
+            "columns": {
+              "eggs": "Eggs"
+            }
+          },
+          "form": {
+            "eggs": "Eggs",
+            "command": "Comando"
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "Crear fragmento de comando",
+              "toast": {
+                "created": "Fragmento de comando creado."
+              }
+            },
+            "editCommandSnippet": {
+              "title": "Editar fragmento de comando",
+              "toast": {
+                "updated": "Fragmento de comando actualizado."
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "Confirmar eliminación del fragmento de comando",
+              "content": "¿Seguro que quieres eliminar **{name}** de tu cuenta?",
+              "toast": {
+                "removed": "Fragmento de comando eliminado."
+              }
+            }
+          }
+        },
+        "oauthLinks": {
+          "title": "Vinculaciones OAuth",
+          "button": {
+            "connect": "Conectar",
+            "connectTo": "Conectar con {provider}"
+          },
+          "table": {
+            "columns": {
+              "providerName": "Nombre del proveedor",
+              "identifier": "Identificador"
+            }
+          },
+          "modal": {
+            "deleteOAuthLink": {
+              "title": "Confirmar eliminación de la vinculación OAuth",
+              "content": "¿Seguro que quieres eliminar la conexión con **{provider}** de tu cuenta?",
+              "toast": {
+                "removed": "Vinculación OAuth eliminada."
+              }
+            }
+          }
+        },
+        "apiKeys": {
+          "title": "Claves API",
+          "button": {
+            "apiDocumentation": "Documentación de la API"
+          },
+          "table": {
+            "columns": {
+              "key": "Clave",
+              "permissions": "Permisos de usuario/servidor/admin",
+              "expires": "Caduca"
+            }
+          },
+          "modal": {
+            "createApiKey": {
+              "title": "Crear clave API",
+              "toast": {
+                "created": "Clave API creada."
+              }
+            },
+            "updateApiKey": {
+              "title": "Actualizar clave API",
+              "toast": {
+                "updated": "Clave API actualizada."
+              }
+            },
+            "recreateApiKey": {
+              "title": "Recrear clave API",
+              "content": "Recrear una clave API generará una nueva clave e invalidará la anterior. ¿Seguro que quieres recrear la clave API **{name}**?",
+              "toast": {
+                "recreated": "Clave API recreada."
+              }
+            },
+            "deleteApiKey": {
+              "title": "Confirmar eliminación de la clave API",
+              "content": "¿Seguro que quieres eliminar **{name}** de tu cuenta?",
+              "toast": {
+                "removed": "Clave API eliminada."
+              }
+            }
+          },
+          "form": {
+            "allowedIps": "IPs permitidas",
+            "allowedIpsPlaceholder": "p. ej. 192.168.1.1, 2001:db8::1",
+            "userPermissions": "Permisos de usuario",
+            "serverPermissions": "Permisos de servidor",
+            "adminPermissions": "Permisos de administrador"
+          }
+        },
+        "activity": {
+          "title": "Actividad"
+        }
+      },
+      "admin": {},
+      "server": {
+        "viewAdmin": {
+          "title": "Ver como administrador"
+        },
+        "console": {
+          "title": "Consola",
+          "input": {
+            "placeholder": "Escribe un comando...",
+            "ariaLabel": "Entrada de comandos de la consola."
+          },
+          "toast": {
+            "installCancelled": "Instalación del servidor cancelada."
+          },
+          "modal": {
+            "sshDetails": {
+              "title": "Detalles SSH",
+              "form": {
+                "protocol": "Protocolo",
+                "port": "Puerto",
+                "host": "Host",
+                "username": "Usuario",
+                "password": "Contraseña",
+                "yourPassword": "Tu contraseña del panel de control",
+                "command": "Comando SSH"
+              },
+              "launch": "Abrir"
+            }
+          },
+          "notification": {
+            "suspended": "Tu servidor está suspendido actualmente. No se pueden realizar acciones hasta que se levante la suspensión.",
+            "suspendedAdmin": "Este servidor está suspendido actualmente. Como eres administrador, aún puedes acceder al servidor, pero las acciones están limitadas.",
+            "nodeMaintenance": "Tu servidor está en un nodo que actualmente está en mantenimiento.",
+            "transferring": "Tu servidor se está transfiriendo actualmente a otro nodo.",
+            "restoringBackup": "Tu servidor se está restaurando desde una copia de seguridad. Espera...",
+            "installing": "Tu servidor se está instalando actualmente. Espera..."
+          },
+          "message": {
+            "serverMarkedAs": "Servidor marcado como {state}...",
+            "installFailed": "La instalación ha fallado.",
+            "installCompleted": "La instalación se completó correctamente.",
+            "transferFailed": "La transferencia ha fallado.",
+            "transferCompleted": "La transferencia se completó correctamente. Reconectando al servidor...",
+            "pullingImage": "Tu servidor está descargando su imagen de Docker. Espera...",
+            "pulling": "Descargando",
+            "extracting": "Extrayendo"
+          },
+          "tooltip": {
+            "search": "Buscar",
+            "sshDetails": "Detalles SSH",
+            "commandHistory": "Historial de comandos",
+            "decreaseFontSize": "Disminuir tamaño de fuente",
+            "increaseFontSize": "Aumentar tamaño de fuente"
+          },
+          "drawer": {
+            "commandHistory": {
+              "title": "Historial de comandos",
+              "detailTitle": "Detalles del comando",
+              "noCommands": "No se encontraron comandos.",
+              "copyButton": "Copiar comando",
+              "sendButton": "Enviar comando",
+              "commandSent": "Comando enviado correctamente."
+            }
+          },
+          "feature": {
+            "eula": {
+              "title": "Acuerdo de la EULA de Minecraft",
+              "content": "El servidor de Minecraft requiere que aceptes el [Minecraft End User License Agreement](https://minecraft.net/eula) antes de poder arrancar.",
+              "contentDetails": "Al hacer clic en \"Aceptar EULA\", aceptas los términos de la EULA de Minecraft y el archivo **eula.txt** se actualizará a **eula=true**.",
+              "toast": {
+                "accepted": "EULA aceptada correctamente."
+              },
+              "button": {
+                "accept": "Aceptar EULA"
+              }
+            }
+          },
+          "details": {
+            "address": "Dirección",
+            "port": "Puerto",
+            "uptime": "Tiempo activo",
+            "cpuLoad": "Carga de CPU",
+            "memoryLoad": "Carga de memoria",
+            "diskUsage": "Uso de disco",
+            "networkIn": "Red (entrada)",
+            "networkOut": "Red (salida)",
+            "normalizeCpuLoad": "Normalizar carga de CPU (ajustada a un máximo de 100%)"
+          },
+          "power": {
+            "modal": {
+              "forceStop": {
+                "title": "Detener el proceso a la fuerza",
+                "content": "Detener un servidor a la fuerza puede provocar corrupción de datos."
+              }
+            }
+          },
+          "stats": {
+            "cpuLoad": "Carga de CPU",
+            "memoryLoad": "Carga de memoria",
+            "network": "Red",
+            "inbound": "Entrada",
+            "outbound": "Salida"
+          },
+          "socketConnected": "Conectado (ping {ping}ms)",
+          "socketDisconnected": "Desconectado"
+        },
+        "files": {
+          "title": "Archivos",
+          "titleEditorViewing": "Viendo {file}",
+          "titleEditorEditing": "Editando {file}",
+          "titleEditorNew": "Nuevo archivo",
+          "table": {
+            "columns": {
+              "modified": "Modificado"
+            }
+          },
+          "button": {
+            "new": "Nuevo",
+            "sftpDetails": "Detalles SFTP",
+            "openInNewWindow": "Abrir en una nueva ventana",
+            "details": "Detalles",
+            "rename": "Renombrar",
+            "copy": "Copiar",
+            "move": "Mover",
+            "fingerprint": "Huella",
+            "permissions": "Permisos",
+            "unarchive": "Extraer",
+            "archive": "Archivar",
+            "more": "Más",
+            "remoteCopy": "Copia remota",
+            "search": "Buscar",
+            "exitBackup": "Salir de la copia de seguridad",
+            "fileFromEditor": "Archivo desde el editor",
+            "directory": "Directorio",
+            "fileFromPull": "Archivo desde pull",
+            "fileFromUpload": "Archivo desde subida",
+            "directoryFromUpload": "Directorio desde subida"
+          },
+          "actionBar": {
+            "copyHere": "Copiar {files} aquí",
+            "moveHere": "Mover {files} aquí"
+          },
+          "searchBanner": {
+            "resultsTitle": "Resultados de búsqueda ({files} encontrados)",
+            "query": "Consulta:",
+            "excluded": "Excluido:",
+            "content": "Contenido:",
+            "size": "Tamaño:",
+            "min": "Mín:",
+            "max": "Máx:"
+          },
+          "operations": {
+            "uploadingFolder": "Subiendo carpeta: {folder} ({files})",
+            "waiting": "Esperando: ",
+            "uploading": "Subiendo: ",
+            "compressing": "Comprimiendo {files} de {path}",
+            "decompressing": "Descomprimiendo {path}",
+            "pulling": "Descargando {destination}",
+            "copying": "Copiando {path} a {destination}",
+            "copyingMany": "Copiando {files}",
+            "receivingRemote": "Recibiendo {files} desde el servidor remoto",
+            "sendingRemote": "Enviando {files} al servidor remoto"
+          },
+          "dropzone": {
+            "title": "Suelta archivos aquí para subirlos",
+            "subtitle": "Suelta para empezar a subir"
+          },
+          "settings": {
+            "clickOnce": "Haz clic una vez para abrir un archivo o carpeta",
+            "preferPhysicalSize": "Mostrar tamaño físico en lugar del tamaño lógico",
+            "editorMinimap": "Mostrar minimapa del archivo",
+            "editorLineOverflow": "Ajustar el desbordamiento de línea",
+            "imageViewerSmoothing": "Suavizar imagen (antialiasing)"
+          },
+          "toast": {
+            "operationCancelled": "Operación cancelada",
+            "copyingStarted": "Se empezó a copiar {files}.",
+            "filesCouldNotBeMoved": "No se pudieron mover los archivos.",
+            "filesMoved": "{files} movidos.",
+            "downloadStarted": "Descarga iniciada.",
+            "filesDeleted": "Los archivos se han eliminado.",
+            "archiveCreationStarted": "Se ha iniciado la creación del archivo.",
+            "fileCopyingStarted": "Se ha iniciado la copia del archivo.",
+            "fileInfoRetrieved": "Información del archivo obtenida correctamente.",
+            "filePullingStarted": "Se ha iniciado la descarga del archivo.",
+            "fileRenamed": "El archivo se ha renombrado.",
+            "fileCouldNotBeRenamed": "No se pudo renombrar el archivo.",
+            "permissionsUpdated": "Los permisos se han actualizado.",
+            "fileSaved": "El archivo se ha guardado."
+          },
+          "modal": {
+            "activeUploads": {
+              "title": "Subidas activas",
+              "content": "¿Seguro que quieres salir de esta página? Tienes {files} subidas de archivos activas. Si sales, las subidas se cancelarán.",
+              "button": {
+                "leave": "Salir de la página"
+              }
+            },
+            "unsavedChanges": {
+              "title": "Cambios sin guardar",
+              "content": "Tienes cambios sin guardar en el editor de archivos. ¿Seguro que quieres salir de esta página? Si sales, se perderán tus cambios.",
+              "button": {
+                "leave": "Salir de la página"
+              }
+            },
+            "createArchive": {
+              "title": "Crear archivo",
+              "form": {
+                "archiveName": "Nombre del archivo",
+                "format": "Formato"
+              },
+              "createdAs": "Este archivo se creará como "
+            },
+            "createDirectory": {
+              "title": "Crear directorio",
+              "form": {
+                "directoryName": "Nombre del directorio"
+              },
+              "createdAs": "Este directorio se creará como "
+            },
+            "copyFile": {
+              "title": "Copiar archivo",
+              "form": {
+                "fileName": "Nombre del archivo"
+              },
+              "createdAs": "Este archivo se creará como "
+            },
+            "copyRemote": {
+              "title": "Copiar archivos de forma remota",
+              "form": {
+                "server": "Servidor",
+                "destination": "Destino"
+              },
+              "createdAs": "Estos archivos se crearán en el servidor remoto bajo "
+            },
+            "fileFingerprints": {
+              "title": "Huella del archivo",
+              "form": {
+                "algorithm": "Algoritmo",
+                "fingerprint": "Huella"
+              },
+              "button": {
+                "calculate": "Calcular huella"
+              }
+            },
+            "deleteFile": {
+              "title": "Eliminar archivo",
+              "singleFileWarning": "No podrás recuperar el contenido de {file} una vez eliminado.",
+              "multipleFilesWarning": "No podrás recuperar el contenido de los siguientes archivos una vez eliminados."
+            },
+            "createFile": {
+              "title": "Crear archivo",
+              "form": {
+                "fileName": "Nombre del archivo"
+              }
+            },
+            "details": {
+              "title": "Detalles del archivo",
+              "path": "Ruta",
+              "mode": "Modo",
+              "logicalSize": "Tamaño lógico",
+              "physicalSize": "Tamaño físico",
+              "mimeType": "Tipo MIME",
+              "lastModifiedAt": "Última modificación",
+              "createdAt": "Creado el"
+            },
+            "filePermissions": {
+              "title": "Permisos del archivo",
+              "symbolic": "Simbólico:",
+              "octal": "Octal:",
+              "owner": "Propietario",
+              "group": "Grupo",
+              "other": "Otros",
+              "breakdown": "Desglose de permisos",
+              "readPermission": "Permiso de lectura (4)",
+              "writePermission": "Permiso de escritura (2)",
+              "executePermission": "Permiso de ejecución (1)"
+            },
+            "renameFile": {
+              "title": "Renombrar archivo",
+              "form": {
+                "fileName": "Nombre del archivo"
+              }
+            },
+            "searchFiles": {
+              "title": "Buscar archivos",
+              "placeholder": "Buscar archivos...",
+              "advancedFilters": "Filtros avanzados",
+              "pathPatterns": "Patrones de ruta",
+              "include": "Incluir",
+              "exclude": "Excluir",
+              "caseInsensitive": "No distinguir mayúsculas/minúsculas",
+              "fileContent": "Contenido del archivo",
+              "searchText": "Texto de búsqueda",
+              "maxFileSize": "Tamaño máximo de archivo",
+              "includeOversized": "Incluir archivos demasiado grandes",
+              "includeOversizedDescription": "Incluye archivos que coinciden con otros filtros pero son demasiado grandes para buscar en su contenido",
+              "fileSize": "Tamaño del archivo",
+              "minimum": "Mínimo",
+              "maximum": "Máximo"
+            },
+            "pullFile": {
+              "title": "Traer archivo",
+              "form": {
+                "fileUrl": "URL del archivo",
+                "query": "Consulta",
+                "fileName": "Nombre del archivo"
+              },
+              "createdAs": "Este archivo se creará como ",
+              "pull": "Traer"
+            },
+            "sftpDetails": {
+              "title": "Detalles SFTP",
+              "form": {
+                "protocol": "Protocolo",
+                "port": "Puerto",
+                "host": "Host",
+                "username": "Usuario",
+                "password": "Contraseña",
+                "yourPassword": "Tu contraseña del panel de control"
+              },
+              "launch": "Abrir"
+            }
+          }
+        },
+        "databases": {
+          "title": "Bases de datos",
+          "subtitle": "{current} de {max} bases de datos máximas creadas.",
+          "tooltip": {
+            "limitReached": "Este servidor está limitado a {max} bases de datos."
+          },
+          "table": {
+            "columns": {
+              "type": "Tipo",
+              "address": "Dirección",
+              "locked": "¿Bloqueada?"
+            }
+          },
+          "button": {
+            "details": "Detalles",
+            "rotatePassword": "Rotar contraseña"
+          },
+          "form": {
+            "databaseName": "Nombre de la base de datos"
+          },
+          "modal": {
+            "createDatabase": {
+              "title": "Crear base de datos",
+              "toast": {
+                "created": "Base de datos creada."
+              },
+              "form": {
+                "databaseHost": "Host de la base de datos",
+                "noHostsFound": "No se encontraron hosts"
+              }
+            },
+            "editDatabase": {
+              "title": "Editar base de datos",
+              "toast": {
+                "updated": "Base de datos actualizada."
+              },
+              "form": {
+                "locked": "Bloqueada"
+              }
+            },
+            "databaseDetails": {
+              "title": "Detalles de conexión de la base de datos",
+              "toast": {
+                "passwordRotated": "La contraseña se ha rotado."
+              },
+              "form": {
+                "jdbcConnectionString": "Cadena de conexión JDBC"
+              }
+            },
+            "recreateDatabase": {
+              "title": "Confirmar recreación de la base de datos",
+              "content": "Recrear una base de datos eliminará de forma permanente todos los datos de la base de datos **{name}** y creará una nueva con los mismos detalles de conexión.",
+              "toast": {
+                "recreated": "Base de datos recreada."
+              }
+            },
+            "deleteDatabase": {
+              "title": "Confirmar eliminación de la base de datos",
+              "content": "Eliminar una base de datos es una acción permanente y no se puede deshacer. Esto eliminará de forma permanente la base de datos **{name}** y borrará todos los datos asociados.",
+              "toast": {
+                "deleted": "Base de datos eliminada."
+              }
+            }
+          }
+        },
+        "schedules": {
+          "title": "Tareas programadas",
+          "subtitle": "{current} de {max} tareas programadas máximas creadas.",
+          "dropzone": {
+            "title": "Suelta algunos archivos aquí para importarlos como tareas programadas",
+            "subtitle": "Suelta para empezar a importar"
+          },
+          "tooltip": {
+            "limitReached": "Este servidor está limitado a {max} tareas programadas."
+          },
+          "table": {
+            "columns": {
+              "lastRun": "Última ejecución",
+              "lastFailure": "Último fallo",
+              "status": "Estado"
+            }
+          },
+          "button": {
+            "import": "Importar",
+            "trigger": "Ejecutar",
+            "triggerWithCondition": "Ejecutar (no omitir condición)",
+            "triggerSkipCondition": "Ejecutar (omitir condición)",
+            "addTrigger": "Añadir disparador",
+            "addCondition": "Añadir condición",
+            "addStep": "Añadir paso",
+            "createFirstStep": "Crear primer paso",
+            "addOutput": "Añadir salida",
+            "addFile": "Añadir archivo",
+            "exitEditor": "Salir del editor"
+          },
+          "toast": {
+            "imported": "Tarea programada importada.",
+            "created": "Tarea programada creada.",
+            "updated": "Tarea programada actualizada.",
+            "deleted": "Tarea programada eliminada.",
+            "triggered": "Tarea programada ejecutada.",
+            "exported": "Tarea programada exportada.",
+            "parseError": "No se pudo analizar la tarea programada: {error}",
+            "step": {
+              "created": "Paso de la tarea programada creado.",
+              "updated": "Paso de la tarea programada actualizado.",
+              "deleted": "Paso de la tarea programada eliminado."
+            }
+          },
+          "enum": {
+            "schedulePreConditionType": {
+              "none": "Ninguno",
+              "and": "Y (todas deben ser verdaderas)",
+              "or": "O (cualquiera puede ser verdadera)",
+              "not": "NO (no debe ser verdadera)",
+              "serverState": "Estado del servidor",
+              "uptime": "Tiempo activo",
+              "cpuUsage": "Uso de CPU",
+              "memoryUsage": "Uso de memoria",
+              "diskUsage": "Uso de disco",
+              "fileExists": "El archivo existe"
+            },
+            "scheduleConditionType": {
+              "none": "Ninguno",
+              "and": "Y (todas deben ser verdaderas)",
+              "or": "O (cualquiera puede ser verdadera)",
+              "not": "NO (no debe ser verdadera)",
+              "variableExists": "La variable existe",
+              "variableContains": "La variable contiene",
+              "variableEquals": "La variable es igual",
+              "variableStartsWith": "La variable empieza por",
+              "variableEndsWith": "La variable termina en"
+            },
+            "scheduleComparator": {
+              "smallerThan": "Menor que",
+              "smallerThanOrEqual": "Menor o igual que",
+              "equal": "Igual a",
+              "greaterThanOrEqual": "Mayor o igual que",
+              "greaterThan": "Mayor que"
+            }
+          },
+          "modal": {
+            "createSchedule": {
+              "title": "Crear tarea programada"
+            },
+            "updateSchedule": {
+              "title": "Actualizar tarea programada"
+            },
+            "deleteSchedule": {
+              "title": "Confirmar eliminación de la tarea programada",
+              "content": "¿Seguro que quieres eliminar {name} de este servidor?"
+            },
+            "createStep": {
+              "title": "Crear paso de tarea programada"
+            },
+            "editStep": {
+              "title": "Editar paso de tarea programada"
+            },
+            "deleteStep": {
+              "title": "Confirmar eliminación del paso de tarea programada",
+              "content": "¿Seguro que quieres eliminar este paso de la tarea programada?"
+            }
+          },
+          "view": {
+            "badge": {
+              "running": "En ejecución"
+            },
+            "tooltip": {
+              "cannotTrigger": "No se puede ejecutar una tarea programada desactivada"
+            },
+            "tabs": {
+              "actions": "Acciones",
+              "conditions": "Condiciones",
+              "triggers": "Disparadores"
+            },
+            "sections": {
+              "actions": "Acciones de la tarea programada",
+              "preConditions": "Precondiciones de la tarea programada",
+              "triggers": "Disparadores de la tarea programada"
+            },
+            "alert": {
+              "noActions": "No hay acciones configuradas para esta tarea programada",
+              "noTriggers": "No hay disparadores configurados para esta tarea programada"
+            }
+          },
+          "form": {
+            "scheduleName": "Nombre de la tarea programada",
+            "enabled": "Activado",
+            "triggersList": "Disparadores",
+            "triggerNumber": "Disparador {number}",
+            "actionType": "Tipo de acción",
+            "conditionType": "Tipo de condición",
+            "serverState": "Estado del servidor",
+            "comparator": "Comparador",
+            "rootPath": "Ruta raíz",
+            "outputInto": "Guardar salida en",
+            "caseInsensitive": "No distinguir mayúsculas/minúsculas",
+            "ignoreFailure": "Ignorar fallo",
+            "runInForeground": "Ejecutar en primer plano"
+          },
+          "condition": {
+            "variable": "Variable",
+            "equals": "Igual a",
+            "contains": "Contiene",
+            "startsWith": "Empieza por",
+            "endsWith": "Termina en",
+            "allMustBeTrue": "Todas las condiciones deben ser verdaderas:",
+            "anyMustBeTrue": "Cualquier condición puede ser verdadera:",
+            "mustNotBeTrue": "La condición no debe ser verdadera:"
+          },
+          "preCondition": {
+            "valueSeconds": "Valor (segundos)",
+            "valuePercent": "Valor (%)",
+            "value": "Valor",
+            "filePath": "Ruta del archivo"
+          },
+          "triggers": {
+            "cron": {
+              "title": "Cron",
+              "form": {
+                "cronSchedule": "Programación cron"
+              },
+              "card": {
+                "content": "En el intervalo cron `{schedule}`. Próxima ejecución: {timestamp} - Última ejecución: {lastTimestamp}."
+              }
+            },
+            "powerAction": {
+              "title": "Acción de energía",
+              "form": {
+                "powerAction": "Acción de energía"
+              },
+              "card": {
+                "content": "Cuando se solicita la acción de energía `{action}`."
+              }
+            },
+            "serverState": {
+              "title": "Estado del servidor",
+              "card": {
+                "content": "Cuando se alcanza el estado del servidor `{state}`."
+              }
+            },
+            "backupStatus": {
+              "title": "Estado de la copia de seguridad",
+              "form": {
+                "backupStatus": "Estado de la copia de seguridad"
+              },
+              "card": {
+                "content": "Cuando la copia de seguridad alcanza el estado `{status}`."
+              }
+            },
+            "consoleLine": {
+              "title": "Línea de consola",
+              "form": {
+                "lineContains": "La línea contiene"
+              },
+              "card": {
+                "content": "Cuando la salida de la consola alcanza una línea que contiene `{contains}`"
+              }
+            },
+            "crash": {
+              "title": "Cierre inesperado",
+              "card": {
+                "content": "Cuando el servidor se cae."
+              }
+            }
+          },
+          "renderer": {
+            "noActionSelected": "Selecciona un tipo de acción para configurar",
+            "noActionDetails": "Detalles de la acción no disponibles",
+            "ignoreFailure": "Ignorar fallo: {value}",
+            "foreground": "Primer plano: {value}"
+          },
+          "steps": {
+            "empty": {
+              "title": "No hay pasos configurados",
+              "description": "Esta tarea programada aún no tiene pasos. Añade algunas acciones para empezar."
+            },
+            "sleep": {
+              "title": "Espera",
+              "form": {
+                "duration": "Duración (milisegundos)"
+              },
+              "renderer": {
+                "compact": "Esperar {duration}ms"
+              }
+            },
+            "ensure": {
+              "title": "Asegurar",
+              "renderer": {
+                "compact": "Asegurar que una condición coincide"
+              }
+            },
+            "format": {
+              "title": "Formatear",
+              "form": {
+                "formatString": "Cadena de formato",
+                "formatStringDescription": "La cadena de formato puede incluir variables envolviéndolas en {wrapper}"
+              },
+              "renderer": {
+                "compact": "Formatear una cadena en {outputInto}"
+              }
+            },
+            "matchRegex": {
+              "title": "Coincidir regex",
+              "form": {
+                "input": "Entrada",
+                "regex": "Regex",
+                "outputs": "Salidas",
+                "outputNumber": "Salida {number}"
+              },
+              "renderer": {
+                "compact": "Comparar {input} con la regex {regex}"
+              }
+            },
+            "waitForConsoleLine": {
+              "title": "Esperar línea de consola",
+              "form": {
+                "lineContains": "La línea contiene",
+                "timeout": "Tiempo de espera (milisegundos)"
+              },
+              "renderer": {
+                "compact": "Esperar {timeout} a una línea de consola que contenga {contains}",
+                "detail": {
+                  "lineContains": "La línea debe contener: {contains}",
+                  "caseInsensitive": "No distinguir mayúsculas/minúsculas: {value}",
+                  "timeout": "Tiempo de espera: {timeout}"
+                }
+              }
+            },
+            "sendCommand": {
+              "title": "Enviar comando",
+              "form": {
+                "command": "Comando"
+              },
+              "renderer": {
+                "compact": "Ejecutar {command}",
+                "detail": {
+                  "command": "Comando: {command}"
+                }
+              }
+            },
+            "sendPower": {
+              "title": "Enviar señal de energía",
+              "form": {
+                "powerAction": "Acción de energía"
+              },
+              "renderer": {
+                "compact": "Hacer {action}",
+                "detail": {
+                  "powerAction": "Acción de energía: {action}"
+                }
+              }
+            },
+            "createBackup": {
+              "title": "Crear copia de seguridad",
+              "form": {
+                "backupName": "Nombre de la copia de seguridad",
+                "ignoredFiles": "Archivos ignorados"
+              },
+              "renderer": {
+                "compact": "Crear {name}",
+                "detail": {
+                  "backupName": "Nombre de la copia de seguridad: {name}",
+                  "ignoredFiles": "Archivos ignorados: {files}"
+                }
+              }
+            },
+            "createDirectory": {
+              "title": "Crear directorio",
+              "form": {
+                "directoryName": "Nombre del directorio"
+              },
+              "renderer": {
+                "compact": "Crear {name} en {root}",
+                "detail": {
+                  "directory": "Directorio: {name}",
+                  "root": "Raíz: {root}"
+                }
+              }
+            },
+            "writeFile": {
+              "title": "Escribir archivo",
+              "form": {
+                "filePath": "Ruta del archivo",
+                "content": "Contenido",
+                "appendToFile": "Añadir al archivo"
+              },
+              "renderer": {
+                "compact": "Escribir en {file}",
+                "detail": {
+                  "file": "Archivo: {file}",
+                  "append": "Añadir: {value}"
+                }
+              }
+            },
+            "copyFile": {
+              "title": "Copiar archivo",
+              "form": {
+                "sourceFile": "Archivo origen",
+                "destination": "Destino"
+              },
+              "renderer": {
+                "compact": "Copiar {file} a {destination}",
+                "detail": {
+                  "from": "Desde: {file}",
+                  "to": "Hacia: {destination}"
+                }
+              }
+            },
+            "deleteFiles": {
+              "title": "Eliminar archivos",
+              "form": {
+                "filesToDelete": "Archivos a eliminar"
+              },
+              "renderer": {
+                "compact": "Eliminar {files}",
+                "detail": {
+                  "root": "Raíz: {root}",
+                  "files": "Archivos: {files}"
+                }
+              }
+            },
+            "renameFiles": {
+              "title": "Renombrar archivos",
+              "form": {
+                "files": "Archivos",
+                "from": "de",
+                "to": "a"
+              },
+              "renderer": {
+                "compact": "Renombrar {files}",
+                "detail": {
+                  "root": "Raíz: {root}",
+                  "files": "Archivos: {files}"
+                }
+              }
+            },
+            "compressFiles": {
+              "title": "Comprimir archivos",
+              "form": {
+                "filesToCompress": "Archivos a comprimir",
+                "archiveFormat": "Formato del archivo",
+                "archiveName": "Nombre del archivo"
+              },
+              "renderer": {
+                "compact": "Comprimir {files} en {root} como {name}",
+                "detail": {
+                  "output": "Salida: {name}",
+                  "root": "Raíz: {root}",
+                  "format": "Formato: {format}",
+                  "files": "Archivos: {files}"
+                }
+              }
+            },
+            "decompressFile": {
+              "title": "Descomprimir archivo",
+              "form": {
+                "file": "Archivo"
+              },
+              "renderer": {
+                "compact": "Descomprimir {file} en {root}",
+                "detail": {
+                  "file": "Archivo: {file}",
+                  "root": "Raíz: {root}"
+                }
+              }
+            },
+            "updateStartupVariable": {
+              "title": "Actualizar variable de arranque",
+              "form": {
+                "envVariable": "Variable de entorno",
+                "value": "Valor"
+              },
+              "renderer": {
+                "compact": "Establecer {variable} en {value}",
+                "detail": {
+                  "variable": "Variable: {variable}",
+                  "value": "Valor: {value}"
+                }
+              }
+            },
+            "updateStartupCommand": {
+              "title": "Actualizar comando de arranque",
+              "form": {
+                "startupCommand": "Comando de arranque"
+              },
+              "renderer": {
+                "compact": "Establecer en {command}",
+                "detail": {
+                  "command": "Comando: {command}"
+                }
+              }
+            },
+            "updateStartupDockerImage": {
+              "title": "Actualizar imagen de Docker",
+              "form": {
+                "dockerImage": "Imagen de Docker"
+              },
+              "renderer": {
+                "compact": "Establecer en {image}",
+                "detail": {
+                  "image": "Imagen: {image}"
+                }
+              }
+            }
+          }
+        },
+        "subusers": {
+          "title": "Subusuarios",
+          "table": {
+            "columns": {
+              "twoFactorEnabled": "2FA activado",
+              "permissions": "Permisos",
+              "ignoredFiles": "Archivos ignorados"
+            }
+          },
+          "modal": {
+            "createSubuser": {
+              "title": "Crear subusuario",
+              "toast": {
+                "created": "Subusuario creado."
+              },
+              "form": {
+                "email": "Correo",
+                "emailPlaceholder": "Introduce el correo con el que se guardará este subusuario.",
+                "permissions": "Permisos",
+                "ignoredFiles": "Archivos ignorados"
+              }
+            },
+            "updateSubuser": {
+              "title": "Actualizar subusuario",
+              "toast": {
+                "updated": "Subusuario actualizado."
+              }
+            },
+            "removeSubuser": {
+              "title": "Confirmar eliminación del subusuario",
+              "content": "¿Seguro que quieres eliminar a **{username}** de este servidor?",
+              "toast": {
+                "removed": "Subusuario eliminado."
+              }
+            }
+          }
+        },
+        "backups": {
+          "title": "Copias de seguridad",
+          "subtitle": "{current} de {max} copias de seguridad máximas creadas.",
+          "tooltip": {
+            "limitReached": "Este servidor está limitado a {max} copias de seguridad."
+          },
+          "table": {
+            "columns": {
+              "checksum": "Checksum",
+              "files": "Archivos",
+              "locked": "¿Bloqueada?"
+            }
+          },
+          "button": {
+            "browse": "Explorar"
+          },
+          "toast": {
+            "downloadStarted": "Descarga iniciada.",
+            "restoringBackup": "Restaurando copia de seguridad..."
+          },
+          "modal": {
+            "createBackup": {
+              "title": "Crear copia de seguridad",
+              "toast": {
+                "created": "Copia de seguridad creada."
+              },
+              "form": {
+                "ignoredFiles": "Archivos ignorados"
+              }
+            },
+            "editBackup": {
+              "title": "Editar copia de seguridad",
+              "toast": {
+                "updated": "Copia de seguridad actualizada."
+              },
+              "form": {
+                "locked": "Bloqueada"
+              }
+            },
+            "restoreBackup": {
+              "title": "Restaurar copia de seguridad"
+            },
+            "deleteBackup": {
+              "title": "Confirmar eliminación de la copia de seguridad",
+              "content": "¿Seguro que quieres eliminar **{name}** de este servidor?",
+              "toast": {
+                "deleted": "Copia de seguridad eliminada."
+              }
+            }
+          }
+        },
+        "network": {
+          "title": "Red",
+          "subtitle": "{current} de {max} asignaciones máximas asignadas.",
+          "tooltip": {
+            "limitReached": "Este servidor está limitado a {max} asignaciones.",
+            "primary": "Principal"
+          },
+          "table": {
+            "columns": {
+              "hostname": "Nombre de host",
+              "port": "Puerto",
+              "notes": "Notas"
+            }
+          },
+          "button": {
+            "setPrimary": "Establecer como principal",
+            "unsetPrimary": "Quitar principal"
+          },
+          "toast": {
+            "created": "Asignación creada.",
+            "updated": "Asignación actualizada.",
+            "removed": "Asignación eliminada.",
+            "setPrimary": "Asignación establecida como principal.",
+            "unsetPrimary": "La asignación ya no es principal."
+          },
+          "modal": {
+            "editAllocation": {
+              "title": "Editar asignación",
+              "form": {
+                "notes": "Notas"
+              }
+            },
+            "removeAllocation": {
+              "title": "Confirmar eliminación de la asignación",
+              "content": "¿Seguro que quieres eliminar **{allocation}** de este servidor?"
+            }
+          }
+        },
+        "startup": {
+          "title": "Arranque",
+          "form": {
+            "startupCommand": "Comando de arranque",
+            "dockerImage": "Imagen de Docker"
+          },
+          "variables": "Variables",
+          "dockerImageDescription": "La imagen de Docker usada para ejecutar este servidor. Se puede cambiar para usar una imagen diferente.",
+          "dockerImageDescriptionCustom": "La imagen de Docker usada para ejecutar este servidor. Ha sido configurada por un administrador y no se puede cambiar.",
+          "toast": {
+            "startupCommandUpdated": "Comando de arranque actualizado.",
+            "dockerImageUpdated": "Imagen de Docker actualizada.",
+            "variablesUpdated": "Variables actualizadas."
+          },
+          "modal": {
+            "unsavedChanges": {
+              "title": "Cambios sin guardar",
+              "content": "Tienes cambios sin guardar en tus variables de arranque. ¿Seguro que quieres salir de esta página? Si sales, se perderán tus cambios.",
+              "button": {
+                "leave": "Salir de la página"
+              }
+            }
+          },
+          "noVariables": "No se encontraron variables de arranque para este servidor."
+        },
+        "mounts": {
+          "title": "Montajes",
+          "table": {
+            "columns": {
+              "target": "Destino",
+              "mounted": "Montado",
+              "readOnly": "Solo lectura"
+            }
+          },
+          "modal": {
+            "attachMount": {
+              "title": "Adjuntar montaje",
+              "content": "¿Quieres adjuntar **{name}** a `{target}`?",
+              "confirm": "Adjuntar",
+              "toast": {
+                "attached": "{name} se ha montado en tu servidor."
+              }
+            },
+            "detachMount": {
+              "title": "Desmontar montaje",
+              "content": "¿Quieres desmontar **{name}** de `{target}`?",
+              "confirm": "Desmontar",
+              "toast": {
+                "detached": "{name} se ha eliminado de tu servidor."
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Ajustes",
+          "debugInformation": {
+            "title": "Información de depuración",
+            "form": {
+              "nodeName": "Nodo (UUID)",
+              "locationName": "Ubicación (UUID)",
+              "serverUuid": "UUID del servidor"
+            }
+          },
+          "rename": {
+            "title": "Renombrar servidor",
+            "form": {
+              "serverName": "Nombre del servidor"
+            },
+            "toast": {
+              "renamed": "Servidor renombrado."
+            }
+          },
+          "timezone": {
+            "title": "Zona horaria",
+            "form": {
+              "timezone": "Zona horaria",
+              "system": "Sistema"
+            },
+            "toast": {
+              "updated": "Zona horaria del servidor actualizada."
+            }
+          },
+          "autokill": {
+            "title": "Detención automática",
+            "form": {
+              "enabled": "Activado",
+              "secondsUntilAutoKill": "Segundos hasta la detención automática"
+            },
+            "toast": {
+              "updated": "Detención automática del servidor actualizada."
+            }
+          },
+          "autostart": {
+            "title": "Autoarranque",
+            "form": {
+              "behavior": "Comportamiento"
+            },
+            "toast": {
+              "updated": "Comportamiento de autoarranque del servidor actualizado."
+            }
+          },
+          "reinstall": {
+            "title": "Reinstalar servidor",
+            "button": "Reinstalar servidor",
+            "content": "Reinstalar tu servidor lo detendrá y volverá a ejecutar el script de instalación que lo configuró inicialmente. **Durante este proceso, algunos archivos pueden eliminarse o modificarse; haz una copia de seguridad de tus datos antes de continuar.**",
+            "modal": {
+              "title": "Reinstalar servidor",
+              "button": "Reinstalar",
+              "toast": {
+                "reinstalling": "Reinstalando servidor..."
+              }
+            }
+          }
+        },
+        "activity": {
+          "title": "Actividad"
+        }
+      }
+    }
+  }
+}

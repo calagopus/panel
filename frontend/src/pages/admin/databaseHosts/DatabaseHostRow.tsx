@@ -19,12 +19,9 @@ export default function DatabaseHostRow({ databaseHost }: { databaseHost: z.infe
       </TableData>
 
       <TableData>{databaseHost.name}</TableData>
+
       <TableData>{databaseTypeLabelMapping[databaseHost.type]}</TableData>
-      <TableData>
-        <Code>
-          {databaseHost.host}:{databaseHost.port}
-        </Code>
-      </TableData>
+
       <TableData>
         <FormattedTimestamp timestamp={databaseHost.created} />
       </TableData>

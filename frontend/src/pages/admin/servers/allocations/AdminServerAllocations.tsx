@@ -38,6 +38,8 @@ export default function AdminServerAllocations({ server }: { server: z.infer<typ
           </Button>
         </AdminCan>
       }
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.allocations.subContainer}
+      registryProps={{ server }}
     >
       <AdminCan action='nodes.read'>
         <ServerAllocationAddModal server={server} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />

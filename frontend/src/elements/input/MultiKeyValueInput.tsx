@@ -167,9 +167,9 @@ function MultiKeyValueInput({
     const { key, value } = item;
 
     return (
-      <Card p={6}>
+      <Card p={6} className='h-11'>
         {editingKey === key ? (
-          <Group gap={4} wrap='nowrap'>
+          <Group gap={4} wrap='nowrap' h='100%' align='center'>
             <ActionIcon size='sm' variant='subtle' color='gray' {...dragHandleProps} hidden={!allowReordering}>
               <FontAwesomeIcon icon={faGripVertical} size='xs' />
             </ActionIcon>
@@ -198,7 +198,7 @@ function MultiKeyValueInput({
             </ActionIcon>
           </Group>
         ) : (
-          <Group gap={6} wrap='nowrap'>
+          <Group gap={6} wrap='nowrap' h='100%' align='center'>
             <ActionIcon size='sm' variant='subtle' color='gray' {...dragHandleProps} hidden={!allowReordering}>
               <FontAwesomeIcon icon={faGripVertical} size='xs' />
             </ActionIcon>

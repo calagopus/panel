@@ -1,5 +1,4 @@
 import { ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -10,6 +9,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverBackupEditSchema, serverBackupSchema } from '@/lib/schemas/server/backups.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -25,14 +25,17 @@ export default function BackupEditModal({ backup, opened, onClose }: Props) {
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverBackupEditSchema>>({
-    initialValues: {
-      name: backup.name,
-      locked: backup.isLocked,
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverBackupEditSchema>>(
+    {
+      initialValues: {
+        name: backup.name,
+        locked: backup.isLocked,
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverBackupEditSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverBackupEditSchema),
-  });
+    onClose,
+  );
 
   const doUpdate = () => {
     setLoading(false);
@@ -41,7 +44,7 @@ export default function BackupEditModal({ backup, opened, onClose }: Props) {
       .then(() => {
         backup.name = form.values.name;
         backup.isLocked = form.values.locked;
-        onClose();
+        handleClose();
         addToast(t('pages.server.backups.modal.editBackup.toast.updated', {}), 'success');
       })
       .catch((msg) => {
@@ -51,7 +54,7 @@ export default function BackupEditModal({ backup, opened, onClose }: Props) {
   };
 
   return (
-    <Modal title={t('pages.server.backups.modal.editBackup.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.backups.modal.editBackup.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
         <Stack>
           <TextInput
@@ -71,7 +74,7 @@ export default function BackupEditModal({ backup, opened, onClose }: Props) {
             <Button type='submit' loading={loading} disabled={!form.isValid()}>
               {t('common.button.save', {})}
             </Button>
-            <Button variant='default' onClick={onClose}>
+            <Button variant='default' onClick={handleClose}>
               {t('common.button.close', {})}
             </Button>
           </ModalFooter>

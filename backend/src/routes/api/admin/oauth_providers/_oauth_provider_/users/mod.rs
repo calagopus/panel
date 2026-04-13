@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod identifier;
+
 mod get {
     use crate::routes::api::admin::oauth_providers::_oauth_provider_::GetOAuthProvider;
     use axum::{extract::Query, http::StatusCode};
@@ -84,5 +86,6 @@ mod get {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
+        .nest("/identifier", identifier::router(state))
         .with_state(state.clone())
 }

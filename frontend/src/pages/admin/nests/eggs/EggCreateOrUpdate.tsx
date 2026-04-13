@@ -333,7 +333,7 @@ export default function EggCreateOrUpdate({
           </Group>
 
           <TitleCard title='Startup Configuration' icon={<FontAwesomeIcon icon={faPlay} size='sm' />}>
-            <Group grow>
+            <Group grow align='top'>
               <TagsInput
                 withAsterisk
                 label='Startup Done'
@@ -601,7 +601,7 @@ export default function EggCreateOrUpdate({
             />
           </Group>
 
-          <Group grow>
+          <Group grow align='top'>
             <TagsInput
               label='Features'
               placeholder='Feature'

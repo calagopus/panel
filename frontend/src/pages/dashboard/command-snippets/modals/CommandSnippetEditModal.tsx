@@ -1,5 +1,4 @@
 import { ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -13,6 +12,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverEggSchema } from '@/lib/schemas/server/server.ts';
 import { userCommandSnippetSchema, userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -33,15 +33,18 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
     fetcher: (search) => getUserEggs(1, search),
   });
 
-  const form = useForm<z.infer<typeof userCommandSnippetUpdateSchema>>({
-    initialValues: {
-      name: '',
-      eggs: [],
-      command: '',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof userCommandSnippetUpdateSchema>>(
+    {
+      initialValues: {
+        name: '',
+        eggs: [],
+        command: '',
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(userCommandSnippetUpdateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(userCommandSnippetUpdateSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     form.setValues({
@@ -58,7 +61,7 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
       .then(() => {
         updateStateCommandSnippet(commandSnippet.uuid, form.values);
 
-        onClose();
+        handleClose();
         addToast(t('pages.account.commandSnippets.modal.editCommandSnippet.toast.updated', {}), 'success');
       })
       .catch((msg) => {
@@ -70,7 +73,7 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
   return (
     <Modal
       title={t('pages.account.commandSnippets.modal.editCommandSnippet.title', {})}
-      onClose={onClose}
+      onClose={handleClose}
       opened={opened}
     >
       <Stack>
@@ -108,7 +111,7 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
           <Button onClick={doUpdate} loading={loading} disabled={!form.isValid()}>
             {t('common.button.edit', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

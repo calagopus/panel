@@ -15,7 +15,7 @@ import { parseVersion } from '@/lib/version.ts';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function NodeRow({ node }: { node: z.infer<typeof adminNodeSchema> }) {
-  const { latestVersions } = useAdminStore();
+  const { updateInformation } = useAdminStore();
 
   const [version, setVersion] = useState<string | null>(null);
 
@@ -43,7 +43,7 @@ export default function NodeRow({ node }: { node: z.infer<typeof adminNodeSchema
             <Tooltip label='Error while fetching version'>
               <FontAwesomeIcon icon={faHeartBroken} className='text-red-500' />
             </Tooltip>
-          ) : latestVersions && parseVersion(latestVersions.wings).isNewerThan(version) ? (
+          ) : updateInformation && parseVersion(updateInformation.latestWings).isNewerThan(version) ? (
             <Tooltip label={`${version} (Update Available)`}>
               <FontAwesomeIcon icon={faHeart} className='text-yellow-500 animate-pulse' />
             </Tooltip>

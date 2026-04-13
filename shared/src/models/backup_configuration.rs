@@ -53,9 +53,9 @@ impl BackupConfigsS3 {
         &mut self,
         database: &crate::database::Database,
     ) -> Result<(), anyhow::Error> {
-        self.secret_key = database
-            .decrypt(base32::decode(base32::Alphabet::Z, &self.secret_key).unwrap())
-            .await?;
+        if let Some(decoded) = base32::decode(base32::Alphabet::Z, &self.secret_key) {
+            self.secret_key = database.decrypt(decoded).await?;
+        }
 
         Ok(())
     }
@@ -119,9 +119,9 @@ impl BackupConfigsRestic {
         database: &crate::database::Database,
     ) -> Result<(), anyhow::Error> {
         for value in self.environment.values_mut() {
-            *value = database
-                .decrypt(base32::decode(base32::Alphabet::Z, value).unwrap())
-                .await?;
+            if let Some(decoded) = base32::decode(base32::Alphabet::Z, value) {
+                *value = database.decrypt(decoded).await?;
+            }
         }
 
         Ok(())

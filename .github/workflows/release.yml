@@ -8,7 +8,6 @@ on:
 env:
   BIN_NAME: panel-rs
   PROJECT_NAME: panel-rs
-  REPO_NAME: calagopus/panel
 
 jobs:
   build-frontend:
@@ -239,30 +238,30 @@ jobs:
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
-          DOCKER_TAGS="ghcr.io/${{ env.REPO_NAME }}:${VERSION}"
+          DOCKER_TAGS="ghcr.io/${{ github.repository }}:${VERSION}"
 
           if [[ "$VERSION" == *-* ]]; then
-            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ env.REPO_NAME }}:latest-pre"
+            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest-pre"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ env.REPO_NAME }}:latest"
+              DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
             fi
           else
-            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ env.REPO_NAME }}:latest"
+            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
           fi
 
           echo "DOCKER_TAGS=$DOCKER_TAGS" >> $GITHUB_ENV
 
-          HEAVY_TAGS="ghcr.io/${{ env.REPO_NAME }}:${VERSION}-heavy"
+          HEAVY_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy"
 
           if [[ "$VERSION" == *-* ]]; then
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ env.REPO_NAME }}:latest-pre-heavy"
+            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:latest-pre-heavy"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ env.REPO_NAME }}:heavy"
+              HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
             fi
           else
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ env.REPO_NAME }}:heavy"
+            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
           fi
 
           echo "HEAVY_TAGS=$HEAVY_TAGS" >> $GITHUB_ENV
@@ -315,7 +314,7 @@ jobs:
           file: Dockerfile.heavy
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ghcr.io/${{ env.REPO_NAME }}:heavy-build-${{ matrix.tag_suffix }}
+          tags: ghcr.io/${{ github.repository }}:heavy-build-${{ matrix.tag_suffix }}
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
 
@@ -341,24 +340,24 @@ jobs:
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
-          HEAVY_TAGS="ghcr.io/${{ env.REPO_NAME }}:${VERSION}-heavy"
+          HEAVY_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy"
 
           if [[ "$VERSION" == *-* ]]; then
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ env.REPO_NAME }}:heavy-pre"
+            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy-pre"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ env.REPO_NAME }}:heavy"
+              HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
             fi
           else
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ env.REPO_NAME }}:heavy"
+            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
           fi
 
           echo "HEAVY_TAGS=$HEAVY_TAGS" >> $GITHUB_ENV
 
       - name: Create and push multi-arch manifest
         run: |
-          SOURCE_AMD64="ghcr.io/${{ env.REPO_NAME }}:heavy-build-amd64"
-          SOURCE_ARM64="ghcr.io/${{ env.REPO_NAME }}:heavy-build-arm64"
+          SOURCE_AMD64="ghcr.io/${{ github.repository }}:heavy-build-amd64"
+          SOURCE_ARM64="ghcr.io/${{ github.repository }}:heavy-build-arm64"
 
           IFS=',' read -ra TAGS <<< "$HEAVY_TAGS"
           for TAG in "${TAGS[@]}"; do

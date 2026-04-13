@@ -7,20 +7,27 @@ import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
 type Props = ModalProps & {
   database: z.infer<typeof serverDatabaseSchema>;
+  setSizeLoading: (loading: boolean) => void;
 };
 
-export default function DatabaseRecreateModal({ database, opened, onClose }: Props) {
+export default function DatabaseRecreateModal({ database, setSizeLoading, opened, onClose }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
 
-  const [enteredName, setEnteredName] = useState('');
+  const { form, onClose: handleClose } = useModalForm(
+    {
+      name: '',
+    },
+    onClose,
+  );
   const [loading, setLoading] = useState(false);
 
   const doRecreate = () => {
@@ -29,7 +36,8 @@ export default function DatabaseRecreateModal({ database, opened, onClose }: Pro
     recreateDatabase(server.uuid, database.uuid)
       .then(() => {
         addToast(t('pages.server.databases.modal.recreateDatabase.toast.recreated', {}), 'success');
-        onClose();
+        setSizeLoading(true);
+        handleClose();
       })
       .catch((error) => {
         console.error(error);
@@ -39,7 +47,7 @@ export default function DatabaseRecreateModal({ database, opened, onClose }: Pro
   };
 
   return (
-    <Modal title={t('pages.server.databases.modal.recreateDatabase.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.databases.modal.recreateDatabase.title', {})} onClose={handleClose} opened={opened}>
       <Stack>
         <Text>{t('pages.server.databases.modal.recreateDatabase.content', { name: database.name }).md()}</Text>
 
@@ -47,15 +55,14 @@ export default function DatabaseRecreateModal({ database, opened, onClose }: Pro
           withAsterisk
           label={t('pages.server.databases.form.databaseName', {})}
           placeholder={t('pages.server.databases.form.databaseName', {})}
-          value={enteredName}
-          onChange={(e) => setEnteredName(e.target.value)}
+          {...form.getInputProps('name')}
         />
 
         <ModalFooter>
-          <Button color='red' onClick={doRecreate} loading={loading} disabled={database.name !== enteredName}>
-            {t('pages.server.databases.button.recreate', {})}
+          <Button color='red' onClick={doRecreate} loading={loading} disabled={database.name !== form.getValues().name}>
+            {t('common.button.recreate', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

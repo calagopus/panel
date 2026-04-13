@@ -238,8 +238,10 @@ impl OAuthProvider {
                         value
                     ))
                 })? {
-                serde_json::Value::String(string) => string.clone(),
-                val => val.to_string(),
+                serde_json::Value::String(string) => {
+                    crate::utils::truncate_up_to(string.clone(), 255)
+                }
+                val => crate::utils::truncate_up_to(val.to_string(), 255),
             },
         )
     }
@@ -263,8 +265,10 @@ impl OAuthProvider {
                     value
                 ))
             })? {
-                serde_json::Value::String(string) => string.clone(),
-                val => val.to_string(),
+                serde_json::Value::String(string) => {
+                    crate::utils::truncate_up_to(string.clone(), 255)
+                }
+                val => crate::utils::truncate_up_to(val.to_string(), 255),
             },
         )
     }
@@ -283,8 +287,10 @@ impl OAuthProvider {
                     value
                 ))
             })? {
-                serde_json::Value::String(string) => string.clone(),
-                val => val.to_string(),
+                serde_json::Value::String(string) => {
+                    crate::utils::truncate_up_to(string.clone(), 15)
+                }
+                val => crate::utils::truncate_up_to(val.to_string(), 15),
             },
         )
     }
@@ -303,8 +309,10 @@ impl OAuthProvider {
                     value
                 ))
             })? {
-                serde_json::Value::String(string) => string.clone(),
-                val => val.to_string(),
+                serde_json::Value::String(string) => {
+                    crate::utils::truncate_up_to(string.clone(), 255)
+                }
+                val => crate::utils::truncate_up_to(val.to_string(), 255),
             },
         )
     }
@@ -323,8 +331,10 @@ impl OAuthProvider {
                     value
                 ))
             })? {
-                serde_json::Value::String(string) => string.clone(),
-                val => val.to_string(),
+                serde_json::Value::String(string) => {
+                    crate::utils::truncate_up_to(string.clone(), 255)
+                }
+                val => crate::utils::truncate_up_to(val.to_string(), 255),
             },
         )
     }

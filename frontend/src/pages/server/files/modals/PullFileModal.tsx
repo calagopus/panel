@@ -1,5 +1,4 @@
 import { ModalProps } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import classNames from 'classnames';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
@@ -14,6 +13,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverFilesPullQueryResultSchema, serverFilesPullSchema } from '@/lib/schemas/server/files.ts';
 import { bytesToString } from '@/lib/size.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -28,14 +28,17 @@ export default function PullFileModal({ opened, onClose }: ModalProps) {
   const [loading, setLoading] = useState(false);
   const [queryResult, setQueryResult] = useState<null | z.infer<typeof serverFilesPullQueryResultSchema>>(null);
 
-  const form = useForm<z.infer<typeof serverFilesPullSchema>>({
-    initialValues: {
-      url: '',
-      name: '',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverFilesPullSchema>>(
+    {
+      initialValues: {
+        url: '',
+        name: '',
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverFilesPullSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverFilesPullSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     setQueryResult(null);
@@ -66,7 +69,7 @@ export default function PullFileModal({ opened, onClose }: ModalProps) {
     })
       .then(() => {
         addToast(t('pages.server.files.toast.filePullingStarted', {}), 'success');
-        onClose();
+        handleClose();
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -75,7 +78,7 @@ export default function PullFileModal({ opened, onClose }: ModalProps) {
   };
 
   return (
-    <Modal title={t('pages.server.files.modal.pullFile.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.files.modal.pullFile.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doPullFile())}>
         <div className='grid grid-cols-4 gap-2'>
           <TextInput
@@ -118,7 +121,7 @@ export default function PullFileModal({ opened, onClose }: ModalProps) {
             {t('pages.server.files.modal.pullFile.pull', {})}
             {queryResult?.fileSize ? ` (${bytesToString(queryResult.fileSize)})` : ''}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

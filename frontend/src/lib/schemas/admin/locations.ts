@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
-import { databaseHostSchema } from '@/lib/schemas/generic.ts';
 import { nullableString } from '@/lib/transformers.ts';
+import { adminDatabaseHostSchema } from './databaseHosts.ts';
 
 export const adminLocationSchema = z.object({
   uuid: z.string(),
@@ -24,6 +24,6 @@ export const adminLocationUpdateSchema = z.lazy(() =>
 );
 
 export const adminLocationDatabaseHostSchema = z.object({
-  databaseHost: databaseHostSchema,
+  databaseHost: z.lazy(() => adminDatabaseHostSchema),
   created: z.date(),
 });

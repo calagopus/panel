@@ -1110,8 +1110,7 @@
             "transferCompleted": "Chuyển giao đã hoàn tất thành công. Kết nối lại với máy chủ...",
             "pullingImage": "Máy chủ của bạn hiện đang kéo hình ảnh docker của nó. Vui lòng chờ...",
             "pulling": "Đang Kéo",
-            "extracting": "Đang Trích Xuất",
-            "layer": "Lớp"
+            "extracting": "Đang Trích Xuất"
           },
           "tooltip": {
             "search": "Tìm Kiếm",

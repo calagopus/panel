@@ -78,11 +78,7 @@ export default function LocationDatabaseHostRow({
             </TableData>
             <TableData>{databaseHost.databaseHost.name}</TableData>
             <TableData>{databaseTypeLabelMapping[databaseHost.databaseHost.type]}</TableData>
-            <TableData>
-              <Code>
-                {databaseHost.databaseHost.host}:{databaseHost.databaseHost.port}
-              </Code>
-            </TableData>
+
             <TableData>
               <FormattedTimestamp timestamp={databaseHost.created} />
             </TableData>

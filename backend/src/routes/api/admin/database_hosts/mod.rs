@@ -110,7 +110,7 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("database-hosts.create")?;
 
-        let database_host = match DatabaseHost::create(&state, data).await {
+        let mut database_host = match DatabaseHost::create(&state, data).await {
             Ok(database_host) => database_host,
             Err(err) if err.is_unique_violation() => {
                 return ApiResponse::error("database host with name already exists")
@@ -119,6 +119,8 @@ mod post {
             }
             Err(err) => return ApiResponse::from(err).ok(),
         };
+
+        database_host.credentials.censor();
 
         activity_logger
             .log(
@@ -132,11 +134,9 @@ mod post {
                     "maintenance_enabled": database_host.maintenance_enabled,
 
                     "public_host": database_host.public_host,
-                    "host": database_host.host,
                     "public_port": database_host.public_port,
-                    "port": database_host.port,
 
-                    "username": database_host.username,
+                    "credentials": database_host.credentials,
                 }),
             )
             .await;

@@ -205,6 +205,33 @@ impl UserApiKey {
             .await;
     }
 
+    pub async fn recreate(
+        &mut self,
+        database: &crate::database::Database,
+    ) -> Result<String, crate::database::DatabaseError> {
+        let new_key = format!(
+            "c7sp_{}",
+            rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 43)
+        );
+
+        sqlx::query(
+            r#"
+            UPDATE user_api_keys
+            SET key_start = $1, key = crypt($2, gen_salt('xdes', 321))
+            WHERE user_api_keys.uuid = $3
+            "#,
+        )
+        .bind(&new_key[0..16])
+        .bind(&new_key)
+        .bind(self.uuid)
+        .execute(database.write())
+        .await?;
+
+        self.key_start = new_key[0..16].into();
+
+        Ok(new_key)
+    }
+
     #[inline]
     pub fn into_api_object(self) -> ApiUserApiKey {
         ApiUserApiKey {

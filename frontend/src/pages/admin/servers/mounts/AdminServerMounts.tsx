@@ -35,6 +35,8 @@ export default function AdminServerMounts({ server }: { server: z.infer<typeof a
           Add
         </Button>
       }
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.mounts.subContainer}
+      registryProps={{ server }}
     >
       <ServerMountAddModal server={server} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
 

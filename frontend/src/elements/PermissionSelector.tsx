@@ -107,11 +107,52 @@ export default function PermissionSelector({
     [permissions, selectedPermissions],
   );
 
+  const selectedPanel = (
+    <Card>
+      <Title order={3} c='white'>
+        {t('elements.permissionSelector.selectedPermissions', { count: selectedPermissions.length })}
+      </Title>
+      <div className='max-h-96 overflow-y-auto'>
+        {selectedPermissions.length === 0 ? (
+          <p className='text-gray-200 text-sm'>{t('elements.permissionSelector.noPermissions', {})}</p>
+        ) : (
+          <div className='space-y-1'>
+            {sortedSelectedPermissions.map((permission) => (
+              <Card key={permission} className='border border-neutral-600' padding='xs'>
+                <Group justify='space-between'>
+                  <span className='text-sm font-mono text-white'>{permission}</span>
+                  <ActionIcon color='red' onClick={() => togglePermission(permission)}>
+                    <FontAwesomeIcon icon={faX} />
+                  </ActionIcon>
+                </Group>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className='mt-4 flex flex-row'>
+        <Button disabled={selectedPermissions.length === allPermissionKeys.length} onClick={selectAllPermissions}>
+          {t('common.button.selectAll', {})}
+        </Button>
+        <Button
+          disabled={selectedPermissions.length === 0}
+          color='red'
+          variant='outline'
+          onClick={clearAllPermissions}
+          className='ml-2'
+        >
+          {t('common.button.deselectAll', {})}
+        </Button>
+      </div>
+    </Card>
+  );
+
   return (
     <Stack gap={0}>
       {label && <Input.Label required={withAsterisk}>{label}</Input.Label>}
-      <div className='grid grid-cols-1 gap-6'>
-        <div className='space-y-4'>
+
+      <div className='flex flex-col lg:flex-row lg:items-start gap-6'>
+        <div className='flex-1 space-y-4 min-w-0'>
           {Object.entries(permissions).map(([category, { description, permissions: perms }]) => {
             const isExpanded = expandedCategories.includes(category);
             const selectionState = getCategorySelectionState(category);
@@ -184,45 +225,7 @@ export default function PermissionSelector({
           })}
         </div>
 
-        <Card>
-          <Title order={3} c='white'>
-            {t('elements.permissionSelector.selectedPermissions', { count: selectedPermissions.length })}
-          </Title>
-          <div className='max-h-96 overflow-y-auto'>
-            {selectedPermissions.length === 0 ? (
-              <p className='text-gray-200 text-sm'>{t('elements.permissionSelector.noPermissions', {})}</p>
-            ) : (
-              <div className='space-y-1'>
-                {sortedSelectedPermissions.map((permission) => (
-                  <Card key={permission} className='border border-neutral-600' padding='xs'>
-                    <Group justify='space-between'>
-                      <span className='text-sm font-mono text-white'>{permission}</span>
-
-                      <ActionIcon color='red' onClick={() => togglePermission(permission)}>
-                        <FontAwesomeIcon icon={faX} />
-                      </ActionIcon>
-                    </Group>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className='mt-4 flex flex-row'>
-            <Button disabled={selectedPermissions.length === allPermissionKeys.length} onClick={selectAllPermissions}>
-              {t('common.button.selectAll', {})}
-            </Button>
-            <Button
-              disabled={selectedPermissions.length === 0}
-              color='red'
-              variant='outline'
-              onClick={clearAllPermissions}
-              className='ml-2'
-            >
-              {t('common.button.deselectAll', {})}
-            </Button>
-          </div>
-        </Card>
+        <div className='w-full lg:w-1/3 lg:sticky lg:top-15 lg:self-start'>{selectedPanel}</div>
       </div>
     </Stack>
   );

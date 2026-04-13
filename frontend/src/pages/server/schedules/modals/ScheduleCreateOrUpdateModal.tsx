@@ -1,7 +1,6 @@
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps, Stack, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -17,6 +16,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { scheduleTriggerDefaultMapping, scheduleTriggerLabelMapping } from '@/lib/enums.ts';
 import { serverScheduleSchema, serverScheduleUpdateSchema } from '@/lib/schemas/server/schedules.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -34,18 +34,21 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverScheduleUpdateSchema>>({
-    initialValues: {
-      name: '',
-      enabled: true,
-      triggers: [],
-      condition: {
-        type: 'none',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverScheduleUpdateSchema>>(
+    {
+      initialValues: {
+        name: '',
+        enabled: true,
+        triggers: [],
+        condition: {
+          type: 'none',
+        },
       },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverScheduleUpdateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverScheduleUpdateSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     if (propSchedule) {
@@ -64,7 +67,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
       updateSchedule(server.uuid, propSchedule.uuid, form.values)
         .then(() => {
           addToast(t('pages.server.schedules.toast.updated', {}), 'success');
-          onClose();
+          handleClose();
           onScheduleUpdate?.(form.values);
         })
         .catch((msg) => {
@@ -76,7 +79,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
         .then((schedule) => {
           addToast(t('pages.server.schedules.toast.created', {}), 'success');
           form.reset();
-          onClose();
+          handleClose();
           addSchedule(schedule);
         })
         .catch((msg) => {
@@ -101,7 +104,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
           ? t('pages.server.schedules.modal.updateSchedule.title', {})
           : t('pages.server.schedules.modal.createSchedule.title', {})
       }
-      onClose={onClose}
+      onClose={handleClose}
       opened={opened}
       size='lg'
     >
@@ -158,7 +161,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
           <Button onClick={doCreateOrUpdate} loading={loading} disabled={!form.isValid()}>
             {propSchedule?.uuid ? t('common.button.update', {}) : t('common.button.create', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

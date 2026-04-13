@@ -233,6 +233,11 @@ impl ExtensionPermissionsBuilder {
     }
 }
 
+pub struct ExtensionUpdateInfo {
+    pub version: semver::Version,
+    pub changes: Vec<compact_str::CompactString>,
+}
+
 pub type ExtensionCallValue = Box<dyn std::any::Any + Send + Sync>;
 
 #[async_trait::async_trait]
@@ -290,6 +295,17 @@ pub trait Extension: Send + Sync {
     /// `SettingsSerializeExt` to be implemented for it. If you have no clue what this means. copy code from the docs.
     async fn settings_deserializer(&self, state: State) -> settings::ExtensionSettingsDeserializer {
         Arc::new(settings::EmptySettings)
+    }
+
+    /// Your extension update checker, this is used to check for updates to your extension. It runs every 24 hours and on startup.
+    /// You can return an `ExtensionUpdateInfo` struct with the new version and a list of changes, this changes list *should* be all
+    /// changes from the current version to the new version. An empty changes list will simply not show any changelog, but will still show that an update is available.
+    async fn check_for_updates(
+        &self,
+        state: State,
+        current_version: &semver::Version,
+    ) -> Result<Option<ExtensionUpdateInfo>, anyhow::Error> {
+        Ok(None)
     }
 
     /// Your extension call processor, this can be called by other extensions to interact with yours,

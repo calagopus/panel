@@ -2,7 +2,6 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _oauth_link_;
-mod identifier;
 
 mod get {
     use crate::routes::api::admin::users::_user_::GetParamUser;
@@ -188,6 +187,5 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(post::route))
         .nest("/{oauth_link}", _oauth_link_::router(state))
-        .nest("/identifier", identifier::router(state))
         .with_state(state.clone())
 }

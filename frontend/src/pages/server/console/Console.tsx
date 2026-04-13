@@ -577,7 +577,6 @@ export default function Terminal() {
                 {progress.status === 'pulling'
                   ? t('pages.server.console.message.pulling', {})
                   : t('pages.server.console.message.extracting', {})}{' '}
-                {t('pages.server.console.message.layer', {})}{' '}
                 <Progress
                   hourglass={false}
                   value={(progress.progress / progress.total) * 100}

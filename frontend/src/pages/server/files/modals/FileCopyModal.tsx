@@ -1,5 +1,4 @@
 import { ModalProps } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
 import { useEffect, useState } from 'react';
@@ -11,6 +10,7 @@ import Code from '@/elements/Code.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverDirectoryEntrySchema, serverFilesCopySchema } from '@/lib/schemas/server/files.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -28,18 +28,21 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverFilesCopySchema>>({
-    initialValues: {
-      name: '',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverFilesCopySchema>>(
+    {
+      initialValues: {
+        name: '',
+      },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverFilesCopySchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverFilesCopySchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     if (file) {
       form.setValues({
-        name: '',
+        name: file.name,
       });
     }
   }, [file]);
@@ -95,7 +98,7 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
     copyFile(server.uuid, join(browsingDirectory, file.name), form.values.name || null)
       .then(() => {
         addToast(t('pages.server.files.toast.fileCopyingStarted', {}), 'success');
-        onClose();
+        handleClose();
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -104,7 +107,7 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
   };
 
   return (
-    <Modal title={t('pages.server.files.modal.copyFile.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.files.modal.copyFile.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doCopy())}>
         <TextInput
           label={t('pages.server.files.modal.copyFile.form.fileName', {})}
@@ -118,7 +121,7 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
           <Code>
             /home/container/
             <span className='text-cyan-200'>
-              {join(browsingDirectory, form.values.name || generateNewName()).replace(/^(\.\.\/|\/)+/, '')}
+              {join(browsingDirectory, form.getValues().name || generateNewName()).replace(/^(\.\.\/|\/)+/, '')}
             </span>
           </Code>
         </p>
@@ -127,7 +130,7 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
           <Button type='submit' loading={loading}>
             {t('pages.server.files.button.copy', {})}
           </Button>
-          <Button variant='default' onClick={onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

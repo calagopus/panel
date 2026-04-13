@@ -11,6 +11,7 @@ import {
   faFolderOpen,
   faFolderTree,
   faPuzzlePiece,
+  faRefresh,
   faScroll,
   faServer,
   faUsers,
@@ -35,6 +36,7 @@ import AdminOverview from '@/pages/admin/overview/AdminOverview.tsx';
 import AdminRoles from '@/pages/admin/roles/AdminRoles.tsx';
 import AdminServers from '@/pages/admin/servers/AdminServers.tsx';
 import AdminSettings from '@/pages/admin/settings/AdminSettings.tsx';
+import AdminUpdates from '@/pages/admin/updates/AdminUpdates.tsx';
 import AdminUsers from '@/pages/admin/users/AdminUsers.tsx';
 
 const routes: AdminRouteDefinition[] = [
@@ -43,6 +45,13 @@ const routes: AdminRouteDefinition[] = [
     icon: faBuilding,
     path: '/',
     element: AdminOverview,
+    exact: true,
+  },
+  {
+    name: 'Updates',
+    icon: faRefresh,
+    path: '/updates',
+    element: AdminUpdates,
     exact: true,
   },
   {

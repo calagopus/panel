@@ -237,7 +237,7 @@ impl CreatableModel for UserSession {
         let mut hash = sha2::Sha256::new();
         hash.update(chrono::Utc::now().timestamp().to_le_bytes());
         hash.update(options.user_uuid.to_bytes_le());
-        let hash = format!("{:x}", hash.finalize());
+        let hash = hex::encode(hash.finalize());
 
         query_builder
             .set("user_uuid", options.user_uuid)

@@ -267,6 +267,7 @@ pub enum ScheduleActionInner {
         #[garde(dive)]
         root: ScheduleDynamicParameter,
         #[garde(skip)]
+        #[schema(inline)]
         files: Vec<super::servers_server_files_rename::put::RequestBodyFiles>,
     },
     CompressFiles {
@@ -365,7 +366,7 @@ pub enum SchedulePreConditionComparator {
 
 #[derive(ToSchema, Validate, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case", tag = "type")]
-#[schema(rename_all = "snake_case", no_recursion)]
+#[schema(no_recursion)]
 pub enum SchedulePreCondition {
     None,
     And {
@@ -417,7 +418,7 @@ pub enum SchedulePreCondition {
 
 #[derive(ToSchema, Deserialize, Serialize, Clone, Validate)]
 #[serde(rename_all = "snake_case", tag = "type")]
-#[schema(rename_all = "snake_case", no_recursion)]
+#[schema(no_recursion)]
 pub enum ScheduleCondition {
     None,
     And {

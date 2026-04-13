@@ -28,6 +28,24 @@ export function formatDateTime(timestamp: string | number | Date, precise?: bool
   });
 }
 
+export function formatDateTimeAsTimezone(
+  timestamp: string | number | Date,
+  timezone: string,
+  precise?: boolean,
+  short = true,
+) {
+  return new Date(timestamp).toLocaleString(getTranslations().language, {
+    year: 'numeric',
+    month: short ? 'short' : 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: precise ? 'numeric' : undefined,
+    timeZone: timezone,
+    timeZoneName: !short ? 'short' : undefined,
+  });
+}
+
 export function formatTimestamp(timestamp: string | number | Date) {
   const now = new Date();
   const target = new Date(timestamp);

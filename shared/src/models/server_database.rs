@@ -275,7 +275,7 @@ impl ServerDatabase {
     }
 
     pub async fn rotate_password(
-        &self,
+        &mut self,
         database: &crate::database::Database,
     ) -> Result<String, anyhow::Error> {
         let new_password = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 24);
@@ -286,7 +286,7 @@ impl ServerDatabase {
                     "ALTER USER '{}'@'%' IDENTIFIED BY '{}'",
                     self.username, new_password
                 ))
-                .execute(pool.as_ref())
+                .execute(&pool)
                 .await?;
             }
             crate::models::database_host::DatabasePool::Postgres(pool) => {
@@ -294,8 +294,15 @@ impl ServerDatabase {
                     "ALTER USER \"{}\" WITH PASSWORD '{}'",
                     self.username, new_password
                 ))
-                .execute(pool.as_ref())
+                .execute(&pool)
                 .await?;
+            }
+            crate::models::database_host::DatabasePool::Mongodb(client) => {
+                let cmd = mongodb::bson::doc! {
+                    "updateUser": self.username.to_string(),
+                    "pwd": &new_password
+                };
+                client.database(&self.name).run_command(cmd).await?;
             }
         }
 
@@ -315,54 +322,87 @@ impl ServerDatabase {
     }
 
     pub async fn get_size(
-        &self,
+        &mut self,
         database: &crate::database::Database,
     ) -> Result<i64, crate::database::DatabaseError> {
         match self.database_host.get_connection(database).await? {
             crate::models::database_host::DatabasePool::Mysql(pool) => {
-                let row = sqlx::query(&format!(
-                    "SELECT CAST(SUM(data_length + index_length) AS INTEGER) FROM information_schema.tables WHERE table_schema = '{}'",
-                    self.name
-                ))
-                .fetch_one(pool.as_ref())
+                let row = sqlx::query(
+                    "SELECT CAST(SUM(data_length + index_length) AS INTEGER) FROM information_schema.tables WHERE table_schema = ?",
+                )
+                .bind(&self.name)
+                .fetch_one(&pool)
                 .await?;
 
                 Ok(row.get::<Option<i64>, _>(0).unwrap_or(0))
             }
             crate::models::database_host::DatabasePool::Postgres(pool) => {
-                let row = sqlx::query(&format!("SELECT pg_database_size('{}')", self.name))
-                    .fetch_one(pool.as_ref())
+                let row = sqlx::query("SELECT pg_database_size($1)")
+                    .bind(&self.name)
+                    .fetch_one(&pool)
                     .await?;
 
                 Ok(row.get::<Option<i64>, _>(0).unwrap_or(0))
+            }
+            crate::models::database_host::DatabasePool::Mongodb(client) => {
+                let cmd = mongodb::bson::doc! { "dbStats": 1, "scale": 1 };
+                let stats = client.database(&self.name).run_command(cmd).await?;
+
+                let size = match stats.get("dataSize") {
+                    Some(mongodb::bson::Bson::Int32(i)) => *i as i64,
+                    Some(mongodb::bson::Bson::Int64(i)) => *i,
+                    Some(mongodb::bson::Bson::Double(f)) => *f as i64,
+                    _ => 0,
+                };
+
+                Ok(size)
             }
         }
     }
 
     pub async fn recreate(
-        &self,
+        &mut self,
         database: &crate::database::Database,
     ) -> Result<(), anyhow::Error> {
-        let run_recreate = async || {
+        let mut run_recreate = async || {
             match self.database_host.get_connection(database).await? {
                 crate::models::database_host::DatabasePool::Mysql(pool) => {
                     sqlx::query(&format!("DROP DATABASE IF EXISTS `{}`", self.name))
-                        .execute(pool.as_ref())
+                        .execute(&pool)
                         .await?;
                     sqlx::query(&format!("CREATE DATABASE `{}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", self.name))
-                        .execute(pool.as_ref())
+                        .execute(&pool)
                         .await?;
                 }
                 crate::models::database_host::DatabasePool::Postgres(pool) => {
                     sqlx::query(&format!("DROP DATABASE IF EXISTS \"{}\"", self.name))
-                        .execute(pool.as_ref())
+                        .execute(&pool)
                         .await?;
                     sqlx::query(&format!(
                         "CREATE DATABASE \"{}\" WITH OWNER \"{}\" ENCODING 'UTF8'",
                         self.name, self.username
                     ))
-                    .execute(pool.as_ref())
+                    .execute(&pool)
                     .await?;
+                }
+                crate::models::database_host::DatabasePool::Mongodb(client) => {
+                    let db = client.database(&self.name);
+
+                    let drop_user_cmd =
+                        mongodb::bson::doc! { "dropUser": self.username.to_string() };
+                    let _ = db.run_command(drop_user_cmd).await;
+
+                    db.drop().await?;
+
+                    let password = database.decrypt(self.password.clone()).await?;
+                    let cmd = mongodb::bson::doc! {
+                        "createUser": self.username.to_string(),
+                        "pwd": password.into_string(),
+                        "roles": [
+                            { "role": "readWrite", "db": self.name.to_string() }
+                        ]
+                    };
+                    db.run_command(cmd).await?;
                 }
             }
 
@@ -393,6 +433,12 @@ impl ServerDatabase {
         database: &crate::database::Database,
         storage_url_retriever: &StorageUrlRetriever<'_>,
     ) -> Result<AdminApiServerDatabase, anyhow::Error> {
+        let details = self
+            .database_host
+            .credentials
+            .parse_connection_details(database)
+            .await?;
+
         Ok(AdminApiServerDatabase {
             uuid: self.uuid,
             server: self
@@ -402,14 +448,11 @@ impl ServerDatabase {
                 .into_admin_api_object(database, storage_url_retriever)
                 .await?,
             r#type: self.database_host.r#type,
-            host: self
-                .database_host
-                .public_host
-                .unwrap_or(self.database_host.host),
+            host: self.database_host.public_host.unwrap_or(details.host),
             port: self
                 .database_host
                 .public_port
-                .unwrap_or(self.database_host.port),
+                .unwrap_or(details.port as i32),
             name: self.name,
             is_locked: self.locked,
             username: self.username,
@@ -431,17 +474,20 @@ impl ServerDatabase {
             username.truncate(space_idx);
         }
 
+        let details = self
+            .database_host
+            .credentials
+            .parse_connection_details(database)
+            .await?;
+
         Ok(ApiServerDatabase {
             uuid: self.uuid,
             r#type: self.database_host.r#type,
-            host: self
-                .database_host
-                .public_host
-                .unwrap_or(self.database_host.host),
+            host: self.database_host.public_host.unwrap_or(details.host),
             port: self
                 .database_host
                 .public_port
-                .unwrap_or(self.database_host.port),
+                .unwrap_or(details.port as i32),
             name: self.name,
             is_locked: self.locked,
             username,
@@ -495,6 +541,7 @@ impl CreatableModel for ServerDatabase {
 
         let transaction: DatabaseTransaction = match options
             .database_host
+            .clone()
             .get_connection(&state.database)
             .await?
         {
@@ -507,8 +554,8 @@ impl CreatableModel for ServerDatabase {
                 .execute(&mut *transaction)
                 .await?;
                 sqlx::query(&format!("CREATE DATABASE IF NOT EXISTS `{name}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"))
-                        .execute(&mut *transaction)
-                        .await?;
+                    .execute(&mut *transaction)
+                    .await?;
                 sqlx::query(&format!(
                     "GRANT ALL PRIVILEGES ON `{name}`.* TO '{username}'@'%' WITH GRANT OPTION"
                 ))
@@ -523,15 +570,28 @@ impl CreatableModel for ServerDatabase {
                 sqlx::query(&format!(
                     "CREATE USER \"{username}\" WITH PASSWORD '{password}'"
                 ))
-                .execute(pool.as_ref())
+                .execute(&pool)
                 .await?;
                 sqlx::query(&format!(
                     "CREATE DATABASE \"{name}\" WITH OWNER \"{username}\" ENCODING 'UTF8'"
                 ))
-                .execute(pool.as_ref())
+                .execute(&pool)
                 .await?;
 
                 DatabaseTransaction::Postgres(transaction, pool)
+            }
+            crate::models::database_host::DatabasePool::Mongodb(client) => {
+                let db = client.database(&name);
+                let cmd = mongodb::bson::doc! {
+                    "createUser": &username,
+                    "pwd": &password,
+                    "roles": [
+                        { "role": "readWrite", "db": &name }
+                    ]
+                };
+                db.run_command(cmd).await?;
+
+                DatabaseTransaction::Mongodb(client)
             }
         };
 
@@ -572,9 +632,12 @@ impl CreatableModel for ServerDatabase {
                         let drop_user = format!("DROP USER IF EXISTS \"{username}\"");
 
                         let (_, _) = tokio::join!(
-                            sqlx::query(&drop_database).execute(pool.as_ref()),
-                            sqlx::query(&drop_user).execute(pool.as_ref())
+                            sqlx::query(&drop_database).execute(&pool),
+                            sqlx::query(&drop_user).execute(&pool)
                         );
+                    }
+                    DatabaseTransaction::Mongodb(client) => {
+                        let _ = client.database(&name).drop().await;
                     }
                 }
 
@@ -582,11 +645,12 @@ impl CreatableModel for ServerDatabase {
             }
         };
 
-        let uuid: uuid::Uuid = row.get("uuid");
+        let uuid: uuid::Uuid = row.try_get("uuid")?;
 
         match match transaction {
             DatabaseTransaction::Mysql(transaction) => transaction.commit().await,
             DatabaseTransaction::Postgres(transaction, _) => transaction.commit().await,
+            DatabaseTransaction::Mongodb(_) => Ok(()),
         } {
             Ok(_) => {}
             Err(err) => {
@@ -700,7 +764,11 @@ impl DeletableModel for ServerDatabase {
         self.run_delete_handlers(&options, state, &mut transaction)
             .await?;
 
-        let connection = self.database_host.get_connection(&state.database).await?;
+        let connection = self
+            .database_host
+            .clone()
+            .get_connection(&state.database)
+            .await?;
         let database_name = self.name.clone();
         let database_username = self.username.trim_end().to_string();
         let database_uuid = self.uuid;
@@ -710,19 +778,27 @@ impl DeletableModel for ServerDatabase {
                 match connection {
                     crate::models::database_host::DatabasePool::Mysql(pool) => {
                         sqlx::query(&format!("DROP DATABASE IF EXISTS `{}`", database_name))
-                            .execute(pool.as_ref())
+                            .execute(&pool)
                             .await?;
                         sqlx::query(&format!("DROP USER IF EXISTS '{}'@'%'", database_username))
-                            .execute(pool.as_ref())
+                            .execute(&pool)
                             .await?;
                     }
                     crate::models::database_host::DatabasePool::Postgres(pool) => {
                         sqlx::query(&format!("DROP DATABASE IF EXISTS \"{}\"", database_name))
-                            .execute(pool.as_ref())
+                            .execute(&pool)
                             .await?;
                         sqlx::query(&format!("DROP USER IF EXISTS \"{}\"", database_username))
-                            .execute(pool.as_ref())
+                            .execute(&pool)
                             .await?;
+                    }
+                    crate::models::database_host::DatabasePool::Mongodb(client) => {
+                        let db = client.database(&database_name);
+
+                        db.run_command(mongodb::bson::doc! { "dropUser": &database_username })
+                            .await?;
+
+                        db.drop().await?;
                     }
                 }
 

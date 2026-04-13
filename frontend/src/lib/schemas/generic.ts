@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const databaseType = z.enum(['mysql', 'postgres']);
+export const databaseType = z.enum(['mysql', 'postgres', 'mongodb']);
 
 export const databaseHostSchema = z.object({
   uuid: z.string(),

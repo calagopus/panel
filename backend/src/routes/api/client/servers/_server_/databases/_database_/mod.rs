@@ -177,6 +177,13 @@ mod delete {
         }
 
         if let Err(err) = database.delete(&state, Default::default()).await {
+            if err
+                .downcast_ref::<shared::response::DisplayError>()
+                .is_some()
+            {
+                return ApiResponse::from(err).ok();
+            }
+
             tracing::error!(server = %server.uuid, "failed to delete database: {:?}", err);
 
             return ApiResponse::error("failed to delete database")

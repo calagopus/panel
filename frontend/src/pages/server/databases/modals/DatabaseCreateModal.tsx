@@ -1,5 +1,4 @@
 import { ModalProps, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -13,6 +12,7 @@ import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { databaseHostSchema } from '@/lib/schemas/generic.ts';
 import { serverDatabaseCreateSchema } from '@/lib/schemas/server/databases.ts';
+import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -25,14 +25,14 @@ export default function DatabaseCreateModal({ opened, onClose }: ModalProps) {
   const [databaseHosts, setDatabaseHosts] = useState<z.infer<typeof databaseHostSchema>[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof serverDatabaseCreateSchema>>({
-    initialValues: {
-      name: '',
-      databaseHostUuid: '',
+  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverDatabaseCreateSchema>>(
+    {
+      initialValues: { name: '', databaseHostUuid: '' },
+      validateInputOnBlur: true,
+      validate: zod4Resolver(serverDatabaseCreateSchema),
     },
-    validateInputOnBlur: true,
-    validate: zod4Resolver(serverDatabaseCreateSchema),
-  });
+    onClose,
+  );
 
   useEffect(() => {
     getDatabaseHosts(server.uuid).then((data) => setDatabaseHosts(data));
@@ -44,7 +44,7 @@ export default function DatabaseCreateModal({ opened, onClose }: ModalProps) {
     createDatabase(server.uuid, form.values)
       .then((database) => {
         addToast(t('pages.server.databases.modal.createDatabase.toast.created', {}), 'success');
-        onClose();
+        handleClose();
         addDatabase(database);
       })
       .catch((msg) => {
@@ -54,7 +54,7 @@ export default function DatabaseCreateModal({ opened, onClose }: ModalProps) {
   };
 
   return (
-    <Modal title={t('pages.server.databases.modal.createDatabase.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.server.databases.modal.createDatabase.title', {})} onClose={handleClose} opened={opened}>
       <form onSubmit={form.onSubmit(() => doCreate())}>
         <Stack>
           <TextInput
@@ -89,7 +89,7 @@ export default function DatabaseCreateModal({ opened, onClose }: ModalProps) {
             <Button type='submit' loading={loading} disabled={!form.isValid()}>
               {t('common.button.create', {})}
             </Button>
-            <Button variant='default' onClick={onClose}>
+            <Button variant='default' onClick={handleClose}>
               {t('common.button.close', {})}
             </Button>
           </ModalFooter>
