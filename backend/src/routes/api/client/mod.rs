@@ -29,9 +29,18 @@ pub async fn auth(
     mut req: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
+    let ratelimit = match state.settings.get_as(|s| s.ratelimits.client).await {
+        Ok(ratelimit) => ratelimit,
+        Err(err) => return Ok(ApiResponse::from(err).into_response()),
+    };
     if let Err(err) = state
         .cache
-        .ratelimit("client", 360, 60, ip.to_string())
+        .ratelimit(
+            "client",
+            ratelimit.hits,
+            ratelimit.window_seconds,
+            ip.to_string(),
+        )
         .await
     {
         return Ok(err.into_response());

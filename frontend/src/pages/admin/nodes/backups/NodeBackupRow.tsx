@@ -1,14 +1,18 @@
-import { faFileArrowDown, faRotateLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faFileArrowDown, faLink, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { NavLink } from 'react-router';
 import { z } from 'zod';
+import detachNodeBackup from '@/api/admin/nodes/backups/detachNodeBackup.ts';
 import downloadNodeBackup from '@/api/admin/nodes/backups/downloadNodeBackup.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Badge from '@/elements/Badge.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -19,6 +23,7 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeBackupsDeleteModal from './modals/NodeBackupsDeleteModal.tsx';
+import NodeBackupsReattachModal from './modals/NodeBackupsReattachModal.tsx';
 import NodeBackupsRestoreModal from './modals/NodeBackupsRestoreModal.tsx';
 
 export default function NodeBackupRow({
@@ -31,13 +36,25 @@ export default function NodeBackupRow({
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [openModal, setOpenModal] = useState<'restore' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'restore' | 'reattach' | 'detach' | 'delete' | null>(null);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadNodeBackup(node.uuid, backup.uuid, archiveFormat)
       .then(({ url }) => {
         addToast('Download started.', 'success');
         window.open(url, '_blank');
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
+  };
+
+  const doDetach = async () => {
+    await detachNodeBackup(node.uuid, backup.uuid)
+      .then(() => {
+        backup.server = null;
+        setOpenModal(null);
+        addToast('Backup detached successfully.', 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -54,6 +71,21 @@ export default function NodeBackupRow({
         opened={openModal === 'restore'}
         onClose={() => setOpenModal(null)}
       />
+      <NodeBackupsReattachModal
+        node={node}
+        backup={backup}
+        opened={openModal === 'reattach'}
+        onClose={() => setOpenModal(null)}
+      />
+      <ConfirmationModal
+        opened={openModal === 'detach'}
+        onClose={() => setOpenModal(null)}
+        title='Confirm Backup Detachment'
+        confirm={t('common.button.continue', {})}
+        onConfirmed={doDetach}
+      >
+        Are you sure you want to detach this backup from its server? It will not be deleted and can be reattached later.
+      </ConfirmationModal>
       <NodeBackupsDeleteModal
         node={node}
         backup={backup}
@@ -88,6 +120,22 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            icon: faLink,
+            label: 'Reattach',
+            hidden: !backup.completed || isFailed,
+            onClick: () => setOpenModal('reattach'),
+            color: 'gray',
+            canAccess: useAdminCan('nodes.backups'),
+          },
+          {
+            icon: faLink,
+            label: 'Detach',
+            hidden: !backup.completed || isFailed || !backup.server,
+            onClick: () => setOpenModal('detach'),
+            color: 'gray',
+            canAccess: useAdminCan('nodes.backups'),
+          },
+          {
             icon: faTrash,
             hidden: !backup.completed,
             label: t('common.button.delete', {}),
@@ -106,7 +154,7 @@ export default function NodeBackupRow({
           >
             <TableData>{backup.name}</TableData>
 
-            <TableData>
+            <TableData className='flex flex-row items-center'>
               <Code>
                 {backup.server ? (
                   <NavLink
@@ -119,6 +167,11 @@ export default function NodeBackupRow({
                   '-'
                 )}
               </Code>
+              {backup.server && backup.server.node.uuid !== node.uuid && (
+                <Tooltip label='This backup is not on the same node as the server. It is not viewable from the Client API.'>
+                  <FontAwesomeIcon icon={faWarning} className='ml-1 text-yellow-400' />
+                </Tooltip>
+              )}
             </TableData>
 
             {!isFailed ? (
@@ -129,11 +182,11 @@ export default function NodeBackupRow({
                   <TableData>{bytesToString(backup.bytes)}</TableData>
                 ) : (
                   <TableData colSpan={2}>
-                    <Spinner />
+                    <Spinner size={16} />
                   </TableData>
                 )}
 
-                <TableData>{backup.completed ? backup.files : null}</TableData>
+                {backup.completed ? <TableData>{backup.files}</TableData> : null}
               </>
             ) : (
               <TableData colSpan={3}>

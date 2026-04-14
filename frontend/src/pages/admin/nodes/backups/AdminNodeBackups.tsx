@@ -37,7 +37,7 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
     >
       <ContextMenuProvider>
         <Table
-          columns={['Name', 'Server', 'Checksum', 'Size', 'Files', 'Created At', '']}
+          columns={['Name', 'Server', 'Checksum', 'Size', 'Files', 'Created', '']}
           loading={loading}
           pagination={nodeBackups}
           onPageSelect={setPage}

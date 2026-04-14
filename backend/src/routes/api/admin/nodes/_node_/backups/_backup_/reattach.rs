@@ -18,8 +18,6 @@ mod post {
     #[derive(ToSchema, Deserialize)]
     pub struct Payload {
         server_uuid: uuid::Uuid,
-
-        truncate_directory: bool,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -59,7 +57,7 @@ mod post {
         }
 
         if !backup.successful {
-            return ApiResponse::error("backup has failed and cannot be restored")
+            return ApiResponse::error("backup has failed and cannot be attached to a server")
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
         }
@@ -80,51 +78,23 @@ mod post {
                 .ok();
         }
 
-        let mut transaction = state.database.write().begin().await?;
-
-        let rows_affected = sqlx::query!(
-            "UPDATE servers
-            SET status = 'RESTORING_BACKUP'
-            WHERE servers.uuid = $1 AND servers.status IS NULL",
-            server.uuid
+        sqlx::query!(
+            "UPDATE server_backups SET server_uuid = $1 WHERE uuid = $2",
+            server.uuid,
+            backup.uuid
         )
-        .execute(&mut *transaction)
-        .await?
-        .rows_affected();
-
-        if rows_affected == 0 {
-            transaction.rollback().await?;
-
-            return ApiResponse::error("server is not in a valid state to restore backup.")
-                .with_status(StatusCode::EXPECTATION_FAILED)
-                .ok();
-        }
-
-        let backup_uuid = backup.uuid;
-        let backup_name = backup.name.clone();
-
-        if let Err(err) = backup
-            .0
-            .restore(&state.database, server, data.truncate_directory)
-            .await
-        {
-            transaction.rollback().await?;
-
-            return ApiResponse::from(err).ok();
-        }
-
-        transaction.commit().await?;
+        .execute(state.database.write())
+        .await?;
 
         activity_logger
             .log(
-                "node:backup.restore",
+                "node:backup.attach",
                 serde_json::json!({
-                    "uuid": backup_uuid,
+                    "uuid": backup.uuid,
                     "node_uuid": node.uuid,
                     "server_uuid": data.server_uuid,
 
-                    "name": backup_name,
-                    "truncate_directory": data.truncate_directory,
+                    "name": backup.name,
                 }),
             )
             .await;

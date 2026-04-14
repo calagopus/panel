@@ -24,6 +24,7 @@ use utoipa::ToSchema;
 
 pub mod activity;
 pub mod app;
+pub mod ratelimits;
 pub mod server;
 pub mod webauthn;
 
@@ -222,6 +223,8 @@ pub struct AppSettings {
     pub server: server::AppSettingsServer,
     #[schema(inline)]
     pub activity: activity::AppSettingsActivity,
+    #[schema(inline)]
+    pub ratelimits: ratelimits::AppSettingsRatelimits,
 
     #[serde(skip)]
     pub extensions: HashMap<&'static str, ExtensionSettings>,
@@ -462,6 +465,8 @@ impl SettingsSerializeExt for AppSettings {
             .nest("server", &self.server)
             .await?
             .nest("activity", &self.activity)
+            .await?
+            .nest("ratelimits", &self.ratelimits)
             .await?;
 
         for (ext_identifier, ext_settings) in self.extensions.iter() {
@@ -693,6 +698,9 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
                 .await?,
             activity: deserializer
                 .nest("activity", &activity::AppSettingsActivityDeserializer)
+                .await?,
+            ratelimits: deserializer
+                .nest("ratelimits", &ratelimits::AppSettingsRatelimitsDeserializer)
                 .await?,
             extensions,
         }))

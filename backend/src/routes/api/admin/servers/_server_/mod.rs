@@ -13,6 +13,7 @@ use shared::{
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod allocations;
+mod backups;
 mod clear_state;
 mod logs;
 mod mounts;
@@ -276,6 +277,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/allocations", allocations::router(state))
         .nest("/clear-state", clear_state::router(state))
         .nest("/logs", logs::router(state))
+        .nest("/backups", backups::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }

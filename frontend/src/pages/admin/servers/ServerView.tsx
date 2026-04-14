@@ -1,4 +1,5 @@
 import {
+  faArchive,
   faCodeCommit,
   faCog,
   faExternalLink,
@@ -14,6 +15,7 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import AdminServerAllocations from '@/pages/admin/servers/allocations/AdminServerAllocations.tsx';
+import AdminServerBackups from '@/pages/admin/servers/backups/AdminServerBackups.tsx';
 import AdminServerLogs from '@/pages/admin/servers/logs/AdminServerLogs.tsx';
 import AdminServerManagement from '@/pages/admin/servers/management/AdminServerManagement.tsx';
 import AdminServerMounts from '@/pages/admin/servers/mounts/AdminServerMounts.tsx';
@@ -64,6 +66,13 @@ export default function ServerView() {
             path: `/mounts`,
             element: <AdminServerMounts server={server} />,
             permission: 'servers.mounts',
+          },
+          {
+            name: 'Backups',
+            icon: faArchive,
+            path: `/backups`,
+            element: <AdminServerBackups server={server} />,
+            permission: 'nodes.backups',
           },
           {
             name: 'Logs',

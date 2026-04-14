@@ -470,8 +470,6 @@
             "languagePlaceholder": "Language",
             "applicationUrl": "URL Ứng dụng",
             "applicationUrlPlaceholder": "https://calagop.us",
-            "telemetry": "Kích hoạt Telemetry",
-            "telemetryDescription": "Cho phép Calagopus thu thập dữ liệu sử dụng giới hạn và vô danh để giúp cải thiện ứng dụng.",
             "registration": "Kích hoạt Đăng ký",
             "registrationDescription": "Cho phép người dùng mới đăng ký tài khoản của họ."
           },

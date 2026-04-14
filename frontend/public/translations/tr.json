@@ -474,8 +474,6 @@
             "languagePlaceholder": "Dil",
             "applicationUrl": "Uygulama URL'si",
             "applicationUrlPlaceholder": "https://calagop.us",
-            "telemetry": "Telemetriyi Etkinleştir",
-            "telemetryDescription": "Calagopus'un uygulamayı geliştirmeye yardımcı olması için sınırlı ve anonim kullanım verileri toplamasına izin verin.",
             "registration": "Kaydı Etkinleştir",
             "registrationDescription": "Yeni kullanıcıların kendi hesaplarını kaydetmelerine izin verin."
           },

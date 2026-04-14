@@ -44,13 +44,27 @@ mod post {
                 .ok();
         }
 
-        state
-            .cache
-            .ratelimit("auth/password/forgot", 10, 3600, ip.to_string())
+        let ratelimit = state
+            .settings
+            .get_as(|s| s.ratelimits.auth_password_forgot)
             .await?;
         state
             .cache
-            .ratelimit("auth/password/forgot:email", 5, 3600, &data.email)
+            .ratelimit(
+                "auth/password/forgot",
+                ratelimit.hits,
+                ratelimit.window_seconds,
+                ip.to_string(),
+            )
+            .await?;
+        state
+            .cache
+            .ratelimit(
+                "auth/password/forgot:email",
+                ratelimit.hits,
+                ratelimit.window_seconds,
+                &data.email,
+            )
             .await?;
 
         if let Err(error) = state.captcha.verify(ip, data.captcha).await {

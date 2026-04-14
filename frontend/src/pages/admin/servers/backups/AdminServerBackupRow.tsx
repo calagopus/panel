@@ -22,11 +22,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeBackupsDeleteModal from '../../nodes/backups/modals/NodeBackupsDeleteModal.tsx';
 import NodeBackupsRestoreModal from '../../nodes/backups/modals/NodeBackupsRestoreModal.tsx';
 
-export default function AdminBackupConfigurationBackupRow({
-  backup,
-}: {
-  backup: z.infer<typeof adminNodeServerBackupSchema>;
-}) {
+export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeof adminNodeServerBackupSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
 
@@ -104,21 +100,6 @@ export default function AdminBackupConfigurationBackupRow({
             }}
           >
             <TableData>{backup.name}</TableData>
-
-            <TableData>
-              <Code>
-                {backup.server ? (
-                  <NavLink
-                    to={`/admin/servers/${backup.server.uuid}`}
-                    className='text-blue-400 hover:text-blue-200 hover:underline'
-                  >
-                    {backup.server.name}
-                  </NavLink>
-                ) : (
-                  '-'
-                )}
-              </Code>
-            </TableData>
 
             <TableData className='flex flex-row items-center'>
               <Code>

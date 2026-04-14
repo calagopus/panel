@@ -63,7 +63,7 @@ minijinja = { workspace = true }
 serde_norway = { workspace = true }
 hyper = "1.8.1"
 hyper-util = { version = "0.1", features = ["tokio"] }
-hex ={ workspace = true }
+hex = { workspace = true }
 
 [target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dependencies]
 tikv-jemallocator = "0.6.0"

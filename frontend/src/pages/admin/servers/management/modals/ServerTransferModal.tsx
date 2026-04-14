@@ -7,6 +7,7 @@ import getNodes from '@/api/admin/nodes/getNodes.ts';
 import postTransfer from '@/api/admin/servers/postTransfer.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getBackups from '@/api/server/backups/getBackups.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
@@ -62,6 +63,7 @@ export default function ServerTransferModal({
   });
   const backups = useSearchableResource<z.infer<typeof serverBackupSchema>>({
     fetcher: (search) => getBackups(server.uuid, 1, search),
+    canRequest: opened,
   });
 
   const closeAll = () => {
@@ -99,6 +101,12 @@ export default function ServerTransferModal({
         confirm='Transfer'
         onConfirmed={doTransfer}
       >
+        {selectedBackupUuids.length < backups.items.length && (
+          <Alert color='yellow' mb='md'>
+            You have not selected all backups to transfer, the remaining backups will become partially detached if the
+            transfer completes successfully.
+          </Alert>
+        )}
         Are you sure you want to transfer <Code>{server.name}</Code> from <Code>{server.node.name}</Code> to{' '}
         <Code>{nodes.items.find((node) => node.uuid === selectedNodeUuid)?.name}</Code>?
       </ConfirmationModal>

@@ -132,11 +132,6 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
             <Card>
               <Stack>
                 <Switch
-                  label={t('pages.oobe.configuration.form.telemetry', {})}
-                  description={t('pages.oobe.configuration.form.telemetryDescription', {})}
-                  {...form.getInputProps('applicationTelemetry', { type: 'checkbox' })}
-                />
-                <Switch
                   label={t('pages.oobe.configuration.form.registration', {})}
                   description={t('pages.oobe.configuration.form.registrationDescription', {})}
                   {...form.getInputProps('applicationRegistration', { type: 'checkbox' })}

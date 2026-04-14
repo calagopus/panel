@@ -316,14 +316,10 @@ impl Storage {
                 drop(settings);
 
                 let buckets = s3_client.list(path.into(), None).await?;
-                let Some(entries) = buckets.into_iter().next().map(|b| b.contents) else {
-                    return Ok(crate::models::Pagination {
-                        total: 0,
-                        per_page: per_page as i64,
-                        page: page as i64,
-                        data: Vec::new(),
-                    });
-                };
+                let entries = buckets
+                    .into_iter()
+                    .flat_map(|bucket| bucket.contents)
+                    .collect::<Vec<_>>();
 
                 let start = (page - 1) * per_page;
 

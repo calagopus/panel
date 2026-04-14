@@ -65,11 +65,17 @@ mod post {
                 .ok();
         }
         let secure = settings.app.url.starts_with("https://");
+        let ratelimit = settings.ratelimits.auth_register;
         drop(settings);
 
         state
             .cache
-            .ratelimit("auth/register", 10, 3600, ip.to_string())
+            .ratelimit(
+                "auth/register",
+                ratelimit.hits,
+                ratelimit.window_seconds,
+                ip.to_string(),
+            )
             .await?;
 
         if let Err(error) = state.captcha.verify(ip, data.captcha).await {

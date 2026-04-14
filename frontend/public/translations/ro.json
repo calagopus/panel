@@ -195,8 +195,6 @@
             "languagePlaceholder": "Limbă",
             "applicationUrl": "URL aplicație",
             "applicationUrlPlaceholder": "https://calagop.us",
-            "telemetry": "Activează telemetria",
-            "telemetryDescription": "Permite Calagopus să colecteze date de utilizare limitate și anonime pentru a ajuta la îmbunătățirea aplicației.",
             "registration": "Activează înregistrarea",
             "registrationDescription": "Permite utilizatorilor noi să își înregistreze propriul cont."
           },

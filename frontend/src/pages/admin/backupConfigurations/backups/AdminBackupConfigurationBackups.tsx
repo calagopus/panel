@@ -28,7 +28,7 @@ export default function AdminBackupConfigurationBackups({
     <AdminSubContentContainer title={`Backup Config Backups`} titleOrder={2} search={search} setSearch={setSearch}>
       <ContextMenuProvider>
         <Table
-          columns={['Name', 'Server', 'Node', 'Checksum', 'Size', 'Files', 'Created At', '']}
+          columns={['Name', 'Server', 'Node', 'Checksum', 'Size', 'Files', 'Created', '']}
           loading={loading}
           pagination={backupConfigurationBackups}
           onPageSelect={setPage}

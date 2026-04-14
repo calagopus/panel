@@ -70,17 +70,17 @@ mod post {
                 .ok();
         }
 
-        state
-            .cache
-            .ratelimit("auth/login/checkpoint", 10, 300, ip.to_string())
+        let ratelimit = state
+            .settings
+            .get_as(|s| s.ratelimits.auth_login_checkpoint)
             .await?;
         state
             .cache
             .ratelimit(
-                "auth/login/checkpoint:user",
-                10,
-                300,
-                payload.user_uuid.to_string(),
+                "auth/login/checkpoint",
+                ratelimit.hits,
+                ratelimit.window_seconds,
+                ip.to_string(),
             )
             .await?;
 

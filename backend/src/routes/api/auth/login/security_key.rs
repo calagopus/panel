@@ -110,9 +110,18 @@ mod post {
         cookies: Cookies,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
+        let ratelimit = state
+            .settings
+            .get_as(|s| s.ratelimits.auth_login_security_key)
+            .await?;
         state
             .cache
-            .ratelimit("auth/login/security-key", 10, 300, ip.to_string())
+            .ratelimit(
+                "auth/login/security-key",
+                ratelimit.hits,
+                ratelimit.window_seconds,
+                ip.to_string(),
+            )
             .await?;
 
         let webauthn = state.settings.get_webauthn().await?;

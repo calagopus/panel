@@ -44,12 +44,16 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_server_permission("files.create")?;
 
+        let ratelimit = state
+            .settings
+            .get_as(|s| s.ratelimits.client_servers_files_pull_query)
+            .await?;
         state
             .cache
             .ratelimit(
                 "client/servers/files/pull/query",
-                10,
-                60,
+                ratelimit.hits,
+                ratelimit.window_seconds,
                 server.uuid.to_string(),
             )
             .await?;

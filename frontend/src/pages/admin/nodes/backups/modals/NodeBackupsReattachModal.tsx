@@ -1,7 +1,7 @@
-import { ModalProps, Stack, Switch } from '@mantine/core';
+import { ModalProps, Stack } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
-import restoreNodeBackup from '@/api/admin/nodes/backups/restoreNodeBackup.ts';
+import reattachNodeBackup from '@/api/admin/nodes/backups/reattachNodeBackup.ts';
 import getNodeServers from '@/api/admin/nodes/servers/getNodeServers.ts';
 import getServers from '@/api/admin/servers/getServers.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -18,11 +18,10 @@ type Props = ModalProps & {
   backup: z.infer<typeof adminServerBackupSchema>;
 };
 
-export default function NodeBackupsRestoreModal({ node, backup, opened, onClose }: Props) {
+export default function NodeBackupsReattachModal({ node, backup, opened, onClose }: Props) {
   const { addToast } = useToast();
 
-  const [truncate, setTruncate] = useState(false);
-  const [selectedServer, setSelectedServer] = useState<z.infer<typeof adminServerSchema> | null>(null);
+  const [selectedServer, setSelectedServer] = useState<z.infer<typeof adminServerSchema> | null>(backup.server ?? null);
   const [loading, setLoading] = useState(false);
 
   const servers = useSearchableResource<z.infer<typeof adminServerSchema>>({
@@ -32,21 +31,22 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
   useEffect(() => {
     if (!opened) {
       servers.setSearch('');
-      setSelectedServer(null);
+      setSelectedServer(backup.server ?? null);
     }
   }, [opened]);
 
-  const doRestore = () => {
+  const doReattach = () => {
     if (!selectedServer) {
       return;
     }
 
     setLoading(true);
 
-    restoreNodeBackup(node.uuid, backup.uuid, { serverUuid: selectedServer.uuid, truncateDirectory: truncate })
+    reattachNodeBackup(node.uuid, backup.uuid, { serverUuid: selectedServer.uuid })
       .then(() => {
+        backup.server = selectedServer;
         onClose();
-        addToast(`Restoring backup to ${selectedServer.name}...`, 'success');
+        addToast(`Reattached backup to ${selectedServer.name} successfully.`, 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -55,8 +55,14 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
   };
 
   return (
-    <Modal title='Restore Node Backup' onClose={onClose} opened={opened}>
+    <Modal title='Reattach Node Backup' onClose={onClose} opened={opened}>
       <Stack>
+        <p>
+          Reattaching a node backup will link it to a server. This is useful if the backup is detached or you want to
+          link it to a different server. Do note that this is not a transfer tool, unless the backup is considered
+          remote (can be accessed by multiple nodes), the server must belong to the same node as the backup.
+        </p>
+
         <Select
           withAsterisk
           label='Server'
@@ -72,18 +78,16 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
           onSearchChange={servers.setSearch}
           loading={servers.loading}
         />
-
-        <Switch
-          label='Do you want to empty the filesystem of this server before restoring the backup?'
-          name='truncate'
-          checked={truncate}
-          onChange={(e) => setTruncate(e.target.checked)}
-        />
       </Stack>
 
       <ModalFooter>
-        <Button color={truncate ? 'red' : undefined} onClick={doRestore} loading={loading}>
-          Restore
+        <Button
+          color='red'
+          onClick={doReattach}
+          loading={loading}
+          disabled={selectedServer?.uuid === backup.server?.uuid}
+        >
+          Reattach
         </Button>
         <Button variant='default' onClick={onClose}>
           Close

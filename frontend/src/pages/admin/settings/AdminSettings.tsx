@@ -19,6 +19,7 @@ import ActivityContainer from './ActivityContainer.tsx';
 import ApplicationContainer from './ApplicationContainer.tsx';
 import CaptchaContainer from './CaptchaContainer.tsx';
 import EmailContainer from './EmailContainer.tsx';
+import RatelimitsContainer from './RatelimitsContainer.tsx';
 import ServerContainer from './ServerContainer.tsx';
 import StorageContainer from './StorageContainer.tsx';
 import WebauthnContainer from './WebauthnContainer.tsx';
@@ -86,6 +87,12 @@ export default function AdminSettings() {
             icon: faToolbox,
             path: '/activity',
             element: <ActivityContainer />,
+          },
+          {
+            name: 'Ratelimits',
+            icon: faToolbox,
+            path: '/ratelimits',
+            element: <RatelimitsContainer />,
           },
         ]}
       />

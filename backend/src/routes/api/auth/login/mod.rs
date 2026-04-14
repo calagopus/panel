@@ -61,9 +61,15 @@ mod post {
                 .ok();
         }
 
+        let ratelimit = state.settings.get_as(|s| s.ratelimits.auth_login).await?;
         state
             .cache
-            .ratelimit("auth/login", 20, 300, ip.to_string())
+            .ratelimit(
+                "auth/login",
+                ratelimit.hits,
+                ratelimit.window_seconds,
+                ip.to_string(),
+            )
             .await?;
 
         if let Err(error) = state.captcha.verify(ip, data.captcha).await {

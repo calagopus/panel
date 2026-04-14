@@ -474,8 +474,6 @@
             "languagePlaceholder": "Sprache",
             "applicationUrl": "Anwendungs-URL",
             "applicationUrlPlaceholder": "https://calagop.us",
-            "telemetry": "Telemetrie aktivieren",
-            "telemetryDescription": "Erlaube Calagopus, limitierte und anonyme Nutzungsdaten zu sammeln, um die Anwendung zu verbessern.",
             "registration": "Registrierung aktivieren",
             "registrationDescription": "Erlaube neuen Benutzern, ihren eigenen Account zu registrieren."
           },

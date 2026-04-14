@@ -1,5 +1,6 @@
 use shared::extensions::commands::CliCommandGroupBuilder;
 
+mod backups;
 mod diagnostics;
 mod extensions;
 mod import;
@@ -28,6 +29,11 @@ pub fn commands(cli: CliCommandGroupBuilder) -> CliCommandGroupBuilder {
     .add_group("users", "Manage users within the Panel.", users::commands)
     .add_group("nests", "Manage nests within the Panel.", nests::commands)
     .add_group("nodes", "Manage nodes within the Panel.", nodes::commands)
+    .add_group(
+        "backups",
+        "Manage backups within the Panel.",
+        backups::commands,
+    )
     .add_group(
         "import",
         "Import data from other panel software into Calagopus.",

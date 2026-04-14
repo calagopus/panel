@@ -72,10 +72,7 @@ export default function BackupS3({
           />
         </Group>
 
-        <Switch
-          label={form.values.pathStyle ? 'Using path-style URLs' : 'Using virtual-hosted-style URLs'}
-          {...form.getInputProps('pathStyle', { type: 'checkbox' })}
-        />
+        <Switch label='Using path-style URLs' {...form.getInputProps('pathStyle', { type: 'checkbox' })} />
       </Stack>
     </Stack>
   );

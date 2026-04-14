@@ -1,0 +1,2158 @@
+{
+  "items": {
+    "byte": {
+      "zero": "{count} بايت",
+      "one": "{count} بايت",
+      "two": "{count} بايت",
+      "few": "{count} بايت",
+      "many": "{count} بايت",
+      "other": "{count} بايت"
+    },
+    "user": {
+      "zero": "{count} مستخدم",
+      "one": "{count} مستخدم",
+      "two": "{count} مستخدم",
+      "few": "{count} مستخدمين",
+      "many": "{count} مستخدم",
+      "other": "{count} مستخدم"
+    },
+    "file": {
+      "zero": "{count} ملف",
+      "one": "{count} ملف",
+      "two": "{count} ملف",
+      "few": "{count} ملفات",
+      "many": "{count} ملف",
+      "other": "{count} ملف"
+    },
+    "server": {
+      "zero": "{count} خادم",
+      "one": "{count} خادم",
+      "two": "{count} خادم",
+      "few": "{count} خوادم",
+      "many": "{count} خادم",
+      "other": "{count} خادم"
+    },
+    "sshKey": {
+      "zero": "{count} مفاتيح SSH",
+      "one": "{count} مفتاح SSH",
+      "two": "{count} مفتاح SSH",
+      "few": "{count} مفاتيح SSH",
+      "many": "{count} مفتاح SSH",
+      "other": "{count} مفتاح SSH"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "إنشاء",
+        "add": "إضافة",
+        "save": "حفظ",
+        "saveAndStay": "حفظ والبقاء",
+        "edit": "تعديل",
+        "delete": "حذف",
+        "remove": "إزالة",
+        "enable": "تفعيل",
+        "disable": "تعطيل",
+        "update": "تحديث",
+        "close": "إغلاق",
+        "cancel": "إلغاء",
+        "continue": "متابعة",
+        "skip": "تخطي",
+        "okay": "موافق",
+        "back": "رجوع",
+        "next": "التالي",
+        "install": "تثبيت",
+        "selectAll": "تحديد الكل",
+        "deselectAll": "إلغاء تحديد الكل",
+        "restore": "استعادة",
+        "download": "تنزيل",
+        "downloadAs": "تنزيل كـ {format}",
+        "export": "تصدير",
+        "exportAs": "تصدير كـ {format}",
+        "recreate": "إعادة إنشاء"
+      },
+      "alert": {
+        "error": "خطأ",
+        "warning": "تحذير",
+        "success": "نجح",
+        "clockOffset": "ساعة نظامك غير متزامنة مع الخادم بأكثر من 5 ثوانٍ. قد يسبب هذا مشاكل مع مصادقة مفتاح المرور والمصادقة الثنائية. يرجى مزامنة ساعتك إذا ظهرت مشاكل. الانحراف الحالي: {offset} ثانية/ثوانٍ."
+      },
+      "divider": {
+        "or": "أو"
+      },
+      "input": {
+        "search": "بحث..."
+      },
+      "tooltip": {
+        "resetToDefault": "إعادة تعيين إلى الافتراضي",
+        "edit": "تعديل",
+        "delete": "حذف"
+      },
+      "form": {
+        "name": "الاسم",
+        "description": "الوصف",
+        "password": "كلمة المرور",
+        "host": "المضيف",
+        "username": "اسم المستخدم",
+        "server": "الخادم",
+        "truncateDirectory": "هل تريد حذف جميع ملفات هذا الخادم قبل تنفيذ هذا الإجراء؟ لا يمكن التراجع عن هذا."
+      },
+      "table": {
+        "pagination": {
+          "results": "عرض {start} إلى {end} من {total} نتيجة.",
+          "empty": "لم يتم العثور على عناصر، يبدو أنها مخفية."
+        },
+        "columns": {
+          "name": "الاسم",
+          "description": "الوصف",
+          "username": "اسم المستخدم",
+          "size": "الحجم",
+          "lastUsed": "آخر استخدام",
+          "created": "تم الإنشاء",
+          "actor": "الممثل",
+          "event": "الحدث",
+          "ip": "IP",
+          "when": "متى",
+          "command": "الأمر"
+        }
+      },
+      "badge": {
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "enabled": "مفعّل",
+        "disabled": "معطّل",
+        "successful": "ناجح",
+        "failed": "فشل"
+      },
+      "server": {
+        "noAllocation": "لا يوجد تخصيص",
+        "state": {
+          "suspended": "معلق",
+          "transferring": "جاري نقل الخادم",
+          "nodeMaintenance": "العقدة قيد الصيانة",
+          "restoringBackup": "جاري استعادة النسخة الاحتياطية",
+          "installing": "جاري التثبيت",
+          "installFailed": "فشل التثبيت"
+        }
+      },
+      "enum": {
+        "userToastPosition": {
+          "topLeft": "أعلى اليسار",
+          "topCenter": "أعلى الوسط",
+          "topRight": "أعلى اليمين",
+          "bottomLeft": "أسفل اليسار",
+          "bottomCenter": "أسفل الوسط",
+          "bottomRight": "أسفل اليمين"
+        },
+        "serverState": {
+          "unknown": "غير معروف",
+          "offline": "غير متصل",
+          "running": "يعمل",
+          "starting": "جاري التشغيل",
+          "stopping": "جاري الإيقاف"
+        },
+        "serverPowerAction": {
+          "start": "تشغيل",
+          "stop": "إيقاف",
+          "restart": "إعادة التشغيل",
+          "kill": "إنهاء"
+        },
+        "serverBackupStatus": {
+          "starting": "جاري البدء",
+          "finished": "مكتمل",
+          "failed": "فشل"
+        },
+        "connectionStatus": {
+          "connected": "متصل",
+          "offline": "غير متصل"
+        },
+        "serverAutoStartBehavior": {
+          "always": "دائماً",
+          "unlessStopped": "ما لم يتم إيقافه",
+          "never": "أبداً"
+        },
+        "bulkActionServerAction": {
+          "started": "تم التشغيل",
+          "stopped": "تم الإيقاف",
+          "restarted": "تم إعادة التشغيل",
+          "killed": "تم الإنهاء"
+        }
+      },
+      "unit": {
+        "bytes": {
+          "bytes": "B",
+          "kibibytes": "KiB",
+          "mebibytes": "MiB",
+          "gibibytes": "GiB",
+          "tebibytes": "TiB",
+          "pebibytes": "PiB"
+        }
+      },
+      "unlimited": "غير محدود",
+      "readOnly": "قراءة فقط",
+      "na": "غير متوفر",
+      "never": "أبداً",
+      "yes": "نعم",
+      "no": "لا",
+      "web": "الويب",
+      "api": "API",
+      "system": "النظام",
+      "schedule": "الجدولة",
+      "impersonatedBy": "تم انتحال صفته بواسطة {username}"
+    },
+    "elements": {
+      "errorBoundary": {
+        "message": "حدث خطأ أثناء عرض هذا العرض. حاول تحديث الصفحة.",
+        "hideDetails": "إخفاء التفاصيل",
+        "showDetails": "إظهار التفاصيل",
+        "errorMessage": "رسالة الخطأ:",
+        "stackTrace": "تتبع المكدس:",
+        "componentStack": "مكدس المكون:"
+      },
+      "copyOnClick": {
+        "toast": {
+          "copied": "تم النسخ إلى الحافظة.",
+          "failed": "فشل النسخ إلى الحافظة.",
+          "copyManual": "نسخ إلى الحافظة: Ctrl+C أو Command+C، Enter"
+        }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "جاري تقدير وقت الإنجاز...",
+          "estimated": "وقت الإنجاز المقدر: {time}"
+        },
+        "calculating": "الوقت المقدر: جاري الحساب...",
+        "calculated": "الوقت المقدر: {time}"
+      },
+      "container": {
+        "alert": {
+          "impersonating": "أنت حالياً تنتحل شخصية مستخدم. يرجى العلم أن إجراءاتك قد تؤثر على حساب المستخدم المنتحل. للخروج من وضع انتحال الشخصية، انقر على زر \"إيقاف انتحال الشخصية\" في الزاوية اليسرى السفلية."
+        }
+      },
+      "sidebar": {
+        "button": {
+          "logout": "تسجيل الخروج",
+          "stopImpersonating": "إيقاف انتحال الشخصية",
+          "openInVirtualWindow": "فتح في نافذة افتراضية",
+          "openInPopup": "فتح في نافذة منبثقة",
+          "openInNewTab": "فتح في علامة تبويب جديدة"
+        }
+      },
+      "permissionSelector": {
+        "selectedPermissions": "الأذونات المحددة ({count})",
+        "noPermissions": "لم يتم تحديد أي أذونات."
+      },
+      "selectInput": {
+        "noResults": "لم يتم العثور على نتائج."
+      },
+      "can": {
+        "tooltip": {
+          "cantSave": "ليس لديك إذن للحفظ.",
+          "cantDelete": "ليس لديك إذن للحذف."
+        }
+      },
+      "activityInfoButton": {
+        "modal": {
+          "info": {
+            "title": "تفاصيل النشاط"
+          }
+        }
+      },
+      "screenBlock": {
+        "permissionDenied": {
+          "title": "تم رفض الإذن",
+          "content": "ليس لديك إذن للوصول إلى هذه الصفحة."
+        },
+        "notFound": {
+          "title": "غير موجود",
+          "content": "لم يتم العثور على الصفحة التي تبحث عنها."
+        },
+        "serverConflict": {
+          "title": "حالة خادم متضاربة",
+          "contentSuspended": "هذا الخادم معلق ولا يمكن الوصول إليه.",
+          "contentNodeMaintenance": "هذا الخادم على عقدة قيد الصيانة حالياً ولا يمكن الوصول إليه.",
+          "contentTransferring": "هذا الخادم قيد النقل حالياً ولا يمكن الوصول إليه حتى اكتمال النقل.",
+          "contentInstallFailed": "فشل تثبيت هذا الخادم ولا يمكن الوصول إليه حتى يتم الاعتراف بالفشل.",
+          "contentInstalling": "هذا الخادم قيد التثبيت حالياً ولا يمكن الوصول إليه حتى يكتمل.",
+          "contentRestoringBackup": "هذا الخادم يستعيد من نسخة احتياطية حالياً ولا يمكن الوصول إليه حتى يكتمل.",
+          "button": {
+            "viewInstallLogs": "عرض سجلات التثبيت",
+            "acknowledgeFailure": "الاعتراف بالفشل"
+          },
+          "modal": {
+            "acknowledgeFailure": {
+              "title": "الاعتراف بفشل التثبيت",
+              "content": "بالموافقة على فشل التثبيت هذا، أنت تؤكد أنك على علم بفشل التثبيت وقد اتخذت الخطوات اللازمة لحل المشكلة. سيسمح لك هذا باستعادة السيطرة على الخادم."
+            }
+          }
+        }
+      },
+      "scheduleDynamicInput": {
+        "enterVariable": "الرجاء إدخال اسم المتغير للتقييم.",
+        "enterData": "الرجاء إدخال البيانات للإرسال.",
+        "inputType": "نوع الإدخال",
+        "dataType": "نوع البيانات للإرسال",
+        "selectType": "تحديد النوع",
+        "none": "لا شيء",
+        "rawString": "سلسلة نصية خام",
+        "variable": "متغير"
+      },
+      "serverWebsocket": {
+        "error": {
+          "connectionFailed": "غير قادر على الاتصال بعد عدة محاولات. يرجى تحديث الصفحة.",
+          "connectionClosed": "تم إغلاق الاتصال بالخادم. جاري إعادة الاتصال...",
+          "connectionRetry": "فقدان الاتصال. جاري إعادة المحاولة (محاولة {attempt})...",
+          "authFailed": "فشل المصادقة. جاري تحديث الاعتمادات... ({error})",
+          "authRefreshFailed": "فشل تحديث الاعتمادات. يرجى تحديث الصفحة للمحاولة مرة أخرى.",
+          "permissionRevoked": "تم إغلاق الاتصال: تم إلغاء وصولك إلى هذا الخادم.",
+          "tokenRefreshLoop": "تم اكتشاف حلقة مصادقة. يرجى تحديث الصفحة للمحاولة مرة أخرى."
+        },
+        "banner": {
+          "retrying": "جاري إعادة المحاولة خلال {countdown}..."
+        },
+        "listener": {
+          "toast": {
+            "backupCompleted": "تم إنشاء النسخة الاحتياطية بنجاح.",
+            "backupFailed": "فشل إنشاء النسخة الاحتياطية.",
+            "backupRestoreCompleted": "تم استعادة النسخة الاحتياطية بنجاح.",
+            "installCompleted": "اكتمل تثبيت الخادم بنجاح.",
+            "installFailed": "فشل تثبيت الخادم.",
+            "operations": {
+              "compressing": {
+                "completed": "تم ضغط {files} إلى `{path}` في {time}.",
+                "failed": "فشل ضغط {files} إلى `{path}`:\n{error}"
+              },
+              "decompressing": {
+                "completed": "تم فك ضغط `{path}` إلى `{destination}` في {time}.",
+                "failed": "فشل فك ضغط `{path}` إلى `{destination}`:\n{error}"
+              },
+              "pulling": {
+                "completed": "تم سحب `{destination}` في {time}.",
+                "failed": "فشل سحب `{destination}`:\n{error}"
+              },
+              "copying": {
+                "completed": "تم نسخ `{path}` إلى `{destination}` في {time}.",
+                "failed": "فشل نسخ `{path}` إلى `{destination}`:\n{error}"
+              },
+              "copyingMany": {
+                "completed": "تم نسخ {files} في {time}.",
+                "failed": "فشل نسخ {files}:\n{error}"
+              },
+              "copyingRemote": {
+                "completedFrom": "تم نسخ {files} من الخادم البعيد في {time}.",
+                "completedTo": "تم نسخ {files} إلى الخادم البعيد في {time}.",
+                "failedFrom": "فشل نسخ {files} من الخادم البعيد:\n{error}",
+                "failedTo": "فشل نسخ {files} إلى الخادم البعيد:\n{error}"
+              }
+            }
+          }
+        }
+      },
+      "fileUpload": {
+        "toast": {
+          "uploading": "بدأ رفع {files}...",
+          "cancelledFile": "تم إلغاء رفع `{file}` بنجاح.",
+          "cancelledFolder": "تم إلغاء رفع `{folder}` ({files}) بنجاح."
+        }
+      }
+    },
+    "pages": {
+      "oobe": {
+        "welcome": {
+          "title": "مرحباً بك في Calagopus",
+          "subtitle": "لنقم بإعداد نظام إدارة خوادم الألعاب الخاص بك وتشغيله!",
+          "wizardIntro": "سيرشدك معالج الإعداد هذا خلال:",
+          "steps": {
+            "account": "إنشاء حساب المسؤول الخاص بك",
+            "settings": "تكوين إعدادات النظام الأساسية",
+            "location": "إعداد موقع الخادم الخاص بك",
+            "node": "إضافة العقدة الأولى",
+            "server": "نشر خادم اللعبة الأول"
+          },
+          "button": {
+            "start": "ابدأ"
+          }
+        },
+        "register": {
+          "title": "إنشاء حساب المسؤول",
+          "alert": {
+            "title": "إشعار أمني",
+            "description": "اختر كلمة مرور قوية. سيكون لهذا الحساب حق الوصول الإداري الكامل إلى جميع الخوادم والإعدادات."
+          },
+          "form": {
+            "username": "اسم المستخدم",
+            "usernamePlaceholder": "admin",
+            "email": "عنوان البريد الإلكتروني",
+            "emailPlaceholder": "admin@example.com",
+            "firstName": "الاسم الأول",
+            "firstNamePlaceholder": "Alan",
+            "lastName": "اسم العائلة",
+            "lastNamePlaceholder": "Turing",
+            "password": "كلمة المرور",
+            "passwordPlaceholder": "أدخل كلمة مرور قوية",
+            "confirmPassword": "تأكيد كلمة المرور",
+            "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور"
+          },
+          "button": {
+            "create": "إنشاء حساب ومتابعة"
+          }
+        },
+        "login": {
+          "title": "تسجيل الدخول مرة أخرى",
+          "alert": "تم تسجيل خروجك أثناء عملية الإعداد. يرجى تسجيل الدخول مرة أخرى للمتابعة من حيث توقفت.",
+          "form": {
+            "username": "اسم المستخدم",
+            "usernamePlaceholder": "admin",
+            "password": "كلمة المرور",
+            "passwordPlaceholder": "أدخل كلمة مرور قوية"
+          },
+          "button": {
+            "login": "تسجيل الدخول ومتابعة"
+          }
+        },
+        "location": {
+          "title": "تكوين الموقع",
+          "form": {
+            "locationName": "اسم الموقع",
+            "locationNamePlaceholder": "منزلي",
+            "backupName": "اسم تكوين النسخ الاحتياطي",
+            "backupNamePlaceholder": "Unicorn Cloud",
+            "backupDisk": "قرص النسخ الاحتياطي",
+            "backupDiskPlaceholder": "قرص النسخ الاحتياطي"
+          },
+          "button": {
+            "create": "إنشاء ومتابعة"
+          }
+        },
+        "node": {
+          "title": "تكوين العقدة",
+          "allocationsTitle": "تكوين التخصيصات",
+          "form": {
+            "name": "الاسم",
+            "namePlaceholder": "خادمي",
+            "url": "URL",
+            "urlPlaceholder": "URL",
+            "urlDescription": "يستخدم للاتصال الداخلي مع العقدة",
+            "publicUrl": "URL العام",
+            "publicUrlPlaceholder": "URL",
+            "publicUrlDescription": "يستخدم لـ websocket/التنزيلات",
+            "sftpHost": "مضيف SFTP",
+            "sftpHostPlaceholder": "مضيف SFTP",
+            "sftpPort": "منفذ SFTP",
+            "sftpPortPlaceholder": "منفذ SFTP",
+            "memory": "الذاكرة",
+            "disk": "القرص",
+            "ip": "IP",
+            "portRanges": "نطاقات المنافذ",
+            "portRangesPlaceholder": "نطاقات المنافذ (مثلاً 3000-4000)"
+          },
+          "error": {
+            "noLocations": "حدث خطأ ما. لم يتم العثور على مواقع."
+          },
+          "button": {
+            "create": "إنشاء ومتابعة"
+          }
+        },
+        "nodeConfiguration": {
+          "title": "تكوين العقدة",
+          "error": {
+            "noNodes": "حدث خطأ ما. لم يتم العثور على عقد.",
+            "connectionError": "حدث خطأ ما. خطأ في الاتصال."
+          },
+          "successMessage": "تم التحقق من الاتصال بالعقدة بنجاح. يمكنك الآن المتابعة.",
+          "configurationDescription": "ضع هذا في ملف التكوين في `{file}` أو قم بتشغيل:",
+          "button": {
+            "verify": "التحقق من الاتصال"
+          }
+        },
+        "configuration": {
+          "title": "إعدادات التطبيق",
+          "form": {
+            "applicationName": "اسم التطبيق",
+            "applicationNamePlaceholder": "Calagopus",
+            "language": "اللغة",
+            "languagePlaceholder": "اللغة",
+            "applicationUrl": "URL التطبيق",
+            "applicationUrlPlaceholder": "https://calagop.us",
+            "registration": "تفعيل التسجيل",
+            "registrationDescription": "السماح للمستخدمين الجدد بتسجيل حساباتهم الخاصة."
+          },
+          "button": {
+            "submit": "تحديث الإعدادات ومتابعة"
+          }
+        },
+        "eggRepositories": {
+          "title": "مستودعات البيض",
+          "description": "هذه هي المستودعات المصدرية لبيضك. يمكنك تغيير هذه المستودعات في أي وقت.",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "بيض ألعاب Pterodactyl",
+              "description": "بيض لألعاب مثل Minecraft و Terraria والعديد غيرها."
+            },
+            "pterodactylApplication": {
+              "title": "بيض تطبيقات Pterodactyl",
+              "description": "بيض لتطبيقات مثل Grafana و Meilisearch وقواعد البيانات المختلفة."
+            },
+            "pterodactylGeneral": {
+              "title": "بيض عامة Pterodactyl",
+              "description": "بيض لبيئات تشغيل التطبيقات العامة مثل Node JS و Java و Rust."
+            }
+          },
+          "button": {
+            "submit": "استيراد"
+          }
+        },
+        "server": {
+          "title": "الخادم",
+          "egg": {
+            "title": "البيضة",
+            "description": "لنقم بإعداد خادمك الأول وتشغيله. ما هي البيضة التي ترغب في استخدامها؟",
+            "nestDescription": "للبدء في استخدام هذه البيضة، ستحتاج إلى إنشاء عش، الأعش هي مجموعات من البيض. أعطها اسماً:"
+          },
+          "server": {
+            "title": "الخادم",
+            "nestDescription": "للبدء في استخدام هذه البيضة، ستحتاج إلى إنشاء عش، الأعش هي مجموعات من البيض. أعطها اسماً:"
+          },
+          "error": {
+            "noNodes": "حدث خطأ ما. لم يتم العثور على عقد."
+          },
+          "button": {
+            "submit": "استيراد",
+            "create": "إنشاء ومتابعة"
+          }
+        },
+        "finished": {
+          "title": "اكتمل الإعداد!",
+          "subtitle": "لوحة التحكم Calagopus الخاصة بك جاهزة للاستخدام",
+          "setupTitle": "ما قمنا بإعداده",
+          "items": {
+            "account": "حساب المسؤول",
+            "configuration": {
+              "title": "تكوين النظام",
+              "subtitle": "تم تكوين إعدادات اللوحة والتفضيلات"
+            },
+            "eggRepositories": {
+              "title": "مستودعات البيض",
+              "subtitle": "{count} مستودع"
+            },
+            "location": "الموقع",
+            "node": "العقدة",
+            "server": "الخادم"
+          },
+          "badge": {
+            "skipped": "تم التخطي"
+          },
+          "button": "الذهاب إلى لوحة المعلومات"
+        }
+      },
+      "auth": {
+        "button": {
+          "login": "تسجيل الدخول",
+          "loginWith": "تسجيل الدخول بـ {name}"
+        },
+        "login": {
+          "error": {
+            "usernameRequired": "الرجاء إدخال اسم المستخدم"
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "متصفحك لا يدعم مفاتيح المرور.",
+              "unexpected": "حدث خطأ غير متوقع أثناء استخدام مفتاح المرور الخاص بك.",
+              "cancelled": "تم إلغاء طلب مفتاح المرور.",
+              "dismissed": "ألغيت أو لم تتفاعل مع موجه مفتاح المرور. قد يكون المفتاح المستخدم غير مسجل أيضاً.",
+              "invalidState": "مفتاح المرور هذا غير متاح أو مسجل بالفعل.",
+              "notSupportedType": "متصفحك أو جهازك لا يدعم هذا النوع من مفاتيح المرور.",
+              "securityError": "يمكن استخدام مفاتيح المرور فقط عبر HTTPS ومع نطاق صالح.",
+              "authenticatorError": "حدث خطأ ما مع المصادق.",
+              "constraintError": "لم يتمكن المصادق من تلبية القيود المطلوبة."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "تسجيل الدخول",
+              "subtitle": "أدخل اسم المستخدم للمتابعة",
+              "form": {
+                "usernamePlaceholder": "أدخل اسم المستخدم"
+              },
+              "link": {
+                "forgotPassword": "نسيت كلمة المرور",
+                "notRegistered": "غير مسجل؟",
+                "createAccount": "إنشاء حساب"
+              },
+              "button": {
+                "oauthLogin": "تسجيل الدخول عبر OAuth"
+              }
+            },
+            "passkey": {
+              "title": "المصادقة بمفتاح المرور",
+              "subtitle": "وجدنا مفتاح مرور مرتبط بـ {username}",
+              "button": {
+                "usePasskey": "استخدام مفتاح المرور",
+                "usePassword": "استخدام كلمة المرور"
+              }
+            },
+            "password": {
+              "title": "إدخال كلمة المرور",
+              "subtitle": "الرجاء إدخال كلمة المرور لـ {username}",
+              "form": {
+                "passwordPlaceholder": "أدخل كلمة المرور"
+              },
+              "button": {
+                "signIn": "تسجيل الدخول",
+                "forgotPassword": "نسيت كلمة المرور"
+              }
+            },
+            "totp": {
+              "title": "المصادقة الثنائية",
+              "welcomeBack": "مرحباً بعودتك {username}!",
+              "enterCode": "أدخل الرقم المكون من 6 أرقام من تطبيق المصادقة الخاص بك",
+              "button": {
+                "verify": "التحقق من الرمز",
+                "useRecoveryCode": "استخدام رمز الاستعادة",
+                "useTotp": "استخدام TOTP"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "أدخل رمز استعادة",
+              "form": {
+                "label": "رمز الاستعادة",
+                "placeholder": "أدخل رمز استعادة"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "التسجيل",
+          "subtitle": "الرجاء إدخال تفاصيلك للتسجيل",
+          "form": {
+            "email": "البريد الإلكتروني",
+            "firstName": "الاسم الأول",
+            "lastName": "اسم العائلة"
+          },
+          "button": {
+            "register": "التسجيل"
+          }
+        },
+        "forgotPassword": {
+          "title": "نسيت كلمة المرور",
+          "subtitle": "أدخل بريدك الإلكتروني لتلقي تعليمات حول كيفية إعادة تعيين كلمة المرور",
+          "form": {
+            "email": "البريد الإلكتروني"
+          },
+          "button": {
+            "request": "طلب إعادة تعيين كلمة المرور"
+          },
+          "success": "تم إرسال بريد إلكتروني إليك يحتوي على تعليمات حول كيفية إعادة تعيين كلمة المرور."
+        },
+        "resetPassword": {
+          "title": "إعادة تعيين كلمة المرور",
+          "subtitle": "الرجاء إدخال كلمة المرور الجديدة",
+          "form": {
+            "confirmPassword": "تأكيد كلمة المرور"
+          },
+          "button": {
+            "reset": "إعادة تعيين كلمة المرور"
+          },
+          "toast": {
+            "success": "تم إعادة تعيين كلمة المرور."
+          }
+        },
+        "oauth": {
+          "title": "المصادقة عبر OAuth",
+          "subtitle": "اختر أي من الموفرين أدناه لتسجيل الدخول"
+        }
+      },
+      "account": {
+        "home": {
+          "title": "الخوادم",
+          "tooltip": {
+            "removeFromGroup": "إزالة من المجموعة",
+            "addToGroup": "إضافة إلى المجموعة",
+            "addServerToGroup": "إضافة الخادم إلى المجموعة",
+            "groupActions": "إجراءات المجموعة",
+            "noGroups": "لا توجد مجموعات متاحة لإضافة الخادم إليها",
+            "noGroup": "هذا الخادم ليس في أي مجموعة"
+          },
+          "tabs": {
+            "groupedServers": {
+              "title": "الخوادم المجمعة",
+              "page": {
+                "button": {
+                  "createGroup": "إنشاء مجموعة"
+                },
+                "modal": {
+                  "createServerGroup": {
+                    "title": "إنشاء مجموعة خوادم",
+                    "toast": {
+                      "created": "تم إنشاء مجموعة الخوادم."
+                    }
+                  },
+                  "editServerGroup": {
+                    "title": "تعديل مجموعة الخوادم",
+                    "toast": {
+                      "updated": "تم تحديث مجموعة الخوادم."
+                    }
+                  },
+                  "deleteServerGroup": {
+                    "title": "تأكيد حذف مجموعة الخوادم",
+                    "content": "هل أنت متأكد أنك تريد حذف **{group}** من حسابك؟",
+                    "toast": {
+                      "deleted": "تم حذف مجموعة الخوادم."
+                    }
+                  },
+                  "addServerToGroup": {
+                    "title": "إضافة الخادم إلى {group}",
+                    "noServers": "جميع الخوادم موجودة بالفعل في هذه المجموعة.",
+                    "toast": {
+                      "added": "تمت إضافة الخادم إلى المجموعة."
+                    }
+                  }
+                },
+                "noGroups": "لم يتم العثور على مجموعات، حان الوقت لإنشاء واحدة؟"
+              }
+            },
+            "allServers": {
+              "title": "جميع الخوادم",
+              "page": {
+                "input": {
+                  "showOtherUsersServers": "إظهار خوادم المستخدمين الآخرين"
+                },
+                "modal": {
+                  "addToServerGroup": {
+                    "title": "إضافة {server} إلى مجموعة الخوادم",
+                    "form": {
+                      "serverGroup": "مجموعة الخوادم"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "bulkActions": {
+            "selectionMode": "وضع التحديد",
+            "select": "تحديد الخادم",
+            "deselect": "إلغاء تحديد الخادم",
+            "success": "تم {action} {servers} بنجاح.",
+            "partial": "تم {action} {successfulServers} بنجاح. فشل {failedServers}.",
+            "groupActions": "إجراءات المجموعة"
+          },
+          "noServers": "لم يتم العثور على خوادم، حان الوقت لإضافة واحدة؟"
+        },
+        "admin": {
+          "title": "المسؤول"
+        },
+        "account": {
+          "title": "الحساب",
+          "alert": {
+            "requireTwoFactor": {
+              "title": "مطلوب المصادقة الثنائية",
+              "description": "المصادقة الثنائية مطلوبة على حسابك. يرجى إعدادها أدناه لمواصلة استخدام اللوحة."
+            }
+          },
+          "containers": {
+            "password": {
+              "title": "كلمة المرور",
+              "toast": {
+                "updated": "تم تحديث كلمة المرور بنجاح."
+              },
+              "form": {
+                "currentPassword": "كلمة المرور الحالية",
+                "newPassword": "كلمة المرور الجديدة",
+                "confirmNewPassword": "تأكيد كلمة المرور الجديدة"
+              }
+            },
+            "email": {
+              "title": "البريد الإلكتروني",
+              "toast": {
+                "updated": "تم تحديث البريد الإلكتروني بنجاح."
+              },
+              "form": {
+                "newEmail": "البريد الإلكتروني الجديد",
+                "currentPassword": "كلمة المرور الحالية"
+              }
+            },
+            "twoFactor": {
+              "title": "المصادقة الثنائية",
+              "toast": {
+                "disabled": "تم تعطيل المصادقة الثنائية بنجاح.",
+                "enabled": "تم تفعيل المصادقة الثنائية بنجاح. يرجى نسخ رموز الاستعادة الخاصة بك."
+              },
+              "modal": {
+                "disableTwoFactor": {
+                  "title": "تعطيل المصادقة الثنائية",
+                  "description": "تعطيل المصادقة الثنائية سيجعل حسابك أقل أماناً.",
+                  "form": {
+                    "code": "رمز المصادقة"
+                  }
+                },
+                "setupTwoFactor": {
+                  "title": "إعداد المصادقة الثنائية",
+                  "description": "ساعد في حماية حسابك من الوصول غير المصرح به. ستُطلب منك رمز تحقق في كل مرة تقوم فيها بتسجيل الدخول.",
+                  "descriptionQR": "امسح رمز QR أعلاه باستخدام تطبيق المصادقة الثنائية الذي تختاره. ثم أدخل الرقم المكون من 6 أرقام الذي تم إنشاؤه في الحقل أدناه.",
+                  "form": {
+                    "code": "رمز المصادقة"
+                  }
+                },
+                "recoveryCodes": {
+                  "title": "رموز الاستعادة",
+                  "description": "فيما يلي رموز الاستعادة الخاصة بك. احفظها في مكان آمن. إذا فقدت الوصول إلى جهاز المصادقة الخاص بك، يمكنك استخدام هذه الرموز لاستعادة الوصول إلى حسابك."
+                }
+              },
+              "button": {
+                "disableTwoFactor": "تعطيل المصادقة الثنائية",
+                "setupTwoFactor": "إعداد المصادقة الثنائية"
+              },
+              "twoFactorEnabled": "التحقق الثنائي مفعل حالياً.",
+              "twoFactorDisabled": "ليس لديك حالياً التحقق الثنائي مفعل على حسابك. انقر على الزر أدناه لبدء تكوينه.",
+              "twoFactorLastUsed": "آخر استخدام: {timestamp}"
+            },
+            "account": {
+              "title": "تفاصيل الحساب",
+              "toast": {
+                "updated": "تم تحديث تفاصيل الحساب بنجاح."
+              },
+              "form": {
+                "nameFirst": "الاسم الأول",
+                "nameLast": "اسم العائلة",
+                "username": "اسم المستخدم",
+                "language": "اللغة",
+                "toastPosition": "موضع الإشعار",
+                "startOnGroupedServers": "البدء في صفحة الخوادم المجمعة"
+              }
+            },
+            "avatar": {
+              "title": "الصورة الرمزية",
+              "toast": {
+                "updated": "تم تحديث الصورة الرمزية بنجاح.",
+                "removed": "تم إزالة الصورة الرمزية بنجاح."
+              },
+              "form": {
+                "avatar": "الصورة الرمزية"
+              }
+            }
+          }
+        },
+        "securityKeys": {
+          "title": "مفاتيح الأمان",
+          "table": {
+            "columns": {
+              "credentialId": "معرف الاعتماد"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "مطلوب سياق آمن (HTTPS) لاستخدام مفاتيح الأمان."
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "إنشاء مفتاح أمان",
+              "toast": {
+                "created": "تم إنشاء مفتاح الأمان بنجاح.",
+                "aborted": "تم إلغاء إنشاء مفتاح الأمان."
+              }
+            },
+            "editSecurityKey": {
+              "title": "تعديل مفتاح الأمان",
+              "toast": {
+                "updated": "تم تحديث مفتاح الأمان بنجاح."
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "تأكيد حذف مفتاح الأمان",
+              "content": "هل أنت متأكد أنك تريد حذف **{key}** من حسابك؟",
+              "toast": {
+                "deleted": "تم حذف مفتاح الأمان بنجاح."
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "الجلسات",
+          "table": {
+            "columns": {
+              "ip": "IP",
+              "thisDevice": "هذا الجهاز؟",
+              "userAgent": "وكيل المستخدم"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "تأكيد حذف الجلسة",
+              "content": "هل أنت متأكد أنك تريد حذف الجلسة **{ip}** من حسابك؟",
+              "toast": {
+                "deleted": "تم حذف الجلسة."
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "اختصارات لوحة المفاتيح",
+          "description": "استخدم هذه الاختصارات للتنقل والتفاعل مع اللوحة بشكل أكثر كفاءة.",
+          "detectedMac": "تم اكتشاف macOS",
+          "detectedWindows": "تم اكتشاف Windows/Linux",
+          "fileManager": {
+            "title": "مدير الملفات",
+            "selectAll": "تحديد جميع الملفات",
+            "cutFiles": "قص الملفات المحددة",
+            "copyFiles": "نسخ الملفات المحددة",
+            "duplicateFile": "نسخ الملف المحدد",
+            "pasteFiles": "لصق الملفات",
+            "searchFiles": "بحث الملفات",
+            "moveUpDirectory": "الانتقال لأعلى مجلد",
+            "moveUpSelection": "تحريك التحديد لأعلى",
+            "moveDownSelection": "تحريك التحديد لأسفل",
+            "renameFile": "إعادة تسمية الملف",
+            "deselectAll": "إلغاء تحديد جميع الملفات",
+            "deleteFiles": "حذف الملفات المحددة"
+          },
+          "table": {
+            "title": "تنقل الجدول",
+            "previousPage": "الصفحة السابقة",
+            "nextPage": "الصفحة التالية",
+            "firstPage": "الصفحة الأولى",
+            "lastPage": "الصفحة الأخيرة"
+          },
+          "console": {
+            "title": "وحدة تحكم الخادم",
+            "searchContent": "البحث في مخرجات وحدة التحكم",
+            "previousCommand": "الأمر السابق في السجل",
+            "nextCommand": "الأمر التالي في السجل"
+          },
+          "serverList": {
+            "title": "قائمة الخوادم",
+            "selectServer": "اضغط على S وانقر لتحديد/إلغاء تحديد الخادم"
+          }
+        },
+        "sshKeys": {
+          "title": "مفاتيح SSH",
+          "button": {
+            "import": "استيراد"
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "البصمة"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "إنشاء مفتاح SSH",
+              "toast": {
+                "created": "تم إنشاء مفتاح SSH."
+              },
+              "button": {
+                "uploadKeyFile": "رفع ملف المفتاح"
+              },
+              "form": {
+                "publicKey": "المفتاح العام"
+              }
+            },
+            "editSshKey": {
+              "title": "تعديل مفتاح SSH",
+              "toast": {
+                "updated": "تم تحديث مفتاح SSH."
+              }
+            },
+            "importSshKeys": {
+              "title": "استيراد مفاتيح SSH",
+              "toast": {
+                "created": "تم إنشاء {sshKeys}."
+              },
+              "form": {
+                "provider": "الموفر",
+                "username": "اسم المستخدم"
+              }
+            },
+            "deleteSshKey": {
+              "title": "تأكيد حذف مفتاح SSH",
+              "content": "هل أنت متأكد أنك تريد حذف **{name}** من حسابك؟",
+              "toast": {
+                "removed": "تم إزالة مفتاح SSH."
+              }
+            }
+          }
+        },
+        "commandSnippets": {
+          "title": "قصاصات الأوامر",
+          "table": {
+            "columns": {
+              "eggs": "البيض"
+            }
+          },
+          "form": {
+            "eggs": "البيض",
+            "command": "الأمر"
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "إنشاء قصاصة أمر",
+              "toast": {
+                "created": "تم إنشاء قصاصة الأمر."
+              }
+            },
+            "editCommandSnippet": {
+              "title": "تعديل قصاصة الأوامر",
+              "toast": {
+                "updated": "تم تحديث قصاصة الأوامر."
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "تأكيد حذف قصاصة الأوامر",
+              "content": "هل أنت متأكد أنك تريد حذف **{name}** من حسابك؟",
+              "toast": {
+                "removed": "تم إزالة قصاصة الأوامر."
+              }
+            }
+          }
+        },
+        "oauthLinks": {
+          "title": "روابط OAuth",
+          "button": {
+            "connect": "اتصال",
+            "connectTo": "الاتصال بـ {provider}"
+          },
+          "table": {
+            "columns": {
+              "providerName": "اسم الموفر",
+              "identifier": "المعرف"
+            }
+          },
+          "modal": {
+            "deleteOAuthLink": {
+              "title": "تأكيد حذف رابط OAuth",
+              "content": "هل أنت متأكد أنك تريد حذف اتصال **{provider}** من حسابك؟",
+              "toast": {
+                "removed": "تم إزالة رابط OAuth."
+              }
+            }
+          }
+        },
+        "apiKeys": {
+          "title": "مفاتيح API",
+          "button": {
+            "apiDocumentation": "وثائق API"
+          },
+          "table": {
+            "columns": {
+              "key": "المفتاح",
+              "permissions": "أذونات المستخدم / الخادم / المسؤول",
+              "expires": "تنتهي"
+            }
+          },
+          "modal": {
+            "createApiKey": {
+              "title": "إنشاء مفتاح API",
+              "toast": {
+                "created": "تم إنشاء مفتاح API."
+              }
+            },
+            "updateApiKey": {
+              "title": "تحديث مفتاح API",
+              "toast": {
+                "updated": "تم تحديث مفتاح API."
+              }
+            },
+            "recreateApiKey": {
+              "title": "إعادة إنشاء مفتاح API",
+              "content": "إعادة إنشاء مفتاح API ستنشئ مفتاحاً جديداً وتلغي المفتاح القديم. هل أنت متأكد أنك تريد إعادة إنشاء مفتاح API **{name}**؟",
+              "toast": {
+                "recreated": "تم إعادة إنشاء مفتاح API."
+              }
+            },
+            "deleteApiKey": {
+              "title": "تأكيد حذف مفتاح API",
+              "content": "هل أنت متأكد أنك تريد حذف **{name}** من حسابك؟",
+              "toast": {
+                "removed": "تم إزالة مفتاح API."
+              }
+            }
+          },
+          "form": {
+            "allowedIps": "عناوين IP المسموحة",
+            "allowedIpsPlaceholder": "مثلاً 192.168.1.1, 2001:db8::1",
+            "userPermissions": "أذونات المستخدم",
+            "serverPermissions": "أذونات الخادم",
+            "adminPermissions": "أذونات المسؤول"
+          }
+        },
+        "activity": {
+          "title": "النشاط"
+        }
+      },
+      "admin": {},
+      "server": {
+        "viewAdmin": {
+          "title": "عرض المسؤول"
+        },
+        "console": {
+          "title": "وحدة التحكم",
+          "input": {
+            "placeholder": "اكتب أمراً...",
+            "ariaLabel": "إدخال أمر وحدة التحكم."
+          },
+          "toast": {
+            "installCancelled": "تم إلغاء تثبيت الخادم."
+          },
+          "modal": {
+            "sshDetails": {
+              "title": "تفاصيل SSH",
+              "form": {
+                "protocol": "البروتوكول",
+                "port": "المنفذ",
+                "host": "المضيف",
+                "username": "اسم المستخدم",
+                "password": "كلمة المرور",
+                "yourPassword": "كلمة مرور لوحة التحكم الخاصة بك",
+                "command": "أمر SSH"
+              },
+              "launch": "إطلاق"
+            }
+          },
+          "notification": {
+            "suspended": "خادمك معلق حالياً. لا يمكن تنفيذ أي إجراءات حتى يتم رفع التعليق.",
+            "suspendedAdmin": "هذا الخادم معلق حالياً. بما أنك مسؤول، يمكنك لا يزال الوصول إلى الخادم، ولكن الإجراءات محدودة.",
+            "nodeMaintenance": "خادمك على عقدة قيد الصيانة حالياً.",
+            "transferring": "خادمك قيد النقل حالياً إلى عقدة أخرى.",
+            "restoringBackup": "خادمك يستعيد من نسخة احتياطية حالياً. يرجى الانتظار...",
+            "installing": "خادمك قيد التثبيت حالياً. يرجى الانتظار..."
+          },
+          "message": {
+            "serverMarkedAs": "تم وضع علامة على الخادم كـ {state}...",
+            "installFailed": "فشل التثبيت.",
+            "installCompleted": "اكتمل التثبيت بنجاح.",
+            "transferFailed": "فشل النقل.",
+            "transferCompleted": "اكتمل النقل بنجاح. جاري إعادة الاتصال بالخادم...",
+            "pullingImage": "خادمك يسحب صورة docker حالياً. يرجى الانتظار...",
+            "pulling": "جاري السحب",
+            "extracting": "جاري الاستخراج"
+          },
+          "tooltip": {
+            "search": "بحث",
+            "sshDetails": "تفاصيل SSH",
+            "commandHistory": "سجل الأوامر",
+            "decreaseFontSize": "تقليل حجم الخط",
+            "increaseFontSize": "زيادة حجم الخط"
+          },
+          "drawer": {
+            "commandHistory": {
+              "title": "سجل الأوامر",
+              "detailTitle": "تفاصيل الأمر",
+              "noCommands": "لم يتم العثور على أوامر.",
+              "copyButton": "نسخ الأمر",
+              "sendButton": "إرسال الأمر",
+              "commandSent": "تم إرسال الأمر بنجاح."
+            }
+          },
+          "feature": {
+            "eula": {
+              "title": "اتفاقية ترخيص Minecraft",
+              "content": "يتطلب خادم Minecraft منك الموافقة على [اتفاقية ترخيص المستخدم النهائي لـ Minecraft](https://minecraft.net/eula) قبل أن يبدأ.",
+              "contentDetails": "بالنقر على \"قبول EULA\"، أنت توافق على شروط EULA الخاصة بـ Minecraft وسيتم تحديث ملف **eula.txt** إلى **eula=true**.",
+              "toast": {
+                "accepted": "تم قبول EULA بنجاح."
+              },
+              "button": {
+                "accept": "قبول EULA"
+              }
+            }
+          },
+          "details": {
+            "address": "العنوان",
+            "port": "المنفذ",
+            "uptime": "وقت التشغيل",
+            "cpuLoad": "تحميل المعالج",
+            "memoryLoad": "تحميل الذاكرة",
+            "diskUsage": "استخدام القرص",
+            "networkIn": "الشبكة (داخل)",
+            "networkOut": "الشبكة (خارج)",
+            "normalizeCpuLoad": "تطبيع تحميل المعالج (تم إزاحته إلى الحد الأقصى 100%)"
+          },
+          "power": {
+            "modal": {
+              "forceStop": {
+                "title": "إيقاف العملية بالقوة",
+                "content": "الإيقاف القسري للخادم قد يؤدي إلى تلف البيانات."
+              }
+            }
+          },
+          "stats": {
+            "cpuLoad": "تحميل المعالج",
+            "memoryLoad": "تحميل الذاكرة",
+            "network": "الشبكة",
+            "inbound": "وارد",
+            "outbound": "صادر"
+          },
+          "socketConnected": "متصل (ping {ping}ms)",
+          "socketDisconnected": "غير متصل"
+        },
+        "files": {
+          "title": "الملفات",
+          "titleEditorViewing": "عرض {file}",
+          "titleEditorEditing": "تعديل {file}",
+          "titleEditorNew": "ملف جديد",
+          "table": {
+            "columns": {
+              "modified": "تم التعديل"
+            }
+          },
+          "button": {
+            "new": "جديد",
+            "sftpDetails": "تفاصيل SFTP",
+            "openInNewWindow": "فتح في نافذة جديدة",
+            "details": "التفاصيل",
+            "rename": "إعادة التسمية",
+            "copy": "نسخ",
+            "move": "نقل",
+            "fingerprint": "البصمة",
+            "permissions": "الأذونات",
+            "unarchive": "فك الأرشفة",
+            "archive": "أرشفة",
+            "more": "المزيد",
+            "remoteCopy": "نسخ عن بعد",
+            "search": "بحث",
+            "exitBackup": "خروج من النسخة الاحتياطية",
+            "fileFromEditor": "ملف من المحرر",
+            "directory": "مجلد",
+            "fileFromPull": "ملف من السحب",
+            "fileFromUpload": "ملف من الرفع",
+            "directoryFromUpload": "مجلد من الرفع"
+          },
+          "actionBar": {
+            "copyHere": "نسخ {files} هنا",
+            "moveHere": "نقل {files} هنا"
+          },
+          "searchBanner": {
+            "resultsTitle": "نتائج البحث ({files} تم العثور)",
+            "query": "الاستعلام:",
+            "excluded": "مستثنى:",
+            "content": "المحتوى:",
+            "size": "الحجم:",
+            "min": "الحد الأدنى:",
+            "max": "الحد الأقصى:"
+          },
+          "operations": {
+            "uploadingFolder": "جاري رفع المجلد: {folder} ({files})",
+            "waiting": "انتظار: ",
+            "uploading": "جاري الرفع: ",
+            "compressing": "جاري ضغط {files} من {path}",
+            "decompressing": "جاري فك ضغط {path}",
+            "pulling": "جاري سحب {destination}",
+            "copying": "جاري نسخ {path} إلى {destination}",
+            "copyingMany": "جاري نسخ {files}",
+            "receivingRemote": "جاري استلام {files} من الخادم البعيد",
+            "sendingRemote": "جاري إرسال {files} إلى الخادم البعيد"
+          },
+          "dropzone": {
+            "title": "أفلت الملفات هنا للرفع",
+            "subtitle": "أفلت لبدء الرفع"
+          },
+          "settings": {
+            "clickOnce": "انقر مرة واحدة لفتح ملف أو مجلد",
+            "preferPhysicalSize": "إظهار الحجم الفعلي بدلاً من الحجم المنطقي",
+            "editorMinimap": "إظهار خريطة الملف المصغرة",
+            "editorLineOverflow": "التفاف تجاوز السطر",
+            "imageViewerSmoothing": "تنعيم الصورة (مضاد للتعرج)"
+          },
+          "toast": {
+            "operationCancelled": "تم إلغاء العملية",
+            "copyingStarted": "بدأ نسخ {files}.",
+            "filesCouldNotBeMoved": "لم يمكن نقل الملفات.",
+            "filesMoved": "تم نقل {files}.",
+            "downloadStarted": "بدأ التنزيل.",
+            "filesDeleted": "تم حذف الملفات.",
+            "archiveCreationStarted": "بدأ إنشاء الأرشيف.",
+            "fileCopyingStarted": "بدأ نسخ الملف.",
+            "fileInfoRetrieved": "تم استرجاع معلومات الملف بنجاح.",
+            "filePullingStarted": "بدأ سحب الملف.",
+            "fileRenamed": "تم إعادة تسمية الملف.",
+            "fileCouldNotBeRenamed": "لم يمكن إعادة تسمية الملف.",
+            "permissionsUpdated": "تم تحديث الأذونات.",
+            "fileSaved": "تم حفظ الملف."
+          },
+          "modal": {
+            "activeUploads": {
+              "title": "الرفعات النشطة",
+              "content": "هل أنت متأكد أنك تريد مغادرة هذه الصفحة؟ لديك {files} رفع ملف نشط. إذا غادرت هذه الصفحة، سيتم إجهاض رفع الملفات.",
+              "button": {
+                "leave": "مغادرة الصفحة"
+              }
+            },
+            "unsavedChanges": {
+              "title": "تغييرات غير محفوظة",
+              "content": "لديك تغييرات غير محفوظة في محرر الملفات. هل أنت متأكد أنك تريد مغادرة هذه الصفحة؟ إذا غادرت، ستفقد تغييراتك.",
+              "button": {
+                "leave": "مغادرة الصفحة"
+              }
+            },
+            "createArchive": {
+              "title": "إنشاء أرشيف",
+              "form": {
+                "archiveName": "اسم الأرشيف",
+                "format": "التنسيق"
+              },
+              "createdAs": "سيتم إنشاء هذا الأرشيف كـ "
+            },
+            "createDirectory": {
+              "title": "إنشاء مجلد",
+              "form": {
+                "directoryName": "اسم المجلد"
+              },
+              "createdAs": "سيتم إنشاء هذا المجلد كـ "
+            },
+            "copyFile": {
+              "title": "نسخ ملف",
+              "form": {
+                "fileName": "اسم الملف"
+              },
+              "createdAs": "سيتم إنشاء هذا الملف كـ "
+            },
+            "copyRemote": {
+              "title": "نسخ الملفات عن بعد",
+              "form": {
+                "server": "الخادم",
+                "destination": "الوجهة"
+              },
+              "createdAs": "سيتم إنشاء هذه الملفات على الخادم البعيد تحت "
+            },
+            "fileFingerprints": {
+              "title": "بصمة الملف",
+              "form": {
+                "algorithm": "الخوارزمية",
+                "fingerprint": "البصمة"
+              },
+              "button": {
+                "calculate": "حساب البصمة"
+              }
+            },
+            "deleteFile": {
+              "title": "حذف الملف",
+              "singleFileWarning": "لن تتمكن من استعادة محتويات {file} بمجرد حذفها.",
+              "multipleFilesWarning": "لن تتمكن من استعادة محتويات الملفات التالية بمجرد حذفها."
+            },
+            "createFile": {
+              "title": "إنشاء ملف",
+              "form": {
+                "fileName": "اسم الملف"
+              }
+            },
+            "details": {
+              "title": "تفاصيل الملف",
+              "path": "المسار",
+              "mode": "الوضع",
+              "logicalSize": "الحجم المنطقي",
+              "physicalSize": "الحجم الفعلي",
+              "mimeType": "نوع MIME",
+              "lastModifiedAt": "آخر تعديل في",
+              "createdAt": "تم الإنشاء في"
+            },
+            "filePermissions": {
+              "title": "أذونات الملف",
+              "symbolic": "رمزي:",
+              "octal": "ثماني:",
+              "owner": "المالك",
+              "group": "المجموعة",
+              "other": "آخر",
+              "breakdown": "تفصيل الأذونات",
+              "readPermission": "إذن القراءة (4)",
+              "writePermission": "إذن الكتابة (2)",
+              "executePermission": "إذن التنفيذ (1)"
+            },
+            "renameFile": {
+              "title": "إعادة تسمية الملف",
+              "form": {
+                "fileName": "اسم الملف"
+              }
+            },
+            "searchFiles": {
+              "title": "بحث الملفات",
+              "placeholder": "البحث عن الملفات...",
+              "advancedFilters": "فلاتر متقدمة",
+              "pathPatterns": "أنماط المسار",
+              "include": "تضمين",
+              "exclude": "استبعاد",
+              "caseInsensitive": "غير حساس لحالة الأحرف",
+              "fileContent": "محتوى الملف",
+              "searchText": "نص البحث",
+              "maxFileSize": "الحد الأقصى لحجم الملف",
+              "includeOversized": "تضمين الملفات الكبيرة جداً",
+              "includeOversizedDescription": "تضمين الملفات التي تطابق الفلاتر الأخرى لكنها كبيرة جداً للبحث",
+              "fileSize": "حجم الملف",
+              "minimum": "الحد الأدنى",
+              "maximum": "الحد الأقصى"
+            },
+            "pullFile": {
+              "title": "سحب ملف",
+              "form": {
+                "fileUrl": "URL الملف",
+                "query": "الاستعلام",
+                "fileName": "اسم الملف"
+              },
+              "createdAs": "سيتم إنشاء هذا الملف كـ ",
+              "pull": "سحب"
+            },
+            "sftpDetails": {
+              "title": "تفاصيل SFTP",
+              "form": {
+                "protocol": "البروتوكول",
+                "port": "المنفذ",
+                "host": "المضيف",
+                "username": "اسم المستخدم",
+                "password": "كلمة المرور",
+                "yourPassword": "كلمة مرور لوحة التحكم الخاصة بك"
+              },
+              "launch": "إطلاق"
+            }
+          }
+        },
+        "databases": {
+          "title": "قواعد البيانات",
+          "subtitle": "{current} من {max} قاعدة بيانات كحد أقصى تم إنشاؤها.",
+          "tooltip": {
+            "limitReached": "هذا الخادم محدود بـ {max} قواعد بيانات."
+          },
+          "table": {
+            "columns": {
+              "type": "النوع",
+              "address": "العنوان",
+              "locked": "مقفل؟"
+            }
+          },
+          "button": {
+            "details": "التفاصيل",
+            "rotatePassword": "تدوير كلمة المرور"
+          },
+          "form": {
+            "databaseName": "اسم قاعدة البيانات"
+          },
+          "modal": {
+            "createDatabase": {
+              "title": "إنشاء قاعدة بيانات",
+              "toast": {
+                "created": "تم إنشاء قاعدة البيانات."
+              },
+              "form": {
+                "databaseHost": "مضيف قاعدة البيانات",
+                "noHostsFound": "لم يتم العثور على مضيفين"
+              }
+            },
+            "editDatabase": {
+              "title": "تعديل قاعدة البيانات",
+              "toast": {
+                "updated": "تم تحديث قاعدة البيانات."
+              },
+              "form": {
+                "locked": "مقفل"
+              }
+            },
+            "databaseDetails": {
+              "title": "تفاصيل اتصال قاعدة البيانات",
+              "toast": {
+                "passwordRotated": "تم تدوير كلمة المرور."
+              },
+              "form": {
+                "jdbcConnectionString": "سلسلة اتصال JDBC"
+              }
+            },
+            "recreateDatabase": {
+              "title": "تأكيد إعادة إنشاء قاعدة البيانات",
+              "content": "إعادة إنشاء قاعدة البيانات ستحذف بشكل دائم جميع البيانات في قاعدة البيانات **{name}** وتنشئ واحدة جديدة بنفس تفاصيل الاتصال.",
+              "toast": {
+                "recreated": "تم إعادة إنشاء قاعدة البيانات."
+              }
+            },
+            "deleteDatabase": {
+              "title": "تأكيد حذف قاعدة البيانات",
+              "content": "حذف قاعدة البيانات هو إجراء دائم، لا يمكن التراجع عنه. سيؤدي هذا إلى حذف قاعدة البيانات **{name}** بشكل دائم وإزالة جميع البيانات المرتبطة.",
+              "toast": {
+                "deleted": "تم حذف قاعدة البيانات."
+              }
+            }
+          }
+        },
+        "schedules": {
+          "title": "الجداول",
+          "subtitle": "{current} من {max} جدول كحد أقصى تم إنشاؤه.",
+          "dropzone": {
+            "title": "أفلت بعض الملفات هنا لاستيرادها كجداول",
+            "subtitle": "أفلت لبدء الاستيراد"
+          },
+          "tooltip": {
+            "limitReached": "هذا الخادم محدود بـ {max} جداول."
+          },
+          "table": {
+            "columns": {
+              "lastRun": "آخر تشغيل",
+              "lastFailure": "آخر فشل",
+              "status": "الحالة"
+            }
+          },
+          "button": {
+            "import": "استيراد",
+            "trigger": "تشغيل",
+            "triggerWithCondition": "تشغيل (عدم تخطي الشرط)",
+            "triggerSkipCondition": "تشغيل (تخطي الشرط)",
+            "addTrigger": "إضافة مشغل",
+            "addCondition": "إضافة شرط",
+            "addStep": "إضافة خطوة",
+            "createFirstStep": "إنشاء الخطوة الأولى",
+            "addOutput": "إضافة مخرجات",
+            "addFile": "إضافة ملف",
+            "exitEditor": "خروج من المحرر"
+          },
+          "toast": {
+            "imported": "تم استيراد الجدول.",
+            "created": "تم إنشاء الجدول.",
+            "updated": "تم تحديث الجدول.",
+            "deleted": "تم حذف الجدول.",
+            "triggered": "تم تشغيل الجدول.",
+            "exported": "تم تصدير الجدول.",
+            "parseError": "فشل تحليل الجدول: {error}",
+            "step": {
+              "created": "تم إنشاء خطوة الجدول.",
+              "updated": "تم تحديث خطوة الجدول.",
+              "deleted": "تم حذف خطوة الجدول."
+            }
+          },
+          "enum": {
+            "schedulePreConditionType": {
+              "none": "لا شيء",
+              "and": "AND (يجب أن تكون كلها صحيحة)",
+              "or": "OR (أي واحدة يجب أن تكون صحيحة)",
+              "not": "NOT (يجب ألا تكون صحيحة)",
+              "serverState": "حالة الخادم",
+              "uptime": "وقت التشغيل",
+              "cpuUsage": "استخدام المعالج",
+              "memoryUsage": "استخدام الذاكرة",
+              "diskUsage": "استخدام القرص",
+              "fileExists": "الملف موجود"
+            },
+            "scheduleConditionType": {
+              "none": "لا شيء",
+              "and": "AND (يجب أن تكون كلها صحيحة)",
+              "or": "OR (أي واحدة يجب أن تكون صحيحة)",
+              "not": "NOT (يجب ألا تكون صحيحة)",
+              "variableExists": "المتغير موجود",
+              "variableContains": "المتغير يحتوي",
+              "variableEquals": "المتغير يساوي",
+              "variableStartsWith": "المتغير يبدأ بـ",
+              "variableEndsWith": "المتغير ينتهي بـ"
+            },
+            "scheduleComparator": {
+              "smallerThan": "أصغر من",
+              "smallerThanOrEqual": "أصغر من أو يساوي",
+              "equal": "يساوي",
+              "greaterThanOrEqual": "أكبر من أو يساوي",
+              "greaterThan": "أكبر من"
+            }
+          },
+          "modal": {
+            "createSchedule": {
+              "title": "إنشاء جدول"
+            },
+            "updateSchedule": {
+              "title": "تحديث الجدول"
+            },
+            "deleteSchedule": {
+              "title": "تأكيد حذف الجدول",
+              "content": "هل أنت متأكد أنك تريد حذف {name} من هذا الخادم؟"
+            },
+            "createStep": {
+              "title": "إنشاء خطوة جدول"
+            },
+            "editStep": {
+              "title": "تعديل خطوة الجدول"
+            },
+            "deleteStep": {
+              "title": "تأكيد حذف خطوة الجدول",
+              "content": "هل أنت متأكد أنك تريد حذف خطوة الجدول هذه؟"
+            }
+          },
+          "view": {
+            "badge": {
+              "running": "جاري التشغيل"
+            },
+            "tooltip": {
+              "cannotTrigger": "لا يمكن تشغيل جدول معطل"
+            },
+            "tabs": {
+              "actions": "الإجراءات",
+              "conditions": "الشروط",
+              "triggers": "المشغلات"
+            },
+            "sections": {
+              "actions": "إجراءات الجدول",
+              "preConditions": "الشروط المسبقة للجدول",
+              "triggers": "مشغلات الجدول"
+            },
+            "alert": {
+              "noActions": "لم يتم تكوين أي إجراءات لهذا الجدول",
+              "noTriggers": "لم يتم تكوين أي مشغلات لهذا الجدول"
+            }
+          },
+          "form": {
+            "scheduleName": "اسم الجدول",
+            "enabled": "مفعّل",
+            "triggersList": "المشغلات",
+            "triggerNumber": "مشغل {number}",
+            "actionType": "نوع الإجراء",
+            "conditionType": "نوع الشرط",
+            "serverState": "حالة الخادم",
+            "comparator": "المقارن",
+            "rootPath": "المسار الجذر",
+            "outputInto": "الإخراج إلى",
+            "caseInsensitive": "غير حساس لحالة الأحرف",
+            "ignoreFailure": "تجاهل الفشل",
+            "runInForeground": "التشغيل في المقدمة"
+          },
+          "condition": {
+            "variable": "المتغير",
+            "equals": "يساوي",
+            "contains": "يحتوي",
+            "startsWith": "يبدأ بـ",
+            "endsWith": "ينتهي بـ",
+            "allMustBeTrue": "جميع الشروط يجب أن تكون صحيحة:",
+            "anyMustBeTrue": "أي شرط يجب أن يكون صحيحاً:",
+            "mustNotBeTrue": "الشرط يجب ألا يكون صحيحاً:"
+          },
+          "preCondition": {
+            "valueSeconds": "القيمة (ثوانٍ)",
+            "valuePercent": "القيمة (٪)",
+            "value": "القيمة",
+            "filePath": "مسار الملف"
+          },
+          "triggers": {
+            "cron": {
+              "title": "Cron",
+              "form": {
+                "cronSchedule": "جدول Cron"
+              },
+              "card": {
+                "content": "على فاصل Cron `{schedule}`، التشغيل التالي هو {timestamp} - التشغيل الأخير كان {lastTimestamp}."
+              }
+            },
+            "powerAction": {
+              "title": "إجراء الطاقة",
+              "form": {
+                "powerAction": "إجراء الطاقة"
+              },
+              "card": {
+                "content": "عند طلب إجراء الطاقة `{action}`."
+              }
+            },
+            "serverState": {
+              "title": "حالة الخادم",
+              "card": {
+                "content": "عند الوصول إلى حالة الخادم `{state}`."
+              }
+            },
+            "backupStatus": {
+              "title": "حالة النسخة الاحتياطية",
+              "form": {
+                "backupStatus": "حالة النسخة الاحتياطية"
+              },
+              "card": {
+                "content": "عند وصول النسخة الاحتياطية إلى الحالة `{status}`."
+              }
+            },
+            "consoleLine": {
+              "title": "سطر وحدة التحكم",
+              "form": {
+                "lineContains": "السطر يحتوي"
+              },
+              "card": {
+                "content": "عند وصول مخرجات وحدة التحكم إلى سطر يحتوي على `{contains}`"
+              }
+            },
+            "crash": {
+              "title": "التعطل",
+              "card": {
+                "content": "عند تعطل الخادم."
+              }
+            }
+          },
+          "renderer": {
+            "noActionSelected": "حدد نوع إجراء للتكوين",
+            "noActionDetails": "تفاصيل الإجراء غير متوفرة",
+            "ignoreFailure": "تجاهل الفشل: {value}",
+            "foreground": "المقدمة: {value}"
+          },
+          "steps": {
+            "empty": {
+              "title": "لم يتم تكوين خطوات",
+              "description": "هذا الجدول ليس لديه أي خطوات بعد. أضف بعض الإجراءات للبدء."
+            },
+            "sleep": {
+              "title": "انتظار",
+              "form": {
+                "duration": "المدة (مللي ثانية)"
+              },
+              "renderer": {
+                "compact": "انتظار {duration}ms"
+              }
+            },
+            "ensure": {
+              "title": "ضمان",
+              "renderer": {
+                "compact": "ضمان مطابقة شرط"
+              }
+            },
+            "format": {
+              "title": "تنسيق",
+              "form": {
+                "formatString": "سلسلة التنسيق",
+                "formatStringDescription": "سلسلة التنسيق، يمكن أن تتضمن متغيرات عن طريق وضعها داخل {wrapper}"
+              },
+              "renderer": {
+                "compact": "تنسيق سلسلة إلى {outputInto}"
+              }
+            },
+            "matchRegex": {
+              "title": "مطابقة Regex",
+              "form": {
+                "input": "الإدخال",
+                "regex": "Regex",
+                "outputs": "المخرجات",
+                "outputNumber": "مخرج {number}"
+              },
+              "renderer": {
+                "compact": "مطابقة {input} مع regex {regex}"
+              }
+            },
+            "waitForConsoleLine": {
+              "title": "انتظار سطر وحدة التحكم",
+              "form": {
+                "lineContains": "السطر يحتوي",
+                "timeout": "المهلة (مللي ثانية)"
+              },
+              "renderer": {
+                "compact": "انتظار {timeout} لسطر وحدة التحكم الذي يحتوي على {contains}",
+                "detail": {
+                  "lineContains": "السطر يجب أن يحتوي على: {contains}",
+                  "caseInsensitive": "غير حساس لحالة الأحرف: {value}",
+                  "timeout": "المهلة: {timeout}"
+                }
+              }
+            },
+            "sendCommand": {
+              "title": "إرسال أمر",
+              "form": {
+                "command": "الأمر"
+              },
+              "renderer": {
+                "compact": "تشغيل {command}",
+                "detail": {
+                  "command": "الأمر: {command}"
+                }
+              }
+            },
+            "sendPower": {
+              "title": "إرسال إشارة طاقة",
+              "form": {
+                "powerAction": "إجراء الطاقة"
+              },
+              "renderer": {
+                "compact": "تنفيذ {action}",
+                "detail": {
+                  "powerAction": "إجراء الطاقة: {action}"
+                }
+              }
+            },
+            "createBackup": {
+              "title": "إنشاء نسخة احتياطية",
+              "form": {
+                "backupName": "اسم النسخة الاحتياطية",
+                "ignoredFiles": "الملفات المتجاهلة"
+              },
+              "renderer": {
+                "compact": "إنشاء {name}",
+                "detail": {
+                  "backupName": "اسم النسخة الاحتياطية: {name}",
+                  "ignoredFiles": "الملفات المتجاهلة: {files}"
+                }
+              }
+            },
+            "createDirectory": {
+              "title": "إنشاء مجلد",
+              "form": {
+                "directoryName": "اسم المجلد"
+              },
+              "renderer": {
+                "compact": "إنشاء {name} في {root}",
+                "detail": {
+                  "directory": "المجلد: {name}",
+                  "root": "الجذر: {root}"
+                }
+              }
+            },
+            "writeFile": {
+              "title": "كتابة ملف",
+              "form": {
+                "filePath": "مسار الملف",
+                "content": "المحتوى",
+                "appendToFile": "إلحاق بالملف"
+              },
+              "renderer": {
+                "compact": "الكتابة إلى {file}",
+                "detail": {
+                  "file": "الملف: {file}",
+                  "append": "إلحاق: {value}"
+                }
+              }
+            },
+            "copyFile": {
+              "title": "نسخ ملف",
+              "form": {
+                "sourceFile": "الملف المصدر",
+                "destination": "الوجهة"
+              },
+              "renderer": {
+                "compact": "نسخ {file} إلى {destination}",
+                "detail": {
+                  "from": "من: {file}",
+                  "to": "إلى: {destination}"
+                }
+              }
+            },
+            "deleteFiles": {
+              "title": "حذف الملفات",
+              "form": {
+                "filesToDelete": "الملفات للحذف"
+              },
+              "renderer": {
+                "compact": "حذف {files}",
+                "detail": {
+                  "root": "الجذر: {root}",
+                  "files": "الملفات: {files}"
+                }
+              }
+            },
+            "renameFiles": {
+              "title": "إعادة تسمية الملفات",
+              "form": {
+                "files": "الملفات",
+                "from": "من",
+                "to": "إلى"
+              },
+              "renderer": {
+                "compact": "إعادة تسمية {files}",
+                "detail": {
+                  "root": "الجذر: {root}",
+                  "files": "الملفات: {files}"
+                }
+              }
+            },
+            "compressFiles": {
+              "title": "ضغط الملفات",
+              "form": {
+                "filesToCompress": "الملفات للضغط",
+                "archiveFormat": "تنسيق الأرشيف",
+                "archiveName": "اسم الأرشيف"
+              },
+              "renderer": {
+                "compact": "ضغط {files} في {root} إلى {name}",
+                "detail": {
+                  "output": "المخرجات: {name}",
+                  "root": "الجذر: {root}",
+                  "format": "التنسيق: {format}",
+                  "files": "الملفات: {files}"
+                }
+              }
+            },
+            "decompressFile": {
+              "title": "فك ضغط ملف",
+              "form": {
+                "file": "الملف"
+              },
+              "renderer": {
+                "compact": "فك ضغط {file} إلى {root}",
+                "detail": {
+                  "file": "الملف: {file}",
+                  "root": "الجذر: {root}"
+                }
+              }
+            },
+            "updateStartupVariable": {
+              "title": "تحديث متغير بدء التشغيل",
+              "form": {
+                "envVariable": "متغير البيئة",
+                "value": "القيمة"
+              },
+              "renderer": {
+                "compact": "تعيين {variable} إلى {value}",
+                "detail": {
+                  "variable": "المتغير: {variable}",
+                  "value": "القيمة: {value}"
+                }
+              }
+            },
+            "updateStartupCommand": {
+              "title": "تحديث أمر بدء التشغيل",
+              "form": {
+                "startupCommand": "أمر بدء التشغيل"
+              },
+              "renderer": {
+                "compact": "تعيين إلى {command}",
+                "detail": {
+                  "command": "الأمر: {command}"
+                }
+              }
+            },
+            "updateStartupDockerImage": {
+              "title": "تحديث صورة Docker",
+              "form": {
+                "dockerImage": "صورة Docker"
+              },
+              "renderer": {
+                "compact": "تعيين إلى {image}",
+                "detail": {
+                  "image": "الصورة: {image}"
+                }
+              }
+            }
+          }
+        },
+        "subusers": {
+          "title": "المستخدمون الفرعيون",
+          "table": {
+            "columns": {
+              "twoFactorEnabled": "تم تفعيل 2FA",
+              "permissions": "الأذونات",
+              "ignoredFiles": "الملفات المتجاهلة"
+            }
+          },
+          "modal": {
+            "createSubuser": {
+              "title": "إنشاء مستخدم فرعي",
+              "toast": {
+                "created": "تم إنشاء المستخدم الفرعي."
+              },
+              "form": {
+                "email": "البريد الإلكتروني",
+                "emailPlaceholder": "أدخل البريد الإلكتروني الذي يجب حفظ هذا المستخدم الفرعي به.",
+                "permissions": "الأذونات",
+                "ignoredFiles": "الملفات المتجاهلة"
+              }
+            },
+            "updateSubuser": {
+              "title": "تحديث المستخدم الفرعي",
+              "toast": {
+                "updated": "تم تحديث المستخدم الفرعي."
+              }
+            },
+            "removeSubuser": {
+              "title": "تأكيد إزالة المستخدم الفرعي",
+              "content": "هل أنت متأكد أنك تريد إزالة **{username}** من هذا الخادم؟",
+              "toast": {
+                "removed": "تم إزالة المستخدم الفرعي."
+              }
+            }
+          }
+        },
+        "backups": {
+          "title": "النسخ الاحتياطية",
+          "subtitle": "{current} من {max} نسخة احتياطية كحد أقصى تم إنشاؤها.",
+          "tooltip": {
+            "limitReached": "هذا الخادم محدود بـ {max} نسخ احتياطية."
+          },
+          "table": {
+            "columns": {
+              "checksum": "مجموع التحقق",
+              "files": "الملفات",
+              "locked": "مقفل؟"
+            }
+          },
+          "button": {
+            "browse": "تصفح"
+          },
+          "toast": {
+            "downloadStarted": "بدأ التنزيل.",
+            "restoringBackup": "جاري استعادة النسخة الاحتياطية..."
+          },
+          "modal": {
+            "createBackup": {
+              "title": "إنشاء نسخة احتياطية",
+              "toast": {
+                "created": "تم إنشاء النسخة الاحتياطية."
+              },
+              "form": {
+                "ignoredFiles": "الملفات المتجاهلة"
+              }
+            },
+            "editBackup": {
+              "title": "تعديل النسخة الاحتياطية",
+              "toast": {
+                "updated": "تم تحديث النسخة الاحتياطية."
+              },
+              "form": {
+                "locked": "مقفل"
+              }
+            },
+            "restoreBackup": {
+              "title": "استعادة النسخة الاحتياطية"
+            },
+            "deleteBackup": {
+              "title": "تأكيد حذف النسخة الاحتياطية",
+              "content": "هل أنت متأكد أنك تريد حذف **{name}** من هذا الخادم؟",
+              "toast": {
+                "deleted": "تم حذف النسخة الاحتياطية."
+              }
+            }
+          }
+        },
+        "network": {
+          "title": "الشبكة",
+          "subtitle": "{current} من {max} تخصيص كحد أقصى تم تعيينه.",
+          "tooltip": {
+            "limitReached": "هذا الخادم محدود بـ {max} تخصيصات.",
+            "primary": "أساسي"
+          },
+          "table": {
+            "columns": {
+              "hostname": "اسم المضيف",
+              "port": "المنفذ",
+              "notes": "ملاحظات"
+            }
+          },
+          "button": {
+            "setPrimary": "تعيين كأساسي",
+            "unsetPrimary": "إلغاء التعيين كأساسي"
+          },
+          "toast": {
+            "created": "تم إنشاء التخصيص.",
+            "updated": "تم تحديث التخصيص.",
+            "removed": "تم إزالة التخصيص.",
+            "setPrimary": "تم تعيين التخصيص كأساسي.",
+            "unsetPrimary": "تم إلغاء تعيين التخصيص كأساسي."
+          },
+          "modal": {
+            "editAllocation": {
+              "title": "تعديل التخصيص",
+              "form": {
+                "notes": "ملاحظات"
+              }
+            },
+            "removeAllocation": {
+              "title": "تأكيد إزالة التخصيص",
+              "content": "هل أنت متأكد أنك تريد إزالة **{allocation}** من هذا الخادم؟"
+            }
+          }
+        },
+        "startup": {
+          "title": "بدء التشغيل",
+          "form": {
+            "startupCommand": "أمر بدء التشغيل",
+            "dockerImage": "صورة Docker"
+          },
+          "variables": "المتغيرات",
+          "dockerImageDescription": "صورة Docker المستخدمة لتشغيل هذا الخادم. يمكن تغييرها لاستخدام صورة مختلفة.",
+          "dockerImageDescriptionCustom": "صورة Docker المستخدمة لتشغيل هذا الخادم. تم تعيينها بواسطة مسؤول ولا يمكن تغييرها.",
+          "toast": {
+            "startupCommandUpdated": "تم تحديث أمر بدء التشغيل.",
+            "dockerImageUpdated": "تم تحديث صورة Docker.",
+            "variablesUpdated": "تم تحديث المتغيرات."
+          },
+          "modal": {
+            "unsavedChanges": {
+              "title": "تغييرات غير محفوظة",
+              "content": "لديك تغييرات غير محفوظة في متغيرات بدء التشغيل. هل أنت متأكد أنك تريد مغادرة هذه الصفحة؟ إذا غادرت، ستفقد تغييراتك.",
+              "button": {
+                "leave": "مغادرة الصفحة"
+              }
+            }
+          },
+          "noVariables": "لم يتم العثور على متغيرات بدء التشغيل لهذا الخادم."
+        },
+        "mounts": {
+          "title": "النقاط",
+          "table": {
+            "columns": {
+              "target": "الهدف",
+              "mounted": "مثبت",
+              "readOnly": "قراءة فقط"
+            }
+          },
+          "modal": {
+            "attachMount": {
+              "title": "تثبيت نقطة",
+              "content": "هل تريد تثبيت **{name}** على `{target}`؟",
+              "confirm": "تثبيت",
+              "toast": {
+                "attached": "تم تثبيت {name} على خادمك."
+              }
+            },
+            "detachMount": {
+              "title": "فك نقطة",
+              "content": "هل تريد فك **{name}** من `{target}`؟",
+              "confirm": "فك",
+              "toast": {
+                "detached": "تم إزالة {name} من خادمك."
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "الإعدادات",
+          "debugInformation": {
+            "title": "معلومات التصحيح",
+            "form": {
+              "nodeName": "العقدة (UUID)",
+              "locationName": "الموقع (UUID)",
+              "serverUuid": "UUID الخادم"
+            }
+          },
+          "rename": {
+            "title": "إعادة تسمية الخادم",
+            "form": {
+              "serverName": "اسم الخادم"
+            },
+            "toast": {
+              "renamed": "تم إعادة تسمية الخادم."
+            }
+          },
+          "timezone": {
+            "title": "المنطقة الزمنية",
+            "form": {
+              "timezone": "المنطقة الزمنية",
+              "system": "النظام"
+            },
+            "toast": {
+              "updated": "تم تحديث المنطقة الزمنية للخادم."
+            }
+          },
+          "autokill": {
+            "title": "الإيقاف التلقائي",
+            "form": {
+              "enabled": "مفعّل",
+              "secondsUntilAutoKill": "ثوانٍ حتى الإيقاف التلقائي"
+            },
+            "toast": {
+              "updated": "تم تحديث الإيقاف التلقائي للخادم."
+            }
+          },
+          "autostart": {
+            "title": "البدء التلقائي",
+            "form": {
+              "behavior": "السلوك"
+            },
+            "toast": {
+              "updated": "تم تحديث سلوك البدء التلقائي للخادم."
+            }
+          },
+          "reinstall": {
+            "title": "إعادة تثبيت الخادم",
+            "button": "إعادة تثبيت الخادم",
+            "content": "إعادة تثبيت خادمك ستوقفه، ثم تعيد تشغيل برنامج التثبيت الذي قام بإعداده في البداية. **قد يتم حذف أو تعديل بعض الملفات أثناء هذه العملية، يرجى عمل نسخة احتياطية من بياناتك قبل المتابعة.**",
+            "modal": {
+              "title": "إعادة تثبيت الخادم",
+              "button": "إعادة التثبيت",
+              "toast": {
+                "reinstalling": "جاري إعادة تثبيت الخادم..."
+              }
+            }
+          }
+        },
+        "activity": {
+          "title": "النشاط"
+        }
+      }
+    }
+  }
+}

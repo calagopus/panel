@@ -74,12 +74,16 @@ mod post {
                 .ok();
         }
 
+        let ratelimit = state
+            .settings
+            .get_as(|s| s.ratelimits.client_servers_backups_create)
+            .await?;
         state
             .cache
             .ratelimit(
                 "client/servers/backups/create",
-                4,
-                300,
+                ratelimit.hits,
+                ratelimit.window_seconds,
                 server.uuid.to_string(),
             )
             .await?;

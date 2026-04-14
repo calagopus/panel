@@ -456,9 +456,6 @@ const baseTranslations = defineTranslations({
             languagePlaceholder: 'Language',
             applicationUrl: 'Application URL',
             applicationUrlPlaceholder: 'https://calagop.us',
-            telemetry: 'Enable Telemetry',
-            telemetryDescription:
-              'Allow Calagopus to collect limited and anonymous usage data to help improve the application.',
             registration: 'Enable Registration',
             registrationDescription: 'Allow new users to register their own account.',
           },

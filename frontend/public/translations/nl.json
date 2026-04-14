@@ -474,8 +474,6 @@
             "languagePlaceholder": "Taal",
             "applicationUrl": "Applicatie-URL",
             "applicationUrlPlaceholder": "https://calagop.us",
-            "telemetry": "Telemetrie inschakelen",
-            "telemetryDescription": "Sta Calagopus toe beperkte en anonieme gebruiksgegevens te verzamelen om de applicatie te verbeteren.",
             "registration": "Registratie inschakelen",
             "registrationDescription": "Sta nieuwe gebruikers toe een eigen account te registreren."
           },

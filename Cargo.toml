@@ -54,7 +54,7 @@ colored = "3.0.0"
 russh = "0.60.0"
 futures-util = "0.3.31"
 clap = { version = "4.5.37", features = ["derive"] }
-rust-s3 = { version = "0.37.0", default-features = false, features = ["tokio-rustls-tls"] }
+rust-s3 = { version = "0.37.0", default-features = false, features = ["fail-on-err", "tokio-rustls-tls"] }
 rand = "0.10.0"
 rustis = "0.19.0"
 dotenvy = "0.15.7"
