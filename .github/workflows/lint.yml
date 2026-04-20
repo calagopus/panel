@@ -106,7 +106,7 @@ jobs:
 
     steps:
       - name: Update packages
-        run: sudo apt-get update && sudo apt-get upgrade -y
+        run: sudo apt-get update && sudo apt-get install --only-upgrade rustc
 
       - name: Checkout sources
         uses: actions/checkout@v6
