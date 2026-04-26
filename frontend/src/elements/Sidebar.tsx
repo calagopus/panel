@@ -63,7 +63,7 @@ function Sidebar({ children, header }: SidebarProps) {
         </Drawer>
 
         <Card
-          className='mt-2 top-2 ml-2 sticky! hidden! lg:block! h-[calc(100vh-1rem)] min-w-64!'
+          className='my-2 ml-2 top-0 sticky! hidden! lg:block! h-[calc(100vh-16px)]  min-w-64!'
           p='sm'
           id='sidebar-desktop'
         >

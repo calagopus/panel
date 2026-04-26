@@ -19,7 +19,7 @@ function Container({ children, isNormal }: LayoutProps) {
       className={
         isNormal
           ? 'flex flex-col justify-between min-w-full h-full'
-          : 'flex flex-col justify-between h-full overflow-auto p-4'
+          : 'flex flex-col justify-between h-full overflow-auto'
       }
     >
       <div>

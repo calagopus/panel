@@ -163,7 +163,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
 
             <TableData>
               <TextArea
-                rows={2}
+                rows={Math.min(3, notes.split('\n').length)}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={t('pages.server.network.table.columns.notes', {})}

@@ -153,7 +153,12 @@ export default function ServerAllocationRow({
             </TableData>
 
             <TableData>
-              <TextArea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder='Notes' />
+              <TextArea
+                rows={Math.min(3, notes.split('\n').length)}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder='Notes'
+              />
             </TableData>
 
             <TableData>
