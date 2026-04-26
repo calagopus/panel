@@ -11,8 +11,10 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            PaginationParams, server_schedule_step::ServerScheduleStep, user::GetPermissionManager,
+            IntoApiObject, PaginationParams, server_schedule_step::ServerScheduleStep,
+            user::GetPermissionManager,
         },
+        prelude::AsyncIteratorExt,
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -58,8 +60,9 @@ mod get {
         ApiResponse::new_serialized(Response {
             schedule_steps: schedule_steps
                 .into_iter()
-                .map(|schedule_step| schedule_step.into_api_object())
-                .collect(),
+                .map(|schedule_step| schedule_step.into_api_object(&state, ()))
+                .try_collect_async_vec()
+                .await?,
         })
         .ok()
     }
@@ -73,7 +76,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoApiObject,
             server::{GetServer, GetServerActivityLogger},
             server_schedule_step::{CreateServerScheduleStepOptions, ServerScheduleStep},
             user::GetPermissionManager,
@@ -170,17 +173,10 @@ mod post {
             )
             .await;
 
-        state
-            .database
-            .batch_action("sync_server", server.uuid, {
-                let state = state.clone();
-
-                async move { server.0.sync(&state.database).await }
-            })
-            .await;
+        server.0.batch_sync(&state.database).await;
 
         ApiResponse::new_serialized(Response {
-            schedule_step: schedule_step.into_api_object(),
+            schedule_step: schedule_step.into_api_object(&state, ()).await?,
         })
         .ok()
     }

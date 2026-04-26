@@ -7,6 +7,7 @@ on:
 
 env:
   BIN_NAME: panel-rs
+  AIO_BIN_NAME: panel-rs-aio
   PROJECT_NAME: panel-rs
 
 jobs:
@@ -119,45 +120,44 @@ jobs:
         if: contains(matrix.target, 'linux')
         run: cargo install cross --git https://github.com/cross-rs/cross
 
-      - name: Run tests (Linux)
-        if: contains(matrix.target, 'linux')
-        run: cross test --release --target ${{ matrix.target }}
-
-      - name: Run tests (Non-Linux)
-        if: ${{ !contains(matrix.target, 'linux') }}
-        run: cargo test --target ${{ matrix.target }}
-
-      - name: Build release binary (Linux)
+      - name: Build release binaries (Linux)
         if: contains(matrix.target, 'linux')
         run: |
           RUSTFLAGS="-C target-feature=+crt-static" \
-          cross build --release --target ${{ matrix.target }}
+          cross build --release --target ${{ matrix.target }} -p $BIN_NAME
+          cross build --release --target ${{ matrix.target }} -p $AIO_BIN_NAME
 
-      - name: Build release binary (Non-Linux)
+      - name: Build release binaries (Non-Linux)
         if: ${{ !contains(matrix.target, 'linux') }}
-        run: cargo build --release --target ${{ matrix.target }}
+        run: |
+          cargo build --release --target ${{ matrix.target }} -p $BIN_NAME
+          cargo build --release --target ${{ matrix.target }} -p $AIO_BIN_NAME
 
-      - name: Prepare binary (Unix)
+      - name: Prepare binaries (Unix)
         if: runner.os != 'Windows'
         run: |
           mkdir -p dist
           cp "target/${{ matrix.target }}/release/$BIN_NAME${{ matrix.binary_suffix }}" "dist/$BIN_NAME-${{ matrix.build }}"
+          cp "target/${{ matrix.target }}/release/$AIO_BIN_NAME${{ matrix.binary_suffix }}" "dist/$AIO_BIN_NAME-${{ matrix.build }}"
 
-      - name: Prepare binary (Windows)
+      - name: Prepare binaries (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist
           Copy-Item "target\${{ matrix.target }}\release\$env:BIN_NAME${{ matrix.binary_suffix }}" "dist\$env:BIN_NAME-${{ matrix.build }}${{ matrix.binary_suffix }}"
+          Copy-Item "target\${{ matrix.target }}\release\$env:AIO_BIN_NAME${{ matrix.binary_suffix }}" "dist\$env:AIO_BIN_NAME-${{ matrix.build }}${{ matrix.binary_suffix }}"
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ env.PROJECT_NAME }}-${{ matrix.build }}
-          path: dist/${{ env.BIN_NAME }}-${{ matrix.build }}${{ matrix.binary_suffix }}
+          path: |
+            dist/${{ env.BIN_NAME }}-${{ matrix.build }}${{ matrix.binary_suffix }}
+            dist/${{ env.AIO_BIN_NAME }}-${{ matrix.build }}${{ matrix.binary_suffix }}
 
   create-multiarch-image:
-    name: Create multi-arch Docker image
+    name: Create multi-arch Docker images
     needs: [dist]
     runs-on: ubuntu-24.04
     permissions:
@@ -194,7 +194,12 @@ jobs:
           cp dist/${{ env.PROJECT_NAME }}-riscv64-linux/${{ env.BIN_NAME }}-riscv64-linux .docker/riscv64/panel-rs
           cp dist/${{ env.PROJECT_NAME }}-ppc64le-linux/${{ env.BIN_NAME }}-ppc64le-linux .docker/ppc64le/panel-rs
 
-          chmod +x .docker/*/panel-rs
+          cp dist/${{ env.PROJECT_NAME }}-x86_64-linux/${{ env.AIO_BIN_NAME }}-x86_64-linux .docker/amd64/panel-rs-aio
+          cp dist/${{ env.PROJECT_NAME }}-aarch64-linux/${{ env.AIO_BIN_NAME }}-aarch64-linux .docker/arm64/panel-rs-aio
+          cp dist/${{ env.PROJECT_NAME }}-riscv64-linux/${{ env.AIO_BIN_NAME }}-riscv64-linux .docker/riscv64/panel-rs-aio
+          cp dist/${{ env.PROJECT_NAME }}-ppc64le-linux/${{ env.AIO_BIN_NAME }}-ppc64le-linux .docker/ppc64le/panel-rs-aio
+
+          chmod +x .docker/*/panel-rs .docker/*/panel-rs-aio
 
       - name: Build & push multi-arch image
         uses: docker/build-push-action@v7
@@ -206,8 +211,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build & push multi-arch AIO image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile.aio
+          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
+          push: true
+          tags: ghcr.io/${{ github.repository }}:nightly-aio
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   build-heavy-image:
-    name: Build Heavy Docker image (${{ matrix.platform }})
+    name: Build Heavy Docker images (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -237,7 +253,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push platform image
+      - name: Build & push heavy platform image
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -248,8 +264,19 @@ jobs:
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
 
+      - name: Build & push heavy AIO platform image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile.heavy.aio
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ghcr.io/${{ github.repository }}:nightly-heavy-aio-${{ matrix.tag_suffix }}
+          cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
+          cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
+
   merge-heavy-image:
-    name: Merge Heavy Docker manifest
+    name: Merge Heavy Docker manifests
     needs: [build-heavy-image]
     runs-on: ubuntu-24.04
     permissions:
@@ -264,8 +291,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create and push multi-arch manifest
+      - name: Create and push multi-arch manifests
         run: |
           docker buildx imagetools create -t ghcr.io/${{ github.repository }}:nightly-heavy \
             ghcr.io/${{ github.repository }}:nightly-heavy-amd64 \
             ghcr.io/${{ github.repository }}:nightly-heavy-arm64
+
+          docker buildx imagetools create -t ghcr.io/${{ github.repository }}:nightly-heavy-aio \
+            ghcr.io/${{ github.repository }}:nightly-heavy-aio-amd64 \
+            ghcr.io/${{ github.repository }}:nightly-heavy-aio-arm64

@@ -8,12 +8,8 @@ export default async (
   search?: string,
   owned?: boolean,
 ): Promise<Pagination<z.infer<typeof adminServerSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/admin/users/${userUuid}/servers`, {
-        params: { page, search, owned },
-      })
-      .then(({ data }) => resolve(data.servers))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/admin/users/${userUuid}/servers`, {
+    params: { page, search, owned },
   });
+  return data.servers;
 };

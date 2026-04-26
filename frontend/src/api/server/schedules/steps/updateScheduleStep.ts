@@ -9,13 +9,8 @@ export default async (
   stepUuid: string,
   data: z.infer<typeof serverScheduleStepUpdateSchema>,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(
-        `/api/client/servers/${serverUuid}/schedules/${scheduleUuid}/steps/${stepUuid}`,
-        transformKeysToSnakeCase(data),
-      )
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.patch(
+    `/api/client/servers/${serverUuid}/schedules/${scheduleUuid}/steps/${stepUuid}`,
+    transformKeysToSnakeCase(data),
+  );
 };

@@ -14,13 +14,26 @@ pub struct NodeMount {
     pub node: Fetchable<super::node::Node>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for NodeMount {
     const NAME: &'static str = "node_mount";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -51,6 +64,7 @@ impl BaseModel for NodeMount {
                 row.try_get(compact_str::format_compact!("{prefix}node_uuid").as_str())?,
             ),
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -160,32 +174,48 @@ impl NodeMount {
     #[inline]
     pub async fn into_admin_node_api_object(
         self,
-        database: &crate::database::Database,
-    ) -> Result<AdminApiNodeNodeMount, anyhow::Error> {
+        state: &crate::State,
+        _args: (),
+    ) -> Result<AdminApiNodeNodeMount, crate::database::DatabaseError> {
         Ok(AdminApiNodeNodeMount {
             node: self
                 .node
-                .fetch_cached(database)
+                .fetch_cached(&state.database)
                 .await?
-                .into_admin_api_object(database)
+                .into_admin_api_object(state, ())
                 .await?,
             created: self.created.and_utc(),
         })
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl IntoAdminApiObject for NodeMount {
+    type AdminApiObject = AdminApiNodeMount;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-    ) -> Result<AdminApiNodeMount, anyhow::Error> {
-        Ok(AdminApiNodeMount {
-            mount: self
-                .mount
-                .fetch_cached(database)
-                .await?
-                .into_admin_api_object(),
-            created: self.created.and_utc(),
-        })
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiNodeMount::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiNodeMount {
+                mount: self
+                    .mount
+                    .fetch_cached(&state.database)
+                    .await?
+                    .into_admin_api_object(state, ())
+                    .await?,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -289,6 +319,9 @@ pub struct AdminApiNodeNodeMount {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(NodeMount, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "AdminNodeMount")]
 pub struct AdminApiNodeMount {

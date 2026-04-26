@@ -8,10 +8,8 @@ export default async (
   scheduleUuid: string,
   data: Partial<z.infer<typeof serverScheduleUpdateSchema>>,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(`/api/client/servers/${serverUuid}/schedules/${scheduleUuid}`, transformKeysToSnakeCase(data))
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.patch(
+    `/api/client/servers/${serverUuid}/schedules/${scheduleUuid}`,
+    transformKeysToSnakeCase(data),
+  );
 };

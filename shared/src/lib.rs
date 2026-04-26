@@ -13,6 +13,8 @@ use std::{
     sync::{Arc, LazyLock},
     time::Instant,
 };
+use tokio::sync::RwLock;
+use tower::util::ServiceExt;
 use utoipa::ToSchema;
 
 pub mod cache;
@@ -91,9 +93,40 @@ impl ApiError {
 #[serde(rename_all = "snake_case")]
 pub enum AppContainerType {
     Official,
+    OfficialAIO,
     OfficialHeavy,
+    OfficialHeavyAIO,
     Unknown,
     None,
+}
+
+impl AppContainerType {
+    pub fn detect() -> Self {
+        match std::env::var("OCI_CONTAINER").as_deref() {
+            Ok("official") => AppContainerType::Official,
+            Ok("official-aio") => AppContainerType::OfficialAIO,
+            Ok("official-heavy") => AppContainerType::OfficialHeavy,
+            Ok("official-heavy-aio") => AppContainerType::OfficialHeavyAIO,
+            Ok(_) => AppContainerType::Unknown,
+            Err(_) => AppContainerType::None,
+        }
+    }
+
+    #[inline]
+    pub fn is_all_in_one(&self) -> bool {
+        matches!(
+            self,
+            AppContainerType::OfficialAIO | AppContainerType::OfficialHeavyAIO
+        )
+    }
+
+    #[inline]
+    pub fn is_heavy(&self) -> bool {
+        matches!(
+            self,
+            AppContainerType::OfficialHeavy | AppContainerType::OfficialHeavyAIO
+        )
+    }
 }
 
 pub struct AppState {
@@ -102,6 +135,7 @@ pub struct AppState {
     pub version: String,
 
     pub client: reqwest::Client,
+    pub app_router: RwLock<Option<axum::Router>>,
 
     pub extensions: Arc<extensions::manager::ExtensionManager>,
     pub updates: Arc<updates::UpdateManager>,
@@ -151,18 +185,14 @@ impl AppState {
 
         let state = Arc::new(AppState {
             start_time: Instant::now(),
-            container_type: match std::env::var("OCI_CONTAINER").as_deref() {
-                Ok("official") => AppContainerType::Official,
-                Ok("official-heavy") => AppContainerType::OfficialHeavy,
-                Ok(_) => AppContainerType::Unknown,
-                Err(_) => AppContainerType::None,
-            },
+            container_type: AppContainerType::detect(),
             version: full_version(),
 
             client: reqwest::ClientBuilder::new()
                 .user_agent(format!("github.com/calagopus/panel {}", VERSION))
                 .build()
                 .unwrap(),
+            app_router: RwLock::new(None),
 
             extensions: Arc::new(extensions::manager::ExtensionManager::new(vec![])),
             updates: Arc::new(updates::UpdateManager::default()),
@@ -180,6 +210,50 @@ impl AppState {
         });
 
         Ok(state)
+    }
+
+    pub async fn send_router_oneshot(
+        &self,
+        req: axum::http::Request<axum::body::Body>,
+    ) -> Result<axum::http::Response<axum::body::Body>, anyhow::Error> {
+        let routes_service = self.app_router.read().await;
+        let routes_service = routes_service
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("router not initialized"))?;
+        let routes_service = routes_service.clone();
+
+        let svc = routes_service.oneshot(req);
+        match svc.await {
+            Ok(res) => Ok(res),
+            Err(err) => Err(anyhow::anyhow!(
+                "failed to process request in oneshot router: {:#?}",
+                err
+            )),
+        }
+    }
+
+    pub async fn send_authenticated_router_oneshot(
+        &self,
+        mut req: axum::http::Request<axum::body::Body>,
+        user: models::user::User,
+        auth_method: models::user::AuthMethod,
+    ) -> Result<axum::http::Response<axum::body::Body>, anyhow::Error> {
+        let routes_service = self.app_router.read().await;
+        let routes_service = routes_service
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("router not initialized"))?;
+        let routes_service = routes_service.clone();
+
+        req.extensions_mut().insert((user, auth_method));
+
+        let svc = routes_service.oneshot(req);
+        match svc.await {
+            Ok(res) => Ok(res),
+            Err(err) => Err(anyhow::anyhow!(
+                "failed to process request in oneshot router: {:#?}",
+                err
+            )),
+        }
     }
 }
 

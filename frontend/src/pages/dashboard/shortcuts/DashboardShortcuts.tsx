@@ -10,7 +10,7 @@ import {
   faTerminal,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Flex, Group, Text, Title } from '@mantine/core';
+import { Flex, Text } from '@mantine/core';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { ShortcutItemProps } from './ShortcutItem.tsx';
@@ -57,12 +57,8 @@ export default function DashboardShortcuts() {
   return (
     <AccountContentContainer
       title={t('pages.account.shortcuts.title', {})}
-      registry={window.extensionContext.extensionRegistry.pages.dashboard.keyboardShortcuts.container}
-    >
-      <Group justify='space-between' mb='md'>
-        <Title order={1} c='white'>
-          {t('pages.account.shortcuts.title', {})}
-        </Title>
+      subtitle={t('pages.account.shortcuts.subtitle', {})}
+      contentRight={
         <Flex
           align='center'
           gap='xs'
@@ -79,12 +75,9 @@ export default function DashboardShortcuts() {
             {isMac ? t('pages.account.shortcuts.detectedMac', {}) : t('pages.account.shortcuts.detectedWindows', {})}
           </Text>
         </Flex>
-      </Group>
-
-      <Text c='gray.5' mb='xl' size='sm'>
-        {t('pages.account.shortcuts.description', {})}
-      </Text>
-
+      }
+      registry={window.extensionContext.extensionRegistry.pages.dashboard.keyboardShortcuts.container}
+    >
       <div className='md:columns-2 gap-4 space-y-4'>
         {window.extensionContext.extensionRegistry.pages.dashboard.keyboardShortcuts.shortcutSections.prependedComponents.map(
           (Component, i) => (

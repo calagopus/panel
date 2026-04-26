@@ -92,7 +92,7 @@ export default function ServerItem({
                     >
                       <ActionIcon
                         size='input-sm'
-                        variant={isSelected ? '' : 'light'}
+                        variant={isSelected ? undefined : 'light'}
                         color={isSelected ? 'green' : 'gray'}
                         onClick={(e) => {
                           e.preventDefault();
@@ -218,8 +218,8 @@ export default function ServerItem({
                     <Spinner size={16} />
                   </div>
                 ) : (
-                  <div className='flex flex-row justify-center'>
-                    <div className='flex gap-2 text-sm justify-center items-center'>
+                  <div className='flex flex-col sm:flex-row justify-center'>
+                    <div className='flex gap-2 text-sm justify-start sm:justify-center items-center'>
                       <FontAwesomeIcon icon={faMicrochip} className='size-5 flex-none' />
                       <div>
                         <span className='mr-1'>{stats.cpuAbsolute.toFixed(2)}%</span>
@@ -229,7 +229,7 @@ export default function ServerItem({
 
                     <Divider mx='sm' orientation='vertical' />
 
-                    <div className='flex gap-2 text-sm justify-center items-center'>
+                    <div className='flex gap-2 text-sm justify-start sm:justify-center items-center'>
                       <FontAwesomeIcon icon={faMemory} className='size-5 flex-none' />
                       <div>
                         <span className='mr-1'>{bytesToString(stats.memoryBytes)}</span>
@@ -239,7 +239,7 @@ export default function ServerItem({
 
                     <Divider mx='sm' orientation='vertical' />
 
-                    <div className='flex gap-2 text-sm justify-center items-center'>
+                    <div className='flex gap-2 text-sm justify-start sm:justify-center items-center'>
                       <FontAwesomeIcon icon={faHardDrive} className='size-5 flex-none' />
                       <div>
                         <span className='mr-1'>{bytesToString(stats.diskBytes)}</span>

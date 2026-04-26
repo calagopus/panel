@@ -35,7 +35,6 @@ mod get {
 
     #[derive(ToSchema, Serialize)]
     struct Response<'a> {
-        version: &'a str,
         oobe_step: Option<&'a str>,
 
         #[schema(inline)]
@@ -53,7 +52,6 @@ mod get {
         let settings = state.settings.get().await?;
 
         ApiResponse::new_serialized(Response {
-            version: &state.version,
             oobe_step: settings.oobe_step.as_deref(),
             captcha_provider: settings.captcha_provider.to_public_provider(),
             app: ResponseApp {

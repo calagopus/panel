@@ -7,6 +7,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
+            IntoApiObject,
             user::{GetPermissionManager, GetUser},
             user_oauth_link::UserOAuthLink,
         },
@@ -48,7 +49,7 @@ mod get {
             };
 
         ApiResponse::new_serialized(Response {
-            oauth_link: oauth_link.into_api_object(&state.database).await?,
+            oauth_link: oauth_link.into_api_object(&state, ()).await?,
         })
         .ok()
     }

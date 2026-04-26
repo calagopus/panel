@@ -13,7 +13,7 @@ export default function BackupS3({
   form: UseFormReturnType<z.infer<typeof adminBackupConfigurationS3Schema>>;
 }) {
   return (
-    <Stack gap='xs'>
+    <Stack gap='xs' mt='md'>
       <Stack gap={0}>
         <Title order={2}>S3 Settings</Title>
         <Divider />

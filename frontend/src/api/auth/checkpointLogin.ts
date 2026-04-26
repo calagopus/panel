@@ -12,10 +12,6 @@ interface Response {
 }
 
 export default async ({ code, confirmation_token }: Data): Promise<Response> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post('/api/auth/login/checkpoint', { code, confirmation_token })
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.post('/api/auth/login/checkpoint', { code, confirmation_token });
+  return data;
 };

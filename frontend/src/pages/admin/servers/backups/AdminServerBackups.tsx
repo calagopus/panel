@@ -6,22 +6,22 @@ import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeServerBackupSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminServerBackupRow from './AdminServerBackupRow.tsx';
 
 export default function AdminServerBackups({ server }: { server: z.infer<typeof adminServerSchema> }) {
-  const [serverBackups, setServerBackups] = useState<Pagination<z.infer<typeof adminNodeServerBackupSchema>>>(
-    getEmptyPaginationSet(),
-  );
   const [showPartiallyDetachedServerBackups, setShowPartiallyDetachedServerBackups] = useState(false);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.servers.backups(server.uuid),
     fetcher: (page, search) => getServerBackups(server.uuid, page, search, showPartiallyDetachedServerBackups),
-    setStoreData: setServerBackups,
     deps: [showPartiallyDetachedServerBackups],
   });
+
+  const serverBackups = data ?? getEmptyPaginationSet<z.infer<typeof adminNodeServerBackupSchema>>();
 
   return (
     <AdminSubContentContainer

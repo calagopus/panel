@@ -1,5 +1,5 @@
 [package]
-name = "panel-rs"
+name = "backend"
 rust-version = { workspace = true }
 license = { workspace = true }
 version = { workspace = true }
@@ -27,14 +27,12 @@ utoipa-axum = { workspace = true }
 chrono = { workspace = true }
 chrono-tz = { workspace = true }
 indexmap = { workspace = true }
-tower-http = { version = "0.6.2", features = ["normalize-path"] }
 reqwest = { workspace = true }
 sha2 = { workspace = true }
 image = "0.25.5"
-tower-cookies = "0.11.0"
+tower-cookies = { workspace = true }
 rand = { workspace = true }
 futures-util = { workspace = true }
-tower = "0.5.2"
 include_dir = { workspace = true }
 uuid = { workspace = true }
 totp-rs = { version = "5.7.0", features = ["gen_secret"] }
@@ -50,7 +48,6 @@ webauthn-rs = { workspace = true }
 openssl = { version = "0.10.73", features = ["vendored"] }
 base64 = { workspace = true }
 rust-s3 = { workspace = true }
-rustis = { workspace = true }
 dotenvy = { workspace = true }
 oauth2 = { workspace = true }
 human_bytes = "0.4.3"
@@ -64,6 +61,3 @@ serde_norway = { workspace = true }
 hyper = "1.8.1"
 hyper-util = { version = "0.1", features = ["tokio"] }
 hex = { workspace = true }
-
-[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dependencies]
-tikv-jemallocator = "0.6.0"

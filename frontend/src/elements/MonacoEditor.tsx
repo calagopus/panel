@@ -3,7 +3,7 @@ import { ComponentProps } from 'react';
 
 loader.config({
   paths: {
-    vs: '/monaco/vs',
+    vs: '/monaco',
   },
 });
 

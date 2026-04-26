@@ -36,17 +36,18 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
   return (
     <div className='lg:flex h-full'>
       {isNormal && (
-        <Sidebar>
-          <NavLink to='/' className='w-full'>
-            <AppIcon />
-          </NavLink>
-
-          <Sidebar.Divider />
-
-          <Sidebar.Link to='/' end icon={faReply} name='Back' />
-
-          <Sidebar.Divider />
-
+        <Sidebar
+          header={
+            <>
+              <NavLink to='/' className='w-full'>
+                <AppIcon />
+              </NavLink>
+              <Sidebar.Divider />
+              <Sidebar.Link to='/' end icon={faReply} name='Back' />
+              <Sidebar.Divider />
+            </>
+          }
+        >
           {allAdminRoutes
             .filter((route) => !!route.name && (!route.filter || route.filter()))
             .map((route) =>
@@ -58,6 +59,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
                     end={route.exact}
                     icon={route.icon}
                     name={typeof route.name === 'function' ? route.name() : route.name}
+                    activeMatches={route.activeMatches}
                   />
                 </AdminCan>
               ) : (
@@ -67,6 +69,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
                   end={route.exact}
                   icon={route.icon}
                   name={typeof route.name === 'function' ? route.name() : route.name}
+                  activeMatches={route.activeMatches}
                 />
               ),
             )}
@@ -75,7 +78,10 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
         </Sidebar>
       )}
 
-      <div id='admin-root' className={isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto'}>
+      <div
+        id='admin-root'
+        className={isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto h-full'}
+      >
         <Container isNormal={isNormal}>
           {window.extensionContext.extensionRegistry.pages.admin.prependedComponents.map((Component, i) => (
             <Component key={`admin-prepended-component-${i}`} />

@@ -7,12 +7,11 @@ export default async (
   eggRepositoryEggUuid: string,
   nestUuid: string,
 ): Promise<z.infer<typeof adminEggSchema>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post(`/api/admin/egg-repositories/${eggRepositoryUuid}/eggs/${eggRepositoryEggUuid}/install`, {
-        nest_uuid: nestUuid,
-      })
-      .then(({ data }) => resolve(data.egg))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.post(
+    `/api/admin/egg-repositories/${eggRepositoryUuid}/eggs/${eggRepositoryEggUuid}/install`,
+    {
+      nest_uuid: nestUuid,
+    },
+  );
+  return data.egg;
 };

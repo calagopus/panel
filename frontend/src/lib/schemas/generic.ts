@@ -56,3 +56,9 @@ export const streamingArchiveFormat = z.enum([
   'tar_zstd',
   'zip',
 ]);
+
+export const hostnameSchema = z.union([
+  z.ipv4().min(1).max(255),
+  z.ipv6().min(1).max(255),
+  z.hostname().min(1).max(255),
+]);

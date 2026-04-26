@@ -9,6 +9,7 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { isIP } from '@/lib/ip.ts';
 import { adminSettingsWebauthnSchema } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -18,6 +19,7 @@ export default function WebauthnContainer() {
   const { addToast } = useToast();
   const { webauthn } = useAdminStore();
 
+  const [openModal, setOpenModal] = useState<'changeRpId' | null>(null);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof adminSettingsWebauthnSchema>>({
@@ -61,7 +63,24 @@ export default function WebauthnContainer() {
 
   return (
     <AdminSubContentContainer title='Webauthn Settings' titleOrder={2}>
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
+      <ConfirmationModal
+        opened={openModal === 'changeRpId'}
+        onClose={() => setOpenModal(null)}
+        title='Confirm Changing RP Id'
+        confirm='Update'
+        onConfirmed={() => {
+          doUpdate();
+          setOpenModal(null);
+        }}
+      >
+        Are you sure you want to change the RP Id? Changing the RP Id will break all existing Webauthn credentials and
+        require users to re-register their devices. This can have significant consequences, so please make sure you
+        understand the implications before proceeding.
+      </ConfirmationModal>
+
+      <form
+        onSubmit={form.onSubmit(() => (form.values.rpId !== webauthn.rpId ? setOpenModal('changeRpId') : doUpdate()))}
+      >
         <Stack>
           <Group grow>
             <TextInput

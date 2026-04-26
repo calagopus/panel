@@ -1,4 +1,4 @@
-import { Group, Stack } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -71,32 +71,31 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'nests']))}>
-        <Stack mt='xs'>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Author'
-              placeholder='Author'
-              key={form.key('author')}
-              {...form.getInputProps('author')}
-            />
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <TextInput
+            withAsterisk
+            label='Author'
+            placeholder='Author'
+            key={form.key('author')}
+            {...form.getInputProps('author')}
+          />
 
           <TextArea
             label='Description'
             placeholder='Description'
+            className='col-span-full'
             rows={3}
             key={form.key('description')}
             {...form.getInputProps('description')}
           />
-        </Stack>
+        </div>
 
         <Group mt='md'>
           <AdminCan action={contextNest ? 'nests.update' : 'nests.create'} cantSave>

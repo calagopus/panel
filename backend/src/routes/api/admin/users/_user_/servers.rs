@@ -8,7 +8,7 @@ mod get {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{Pagination, server::Server, user::GetPermissionManager},
+        models::{IntoAdminApiObject, Pagination, server::Server, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -108,7 +108,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             servers: servers
                 .try_async_map(|server| {
-                    server.into_admin_api_object(&state.database, &storage_url_retriever)
+                    server.into_admin_api_object(&state, &storage_url_retriever)
                 })
                 .await?,
         })

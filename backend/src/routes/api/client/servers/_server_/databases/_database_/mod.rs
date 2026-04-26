@@ -63,7 +63,7 @@ mod get {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::user::GetPermissionManager,
+        models::{IntoApiObject, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -111,7 +111,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             database: database
                 .0
-                .into_api_object(&state.database, params.include_password)
+                .into_api_object(&state, params.include_password)
                 .await?,
         })
         .ok()

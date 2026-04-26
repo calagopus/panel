@@ -1,4 +1,5 @@
 import React, { createElement } from 'react';
+import { z } from 'zod';
 
 export function createBeforeCallHook<Fn extends (...args: Parameters<Fn>) => ReturnType<Fn>>(
   fn: Fn,
@@ -112,4 +113,80 @@ export function makeComponentHookable<
   }
 
   return HookableWrapper as HookableComponent<P> & AdditionalComponents;
+}
+
+function unwrapZodObject(schema: z.ZodTypeAny): {
+  // biome-ignore lint/suspicious/noExplicitAny: its fine
+  inner: z.ZodObject<any>;
+  // biome-ignore lint/suspicious/noExplicitAny: its fine
+  rewrap: (s: z.ZodObject<any>) => z.ZodTypeAny;
+} | null {
+  if (schema instanceof z.ZodObject) {
+    return { inner: schema, rewrap: (s) => s };
+  }
+  if (schema instanceof z.ZodLazy) {
+    const resolved = schema.unwrap();
+    const result = unwrapZodObject(resolved as z.ZodTypeAny);
+    if (result) return { inner: result.inner, rewrap: result.rewrap };
+  }
+  if (schema instanceof z.ZodOptional) {
+    const result = unwrapZodObject(schema.unwrap() as z.ZodTypeAny);
+    if (result)
+      return {
+        inner: result.inner,
+        rewrap: (s) => result.rewrap(s).optional(),
+      };
+  }
+  if (schema instanceof z.ZodNullable) {
+    const result = unwrapZodObject(schema.unwrap() as z.ZodTypeAny);
+    if (result)
+      return {
+        inner: result.inner,
+        rewrap: (s) => result.rewrap(s).nullable(),
+      };
+  }
+  if (schema instanceof z.ZodDefault) {
+    const result = unwrapZodObject(schema.removeDefault() as z.ZodTypeAny);
+    if (result)
+      return {
+        inner: result.inner,
+        // biome-ignore lint/suspicious/noExplicitAny: its fine
+        rewrap: (s) => result.rewrap(s).default((schema as any)._zod.def.defaultValue),
+      };
+  }
+  if ('unwrap' in schema && !(schema instanceof z.ZodObject)) {
+    // biome-ignore lint/suspicious/noExplicitAny: its fine
+    const result = unwrapZodObject((schema as any).unwrap() as z.ZodTypeAny);
+    if (result) return { inner: result.inner, rewrap: result.rewrap };
+  }
+
+  return null;
+}
+
+export function deepMergeZod(baseSchema: z.ZodTypeAny, pluginSchema: z.ZodTypeAny): z.ZodTypeAny {
+  const baseObj = unwrapZodObject(baseSchema);
+  const pluginObj = unwrapZodObject(pluginSchema);
+
+  if (baseObj && pluginObj) {
+    const baseShape = baseObj.inner.shape;
+    const pluginShape = pluginObj.inner.shape;
+    const mergedShape: Record<string, z.ZodTypeAny> = { ...baseShape };
+
+    for (const key of Object.keys(pluginShape)) {
+      if (key in baseShape) {
+        mergedShape[key] = deepMergeZod(baseShape[key], pluginShape[key]);
+      } else {
+        mergedShape[key] = pluginShape[key];
+      }
+    }
+
+    return baseObj.rewrap(z.object(mergedShape));
+  }
+
+  return pluginSchema;
+}
+
+export function deepMergeZods(...schemas: z.ZodTypeAny[]): z.ZodTypeAny {
+  if (schemas.length === 0) return z.object({});
+  return schemas.reduce((merged, schema) => deepMergeZod(merged, schema));
 }

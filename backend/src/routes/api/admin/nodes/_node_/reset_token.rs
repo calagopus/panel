@@ -2,6 +2,7 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod post {
+    use axum::http::StatusCode;
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
@@ -35,6 +36,12 @@ mod post {
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("nodes.reset-token")?;
+
+        if node.is_all_in_one_node() && state.container_type.is_all_in_one() {
+            return ApiResponse::error("the token for the aio node cannot be reset")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
 
         let (token_id, token) = node.reset_token(&state).await?;
 

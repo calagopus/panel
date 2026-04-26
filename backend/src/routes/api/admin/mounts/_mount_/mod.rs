@@ -49,8 +49,8 @@ mod get {
     use crate::routes::api::admin::mounts::_mount_::GetMount;
     use serde::Serialize;
     use shared::{
-        ApiError,
-        models::user::GetPermissionManager,
+        ApiError, GetState,
+        models::{IntoAdminApiObject, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -70,11 +70,15 @@ mod get {
             example = "1",
         ),
     ))]
-    pub async fn route(permissions: GetPermissionManager, mount: GetMount) -> ApiResponseResult {
+    pub async fn route(
+        state: GetState,
+        permissions: GetPermissionManager,
+        mount: GetMount,
+    ) -> ApiResponseResult {
         permissions.has_admin_permission("mounts.read")?;
 
         ApiResponse::new_serialized(Response {
-            mount: mount.0.into_admin_api_object(),
+            mount: mount.0.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

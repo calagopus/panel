@@ -3,11 +3,9 @@ import { axiosInstance } from '@/api/axios.ts';
 import { adminServerCreateSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
-export default async (data: z.infer<typeof adminServerCreateSchema>): Promise<z.infer<typeof adminServerSchema>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post('/api/admin/servers', transformKeysToSnakeCase(data))
-      .then(({ data }) => resolve(data.server))
-      .catch(reject);
-  });
+export default async (
+  serverData: z.infer<typeof adminServerCreateSchema>,
+): Promise<z.infer<typeof adminServerSchema>> => {
+  const { data } = await axiosInstance.post('/api/admin/servers', transformKeysToSnakeCase(serverData));
+  return data.server;
 };

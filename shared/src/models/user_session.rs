@@ -5,15 +5,18 @@ use crate::{
     },
     prelude::*,
 };
+use compact_str::ToCompactString;
 use garde::Validate;
 use rand::distr::SampleString;
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 use sqlx::{Row, postgres::PgRow};
 use std::{
+    borrow::Cow,
     collections::BTreeMap,
     sync::{Arc, LazyLock},
 };
+use tower_cookies::Cookie;
 use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -21,17 +24,30 @@ pub struct UserSession {
     pub uuid: uuid::Uuid,
 
     pub ip: sqlx::types::ipnetwork::IpNetwork,
-    pub user_agent: String,
+    pub user_agent: compact_str::CompactString,
 
     pub last_used: chrono::NaiveDateTime,
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for UserSession {
     const NAME: &'static str = "user_session";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -68,6 +84,7 @@ impl BaseModel for UserSession {
             user_agent: row.try_get(compact_str::format_compact!("{prefix}user_agent").as_str())?,
             last_used: row.try_get(compact_str::format_compact!("{prefix}last_used").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -163,8 +180,8 @@ impl UserSession {
                 async move {
                     sqlx::query!(
                         "UPDATE user_sessions
-		                    SET ip = $2, user_agent = $3, last_used = $4
-		                    WHERE user_sessions.uuid = $1",
+                        SET ip = $2, user_agent = $3, last_used = $4
+                        WHERE user_sessions.uuid = $1",
                         uuid,
                         ip,
                         user_agent,
@@ -179,19 +196,54 @@ impl UserSession {
             .await;
     }
 
-    #[inline]
-    pub fn into_api_object(self, auth: &GetAuthMethod) -> ApiUserSession {
-        ApiUserSession {
-            uuid: self.uuid,
-            ip: self.ip.ip().to_string(),
-            user_agent: self.user_agent,
-            is_using: match &**auth {
-                AuthMethod::Session(session) => session.uuid == self.uuid,
-                _ => false,
+    pub async fn get_cookie<'a>(
+        state: &crate::State,
+        key: impl Into<Cow<'a, str>>,
+    ) -> Result<Cookie<'a>, anyhow::Error> {
+        let settings = state.settings.get().await?;
+
+        Ok(Cookie::build(("session", key))
+            .http_only(true)
+            .same_site(tower_cookies::cookie::SameSite::Strict)
+            .secure(settings.app.url.starts_with("https://"))
+            .path("/")
+            .expires(
+                tower_cookies::cookie::time::OffsetDateTime::now_utc()
+                    + tower_cookies::cookie::time::Duration::days(30),
+            )
+            .build())
+    }
+}
+
+#[async_trait::async_trait]
+impl IntoApiObject for UserSession {
+    type ApiObject = ApiUserSession;
+    type ExtraArgs<'a> = &'a GetAuthMethod;
+
+    async fn into_api_object<'a>(
+        self,
+        state: &crate::State,
+        auth: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiUserSession::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiUserSession {
+                uuid: self.uuid,
+                ip: self.ip.ip().to_compact_string(),
+                user_agent: self.user_agent,
+                is_using: match &**auth {
+                    AuthMethod::Session(session) => session.uuid == self.uuid,
+                    _ => false,
+                },
+                last_used: self.last_used.and_utc(),
+                created: self.created.and_utc(),
             },
-            last_used: self.last_used.and_utc(),
-            created: self.created.and_utc(),
-        }
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -291,13 +343,16 @@ impl DeletableModel for UserSession {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(UserSession, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize, Deserialize)]
 #[schema(title = "UserSession")]
 pub struct ApiUserSession {
     pub uuid: uuid::Uuid,
 
-    pub ip: String,
-    pub user_agent: String,
+    pub ip: compact_str::CompactString,
+    pub user_agent: compact_str::CompactString,
 
     pub is_using: bool,
 

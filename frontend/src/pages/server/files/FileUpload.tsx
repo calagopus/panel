@@ -3,13 +3,12 @@ import { useFileDragAndDrop } from '@/pages/server/files/hooks/useFileDragAndDro
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 
 export default function FileUpload() {
-  const { fileUploader } = useFileManager();
+  const { fileUploader, browsingWritableDirectory, fileInputRef, folderInputRef } = useFileManager();
   const { uploadFiles, handleFileSelect, handleFolderSelect } = fileUploader;
-  const { browsingBackup, fileInputRef, folderInputRef } = useFileManager();
 
   const { isDragging } = useFileDragAndDrop({
     onDrop: uploadFiles,
-    enabled: !browsingBackup,
+    enabled: browsingWritableDirectory,
   });
 
   return (
@@ -30,7 +29,7 @@ export default function FileUpload() {
         {...{ webkitdirectory: '', directory: '' }}
       />
 
-      <FileUploadOverlay visible={isDragging && !browsingBackup} />
+      <FileUploadOverlay visible={isDragging && browsingWritableDirectory} />
     </>
   );
 }

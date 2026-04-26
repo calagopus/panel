@@ -1,9 +1,9 @@
 export const toCamelCase = (str: string): string => {
-  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+  return str.replace(/_([a-z0-9])/gi, (_, letter) => letter.toUpperCase());
 };
 
 export const toSnakeCase = (str: string): string => {
-  return str.replace(/([A-Z])/g, '_$1').toLowerCase();
+  return str.replace(/([A-Z]|\d+)/g, '_$1').toLowerCase();
 };
 
 export const transformKeysToCamelCase = (obj: object): object => {

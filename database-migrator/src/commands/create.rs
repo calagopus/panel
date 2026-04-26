@@ -111,7 +111,12 @@ impl shared::extensions::commands::CliCommand<CreateArgs> for CreateCommand {
                 println!(
                     "{} {}",
                     "view the new migration at".green(),
-                    format!("database/extension-migrations/{}/", migration_name).bright_blue()
+                    format!(
+                        "database/extension-migrations/{}/{}/",
+                        MetadataToml::convert_package_name_to_identifier(&args.package_name),
+                        migration_name
+                    )
+                    .bright_blue()
                 );
 
                 Ok(0)

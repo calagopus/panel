@@ -8,7 +8,11 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::oauth_provider::{ApiOAuthProvider, OAuthProvider},
+        models::{
+            IntoApiObject,
+            oauth_provider::{ApiOAuthProvider, OAuthProvider},
+        },
+        prelude::AsyncIteratorExt,
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -38,8 +42,9 @@ mod get {
         ApiResponse::new_serialized(Response {
             oauth_providers: oauth_providers
                 .into_iter()
-                .map(|oauth_provider| oauth_provider.into_api_object())
-                .collect(),
+                .map(|oauth_provider| oauth_provider.into_api_object(&state, ()))
+                .try_collect_async_vec()
+                .await?,
         })
         .ok()
     }

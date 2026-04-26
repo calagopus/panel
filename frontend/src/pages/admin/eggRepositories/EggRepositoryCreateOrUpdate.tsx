@@ -1,4 +1,4 @@
-import { Group, Stack } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -96,32 +96,31 @@ export default function EggRepositoryCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'eggRepositories']))}>
-        <Stack mt='xs'>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <TextInput
-              withAsterisk
-              label='Git Repository'
-              placeholder='Git Repository'
-              key={form.key('gitRepository')}
-              {...form.getInputProps('gitRepository')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <TextInput
+            withAsterisk
+            label='Git Repository'
+            placeholder='Git Repository'
+            key={form.key('gitRepository')}
+            {...form.getInputProps('gitRepository')}
+          />
 
           <TextArea
             label='Description'
             placeholder='Description'
+            className='col-span-full'
             rows={3}
             key={form.key('description')}
             {...form.getInputProps('description')}
           />
-        </Stack>
+        </div>
 
         <Group mt='md'>
           <AdminCan action={contextEggRepository ? 'egg-repositories.update' : 'egg-repositories.create'} cantSave>

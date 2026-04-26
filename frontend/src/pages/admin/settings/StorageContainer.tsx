@@ -9,6 +9,7 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Select from '@/elements/input/Select.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { storageDriverTypeLabelMapping } from '@/lib/enums.ts';
 import {
   adminSettingsStorageFilesystemSchema,
@@ -24,6 +25,7 @@ export default function StorageContainer() {
   const { addToast } = useToast();
   const { storageDriver } = useAdminStore();
 
+  const [openModal, setOpenModal] = useState<'changeStorageType' | null>(null);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof adminSettingsStorageSchema>>({
@@ -55,7 +57,26 @@ export default function StorageContainer() {
 
   return (
     <AdminSubContentContainer title='Storage Settings' titleOrder={2}>
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
+      <ConfirmationModal
+        opened={openModal === 'changeStorageType'}
+        onClose={() => setOpenModal(null)}
+        title='Confirm Changing Storage Type'
+        confirm='Update'
+        onConfirmed={() => {
+          doUpdate();
+          setOpenModal(null);
+        }}
+      >
+        Are you sure you want to change the storage type? Changing the storage type will cause the application to look
+        for assets (e.g. profile pictures) in a different location, which may result in missing assets if they are not
+        moved to the new location manually.
+      </ConfirmationModal>
+
+      <form
+        onSubmit={form.onSubmit(() =>
+          form.values.type !== storageDriver.type ? setOpenModal('changeStorageType') : doUpdate(),
+        )}
+      >
         <Select
           label='Driver'
           data={Object.entries(storageDriverTypeLabelMapping).map(([value, label]) => ({

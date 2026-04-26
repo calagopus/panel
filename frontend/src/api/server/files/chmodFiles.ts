@@ -10,10 +10,6 @@ interface Props {
 }
 
 export default async ({ uuid, root, files }: Props): Promise<{ updated: number }> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .put(`/api/client/servers/${uuid}/files/chmod`, { root, files })
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.put(`/api/client/servers/${uuid}/files/chmod`, { root, files });
+  return data;
 };

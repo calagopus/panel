@@ -63,8 +63,8 @@ mod get {
     use crate::routes::api::client::servers::_server_::schedules::_schedule_::GetServerSchedule;
     use serde::Serialize;
     use shared::{
-        ApiError,
-        models::user::GetPermissionManager,
+        ApiError, GetState,
+        models::{IntoApiObject, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -91,13 +91,14 @@ mod get {
         ),
     ))]
     pub async fn route(
+        state: GetState,
         permissions: GetPermissionManager,
         schedule: GetServerSchedule,
     ) -> ApiResponseResult {
         permissions.has_server_permission("schedules.read")?;
 
         ApiResponse::new_serialized(Response {
-            schedule: schedule.0.into_api_object(),
+            schedule: schedule.0.into_api_object(&state, ()).await?,
         })
         .ok()
     }
@@ -158,14 +159,7 @@ mod delete {
             )
             .await;
 
-        state
-            .database
-            .batch_action("sync_server", server.uuid, {
-                let state = state.clone();
-
-                async move { server.0.sync(&state.database).await }
-            })
-            .await;
+        server.0.batch_sync(&state.database).await;
 
         ApiResponse::new_serialized(Response {}).ok()
     }
@@ -232,14 +226,7 @@ mod patch {
             )
             .await;
 
-        state
-            .database
-            .batch_action("sync_server", server.uuid, {
-                let state = state.clone();
-
-                async move { server.0.sync(&state.database).await }
-            })
-            .await;
+        server.0.batch_sync(&state.database).await;
 
         ApiResponse::new_serialized(Response {}).ok()
     }

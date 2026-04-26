@@ -9,7 +9,10 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{Pagination, PaginationParamsWithSearch, nest::Nest, user::GetPermissionManager},
+        models::{
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch, nest::Nest,
+            user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -60,16 +63,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            nests: Pagination {
-                total: nests.total,
-                per_page: nests.per_page,
-                page: nests.page,
-                data: nests
-                    .data
-                    .into_iter()
-                    .map(|nest| nest.into_admin_api_object())
-                    .collect(),
-            },
+            nests: nests
+                .try_async_map(|nest| nest.into_admin_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }
@@ -81,7 +77,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             nest::{CreateNestOptions, Nest},
             user::GetPermissionManager,
@@ -131,7 +127,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            nest: nest.into_admin_api_object(),
+            nest: nest.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

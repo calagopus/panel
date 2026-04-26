@@ -1,6 +1,6 @@
 import { faCheck, faGripVertical, faPencil, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Input, Stack, Text } from '@mantine/core';
+import { Group, Input, Stack, StyleProp, Text } from '@mantine/core';
 import { ComponentProps, startTransition, useEffect, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import ActionIcon from '@/elements/ActionIcon.tsx';
@@ -20,6 +20,7 @@ interface TagsInputProps {
   onChange: (tags: string[]) => void;
   placeholder?: string;
   allowDuplicates?: boolean;
+  flex?: StyleProp<React.CSSProperties['flex']>;
 }
 
 interface DndTag extends DndItem {
@@ -37,6 +38,7 @@ function TagsInput({
   onChange,
   placeholder = 'Add tag...',
   allowDuplicates = false,
+  flex,
 }: TagsInputProps) {
   const { t } = useTranslations();
 
@@ -172,8 +174,8 @@ function TagsInput({
   );
 
   return (
-    <Stack gap='xs'>
-      <Stack gap={0}>
+    <Stack gap='xs' flex={flex}>
+      <Stack gap={2}>
         {label && <Input.Label required={withAsterisk}>{label}</Input.Label>}
         {description && <Input.Description>{description}</Input.Description>}
         <Group gap='xs' wrap='nowrap'>
@@ -183,10 +185,10 @@ function TagsInput({
             onChange={(e) => setNewTag(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            size='xs'
+            size='sm'
             className='flex-1'
           />
-          <Button onClick={handleAdd} size='xs' disabled={!newTag.trim()}>
+          <Button onClick={handleAdd} size='sm' disabled={!newTag.trim()}>
             {t('common.button.add', {})}
           </Button>
         </Group>

@@ -8,6 +8,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -26,6 +27,7 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
   const [loading, setLoading] = useState(false);
 
   const servers = useSearchableResource<z.infer<typeof adminServerSchema>>({
+    queryKey: backup.isRemote ? queryKeys.admin.servers.all() : queryKeys.admin.nodes.servers(node.uuid),
     fetcher: (search) => (backup.isRemote ? getServers(1, search) : getNodeServers(node.uuid, 1, search)),
   });
 

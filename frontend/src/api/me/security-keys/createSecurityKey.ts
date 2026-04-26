@@ -45,10 +45,6 @@ interface Data {
 }
 
 export default async (data: Data): Promise<[z.infer<typeof userSecurityKeySchema>, CredentialCreationOptions]> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post('/api/client/account/security-keys', data)
-      .then(({ data }) => resolve([data.securityKey, prepareCredentialOptions(data.options)]))
-      .catch(reject);
-  });
+  const { data: responseData } = await axiosInstance.post('/api/client/account/security-keys', data);
+  return [responseData.securityKey, prepareCredentialOptions(responseData.options)];
 };

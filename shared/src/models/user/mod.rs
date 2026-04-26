@@ -1,172 +1,20 @@
 use crate::{
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
-    response::ApiResponse,
     storage::StorageUrlRetriever,
 };
-use axum::http::StatusCode;
 use garde::Validate;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow, prelude::Type};
 use std::{
     collections::BTreeMap,
-    ops::{Deref, DerefMut},
     sync::{Arc, LazyLock},
 };
 use utoipa::ToSchema;
 use webauthn_rs::prelude::CredentialID;
 
-#[derive(Clone)]
-pub enum AuthMethod {
-    Session(super::user_session::UserSession),
-    ApiKey(super::user_api_key::UserApiKey),
-}
-
-#[derive(Clone)]
-pub struct UserImpersonator(pub User);
-
-impl Deref for UserImpersonator {
-    type Target = User;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for UserImpersonator {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-pub type GetUser = crate::extract::ConsumingExtension<User>;
-pub type GetUserImpersonator = crate::extract::ConsumingExtension<Option<UserImpersonator>>;
-pub type GetAuthMethod = crate::extract::ConsumingExtension<AuthMethod>;
-pub type GetPermissionManager = axum::extract::Extension<PermissionManager>;
-
-#[derive(Clone)]
-pub struct PermissionManager {
-    user_admin: bool,
-    user_server_owner: bool,
-    role_admin_permissions: Option<Arc<Vec<compact_str::CompactString>>>,
-    role_server_permissions: Option<Arc<Vec<compact_str::CompactString>>>,
-    api_key_user_permissions: Option<Arc<Vec<compact_str::CompactString>>>,
-    api_key_admin_permissions: Option<Arc<Vec<compact_str::CompactString>>>,
-    api_key_server_permissions: Option<Arc<Vec<compact_str::CompactString>>>,
-    server_subuser_permissions: Option<Arc<Vec<compact_str::CompactString>>>,
-}
-
-impl PermissionManager {
-    pub fn new(user: &User) -> Self {
-        Self {
-            user_admin: user.admin,
-            user_server_owner: false,
-            role_admin_permissions: user.role.as_ref().map(|r| r.admin_permissions.clone()),
-            role_server_permissions: user.role.as_ref().map(|r| r.server_permissions.clone()),
-            api_key_user_permissions: None,
-            api_key_admin_permissions: None,
-            api_key_server_permissions: None,
-            server_subuser_permissions: None,
-        }
-    }
-
-    pub fn add_api_key(mut self, api_key: &super::user_api_key::UserApiKey) -> Self {
-        self.api_key_user_permissions = Some(api_key.user_permissions.clone());
-        self.api_key_admin_permissions = Some(api_key.admin_permissions.clone());
-        self.api_key_server_permissions = Some(api_key.server_permissions.clone());
-        self
-    }
-
-    pub fn set_user_server_owner(mut self, is_owner: bool) -> Self {
-        self.user_server_owner = is_owner;
-        self
-    }
-
-    pub fn add_subuser_permissions(
-        mut self,
-        permissions: Option<Arc<Vec<compact_str::CompactString>>>,
-    ) -> Self {
-        self.server_subuser_permissions = permissions;
-        self
-    }
-
-    pub fn has_user_permission(&self, permission: &str) -> Result<(), ApiResponse> {
-        if let Some(api_key_permissions) = &self.api_key_user_permissions
-            && !api_key_permissions.iter().any(|p| p == permission)
-        {
-            return Err(ApiResponse::error(format!(
-                "you do not have permission to perform this action: {permission}"
-            ))
-            .with_status(StatusCode::FORBIDDEN));
-        }
-
-        Ok(())
-    }
-
-    pub fn has_admin_permission(&self, permission: &str) -> Result<(), ApiResponse> {
-        let is_admin = self.user_admin;
-        let has_role_perm = self
-            .role_admin_permissions
-            .as_ref()
-            .is_some_and(|perms| perms.iter().any(|p| p == permission));
-
-        let has_base_permission = is_admin || has_role_perm;
-
-        if !has_base_permission {
-            return Err(ApiResponse::error(format!(
-                "you do not have permission to perform this action: {permission}"
-            ))
-            .with_status(StatusCode::FORBIDDEN));
-        }
-
-        if let Some(api_key_permissions) = &self.api_key_admin_permissions
-            && !api_key_permissions.iter().any(|p| p == permission)
-        {
-            return Err(ApiResponse::error(format!(
-                "you do not have permission to perform this action: {permission}"
-            ))
-            .with_status(StatusCode::FORBIDDEN));
-        }
-
-        Ok(())
-    }
-
-    pub fn has_server_permission(&self, permission: &str) -> Result<(), ApiResponse> {
-        let is_admin = self.user_admin;
-
-        let has_role_perm = self
-            .role_server_permissions
-            .as_ref()
-            .is_some_and(|perms| perms.iter().any(|p| p == permission));
-
-        let is_owner = self.user_server_owner;
-
-        let has_subuser_perm = self
-            .server_subuser_permissions
-            .as_ref()
-            .is_some_and(|perms| perms.iter().any(|p| p == permission));
-
-        let has_base_permission = is_admin || has_role_perm || is_owner || has_subuser_perm;
-
-        if !has_base_permission {
-            return Err(ApiResponse::error(format!(
-                "you do not have permission to perform this action: {permission}"
-            ))
-            .with_status(StatusCode::FORBIDDEN));
-        }
-
-        if let Some(api_key_permissions) = &self.api_key_server_permissions
-            && !api_key_permissions.iter().any(|p| p == permission)
-        {
-            return Err(ApiResponse::error(format!(
-                "you do not have permission to perform this action: {permission}"
-            ))
-            .with_status(StatusCode::FORBIDDEN));
-        }
-
-        Ok(())
-    }
-}
+mod auth;
+pub use auth::*;
 
 #[derive(ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
@@ -205,13 +53,26 @@ pub struct User {
     pub has_password: bool,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for User {
     const NAME: &'static str = "user";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         let mut columns = BTreeMap::from([
@@ -272,7 +133,7 @@ impl BaseModel for User {
             ),
         ]);
 
-        columns.extend(super::role::Role::columns(Some("role_")));
+        columns.extend(super::role::Role::base_columns(Some("role_")));
 
         columns
     }
@@ -316,6 +177,7 @@ impl BaseModel for User {
             has_password: row
                 .try_get(compact_str::format_compact!("{prefix}has_password").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -751,79 +613,130 @@ impl User {
         }
     }
 
-    #[inline]
-    pub fn into_api_object(self, storage_url_retriever: &StorageUrlRetriever<'_>) -> ApiUser {
-        ApiUser {
-            uuid: self.uuid,
-            username: self.username,
-            avatar: self
-                .avatar
-                .as_ref()
-                .map(|a| storage_url_retriever.get_url(a)),
-            totp_enabled: self.totp_enabled,
-            created: self.created.and_utc(),
-        }
-    }
-
-    #[inline]
-    pub fn into_api_full_object(
+    pub async fn into_api_full_object(
         self,
+        state: &crate::State,
         storage_url_retriever: &StorageUrlRetriever<'_>,
-    ) -> ApiFullUser {
+    ) -> Result<ApiFullUser, crate::database::DatabaseError> {
+        let api_object = ApiFullUser::init_hooks(&self, state).await?;
+
         let require_two_factor = self.require_two_factor(storage_url_retriever.get_settings());
 
-        ApiFullUser {
-            uuid: self.uuid,
-            username: self.username,
-            role: self.role.map(|r| r.into_admin_api_object()),
-            avatar: self
-                .avatar
-                .as_ref()
-                .map(|a| storage_url_retriever.get_url(a)),
-            email: self.email,
-            name_first: self.name_first,
-            name_last: self.name_last,
-            admin: self.admin,
-            totp_enabled: self.totp_enabled,
-            totp_last_used: self.totp_last_used.map(|dt| dt.and_utc()),
-            require_two_factor,
-            language: self.language,
-            toast_position: self.toast_position,
-            start_on_grouped_servers: self.start_on_grouped_servers,
-            has_password: self.has_password,
-            created: self.created.and_utc(),
-        }
-    }
+        let role = if let Some(r) = self.role {
+            Some(r.into_admin_api_object(state, ()).await?)
+        } else {
+            None
+        };
 
-    #[inline]
-    pub fn into_admin_api_object(
+        let api_object = finish_extendible!(
+            ApiFullUser {
+                uuid: self.uuid,
+                username: self.username,
+                role,
+                avatar: self
+                    .avatar
+                    .as_ref()
+                    .map(|a| storage_url_retriever.get_url(a)),
+                email: self.email,
+                name_first: self.name_first,
+                name_last: self.name_last,
+                admin: self.admin,
+                totp_enabled: self.totp_enabled,
+                totp_last_used: self.totp_last_used.map(|dt| dt.and_utc()),
+                require_two_factor,
+                language: self.language,
+                toast_position: self.toast_position,
+                start_on_grouped_servers: self.start_on_grouped_servers,
+                has_password: self.has_password,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
+    }
+}
+
+#[async_trait::async_trait]
+impl IntoApiObject for User {
+    type ApiObject = ApiUser;
+    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+
+    async fn into_api_object<'a>(
         self,
-        storage_url_retriever: &StorageUrlRetriever<'_>,
-    ) -> AdminApiUser {
+        state: &crate::State,
+        storage_url_retriever: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiUser::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiUser {
+                uuid: self.uuid,
+                username: self.username,
+                avatar: self
+                    .avatar
+                    .as_ref()
+                    .map(|a| storage_url_retriever.get_url(a)),
+                totp_enabled: self.totp_enabled,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
+    }
+}
+
+#[async_trait::async_trait]
+impl IntoAdminApiObject for User {
+    type AdminApiObject = AdminApiUser;
+    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+
+    async fn into_admin_api_object<'a>(
+        self,
+        state: &crate::State,
+        storage_url_retriever: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiUser::init_hooks(&self, state).await?;
+
         let require_two_factor = self.require_two_factor(storage_url_retriever.get_settings());
 
-        AdminApiUser {
-            uuid: self.uuid,
-            external_id: self.external_id,
-            username: self.username,
-            role: self.role.map(|r| r.into_admin_api_object()),
-            avatar: self
-                .avatar
-                .as_ref()
-                .map(|a| storage_url_retriever.get_url(a)),
-            email: self.email,
-            name_first: self.name_first,
-            name_last: self.name_last,
-            admin: self.admin,
-            totp_enabled: self.totp_enabled,
-            totp_last_used: self.totp_last_used.map(|dt| dt.and_utc()),
-            require_two_factor,
-            language: self.language,
-            toast_position: self.toast_position,
-            start_on_grouped_servers: self.start_on_grouped_servers,
-            has_password: self.has_password,
-            created: self.created.and_utc(),
-        }
+        let role = if let Some(r) = self.role {
+            Some(r.into_admin_api_object(state, ()).await?)
+        } else {
+            None
+        };
+
+        let api_object = finish_extendible!(
+            AdminApiUser {
+                uuid: self.uuid,
+                external_id: self.external_id,
+                username: self.username,
+                role,
+                avatar: self
+                    .avatar
+                    .as_ref()
+                    .map(|a| storage_url_retriever.get_url(a)),
+                email: self.email,
+                name_first: self.name_first,
+                name_last: self.name_last,
+                admin: self.admin,
+                totp_enabled: self.totp_enabled,
+                totp_last_used: self.totp_last_used.map(|dt| dt.and_utc()),
+                require_two_factor,
+                language: self.language,
+                toast_position: self.toast_position,
+                start_on_grouped_servers: self.start_on_grouped_servers,
+                has_password: self.has_password,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -1139,6 +1052,9 @@ impl ByUuid for User {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(User, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "User")]
 pub struct ApiUser {
@@ -1152,6 +1068,9 @@ pub struct ApiUser {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(User, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "FullUser")]
 pub struct ApiFullUser {
@@ -1179,6 +1098,9 @@ pub struct ApiFullUser {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(User, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "AdminUser")]
 pub struct AdminApiUser {

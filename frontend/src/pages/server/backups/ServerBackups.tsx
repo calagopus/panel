@@ -1,6 +1,7 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
+import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getBackups from '@/api/server/backups/getBackups.ts';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
@@ -8,6 +9,7 @@ import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -16,14 +18,16 @@ import BackupCreateModal from './modals/BackupCreateModal.tsx';
 
 export default function ServerBackups() {
   const { t } = useTranslations();
-  const { server, backups, setBackups } = useServerStore();
+  const { server } = useServerStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.server(server.uuid).backups.all(),
     fetcher: (page, search) => getBackups(server.uuid, page, search),
-    setStoreData: setBackups,
   });
+
+  const backups = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <ServerContentContainer

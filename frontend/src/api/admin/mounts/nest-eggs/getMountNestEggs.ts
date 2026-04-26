@@ -10,12 +10,8 @@ export default async (
 ): Promise<
   Pagination<AndCreated<{ nest: z.infer<typeof adminNestSchema>; nestEgg: z.infer<typeof adminEggSchema> }>>
 > => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/admin/mounts/${mountUuid}/nest-eggs`, {
-        params: { page, search },
-      })
-      .then(({ data }) => resolve(data.nestEggMounts))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/admin/mounts/${mountUuid}/nest-eggs`, {
+    params: { page, search },
   });
+  return data.nestEggMounts;
 };

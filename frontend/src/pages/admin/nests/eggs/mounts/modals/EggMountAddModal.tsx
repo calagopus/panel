@@ -7,6 +7,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
@@ -26,7 +27,10 @@ export default function EggMountAddModal({
   const [loading, setLoading] = useState(false);
   const [mount, setMount] = useState<z.infer<typeof adminMountSchema> | null>(null);
 
-  const mounts = useSearchableResource<z.infer<typeof adminMountSchema>>({ fetcher: (search) => getMounts(1, search) });
+  const mounts = useSearchableResource<z.infer<typeof adminMountSchema>>({
+    queryKey: queryKeys.admin.mounts.all(),
+    fetcher: (search) => getMounts(1, search),
+  });
 
   const doAdd = () => {
     if (!mount) {

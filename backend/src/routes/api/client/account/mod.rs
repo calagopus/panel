@@ -35,7 +35,8 @@ mod get {
         ApiResponse::new_serialized(Response {
             user: user
                 .0
-                .into_api_full_object(&state.storage.retrieve_urls().await?),
+                .into_api_full_object(&state, &state.storage.retrieve_urls().await?)
+                .await?,
         })
         .ok()
     }

@@ -1,4 +1,4 @@
-use crate::{models::InsertQueryBuilder, prelude::*, storage::StorageUrlRetriever};
+use crate::{models::InsertQueryBuilder, prelude::*};
 use garde::Validate;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
@@ -18,13 +18,26 @@ pub struct UserOAuthLink {
 
     pub last_used: Option<chrono::NaiveDateTime>,
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for UserOAuthLink {
     const NAME: &'static str = "user_oauth_link";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -70,6 +83,7 @@ impl BaseModel for UserOAuthLink {
             identifier: row.try_get(compact_str::format_compact!("{prefix}identifier").as_str())?,
             last_used: row.try_get(compact_str::format_compact!("{prefix}last_used").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -253,42 +267,71 @@ impl UserOAuthLink {
                 .try_collect_vec()?,
         })
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl IntoAdminApiObject for UserOAuthLink {
+    type AdminApiObject = AdminApiUserOAuthLink;
+    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-        storage_url_retriever: &StorageUrlRetriever<'_>,
-    ) -> Result<AdminApiUserOAuthLink, anyhow::Error> {
-        Ok(AdminApiUserOAuthLink {
-            uuid: self.uuid,
-            user: self
-                .user
-                .fetch_cached(database)
-                .await?
-                .into_admin_api_object(storage_url_retriever),
-            identifier: self.identifier,
-            last_used: self.last_used.map(|dt| dt.and_utc()),
-            created: self.created.and_utc(),
-        })
+        state: &crate::State,
+        storage_url_retriever: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiUserOAuthLink::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiUserOAuthLink {
+                uuid: self.uuid,
+                user: self
+                    .user
+                    .fetch_cached(&state.database)
+                    .await?
+                    .into_admin_api_object(state, storage_url_retriever)
+                    .await?,
+                identifier: self.identifier,
+                last_used: self.last_used.map(|dt| dt.and_utc()),
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
+}
 
-    #[inline]
-    pub async fn into_api_object(
+#[async_trait::async_trait]
+impl IntoApiObject for UserOAuthLink {
+    type ApiObject = ApiUserOAuthLink;
+    type ExtraArgs<'a> = ();
+
+    async fn into_api_object<'a>(
         self,
-        database: &crate::database::Database,
-    ) -> Result<ApiUserOAuthLink, anyhow::Error> {
-        Ok(ApiUserOAuthLink {
-            uuid: self.uuid,
-            oauth_provider: self
-                .oauth_provider
-                .fetch_cached(database)
-                .await?
-                .into_api_object(),
-            identifier: self.identifier,
-            last_used: self.last_used.map(|dt| dt.and_utc()),
-            created: self.created.and_utc(),
-        })
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiUserOAuthLink::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiUserOAuthLink {
+                uuid: self.uuid,
+                oauth_provider: self
+                    .oauth_provider
+                    .fetch_cached(&state.database)
+                    .await?
+                    .into_api_object(state, ())
+                    .await?,
+                identifier: self.identifier,
+                last_used: self.last_used.map(|dt| dt.and_utc()),
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -390,6 +433,9 @@ impl DeletableModel for UserOAuthLink {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(UserOAuthLink, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "AdminUserOAuthLink")]
 pub struct AdminApiUserOAuthLink {
@@ -402,6 +448,9 @@ pub struct AdminApiUserOAuthLink {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(UserOAuthLink, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "UserOAuthLink")]
 pub struct ApiUserOAuthLink {

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE nodes SET uuid = $2 WHERE nodes.uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8ecf19b153559737642444db5353625a25cf2462a6a1953085fb64d8c39b0420"
+}

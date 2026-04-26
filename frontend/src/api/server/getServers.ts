@@ -7,17 +7,11 @@ export default async (
   search?: string,
   other?: boolean,
 ): Promise<Pagination<z.infer<typeof serverSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get('/api/client/servers', {
-        params: { page, per_page: 26, search, other },
-      })
-      .then(({ data }) =>
-        resolve({
-          ...getPaginationSet(data.servers),
-          data: data.servers.data || [],
-        }),
-      )
-      .catch(reject);
+  const { data } = await axiosInstance.get('/api/client/servers', {
+    params: { page, per_page: 26, search, other },
   });
+  return {
+    ...getPaginationSet(data.servers),
+    data: data.servers.data || [],
+  };
 };

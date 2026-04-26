@@ -9,7 +9,7 @@ mod get {
     use shared::{
         GetState,
         models::{
-            Pagination, PaginationParamsWithSearch,
+            IntoApiObject, Pagination, PaginationParamsWithSearch,
             user::{GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
@@ -58,16 +58,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            nest_eggs: Pagination {
-                total: nest_eggs.total,
-                per_page: nest_eggs.per_page,
-                page: nest_eggs.page,
-                data: nest_eggs
-                    .data
-                    .into_iter()
-                    .map(|nest_egg| nest_egg.into_api_object())
-                    .collect(),
-            },
+            nest_eggs: nest_eggs
+                .try_async_map(|nest_egg| nest_egg.into_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }

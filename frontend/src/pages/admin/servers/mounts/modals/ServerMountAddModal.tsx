@@ -7,6 +7,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeMountSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -25,6 +26,7 @@ export default function ServerMountAddModal({
   const [selectedMount, setSelectedMount] = useState<z.infer<typeof adminNodeMountSchema> | null>(null);
 
   const mounts = useSearchableResource<z.infer<typeof adminServerMountSchema>>({
+    queryKey: queryKeys.admin.servers.mounts(server.uuid),
     fetcher: (search) => getAvailableServerMounts(server.uuid, 1, search),
   });
 

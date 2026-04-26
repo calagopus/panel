@@ -4,6 +4,7 @@ import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { nullableString } from '@/lib/transformers.ts';
+import { hostnameSchema } from '../generic.ts';
 
 export const adminNodeSchema = z.object({
   uuid: z.string(),
@@ -25,7 +26,7 @@ export const adminNodeSchema = z.object({
     .url({ protocol: /^https?$/ })
     .min(3)
     .max(255),
-  sftpHost: z.preprocess(nullableString, z.string().min(3).max(255).nullable()),
+  sftpHost: z.preprocess(nullableString, hostnameSchema.nullable()),
   sftpPort: z.number().min(0).max(65535),
   memory: z.number().min(0),
   disk: z.number().min(0),

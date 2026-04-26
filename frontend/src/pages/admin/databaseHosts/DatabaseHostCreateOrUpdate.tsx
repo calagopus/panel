@@ -1,6 +1,6 @@
-import { faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
+import { faExternalLink, faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Stack } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { UseFormReturnType, useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -126,46 +126,43 @@ export default function DatabaseHostCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'databaseHosts']))}>
-        <Stack mt='xs'>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <Select
-              withAsterisk
-              label='Type'
-              data={Object.entries(databaseTypeLabelMapping).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-              disabled={!!contextDatabaseHost}
-              key={form.key('type')}
-              {...form.getInputProps('type')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <Select
+            withAsterisk
+            label='Type'
+            data={Object.entries(databaseTypeLabelMapping).map(([value, label]) => ({
+              value,
+              label,
+            }))}
+            disabled={!!contextDatabaseHost}
+            key={form.key('type')}
+            {...form.getInputProps('type')}
+          />
 
-          <Group grow>
-            <TextInput
-              label='Public Host'
-              placeholder='Public Host'
-              key={form.key('publicHost')}
-              {...form.getInputProps('publicHost')}
-            />
-            <NumberInput
-              label='Public Port'
-              placeholder='Public Port'
-              key={form.key('publicPort')}
-              {...form.getInputProps('publicPort')}
-            />
-          </Group>
+          <TextInput
+            label='Public Host'
+            placeholder='Public Host'
+            key={form.key('publicHost')}
+            {...form.getInputProps('publicHost')}
+          />
+          <NumberInput
+            label='Public Port'
+            placeholder='Public Port'
+            key={form.key('publicPort')}
+            {...form.getInputProps('publicPort')}
+          />
 
           <CollapsibleSection
             icon={<FontAwesomeIcon icon={faUnlockKeyhole} />}
             enabled={!!form.values.credentials}
+            className='col-span-full'
             onToggle={(enabled) =>
               enabled
                 ? form.setValues({
@@ -207,46 +204,53 @@ export default function DatabaseHostCreateOrUpdate({
             ) : null}
           </CollapsibleSection>
 
-          <Group grow>
-            <Switch
-              label='Deployment Enabled'
-              key={form.key('deploymentEnabled')}
-              {...form.getInputProps('deploymentEnabled', { type: 'checkbox' })}
-            />
-            <Switch
-              label='Maintenance Enabled'
-              key={form.key('maintenanceEnabled')}
-              {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
-            />
-          </Group>
+          <Switch
+            label='Deployment Enabled'
+            key={form.key('deploymentEnabled')}
+            {...form.getInputProps('deploymentEnabled', { type: 'checkbox' })}
+          />
+          <Switch
+            label='Maintenance Enabled'
+            key={form.key('maintenanceEnabled')}
+            {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
+          />
+        </div>
 
-          <Group>
-            <AdminCan action={contextDatabaseHost ? 'database-hosts.update' : 'database-hosts.create'} cantSave>
-              <Button type='submit' disabled={!form.isValid()} loading={loading}>
-                Save
+        <Group mt='md'>
+          <AdminCan action={contextDatabaseHost ? 'database-hosts.update' : 'database-hosts.create'} cantSave>
+            <Button type='submit' disabled={!form.isValid()} loading={loading}>
+              Save
+            </Button>
+            {!contextDatabaseHost && (
+              <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
+                Save & Stay
               </Button>
-              {!contextDatabaseHost && (
-                <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                  Save & Stay
-                </Button>
-              )}
-            </AdminCan>
-            {contextDatabaseHost && (
-              <>
-                <AdminCan action='database-hosts.read'>
-                  <Button variant='outline' onClick={doTest} loading={loading}>
-                    Test Connection
-                  </Button>
-                </AdminCan>
-                <AdminCan action='database-hosts.delete' cantDelete>
-                  <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                    Delete
-                  </Button>
-                </AdminCan>
-              </>
             )}
-          </Group>
-        </Stack>
+          </AdminCan>
+          {contextDatabaseHost && (
+            <>
+              <AdminCan action='database-hosts.read'>
+                <Button variant='outline' onClick={doTest} loading={loading}>
+                  Test Connection
+                </Button>
+              </AdminCan>
+              <AdminCan action='database-hosts.delete' cantDelete>
+                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
+                  Delete
+                </Button>
+              </AdminCan>
+            </>
+          )}
+          <a
+            href='https://calagopus.com/docs/advanced/setting-up-database-hosts'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
+              View Documentation
+            </Button>
+          </a>
+        </Group>
       </form>
     </AdminContentContainer>
   );

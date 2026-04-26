@@ -46,7 +46,7 @@ export default function StatCard({
         </div>
         <span className='text-lg font-bold'>
           {copyOnClick ? (
-            <CopyOnClick content={value}>
+            <CopyOnClick content={value} className='text-left'>
               {value} {limit && <span className='text-sm text-gray-400'>/ {limit}</span>}{' '}
               {details && <span className='text-sm text-gray-400'>({details})</span>}
             </CopyOnClick>

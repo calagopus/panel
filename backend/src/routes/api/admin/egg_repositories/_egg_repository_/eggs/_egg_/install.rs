@@ -8,8 +8,9 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            ByUuid, admin_activity::GetAdminActivityLogger, egg_repository_egg::EggRepositoryEgg,
-            nest::Nest, nest_egg::NestEgg, user::GetPermissionManager,
+            ByUuid, IntoAdminApiObject, admin_activity::GetAdminActivityLogger,
+            egg_repository_egg::EggRepositoryEgg, nest::Nest, nest_egg::NestEgg,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -120,7 +121,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            egg: egg.into_admin_api_object(&state.database).await?,
+            egg: egg.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

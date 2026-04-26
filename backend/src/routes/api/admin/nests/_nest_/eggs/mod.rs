@@ -14,7 +14,8 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, nest_egg::NestEgg, user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch, nest_egg::NestEgg,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -74,7 +75,7 @@ mod get {
 
         ApiResponse::new_serialized(Response {
             eggs: eggs
-                .try_async_map(|egg| egg.into_admin_api_object(&state.database))
+                .try_async_map(|egg| egg.into_admin_api_object(&state, ()))
                 .await?,
         })
         .ok()
@@ -90,7 +91,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             nest_egg::{CreateNestEggOptions, NestEgg},
             user::GetPermissionManager,
@@ -231,7 +232,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            egg: egg.into_admin_api_object(&state.database).await?,
+            egg: egg.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

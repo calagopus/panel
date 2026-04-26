@@ -11,10 +11,5 @@ export default async (
   serverUuid: string,
   data: z.infer<typeof adminServerUpdateSchema> | SuspendedServer,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(`/api/admin/servers/${serverUuid}`, transformKeysToSnakeCase(data))
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.patch(`/api/admin/servers/${serverUuid}`, transformKeysToSnakeCase(data));
 };

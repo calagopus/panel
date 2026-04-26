@@ -8,6 +8,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
+            IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             nest_egg::{ExportedNestEgg, NestEgg},
             user::GetPermissionManager,
@@ -80,7 +81,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            egg: egg.into_admin_api_object(&state.database).await?,
+            egg: egg.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

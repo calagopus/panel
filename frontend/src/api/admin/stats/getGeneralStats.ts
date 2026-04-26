@@ -8,10 +8,6 @@ export interface GeneralStats {
 }
 
 export default async (): Promise<GeneralStats> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get('/api/admin/stats/general')
-      .then(({ data }) => resolve(data.stats))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.get('/api/admin/stats/general');
+  return data.stats;
 };

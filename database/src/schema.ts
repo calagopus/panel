@@ -337,6 +337,7 @@ export const oauthProvidersTable = pgTable(
     name_last_path: varchar({ length: 255 }),
     enabled: boolean().default(false).notNull(),
     login_only: boolean().default(false).notNull(),
+    login_bypass_2fa: boolean().default(true).notNull(),
     link_viewable: boolean().default(false).notNull(),
     user_manageable: boolean().default(false).notNull(),
     basic_auth: boolean().default(false).notNull(),

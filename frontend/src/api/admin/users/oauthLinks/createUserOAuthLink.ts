@@ -7,13 +7,9 @@ export default async (
   oauthProviderUuid: string,
   identifier: string,
 ): Promise<z.infer<typeof adminUserOAuthLinkSchema>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post(`/api/admin/users/${userUuid}/oauth-links`, {
-        oauth_provider_uuid: oauthProviderUuid,
-        identifier,
-      })
-      .then(({ data }) => resolve(data.oauthLink))
-      .catch(reject);
+  const { data } = await axiosInstance.post(`/api/admin/users/${userUuid}/oauth-links`, {
+    oauth_provider_uuid: oauthProviderUuid,
+    identifier,
   });
+  return data.oauthLink;
 };

@@ -9,8 +9,8 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, oauth_provider::OAuthProvider,
-            user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch,
+            oauth_provider::OAuthProvider, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -63,9 +63,7 @@ mod get {
 
         ApiResponse::new_serialized(Response {
             oauth_providers: oauth_providers
-                .try_async_map(|oauth_provider| {
-                    oauth_provider.into_admin_api_object(&state.database)
-                })
+                .try_async_map(|oauth_provider| oauth_provider.into_admin_api_object(&state, ()))
                 .await?,
         })
         .ok()
@@ -78,7 +76,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             oauth_provider::{CreateOAuthProviderOptions, OAuthProvider},
             user::GetPermissionManager,
@@ -123,6 +121,7 @@ mod post {
                     "description": oauth_provider.description,
                     "enabled": oauth_provider.enabled,
                     "login_only": oauth_provider.login_only,
+                    "login_bypass_2fa": oauth_provider.login_bypass_2fa,
                     "link_viewable": oauth_provider.link_viewable,
                     "user_manageable": oauth_provider.user_manageable,
                     "basic_auth": oauth_provider.basic_auth,
@@ -145,9 +144,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            oauth_provider: oauth_provider
-                .into_admin_api_object(&state.database)
-                .await?,
+            oauth_provider: oauth_provider.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

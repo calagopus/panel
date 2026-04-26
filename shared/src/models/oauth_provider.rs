@@ -34,18 +34,32 @@ pub struct OAuthProvider {
 
     pub enabled: bool,
     pub login_only: bool,
+    pub login_bypass_2fa: bool,
     pub link_viewable: bool,
     pub user_manageable: bool,
     pub basic_auth: bool,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for OAuthProvider {
     const NAME: &'static str = "oauth_provider";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -114,6 +128,10 @@ impl BaseModel for OAuthProvider {
                 compact_str::format_compact!("{prefix}login_only"),
             ),
             (
+                "oauth_providers.login_bypass_2fa",
+                compact_str::format_compact!("{prefix}login_bypass_2fa"),
+            ),
+            (
                 "oauth_providers.link_viewable",
                 compact_str::format_compact!("{prefix}link_viewable"),
             ),
@@ -159,12 +177,15 @@ impl BaseModel for OAuthProvider {
                 .try_get(compact_str::format_compact!("{prefix}name_last_path").as_str())?,
             enabled: row.try_get(compact_str::format_compact!("{prefix}enabled").as_str())?,
             login_only: row.try_get(compact_str::format_compact!("{prefix}login_only").as_str())?,
+            login_bypass_2fa: row
+                .try_get(compact_str::format_compact!("{prefix}login_bypass_2fa").as_str())?,
             link_viewable: row
                 .try_get(compact_str::format_compact!("{prefix}link_viewable").as_str())?,
             user_manageable: row
                 .try_get(compact_str::format_compact!("{prefix}user_manageable").as_str())?,
             basic_auth: row.try_get(compact_str::format_compact!("{prefix}basic_auth").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -338,44 +359,76 @@ impl OAuthProvider {
             },
         )
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl IntoAdminApiObject for OAuthProvider {
+    type AdminApiObject = AdminApiOAuthProvider;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-    ) -> Result<AdminApiOAuthProvider, anyhow::Error> {
-        Ok(AdminApiOAuthProvider {
-            uuid: self.uuid,
-            name: self.name,
-            description: self.description,
-            client_id: self.client_id,
-            client_secret: database.decrypt(self.client_secret).await?,
-            auth_url: self.auth_url,
-            token_url: self.token_url,
-            info_url: self.info_url,
-            scopes: self.scopes,
-            identifier_path: self.identifier_path,
-            email_path: self.email_path,
-            username_path: self.username_path,
-            name_first_path: self.name_first_path,
-            name_last_path: self.name_last_path,
-            enabled: self.enabled,
-            login_only: self.login_only,
-            link_viewable: self.link_viewable,
-            user_manageable: self.user_manageable,
-            basic_auth: self.basic_auth,
-            created: self.created.and_utc(),
-        })
-    }
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiOAuthProvider::init_hooks(&self, state).await?;
 
-    #[inline]
-    pub fn into_api_object(self) -> ApiOAuthProvider {
-        ApiOAuthProvider {
-            uuid: self.uuid,
-            name: self.name,
-            link_viewable: self.link_viewable,
-            user_manageable: self.user_manageable,
-        }
+        let api_object = finish_extendible!(
+            AdminApiOAuthProvider {
+                uuid: self.uuid,
+                name: self.name,
+                description: self.description,
+                client_id: self.client_id,
+                client_secret: state.database.decrypt(self.client_secret).await?,
+                auth_url: self.auth_url,
+                token_url: self.token_url,
+                info_url: self.info_url,
+                scopes: self.scopes,
+                identifier_path: self.identifier_path,
+                email_path: self.email_path,
+                username_path: self.username_path,
+                name_first_path: self.name_first_path,
+                name_last_path: self.name_last_path,
+                enabled: self.enabled,
+                login_only: self.login_only,
+                login_bypass_2fa: self.login_bypass_2fa,
+                link_viewable: self.link_viewable,
+                user_manageable: self.user_manageable,
+                basic_auth: self.basic_auth,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
+    }
+}
+
+#[async_trait::async_trait]
+impl IntoApiObject for OAuthProvider {
+    type ApiObject = ApiOAuthProvider;
+    type ExtraArgs<'a> = ();
+
+    async fn into_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiOAuthProvider::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiOAuthProvider {
+                uuid: self.uuid,
+                name: self.name,
+                link_viewable: self.link_viewable,
+                user_manageable: self.user_manageable,
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -413,6 +466,8 @@ pub struct CreateOAuthProviderOptions {
     pub enabled: bool,
     #[garde(skip)]
     pub login_only: bool,
+    #[garde(skip)]
+    pub login_bypass_2fa: bool,
     #[garde(skip)]
     pub link_viewable: bool,
     #[garde(skip)]
@@ -504,6 +559,7 @@ impl CreatableModel for OAuthProvider {
             .set("name_last_path", &options.name_last_path)
             .set("enabled", options.enabled)
             .set("login_only", options.login_only)
+            .set("login_bypass_2fa", options.login_bypass_2fa)
             .set("link_viewable", options.link_viewable)
             .set("user_manageable", options.user_manageable)
             .set("basic_auth", options.basic_auth);
@@ -537,6 +593,8 @@ pub struct UpdateOAuthProviderOptions {
     pub enabled: Option<bool>,
     #[garde(skip)]
     pub login_only: Option<bool>,
+    #[garde(skip)]
+    pub login_bypass_2fa: Option<bool>,
     #[garde(skip)]
     pub link_viewable: Option<bool>,
     #[garde(skip)]
@@ -675,6 +733,7 @@ impl UpdatableModel for OAuthProvider {
             )
             .set("enabled", options.enabled)
             .set("login_only", options.login_only)
+            .set("login_bypass_2fa", options.login_bypass_2fa)
             .set("link_viewable", options.link_viewable)
             .set("user_manageable", options.user_manageable)
             .set("basic_auth", options.basic_auth)
@@ -693,6 +752,9 @@ impl UpdatableModel for OAuthProvider {
         }
         if let Some(login_only) = options.login_only {
             self.login_only = login_only;
+        }
+        if let Some(login_bypass_2fa) = options.login_bypass_2fa {
+            self.login_bypass_2fa = login_bypass_2fa;
         }
         if let Some(link_viewable) = options.link_viewable {
             self.link_viewable = link_viewable;
@@ -784,6 +846,9 @@ impl DeletableModel for OAuthProvider {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(OAuthProvider, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "AdminOAuthProvider")]
 pub struct AdminApiOAuthProvider {
@@ -807,6 +872,7 @@ pub struct AdminApiOAuthProvider {
 
     pub enabled: bool,
     pub login_only: bool,
+    pub login_bypass_2fa: bool,
     pub link_viewable: bool,
     pub user_manageable: bool,
     pub basic_auth: bool,
@@ -814,6 +880,9 @@ pub struct AdminApiOAuthProvider {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(OAuthProvider, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "OAuthProvider")]
 pub struct ApiOAuthProvider {

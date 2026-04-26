@@ -1,6 +1,5 @@
 import { faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Title } from '@mantine/core';
 import Alert from '@/elements/Alert.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -26,10 +25,6 @@ export default function DashboardAccount() {
       title={t('pages.account.account.title', {})}
       registry={window.extensionContext.extensionRegistry.pages.dashboard.account.container}
     >
-      <Title order={1} c='white'>
-        {t('pages.account.account.title', {})}
-      </Title>
-
       {requireTwoFactorActivation && (
         <Alert
           icon={<FontAwesomeIcon icon={faShieldAlt} />}

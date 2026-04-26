@@ -11,7 +11,6 @@ import {
   faFolderOpen,
   faFolderTree,
   faPuzzlePiece,
-  faRefresh,
   faScroll,
   faServer,
   faUsers,
@@ -27,31 +26,24 @@ import AdminEggConfigurations from '@/pages/admin/eggConfigurations/AdminEggConf
 import AdminEggRepositories from '@/pages/admin/eggRepositories/AdminEggRepositories.tsx';
 import AdminExtensions from '@/pages/admin/extensions/AdminExtensions.tsx';
 import AdminExtensionsExtension from '@/pages/admin/extensions/extension/AdminExtensionsExtension.tsx';
+import AdminHome from '@/pages/admin/home/AdminHome.tsx';
 import AdminLocations from '@/pages/admin/locations/AdminLocations.tsx';
 import AdminMounts from '@/pages/admin/mounts/AdminMounts.tsx';
 import AdminNests from '@/pages/admin/nests/AdminNests.tsx';
 import AdminNodes from '@/pages/admin/nodes/AdminNodes.tsx';
 import AdminOAuthProviders from '@/pages/admin/oAuthProviders/AdminOAuthProviders.tsx';
-import AdminOverview from '@/pages/admin/overview/AdminOverview.tsx';
 import AdminRoles from '@/pages/admin/roles/AdminRoles.tsx';
 import AdminServers from '@/pages/admin/servers/AdminServers.tsx';
 import AdminSettings from '@/pages/admin/settings/AdminSettings.tsx';
-import AdminUpdates from '@/pages/admin/updates/AdminUpdates.tsx';
 import AdminUsers from '@/pages/admin/users/AdminUsers.tsx';
 
 const routes: AdminRouteDefinition[] = [
   {
-    name: 'Overview',
+    name: 'Home',
     icon: faBuilding,
-    path: '/',
-    element: AdminOverview,
-    exact: true,
-  },
-  {
-    name: 'Updates',
-    icon: faRefresh,
-    path: '/updates',
-    element: AdminUpdates,
+    path: '/*',
+    activeMatches: ['/admin/updates', '/admin/health'],
+    element: AdminHome,
     exact: true,
   },
   {

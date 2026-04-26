@@ -21,6 +21,7 @@ impl CliCommandGroupBuilder {
     pub fn new(name: &'static str, about: &'static str) -> Self {
         Self {
             command: Command::new(name)
+                .version(crate::full_version())
                 .arg(
                     Arg::new("debug")
                         .help("pass in order to run in debug mode")

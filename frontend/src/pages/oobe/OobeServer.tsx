@@ -1,14 +1,14 @@
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getEggRepositoryEggs from '@/api/admin/egg-repositories/eggs/getEggRepositoryEggs.ts';
 import installEgg from '@/api/admin/egg-repositories/eggs/installEgg.ts';
-import getEggRepositories from '@/api/admin/egg-repositories/getEggRepositories.ts';
 import createNest from '@/api/admin/nests/createNest.ts';
 import getAvailableNodeAllocations from '@/api/admin/nodes/allocations/getAvailableNodeAllocations.ts';
-import getNodes from '@/api/admin/nodes/getNodes.ts';
 import createServer from '@/api/admin/servers/createServer.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import AlertError from '@/elements/alerts/AlertError.tsx';
@@ -20,8 +20,9 @@ import Select from '@/elements/input/Select.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
-import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
+import { adminEggRepositoryEggSchema } from '@/lib/schemas/admin/eggRepositories.ts';
+import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { oobeServerSchema } from '@/lib/schemas/oobe.ts';
 import { formatAllocation } from '@/lib/server.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -29,23 +30,23 @@ import { useAuth } from '@/providers/contexts/authContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 
-export default function OobeServer({ onNext, skipFrom }: OobeComponentProps) {
+export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }: OobeComponentProps) {
   const { t } = useTranslations();
   const { user } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [checkedEggRepos, setCheckedEggRepos] = useState(false);
 
-  const node = useRef<z.infer<typeof adminNodeSchema> | null>(null);
+  const node = data.nodes[0] ?? null;
+  const existingServer = data.servers[0] ?? null;
+
   const [selectedEggRepositoryUuid, setSelectedEggRepositoryUuid] = useState<string | null>(null);
   const [selectedEgg, setSelectedEgg] = useState<z.infer<typeof adminEggRepositoryEggSchema> | null>(null);
 
-  const eggRepositories = useSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
-    fetcher: (search) => getEggRepositories(1, search),
-    defaultLoadState: true,
-  });
   const eggs = useSearchableResource<z.infer<typeof adminEggRepositoryEggSchema>>({
+    queryKey: selectedEggRepositoryUuid
+      ? queryKeys.admin.eggRepositories.eggs(selectedEggRepositoryUuid)
+      : ['oobe', 'eggs'],
     fetcher: (search) =>
       selectedEggRepositoryUuid
         ? getEggRepositoryEggs(selectedEggRepositoryUuid, 1, search)
@@ -53,38 +54,26 @@ export default function OobeServer({ onNext, skipFrom }: OobeComponentProps) {
     deps: [selectedEggRepositoryUuid],
   });
   const availablePrimaryAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+    queryKey: node ? queryKeys.admin.nodes.allocations(node.uuid) : ['oobe', 'primary-allocations'],
     fetcher: (search) =>
-      node.current
-        ? getAvailableNodeAllocations(node.current.uuid, 1, search)
-        : Promise.resolve(getEmptyPaginationSet()),
-    deps: [node.current],
+      node ? getAvailableNodeAllocations(node.uuid, 1, search) : Promise.resolve(getEmptyPaginationSet()),
+    deps: [node?.uuid],
   });
   const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+    queryKey: node ? queryKeys.admin.nodes.allocations(node.uuid) : ['oobe', 'allocations'],
     fetcher: (search) =>
-      node.current
-        ? getAvailableNodeAllocations(node.current.uuid, 1, search)
-        : Promise.resolve(getEmptyPaginationSet()),
-    deps: [node.current],
+      node ? getAvailableNodeAllocations(node.uuid, 1, search) : Promise.resolve(getEmptyPaginationSet()),
+    deps: [node?.uuid],
   });
 
   const form = useForm<z.infer<typeof oobeServerSchema>>({
     initialValues: {
       nestName: '',
       name: '',
-      limits: {
-        cpu: 100,
-        memory: 1024,
-        swap: 0,
-        disk: 10240,
-      },
+      limits: { cpu: 100, memory: 1024, swap: 0, disk: 10240 },
       image: '',
       startOnCompletion: true,
-      featureLimits: {
-        allocations: 5,
-        databases: 5,
-        backups: 5,
-        schedules: 5,
-      },
+      featureLimits: { allocations: 5, databases: 5, backups: 5, schedules: 5 },
       allocationUuid: '',
       allocationUuids: [],
     },
@@ -93,31 +82,13 @@ export default function OobeServer({ onNext, skipFrom }: OobeComponentProps) {
   });
 
   useEffect(() => {
-    getNodes(1)
-      .then((nodes) => {
-        if (nodes.total > 0) {
-          node.current = nodes.data[0];
-          setLoading(false);
-        } else {
-          setError(t('pages.oobe.server.error.noNodes', {}));
-        }
-      })
-      .catch((msg) => {
-        setError(httpErrorToHuman(msg));
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!eggRepositories.loading && eggRepositories.items.length <= 0 && !checkedEggRepos) {
+    if (!data.isLoading && data.eggRepositories.length === 0) {
       skipFrom('server');
-    } else {
-      setCheckedEggRepos(true);
     }
-  }, [eggRepositories.loading]);
+  }, [data.isLoading]);
 
   useEffect(() => {
     if (!selectedEgg) return;
-
     form.setFieldValue('image', Object.values(selectedEgg.exportedEgg.dockerImages)[0] ?? '');
   }, [selectedEgg]);
 
@@ -159,7 +130,7 @@ export default function OobeServer({ onNext, skipFrom }: OobeComponentProps) {
           backups: form.getValues().featureLimits.backups,
           schedules: form.getValues().featureLimits.schedules,
         },
-        nodeUuid: node.current!.uuid,
+        nodeUuid: node!.uuid,
         ownerUuid: user!.uuid,
         eggUuid: installedEgg.uuid,
         backupConfigurationUuid: null,
@@ -168,6 +139,7 @@ export default function OobeServer({ onNext, skipFrom }: OobeComponentProps) {
         variables: [],
       });
 
+      data.refetch();
       onNext();
     } catch (msg) {
       setError(httpErrorToHuman(msg));
@@ -183,114 +155,125 @@ export default function OobeServer({ onNext, skipFrom }: OobeComponentProps) {
       {error && <AlertError error={error} setError={setError} />}
 
       <Stack gap='xl'>
-        <Stack gap='sm'>
+        {existingServer ? (
           <Card>
             <Stack gap='sm'>
-              <Title order={4}>{t('pages.oobe.server.egg.title', {})}</Title>
-              <Text size='sm'>{t('pages.oobe.server.egg.description', {})}</Text>
-
-              <Group grow>
-                <Select
-                  withAsterisk
-                  label='Egg Repository'
-                  placeholder='Egg Repository'
-                  data={eggRepositories.items.map((repo) => ({
-                    label: repo.name,
-                    value: repo.uuid,
-                  }))}
-                  searchable
-                  searchValue={eggRepositories.search}
-                  onSearchChange={eggRepositories.setSearch}
-                  loading={eggRepositories.loading}
-                  value={selectedEggRepositoryUuid}
-                  onChange={(val) => setSelectedEggRepositoryUuid(val)}
-                />
-                <Select
-                  withAsterisk
-                  label='Egg'
-                  placeholder='Egg'
-                  data={eggs.items.map((egg) => ({
-                    label: egg.name,
-                    value: egg.uuid,
-                  }))}
-                  searchable
-                  searchValue={eggs.search}
-                  onSearchChange={eggs.setSearch}
-                  loading={eggs.loading}
-                  disabled={!selectedEggRepositoryUuid}
-                  value={selectedEgg?.uuid}
-                  onChange={(val) => setSelectedEgg(eggs.items.find((e) => e.uuid === val)!)}
-                />
-              </Group>
-
-              <Stack gap='xs'>
-                <Text size='sm'>{t('pages.oobe.server.egg.nestDescription', {})}</Text>
-                <TextInput
-                  withAsterisk
-                  label='Nest Name'
-                  placeholder='Nest Name'
-                  key={form.key('nestName')}
-                  {...form.getInputProps('nestName')}
-                />
-              </Stack>
+              <Title order={4}>{existingServer.name}</Title>
+              <Text size='sm' c='dimmed'>
+                {t('pages.oobe.server.existingServer', {})}
+              </Text>
             </Stack>
           </Card>
+        ) : (
+          <Stack gap='sm'>
+            <Card>
+              <Stack gap='sm'>
+                <Title order={4}>{t('pages.oobe.server.egg.title', {})}</Title>
+                <Text size='sm'>{t('pages.oobe.server.egg.description', {})}</Text>
 
-          <Card>
-            <Stack>
-              <Title order={4}>{t('pages.oobe.server.server.title', {})}</Title>
+                <div className='flex flex-col sm:flex-row gap-2'>
+                  <Select
+                    withAsterisk
+                    className='flex-1'
+                    label='Egg Repository'
+                    placeholder='Egg Repository'
+                    data={data.eggRepositories.map((repo) => ({
+                      label: repo.name,
+                      value: repo.uuid,
+                    }))}
+                    value={selectedEggRepositoryUuid}
+                    onChange={(val) => setSelectedEggRepositoryUuid(val)}
+                  />
+                  <Select
+                    withAsterisk
+                    className='flex-1'
+                    label='Egg'
+                    placeholder='Egg'
+                    data={eggs.items.map((egg) => ({
+                      label: egg.name,
+                      value: egg.uuid,
+                    }))}
+                    searchable
+                    searchValue={eggs.search}
+                    onSearchChange={eggs.setSearch}
+                    loading={eggs.loading}
+                    disabled={!selectedEggRepositoryUuid}
+                    value={selectedEgg?.uuid}
+                    onChange={(val) => setSelectedEgg(eggs.items.find((e) => e.uuid === val)!)}
+                  />
+                </div>
 
-              <TextInput
-                withAsterisk
-                label='Server Name'
-                placeholder='My Game Server'
-                key={form.key('name')}
-                {...form.getInputProps('name')}
-              />
+                <Stack gap='xs'>
+                  <Text size='sm'>{t('pages.oobe.server.egg.nestDescription', {})}</Text>
+                  <TextInput
+                    withAsterisk
+                    label='Nest Name'
+                    placeholder='Nest Name'
+                    key={form.key('nestName')}
+                    {...form.getInputProps('nestName')}
+                  />
+                </Stack>
+              </Stack>
+            </Card>
 
-              <Group grow>
-                <NumberInput
+            <Card>
+              <Stack>
+                <Title order={4}>{t('pages.oobe.server.server.title', {})}</Title>
+
+                <TextInput
                   withAsterisk
-                  label='CPU Limit (%)'
-                  description='The CPU Limit in % that the server can use, 1 thread = 100%'
-                  placeholder='100'
-                  min={0}
-                  key={form.key('limits.cpu')}
-                  {...form.getInputProps('limits.cpu')}
+                  label='Server Name'
+                  placeholder='My Game Server'
+                  key={form.key('name')}
+                  {...form.getInputProps('name')}
                 />
-                <SizeInput
-                  withAsterisk
-                  label='Swap'
-                  description='The amount of swap to give this server, -1 will not set a limit'
-                  mode='mb'
-                  min={-1}
-                  value={form.getValues().limits.swap}
-                  onChange={(value) => form.setFieldValue('limits.swap', value)}
-                />
-              </Group>
 
-              <Group grow>
-                <SizeInput
-                  withAsterisk
-                  label='Memory'
-                  description='The Memory limit of the server container, 0 will not set a limit'
-                  mode='mb'
-                  min={0}
-                  value={form.getValues().limits.memory}
-                  onChange={(value) => form.setFieldValue('limits.memory', value)}
-                />
-                <SizeInput
-                  withAsterisk
-                  label='Disk Space'
-                  description='The disk limit of the server, this is a soft-limit unless disk limiter configured on wings'
-                  mode='mb'
-                  min={0}
-                  value={form.getValues().limits.disk}
-                  onChange={(value) => form.setFieldValue('limits.disk', value)}
-                />
-              </Group>
+                <div className='flex flex-col sm:flex-row gap-2'>
+                  <NumberInput
+                    withAsterisk
+                    className='flex-1'
+                    label='CPU Limit (%)'
+                    description='The CPU Limit in % that the server can use, 1 thread = 100%'
+                    placeholder='100'
+                    min={0}
+                    key={form.key('limits.cpu')}
+                    {...form.getInputProps('limits.cpu')}
+                  />
+                  <SizeInput
+                    withAsterisk
+                    label='Swap'
+                    description='The amount of swap to give this server, -1 will not set a limit'
+                    mode='mb'
+                    min={-1}
+                    flex={1}
+                    value={form.getValues().limits.swap}
+                    onChange={(value) => form.setFieldValue('limits.swap', value)}
+                  />
+                </div>
 
-              <Group grow>
+                <div className='flex flex-col sm:flex-row gap-2'>
+                  <SizeInput
+                    withAsterisk
+                    label='Memory'
+                    description='The Memory limit of the server container, 0 will not set a limit'
+                    mode='mb'
+                    min={0}
+                    flex={1}
+                    value={form.getValues().limits.memory}
+                    onChange={(value) => form.setFieldValue('limits.memory', value)}
+                  />
+                  <SizeInput
+                    withAsterisk
+                    label='Disk Space'
+                    description='The disk limit of the server, this is a soft-limit unless disk limiter configured on wings'
+                    mode='mb'
+                    min={0}
+                    flex={1}
+                    value={form.getValues().limits.disk}
+                    onChange={(value) => form.setFieldValue('limits.disk', value)}
+                  />
+                </div>
+
                 <Select
                   withAsterisk
                   label='Docker Image'
@@ -304,98 +287,112 @@ export default function OobeServer({ onNext, skipFrom }: OobeComponentProps) {
                   key={form.key('image')}
                   {...form.getInputProps('image')}
                 />
-              </Group>
 
-              <Group grow>
                 <Switch
                   label='Start on Completion'
                   description='Start server after installation completes'
                   key={form.key('startOnCompletion')}
-                  {...form.getInputProps('startOnCompletion', {
-                    type: 'checkbox',
-                  })}
+                  {...form.getInputProps('startOnCompletion', { type: 'checkbox' })}
                 />
-              </Group>
 
-              <Group grow>
-                <NumberInput
-                  withAsterisk
-                  label='Allocations'
-                  placeholder='0'
-                  min={0}
-                  key={form.key('featureLimits.allocations')}
-                  {...form.getInputProps('featureLimits.allocations')}
-                />
-                <NumberInput
-                  withAsterisk
-                  label='Databases'
-                  placeholder='0'
-                  min={0}
-                  key={form.key('featureLimits.databases')}
-                  {...form.getInputProps('featureLimits.databases')}
-                />
-                <NumberInput
-                  withAsterisk
-                  label='Backups'
-                  placeholder='0'
-                  min={0}
-                  key={form.key('featureLimits.backups')}
-                  {...form.getInputProps('featureLimits.backups')}
-                />
-                <NumberInput
-                  withAsterisk
-                  label='Schedules'
-                  placeholder='0'
-                  min={0}
-                  key={form.key('featureLimits.schedules')}
-                  {...form.getInputProps('featureLimits.schedules')}
-                />
-              </Group>
+                <div className='grid grid-cols-2 sm:grid-cols-4 gap-2'>
+                  <NumberInput
+                    withAsterisk
+                    label='Allocations'
+                    placeholder='0'
+                    min={0}
+                    key={form.key('featureLimits.allocations')}
+                    {...form.getInputProps('featureLimits.allocations')}
+                  />
+                  <NumberInput
+                    withAsterisk
+                    label='Databases'
+                    placeholder='0'
+                    min={0}
+                    key={form.key('featureLimits.databases')}
+                    {...form.getInputProps('featureLimits.databases')}
+                  />
+                  <NumberInput
+                    withAsterisk
+                    label='Backups'
+                    placeholder='0'
+                    min={0}
+                    key={form.key('featureLimits.backups')}
+                    {...form.getInputProps('featureLimits.backups')}
+                  />
+                  <NumberInput
+                    withAsterisk
+                    label='Schedules'
+                    placeholder='0'
+                    min={0}
+                    key={form.key('featureLimits.schedules')}
+                    {...form.getInputProps('featureLimits.schedules')}
+                  />
+                </div>
 
-              <Group grow>
-                <Select
-                  label='Primary Allocation'
-                  placeholder='Primary Allocation'
-                  data={availablePrimaryAllocations.items
-                    .filter((alloc) => !form.getValues().allocationUuids.includes(alloc.uuid))
-                    .map((alloc) => ({
-                      label: formatAllocation(alloc),
-                      value: alloc.uuid,
-                    }))}
-                  searchable
-                  searchValue={availablePrimaryAllocations.search}
-                  onSearchChange={availablePrimaryAllocations.setSearch}
-                  allowDeselect
-                  key={form.key('allocationUuid')}
-                  {...form.getInputProps('allocationUuid')}
-                />
-                <MultiSelect
-                  label='Additional Allocations'
-                  placeholder='Additional Allocations'
-                  data={availableAllocations.items
-                    .filter((alloc) => alloc.uuid !== form.getValues().allocationUuid)
-                    .map((alloc) => ({
-                      label: formatAllocation(alloc),
-                      value: alloc.uuid,
-                    }))}
-                  searchable
-                  searchValue={availableAllocations.search}
-                  onSearchChange={availableAllocations.setSearch}
-                  key={form.key('allocationUuids')}
-                  {...form.getInputProps('allocationUuids')}
-                />
-              </Group>
-            </Stack>
-          </Card>
-        </Stack>
+                <div className='flex flex-col sm:flex-row gap-2'>
+                  <Select
+                    className='flex-1'
+                    label='Primary Allocation'
+                    placeholder='Primary Allocation'
+                    data={availablePrimaryAllocations.items
+                      .filter((alloc) => !form.getValues().allocationUuids.includes(alloc.uuid))
+                      .map((alloc) => ({
+                        label: formatAllocation(alloc),
+                        value: alloc.uuid,
+                      }))}
+                    searchable
+                    searchValue={availablePrimaryAllocations.search}
+                    onSearchChange={availablePrimaryAllocations.setSearch}
+                    allowDeselect
+                    key={form.key('allocationUuid')}
+                    {...form.getInputProps('allocationUuid')}
+                  />
+                  <MultiSelect
+                    className='flex-1'
+                    label='Additional Allocations'
+                    placeholder='Additional Allocations'
+                    data={availableAllocations.items
+                      .filter((alloc) => alloc.uuid !== form.getValues().allocationUuid)
+                      .map((alloc) => ({
+                        label: formatAllocation(alloc),
+                        value: alloc.uuid,
+                      }))}
+                    searchable
+                    searchValue={availableAllocations.search}
+                    onSearchChange={availableAllocations.setSearch}
+                    key={form.key('allocationUuids')}
+                    {...form.getInputProps('allocationUuids')}
+                  />
+                </div>
+              </Stack>
+            </Card>
+          </Stack>
+        )}
 
         <Group justify='flex-end'>
-          <Button variant='outline' onClick={() => skipFrom('server')}>
-            {t('common.button.skip', {})}
-          </Button>
-          <Button type='submit' disabled={!selectedEgg || !form.isValid()} loading={loading} onClick={() => onSubmit()}>
-            {t('pages.oobe.server.button.create', {})}
-          </Button>
+          {canGoBack && (
+            <Button variant='subtle' onClick={onBack} leftSection={<FontAwesomeIcon icon={faChevronLeft} />}>
+              Back
+            </Button>
+          )}
+          {!existingServer && (
+            <Button variant='outline' onClick={() => skipFrom('server')}>
+              {t('common.button.skip', {})}
+            </Button>
+          )}
+          {existingServer ? (
+            <Button onClick={() => onNext()}>{t('common.button.continue', {})}</Button>
+          ) : (
+            <Button
+              type='submit'
+              disabled={!selectedEgg || !form.isValid()}
+              loading={loading}
+              onClick={() => onSubmit()}
+            >
+              {t('pages.oobe.server.button.create', {})}
+            </Button>
+          )}
         </Group>
       </Stack>
     </Stack>

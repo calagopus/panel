@@ -51,7 +51,7 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{server::GetServer, user::GetPermissionManager},
+        models::{IntoAdminApiObject, server::GetServer, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -81,7 +81,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             server: server
                 .0
-                .into_admin_api_object(&state.database, &state.storage.retrieve_urls().await?)
+                .into_admin_api_object(&state, &state.storage.retrieve_urls().await?)
                 .await?,
         })
         .ok()

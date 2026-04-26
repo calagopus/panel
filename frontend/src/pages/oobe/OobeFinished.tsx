@@ -20,6 +20,7 @@ import updateOobeSettings from '@/api/admin/settings/updateOobeSettings.ts';
 import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import Divider from '@/elements/Divider.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -36,15 +37,19 @@ export default function OobeFinished() {
   const navigate = useNavigate();
 
   const eggRepositories = useSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
+    queryKey: queryKeys.admin.eggRepositories.all(),
     fetcher: () => getEggRepositories(1),
   });
   const locations = useSearchableResource<z.infer<typeof adminLocationSchema>>({
+    queryKey: queryKeys.admin.locations.all(),
     fetcher: () => getLocations(1),
   });
   const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+    queryKey: queryKeys.admin.nodes.all(),
     fetcher: () => getNodes(1),
   });
   const servers = useSearchableResource<z.infer<typeof adminServerSchema>>({
+    queryKey: queryKeys.admin.servers.all(),
     fetcher: () => getServers(1),
   });
 

@@ -1,7 +1,7 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import { httpErrorToHuman } from '@/api/axios.ts';
+import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getPermissions from '@/api/getPermissions.ts';
 import createSubuser from '@/api/server/subusers/createSubuser.ts';
 import getSubusers from '@/api/server/subusers/getSubusers.ts';
@@ -10,6 +10,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -21,7 +22,7 @@ import SubuserRow from './SubuserRow.tsx';
 export default function ServerSubusers() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, subusers, setSubusers, addSubuser } = useServerStore();
+  const { server } = useServerStore();
   const { setAvailablePermissions } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
@@ -32,15 +33,17 @@ export default function ServerSubusers() {
     });
   }, []);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
+    queryKey: queryKeys.server(server.uuid).subusers.all(),
     fetcher: (page, search) => getSubusers(server.uuid, page, search),
-    setStoreData: setSubusers,
   });
+
+  const subusers = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const doCreate = (email: string, permissions: string[], ignoredFiles: string[], captcha: string | null) => {
     createSubuser(server.uuid, { email, permissions, ignoredFiles, captcha })
-      .then((subuser) => {
-        addSubuser(subuser);
+      .then(() => {
+        refetch();
         addToast(t('pages.server.subusers.modal.createSubuser.toast.created', {}), 'success');
         setOpenModal(null);
       })

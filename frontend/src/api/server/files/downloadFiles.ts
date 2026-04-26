@@ -10,17 +10,13 @@ export default async (
   isDirectory: boolean,
   archiveFormat: z.infer<typeof streamingArchiveFormat>,
 ): Promise<{ url: string }> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(
-        `/api/client/servers/${uuid}/files/download?${createSearchParams({
-          root,
-          files: paths,
-          directory: isDirectory.toString(),
-          archive_format: archiveFormat,
-        })}`,
-      )
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.get(
+    `/api/client/servers/${uuid}/files/download?${createSearchParams({
+      root,
+      files: paths,
+      directory: isDirectory.toString(),
+      archive_format: archiveFormat,
+    })}`,
+  );
+  return data;
 };

@@ -1,6 +1,6 @@
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Stack } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -25,6 +25,8 @@ import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { isNodeAIO } from '@/lib/node.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNodeSchema, adminNodeUpdateSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -94,10 +96,12 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
   }, [contextNode]);
 
   const locations = useSearchableResource<z.infer<typeof adminLocationSchema>>({
+    queryKey: queryKeys.admin.locations.all(),
     fetcher: (search) => getLocations(1, search),
     defaultSearchValue: contextNode?.location.name,
   });
   const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+    queryKey: queryKeys.admin.backupConfigurations.all(),
     fetcher: (search) => getBackupConfigurations(1, search),
     defaultSearchValue: contextNode?.backupConfiguration?.name,
   });
@@ -136,167 +140,168 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'nodes']))}>
-        <Stack mt='xs'>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <Select
-              withAsterisk
-              label='Location'
-              placeholder='Location'
-              data={locations.items.map((location) => ({
-                label: location.name,
-                value: location.uuid,
-              }))}
-              searchable
-              searchValue={locations.search}
-              onSearchChange={locations.setSearch}
-              loading={locations.loading}
-              key={form.key('locationUuid')}
-              {...form.getInputProps('locationUuid')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <Select
+            withAsterisk
+            label='Location'
+            placeholder='Location'
+            data={locations.items.map((location) => ({
+              label: location.name,
+              value: location.uuid,
+            }))}
+            searchable
+            searchValue={locations.search}
+            onSearchChange={locations.setSearch}
+            loading={locations.loading}
+            key={form.key('locationUuid')}
+            {...form.getInputProps('locationUuid')}
+          />
 
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='URL'
-              description='used for internal communication with the node'
-              placeholder='URL'
-              key={form.key('url')}
-              {...form.getInputProps('url')}
-            />
-            <TextInput
-              label='Public URL'
-              description='used for websocket/downloads'
-              placeholder='URL'
-              key={form.key('publicUrl')}
-              rightSection={
-                <Tooltip label='Use Wings Proxy URL'>
-                  <ActionIcon
-                    variant='subtle'
-                    onClick={() =>
-                      form.setFieldValue('publicUrl', `${window.location.origin}/wings-proxy/${contextNode?.uuid}`)
-                    }
-                    disabled={!contextNode}
-                    size='lg'
-                  >
-                    <FontAwesomeIcon icon={faGlobe} />
-                  </ActionIcon>
-                </Tooltip>
-              }
-              {...form.getInputProps('publicUrl')}
-            />
-          </Group>
+          <TextInput
+            withAsterisk
+            label='URL'
+            description='used for internal communication with the node'
+            placeholder='URL'
+            key={form.key('url')}
+            {...form.getInputProps('url')}
+            disabled={contextNode ? isNodeAIO(contextNode) : false}
+          />
+          <TextInput
+            label='Public URL'
+            description='used for websocket/downloads'
+            placeholder='URL'
+            key={form.key('publicUrl')}
+            rightSection={
+              <Tooltip label='Use Wings Proxy URL'>
+                <ActionIcon
+                  variant='subtle'
+                  onClick={() =>
+                    form.setFieldValue('publicUrl', `${window.location.origin}/wings-proxy/${contextNode?.uuid}`)
+                  }
+                  disabled={!contextNode}
+                  size='lg'
+                >
+                  <FontAwesomeIcon icon={faGlobe} />
+                </ActionIcon>
+              </Tooltip>
+            }
+            {...form.getInputProps('publicUrl')}
+            disabled={contextNode ? isNodeAIO(contextNode) : false}
+          />
 
-          <Group grow>
-            <TextInput
-              label='SFTP Host'
-              placeholder='SFTP Host'
-              key={form.key('sftpHost')}
-              {...form.getInputProps('sftpHost')}
-            />
-            <NumberInput
-              withAsterisk
-              label='SFTP Port'
-              placeholder='SFTP Port'
-              min={1}
-              max={65535}
-              key={form.key('sftpPort')}
-              {...form.getInputProps('sftpPort')}
-            />
-          </Group>
+          <TextInput
+            label='SFTP Host'
+            placeholder='SFTP Host'
+            key={form.key('sftpHost')}
+            {...form.getInputProps('sftpHost')}
+          />
+          <NumberInput
+            withAsterisk
+            label='SFTP Port'
+            placeholder='SFTP Port'
+            min={1}
+            max={65535}
+            key={form.key('sftpPort')}
+            {...form.getInputProps('sftpPort')}
+          />
 
-          <Group grow>
-            <SizeInput
-              withAsterisk
-              label='Memory'
-              mode='mb'
-              min={0}
-              value={form.getValues().memory}
-              onChange={(value) => form.setFieldValue('memory', value)}
-            />
-            <SizeInput
-              withAsterisk
-              label='Disk'
-              mode='mb'
-              min={0}
-              value={form.getValues().disk}
-              onChange={(value) => form.setFieldValue('disk', value)}
-            />
-          </Group>
+          <SizeInput
+            withAsterisk
+            label='Memory'
+            mode='mb'
+            min={0}
+            value={form.getValues().memory}
+            onChange={(value) => form.setFieldValue('memory', value)}
+          />
+          <SizeInput
+            withAsterisk
+            label='Disk'
+            mode='mb'
+            min={0}
+            value={form.getValues().disk}
+            onChange={(value) => form.setFieldValue('disk', value)}
+          />
 
-          <Group grow align='start'>
-            <Select
-              label='Backup Configuration'
-              placeholder='Inherit from Location'
-              data={backupConfigurations.items.map((backupConfiguration) => ({
-                label: backupConfiguration.name,
-                value: backupConfiguration.uuid,
-              }))}
-              searchable
-              searchValue={backupConfigurations.search}
-              onSearchChange={backupConfigurations.setSearch}
-              allowDeselect
-              clearable
-              loading={backupConfigurations.loading}
-              key={form.key('backupConfigurationUuid')}
-              {...form.getInputProps('backupConfigurationUuid')}
-            />
-            <TextArea
-              label='Description'
-              placeholder='Description'
-              rows={3}
-              key={form.key('description')}
-              {...form.getInputProps('description')}
-            />
-          </Group>
+          <Select
+            label='Backup Configuration'
+            placeholder='Inherit from Location'
+            data={backupConfigurations.items.map((backupConfiguration) => ({
+              label: backupConfiguration.name,
+              value: backupConfiguration.uuid,
+            }))}
+            searchable
+            searchValue={backupConfigurations.search}
+            onSearchChange={backupConfigurations.setSearch}
+            allowDeselect
+            clearable
+            loading={backupConfigurations.loading}
+            key={form.key('backupConfigurationUuid')}
+            {...form.getInputProps('backupConfigurationUuid')}
+          />
+          <TextArea
+            label='Description'
+            placeholder='Description'
+            rows={3}
+            key={form.key('description')}
+            {...form.getInputProps('description')}
+          />
 
-          <Group grow>
-            <Switch
-              label='Deployment Enabled'
-              key={form.key('deploymentEnabled')}
-              {...form.getInputProps('deploymentEnabled', { type: 'checkbox' })}
-            />
-            <Switch
-              label='Maintenance Enabled'
-              key={form.key('maintenanceEnabled')}
-              {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
-            />
-          </Group>
+          <Switch
+            label='Deployment Enabled'
+            key={form.key('deploymentEnabled')}
+            {...form.getInputProps('deploymentEnabled', { type: 'checkbox' })}
+          />
+          <Switch
+            label='Maintenance Enabled'
+            key={form.key('maintenanceEnabled')}
+            {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
+          />
+        </div>
 
-          <Group>
-            <AdminCan action={contextNode ? 'nodes.update' : 'nodes.create'} cantSave>
-              <Button type='submit' disabled={!isValid} loading={loading}>
-                Save
+        <Group mt='md'>
+          <AdminCan action={contextNode ? 'nodes.update' : 'nodes.create'} cantSave>
+            <Button type='submit' disabled={!isValid} loading={loading}>
+              Save
+            </Button>
+            {!contextNode && (
+              <Button onClick={() => doCreateOrUpdate(true)} disabled={!isValid} loading={loading}>
+                Save & Stay
               </Button>
-              {!contextNode && (
-                <Button onClick={() => doCreateOrUpdate(true)} disabled={!isValid} loading={loading}>
-                  Save & Stay
-                </Button>
-              )}
-            </AdminCan>
-            {contextNode && (
-              <>
-                <AdminCan action='nodes.reset-token'>
-                  <Button color='red' variant='outline' onClick={doResetToken} loading={loading}>
-                    Reset Token
-                  </Button>
-                </AdminCan>
-                <AdminCan action='nodes.delete' cantDelete>
-                  <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                    Delete
-                  </Button>
-                </AdminCan>
-              </>
             )}
-          </Group>
-        </Stack>
+          </AdminCan>
+          {contextNode && (
+            <>
+              <AdminCan action='nodes.reset-token'>
+                <Button
+                  color='red'
+                  variant='outline'
+                  onClick={doResetToken}
+                  loading={loading}
+                  disabled={isNodeAIO(contextNode)}
+                >
+                  Reset Token
+                </Button>
+              </AdminCan>
+              <AdminCan action='nodes.delete' cantDelete>
+                <Button
+                  color='red'
+                  onClick={() => setOpenModal('delete')}
+                  loading={loading}
+                  disabled={isNodeAIO(contextNode)}
+                >
+                  Delete
+                </Button>
+              </AdminCan>
+            </>
+          )}
+        </Group>
       </form>
     </AdminContentContainer>
   );

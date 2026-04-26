@@ -11,7 +11,8 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, server::Server, user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch, server::Server,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -67,7 +68,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             servers: servers
                 .try_async_map(|server| {
-                    server.into_admin_api_object(&state.database, &storage_url_retriever)
+                    server.into_admin_api_object(&state, &storage_url_retriever)
                 })
                 .await?,
         })
@@ -82,7 +83,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel, admin_activity::GetAdminActivityLogger,
+            CreatableModel, IntoAdminApiObject, admin_activity::GetAdminActivityLogger,
             nest_egg_variable::NestEggVariable, server::Server, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -305,7 +306,7 @@ mod post {
 
         ApiResponse::new_serialized(Response {
             server: server
-                .into_admin_api_object(&state.database, &state.storage.retrieve_urls().await?)
+                .into_admin_api_object(&state, &state.storage.retrieve_urls().await?)
                 .await?,
         })
         .ok()

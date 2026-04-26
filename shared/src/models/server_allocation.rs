@@ -6,8 +6,6 @@ use std::{
     collections::BTreeMap,
     sync::{Arc, LazyLock},
 };
-use utoipa::ToSchema;
-
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ServerAllocation {
     pub uuid: uuid::Uuid,
@@ -16,13 +14,26 @@ pub struct ServerAllocation {
     pub notes: Option<compact_str::CompactString>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for ServerAllocation {
     const NAME: &'static str = "server_allocation";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         let mut columns = BTreeMap::from([
@@ -40,7 +51,7 @@ impl BaseModel for ServerAllocation {
             ),
         ]);
 
-        columns.extend(super::node_allocation::NodeAllocation::columns(Some(
+        columns.extend(super::node_allocation::NodeAllocation::base_columns(Some(
             "allocation_",
         )));
 
@@ -56,6 +67,7 @@ impl BaseModel for ServerAllocation {
             allocation: super::node_allocation::NodeAllocation::map(Some("allocation_"), row)?,
             notes: row.try_get(compact_str::format_compact!("{prefix}notes").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -208,6 +220,29 @@ impl ServerAllocation {
         })
     }
 
+    pub async fn all_by_server_uuid(
+        database: &crate::database::Database,
+        server_uuid: uuid::Uuid,
+    ) -> Result<Vec<Self>, crate::database::DatabaseError> {
+        let rows = sqlx::query(&format!(
+            r#"
+            SELECT {}
+            FROM server_allocations
+            JOIN node_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
+            WHERE server_allocations.server_uuid = $1
+            ORDER BY server_allocations.created
+            "#,
+            Self::columns_sql(None)
+        ))
+        .bind(server_uuid)
+        .fetch_all(database.read())
+        .await?;
+
+        rows.into_iter()
+            .map(|row| Self::map(None, &row))
+            .try_collect_vec()
+    }
+
     pub async fn count_by_server_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
@@ -224,18 +259,35 @@ impl ServerAllocation {
         .await
         .unwrap_or(0)
     }
+}
 
-    #[inline]
-    pub fn into_api_object(self, primary: Option<uuid::Uuid>) -> ApiServerAllocation {
-        ApiServerAllocation {
-            uuid: self.uuid,
-            ip: compact_str::format_compact!("{}", self.allocation.ip.ip()),
-            ip_alias: self.allocation.ip_alias,
-            port: self.allocation.port,
-            notes: self.notes,
-            is_primary: primary.is_some_and(|p| p == self.uuid),
-            created: self.created.and_utc(),
-        }
+#[async_trait::async_trait]
+impl IntoApiObject for ServerAllocation {
+    type ApiObject = ApiServerAllocation;
+    type ExtraArgs<'a> = Option<uuid::Uuid>;
+
+    async fn into_api_object<'a>(
+        self,
+        state: &crate::State,
+        primary: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiServerAllocation::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiServerAllocation {
+                uuid: self.uuid,
+                ip: compact_str::format_compact!("{}", self.allocation.ip.ip()),
+                ip_alias: self.allocation.ip_alias,
+                port: self.allocation.port,
+                notes: self.notes,
+                is_primary: primary.is_some_and(|p| p == self.uuid),
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -276,6 +328,9 @@ impl DeletableModel for ServerAllocation {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(ServerAllocation, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "ServerAllocation")]
 pub struct ApiServerAllocation {

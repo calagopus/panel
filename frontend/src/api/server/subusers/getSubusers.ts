@@ -7,12 +7,8 @@ export default async (
   page: number,
   search?: string,
 ): Promise<Pagination<z.infer<typeof serverSubuserSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/client/servers/${uuid}/subusers`, {
-        params: { page, search },
-      })
-      .then(({ data }) => resolve(data.subusers))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/subusers`, {
+    params: { page, search },
   });
+  return data.subusers;
 };

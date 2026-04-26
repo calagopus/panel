@@ -11,12 +11,8 @@ export default async (
   servers: Pagination<z.infer<typeof adminServerSchema>>;
   transfers: Record<string, z.infer<typeof adminNodeTransferProgressSchema>>;
 }> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/admin/nodes/${nodeUuid}/servers/transfers`, {
-        params: { page, search },
-      })
-      .then(({ data }) => resolve(data))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/admin/nodes/${nodeUuid}/servers/transfers`, {
+    params: { page, search },
   });
+  return data;
 };

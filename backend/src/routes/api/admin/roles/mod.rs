@@ -8,7 +8,10 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{Pagination, PaginationParamsWithSearch, role::Role, user::GetPermissionManager},
+        models::{
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch, role::Role,
+            user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -59,16 +62,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            roles: Pagination {
-                total: roles.total,
-                per_page: roles.per_page,
-                page: roles.page,
-                data: roles
-                    .data
-                    .into_iter()
-                    .map(|mount| mount.into_admin_api_object())
-                    .collect(),
-            },
+            roles: roles
+                .try_async_map(|role| role.into_admin_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }
@@ -80,7 +76,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             role::{CreateRoleOptions, Role},
             user::GetPermissionManager,
@@ -132,7 +128,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            role: role.into_admin_api_object(),
+            role: role.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

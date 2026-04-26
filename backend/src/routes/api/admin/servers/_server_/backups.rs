@@ -109,7 +109,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             backups: backups
                 .try_async_map(|backup| {
-                    backup.into_admin_node_api_object(&state.database, &storage_url_retriever)
+                    backup.into_admin_node_api_object(&state, &storage_url_retriever)
                 })
                 .await?,
         })

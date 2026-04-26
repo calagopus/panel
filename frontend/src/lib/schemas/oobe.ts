@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { adminServerFeatureLimitsSchema, adminServerLimitsSchema } from '@/lib/schemas/admin/servers.ts';
 import { nullableString } from '../transformers.ts';
+import { hostnameSchema } from './generic.ts';
 
 export const oobeStepKey = z
   .enum(['register', 'configuration', 'repositories', 'location', 'node', 'nodeconfiguration', 'server', 'finished'])
@@ -38,7 +39,7 @@ export const oobeNodeSchema = z.object({
     .url({ protocol: /^https?$/ })
     .min(3)
     .max(255),
-  sftpHost: z.preprocess(nullableString, z.string().min(3).max(255).nullable()),
+  sftpHost: z.preprocess(nullableString, hostnameSchema.nullable()),
   sftpPort: z.number().min(1).max(65535),
   memory: z.number(),
   disk: z.number(),

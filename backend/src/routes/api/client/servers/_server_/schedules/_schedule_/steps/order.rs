@@ -65,14 +65,7 @@ mod put {
             )
             .await;
 
-        state
-            .database
-            .batch_action("sync_server", server.uuid, {
-                let state = state.clone();
-
-                async move { server.0.sync(&state.database).await }
-            })
-            .await;
+        server.0.batch_sync(&state.database).await;
 
         ApiResponse::new_serialized(Response {}).ok()
     }

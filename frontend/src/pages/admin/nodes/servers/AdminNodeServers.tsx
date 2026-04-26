@@ -9,6 +9,7 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
@@ -24,9 +25,6 @@ import ServersTransferModal from './modals/ServersTransferModal.tsx';
 export default function AdminNodeServers({ node }: { node: z.infer<typeof adminNodeSchema> }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const [nodeServers, setNodeServers] = useState<Pagination<z.infer<typeof adminServerSchema>>>(
-    getEmptyPaginationSet(),
-  );
   const [selectedServers, setSelectedServers] = useState(
     new ObjectSet<z.infer<typeof adminServerSchema>, 'uuid'>('uuid'),
   );
@@ -36,10 +34,12 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
   const [allActionLoading, setAllActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
   const [openModal, setOpenModal] = useState<'transfer' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.nodes.servers(node.uuid),
     fetcher: (page, search) => getNodeServers(node.uuid, page, search),
-    setStoreData: setNodeServers,
   });
+
+  const nodeServers = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const onSelectedStart = useCallback(
     (event: React.MouseEvent | MouseEvent) => {

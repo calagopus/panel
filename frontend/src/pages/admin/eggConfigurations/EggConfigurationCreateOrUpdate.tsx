@@ -18,7 +18,7 @@ import Code from '@/elements/Code.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Divider from '@/elements/Divider.tsx';
-import MultiSelect from '@/elements/input/MultiSelect.tsx';
+import MultiSelectGroup from '@/elements/input/MultiSelectGroup.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -292,46 +292,43 @@ export default function EggConfigurationCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'eggConfigurations']))}>
-        <Stack mt='xs'>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <NumberInput
-              withAsterisk
-              label='Order'
-              placeholder='Order'
-              key={form.key('order')}
-              {...form.getInputProps('order')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <NumberInput
+            withAsterisk
+            label='Order'
+            placeholder='Order'
+            key={form.key('order')}
+            {...form.getInputProps('order')}
+          />
 
-          <Group grow align='start'>
-            <MultiSelect
-              label='Eggs'
-              placeholder='Select Eggs'
-              data={eggs}
-              searchable
-              loading={!eggs.length}
-              {...form.getInputProps('eggs')}
-            />
-            <TextArea
-              label='Description'
-              placeholder='Description'
-              rows={3}
-              key={form.key('description')}
-              {...form.getInputProps('description')}
-            />
-          </Group>
+          <MultiSelectGroup
+            label='Eggs'
+            placeholder='Select Eggs'
+            data={eggs}
+            searchable
+            loading={!eggs.length}
+            {...form.getInputProps('eggs')}
+          />
+          <TextArea
+            label='Description'
+            placeholder='Description'
+            rows={3}
+            key={form.key('description')}
+            {...form.getInputProps('description')}
+          />
 
           <CollapsibleSection
             icon={<FontAwesomeIcon icon={faNetworkWired} />}
             title='Allocation Configuration'
             enabled={form.values.configAllocations !== null}
+            className='col-span-full'
             onToggle={(enabled) =>
               form.setFieldValue(
                 'configAllocations',
@@ -487,6 +484,7 @@ export default function EggConfigurationCreateOrUpdate({
           <CollapsibleSection
             icon={<FontAwesomeIcon icon={faList} />}
             title='Route Configuration'
+            className='col-span-full'
             enabled={form.values.configRoutes !== null}
             onToggle={(enabled) => form.setFieldValue('configRoutes', enabled ? { order: defaultRoutes.order } : null)}
           >
@@ -522,7 +520,7 @@ export default function EggConfigurationCreateOrUpdate({
               </AdminCan>
             )}
           </Group>
-        </Stack>
+        </div>
       </form>
     </AdminContentContainer>
   );

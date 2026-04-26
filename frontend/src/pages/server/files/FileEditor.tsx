@@ -16,6 +16,7 @@ import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/monaco.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
+import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { FileManagerProvider, useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -52,6 +53,8 @@ function FileEditorComponent() {
     setBrowsingDirectory,
   } = useFileManager();
 
+  const { getParent } = useCurrentWindow();
+
   const [loading, setLoading] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -63,6 +66,7 @@ function FileEditorComponent() {
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const contentRef = useRef(content);
   const blocker = useBlocker(dirty);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setBrowsingDirectory(searchParams.get('directory') || '/');
@@ -106,6 +110,43 @@ function FileEditorComponent() {
   useEffect(() => {
     contentRef.current = content;
   }, [content]);
+
+  useEffect(() => {
+    const el = editorContainerRef.current;
+    if (!el || loading) return;
+
+    const updateHeight = () => {
+      const virtualWindowEl = getParent();
+      const elRect = el.getBoundingClientRect();
+
+      let bottomEdge;
+      if (virtualWindowEl) {
+        bottomEdge = virtualWindowEl.getBoundingClientRect().bottom;
+      } else {
+        bottomEdge = window.innerHeight;
+      }
+
+      const newHeight = Math.max(0, bottomEdge - elRect.top);
+      el.style.height = `${newHeight}px`;
+
+      if (editorRef.current?.layout) {
+        editorRef.current.layout();
+      }
+    };
+
+    const observer = new ResizeObserver(() => updateHeight());
+
+    const virtualWindowEl = getParent();
+    if (virtualWindowEl) {
+      observer.observe(virtualWindowEl);
+    } else {
+      observer.observe(document.body);
+    }
+
+    updateHeight();
+
+    return () => observer.disconnect();
+  }, [loading, getParent, params.action, fileName]);
 
   const saveFile = (name?: string) => {
     setDirty(false);
@@ -221,12 +262,7 @@ function FileEditorComponent() {
             <FileBreadcrumbs inFileEditor path={join(decodeURIComponent(browsingDirectory), fileName)} />
           </div>
           <div className='relative'>
-            <div
-              ref={(el) => {
-                if (el) el.style.height = `calc(100vh - ${el.getBoundingClientRect().top}px)`;
-              }}
-              className='flex max-w-full w-full z-1 absolute'
-            >
+            <div ref={editorContainerRef} className='flex max-w-full w-full z-1 absolute'>
               {matchedFileEditorAction?.contentType === 'string' ? (
                 <matchedFileEditorAction.content
                   content={content}
@@ -272,6 +308,7 @@ function FileEditorComponent() {
                     smoothScrolling: true,
                     // @ts-expect-error this is valid
                     touchScrollEnabled: true,
+                    fixedOverflowWidgets: true,
                   }}
                   onChange={(value) => setContent(value || '')}
                   onMount={(editor, monaco) => {

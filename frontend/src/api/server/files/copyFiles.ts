@@ -10,10 +10,6 @@ interface Props {
 }
 
 export default async ({ uuid, root, files }: Props): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post(`/api/client/servers/${uuid}/files/copy-many`, { root, files })
-      .then(({ data }) => resolve(data.identifier))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.post(`/api/client/servers/${uuid}/files/copy-many`, { root, files });
+  return data.identifier;
 };

@@ -7,10 +7,8 @@ export default async (
   backupUuid: string,
   archiveFormat: z.infer<typeof streamingArchiveFormat>,
 ): Promise<{ url: string }> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/client/servers/${uuid}/backups/${backupUuid}/download`, { params: { archive_format: archiveFormat } })
-      .then(({ data }) => resolve(data))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/backups/${backupUuid}/download`, {
+    params: { archive_format: archiveFormat },
   });
+  return data;
 };

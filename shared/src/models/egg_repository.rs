@@ -25,13 +25,26 @@ pub struct EggRepository {
 
     pub last_synced: Option<chrono::NaiveDateTime>,
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for EggRepository {
     const NAME: &'static str = "egg_repository";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -76,6 +89,7 @@ impl BaseModel for EggRepository {
             last_synced: row
                 .try_get(compact_str::format_compact!("{prefix}last_synced").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -222,17 +236,34 @@ impl EggRepository {
 
         Ok(exported_eggs.len())
     }
+}
 
-    #[inline]
-    pub fn into_admin_api_object(self) -> AdminApiEggRepository {
-        AdminApiEggRepository {
-            uuid: self.uuid,
-            name: self.name,
-            description: self.description,
-            git_repository: self.git_repository,
-            last_synced: self.last_synced.map(|dt| dt.and_utc()),
-            created: self.created.and_utc(),
-        }
+#[async_trait::async_trait]
+impl IntoAdminApiObject for EggRepository {
+    type AdminApiObject = AdminApiEggRepository;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiEggRepository::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiEggRepository {
+                uuid: self.uuid,
+                name: self.name,
+                description: self.description,
+                git_repository: self.git_repository,
+                last_synced: self.last_synced.map(|dt| dt.and_utc()),
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -426,6 +457,9 @@ impl DeletableModel for EggRepository {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(EggRepository, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "EggRepository")]
 pub struct AdminApiEggRepository {

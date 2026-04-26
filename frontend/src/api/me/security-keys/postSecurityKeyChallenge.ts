@@ -72,12 +72,7 @@ export function prepareCredentialForTransport(credential: PublicKeyCredential): 
 }
 
 export default async (securityKeyUuid: string, challenge: PublicKeyCredential): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post(`/api/client/account/security-keys/${securityKeyUuid}/challenge`, {
-        public_key_credential: prepareCredentialForTransport(challenge),
-      })
-      .then(() => resolve())
-      .catch(reject);
+  await axiosInstance.post(`/api/client/account/security-keys/${securityKeyUuid}/challenge`, {
+    public_key_credential: prepareCredentialForTransport(challenge),
   });
 };

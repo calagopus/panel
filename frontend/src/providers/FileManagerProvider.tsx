@@ -9,7 +9,7 @@ import loadDirectory from '@/api/server/files/loadDirectory.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
-import { useFileUpload } from '@/plugins/useFileUpload.ts';
+import { UploadResult, useFileUpload } from '@/plugins/useFileUpload.ts';
 import { ActingFileMode, FileManagerContext, ModalType, SearchInfo } from '@/providers/contexts/fileManagerContext.ts';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -82,12 +82,28 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
       .catch((e) => console.error(e));
   };
 
-  const doUpload = async (form: FormData, config: AxiosRequestConfig) => {
+  const doUpload = async (form: FormData, config: AxiosRequestConfig): Promise<UploadResult> => {
     const { url } = await getFileUploadUrl(server.uuid, browsingDirectory);
-    return axiosInstance.post(url, form, config);
+    const { data } = await axiosInstance.post(url, form, config);
+
+    return { url, continuationToken: data.continuationToken ?? null };
   };
 
-  const fileUploader = useFileUpload(doUpload, invalidateFilemanager);
+  const doSplitUpload = async (
+    form: FormData,
+    config: AxiosRequestConfig,
+    continuationToken: string,
+    prevUrl: string,
+  ): Promise<UploadResult> => {
+    const { data } = await axiosInstance.post(prevUrl, form, {
+      ...config,
+      params: { ...config.params, continuation_token: continuationToken },
+    });
+
+    return { url: prevUrl, continuationToken: data.continuationToken ?? null };
+  };
+
+  const fileUploader = useFileUpload(doUpload, invalidateFilemanager, doSplitUpload);
 
   const doActFiles = (mode: ActingFileMode | null, files: z.infer<typeof serverDirectoryEntrySchema>[]) => {
     setActingMode(mode);

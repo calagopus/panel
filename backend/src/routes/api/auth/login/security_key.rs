@@ -83,7 +83,7 @@ mod post {
         },
         response::{ApiResponse, ApiResponseResult},
     };
-    use tower_cookies::{Cookie, Cookies};
+    use tower_cookies::Cookies;
     use utoipa::ToSchema;
     use webauthn_rs::prelude::{PasskeyAuthentication, PublicKeyCredential};
 
@@ -200,22 +200,7 @@ mod post {
         )
         .await?;
 
-        let settings = state.settings.get().await?;
-
-        cookies.add(
-            Cookie::build(("session", key))
-                .http_only(true)
-                .same_site(tower_cookies::cookie::SameSite::Strict)
-                .secure(settings.app.url.starts_with("https://"))
-                .path("/")
-                .expires(
-                    tower_cookies::cookie::time::OffsetDateTime::now_utc()
-                        + tower_cookies::cookie::time::Duration::days(30),
-                )
-                .build(),
-        );
-
-        drop(settings);
+        cookies.add(UserSession::get_cookie(&state, key).await?);
 
         if let Err(err) = UserActivity::create(
             &state,
@@ -247,7 +232,9 @@ mod post {
         }
 
         ApiResponse::new_serialized(Response {
-            user: user.into_api_full_object(&state.storage.retrieve_urls().await?),
+            user: user
+                .into_api_full_object(&state, &state.storage.retrieve_urls().await?)
+                .await?,
         })
         .ok()
     }

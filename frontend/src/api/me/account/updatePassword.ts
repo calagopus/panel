@@ -7,10 +7,5 @@ interface Data {
 }
 
 export default async (data: Data): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .put('/api/client/account/password', transformKeysToSnakeCase(data))
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.put('/api/client/account/password', transformKeysToSnakeCase(data));
 };

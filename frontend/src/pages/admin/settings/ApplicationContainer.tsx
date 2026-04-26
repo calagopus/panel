@@ -15,6 +15,7 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { adminSettingsApplicationSchema } from '@/lib/schemas/admin/settings.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -51,6 +52,7 @@ export default function ApplicationContainer() {
   });
 
   const assets = useSearchableResource<z.infer<typeof storageAssetSchema>>({
+    queryKey: queryKeys.admin.assets.all(),
     fetcher: () => getAssets(1),
     canRequest: canReadAssets,
   });

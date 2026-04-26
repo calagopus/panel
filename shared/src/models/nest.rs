@@ -20,13 +20,26 @@ pub struct Nest {
     pub author: compact_str::CompactString,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for Nest {
     const NAME: &'static str = "nest";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -58,6 +71,7 @@ impl BaseModel for Nest {
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             author: row.try_get(compact_str::format_compact!("{prefix}author").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -118,16 +132,33 @@ impl Nest {
 
         row.try_map(|row| Self::map(None, &row))
     }
+}
 
-    #[inline]
-    pub fn into_admin_api_object(self) -> AdminApiNest {
-        AdminApiNest {
-            uuid: self.uuid,
-            name: self.name,
-            description: self.description,
-            author: self.author,
-            created: self.created.and_utc(),
-        }
+#[async_trait::async_trait]
+impl IntoAdminApiObject for Nest {
+    type AdminApiObject = AdminApiNest;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiNest::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiNest {
+                uuid: self.uuid,
+                name: self.name,
+                description: self.description,
+                author: self.author,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -321,6 +352,9 @@ impl DeletableModel for Nest {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(Nest, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "Nest")]
 pub struct AdminApiNest {

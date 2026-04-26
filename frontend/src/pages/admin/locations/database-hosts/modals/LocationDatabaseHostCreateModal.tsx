@@ -8,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -26,6 +27,7 @@ export default function LocationDatabaseHostCreateModal({
   const [databaseHost, setDatabaseHost] = useState<z.infer<typeof adminDatabaseHostSchema> | null>(null);
 
   const databaseHosts = useSearchableResource<z.infer<typeof adminDatabaseHostSchema>>({
+    queryKey: queryKeys.admin.databaseHosts.all(),
     fetcher: (search) => getDatabaseHosts(1, search),
   });
 

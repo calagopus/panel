@@ -1,6 +1,6 @@
 import { Group, Title, TitleOrder } from '@mantine/core';
-import { Dispatch, ReactNode, SetStateAction } from 'react';
-import { ContainerRegistry } from 'shared';
+import { Dispatch, ReactNode, SetStateAction, useMemo } from 'react';
+import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -9,6 +9,7 @@ import ContentContainer from './ContentContainer.tsx';
 
 export interface Props {
   title: string;
+  subtitle?: string;
   hideTitleComponent?: boolean;
   titleOrder?: TitleOrder;
   search?: string;
@@ -19,9 +20,22 @@ export interface Props {
   children: ReactNode;
 }
 
-export default function AdminContentContainer(props: Props) {
+function AdminContentContainer(props: Props) {
+  props = useMemo(() => {
+    let modifiedProps = props;
+
+    if (props.registry) {
+      for (const interceptor of props.registry.propsInterceptors) {
+        modifiedProps = interceptor(modifiedProps);
+      }
+    }
+
+    return modifiedProps;
+  }, [props]);
+
   const {
     title,
+    subtitle,
     hideTitleComponent = false,
     titleOrder = 1,
     search,
@@ -45,9 +59,12 @@ export default function AdminContentContainer(props: Props) {
 
         {hideTitleComponent ? null : setSearch ? (
           <Group justify='space-between' mb='md'>
-            <Title order={titleOrder} c='white'>
-              {title}
-            </Title>
+            <div>
+              <Title order={titleOrder} c='white'>
+                {title}
+              </Title>
+              {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+            </div>
             <Group>
               <TextInput
                 placeholder={t('common.input.search', {})}
@@ -60,15 +77,21 @@ export default function AdminContentContainer(props: Props) {
           </Group>
         ) : contentRight ? (
           <Group justify='space-between' mb='md'>
-            <Title order={titleOrder} c='white'>
-              {title}
-            </Title>
+            <div>
+              <Title order={titleOrder} c='white'>
+                {title}
+              </Title>
+              {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+            </div>
             <Group>{contentRight}</Group>
           </Group>
         ) : (
-          <Title order={titleOrder} c='white'>
-            {title}
-          </Title>
+          <div className='mb-4'>
+            <Title order={titleOrder} c='white'>
+              {title}
+            </Title>
+            {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+          </div>
         )}
         {registry?.prependedContentComponents.map((Component, index) => (
           <Component key={`prepended-content-${index}`} {...props} />
@@ -83,3 +106,5 @@ export default function AdminContentContainer(props: Props) {
     </ContentContainer>
   );
 }
+
+export default makeComponentHookable(AdminContentContainer);

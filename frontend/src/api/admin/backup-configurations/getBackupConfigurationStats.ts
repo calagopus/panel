@@ -12,10 +12,6 @@ export interface BackupStats {
 export default async (
   backupConfigUuid: string,
 ): Promise<Record<'allTime' | 'today' | 'week' | 'month', BackupStats>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/admin/backup-configurations/${backupConfigUuid}/stats`)
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.get(`/api/admin/backup-configurations/${backupConfigUuid}/stats`);
+  return data;
 };

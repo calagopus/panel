@@ -9,9 +9,11 @@ mod get {
     use shared::{
         GetState,
         models::{
+            IntoApiObject,
             user::{GetPermissionManager, GetUser},
             user_server_group::UserServerGroup,
         },
+        prelude::AsyncIteratorExt,
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -36,8 +38,9 @@ mod get {
         ApiResponse::new_serialized(Response {
             server_groups: server_groups
                 .into_iter()
-                .map(|server_group| server_group.into_api_object())
-                .collect(),
+                .map(|server_group| server_group.into_api_object(&state, ()))
+                .try_collect_async_vec()
+                .await?,
         })
         .ok()
     }
@@ -50,7 +53,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoApiObject,
             user::{GetPermissionManager, GetUser},
             user_activity::GetUserActivityLogger,
             user_server_group::UserServerGroup,
@@ -113,7 +116,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            server_group: server_group.into_api_object(),
+            server_group: server_group.into_api_object(&state, ()).await?,
         })
         .ok()
     }

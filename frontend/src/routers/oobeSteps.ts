@@ -28,6 +28,7 @@ export interface OobeStep {
   path: string;
   stepKey: z.infer<typeof oobeStepKey> | null;
   label?: string | null;
+  description?: string | null;
   icon?: IconDefinition | null;
   component: ComponentType<OobeComponentProps>;
   preAuth?: boolean;
@@ -39,6 +40,7 @@ export const steps: OobeStep[] = [
     path: '',
     stepKey: 'register',
     label: 'Welcome',
+    description: 'Welcome to Calagopus',
     icon: faRocket,
     component: OobeWelcome,
     preAuth: true,
@@ -47,6 +49,7 @@ export const steps: OobeStep[] = [
     path: '/register',
     stepKey: null,
     label: 'Register',
+    description: 'Create your account',
     icon: faUsers,
     component: OobeRegister,
     preAuth: true,
@@ -63,6 +66,7 @@ export const steps: OobeStep[] = [
     path: '/configuration',
     stepKey: 'configuration',
     label: 'Configuration',
+    description: 'General settings',
     icon: faCogs,
     component: OobeConfiguration,
   },
@@ -70,6 +74,7 @@ export const steps: OobeStep[] = [
     path: '/repositories',
     stepKey: 'repositories',
     label: 'Egg Repositories',
+    description: 'Configure egg repositories',
     icon: faDownload,
     component: OobeRepositories,
     skipTo: 'location',
@@ -78,6 +83,7 @@ export const steps: OobeStep[] = [
     path: '/location',
     stepKey: 'location',
     label: 'Location',
+    description: 'Create a place for your nodes',
     icon: faEarthAmerica,
     component: OobeLocation,
     skipTo: 'finished',
@@ -86,6 +92,7 @@ export const steps: OobeStep[] = [
     path: '/node',
     stepKey: 'node',
     label: 'Node',
+    description: 'Setting up your node',
     icon: faServer,
     component: OobeNode,
     skipTo: 'finished',
@@ -94,6 +101,7 @@ export const steps: OobeStep[] = [
     path: '/nodeconfiguration',
     stepKey: 'nodeconfiguration',
     label: 'Node Configuration',
+    description: 'Verifying your node configuration',
     icon: faWrench,
     component: OobeNodeConfigure,
     skipTo: 'finished',
@@ -102,6 +110,7 @@ export const steps: OobeStep[] = [
     path: '/server',
     stepKey: 'server',
     label: 'Server',
+    description: 'Launching your first server',
     icon: faServer,
     component: OobeServer,
     skipTo: 'finished',
@@ -110,6 +119,7 @@ export const steps: OobeStep[] = [
     path: '/finish',
     stepKey: 'finished',
     label: 'Finish',
+    description: 'Ready! Set! Enjoy!',
     icon: faGraduationCap,
     component: OobeFinished,
   },

@@ -8,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -29,6 +30,7 @@ export default function UserOAuthLinkAddModal({
   );
 
   const oauthProviders = useSearchableResource<z.infer<typeof adminOAuthProviderSchema>>({
+    queryKey: queryKeys.admin.oAuthProviders.all(),
     fetcher: (search) => getOAuthProviders(1, search),
   });
 

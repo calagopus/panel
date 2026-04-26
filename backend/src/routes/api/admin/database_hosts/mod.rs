@@ -9,8 +9,8 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, database_host::DatabaseHost,
-            user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch,
+            database_host::DatabaseHost, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -62,16 +62,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            database_hosts: Pagination {
-                total: database_hosts.total,
-                per_page: database_hosts.per_page,
-                page: database_hosts.page,
-                data: database_hosts
-                    .data
-                    .into_iter()
-                    .map(|database_host| database_host.into_admin_api_object())
-                    .collect(),
-            },
+            database_hosts: database_hosts
+                .try_async_map(|database_host| database_host.into_admin_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }
@@ -83,7 +76,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             database_host::{CreateDatabaseHostOptions, DatabaseHost},
             user::GetPermissionManager,
@@ -142,7 +135,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            database_host: database_host.into_admin_api_object(),
+            database_host: database_host.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

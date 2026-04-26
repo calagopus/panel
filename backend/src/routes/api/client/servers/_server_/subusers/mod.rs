@@ -9,7 +9,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, server::GetServer,
+            IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
             server_subuser::ServerSubuser, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -72,16 +72,9 @@ mod get {
         let storage_url_retriever = state.storage.retrieve_urls().await?;
 
         ApiResponse::new_serialized(Response {
-            subusers: Pagination {
-                total: subusers.total,
-                per_page: subusers.per_page,
-                page: subusers.page,
-                data: subusers
-                    .data
-                    .into_iter()
-                    .map(|subuser| subuser.into_api_object(&storage_url_retriever))
-                    .collect(),
-            },
+            subusers: subusers
+                .try_async_map(|subuser| subuser.into_api_object(&state, &storage_url_retriever))
+                .await?,
         })
         .ok()
     }
@@ -94,7 +87,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoApiObject,
             server::{GetServer, GetServerActivityLogger},
             server_subuser::ServerSubuser,
             user::{GetPermissionManager, GetUser},
@@ -202,7 +195,9 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            subuser: subuser.into_api_object(&state.storage.retrieve_urls().await?),
+            subuser: subuser
+                .into_api_object(&state, &state.storage.retrieve_urls().await?)
+                .await?,
         })
         .ok()
     }

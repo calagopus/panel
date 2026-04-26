@@ -2,7 +2,7 @@ use crate::prelude::*;
 use rand::distr::SampleString;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, sync::LazyLock};
 
 #[derive(Serialize, Deserialize)]
 pub struct UserPasswordReset {
@@ -12,13 +12,26 @@ pub struct UserPasswordReset {
     pub token: String,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for UserPasswordReset {
     const NAME: &'static str = "user_password_reset";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         let mut columns = BTreeMap::from([
@@ -36,7 +49,7 @@ impl BaseModel for UserPasswordReset {
             ),
         ]);
 
-        columns.extend(super::user::User::columns(Some("user_")));
+        columns.extend(super::user::User::base_columns(Some("user_")));
 
         columns
     }
@@ -50,6 +63,7 @@ impl BaseModel for UserPasswordReset {
             user: super::user::User::map(Some("user_"), row)?,
             token: row.try_get(compact_str::format_compact!("{prefix}token").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }

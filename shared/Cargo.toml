@@ -22,6 +22,7 @@ tracing-subscriber = { workspace = true }
 tracing-appender = { workspace = true }
 clap = { workspace = true }
 include_dir = { workspace = true }
+tower-cookies = { workspace = true }
 cron = { workspace = true }
 lettre = { version = "0.11.17", default-features = false, features = ["tokio1-native-tls", "builder", "pool", "smtp-transport", "sendmail-transport", "file-transport"] }
 zip = { version = "8.0.0", default-features = false, features = ["deflate"] }
@@ -32,6 +33,7 @@ serde_json = { workspace = true }
 serde_norway = { workspace = true }
 rmp-serde = { workspace = true }
 serde-xml-rs = { workspace = true }
+erased-serde = "0.4.10"
 utoipa-axum = { workspace = true }
 base32 = { workspace = true }
 base64 = { workspace = true }
@@ -55,7 +57,7 @@ sentry = { workspace = true }
 sentry-anyhow = { workspace = true }
 russh = { workspace = true }
 rand = { workspace = true }
-constant_time_eq = "0.4.2"
+constant_time_eq = "0.5.0"
 urlencoding = { workspace = true }
 ignore = { version = "0.4.23", features = ["simd-accel"] }
 futures-util = { workspace = true }
@@ -75,3 +77,4 @@ sntpc-net-tokio = "1.0.1"
 sntpc = { version = "0.9.0", features = ["std"] }
 xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 hex = { workspace = true }
+tower = "0.5.3"

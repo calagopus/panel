@@ -8,7 +8,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel, admin_activity::GetAdminActivityLogger,
+            CreatableModel, IntoAdminApiObject, admin_activity::GetAdminActivityLogger,
             nest_egg_variable::NestEggVariable, node::Node, node_allocation::NodeAllocation,
             server::Server, user::GetPermissionManager,
         },
@@ -217,6 +217,7 @@ mod post {
                 }
 
                 node_uuid = Some(node.uuid);
+                break;
             }
         } else {
             node_uuid = nodes.into_iter().next().map(|n| n.uuid);
@@ -327,7 +328,7 @@ mod post {
 
         ApiResponse::new_serialized(Response {
             server: server
-                .into_admin_api_object(&state.database, &state.storage.retrieve_urls().await?)
+                .into_admin_api_object(&state, &state.storage.retrieve_urls().await?)
                 .await?,
         })
         .ok()

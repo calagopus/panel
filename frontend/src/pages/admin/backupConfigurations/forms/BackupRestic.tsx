@@ -13,7 +13,7 @@ export default function BackupRestic({
   form: UseFormReturnType<z.infer<typeof adminBackupConfigurationResticSchema>>;
 }) {
   return (
-    <Stack gap='xs'>
+    <Stack gap='xs' mt='md'>
       <Stack gap={0}>
         <Title order={2}>Restic Settings</Title>
         <Divider />

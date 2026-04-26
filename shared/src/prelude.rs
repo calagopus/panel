@@ -1,11 +1,11 @@
-use std::borrow::Cow;
-
 pub use crate::models::{
     BaseModel, ByUuid, CreatableModel, CreateListenerList, DeletableModel, DeleteListenerList,
-    EventEmittingModel, Fetchable, ListenerPriority, ModelHandlerList, UpdatableModel,
-    UpdateListenerList,
+    EventEmittingModel, Fetchable, IntoAdminApiObject, IntoApiObject, ListenerPriority,
+    ModelHandlerList, OrderedJson, UpdatableModel, UpdateListenerList,
 };
+use futures_util::{StreamExt, TryStreamExt};
 pub use schema_extension_core::finish_extendible;
+use std::borrow::Cow;
 
 pub trait IteratorExt<R, E>: Iterator<Item = Result<R, E>> {
     fn try_collect_vec(self) -> Result<Vec<R>, E>
@@ -64,6 +64,42 @@ pub trait IteratorExt<R, E>: Iterator<Item = Result<R, E>> {
 }
 
 impl<R, E, T: Iterator<Item = Result<R, E>>> IteratorExt<R, E> for T {}
+
+#[async_trait::async_trait]
+pub trait AsyncIteratorExt<R: Send, E: Send, F: Future<Output = Result<R, E>> + Send>:
+    Iterator<Item = F> + Sized + Send
+{
+    async fn try_collect_async_vec(self) -> Result<Vec<R>, E>
+    where
+        Self: Sized,
+    {
+        let mut vec = Vec::new();
+
+        let (hint_min, hint_max) = self.size_hint();
+        if let Some(hint_max) = hint_max
+            && hint_min == hint_max
+        {
+            vec.reserve_exact(hint_max);
+        }
+
+        let mut result_stream = futures_util::stream::iter(self).buffered(25);
+
+        while let Some(result) = result_stream.try_next().await? {
+            vec.push(result);
+        }
+
+        Ok(vec)
+    }
+}
+
+impl<
+    R: Send,
+    E: Send,
+    F: Future<Output = Result<R, E>> + Send,
+    T: Iterator<Item = F> + Sized + Send,
+> AsyncIteratorExt<R, E, F> for T
+{
+}
 
 pub trait OptionExt<T> {
     fn try_map<R, E, F: FnMut(T) -> Result<R, E>>(self, f: F) -> Result<Option<R>, E>;

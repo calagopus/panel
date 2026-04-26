@@ -23,7 +23,7 @@ interface UseResourceFormOptions<T, U extends HasUuid, CArgs = unknown, UArgs = 
 interface UseResourceFormReturn {
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  doCreateOrUpdate: (stay: boolean, bustCacheKey?: string[]) => void;
+  doCreateOrUpdate: (stay: boolean, bustCacheKey?: readonly unknown[]) => void;
   doDelete: () => void;
 }
 
@@ -37,7 +37,7 @@ export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = u
 
   const [loading, setLoading] = useState(false);
 
-  const doCreateOrUpdate = (stay: boolean, bustCacheKey?: string[], args?: CArgs | UArgs) => {
+  const doCreateOrUpdate = (stay: boolean, bustCacheKey?: readonly unknown[], args?: CArgs | UArgs) => {
     setLoading(true);
 
     const doBustCache = () => {

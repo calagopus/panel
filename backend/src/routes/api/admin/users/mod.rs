@@ -10,7 +10,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch,
             user::{GetPermissionManager, User},
         },
         response::{ApiResponse, ApiResponseResult},
@@ -65,16 +65,9 @@ mod get {
         let storage_url_retriever = state.storage.retrieve_urls().await?;
 
         ApiResponse::new_serialized(Response {
-            users: Pagination {
-                total: users.total,
-                per_page: users.per_page,
-                page: users.page,
-                data: users
-                    .data
-                    .into_iter()
-                    .map(|user| user.into_admin_api_object(&storage_url_retriever))
-                    .collect(),
-            },
+            users: users
+                .try_async_map(|user| user.into_admin_api_object(&state, &storage_url_retriever))
+                .await?,
         })
         .ok()
     }
@@ -139,7 +132,9 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            user: user.into_api_full_object(&state.storage.retrieve_urls().await?),
+            user: user
+                .into_api_full_object(&state, &state.storage.retrieve_urls().await?)
+                .await?,
         })
         .ok()
     }

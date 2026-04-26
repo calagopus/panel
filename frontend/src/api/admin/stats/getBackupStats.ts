@@ -10,10 +10,6 @@ export interface BackupStats {
 }
 
 export default async (): Promise<Record<'allTime' | 'today' | 'week' | 'month', BackupStats>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get('/api/admin/stats/backups')
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.get('/api/admin/stats/backups');
+  return data;
 };

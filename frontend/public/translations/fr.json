@@ -533,7 +533,7 @@
         },
         "shortcuts": {
           "title": "Raccourcis clavier",
-          "description": "Utilisez ces raccourcis clavier pour naviguer et interagir avec le panel plus efficacement.",
+          "subtitle": "Utilisez ces raccourcis clavier pour naviguer et interagir avec le panel plus efficacement.",
           "detectedMac": "macOS détecté",
           "detectedWindows": "Windows/Linux détecté",
           "fileManager": {

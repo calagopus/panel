@@ -8,7 +8,10 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{ByUuid, Pagination, PaginationParams, node::Node, user::GetPermissionManager},
+        models::{
+            ByUuid, IntoAdminApiObject, Pagination, PaginationParams, node::Node,
+            user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
         updates::ParsedVersionInformation,
     };
@@ -80,7 +83,12 @@ mod get {
                     for node in &nodes.data {
                         let client = node.api_client(&state.database).await?;
                         versions_futures.push(async move {
-                            let overview = client.get_system_overview().await?;
+                            let overview = tokio::time::timeout(
+                                std::time::Duration::from_secs(2),
+                                client.get_system_overview(),
+                            )
+                            .await??;
+
                             Ok::<_, anyhow::Error>((
                                 node.uuid,
                                 ParsedVersionInformation::from_str(&overview.version)?,
@@ -118,7 +126,7 @@ mod get {
                     node_page += 1;
                 }
 
-                versions.sort_unstable_by(|a, b| a.1.cmp(&b.1));
+                versions.sort_unstable_by_key(|a| a.1);
 
                 Ok::<_, anyhow::Error>((versions, failed_nodes))
             })
@@ -126,7 +134,7 @@ mod get {
 
         let mut outdated_node_uuids = Vec::new();
         for (node_uuid, _, version) in node_versions {
-            if version.version < update_information.latest_wings {
+            if version.version < update_information.latest_wings_version {
                 outdated_node_uuids.push((node_uuid, version));
             }
         }
@@ -147,7 +155,7 @@ mod get {
         {
             node_futures.push(async {
                 let node = Node::by_uuid_cached(&state.database, *node_uuid).await?;
-                node.into_admin_api_object(&state.database).await
+                node.into_admin_api_object(&state, ()).await
             });
         }
 

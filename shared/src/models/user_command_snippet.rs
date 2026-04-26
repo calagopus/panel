@@ -20,13 +20,26 @@ pub struct UserCommandSnippet {
     pub command: compact_str::CompactString,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for UserCommandSnippet {
     const NAME: &'static str = "user_command_snippet";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -63,6 +76,7 @@ impl BaseModel for UserCommandSnippet {
             eggs: row.try_get(compact_str::format_compact!("{prefix}eggs").as_str())?,
             command: row.try_get(compact_str::format_compact!("{prefix}command").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -168,16 +182,33 @@ impl UserCommandSnippet {
         .await
         .unwrap_or(0)
     }
+}
 
-    #[inline]
-    pub fn into_api_object(self) -> ApiUserCommandSnippet {
-        ApiUserCommandSnippet {
-            uuid: self.uuid,
-            name: self.name,
-            eggs: self.eggs,
-            command: self.command,
-            created: self.created.and_utc(),
-        }
+#[async_trait::async_trait]
+impl IntoApiObject for UserCommandSnippet {
+    type ApiObject = ApiUserCommandSnippet;
+    type ExtraArgs<'a> = ();
+
+    async fn into_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiUserCommandSnippet::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiUserCommandSnippet {
+                uuid: self.uuid,
+                name: self.name,
+                eggs: self.eggs,
+                command: self.command,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -347,6 +378,9 @@ impl DeletableModel for UserCommandSnippet {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(UserCommandSnippet, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "UserCommandSnippet")]
 pub struct ApiUserCommandSnippet {

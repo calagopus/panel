@@ -7,7 +7,10 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{Pagination, PaginationParamsWithSearch, node::Node, user::GetPermissionManager},
+        models::{
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch, node::Node,
+            user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -67,7 +70,7 @@ mod get {
 
         ApiResponse::new_serialized(Response {
             nodes: nodes
-                .try_async_map(|node| node.into_admin_api_object(&state.database))
+                .try_async_map(|node| node.into_admin_api_object(&state, ()))
                 .await?,
         })
         .ok()

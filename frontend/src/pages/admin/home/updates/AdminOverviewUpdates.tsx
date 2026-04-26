@@ -11,39 +11,38 @@ import { useMemo, useState } from 'react';
 import { z } from 'zod';
 import getNodeUpdates from '@/api/admin/system/updates/getNodeUpdates.ts';
 import recheckUpdates from '@/api/admin/system/updates/recheckUpdates.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
+import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
-import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminExtensionUpdateCheckResultErrorSchema,
   adminExtensionUpdateCheckResultUpdateAvailableSchema,
-} from '@/lib/schemas/admin/updates.ts';
+} from '@/lib/schemas/admin/system.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { parseVersion } from '@/lib/version.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
-import NodeRow from '../nodes/NodeRow.tsx';
+import NodeRow from '../../nodes/NodeRow.tsx';
 
-export default function AdminUpdates() {
+export default function AdminOverviewUpdates() {
   const { addToast } = useToast();
   const { updateInformation, setUpdateInformation } = useAdminStore();
-  const { settings } = useGlobalStore();
 
-  const [nodes, setNodes] = useState<Awaited<ReturnType<typeof getNodeUpdates>> | null>(null);
   const [recheckLoading, setRecheckLoading] = useState(false);
 
-  const { loading, setPage } = useSearchablePaginatedTable({
+  const { data, loading, setPage, refetch } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.updates.nodes(),
     fetcher: (page) => getNodeUpdates(page),
-    setStoreData: setNodes,
     paginationKey: 'outdatedNodes',
   });
+
+  const nodes = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const extensionUpdates = useMemo(
     () =>
@@ -67,6 +66,7 @@ export default function AdminUpdates() {
     recheckUpdates()
       .then((updateInformation) => {
         setUpdateInformation(updateInformation);
+        refetch();
         addToast('Recheck complete', 'success');
       })
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
@@ -74,31 +74,33 @@ export default function AdminUpdates() {
   };
 
   return (
-    <AdminContentContainer title='Updates'>
-      {updateInformation && parseVersion(updateInformation.latestPanel).isNewerThan(settings.version) && (
-        <Alert className='mb-4' color='yellow'>
-          A new version is available for the panel! You are currently on {settings.version} and the latest version is{' '}
-          {updateInformation.latestPanel}. You may want to consider upgrading.{' '}
-          <a href='https://calagopus.com/docs/panel/updating' className='underline text-blue-400'>
-            Click here
-          </a>{' '}
-          to view upgrade instructions.
-        </Alert>
-      )}
+    <>
+      {updateInformation &&
+        parseVersion(updateInformation.latestPanelVersion).isNewerThan(updateInformation.panelVersion) && (
+          <Alert className='mb-4' color='yellow'>
+            A new version is available for the panel! You are currently on {updateInformation.panelVersion} and the
+            latest version is {updateInformation.latestPanelVersion}. You may want to consider upgrading.{' '}
+            <a href='https://calagopus.com/docs/panel/updating' className='underline text-blue-400' target='_blank'>
+              Click here
+            </a>{' '}
+            to view upgrade instructions.
+          </Alert>
+        )}
 
       <div className='2xl:columns-2 gap-4 space-y-4'>
         <TitleCard title='Panel Version' icon={<FontAwesomeIcon icon={faInfoCircle} />}>
-          <div className='flex flex-row justify-between items-center'>
+          <div className='flex flex-row justify-between'>
             <span>
               <FontAwesomeIcon
                 icon={
-                  updateInformation && parseVersion(updateInformation.latestPanel).isNewerThan(settings.version)
+                  updateInformation &&
+                  parseVersion(updateInformation.latestPanelVersion).isNewerThan(updateInformation.panelVersion)
                     ? faExclamationTriangle
                     : faCheck
                 }
               />{' '}
-              Your panel is currently running version <Code>{settings.version}</Code>. The latest available version is{' '}
-              <Code>{updateInformation?.latestPanel || 'unknown'}</Code>.
+              Your panel is currently running version <Code>{updateInformation?.panelVersion || 'unknown'}</Code>. The
+              latest available version is <Code>{updateInformation?.latestPanelVersion || 'unknown'}</Code>.
             </span>
 
             <Button
@@ -112,7 +114,7 @@ export default function AdminUpdates() {
           </div>
         </TitleCard>
         <TitleCard title='Outdated Extensions' icon={<FontAwesomeIcon icon={faPuzzlePiece} />}>
-          {loading || !updateInformation ? (
+          {!updateInformation ? (
             <Spinner.Centered />
           ) : !extensionUpdates.length && !extensionUpdateErrors.length ? (
             <>
@@ -185,7 +187,7 @@ export default function AdminUpdates() {
           ) : (
             <>
               <FontAwesomeIcon icon={faExclamationTriangle} /> Some nodes are outdated, the latest available version is{' '}
-              <Code>{updateInformation?.latestWings || 'unknown'}</Code>. ({nodes?.outdatedNodes.total} outdated,{' '}
+              <Code>{updateInformation?.latestWingsVersion || 'unknown'}</Code>. ({nodes?.outdatedNodes.total} outdated,{' '}
               {nodes?.failedNodes} failed to check)
               <div className='mt-4' />
               <Table
@@ -202,6 +204,6 @@ export default function AdminUpdates() {
           )}
         </TitleCard>
       </div>
-    </AdminContentContainer>
+    </>
   );
 }

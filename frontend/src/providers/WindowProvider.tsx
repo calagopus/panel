@@ -4,13 +4,11 @@ import { CurrentWindowProvider } from '@/providers/CurrentWindowProvider.tsx';
 import { WindowContext } from '@/providers/contexts/windowContext.ts';
 
 const MAX_WINDOWS = 32;
-const BASE_Z_INDEX = 100;
 
 interface WindowType {
   id: number;
   title: string;
   component: ReactNode;
-  zIndex: number;
 }
 
 const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
@@ -32,7 +30,7 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
       const id = windowId.current++;
 
       startTransition(() => {
-        setWindows((prev) => [...prev, { id, title, component, zIndex: BASE_Z_INDEX + prev.length }]);
+        setWindows((prev) => [...prev, { id, title, component }]);
       });
 
       return id;
@@ -42,26 +40,6 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const updateWindow = useCallback((id: number, title: string) => {
     setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, title } : w)));
-  }, []);
-
-  const _bringToFront = useCallback((id: number) => {
-    startTransition(() => {
-      setWindows((prev) => {
-        const target = prev.find((w) => w.id === id);
-        if (!target) return prev;
-
-        const isOnTop = prev.every((w) => w.id === id || w.zIndex < target.zIndex);
-        if (isOnTop) return prev;
-
-        const others = prev.filter((w) => w.id !== id).sort((a, b) => a.zIndex - b.zIndex);
-
-        const reindexed = new Map<number, number>();
-        others.forEach((w, i) => reindexed.set(w.id, BASE_Z_INDEX + i));
-        reindexed.set(id, BASE_Z_INDEX + others.length);
-
-        return prev.map((w) => ({ ...w, zIndex: reindexed.get(w.id)! }));
-      });
-    });
   }, []);
 
   const contextValue = useMemo(
@@ -77,7 +55,7 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <WindowContext.Provider value={contextValue}>
       {children}
-      <Window.Group withinPortal>
+      <Window.Group withinPortal zIndexStrategy='normalize' initialZIndex={100} showToolsButton={false}>
         {windows.map((w) => (
           <Window
             id={`window_${w.id}`}
@@ -89,6 +67,7 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
             onClose={() => closeWindow(w.id)}
             defaultWidth='50%'
             defaultHeight='50%'
+            withScrollArea={false}
           >
             <CurrentWindowProvider id={w.id}>{w.component}</CurrentWindowProvider>
           </Window>

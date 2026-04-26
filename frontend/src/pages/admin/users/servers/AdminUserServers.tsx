@@ -5,6 +5,7 @@ import { getEmptyPaginationSet } from '@/api/axios.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
@@ -13,15 +14,14 @@ import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTabl
 
 export default function AdminUserServers({ user }: { user: z.infer<typeof fullUserSchema> }) {
   const [showOwnedUserServers, setShowOwnedUserServers] = useState(false);
-  const [userServers, setUserServers] = useState<Pagination<z.infer<typeof adminServerSchema>>>(
-    getEmptyPaginationSet(),
-  );
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.users.servers(user.uuid),
     fetcher: (page, search) => getUserServers(user.uuid, page, search, showOwnedUserServers),
-    setStoreData: setUserServers,
     deps: [showOwnedUserServers],
   });
+
+  const userServers = data ?? getEmptyPaginationSet<z.infer<typeof adminServerSchema>>();
 
   return (
     <AdminSubContentContainer

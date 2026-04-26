@@ -36,10 +36,6 @@ export interface AdminSystemOverview {
 }
 
 export default async (): Promise<AdminSystemOverview> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get('/api/admin/system/overview')
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.get('/api/admin/system/overview');
+  return data;
 };

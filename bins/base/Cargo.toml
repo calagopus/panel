@@ -1,0 +1,21 @@
+[package]
+name = "panel-rs"
+rust-version = { workspace = true }
+license = { workspace = true }
+version = { workspace = true }
+edition = { workspace = true }
+default-run = "panel-rs"
+
+[dependencies]
+backend = { workspace = true }
+shared = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+colored = { workspace = true }
+futures-util = { workspace = true }
+
+[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dependencies]
+tikv-jemallocator = "0.6.0"

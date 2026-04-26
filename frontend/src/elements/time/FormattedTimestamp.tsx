@@ -3,6 +3,7 @@
 import classNames from 'classnames';
 import { memo, useEffect, useState } from 'react';
 import { formatDateTime, formatTimestamp } from '@/lib/time.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import Tooltip from '../Tooltip.tsx';
 
 interface FormattedTimestampProps {
@@ -12,6 +13,7 @@ interface FormattedTimestampProps {
   className?: string;
   autoUpdate?: boolean;
   precise?: boolean;
+  showNA?: boolean;
 }
 
 function FormattedTimestamp({
@@ -21,7 +23,10 @@ function FormattedTimestamp({
   className,
   autoUpdate = true,
   precise,
+  showNA = false,
 }: FormattedTimestampProps) {
+  const { t } = useTranslations();
+
   const [, forceRender] = useState(0);
 
   useEffect(() => {
@@ -50,6 +55,10 @@ function FormattedTimestamp({
 
     return () => clearTimeout(timeoutId);
   }, [timestamp, autoUpdate]);
+
+  if (showNA && (!timestamp || new Date(timestamp).getTime() === 0)) {
+    return <span className={className}>{t('common.na', {})}</span>;
+  }
 
   return (
     <Tooltip

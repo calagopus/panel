@@ -196,10 +196,7 @@ impl shared::extensions::commands::CliCommand<ImportArgs> for ImportCommand {
                         if args.json {
                             imported_backups.push(
                                 backup
-                                    .into_admin_node_api_object(
-                                        &state.database,
-                                        &storage_url_retriever,
-                                    )
+                                    .into_admin_node_api_object(&state, &storage_url_retriever)
                                     .await?,
                             );
                         }

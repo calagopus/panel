@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { StateCreator } from 'zustand';
 import { adminSettingsSchema } from '@/lib/schemas/admin/settings.ts';
-import { adminUpdateInformationSchema } from '@/lib/schemas/admin/updates.ts';
+import { adminUpdateInformationSchema } from '@/lib/schemas/admin/system.ts';
 import { AdminStore } from '@/stores/admin.tsx';
 
 export interface SettingsSlice extends z.infer<typeof adminSettingsSchema> {

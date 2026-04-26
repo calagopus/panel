@@ -12,6 +12,7 @@ import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 interface BaseItemProp {
   name: string | (() => string);
   icon: IconDefinition;
+  hidden?: boolean;
   permission?: string;
   end?: boolean;
 }
@@ -40,6 +41,7 @@ function SubNavigationItem({ baseUrl, item }: { baseUrl: string; item: ItemProp 
   const canAccess = useCan(permissionMatrix, true);
 
   if (item.permission && !canAccess) return null;
+  if (item.hidden) return null;
 
   return (
     <NavLink

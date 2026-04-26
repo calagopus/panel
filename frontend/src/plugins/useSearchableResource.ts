@@ -1,62 +1,59 @@
+import { useQuery } from '@tanstack/react-query';
 import debounce from 'debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 
 interface UseSearchableResourceOptions<T> {
+  queryKey: readonly unknown[];
   fetcher: (search: string) => Promise<Pagination<T>>;
   defaultSearchValue?: string;
   deps?: unknown[];
   debounceMs?: number;
   canRequest?: boolean;
-  defaultLoadState?: boolean;
 }
 
 export function useSearchableResource<T>({
+  queryKey,
   fetcher,
   defaultSearchValue = '',
   deps = [],
   debounceMs = 150,
   canRequest = true,
-  defaultLoadState = false,
 }: UseSearchableResourceOptions<T>) {
   const { addToast } = useToast();
 
-  const [items, setItems] = useState<T[]>([]);
   const [search, setSearch] = useState(defaultSearchValue);
-  const [loading, setLoading] = useState(defaultLoadState);
+  const [debouncedSearch, setDebouncedSearch] = useState(defaultSearchValue);
 
-  const fetchData = (searchValue: string) => {
-    if (!canRequest) return;
-
-    setLoading(true);
-
-    fetcher(searchValue)
-      .then((response) => {
-        setItems(response.data);
-      })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
-
-  const setDebouncedSearch = useCallback(
-    debounce((s: string) => fetchData(s), debounceMs),
-    deps,
+  const updateDebouncedSearch = useCallback(
+    debounce((s: string) => setDebouncedSearch(s), debounceMs),
+    [],
   );
 
   useEffect(() => {
-    setDebouncedSearch(search);
+    updateDebouncedSearch(search);
   }, [search]);
 
+  const enabled = canRequest && (!deps.length || deps.every(Boolean));
+
+  const { data, isFetching, error, refetch } = useQuery({
+    queryKey: [...queryKey, ...deps, { search: debouncedSearch }],
+    queryFn: () => fetcher(debouncedSearch),
+    enabled,
+  });
+
   useEffect(() => {
-    if (!deps?.length || deps.filter((d) => !!d).length !== deps.length) {
-      return;
+    if (error) {
+      addToast(httpErrorToHuman(error), 'error');
     }
+  }, [error]);
 
-    fetchData(defaultSearchValue);
-  }, deps);
-
-  return { items, loading, search, setSearch, refetch: () => fetchData(search) };
+  return {
+    items: data?.data ?? [],
+    loading: isFetching,
+    search,
+    setSearch,
+    refetch: () => refetch(),
+  };
 }

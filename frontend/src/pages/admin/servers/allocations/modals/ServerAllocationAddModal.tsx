@@ -7,6 +7,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { formatAllocation } from '@/lib/server.ts';
@@ -26,6 +27,7 @@ export default function ServerAllocationAddModal({
   const [selectedAllocationUuids, setSelectedAllocationUuids] = useState<string[]>([]);
 
   const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+    queryKey: queryKeys.admin.nodes.allocations(server.node.uuid),
     fetcher: (search) => getAvailableNodeAllocations(server.node.uuid, 1, search),
   });
 

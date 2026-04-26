@@ -10,6 +10,7 @@ import Code from '@/elements/Code.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDirectoryEntrySchema, serverFilesCopyRemoteSchema } from '@/lib/schemas/server/files.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
@@ -44,6 +45,7 @@ export default function FileCopyRemoteModal({ files, opened, onClose }: Props) {
   );
 
   const servers = useSearchableResource<z.infer<typeof serverSchema>>({
+    queryKey: queryKeys.user.servers.all(),
     fetcher: (search) => getServers(1, search),
   });
 

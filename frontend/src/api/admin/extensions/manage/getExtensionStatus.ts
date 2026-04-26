@@ -9,10 +9,6 @@ export interface ExtensionStatus {
 }
 
 export default async (): Promise<ExtensionStatus> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get('/api/admin/extensions/manage/status')
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.get('/api/admin/extensions/manage/status');
+  return data;
 };

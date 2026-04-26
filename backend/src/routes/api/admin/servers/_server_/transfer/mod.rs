@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod cancel;
+
 mod post {
     use axum::http::StatusCode;
     use serde::{Deserialize, Serialize};
@@ -111,5 +113,6 @@ mod post {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(post::route))
+        .nest("/cancel", cancel::router(state))
         .with_state(state.clone())
 }

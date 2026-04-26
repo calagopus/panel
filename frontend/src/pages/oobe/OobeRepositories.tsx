@@ -1,4 +1,6 @@
-import { Group, Paper, Stack, Text, Title } from '@mantine/core';
+import { faCheck, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Badge, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import { useState } from 'react';
 import { z } from 'zod';
 import createEggRepository from '@/api/admin/egg-repositories/createEggRepository.ts';
@@ -11,7 +13,7 @@ import { adminEggRepositoryUpdateSchema } from '@/lib/schemas/admin/eggRepositor
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 
-export default function OobeRepositories({ onNext, skipFrom }: OobeComponentProps) {
+export default function OobeRepositories({ onNext, onBack, canGoBack, skipFrom, data }: OobeComponentProps) {
   const { t } = useTranslations();
 
   const repositories: z.infer<typeof adminEggRepositoryUpdateSchema>[] = [
@@ -32,11 +34,14 @@ export default function OobeRepositories({ onNext, skipFrom }: OobeComponentProp
     },
   ];
 
+  const installedGitUrls = new Set(data.eggRepositories.map((r) => r.gitRepository));
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedRepos, setSelectedRepos] = useState<string[]>([]);
 
   const toggleRepo = (gitRepository: string) => {
+    if (installedGitUrls.has(gitRepository)) return;
     setSelectedRepos((prev) =>
       prev.includes(gitRepository) ? prev.filter((r) => r !== gitRepository) : [...prev, gitRepository],
     );
@@ -46,17 +51,19 @@ export default function OobeRepositories({ onNext, skipFrom }: OobeComponentProp
     setLoading(true);
 
     try {
-      const promises = selectedRepos.map(async (selected) => {
-        const repo = repositories.find((r) => r.gitRepository === selected);
+      const promises = selectedRepos
+        .filter((selected) => !installedGitUrls.has(selected))
+        .map(async (selected) => {
+          const repo = repositories.find((r) => r.gitRepository === selected);
+          if (!repo) return;
 
-        if (!repo) return;
-
-        const repository = await createEggRepository(repo);
-        await syncEggRepository(repository.uuid);
-      });
+          const repository = await createEggRepository(repo);
+          await syncEggRepository(repository.uuid);
+        });
 
       await Promise.all(promises);
 
+      data.refetch();
       onNext();
     } catch (msg) {
       setError(httpErrorToHuman(msg));
@@ -64,6 +71,8 @@ export default function OobeRepositories({ onNext, skipFrom }: OobeComponentProp
       setLoading(false);
     }
   };
+
+  const hasSelection = selectedRepos.length > 0;
 
   return (
     <Stack gap='lg'>
@@ -75,7 +84,8 @@ export default function OobeRepositories({ onNext, skipFrom }: OobeComponentProp
         <Stack gap='sm'>
           <Text size='sm'>{t('pages.oobe.eggRepositories.description', {})}</Text>
           {repositories.map((repo) => {
-            const isSelected = selectedRepos.includes(repo.gitRepository);
+            const isInstalled = installedGitUrls.has(repo.gitRepository);
+            const isSelected = isInstalled || selectedRepos.includes(repo.gitRepository);
             return (
               <Paper
                 key={repo.gitRepository}
@@ -83,19 +93,31 @@ export default function OobeRepositories({ onNext, skipFrom }: OobeComponentProp
                 p='md'
                 radius='md'
                 onClick={() => toggleRepo(repo.gitRepository)}
-                style={{ cursor: 'pointer', borderColor: isSelected ? 'var(--mantine-color-blue-5)' : undefined }}
+                style={{
+                  cursor: isInstalled ? 'default' : 'pointer',
+                  borderColor: isSelected ? 'var(--mantine-color-blue-5)' : undefined,
+                  opacity: isInstalled ? 0.8 : 1,
+                }}
               >
                 <div className='flex items-start gap-3'>
                   <Checkbox
                     checked={isSelected}
                     onChange={() => toggleRepo(repo.gitRepository)}
                     onClick={(e) => e.stopPropagation()}
+                    disabled={isInstalled}
                     mt={2}
                   />
-                  <div className='flex flex-col gap-0.5'>
-                    <Text fw={600} size='sm'>
-                      {repo.name}
-                    </Text>
+                  <div className='flex flex-col gap-0.5 flex-1'>
+                    <div className='flex items-center gap-2'>
+                      <Text fw={600} size='sm'>
+                        {repo.name}
+                      </Text>
+                      {isInstalled && (
+                        <Badge size='xs' color='green' leftSection={<FontAwesomeIcon icon={faCheck} />}>
+                          {t('common.badge.installed', {})}
+                        </Badge>
+                      )}
+                    </div>
                     <Text size='xs' c='dimmed'>
                       {repo.description}
                     </Text>
@@ -110,10 +132,15 @@ export default function OobeRepositories({ onNext, skipFrom }: OobeComponentProp
         </Stack>
 
         <Group justify='flex-end'>
+          {canGoBack && (
+            <Button variant='subtle' onClick={onBack} leftSection={<FontAwesomeIcon icon={faChevronLeft} />}>
+              Back
+            </Button>
+          )}
           <Button variant='outline' onClick={() => skipFrom('repositories')}>
             {t('common.button.skip', {})}
           </Button>
-          <Button type='submit' disabled={!(selectedRepos.length > 0)} loading={loading} onClick={() => onSubmit()}>
+          <Button type='submit' disabled={!hasSelection} loading={loading} onClick={() => onSubmit()}>
             {t('pages.oobe.eggRepositories.button.submit', {})}
           </Button>
         </Group>

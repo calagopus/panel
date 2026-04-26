@@ -24,7 +24,7 @@ export function convertType(object: oas31.SchemaObject | oas31.ReferenceObject):
             case 'string': {
                 switch (object.format) {
                     case 'uuid': return 'uuid::Uuid'
-                    case 'date-time': return 'chrono::DateTime<chrono::Utc>'
+                    case 'date-time': return 'chrono::DateTime<chrono::Local>'
                 }
 
                 return 'compact_str::CompactString'

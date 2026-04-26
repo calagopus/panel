@@ -14,13 +14,26 @@ pub struct LocationDatabaseHost {
     pub database_host: super::database_host::DatabaseHost,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for LocationDatabaseHost {
     const NAME: &'static str = "location_database_host";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         let mut columns = BTreeMap::from([
@@ -34,7 +47,7 @@ impl BaseModel for LocationDatabaseHost {
             ),
         ]);
 
-        columns.extend(super::database_host::DatabaseHost::columns(Some(
+        columns.extend(super::database_host::DatabaseHost::base_columns(Some(
             "database_host_",
         )));
 
@@ -51,6 +64,7 @@ impl BaseModel for LocationDatabaseHost {
             ),
             database_host: super::database_host::DatabaseHost::map(Some("database_host_"), row)?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -140,13 +154,30 @@ impl LocationDatabaseHost {
             .map(|row| Self::map(None, &row))
             .try_collect_vec()
     }
+}
 
-    #[inline]
-    pub fn into_admin_api_object(self) -> AdminApiLocationDatabaseHost {
-        AdminApiLocationDatabaseHost {
-            database_host: self.database_host.into_admin_api_object(),
-            created: self.created.and_utc(),
-        }
+#[async_trait::async_trait]
+impl IntoAdminApiObject for LocationDatabaseHost {
+    type AdminApiObject = AdminApiLocationDatabaseHost;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiLocationDatabaseHost::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiLocationDatabaseHost {
+                database_host: self.database_host.into_admin_api_object(state, ()).await?,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -249,6 +280,9 @@ impl DeletableModel for LocationDatabaseHost {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(LocationDatabaseHost, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "LocationDatabaseHost")]
 pub struct AdminApiLocationDatabaseHost {

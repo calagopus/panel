@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurationServers from '@/api/admin/backup-configurations/servers/getBackupConfigurationServers.ts';
 import { getEmptyPaginationSet } from '@/api/axios.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
@@ -15,14 +15,12 @@ export default function AdminBackupConfigurationServers({
 }: {
   backupConfiguration: z.infer<typeof adminBackupConfigurationSchema>;
 }) {
-  const [backupConfigurationServers, setBackupConfigurationServers] = useState<
-    Pagination<z.infer<typeof adminServerSchema>>
-  >(getEmptyPaginationSet());
-
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.backupConfigurations.servers(backupConfiguration.uuid),
     fetcher: (page, search) => getBackupConfigurationServers(backupConfiguration.uuid, page, search),
-    setStoreData: setBackupConfigurationServers,
   });
+
+  const backupConfigurationServers = data ?? getEmptyPaginationSet<z.infer<typeof adminServerSchema>>();
 
   return (
     <AdminSubContentContainer title={`Backup Config Servers`} titleOrder={2} search={search} setSearch={setSearch}>

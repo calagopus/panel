@@ -26,10 +26,7 @@ mod put {
         permissions: GetPermissionManager,
         body: axum::body::Body,
     ) -> ApiResponseResult {
-        if !matches!(
-            state.container_type,
-            shared::AppContainerType::OfficialHeavy
-        ) {
+        if !state.container_type.is_heavy() {
             return ApiResponse::error(
                 "extension management is only available in the official heavy container",
             )

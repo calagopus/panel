@@ -4,7 +4,6 @@ use crate::{
         database_host::{DatabaseTransaction, DatabaseType},
     },
     prelude::*,
-    storage::StorageUrlRetriever,
 };
 use garde::Validate;
 use rand::distr::SampleString;
@@ -29,13 +28,26 @@ pub struct ServerDatabase {
     pub password: Vec<u8>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for ServerDatabase {
     const NAME: &'static str = "server_database";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         let mut columns = BTreeMap::from([
@@ -69,7 +81,7 @@ impl BaseModel for ServerDatabase {
             ),
         ]);
 
-        columns.extend(super::database_host::DatabaseHost::columns(Some(
+        columns.extend(super::database_host::DatabaseHost::base_columns(Some(
             "database_host_",
         )));
 
@@ -91,6 +103,7 @@ impl BaseModel for ServerDatabase {
             username: row.try_get(compact_str::format_compact!("{prefix}username").as_str())?,
             password: row.try_get(compact_str::format_compact!("{prefix}password").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -426,47 +439,67 @@ impl ServerDatabase {
 
         Ok(())
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl IntoAdminApiObject for ServerDatabase {
+    type AdminApiObject = AdminApiServerDatabase;
+    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-        storage_url_retriever: &StorageUrlRetriever<'_>,
-    ) -> Result<AdminApiServerDatabase, anyhow::Error> {
+        state: &crate::State,
+        storage_url_retriever: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiServerDatabase::init_hooks(&self, state).await?;
+
         let details = self
             .database_host
             .credentials
-            .parse_connection_details(database)
+            .parse_connection_details(&state.database)
             .await?;
 
-        Ok(AdminApiServerDatabase {
-            uuid: self.uuid,
-            server: self
-                .server
-                .fetch_cached(database)
-                .await?
-                .into_admin_api_object(database, storage_url_retriever)
-                .await?,
-            r#type: self.database_host.r#type,
-            host: self.database_host.public_host.unwrap_or(details.host),
-            port: self
-                .database_host
-                .public_port
-                .unwrap_or(details.port as i32),
-            name: self.name,
-            is_locked: self.locked,
-            username: self.username,
-            password: database.decrypt(self.password).await?,
-            created: self.created.and_utc(),
-        })
-    }
+        let api_object = finish_extendible!(
+            AdminApiServerDatabase {
+                uuid: self.uuid,
+                server: self
+                    .server
+                    .fetch_cached(&state.database)
+                    .await?
+                    .into_admin_api_object(state, storage_url_retriever)
+                    .await?,
+                r#type: self.database_host.r#type,
+                host: self.database_host.public_host.unwrap_or(details.host),
+                port: self
+                    .database_host
+                    .public_port
+                    .unwrap_or(details.port as i32),
+                name: self.name,
+                is_locked: self.locked,
+                username: self.username,
+                password: state.database.decrypt(self.password).await?,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
 
-    #[inline]
-    pub async fn into_api_object(
+        Ok(api_object)
+    }
+}
+
+#[async_trait::async_trait]
+impl IntoApiObject for ServerDatabase {
+    type ApiObject = ApiServerDatabase;
+    type ExtraArgs<'a> = bool;
+
+    async fn into_api_object<'a>(
         self,
-        database: &crate::database::Database,
-        show_password: bool,
-    ) -> Result<ApiServerDatabase, anyhow::Error> {
+        state: &crate::State,
+        show_password: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiServerDatabase::init_hooks(&self, state).await?;
+
         let mut username = self.username;
         let space_idx = username.find(' ');
 
@@ -477,27 +510,33 @@ impl ServerDatabase {
         let details = self
             .database_host
             .credentials
-            .parse_connection_details(database)
+            .parse_connection_details(&state.database)
             .await?;
 
-        Ok(ApiServerDatabase {
-            uuid: self.uuid,
-            r#type: self.database_host.r#type,
-            host: self.database_host.public_host.unwrap_or(details.host),
-            port: self
-                .database_host
-                .public_port
-                .unwrap_or(details.port as i32),
-            name: self.name,
-            is_locked: self.locked,
-            username,
-            password: if show_password {
-                Some(database.decrypt(self.password).await?)
-            } else {
-                None
+        let api_object = finish_extendible!(
+            ApiServerDatabase {
+                uuid: self.uuid,
+                r#type: self.database_host.r#type,
+                host: self.database_host.public_host.unwrap_or(details.host),
+                port: self
+                    .database_host
+                    .public_port
+                    .unwrap_or(details.port as i32),
+                name: self.name,
+                is_locked: self.locked,
+                username,
+                password: if show_password {
+                    Some(state.database.decrypt(self.password).await?)
+                } else {
+                    None
+                },
+                created: self.created.and_utc(),
             },
-            created: self.created.and_utc(),
-        })
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -840,6 +879,9 @@ impl DeletableModel for ServerDatabase {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(ServerDatabase, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "AdminServerDatabase")]
 pub struct AdminApiServerDatabase {
@@ -859,6 +901,9 @@ pub struct AdminApiServerDatabase {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(ServerDatabase, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "ServerDatabase")]
 pub struct ApiServerDatabase {

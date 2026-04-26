@@ -354,7 +354,10 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("read", "Allows viewing servers."),
                         ("update", "Allows modifying servers."),
                         ("delete", "Allows deleting servers."),
-                        ("transfer", "Allows transferring servers to other nodes."),
+                        (
+                            "transfer",
+                            "Allows transferring servers to other nodes or canceling ongoing transfers.",
+                        ),
                         (
                             "allocations",
                             "Allows viewing and managing a server's allocations.",

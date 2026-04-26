@@ -2,8 +2,8 @@ use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
-    Data, DeriveInput, Field, Fields, Ident, Meta, Path, Type, parse::Parser, parse_macro_input,
-    punctuated::Punctuated, token::Comma,
+    Attribute, Data, DeriveInput, Field, Fields, Ident, Meta, Path, Type, parse::Parser,
+    parse_macro_input, punctuated::Punctuated, token::Comma,
 };
 
 #[proc_macro_attribute]
@@ -14,9 +14,16 @@ pub fn extendible(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let hook_args_types = extract_attr_types(&mut input, "hook_args");
     let has_validate = has_derive(&input, "Validate");
 
+    let struct_schema_attrs = take_struct_attrs(&mut input, "schema");
+
     remove_derive(&mut input, "ToSchema");
 
-    let impl_block = match expand(&input, &init_args_types, &hook_args_types) {
+    let impl_block = match expand(
+        &input,
+        &init_args_types,
+        &hook_args_types,
+        &struct_schema_attrs,
+    ) {
         Ok(ts) => ts,
         Err(e) => return e.to_compile_error().into(),
     };
@@ -44,6 +51,19 @@ fn extract_attr_types(input: &mut DeriveInput, name: &str) -> Option<Vec<Type>> 
         }
     });
     result
+}
+
+fn take_struct_attrs(input: &mut DeriveInput, name: &str) -> Vec<Attribute> {
+    let mut taken = Vec::new();
+    input.attrs.retain(|attr| {
+        if attr.path().is_ident(name) {
+            taken.push(attr.clone());
+            false
+        } else {
+            true
+        }
+    });
+    taken
 }
 
 fn has_derive(input: &DeriveInput, name: &str) -> bool {
@@ -83,6 +103,7 @@ fn expand(
     input: &DeriveInput,
     init_args_types: &Option<Vec<Type>>,
     hook_args_types: &Option<Vec<Type>>,
+    struct_schema_attrs: &[Attribute],
 ) -> syn::Result<TokenStream2> {
     let ident = &input.ident;
     let ident_str = ident.to_string();
@@ -116,6 +137,22 @@ fn expand(
             quote! { #(#a)* pub #n: #t, }
         })
         .collect::<Vec<_>>();
+
+    let user_set_title = struct_schema_attrs.iter().any(|a| {
+        let mut found = false;
+        let _ = a.parse_nested_meta(|nm| {
+            if nm.path.is_ident("title") {
+                found = true;
+            }
+            Ok(())
+        });
+        found
+    });
+    let default_title = if user_set_title {
+        quote! {}
+    } else {
+        quote! { #[schema(title = #ident_str)] }
+    };
 
     let ia: Vec<&Type> = init_args_types
         .as_ref()
@@ -171,7 +208,8 @@ fn expand(
 
         #[doc(hidden)]
         #[derive(::utoipa::ToSchema)]
-        #[schema(title = #ident_str)]
+        #default_title
+        #(#struct_schema_attrs)*
         #[allow(non_camel_case_types, dead_code)]
         struct #inner_struct { #(#inner_fields)* }
 

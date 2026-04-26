@@ -158,13 +158,26 @@ pub struct EggConfiguration {
     pub config_routes: Option<EggConfigRoutes>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for EggConfiguration {
     const NAME: &'static str = "egg_configuration";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -225,6 +238,7 @@ impl BaseModel for EggConfiguration {
                 )?
                 .and_then(|v| serde_json::from_value(v).ok()),
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -305,19 +319,36 @@ impl EggConfiguration {
 
         Ok(base)
     }
+}
 
-    #[inline]
-    pub fn into_admin_api_object(self) -> AdminApiEggConfiguration {
-        AdminApiEggConfiguration {
-            uuid: self.uuid,
-            name: self.name,
-            description: self.description,
-            order: self.order,
-            eggs: self.eggs,
-            config_allocations: self.config_allocations,
-            config_routes: self.config_routes,
-            created: self.created.and_utc(),
-        }
+#[async_trait::async_trait]
+impl IntoAdminApiObject for EggConfiguration {
+    type AdminApiObject = AdminApiEggConfiguration;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiEggConfiguration::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiEggConfiguration {
+                uuid: self.uuid,
+                name: self.name,
+                description: self.description,
+                order: self.order,
+                eggs: self.eggs,
+                config_allocations: self.config_allocations,
+                config_routes: self.config_routes,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -581,6 +612,9 @@ impl DeletableModel for EggConfiguration {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(EggConfiguration, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "AdminEggConfiguration")]
 pub struct AdminApiEggConfiguration {
@@ -606,23 +640,43 @@ pub struct MergedEggConfiguration {
     pub config_routes: Option<EggConfigRoutes>,
 }
 
-impl MergedEggConfiguration {
-    #[inline]
-    pub fn into_api_object(self) -> ApiEggConfiguration {
-        ApiEggConfiguration {
-            allocation_self_assign_enabled: self
-                .config_allocations
-                .as_ref()
-                .is_some_and(|c| c.user_self_assign.enabled),
-            allocation_self_assign_require_primary: self
-                .config_allocations
-                .as_ref()
-                .is_some_and(|c| c.user_self_assign.require_primary_allocation),
-            route_order: self.config_routes.map(|c| c.order),
-        }
+impl MergedEggConfiguration {}
+
+#[async_trait::async_trait]
+impl IntoApiObject for MergedEggConfiguration {
+    type ApiObject = ApiEggConfiguration;
+    type ExtraArgs<'a> = ();
+
+    async fn into_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiEggConfiguration::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiEggConfiguration {
+                allocation_self_assign_enabled: self
+                    .config_allocations
+                    .as_ref()
+                    .is_some_and(|c| c.user_self_assign.enabled),
+                allocation_self_assign_require_primary: self
+                    .config_allocations
+                    .as_ref()
+                    .is_some_and(|c| c.user_self_assign.require_primary_allocation),
+                route_order: self.config_routes.map(|c| c.order),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(MergedEggConfiguration, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "NestEggConfiguration")]
 pub struct ApiEggConfiguration {

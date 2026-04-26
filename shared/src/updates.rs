@@ -82,10 +82,11 @@ pub enum ExtensionUpdateCheckResult {
 
 #[derive(ToSchema, Serialize, Clone)]
 pub struct UpdateInformation {
+    pub panel_version: compact_str::CompactString,
     #[schema(value_type = String)]
-    pub latest_panel: semver::Version,
+    pub latest_panel_version: semver::Version,
     #[schema(value_type = String)]
-    pub latest_wings: semver::Version,
+    pub latest_wings_version: semver::Version,
 
     pub extensions: BTreeMap<&'static str, ExtensionUpdateCheckResult>,
 }
@@ -147,8 +148,9 @@ impl UpdateManager {
                     }
 
                     let mut update_info = UpdateInformation {
-                        latest_panel: data.versions.panel,
-                        latest_wings: data.versions.wings,
+                        panel_version: state.version.to_compact_string(),
+                        latest_panel_version: data.versions.panel,
+                        latest_wings_version: data.versions.wings,
                         extensions: BTreeMap::new(),
                     };
 

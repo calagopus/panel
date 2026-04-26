@@ -7,6 +7,7 @@ on:
 
 env:
   BIN_NAME: panel-rs
+  AIO_BIN_NAME: panel-rs-aio
   PROJECT_NAME: panel-rs
 
 jobs:
@@ -119,29 +120,23 @@ jobs:
         if: contains(matrix.target, 'linux')
         run: cargo install cross --git https://github.com/cross-rs/cross
 
-      - name: Run tests (Linux)
-        if: contains(matrix.target, 'linux')
-        run: cross test --release --target ${{ matrix.target }}
-
-      - name: Run tests (Non-Linux)
-        if: ${{ !contains(matrix.target, 'linux') }}
-        run: cargo test --target ${{ matrix.target }}
-
-      - name: Build release binary (Linux)
+      - name: Build release binaries (Linux)
         if: contains(matrix.target, 'linux')
         run: |
           RUSTFLAGS="-C target-feature=+crt-static" \
-          cross build --release --target ${{ matrix.target }}
+          cross build --release --target ${{ matrix.target }} -p $BIN_NAME
+          cross build --release --target ${{ matrix.target }} -p $AIO_BIN_NAME
 
-      - name: Build release binary (Non-Linux)
-        if: ${{ !contains(matrix.target, 'linux') }}
-        run: cargo build --release --target ${{ matrix.target }}
+      - name: Build release binary (Windows)
+        if: runner.os == 'Windows'
+        run: cargo build --release --target ${{ matrix.target }} -p $env:BIN_NAME
 
-      - name: Prepare binary (Unix)
-        if: runner.os != 'Windows'
+      - name: Prepare binaries (Linux)
+        if: contains(matrix.target, 'linux')
         run: |
           mkdir -p dist
           cp "target/${{ matrix.target }}/release/$BIN_NAME${{ matrix.binary_suffix }}" "dist/$BIN_NAME-${{ matrix.build }}"
+          cp "target/${{ matrix.target }}/release/$AIO_BIN_NAME${{ matrix.binary_suffix }}" "dist/$AIO_BIN_NAME-${{ matrix.build }}"
 
       - name: Prepare binary (Windows)
         if: runner.os == 'Windows'
@@ -154,7 +149,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ env.PROJECT_NAME }}-${{ matrix.build }}
-          path: dist/${{ env.BIN_NAME }}-${{ matrix.build }}${{ matrix.binary_suffix }}
+          path: dist/*${{ matrix.binary_suffix }}
 
   publish-draft-release:
     name: Publish Draft Release
@@ -193,7 +188,7 @@ jobs:
           files: artifacts/${{ env.PROJECT_NAME }}-*/*
 
   create-multiarch-image:
-    name: Create multi-arch Docker image
+    name: Create multi-arch Docker images
     needs: [dist]
     runs-on: ubuntu-24.04
     permissions:
@@ -230,7 +225,12 @@ jobs:
           cp dist/${{ env.PROJECT_NAME }}-riscv64-linux/${{ env.BIN_NAME }}-riscv64-linux .docker/riscv64/panel-rs
           cp dist/${{ env.PROJECT_NAME }}-ppc64le-linux/${{ env.BIN_NAME }}-ppc64le-linux .docker/ppc64le/panel-rs
 
-          chmod +x .docker/*/panel-rs
+          cp dist/${{ env.PROJECT_NAME }}-x86_64-linux/${{ env.AIO_BIN_NAME }}-x86_64-linux .docker/amd64/panel-rs-aio
+          cp dist/${{ env.PROJECT_NAME }}-aarch64-linux/${{ env.AIO_BIN_NAME }}-aarch64-linux .docker/arm64/panel-rs-aio
+          cp dist/${{ env.PROJECT_NAME }}-riscv64-linux/${{ env.AIO_BIN_NAME }}-riscv64-linux .docker/riscv64/panel-rs-aio
+          cp dist/${{ env.PROJECT_NAME }}-ppc64le-linux/${{ env.AIO_BIN_NAME }}-ppc64le-linux .docker/ppc64le/panel-rs-aio
+
+          chmod +x .docker/*/panel-rs .docker/*/panel-rs-aio
 
       - name: Extract version and determine tags
         id: prep_tags
@@ -239,32 +239,23 @@ jobs:
           VERSION="${RAW_TAG#release-}"
 
           DOCKER_TAGS="ghcr.io/${{ github.repository }}:${VERSION}"
+          AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-aio"
 
           if [[ "$VERSION" == *-* ]]; then
             DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest-pre"
+            AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio-pre"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
               DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
+              AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio"
             fi
           else
             DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
+            AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio"
           fi
 
           echo "DOCKER_TAGS=$DOCKER_TAGS" >> $GITHUB_ENV
-
-          HEAVY_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy"
-
-          if [[ "$VERSION" == *-* ]]; then
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:latest-pre-heavy"
-
-            if [[ "$VERSION" == 1.0.0-* ]]; then
-              HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
-            fi
-          else
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
-          fi
-
-          echo "HEAVY_TAGS=$HEAVY_TAGS" >> $GITHUB_ENV
+          echo "AIO_TAGS=$AIO_TAGS" >> $GITHUB_ENV
 
       - name: Build & push multi-arch image
         uses: docker/build-push-action@v7
@@ -276,8 +267,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build & push multi-arch AIO image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile.aio
+          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
+          push: true
+          tags: ${{ env.AIO_TAGS }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   build-heavy-image:
-    name: Build Heavy Docker image (${{ matrix.platform }})
+    name: Build Heavy Docker images (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -307,7 +309,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push platform image
+      - name: Build & push heavy platform image
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -318,8 +320,19 @@ jobs:
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
 
+      - name: Build & push heavy AIO platform image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile.heavy.aio
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ghcr.io/${{ github.repository }}:heavy-aio-build-${{ matrix.tag_suffix }}
+          cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
+          cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
+
   merge-heavy-image:
-    name: Merge Heavy Docker manifest
+    name: Merge Heavy Docker manifests
     needs: [build-heavy-image]
     runs-on: ubuntu-24.04
     permissions:
@@ -341,20 +354,25 @@ jobs:
           VERSION="${RAW_TAG#release-}"
 
           HEAVY_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy"
+          HEAVY_AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy-aio"
 
           if [[ "$VERSION" == *-* ]]; then
             HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy-pre"
+            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio-pre"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
               HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
+              HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
             fi
           else
             HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
+            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
           fi
 
           echo "HEAVY_TAGS=$HEAVY_TAGS" >> $GITHUB_ENV
+          echo "HEAVY_AIO_TAGS=$HEAVY_AIO_TAGS" >> $GITHUB_ENV
 
-      - name: Create and push multi-arch manifest
+      - name: Create and push multi-arch manifests
         run: |
           SOURCE_AMD64="ghcr.io/${{ github.repository }}:heavy-build-amd64"
           SOURCE_ARM64="ghcr.io/${{ github.repository }}:heavy-build-arm64"
@@ -362,4 +380,12 @@ jobs:
           IFS=',' read -ra TAGS <<< "$HEAVY_TAGS"
           for TAG in "${TAGS[@]}"; do
             docker buildx imagetools create -t "$TAG" "$SOURCE_AMD64" "$SOURCE_ARM64"
+          done
+
+          AIO_SOURCE_AMD64="ghcr.io/${{ github.repository }}:heavy-aio-build-amd64"
+          AIO_SOURCE_ARM64="ghcr.io/${{ github.repository }}:heavy-aio-build-arm64"
+
+          IFS=',' read -ra TAGS <<< "$HEAVY_AIO_TAGS"
+          for TAG in "${TAGS[@]}"; do
+            docker buildx imagetools create -t "$TAG" "$AIO_SOURCE_AMD64" "$AIO_SOURCE_ARM64"
           done

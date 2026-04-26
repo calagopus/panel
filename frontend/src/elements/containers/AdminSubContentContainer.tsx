@@ -1,6 +1,6 @@
 import { Group, Title, TitleOrder } from '@mantine/core';
-import { Dispatch, ReactNode, SetStateAction } from 'react';
-import { ContainerRegistry } from 'shared';
+import { Dispatch, ReactNode, SetStateAction, useMemo } from 'react';
+import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import TextInput from '../input/TextInput.tsx';
@@ -16,7 +16,19 @@ export type Props<P = {}> = {
   children: ReactNode;
 } & ({ registry: ContainerRegistry<Props<P>>; registryProps: P } | { registry?: never; registryProps?: never });
 
-export default function AdminSubContentContainer<P>(props: Props<P>) {
+function AdminSubContentContainer<P>(props: Props<P>) {
+  props = useMemo(() => {
+    let modifiedProps = props;
+
+    if (props.registry) {
+      for (const interceptor of props.registry.propsInterceptors) {
+        modifiedProps = interceptor(modifiedProps);
+      }
+    }
+
+    return modifiedProps;
+  }, [props]);
+
   const {
     title,
     hideTitleComponent = false,
@@ -77,3 +89,5 @@ export default function AdminSubContentContainer<P>(props: Props<P>) {
     </ContentContainer>
   );
 }
+
+export default makeComponentHookable(AdminSubContentContainer) as typeof AdminSubContentContainer;

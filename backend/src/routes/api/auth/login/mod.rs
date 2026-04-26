@@ -1,7 +1,7 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-mod checkpoint;
+pub mod checkpoint;
 mod security_key;
 
 mod post {
@@ -13,11 +13,12 @@ mod post {
         ApiError, GetState,
         jwt::BasePayload,
         models::{
-            CreatableModel, user::User, user_activity::UserActivity, user_session::UserSession,
+            CreatableModel, IntoApiObject, user::User, user_activity::UserActivity,
+            user_session::UserSession,
         },
         response::{ApiResponse, ApiResponseResult},
     };
-    use tower_cookies::{Cookie, Cookies};
+    use tower_cookies::Cookies;
     use utoipa::ToSchema;
 
     #[derive(ToSchema, Validate, Deserialize)]
@@ -121,6 +122,8 @@ mod post {
                     event: "auth:checkpoint".into(),
                     ip: Some(ip.0.into()),
                     data: serde_json::json!({
+                        "using": "password",
+
                         "user_agent": headers
                             .get("User-Agent")
                             .map(|ua| shared::utils::slice_up_to(ua.to_str().unwrap_or("unknown"), 255))
@@ -139,7 +142,10 @@ mod post {
             }
 
             ApiResponse::new_serialized(Response::TwoFactorRequired {
-                user: Box::new(user.into_api_object(&state.storage.retrieve_urls().await?)),
+                user: Box::new(
+                    user.into_api_object(&state, &state.storage.retrieve_urls().await?)
+                        .await?,
+                ),
                 token,
             })
             .ok()
@@ -158,22 +164,7 @@ mod post {
             )
             .await?;
 
-            let settings = state.settings.get().await?;
-
-            cookies.add(
-                Cookie::build(("session", key))
-                    .http_only(true)
-                    .same_site(tower_cookies::cookie::SameSite::Strict)
-                    .secure(settings.app.url.starts_with("https://"))
-                    .path("/")
-                    .expires(
-                        tower_cookies::cookie::time::OffsetDateTime::now_utc()
-                            + tower_cookies::cookie::time::Duration::days(30),
-                    )
-                    .build(),
-            );
-
-            drop(settings);
+            cookies.add(UserSession::get_cookie(&state, key).await?);
 
             if let Err(err) = UserActivity::create(
                 &state,
@@ -204,7 +195,10 @@ mod post {
             }
 
             ApiResponse::new_serialized(Response::Completed {
-                user: Box::new(user.into_api_full_object(&state.storage.retrieve_urls().await?)),
+                user: Box::new(
+                    user.into_api_full_object(&state, &state.storage.retrieve_urls().await?)
+                        .await?,
+                ),
             })
             .ok()
         }

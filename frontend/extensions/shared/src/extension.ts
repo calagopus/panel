@@ -6,12 +6,7 @@ class ExtensionSkip {
   protected static readonly __skip = 0xdeadbeeeeef;
 
   public static isSkip(other: unknown): other is ExtensionSkip {
-    return (
-      typeof other === 'object' &&
-      other !== null &&
-      '__skip' in other &&
-      (other as Record<string, unknown>).__skip === this.__skip
-    );
+    return typeof other === 'object' && other !== null && '__skip' in other && other.__skip === this.__skip;
   }
 }
 

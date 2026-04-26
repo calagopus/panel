@@ -1,5 +1,4 @@
 import { faServer } from '@fortawesome/free-solid-svg-icons';
-import { Title } from '@mantine/core';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -10,10 +9,6 @@ export default function DashboardHomeTitle() {
 
   return (
     <>
-      <Title order={1} c='white' mb='md'>
-        {t('pages.account.home.title', {})}
-      </Title>
-
       <SubNavigation
         baseUrl='/'
         items={

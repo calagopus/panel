@@ -115,11 +115,16 @@ mod get {
                 },
             )?;
 
-            let mut url = node.public_url(if params.directory {
-                "/download/directory"
-            } else {
-                "/download/file"
-            });
+            let mut url = node
+                .public_url(
+                    &state,
+                    if params.directory {
+                        "/download/directory"
+                    } else {
+                        "/download/file"
+                    },
+                )
+                .await?;
             url.set_query(Some(&format!(
                 "token={}&archive_format={}",
                 urlencoding::encode(&token),
@@ -159,7 +164,7 @@ mod get {
                 },
             )?;
 
-            let mut url = node.public_url("/download/files");
+            let mut url = node.public_url(&state, "/download/files").await?;
             url.set_query(Some(&format!(
                 "token={}&archive_format={}",
                 urlencoding::encode(&token),

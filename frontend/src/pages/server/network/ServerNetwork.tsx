@@ -1,6 +1,6 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { httpErrorToHuman } from '@/api/axios.ts';
+import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import createAllocation from '@/api/server/allocations/createAllocation.ts';
 import getAllocations from '@/api/server/allocations/getAllocations.ts';
 import Button from '@/elements/Button.tsx';
@@ -9,6 +9,7 @@ import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -18,17 +19,19 @@ import AllocationRow from './AllocationRow.tsx';
 export default function ServerNetwork() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, allocations, setAllocations, addAllocation } = useServerStore();
+  const { server } = useServerStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
+    queryKey: queryKeys.server(server.uuid).network.all(),
     fetcher: (page, search) => getAllocations(server.uuid, page, search),
-    setStoreData: setAllocations,
   });
+
+  const allocations = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const doAdd = () => {
     createAllocation(server.uuid)
-      .then((alloc) => {
-        addAllocation(alloc);
+      .then(() => {
+        refetch();
         addToast(t('pages.server.network.toast.created', {}), 'success');
       })
       .catch((msg) => {

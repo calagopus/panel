@@ -1,4 +1,7 @@
-use super::{BASE64_ENGINE, collect_mappings, decrypt_laravel_value, process_table};
+use super::{
+    BASE64_ENGINE, collect_mappings, decrypt_laravel_value, is_datetime_column, is_sqlite_source,
+    process_table,
+};
 use anyhow::Context;
 use base64::Engine;
 use clap::{Args, FromArgMatches};
@@ -6,11 +9,16 @@ use colored::Colorize;
 use compact_str::ToCompactString;
 use shared::models::database_host::DatabaseCredentials;
 use sqlx::Row;
+use sqlx::any::AnyPoolOptions;
 use std::{
     collections::{HashMap, HashSet},
+    path::{Path, PathBuf},
     str::FromStr,
     sync::Arc,
 };
+
+type SourcePool = sqlx::AnyPool;
+type SourceRow = sqlx::any::AnyRow;
 
 #[inline]
 fn first_import_tag(raw_tags: Option<&str>, fallback: &str) -> compact_str::CompactString {
@@ -27,47 +35,188 @@ fn first_import_tag(raw_tags: Option<&str>, fallback: &str) -> compact_str::Comp
 
 #[inline]
 fn derive_name_parts(username: &str) -> (compact_str::CompactString, compact_str::CompactString) {
-    (
-        username.to_compact_string(),
-        compact_str::CompactString::default(),
-    )
+    let mut parts = username
+        .split([' ', '_', '-', '.'])
+        .filter(|part| !part.is_empty())
+        .map(compact_str::CompactString::from);
+
+    let first = parts.next().unwrap_or_else(|| username.to_compact_string());
+    let last = parts.next().unwrap_or_else(|| username.to_compact_string());
+
+    (first, last)
 }
 
-async fn connect_source_database() -> Result<sqlx::Pool<sqlx::MySql>, anyhow::Error> {
+async fn connect_source_database_any(environment_path: &str) -> Result<SourcePool, anyhow::Error> {
+    sqlx::any::install_default_drivers();
+
     let connection = std::env::var("DB_CONNECTION")
         .unwrap_or_else(|_| "mysql".to_string())
         .trim_matches('"')
         .to_ascii_lowercase();
 
-    if !matches!(connection.as_str(), "mysql" | "mariadb") {
-        return Err(anyhow::anyhow!(
-            "unsupported source database driver `{connection}`; expected mysql or mariadb"
-        ));
-    }
+    let database_url = match connection.as_str() {
+        "mysql" | "mariadb" => {
+            let source_database_host =
+                std::env::var("DB_HOST").context("failed to read pelican environment DB_HOST")?;
+            let source_database_port = std::env::var("DB_PORT")
+                .unwrap_or_else(|_| "3306".to_string())
+                .parse::<u16>()
+                .context("failed to parse pelican environment DB_PORT")?;
+            let source_database_database = std::env::var("DB_DATABASE")
+                .context("failed to read pelican environment DB_DATABASE")?;
+            let source_database_username = std::env::var("DB_USERNAME")
+                .context("failed to read pelican environment DB_USERNAME")?;
+            let source_database_password = std::env::var("DB_PASSWORD")
+                .context("failed to read pelican environment DB_PASSWORD")?;
 
-    let host = std::env::var("DB_HOST").context("failed to read pelican environment DB_HOST")?;
-    let port = std::env::var("DB_PORT")
-        .unwrap_or_else(|_| "3306".to_string())
-        .parse::<u16>()
-        .context("failed to parse pelican environment DB_PORT")?;
-    let database =
-        std::env::var("DB_DATABASE").context("failed to read pelican environment DB_DATABASE")?;
-    let username =
-        std::env::var("DB_USERNAME").context("failed to read pelican environment DB_USERNAME")?;
-    let password =
-        std::env::var("DB_PASSWORD").context("failed to read pelican environment DB_PASSWORD")?;
+            let mut url = reqwest::Url::parse("mysql://localhost")
+                .context("failed to construct pelican mysql database url")?;
+            url.set_host(Some(source_database_host.trim_matches('"')))
+                .context("failed to set pelican mysql database host")?;
+            url.set_port(Some(source_database_port))
+                .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database port"))?;
+            url.set_username(source_database_username.trim_matches('"'))
+                .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database username"))?;
+            url.set_password(Some(source_database_password.trim_matches('"')))
+                .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database password"))?;
+            url.set_path(source_database_database.trim_matches('"'));
+            url.to_string()
+        }
+        "sqlite" | "sqlite3" => {
+            let source_database_database = std::env::var("DB_DATABASE")
+                .context("failed to read pelican environment DB_DATABASE")?;
+            let source_database_database = source_database_database.trim_matches('"');
 
-    let options = sqlx::mysql::MySqlConnectOptions::new()
-        .host(host.trim_matches('"'))
-        .port(port)
-        .database(database.trim_matches('"'))
-        .username(username.trim_matches('"'))
-        .password(password.trim_matches('"'));
+            match source_database_database {
+                ":memory:" | "file::memory:" => {
+                    return Err(anyhow::anyhow!(
+                        "refusing to import from an in-memory sqlite database"
+                    ));
+                }
+                _ => {
+                    let source_database_database = Path::new(source_database_database);
+                    let source_database_database: PathBuf =
+                        if source_database_database.is_absolute() {
+                            source_database_database.to_path_buf()
+                        } else {
+                            Path::new(environment_path)
+                                .parent()
+                                .unwrap_or_else(|| Path::new("."))
+                                .join(source_database_database)
+                        };
 
-    sqlx::mysql::MySqlPoolOptions::new()
-        .connect_with(options)
+                    format!("sqlite://{}", source_database_database.to_string_lossy())
+                }
+            }
+        }
+        _ => {
+            return Err(anyhow::anyhow!(
+                "unsupported source database driver `{connection}`; expected mysql, mariadb, sqlite, or sqlite3"
+            ));
+        }
+    };
+
+    AnyPoolOptions::new()
+        .connect(&database_url)
         .await
         .with_context(|| format!("failed to connect to source database using `{connection}`"))
+}
+
+fn source_uuid(row: &SourceRow, column: &str) -> Result<uuid::Uuid, anyhow::Error> {
+    row.try_get::<String, _>(column)
+        .with_context(|| format!("failed to read source uuid column `{column}`"))?
+        .parse::<uuid::Uuid>()
+        .with_context(|| format!("failed to parse source uuid column `{column}`"))
+}
+
+fn source_datetime(
+    row: &SourceRow,
+    column: &str,
+) -> Result<chrono::DateTime<chrono::Utc>, anyhow::Error> {
+    let value: String = row
+        .try_get(column)
+        .with_context(|| format!("failed to read source datetime column `{column}`"))?;
+
+    chrono::DateTime::parse_from_rfc3339(&value)
+        .map(|value| value.with_timezone(&chrono::Utc))
+        .or_else(|_| {
+            chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S%.f")
+                .map(|value| value.and_utc())
+        })
+        .or_else(|_| {
+            chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                .map(|value| value.and_utc())
+        })
+        .with_context(|| format!("failed to parse source datetime column `{column}`"))
+}
+
+fn source_optional_datetime(
+    row: &SourceRow,
+    column: &str,
+) -> Result<Option<chrono::DateTime<chrono::Utc>>, anyhow::Error> {
+    let value = row
+        .try_get::<Option<String>, _>(column)
+        .with_context(|| format!("failed to read source datetime column `{column}`"))?;
+
+    value
+        .map(|value| {
+            chrono::DateTime::parse_from_rfc3339(&value)
+                .map(|value| value.with_timezone(&chrono::Utc))
+                .or_else(|_| {
+                    chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S%.f")
+                        .map(|value| value.and_utc())
+                })
+                .or_else(|_| {
+                    chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                        .map(|value| value.and_utc())
+                })
+                .with_context(|| format!("failed to parse source datetime column `{column}`"))
+        })
+        .transpose()
+}
+
+fn source_bool(row: &SourceRow, column: &str) -> Result<bool, anyhow::Error> {
+    if let Ok(value) = row.try_get::<bool, _>(column) {
+        return Ok(value);
+    }
+
+    if let Ok(value) = row.try_get::<i64, _>(column) {
+        return Ok(value != 0);
+    }
+
+    if let Ok(value) = row.try_get::<i32, _>(column) {
+        return Ok(value != 0);
+    }
+
+    let value: String = row
+        .try_get(column)
+        .with_context(|| format!("failed to read source bool column `{column}`"))?;
+
+    Ok(matches!(
+        value.trim().to_ascii_lowercase().as_str(),
+        "1" | "true" | "yes" | "on"
+    ))
+}
+
+async fn source_query_rows(
+    source_database: &SourcePool,
+    table: &str,
+    columns: &[&str],
+) -> Result<Vec<SourceRow>, anyhow::Error> {
+    let projection = columns
+        .iter()
+        .map(|column| {
+            if is_sqlite_source() && is_datetime_column(column) {
+                format!("CAST(`{column}` AS TEXT) AS `{column}`")
+            } else {
+                format!("`{column}`")
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(", ");
+
+    let query = format!("SELECT {projection} FROM `{table}`");
+    Ok(sqlx::query(&query).fetch_all(source_database).await?)
 }
 
 #[derive(Args)]
@@ -146,7 +295,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         return Ok(1);
                     }
                 };
-                let source_database = match connect_source_database().await {
+                let source_database = match connect_source_database_any(&args.environment).await {
                     Ok(database) => database,
                     Err(err) => {
                         eprintln!(
@@ -226,11 +375,13 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                     return Ok(1);
                 }
 
-                let admin_user_ids = match sqlx::query_scalar::<_, i32>(
+                let admin_user_ids = match sqlx::query_scalar::<sqlx::Any, i32>(
                     r#"
-                    SELECT DISTINCT model_id
+                    SELECT DISTINCT model_has_roles.model_id
                     FROM model_has_roles
-                    WHERE model_type = 'user'
+                    JOIN roles ON roles.id = model_has_roles.role_id
+                    WHERE model_has_roles.model_type = 'user'
+                      AND LOWER(roles.name) = 'root admin'
                     "#,
                 )
                 .fetch_all(&source_database)
@@ -253,9 +404,9 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
 
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
-                            let uuid: uuid::fmt::Hyphenated = row.try_get("uuid")?;
+                            let uuid = source_uuid(&row, "uuid")?;
 
-                            mapping.insert(id, *uuid.as_uuid());
+                            mapping.insert(id, uuid);
 
                             let admin_user_ids = admin_user_ids.clone();
                             let database = database.clone();
@@ -266,7 +417,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let password: &str = row.try_get("password")?;
                                 let language: Option<&str> = row.try_get("language")?;
                                 let mfa_app_secret: Option<&str> = row.try_get("mfa_app_secret")?;
-                                let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
+                                let created = source_datetime(&row, "created_at")?;
                                 let (name_first, name_last) = derive_name_parts(username);
                                 let admin = admin_user_ids.contains(&id);
                                 let totp_secret = mfa_app_secret.map(compact_str::CompactString::from);
@@ -279,7 +430,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     ON CONFLICT DO NOTHING
                                     "#
                                 )
-                                .bind(uuid.as_uuid())
+                                .bind(uuid)
                                 .bind(external_id)
                                 .bind(username)
                                 .bind(email)
@@ -327,7 +478,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let user_id: i32 = row.try_get("user_id")?;
                                 let name: &str = row.try_get("name")?;
                                 let public_key: &str = row.try_get("public_key")?;
-                                let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
+                                let created = source_datetime(&row, "created_at")?;
 
                                 let user_uuid = match user_mappings.get(&user_id) {
                                     Some(uuid) => uuid,
@@ -425,8 +576,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                 };
 
                 let location_mappings = match async {
-                    let rows = sqlx::query("SELECT id, tags, created_at FROM nodes")
-                        .fetch_all(&source_database)
+                    let rows = source_query_rows(&source_database, "nodes", &["id", "tags", "created_at"])
                         .await?;
                         let mut mapping = HashMap::with_capacity(rows.len());
                         let mut created_locations: HashMap<compact_str::CompactString, uuid::Uuid> =
@@ -438,8 +588,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 row.try_get::<Option<&str>, _>("tags")?,
                                 "pelican",
                             );
-                            let created: Option<chrono::DateTime<chrono::Utc>> =
-                                row.try_get("created_at")?;
+                            let created = source_optional_datetime(&row, "created_at")?;
 
                             let location_uuid = if let Some(uuid) = created_locations.get(&tag) {
                                 *uuid
@@ -490,9 +639,9 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
 
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
-                            let uuid: uuid::fmt::Hyphenated = row.try_get("uuid")?;
+                            let uuid = source_uuid(&row, "uuid")?;
 
-                            mapping.insert(id, *uuid.as_uuid());
+                            mapping.insert(id, uuid);
 
                             let source_app_key = source_app_key.clone();
                             let location_mappings = location_mappings.clone();
@@ -500,8 +649,8 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             futures.push(async move {
                                 let name: &str = row.try_get("name")?;
                                 let description: Option<&str> = row.try_get("description")?;
-                                let public: bool = row.try_get("public")?;
-                                let maintenance_mode: bool = row.try_get("maintenance_mode")?;
+                                let public = source_bool(&row, "public")?;
+                                let maintenance_mode = source_bool(&row, "maintenance_mode")?;
                                 let fqdn: &str = row.try_get("fqdn")?;
                                 let scheme: &str = row.try_get("scheme")?;
                                 let memory: i64 = row.try_get("memory")?;
@@ -510,7 +659,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let token: &str = row.try_get("daemon_token")?;
                                 let daemon_listen: i32 = row.try_get("daemon_listen")?;
                                 let daemon_sftp: i32 = row.try_get("daemon_sftp")?;
-                                let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
+                                let created = source_datetime(&row, "created_at")?;
 
                                 let location_uuid = match location_mappings.get(&id) {
                                     Some(uuid) => uuid,
@@ -534,7 +683,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     ON CONFLICT DO NOTHING
                                     "#
                                 )
-                                .bind(uuid.as_uuid())
+                                .bind(uuid)
                                 .bind(name)
                                 .bind(description)
                                 .bind(public)
@@ -572,9 +721,9 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                 drop(location_mappings);
 
                 let nest_mappings = match async {
-                    let rows = sqlx::query("SELECT id, author, tags, created_at FROM eggs")
-                        .fetch_all(&source_database)
-                        .await?;
+                    let rows =
+                        source_query_rows(&source_database, "eggs", &["id", "author", "tags", "created_at"])
+                            .await?;
                         let mut mapping = HashMap::with_capacity(rows.len());
                         let mut created_nests: HashMap<compact_str::CompactString, uuid::Uuid> =
                             HashMap::new();
@@ -586,8 +735,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 row.try_get::<Option<&str>, _>("tags")?,
                                 "pelican",
                             );
-                            let created: Option<chrono::DateTime<chrono::Utc>> =
-                                row.try_get("created_at")?;
+                            let created = source_optional_datetime(&row, "created_at")?;
 
                             let nest_uuid = if let Some(uuid) = created_nests.get(&tag) {
                                 *uuid
@@ -637,7 +785,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
 
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
-                            let uuid: uuid::fmt::Hyphenated = row.try_get("uuid")?;
+                            let uuid = source_uuid(&row, "uuid")?;
                             let author: &str = row.try_get("author")?;
                             let name: &str = row.try_get("name")?;
                             let description: Option<&str> = row.try_get("description")?;
@@ -650,14 +798,13 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 .try_get::<Option<&str>, _>("config_stop")?
                                 .map(compact_str::CompactString::from);
                             let config_script = shared::models::nest_egg::NestEggConfigScript {
-                                container: row.try_get("script_container")?,
-                                entrypoint: row.try_get("script_entry")?,
+                                container: row.try_get::<String, _>("script_container")?.into(),
+                                entrypoint: row.try_get::<String, _>("script_entry")?.into(),
                                 content: row.try_get("script_install").unwrap_or_default(),
                             };
                             let startup_commands: Option<&str> = row.try_get("startup_commands")?;
-                            let force_outgoing_ip: bool = row.try_get("force_outgoing_ip")?;
-                            let created: chrono::DateTime<chrono::Utc> =
-                                row.try_get("created_at")?;
+                            let force_outgoing_ip = source_bool(&row, "force_outgoing_ip")?;
+                            let created = source_datetime(&row, "created_at")?;
 
                             let nest_uuid = match nest_mappings.get(&id) {
                                 Some(uuid) => uuid,
@@ -726,7 +873,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 RETURNING uuid
                                 "#,
                             )
-                            .bind(uuid.as_uuid())
+                            .bind(uuid)
                             .bind(nest_uuid)
                             .bind(author)
                             .bind(name)
@@ -776,17 +923,28 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let description: Option<&str> = row.try_get("description")?;
                             let env_variable: &str = row.try_get("env_variable")?;
                             let default_value: Option<&str> = row.try_get("default_value")?;
-                            let user_viewable: bool = row.try_get("user_viewable")?;
-                            let user_editable: bool = row.try_get("user_editable")?;
+                            let user_viewable = source_bool(&row, "user_viewable")?;
+                            let user_editable = source_bool(&row, "user_editable")?;
                             let rules: &str = row.try_get("rules")?;
-                            let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
+                            let created = source_datetime(&row, "created_at")?;
 
                             let egg_uuid = match egg_mappings.get(&egg_id) {
                                 Some(uuid) => uuid,
                                 None => continue,
                             };
-
-                            let rules = rules.split('|').map(compact_str::CompactString::from).collect::<Vec<_>>();
+                            let rules = serde_json::from_str::<Vec<String>>(rules)
+                                .map(|rules| {
+                                    rules
+                                        .into_iter()
+                                        .map(compact_str::CompactString::from)
+                                        .collect::<Vec<_>>()
+                                })
+                                .unwrap_or_else(|_| {
+                                    rules
+                                        .split('|')
+                                        .map(compact_str::CompactString::from)
+                                        .collect::<Vec<_>>()
+                                });
 
                             if rule_validator::validate_rules(&rules, &()).is_err() {
                                 continue;
@@ -843,8 +1001,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let port: i32 = row.try_get("port")?;
                             let username: &str = row.try_get("username")?;
                             let password: &str = row.try_get("password")?;
-                            let created: chrono::DateTime<chrono::Utc> =
-                                row.try_get("created_at")?;
+                            let created = source_datetime(&row, "created_at")?;
 
                             let password = match decrypt_laravel_value(password, &source_app_key) {
                                 Ok(password) => password,
@@ -901,10 +1058,10 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
 
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
-                            let uuid: uuid::fmt::Hyphenated = row.try_get("uuid")?;
+                            let uuid = source_uuid(&row, "uuid")?;
                             let allocation_id: Option<i32> = row.try_get("allocation_id")?;
 
-                            mapping.insert(id, (*uuid.as_uuid(), allocation_id));
+                            mapping.insert(id, (uuid, allocation_id));
 
                             let node_mappings = node_mappings.clone();
                             let user_mappings = user_mappings.clone();
@@ -928,7 +1085,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let allocation_limit: Option<i32> = row.try_get("allocation_limit")?;
                                 let database_limit: i32 = row.try_get("database_limit")?;
                                 let backup_limit: i32 = row.try_get("backup_limit")?;
-                                let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
+                                let created = source_datetime(&row, "created_at")?;
 
                                 let node_uuid = match node_mappings.get(&node_id) {
                                     Some(uuid) => uuid,
@@ -967,8 +1124,8 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     ON CONFLICT DO NOTHING
                                     "#,
                                 )
-                                .bind(uuid.as_uuid())
-                                .bind(uuid.as_uuid().as_fields().0 as i32)
+                                .bind(uuid)
+                                .bind(uuid.as_fields().0 as i32)
                                 .bind(external_id)
                                 .bind(node_uuid)
                                 .bind(name)
@@ -1034,7 +1191,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let database_name: &str = row.try_get("database")?;
                                 let username: &str = row.try_get("username")?;
                                 let password: &str = row.try_get("password")?;
-                                let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
+                                let created = source_datetime(&row, "created_at")?;
 
                                 let server_uuid = match server_mappings.get(&server_id) {
                                     Some((uuid, _)) => uuid,
@@ -1092,8 +1249,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let server_id: i32 = row.try_get("server_id")?;
                             let variable_id: i32 = row.try_get("variable_id")?;
                             let variable_value: Option<&str> = row.try_get("variable_value")?;
-                            let created: Option<chrono::DateTime<chrono::Utc>> =
-                                row.try_get("created_at")?;
+                            let created = source_optional_datetime(&row, "created_at")?;
 
                             let server_uuid = match server_mappings.get(&server_id) {
                                 Some((uuid, _)) => uuid,
@@ -1141,18 +1297,18 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let server_mappings = server_mappings.clone();
                             let database = database.clone();
                             futures.push(async move {
-                                let uuid: uuid::fmt::Hyphenated = row.try_get("uuid")?;
+                                let uuid = source_uuid(&row, "uuid")?;
                                 let server_id: i32 = row.try_get("server_id")?;
-                                let successful: bool = row.try_get("is_successful")?;
-                                let locked: bool = row.try_get("is_locked")?;
+                                let successful = source_bool(&row, "is_successful")?;
+                                let locked = source_bool(&row, "is_locked")?;
                                 let name: &str = row.try_get("name")?;
                                 let ignored_files: Option<&str> = row.try_get("ignored_files")?;
                                 let disk: &str = row.try_get("disk")?;
                                 let checksum: Option<&str> = row.try_get("checksum")?;
                                 let bytes: i64 = row.try_get("bytes")?;
-                                let completed: Option<chrono::DateTime<chrono::Utc>> = row.try_get("completed_at")?;
-                                let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
-                                let deleted: Option<chrono::DateTime<chrono::Utc>> = row.try_get("deleted_at")?;
+                                let completed = source_optional_datetime(&row, "completed_at")?;
+                                let created = source_datetime(&row, "created_at")?;
+                                let deleted = source_optional_datetime(&row, "deleted_at")?;
 
                                 let server_uuid = match server_mappings.get(&server_id) {
                                     Some((uuid, _)) => uuid,
@@ -1170,7 +1326,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     ON CONFLICT DO NOTHING
                                     "#,
                                 )
-                                .bind(uuid.as_uuid())
+                                .bind(uuid)
                                 .bind(server_uuid)
                                 .bind(backup_configuration_uuid)
                                 .bind(name)
@@ -1227,7 +1383,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let user_id: i32 = row.try_get("user_id")?;
                                 let server_id: i32 = row.try_get("server_id")?;
                                 let permissions: Option<&str> = row.try_get("permissions")?;
-                                let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
+                                let created = source_datetime(&row, "created_at")?;
 
                                 let user_uuid = match user_mappings.get(&user_id) {
                                     Some(uuid) => uuid,
@@ -1334,13 +1490,13 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
 
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
-                            let uuid: uuid::fmt::Hyphenated = row.try_get("uuid")?;
+                            let uuid = source_uuid(&row, "uuid")?;
                             let name: &str = row.try_get("name")?;
                             let description: Option<&str> = row.try_get("description")?;
                             let source: &str = row.try_get("source")?;
                             let target: &str = row.try_get("target")?;
-                            let read_only: bool = row.try_get("read_only")?;
-                            let user_mountable: bool = row.try_get("user_mountable")?;
+                            let read_only = source_bool(&row, "read_only")?;
+                            let user_mountable = source_bool(&row, "user_mountable")?;
 
                             sqlx::query(
                                 r#"
@@ -1349,7 +1505,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 ON CONFLICT DO NOTHING
                                 "#,
                             )
-                            .bind(uuid.as_uuid())
+                            .bind(uuid)
                             .bind(name)
                             .bind(description)
                             .bind(source)
@@ -1359,7 +1515,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             .execute(database.write())
                             .await?;
 
-                            mapping.insert(id, *uuid.as_uuid());
+                            mapping.insert(id, uuid);
                         }
 
                         Ok(mapping)
@@ -1514,15 +1670,15 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let id: i32 = row.try_get("id")?;
                             let server_id: i32 = row.try_get("server_id")?;
                             let name: &str = row.try_get("name")?;
-                            let enabled: bool = row.try_get("is_active")?;
-                            let only_when_online: bool = row.try_get("only_when_online")?;
+                            let enabled = source_bool(&row, "is_active")?;
+                            let only_when_online = source_bool(&row, "only_when_online")?;
                             let cron_day_of_week: &str = row.try_get("cron_day_of_week")?;
                             let cron_month: &str = row.try_get("cron_month")?;
                             let cron_day_of_month: &str = row.try_get("cron_day_of_month")?;
                             let cron_hour: &str = row.try_get("cron_hour")?;
                             let cron_minute: &str = row.try_get("cron_minute")?;
-                            let last_run: Option<chrono::DateTime<chrono::Utc>> = row.try_get("last_run_at")?;
-                            let created: chrono::DateTime<chrono::Utc> = row.try_get("created_at")?;
+                            let last_run = source_optional_datetime(&row, "last_run_at")?;
+                            let created = source_datetime(&row, "created_at")?;
 
                             let server_uuid = match server_mappings.get(&server_id) {
                                 Some((uuid, _)) => uuid,
@@ -1597,9 +1753,8 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let action: &str = row.try_get("action")?;
                             let payload: &str = row.try_get("payload")?;
                             let time_offset: i32 = row.try_get("time_offset")?;
-                            let continue_on_failure: bool = row.try_get("continue_on_failure")?;
-                            let created: chrono::DateTime<chrono::Utc> =
-                                row.try_get("created_at")?;
+                            let continue_on_failure = source_bool(&row, "continue_on_failure")?;
+                            let created = source_datetime(&row, "created_at")?;
 
                             let schedule_uuid = match schedule_mappings.get(&schedule_id) {
                                 Some(uuid) => uuid,
@@ -1696,7 +1851,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             } else {
                                 None
                             };
-                            let created: Option<chrono::DateTime<chrono::Utc>> = row.try_get("created_at")?;
+                            let created = source_optional_datetime(&row, "created_at")?;
 
                             let node_uuid = match node_mappings.get(&node_id) {
                                 Some(uuid) => uuid,

@@ -15,6 +15,7 @@ import getNode from '@/api/admin/nodes/getNode.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { isNodeAIO } from '@/lib/node.ts';
 import AdminNodeAllocations from './allocations/AdminNodeAllocations.tsx';
 import AdminNodeBackups from './backups/AdminNodeBackups.tsx';
 import AdminNodeConfiguration from './configuration/AdminNodeConfiguration.tsx';
@@ -50,6 +51,7 @@ export default function NodeView() {
             name: 'Configuration',
             icon: faPenRuler,
             path: `/configuration`,
+            hidden: isNodeAIO(node),
             element: <AdminNodeConfiguration node={node} />,
           },
           {

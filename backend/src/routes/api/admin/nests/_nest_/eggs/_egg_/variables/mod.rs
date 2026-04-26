@@ -9,7 +9,9 @@ mod get {
     use serde::Serialize;
     use shared::{
         GetState,
-        models::{nest_egg_variable::NestEggVariable, user::GetPermissionManager},
+        models::{
+            IntoAdminApiObject, nest_egg_variable::NestEggVariable, user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -43,10 +45,12 @@ mod get {
         let variables = NestEggVariable::all_by_egg_uuid(&state.database, egg.uuid).await?;
 
         ApiResponse::new_serialized(Response {
-            variables: variables
-                .into_iter()
-                .map(|variable| variable.into_admin_api_object())
-                .collect(),
+            variables: futures_util::future::try_join_all(
+                variables
+                    .into_iter()
+                    .map(|variable| variable.into_admin_api_object(&state, ())),
+            )
+            .await?,
         })
         .ok()
     }
@@ -62,7 +66,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             nest_egg_variable::{CreateNestEggVariableOptions, NestEggVariable},
             user::GetPermissionManager,
@@ -185,7 +189,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            variable: egg_variable.into_admin_api_object(),
+            variable: egg_variable.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

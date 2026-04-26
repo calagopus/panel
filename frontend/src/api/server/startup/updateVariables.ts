@@ -4,12 +4,7 @@ import { serverEnvVariableSchema } from '@/lib/schemas/server/startup.ts';
 import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (uuid: string, variables: z.infer<typeof serverEnvVariableSchema>[]): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .put(`/api/client/servers/${uuid}/startup/variables`, {
-        variables: transformKeysToSnakeCase(variables),
-      })
-      .then(() => resolve())
-      .catch(reject);
+  await axiosInstance.put(`/api/client/servers/${uuid}/startup/variables`, {
+    variables: transformKeysToSnakeCase(variables),
   });
 };

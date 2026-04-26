@@ -3,12 +3,8 @@ import { axiosInstance } from '@/api/axios.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 
 export default async (page: number, search?: string): Promise<Pagination<z.infer<typeof adminNestSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get('/api/admin/nests', {
-        params: { page, search },
-      })
-      .then(({ data }) => resolve(data.nests))
-      .catch(reject);
+  const { data } = await axiosInstance.get('/api/admin/nests', {
+    params: { page, search },
   });
+  return data.nests;
 };

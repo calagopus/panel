@@ -10,7 +10,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch, user::GetPermissionManager,
             user_oauth_link::UserOAuthLink,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -75,7 +75,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             user_oauth_links: user_oauth_links
                 .try_async_map(|user_oauth_link| {
-                    user_oauth_link.into_admin_api_object(&state.database, &storage_url_retriever)
+                    user_oauth_link.into_admin_api_object(&state, &storage_url_retriever)
                 })
                 .await?,
         })

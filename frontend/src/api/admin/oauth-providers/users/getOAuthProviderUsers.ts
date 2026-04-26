@@ -7,12 +7,8 @@ export default async (
   page: number,
   search?: string,
 ): Promise<Pagination<z.infer<typeof adminOAuthUserLinkSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/admin/oauth-providers/${oauthProviderUuid}/users`, {
-        params: { page, search },
-      })
-      .then(({ data }) => resolve(data.userOauthLinks))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/admin/oauth-providers/${oauthProviderUuid}/users`, {
+    params: { page, search },
   });
+  return data.userOauthLinks;
 };

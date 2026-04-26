@@ -20,13 +20,26 @@ pub struct Location {
     pub description: Option<compact_str::CompactString>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for Location {
     const NAME: &'static str = "location";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -68,6 +81,7 @@ impl BaseModel for Location {
             description: row
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -148,31 +162,47 @@ impl Location {
                 .try_collect_vec()?,
         })
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl IntoAdminApiObject for Location {
+    type AdminApiObject = AdminApiLocation;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-    ) -> AdminApiLocation {
-        AdminApiLocation {
-            uuid: self.uuid,
-            backup_configuration: if let Some(backup_configuration) = self.backup_configuration {
-                if let Ok(backup_configuration) = backup_configuration.fetch_cached(database).await
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiLocation::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiLocation {
+                uuid: self.uuid,
+                backup_configuration: if let Some(backup_configuration) = self.backup_configuration
                 {
-                    backup_configuration
-                        .into_admin_api_object(database)
-                        .await
-                        .ok()
+                    if let Ok(backup_configuration) =
+                        backup_configuration.fetch_cached(&state.database).await
+                    {
+                        backup_configuration
+                            .into_admin_api_object(state, ())
+                            .await
+                            .ok()
+                    } else {
+                        None
+                    }
                 } else {
                     None
-                }
-            } else {
-                None
+                },
+                name: self.name,
+                description: self.description,
+                created: self.created.and_utc(),
             },
-            name: self.name,
-            description: self.description,
-            created: self.created.and_utc(),
-        }
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -412,6 +442,9 @@ impl DeletableModel for Location {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(Location, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "Location")]
 pub struct AdminApiLocation {

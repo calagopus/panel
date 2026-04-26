@@ -20,11 +20,11 @@ impl shared::extensions::commands::CliCommand<VersionArgs> for VersionCommand {
                     shared::TARGET
                 );
                 println!(
-                    "copyright © 2025 - {} 0x7d8 & Contributors",
+                    "copyright © 2025 - {} Calagopus, 0x7d8 & Contributors",
                     chrono::Local::now().year()
                 );
 
-                Ok(1)
+                Ok(0)
             })
         })
     }

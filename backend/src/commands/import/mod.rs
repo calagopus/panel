@@ -4,6 +4,7 @@ use futures_util::StreamExt;
 use openssl::symm::Cipher;
 use serde::Deserialize;
 use shared::extensions::commands::CliCommandGroupBuilder;
+use sqlx::Row;
 use std::collections::HashMap;
 
 mod pelican;
@@ -96,14 +97,70 @@ fn decrypt_laravel_value(
     extract_php_serialized_string(&result)
 }
 
-pub async fn process_table<T, Fut: Future<Output = Result<T, anyhow::Error>>>(
-    source_database: &sqlx::Pool<sqlx::MySql>,
+#[inline]
+pub(crate) fn is_sqlite_source() -> bool {
+    matches!(
+        std::env::var("DB_CONNECTION")
+            .unwrap_or_else(|_| "mysql".to_string())
+            .trim_matches('"')
+            .to_ascii_lowercase()
+            .as_str(),
+        "sqlite" | "sqlite3"
+    )
+}
+
+#[inline]
+pub(crate) fn is_datetime_column(column: &str) -> bool {
+    matches!(
+        column,
+        "created_at"
+            | "updated_at"
+            | "deleted_at"
+            | "completed_at"
+            | "installed_at"
+            | "last_run_at"
+            | "next_run_at"
+    ) || column.ends_with("_at")
+}
+
+pub async fn process_table<DB, T, Fut: Future<Output = Result<T, anyhow::Error>>>(
+    source_database: &sqlx::Pool<DB>,
     table: &str,
     sql_where: Option<&str>,
-    compute: impl Fn(Vec<sqlx::mysql::MySqlRow>) -> Fut,
+    compute: impl Fn(Vec<DB::Row>) -> Fut,
     page_size: usize,
-) -> Result<Vec<T>, anyhow::Error> {
-    let total: i64 = sqlx::query_scalar(&format!(
+) -> Result<Vec<T>, anyhow::Error>
+where
+    DB: sqlx::Database,
+    for<'q> <DB as sqlx::Database>::Arguments<'q>: sqlx::IntoArguments<'q, DB>,
+    for<'c> &'c sqlx::Pool<DB>: sqlx::Executor<'c, Database = DB>,
+    for<'r> &'r str: sqlx::ColumnIndex<DB::Row>,
+    usize: sqlx::ColumnIndex<DB::Row>,
+    for<'r> i64: sqlx::Decode<'r, DB> + sqlx::Type<DB>,
+    for<'r> String: sqlx::Decode<'r, DB> + sqlx::Type<DB>,
+{
+    let projection = if is_sqlite_source() {
+        let pragma_query = format!("PRAGMA table_info(`{table}`)");
+        let columns: Vec<DB::Row> = sqlx::query::<DB>(&pragma_query)
+            .fetch_all(source_database)
+            .await?;
+        columns
+            .into_iter()
+            .map(|column| {
+                let name: String = column.try_get("name")?;
+                Ok::<_, anyhow::Error>(if is_datetime_column(&name) {
+                    format!("CAST(`{name}` AS TEXT) AS `{name}`")
+                } else {
+                    format!("`{name}`")
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?
+            .join(", ")
+    } else {
+        "*".to_string()
+    };
+
+    let total: i64 = sqlx::query_scalar::<DB, i64>(&format!(
         "SELECT COUNT(*) FROM `{table}` {}",
         if let Some(where_clause) = sql_where {
             format!("WHERE {where_clause}")
@@ -116,14 +173,14 @@ pub async fn process_table<T, Fut: Future<Output = Result<T, anyhow::Error>>>(
     .context("failed to count total rows for table")?;
 
     let query = format!(
-        "SELECT * FROM `{table}` {}",
+        "SELECT {projection} FROM `{table}` {}",
         if let Some(where_clause) = sql_where {
             format!("WHERE {where_clause}")
         } else {
             String::new()
         }
     );
-    let mut query_rows = sqlx::query(&query).fetch(source_database);
+    let mut query_rows = sqlx::query::<DB>(&query).fetch(source_database);
 
     let mut processed_rows: usize = 0;
     let mut results = Vec::new();

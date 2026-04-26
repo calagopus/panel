@@ -1,10 +1,11 @@
-use crate::{prelude::*, storage::StorageUrlRetriever};
+use crate::prelude::*;
 use compact_str::ToCompactString;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
-use std::collections::{BTreeMap, HashMap};
-use utoipa::ToSchema;
-
+use std::{
+    collections::{BTreeMap, HashMap},
+    sync::LazyLock,
+};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct NodeAllocation {
     pub uuid: uuid::Uuid,
@@ -15,13 +16,26 @@ pub struct NodeAllocation {
     pub port: i32,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for NodeAllocation {
     const NAME: &'static str = "node_allocation";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -63,6 +77,7 @@ impl BaseModel for NodeAllocation {
             ip_alias: row.try_get(compact_str::format_compact!("{prefix}ip_alias").as_str())?,
             port: row.try_get(compact_str::format_compact!("{prefix}port").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -635,35 +650,51 @@ impl NodeAllocation {
 
         Ok(deleted)
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl IntoAdminApiObject for NodeAllocation {
+    type AdminApiObject = AdminApiNodeAllocation;
+    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-        storage_url_retriever: &StorageUrlRetriever<'_>,
-    ) -> Result<AdminApiNodeAllocation, crate::database::DatabaseError> {
+        state: &crate::State,
+        storage_url_retriever: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiNodeAllocation::init_hooks(&self, state).await?;
+
         let server = match self.server {
             Some(fetchable) => Some(
                 fetchable
-                    .fetch_cached(database)
+                    .fetch_cached(&state.database)
                     .await?
-                    .into_admin_api_object(database, storage_url_retriever)
+                    .into_admin_api_object(state, storage_url_retriever)
                     .await?,
             ),
             None => None,
         };
 
-        Ok(AdminApiNodeAllocation {
-            uuid: self.uuid,
-            server,
-            ip: compact_str::format_compact!("{}", self.ip.ip()),
-            ip_alias: self.ip_alias,
-            port: self.port,
-            created: self.created.and_utc(),
-        })
+        let api_object = finish_extendible!(
+            AdminApiNodeAllocation {
+                uuid: self.uuid,
+                server,
+                ip: self.ip.ip().to_compact_string(),
+                ip_alias: self.ip_alias,
+                port: self.port,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(NodeAllocation, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "NodeAllocation")]
 pub struct AdminApiNodeAllocation {

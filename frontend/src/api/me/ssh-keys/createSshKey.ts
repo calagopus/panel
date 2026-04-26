@@ -8,11 +8,7 @@ interface Data {
   publicKey: string;
 }
 
-export default async (data: Data): Promise<z.infer<typeof userSshKeySchema>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post('/api/client/account/ssh-keys', transformKeysToSnakeCase(data))
-      .then(({ data }) => resolve(data.sshKey))
-      .catch(reject);
-  });
+export default async (keyData: Data): Promise<z.infer<typeof userSshKeySchema>> => {
+  const { data } = await axiosInstance.post('/api/client/account/ssh-keys', transformKeysToSnakeCase(keyData));
+  return data.sshKey;
 };

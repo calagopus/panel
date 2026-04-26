@@ -50,6 +50,12 @@ pub struct ApplyArgs {
         default_value = "false"
     )]
     skip_replace_binary: bool,
+    #[arg(
+        long = "bin",
+        help = "the name of the binary to build",
+        default_value = "panel-rs"
+    )]
+    bin: String,
 }
 
 pub struct ApplyCommand;
@@ -212,6 +218,8 @@ impl shared::extensions::commands::CliCommand<ApplyArgs> for ApplyCommand {
                     .arg("build")
                     .arg("--profile")
                     .arg(args.profile.to_rust_profile())
+                    .arg("-p")
+                    .arg(&args.bin)
                     .status()
                     .await?;
                 if !status.success() {

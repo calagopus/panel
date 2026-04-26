@@ -116,17 +116,19 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   return (
     <div className='lg:flex h-full'>
       {isNormal && (
-        <Sidebar>
-          <NavLink to='/' className='w-full'>
-            <AppIcon />
-          </NavLink>
-
-          <div className='flex flex-col gap-2 mt-2 mb-1'>
-            <ServerStatusIndicator />
-          </div>
-
-          <Sidebar.Divider />
-
+        <Sidebar
+          header={
+            <>
+              <NavLink to='/' className='w-full'>
+                <AppIcon />
+              </NavLink>
+              <div className='flex flex-col gap-2 mt-2 mb-1'>
+                <ServerStatusIndicator />
+              </div>
+              <Sidebar.Divider />
+            </>
+          }
+        >
           <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
           {isAdmin(user) && (
             <>
@@ -171,6 +173,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
                     end={route.exact}
                     icon={route.icon}
                     name={name}
+                    activeMatches={route.activeMatches}
                   />
                 </ServerCan>
               ) : (
@@ -180,6 +183,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
                   end={route.exact}
                   icon={route.icon}
                   name={name}
+                  activeMatches={route.activeMatches}
                 />
               );
             }
@@ -194,7 +198,10 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
         </Sidebar>
       )}
 
-      <div id='server-root' className={isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto'}>
+      <div
+        id='server-root'
+        className={isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto h-full'}
+      >
         <Container isNormal={isNormal}>
           {loading ? (
             <Spinner.Centered />

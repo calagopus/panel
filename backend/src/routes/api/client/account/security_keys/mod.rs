@@ -9,7 +9,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch,
+            IntoApiObject, Pagination, PaginationParamsWithSearch,
             user::{GetPermissionManager, GetUser},
             user_security_key::UserSecurityKey,
         },
@@ -65,16 +65,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            security_keys: Pagination {
-                total: security_keys.total,
-                per_page: security_keys.per_page,
-                page: security_keys.page,
-                data: security_keys
-                    .data
-                    .into_iter()
-                    .map(|security_key| security_key.into_api_object())
-                    .collect(),
-            },
+            security_keys: security_keys
+                .try_async_map(|security_key| security_key.into_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }
@@ -87,7 +80,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoApiObject,
             user::{GetPermissionManager, GetUser},
             user_security_key::UserSecurityKey,
         },
@@ -175,7 +168,7 @@ mod post {
         };
 
         ApiResponse::new_serialized(Response {
-            security_key: security_key.into_api_object(),
+            security_key: security_key.into_api_object(&state, ()).await?,
             options: webauthn_options,
         })
         .ok()

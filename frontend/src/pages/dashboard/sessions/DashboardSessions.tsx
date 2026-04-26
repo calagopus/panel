@@ -1,42 +1,30 @@
-import { Group, Title } from '@mantine/core';
+import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getSessions from '@/api/me/sessions/getSessions.ts';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 import SessionRow from './SessionRow.tsx';
 
 export default function DashboardSessions() {
   const { t } = useTranslations();
-  const { sessions, setSessions } = useUserStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.user.sessions.all(),
     fetcher: getSessions,
-    setStoreData: setSessions,
   });
+
+  const sessions = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AccountContentContainer
       title={t('pages.account.sessions.title', {})}
+      search={search}
+      setSearch={setSearch}
       registry={window.extensionContext.extensionRegistry.pages.dashboard.sessions.container}
     >
-      <Group justify='space-between' mb='md'>
-        <Title order={1} c='white'>
-          {t('pages.account.sessions.title', {})}
-        </Title>
-        <Group>
-          <TextInput
-            placeholder={t('common.input.search', {})}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            w={250}
-          />
-        </Group>
-      </Group>
-
       <ContextMenuProvider>
         <Table
           columns={[

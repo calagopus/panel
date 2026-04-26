@@ -1,6 +1,6 @@
-import { faChevronDown, faFileDownload } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faExternalLink, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Stack, Title } from '@mantine/core';
+import { Group, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import jsYaml from 'js-yaml';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -55,6 +55,7 @@ export default function OAuthProviderCreateOrUpdate({
       nameLastPath: null,
       enabled: true,
       loginOnly: false,
+      loginBypass2fa: false,
       linkViewable: true,
       userManageable: true,
       basicAuth: false,
@@ -97,6 +98,7 @@ export default function OAuthProviderCreateOrUpdate({
         nameLastPath: contextOAuthProvider.nameLastPath,
         enabled: contextOAuthProvider.enabled,
         loginOnly: contextOAuthProvider.loginOnly,
+        loginBypass2fa: contextOAuthProvider.loginBypass2fa,
         linkViewable: contextOAuthProvider.linkViewable,
         userManageable: contextOAuthProvider.userManageable,
         basicAuth: contextOAuthProvider.basicAuth,
@@ -169,25 +171,23 @@ export default function OAuthProviderCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'oauthProviderslocations']))}>
-        <Stack mt='xs'>
-          <Group grow align='start'>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <TextArea
-              label='Description'
-              placeholder='Description'
-              rows={3}
-              key={form.key('description')}
-              {...form.getInputProps('description')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <TextArea
+            label='Description'
+            placeholder='Description'
+            rows={3}
+            key={form.key('description')}
+            {...form.getInputProps('description')}
+          />
 
-          <Card className='flex flex-row! items-center justify-between'>
+          <Card className='flex flex-row! items-center justify-between col-span-full'>
             <Title order={4}>Redirect URL</Title>
             <Code>
               {contextOAuthProvider
@@ -196,192 +196,184 @@ export default function OAuthProviderCreateOrUpdate({
             </Code>
           </Card>
 
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Client Id'
-              placeholder='Client Id'
-              key={form.key('clientId')}
-              {...form.getInputProps('clientId')}
-            />
-            <TextInput
-              withAsterisk={!contextOAuthProvider}
-              label='Client Secret'
-              placeholder='Client Secret'
-              type='password'
-              key={form.key('clientSecret')}
-              {...form.getInputProps('clientSecret')}
-            />
-          </Group>
+          <TextInput
+            withAsterisk
+            label='Client Id'
+            placeholder='Client Id'
+            key={form.key('clientId')}
+            {...form.getInputProps('clientId')}
+          />
+          <TextInput
+            withAsterisk={!contextOAuthProvider}
+            label='Client Secret'
+            placeholder='Client Secret'
+            type='password'
+            key={form.key('clientSecret')}
+            {...form.getInputProps('clientSecret')}
+          />
 
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Auth URL'
-              placeholder='Auth URL'
-              key={form.key('authUrl')}
-              {...form.getInputProps('authUrl')}
-            />
-            <TextInput
-              withAsterisk
-              label='Token URL'
-              placeholder='Token URL'
-              key={form.key('tokenUrl')}
-              {...form.getInputProps('tokenUrl')}
-            />
-          </Group>
+          <TextInput
+            withAsterisk
+            label='Auth URL'
+            placeholder='Auth URL'
+            key={form.key('authUrl')}
+            {...form.getInputProps('authUrl')}
+          />
+          <TextInput
+            withAsterisk
+            label='Token URL'
+            placeholder='Token URL'
+            key={form.key('tokenUrl')}
+            {...form.getInputProps('tokenUrl')}
+          />
 
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Info URL'
-              placeholder='Info URL'
-              key={form.key('infoUrl')}
-              {...form.getInputProps('infoUrl')}
-            />
-            <Switch
-              label='Basic Auth'
-              description='Uses HTTP Basic Authentication to transmit client id and secret, not common anymore'
-              key={form.key('basicAuth')}
-              {...form.getInputProps('basicAuth', { type: 'checkbox' })}
-            />
-          </Group>
+          <TextInput
+            withAsterisk
+            label='Info URL'
+            placeholder='Info URL'
+            key={form.key('infoUrl')}
+            {...form.getInputProps('infoUrl')}
+          />
+          <Switch
+            label='Basic Auth'
+            description='Uses HTTP Basic Authentication to transmit client id and secret, not common anymore'
+            key={form.key('basicAuth')}
+            {...form.getInputProps('basicAuth', { type: 'checkbox' })}
+          />
 
-          <Group grow align='top'>
-            <TagsInput
-              label='Scopes'
-              placeholder='Scopes'
-              description='The OAuth2 Scopes to request, make sure to include scopes for email/profile info when needed'
-              key={form.key('scopes')}
-              {...form.getInputProps('scopes')}
-            />
-            <TextInput
-              withAsterisk
-              label='Identifier Path'
-              placeholder='Identifier Path'
-              description='The Path to use to extract the unique user identifier from the Info URL response (https://serdejsonpath.live)'
-              key={form.key('identifierPath')}
-              {...form.getInputProps('identifierPath')}
-            />
-          </Group>
+          <TagsInput
+            label='Scopes'
+            placeholder='Scopes'
+            description='The OAuth2 Scopes to request, make sure to include scopes for email/profile info when needed'
+            key={form.key('scopes')}
+            {...form.getInputProps('scopes')}
+          />
+          <TextInput
+            withAsterisk
+            label='Identifier Path'
+            placeholder='Identifier Path'
+            description='The Path to use to extract the unique user identifier from the Info URL response (https://serdejsonpath.live)'
+            key={form.key('identifierPath')}
+            {...form.getInputProps('identifierPath')}
+          />
 
-          <Group grow>
-            <TextInput
-              label='Email Path'
-              placeholder='Email Path'
-              description='The Path to use to extract the email from the Info URL response (https://serdejsonpath.live)'
-              key={form.key('emailPath')}
-              {...form.getInputProps('emailPath')}
-            />
-            <TextInput
-              label='Username Path'
-              placeholder='Username Path'
-              description='The Path to use to extract the username from the Info URL response (https://serdejsonpath.live)'
-              key={form.key('usernamePath')}
-              {...form.getInputProps('usernamePath')}
-            />
-          </Group>
+          <TextInput
+            label='Email Path'
+            placeholder='Email Path'
+            description='The Path to use to extract the email from the Info URL response (https://serdejsonpath.live)'
+            key={form.key('emailPath')}
+            {...form.getInputProps('emailPath')}
+          />
+          <TextInput
+            label='Username Path'
+            placeholder='Username Path'
+            description='The Path to use to extract the username from the Info URL response (https://serdejsonpath.live)'
+            key={form.key('usernamePath')}
+            {...form.getInputProps('usernamePath')}
+          />
 
-          <Group grow>
-            <TextInput
-              label='First Name Path'
-              placeholder='First Name URL'
-              description='The Path to use to extract the first name from the Info URL response (https://serdejsonpath.live)'
-              key={form.key('nameFirstPath')}
-              {...form.getInputProps('nameFirstPath')}
-            />
-            <TextInput
-              label='Last Name Path'
-              placeholder='Last Name Path'
-              description='The Path to use to extract the last name from the Info URL response (https://serdejsonpath.live)'
-              key={form.key('nameLastPath')}
-              {...form.getInputProps('nameLastPath')}
-            />
-          </Group>
+          <TextInput
+            label='First Name Path'
+            placeholder='First Name URL'
+            description='The Path to use to extract the first name from the Info URL response (https://serdejsonpath.live)'
+            key={form.key('nameFirstPath')}
+            {...form.getInputProps('nameFirstPath')}
+          />
+          <TextInput
+            label='Last Name Path'
+            placeholder='Last Name Path'
+            description='The Path to use to extract the last name from the Info URL response (https://serdejsonpath.live)'
+            key={form.key('nameLastPath')}
+            {...form.getInputProps('nameLastPath')}
+          />
 
-          <Group grow>
-            <Switch
-              label='Enabled'
-              key={form.key('enabled')}
-              {...form.getInputProps('enabled', { type: 'checkbox' })}
-            />
-            <Switch
-              label='Only allow Login'
-              key={form.key('loginOnly')}
-              {...form.getInputProps('loginOnly', { type: 'checkbox' })}
-            />
-          </Group>
+          <Switch
+            label='Only allow Login'
+            key={form.key('loginOnly')}
+            {...form.getInputProps('loginOnly', { type: 'checkbox' })}
+          />
+          <Switch
+            label='Bypass 2FA on Login'
+            description='Allows users logging in with this provider to bypass their panel 2FA'
+            key={form.key('loginBypass2fa')}
+            {...form.getInputProps('loginBypass2fa', { type: 'checkbox' })}
+          />
 
-          <Group grow>
-            <Switch
-              label='Link Viewable to User'
-              description='Allows the User to see the Connection and its identifier in the Client UI'
-              key={form.key('linkViewable')}
-              {...form.getInputProps('linkViewable', { type: 'checkbox' })}
-            />
-            <Switch
-              label='Link Manageable by User'
-              description='Allows the User to connect and disconnect with this provider'
-              key={form.key('userManageable')}
-              {...form.getInputProps('userManageable', { type: 'checkbox' })}
-            />
-          </Group>
+          <Switch
+            label='Link Viewable to User'
+            description='Allows the User to see the Connection and its identifier in the Client UI'
+            key={form.key('linkViewable')}
+            {...form.getInputProps('linkViewable', { type: 'checkbox' })}
+          />
+          <Switch
+            label='Link Manageable by User'
+            description='Allows the User to connect and disconnect with this provider'
+            key={form.key('userManageable')}
+            {...form.getInputProps('userManageable', { type: 'checkbox' })}
+          />
 
-          <Group>
-            <AdminCan action={contextOAuthProvider ? 'oauth-providers.update' : 'oauth-providers.create'} cantSave>
-              <Button type='submit' disabled={!isValid} loading={loading}>
-                Save
+          <Switch label='Enabled' key={form.key('enabled')} {...form.getInputProps('enabled', { type: 'checkbox' })} />
+        </div>
+
+        <Group mt='md'>
+          <AdminCan action={contextOAuthProvider ? 'oauth-providers.update' : 'oauth-providers.create'} cantSave>
+            <Button type='submit' disabled={!isValid} loading={loading}>
+              Save
+            </Button>
+            {!contextOAuthProvider && (
+              <Button onClick={() => doCreateOrUpdate(true)} disabled={!isValid} loading={loading}>
+                Save & Stay
               </Button>
-              {!contextOAuthProvider && (
-                <Button onClick={() => doCreateOrUpdate(true)} disabled={!isValid} loading={loading}>
-                  Save & Stay
-                </Button>
-              )}
-              {contextOAuthProvider && (
-                <ContextMenuProvider menuProps={{ position: 'top', offset: 40 }}>
-                  <ContextMenu
-                    items={[
-                      {
-                        icon: faFileDownload,
-                        label: 'as JSON',
-                        onClick: () => doExport('json'),
-                        color: 'gray',
-                      },
-                      {
-                        icon: faFileDownload,
-                        label: 'as YAML',
-                        onClick: () => doExport('yaml'),
-                        color: 'gray',
-                      },
-                    ]}
-                  >
-                    {({ openMenu }) => (
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          openMenu(rect.left, rect.bottom);
-                        }}
-                        loading={loading}
-                        variant='outline'
-                        rightSection={<FontAwesomeIcon icon={faChevronDown} />}
-                      >
-                        Export
-                      </Button>
-                    )}
-                  </ContextMenu>
-                </ContextMenuProvider>
-              )}
-            </AdminCan>
-            {contextOAuthProvider && (
-              <AdminCan action='oauth-provider.delete' cantDelete>
-                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  Delete
-                </Button>
-              </AdminCan>
             )}
-          </Group>
-        </Stack>
+            {contextOAuthProvider && (
+              <ContextMenuProvider menuProps={{ position: 'top', offset: 40 }}>
+                <ContextMenu
+                  items={[
+                    {
+                      icon: faFileDownload,
+                      label: 'as JSON',
+                      onClick: () => doExport('json'),
+                      color: 'gray',
+                    },
+                    {
+                      icon: faFileDownload,
+                      label: 'as YAML',
+                      onClick: () => doExport('yaml'),
+                      color: 'gray',
+                    },
+                  ]}
+                >
+                  {({ openMenu }) => (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        openMenu(rect.left, rect.bottom);
+                      }}
+                      loading={loading}
+                      variant='outline'
+                      rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+                    >
+                      Export
+                    </Button>
+                  )}
+                </ContextMenu>
+              </ContextMenuProvider>
+            )}
+          </AdminCan>
+          {contextOAuthProvider && (
+            <AdminCan action='oauth-provider.delete' cantDelete>
+              <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
+                Delete
+              </Button>
+            </AdminCan>
+          )}
+          <a href='https://calagopus.com/docs/advanced/oauth' target='_blank' rel='noopener noreferrer'>
+            <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
+              View Documentation
+            </Button>
+          </a>
+        </Group>
       </form>
     </AdminContentContainer>
   );

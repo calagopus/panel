@@ -71,7 +71,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             nest_egg_mounts: nest_egg_mounts
                 .try_async_map(|nest_egg_mount| {
-                    nest_egg_mount.into_admin_nest_egg_api_object(&state.database)
+                    nest_egg_mount.into_admin_nest_egg_api_object(&state, ())
                 })
                 .await?,
         })

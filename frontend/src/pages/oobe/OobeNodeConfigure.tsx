@@ -1,11 +1,9 @@
-import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faChevronLeft, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack, Title } from '@mantine/core';
 import jsYaml from 'js-yaml';
 import { useEffect, useState } from 'react';
-import { z } from 'zod';
-import getNodes from '@/api/admin/nodes/getNodes.ts';
-import { axiosInstance, httpErrorToHuman } from '@/api/axios.ts';
+import { axiosInstance } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Alert from '@/elements/Alert.tsx';
 import AlertError from '@/elements/alerts/AlertError.tsx';
@@ -14,39 +12,27 @@ import Code from '@/elements/Code.tsx';
 import HljsCode from '@/elements/HljsCode.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { getNodeConfiguration, getNodeConfigurationCommand, getNodeUrl } from '@/lib/node.ts';
-import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 
-export default function OobeNodeConfigure({ onNext, skipFrom }: OobeComponentProps) {
+export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom, data }: OobeComponentProps) {
   const { addToast } = useToast();
   const { t } = useTranslations();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isVerified, setIsVerified] = useState(false);
-  const [node, setNode] = useState<z.infer<typeof adminNodeSchema> | null>(null);
   const [nodeConfiguration, setNodeConfiguration] = useState({});
   const [command, setCommand] = useState('');
 
-  useEffect(() => {
-    getNodes(1)
-      .then((nodes) => {
-        if (nodes.total > 0) {
-          setNode(nodes.data[0]);
-          setLoading(false);
-        } else {
-          setError(t('pages.oobe.nodeConfiguration.error.noNodes', {}));
-        }
-      })
-      .catch((msg) => {
-        setError(httpErrorToHuman(msg));
-      });
-  }, []);
+  const node = data.nodes[0] ?? null;
 
   useEffect(() => {
-    if (!node) return;
+    if (!node) {
+      setError(t('pages.oobe.nodeConfiguration.error.noNodes', {}));
+      return;
+    }
 
     const remote = window.location.origin;
     const apiPort = parseInt(new URL(node.url).port || '8080');
@@ -66,6 +52,7 @@ export default function OobeNodeConfigure({ onNext, skipFrom }: OobeComponentPro
       .get(getNodeUrl(node, '/api/system'), {
         headers: {
           Authorization: `Bearer ${node.token}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
       })
       .then(({ data }) => {
@@ -85,7 +72,7 @@ export default function OobeNodeConfigure({ onNext, skipFrom }: OobeComponentPro
     <Stack gap='lg'>
       <Title order={2}>{t('pages.oobe.nodeConfiguration.title', {})}</Title>
 
-      <div className='max-w-2xl flex flex-col gap-4 self-end'>
+      <div className='w-full sm:max-w-2xl flex flex-col gap-4 sm:self-end'>
         {error && <AlertError error={error} setError={setError} />}
         {isVerified && !error && (
           <Alert icon={<FontAwesomeIcon icon={faCheck} />} color='green' title={t('common.alert.success', {})}>
@@ -93,38 +80,45 @@ export default function OobeNodeConfigure({ onNext, skipFrom }: OobeComponentPro
           </Alert>
         )}
 
-        <div className='flex flex-col min-w-0'>
-          <HljsCode
-            languageName='yaml'
-            language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
-          >
-            {jsYaml.dump(nodeConfiguration)}
-          </HljsCode>
+        {node && (
+          <div className='flex flex-col min-w-0'>
+            <HljsCode
+              languageName='yaml'
+              language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
+            >
+              {jsYaml.dump(nodeConfiguration)}
+            </HljsCode>
 
-          <div className='mt-2'>
-            {t('pages.oobe.nodeConfiguration.configurationDescription', { file: '/etc/pterodactyl/config.yml' }).md()}
-            <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
-              <Code block className='flex-1 overflow-x-auto'>
-                {command}
-              </Code>
-              <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
-                <FontAwesomeIcon icon={faCopy} />
-              </ActionIcon>
-            </Group>
+            <div className='mt-2'>
+              {t('pages.oobe.nodeConfiguration.configurationDescription', { file: '/etc/pterodactyl/config.yml' }).md()}
+              <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
+                <Code block className='flex-1 overflow-x-auto'>
+                  {command}
+                </Code>
+                <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
+                  <FontAwesomeIcon icon={faCopy} />
+                </ActionIcon>
+              </Group>
+            </div>
           </div>
-        </div>
+        )}
 
-        <Button loading={loading} leftSection={<FontAwesomeIcon icon={faCheck} />} onClick={() => verifyNode()}>
-          {t('pages.oobe.nodeConfiguration.button.verify', {})}
-        </Button>
+        {node && (
+          <Button loading={loading} leftSection={<FontAwesomeIcon icon={faCheck} />} onClick={() => verifyNode()}>
+            {t('pages.oobe.nodeConfiguration.button.verify', {})}
+          </Button>
+        )}
       </div>
 
       <Group justify='flex-end'>
-        {!!skipFrom && (
-          <Button variant='outline' onClick={() => skipFrom('node')}>
-            {t('common.button.skip', {})}
+        {canGoBack && (
+          <Button variant='subtle' onClick={onBack} leftSection={<FontAwesomeIcon icon={faChevronLeft} />}>
+            Back
           </Button>
         )}
+        <Button variant='outline' onClick={() => skipFrom('nodeconfiguration')}>
+          {t('common.button.skip', {})}
+        </Button>
         <Button disabled={!isVerified} loading={loading} onClick={() => onNext()}>
           {t('common.button.continue', {})}
         </Button>

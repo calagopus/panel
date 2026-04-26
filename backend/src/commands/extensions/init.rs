@@ -166,6 +166,7 @@ impl shared::extensions::commands::CliCommand<InitArgs> for InitCommand {
                     &extension_distr.metadata_toml.package_name,
                     &args.package_name,
                 );
+                metadata_toml = metadata_toml.replace(">=1.0.0", &format!(">={}", shared::VERSION));
                 tokio::fs::write(&metadata_toml_path, metadata_toml).await?;
 
                 if let Err(err) = tokio::task::spawn_blocking(|| {

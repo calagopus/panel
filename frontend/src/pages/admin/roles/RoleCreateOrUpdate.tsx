@@ -1,4 +1,4 @@
-import { Group, Stack } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -90,26 +90,22 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'roles']))}>
-        <Stack mt='xs'>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
 
-          <Group grow align='start'>
-            <TextArea
-              label='Description'
-              placeholder='Description'
-              rows={3}
-              key={form.key('description')}
-              {...form.getInputProps('description')}
-            />
-          </Group>
+          <TextArea
+            label='Description'
+            placeholder='Description'
+            rows={3}
+            key={form.key('description')}
+            {...form.getInputProps('description')}
+          />
 
           <Switch
             label='Require Two Factor'
@@ -118,47 +114,47 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
             {...form.getInputProps('requireTwoFactor', { type: 'checkbox' })}
           />
 
-          <Stack>
-            {availablePermissions?.serverPermissions && (
-              <PermissionSelector
-                label='Server Permissions'
-                permissionsMapType='serverPermissions'
-                permissions={availablePermissions.serverPermissions}
-                selectedPermissions={form.getValues().serverPermissions}
-                setSelectedPermissions={(permissions) => form.setFieldValue('serverPermissions', permissions)}
-              />
-            )}
-            {availablePermissions?.adminPermissions && (
-              <PermissionSelector
-                label='Admin Permissions'
-                permissionsMapType='adminPermissions'
-                permissions={availablePermissions.adminPermissions}
-                selectedPermissions={form.getValues().adminPermissions}
-                setSelectedPermissions={(permissions) => form.setFieldValue('adminPermissions', permissions)}
-              />
-            )}
-          </Stack>
+          {availablePermissions?.serverPermissions && (
+            <PermissionSelector
+              label='Server Permissions'
+              className='col-span-full'
+              permissionsMapType='serverPermissions'
+              permissions={availablePermissions.serverPermissions}
+              selectedPermissions={form.getValues().serverPermissions}
+              setSelectedPermissions={(permissions) => form.setFieldValue('serverPermissions', permissions)}
+            />
+          )}
+          {availablePermissions?.adminPermissions && (
+            <PermissionSelector
+              label='Admin Permissions'
+              className='col-span-full'
+              permissionsMapType='adminPermissions'
+              permissions={availablePermissions.adminPermissions}
+              selectedPermissions={form.getValues().adminPermissions}
+              setSelectedPermissions={(permissions) => form.setFieldValue('adminPermissions', permissions)}
+            />
+          )}
+        </div>
 
-          <Group>
-            <AdminCan action={contextRole ? 'roles.update' : 'roles.create'} cantSave>
-              <Button type='submit' disabled={!form.isValid()} loading={loading}>
-                Save
+        <Group mt='md'>
+          <AdminCan action={contextRole ? 'roles.update' : 'roles.create'} cantSave>
+            <Button type='submit' disabled={!form.isValid()} loading={loading}>
+              Save
+            </Button>
+            {!contextRole && (
+              <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
+                Save & Stay
               </Button>
-              {!contextRole && (
-                <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                  Save & Stay
-                </Button>
-              )}
-            </AdminCan>
-            {contextRole && (
-              <AdminCan action='roles.delete' cantDelete>
-                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  Delete
-                </Button>
-              </AdminCan>
             )}
-          </Group>
-        </Stack>
+          </AdminCan>
+          {contextRole && (
+            <AdminCan action='roles.delete' cantDelete>
+              <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
+                Delete
+              </Button>
+            </AdminCan>
+          )}
+        </Group>
       </form>
     </AdminContentContainer>
   );

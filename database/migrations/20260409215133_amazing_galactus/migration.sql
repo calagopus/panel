@@ -8,7 +8,7 @@ SET "credentials" = jsonb_build_object(
     'host', host,
     'port', port,
     'username', username,
-    'password', replace(encode(password, 'base64'), '\n', '')
+    'password', replace(encode(password, 'base64'), E'\n', '')
 );
 
 ALTER TABLE "database_hosts" ALTER COLUMN "credentials" SET NOT NULL;

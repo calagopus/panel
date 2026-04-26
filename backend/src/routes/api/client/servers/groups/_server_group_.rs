@@ -10,7 +10,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch,
+            IntoApiObject, Pagination, PaginationParamsWithSearch,
             server::Server,
             user::{GetPermissionManager, GetUser},
             user_server_group::UserServerGroup,
@@ -87,7 +87,7 @@ mod get {
 
         ApiResponse::new_serialized(Response {
             servers: servers
-                .try_async_map(|server| server.into_api_object(&state.database, &user))
+                .try_async_map(|server| server.into_api_object(&state, &user))
                 .await?,
         })
         .ok()

@@ -24,12 +24,19 @@ export const adminExtensionUpdateCheckResultSchema = z.discriminatedUnion('type'
 ]);
 
 export const adminUpdateInformationSchema = z.object({
-  latestPanel: z.string(),
-  latestWings: z.string(),
+  panelVersion: z.string(),
+  latestPanelVersion: z.string(),
+  latestWingsVersion: z.string(),
   extensions: z.record(z.string(), adminExtensionUpdateCheckResultSchema),
 });
 
 export const adminNodeUpdateInformationSchema = z.object({
   version: z.string(),
+  node: z.lazy(() => adminNodeSchema),
+});
+
+export const adminNodeDesyncSchema = z.object({
+  localTime: z.string(),
+  panelLocalTime: z.string(),
   node: z.lazy(() => adminNodeSchema),
 });

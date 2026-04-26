@@ -1,3 +1,4 @@
+import { ComponentListRegistry } from 'shared/src/registries/slices/componentList.ts';
 import { ElementsRegistry } from './elements/index.ts';
 import { PageRegistry } from './pages/index.ts';
 import { PermissionIconRegistry } from './permission-icons.ts';
@@ -13,6 +14,7 @@ export class ExtensionRegistry implements Registry {
     this.elements.mergeFrom(other.elements);
     this.routes.mergeFrom(other.routes);
     this.permissionIcons.mergeFrom(other.permissionIcons);
+    this.global.mergeFrom(other.global);
 
     return this;
   }
@@ -21,6 +23,7 @@ export class ExtensionRegistry implements Registry {
   public elements: ElementsRegistry = new ElementsRegistry();
   public routes: RouteRegistry = new RouteRegistry();
   public permissionIcons: PermissionIconRegistry = new PermissionIconRegistry();
+  public global: ComponentListRegistry = new ComponentListRegistry();
 
   public enterPages(callback: (registry: PageRegistry) => unknown): this {
     callback(this.pages);
@@ -39,6 +42,11 @@ export class ExtensionRegistry implements Registry {
 
   public enterPermissionIcons(callback: (registry: PermissionIconRegistry) => unknown): this {
     callback(this.permissionIcons);
+    return this;
+  }
+
+  public enterGlobal(callback: (registry: ComponentListRegistry) => unknown): this {
+    callback(this.global);
     return this;
   }
 }

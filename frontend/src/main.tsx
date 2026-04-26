@@ -5,10 +5,11 @@ import App from '@/App.tsx';
 import.meta.glob('../extensions/*/src/app.css', { eager: true });
 import '@/app.css';
 
-const extensionModules = import.meta.glob('../extensions/*/src/index.ts', { eager: true });
+const extensionModulesTs = import.meta.glob('../extensions/*/src/index.ts', { eager: true });
+const extensionModulesTsx = import.meta.glob('../extensions/*/src/index.tsx', { eager: true });
 const extensions: Extension[] = [];
 
-for (const [path, module] of Object.entries(extensionModules)) {
+for (const [path, module] of Object.entries({ ...extensionModulesTs, ...extensionModulesTsx })) {
   const identifier = path.split('/')[2];
   if (identifier === 'shared') continue;
 

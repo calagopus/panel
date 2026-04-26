@@ -882,7 +882,7 @@
         },
         "shortcuts": {
           "title": "Phím Tắt Bàn Phím",
-          "description": "Sử dụng các phím tắt này để điều hướng và tương tác với bảng điều khiển hiệu quả hơn.",
+          "subtitle": "Sử dụng các phím tắt này để điều hướng và tương tác với bảng điều khiển hiệu quả hơn.",
           "detectedMac": "Đã phát hiện macOS",
           "detectedWindows": "Đã phát hiện Windows/Linux",
           "fileManager": {

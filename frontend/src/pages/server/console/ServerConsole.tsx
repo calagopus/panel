@@ -18,17 +18,19 @@ export default function ServerConsole() {
       hideTitleComponent
       registry={window.extensionContext.extensionRegistry.pages.server.console.container}
     >
-      <Group justify='space-between' mb='md'>
-        <div className='flex flex-col'>
-          <Title order={1} c='white'>
-            {server.name}
-          </Title>
-          <p className='text-sm text-gray-300!'>{server.description}</p>
-        </div>
-        <ServerCan action={['control.start', 'control.stop', 'control.restart']} matchAny>
-          <ServerPowerControls />
-        </ServerCan>
-      </Group>
+      <div className='sticky top-0 z-10 bg-neutral-850 mb-4 py-2 -mx-4 lg:-mx-6 px-4 lg:px-6'>
+        <Group justify='space-between'>
+          <div className='flex flex-col'>
+            <Title order={1} c='white'>
+              {server.name}
+            </Title>
+            <p className='text-sm text-gray-300!'>{server.description}</p>
+          </div>
+          <ServerCan action={['control.start', 'control.stop', 'control.restart']} matchAny>
+            <ServerPowerControls />
+          </ServerCan>
+        </Group>
+      </div>
 
       <div className='grid xl:grid-cols-4 gap-4 mb-4'>
         <div className='xl:col-span-3 flex flex-col h-[60vh] xl:h-auto'>

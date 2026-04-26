@@ -7,12 +7,8 @@ export default async (
   page: number,
   search?: string,
 ): Promise<Pagination<AndCreated<{ node: z.infer<typeof adminNodeSchema> }>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/admin/mounts/${mountUuid}/nodes`, {
-        params: { page, search },
-      })
-      .then(({ data }) => resolve(data.nodeMounts))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/admin/mounts/${mountUuid}/nodes`, {
+    params: { page, search },
   });
+  return data.nodeMounts;
 };

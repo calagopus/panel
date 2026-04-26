@@ -21,24 +21,24 @@ import { dashboardTwoFactorEnableSchema } from '@/lib/schemas/dashboard.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 
 export interface TwoFactorSetupResponse {
   otpUrl: string;
   secret: string;
-  serverTime: Date;
 }
 
 export default function TwoFactorSetupButton() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
+  const { timeOffset } = useGlobalStore();
 
   const stageStack = useModalsStack(['setup', 'recovery']);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [token, setToken] = useState<TwoFactorSetupResponse | null>(null);
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
-  const [timeOffset, setTimeOffset] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof dashboardTwoFactorEnableSchema>>({
@@ -61,7 +61,6 @@ export default function TwoFactorSetupButton() {
     getTwoFactor()
       .then((res) => {
         setToken(res);
-        setTimeOffset(Date.now() - res.serverTime.getTime());
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

@@ -9,8 +9,8 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, egg_repository::EggRepository,
-            user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch,
+            egg_repository::EggRepository, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -62,16 +62,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            egg_repositories: Pagination {
-                total: egg_repositories.total,
-                per_page: egg_repositories.per_page,
-                page: egg_repositories.page,
-                data: egg_repositories
-                    .data
-                    .into_iter()
-                    .map(|egg_repository| egg_repository.into_admin_api_object())
-                    .collect(),
-            },
+            egg_repositories: egg_repositories
+                .try_async_map(|egg_repository| egg_repository.into_admin_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }
@@ -83,7 +76,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             egg_repository::{CreateEggRepositoryOptions, EggRepository},
             user::GetPermissionManager,
@@ -135,7 +128,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            egg_repository: egg_repository.into_admin_api_object(),
+            egg_repository: egg_repository.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

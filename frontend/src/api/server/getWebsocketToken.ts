@@ -6,15 +6,9 @@ interface Response {
 }
 
 export default async (uuid: string): Promise<Response> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/client/servers/${uuid}/websocket`)
-      .then(({ data }) =>
-        resolve({
-          token: data.token,
-          socket: data.url,
-        }),
-      )
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/websocket`);
+  return {
+    token: data.token,
+    socket: data.url,
+  };
 };

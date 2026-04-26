@@ -7,6 +7,7 @@ import getServers from '@/api/server/getServers.ts';
 import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -28,6 +29,7 @@ export default function GroupAddServerModal({ serverGroup, opened, onClose, onSe
   const [loading, setLoading] = useState(false);
 
   const servers = useSearchableResource<z.infer<typeof serverSchema>>({
+    queryKey: queryKeys.user.servers.all(),
     fetcher: (search) => getServers(1, search),
   });
 

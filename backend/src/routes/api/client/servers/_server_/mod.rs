@@ -117,7 +117,7 @@ mod get {
     use serde::Serialize;
     use shared::{
         GetState,
-        models::{server::GetServer, user::GetUser},
+        models::{IntoApiObject, server::GetServer, user::GetUser},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -138,7 +138,7 @@ mod get {
     ))]
     pub async fn route(state: GetState, user: GetUser, server: GetServer) -> ApiResponseResult {
         ApiResponse::new_serialized(Response {
-            server: server.0.into_api_object(&state.database, &user).await?,
+            server: server.0.into_api_object(&state, &user).await?,
         })
         .ok()
     }

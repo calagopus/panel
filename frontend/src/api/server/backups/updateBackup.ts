@@ -8,10 +8,5 @@ export default async (
   backupUuid: string,
   data: z.infer<typeof serverBackupEditSchema>,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(`/api/client/servers/${uuid}/backups/${backupUuid}`, transformKeysToSnakeCase(data))
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.patch(`/api/client/servers/${uuid}/backups/${backupUuid}`, transformKeysToSnakeCase(data));
 };

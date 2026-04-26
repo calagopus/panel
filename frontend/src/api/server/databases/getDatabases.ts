@@ -7,12 +7,8 @@ export default async (
   page: number,
   search?: string,
 ): Promise<Pagination<z.infer<typeof serverDatabaseSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/client/servers/${uuid}/databases`, {
-        params: { page, search, include_password: true },
-      })
-      .then(({ data }) => resolve(data.databases))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/databases`, {
+    params: { page, search, include_password: true },
   });
+  return data.databases;
 };

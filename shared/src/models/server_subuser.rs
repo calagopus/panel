@@ -1,7 +1,6 @@
 use crate::{
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
-    storage::StorageUrlRetriever,
 };
 use garde::Validate;
 use rand::distr::SampleString;
@@ -22,13 +21,26 @@ pub struct ServerSubuser {
     pub ignored_files: Vec<compact_str::CompactString>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for ServerSubuser {
     const NAME: &'static str = "server_subuser";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         let mut columns = BTreeMap::from([
@@ -50,7 +62,7 @@ impl BaseModel for ServerSubuser {
             ),
         ]);
 
-        columns.extend(super::user::User::columns(Some("user_")));
+        columns.extend(super::user::User::base_columns(Some("user_")));
 
         columns
     }
@@ -69,6 +81,7 @@ impl BaseModel for ServerSubuser {
             ignored_files: row
                 .try_get(compact_str::format_compact!("{prefix}ignored_files").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -156,18 +169,35 @@ impl ServerSubuser {
 
         Ok(())
     }
+}
 
-    #[inline]
-    pub fn into_api_object(
+#[async_trait::async_trait]
+impl IntoApiObject for ServerSubuser {
+    type ApiObject = ApiServerSubuser;
+    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+
+    async fn into_api_object<'a>(
         self,
-        storage_url_retriever: &StorageUrlRetriever<'_>,
-    ) -> ApiServerSubuser {
-        ApiServerSubuser {
-            user: self.user.into_api_object(storage_url_retriever),
-            permissions: self.permissions,
-            ignored_files: self.ignored_files,
-            created: self.created.and_utc(),
-        }
+        state: &crate::State,
+        storage_url_retriever: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiServerSubuser::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiServerSubuser {
+                user: self
+                    .user
+                    .into_api_object(state, storage_url_retriever)
+                    .await?,
+                permissions: self.permissions,
+                ignored_files: self.ignored_files,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -430,6 +460,9 @@ impl DeletableModel for ServerSubuser {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(ServerSubuser, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "ServerSubuser")]
 pub struct ApiServerSubuser {

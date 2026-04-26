@@ -10,6 +10,7 @@ import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverEggSchema } from '@/lib/schemas/server/server.ts';
 import { userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
@@ -26,6 +27,7 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
   const [loading, setLoading] = useState(false);
 
   const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
+    queryKey: [...queryKeys.user.servers.all(), 'eggs'],
     fetcher: (search) => getUserEggs(1, search),
   });
 

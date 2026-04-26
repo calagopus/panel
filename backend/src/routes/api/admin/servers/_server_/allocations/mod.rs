@@ -9,7 +9,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, server::GetServer,
+            IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
             server_allocation::ServerAllocation, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -71,16 +71,9 @@ mod get {
         let allocation_uuid = server.0.allocation.map(|a| a.uuid);
 
         ApiResponse::new_serialized(Response {
-            allocations: Pagination {
-                total: allocations.total,
-                per_page: allocations.per_page,
-                page: allocations.page,
-                data: allocations
-                    .data
-                    .into_iter()
-                    .map(|allocation| allocation.into_api_object(allocation_uuid))
-                    .collect(),
-            },
+            allocations: allocations
+                .try_async_map(|allocation| allocation.into_api_object(&state, allocation_uuid))
+                .await?,
         })
         .ok()
     }
@@ -92,7 +85,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            admin_activity::GetAdminActivityLogger, node_allocation::NodeAllocation,
+            IntoApiObject, admin_activity::GetAdminActivityLogger, node_allocation::NodeAllocation,
             server::GetServer, server_allocation::ServerAllocation, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -173,7 +166,9 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            allocation: allocation.into_api_object(server.0.allocation.map(|a| a.uuid)),
+            allocation: allocation
+                .into_api_object(&state, server.0.allocation.map(|a| a.uuid))
+                .await?,
         })
         .ok()
     }

@@ -7,10 +7,5 @@ export default async (
   oauthProviderUuid: string,
   data: z.infer<typeof adminOAuthProviderUpdateSchema>,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(`/api/admin/oauth-providers/${oauthProviderUuid}`, transformKeysToSnakeCase(data))
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.patch(`/api/admin/oauth-providers/${oauthProviderUuid}`, transformKeysToSnakeCase(data));
 };

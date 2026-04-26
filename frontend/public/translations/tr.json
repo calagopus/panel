@@ -886,7 +886,7 @@
         },
         "shortcuts": {
           "title": "Klavye Kısayolları",
-          "description": "Panelde daha verimli gezinmek ve etkileşimde bulunmak için bu klavye kısayollarını kullanın.",
+          "subtitle": "Panelde daha verimli gezinmek ve etkileşimde bulunmak için bu klavye kısayollarını kullanın.",
           "detectedMac": "macOS algılandı",
           "detectedWindows": "Windows/Linux algılandı",
           "fileManager": {

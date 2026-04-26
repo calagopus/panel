@@ -7,7 +7,7 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{user::GetPermissionManager, user_oauth_link::UserOAuthLink},
+        models::{IntoApiObject, user::GetPermissionManager, user_oauth_link::UserOAuthLink},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -51,7 +51,7 @@ mod get {
             };
 
         ApiResponse::new_serialized(Response {
-            oauth_link: oauth_link.into_api_object(&state.database).await?,
+            oauth_link: oauth_link.into_api_object(&state, ()).await?,
         })
         .ok()
     }

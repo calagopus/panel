@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import getLocations from '@/api/admin/locations/getLocations.ts';
 import getNodes from '@/api/admin/nodes/getNodes.ts';
+import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import LocationCreateOrUpdateModal from './LocationCreateOrUpdateModal.tsx';
 import NodeCreateOrUpdate from './NodeCreateOrUpdate.tsx';
 import NodeRow from './NodeRow.tsx';
@@ -19,14 +20,15 @@ import NodeView from './NodeView.tsx';
 
 function NodesContainer() {
   const navigate = useNavigate();
-  const { nodes, setNodes } = useAdminStore();
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [checkingLocations, setCheckingLocations] = useState(true);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.nodes.all(),
     fetcher: getNodes,
-    setStoreData: setNodes,
   });
+
+  const nodes = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   useEffect(() => {
     getLocations(1)

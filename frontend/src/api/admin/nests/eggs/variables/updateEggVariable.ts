@@ -9,10 +9,8 @@ export default async (
   variableUuid: string,
   data: z.infer<typeof adminEggVariableUpdateSchema>,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(`/api/admin/nests/${nestUuid}/eggs/${eggUuid}/variables/${variableUuid}`, transformKeysToSnakeCase(data))
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.patch(
+    `/api/admin/nests/${nestUuid}/eggs/${eggUuid}/variables/${variableUuid}`,
+    transformKeysToSnakeCase(data),
+  );
 };

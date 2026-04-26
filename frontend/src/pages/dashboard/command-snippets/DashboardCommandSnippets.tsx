@@ -1,53 +1,43 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Title } from '@mantine/core';
 import { useState } from 'react';
+import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getCommandSnippets from '@/api/me/command-snippets/getCommandSnippets.ts';
 import Button from '@/elements/Button.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import Table from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 import CommandSnippetRow from './CommandSnippetRow.tsx';
 import CommandSnippetCreateModal from './modals/CommandSnippetCreateModal.tsx';
 
 export default function DashboardCommandSnippets() {
   const { t } = useTranslations();
-  const { commandSnippets, setCommandSnippets } = useUserStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.user.commandSnippets.all(),
     fetcher: getCommandSnippets,
-    setStoreData: setCommandSnippets,
   });
+
+  const commandSnippets = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AccountContentContainer
       title={t('pages.account.commandSnippets.title', {})}
+      search={search}
+      setSearch={setSearch}
+      contentRight={
+        <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
+          {t('common.button.create', {})}
+        </Button>
+      }
       registry={window.extensionContext.extensionRegistry.pages.dashboard.commandSnippets.container}
     >
       <CommandSnippetCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
-
-      <Group justify='space-between' align='start' mb='md'>
-        <Title order={1} c='white'>
-          {t('pages.account.commandSnippets.title', {})}
-        </Title>
-        <Group>
-          <TextInput
-            placeholder={t('common.input.search', {})}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            w={250}
-          />
-          <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            {t('common.button.create', {})}
-          </Button>
-        </Group>
-      </Group>
 
       <ContextMenuProvider>
         <Table

@@ -7,17 +7,11 @@ export default async (
   page: number,
   search?: string,
 ): Promise<Pagination<z.infer<typeof serverActivitySchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/client/servers/${uuid}/activity`, {
-        params: { page, search },
-      })
-      .then(({ data }) =>
-        resolve({
-          ...getPaginationSet(data.activities),
-          data: data.activities.data || [],
-        }),
-      )
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/activity`, {
+    params: { page, search },
   });
+  return {
+    ...getPaginationSet(data.activities),
+    data: data.activities.data || [],
+  };
 };

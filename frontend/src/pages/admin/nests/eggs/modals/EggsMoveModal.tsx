@@ -8,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -29,7 +30,10 @@ export default function EggsMoveModal({
   const [loading, setLoading] = useState(false);
   const [selectedNest, setSelectedNest] = useState<z.infer<typeof adminNestSchema> | null>(null);
 
-  const nests = useSearchableResource<z.infer<typeof adminNestSchema>>({ fetcher: (search) => getNests(1, search) });
+  const nests = useSearchableResource<z.infer<typeof adminNestSchema>>({
+    queryKey: queryKeys.admin.nests.all(),
+    fetcher: (search) => getNests(1, search),
+  });
 
   const doMove = () => {
     if (!selectedNest) {

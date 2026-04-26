@@ -34,6 +34,7 @@ impl SettingsSerializer {
         )
     }
 
+    /// Write a raw setting with the given key and value. The value will be stored as-is without any serialization or encryption.
     pub fn write_raw_setting(
         mut self,
         key: impl AsRef<str>,
@@ -45,6 +46,21 @@ impl SettingsSerializer {
         self
     }
 
+    /// Write a raw setting with the given key and value, encrypting the value before storage. The value will be encrypted and stored as a base64 string.
+    pub async fn write_raw_encrypted_setting(
+        mut self,
+        key: impl AsRef<str>,
+        value: impl Into<compact_str::CompactString>,
+    ) -> Result<Self, anyhow::Error> {
+        let encrypted_value = self.database.encrypt_base64(value.into()).await?;
+
+        self.keys.push(self.key_prefix(key));
+        self.values.push(encrypted_value);
+
+        Ok(self)
+    }
+
+    /// Write a setting with the given key and value, serializing the value to JSON before storage. The value will be stored as a JSON string.
     pub fn write_serde_setting(
         mut self,
         key: impl AsRef<str>,
@@ -58,6 +74,22 @@ impl SettingsSerializer {
         Ok(self)
     }
 
+    /// Write a setting with the given key and value, serializing the value to JSON and encrypting it before storage. The value will be encrypted and stored as a base64 string.
+    pub async fn write_serde_encrypted_setting(
+        mut self,
+        key: impl AsRef<str>,
+        value: &impl serde::Serialize,
+    ) -> Result<Self, anyhow::Error> {
+        let serialized = serde_json::to_string(value)?;
+        let encrypted_value = self.database.encrypt_base64(serialized).await?;
+
+        self.keys.push(self.key_prefix(key));
+        self.values.push(encrypted_value);
+
+        Ok(self)
+    }
+
+    /// Nest another set of settings under the given nested prefix. The nested settings will be serialized with a prefix of `self.prefix::nested_prefix`.
     pub async fn nest(
         mut self,
         nested_prefix: &str,
@@ -123,14 +155,31 @@ impl<'a> SettingsDeserializer<'a> {
         )
     }
 
+    /// Read a raw setting with the given key. The value will be returned as-is without any deserialization or decryption.
     pub fn read_raw_setting(&self, key: impl AsRef<str>) -> Option<&compact_str::CompactString> {
         self.settings.get(&self.key_prefix(key))
     }
 
+    /// Read a raw setting with the given key, decrypting the value before returning. The value will be decrypted from a base64 string and returned as-is without any deserialization.
+    pub async fn read_raw_encrypted_setting(
+        &self,
+        key: impl AsRef<str>,
+    ) -> Result<Option<compact_str::CompactString>, anyhow::Error> {
+        match self.settings.get(&self.key_prefix(key)) {
+            Some(encrypted_value) => {
+                let decrypted = self.database.decrypt_base64(encrypted_value).await?;
+                Ok(Some(decrypted))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Remove and return a raw setting with the given key. The value will be returned as-is without any deserialization or decryption.
     pub fn take_raw_setting(&mut self, key: impl AsRef<str>) -> Option<compact_str::CompactString> {
         self.settings.remove(&self.key_prefix(key))
     }
 
+    /// Remove and return a raw setting with the given key, decrypting the value before returning. The value will be decrypted from a base64 string and returned as-is without any deserialization.
     pub fn read_serde_setting<T: serde::de::DeserializeOwned>(
         &self,
         key: impl AsRef<str>,
@@ -143,6 +192,22 @@ impl<'a> SettingsDeserializer<'a> {
         serde_json::from_str(value)
     }
 
+    /// Read a setting with the given key, decrypting the value before returning. The value will be decrypted from a base64 string and deserialized from JSON.
+    pub async fn read_serde_encrypted_setting<T: serde::de::DeserializeOwned>(
+        &self,
+        key: impl AsRef<str>,
+    ) -> Result<Option<T>, anyhow::Error> {
+        match self.settings.get(&self.key_prefix(key)) {
+            Some(encrypted_value) => {
+                let decrypted = self.database.decrypt_base64(encrypted_value).await?;
+                let deserialized = serde_json::from_str(&decrypted)?;
+                Ok(Some(deserialized))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Nest another set of settings under the given nested prefix. The nested settings will be deserialized with a prefix of `self.prefix::nested_prefix`.
     pub async fn nest<T: 'static>(
         &mut self,
         nested_prefix: &str,

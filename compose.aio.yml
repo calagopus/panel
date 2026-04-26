@@ -1,0 +1,67 @@
+services:
+  web:
+    # image: ghcr.io/calagopus/panel:nightly-aio # if you want to live on the edge
+    image: ghcr.io/calagopus/panel:aio
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Berlin
+      - REDIS_URL=redis://cache
+      - DATABASE_URL=postgresql://panel:panel@db/panel
+      - DATABASE_MIGRATE=true
+      - PORT=8000
+      - AIO_BASE_WINGS_CONFIGURATION=/wings-config.yml
+      - APP_DEBUG=false
+      - APP_LOG_DIRECTORY=/var/log/calagopus
+      - APP_PRIMARY=true # sets whether this panel instance is responsible for running background tasks (e.g. cleanup)
+      - APP_ENABLE_WINGS_PROXY=true # enables the wings proxy feature, allowing the panel to proxy user requests to wings nodes, simplifies home network setups, not recommended for many nodes or high traffic setups
+      - APP_ENCRYPTION_KEY=CHANGEME
+      - APP_USE_DECRYPTION_CACHE=true # caches decrypted values in memory and redis to improve performance, can be considered less secure
+      - APP_USE_INTERNAL_CACHE=true # caches short-lived values in app memory and redis instead of just redis, improves performance at the cost of higher memory usage
+    volumes:
+      # --- panel
+      - ./data:/var/lib/calagopus
+      - ./logs:/var/log/calagopus
+
+      # --- wings
+      - ./wings-config.yml:/wings-config.yml
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/lib/docker/containers/:/var/lib/docker/containers/"
+      # this is exclusively for the main wings configuration file, called config.yml
+      - "/etc/pterodactyl:/etc/pterodactyl/"
+      # please note: if you change the /var/lib/pterodactyl path and split it up, make sure to include the following paths properly (all in the config.yml):
+      # /var/lib/pterodactyl/volumes (used for storing server files)
+      # /var/lib/pterodactyl/vmounts (used for storing temporary mountpoints, DO NOT put this on a tmpfs, thats why its separate)
+      # /var/lib/pterodactyl/archives (unused for wings-rs currently, may get a future use)
+      # /var/lib/pterodactyl/backups (used for storing local backups of servers)
+      - "/var/lib/pterodactyl/:/var/lib/pterodactyl/"
+      - "/var/log/pterodactyl/:/var/log/pterodactyl/"
+      - "/tmp/pterodactyl/:/tmp/pterodactyl/"
+    ports:
+      - 8000:8000
+      - 2022:2022 # sftp port for integrated wings
+    extra_hosts: # mainly useful when importing from a standalone installation, can be omitted otherwise
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - db
+      - cache
+
+  db:
+    image: ghcr.io/calagopus/pgautoupgrade:18-alpine
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Berlin
+      - POSTGRES_USER=panel
+      - POSTGRES_PASSWORD=panel
+      - POSTGRES_DB=panel
+      - PGDATA=/data
+    volumes:
+      - ./postgres:/data
+
+  cache:
+    image: ghcr.io/calagopus/valkey:latest
+    restart: unless-stopped
+    command: --protected-mode no --save 60 1
+    environment:
+      TZ: Europe/Berlin
+    volumes:
+      - ./cache:/data

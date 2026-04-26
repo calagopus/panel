@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
+import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
@@ -14,10 +15,11 @@ interface EggRowProps {
   showSelection?: boolean;
   isSelected?: boolean;
   onSelectionChange?: (selected: boolean) => void;
+  contextMenuProps?: ContextMenuChildrenProps;
 }
 
 const EggRow = forwardRef<HTMLTableRowElement, EggRowProps>(function EggRow(
-  { nest, egg, showSelection, isSelected, onSelectionChange },
+  { nest, egg, showSelection, isSelected, onSelectionChange, contextMenuProps },
   ref,
 ) {
   return (
@@ -30,6 +32,12 @@ const EggRow = forwardRef<HTMLTableRowElement, EggRowProps>(function EggRow(
         }
 
         return false;
+      }}
+      onContextMenu={(e) => {
+        if (!contextMenuProps) return;
+
+        e.preventDefault();
+        contextMenuProps.openMenu(e.pageX, e.pageY);
       }}
       ref={ref}
     >
@@ -65,6 +73,12 @@ const EggRow = forwardRef<HTMLTableRowElement, EggRowProps>(function EggRow(
       <TableData>
         <FormattedTimestamp timestamp={egg.created} />
       </TableData>
+
+      {contextMenuProps && (
+        <TableData className='relative cursor-pointer min-w-10 text-center'>
+          <ContextMenuToggle items={contextMenuProps.items} openMenu={contextMenuProps.openMenu} />
+        </TableData>
+      )}
     </TableRow>
   );
 });

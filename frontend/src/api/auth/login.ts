@@ -20,10 +20,6 @@ type Response =
     };
 
 export default async ({ user, password, captcha }: Data): Promise<Response> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post('/api/auth/login', { user, password, captcha })
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.post('/api/auth/login', { user, password, captcha });
+  return data;
 };

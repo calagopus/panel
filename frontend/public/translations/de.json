@@ -122,7 +122,8 @@
         "enabled": "Aktiviert",
         "disabled": "Deaktiviert",
         "successful": "Erfolgreich",
-        "failed": "Fehlgeschlagen"
+        "failed": "Fehlgeschlagen",
+        "installed": "Installiert"
       },
       "server": {
         "noAllocation": "Keine Allocation",
@@ -504,6 +505,7 @@
         },
         "server": {
           "title": "Server",
+          "existingServer": "Es wurde bereits ein Server erstellt. Du kannst die Einstellungen später im Admin-Menü ändern.",
           "egg": {
             "title": "Egg",
             "description": "Lass uns deinen ersten Server zum Laufen bringen. Welches Egg möchtest du verwenden?",
@@ -552,7 +554,9 @@
         },
         "login": {
           "error": {
-            "usernameRequired": "Bitte gib einen Benutzernamen ein"
+            "usernameRequired": "Bitte gib einen Benutzernamen ein",
+            "registrationDisabled": "Es konnte kein passender Account gefunden werden und die Registrierung ist derzeit deaktiviert.",
+            "userAlreadyExists": "Ein Account mit diesem Benutzernamen oder dieser E-Mail existiert bereits."
           },
           "passkey": {
             "error": {
@@ -886,7 +890,7 @@
         },
         "shortcuts": {
           "title": "Tastaturkürzel",
-          "description": "Verwende diese Tastaturkürzel, um effizienter durch das Panel zu navigieren und damit zu interagieren.",
+          "subtitle": "Verwende diese Tastaturkürzel, um effizienter durch das Panel zu navigieren und damit zu interagieren.",
           "detectedMac": "macOS erkannt",
           "detectedWindows": "Windows/Linux erkannt",
           "fileManager": {
@@ -1050,6 +1054,13 @@
                 "updated": "API-Schlüssel aktualisiert."
               }
             },
+            "recreateApiKey": {
+              "title": "API-Schlüssel neu erstellen",
+              "content": "Das Neuerstellen eines API-Schlüssels generiert einen neuen Schlüssel und macht den alten ungültig. Bist du sicher, dass du den API-Schlüssel **{name}** neu erstellen möchtest?",
+              "toast": {
+                "recreated": "API-Schlüssel neu erstellt."
+              }
+            },
             "deleteApiKey": {
               "title": "Löschen des API-Schlüssels bestätigen",
               "content": "Bist du sicher, dass du **{name}** von deinem Account löschen möchtest?",
@@ -1082,7 +1093,8 @@
             "ariaLabel": "Konsolenbefehl Eingabe."
           },
           "toast": {
-            "installCancelled": "Server-Installation abgebrochen."
+            "installCancelled": "Server-Installation abgebrochen.",
+            "transferCancelled": "Server-Transfer abgebrochen."
           },
           "modal": {
             "sshDetails": {
@@ -1100,6 +1112,8 @@
             }
           },
           "notification": {
+            "suspended": "Dein Server ist derzeit suspendiert. Es können keine Aktionen durchgeführt werden, bis die Suspendierung aufgehoben wird.",
+            "suspendedAdmin": "Dieser Server ist derzeit suspendiert. Da du ein Administrator bist, kannst du weiterhin auf den Server zugreifen, aber Aktionen sind eingeschränkt.",
             "nodeMaintenance": "Dein Server befindet sich auf einer Node, die derzeit gewartet wird.",
             "transferring": "Dein Server wird derzeit auf eine andere Node übertragen.",
             "restoringBackup": "Dein Server stellt gerade ein Backup wieder her. Bitte warten...",

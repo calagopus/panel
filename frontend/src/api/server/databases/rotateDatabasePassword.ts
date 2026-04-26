@@ -1,10 +1,6 @@
 import { axiosInstance } from '@/api/axios.ts';
 
 export default async (uuid: string, databaseUuid: string): Promise<string | null> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post(`/api/client/servers/${uuid}/databases/${databaseUuid}/rotate-password`)
-      .then(({ data }) => resolve(data.password))
-      .catch(reject);
-  });
+  const { data } = await axiosInstance.post(`/api/client/servers/${uuid}/databases/${databaseUuid}/rotate-password`);
+  return data.password;
 };

@@ -1,4 +1,4 @@
-import { faAddressCard, faFloppyDisk, faRainbow } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faChevronLeft, faFloppyDisk, faRainbow } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -6,7 +6,9 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 import { z } from 'zod';
 import createBackupConfiguration from '@/api/admin/backup-configurations/createBackupConfiguration.ts';
+import updateBackupConfiguration from '@/api/admin/backup-configurations/updateBackupConfiguration.ts';
 import createLocation from '@/api/admin/locations/createLocation.ts';
+import updateLocation from '@/api/admin/locations/updateLocation.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import AlertError from '@/elements/alerts/AlertError.tsx';
 import Button from '@/elements/Button.tsx';
@@ -23,23 +25,27 @@ import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 import BackupRestic from '../admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '../admin/backupConfigurations/forms/BackupS3.tsx';
 
-export default function OobeLocation({ onNext, skipFrom }: OobeComponentProps) {
+export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data }: OobeComponentProps) {
   const { t } = useTranslations();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const existingLocation = data.locations[0];
+  const existingBackupConfig = existingLocation?.backupConfiguration;
+  const isEdit = !!existingLocation;
+
   const form = useForm<z.infer<typeof oobeLocationSchema>>({
     initialValues: {
-      locationName: '',
-      backupName: '',
-      backupDisk: 'local',
+      locationName: existingLocation?.name ?? '',
+      backupName: existingBackupConfig?.name ?? '',
+      backupDisk: existingBackupConfig?.backupDisk ?? 'local',
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(oobeLocationSchema),
   });
 
   const backupConfigS3Form = useForm<z.infer<typeof adminBackupConfigurationS3Schema>>({
-    initialValues: {
+    initialValues: existingBackupConfig?.backupConfigs?.s3 ?? {
       accessKey: '',
       secretKey: '',
       bucket: '',
@@ -53,7 +59,7 @@ export default function OobeLocation({ onNext, skipFrom }: OobeComponentProps) {
   });
 
   const backupConfigResticForm = useForm<z.infer<typeof adminBackupConfigurationResticSchema>>({
-    initialValues: {
+    initialValues: existingBackupConfig?.backupConfigs?.restic ?? {
       repository: '',
       retryLockSeconds: 0,
       environment: {},
@@ -65,31 +71,47 @@ export default function OobeLocation({ onNext, skipFrom }: OobeComponentProps) {
   const onSubmit = async () => {
     setLoading(true);
 
-    createBackupConfiguration({
-      name: form.values.backupName,
-      description: null,
-      maintenanceEnabled: false,
-      backupDisk: form.values.backupDisk,
-      backupConfigs: {
-        s3: form.values.backupDisk === 's3' ? backupConfigS3Form.values : null,
-        restic: form.values.backupDisk === 'restic' ? backupConfigResticForm.values : null,
-      },
-    })
-      .then((backupConfig) => {
-        createLocation({
+    const backupConfigs = {
+      s3: form.values.backupDisk === 's3' ? backupConfigS3Form.values : null,
+      restic: form.values.backupDisk === 'restic' ? backupConfigResticForm.values : null,
+    };
+
+    try {
+      if (isEdit) {
+        await updateBackupConfiguration(existingBackupConfig!.uuid, {
+          name: form.values.backupName,
+          description: existingBackupConfig!.description,
+          maintenanceEnabled: existingBackupConfig!.maintenanceEnabled,
+          backupDisk: form.values.backupDisk,
+          backupConfigs,
+        });
+        await updateLocation(existingLocation.uuid, {
+          name: form.values.locationName,
+          description: existingLocation.description,
+          backupConfigurationUuid: existingBackupConfig!.uuid,
+        });
+      } else {
+        const backupConfig = await createBackupConfiguration({
+          name: form.values.backupName,
+          description: null,
+          maintenanceEnabled: false,
+          backupDisk: form.values.backupDisk,
+          backupConfigs,
+        });
+        await createLocation({
           name: form.values.locationName,
           description: null,
           backupConfigurationUuid: backupConfig.uuid,
-        })
-          .then(() => {
-            onNext();
-          })
-          .catch((msg) => setError(httpErrorToHuman(msg)))
-          .finally(() => setLoading(false));
-      })
-      .catch((msg) => {
-        setError(httpErrorToHuman(msg));
-      });
+        });
+      }
+
+      data.refetch();
+      onNext();
+    } catch (msg) {
+      setError(httpErrorToHuman(msg));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -135,11 +157,18 @@ export default function OobeLocation({ onNext, skipFrom }: OobeComponentProps) {
           </div>
 
           <Group justify='flex-end'>
-            <Button variant='outline' onClick={() => skipFrom('location')}>
-              {t('common.button.skip', {})}
-            </Button>
+            {canGoBack && (
+              <Button variant='subtle' onClick={onBack} leftSection={<FontAwesomeIcon icon={faChevronLeft} />}>
+                Back
+              </Button>
+            )}
+            {!isEdit && (
+              <Button variant='outline' onClick={() => skipFrom('location')}>
+                {t('common.button.skip', {})}
+              </Button>
+            )}
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              {t('pages.oobe.location.button.create', {})}
+              {isEdit ? t('common.button.save', {}) : t('pages.oobe.location.button.create', {})}
             </Button>
           </Group>
         </Stack>

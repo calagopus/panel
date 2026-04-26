@@ -18,13 +18,26 @@ pub struct EggRepositoryEgg {
     pub author: compact_str::CompactString,
 
     pub exported_egg: super::nest_egg::ExportedNestEgg,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for EggRepositoryEgg {
     const NAME: &'static str = "egg_repository_egg";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -76,6 +89,7 @@ impl BaseModel for EggRepositoryEgg {
             exported_egg: serde_json::from_value(
                 row.try_get(compact_str::format_compact!("{prefix}exported_egg").as_str())?,
             )?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -108,7 +122,7 @@ impl EggRepositoryEgg {
         .bind(author)
         .bind(name)
         .bind(description)
-        .bind(serde_json::to_value(exported_egg)?)
+        .bind(OrderedJson(exported_egg))
         .fetch_one(database.write())
         .await?;
 
@@ -197,36 +211,54 @@ impl EggRepositoryEgg {
         Ok(())
     }
 
-    #[inline]
-    pub fn into_admin_api_object(self) -> AdminApiEggRepositoryEgg {
-        AdminApiEggRepositoryEgg {
-            uuid: self.uuid,
-            path: self.path,
-            name: self.name,
-            description: self.description,
-            author: self.author,
-            exported_egg: self.exported_egg,
-        }
-    }
-
-    #[inline]
     pub async fn into_admin_egg_api_object(
         self,
-        database: &crate::database::Database,
+        state: &crate::State,
+        _args: (),
     ) -> Result<AdminApiEggEggRepositoryEgg, crate::database::DatabaseError> {
         Ok(AdminApiEggEggRepositoryEgg {
             uuid: self.uuid,
             path: self.path,
             egg_repository: self
                 .egg_repository
-                .fetch_cached(database)
+                .fetch_cached(&state.database)
                 .await?
-                .into_admin_api_object(),
+                .into_admin_api_object(state, ())
+                .await?,
             name: self.name,
             description: self.description,
             author: self.author,
             exported_egg: self.exported_egg,
         })
+    }
+}
+
+#[async_trait::async_trait]
+impl IntoAdminApiObject for EggRepositoryEgg {
+    type AdminApiObject = AdminApiEggRepositoryEgg;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiEggRepositoryEgg::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiEggRepositoryEgg {
+                uuid: self.uuid,
+                path: self.path,
+                name: self.name,
+                description: self.description,
+                author: self.author,
+                exported_egg: self.exported_egg,
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -289,6 +321,9 @@ impl DeletableModel for EggRepositoryEgg {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(EggRepositoryEgg, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "EggRepositoryEgg")]
 pub struct AdminApiEggRepositoryEgg {

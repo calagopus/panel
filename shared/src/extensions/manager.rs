@@ -119,6 +119,11 @@ impl ExtensionManager {
         self.vec.read().await
     }
 
+    #[inline]
+    pub fn blocking_extensions(&self) -> RwLockReadGuard<'_, Vec<ConstructedExtension>> {
+        self.vec.blocking_read()
+    }
+
     pub async fn call(
         &self,
         name: impl AsRef<str>,

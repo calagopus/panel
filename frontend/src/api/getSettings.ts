@@ -2,11 +2,10 @@ import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
 import { publicSettingsSchema } from '@/lib/schemas/settings.ts';
 
-export default async (): Promise<z.infer<typeof publicSettingsSchema>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get('/api/settings')
-      .then(({ data }) => resolve(data))
-      .catch(reject);
-  });
+export default async (): Promise<{ settings: z.infer<typeof publicSettingsSchema>; serverTime: Date }> => {
+  const { data, headers } = await axiosInstance.get('/api/settings');
+  return {
+    settings: data,
+    serverTime: new Date(headers['date']),
+  };
 };

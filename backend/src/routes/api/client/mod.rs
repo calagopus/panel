@@ -10,11 +10,12 @@ use shared::{
         ByUuid,
         user::{AuthMethod, PermissionManager, User, UserImpersonator},
         user_activity::UserActivityLogger,
+        user_session::UserSession,
     },
     response::ApiResponse,
 };
 use std::sync::Arc;
-use tower_cookies::{Cookie, Cookies};
+use tower_cookies::Cookies;
 use utoipa_axum::router::OpenApiRouter;
 
 mod account;
@@ -52,7 +53,90 @@ pub async fn auth(
         "/api/client/account/logout",
     ];
 
-    if let Some(session_id) = cookies.get("session") {
+    if let Some((auth_user, auth_method)) = req.extensions_mut().remove::<(User, AuthMethod)>() {
+        let settings = match state.settings.get().await {
+            Ok(settings) => settings,
+            Err(err) => return Ok(ApiResponse::from(err).into_response()),
+        };
+        let require_two_factor = auth_user.require_two_factor(&settings);
+        drop(settings);
+
+        if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
+            && !auth_user.totp_enabled
+            && require_two_factor
+        {
+            return Ok(ApiResponse::error("two-factor authentication required")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response());
+        }
+
+        match &auth_method {
+            AuthMethod::Session(session) => {
+                session
+                    .update_last_used(
+                        &state.database,
+                        ip.0,
+                        req.headers()
+                            .get("User-Agent")
+                            .and_then(|ua| ua.to_str().ok())
+                            .unwrap_or("unknown"),
+                    )
+                    .await;
+            }
+            AuthMethod::ApiKey(api_key) => {
+                api_key.update_last_used(&state.database).await;
+            }
+        }
+
+        let auth_permission_manager = PermissionManager::new(&auth_user);
+
+        if auth_permission_manager
+            .has_admin_permission("users.impersonate")
+            .is_ok()
+            && let Some(user_uuid) = req
+                .headers()
+                .get("Calagopus-User")
+                .and_then(|h| h.to_str().ok())
+                .and_then(|h| h.parse().ok())
+        {
+            let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
+                Ok(Some(user)) => user,
+                Ok(None) => {
+                    return Ok(ApiResponse::error(
+                        "unable to find user from calagopus-user header",
+                    )
+                    .with_status(StatusCode::UNAUTHORIZED)
+                    .into_response());
+                }
+                Err(err) => return Ok(ApiResponse::from(err).into_response()),
+            };
+
+            req.extensions_mut().insert(PermissionManager::new(&user));
+            req.extensions_mut().insert(UserActivityLogger {
+                state: Arc::clone(&state),
+                user_uuid: user.uuid,
+                impersonator_uuid: Some(auth_user.uuid),
+                api_key_uuid: None,
+                ip: ip.0,
+            });
+            req.extensions_mut().insert(user);
+            req.extensions_mut()
+                .insert(Some(UserImpersonator(auth_user)));
+        } else {
+            req.extensions_mut().insert(auth_permission_manager);
+            req.extensions_mut().insert(UserActivityLogger {
+                state: Arc::clone(&state),
+                user_uuid: auth_user.uuid,
+                impersonator_uuid: None,
+                api_key_uuid: None,
+                ip: ip.0,
+            });
+            req.extensions_mut().insert(auth_user);
+            req.extensions_mut().insert(None::<UserImpersonator>);
+        }
+
+        req.extensions_mut().insert(auth_method);
+    } else if let Some(session_id) = cookies.get("session") {
         if session_id.value().len() != 81 {
             return Ok(ApiResponse::error("invalid authorization cookie")
                 .with_status(StatusCode::UNAUTHORIZED)
@@ -86,20 +170,13 @@ pub async fn auth(
             Err(err) => return Ok(ApiResponse::from(err).into_response()),
         };
         let require_two_factor = auth_user.require_two_factor(&settings);
-        let secure = settings.app.url.starts_with("https://");
         drop(settings);
 
         cookies.add(
-            Cookie::build(("session", session_id.value().to_string()))
-                .http_only(true)
-                .same_site(tower_cookies::cookie::SameSite::Lax)
-                .secure(secure)
-                .path("/")
-                .expires(
-                    tower_cookies::cookie::time::OffsetDateTime::now_utc()
-                        + tower_cookies::cookie::time::Duration::days(30),
-                )
-                .build(),
+            match UserSession::get_cookie(&state, session_id.value().to_string()).await {
+                Ok(cookie) => cookie,
+                Err(err) => return Ok(ApiResponse::from(err).into_response()),
+            },
         );
 
         if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())

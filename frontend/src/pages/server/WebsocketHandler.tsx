@@ -12,6 +12,7 @@ const MAX_TOKEN_REFRESH_FAILURES = 3;
 export default function WebsocketHandler() {
   const uuid = useServerStore((state) => state.server.uuid);
   const isTransferring = useServerStore((state) => state.server.isTransferring);
+  const nodeMaintenanceEnabled = useServerStore((state) => state.server.nodeMaintenanceEnabled);
   const { t } = useTranslations();
   const { setSocketInstance, setSocketConnectionState, setSocketError, setState } = useServerStore();
   const { addToast } = useToast();
@@ -178,15 +179,15 @@ export default function WebsocketHandler() {
       updatingTokenRef.current = false;
       tokenRefreshFailuresRef.current = 0;
     };
-  }, [uuid, isTransferring]);
+  }, [uuid, isTransferring, nodeMaintenanceEnabled]);
 
   useEffect(() => {
-    if (!uuid || socketRef.current) {
+    if (!uuid || socketRef.current || nodeMaintenanceEnabled) {
       return;
     }
 
     connect(uuid);
-  }, [uuid, isTransferring]);
+  }, [uuid, isTransferring, nodeMaintenanceEnabled]);
 
   return null;
 }

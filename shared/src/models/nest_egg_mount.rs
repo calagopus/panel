@@ -14,13 +14,26 @@ pub struct NestEggMount {
     pub nest_egg: Fetchable<super::nest_egg::NestEgg>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for NestEggMount {
     const NAME: &'static str = "nest_egg_mount";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -51,6 +64,7 @@ impl BaseModel for NestEggMount {
                 row.try_get(compact_str::format_compact!("{prefix}egg_uuid").as_str())?,
             ),
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -158,37 +172,52 @@ impl NestEggMount {
         })
     }
 
-    #[inline]
     pub async fn into_admin_nest_egg_api_object(
         self,
-        database: &crate::database::Database,
+        state: &crate::State,
+        _args: (),
     ) -> Result<AdminApiNestEggNestEggMount, crate::database::DatabaseError> {
-        let nest_egg = self.nest_egg.fetch_cached(database).await?;
+        let nest_egg = self.nest_egg.fetch_cached(&state.database).await?;
         let nest = nest_egg.nest.clone();
-        let (nest, nest_egg) = tokio::try_join!(nest.fetch_cached(database), async {
-            Ok(nest_egg.into_admin_api_object(database).await?)
+        let (nest, nest_egg) = tokio::try_join!(nest.fetch_cached(&state.database), async {
+            Ok(nest_egg.into_admin_api_object(state, ()).await?)
         })?;
 
         Ok(AdminApiNestEggNestEggMount {
-            nest: nest.into_admin_api_object(),
+            nest: nest.into_admin_api_object(state, ()).await?,
             nest_egg,
             created: self.created.and_utc(),
         })
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl IntoAdminApiObject for NestEggMount {
+    type AdminApiObject = AdminApiNestEggMount;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-    ) -> Result<AdminApiNestEggMount, crate::database::DatabaseError> {
-        Ok(AdminApiNestEggMount {
-            mount: self
-                .mount
-                .fetch_cached(database)
-                .await?
-                .into_admin_api_object(),
-            created: self.created.and_utc(),
-        })
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiNestEggMount::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            AdminApiNestEggMount {
+                mount: self
+                    .mount
+                    .fetch_cached(&state.database)
+                    .await?
+                    .into_admin_api_object(state, ())
+                    .await?,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -293,6 +322,9 @@ pub struct AdminApiNestEggNestEggMount {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(NestEggMount, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "AdminNestEggMount")]
 pub struct AdminApiNestEggMount {

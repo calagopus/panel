@@ -4,6 +4,7 @@ import type { FC } from 'react';
 export interface GlobalRouteDefinition {
   path: string;
   filter?: () => boolean;
+  matches?: (path: string) => boolean;
   element: FC;
   exact?: boolean;
 }
@@ -11,6 +12,7 @@ export interface GlobalRouteDefinition {
 export interface RouteDefinition extends GlobalRouteDefinition {
   name: string | (() => string) | undefined;
   icon?: IconDefinition;
+  activeMatches?: string[];
 }
 
 export interface AdminRouteDefinition extends RouteDefinition {

@@ -16,6 +16,13 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v6
 
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          cache: false
+
       - name: Dummy Frontend Files
         run: mkdir -p frontend/dist && echo "Dummy file" > frontend/dist/dummy.txt
 

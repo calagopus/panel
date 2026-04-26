@@ -6,13 +6,14 @@ import { Route, Routes, useNavigate } from 'react-router';
 import { z } from 'zod';
 import getEggs from '@/api/admin/nests/eggs/getEggs.ts';
 import importEgg from '@/api/admin/nests/eggs/importEgg.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
+import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { eggTableColumns } from '@/lib/tableColumns.ts';
@@ -22,7 +23,6 @@ import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import EggActionBar from './EggActionBar.tsx';
 import EggCreateOrUpdate from './EggCreateOrUpdate.tsx';
 import EggImportOverlay from './EggImportOverlay.tsx';
@@ -31,17 +31,18 @@ import EggRow from './EggRow.tsx';
 function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestSchema> }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const { eggs, setEggs, addEgg } = useAdminStore();
 
   const selectedEggsPreviousRef = useRef<z.infer<typeof adminEggSchema>[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedEggs, setSelectedEggs] = useState(new ObjectSet<z.infer<typeof adminEggSchema>, 'uuid'>('uuid'));
 
-  const { loading, refetch, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, refetch, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.nests.eggs(contextNest.uuid),
     fetcher: (page, search) => getEggs(contextNest.uuid, page, search),
-    setStoreData: setEggs,
   });
+
+  const eggs = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const handleImport = async (file: File) => {
     const text = await file.text().then((t) => t.trim());
@@ -59,7 +60,7 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
 
     importEgg(contextNest.uuid, data)
       .then((data) => {
-        addEgg(data);
+        refetch();
         addToast('Egg imported.', 'success');
       })
       .catch((msg) => {

@@ -5,7 +5,9 @@ use garde::Validate;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use sqlx::{
     Arguments, Postgres, QueryBuilder, Row,
-    postgres::{PgArguments, PgRow},
+    encode::IsNull,
+    error::BoxDynError,
+    postgres::{PgArgumentBuffer, PgArguments, PgRow, PgTypeInfo},
 };
 use std::{
     collections::{BTreeMap, HashSet},
@@ -152,10 +154,87 @@ impl<T: Serialize> Pagination<T> {
     }
 }
 
+pub type ModelExtensionList = std::sync::RwLock<Vec<Box<dyn ModelExtension + Send + Sync>>>;
+pub type ModelExtensionData = Vec<(compact_str::CompactString, Vec<u8>)>;
+pub type ModelExtensionMapType = Box<dyn erased_serde::Serialize>;
+
+pub trait ModelExtension {
+    fn extension_name(&self) -> &'static str;
+
+    fn extended_columns(&self, prefix: &str) -> BTreeMap<&'static str, compact_str::CompactString>;
+
+    fn map_extended(
+        &self,
+        prefix: &str,
+        row: &PgRow,
+    ) -> Result<ModelExtensionMapType, crate::database::DatabaseError>;
+}
+
+pub trait SafeModelExtension: ModelExtension {
+    type Value: Serialize + DeserializeOwned;
+
+    fn name() -> &'static str;
+}
+
 pub trait BaseModel: Serialize + DeserializeOwned {
     const NAME: &'static str;
 
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString>;
+    fn get_extension_list() -> &'static ModelExtensionList;
+    fn get_extension_data(&self) -> &ModelExtensionData;
+
+    /// Registers a model extension. If an extension with the same name is already registered, this function will do nothing.
+    fn register_model_extension(extension: impl ModelExtension + Send + Sync + 'static) {
+        let mut extensions = Self::get_extension_list().write().unwrap();
+
+        if extensions
+            .iter()
+            .any(|e| e.extension_name() == extension.extension_name())
+        {
+            return;
+        }
+
+        extensions.push(Box::new(extension));
+    }
+
+    /// Parses a model extension from the model's extension data. If the extension is not found, or if the data cannot be deserialized, an error is returned.
+    ///
+    /// This can be costly depending on what is stored, so use sparingly.
+    fn parse_model_extension<Extension: SafeModelExtension>(
+        &self,
+    ) -> Result<Extension::Value, crate::database::DatabaseError>
+    where
+        Extension::Value: Serialize + DeserializeOwned,
+    {
+        let data = self.get_extension_data();
+
+        for (name, value) in data.iter() {
+            if name.as_str() == Extension::name() {
+                let deserialized =
+                    rmp_serde::from_slice::<Extension::Value>(value).map_err(anyhow::Error::new)?;
+
+                return Ok(deserialized);
+            }
+        }
+
+        Err(crate::database::DatabaseError::Any(anyhow::anyhow!(
+            "model extension not found"
+        )))
+    }
+
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString>;
+    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+        if let Ok(extensions) = Self::get_extension_list().read() {
+            let mut columns = Self::base_columns(prefix);
+
+            for extension in extensions.iter() {
+                columns.extend(extension.extended_columns(prefix.unwrap_or_default()));
+            }
+
+            columns
+        } else {
+            Self::base_columns(prefix)
+        }
+    }
 
     #[inline]
     fn columns_sql(prefix: Option<&str>) -> compact_str::CompactString {
@@ -163,6 +242,27 @@ pub trait BaseModel: Serialize + DeserializeOwned {
             .iter()
             .map(|(key, value)| compact_str::format_compact!("{key} as {value}"))
             .join_compact(", ")
+    }
+
+    fn map_extensions(
+        prefix: &str,
+        row: &PgRow,
+    ) -> Result<ModelExtensionData, crate::database::DatabaseError> {
+        let mut data = Vec::new();
+
+        if let Ok(extensions) = Self::get_extension_list().read() {
+            for extension in extensions.iter() {
+                let value = extension.map_extended(prefix, row)?;
+                let serialized = rmp_serde::to_vec(&value).map_err(anyhow::Error::new)?;
+
+                data.push((
+                    compact_str::CompactString::const_new(extension.extension_name()),
+                    serialized,
+                ));
+            }
+        }
+
+        Ok(data)
     }
 
     fn map(prefix: Option<&str>, row: &PgRow) -> Result<Self, crate::database::DatabaseError>;
@@ -490,7 +590,9 @@ pub trait ByUuid: BaseModel {
         match Self::by_uuid_cached(database, uuid).await {
             Ok(res) => Ok(Some(res)),
             Err(err) => {
-                if let Some(sqlx::Error::RowNotFound) = err.downcast_ref::<sqlx::Error>() {
+                if let Some(DatabaseError::Sqlx(sqlx::Error::RowNotFound)) =
+                    err.downcast_ref::<DatabaseError>()
+                {
                     Ok(None)
                 } else {
                     Err(err)
@@ -593,7 +695,7 @@ impl<F: Send + Sync + 'static> ModelHandlerList<F> {
 
         let mut self_listeners = self.listeners.write().await;
         self_listeners.push(listener);
-        self_listeners.sort_by(|a, b| a.priority.cmp(&b.priority));
+        self_listeners.sort_by_key(|a| a.priority);
 
         aborter
     }
@@ -610,7 +712,7 @@ impl<F: Send + Sync + 'static> ModelHandlerList<F> {
 
         let mut self_listeners = self.listeners.blocking_write();
         self_listeners.push(listener);
-        self_listeners.sort_by(|a, b| a.priority.cmp(&b.priority));
+        self_listeners.sort_by_key(|a| a.priority);
 
         aborter
     }
@@ -878,4 +980,45 @@ impl<'a> UpdateQueryBuilder<'a> {
         let query = self.builder.build();
         query.execute(executor).await.map(|r| r.into())
     }
+}
+
+/// SQLx helper type to preserve order of keys when encoding JSON. By default, SQLx encodes JSON using `serde_json::Value`, which does not preserve order of keys. This type allows you to encode any serializable type as JSON while preserving the order of keys.
+pub struct OrderedJson<T>(pub T);
+
+impl<T: Serialize> sqlx::Encode<'_, sqlx::Postgres> for OrderedJson<T> {
+    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> Result<IsNull, BoxDynError> {
+        serde_json::to_writer(&mut **buf, &self.0)?;
+        Ok(IsNull::No)
+    }
+}
+
+impl<T> sqlx::Type<sqlx::Postgres> for OrderedJson<T> {
+    fn type_info() -> PgTypeInfo {
+        // JSON, not JSONB, to preserve order of keys
+        PgTypeInfo::with_oid(sqlx::postgres::types::Oid(114))
+    }
+}
+
+#[async_trait::async_trait]
+pub trait IntoApiObject {
+    type ApiObject: Send;
+    type ExtraArgs<'a>: Send;
+
+    async fn into_api_object<'a>(
+        self,
+        state: &crate::State,
+        args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, DatabaseError>;
+}
+
+#[async_trait::async_trait]
+pub trait IntoAdminApiObject {
+    type AdminApiObject: Send;
+    type ExtraArgs<'a>: Send;
+
+    async fn into_admin_api_object<'a>(
+        self,
+        state: &crate::State,
+        args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, DatabaseError>;
 }

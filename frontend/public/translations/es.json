@@ -886,7 +886,7 @@
         },
         "shortcuts": {
           "title": "Atajos de teclado",
-          "description": "Usa estos atajos de teclado para navegar e interactuar con el panel de forma más eficiente.",
+          "subtitle": "Usa estos atajos de teclado para navegar e interactuar con el panel de forma más eficiente.",
           "detectedMac": "macOS detectado",
           "detectedWindows": "Windows/Linux detectado",
           "fileManager": {

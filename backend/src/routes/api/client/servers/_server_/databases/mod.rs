@@ -11,7 +11,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, server::GetServer, server_database::ServerDatabase,
+            IntoApiObject, Pagination, server::GetServer, server_database::ServerDatabase,
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -103,10 +103,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             databases: databases
                 .try_async_map(|database| {
-                    database.into_api_object(
-                        &state.database,
-                        params.include_password && can_read_password,
-                    )
+                    database.into_api_object(&state, params.include_password && can_read_password)
                 })
                 .await?,
         })
@@ -121,7 +118,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoApiObject,
             database_host::DatabaseHost,
             server::{GetServer, GetServerActivityLogger},
             server_database::ServerDatabase,
@@ -248,7 +245,7 @@ mod post {
         ApiResponse::new_serialized(Response {
             database: database
                 .into_api_object(
-                    &state.database,
+                    &state,
                     permissions
                         .has_server_permission("databases.read-password")
                         .is_ok(),

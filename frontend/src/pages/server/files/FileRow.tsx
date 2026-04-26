@@ -153,7 +153,7 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
               </TableData>
 
               <TableData className='hidden md:table-cell min-w-fit text-nowrap'>
-                <FormattedTimestamp timestamp={file.modified} />
+                <FormattedTimestamp timestamp={file.modified} showNA />
               </TableData>
 
               <ContextMenuToggle items={items} openMenu={openMenu} />

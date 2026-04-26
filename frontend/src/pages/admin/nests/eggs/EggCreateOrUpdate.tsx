@@ -42,6 +42,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import { processConfigurationParserLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { adminEggSchema, adminEggUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
@@ -139,10 +140,14 @@ export default function EggCreateOrUpdate({
   }, [contextEgg]);
 
   const eggRepositories = useSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
+    queryKey: queryKeys.admin.eggRepositories.all(),
     fetcher: (search) => getEggRepositories(1, search),
     defaultSearchValue: contextEgg?.eggRepositoryEgg?.eggRepository.name,
   });
   const eggRepositoryEggs = useSearchableResource<z.infer<typeof adminEggRepositoryEggSchema>>({
+    queryKey: selectedEggRepositoryUuid
+      ? queryKeys.admin.eggRepositories.eggs(selectedEggRepositoryUuid)
+      : ['admin', 'egg-repository-eggs'],
     fetcher: (search) =>
       selectedEggRepositoryUuid
         ? getEggRepositoryEggs(selectedEggRepositoryUuid, 1, search)

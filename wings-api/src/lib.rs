@@ -107,9 +107,9 @@ nestify::nest! {
         #[schema(inline)]
         pub mime: compact_str::CompactString,
         #[schema(inline)]
-        pub created: chrono::DateTime<chrono::Utc>,
+        pub created: chrono::DateTime<chrono::Local>,
         #[schema(inline)]
-        pub modified: chrono::DateTime<chrono::Utc>,
+        pub modified: chrono::DateTime<chrono::Local>,
     }
 }
 
@@ -2191,7 +2191,7 @@ pub mod system_logs {
                     #[schema(inline)]
                     pub size: u64,
                     #[schema(inline)]
-                    pub last_modified: chrono::DateTime<chrono::Utc>,
+                    pub last_modified: chrono::DateTime<chrono::Local>,
                 }>,
             }
         }
@@ -2223,7 +2223,7 @@ pub mod system_overview {
                 #[schema(inline)]
                 pub version: compact_str::CompactString,
                 #[schema(inline)]
-                pub local_time: chrono::DateTime<chrono::Utc>,
+                pub local_time: chrono::DateTime<chrono::Local>,
                 #[schema(inline)]
                 pub container_type: AppContainerType,
                 #[schema(inline)]

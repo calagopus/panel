@@ -7,9 +7,11 @@ mod get {
     use shared::{
         GetState,
         models::{
+            IntoApiObject,
             user::{GetPermissionManager, GetUser},
             user_command_snippet::UserCommandSnippet,
         },
+        prelude::AsyncIteratorExt,
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -37,8 +39,9 @@ mod get {
         ApiResponse::new_serialized(Response {
             command_snippets: command_snippets
                 .into_iter()
-                .map(|command_snippet| command_snippet.into_api_object())
-                .collect(),
+                .map(|command_snippet| command_snippet.into_api_object(&state, ()))
+                .try_collect_async_vec()
+                .await?,
         })
         .ok()
     }

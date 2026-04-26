@@ -35,6 +35,7 @@ mod get {
         total_hits: u64,
         total_misses: u64,
         average_call_latency_ns: u64,
+        max_call_latency_ns: u64,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -116,6 +117,7 @@ mod get {
                 total_hits: state.cache.cache_calls() - state.cache.cache_misses(),
                 total_misses: state.cache.cache_misses(),
                 average_call_latency_ns: state.cache.cache_latency_ns_average(),
+                max_call_latency_ns: state.cache.cache_latency_ns_max(),
             },
             database: ResponseDatabase {
                 version: state

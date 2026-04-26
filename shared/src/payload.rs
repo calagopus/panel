@@ -32,6 +32,7 @@ static AVAILABLE_DESERIALIZERS: LazyLock<[mime::Mime; 4]> = LazyLock::new(|| {
     ]
 });
 
+/// A small axum payload extractor with content negotiation based on the `Accept` header.
 pub struct Payload<T: DeserializeOwned>(pub T);
 
 impl<T: DeserializeOwned> Payload<T> {

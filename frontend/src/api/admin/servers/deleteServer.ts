@@ -7,12 +7,7 @@ interface Data {
 }
 
 export default async (serverUuid: string, data: Data): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .delete(`/api/admin/servers/${serverUuid}`, {
-        data: transformKeysToSnakeCase(data),
-      })
-      .then(() => resolve())
-      .catch(reject);
+  await axiosInstance.delete(`/api/admin/servers/${serverUuid}`, {
+    data: transformKeysToSnakeCase(data),
   });
 };

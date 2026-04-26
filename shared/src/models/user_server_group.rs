@@ -20,13 +20,26 @@ pub struct UserServerGroup {
     pub server_order: Vec<uuid::Uuid>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for UserServerGroup {
     const NAME: &'static str = "user_server_group";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -64,6 +77,7 @@ impl BaseModel for UserServerGroup {
             server_order: row
                 .try_get(compact_str::format_compact!("{prefix}server_order").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -128,16 +142,33 @@ impl UserServerGroup {
         .await
         .unwrap_or(0)
     }
+}
 
-    #[inline]
-    pub fn into_api_object(self) -> ApiUserServerGroup {
-        ApiUserServerGroup {
-            uuid: self.uuid,
-            name: self.name,
-            order: self.order,
-            server_order: self.server_order,
-            created: self.created.and_utc(),
-        }
+#[async_trait::async_trait]
+impl IntoApiObject for UserServerGroup {
+    type ApiObject = ApiUserServerGroup;
+    type ExtraArgs<'a> = ();
+
+    async fn into_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiUserServerGroup::init_hooks(&self, state).await?;
+
+        let api_object = finish_extendible!(
+            ApiUserServerGroup {
+                uuid: self.uuid,
+                name: self.name,
+                order: self.order,
+                server_order: self.server_order,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -296,6 +327,9 @@ impl DeletableModel for UserServerGroup {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(UserServerGroup, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "UserServerGroup")]
 pub struct ApiUserServerGroup {

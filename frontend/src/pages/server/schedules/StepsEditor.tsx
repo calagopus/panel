@@ -27,6 +27,7 @@ export default function StepsEditor({ schedule }: { schedule: z.infer<typeof ser
   const { addToast } = useToast();
 
   const [openModal, setOpenModal] = useState<'edit' | 'create' | null>(null);
+  const [childModalOpen, setChildModalOpen] = useState(false);
 
   const nextStepOrder = useMemo(
     () =>
@@ -148,10 +149,11 @@ export default function StepsEditor({ schedule }: { schedule: z.infer<typeof ser
                   <SortableItem
                     key={step.id}
                     id={step.id}
-                    disabled={openModal !== null}
+                    disabled={openModal !== null || childModalOpen}
                     renderItem={({ dragHandleProps }) => (
                       <div {...dragHandleProps}>
                         <MemoizedStepCard
+                          onStepToggle={setChildModalOpen}
                           schedule={schedule}
                           step={step}
                           onStepUpdate={handleStepUpdate}

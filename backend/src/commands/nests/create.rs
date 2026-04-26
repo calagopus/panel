@@ -3,6 +3,7 @@ use colored::Colorize;
 use compact_str::ToCompactString;
 use dialoguer::{Input, theme::ColorfulTheme};
 use shared::models::CreatableModel;
+use shared::models::IntoAdminApiObject;
 use std::io::IsTerminal;
 
 #[derive(Args)]
@@ -75,7 +76,9 @@ impl shared::extensions::commands::CliCommand<CreateArgs> for CreateCommand {
                 if args.json {
                     eprintln!(
                         "{}",
-                        serde_json::to_string_pretty(&nest.into_admin_api_object())?
+                        serde_json::to_string_pretty(
+                            &nest.into_admin_api_object(&state, ()).await?
+                        )?
                     );
                 } else {
                     eprintln!(

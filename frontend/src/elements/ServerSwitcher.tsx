@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { z } from 'zod';
 import getServers from '@/api/server/getServers.ts';
 import Select from '@/elements/input/Select.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerState, serverSchema, serverStatus } from '@/lib/schemas/server/server.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useServerStats } from '@/plugins/useServerStats.ts';
@@ -55,6 +56,7 @@ export default function ServerSwitcher({ className, isServer }: { className?: st
   const navigate = useNavigate();
 
   const servers = useSearchableResource<z.infer<typeof serverSchema>>({
+    queryKey: queryKeys.user.servers.all(),
     fetcher: (search) => getServers(1, search),
   });
 

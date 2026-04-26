@@ -7,10 +7,5 @@ export default async (
   databaseUuid: string,
   data: z.infer<typeof serverDatabaseEditSchema>,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(`/api/client/servers/${uuid}/databases/${databaseUuid}`, data)
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.patch(`/api/client/servers/${uuid}/databases/${databaseUuid}`, data);
 };

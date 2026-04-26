@@ -56,8 +56,8 @@ mod get {
     use crate::routes::api::admin::nests::_nest_::GetNest;
     use serde::Serialize;
     use shared::{
-        ApiError,
-        models::user::GetPermissionManager,
+        ApiError, GetState,
+        models::{IntoAdminApiObject, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -77,11 +77,15 @@ mod get {
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
     ))]
-    pub async fn route(permissions: GetPermissionManager, nest: GetNest) -> ApiResponseResult {
+    pub async fn route(
+        state: GetState,
+        permissions: GetPermissionManager,
+        nest: GetNest,
+    ) -> ApiResponseResult {
         permissions.has_admin_permission("nests.read")?;
 
         ApiResponse::new_serialized(Response {
-            nest: nest.0.into_admin_api_object(),
+            nest: nest.0.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

@@ -41,6 +41,8 @@ pub struct Env {
     pub bind: String,
     pub port: u16,
 
+    pub aio_base_wings_configuration: Option<String>,
+
     pub app_primary: bool,
     pub app_debug: AtomicBool,
     pub app_enable_wings_proxy: bool,
@@ -110,11 +112,15 @@ impl Env {
                 .parse()
                 .context("Invalid PORT value")?,
 
+            aio_base_wings_configuration: std::env::var("AIO_BASE_WINGS_CONFIGURATION")
+                .ok()
+                .map(|s| s.trim_matches('"').to_string()),
+
             app_primary: std::env::var("APP_PRIMARY")
                 .unwrap_or("true".to_string())
                 .trim_matches('"')
                 .parse()
-                .context("Invalid APP_DEBUG value")?,
+                .context("Invalid APP_PRIMARY value")?,
             app_debug: AtomicBool::new(
                 std::env::var("APP_DEBUG")
                     .unwrap_or("false".to_string())

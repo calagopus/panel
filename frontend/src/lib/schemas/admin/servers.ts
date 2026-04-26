@@ -78,7 +78,7 @@ export const adminServerCreateSchema = z.lazy(() =>
   adminServerBaseOmit.extend({
     startOnCompletion: z.boolean(),
     skipInstaller: z.boolean(),
-    nodeUuid: z.uuid(),
+    nodeUuid: z.string(),
     ownerUuid: z.uuid(),
     eggUuid: z.uuid(),
     backupConfigurationUuid: z.uuid().nullable(),

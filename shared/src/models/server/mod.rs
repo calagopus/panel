@@ -3,7 +3,6 @@ use crate::{
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
     response::DisplayError,
-    storage::StorageUrlRetriever,
 };
 use compact_str::ToCompactString;
 use garde::Validate;
@@ -165,13 +164,26 @@ pub struct Server {
     subuser_ignored_files_overrides: Option<Box<ignore::overrides::Override>>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for Server {
     const NAME: &'static str = "server";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         let mut columns = BTreeMap::from([
@@ -282,12 +294,12 @@ impl BaseModel for Server {
             ),
         ]);
 
-        columns.extend(super::server_allocation::ServerAllocation::columns(Some(
-            "allocation_",
-        )));
-        columns.extend(super::user::User::columns(Some("owner_")));
-        columns.extend(super::nest_egg::NestEgg::columns(Some("egg_")));
-        columns.extend(super::nest::Nest::columns(Some("nest_")));
+        columns.extend(super::server_allocation::ServerAllocation::base_columns(
+            Some("allocation_"),
+        ));
+        columns.extend(super::user::User::base_columns(Some("owner_")));
+        columns.extend(super::nest_egg::NestEgg::base_columns(Some("egg_")));
+        columns.extend(super::nest::Nest::base_columns(Some("nest_")));
 
         columns
     }
@@ -379,6 +391,7 @@ impl BaseModel for Server {
                 .ok(),
             subuser_ignored_files_overrides: None,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -1031,6 +1044,7 @@ impl Server {
         Ok(status)
     }
 
+    /// Syncs the server with the node. This will update server resources, schedules, name, etc.
     pub async fn sync(self, database: &crate::database::Database) -> Result<(), anyhow::Error> {
         self.node
             .fetch_cached(database)
@@ -1046,6 +1060,19 @@ impl Server {
             .await?;
 
         Ok(())
+    }
+
+    /// Same as [`sync`](Self::sync) but runs in a background task, is deduplicated and is not awaited. Any errors will be logged but not returned.
+    ///
+    /// This method is meant to be used in 90% of cases where you want to sync the server with low priority.
+    pub async fn batch_sync(self, database: &Arc<crate::database::Database>) {
+        database
+            .batch_action("sync_server", self.uuid, {
+                let database = database.clone();
+
+                async move { self.sync(&database).await }
+            })
+            .await;
     }
 
     /// Triggers a re-installation of the server on the node.
@@ -1156,6 +1183,12 @@ impl Server {
             )
             .with_status(axum::http::StatusCode::CONFLICT)
             .into());
+        }
+
+        if options.destination_node.is_all_in_one_node() {
+            return Err(DisplayError::new("cannot transfer to an all-in-one node")
+                .with_status(axum::http::StatusCode::CONFLICT)
+                .into());
         }
 
         let mut transaction = state.database.write().begin().await?;
@@ -1574,16 +1607,27 @@ impl Server {
             },
         })
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl super::IntoAdminApiObject for Server {
+    type AdminApiObject = AdminApiServer;
+    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-        storage_url_retriever: &StorageUrlRetriever<'_>,
-    ) -> Result<AdminApiServer, anyhow::Error> {
-        let allocation_uuid = self.allocation.as_ref().map(|a| a.uuid);
+        state: &crate::State,
+        storage_url_retriever: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let feature_limits = ApiServerFeatureLimits::init_hooks(&self, state).await?;
+        let api_object = AdminApiServer::init_hooks(&self, state).await?;
 
-        let feature_limits = ApiServerFeatureLimits::init_hooks(&self, database).await?;
+        let allocation_uuid = self.allocation.as_ref().map(|a| a.uuid);
+        let allocation = match self.allocation {
+            Some(a) => Some(a.into_api_object(state, allocation_uuid).await?),
+            None => None,
+        };
+
         let feature_limits = finish_extendible!(
             ApiServerFeatureLimits {
                 allocations: self.allocation_limit,
@@ -1592,23 +1636,23 @@ impl Server {
                 schedules: self.schedule_limit,
             },
             feature_limits,
-            database
+            state
         )?;
 
         let (node, backup_configuration, egg) = tokio::join!(
             async {
-                match self.node.fetch_cached(database).await {
-                    Ok(node) => Ok(node.into_admin_api_object(database).await?),
+                match self.node.fetch_cached(&state.database).await {
+                    Ok(node) => Ok(node.into_admin_api_object(state, ()).await?),
                     Err(err) => Err(err),
                 }
             },
             async {
                 if let Some(backup_configuration) = self.backup_configuration {
                     if let Ok(backup_configuration) =
-                        backup_configuration.fetch_cached(database).await
+                        backup_configuration.fetch_cached(&state.database).await
                     {
                         backup_configuration
-                            .into_admin_api_object(database)
+                            .into_admin_api_object(state, ())
                             .await
                             .ok()
                     } else {
@@ -1618,58 +1662,79 @@ impl Server {
                     None
                 }
             },
-            self.egg.into_admin_api_object(database)
+            self.egg.into_admin_api_object(state, ())
         );
 
-        Ok(AdminApiServer {
-            uuid: self.uuid,
-            uuid_short: compact_str::format_compact!("{:08x}", self.uuid_short),
-            external_id: self.external_id,
-            allocation: self.allocation.map(|a| a.into_api_object(allocation_uuid)),
-            node: node?,
-            owner: self.owner.into_api_full_object(storage_url_retriever),
-            egg: egg?,
-            nest: self.nest.into_admin_api_object(),
-            backup_configuration,
-            status: self.status,
-            is_suspended: self.suspended,
-            is_transferring: self.destination_node.is_some(),
-            name: self.name,
-            description: self.description,
-            limits: AdminApiServerLimits {
-                cpu: self.cpu,
-                memory: self.memory,
-                memory_overhead: self.memory_overhead,
-                swap: self.swap,
-                disk: self.disk,
-                io_weight: self.io_weight,
+        let api_objct = finish_extendible!(
+            AdminApiServer {
+                uuid: self.uuid,
+                uuid_short: format!("{:08x}", self.uuid_short).into(),
+                external_id: self.external_id,
+                allocation,
+                node: node?,
+                owner: self
+                    .owner
+                    .into_api_full_object(state, storage_url_retriever)
+                    .await?,
+                egg: egg?,
+                nest: self.nest.into_admin_api_object(state, ()).await?,
+                backup_configuration,
+                status: self.status,
+                is_suspended: self.suspended,
+                is_transferring: self.destination_node.is_some(),
+                name: self.name,
+                description: self.description,
+                limits: AdminApiServerLimits {
+                    cpu: self.cpu,
+                    memory: self.memory,
+                    memory_overhead: self.memory_overhead,
+                    swap: self.swap,
+                    disk: self.disk,
+                    io_weight: self.io_weight,
+                },
+                pinned_cpus: self.pinned_cpus,
+                feature_limits,
+                startup: self.startup,
+                image: self.image,
+                auto_kill: self.auto_kill,
+                auto_start_behavior: self.auto_start_behavior,
+                timezone: self.timezone,
+                hugepages_passthrough_enabled: self.hugepages_passthrough_enabled,
+                kvm_passthrough_enabled: self.kvm_passthrough_enabled,
+                created: self.created.and_utc(),
             },
-            pinned_cpus: self.pinned_cpus,
-            feature_limits,
-            startup: self.startup,
-            image: self.image,
-            auto_kill: self.auto_kill,
-            auto_start_behavior: self.auto_start_behavior,
-            timezone: self.timezone,
-            hugepages_passthrough_enabled: self.hugepages_passthrough_enabled,
-            kvm_passthrough_enabled: self.kvm_passthrough_enabled,
-            created: self.created.and_utc(),
-        })
-    }
-
-    #[inline]
-    pub async fn into_api_object(
-        self,
-        database: &crate::database::Database,
-        user: &super::user::User,
-    ) -> Result<ApiServer, anyhow::Error> {
-        let allocation_uuid = self.allocation.as_ref().map(|a| a.uuid);
-        let (node, egg_configuration) = tokio::try_join!(
-            self.node.fetch_cached(database),
-            self.egg.configuration(database)
+            api_object,
+            state
         )?;
 
-        let feature_limits = ApiServerFeatureLimits::init_hooks(&self, database).await?;
+        Ok(api_objct)
+    }
+}
+
+#[async_trait::async_trait]
+impl super::IntoApiObject for Server {
+    type ApiObject = ApiServer;
+    type ExtraArgs<'a> = &'a super::user::User;
+
+    async fn into_api_object<'a>(
+        self,
+        state: &crate::State,
+        user: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let feature_limits = ApiServerFeatureLimits::init_hooks(&self, state).await?;
+        let api_object = ApiServer::init_hooks(&self, state).await?;
+
+        let allocation_uuid = self.allocation.as_ref().map(|a| a.uuid);
+        let allocation = match self.allocation {
+            Some(a) => Some(a.into_api_object(state, allocation_uuid).await?),
+            None => None,
+        };
+
+        let (node, egg_configuration) = tokio::try_join!(
+            self.node.fetch_cached(&state.database),
+            self.egg.configuration(&state.database)
+        )?;
+
         let feature_limits = finish_extendible!(
             ApiServerFeatureLimits {
                 allocations: self.allocation_limit,
@@ -1678,54 +1743,60 @@ impl Server {
                 schedules: self.schedule_limit,
             },
             feature_limits,
-            database
+            state
         )?;
 
-        Ok(ApiServer {
-            uuid: self.uuid,
-            uuid_short: compact_str::format_compact!("{:08x}", self.uuid_short),
-            allocation: self.allocation.map(|a| a.into_api_object(allocation_uuid)),
-            egg: self.egg.into_api_object(),
-            egg_configuration: egg_configuration.into_api_object(),
-            permissions: if user.admin {
-                vec!["*".into()]
-            } else {
-                self.subuser_permissions
-                    .map_or_else(|| vec!["*".into()], |p| p.to_vec())
+        let api_object = finish_extendible!(
+            ApiServer {
+                uuid: self.uuid,
+                uuid_short: format!("{:08x}", self.uuid_short).into(),
+                allocation,
+                egg: self.egg.into_api_object(state, ()).await?,
+                egg_configuration: egg_configuration.into_api_object(state, ()).await?,
+                permissions: if user.admin {
+                    vec!["*".into()]
+                } else {
+                    self.subuser_permissions
+                        .map_or_else(|| vec!["*".into()], |p| p.to_vec())
+                },
+                location_uuid: node.location.uuid,
+                location_name: node.location.name,
+                node_uuid: node.uuid,
+                node_name: node.name,
+                node_maintenance_enabled: node.maintenance_enabled,
+                sftp_host: node.sftp_host.unwrap_or_else(|| {
+                    node.public_url
+                        .unwrap_or(node.url)
+                        .host_str()
+                        .unwrap_or("unknown.sftp.host")
+                        .into()
+                }),
+                sftp_port: node.sftp_port,
+                status: self.status,
+                is_suspended: self.suspended,
+                is_owner: self.owner.uuid == user.uuid,
+                is_transferring: self.destination_node.is_some(),
+                name: self.name,
+                description: self.description,
+                limits: ApiServerLimits {
+                    cpu: self.cpu,
+                    memory: self.memory,
+                    swap: self.swap,
+                    disk: self.disk,
+                },
+                feature_limits,
+                startup: self.startup,
+                image: self.image,
+                auto_kill: self.auto_kill,
+                auto_start_behavior: self.auto_start_behavior,
+                timezone: self.timezone,
+                created: self.created.and_utc(),
             },
-            location_uuid: node.location.uuid,
-            location_name: node.location.name,
-            node_uuid: node.uuid,
-            node_name: node.name,
-            node_maintenance_enabled: node.maintenance_enabled,
-            sftp_host: node.sftp_host.unwrap_or_else(|| {
-                node.public_url
-                    .unwrap_or(node.url)
-                    .host_str()
-                    .unwrap_or("unknown.sftp.host")
-                    .into()
-            }),
-            sftp_port: node.sftp_port,
-            status: self.status,
-            is_suspended: self.suspended,
-            is_owner: self.owner.uuid == user.uuid,
-            is_transferring: self.destination_node.is_some(),
-            name: self.name,
-            description: self.description,
-            limits: ApiServerLimits {
-                cpu: self.cpu,
-                memory: self.memory,
-                swap: self.swap,
-                disk: self.disk,
-            },
-            feature_limits,
-            startup: self.startup,
-            image: self.image,
-            auto_kill: self.auto_kill,
-            auto_start_behavior: self.auto_start_behavior,
-            timezone: self.timezone,
-            created: self.created.and_utc(),
-        })
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -2389,8 +2460,8 @@ pub struct ApiServerLimits {
 }
 
 #[schema_extension_derive::extendible]
-#[init_args(Server, crate::database::Database)]
-#[hook_args(crate::database::Database)]
+#[init_args(Server, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
 pub struct ApiServerFeatureLimits {
     #[garde(range(min = 0))]
@@ -2407,6 +2478,9 @@ pub struct ApiServerFeatureLimits {
     pub schedules: i32,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(Server, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "AdminServer")]
 pub struct AdminApiServer {
@@ -2447,6 +2521,9 @@ pub struct AdminApiServer {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(Server, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "Server")]
 pub struct ApiServer {

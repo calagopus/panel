@@ -7,12 +7,8 @@ export default async (
   page: number,
   search?: string,
 ): Promise<Pagination<z.infer<typeof adminNodeAllocationSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/admin/nodes/${nodeUuid}/allocations`, {
-        params: { page, per_page: 100, search },
-      })
-      .then(({ data }) => resolve(data.allocations))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/admin/nodes/${nodeUuid}/allocations`, {
+    params: { page, per_page: 100, search },
   });
+  return data.allocations;
 };

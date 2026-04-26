@@ -7,12 +7,8 @@ export default async (
   page: number,
   search?: string,
 ): Promise<Pagination<z.infer<typeof serverScheduleSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/client/servers/${uuid}/schedules`, {
-        params: { page, search },
-      })
-      .then(({ data }) => resolve(data.schedules))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/schedules`, {
+    params: { page, search },
   });
+  return data.schedules;
 };

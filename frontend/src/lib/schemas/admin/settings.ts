@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { oobeStepKey } from '@/lib/schemas/oobe.ts';
 import { nullableString } from '@/lib/transformers.ts';
+import { hostnameSchema } from '../generic.ts';
 
 export const adminSettingsApplicationSchema = z.object({
   name: z.string().min(1).max(64),
@@ -57,7 +58,7 @@ export const adminSettingsEmailNoneSchema = z.object({
 
 export const adminSettingsEmailSmtpSchema = z.object({
   type: z.literal('smtp'),
-  host: z.string().min(1).max(255),
+  host: hostnameSchema,
   port: z.number().min(1),
   username: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   password: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),

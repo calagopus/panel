@@ -8,12 +8,7 @@ export default async (
   eggUuid: string,
   data: z.infer<typeof adminEggConfigScriptSchema>,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(`/api/admin/nests/${nestUuid}/eggs/${eggUuid}`, {
-        config_script: transformKeysToSnakeCase(data),
-      })
-      .then(() => resolve())
-      .catch(reject);
+  await axiosInstance.patch(`/api/admin/nests/${nestUuid}/eggs/${eggUuid}`, {
+    config_script: transformKeysToSnakeCase(data),
   });
 };

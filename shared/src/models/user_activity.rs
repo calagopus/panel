@@ -1,4 +1,4 @@
-use crate::{State, models::InsertQueryBuilder, prelude::*, storage::StorageUrlRetriever};
+use crate::{State, models::InsertQueryBuilder, prelude::*};
 use compact_str::ToCompactString;
 use garde::Validate;
 use serde::{Deserialize, Serialize};
@@ -51,13 +51,26 @@ pub struct UserActivity {
     pub data: serde_json::Value,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for UserActivity {
     const NAME: &'static str = "user_activity";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         BTreeMap::from([
@@ -105,6 +118,7 @@ impl BaseModel for UserActivity {
             ip: row.try_get(compact_str::format_compact!("{prefix}ip").as_str())?,
             data: row.try_get(compact_str::format_compact!("{prefix}data").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
@@ -165,30 +179,46 @@ impl UserActivity {
 
         Ok(result.rows_affected())
     }
+}
 
-    #[inline]
-    pub async fn into_api_object(
+#[async_trait::async_trait]
+impl IntoApiObject for UserActivity {
+    type ApiObject = ApiUserActivity;
+    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+
+    async fn into_api_object<'a>(
         self,
-        database: &crate::database::Database,
-        storage_url_retriever: &StorageUrlRetriever<'_>,
-    ) -> Result<ApiUserActivity, anyhow::Error> {
-        Ok(ApiUserActivity {
-            impersonator: if let Some(impersonator) = self.impersonator {
-                Some(
-                    impersonator
-                        .fetch_cached(database)
-                        .await?
-                        .into_api_object(storage_url_retriever),
-                )
-            } else {
-                None
+        state: &crate::State,
+        storage_url_retriever: Self::ExtraArgs<'a>,
+    ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let api_object = ApiUserActivity::init_hooks(&self, state).await?;
+
+        let impersonator = if let Some(impersonator) = self.impersonator {
+            Some(
+                impersonator
+                    .fetch_cached(&state.database)
+                    .await?
+                    .into_api_object(state, storage_url_retriever)
+                    .await?,
+            )
+        } else {
+            None
+        };
+
+        let api_object = finish_extendible!(
+            ApiUserActivity {
+                impersonator,
+                event: self.event,
+                ip: self.ip.map(|ip| ip.ip().to_compact_string()),
+                data: self.data,
+                is_api: self.api_key.is_some(),
+                created: self.created.and_utc(),
             },
-            event: self.event,
-            ip: self.ip.map(|ip| ip.ip().to_compact_string()),
-            data: self.data,
-            is_api: self.api_key.is_some(),
-            created: self.created.and_utc(),
-        })
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -257,6 +287,9 @@ impl CreatableModel for UserActivity {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(UserActivity, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "UserActivity")]
 pub struct ApiUserActivity {

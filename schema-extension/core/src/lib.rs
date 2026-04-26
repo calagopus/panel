@@ -93,9 +93,13 @@ pub trait Extendible: Serialize + Sized + 'static {
     fn overlay_map_mut(&mut self) -> &mut serde_json::Map<String, serde_json::Value>;
     fn overlay_map(&self) -> &serde_json::Map<String, serde_json::Value>;
 
-    fn get_extended<E: serde::de::DeserializeOwned>(&self) -> Result<E, anyhow::Error> {
+    fn parse_extended<E: serde::de::DeserializeOwned>(&self) -> Result<E, anyhow::Error> {
         serde_json::from_value(serde_json::Value::Object(self.overlay_map().clone()))
             .map_err(anyhow::Error::from)
+    }
+
+    fn insert_extension<E: Serialize>(&mut self, ext_value: E) -> Result<(), anyhow::Error> {
+        crate::apply_extension_to_overlay(self, ext_value)
     }
 }
 
@@ -117,9 +121,9 @@ pub fn apply_extension_to_overlay<T: Extendible, E: Serialize>(
 
 #[macro_export]
 macro_rules! finish_extendible {
-    ($ty:ident { $($field:ident: $val:expr),* $(,)? }, $ready:expr $(, $hook_arg:expr)* $(,)?) => {{
+    ($ty:ident { $($tt:tt)* }, $ready:expr $(, $hook_arg:expr)* $(,)?) => {{
         let mut instance = $ty {
-            $($field: $val,)*
+            $($tt)*
             __overlay: $crate::ExtensionOverlay::new(),
         };
         $ty::finish_hooks(&mut instance, $ready $(, $hook_arg)*)?;

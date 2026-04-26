@@ -6,6 +6,7 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { eggRepositoryEggTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
@@ -18,9 +19,6 @@ export default function EggRepositoryEggs({
 }: {
   contextEggRepository: z.infer<typeof adminEggRepositorySchema>;
 }) {
-  const [eggRepositoryEggs, setEggRepositoryEggs] = useState(
-    getEmptyPaginationSet<z.infer<typeof adminEggRepositoryEggSchema>>(),
-  );
   const [selectedEggs, setSelectedEggs] = useState(
     new ObjectSet<z.infer<typeof adminEggRepositoryEggSchema>, 'uuid'>('uuid'),
   );
@@ -56,10 +54,12 @@ export default function EggRepositoryEggs({
     [],
   );
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.eggRepositories.eggs(contextEggRepository.uuid),
     fetcher: (page, search) => getEggRepositoryEggs(contextEggRepository.uuid, page, search),
-    setStoreData: setEggRepositoryEggs,
   });
+
+  const eggRepositoryEggs = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   useKeyboardShortcuts({
     shortcuts: [

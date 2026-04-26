@@ -65,7 +65,7 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::user::GetPermissionManager,
+        models::{IntoAdminApiObject, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -95,7 +95,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             backup_configuration: backup_configuration
                 .0
-                .into_admin_api_object(&state.database)
+                .into_admin_api_object(&state, ())
                 .await?,
         })
         .ok()

@@ -361,7 +361,6 @@ impl ExtensionDistrFile {
             "backend/Cargo.toml",
             "backend/src/lib.rs",
             "frontend/package.json",
-            "frontend/src/index.ts",
         ];
 
         let mut package_segments = self.metadata_toml.package_name.split('.');
@@ -442,6 +441,14 @@ impl ExtensionDistrFile {
             }
         }
 
+        if self.zip.by_name("frontend/src/index.ts").is_err()
+            && self.zip.by_name("frontend/src/index.tsx").is_err()
+        {
+            return Err(anyhow::anyhow!(
+                "unable to find file `frontend/src/index.ts` or `frontend/src/index.tsx` in calagopus extension archive."
+            ));
+        }
+
         {
             let mut lib = self.zip.by_name("backend/src/lib.rs")?;
             let mut lib_string = String::new();
@@ -457,7 +464,11 @@ impl ExtensionDistrFile {
         }
 
         {
-            let mut index = self.zip.by_name("frontend/src/index.ts")?;
+            let mut index = if let Ok(index) = self.zip.by_name("frontend/src/index.ts") {
+                index
+            } else {
+                self.zip.by_name("frontend/src/index.tsx")?
+            };
             let mut index_string = String::new();
             index_string.reserve_exact(index.size() as usize);
             index.read_to_string(&mut index_string)?;

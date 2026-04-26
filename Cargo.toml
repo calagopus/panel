@@ -1,16 +1,26 @@
 [workspace]
 resolver = "3"
-members = ["backend", "database-migrator", "rule-validator", "wings-api", "shared", "schema-extension/*", "backend-extensions/*"]
-default-members = ["backend"]
-package.rust-version = "1.93.0"
+members = [
+	"backend",
+	"database-migrator",
+	"rule-validator",
+	"wings-api",
+	"shared",
+	"bins/*",
+	"schema-extension/*",
+	"backend-extensions/*"
+]
+default-members = ["bins/base", "bins/all-in-one"]
+package.rust-version = "1.95.0"
 package.license = "MIT"
-package.version = "1.0.3"
+package.version = "1.0.4"
 package.edition = "2024"
 
 [workspace.dependencies]
 wings-api = { path = "wings-api" }
 rule-validator = { path = "rule-validator" }
 shared = { path = "shared" }
+backend = { path = "backend" }
 database-migrator = { path = "database-migrator" }
 schema-extension-core = { path = "schema-extension/core" }
 schema-extension-derive = { path = "schema-extension/derive" }
@@ -20,10 +30,13 @@ tracing-appender = "0.2.3"
 sentry = { version = "0.47.0", default-features = false, features = ["rustls", "reqwest", "backtrace", "contexts", "debug-images", "panic"] }
 sentry-tower = { version = "0.47.0", default-features = false, features = ["http", "axum-matched-path"] }
 sentry-anyhow = "0.47.0"
+tower = "0.5.2"
+tower-cookies = "0.11.0"
+tower-http = { version = "0.6.2", features = ["normalize-path"] }
 axum = { version = "0.8.1", features = ["multipart"] }
 axum-extra = { version = "0.12.1", features = ["query"] }
 include_dir = "0.7.4"
-sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "mysql", "chrono", "ipnetwork", "uuid"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "mysql", "sqlite", "any", "chrono", "ipnetwork", "uuid"] }
 mongodb = "3.5.2"
 tokio = { version = "1.43.0", features = ["full"] }
 tokio-util = { version = "0.7.16", features = ["full"] }
@@ -53,7 +66,7 @@ sha2 = "0.11.0"
 colored = "3.0.0"
 russh = "0.60.0"
 futures-util = "0.3.31"
-clap = { version = "4.5.37", features = ["derive"] }
+clap = { version = "4.5.37", features = ["derive", "string"] }
 rust-s3 = { version = "0.37.0", default-features = false, features = ["fail-on-err", "tokio-rustls-tls"] }
 rand = "0.10.0"
 rustis = "0.19.0"
@@ -68,6 +81,7 @@ serde_with = "3.16.1"
 minijinja = "2.15.1"
 dialoguer = "0.12.0"
 hex = "0.4.3"
+zstd = "0.13.3"
 
 [patch.crates-io]
 compact_str = { git = "https://github.com/ParkMyCar/compact_str.git" }

@@ -1,5 +1,6 @@
 import { ContainerRegistry, Registry } from 'shared';
 import { z } from 'zod';
+import type { Props as ContainerProps } from '@/elements/containers/AccountContentContainer.tsx';
 import { userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
 import { ContextMenuRegistry } from '../../slices/contextMenu.ts';
 
@@ -11,11 +12,11 @@ export class SecurityKeysRegistry implements Registry {
     return this;
   }
 
-  public container: ContainerRegistry = new ContainerRegistry();
+  public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
   public securityKeyContextMenu: ContextMenuRegistry<{ securityKey: z.infer<typeof userSecurityKeySchema> }> =
     new ContextMenuRegistry();
 
-  public enterContainer(callback: (registry: ContainerRegistry) => unknown): this {
+  public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }

@@ -48,8 +48,8 @@ mod get {
     use crate::routes::api::admin::database_hosts::_database_host_::GetDatabaseHost;
     use serde::Serialize;
     use shared::{
-        ApiError,
-        models::user::GetPermissionManager,
+        ApiError, GetState,
+        models::{IntoAdminApiObject, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -70,13 +70,14 @@ mod get {
         ),
     ))]
     pub async fn route(
+        state: GetState,
         permissions: GetPermissionManager,
         database_host: GetDatabaseHost,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("database-hosts.read")?;
 
         ApiResponse::new_serialized(Response {
-            database_host: database_host.0.into_admin_api_object(),
+            database_host: database_host.0.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

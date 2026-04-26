@@ -1,5 +1,6 @@
 import { ContainerRegistry, Registry } from 'shared';
 import { z } from 'zod';
+import type { Props as ContainerProps } from '@/elements/containers/AccountContentContainer.tsx';
 import { userCommandSnippetSchema } from '@/lib/schemas/user/commandSnippets.ts';
 import { ContextMenuRegistry } from '../../slices/contextMenu.ts';
 
@@ -11,11 +12,11 @@ export class CommandSnippetsRegistry implements Registry {
     return this;
   }
 
-  public container: ContainerRegistry = new ContainerRegistry();
+  public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
   public commandSnippetContextMenu: ContextMenuRegistry<{ commandSnippet: z.infer<typeof userCommandSnippetSchema> }> =
     new ContextMenuRegistry();
 
-  public enterContainer(callback: (registry: ContainerRegistry) => unknown): this {
+  public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }

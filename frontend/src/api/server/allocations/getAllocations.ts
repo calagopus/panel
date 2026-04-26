@@ -7,12 +7,8 @@ export default async (
   page: number,
   search?: string,
 ): Promise<Pagination<z.infer<typeof serverAllocationSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/client/servers/${uuid}/allocations`, {
-        params: { page, search },
-      })
-      .then(({ data }) => resolve(data.allocations))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/allocations`, {
+    params: { page, search },
   });
+  return data.allocations;
 };

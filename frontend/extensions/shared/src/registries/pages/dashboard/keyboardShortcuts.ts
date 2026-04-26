@@ -1,4 +1,5 @@
 import { ContainerRegistry, Registry } from 'shared';
+import type { Props as ContainerProps } from '@/elements/containers/AccountContentContainer.tsx';
 import { ComponentListRegistry } from '../../slices/componentList.ts';
 
 export class KeyboardShortcutsRegistry implements Registry {
@@ -9,10 +10,10 @@ export class KeyboardShortcutsRegistry implements Registry {
     return this;
   }
 
-  public container: ContainerRegistry = new ContainerRegistry();
+  public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
   public shortcutSections: ComponentListRegistry = new ComponentListRegistry();
 
-  public enterContainer(callback: (registry: ContainerRegistry) => unknown): this {
+  public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }

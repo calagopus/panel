@@ -1,7 +1,7 @@
 import { Group } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
+import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
 import getServers from '@/api/server/getServers.ts';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -12,6 +12,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { Pagination } from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
@@ -25,7 +26,7 @@ import ServerItem from './ServerItem.tsx';
 
 export default function DashboardHomeAll() {
   const { t } = useTranslations();
-  const { servers, setServers, setServerGroups } = useUserStore();
+  const { setServerGroups } = useUserStore();
   const { serverListShowOthers, setServerListShowOthers } = useGlobalStore();
   const { addToast } = useToast();
 
@@ -70,11 +71,13 @@ export default function DashboardHomeAll() {
     };
   }, []);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.user.servers.all(),
     fetcher: (page, search) => getServers(page, search, serverListShowOthers),
-    setStoreData: setServers,
     deps: [serverListShowOthers],
   });
+
+  const servers = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const handleServerSelectionChange = (server: z.infer<typeof serverSchema>, selected: boolean) => {
     setSelectedServers((prev) => {

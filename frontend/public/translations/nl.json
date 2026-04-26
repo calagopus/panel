@@ -886,7 +886,7 @@
         },
         "shortcuts": {
           "title": "Sneltoetsen",
-          "description": "Gebruik deze sneltoetsen om efficiënter door het panel te navigeren.",
+          "subtitle": "Gebruik deze sneltoetsen om efficiënter door het panel te navigeren.",
           "detectedMac": "macOS gedetecteerd",
           "detectedWindows": "Windows/Linux gedetecteerd",
           "fileManager": {

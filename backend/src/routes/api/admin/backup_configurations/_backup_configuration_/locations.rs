@@ -8,7 +8,8 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, location::Location, user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch, location::Location,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -69,8 +70,8 @@ mod get {
 
         ApiResponse::new_serialized(Response {
             locations: locations
-                .async_map(|location| location.into_admin_api_object(&state.database))
-                .await,
+                .try_async_map(|location| location.into_admin_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }

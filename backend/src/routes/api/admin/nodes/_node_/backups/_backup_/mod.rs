@@ -61,8 +61,8 @@ mod get {
     use crate::routes::api::admin::nodes::_node_::backups::_backup_::GetServerBackup;
     use serde::Serialize;
     use shared::{
-        ApiError,
-        models::user::GetPermissionManager,
+        ApiError, GetState,
+        models::{IntoApiObject, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -89,13 +89,14 @@ mod get {
         ),
     ))]
     pub async fn route(
+        state: GetState,
         permissions: GetPermissionManager,
         backup: GetServerBackup,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("nodes.backups")?;
 
         ApiResponse::new_serialized(Response {
-            backup: backup.0.into_api_object(),
+            backup: backup.0.into_api_object(&state, ()).await?,
         })
         .ok()
     }

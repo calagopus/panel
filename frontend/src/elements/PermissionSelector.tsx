@@ -21,6 +21,7 @@ const permissionIconMap: Record<
 
 export default function PermissionSelector({
   label,
+  className,
   withAsterisk,
   permissionsMapType,
   permissions,
@@ -28,6 +29,7 @@ export default function PermissionSelector({
   setSelectedPermissions,
 }: {
   label?: string;
+  className?: string;
   withAsterisk?: boolean;
   permissionsMapType: keyof z.infer<typeof apiPermissionsSchema>;
   permissions: z.infer<typeof permissionMapSchema>;
@@ -148,7 +150,7 @@ export default function PermissionSelector({
   );
 
   return (
-    <Stack gap={0}>
+    <Stack gap={0} className={className}>
       {label && <Input.Label required={withAsterisk}>{label}</Input.Label>}
 
       <div className='flex flex-col lg:flex-row lg:items-start gap-6'>

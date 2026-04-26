@@ -57,8 +57,8 @@ mod get {
     use crate::routes::api::admin::egg_repositories::_egg_repository_::GetEggRepository;
     use serde::Serialize;
     use shared::{
-        ApiError,
-        models::user::GetPermissionManager,
+        ApiError, GetState,
+        models::{IntoAdminApiObject, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -79,13 +79,14 @@ mod get {
         ),
     ))]
     pub async fn route(
+        state: GetState,
         permissions: GetPermissionManager,
         egg_repository: GetEggRepository,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("egg-repositories.read")?;
 
         ApiResponse::new_serialized(Response {
-            egg_repository: egg_repository.0.into_admin_api_object(),
+            egg_repository: egg_repository.0.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

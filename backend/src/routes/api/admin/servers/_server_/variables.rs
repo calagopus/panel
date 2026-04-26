@@ -5,7 +5,11 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{server::GetServer, server_variable::ServerVariable, user::GetPermissionManager},
+        models::{
+            IntoApiObject, server::GetServer, server_variable::ServerVariable,
+            user::GetPermissionManager,
+        },
+        prelude::AsyncIteratorExt,
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -42,8 +46,9 @@ mod get {
         ApiResponse::new_serialized(Response {
             variables: variables
                 .into_iter()
-                .map(|variable| variable.into_api_object())
-                .collect(),
+                .map(|variable| variable.into_api_object(&state, ()))
+                .try_collect_async_vec()
+                .await?,
         })
         .ok()
     }

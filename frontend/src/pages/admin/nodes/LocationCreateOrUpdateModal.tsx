@@ -11,6 +11,7 @@ import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
@@ -47,6 +48,7 @@ export default function LocationCreateOrUpdateModal({
   );
 
   const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+    queryKey: queryKeys.admin.backupConfigurations.all(),
     fetcher: (search) => getBackupConfigurations(1, search),
     defaultSearchValue: '',
     canRequest: canReadBackupConfigurations,

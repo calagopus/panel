@@ -9,6 +9,7 @@ mod post {
         ApiError, GetState,
         models::{admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
+        settings::MailMode,
     };
     use utoipa::ToSchema;
 
@@ -39,10 +40,21 @@ mod post {
 
         permissions.has_admin_permission("settings.read")?;
 
-        let subject = state
+        let (subject, is_none) = state
             .settings
-            .get_as(|s| format!("{} - Email Connection Test", s.app.name))
+            .get_as(|s| {
+                (
+                    format!("{} - Email Connection Test", s.app.name),
+                    matches!(s.mail_mode, MailMode::None),
+                )
+            })
             .await?;
+
+        if is_none {
+            return ApiResponse::error("email functionality is disabled in settings")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
 
         if let Err(err) = state
             .mail

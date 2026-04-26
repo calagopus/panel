@@ -99,6 +99,7 @@ const baseTranslations = defineTranslations({
         disabled: 'Disabled',
         successful: 'Successful',
         failed: 'Failed',
+        installed: 'Installed',
       },
       server: {
         noAllocation: 'No Allocation',
@@ -178,7 +179,8 @@ const baseTranslations = defineTranslations({
     },
     elements: {
       errorBoundary: {
-        message: 'An error was encountered by the application while rendering this view. Try refreshing the page.',
+        message:
+          'An unexpected error occurred while rendering this page. Try refreshing. If the problem persists, contact your system administrator.',
         hideDetails: 'Hide Details',
         showDetails: 'Show Details',
         errorMessage: 'Error Message:',
@@ -486,6 +488,7 @@ const baseTranslations = defineTranslations({
         },
         server: {
           title: 'Server',
+          existingServer: 'A server has already been created. You can change the settings later in the admin menu.',
           egg: {
             title: 'Egg',
             description: "Let's get your first server up and running. What egg would you like to use?",
@@ -537,6 +540,8 @@ const baseTranslations = defineTranslations({
         login: {
           error: {
             usernameRequired: 'Please enter a username',
+            registrationDisabled: 'No matching Account could be found and registration is currently disabled.',
+            userAlreadyExists: 'An account with this username or email already exists.',
           },
           passkey: {
             error: {
@@ -876,7 +881,7 @@ const baseTranslations = defineTranslations({
         },
         shortcuts: {
           title: 'Keyboard Shortcuts',
-          description: 'Use these keyboard shortcuts to navigate and interact with the panel more efficiently.',
+          subtitle: 'Use these keyboard shortcuts to navigate and interact with the panel more efficiently.',
           detectedMac: 'macOS detected',
           detectedWindows: 'Windows/Linux detected',
           fileManager: {
@@ -1081,6 +1086,7 @@ const baseTranslations = defineTranslations({
           },
           toast: {
             installCancelled: 'Server install cancelled.',
+            transferCancelled: 'Server transfer cancelled.',
           },
           modal: {
             sshDetails: {

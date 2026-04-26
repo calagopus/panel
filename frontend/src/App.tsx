@@ -34,7 +34,7 @@ const browserHistory = createBrowserHistory();
 const MAX_RETRIES = 10;
 
 export default function App({ theme }: { theme: MantineThemeOverride }) {
-  const { settings, setSettings, setLanguages } = useGlobalStore();
+  const { settings, setSettings, setLanguages, setTimeOffset } = useGlobalStore();
   const [loadWarning, setLoadWarning] = useState(false);
   const retryCount = useRef(0);
 
@@ -44,10 +44,11 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
 
     const loadData = () => {
       Promise.all([getSettings(), getLanguages()])
-        .then(([settings, languages]) => {
+        .then(([{ settings, serverTime }, languages]) => {
           if (cancelled) return;
           setSettings(settings);
           setLanguages(languages);
+          setTimeOffset(Date.now() - serverTime.getTime());
         })
         .catch((err) => {
           if (cancelled) return;
@@ -84,7 +85,12 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
 
   return Object.keys(settings).length > 0 ? (
     <ErrorBoundary>
-      <MantineProvider theme={theme} forceColorScheme='dark' cssVariablesResolver={v8CssVariablesResolver}>
+      <MantineProvider
+        theme={theme}
+        forceColorScheme='dark'
+        cssVariablesResolver={v8CssVariablesResolver}
+        deduplicateInlineStyles
+      >
         <QueryClientProvider client={queryClient}>
           <TranslationProvider>
             <ToastProvider>
@@ -92,7 +98,15 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
                 <CurrentWindowProvider id={null}>
                   <HistoryContext.Provider value={browserHistory}>
                     <HistoryRouter history={browserHistory as never}>
+                      {window.extensionContext.extensionRegistry.global.prependedComponents.map((Component, index) => (
+                        <Component key={`global-prepended-${index}`} />
+                      ))}
+
                       <RouterRoutes isNormal />
+
+                      {window.extensionContext.extensionRegistry.global.appendedComponents.map((Component, index) => (
+                        <Component key={`global-appended-${index}`} />
+                      ))}
                     </HistoryRouter>
                   </HistoryContext.Provider>
 

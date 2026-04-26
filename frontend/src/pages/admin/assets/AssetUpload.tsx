@@ -14,7 +14,7 @@ import { useFileUpload } from '@/plugins/useFileUpload.ts';
 
 export default function AssetUpload({ invalidateAssets }: { invalidateAssets: () => void }) {
   const { uploadingFiles, handleFileSelect, totalUploadProgress, cancelFileUpload } = useFileUpload(
-    uploadAssets,
+    (form, config) => uploadAssets(form, config).then(() => ({ url: '', continuationToken: null })),
     invalidateAssets,
   );
 

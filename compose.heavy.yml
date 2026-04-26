@@ -25,6 +25,8 @@ services:
       - ./build/extension-migrations:/app/repo/database/extension-migrations
     ports:
       - 8000:8000
+    extra_hosts: # mainly useful when importing from a standalone installation, can be omitted otherwise
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - cache

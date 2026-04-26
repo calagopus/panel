@@ -6,10 +6,5 @@ export default async (
   commandSnippetUuid: string,
   data: z.infer<typeof userCommandSnippetUpdateSchema>,
 ): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .patch(`/api/client/account/command-snippets/${commandSnippetUuid}`, data)
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.patch(`/api/client/account/command-snippets/${commandSnippetUuid}`, data);
 };

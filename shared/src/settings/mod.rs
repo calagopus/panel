@@ -171,18 +171,6 @@ impl CaptchaProvider {
         }
     }
 
-    pub fn to_csp_frame_src(&self) -> &'static str {
-        match self {
-            CaptchaProvider::None => "",
-            CaptchaProvider::Turnstile { .. } => "https://challenges.cloudflare.com",
-            CaptchaProvider::Recaptcha { .. } => {
-                "https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/"
-            }
-            CaptchaProvider::Hcaptcha { .. } => "https://hcaptcha.com https://*.hcaptcha.com",
-            CaptchaProvider::FriendlyCaptcha { .. } => "https://*.frcapi.com",
-        }
-    }
-
     pub fn to_csp_style_src(&self) -> &'static str {
         match self {
             CaptchaProvider::None => "",
@@ -771,10 +759,8 @@ impl<'a> SettingsWriteGuard<'a> {
                         censor_values(k, v);
                     }
                 }
-                serde_json::Value::String(s) => {
-                    if key.contains("password") {
-                        *s = "*".repeat(s.len());
-                    }
+                serde_json::Value::String(s) if key.contains("password") => {
+                    *s = "*".repeat(s.len());
                 }
                 _ => {}
             }
@@ -846,14 +832,19 @@ impl Settings {
     }
 
     pub async fn new(database: Arc<crate::database::Database>) -> Result<Self, anyhow::Error> {
+        let (s1, s2) = tokio::try_join!(
+            Self::fetch_settings(&database),
+            Self::fetch_settings(&database)
+        )?;
+
         Ok(Self {
             cached: [
                 RwLock::new(SettingsBuffer {
-                    settings: Self::fetch_settings(&database).await?,
+                    settings: s1,
                     expires: std::time::Instant::now() + std::time::Duration::from_secs(60),
                 }),
                 RwLock::new(SettingsBuffer {
-                    settings: Self::fetch_settings(&database).await?,
+                    settings: s2,
                     expires: std::time::Instant::now() + std::time::Duration::from_secs(60),
                 }),
             ],

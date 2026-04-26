@@ -9,7 +9,7 @@ mod get {
     use shared::{
         GetState,
         models::{
-            Pagination, PaginationParamsWithSearch,
+            IntoApiObject, Pagination, PaginationParamsWithSearch,
             user::{GetPermissionManager, GetUser},
             user_command_snippet::UserCommandSnippet,
         },
@@ -59,16 +59,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            command_snippets: Pagination {
-                total: command_snippets.total,
-                per_page: command_snippets.per_page,
-                page: command_snippets.page,
-                data: command_snippets
-                    .data
-                    .into_iter()
-                    .map(|command_snippet| command_snippet.into_api_object())
-                    .collect(),
-            },
+            command_snippets: command_snippets
+                .try_async_map(|command_snippet| command_snippet.into_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }
@@ -81,7 +74,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoApiObject,
             user::{GetPermissionManager, GetUser},
             user_activity::GetUserActivityLogger,
             user_command_snippet::UserCommandSnippet,
@@ -159,7 +152,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            command_snippet: command_snippet.into_api_object(),
+            command_snippet: command_snippet.into_api_object(&state, ()).await?,
         })
         .ok()
     }

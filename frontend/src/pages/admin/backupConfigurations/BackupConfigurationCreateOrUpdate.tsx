@@ -1,4 +1,6 @@
-import { Group, Stack } from '@mantine/core';
+import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -139,51 +141,63 @@ export default function BackupConfigurationCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'backupConfigurations']))}>
-        <Stack mt='xs'>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <Select
-              withAsterisk
-              label='Backup Disk'
-              placeholder='Backup Disk'
-              data={Object.entries(backupDiskLabelMapping).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-              key={form.key('backupDisk')}
-              {...form.getInputProps('backupDisk')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <Select
+            withAsterisk
+            label='Backup Disk'
+            placeholder='Backup Disk'
+            data={Object.entries(backupDiskLabelMapping).map(([value, label]) => ({
+              value,
+              label,
+            }))}
+            key={form.key('backupDisk')}
+            {...form.getInputProps('backupDisk')}
+          />
 
-          <Group grow align='start'>
-            <TextArea
-              label='Description'
-              placeholder='Description'
-              rows={3}
-              key={form.key('description')}
-              {...form.getInputProps('description')}
-            />
-          </Group>
+          <TextArea
+            label='Description'
+            placeholder='Description'
+            className='col-span-full'
+            rows={3}
+            key={form.key('description')}
+            {...form.getInputProps('description')}
+          />
 
           <Switch
             label='Maintenance Enabled'
             key={form.key('maintenanceEnabled')}
             {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
           />
+        </div>
 
-          <Group>
-            <AdminCan
-              action={contextBackupConfiguration ? 'backup-configurations.update' : 'backup-configurations.create'}
-              cantSave
+        <Group mt='md'>
+          <AdminCan
+            action={contextBackupConfiguration ? 'backup-configurations.update' : 'backup-configurations.create'}
+            cantSave
+          >
+            <Button
+              type='submit'
+              disabled={
+                !form.isValid() ||
+                ((form.getValues().backupDisk === 's3' || backupConfigS3Form.isDirty()) &&
+                  !backupConfigS3Form.isValid()) ||
+                ((form.getValues().backupDisk === 'restic' || backupConfigResticForm.isDirty()) &&
+                  !backupConfigResticForm.isValid())
+              }
+              loading={loading}
             >
+              Save
+            </Button>
+            {!contextBackupConfiguration && (
               <Button
-                type='submit'
+                onClick={() => doCreateOrUpdate(true)}
                 disabled={
                   !form.isValid() ||
                   ((form.getValues().backupDisk === 's3' || backupConfigS3Form.isDirty()) &&
@@ -193,39 +207,34 @@ export default function BackupConfigurationCreateOrUpdate({
                 }
                 loading={loading}
               >
-                Save
+                Save & Stay
               </Button>
-              {!contextBackupConfiguration && (
-                <Button
-                  onClick={() => doCreateOrUpdate(true)}
-                  disabled={
-                    !form.isValid() ||
-                    ((form.getValues().backupDisk === 's3' || backupConfigS3Form.isDirty()) &&
-                      !backupConfigS3Form.isValid()) ||
-                    ((form.getValues().backupDisk === 'restic' || backupConfigResticForm.isDirty()) &&
-                      !backupConfigResticForm.isValid())
-                  }
-                  loading={loading}
-                >
-                  Save & Stay
-                </Button>
-              )}
-            </AdminCan>
-            {contextBackupConfiguration && (
-              <AdminCan action='backup-configurations.delete' cantDelete>
-                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  Delete
-                </Button>
-              </AdminCan>
             )}
-          </Group>
-          {(form.getValues().backupDisk === 's3' || backupConfigS3Form.isDirty() || backupConfigS3Form.isTouched()) && (
-            <BackupS3 form={backupConfigS3Form} />
+          </AdminCan>
+          {contextBackupConfiguration && (
+            <AdminCan action='backup-configurations.delete' cantDelete>
+              <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
+                Delete
+              </Button>
+            </AdminCan>
           )}
-          {(form.getValues().backupDisk === 'restic' ||
-            backupConfigResticForm.isDirty() ||
-            backupConfigResticForm.isTouched()) && <BackupRestic form={backupConfigResticForm} />}
-        </Stack>
+          <a
+            href='https://calagopus.com/docs/advanced/setting-up-backup-configurations'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
+              View Documentation
+            </Button>
+          </a>
+        </Group>
+
+        {(form.getValues().backupDisk === 's3' || backupConfigS3Form.isDirty() || backupConfigS3Form.isTouched()) && (
+          <BackupS3 form={backupConfigS3Form} />
+        )}
+        {(form.getValues().backupDisk === 'restic' ||
+          backupConfigResticForm.isDirty() ||
+          backupConfigResticForm.isTouched()) && <BackupRestic form={backupConfigResticForm} />}
       </form>
     </AdminContentContainer>
   );

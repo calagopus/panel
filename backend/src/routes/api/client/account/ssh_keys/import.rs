@@ -9,11 +9,12 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoApiObject,
             user::{GetPermissionManager, GetUser},
             user_activity::GetUserActivityLogger,
             user_ssh_key::UserSshKey,
         },
+        prelude::AsyncIteratorExt,
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -258,8 +259,9 @@ mod post {
         ApiResponse::new_serialized(Response {
             ssh_keys: ssh_keys
                 .into_iter()
-                .map(|ssh_key| ssh_key.into_api_object())
-                .collect(),
+                .map(|ssh_key| ssh_key.into_api_object(&state, ()))
+                .try_collect_async_vec()
+                .await?,
         })
         .ok()
     }

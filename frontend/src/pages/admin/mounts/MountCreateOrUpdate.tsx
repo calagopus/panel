@@ -1,4 +1,4 @@
-import { Group, Stack } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -78,74 +78,68 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'mounts']))}>
-        <Stack mt='xs'>
-          <Group grow align='start'>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <TextArea
-              label='Description'
-              placeholder='Description'
-              rows={3}
-              key={form.key('description')}
-              {...form.getInputProps('description')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <TextArea
+            label='Description'
+            placeholder='Description'
+            rows={3}
+            key={form.key('description')}
+            {...form.getInputProps('description')}
+          />
 
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Source'
-              placeholder='Source'
-              key={form.key('source')}
-              {...form.getInputProps('source')}
-            />
-            <TextInput
-              withAsterisk
-              label='Target'
-              placeholder='Target'
-              key={form.key('target')}
-              {...form.getInputProps('target')}
-            />
-          </Group>
+          <TextInput
+            withAsterisk
+            label='Source'
+            placeholder='Source'
+            key={form.key('source')}
+            {...form.getInputProps('source')}
+          />
+          <TextInput
+            withAsterisk
+            label='Target'
+            placeholder='Target'
+            key={form.key('target')}
+            {...form.getInputProps('target')}
+          />
 
-          <Group grow>
-            <Switch
-              label='Read Only'
-              key={form.key('readOnly')}
-              {...form.getInputProps('readOnly', { type: 'checkbox' })}
-            />
-            <Switch
-              label='User Mountable'
-              key={form.key('userMountable')}
-              {...form.getInputProps('userMountable', { type: 'checkbox' })}
-            />
-          </Group>
+          <Switch
+            label='Read Only'
+            key={form.key('readOnly')}
+            {...form.getInputProps('readOnly', { type: 'checkbox' })}
+          />
+          <Switch
+            label='User Mountable'
+            key={form.key('userMountable')}
+            {...form.getInputProps('userMountable', { type: 'checkbox' })}
+          />
+        </div>
 
-          <Group>
-            <AdminCan action={contextMount ? 'mounts.update' : 'mounts.create'} cantSave>
-              <Button type='submit' disabled={!form.isValid()} loading={loading}>
-                Save
+        <Group mt='md'>
+          <AdminCan action={contextMount ? 'mounts.update' : 'mounts.create'} cantSave>
+            <Button type='submit' disabled={!form.isValid()} loading={loading}>
+              Save
+            </Button>
+            {!contextMount && (
+              <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
+                Save & Stay
               </Button>
-              {!contextMount && (
-                <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                  Save & Stay
-                </Button>
-              )}
-            </AdminCan>
-            {contextMount && (
-              <AdminCan action='mounts.delete' cantDelete>
-                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  Delete
-                </Button>
-              </AdminCan>
             )}
-          </Group>
-        </Stack>
+          </AdminCan>
+          {contextMount && (
+            <AdminCan action='mounts.delete' cantDelete>
+              <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
+                Delete
+              </Button>
+            </AdminCan>
+          )}
+        </Group>
       </form>
     </AdminContentContainer>
   );

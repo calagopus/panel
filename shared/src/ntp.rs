@@ -1,7 +1,7 @@
 use anyhow::Context;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
+    collections::BTreeMap,
     net::SocketAddr,
     sync::Arc,
     time::{Duration, Instant},
@@ -28,14 +28,14 @@ impl NtpOffset {
 
 pub struct Ntp {
     last_check: RwLock<Instant>,
-    last_result: RwLock<HashMap<SocketAddr, NtpOffset>>,
+    last_result: RwLock<BTreeMap<SocketAddr, NtpOffset>>,
 }
 
 impl Ntp {
     pub fn new() -> Arc<Self> {
         let ntp = Arc::new(Self {
             last_check: RwLock::new(Instant::now()),
-            last_result: RwLock::new(HashMap::new()),
+            last_result: RwLock::new(BTreeMap::new()),
         });
 
         tokio::spawn({
@@ -57,7 +57,7 @@ impl Ntp {
         ntp
     }
 
-    async fn update_result(&self, result: HashMap<SocketAddr, NtpOffset>) {
+    async fn update_result(&self, result: BTreeMap<SocketAddr, NtpOffset>) {
         *self.last_check.write().await = Instant::now();
         *self.last_result.write().await = result;
     }
@@ -69,12 +69,12 @@ impl Ntp {
         Ok(())
     }
 
-    pub async fn get_last_result(&self) -> RwLockReadGuard<'_, HashMap<SocketAddr, NtpOffset>> {
+    pub async fn get_last_result(&self) -> RwLockReadGuard<'_, BTreeMap<SocketAddr, NtpOffset>> {
         self.last_result.read().await
     }
 }
 
-pub async fn check_ntp() -> Result<HashMap<SocketAddr, NtpOffset>, anyhow::Error> {
+pub async fn check_ntp() -> Result<BTreeMap<SocketAddr, NtpOffset>, anyhow::Error> {
     let socket = tokio::net::UdpSocket::bind("0.0.0.0:0").await?;
     let socket = sntpc_net_tokio::UdpSocketWrapper::from(socket);
     let context = sntpc::NtpContext::new(sntpc::StdTimestampGen::default());
@@ -93,7 +93,7 @@ pub async fn check_ntp() -> Result<HashMap<SocketAddr, NtpOffset>, anyhow::Error
         .context("failed to get time from pool.ntp.org")
     };
 
-    let mut result = HashMap::new();
+    let mut result = BTreeMap::new();
 
     for pool_ntp_addr in pool_ntp_addrs {
         let pool_time = match get_pool_time(pool_ntp_addr).await {

@@ -8,12 +8,8 @@ export default async (
   search?: string,
   detached?: boolean,
 ): Promise<Pagination<z.infer<typeof adminServerBackupSchema>>> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .get(`/api/admin/nodes/${nodeUuid}/backups`, {
-        params: { page, search, detached },
-      })
-      .then(({ data }) => resolve(data.backups))
-      .catch(reject);
+  const { data } = await axiosInstance.get(`/api/admin/nodes/${nodeUuid}/backups`, {
+    params: { page, search, detached },
   });
+  return data.backups;
 };

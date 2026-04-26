@@ -1,11 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import type { LanguageData } from 'shared';
 import type { Plugin } from 'vite';
-import { defineConfig } from 'vite';
+import { defineConfig, normalizePath } from 'vite';
 import dynamicPublicDirectory from 'vite-multiple-assets';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
@@ -175,6 +176,10 @@ const translationsPlugin = (): Plugin => {
   };
 };
 
+const monacoVsDir = normalizePath(
+  path.join(path.dirname(fileURLToPath(import.meta.resolve('monaco-editor/package.json'))), 'min/vs'),
+);
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -207,8 +212,11 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: path.join(new URL('./', import.meta.resolve('monaco-editor/package.json')).pathname, 'min/vs'),
+          src: monacoVsDir,
           dest: 'monaco',
+          rename: {
+            stripBase: 7,
+          },
         },
       ],
     }),

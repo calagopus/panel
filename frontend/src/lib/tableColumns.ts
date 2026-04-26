@@ -20,7 +20,7 @@ export const eggTableColumns = ['ID', 'Name', 'Author', 'Description', 'Created'
 
 export const eggConfigurationTableColumns = ['ID', 'Order', 'Name', 'Eggs', 'Created'];
 
-export const nodeTableColumns = ['', 'ID', 'Name', 'Location', 'URL', 'Created'];
+export const nodeTableColumns = ['', 'ID', 'Name', 'Location', 'Created'];
 
 export const nodeMountTableColumns = ['ID', 'Name', 'Source', 'Target', 'Added', ''];
 

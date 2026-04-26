@@ -21,14 +21,19 @@ interface Props {
   step: z.infer<typeof serverScheduleStepSchema>;
   onStepUpdate: (step: z.infer<typeof serverScheduleStepSchema>) => void;
   onStepDelete: (stepUuid: string) => void;
+  onStepToggle?: (open: boolean) => void;
 }
 
-export default function StepCard({ schedule, step, onStepUpdate, onStepDelete }: Props) {
+export default function StepCard({ schedule, step, onStepUpdate, onStepDelete, onStepToggle }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
 
   const [openModal, setOpenModal] = useState<'update' | 'delete' | null>(null);
+  const handleOpenModal = (modal: 'update' | 'delete' | null) => {
+    setOpenModal(modal);
+    onStepToggle?.(modal !== null);
+  };
 
   const doDelete = async () => {
     await deleteScheduleStep(server.uuid, schedule.uuid, step.uuid)
@@ -45,7 +50,7 @@ export default function StepCard({ schedule, step, onStepUpdate, onStepDelete }:
     <Card>
       <StepCreateOrUpdateModal
         opened={openModal === 'update'}
-        onClose={() => setOpenModal(null)}
+        onClose={() => handleOpenModal(null)}
         schedule={schedule}
         propStep={step}
         onStepUpdate={onStepUpdate}
@@ -53,7 +58,7 @@ export default function StepCard({ schedule, step, onStepUpdate, onStepDelete }:
 
       <ConfirmationModal
         opened={openModal === 'delete'}
-        onClose={() => setOpenModal(null)}
+        onClose={() => handleOpenModal(null)}
         title={t('pages.server.schedules.modal.deleteStep.title', {})}
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
@@ -75,10 +80,10 @@ export default function StepCard({ schedule, step, onStepUpdate, onStepDelete }:
         </Group>
 
         <Group gap='xs'>
-          <ActionIcon color='blue' onClick={() => setOpenModal('update')}>
+          <ActionIcon color='blue' onClick={() => handleOpenModal('update')}>
             <FontAwesomeIcon icon={faPencil} />
           </ActionIcon>
-          <ActionIcon color='red' onClick={() => setOpenModal('delete')}>
+          <ActionIcon color='red' onClick={() => handleOpenModal('delete')}>
             <FontAwesomeIcon icon={faTrash} />
           </ActionIcon>
         </Group>

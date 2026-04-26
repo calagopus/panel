@@ -1,10 +1,5 @@
 import { axiosInstance } from '@/api/axios.ts';
 
 export default async (uuid: string, backupUuid: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .delete(`/api/client/servers/${uuid}/backups/${backupUuid}`)
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.delete(`/api/client/servers/${uuid}/backups/${backupUuid}`);
 };

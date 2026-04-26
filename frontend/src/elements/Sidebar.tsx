@@ -9,8 +9,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Menu } from '@mantine/core';
+import classNames from 'classnames';
 import { ReactNode, useEffect, useState } from 'react';
-import { MemoryRouter, NavLink, useNavigate } from 'react-router';
+import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
 import { makeComponentHookable } from 'shared';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
@@ -27,9 +28,10 @@ import ContextMenu, { ContextMenuProvider } from './ContextMenu.tsx';
 
 type SidebarProps = {
   children: ReactNode;
+  header?: ReactNode;
 };
 
-function Sidebar({ children }: SidebarProps) {
+function Sidebar({ children, header }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -54,7 +56,10 @@ function Sidebar({ children }: SidebarProps) {
         >
           <CloseButton size='xl' className='absolute! right-4 z-10' onClick={() => setIsMobileMenuOpen(false)} />
 
-          <div className='h-full flex flex-col overflow-y-auto'>{children}</div>
+          <div id='sidebar-content' className='h-full flex flex-col'>
+            {header && <div className='shrink-0'>{header}</div>}
+            <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+          </div>
         </Drawer>
 
         <Card
@@ -62,7 +67,10 @@ function Sidebar({ children }: SidebarProps) {
           p='sm'
           id='sidebar-desktop'
         >
-          <div className='h-full flex flex-col overflow-y-auto'>{children}</div>
+          <div id='sidebar-content' className='h-full flex flex-col'>
+            {header && <div className='shrink-0'>{header}</div>}
+            <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+          </div>
         </Card>
       </ContextMenuProvider>
     </>
@@ -75,11 +83,17 @@ type LinkProps = {
   icon?: IconDefinition;
   name?: string;
   title?: string;
+  className?: string;
+  activeMatches?: string[];
 };
 
-function Link({ to, end, icon, name, title = name }: LinkProps) {
+function Link({ to, end, icon, name, title = name, className, activeMatches }: LinkProps) {
   const { t } = useTranslations();
   const { addWindow } = useWindows();
+  const { pathname } = useLocation();
+  const extraActive = activeMatches?.some((pattern) => matchPath({ path: pattern, end: false }, pathname)) ?? false;
+
+  if (to.endsWith('/*')) to = to.slice(0, to.length - 2);
 
   return (
     <ContextMenu
@@ -127,17 +141,20 @@ function Link({ to, end, icon, name, title = name }: LinkProps) {
           }}
           className='w-full'
         >
-          {({ isActive }) => (
-            <Button
-              color={isActive ? 'blue' : 'gray'}
-              className={isActive ? 'cursor-default! active' : undefined}
-              variant='subtle'
-              fullWidth
-              styles={{ label: { width: '100%' } }}
-            >
-              {icon && <FontAwesomeIcon icon={icon} className='mr-2' />} {name}
-            </Button>
-          )}
+          {({ isActive: navActive }) => {
+            const isActive = navActive || extraActive;
+            return (
+              <Button
+                color={isActive ? 'blue' : 'gray'}
+                className={classNames(isActive && 'cursor-default! active', className)}
+                variant='subtle'
+                fullWidth
+                styles={{ label: { width: '100%' } }}
+              >
+                {icon && <FontAwesomeIcon icon={icon} className='mr-2' />} {name}
+              </Button>
+            );
+          }}
         </NavLink>
       )}
     </ContextMenu>

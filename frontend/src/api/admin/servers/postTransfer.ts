@@ -15,10 +15,5 @@ interface Data {
 }
 
 export default async (serverUuid: string, data: Data): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    axiosInstance
-      .post(`/api/admin/servers/${serverUuid}/transfer`, transformKeysToSnakeCase(data))
-      .then(() => resolve())
-      .catch(reject);
-  });
+  await axiosInstance.post(`/api/admin/servers/${serverUuid}/transfer`, transformKeysToSnakeCase(data));
 };

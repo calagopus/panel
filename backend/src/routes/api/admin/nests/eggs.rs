@@ -6,7 +6,9 @@ mod get {
     use serde::Serialize;
     use shared::{
         GetState,
-        models::{ByUuid, nest::Nest, nest_egg::NestEgg, user::GetPermissionManager},
+        models::{
+            ByUuid, IntoAdminApiObject, nest::Nest, nest_egg::NestEgg, user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use std::collections::BTreeMap;
@@ -37,7 +39,7 @@ mod get {
             futures_map
                 .entry(nest_egg.nest.uuid)
                 .or_insert_with(Vec::new)
-                .push(nest_egg.into_admin_api_object(&state.database));
+                .push(nest_egg.into_admin_api_object(&state, ()));
         }
 
         let mut nests = Vec::new();
@@ -50,7 +52,8 @@ mod get {
             nests.push(ResponseNestEggGroup {
                 nest: Nest::by_uuid_cached(&state.database, nest_uuid)
                     .await?
-                    .into_admin_api_object(),
+                    .into_admin_api_object(&state, ())
+                    .await?,
                 eggs,
             });
         }

@@ -9,8 +9,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            ByUuid, DeletableModel, admin_activity::GetAdminActivityLogger,
-            user::GetPermissionManager,
+            ByUuid, DeletableModel, admin_activity::GetAdminActivityLogger, nest_egg::NestEgg,
+            server::Server, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -49,13 +49,14 @@ mod post {
         permissions.has_admin_permission("eggs.delete")?;
 
         let delete_egg = async |egg: uuid::Uuid| {
-            let nest_egg =
-                match shared::models::nest_egg::NestEgg::by_uuid_optional(&state.database, egg)
-                    .await?
-                {
-                    Some(nest_egg) => nest_egg,
-                    None => return Ok(false),
-                };
+            if Server::count_by_egg_uuid(&state.database, egg).await > 0 {
+                return Ok(false);
+            }
+
+            let nest_egg = match NestEgg::by_uuid_optional(&state.database, egg).await? {
+                Some(nest_egg) => nest_egg,
+                None => return Ok(false),
+            };
 
             nest_egg.delete(&state, ()).await?;
 

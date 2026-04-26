@@ -59,7 +59,7 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{node::GetNode, user::GetPermissionManager},
+        models::{IntoAdminApiObject, node::GetNode, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -88,7 +88,7 @@ mod get {
         permissions.has_admin_permission("nodes.read")?;
 
         ApiResponse::new_serialized(Response {
-            node: node.0.into_admin_api_object(&state.database).await?,
+            node: node.0.into_admin_api_object(&state, ()).await?,
         })
         .ok()
     }

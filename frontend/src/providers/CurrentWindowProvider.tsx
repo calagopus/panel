@@ -7,7 +7,7 @@ const CurrentWindowProvider: FC<{ children: ReactNode; id: number | null }> = ({
       return null;
     }
 
-    return (document.getElementsByClassName(`window_${id}_card`) as HTMLCollectionOf<HTMLDivElement>)[0] || null;
+    return (document.getElementById(`window_${id}_inner`) as HTMLDivElement) || null;
   }, [id]);
 
   const contextValue = useMemo(
@@ -18,7 +18,13 @@ const CurrentWindowProvider: FC<{ children: ReactNode; id: number | null }> = ({
     [id, getParent],
   );
 
-  return <CurrentWindowContext.Provider value={contextValue}>{children}</CurrentWindowContext.Provider>;
+  return (
+    <CurrentWindowContext.Provider value={contextValue}>
+      <div id={`window_${id}_inner`} className='h-full'>
+        {children}
+      </div>
+    </CurrentWindowContext.Provider>
+  );
 };
 
 export { useCurrentWindow } from './contexts/currentWindowContext.ts';

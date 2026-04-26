@@ -2,6 +2,12 @@ import jsYaml from 'js-yaml';
 import { z } from 'zod';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 
+export const NODE_AIO_UUID = '7dbbbb63-1734-48c4-e1de-d1a65f62cada';
+
+export const isNodeAIO = (node: z.infer<typeof adminNodeSchema>) => {
+  return node.uuid === NODE_AIO_UUID;
+};
+
 interface NodeConfigurationParams {
   node: z.infer<typeof adminNodeSchema>;
   remote: string;

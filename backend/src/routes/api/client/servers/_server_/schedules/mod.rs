@@ -10,7 +10,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch, server::GetServer,
+            IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
             server_schedule::ServerSchedule, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -71,16 +71,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            schedules: Pagination {
-                total: schedules.total,
-                per_page: schedules.per_page,
-                page: schedules.page,
-                data: schedules
-                    .data
-                    .into_iter()
-                    .map(|schedule| schedule.into_api_object())
-                    .collect(),
-            },
+            schedules: schedules
+                .try_async_map(|schedule| schedule.into_api_object(&state, ()))
+                .await?,
         })
         .ok()
     }
@@ -93,7 +86,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel,
+            CreatableModel, IntoApiObject,
             server::{GetServer, GetServerActivityLogger},
             server_schedule::ServerSchedule,
             user::GetPermissionManager,
@@ -195,7 +188,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            schedule: schedule.into_api_object(),
+            schedule: schedule.into_api_object(&state, ()).await?,
         })
         .ok()
     }

@@ -9,7 +9,7 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            Pagination, PaginationParamsWithSearch,
+            IntoApiObject, Pagination, PaginationParamsWithSearch,
             user::{GetAuthMethod, GetPermissionManager, GetUser},
             user_session::UserSession,
         },
@@ -66,16 +66,9 @@ mod get {
         .await?;
 
         ApiResponse::new_serialized(Response {
-            sessions: Pagination {
-                total: sessions.total,
-                per_page: sessions.per_page,
-                page: sessions.page,
-                data: sessions
-                    .data
-                    .into_iter()
-                    .map(|session| session.into_api_object(&auth))
-                    .collect(),
-            },
+            sessions: sessions
+                .try_async_map(|session| session.into_api_object(&state, &auth))
+                .await?,
         })
         .ok()
     }

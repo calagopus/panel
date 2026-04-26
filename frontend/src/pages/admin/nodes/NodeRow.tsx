@@ -5,16 +5,25 @@ import { NavLink } from 'react-router';
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
 import Code from '@/elements/Code.tsx';
+import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { getNodeUrl } from '@/lib/node.ts';
+import { getNodeUrl, isNodeAIO } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { parseVersion } from '@/lib/version.ts';
 import { useAdminStore } from '@/stores/admin.tsx';
 
-export default function NodeRow({ node }: { node: z.infer<typeof adminNodeSchema> }) {
+export default function NodeRow({
+  node,
+  desync,
+  contextMenuProps,
+}: {
+  node: z.infer<typeof adminNodeSchema>;
+  desync?: number;
+  contextMenuProps?: ContextMenuChildrenProps;
+}) {
   const { updateInformation } = useAdminStore();
 
   const [version, setVersion] = useState<string | null>(null);
@@ -36,14 +45,21 @@ export default function NodeRow({ node }: { node: z.infer<typeof adminNodeSchema
   }, []);
 
   return (
-    <TableRow>
+    <TableRow
+      onContextMenu={(e) => {
+        if (!contextMenuProps) return;
+
+        e.preventDefault();
+        contextMenuProps.openMenu(e.pageX, e.pageY);
+      }}
+    >
       <TableData>
         {version ? (
           version === 'Unavailable' ? (
             <Tooltip label='Error while fetching version'>
               <FontAwesomeIcon icon={faHeartBroken} className='text-red-500' />
             </Tooltip>
-          ) : updateInformation && parseVersion(updateInformation.latestWings).isNewerThan(version) ? (
+          ) : updateInformation && parseVersion(updateInformation.latestWingsVersion).isNewerThan(version) ? (
             <Tooltip label={`${version} (Update Available)`}>
               <FontAwesomeIcon icon={faHeart} className='text-yellow-500 animate-pulse' />
             </Tooltip>
@@ -63,6 +79,8 @@ export default function NodeRow({ node }: { node: z.infer<typeof adminNodeSchema
         </NavLink>
       </TableData>
 
+      {desync !== undefined && <TableData>{desync}ms</TableData>}
+
       <TableData>
         <span className='flex gap-2 items-center'>
           {node.name}&nbsp;
@@ -73,6 +91,11 @@ export default function NodeRow({ node }: { node: z.infer<typeof adminNodeSchema
           ) : (
             <Tooltip label='Deployment Disabled'>
               <FontAwesomeIcon icon={faGlobe} className='text-red-500' />
+            </Tooltip>
+          )}
+          {isNodeAIO(node) && (
+            <Tooltip label='All-in-One Node'>
+              <FontAwesomeIcon icon={faHeart} className='text-purple-500' />
             </Tooltip>
           )}
         </span>
@@ -88,12 +111,14 @@ export default function NodeRow({ node }: { node: z.infer<typeof adminNodeSchema
       </TableData>
 
       <TableData>
-        <Code>{node.url}</Code>
-      </TableData>
-
-      <TableData>
         <FormattedTimestamp timestamp={node.created} />
       </TableData>
+
+      {contextMenuProps && (
+        <TableData className='relative cursor-pointer min-w-10 text-center'>
+          <ContextMenuToggle items={contextMenuProps.items} openMenu={contextMenuProps.openMenu} />
+        </TableData>
+      )}
     </TableRow>
   );
 }

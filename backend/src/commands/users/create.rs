@@ -152,7 +152,9 @@ impl shared::extensions::commands::CliCommand<CreateArgs> for CreateCommand {
                     eprintln!(
                         "{}",
                         serde_json::to_string_pretty(
-                            &user.into_api_full_object(&state.storage.retrieve_urls().await?)
+                            &user
+                                .into_api_full_object(&state, &state.storage.retrieve_urls().await?)
+                                .await?
                         )?
                     );
                 } else {

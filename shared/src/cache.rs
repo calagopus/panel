@@ -444,6 +444,25 @@ impl Cache {
         Ok(None)
     }
 
+    pub async fn get_raw(&self, key: &str) -> Result<Option<Arc<Vec<u8>>>, anyhow::Error> {
+        if let Some(entry) = self.local.get(key).await {
+            tracing::debug!("get_raw: found in moka cache");
+            return Ok(Some(entry.data.clone()));
+        }
+
+        if let Some(client) = &self.client {
+            tracing::debug!("get_raw: checking redis cache");
+            let cached_value: Option<BulkString> = client.get(key).await?;
+
+            if let Some(value) = cached_value {
+                tracing::debug!("get_raw: found in redis cache");
+                return Ok(Some(Arc::new(value.to_vec())));
+            }
+        }
+
+        Ok(None)
+    }
+
     pub async fn set<T: Serialize + Send + Sync>(
         &self,
         key: &str,
@@ -483,6 +502,56 @@ impl Cache {
         Ok(())
     }
 
+    pub async fn set_raw(
+        &self,
+        key: &str,
+        ttl: u64,
+        value: impl Into<Arc<Vec<u8>>>,
+    ) -> Result<(), anyhow::Error> {
+        let serialized_arc = value.into();
+
+        let effective_moka_ttl = if self.use_internal_cache {
+            Duration::from_secs(ttl)
+        } else {
+            Duration::from_millis(50)
+        };
+
+        self.local
+            .insert(
+                key.to_compact_string(),
+                DataEntry {
+                    data: serialized_arc.clone(),
+                    intended_ttl: effective_moka_ttl,
+                },
+            )
+            .await;
+
+        if let Some(client) = &self.client {
+            client
+                .set_with_options(
+                    key,
+                    BulkStringRef(&serialized_arc),
+                    None,
+                    SetExpiration::Ex(ttl),
+                )
+                .await?;
+        }
+
+        Ok(())
+    }
+
+    pub async fn exists(&self, key: &str) -> Result<bool, anyhow::Error> {
+        if self.local.contains_key(key) {
+            return Ok(true);
+        }
+
+        if let Some(client) = &self.client {
+            Ok(client.exists(key).await? > 0)
+        } else {
+            Ok(false)
+        }
+    }
+
     pub async fn invalidate(&self, key: &str) -> Result<(), anyhow::Error> {
         self.local.invalidate(key).await;
         if let Some(client) = &self.client {
@@ -505,11 +574,15 @@ impl Cache {
     #[inline]
     pub fn cache_latency_ns_average(&self) -> u64 {
         let calls = self.cache_calls();
-        if calls == 0 {
-            0
-        } else {
-            self.cache_latency_ns_total.load(Ordering::Relaxed) / calls
-        }
+        self.cache_latency_ns_total
+            .load(Ordering::Relaxed)
+            .checked_div(calls)
+            .unwrap_or(0)
+    }
+
+    #[inline]
+    pub fn cache_latency_ns_max(&self) -> u64 {
+        self.cache_latency_ns_max.load(Ordering::Relaxed)
     }
 }
 

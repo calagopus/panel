@@ -5,6 +5,7 @@ use crate::{
     },
     prelude::*,
 };
+use compact_str::ToCompactString;
 use garde::Validate;
 use rand::distr::SampleString;
 use serde::{Deserialize, Serialize};
@@ -44,13 +45,26 @@ pub struct Node {
     pub token: Vec<u8>,
 
     pub created: chrono::NaiveDateTime,
+
+    extension_data: super::ModelExtensionData,
 }
 
 impl BaseModel for Node {
     const NAME: &'static str = "node";
 
+    fn get_extension_list() -> &'static super::ModelExtensionList {
+        static EXTENSIONS: LazyLock<super::ModelExtensionList> =
+            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+
+        &EXTENSIONS
+    }
+
+    fn get_extension_data(&self) -> &super::ModelExtensionData {
+        &self.extension_data
+    }
+
     #[inline]
-    fn columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
+    fn base_columns(prefix: Option<&str>) -> BTreeMap<&'static str, compact_str::CompactString> {
         let prefix = prefix.unwrap_or_default();
 
         let mut columns = BTreeMap::from([
@@ -101,7 +115,7 @@ impl BaseModel for Node {
             ),
         ]);
 
-        columns.extend(super::location::Location::columns(Some("location_")));
+        columns.extend(super::location::Location::base_columns(Some("location_")));
 
         columns
     }
@@ -142,11 +156,14 @@ impl BaseModel for Node {
             token_id: row.try_get(compact_str::format_compact!("{prefix}token_id").as_str())?,
             token: row.try_get(compact_str::format_compact!("{prefix}token").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
+            extension_data: Self::map_extensions(prefix, row)?,
         })
     }
 }
 
 impl Node {
+    pub const AIO_NODE_UUID: uuid::Uuid = uuid::uuid!("7dbbbb63-1734-48c4-e1de-d1a65f62cada");
+
     pub async fn by_token_id_token_cached(
         database: &crate::database::Database,
         token_id: &str,
@@ -466,6 +483,11 @@ impl Node {
     }
 
     #[inline]
+    pub fn is_all_in_one_node(&self) -> bool {
+        self.uuid == Self::AIO_NODE_UUID
+    }
+
+    #[inline]
     pub fn url(&self, path: &str) -> reqwest::Url {
         let mut url = self.url.clone();
         url.path_segments_mut()
@@ -475,12 +497,29 @@ impl Node {
     }
 
     #[inline]
-    pub fn public_url(&self, path: &str) -> reqwest::Url {
-        let mut url = self.public_url.clone().unwrap_or(self.url.clone());
+    pub async fn public_url(
+        &self,
+        state: &crate::State,
+        path: &str,
+    ) -> Result<reqwest::Url, anyhow::Error> {
+        let mut url = if self.is_all_in_one_node() {
+            let mut url = state
+                .settings
+                .get_as(|s| reqwest::Url::parse(&s.app.url))
+                .await??;
+            url.path_segments_mut()
+                .unwrap()
+                .extend(&["wings-proxy", &self.uuid.to_compact_string()]);
+            url
+        } else {
+            self.public_url.clone().unwrap_or(self.url.clone())
+        };
+
         url.path_segments_mut()
             .unwrap()
             .extend(path.trim_start_matches('/').split('/'));
-        url
+
+        Ok(url)
     }
 
     #[inline]
@@ -506,20 +545,34 @@ impl Node {
             payload,
         )
     }
+}
 
-    #[inline]
-    pub async fn into_admin_api_object(
+#[async_trait::async_trait]
+impl IntoAdminApiObject for Node {
+    type AdminApiObject = AdminApiNode;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
         self,
-        database: &crate::database::Database,
-    ) -> Result<AdminApiNode, anyhow::Error> {
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiNode::init_hooks(&self, state).await?;
+
+        let public_url = if self.is_all_in_one_node() {
+            Some(self.public_url(state, "/").await?.to_string())
+        } else {
+            self.public_url.map(|url| url.to_string())
+        };
+
         let (location, backup_configuration) =
-            tokio::join!(self.location.into_admin_api_object(database), async {
+            tokio::join!(self.location.into_admin_api_object(state, ()), async {
                 if let Some(backup_configuration) = self.backup_configuration {
                     if let Ok(backup_configuration) =
-                        backup_configuration.fetch_cached(database).await
+                        backup_configuration.fetch_cached(&state.database).await
                     {
                         backup_configuration
-                            .into_admin_api_object(database)
+                            .into_admin_api_object(state, ())
                             .await
                             .ok()
                     } else {
@@ -530,24 +583,30 @@ impl Node {
                 }
             });
 
-        Ok(AdminApiNode {
-            uuid: self.uuid,
-            location,
-            backup_configuration,
-            name: self.name,
-            description: self.description,
-            deployment_enabled: self.deployment_enabled,
-            maintenance_enabled: self.maintenance_enabled,
-            public_url: self.public_url.map(|url| url.to_string()),
-            url: self.url.to_string(),
-            sftp_host: self.sftp_host,
-            sftp_port: self.sftp_port,
-            memory: self.memory,
-            disk: self.disk,
-            token_id: self.token_id,
-            token: database.decrypt(self.token).await?,
-            created: self.created.and_utc(),
-        })
+        let api_object = finish_extendible!(
+            AdminApiNode {
+                uuid: self.uuid,
+                location: location?,
+                backup_configuration,
+                name: self.name,
+                description: self.description,
+                deployment_enabled: self.deployment_enabled,
+                maintenance_enabled: self.maintenance_enabled,
+                public_url,
+                url: self.url.to_string(),
+                sftp_host: self.sftp_host,
+                sftp_port: self.sftp_port,
+                memory: self.memory,
+                disk: self.disk,
+                token_id: self.token_id,
+                token: state.database.decrypt(self.token).await?,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -891,6 +950,10 @@ impl DeletableModel for Node {
         state: &crate::State,
         options: Self::DeleteOptions,
     ) -> Result<(), anyhow::Error> {
+        if self.is_all_in_one_node() && state.container_type.is_all_in_one() {
+            return Err(anyhow::anyhow!("The AIO node cannot be deleted"));
+        }
+
         let mut transaction = state.database.write().begin().await?;
 
         self.run_delete_handlers(&options, state, &mut transaction)
@@ -912,6 +975,9 @@ impl DeletableModel for Node {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(Node, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "Node")]
 pub struct AdminApiNode {

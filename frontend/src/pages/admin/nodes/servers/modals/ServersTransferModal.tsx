@@ -14,6 +14,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
 import { archiveFormatLabelMapping, compressionLevelLabelMapping } from '@/lib/enums.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import {
@@ -49,6 +50,7 @@ export default function ServersTransferModal({
   const [multiplexChannels, setMultiplexChannels] = useState(0);
 
   const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+    queryKey: queryKeys.admin.nodes.all(),
     fetcher: (search) => getNodes(1, search),
   });
 

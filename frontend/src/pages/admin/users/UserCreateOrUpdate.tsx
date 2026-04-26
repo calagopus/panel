@@ -1,4 +1,4 @@
-import { Group, Stack } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -17,6 +17,7 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/users.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -82,6 +83,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
   }, [contextUser]);
 
   const roles = useSearchableResource<z.infer<typeof roleSchema>>({
+    queryKey: queryKeys.admin.roles.all(),
     fetcher: (search) => getRoles(1, search),
     defaultSearchValue: contextUser?.role?.name,
     canRequest: canReadRoles,
@@ -155,94 +157,86 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'users']))}>
-        <Stack mt='xs'>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Username'
-              placeholder='Username'
-              key={form.key('username')}
-              {...form.getInputProps('username')}
-            />
-            <TextInput
-              withAsterisk
-              label='Email'
-              placeholder='Email'
-              type='email'
-              key={form.key('email')}
-              {...form.getInputProps('email')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Username'
+            placeholder='Username'
+            key={form.key('username')}
+            {...form.getInputProps('username')}
+          />
+          <TextInput
+            withAsterisk
+            label='Email'
+            placeholder='Email'
+            type='email'
+            key={form.key('email')}
+            {...form.getInputProps('email')}
+          />
 
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='First Name'
-              placeholder='First Name'
-              key={form.key('nameFirst')}
-              {...form.getInputProps('nameFirst')}
-            />
-            <TextInput
-              withAsterisk
-              label='Last Name'
-              placeholder='Last Name'
-              key={form.key('nameLast')}
-              {...form.getInputProps('nameLast')}
-            />
-          </Group>
+          <TextInput
+            withAsterisk
+            label='First Name'
+            placeholder='First Name'
+            key={form.key('nameFirst')}
+            {...form.getInputProps('nameFirst')}
+          />
+          <TextInput
+            withAsterisk
+            label='Last Name'
+            placeholder='Last Name'
+            key={form.key('nameLast')}
+            {...form.getInputProps('nameLast')}
+          />
 
-          <Group grow>
-            <Select
-              withAsterisk
-              label='Language'
-              placeholder='Language'
-              data={languages.map((language) => ({
-                label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
-                value: language,
-              }))}
-              searchable
-              key={form.key('language')}
-              {...form.getInputProps('language')}
-            />
+          <Select
+            withAsterisk
+            label='Language'
+            placeholder='Language'
+            data={languages.map((language) => ({
+              label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
+              value: language,
+            }))}
+            searchable
+            key={form.key('language')}
+            {...form.getInputProps('language')}
+          />
 
-            <Select
-              label='Role'
-              placeholder='None'
-              data={roles.items.map((role) => ({
-                label: role.name,
-                value: role.uuid,
-              }))}
-              searchable
-              searchValue={roles.search}
-              onSearchChange={roles.setSearch}
-              allowDeselect
-              clearable
-              disabled={!canReadRoles}
-              loading={roles.loading}
-              key={form.key('roleUuid')}
-              {...form.getInputProps('roleUuid')}
-            />
-          </Group>
+          <Select
+            label='Role'
+            placeholder='None'
+            data={roles.items.map((role) => ({
+              label: role.name,
+              value: role.uuid,
+            }))}
+            searchable
+            searchValue={roles.search}
+            onSearchChange={roles.setSearch}
+            allowDeselect
+            clearable
+            disabled={!canReadRoles}
+            loading={roles.loading}
+            key={form.key('roleUuid')}
+            {...form.getInputProps('roleUuid')}
+          />
 
-          <Group grow>
-            <TextInput
-              label='External ID'
-              placeholder='External ID'
-              key={form.key('externalId')}
-              {...form.getInputProps('externalId')}
-            />
-            <TextInput
-              withAsterisk={!contextUser}
-              label='Password'
-              placeholder='Password'
-              type='password'
-              key={form.key('password')}
-              {...form.getInputProps('password')}
-            />
-          </Group>
+          <TextInput
+            label='External ID'
+            placeholder='External ID'
+            key={form.key('externalId')}
+            {...form.getInputProps('externalId')}
+          />
+          <TextInput
+            withAsterisk={!contextUser}
+            label='Password'
+            placeholder='Password'
+            type='password'
+            key={form.key('password')}
+            {...form.getInputProps('password')}
+          />
 
           <Switch label='Admin' key={form.key('admin')} {...form.getInputProps('admin', { type: 'checkbox' })} />
-        </Stack>
+        </div>
 
         <Group mt='md'>
           <AdminCan action={contextUser ? 'users.update' : 'users.create'} cantSave>
