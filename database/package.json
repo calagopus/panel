@@ -26,13 +26,13 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.9",
+    "@biomejs/biome": "2.4.13",
     "@types/node": "^24.12.0",
     "@types/pg": "^8.20.0",
-    "drizzle-kit": "1.0.0-beta.12-a5629fb",
-    "drizzle-orm": "1.0.0-beta.12-a5629fb",
-    "esbuild": "^0.27.4",
-    "typescript": "^5.9.3"
+    "drizzle-kit": "1.0.0-beta.22",
+    "drizzle-orm": "1.0.0-beta.22",
+    "esbuild": "^0.28.0",
+    "typescript": "^6.0.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

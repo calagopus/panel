@@ -10,6 +10,8 @@ jobs:
   lint-frontend:
     name: Lint Frontend
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout sources
@@ -51,6 +53,8 @@ jobs:
   lint-translations:
       name: Lint Translations
       runs-on: ubuntu-24.04
+      permissions:
+        contents: read
       steps:
         - name: Checkout sources
           uses: actions/checkout@v6
@@ -103,6 +107,8 @@ jobs:
   lint-backend:
     name: Lint Backend
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout sources

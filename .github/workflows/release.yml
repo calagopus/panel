@@ -14,6 +14,8 @@ jobs:
   build-frontend:
     name: Build Frontend
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout sources
@@ -62,6 +64,8 @@ jobs:
     name: Dist
     needs: [build-frontend]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
