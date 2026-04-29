@@ -79,7 +79,7 @@ mod post {
                     "config_stop": egg.config_stop,
                     "config_script": egg.config_script,
 
-                    "startup": egg.startup,
+                    "startup_commands": egg.startup_commands,
                     "force_outgoing_ip": egg.force_outgoing_ip,
                     "separate_port": egg.separate_port,
 

@@ -50,10 +50,20 @@ mod put {
                 .ok();
         }
 
-        let settings = state.settings.get().await?;
+        let egg_configuration = server.egg.configuration(&state.database).await?;
 
-        if !settings.server.allow_editing_startup_command {
-            return ApiResponse::error("editing the startup command is not allowed")
+        let is_predefined = server
+            .egg
+            .startup_commands
+            .iter()
+            .any(|(_, command)| command == data.command);
+        let custom_allowed = egg_configuration
+            .config_startup
+            .as_ref()
+            .is_some_and(|config| config.allow_custom_startup_command);
+
+        if !is_predefined && !custom_allowed {
+            return ApiResponse::error("custom startup commands are not enabled for this server")
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
         }

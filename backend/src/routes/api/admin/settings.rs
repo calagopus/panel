@@ -90,8 +90,6 @@ mod put {
         #[garde(skip)]
         allow_overwriting_custom_docker_image: Option<bool>,
         #[garde(skip)]
-        allow_editing_startup_command: Option<bool>,
-        #[garde(skip)]
         allow_viewing_installation_logs: Option<bool>,
         #[garde(skip)]
         allow_viewing_transfer_progress: Option<bool>,
@@ -257,9 +255,6 @@ mod put {
             {
                 settings.server.allow_overwriting_custom_docker_image =
                     allow_overwriting_custom_docker_image;
-            }
-            if let Some(allow_editing_startup_command) = server.allow_editing_startup_command {
-                settings.server.allow_editing_startup_command = allow_editing_startup_command;
             }
             if let Some(allow_viewing_installation_logs) = server.allow_viewing_installation_logs {
                 settings.server.allow_viewing_installation_logs = allow_viewing_installation_logs;

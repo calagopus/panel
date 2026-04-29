@@ -39,7 +39,7 @@ export const adminEggSchema = z.object({
     type: z.string(),
     value: z.preprocess(nullableString, z.string().nullable()),
   }),
-  startup: z.string().min(1).max(4096),
+  startupCommands: z.record(z.string(), z.string()),
   forceOutgoingIp: z.boolean(),
   separatePort: z.boolean(),
   features: z.array(z.string()),

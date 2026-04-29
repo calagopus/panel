@@ -1,0 +1,1 @@
+ALTER TABLE "egg_configurations" ADD COLUMN "config_startup" jsonb;

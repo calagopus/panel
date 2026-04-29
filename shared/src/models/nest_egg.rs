@@ -14,6 +14,29 @@ use std::{
 };
 use utoipa::ToSchema;
 
+pub fn validate_startup_commands(
+    startup_commands: &IndexMap<compact_str::CompactString, compact_str::CompactString>,
+    _context: &(),
+) -> Result<(), garde::Error> {
+    if startup_commands.is_empty() {
+        return Err(garde::Error::new(compact_str::format_compact!(
+            "at least one startup command is required"
+        )));
+    }
+
+    let mut seen_commands = HashSet::new();
+    for command in startup_commands.values() {
+        if !seen_commands.insert(command) {
+            return Err(garde::Error::new(compact_str::format_compact!(
+                "duplicate startup command: {}",
+                command
+            )));
+        }
+    }
+
+    Ok(())
+}
+
 pub fn validate_docker_images(
     docker_images: &IndexMap<compact_str::CompactString, compact_str::CompactString>,
     _context: &(),
@@ -169,9 +192,12 @@ pub struct ExportedNestEgg {
     #[schema(inline)]
     pub scripts: ExportedNestEggScripts,
 
-    #[garde(length(chars, min = 1, max = 8192))]
-    #[schema(min_length = 1, max_length = 8192)]
-    pub startup: compact_str::CompactString,
+    #[garde(custom(validate_startup_commands))]
+    #[serde(
+        deserialize_with = "crate::deserialize::deserialize_map_or_not",
+        alias = "startup"
+    )]
+    pub startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     #[garde(skip)]
     #[serde(default)]
     pub force_outgoing_ip: bool,
@@ -214,7 +240,7 @@ pub struct NestEgg {
     pub config_stop: NestEggConfigStop,
     pub config_script: NestEggConfigScript,
 
-    pub startup: compact_str::CompactString,
+    pub startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     pub force_outgoing_ip: bool,
     pub separate_port: bool,
 
@@ -287,8 +313,8 @@ impl BaseModel for NestEgg {
                 compact_str::format_compact!("{prefix}config_script"),
             ),
             (
-                "nest_eggs.startup",
-                compact_str::format_compact!("{prefix}startup"),
+                "nest_eggs.startup_commands",
+                compact_str::format_compact!("{prefix}startup_commands"),
             ),
             (
                 "nest_eggs.force_outgoing_ip",
@@ -347,7 +373,9 @@ impl BaseModel for NestEgg {
             config_script: serde_json::from_value(
                 row.try_get(compact_str::format_compact!("{prefix}config_script").as_str())?,
             )?,
-            startup: row.try_get(compact_str::format_compact!("{prefix}startup").as_str())?,
+            startup_commands: serde_json::from_value(
+                row.try_get(compact_str::format_compact!("{prefix}startup_commands").as_str())?,
+            )?,
             force_outgoing_ip: row
                 .try_get(compact_str::format_compact!("{prefix}force_outgoing_ip").as_str())?,
             separate_port: row
@@ -393,7 +421,7 @@ impl NestEgg {
                 config_startup: exported_egg.config.startup,
                 config_stop: exported_egg.config.stop,
                 config_script: exported_egg.scripts.installation,
-                startup: exported_egg.startup,
+                startup_commands: exported_egg.startup_commands,
                 force_outgoing_ip: exported_egg.force_outgoing_ip,
                 separate_port: exported_egg.separate_port,
                 features: exported_egg.features,
@@ -447,7 +475,7 @@ impl NestEgg {
             SET
                 author = $2, name = $3, description = $4,
                 config_files = $5, config_startup = $6, config_stop = $7,
-                config_script = $8, startup = $9,
+                config_script = $8, startup_commands = $9::json,
                 force_outgoing_ip = $10, separate_port = $11, features = $12,
                 docker_images = $13::json, file_denylist = $14
             WHERE nest_eggs.uuid = $1",
@@ -471,7 +499,7 @@ impl NestEgg {
             serde_json::to_value(&exported_egg.config.startup)?,
             serde_json::to_value(&exported_egg.config.stop)?,
             serde_json::to_value(&exported_egg.scripts.installation)?,
-            &exported_egg.startup,
+            serde_json::to_string(&exported_egg.startup_commands)? as String,
             exported_egg.force_outgoing_ip,
             exported_egg.separate_port,
             &exported_egg
@@ -513,10 +541,10 @@ impl NestEgg {
             }
 
             if let Err(err) = sqlx::query!(
-                "INSERT INTO nest_egg_variables (  
-                    egg_uuid, name, description, description_translations, order_, env_variable,  
-                    default_value, user_viewable, user_editable, rules  
-                )  
+                "INSERT INTO nest_egg_variables (
+                    egg_uuid, name, description, description_translations, order_, env_variable,
+                    default_value, user_viewable, user_editable, rules
+                )
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 ON CONFLICT (egg_uuid, env_variable) DO UPDATE SET
                     name = EXCLUDED.name,
@@ -793,7 +821,7 @@ impl NestEgg {
             scripts: ExportedNestEggScripts {
                 installation: self.config_script,
             },
-            startup: self.startup,
+            startup_commands: self.startup_commands,
             force_outgoing_ip: self.force_outgoing_ip,
             separate_port: self.separate_port,
             features: self.features,
@@ -842,7 +870,7 @@ impl IntoAdminApiObject for NestEgg {
                 config_startup: self.config_startup,
                 config_stop: self.config_stop,
                 config_script: self.config_script,
-                startup: self.startup,
+                startup_commands: self.startup_commands,
                 force_outgoing_ip: self.force_outgoing_ip,
                 separate_port: self.separate_port,
                 features: self.features,
@@ -875,7 +903,7 @@ impl IntoApiObject for NestEgg {
                 uuid: self.uuid,
                 name: self.name,
                 description: self.description,
-                startup: self.startup,
+                startup_commands: self.startup_commands,
                 separate_port: self.separate_port,
                 features: self.features,
                 docker_images: self.docker_images,
@@ -938,9 +966,8 @@ pub struct CreateNestEggOptions {
     #[garde(skip)]
     #[schema(inline)]
     pub config_script: NestEggConfigScript,
-    #[garde(length(chars, min = 1, max = 4096))]
-    #[schema(min_length = 1, max_length = 4096)]
-    pub startup: compact_str::CompactString,
+    #[garde(custom(validate_startup_commands))]
+    pub startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     #[garde(skip)]
     pub force_outgoing_ip: bool,
     #[garde(skip)]
@@ -1003,7 +1030,7 @@ impl CreatableModel for NestEgg {
                 "config_script",
                 serde_json::to_value(&options.config_script)?,
             )
-            .set("startup", &options.startup)
+            .set("startup_commands", OrderedJson(&options.startup_commands))
             .set("force_outgoing_ip", options.force_outgoing_ip)
             .set("separate_port", options.separate_port)
             .set("features", &options.features)
@@ -1057,9 +1084,8 @@ pub struct UpdateNestEggOptions {
     #[garde(skip)]
     #[schema(inline)]
     pub config_script: Option<NestEggConfigScript>,
-    #[garde(length(chars, min = 1, max = 4096))]
-    #[schema(min_length = 1, max_length = 4096)]
-    pub startup: Option<compact_str::CompactString>,
+    #[garde(inner(custom(validate_startup_commands)))]
+    pub startup_commands: Option<IndexMap<compact_str::CompactString, compact_str::CompactString>>,
     #[garde(skip)]
     pub force_outgoing_ip: Option<bool>,
     #[garde(skip)]
@@ -1166,7 +1192,10 @@ impl UpdatableModel for NestEgg {
                     .map(serde_json::to_value)
                     .transpose()?,
             )
-            .set("startup", options.startup.as_ref())
+            .set(
+                "startup_commands",
+                options.startup_commands.as_ref().map(OrderedJson),
+            )
             .set("force_outgoing_ip", options.force_outgoing_ip)
             .set("separate_port", options.separate_port)
             .set("features", options.features.as_ref())
@@ -1203,8 +1232,8 @@ impl UpdatableModel for NestEgg {
         if let Some(config_script) = options.config_script {
             self.config_script = config_script;
         }
-        if let Some(startup) = options.startup {
-            self.startup = startup;
+        if let Some(startup_commands) = options.startup_commands {
+            self.startup_commands = startup_commands;
         }
         if let Some(force_outgoing_ip) = options.force_outgoing_ip {
             self.force_outgoing_ip = force_outgoing_ip;
@@ -1287,7 +1316,7 @@ pub struct AdminApiNestEgg {
     #[schema(inline)]
     pub config_script: NestEggConfigScript,
 
-    pub startup: compact_str::CompactString,
+    pub startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     pub force_outgoing_ip: bool,
     pub separate_port: bool,
 
@@ -1309,7 +1338,7 @@ pub struct ApiNestEgg {
     pub name: compact_str::CompactString,
     pub description: Option<compact_str::CompactString>,
 
-    pub startup: compact_str::CompactString,
+    pub startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     pub separate_port: bool,
 
     pub features: Vec<compact_str::CompactString>,

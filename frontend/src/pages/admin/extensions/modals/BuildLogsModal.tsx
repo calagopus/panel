@@ -13,20 +13,28 @@ export default function BuildLogsModal({ opened, onClose }: ModalProps) {
   const [logs, setLogs] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const wasAtBottomRef = useRef(true);
+  const errorCount = useRef(0);
 
   useEffect(() => {
     if (!opened) return;
+
+    errorCount.current = 0;
 
     const fetchLogs = () => {
       getExtensionBuildLogs()
         .then((data) => setLogs(data))
         .catch((msg) => {
+          if (errorCount.current < 5) {
+            errorCount.current += 1;
+            return;
+          }
+
           addToast(httpErrorToHuman(msg), 'error');
         });
     };
 
     fetchLogs();
-    const interval = setInterval(fetchLogs, 5000);
+    const interval = setInterval(fetchLogs, 2000);
 
     return () => clearInterval(interval);
   }, [opened]);
@@ -34,6 +42,8 @@ export default function BuildLogsModal({ opened, onClose }: ModalProps) {
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
+
+    errorCount.current = 0;
 
     if (wasAtBottomRef.current) {
       el.scrollTop = el.scrollHeight;

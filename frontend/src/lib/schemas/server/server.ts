@@ -17,7 +17,7 @@ export const serverEggSchema = z.object({
   uuid: z.string(),
   name: z.string(),
   description: z.string().nullable(),
-  startup: z.string(),
+  startupCommands: z.record(z.string(), z.string()),
   separatePort: z.boolean(),
   features: z.array(z.string()),
   dockerImages: z.record(z.string(), z.string()),
@@ -27,6 +27,7 @@ export const serverEggSchema = z.object({
 export const serverEggConfigurationSchema = z.object({
   allocationSelfAssignEnabled: z.boolean(),
   allocationSelfAssignRequirePrimary: z.boolean(),
+  startupAllowCustomStartupCommand: z.boolean(),
   routeOrder: z.array(eggConfigurationRouteItemSchema).nullable(),
 });
 

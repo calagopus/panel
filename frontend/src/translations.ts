@@ -173,6 +173,8 @@ const baseTranslations = defineTranslations({
       no: 'No',
       web: 'Web',
       api: 'API',
+      default: 'Default',
+      custom: 'Custom',
       system: 'System',
       schedule: 'Schedule',
       impersonatedBy: 'Impersonated by {username}',

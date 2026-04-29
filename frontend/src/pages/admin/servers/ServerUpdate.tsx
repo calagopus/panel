@@ -1,9 +1,9 @@
 import {
   faAddressCard,
   faCircleInfo,
+  faCog,
   faIcons,
   faInfoCircle,
-  faReply,
   faStopwatch,
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
@@ -31,8 +31,8 @@ import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Popover from '@/elements/Popover.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
@@ -43,7 +43,6 @@ import { useExtendibleForm } from '@/plugins/useExtendibleForm.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
-import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const timezones = Object.keys(zones)
   .sort()
@@ -53,7 +52,6 @@ const timezones = Object.keys(zones)
   }));
 
 export default function ServerUpdate({ contextServer }: { contextServer: z.infer<typeof adminServerSchema> }) {
-  const { t } = useTranslations();
   const canReadUsers = useAdminCan('users.read');
   const canReadNests = useAdminCan('nests.read');
   const canReadEggs = useAdminCan('eggs.read');
@@ -181,7 +179,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
     }
 
     form.setFieldValue('image', Object.values(egg.dockerImages)[0] ?? '');
-    form.setFieldValue('startup', egg.startup);
+    form.setFieldValue('startup', egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '');
   }, [form.getValues().eggUuid, eggs.items, contextServer]);
 
   return (
@@ -477,23 +475,35 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                   required
                   rows={2}
                   rightSection={
-                    <Tooltip label={t('common.tooltip.resetToDefault', {})}>
-                      <ActionIcon
-                        variant='subtle'
-                        disabled={
-                          form.getValues().startup ===
-                          eggs.items.find((e) => e.uuid === form.getValues().eggUuid)?.startup
-                        }
-                        onClick={() =>
-                          form.setFieldValue(
-                            'startup',
-                            eggs.items.find((e) => e.uuid === form.getValues().eggUuid)?.startup || '',
-                          )
-                        }
-                      >
-                        <FontAwesomeIcon icon={faReply} />
-                      </ActionIcon>
-                    </Tooltip>
+                    <Popover>
+                      <Popover.Target>
+                        <ActionIcon variant='subtle'>
+                          <FontAwesomeIcon icon={faCog} />
+                        </ActionIcon>
+                      </Popover.Target>
+                      <Popover.Dropdown>
+                        <Select
+                          data={[
+                            {
+                              label: 'Custom',
+                              value: '',
+                            },
+                            ...Object.entries(
+                              eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
+                            ).map(([key, value]) => ({
+                              value,
+                              label: key,
+                            })),
+                          ]}
+                          value={
+                            Object.values(
+                              eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
+                            ).find((value) => value === form.getValues().startup) || ''
+                          }
+                          onChange={(value) => form.setFieldValue('startup', value ?? '')}
+                        />
+                      </Popover.Dropdown>
+                    </Popover>
                   }
                   key={form.key('startup')}
                   {...form.getInputProps('startup')}

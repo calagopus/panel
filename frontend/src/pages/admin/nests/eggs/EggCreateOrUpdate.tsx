@@ -84,7 +84,7 @@ export default function EggCreateOrUpdate({
         type: '',
         value: null,
       },
-      startup: '',
+      startupCommands: { Default: '' },
       forceOutgoingIp: false,
       separatePort: false,
       features: [],
@@ -129,7 +129,7 @@ export default function EggCreateOrUpdate({
         configFiles: contextEgg.configFiles,
         configStartup: contextEgg.configStartup,
         configStop: contextEgg.configStop,
-        startup: contextEgg.startup,
+        startupCommands: contextEgg.startupCommands,
         forceOutgoingIp: contextEgg.forceOutgoingIp,
         separatePort: contextEgg.separatePort,
         features: contextEgg.features,
@@ -584,12 +584,11 @@ export default function EggCreateOrUpdate({
             </Button>
           </TitleCard>
 
-          <TextInput
+          <MultiKeyValueInput
+            label='Startup Commands'
             withAsterisk
-            label='Startup'
-            placeholder='Startup'
-            key={form.key('startup')}
-            {...form.getInputProps('startup')}
+            options={form.getValues().startupCommands}
+            onChange={(e) => form.setFieldValue('startupCommands', e)}
           />
 
           <Group grow>

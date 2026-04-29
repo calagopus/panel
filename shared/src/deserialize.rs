@@ -54,6 +54,36 @@ where
     Ok(value)
 }
 
+pub fn deserialize_map_or_not<
+    'de,
+    D,
+    K: DeserializeOwned + std::hash::Hash + Eq,
+    V: DeserializeOwned,
+>(
+    deserializer: D,
+) -> Result<IndexMap<K, V>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = serde_json::Value::deserialize(deserializer).unwrap_or_default();
+    let value: IndexMap<K, V> = match value {
+        serde_json::Value::Object(map) => serde_json::from_value(serde_json::Value::Object(map))
+            .map_err(serde::de::Error::custom)?,
+        value => {
+            let v = serde_json::from_value(value).map_err(serde::de::Error::custom)?;
+            let mut map = IndexMap::new();
+            map.insert(
+                K::deserialize(serde_json::Value::String("Default".into()))
+                    .map_err(serde::de::Error::custom)?,
+                v,
+            );
+            map
+        }
+    };
+
+    Ok(value)
+}
+
 pub fn deserialize_pre_stringified<'de, D, T: DeserializeOwned>(
     deserializer: D,
 ) -> Result<T, D::Error>

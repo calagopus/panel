@@ -84,6 +84,11 @@ export const adminEggConfigurationSchema = z.object({
       }),
     })
     .nullable(),
+  configStartup: z
+    .object({
+      allowCustomStartupCommand: z.boolean(),
+    })
+    .nullable(),
   configRoutes: z
     .object({
       order: z.array(eggConfigurationRouteItemSchema),

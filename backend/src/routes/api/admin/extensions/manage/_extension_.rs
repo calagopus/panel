@@ -6,6 +6,7 @@ mod delete {
     use serde::{Deserialize, Serialize};
     use shared::{
         GetState,
+        extensions::distr::MetadataToml,
         models::user::GetPermissionManager,
         response::{ApiResponse, ApiResponseResult},
     };
@@ -38,17 +39,7 @@ mod delete {
 
         permissions.has_admin_permission("extensions.manage")?;
 
-        let extensions = state.extensions.extensions().await;
-        let Some(extension) = extensions
-            .iter()
-            .find(|ext| ext.package_name == package_name)
-        else {
-            return ApiResponse::error("extension not found")
-                .with_status(StatusCode::NOT_FOUND)
-                .ok();
-        };
-
-        let extension_identifier = extension.metadata_toml.get_package_identifier();
+        let extension_identifier = MetadataToml::convert_package_name_to_identifier(&package_name);
         if data.remove_migrations
             && let Ok(migrations) = tokio::task::spawn_blocking(move || {
                 database_migrator::collect_embedded_extension_migrations(&extension_identifier)

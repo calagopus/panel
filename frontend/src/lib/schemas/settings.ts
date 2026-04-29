@@ -54,7 +54,6 @@ export const publicSettingsSchema = z.object({
     maxFileManagerSearchResults: z.number(),
     maxSchedulesStepCount: z.number(),
     allowOverwritingCustomDockerImage: z.boolean(),
-    allowEditingStartupCommand: z.boolean(),
     allowAcknowledgingInstallationFailure: z.boolean(),
   }),
 });

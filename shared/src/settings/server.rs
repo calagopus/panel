@@ -14,7 +14,6 @@ pub struct AppSettingsServer {
     pub max_schedules_step_count: u64,
 
     pub allow_overwriting_custom_docker_image: bool,
-    pub allow_editing_startup_command: bool,
     pub allow_viewing_installation_logs: bool,
     pub allow_acknowledging_installation_failure: bool,
     pub allow_viewing_transfer_progress: bool,
@@ -48,10 +47,6 @@ impl SettingsSerializeExt for AppSettingsServer {
                 "allow_overwriting_custom_docker_image",
                 self.allow_overwriting_custom_docker_image
                     .to_compact_string(),
-            )
-            .write_raw_setting(
-                "allow_editing_startup_command",
-                self.allow_editing_startup_command.to_compact_string(),
             )
             .write_raw_setting(
                 "allow_viewing_installation_logs",
@@ -98,10 +93,6 @@ impl SettingsDeserializeExt for AppSettingsServerDeserializer {
                 .take_raw_setting("allow_overwriting_custom_docker_image")
                 .map(|s| s == "true")
                 .unwrap_or(true),
-            allow_editing_startup_command: deserializer
-                .take_raw_setting("allow_editing_startup_command")
-                .map(|s| s == "true")
-                .unwrap_or(false),
             allow_viewing_installation_logs: deserializer
                 .take_raw_setting("allow_viewing_installation_logs")
                 .map(|s| s == "true")

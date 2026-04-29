@@ -1,4 +1,4 @@
-import { faList, faNetworkWired, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faList, faNetworkWired, faPlay, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -169,6 +169,7 @@ export default function EggConfigurationCreateOrUpdate({
       order: 0,
       eggs: [],
       configAllocations: null,
+      configStartup: null,
       configRoutes: null,
     },
     validateInputOnBlur: true,
@@ -202,6 +203,7 @@ export default function EggConfigurationCreateOrUpdate({
         order: contextEggConfiguration.order,
         eggs: contextEggConfiguration.eggs,
         configAllocations: contextEggConfiguration.configAllocations,
+        configStartup: contextEggConfiguration.configStartup,
         configRoutes: contextEggConfiguration.configRoutes,
       });
     }
@@ -479,6 +481,32 @@ export default function EggConfigurationCreateOrUpdate({
                 ))}
               </Stack>
             </Stack>
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            icon={<FontAwesomeIcon icon={faPlay} />}
+            title='Startup Configuration'
+            enabled={form.values.configStartup !== null}
+            className='col-span-full'
+            onToggle={(enabled) =>
+              form.setFieldValue(
+                'configStartup',
+                enabled
+                  ? {
+                      allowCustomStartupCommand: false,
+                    }
+                  : null,
+              )
+            }
+          >
+            <Switch
+              label='Allow Custom Startup Command'
+              description='Allow users to set their own, non-predefined startup commands.'
+              key={form.key('configStartup.allowCustomStartupCommand')}
+              {...form.getInputProps('configStartup.allowCustomStartupCommand', {
+                type: 'checkbox',
+              })}
+            />
           </CollapsibleSection>
 
           <CollapsibleSection

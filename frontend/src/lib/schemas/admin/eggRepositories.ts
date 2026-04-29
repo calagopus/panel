@@ -23,7 +23,7 @@ export const adminEggRepositoryEggSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   exportedEgg: z.object({
-    startup: z.string().min(1).max(4096),
+    startupCommands: z.record(z.string(), z.string()),
     dockerImages: z.record(z.string(), z.string()),
   }),
 });

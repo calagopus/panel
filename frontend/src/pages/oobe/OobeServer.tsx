@@ -119,7 +119,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
           ioWeight: null,
         },
         pinnedCpus: [],
-        startup: installedEgg.startup,
+        startup: installedEgg.startupCommands['Default'] || Object.values(installedEgg.startupCommands)[0] || '',
         image: form.getValues().image,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         hugepagesPassthroughEnabled: false,

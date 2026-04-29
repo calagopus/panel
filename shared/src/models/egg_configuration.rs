@@ -120,6 +120,12 @@ pub struct EggConfigAllocations {
     pub deployment: EggConfigAllocationsDeployment,
 }
 
+#[derive(ToSchema, Validate, Serialize, Deserialize, Default, Clone)]
+pub struct EggConfigStartup {
+    #[garde(skip)]
+    pub allow_custom_startup_command: bool,
+}
+
 #[derive(ToSchema, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum EggConfigRoutesRouteItem {
@@ -155,6 +161,7 @@ pub struct EggConfiguration {
     pub eggs: Vec<uuid::Uuid>,
 
     pub config_allocations: Option<EggConfigAllocations>,
+    pub config_startup: Option<EggConfigStartup>,
     pub config_routes: Option<EggConfigRoutes>,
 
     pub created: chrono::NaiveDateTime,
@@ -206,6 +213,10 @@ impl BaseModel for EggConfiguration {
                 compact_str::format_compact!("{prefix}config_allocations"),
             ),
             (
+                "egg_configurations.config_startup",
+                compact_str::format_compact!("{prefix}config_startup"),
+            ),
+            (
                 "egg_configurations.config_routes",
                 compact_str::format_compact!("{prefix}config_routes"),
             ),
@@ -230,6 +241,11 @@ impl BaseModel for EggConfiguration {
             config_allocations: row
                 .try_get::<Option<serde_json::Value>, _>(
                     compact_str::format_compact!("{prefix}config_allocations").as_str(),
+                )?
+                .and_then(|v| serde_json::from_value(v).ok()),
+            config_startup: row
+                .try_get::<Option<serde_json::Value>, _>(
+                    compact_str::format_compact!("{prefix}config_startup").as_str(),
                 )?
                 .and_then(|v| serde_json::from_value(v).ok()),
             config_routes: row
@@ -305,12 +321,16 @@ impl EggConfiguration {
 
         let mut base = MergedEggConfiguration {
             config_allocations: None,
+            config_startup: None,
             config_routes: None,
         };
 
         for row in rows {
             if row.config_allocations.is_some() {
                 base.config_allocations = row.config_allocations;
+            }
+            if row.config_startup.is_some() {
+                base.config_startup = row.config_startup;
             }
             if row.config_routes.is_some() {
                 base.config_routes = row.config_routes;
@@ -341,6 +361,7 @@ impl IntoAdminApiObject for EggConfiguration {
                 order: self.order,
                 eggs: self.eggs,
                 config_allocations: self.config_allocations,
+                config_startup: self.config_startup,
                 config_routes: self.config_routes,
                 created: self.created.and_utc(),
             },
@@ -392,6 +413,9 @@ pub struct CreateEggConfigurationOptions {
     pub config_allocations: Option<EggConfigAllocations>,
     #[garde(dive)]
     #[schema(inline)]
+    pub config_startup: Option<EggConfigStartup>,
+    #[garde(dive)]
+    #[schema(inline)]
     pub config_routes: Option<EggConfigRoutes>,
 }
 
@@ -429,6 +453,14 @@ impl CreatableModel for EggConfiguration {
                 "config_allocations",
                 options
                     .config_allocations
+                    .as_ref()
+                    .map(serde_json::to_value)
+                    .transpose()?,
+            )
+            .set(
+                "config_startup",
+                options
+                    .config_startup
                     .as_ref()
                     .map(serde_json::to_value)
                     .transpose()?,
@@ -481,6 +513,14 @@ pub struct UpdateEggConfigurationOptions {
         with = "::serde_with::rust::double_option"
     )]
     pub config_allocations: Option<Option<EggConfigAllocations>>,
+    #[garde(dive)]
+    #[schema(inline)]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub config_startup: Option<Option<EggConfigStartup>>,
     #[garde(dive)]
     #[schema(inline)]
     #[serde(
@@ -629,6 +669,8 @@ pub struct AdminApiEggConfiguration {
     #[schema(inline)]
     pub config_allocations: Option<EggConfigAllocations>,
     #[schema(inline)]
+    pub config_startup: Option<EggConfigStartup>,
+    #[schema(inline)]
     pub config_routes: Option<EggConfigRoutes>,
 
     pub created: chrono::DateTime<chrono::Utc>,
@@ -637,6 +679,7 @@ pub struct AdminApiEggConfiguration {
 #[derive(Deserialize, Serialize)]
 pub struct MergedEggConfiguration {
     pub config_allocations: Option<EggConfigAllocations>,
+    pub config_startup: Option<EggConfigStartup>,
     pub config_routes: Option<EggConfigRoutes>,
 }
 
@@ -664,6 +707,10 @@ impl IntoApiObject for MergedEggConfiguration {
                     .config_allocations
                     .as_ref()
                     .is_some_and(|c| c.user_self_assign.require_primary_allocation),
+                startup_allow_custom_command: self
+                    .config_startup
+                    .as_ref()
+                    .is_some_and(|c| c.allow_custom_startup_command),
                 route_order: self.config_routes.map(|c| c.order),
             },
             api_object,
@@ -682,5 +729,6 @@ impl IntoApiObject for MergedEggConfiguration {
 pub struct ApiEggConfiguration {
     pub allocation_self_assign_enabled: bool,
     pub allocation_self_assign_require_primary: bool,
+    pub startup_allow_custom_command: bool,
     pub route_order: Option<Vec<EggConfigRoutesRouteItem>>,
 }

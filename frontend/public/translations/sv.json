@@ -1,0 +1,2163 @@
+{
+  "items": {
+    "byte": {
+      "zero": "{count} Bytes",
+      "one": "{count} Byte",
+      "two": "{count} Bytes",
+      "few": "{count} Bytes",
+      "many": "{count} Bytes",
+      "other": "{count} Bytes"
+    },
+    "user": {
+      "zero": "{count} Användare",
+      "one": "{count} Användare",
+      "two": "{count} Användare",
+      "few": "{count} Användare",
+      "many": "{count} Användare",
+      "other": "{count} Användare"
+    },
+    "file": {
+      "zero": "{count} Filer",
+      "one": "{count} Fil",
+      "two": "{count} Filer",
+      "few": "{count} Filer",
+      "many": "{count} Filer",
+      "other": "{count} Filer"
+    },
+    "server": {
+      "zero": "{count} Servrar",
+      "one": "{count} Server",
+      "two": "{count} Servrar",
+      "few": "{count} Servrar",
+      "many": "{count} Servrar",
+      "other": "{count} Servrar"
+    },
+    "sshKey": {
+      "zero": "{count} SSH-nycklar",
+      "one": "{count} SSH-nyckel",
+      "two": "{count} SSH-nycklar",
+      "few": "{count} SSH-nycklar",
+      "many": "{count} SSH-nycklar",
+      "other": "{count} SSH-nycklar"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "Skapa",
+        "add": "Lägg till",
+        "save": "Spara",
+        "saveAndStay": "Spara & Stanna",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "remove": "Ta bort",
+        "enable": "Aktivera",
+        "disable": "Inaktivera",
+        "update": "Uppdatera",
+        "close": "Stäng",
+        "cancel": "Avbryt",
+        "continue": "Fortsätt",
+        "skip": "Hoppa över",
+        "okay": "Okej",
+        "back": "Tillbaka",
+        "next": "Nästa",
+        "install": "Installera",
+        "selectAll": "Välj alla",
+        "deselectAll": "Avvälj alla",
+        "restore": "Återställ",
+        "download": "Ladda ner",
+        "downloadAs": "Ladda ner som {format}",
+        "export": "Export",
+        "exportAs": "Exportera som {format}",
+        "recreate": "Skapa om"
+      },
+      "alert": {
+        "error": "Fel",
+        "warning": "Varning",
+        "success": "Succé",
+        "clockOffset": "Din systemklocka är mer än 5 sekunder osynkroniserad med servern. Detta kan orsaka problem med nyckelautentisering och tvåfaktorsautentisering. Synkronisera din klocka om problem uppstår. Nuvarande förskjutning: {offset} sekund(er)."
+      },
+      "divider": {
+        "or": "ELLER"
+      },
+      "input": {
+        "search": "Sök..."
+      },
+      "tooltip": {
+        "resetToDefault": "Återställ till standard",
+        "edit": "Redigera",
+        "delete": "Ta bort"
+      },
+      "form": {
+        "name": "Namn",
+        "description": "Beskrivning",
+        "password": "Lösenord",
+        "host": "Värd",
+        "username": "Användarnamn",
+        "server": "Server",
+        "truncateDirectory": "Vill du ta bort alla filer på denna server innan du utför denna åtgärd? Detta kan inte ångras."
+      },
+      "table": {
+        "pagination": {
+          "results": "Visar {start} till {end} av {total} resultat.",
+          "empty": "Inga objekt kunde hittas, det är nästan som om de döljer sig."
+        },
+        "columns": {
+          "name": "Namn",
+          "description": "Beskrivning",
+          "username": "Användarnamn",
+          "size": "Storlek",
+          "lastUsed": "Senast Använd",
+          "created": "Skapad",
+          "actor": "Aktör",
+          "event": "Händelse",
+          "ip": "IP",
+          "when": "När",
+          "command": "Kommando"
+        }
+      },
+      "badge": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "enabled": "Aktiverad",
+        "disabled": "Inaktiverad",
+        "successful": "Lyckad",
+        "failed": "Misslyckad",
+        "installed": "Installerad"
+      },
+      "server": {
+        "noAllocation": "Ingen Allokering",
+        "state": {
+          "suspended": "Suspenderad",
+          "transferring": "Servern överförs",
+          "nodeMaintenance": "Noden är under underhåll",
+          "restoringBackup": "Återställer Backup",
+          "installing": "Installerar",
+          "installFailed": "Installationen misslyckades"
+        }
+      },
+      "enum": {
+        "userToastPosition": {
+          "topLeft": "Överst till vänster",
+          "topCenter": "Övre Mitten",
+          "topRight": "Överst till höger",
+          "bottomLeft": "Nederst till vänster",
+          "bottomCenter": "Nederst till mitten",
+          "bottomRight": "Nederst till höger"
+        },
+        "serverState": {
+          "unknown": "Okänd",
+          "offline": "Offline",
+          "running": "Kör",
+          "starting": "Startar",
+          "stopping": "Stoppas"
+        },
+        "serverPowerAction": {
+          "start": "Starta",
+          "stop": "Stoppa",
+          "restart": "Starta om",
+          "kill": "Döda"
+        },
+        "serverBackupStatus": {
+          "starting": "Startar",
+          "finished": "Avslutad",
+          "failed": "Misslyckad"
+        },
+        "connectionStatus": {
+          "connected": "Ansluten",
+          "offline": "Offline"
+        },
+        "serverAutoStartBehavior": {
+          "always": "Alltid",
+          "unlessStopped": "Om Inte Stoppad",
+          "never": "Aldrig"
+        },
+        "bulkActionServerAction": {
+          "started": "Startad",
+          "stopped": "Stoppad",
+          "restarted": "Omstartad",
+          "killed": "Dödad"
+        }
+      },
+      "unit": {
+        "bytes": {
+          "bytes": "B",
+          "kibibytes": "KiB",
+          "mebibytes": "MiB",
+          "gibibytes": "GiB",
+          "tebibytes": "TiB",
+          "pebibytes": "PiB"
+        }
+      },
+      "unlimited": "Obegränsad",
+      "readOnly": "Skrivskyddad",
+      "na": "N/A",
+      "never": "Aldrig",
+      "yes": "Ja",
+      "no": "Nej",
+      "web": "Webb",
+      "api": "API",
+      "system": "System",
+      "schedule": "Schema",
+      "impersonatedBy": "Imiterad av {username}"
+    },
+    "elements": {
+      "errorBoundary": {
+        "message": "Ett oväntat fel uppstod när sidan renderades. Försök att uppdatera. Om problemet kvarstår kontaktar du systemadministratören.",
+        "hideDetails": "Dölj Detaljer",
+        "showDetails": "Visa Detaljer",
+        "errorMessage": "Felmeddelande:",
+        "stackTrace": "Stack Trace:",
+        "componentStack": "Component Stack:"
+      },
+      "copyOnClick": {
+        "toast": {
+          "copied": "Kopierad till urklipp.",
+          "failed": "Misslyckades att kopiera till urklipp.",
+          "copyManual": "Kopiera till urklipp: Ctrl+C eller Command+C, Enter"
+        }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "Uppskattar färdigställandetid...",
+          "estimated": "Beräknad slutförandetid: {time}"
+        },
+        "calculating": "ETA: Calculating...",
+        "calculated": "ETA: {time}"
+      },
+      "container": {
+        "alert": {
+          "impersonating": "Du utger dig för att vara en annan användare. Observera att dina handlingar kan påverka den utgivna användarens konto. För att avsluta utgivandeläget klickar du på knappen \"Sluta utge dig\" i det nedre vänstra hörnet."
+        }
+      },
+      "sidebar": {
+        "button": {
+          "logout": "Logga ut",
+          "stopImpersonating": "Sluta utge dig",
+          "openInVirtualWindow": "Öppna i Virtuellt Fönster",
+          "openInPopup": "Öppna i Popup",
+          "openInNewTab": "Öppna i Ny Flik"
+        }
+      },
+      "permissionSelector": {
+        "selectedPermissions": "Valda behörigheter ({count})",
+        "noPermissions": "Inga behörigheter valda."
+      },
+      "selectInput": {
+        "noResults": "Inga resultat hittades."
+      },
+      "can": {
+        "tooltip": {
+          "cantSave": "Du har inte behörighet att spara.",
+          "cantDelete": "Du har inte behörighet att ta bort."
+        }
+      },
+      "activityInfoButton": {
+        "modal": {
+          "info": {
+            "title": "Aktivitetsinformation"
+          }
+        }
+      },
+      "screenBlock": {
+        "permissionDenied": {
+          "title": "Tillgång nekad",
+          "content": "Du har inte behörighet att komma åt den här sidan."
+        },
+        "notFound": {
+          "title": "Hittades inte",
+          "content": "Sidan du letar efter kunde inte hittas."
+        },
+        "serverConflict": {
+          "title": "Servertillstånd i konflikt",
+          "contentSuspended": "Den här servern är pausad och kan inte nås.",
+          "contentNodeMaintenance": "Den här servern är på en nod som för närvarande är under underhåll och kan inte nås.",
+          "contentTransferring": "Den här servern överförs för närvarande och kan inte nås förrän överföringen är klar.",
+          "contentInstallFailed": "Den här servern misslyckades att installeras och kan inte nås tills den har bekräftats.",
+          "contentInstalling": "Den här servern är för närvarande installation och kan inte nås tills den är slutförd.",
+          "contentRestoringBackup": "Den här servern är för närvarande återställning från en backup och kan inte nås tills den är slutförd.",
+          "button": {
+            "viewInstallLogs": "Visa installationsloggar",
+            "acknowledgeFailure": "Erkänn misslyckandet"
+          },
+          "modal": {
+            "acknowledgeFailure": {
+              "title": "Erkänn installationsfel",
+              "content": "Genom att erkänna detta installationsfel bekräftar du att du är medveten om det misslyckade installationen och har tagit några nödvändiga steg för att lösa problemet. Detta kommer att tillåta dig att återfå kontroll över servern."
+            }
+          }
+        }
+      },
+      "scheduleDynamicInput": {
+        "enterVariable": "Ange variabelnamnet för utvärdering.",
+        "enterData": "Ange data som ska skickas.",
+        "inputType": "Ingångstyp",
+        "dataType": "Datatyp att skicka",
+        "selectType": "Välj Typ",
+        "none": "Ingen",
+        "rawString": "Rå sträng",
+        "variable": "Variabel"
+      },
+      "serverWebsocket": {
+        "error": {
+          "connectionFailed": "Det gick inte att ansluta efter flera försök. Uppdatera sidan.",
+          "connectionClosed": "Anslutningen till servern stängdes. Försöker återansluta...",
+          "connectionRetry": "Anslutningen bruten. Försöker igen (försök {attempt})...",
+          "authFailed": "Autentiseringen misslyckades. Försöker uppdatera inloggningsuppgifterna... ({error})",
+          "authRefreshFailed": "Det gick inte att uppdatera inloggningsuppgifterna. Uppdatera sidan för att försöka igen.",
+          "permissionRevoked": "Anslutningen stängd: din åtkomst till den här servern har återkallats.",
+          "tokenRefreshLoop": "Autentiseringsslinga upptäckt. Uppdatera sidan för att försöka igen."
+        },
+        "banner": {
+          "retrying": "Försöker igen om {countdown}..."
+        },
+        "listener": {
+          "toast": {
+            "backupCompleted": "Säkerhetskopieringen har slutförts.",
+            "backupFailed": "Säkerhetskopieringen misslyckades.",
+            "backupRestoreCompleted": "Återställning av säkerhetskopia har slutförts.",
+            "installCompleted": "Serverinstallationen är slutförd.",
+            "installFailed": "Serverinstallationen misslyckades.",
+            "operations": {
+              "compressing": {
+                "completed": "Komprimerade {files} till `{path}` på {time}.",
+                "failed": "Det gick inte att komprimera {files} till `{path}`:\n{error}"
+              },
+              "decompressing": {
+                "completed": "Dekomprimerade `{path}` till `{destination}` på {time}.",
+                "failed": "Det gick inte att dekomprimera `{path}` till `{destination}`:\n{error}"
+              },
+              "pulling": {
+                "completed": "Hämtade `{destination}` på {time}.",
+                "failed": "Det gick inte att hämta `{destination}`:\n{error}"
+              },
+              "copying": {
+                "completed": "Kopierade `{path}` till `{destination}` på {time}.",
+                "failed": "Det gick inte att kopiera `{path}` till `{destination}`:\n{error}"
+              },
+              "copyingMany": {
+                "completed": "Kopierade {files} på {time}.",
+                "failed": "Det gick inte att kopiera {files}:\n{error}"
+              },
+              "copyingRemote": {
+                "completedFrom": "Kopierade {files} från fjärrserver på {time}.",
+                "completedTo": "Kopierade {files} till fjärrserver på {time}.",
+                "failedFrom": "Det gick inte att kopiera {files} från fjärrserver:\n{error}",
+                "failedTo": "Det gick inte att kopiera {files} till fjärrserver:\n{error}"
+              }
+            }
+          }
+        }
+      },
+      "fileUpload": {
+        "toast": {
+          "uploading": "Började ladda upp {files}...",
+          "cancelledFile": "Uppladdningen avbröts `{file}`.",
+          "cancelledFolder": "Uppladdningen av `{folder}` ({files}) har avbrutits."
+        }
+      }
+    },
+    "pages": {
+      "oobe": {
+        "welcome": {
+          "title": "Välkommen till Calagopus",
+          "subtitle": "Låt oss få igång ditt spelserverhanteringssystem!",
+          "wizardIntro": "Den här installationsguiden guidar dig genom:",
+          "steps": {
+            "account": "Skapa ditt administratörskonto",
+            "settings": "Konfigurera grundläggande systeminställningar",
+            "location": "Ställ in din serverplats",
+            "node": "Lägg till din första nod",
+            "server": "Distribuera din första spelserver"
+          },
+          "button": {
+            "start": "Kom igång"
+          }
+        },
+        "register": {
+          "title": "Skapa administratörskonto",
+          "alert": {
+            "title": "Säkerhetsmeddelande",
+            "description": "Välj ett starkt lösenord. Detta konto kommer att ha fullständig administrativ åtkomst till alla servrar och inställningar."
+          },
+          "form": {
+            "username": "Användarnamn",
+            "usernamePlaceholder": "admin",
+            "email": "E-postadress",
+            "emailPlaceholder": "admin@example.com",
+            "firstName": "Förnamn",
+            "firstNamePlaceholder": "Alan",
+            "lastName": "Efternamn",
+            "lastNamePlaceholder": "Turing",
+            "password": "Lösenord",
+            "passwordPlaceholder": "Ange ett starkt lösenord",
+            "confirmPassword": "Bekräfta Lösenord",
+            "confirmPasswordPlaceholder": "Ange lösenordet igen"
+          },
+          "button": {
+            "create": "Skapa konto & fortsätt"
+          }
+        },
+        "login": {
+          "title": "Logga in igen",
+          "alert": "Du blev utloggad under installationsprocessen. Vänligen logga in igen för att fortsätta där du lämnade av.",
+          "form": {
+            "username": "Användarnamn",
+            "usernamePlaceholder": "admin",
+            "password": "Lösenord",
+            "passwordPlaceholder": "Ange ett starkt lösenord"
+          },
+          "button": {
+            "login": "Logga in & fortsätt"
+          }
+        },
+        "location": {
+          "title": "Platskonfiguration",
+          "form": {
+            "locationName": "Platsnamn",
+            "locationNamePlaceholder": "Mitt hem",
+            "backupName": "Säkerhetskopieringskonfigurationsnamn",
+            "backupNamePlaceholder": "Unicorn Cloud",
+            "backupDisk": "Säkerhetskopieringsskiva",
+            "backupDiskPlaceholder": "Säkerhetskopieringsskiva"
+          },
+          "button": {
+            "create": "Skapa & fortsätt"
+          }
+        },
+        "node": {
+          "title": "Nodkonfiguration",
+          "allocationsTitle": "Allokationskonfiguration",
+          "form": {
+            "name": "Namn",
+            "namePlaceholder": "Min server",
+            "url": "URL",
+            "urlPlaceholder": "URL",
+            "urlDescription": "används för intern kommunikation med noden",
+            "publicUrl": "Offentlig URL",
+            "publicUrlPlaceholder": "URL",
+            "publicUrlDescription": "används för websocket/nedladdningar",
+            "sftpHost": "SFTP Host",
+            "sftpHostPlaceholder": "SFTP Host",
+            "sftpPort": "SFTP Port",
+            "sftpPortPlaceholder": "SFTP Port",
+            "memory": "Minne",
+            "disk": "Disk",
+            "ip": "IP",
+            "portRanges": "Port Avstånd",
+            "portRangesPlaceholder": "Port Avstånd (eg. 3000-4000)"
+          },
+          "error": {
+            "noLocations": "Något gick fel. Inga platser hittades."
+          },
+          "button": {
+            "create": "Skapa & fortsätt"
+          }
+        },
+        "nodeConfiguration": {
+          "title": "Nodkonfiguration",
+          "error": {
+            "noNodes": "Något gick fel. Inga noder hittades.",
+            "connectionError": "Något gick fel. Anslutningsfel."
+          },
+          "successMessage": "Anslutningen till din nod har verifierats. Du kan nu fortsätta.",
+          "configurationDescription": "Placera detta i konfigurationsfilen på `{file}` eller kör:",
+          "button": {
+            "verify": "Verifiera Anslutning"
+          }
+        },
+        "configuration": {
+          "title": "Applikationsinställningar",
+          "form": {
+            "applicationName": "Applikationsnamn",
+            "applicationNamePlaceholder": "Calagopus",
+            "language": "Språk",
+            "languagePlaceholder": "Språk",
+            "applicationUrl": "Applikations-URL",
+            "applicationUrlPlaceholder": "https://calagop.us",
+            "registration": "Aktivera registrering",
+            "registrationDescription": "Tillåt nya användare att registrera sina egna konton."
+          },
+          "button": {
+            "submit": "Uppdatera inställningar och fortsätt"
+          }
+        },
+        "eggRepositories": {
+          "title": "Egg Förråd",
+          "description": "Dessa är källförråden för dina ägg. Du kan ändra dessa Förråd när som helst.",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "Pterodactyl Spel Egg",
+              "description": "Ägg till spel som Minecraft, Terraria och mycket mer."
+            },
+            "pterodactylApplication": {
+              "title": "Pterodactyl Applikations Egg",
+              "description": "Ägg för applikationer som Grafana, Meilisearch och flertalet databaser."
+            },
+            "pterodactylGeneral": {
+              "title": "Pterodactyl Generella Egg",
+              "description": "Ägg för generiska applikationskörningar som Node JS, Java och Rust."
+            }
+          },
+          "button": {
+            "submit": "Importera"
+          }
+        },
+        "server": {
+          "title": "Server",
+          "existingServer": "En server har redan skapats. Du kan ändra inställningarna senare i administratörsmenyn.",
+          "egg": {
+            "title": "Egg",
+            "description": "Nu får vi igång din första server. Vilket ägg vill du använda?",
+            "nestDescription": "För att börja använda detta ägg måste du skapa ett nest, nest är samlingar av ägg. Ge det ett namn:"
+          },
+          "server": {
+            "title": "Server",
+            "nestDescription": "För att börja använda detta ägg måste du skapa ett nest, nest är samlingar av ägg. Ge det ett namn:"
+          },
+          "error": {
+            "noNodes": "Något gick fel. Inga noder hittades."
+          },
+          "button": {
+            "submit": "Importera",
+            "create": "Skapa & fortsätt"
+          }
+        },
+        "finished": {
+          "title": "Installationen är klar!",
+          "subtitle": "Din Calagopus panel är redo att användas",
+          "setupTitle": "Vad vi har satt upp",
+          "items": {
+            "account": "Administratörskonto",
+            "configuration": {
+              "title": "Systemkonfiguration",
+              "subtitle": "Panelinställningar och konfigurerade preferenser"
+            },
+            "eggRepositories": {
+              "title": "Egg Förråd",
+              "subtitle": "{count} förråd"
+            },
+            "location": "Plats",
+            "node": "Node",
+            "server": "Server"
+          },
+          "badge": {
+            "skipped": "Hoppade över"
+          },
+          "button": "Gå till Dashboard"
+        }
+      },
+      "auth": {
+        "button": {
+          "login": "Logga in",
+          "loginWith": "Logga in med {name}"
+        },
+        "login": {
+          "error": {
+            "usernameRequired": "Vänligen ange ett användarnamn",
+            "registrationDisabled": "Inget matchande konto kunde hittas och registreringen är för närvarande inaktiverad.",
+            "userAlreadyExists": "Ett konto med detta användarnamn eller denna e-postadress finns redan."
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "Din webbläsare stöder inte passnycklar.",
+              "unexpected": "Ett oväntat fel uppstod när du använde din passnyckel.",
+              "cancelled": "Passnyckelförfrågan avbröts.",
+              "dismissed": "Du avvisade eller interagerade inte med passnyckeln. Den använda nyckeln kan också inte vara registrerad.",
+              "invalidState": "Denna passnyckel är inte tillgänglig eller redan registrerad.",
+              "notSupportedType": "Din webbläsare eller enhet stöder inte denna typ av passnyckel.",
+              "securityError": "Passnycklar kan endast användas via HTTPS och med en giltig domän.",
+              "authenticatorError": "Något gick fel med autentiseraren.",
+              "constraintError": "Autentiseraren kunde inte uppfylla de obligatoriska begränsningarna."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "Logga in",
+              "subtitle": "Ange ditt användarnamn för att fortsätta",
+              "form": {
+                "usernamePlaceholder": "Ange ditt användarnamn"
+              },
+              "link": {
+                "forgotPassword": "Glömt lösenord",
+                "notRegistered": "Inte registrerad?",
+                "createAccount": "Skapa konto"
+              },
+              "button": {
+                "oauthLogin": "OAuth-inloggning"
+              }
+            },
+            "passkey": {
+              "title": "Autentisera med Passkey",
+              "subtitle": "Vi hittade en passnyckel kopplad till {username}",
+              "button": {
+                "usePasskey": "Använd Passkey",
+                "usePassword": "Använd Lösenord"
+              }
+            },
+            "password": {
+              "title": "Ange Lösenord",
+              "subtitle": "Ange ditt lösenord för {username}",
+              "form": {
+                "passwordPlaceholder": "Ange ditt lösenord"
+              },
+              "button": {
+                "signIn": "Logga in",
+                "forgotPassword": "Glömt lösenord"
+              }
+            },
+            "totp": {
+              "title": "Tvåfaktorsautentisering",
+              "welcomeBack": "Välkommen tillbaka {username}!",
+              "enterCode": "Ange den 6-siffriga koden från din autentiseringsapp",
+              "button": {
+                "verify": "Verifiera koden",
+                "useRecoveryCode": "Använd återställningskod",
+                "useTotp": "Använd TOTP"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "Ange en återställningskod",
+              "form": {
+                "label": "Återställningskod",
+                "placeholder": "Ange en återställningskod"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "Registrera",
+          "subtitle": "Ange dina uppgifter för att registrera dig",
+          "form": {
+            "email": "E-post",
+            "firstName": "Förnamn",
+            "lastName": "Efternamn"
+          },
+          "button": {
+            "register": "Registrera"
+          }
+        },
+        "forgotPassword": {
+          "title": "Glömt lösenord",
+          "subtitle": "Ange din e-postadress för att få instruktioner om hur du resetar ditt lösenord",
+          "form": {
+            "email": "E-post"
+          },
+          "button": {
+            "request": "Begär lösenordsåterställning"
+          },
+          "success": "Ett e-postmeddelande har skickats till dig med instruktioner om hur du resetar ditt lösenord."
+        },
+        "resetPassword": {
+          "title": "Återställ lösenord",
+          "subtitle": "Ange ditt nya lösenord",
+          "form": {
+            "confirmPassword": "Bekräfta Lösenord"
+          },
+          "button": {
+            "reset": "Återställ Lösenord"
+          },
+          "toast": {
+            "success": "Lösenordet har återställts."
+          }
+        },
+        "oauth": {
+          "title": "Autentisera med OAuth",
+          "subtitle": "Välj någon av leverantörerna nedan för att logga in"
+        }
+      },
+      "account": {
+        "home": {
+          "title": "Servrar",
+          "tooltip": {
+            "removeFromGroup": "Ta bort från gruppen",
+            "addToGroup": "Lägg till i grupp",
+            "addServerToGroup": "Lägg till server i grupp",
+            "groupActions": "Gruppadministrering",
+            "noGroups": "Inga grupper tillgängliga att lägga till server i",
+            "noGroup": "Denna server är inte i någon grupp"
+          },
+          "tabs": {
+            "groupedServers": {
+              "title": "Grupperade servrar",
+              "page": {
+                "button": {
+                  "createGroup": "Skapa grupp"
+                },
+                "modal": {
+                  "createServerGroup": {
+                    "title": "Skapa servergrupp",
+                    "toast": {
+                      "created": "Servergrupp skapad."
+                    }
+                  },
+                  "editServerGroup": {
+                    "title": "Redigera servergrupp",
+                    "toast": {
+                      "updated": "Servergrupp uppdaterad."
+                    }
+                  },
+                  "deleteServerGroup": {
+                    "title": "Bekräfta borttagning av servergrupp",
+                    "content": "Är du säker på att du vill ta bort **{group}** från ditt konto?",
+                    "toast": {
+                      "deleted": "Servergrupp borttagen."
+                    }
+                  },
+                  "addServerToGroup": {
+                    "title": "Lägg till server till {group}",
+                    "noServers": "Alla servrar finns redan i den här gruppen.",
+                    "toast": {
+                      "added": "Servern har lagts till i gruppen."
+                    }
+                  }
+                },
+                "noGroups": "Inga grupper kunde hittas, dags att skapa en?"
+              }
+            },
+            "allServers": {
+              "title": "Alla servrar",
+              "page": {
+                "input": {
+                  "showOtherUsersServers": "Visa andra användares servrar"
+                },
+                "modal": {
+                  "addToServerGroup": {
+                    "title": "Lägg till {server} i servergrupp",
+                    "form": {
+                      "serverGroup": "Servergrupp"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "bulkActions": {
+            "selectionMode": "Valläge",
+            "select": "Välj server",
+            "deselect": "Avmarkera server",
+            "success": "Lyckades {action} {servers}.",
+            "partial": "Lyckades {action} {successfulServers}. {failedServers} misslyckades.",
+            "groupActions": "Gruppåtgärder"
+          },
+          "noServers": "Inga servrar kunde hittas, dags att lägga till en?"
+        },
+        "admin": {
+          "title": "Admin"
+        },
+        "account": {
+          "title": "Konto",
+          "alert": {
+            "requireTwoFactor": {
+              "title": "Tvåfaktorsautentisering krävs",
+              "description": "Tvåfaktorsautentisering krävs på ditt konto. Vänligen konfigurera det nedan för att fortsätta använda panelen."
+            }
+          },
+          "containers": {
+            "password": {
+              "title": "Lösenord",
+              "toast": {
+                "updated": "Lösenord uppdaterat framgångsrikt."
+              },
+              "form": {
+                "currentPassword": "Nuvarande Lösenord",
+                "newPassword": "Nytt Lösenord",
+                "confirmNewPassword": "Bekräfta Nytt Lösenord"
+              }
+            },
+            "email": {
+              "title": "E-post",
+              "toast": {
+                "updated": "E-post uppdaterat framgångsrikt."
+              },
+              "form": {
+                "newEmail": "Ny E-post",
+                "currentPassword": "Nuvarande Lösenord"
+              }
+            },
+            "twoFactor": {
+              "title": "Tvåfaktorsautentisering",
+              "toast": {
+                "disabled": "Tvåfaktorsautentisering inaktiverad framgångsrikt.",
+                "enabled": "Tvåfaktorsautentisering aktiverad framgångsrikt. Vänligen kopiera dina återställningskoder."
+              },
+              "modal": {
+                "disableTwoFactor": {
+                  "title": "Inaktivera Tvåfaktorsautentisering",
+                  "description": "Att inaktivera tvåfaktorsautentisering kommer att göra ditt konto mindre säkert.",
+                  "form": {
+                    "code": "Autentiseringskod"
+                  }
+                },
+                "setupTwoFactor": {
+                  "title": "Konfigurera tvåfaktorsautentisering",
+                  "description": "Skydda ditt konto från obehörig åtkomst. Du kommer att bli ombedd att ange en verifieringskod varje gång du loggar in.",
+                  "descriptionQR": "Skanna QR-koden ovan med valfri tvåfaktorsautentiseringsapp. Ange sedan den genererade 6-siffriga koden i fältet nedan.",
+                  "form": {
+                    "code": "Autentiseringskod"
+                  }
+                },
+                "recoveryCodes": {
+                  "title": "Återställningskoder",
+                  "description": "Nedan följer dina återställningskoder. Förvara dessa på ett säkert ställe. Om du förlorar åtkomst till din autentiseringsenhet kan du använda dessa koder för att återfå åtkomst till ditt konto."
+                }
+              },
+              "button": {
+                "disableTwoFactor": "Inaktivera Tvåfaktorsautentisering",
+                "setupTwoFactor": "Konfigurera Tvåfaktorsautentisering"
+              },
+              "twoFactorEnabled": "Tvåfaktorsautentisering är för närvarande aktiverad.",
+              "twoFactorDisabled": "Du har för närvarande inte tvåfaktorsautentisering aktiverad på ditt konto. Klicka på knappen nedan för att börja konfigurera det.",
+              "twoFactorLastUsed": "Senast använd: {timestamp}"
+            },
+            "account": {
+              "title": "Kontodetaljer",
+              "toast": {
+                "updated": "Kontodetaljer uppdaterade framgångsrikt."
+              },
+              "form": {
+                "nameFirst": "Förnamn",
+                "nameLast": "Efternamn",
+                "username": "Användarnamn",
+                "language": "Språk",
+                "toastPosition": "Toast Position",
+                "startOnGroupedServers": "Starta på sidan för grupperade servrar"
+              }
+            },
+            "avatar": {
+              "title": "Avatar",
+              "toast": {
+                "updated": "Avataren har uppdaterats.",
+                "removed": "Avatar borttagen framgångsrikt."
+              },
+              "form": {
+                "avatar": "Avatar"
+              }
+            }
+          }
+        },
+        "securityKeys": {
+          "title": "Säkerhetsnycklar",
+          "table": {
+            "columns": {
+              "credentialId": "Autentiserings-ID"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "Ett säkert sammanhang (HTTPS) krävs för att använda säkerhetsnycklar."
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "Skapa Säkerhetsnyckel",
+              "toast": {
+                "created": "Säkerhetsnyckel skapad framgångsrikt.",
+                "aborted": "Skapande av säkerhetsnyckel avbrutet."
+              }
+            },
+            "editSecurityKey": {
+              "title": "Redigera Säkerhetsnyckel",
+              "toast": {
+                "updated": "Säkerhetsnyckel uppdaterad framgångsrikt."
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "Bekräfta borttagning av säkerhetsnyckel",
+              "content": "Är du säker på att du vill ta bort **{key}** från ditt konto?",
+              "toast": {
+                "deleted": "Säkerhetsnyckel borttagen framgångsrikt."
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "Sessioner",
+          "table": {
+            "columns": {
+              "ip": "IP",
+              "thisDevice": "Denna Enhet?",
+              "userAgent": "User Agent"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "Bekräfta borttagning av session",
+              "content": "Är du säker på att du vill ta bort sessionen **{ip}** från ditt konto?",
+              "toast": {
+                "deleted": "Session borttagen framgångsrikt."
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "Kortkommandon",
+          "subtitle": "Använd dessa kortkommandon för att navigera och interagera med panelen mer effektivt.",
+          "detectedMac": "macOS upptäckt",
+          "detectedWindows": "Windows/Linux upptäckt",
+          "fileManager": {
+            "title": "Filhanteraren",
+            "selectAll": "Välj alla filer",
+            "cutFiles": "Klipp ut valda filer",
+            "copyFiles": "Kopiera valda filer",
+            "duplicateFile": "Duplicera vald fil",
+            "pasteFiles": "Klistra in filer",
+            "searchFiles": "Sök efter filer",
+            "moveUpDirectory": "Flytta upp en katalog",
+            "moveUpSelection": "Flytta upp vald fil",
+            "moveDownSelection": "Flytta ner vald fil",
+            "renameFile": "Döp om fil",
+            "deselectAll": "Avmarkera alla filer",
+            "deleteFiles": "Ta bort valda filer"
+          },
+          "table": {
+            "title": "Tabellnavigering",
+            "previousPage": "Föregående sida",
+            "nextPage": "Nästa sida",
+            "firstPage": "örsta sida",
+            "lastPage": "Sista sida"
+          },
+          "console": {
+            "title": "Serverkonsol",
+            "searchContent": "Sök i konsolens utdata",
+            "previousCommand": "Föregående kommando i historik",
+            "nextCommand": "Nästa kommando i historik"
+          },
+          "serverList": {
+            "title": "Serverlista",
+            "selectServer": "Håll S nedtryckt och klicka för att välja/avmarkera server"
+          }
+        },
+        "sshKeys": {
+          "title": "SSH-nycklar",
+          "button": {
+            "import": "Importera"
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "Fingeravtryck"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "Skapa SSH-nyckel",
+              "toast": {
+                "created": "SSH-nyckel skapad."
+              },
+              "button": {
+                "uploadKeyFile": "Ladda upp nyckelfil"
+              },
+              "form": {
+                "publicKey": "Offentlig nyckel"
+              }
+            },
+            "editSshKey": {
+              "title": "Redigera SSH-nyckel",
+              "toast": {
+                "updated": "SSH-nyckel uppdaterad."
+              }
+            },
+            "importSshKeys": {
+              "title": "Importera SSH-nycklar",
+              "toast": {
+                "created": "{sshKeys} skapade."
+              },
+              "form": {
+                "provider": "Leverantör",
+                "username": "Användarnamn"
+              }
+            },
+            "deleteSshKey": {
+              "title": "Bekräfta borttagning av SSH-nyckel",
+              "content": "Är du säker på att du vill ta bort **{name}** från ditt konto?",
+              "toast": {
+                "removed": "SSH-nyckel borttagen."
+              }
+            }
+          }
+        },
+        "commandSnippets": {
+          "title": "Kommandosnuttar",
+          "table": {
+            "columns": {
+              "eggs": "Eggs"
+            }
+          },
+          "form": {
+            "eggs": "Eggs",
+            "command": "Kommando"
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "Skapa kommandosnutt",
+              "toast": {
+                "created": "Kommandosnutt skapad."
+              }
+            },
+            "editCommandSnippet": {
+              "title": "Redigera kommandosnutt",
+              "toast": {
+                "updated": "Kommandosnutt uppdaterad."
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "Bekräfta borttagning av kommandosnutt",
+              "content": "Är du säker på att du vill ta bort **{name}** från ditt konto?",
+              "toast": {
+                "removed": "Kommandosnutt borttagen."
+              }
+            }
+          }
+        },
+        "oauthLinks": {
+          "title": "OAuth-länkar",
+          "button": {
+            "connect": "Ansluta",
+            "connectTo": "Anslut till {provider}"
+          },
+          "table": {
+            "columns": {
+              "providerName": "Leverantörens namn",
+              "identifier": "Identifierare"
+            }
+          },
+          "modal": {
+            "deleteOAuthLink": {
+              "title": "Bekräfta borttagning av OAuth-länk",
+              "content": "Är du säker på att du vill ta bort **{provider}**-anslutningen från ditt konto?",
+              "toast": {
+                "removed": "OAuth-länk borttagen."
+              }
+            }
+          }
+        },
+        "apiKeys": {
+          "title": "API-nycklar",
+          "button": {
+            "apiDocumentation": "API dokumentation"
+          },
+          "table": {
+            "columns": {
+              "key": "Nyckel",
+              "permissions": "Användar-/Server-/Admin-behörigheter",
+              "expires": "Upphör att gälla"
+            }
+          },
+          "modal": {
+            "createApiKey": {
+              "title": "Skapa API-nyckel",
+              "toast": {
+                "created": "API-nyckel skapad."
+              }
+            },
+            "updateApiKey": {
+              "title": "Uppdatera API-nyckel",
+              "toast": {
+                "updated": "API-nyckel uppdaterad."
+              }
+            },
+            "recreateApiKey": {
+              "title": "Återskapa API-nyckel",
+              "content": "Återskapandet av en API-nyckel kommer att generera en ny nyckel och ogiltigförklara den gamla. Är du säker på att du vill återskapa API-nyckeln **{name}**?",
+              "toast": {
+                "recreated": "API-nyckel återskapad."
+              }
+            },
+            "deleteApiKey": {
+              "title": "Bekräfta borttagning av API-nyckel",
+              "content": "Är du säker på att du vill ta bort **{name}** från ditt konto?",
+              "toast": {
+                "removed": "API-nyckel borttagen."
+              }
+            }
+          },
+          "form": {
+            "allowedIps": "Tillåtna IP-adresser",
+            "allowedIpsPlaceholder": "e.g. 192.168.1.1, 2001:db8::1",
+            "userPermissions": "Användarbehörigheter",
+            "serverPermissions": "Serverbehörigheter",
+            "adminPermissions": "Adminbehörigheter"
+          }
+        },
+        "activity": {
+          "title": "Aktivitetslogg"
+        }
+      },
+      "admin": {},
+      "server": {
+        "viewAdmin": {
+          "title": "Visa admin"
+        },
+        "console": {
+          "title": "Konsol",
+          "input": {
+            "placeholder": "Skriv ett kommando...",
+            "ariaLabel": "Ingång för konsolkommando."
+          },
+          "toast": {
+            "installCancelled": "Serverinstallationen avbröts.",
+            "transferCancelled": "Serveröverföring avbruten."
+          },
+          "modal": {
+            "sshDetails": {
+              "title": "SSH Detaljer",
+              "form": {
+                "protocol": "Protokoll",
+                "port": "Port",
+                "host": "Host",
+                "username": "Användarnamn",
+                "password": "Lösenord",
+                "yourPassword": "Ditt Control Panel Lösenord",
+                "command": "SSH kommando"
+              },
+              "launch": "Lansera"
+            }
+          },
+          "notification": {
+            "suspended": "Din server är för närvarande avstängd. Inga åtgärder kan utföras förrän avstängningen har upphävts.",
+            "suspendedAdmin": "Den här servern är för närvarande avstängd. Eftersom du är administratör kan du fortfarande komma åt servern, men åtgärderna är begränsade.",
+            "nodeMaintenance": "Din server finns på en nod som för närvarande är under underhåll.",
+            "transferring": "Din server överförs för närvarande till en annan node..",
+            "restoringBackup": "Din server återställer för närvarande från en säkerhetskopia. Vänligen vänta...",
+            "installing": "Din server installeras för närvarande. Vänligen vänta..."
+          },
+          "message": {
+            "serverMarkedAs": "Server markerad som {state}...",
+            "installFailed": "Installationen misslyckades.",
+            "installCompleted": "Installationen har slutförts.",
+            "transferFailed": "Överföringen misslyckades.",
+            "transferCompleted": "Överföringen har slutförts. Återansluter till servern...",
+            "pullingImage": "Din server drar nu ner sin docker-bild. Vänligen vänta...",
+            "pulling": "Drar ner",
+            "extracting": "Extraherar"
+          },
+          "tooltip": {
+            "search": "Sök",
+            "sshDetails": "SSH Detaljer",
+            "commandHistory": "Kommandohistorik",
+            "decreaseFontSize": "Minska teckenstorleken",
+            "increaseFontSize": "Öka teckenstorleken"
+          },
+          "drawer": {
+            "commandHistory": {
+              "title": "Kommandohistorik",
+              "detailTitle": "Kommandodetaljer",
+              "noCommands": "Inga kommandon hittades.",
+              "copyButton": "Kopiera kommando",
+              "sendButton": "Skicka kommando",
+              "commandSent": "Kommando skickat."
+            }
+          },
+          "feature": {
+            "eula": {
+              "title": "Minecraft EULA-avtal",
+              "content": "Minecraft-servern kräver att du godkänner [Minecrafts slutanvändarlicensavtal](https://www.minecraft.net/sv-se/eula) innan den kan starta.",
+              "contentDetails": "Genom att klicka på \"Acceptera EULA\" godkänner du villkoren i Minecraft EULA och filen **eula.txt** kommer att uppdateras till **eula=true**.",
+              "toast": {
+                "accepted": "EULA har godkänts."
+              },
+              "button": {
+                "accept": "Acceptera EULA"
+              }
+            }
+          },
+          "details": {
+            "address": "Adress",
+            "port": "Port",
+            "uptime": "Drifttid",
+            "cpuLoad": "CPU-belastning",
+            "memoryLoad": "Minnesbelastning",
+            "diskUsage": "Diskanvändning",
+            "networkIn": "Nätverk (in)",
+            "networkOut": "Nätverk (ut)",
+            "normalizeCpuLoad": "Normalisera CPU-belastning (skiftad till max 100%)"
+          },
+          "power": {
+            "modal": {
+              "forceStop": {
+                "title": "Tvångsstoppa processen",
+                "content": "Att tvångsstoppa en server kan leda till datakorruption."
+              }
+            }
+          },
+          "stats": {
+            "cpuLoad": "CPU-belastning",
+            "memoryLoad": "Minnesbelastning",
+            "network": "Nätverk",
+            "inbound": "Inkommande",
+            "outbound": "Utgående"
+          },
+          "socketConnected": "Ansluten ({ping}ms ping)",
+          "socketDisconnected": "Frånkopplad"
+        },
+        "files": {
+          "title": "Filer",
+          "titleEditorViewing": "Visa {file}",
+          "titleEditorEditing": "Redigera {file}",
+          "titleEditorNew": "Ny fil",
+          "table": {
+            "columns": {
+              "modified": "Ändrad"
+            }
+          },
+          "button": {
+            "new": "Ny",
+            "sftpDetails": "SFTP-detaljer",
+            "openInNewWindow": "Öppna i nytt fönster",
+            "details": "Detaljer",
+            "rename": "Döp om",
+            "copy": "Kopiera",
+            "move": "Flytta",
+            "fingerprint": "Fingeravtryck",
+            "permissions": "Behörigheter",
+            "unarchive": "Avkomprimera",
+            "archive": "Komprimera",
+            "more": "Mer",
+            "remoteCopy": "Kopiera från remote",
+            "search": "Sök",
+            "exitBackup": "Avsluta Backup",
+            "fileFromEditor": "Fil från Editor",
+            "directory": "Katalog",
+            "fileFromPull": "Fil från Pull",
+            "fileFromUpload": "Fil från Upload",
+            "directoryFromUpload": "Katalog från Upload"
+          },
+          "actionBar": {
+            "copyHere": "Kopiera {files} hit",
+            "moveHere": "Flytta {files} hit"
+          },
+          "searchBanner": {
+            "resultsTitle": "Sökresultat ({files} hittade)",
+            "query": "Fråga:",
+            "excluded": "Utesluten:",
+            "content": "Innehåll:",
+            "size": "Storlek:",
+            "min": "Min:",
+            "max": "Max:"
+          },
+          "operations": {
+            "uploadingFolder": "Laddar upp mapp: {folder} ({files})",
+            "waiting": "Väntar: ",
+            "uploading": "Laddar upp: ",
+            "compressing": "Komprimerar {files} från {path}",
+            "decompressing": "Avkomprimerar {path}",
+            "pulling": "Hämtar {destination}",
+            "copying": "Kopierar {path} till {destination}",
+            "copyingMany": "Kopierar {files}",
+            "receivingRemote": "Tar emot {files} från remote server",
+            "sendingRemote": "Skickar {files} till remote server"
+          },
+          "dropzone": {
+            "title": "Släpp filer här för att ladda upp",
+            "subtitle": "Släpp för att börja ladda upp"
+          },
+          "settings": {
+            "clickOnce": "Klicka en gång för att öppna filen eller mappen",
+            "preferPhysicalSize": "Visa fysisk storlek istället för logisk storlek",
+            "editorMinimap": "Visa filminikarta",
+            "editorLineOverflow": "Överfylld radbrytning",
+            "imageViewerSmoothing": "Jämna ut bilden (antialiasing)"
+          },
+          "toast": {
+            "operationCancelled": "Åtgärden avbröts",
+            "copyingStarted": "{files} har börjat kopieras.",
+            "filesCouldNotBeMoved": "Filer kunde inte flyttas.",
+            "filesMoved": "{files} har flyttats.",
+            "downloadStarted": "Nedladdning har börjat.",
+            "filesDeleted": "Filer har tagits bort.",
+            "archiveCreationStarted": "Arkivering har börjat.",
+            "fileCopyingStarted": "Filkopiering har börjat.",
+            "fileInfoRetrieved": "Filinformation har hämtats.",
+            "filePullingStarted": "Filkopiering har börjat.",
+            "fileRenamed": "Filen har döpts om.",
+            "fileCouldNotBeRenamed": "Filen kunde inte döpas om.",
+            "permissionsUpdated": "Behörigheter har uppdaterats.",
+            "fileSaved": "Filen har sparats."
+          },
+          "modal": {
+            "activeUploads": {
+              "title": "Aktiva uppladdningar",
+              "content": "Är du säker på att du vill lämna den här sidan? Du har {files} aktiva filuppladdningar. Om du lämnar den här sidan kommer filuppladdningarna att avbrytas.",
+              "button": {
+                "leave": "Lämna sidan"
+              }
+            },
+            "unsavedChanges": {
+              "title": "Osparade ändringar",
+              "content": "Du har osparade ändringar i filredigeringen. Är du säker på att du vill lämna den här sidan? Om du lämnar sidan kommer dina ändringar att förloras.",
+              "button": {
+                "leave": "Lämna sidan"
+              }
+            },
+            "createArchive": {
+              "title": "Skapa arkiv",
+              "form": {
+                "archiveName": "Arkivnamn",
+                "format": "Format"
+              },
+              "createdAs": "Detta arkiv kommer att skapas som "
+            },
+            "createDirectory": {
+              "title": "Skapa katalog",
+              "form": {
+                "directoryName": "Katalognamn"
+              },
+              "createdAs": "Denna katalog kommer att skapas som "
+            },
+            "copyFile": {
+              "title": "Kopiera fil",
+              "form": {
+                "fileName": "Filnamn"
+              },
+              "createdAs": "Denna fil kommer att skapas som "
+            },
+            "copyRemote": {
+              "title": "Fjärrkopiera filer",
+              "form": {
+                "server": "Server",
+                "destination": "Destination"
+              },
+              "createdAs": "Dessa filer kommer att skapas på den remote servern under "
+            },
+            "fileFingerprints": {
+              "title": "Fil Fingeravtryck",
+              "form": {
+                "algorithm": "Algoritm",
+                "fingerprint": "Fingeravtryck"
+              },
+              "button": {
+                "calculate": "Beräkna fingeravtryck"
+              }
+            },
+            "deleteFile": {
+              "title": "Ta bort fil",
+              "singleFileWarning": "Du kommer inte att kunna återställa innehållet i {file} efter borttagning.",
+              "multipleFilesWarning": "Du kommer inte att kunna återställa innehållet i följande filer efter borttagning."
+            },
+            "createFile": {
+              "title": "Skapa fil",
+              "form": {
+                "fileName": "Filnamn"
+              }
+            },
+            "details": {
+              "title": "Fildetaljer",
+              "path": "Väg",
+              "mode": "Läge",
+              "logicalSize": "Logisk storlek",
+              "physicalSize": "Fysisk storlek",
+              "mimeType": "MIME Typ",
+              "lastModifiedAt": "Senast ändrad",
+              "createdAt": "Skapad"
+            },
+            "filePermissions": {
+              "title": "Filbehörigheter",
+              "symbolic": "Symbolisk:",
+              "octal": "Octal:",
+              "owner": "Ägare",
+              "group": "Grupp",
+              "other": "Övriga",
+              "breakdown": "Tillståndsfördelning",
+              "readPermission": "Läsbehörighet (4)",
+              "writePermission": "Skrivbehörighet (2)",
+              "executePermission": "Körbehörighet (1)"
+            },
+            "renameFile": {
+              "title": "Byt namn på fil",
+              "form": {
+                "fileName": "Filnamn"
+              }
+            },
+            "searchFiles": {
+              "title": "Sök efter filer",
+              "placeholder": "Sök efter filer...",
+              "advancedFilters": "Avancerade filter",
+              "pathPatterns": "Sökvägsmönster",
+              "include": "Inkludera",
+              "exclude": "Exkludera",
+              "caseInsensitive": "Skilj på stora och små bokstäver",
+              "fileContent": "Filinnehåll",
+              "searchText": "Söktext",
+              "maxFileSize": "Max filstorlek",
+              "includeOversized": "Inkludera oversized filer",
+              "includeOversizedDescription": "Inkludera filer som matchar andra filter men är för stora att söka i",
+              "fileSize": "Filstorlek",
+              "minimum": "Minimum",
+              "maximum": "Maximum"
+            },
+            "pullFile": {
+              "title": "Pull Fil",
+              "form": {
+                "fileUrl": "Fil URL",
+                "query": "Query",
+                "fileName": "Filnamn"
+              },
+              "createdAs": "Denna fil kommer att skapas som ",
+              "pull": "Pull"
+            },
+            "sftpDetails": {
+              "title": "SFTP-detaljer",
+              "form": {
+                "protocol": "Protokoll",
+                "port": "Port",
+                "host": "Host",
+                "username": "Användarnamn",
+                "password": "Lösenord",
+                "yourPassword": "Ditt lösenord för kontrollpanelen"
+              },
+              "launch": "Starta"
+            }
+          }
+        },
+        "databases": {
+          "title": "Databaser",
+          "subtitle": "{current} av maximalt {max} databaser skapade.",
+          "tooltip": {
+            "limitReached": "Denna server är begränsad till {max} databaser."
+          },
+          "table": {
+            "columns": {
+              "type": "Typ",
+              "address": "Adress",
+              "locked": "Låst?"
+            }
+          },
+          "button": {
+            "details": "Detaljer",
+            "rotatePassword": "Rotera lösenord"
+          },
+          "form": {
+            "databaseName": "Databasnamn"
+          },
+          "modal": {
+            "createDatabase": {
+              "title": "Skapa databas",
+              "toast": {
+                "created": "Databas skapad."
+              },
+              "form": {
+                "databaseHost": "Databas Host",
+                "noHostsFound": "Inga värdar hittades"
+              }
+            },
+            "editDatabase": {
+              "title": "Redigera databas",
+              "toast": {
+                "updated": "Databas uppdaterad."
+              },
+              "form": {
+                "locked": "Låst"
+              }
+            },
+            "databaseDetails": {
+              "title": "Databasanslutningsdetaljer",
+              "toast": {
+                "passwordRotated": "Lösenordet har blivit rotat."
+              },
+              "form": {
+                "jdbcConnectionString": "JDBC-anslutningssträng"
+              }
+            },
+            "recreateDatabase": {
+              "title": "Bekräfta databasåterskapande",
+              "content": "Om du återskapar en databas raderas all data i databasen **{name}** permanent och en ny skapas med samma anslutningsuppgifter.",
+              "toast": {
+                "recreated": "Databas återskapad."
+              }
+            },
+            "deleteDatabase": {
+              "title": "Bekräfta databasborttagning",
+              "content": "Att ta bort en databas är en permanent åtgärd, den kan inte ångras. Detta kommer att permanent ta bort databasen **{name}** och ta bort all associerad data.",
+              "toast": {
+                "deleted": "Databas borttagen."
+              }
+            }
+          }
+        },
+        "schedules": {
+          "title": "Scheman",
+          "subtitle": "{current} av {max} maximala scheman skapade.",
+          "dropzone": {
+            "title": "Släpp några filer här för att importera dem som scheman",
+            "subtitle": "Släpp för att börja importera"
+          },
+          "tooltip": {
+            "limitReached": "Den här servern är begränsad till {max} scheman."
+          },
+          "table": {
+            "columns": {
+              "lastRun": "Senaste körning",
+              "lastFailure": "Senaste fel",
+              "status": "Status"
+            }
+          },
+          "button": {
+            "import": "Importera",
+            "trigger": "Utlösare",
+            "triggerWithCondition": "Utlösare (do not skip condition)",
+            "triggerSkipCondition": "Utlösare (skip condition)",
+            "addTrigger": "Lägg till utlösare",
+            "addCondition": "Lägg till villkor",
+            "addStep": "Lägg till steg",
+            "createFirstStep": "Skapa första steget",
+            "addOutput": "Lägg till utdata",
+            "addFile": "Lägg till fil",
+            "exitEditor": "Avsluta editor"
+          },
+          "toast": {
+            "imported": "Schema importerat.",
+            "created": "Schema skapat.",
+            "updated": "Schema uppdaterat.",
+            "deleted": "Schema borttaget.",
+            "triggered": "Schema utlöst.",
+            "exported": "Schema exporterat.",
+            "parseError": "Det gick inte att parsa schemat: {error}",
+            "step": {
+              "created": "Schema steg skapat.",
+              "updated": "Schema steg uppdaterat.",
+              "deleted": "Schema steg borttaget."
+            }
+          },
+          "enum": {
+            "schedulePreConditionType": {
+              "none": "Ingen",
+              "and": "OCH (Allt måste vara sant)",
+              "or": "ELLER (Vilken som helst måste vara sant)",
+              "not": "INTE (Måste inte vara sant)",
+              "serverState": "Serverstatus",
+              "uptime": "Drifttid",
+              "cpuUsage": "CPU-användning",
+              "memoryUsage": "Minnesanvändning",
+              "diskUsage": "Diskanvändning",
+              "fileExists": "Filen finns"
+            },
+            "scheduleConditionType": {
+              "none": "Ingen",
+              "and": "OCH (Allt måste vara sant)",
+              "or": "ELLER (Vilken som helst måste vara sant)",
+              "not": "INTE (Måste inte vara sant)",
+              "variableExists": "Variabeln finns",
+              "variableContains": "Variabeln innehåller",
+              "variableEquals": "Variabeln är lika med",
+              "variableStartsWith": "Variabeln börjar med",
+              "variableEndsWith": "Variabeln slutar med"
+            },
+            "scheduleComparator": {
+              "smallerThan": "Mindre än",
+              "smallerThanOrEqual": "Mindre än eller lika med",
+              "equal": "Likamed",
+              "greaterThanOrEqual": "Större än eller lika med",
+              "greaterThan": "Större än"
+            }
+          },
+          "modal": {
+            "createSchedule": {
+              "title": "Skapa schema"
+            },
+            "updateSchedule": {
+              "title": "Uppdatera schema"
+            },
+            "deleteSchedule": {
+              "title": "Bekräfta borttagning av schema",
+              "content": "Är du säker på att du vill ta bort {name} från den här servern?"
+            },
+            "createStep": {
+              "title": "Skapa schema steg"
+            },
+            "editStep": {
+              "title": "Redigera schema steg"
+            },
+            "deleteStep": {
+              "title": "Bekräfta borttagning av schema steg",
+              "content": "Är du säker på att du vill ta bort detta schema steg?"
+            }
+          },
+          "view": {
+            "badge": {
+              "running": "Running"
+            },
+            "tooltip": {
+              "cannotTrigger": "Kan inte utlösa ett inaktiverat schema"
+            },
+            "tabs": {
+              "actions": "Åtgärder",
+              "conditions": "Villkor",
+              "triggers": "Utlösare"
+            },
+            "sections": {
+              "actions": "Schemaåtgärder",
+              "preConditions": "Schema Pre-Conditions",
+              "triggers": "Schema Utlösare"
+            },
+            "alert": {
+              "noActions": "Inga åtgärder konfigurerade för detta schema",
+              "noTriggers": "Inga utlösare konfigurerade för detta schema"
+            }
+          },
+          "form": {
+            "scheduleName": "Schema Name",
+            "enabled": "Aktiverad",
+            "triggersList": "Utlösare",
+            "triggerNumber": "Utlösare {number}",
+            "actionType": "Åtgärdstyp",
+            "conditionType": "Skick Typ",
+            "serverState": "Serverstatus",
+            "comparator": "Komparator",
+            "rootPath": "Rotväg",
+            "outputInto": "Utgång i",
+            "caseInsensitive": "Skiftlägesokänslig",
+            "ignoreFailure": "Ignorera misslyckande",
+            "runInForeground": "Kör i förgrunden"
+          },
+          "condition": {
+            "variable": "Variabel",
+            "equals": "Lika med",
+            "contains": "Innehåller",
+            "startsWith": "Börjar med",
+            "endsWith": "Slutar med",
+            "allMustBeTrue": "Alla villkor måste vara sanna:",
+            "anyMustBeTrue": "Något villkor måste vara sann:",
+            "mustNotBeTrue": "Villkor får inte vara sant:"
+          },
+          "preCondition": {
+            "valueSeconds": "Värde (sekunder)",
+            "valuePercent": "Värde (%)",
+            "value": "Värde",
+            "filePath": "Filväg"
+          },
+          "triggers": {
+            "cron": {
+              "title": "Cron",
+              "form": {
+                "cronSchedule": "Cron Schema"
+              },
+              "card": {
+                "content": "På Cron-intervallet `{schedule}` är nästa körning {timestamp} - Senaste körningen var {lastTimestamp}."
+              }
+            },
+            "powerAction": {
+              "title": "Power Action",
+              "form": {
+                "powerAction": "Power Action"
+              },
+              "card": {
+                "content": "När Power Action `{action}` begärs."
+              }
+            },
+            "serverState": {
+              "title": "Serverstatus",
+              "card": {
+                "content": "När Server Status `{state}` är nådd."
+              }
+            },
+            "backupStatus": {
+              "title": "Backup Status",
+              "form": {
+                "backupStatus": "Backup Status"
+              },
+              "card": {
+                "content": "När Backup nås Status `{status}`."
+              }
+            },
+            "consoleLine": {
+              "title": "Konsollinje",
+              "form": {
+                "lineContains": "Linje innehåller"
+              },
+              "card": {
+                "content": "När konsollutmatningen når en linje som innehåller `{contains}`"
+              }
+            },
+            "crash": {
+              "title": "krasch",
+              "card": {
+                "content": "När Server kraschar."
+              }
+            }
+          },
+          "renderer": {
+            "noActionSelected": "Välj en åtgärdstyp att konfigurera",
+            "noActionDetails": "Åtgärdsinformation inte tillgänglig",
+            "ignoreFailure": "Ignorera fel: {value}",
+            "foreground": "Förgrund: {value}"
+          },
+          "steps": {
+            "empty": {
+              "title": "Inga steg konfigurerade",
+              "description": "Det här schemat har inga steg ännu. Lägg till några åtgärder för att komma igång."
+            },
+            "sleep": {
+              "title": "Sov",
+              "form": {
+                "duration": "Varaktighet (millisekunder)"
+              },
+              "renderer": {
+                "compact": "Sov i {duration}ms"
+              }
+            },
+            "ensure": {
+              "title": "Säkerställ",
+              "renderer": {
+                "compact": "Säkerställ att ett villkor matchar"
+              }
+            },
+            "format": {
+              "title": "Format",
+              "form": {
+                "formatString": "Formatera sträng",
+                "formatStringDescription": "Formatsträngen kan inkludera variabler genom att radbrytas inuti {wrapper}"
+              },
+              "renderer": {
+                "compact": "Formatera en sträng till {outputInto}"
+              }
+            },
+            "matchRegex": {
+              "title": "Matcha Regex",
+              "form": {
+                "input": "Input",
+                "regex": "Regex",
+                "outputs": "Utgångar",
+                "outputNumber": "Utgångar {number}"
+              },
+              "renderer": {
+                "compact": "Matcha {input} med regex {regex}"
+              }
+            },
+            "waitForConsoleLine": {
+              "title": "Vänta på Konsollinje",
+              "form": {
+                "lineContains": "Linje innehåller",
+                "timeout": "Timeout (millisekunder)"
+              },
+              "renderer": {
+                "compact": "Vänta {timeout} på konsolraden som innehåller {contains}",
+                "detail": {
+                  "lineContains": "Raden måste innehålla: {contains}",
+                  "caseInsensitive": "Skiftlägesokänslig: {value}",
+                  "timeout": "Timeout: {timeout}"
+                }
+              }
+            },
+            "sendCommand": {
+              "title": "Skicka Kommando",
+              "form": {
+                "command": "Kommando"
+              },
+              "renderer": {
+                "compact": "Kör {command}",
+                "detail": {
+                  "command": "Kommando: {command}"
+                }
+              }
+            },
+            "sendPower": {
+              "title": "Skicka Strömsignal",
+              "form": {
+                "powerAction": "Strömmåtgärd"
+              },
+              "renderer": {
+                "compact": "Gör {action}",
+                "detail": {
+                  "powerAction": "Strömmåtgärd: {action}"
+                }
+              }
+            },
+            "createBackup": {
+              "title": "Skapa säkerhetskopia",
+              "form": {
+                "backupName": "Säkerhetskopieringsnamn",
+                "ignoredFiles": "Ignorerade filer"
+              },
+              "renderer": {
+                "compact": "Skapa {name}",
+                "detail": {
+                  "backupName": "Säkerhetskopieringsnamn: {name}",
+                  "ignoredFiles": "Ignorerade filer: {files}"
+                }
+              }
+            },
+            "createDirectory": {
+              "title": "Skapa Katalog",
+              "form": {
+                "directoryName": "Katalognamn"
+              },
+              "renderer": {
+                "compact": "Skapa {name} i {root}",
+                "detail": {
+                  "directory": "Katalog: {name}",
+                  "root": "Rot: {root}"
+                }
+              }
+            },
+            "writeFile": {
+              "title": "Skriv Fil",
+              "form": {
+                "filePath": "Filväg",
+                "content": "Innehåll",
+                "appendToFile": "Lägg till i fil"
+              },
+              "renderer": {
+                "compact": "Skriv till {file}",
+                "detail": {
+                  "file": "Fil: {file}",
+                  "append": "Lägg till: {value}"
+                }
+              }
+            },
+            "copyFile": {
+              "title": "Kopiera Fil",
+              "form": {
+                "sourceFile": "Källfil",
+                "destination": "Destination"
+              },
+              "renderer": {
+                "compact": "Kopiera {file} till {destination}",
+                "detail": {
+                  "from": "Från: {file}",
+                  "to": "Till: {destination}"
+                }
+              }
+            },
+            "deleteFiles": {
+              "title": "Ta Bort Filer",
+              "form": {
+                "filesToDelete": "Filer att Ta Bort"
+              },
+              "renderer": {
+                "compact": "Ta Bort {files}",
+                "detail": {
+                  "root": "Root: {root}",
+                  "files": "Filer: {files}"
+                }
+              }
+            },
+            "renameFiles": {
+              "title": "Döp om Filer",
+              "form": {
+                "files": "Filer",
+                "from": "från",
+                "to": "till"
+              },
+              "renderer": {
+                "compact": "Döp om {files}",
+                "detail": {
+                  "root": "Root: {root}",
+                  "files": "Filer: {files}"
+                }
+              }
+            },
+            "compressFiles": {
+              "title": "Komprimera Filer",
+              "form": {
+                "filesToCompress": "Filer att komprimera",
+                "archiveFormat": "Arkivformat",
+                "archiveName": "Arkivnamn"
+              },
+              "renderer": {
+                "compact": "Komprimera {files} i {root} till {name}",
+                "detail": {
+                  "output": "Produktion: {name}",
+                  "root": "Root: {root}",
+                  "format": "Format: {format}",
+                  "files": "Filer: {files}"
+                }
+              }
+            },
+            "decompressFile": {
+              "title": "Dekomprimera Fil",
+              "form": {
+                "file": "Fil"
+              },
+              "renderer": {
+                "compact": "Dekomprimera {file} till {root}",
+                "detail": {
+                  "file": "Fil: {file}",
+                  "root": "Root: {root}"
+                }
+              }
+            },
+            "updateStartupVariable": {
+              "title": "Uppdatera Startvariabel",
+              "form": {
+                "envVariable": "Env-variabel",
+                "value": "Värde"
+              },
+              "renderer": {
+                "compact": "Sätt {variable} till {value}",
+                "detail": {
+                  "variable": "Variable: {variable}",
+                  "value": "Värde: {value}"
+                }
+              }
+            },
+            "updateStartupCommand": {
+              "title": "Uppdatera startkommando",
+              "form": {
+                "startupCommand": "Startkommando"
+              },
+              "renderer": {
+                "compact": "Sätt till {command}",
+                "detail": {
+                  "command": "Kommando: {command}"
+                }
+              }
+            },
+            "updateStartupDockerImage": {
+              "title": "Uppdatera Docker Image",
+              "form": {
+                "dockerImage": "Docker Image"
+              },
+              "renderer": {
+                "compact": "Sätt till {image}",
+                "detail": {
+                  "image": "Image: {image}"
+                }
+              }
+            }
+          }
+        },
+        "subusers": {
+          "title": "Underanvändare",
+          "table": {
+            "columns": {
+              "twoFactorEnabled": "2FA aktiverad",
+              "permissions": "Behörigheter",
+              "ignoredFiles": "Ignorerade filer"
+            }
+          },
+          "modal": {
+            "createSubuser": {
+              "title": "Skapa Underanvändare",
+              "toast": {
+                "created": "Underanvändare skapad."
+              },
+              "form": {
+                "email": "E-post",
+                "emailPlaceholder": "Ange den e-postadress som denna underanvändare ska sparas som.",
+                "permissions": "Behörigheter",
+                "ignoredFiles": "Ignorerade filer"
+              }
+            },
+            "updateSubuser": {
+              "title": "Uppdatera Underanvändare",
+              "toast": {
+                "updated": "Underanvändare uppdaterad."
+              }
+            },
+            "removeSubuser": {
+              "title": "Bekräfta Borttagning av Underanvändare",
+              "content": "Är du säker på att du vill ta bort **{username}** från den här servern?",
+              "toast": {
+                "removed": "Underanvändare borttagen."
+              }
+            }
+          }
+        },
+        "backups": {
+          "title": "Säkerhetskopieringar",
+          "subtitle": "{current} av maximalt {max} säkerhetskopior skapade.",
+          "tooltip": {
+            "limitReached": "Den här servern är begränsad till {max} säkerhetskopior."
+          },
+          "table": {
+            "columns": {
+              "checksum": "Checksum",
+              "files": "Filer",
+              "locked": "Låst?"
+            }
+          },
+          "button": {
+            "browse": "Bläddra"
+          },
+          "toast": {
+            "downloadStarted": "Nedladdningen startade.",
+            "restoringBackup": "Återställer säkerhetskopia..."
+          },
+          "modal": {
+            "createBackup": {
+              "title": "Skapa Säkerhetskopia",
+              "toast": {
+                "created": "Säkerhetskopia skapad."
+              },
+              "form": {
+                "ignoredFiles": "Ignorerade Filer"
+              }
+            },
+            "editBackup": {
+              "title": "Redigera Säkerhetskopia",
+              "toast": {
+                "updated": "Säkerhetskopia uppdaterad."
+              },
+              "form": {
+                "locked": "Låst"
+              }
+            },
+            "restoreBackup": {
+              "title": "Återställ Säkerhetskopia"
+            },
+            "deleteBackup": {
+              "title": "Bekräfta Borttagning av Säkerhetskopia",
+              "content": "Är du säker på att du vill ta bort **{name}** från den här servern?",
+              "toast": {
+                "deleted": "Säkerhetskopia borttagen."
+              }
+            }
+          }
+        },
+        "network": {
+          "title": "Nätverk",
+          "subtitle": "{current} av {max} maximala allokeringar tilldelade.",
+          "tooltip": {
+            "limitReached": "Den här servern är begränsad till {max} allokeringar.",
+            "primary": "Primär"
+          },
+          "table": {
+            "columns": {
+              "hostname": "Värdnamn",
+              "port": "Port",
+              "notes": "Anteckningar"
+            }
+          },
+          "button": {
+            "setPrimary": "Ange som Primär",
+            "unsetPrimary": "Avlägsna Primär Status"
+          },
+          "toast": {
+            "created": "Tilldelning skapad.",
+            "updated": "Tilldelning uppdaterad.",
+            "removed": "Tilldelning borttagen.",
+            "setPrimary": "Tilldelning angiven som primär.",
+            "unsetPrimary": "Tilldelning avlägsnad som primär."
+          },
+          "modal": {
+            "editAllocation": {
+              "title": "Redigera tilldelning",
+              "form": {
+                "notes": "Anteckningar"
+              }
+            },
+            "removeAllocation": {
+              "title": "Bekräfta Borttagning av Tilldelning",
+              "content": "Är du säker på att du vill ta bort **{allocation}** från den här servern?"
+            }
+          }
+        },
+        "startup": {
+          "title": "Uppstart",
+          "form": {
+            "startupCommand": "Startkommando",
+            "dockerImage": "Docker-bild"
+          },
+          "variables": "Variabler",
+          "dockerImageDescription": "Docker-avbildningen som används för att köra den här servern. Denna kan ändras för att använda en annan avbildning.",
+          "dockerImageDescriptionCustom": "Docker-avbildningen som används för att köra den här servern. Denna har ställts in av en administratör och kan inte ändras.",
+          "toast": {
+            "startupCommandUpdated": "Startkommandot uppdaterat.",
+            "dockerImageUpdated": "Docker-bilden uppdaterad.",
+            "variablesUpdated": "Variablerna uppdaterade."
+          },
+          "modal": {
+            "unsavedChanges": {
+              "title": "Osparade ändringar",
+              "content": "Du har osparade ändringar i dina startvariabler. Är du säker på att du vill lämna den här sidan? Om du lämnar sidan kommer dina ändringar att gå förlorade.",
+              "button": {
+                "leave": "Lämna sida"
+              }
+            }
+          },
+          "noVariables": "Inga startvariabler hittades för den här servern."
+        },
+        "mounts": {
+          "title": "Mounts",
+          "table": {
+            "columns": {
+              "target": "Mål",
+              "mounted": "Monterad",
+              "readOnly": "Skrivskyddad"
+            }
+          },
+          "modal": {
+            "attachMount": {
+              "title": "Bifoga Mount",
+              "content": "Vill du bifoga **{name}** till `{target}`?",
+              "confirm": "Bifoga",
+              "toast": {
+                "attached": "{name} har blivit monterad på din server."
+              }
+            },
+            "detachMount": {
+              "title": "Lösgör Mount",
+              "content": "Vill du lösgöra **{name}** från `{target}`?",
+              "confirm": "Lösgör",
+              "toast": {
+                "detached": "{name} har blivit borttagen från din server."
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Inställningar",
+          "debugInformation": {
+            "title": "Felsökningsinformation",
+            "form": {
+              "nodeName": "Node (UUID)",
+              "locationName": "Plats (UUID)",
+              "serverUuid": "Server UUID"
+            }
+          },
+          "rename": {
+            "title": "Döp om Server",
+            "form": {
+              "serverName": "Servernamn"
+            },
+            "toast": {
+              "renamed": "Server har döpts om."
+            }
+          },
+          "timezone": {
+            "title": "Tidszon",
+            "form": {
+              "timezone": "Tidszon",
+              "system": "System"
+            },
+            "toast": {
+              "updated": "Serverns tidszon uppdaterad."
+            }
+          },
+          "autokill": {
+            "title": "Auto-Kill",
+            "form": {
+              "enabled": "Aktiverad",
+              "secondsUntilAutoKill": "Sekunder tills auto-kill"
+            },
+            "toast": {
+              "updated": "Serverns auto-kill uppdaterad."
+            }
+          },
+          "autostart": {
+            "title": "Auto-Start",
+            "form": {
+              "behavior": "Beteende"
+            },
+            "toast": {
+              "updated": "Serverns auto-start beteende uppdaterat."
+            }
+          },
+          "reinstall": {
+            "title": "Installera om servern",
+            "button": "Installera om servern",
+            "content": "Om du installerar om servern stoppas den och installationsskriptet som ursprungligen installerade den körs igen. **Vissa filer kan raderas eller ändras under processen. Säkerhetskopiera dina data innan du fortsätter.**",
+            "modal": {
+              "title": "Installera om servern",
+              "button": "Installera om",
+              "toast": {
+                "reinstalling": "Installerar om servern..."
+              }
+            }
+          }
+        },
+        "activity": {
+          "title": "Aktivitet"
+        }
+      }
+    }
+  }
+}

@@ -36,7 +36,7 @@ export const untransformedAxiosInstance: AxiosInstance = axios.create({
   },
 });
 
-axiosInstance.interceptors.request.use((request) => {
+untransformedAxiosInstance.interceptors.request.use((request) => {
   request.headers.set('Calagopus-User', localStorage.getItem('impersonatedUser'));
 
   return request;

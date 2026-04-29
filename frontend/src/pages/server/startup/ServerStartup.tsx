@@ -1,4 +1,5 @@
-import { faImage, faPlay, faReply } from '@fortawesome/free-solid-svg-icons';
+import { faDocker } from '@fortawesome/free-brands-svg-icons';
+import { faCog, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Title } from '@mantine/core';
 import debounce from 'debounce';
@@ -14,9 +15,9 @@ import ServerContentContainer from '@/elements/containers/ServerContentContainer
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import Popover from '@/elements/Popover.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
 import VariableContainer from '@/elements/VariableContainer.tsx';
 import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
@@ -84,7 +85,10 @@ export default function ServerStartup() {
     setLoading(true);
     updateVariables(
       server.uuid,
-      Object.entries(values).map(([envVariable, value]) => ({ envVariable, value })),
+      Object.entries(values).map(([envVariable, value]) => ({
+        envVariable,
+        value,
+      })),
     )
       .then(() => {
         addToast(t('pages.server.startup.toast.variablesUpdated', {}), 'success');
@@ -140,23 +144,47 @@ export default function ServerStartup() {
             placeholder={t('pages.server.startup.form.startupCommand', {})}
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            readOnly={!useServerCan('startup.command') || !settings.server.allowEditingStartupCommand}
+            readOnly={!useServerCan('startup.command') || !server.eggConfiguration?.startupAllowCustomStartupCommand}
             autosize
             rightSection={
-              <Tooltip label={t('common.tooltip.resetToDefault', {})}>
-                <ActionIcon
-                  variant='subtle'
-                  hidden={!settings.server.allowEditingStartupCommand}
-                  disabled={command === server.egg.startup}
-                  onClick={() => setCommand(server.egg.startup)}
-                >
-                  <FontAwesomeIcon icon={faReply} />
-                </ActionIcon>
-              </Tooltip>
+              <Popover>
+                <Popover.Target>
+                  <ActionIcon variant='subtle'>
+                    <FontAwesomeIcon icon={faCog} />
+                  </ActionIcon>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <Select
+                    data={[
+                      ...((!server.eggConfiguration?.startupAllowCustomStartupCommand &&
+                        Object.values(server.egg.startupCommands).every((value) => value !== command)) ||
+                      server.eggConfiguration?.startupAllowCustomStartupCommand
+                        ? [
+                            {
+                              label: t('common.custom', {}),
+                              value: '',
+                            },
+                          ]
+                        : []),
+                      ...Object.entries(server.egg.startupCommands).map(([key, value]) => ({
+                        value,
+                        label: key,
+                      })),
+                    ]}
+                    disabled={
+                      !useServerCan('startup.command') ||
+                      (!server.eggConfiguration?.startupAllowCustomStartupCommand &&
+                        Object.values(server.egg.startupCommands).every((value) => value !== command))
+                    }
+                    value={Object.values(server.egg.startupCommands).find((value) => value === command) || ''}
+                    onChange={(value) => setCommand(value ?? '')}
+                  />
+                </Popover.Dropdown>
+              </Popover>
             }
           />
         </TitleCard>
-        <TitleCard title={t('pages.server.startup.form.dockerImage', {})} icon={<FontAwesomeIcon icon={faImage} />}>
+        <TitleCard title={t('pages.server.startup.form.dockerImage', {})} icon={<FontAwesomeIcon icon={faDocker} />}>
           <Select
             withAsterisk
             value={dockerImage}

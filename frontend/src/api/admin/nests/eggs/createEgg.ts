@@ -9,6 +9,7 @@ export default async (
 ): Promise<z.infer<typeof adminEggSchema>> => {
   const { data } = await axiosInstance.post(`/api/admin/nests/${nestUuid}/eggs`, {
     ...transformKeysToSnakeCase(eggData),
+    startup_commands: eggData.startupCommands,
     docker_images: eggData.dockerImages,
   });
   return data.egg;

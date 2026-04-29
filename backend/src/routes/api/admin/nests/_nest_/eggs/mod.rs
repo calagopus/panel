@@ -128,9 +128,8 @@ mod post {
         #[schema(inline)]
         config_script: shared::models::nest_egg::NestEggConfigScript,
 
-        #[garde(length(chars, min = 1, max = 4096))]
-        #[schema(min_length = 1, max_length = 4096)]
-        startup: compact_str::CompactString,
+        #[garde(custom(shared::models::nest_egg::validate_startup_commands))]
+        startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
         #[garde(skip)]
         force_outgoing_ip: bool,
         #[garde(skip)]
@@ -185,7 +184,7 @@ mod post {
             config_startup: data.config_startup,
             config_stop: data.config_stop,
             config_script: data.config_script,
-            startup: data.startup,
+            startup_commands: data.startup_commands,
             force_outgoing_ip: data.force_outgoing_ip,
             separate_port: data.separate_port,
             features: data.features,
@@ -220,7 +219,7 @@ mod post {
                     "config_stop": egg.config_stop,
                     "config_script": egg.config_script,
 
-                    "startup": egg.startup,
+                    "startup_commands": egg.startup_commands,
                     "force_outgoing_ip": egg.force_outgoing_ip,
                     "separate_port": egg.separate_port,
 
