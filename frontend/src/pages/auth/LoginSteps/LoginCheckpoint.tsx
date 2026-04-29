@@ -76,13 +76,15 @@ export default function LoginCheckpoint() {
   return (
     <AuthWrapper>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
-        {(timeOffset > 5000 || timeOffset < -5000) && (
+        {Math.abs(timeOffset) > 5000 && (
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
             color='yellow'
             title={t('common.alert.warning', {})}
           >
-            {t('common.alert.clockOffset', { offset: String(Math.round(timeOffset / 1000)) })}
+            {t('common.alert.clockOffset', {
+              offset: String(Math.round(timeOffset / 1000)),
+            })}
           </Alert>
         )}
         {error && (

@@ -8,10 +8,10 @@ mod put {
     use shared::{
         ApiError, GetState,
         models::{
+            UpdatableModel,
             user::{GetPermissionManager, GetUser},
             user_activity::GetUserActivityLogger,
         },
-        prelude::SqlxErrorExt,
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -20,10 +20,10 @@ mod put {
     pub struct Payload {
         #[garde(email)]
         #[schema(format = "email")]
-        email: String,
+        email: compact_str::CompactString,
         #[garde(length(max = 512))]
         #[schema(max_length = 512)]
-        password: String,
+        password: compact_str::CompactString,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -37,7 +37,7 @@ mod put {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        user: GetUser,
+        mut user: GetUser,
         activity_logger: GetUserActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
@@ -59,15 +59,17 @@ mod put {
         }
 
         if user.email != data.email {
-            match sqlx::query!(
-                "UPDATE users
-                SET email = $1
-                WHERE users.uuid = $2",
-                data.email,
-                user.uuid
-            )
-            .execute(state.database.write())
-            .await
+            let old_email = user.email.clone();
+
+            match user
+                .update(
+                    &state,
+                    shared::models::user::UpdateUserOptions {
+                        email: Some(data.email.clone()),
+                        ..Default::default()
+                    },
+                )
+                .await
             {
                 Ok(_) => {}
                 Err(err) if err.is_unique_violation() => {
@@ -88,8 +90,8 @@ mod put {
                 .log(
                     "account:email-changed",
                     serde_json::json!({
-                        "old": user.email,
-                        "new": data.email,
+                        "old": old_email,
+                        "new": user.email,
                     }),
                 )
                 .await;

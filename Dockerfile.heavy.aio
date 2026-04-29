@@ -42,7 +42,7 @@ RUN cargo build --profile heavy-release
 RUN ln -s /app/repo/target/heavy-release/panel-rs-aio /usr/local/bin/panel-rs
 RUN ln -s /app/repo/target/heavy-release/panel-rs-aio /usr/local/bin/calagopus-panel
 
-COPY entrypoint.heavy.sh /entrypoint.sh
+COPY entrypoint.heavy.aio.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENV OCI_CONTAINER=official-heavy-aio

@@ -16,6 +16,7 @@ import {
   faEarthAmerica,
   faEdit,
   faEgg,
+  faEnvelope,
   faEquals,
   faExpand,
   faFile,
@@ -440,6 +441,7 @@ export const sshKeyProviderLabelMapping: Record<z.infer<typeof userSshKeyProvide
 
 export const permissionCategoryIconMapping: Record<string, IconDefinition> = {
   stats: faChartPie,
+  'email-templates': faEnvelope,
   account: faUser,
   activity: faBriefcase,
   allocations: faNetworkWired,

@@ -128,6 +128,7 @@ mod patch {
     use shared::{
         ApiError, GetState,
         models::{
+            UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
             server_subuser::ServerSubuser,
             user::{GetPermissionManager, GetUser},
@@ -209,24 +210,15 @@ mod patch {
                 .ok();
         }
 
-        if let Some(permissions) = data.permissions {
-            subuser.permissions = permissions;
-        }
-        if let Some(ignored_files) = data.ignored_files {
-            subuser.ignored_files = ignored_files;
-        }
-
-        sqlx::query!(
-            "UPDATE server_subusers
-            SET permissions = $1, ignored_files = $2
-            WHERE server_subusers.server_uuid = $3 AND server_subusers.user_uuid = $4",
-            &subuser.permissions as &[compact_str::CompactString],
-            &subuser.ignored_files as &[compact_str::CompactString],
-            server.uuid,
-            subuser.user.uuid,
-        )
-        .execute(state.database.write())
-        .await?;
+        subuser
+            .update(
+                &state,
+                shared::models::server_subuser::UpdateServerSubuserOptions {
+                    permissions: data.permissions,
+                    ignored_files: data.ignored_files,
+                },
+            )
+            .await?;
 
         activity_logger
             .log(

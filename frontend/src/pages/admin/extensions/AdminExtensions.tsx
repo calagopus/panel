@@ -1,6 +1,6 @@
 import { faFileText, faRefresh, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Title } from '@mantine/core';
+import { Group, Stack, Title } from '@mantine/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import getAdminExtensions from '@/api/admin/extensions/getAdminExtensions.ts';
@@ -11,8 +11,11 @@ import removeExtension from '@/api/admin/extensions/manage/removeExtension.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import Code from '@/elements/Code.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import Switch from '@/elements/input/Switch.tsx';
+import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { adminBackendExtensionSchema } from '@/lib/schemas/admin/backendExtension.ts';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
@@ -28,7 +31,9 @@ export default function AdminExtensions() {
     null,
   );
   const [extensionStatus, setExtensionStatus] = useState<ExtensionStatus | null>(null);
+  const [removalExtension, setRemovalExtension] = useState<z.infer<typeof adminBackendExtensionSchema> | null>(null);
   const [openModal, setOpenModal] = useState<'logs' | null>(null);
+  const [removeMigrations, setRemoveMigrations] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const statusIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -96,7 +101,7 @@ export default function AdminExtensions() {
   };
 
   const handleRemove = (backendExtension: z.infer<typeof adminBackendExtensionSchema>) => {
-    removeExtension(backendExtension.metadataToml.packageName)
+    removeExtension(backendExtension.metadataToml.packageName, removeMigrations)
       .then(() => {
         setExtensionStatus((prev) =>
           prev
@@ -207,6 +212,29 @@ export default function AdminExtensions() {
       }
     >
       <BuildLogsModal opened={openModal === 'logs'} onClose={() => setOpenModal(null)} />
+      <Modal opened={!!removalExtension} onClose={() => setRemovalExtension(null)} title='Remove extension'>
+        <p>
+          Are you sure you want to remove the extension <Code>{removalExtension?.metadataToml.packageName}</Code>? This
+          action cannot be undone.
+        </p>
+
+        <Stack mt='md'>
+          <Switch
+            label='Do you want to remove & rollback the database migrations of this extension?'
+            name='remove_migrations'
+            defaultChecked={removeMigrations}
+            onChange={(e) => setRemoveMigrations(e.target.checked)}
+          />
+        </Stack>
+
+        <ModalFooter>
+          <Button color='red'>Delete</Button>
+          <Button variant='default' onClick={() => setRemovalExtension(null)}>
+            Close
+          </Button>
+        </ModalFooter>
+      </Modal>
+
       <ExtensionInstallOverlay visible={isDragging} />
 
       {!backendExtensions ? (
@@ -218,14 +246,14 @@ export default function AdminExtensions() {
             <span>
               You don't seem to be using the heavy image required to install extensions, see{' '}
               <a
-                href='https://calagopus.com/docs/panel/installation/docker#change-the-docker-image-variant-optional'
+                href='https://calagopus.com/docs/panel/extensions/switching-to-the-heavy-image'
                 className='underline text-blue-400'
                 target='_blank'
                 rel='noopener noreferrer'
               >
                 here
-              </a>
-              . on how to switch to it.
+              </a>{' '}
+              on how to switch to it.
             </span>
           )}
         </span>
@@ -242,10 +270,12 @@ export default function AdminExtensions() {
                 key={extension.packageName}
                 extension={extension}
                 backendExtension={backendExtension}
-                isRemoved={extensionStatus?.removedExtensions.some(
-                  (e) => e.metadataToml.packageName === extension.packageName,
-                )}
-                onRemove={extensionStatus && backendExtension ? () => handleRemove(backendExtension) : undefined}
+                isRemoved={
+                  extensionStatus?.removedExtensions.some(
+                    (e) => e.metadataToml.packageName === extension.packageName,
+                  ) && false
+                }
+                onRemove={extensionStatus && backendExtension ? () => setRemovalExtension(backendExtension) : undefined}
               />
             ),
           )}
@@ -260,7 +290,7 @@ export default function AdminExtensions() {
                 isRemoved={extensionStatus?.removedExtensions.some(
                   (e) => e.metadataToml.packageName === backendExtension.metadataToml.packageName,
                 )}
-                onRemove={extensionStatus ? () => handleRemove(backendExtension) : undefined}
+                onRemove={extensionStatus ? () => setRemovalExtension(backendExtension) : undefined}
               />
             ))}
         </div>

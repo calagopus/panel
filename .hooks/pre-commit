@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+run_biome_fix() {
+  local dir="$1"
+  if git diff --cached --quiet -- "$dir/"; then
+    return
+  fi
+
+  echo "Running biome:fix-unsafe in $dir..."
+  (cd "$dir" && pnpm biome:fix-unsafe)
+
+  git diff --quiet -- "$dir/" || git add "$dir/"
+}
+
+build_translations() {
+  local dir="$1"
+  if git diff --cached --quiet -- "$dir/"; then
+    return
+  fi
+
+  echo "Running build:translations in $dir..."
+  (cd "$dir" && pnpm build:translations)
+
+  git diff --quiet -- "$dir/" || git add "$dir/"
+}
+
+run_biome_fix frontend
+run_biome_fix database
+build_translations frontend

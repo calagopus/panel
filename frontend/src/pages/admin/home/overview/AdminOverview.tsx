@@ -1,4 +1,22 @@
-import { faArchive, faArrowRightLong, faChartBar, faCrow, faStethoscope } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArchive,
+  faArrowRightLong,
+  faBan,
+  faChartBar,
+  faCheck,
+  faCircleQuestion,
+  faComputer,
+  faCrow,
+  faDatabase,
+  faEarth,
+  faEgg,
+  faMemory,
+  faMicrochip,
+  faScroll,
+  faServer,
+  faStethoscope,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Text, Title } from '@mantine/core';
 import { startTransition, useEffect, useState } from 'react';
@@ -75,14 +93,15 @@ export default function AdminOverview() {
               <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
                 <Card className='flex col-span-2'>
                   <Title order={3} c='white'>
-                    {systemOverview.cpu.brand}
+                    <FontAwesomeIcon icon={faMicrochip} /> {systemOverview.cpu.brand}
                   </Title>
                   CPU
                 </Card>
                 <Card className='flex col-span-2'>
                   <Title order={3} c='white'>
-                    {bytesToString(systemOverview.memory.usedBytes)} / {bytesToString(systemOverview.memory.totalBytes)}{' '}
-                    ({((systemOverview.memory.usedBytes / systemOverview.memory.totalBytes) * 100).toFixed(2)}%)
+                    <FontAwesomeIcon icon={faMemory} /> {bytesToString(systemOverview.memory.usedBytes)} /{' '}
+                    {bytesToString(systemOverview.memory.totalBytes)} (
+                    {((systemOverview.memory.usedBytes / systemOverview.memory.totalBytes) * 100).toFixed(2)}%)
                   </Title>
                   Memory Usage ({bytesToString(systemOverview.memory.usedBytesProcess)} used by Panel)
                 </Card>
@@ -91,25 +110,42 @@ export default function AdminOverview() {
               <div className='grid grid-cols-2 xl:grid-cols-4 gap-4 mt-4'>
                 <Card className='flex'>
                   <Title order={3} c='white'>
-                    {systemOverview.kernelVersion}
+                    <FontAwesomeIcon icon={faServer} /> {systemOverview.kernelVersion}
                   </Title>
                   Kernel Version ({systemOverview.architecture})
                 </Card>
                 <Card className='flex'>
                   <Title order={3} c='white'>
-                    {systemOverview.containerType}
+                    <FontAwesomeIcon
+                      icon={
+                        systemOverview.containerType === 'unknown'
+                          ? faCircleQuestion
+                          : systemOverview.containerType === 'none'
+                            ? faBan
+                            : faCheck
+                      }
+                    />{' '}
+                    {systemOverview.containerType === 'unknown'
+                      ? 'Unknown'
+                      : systemOverview.containerType === 'none'
+                        ? 'None detected'
+                        : systemOverview.containerType === 'official'
+                          ? 'Official'
+                          : systemOverview.containerType === 'official-aio'
+                            ? 'Official AIO'
+                            : 'Official Heavy'}
                   </Title>
                   Container Type
                 </Card>
                 <Card className='flex'>
                   <Title order={3} c='white'>
-                    PostgreSQL {systemOverview.database.version}
+                    <FontAwesomeIcon icon={faDatabase} /> PostgreSQL {systemOverview.database.version}
                   </Title>
                   Database Version ({bytesToString(systemOverview.database.sizeBytes)})
                 </Card>
                 <Card className='flex'>
                   <Title order={3} c='white'>
-                    {systemOverview.cache.version}
+                    <FontAwesomeIcon icon={faDatabase} /> {systemOverview.cache.version}
                   </Title>
                   Cache Version
                 </Card>
@@ -153,27 +189,51 @@ export default function AdminOverview() {
             <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
               <Card className='flex'>
                 <Title order={3} c='white'>
-                  {generalStats.users}
+                  <FontAwesomeIcon icon={faUsers} /> {generalStats.users}
                 </Title>
                 Users
               </Card>
               <Card className='flex'>
                 <Title order={3} c='white'>
-                  {generalStats.servers}
+                  <FontAwesomeIcon icon={faComputer} /> {generalStats.servers}
                 </Title>
                 Servers
               </Card>
               <Card className='flex'>
                 <Title order={3} c='white'>
-                  {generalStats.locations}
+                  <FontAwesomeIcon icon={faEarth} /> {generalStats.locations}
                 </Title>
                 Locations
               </Card>
               <Card className='flex'>
                 <Title order={3} c='white'>
-                  {generalStats.nodes}
+                  <FontAwesomeIcon icon={faServer} /> {generalStats.nodes}
                 </Title>
                 Nodes
+              </Card>
+              <Card className='flex'>
+                <Title order={3} c='white'>
+                  <FontAwesomeIcon icon={faEgg} /> {generalStats.nestEggs}
+                </Title>
+                Nest Eggs
+              </Card>
+              <Card className='flex'>
+                <Title order={3} c='white'>
+                  <FontAwesomeIcon icon={faDatabase} /> {generalStats.databaseHosts}
+                </Title>
+                Database Hosts
+              </Card>
+              <Card className='flex'>
+                <Title order={3} c='white'>
+                  <FontAwesomeIcon icon={faArchive} /> {generalStats.backupConfigurations}
+                </Title>
+                Backup Configurations
+              </Card>
+              <Card className='flex'>
+                <Title order={3} c='white'>
+                  <FontAwesomeIcon icon={faScroll} /> {generalStats.roles}
+                </Title>
+                Roles
               </Card>
             </div>
           )}

@@ -8,6 +8,7 @@ mod put {
     use shared::{
         ApiError, GetState,
         models::{
+            UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
             user::GetPermissionManager,
         },
@@ -19,7 +20,7 @@ mod put {
     pub struct Payload {
         #[garde(length(chars, min = 1, max = 8192))]
         #[schema(min_length = 1, max_length = 8192)]
-        command: String,
+        command: compact_str::CompactString,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -40,7 +41,7 @@ mod put {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        server: GetServer,
+        mut server: GetServer,
         activity_logger: GetServerActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
@@ -60,21 +61,21 @@ mod put {
                 .ok();
         }
 
-        sqlx::query!(
-            "UPDATE servers
-            SET startup = $1
-            WHERE servers.uuid = $2",
-            data.command,
-            server.uuid
-        )
-        .execute(state.database.write())
-        .await?;
+        server
+            .update(
+                &state,
+                shared::models::server::UpdateServerOptions {
+                    startup: Some(data.command),
+                    ..Default::default()
+                },
+            )
+            .await?;
 
         activity_logger
             .log(
                 "server:startup.command",
                 serde_json::json!({
-                    "command": data.command,
+                    "command": server.startup,
                 }),
             )
             .await;

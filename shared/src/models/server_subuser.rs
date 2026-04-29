@@ -299,7 +299,12 @@ impl CreatableModel for ServerSubuser {
                             .send(
                                 user.email.clone(),
                                 format!("{} - Account Created", settings.app.name).into(),
-                                crate::mail::MAIL_ACCOUNT_CREATED,
+                                state
+                                    .mail
+                                    .templates
+                                    .get_template("account_created")?
+                                    .get_content(state)
+                                    .await?,
                                 minijinja::context! {
                                     user => user,
                                     reset_link => format!(

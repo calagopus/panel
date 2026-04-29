@@ -65,6 +65,14 @@ export const settingsTable = pgTable('settings', {
   value: text().notNull(),
 });
 
+export const emailTemplatesTable = pgTable(
+  'email_templates',
+  {
+    identifier: varchar({ length: 255 }).primaryKey().notNull(),
+    content: text().notNull(),
+  },
+);
+
 export const usersTable = pgTable(
   'users',
   {

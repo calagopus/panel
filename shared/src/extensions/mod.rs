@@ -10,6 +10,7 @@ use utoipa_axum::router::OpenApiRouter;
 pub mod background_tasks;
 pub mod commands;
 pub mod distr;
+pub mod email_templates;
 pub mod manager;
 pub mod settings;
 pub mod shutdown_handlers;
@@ -260,6 +261,15 @@ pub trait Extension: Send + Sync {
         state: State,
         builder: ExtensionRouteBuilder,
     ) -> ExtensionRouteBuilder {
+        builder
+    }
+
+    /// Your extension email templates entrypoint, this runs as soon as the database is migrated and before the webserver starts
+    async fn initialize_email_templates(
+        &mut self,
+        state: State,
+        builder: email_templates::ExtensionEmailTemplateBuilder,
+    ) -> email_templates::ExtensionEmailTemplateBuilder {
         builder
     }
 

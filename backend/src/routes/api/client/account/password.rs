@@ -19,10 +19,10 @@ mod put {
     pub struct Payload {
         #[garde(length(chars, min = 8, max = 512))]
         #[schema(min_length = 8, max_length = 512)]
-        new_password: String,
+        new_password: compact_str::CompactString,
         #[garde(length(max = 512))]
         #[schema(max_length = 512)]
-        password: String,
+        password: compact_str::CompactString,
     }
 
     #[derive(ToSchema, Serialize)]

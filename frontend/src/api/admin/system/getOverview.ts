@@ -22,6 +22,7 @@ export interface AdminSystemOverview {
     totalHits: number;
     totalMisses: number;
     averageCallLatencyNs: number;
+    maxCallLatencyNs: number;
   };
   database: {
     version: string;

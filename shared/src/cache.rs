@@ -205,7 +205,14 @@ impl Cache {
                     "you are ratelimited, retry in {}s",
                     expiry - now
                 ))
-                .with_status(StatusCode::TOO_MANY_REQUESTS));
+                .with_status(StatusCode::TOO_MANY_REQUESTS)
+                .with_header("X-RateLimit-Limit", limit.to_string())
+                .with_header(
+                    "X-RateLimit-Remaining",
+                    limit.saturating_sub(limit_used).to_string(),
+                )
+                .with_header("X-RateLimit-Reset", expire_unix.to_string())
+                .with_header("Retry-After", (expiry - now).to_compact_string()));
             }
         } else {
             let mut current_count = 0;
@@ -228,7 +235,17 @@ impl Cache {
                     "you are ratelimited, retry in {}s",
                     expire_unix.saturating_sub(now as u64)
                 ))
-                .with_status(StatusCode::TOO_MANY_REQUESTS));
+                .with_status(StatusCode::TOO_MANY_REQUESTS)
+                .with_header("X-RateLimit-Limit", limit.to_string())
+                .with_header(
+                    "X-RateLimit-Remaining",
+                    limit.saturating_sub(limit_used).to_string(),
+                )
+                .with_header("X-RateLimit-Reset", expire_unix.to_string())
+                .with_header(
+                    "Retry-After",
+                    (expire_unix.saturating_sub(now as u64)).to_compact_string(),
+                ));
             }
         }
 

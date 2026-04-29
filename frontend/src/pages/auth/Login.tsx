@@ -196,13 +196,15 @@ export default function Login() {
   return (
     <AuthWrapper>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
-        {(timeOffset > 5000 || timeOffset < -5000) && (
+        {Math.abs(timeOffset) > 5000 && (
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
             color='yellow'
             title={t('common.alert.warning', {})}
           >
-            {t('common.alert.clockOffset', { offset: String(Math.round(timeOffset / 1000)) })}
+            {t('common.alert.clockOffset', {
+              offset: String(Math.round(timeOffset / 1000)),
+            })}
           </Alert>
         )}
         {error && (
@@ -272,7 +274,9 @@ export default function Login() {
                       {oAuthProviders.map((oAuthProvider) => (
                         <a key={oAuthProvider.uuid} href={`/api/auth/oauth/redirect/${oAuthProvider.uuid}`}>
                           <Button leftSection={<FontAwesomeIcon icon={faFingerprint} />} size='md' fullWidth>
-                            {t('pages.auth.button.loginWith', { name: oAuthProvider.name })}
+                            {t('pages.auth.button.loginWith', {
+                              name: oAuthProvider.name,
+                            })}
                           </Button>
                         </a>
                       ))}
@@ -293,7 +297,9 @@ export default function Login() {
             <div>
               <Title order={2}>{t('pages.auth.login.step.passkey.title', {})}</Title>
               <Text className='text-neutral-400!'>
-                {t('pages.auth.login.step.passkey.subtitle', { username: usernameForm.values.username })}
+                {t('pages.auth.login.step.passkey.subtitle', {
+                  username: usernameForm.values.username,
+                })}
               </Text>
             </div>
             <Card>
@@ -319,7 +325,9 @@ export default function Login() {
             <div>
               <Title order={2}>{t('pages.auth.login.step.password.title', {})}</Title>
               <Text className='text-neutral-400!'>
-                {t('pages.auth.login.step.password.subtitle', { username: usernameForm.values.username })}
+                {t('pages.auth.login.step.password.subtitle', {
+                  username: usernameForm.values.username,
+                })}
               </Text>
             </div>
             <Card>

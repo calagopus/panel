@@ -35,6 +35,7 @@ mod get {
 
     #[derive(ToSchema, Serialize)]
     struct Response<'a> {
+        time: chrono::DateTime<chrono::Utc>,
         oobe_step: Option<&'a str>,
 
         #[schema(inline)]
@@ -52,6 +53,7 @@ mod get {
         let settings = state.settings.get().await?;
 
         ApiResponse::new_serialized(Response {
+            time: chrono::Utc::now(),
             oobe_step: settings.oobe_step.as_deref(),
             captcha_provider: settings.captcha_provider.to_public_provider(),
             app: ResponseApp {

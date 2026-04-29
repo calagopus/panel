@@ -8,6 +8,7 @@ mod put {
     use shared::{
         ApiError, GetState,
         models::{
+            UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
             user::GetPermissionManager,
         },
@@ -19,7 +20,7 @@ mod put {
     pub struct Payload {
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
-        image: String,
+        image: compact_str::CompactString,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -40,7 +41,7 @@ mod put {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        server: GetServer,
+        mut server: GetServer,
         activity_logger: GetServerActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
@@ -77,21 +78,21 @@ mod put {
                 .ok();
         }
 
-        sqlx::query!(
-            "UPDATE servers
-            SET image = $1
-            WHERE servers.uuid = $2",
-            data.image,
-            server.uuid
-        )
-        .execute(state.database.write())
-        .await?;
+        server
+            .update(
+                &state,
+                shared::models::server::UpdateServerOptions {
+                    image: Some(data.image),
+                    ..Default::default()
+                },
+            )
+            .await?;
 
         activity_logger
             .log(
                 "server:startup.docker-image",
                 serde_json::json!({
-                    "image": data.image,
+                    "image": server.image,
                 }),
             )
             .await;

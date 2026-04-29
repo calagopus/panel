@@ -2,10 +2,6 @@ use crate::settings::SettingsReadGuard;
 use lettre::AsyncTransport;
 use std::sync::Arc;
 
-pub const MAIL_CONNECTION_TEST: &str = include_str!("../mails/connection_test.html");
-pub const MAIL_PASSWORD_RESET: &str = include_str!("../mails/password_reset.html");
-pub const MAIL_ACCOUNT_CREATED: &str = include_str!("../mails/account_created.html");
-
 #[derive(Debug)]
 enum Transport {
     None,
@@ -28,11 +24,17 @@ enum Transport {
 
 pub struct Mail {
     settings: Arc<super::settings::Settings>,
+    pub templates: Arc<super::extensions::email_templates::EmailTemplateManager>,
 }
 
 impl Mail {
     pub fn new(settings: Arc<super::settings::Settings>) -> Self {
-        Self { settings }
+        Self {
+            settings,
+            templates: Arc::new(
+                super::extensions::email_templates::EmailTemplateManager::default(),
+            ),
+        }
     }
 
     async fn get_transport(&self) -> Result<(SettingsReadGuard<'_>, Transport), anyhow::Error> {

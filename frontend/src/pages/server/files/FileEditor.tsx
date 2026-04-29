@@ -203,7 +203,7 @@ function FileEditorComponent() {
       title={title}
       registry={window.extensionContext.extensionRegistry.pages.server.files.editorContainer}
     >
-      <div className='flex justify-between items-center  lg:pt-6 px-4 lg:px-6 lg:pb-0'>
+      <div className='flex justify-between items-center lg:pt-6 px-4 lg:px-6 lg:pb-0'>
         <Group>
           <Title>{title}</Title>
 

@@ -6,6 +6,7 @@ mod put {
     use shared::{
         ApiError, GetState,
         models::{
+            UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
             user::GetPermissionManager,
         },
@@ -36,21 +37,21 @@ mod put {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        server: GetServer,
+        mut server: GetServer,
         activity_logger: GetServerActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         permissions.has_server_permission("settings.timezone")?;
 
-        sqlx::query!(
-            "UPDATE servers
-            SET timezone = $1
-            WHERE servers.uuid = $2",
-            data.timezone.map(|tz| tz.name()),
-            server.uuid
-        )
-        .execute(state.database.write())
-        .await?;
+        server
+            .update(
+                &state,
+                shared::models::server::UpdateServerOptions {
+                    timezone: Some(data.timezone),
+                    ..Default::default()
+                },
+            )
+            .await?;
 
         activity_logger
             .log(

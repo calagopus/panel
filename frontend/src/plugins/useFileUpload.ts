@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 import { ChangeEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -12,6 +12,7 @@ interface FileUploadProgress {
   uploaded: number;
   batchId: string;
   status: UploadStatus;
+  retryAttempt: number;
 }
 
 export interface AggregatedUploadProgress {
@@ -27,6 +28,7 @@ export interface FileUploader {
   uploadFiles: (files: File[]) => Promise<void>;
   cancelFileUpload: (fileKey: string) => void;
   cancelFolderUpload: (folderName: string) => void;
+  cancelAllUploads: () => void;
   handleFileSelect: (event: ChangeEvent<HTMLInputElement>, inputRef: RefObject<HTMLInputElement | null>) => void;
   handleFolderSelect: (event: ChangeEvent<HTMLInputElement>, inputRef: RefObject<HTMLInputElement | null>) => void;
 }
@@ -47,6 +49,40 @@ export type SplitUploadFunction = (
 
 const CHUNK_TARGET_BYTES = 95 * 1024 * 1024; // 95 MiB
 const FOLDER_CONCURRENCY = 2;
+const FILE_CONCURRENCY = 10;
+const MAX_RETRIES = 5;
+const BASE_RETRY_MS = 1_000;
+const MAX_RETRY_MS = 30_000;
+
+function is429Error(error: AxiosError): boolean {
+  return error.response?.status === 429;
+}
+
+function get429RetryDelay(error: AxiosError, attempt: number): number {
+  const retryAfter = error.response?.headers['retry-after'];
+  if (retryAfter) {
+    const seconds = parseFloat(String(retryAfter));
+    if (!isNaN(seconds)) return seconds * 1000;
+    const date = new Date(String(retryAfter));
+    if (!isNaN(date.getTime())) return Math.max(BASE_RETRY_MS, date.getTime() - Date.now());
+  }
+  return Math.min(BASE_RETRY_MS * 2 ** attempt, MAX_RETRY_MS);
+}
+
+function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) return Promise.resolve();
+  return new Promise<void>((resolve) => {
+    const id = setTimeout(resolve, ms);
+    signal.addEventListener(
+      'abort',
+      () => {
+        clearTimeout(id);
+        resolve();
+      },
+      { once: true },
+    );
+  });
+}
 
 class Semaphore {
   private queue: Array<() => void> = [];
@@ -228,7 +264,32 @@ export function useFileUpload(
           },
         };
 
-        await uploadFunction(formData, config);
+        for (let attempt = 0; ; attempt++) {
+          try {
+            lastLoaded = 0;
+            await uploadFunction(formData, config);
+            break;
+          } catch (err) {
+            if (
+              !(err instanceof AxiosError) ||
+              !is429Error(err) ||
+              attempt >= MAX_RETRIES ||
+              controller.signal.aborted
+            ) {
+              throw err;
+            }
+            setUploadingFiles((prev) => {
+              const next = new Map(prev);
+              for (const idx of indices) {
+                const key = `file-${idx}`;
+                const entry = next.get(key);
+                if (entry) next.set(key, { ...entry, retryAttempt: attempt + 1 });
+              }
+              return next;
+            });
+            await sleep(get429RetryDelay(err, attempt), controller.signal);
+          }
+        }
 
         setUploadingFiles((prev) => {
           const next = new Map(prev);
@@ -241,12 +302,11 @@ export function useFileUpload(
           }
           return next;
         });
-      } catch (error: unknown) {
+      } catch (error) {
         const isCancelled =
-          error != null &&
-          typeof error === 'object' &&
-          'code' in error &&
-          (error.code === 'CanceledError' || error.code === 'ERR_CANCELED');
+          error instanceof AxiosError
+            ? error.code === 'ERR_CANCELED' || error.code === 'CanceledError'
+            : error instanceof Error && (error as Error & { code?: string }).code === 'ERR_CANCELED';
 
         if (!isCancelled) {
           console.error('Upload error:', error);
@@ -261,8 +321,7 @@ export function useFileUpload(
             }
             return next;
           });
-          const message =
-            error != null && typeof error === 'object' && 'message' in error ? String(error.message) : 'Unknown error';
+          const message = error instanceof Error ? error.message : 'Unknown error';
           addToast(`Upload failed: ${message}`, 'error');
         }
       } finally {
@@ -349,10 +408,34 @@ export function useFileUpload(
             },
           };
 
-          const result =
-            continuationToken === undefined || prevUrl === undefined
-              ? await uploadFunction(formData, config)
-              : await splitUploadFunction!(formData, config, continuationToken, prevUrl);
+          let result!: UploadResult;
+          for (let attempt = 0; ; attempt++) {
+            try {
+              lastLoaded = 0;
+              result =
+                continuationToken === undefined || prevUrl === undefined
+                  ? await uploadFunction(formData, config)
+                  : await splitUploadFunction!(formData, config, continuationToken, prevUrl);
+              break;
+            } catch (err) {
+              if (
+                !(err instanceof AxiosError) ||
+                !is429Error(err) ||
+                attempt >= MAX_RETRIES ||
+                controller.signal.aborted
+              ) {
+                throw err;
+              }
+              setUploadingFiles((prev) => {
+                const entry = prev.get(key);
+                if (!entry) return prev;
+                const next = new Map(prev);
+                next.set(key, { ...entry, retryAttempt: attempt + 1 });
+                return next;
+              });
+              await sleep(get429RetryDelay(err, attempt), controller.signal);
+            }
+          }
 
           priorUploaded += sliceSize;
           offset = sliceEnd;
@@ -374,12 +457,11 @@ export function useFileUpload(
           next.set(key, { ...entry, progress: 100, uploaded: entry.size, status: 'completed' });
           return next;
         });
-      } catch (error: unknown) {
+      } catch (error) {
         const isCancelled =
-          error != null &&
-          typeof error === 'object' &&
-          'code' in error &&
-          (error.code === 'CanceledError' || error.code === 'ERR_CANCELED');
+          error instanceof AxiosError
+            ? error.code === 'ERR_CANCELED' || error.code === 'CanceledError'
+            : error instanceof Error && (error as Error & { code?: string }).code === 'ERR_CANCELED';
 
         if (!isCancelled) {
           console.error('Upload error:', error);
@@ -390,8 +472,7 @@ export function useFileUpload(
             next.set(key, { ...entry, status: 'error' });
             return next;
           });
-          const message =
-            error != null && typeof error === 'object' && 'message' in error ? String(error.message) : 'Unknown error';
+          const message = error instanceof Error ? error.message : 'Unknown error';
           addToast(`Upload failed: ${message}`, 'error');
         }
       } finally {
@@ -438,6 +519,8 @@ export function useFileUpload(
         folderFileCounts.current.set(folder, existingCount + count);
       });
 
+      const individualBatchId = `individual-batch-${Date.now()}`;
+
       setUploadingFiles((prev) => {
         const next = new Map(prev);
 
@@ -448,8 +531,9 @@ export function useFileUpload(
             progress: 0,
             size: file.size,
             uploaded: 0,
-            batchId: key,
+            batchId: individualBatchId,
             status: 'pending',
+            retryAttempt: 0,
           });
         }
 
@@ -464,6 +548,7 @@ export function useFileUpload(
             uploaded: 0,
             batchId,
             status: 'pending',
+            retryAttempt: 0,
           });
         }
 
@@ -481,15 +566,25 @@ export function useFileUpload(
 
       const promises: Promise<void>[] = [];
 
+      const fileSemaphore = new Semaphore(FILE_CONCURRENCY);
       for (const { file, index } of individualFiles) {
         const key = `file-${index}`;
         const controller = controllers.current.get(key)!;
 
-        if (splittingEnabled && file.size > CHUNK_TARGET_BYTES) {
-          promises.push(uploadSplitFile(file, index, key, controller));
-        } else {
-          promises.push(uploadRequest([file], [index], key, controller));
-        }
+        promises.push(
+          fileSemaphore.acquire().then(async () => {
+            try {
+              if (controller.signal.aborted) return;
+              if (splittingEnabled && file.size > CHUNK_TARGET_BYTES) {
+                await uploadSplitFile(file, index, key, controller);
+              } else {
+                await uploadRequest([file], [index], key, controller);
+              }
+            } finally {
+              fileSemaphore.release();
+            }
+          }),
+        );
       }
 
       const folderGroups = new Map<string, Array<{ file: File; index: number }>>();
@@ -529,6 +624,7 @@ export function useFileUpload(
           promises.push(
             semaphore.acquire().then(async () => {
               try {
+                if (controller.signal.aborted) return;
                 await uploadRequest(chunk, chunkIndices, batchId, controller);
               } finally {
                 semaphore.release();
@@ -610,6 +706,15 @@ export function useFileUpload(
     [addToast],
   );
 
+  const cancelAllUploads = useCallback(() => {
+    controllers.current.forEach((controller) => controller.abort());
+    controllers.current.clear();
+    folderFileCounts.current.clear();
+    setUploadingFiles(new Map());
+    onUploadCompleteRef.current();
+    addToast(t('elements.fileUpload.toast.cancelledAll', {}), 'success');
+  }, []);
+
   const aggregatedUploadProgress = useMemo(() => {
     const map = new Map<string, AggregatedUploadProgress>();
 
@@ -674,6 +779,7 @@ export function useFileUpload(
     uploadFiles,
     cancelFileUpload,
     cancelFolderUpload,
+    cancelAllUploads,
     handleFileSelect,
     handleFolderSelect,
   };

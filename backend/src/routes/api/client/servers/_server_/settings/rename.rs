@@ -8,6 +8,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
+            UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
             user::GetPermissionManager,
         },
@@ -20,9 +21,10 @@ mod post {
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
         name: Option<compact_str::CompactString>,
-        #[garde(length(max = 1024))]
-        #[schema(max_length = 1024)]
-        description: Option<compact_str::CompactString>,
+        #[garde(length(chars, min = 1, max = 1024))]
+        #[schema(min_length = 1, max_length = 1024)]
+        #[serde(with = "serde_with::rust::double_option")]
+        description: Option<Option<compact_str::CompactString>>,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -54,27 +56,16 @@ mod post {
 
         permissions.has_server_permission("settings.rename")?;
 
-        if let Some(name) = data.name {
-            server.name = name;
-        }
-        if let Some(description) = data.description {
-            if description.is_empty() {
-                server.description = None;
-            } else {
-                server.description = Some(description);
-            }
-        }
-
-        sqlx::query!(
-            "UPDATE servers
-            SET name = $1, description = $2
-            WHERE servers.uuid = $3",
-            &server.name,
-            server.description.as_deref(),
-            server.uuid
-        )
-        .execute(state.database.write())
-        .await?;
+        server
+            .update(
+                &state,
+                shared::models::server::UpdateServerOptions {
+                    name: data.name,
+                    description: data.description,
+                    ..Default::default()
+                },
+            )
+            .await?;
 
         activity_logger
             .log(

@@ -13,7 +13,7 @@ pub struct RemoveArgs {
     package_name: String,
     #[arg(
         long = "remove-migrations",
-        help = "whether to remove the database migrations of this extension (usually not recommended)",
+        help = "whether to remove the database migrations and run their down.sql code of this extension (usually not recommended)",
         default_value = "false"
     )]
     remove_migrations: bool,
@@ -27,7 +27,7 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
     }
 
     fn get_executor(self) -> Box<shared::extensions::commands::ExecutorFunc> {
-        Box::new(|_env, arg_matches| {
+        Box::new(|env, arg_matches| {
             Box::pin(async move {
                 let args = RemoveArgs::from_arg_matches(&arg_matches)?;
 
@@ -87,6 +87,8 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                     return Ok(1);
                 }
 
+                let frontend_translations_path = Path::new("frontend/public/translations/en")
+                    .join(format!("{}.json", &args.package_name));
                 let migrations_path = Path::new("database/extension-migrations").join(
                     MetadataToml::convert_package_name_to_identifier(&args.package_name),
                 );
@@ -162,6 +164,12 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                 }
 
                 tokio::fs::remove_dir_all(frontend_path).await?;
+                if tokio::fs::metadata(&frontend_translations_path)
+                    .await
+                    .is_ok()
+                {
+                    tokio::fs::remove_file(frontend_translations_path).await?;
+                }
                 tokio::fs::remove_dir_all(backend_path).await?;
                 tokio::fs::copy(
                     Path::new("backend-extensions/internal-list/Cargo.template.toml"),
@@ -202,12 +210,55 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                 }
 
                 if args.remove_migrations && tokio::fs::metadata(&migrations_path).await.is_ok() {
+                    let state = match shared::AppState::new_cli(env).await {
+                        Ok(state) => state,
+                        Err(err) => {
+                            eprintln!(
+                                "{} {}: {}",
+                                "failed to initialize application state".red(),
+                                "(required to remove migrations)".bright_red(),
+                                err.to_string().red()
+                            );
+                            eprintln!(
+                                "{} {}",
+                                "if your sole purpose is to remove the extension migrations, you can safely delete the directory".red(),
+                                migrations_path.to_string_lossy().bright_red()
+                            );
+                            println!(
+                                "besides this, {} has been removed successfully.",
+                                args.package_name.cyan()
+                            );
+                            return Ok(1);
+                        }
+                    };
+
+                    let extension_migrations = database_migrator::collect_extension_migrations(
+                        &migrations_path,
+                        &args.package_name,
+                    )
+                    .await?;
+
+                    for migration in extension_migrations.iter().rev() {
+                        println!("running down migration: {}", migration.name.bright_blue());
+                        if let Err(err) = database_migrator::rollback_extension_migration(
+                            state.database.write(),
+                            migration,
+                        )
+                        .await
+                        {
+                            eprintln!(
+                                "{} {}: {}",
+                                "failed to run down migration".red(),
+                                migration.name.bright_red(),
+                                err.to_string().red()
+                            );
+                            return Ok(1);
+                        }
+                    }
+
                     tokio::fs::remove_dir_all(migrations_path).await?;
 
-                    println!("removed database migrations for this extension");
-                    println!(
-                        "this did NOT run any down migrations, it only removed the migration files from the filesystem, use with caution as this can lead to an inconsistent state if the migrations have already been applied to the database"
-                    );
+                    println!("removed and rolled back database migrations for this extension");
                 }
 
                 println!("sucessfully removed {}", args.package_name.cyan());

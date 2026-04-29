@@ -129,12 +129,35 @@ mod post {
                 );
             }
 
+            let template = match state.mail.templates.get_template("password_reset") {
+                Ok(template) => template,
+                Err(err) => {
+                    tracing::warn!(
+                        user = %user.uuid,
+                        "failed to get email template for password reset email: {:#?}",
+                        err
+                    );
+                    return;
+                }
+            };
+            let content = match template.get_content(&state).await {
+                Ok(content) => content,
+                Err(err) => {
+                    tracing::warn!(
+                        user = %user.uuid,
+                        "failed to get email content for password reset email: {:#?}",
+                        err
+                    );
+                    return;
+                }
+            };
+
             state
                 .mail
                 .send(
                     user.email.clone(),
                     format!("{} - Password Reset", settings.app.name).into(),
-                    shared::mail::MAIL_PASSWORD_RESET,
+                    content,
                     minijinja::context! {
                         user => user,
                         reset_link => format!(

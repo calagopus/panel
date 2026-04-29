@@ -28,6 +28,8 @@ impl ExtensionManager {
         super::shutdown_handlers::ShutdownHandlerBuilder,
     ) {
         let mut route_builder = ExtensionRouteBuilder::new(state.clone());
+        let mut email_templates_builder =
+            super::email_templates::ExtensionEmailTemplateBuilder::default();
         let mut background_tasks_builder =
             super::background_tasks::BackgroundTaskBuilder::new(state.clone());
         let mut shutdown_handlers_builder =
@@ -61,6 +63,9 @@ impl ExtensionManager {
             ext.initialize(state.clone()).await;
 
             route_builder = ext.initialize_router(state.clone(), route_builder).await;
+            email_templates_builder = ext
+                .initialize_email_templates(state.clone(), email_templates_builder)
+                .await;
             background_tasks_builder = ext
                 .initialize_background_tasks(state.clone(), background_tasks_builder)
                 .await;
@@ -71,6 +76,8 @@ impl ExtensionManager {
                 .initialize_permissions(state.clone(), permissions_builder)
                 .await;
         }
+
+        *state.mail.templates.templates.write().unwrap() = email_templates_builder.finish();
 
         crate::permissions::USER_PERMISSIONS
             .write()

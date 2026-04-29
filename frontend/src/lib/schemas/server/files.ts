@@ -12,7 +12,7 @@ export const serverFilesDirectoryCreateSchema = z.object({
 });
 
 export const serverFilesCopySchema = z.object({
-  name: z.string().min(1).max(255),
+  name: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
 });
 
 export const serverFilesCopyRemoteSchema = z.object({

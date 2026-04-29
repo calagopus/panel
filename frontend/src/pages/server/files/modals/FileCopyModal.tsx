@@ -1,7 +1,7 @@
 import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
@@ -38,14 +38,6 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
     },
     onClose,
   );
-
-  useEffect(() => {
-    if (file) {
-      form.setValues({
-        name: file.name,
-      });
-    }
-  }, [file]);
 
   const generateNewName = () => {
     if (!file) return '';

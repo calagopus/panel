@@ -1,0 +1,62 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                (SELECT COUNT(*) FROM users) as users,\n                (SELECT COUNT(*) FROM servers) as servers,\n                (SELECT COUNT(*) FROM locations) as locations,\n                (SELECT COUNT(*) FROM nodes) as nodes,\n                (SELECT COUNT(*) FROM nest_eggs) as nest_eggs,\n                (SELECT COUNT(*) FROM database_hosts) as database_hosts,\n                (SELECT COUNT(*) FROM backup_configurations) as backup_configurations,\n                (SELECT COUNT(*) FROM roles) as roles",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "users",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "servers",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "locations",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "nodes",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "nest_eggs",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "database_hosts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "backup_configurations",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "roles",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "edf3dc075d7db4430bf1354b69a85782168983af1d3bc9b3018c1f9b7c543296"
+}

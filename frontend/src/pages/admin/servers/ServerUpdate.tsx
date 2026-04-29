@@ -460,7 +460,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
 
                 <Select
-                  withAsterisk
                   label='Timezone'
                   placeholder='System'
                   data={timezones}

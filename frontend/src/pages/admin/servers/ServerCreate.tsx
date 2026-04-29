@@ -480,7 +480,6 @@ export default function ServerCreate() {
                   {...form.getInputProps('image')}
                 />
                 <Select
-                  withAsterisk
                   label='Timezone'
                   placeholder='Europe/Amsterdam'
                   data={[

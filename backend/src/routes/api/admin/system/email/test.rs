@@ -61,7 +61,12 @@ mod post {
             .send_foreground(
                 data.email.clone(),
                 subject.into(),
-                shared::mail::MAIL_CONNECTION_TEST,
+                state
+                    .mail
+                    .templates
+                    .get_template("connection_test")?
+                    .get_content(&state)
+                    .await?,
                 minijinja::context! {},
             )
             .await

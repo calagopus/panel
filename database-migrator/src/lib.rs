@@ -459,6 +459,18 @@ pub async fn mark_extension_migration_as_applied(
     }
 }
 
+pub async fn mark_extension_migration_as_rolled_back(
+    pool: impl Executor<'_, Database = sqlx::Postgres>,
+    migration: &ExtensionMigration,
+) -> Result<(), sqlx::Error> {
+    sqlx::query("DELETE FROM migrations WHERE id = $1")
+        .bind(migration.id)
+        .execute(pool)
+        .await?;
+
+    Ok(())
+}
+
 /// Runs a single migration within a transaction.
 /// This function ensures that the migration is applied atomically,
 /// meaning that either all changes are applied, or none are.
@@ -498,6 +510,30 @@ pub async fn run_extension_migration(
     drop(query_stream);
 
     mark_extension_migration_as_applied(&mut *transaction, migration).await?;
+
+    transaction.commit().await?;
+
+    Ok(())
+}
+
+/// Rolls back a single extension migration within a transaction by running its down SQL.
+/// This function ensures that the rollback is applied atomically,
+/// meaning that either all changes are applied, or none are.
+///
+/// If everything goes well, the transaction is committed.
+pub async fn rollback_extension_migration(
+    pool: &sqlx::PgPool,
+    migration: &ExtensionMigration,
+) -> Result<(), sqlx::Error> {
+    let mut transaction = pool.begin().await?;
+
+    let mut query_stream = (&mut transaction).execute_many(&*migration.sql_down);
+    while let Some(result) = query_stream.next().await {
+        result?;
+    }
+    drop(query_stream);
+
+    mark_extension_migration_as_rolled_back(&mut *transaction, migration).await?;
 
     transaction.commit().await?;
 

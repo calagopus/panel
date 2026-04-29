@@ -92,6 +92,26 @@ export const adminSettingsEmailTestSchema = z.object({
   email: z.email().max(255),
 });
 
+export const adminSettingsEmailTemplateListSchema = z.array(
+  z.object({
+    identifier: z.string(),
+    availableVariables: z.array(z.string()),
+  }),
+);
+
+export const adminSettingsEmailTemplateSchema = z.object({
+  availableVariables: z.array(z.string()),
+  defaultContent: z.string(),
+  content: z.string().nullable(),
+});
+
+export const adminSettingsEmailTemplateUpdateSchema = z.lazy(() =>
+  adminSettingsEmailTemplateSchema.omit({
+    availableVariables: true,
+    defaultContent: true,
+  }),
+);
+
 export const adminSettingsServerSchema = z.object({
   maxFileManagerViewSize: z.number().min(0),
   maxFileManagerContentSearchSize: z.number().min(0),

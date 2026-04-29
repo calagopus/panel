@@ -5,6 +5,10 @@ export interface GeneralStats {
   servers: number;
   locations: number;
   nodes: number;
+  nestEggs: number;
+  databaseHosts: number;
+  backupConfigurations: number;
+  roles: number;
 }
 
 export default async (): Promise<GeneralStats> => {

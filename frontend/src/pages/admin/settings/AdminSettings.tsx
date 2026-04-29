@@ -1,6 +1,8 @@
 import {
   faAt,
+  faBan,
   faDatabase,
+  faEnvelopesBulk,
   faLayerGroup,
   faRobot,
   faServer,
@@ -13,6 +15,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import EmailTemplatesContainer from '@/pages/admin/settings/EmailTemplatesContainer.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import ActivityContainer from './ActivityContainer.tsx';
@@ -65,6 +68,12 @@ export default function AdminSettings() {
             element: <EmailContainer />,
           },
           {
+            name: 'Mail Templates',
+            icon: faEnvelopesBulk,
+            path: '/mail-templates',
+            element: <EmailTemplatesContainer />,
+          },
+          {
             name: 'Captcha',
             icon: faRobot,
             path: '/captcha',
@@ -90,7 +99,7 @@ export default function AdminSettings() {
           },
           {
             name: 'Ratelimits',
-            icon: faToolbox,
+            icon: faBan,
             path: '/ratelimits',
             element: <RatelimitsContainer />,
           },

@@ -16,6 +16,10 @@ mod get {
         servers: i64,
         locations: i64,
         nodes: i64,
+        nest_eggs: i64,
+        database_hosts: i64,
+        backup_configurations: i64,
+        roles: i64,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -36,7 +40,11 @@ mod get {
                 (SELECT COUNT(*) FROM users) as users,
                 (SELECT COUNT(*) FROM servers) as servers,
                 (SELECT COUNT(*) FROM locations) as locations,
-                (SELECT COUNT(*) FROM nodes) as nodes"
+                (SELECT COUNT(*) FROM nodes) as nodes,
+                (SELECT COUNT(*) FROM nest_eggs) as nest_eggs,
+                (SELECT COUNT(*) FROM database_hosts) as database_hosts,
+                (SELECT COUNT(*) FROM backup_configurations) as backup_configurations,
+                (SELECT COUNT(*) FROM roles) as roles"
         )
         .fetch_one(state.database.read())
         .await?;

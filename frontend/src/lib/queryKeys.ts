@@ -108,6 +108,11 @@ const admin = {
   health: {
     nodes: () => ['admin', 'health', 'nodes'] as const,
   },
+
+  emailTemplates: {
+    all: () => ['admin', 'emailTemplates'] as const,
+    detail: (identifier: string) => ['admin', 'emailTemplates', { identifier }] as const,
+  },
 };
 
 const server = (serverUuid: string) => ({

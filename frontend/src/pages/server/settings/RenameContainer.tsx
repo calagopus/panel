@@ -34,7 +34,7 @@ export default function RenameContainer() {
 
   const doUpdate = () => {
     setLoading(true);
-    renameServer(server.uuid, form.values)
+    renameServer(server.uuid, serverSettingsRenameSchema.parse(form.values))
       .then(() => {
         addToast(t('pages.server.settings.rename.toast.renamed', {}), 'success');
         updateServer(form.values);

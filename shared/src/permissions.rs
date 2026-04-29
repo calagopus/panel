@@ -222,6 +222,16 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                 },
             ),
             (
+                "email-templates",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage email templates for the panel.",
+                    permissions: IndexMap::from([
+                        ("read", "Allows viewing email templates."),
+                        ("update", "Allows modifying email templates."),
+                    ]),
+                },
+            ),
+            (
                 "extensions",
                 PermissionGroup {
                     description: "Permissions that control the ability to manage extensions for the panel.",
@@ -229,7 +239,7 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("read", "Allows viewing panel extensions."),
                         (
                             "manage",
-                            "Allows installing, updating, and removing panel extensions.",
+                            "Allows installing, updating, and removing panel extensions, usually also used to manage extension settings.",
                         ),
                     ]),
                 },

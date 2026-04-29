@@ -44,11 +44,12 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
 
     const loadData = () => {
       Promise.all([getSettings(), getLanguages()])
-        .then(([{ settings, serverTime }, languages]) => {
+        .then(([settings, languages]) => {
           if (cancelled) return;
+
           setSettings(settings);
           setLanguages(languages);
-          setTimeOffset(Date.now() - serverTime.getTime());
+          setTimeOffset(Date.now() - new Date(settings.time).getTime());
         })
         .catch((err) => {
           if (cancelled) return;

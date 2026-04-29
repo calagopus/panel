@@ -1,7 +1,8 @@
 import { Popover, Text, UnstyledButton } from '@mantine/core';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelOperation from '@/api/server/files/cancelOperation.ts';
+import Button from '@/elements/Button.tsx';
 import CloseButton from '@/elements/CloseButton.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Progress from '@/elements/Progress.tsx';
@@ -19,9 +20,25 @@ function FileOperationsProgress() {
   const { addToast } = useToast();
   const { server, fileOperations, removeFileOperation } = useServerStore();
   const { fileUploader } = useFileManager();
-  const { uploadingFiles, cancelFileUpload, cancelFolderUpload, aggregatedUploadProgress } = fileUploader;
+  const { uploadingFiles, cancelFileUpload, cancelFolderUpload, cancelAllUploads, aggregatedUploadProgress } =
+    fileUploader;
 
   const blocker = useBlocker(uploadingFiles.size > 0, true);
+
+  const isRateLimited = useMemo(() => {
+    for (const file of uploadingFiles.values()) {
+      if (file.retryAttempt > 0 && file.status === 'uploading') return true;
+    }
+    return false;
+  }, [uploadingFiles]);
+
+  const cancelAllOperations = useCallback(() => {
+    fileOperations.forEach((_, uuid) => {
+      removeFileOperation(uuid);
+      cancelOperation(server.uuid, uuid).catch(console.error);
+    });
+    addToast(t('pages.server.files.toast.allOperationsCancelled', {}), 'success');
+  }, [fileOperations, server.uuid, removeFileOperation, addToast, t]);
 
   const doCancelOperation = (uuid: string) => {
     removeFileOperation(uuid);
@@ -81,13 +98,18 @@ function FileOperationsProgress() {
               sections={[
                 {
                   value: averageOperationProgress,
-                  color: uploadingFiles.size > 0 ? 'green' : 'blue',
+                  color: isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue',
                 },
               ]}
               roundCaps
               thickness={4}
               label={
-                <Text c={uploadingFiles.size > 0 ? 'green' : 'blue'} fw={700} ta='center' size='xs'>
+                <Text
+                  c={isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue'}
+                  fw={700}
+                  ta='center'
+                  size='xs'
+                >
                   {averageOperationProgress.toFixed(0)}%
                 </Text>
               }
@@ -100,6 +122,25 @@ function FileOperationsProgress() {
               <Component key={`files-operationProgress-prepended-${i}`} />
             ),
           )}
+
+          {isRateLimited && (
+            <Text size='xs' c='orange' mb='sm'>
+              {t('pages.server.files.operations.rateLimited', {})}
+            </Text>
+          )}
+
+          <div className='flex gap-2 mb-3'>
+            {uploadingFiles.size > 0 && (
+              <Button size='xs' variant='subtle' color='red' onClick={cancelAllUploads}>
+                {t('pages.server.files.operations.cancelAllUploads', {})}
+              </Button>
+            )}
+            {fileOperations.size > 0 && (
+              <Button size='xs' variant='subtle' color='red' onClick={cancelAllOperations}>
+                {t('pages.server.files.operations.cancelAllOperations', {})}
+              </Button>
+            )}
+          </div>
 
           {Array.from(aggregatedUploadProgress).map(([folderName, info]) => {
             const progress = info.totalSize > 0 ? (info.uploadedSize / info.totalSize) * 100 : 0;
@@ -116,7 +157,7 @@ function FileOperationsProgress() {
                     label={`${bytesToString(info.uploadedSize)} / ${bytesToString(info.totalSize)}`}
                     innerClassName='w-full'
                   >
-                    <Progress value={progress} />
+                    <Progress value={progress} color={isRateLimited ? 'orange' : undefined} />
                   </Tooltip>
                 </div>
                 <CloseButton className='ml-3' onClick={() => cancelFolderUpload(folderName)} />
@@ -142,7 +183,7 @@ function FileOperationsProgress() {
                     label={`${bytesToString(file.uploaded)} / ${bytesToString(file.size)}`}
                     innerClassName='w-full'
                   >
-                    <Progress value={file.progress} />
+                    <Progress value={file.progress} color={isRateLimited ? 'orange' : undefined} />
                   </Tooltip>
                 </div>
                 <CloseButton className='ml-3' onClick={() => cancelFileUpload(key)} />
