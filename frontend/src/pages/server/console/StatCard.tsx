@@ -30,7 +30,7 @@ export default function StatCard({
       <ThemeIcon size='xl' radius='md'>
         <FontAwesomeIcon size='xl' icon={icon} />
       </ThemeIcon>
-      <div className='flex flex-col ml-4 w-full'>
+      <div className='flex flex-col ml-4 w-full min-w-0'>
         <div className='w-full flex justify-between'>
           <span className='text-sm text-left text-gray-400 font-bold'>{label}</span>
           {popover && (
@@ -44,9 +44,9 @@ export default function StatCard({
             </Popover>
           )}
         </div>
-        <span className='text-lg font-bold'>
+        <span className='text-lg font-bold truncate max-w-full block'>
           {copyOnClick ? (
-            <CopyOnClick content={value} className='text-left'>
+            <CopyOnClick content={value} className='text-left truncate block'>
               {value} {limit && <span className='text-sm text-gray-400'>/ {limit}</span>}{' '}
               {details && <span className='text-sm text-gray-400'>({details})</span>}
             </CopyOnClick>
