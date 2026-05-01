@@ -124,7 +124,7 @@
         "failed": "Thất bại"
       },
       "server": {
-        "noAllocation": "Thật không may, không có phân bổ nào có sẵn cho máy chủ này.",
+        "noAllocation": "Không có địa chỉ ip.",
         "state": {
           "suspended": "Máy chủ bị khóa",
           "transferring": "Máy chủ đang được di dời",
