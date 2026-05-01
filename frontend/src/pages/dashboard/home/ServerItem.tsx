@@ -119,7 +119,9 @@ export default function ServerItem({
                       <div className='flex flex-row gap-2 min-w-0'>
                         <CopyOnClick content={server.allocation.ipAlias ?? server.allocation.ip} className='min-w-0'>
                           <Card p='xs' hoverable className='leading-[100%] min-w-0 rounded-lg!'>
-                            <p className='text-sm text-gray-400 truncate'>{server.allocation.ipAlias ?? server.allocation.ip}</p>
+                            <p className='text-sm text-gray-400 truncate'>
+                              {server.allocation.ipAlias ?? server.allocation.ip}
+                            </p>
                           </Card>
                         </CopyOnClick>
                         <CopyOnClick content={server.allocation.port.toString()} className='shrink-0'>
