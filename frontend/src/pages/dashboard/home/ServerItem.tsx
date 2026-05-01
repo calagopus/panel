@@ -80,7 +80,7 @@ export default function ServerItem({
               leftStripeClassName={statusToColor(stats?.state)}
               hoverable
             >
-              <div className='flex flex-col sm:flex-row sm:items-center gap-2 justify-between overflow-hidden'>
+              <div className='flex flex-col sm:flex-row sm:items-center gap-2 justify-between overflow-hidden min-w-0'>
                 <div className='flex gap-2 items-center min-w-0 flex-1'>
                   {showSelection && (
                     <Tooltip
@@ -104,8 +104,8 @@ export default function ServerItem({
                       </ActionIcon>
                     </Tooltip>
                   )}
-                  <span className='text-xl font-medium flex items-center gap-2 min-w-0' title={server.name}>
-                    <span className='truncate'>{server.name}</span>
+                  <span className='text-xl font-medium flex items-center gap-2 min-w-0 flex-1' title={server.name}>
+                    <span className='truncate flex-1'>{server.name}</span>
                     {!serverListShowOthers && serverGroups.every((g) => !g.serverOrder.includes(server.uuid)) && (
                       <Tooltip label={t('pages.account.home.tooltip.noGroup', {})}>
                         <FontAwesomeIcon size='sm' icon={faInfoCircle} className='shrink-0' />
@@ -113,7 +113,7 @@ export default function ServerItem({
                     )}
                   </span>
                 </div>
-                <div className='flex flex-row items-center min-w-0 justify-end sm:max-w-none max-w-full'>
+                <div className='flex flex-row items-center min-w-0 justify-end sm:max-w-none max-w-[160px]'>
                   {server.allocation ? (
                     server.egg.separatePort ? (
                       <div className='flex flex-row gap-2 min-w-0'>
@@ -138,7 +138,7 @@ export default function ServerItem({
                       </CopyOnClick>
                     )
                   ) : (
-                    <Card p='xs' className='leading-[100%] min-w-0 rounded-lg!'>
+                    <Card p='xs' className='leading-[100%] min-w-0 rounded-lg! max-w-full'>
                       <p className='text-sm text-gray-400 truncate'>{t('common.server.noAllocation', {})}</p>
                     </Card>
                   )}
