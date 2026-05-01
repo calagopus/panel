@@ -29,9 +29,10 @@ import ContextMenu, { ContextMenuProvider } from './ContextMenu.tsx';
 type SidebarProps = {
   children: ReactNode;
   header?: ReactNode;
+  footer?: ReactNode;
 };
 
-function Sidebar({ children, header }: SidebarProps) {
+function Sidebar({ children, header, footer }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -59,17 +60,19 @@ function Sidebar({ children, header }: SidebarProps) {
           <div id='sidebar-content' className='h-full flex flex-col'>
             {header && <div className='shrink-0'>{header}</div>}
             <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+            {footer && <div className='shrink-0 pt-2'>{footer}</div>}
           </div>
         </Drawer>
 
         <Card
-          className='my-2 ml-2 top-0 sticky! hidden! lg:block! h-[calc(100vh-16px)]  min-w-64!'
+          className='my-2 ml-2 top-2 sticky! hidden! lg:block! h-[calc(100vh-16px)] min-w-64! transition-[width] duration-200 ease-in-out'
           p='sm'
           id='sidebar-desktop'
         >
           <div id='sidebar-content' className='h-full flex flex-col'>
             {header && <div className='shrink-0'>{header}</div>}
             <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+            {footer && <div className='shrink-0 pt-2'>{footer}</div>}
           </div>
         </Card>
       </ContextMenuProvider>
@@ -177,7 +180,7 @@ function Footer() {
   return (
     <>
       <div
-        className='border border-neutral-700 rounded-lg mt-auto p-2 flex flex-row justify-between items-center min-h-fit'
+        className='border border-neutral-700 rounded-lg p-2 flex flex-row justify-between items-center min-h-fit'
         id='sidebar-account-card'
       >
         <NavLink

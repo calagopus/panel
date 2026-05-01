@@ -47,6 +47,12 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
               <Sidebar.Divider />
             </>
           }
+          footer={
+            <>
+              <ServerSwitcher className='mb-2' />
+              <Sidebar.Footer />
+            </>
+          }
         >
           {allAccountRoutes
             .filter((route) => !!route.name && (!route.filter || route.filter()))
@@ -60,11 +66,6 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                 activeMatches={route.activeMatches}
               />
             ))}
-
-          <div className='mt-auto pt-4'>
-            <ServerSwitcher className='mb-2' />
-            <Sidebar.Footer />
-          </div>
         </Sidebar>
       )}
 

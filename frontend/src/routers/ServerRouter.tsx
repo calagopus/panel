@@ -128,6 +128,12 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
               <Sidebar.Divider />
             </>
           }
+          footer={
+            <>
+              <ServerSwitcher isServer className='mb-2' />
+              <Sidebar.Footer />
+            </>
+          }
         >
           <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
           {isAdmin(user) && (
@@ -190,11 +196,6 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
 
             return null;
           })}
-
-          <div className='mt-auto pt-4'>
-            <ServerSwitcher isServer className='mb-2' />
-            <Sidebar.Footer />
-          </div>
         </Sidebar>
       )}
 

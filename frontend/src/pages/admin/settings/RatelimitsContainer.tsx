@@ -1,4 +1,4 @@
-import { Group, Paper, SimpleGrid, Stack } from '@mantine/core';
+import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -7,6 +7,7 @@ import updateRatelimitSettings from '@/api/admin/settings/updateRatelimitSetting
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
@@ -67,9 +68,9 @@ export default function RatelimitsContainer() {
   return (
     <AdminSubContentContainer title='Ratelimit Settings' titleOrder={2}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} spacing='sm'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2'>
           {ENDPOINTS.map(({ label, key }) => (
-            <Paper key={key} withBorder radius='md' p='md'>
+            <Card key={key} withBorder radius='md' p='md'>
               <Stack gap='xs'>
                 <Code w='fit-content' title={label}>
                   {label}
@@ -91,9 +92,9 @@ export default function RatelimitsContainer() {
                   />
                 </Group>
               </Stack>
-            </Paper>
+            </Card>
           ))}
-        </SimpleGrid>
+        </div>
 
         <Group mt='md'>
           <AdminCan
