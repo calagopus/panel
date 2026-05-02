@@ -10,6 +10,7 @@ pub struct StorageAsset {
     pub name: compact_str::CompactString,
     pub url: String,
     pub size: u64,
+    pub is_directory: bool,
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
@@ -219,78 +220,108 @@ impl Storage {
 
     pub async fn list(
         &self,
-        path: impl AsRef<str>,
+        base: impl AsRef<str>,
+        directory: impl AsRef<str>,
         page: usize,
         per_page: usize,
     ) -> Result<crate::models::Pagination<StorageAsset>, anyhow::Error> {
-        let path = path.as_ref();
+        let base = base.as_ref();
+        let directory = directory.as_ref();
 
-        if path.is_empty() || path.contains("..") || path.starts_with("/") {
-            return Err(anyhow::anyhow!("invalid path"));
+        if base.is_empty() || base.contains("..") || base.starts_with('/') {
+            return Err(anyhow::anyhow!("invalid base path"));
+        }
+        if !directory.is_empty()
+            && (directory.contains("..") || directory.starts_with('/') || directory.ends_with('/'))
+        {
+            return Err(anyhow::anyhow!("invalid directory path"));
         }
 
         let settings = self.settings.get().await?;
 
         match &settings.storage_driver {
             super::settings::StorageDriver::Filesystem { path: base_path } => {
-                let base_filesystem =
-                    match crate::cap::CapFilesystem::async_new(Path::new(base_path).join(path))
-                        .await
-                    {
-                        Ok(base_filesystem) => base_filesystem,
-                        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
-                            return Ok(crate::models::Pagination {
-                                total: 0,
-                                per_page: per_page as i64,
-                                page: page as i64,
-                                data: Vec::new(),
-                            });
-                        }
-                        Err(err) => return Err(err.into()),
-                    };
+                let dir_path = if directory.is_empty() {
+                    Path::new(base_path).join(base)
+                } else {
+                    Path::new(base_path).join(base).join(directory)
+                };
+
+                let base_filesystem = match crate::cap::CapFilesystem::async_new(dir_path).await {
+                    Ok(base_filesystem) => base_filesystem,
+                    Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+                        return Ok(crate::models::Pagination {
+                            total: 0,
+                            per_page: per_page as i64,
+                            page: page as i64,
+                            data: Vec::new(),
+                        });
+                    }
+                    Err(err) => return Err(err.into()),
+                };
                 drop(settings);
 
-                let mut directory_reader = base_filesystem.async_walk_dir("").await?;
-                let mut raw_entries = Vec::new();
+                let mut dir_reader = base_filesystem.async_read_dir("").await?;
+                let mut raw_dirs: Vec<String> = Vec::new();
+                let mut raw_files: Vec<String> = Vec::new();
 
-                while let Some(Ok((is_dir, entry))) = directory_reader.next_entry().await {
+                while let Some(Ok((is_dir, name))) = dir_reader.next_entry().await {
                     if is_dir {
-                        continue;
+                        raw_dirs.push(name);
+                    } else {
+                        raw_files.push(name);
                     }
-
-                    raw_entries.push(entry);
                 }
 
-                raw_entries.sort_unstable();
+                raw_dirs.sort_unstable();
+                raw_files.sort_unstable();
 
-                let total_entries = raw_entries.len();
-                let mut entries = Vec::new();
+                let total = (raw_dirs.len() + raw_files.len()) as i64;
                 let start = (page - 1) * per_page;
 
                 let storage_url_retriever = self.retrieve_urls().await?;
 
-                for entry in raw_entries.into_iter().skip(start).take(per_page) {
-                    let metadata = match base_filesystem.async_metadata(&entry).await {
-                        Ok(metadata) => metadata,
-                        Err(_) => continue,
+                let mut entries = Vec::new();
+
+                for (is_dir, name) in raw_dirs
+                    .into_iter()
+                    .map(|n| (true, n))
+                    .chain(raw_files.into_iter().map(|n| (false, n)))
+                    .skip(start)
+                    .take(per_page)
+                {
+                    let full_name = if directory.is_empty() {
+                        name.clone()
+                    } else {
+                        format!("{directory}/{name}")
                     };
 
-                    let entry_name = entry.to_string_lossy().to_compact_string();
-
-                    entries.push(StorageAsset {
-                        url: storage_url_retriever.get_url(format!("assets/{entry_name}")),
-                        name: entry_name,
-                        size: metadata.len(),
-                        created: metadata
+                    let (size, created) = if is_dir {
+                        (0u64, chrono::DateTime::<chrono::Utc>::default())
+                    } else {
+                        let metadata = match base_filesystem.async_metadata(&name).await {
+                            Ok(m) => m,
+                            Err(_) => continue,
+                        };
+                        let created = metadata
                             .created()
                             .or_else(|_| metadata.modified())?
                             .into_std()
-                            .into(),
+                            .into();
+                        (metadata.len(), created)
+                    };
+
+                    entries.push(StorageAsset {
+                        url: storage_url_retriever.get_url(format!("{base}/{full_name}")),
+                        name: full_name.to_compact_string(),
+                        size,
+                        is_directory: is_dir,
+                        created,
                     });
                 }
 
                 Ok(crate::models::Pagination {
-                    total: total_entries as i64,
+                    total,
                     per_page: per_page as i64,
                     page: page as i64,
                     data: entries,
@@ -315,30 +346,70 @@ impl Storage {
                 )?;
                 drop(settings);
 
-                let buckets = s3_client.list(path.into(), None).await?;
-                let entries = buckets
-                    .into_iter()
-                    .flat_map(|bucket| bucket.contents)
-                    .collect::<Vec<_>>();
+                let s3_prefix = if directory.is_empty() {
+                    format!("{base}/")
+                } else {
+                    format!("{base}/{directory}/")
+                };
+                let strip_prefix = format!("{base}/");
 
-                let start = (page - 1) * per_page;
+                let results = s3_client
+                    .list(s3_prefix.clone(), Some("/".to_string()))
+                    .await?;
 
                 let storage_url_retriever = self.retrieve_urls().await?;
 
+                let mut dirs: Vec<StorageAsset> = Vec::new();
+                let mut files: Vec<StorageAsset> = Vec::new();
+
+                for result in &results {
+                    if let Some(prefixes) = &result.common_prefixes {
+                        for cp in prefixes {
+                            let name = cp
+                                .prefix
+                                .trim_start_matches(&strip_prefix)
+                                .trim_end_matches('/')
+                                .to_compact_string();
+                            dirs.push(StorageAsset {
+                                url: storage_url_retriever.get_url(&cp.prefix),
+                                name,
+                                size: 0,
+                                is_directory: true,
+                                created: chrono::DateTime::<chrono::Utc>::default(),
+                            });
+                        }
+                    }
+
+                    for entry in &result.contents {
+                        if entry.key == s3_prefix {
+                            continue;
+                        }
+                        let name = entry
+                            .key
+                            .trim_start_matches(&strip_prefix)
+                            .to_compact_string();
+                        files.push(StorageAsset {
+                            url: storage_url_retriever.get_url(&entry.key),
+                            name,
+                            size: entry.size,
+                            is_directory: false,
+                            created: entry.last_modified.parse().unwrap_or_default(),
+                        });
+                    }
+                }
+
+                let total = (dirs.len() + files.len()) as i64;
+                let start = (page - 1) * per_page;
+
                 Ok(crate::models::Pagination {
-                    total: entries.len() as i64,
+                    total,
                     per_page: per_page as i64,
                     page: page as i64,
-                    data: entries
+                    data: dirs
                         .into_iter()
+                        .chain(files)
                         .skip(start)
                         .take(per_page)
-                        .map(|e| StorageAsset {
-                            url: storage_url_retriever.get_url(&e.key),
-                            name: e.key.trim_start_matches("assets/").to_compact_string(),
-                            size: e.size,
-                            created: e.last_modified.parse().unwrap_or_default(),
-                        })
                         .collect(),
                 })
             }

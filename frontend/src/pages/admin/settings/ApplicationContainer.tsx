@@ -53,7 +53,7 @@ export default function ApplicationContainer() {
 
   const assets = useSearchableResource<z.infer<typeof storageAssetSchema>>({
     queryKey: queryKeys.admin.assets.all(),
-    fetcher: () => getAssets(1),
+    fetcher: () => getAssets(1, ''),
     canRequest: canReadAssets,
   });
 

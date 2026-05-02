@@ -1372,7 +1372,7 @@ impl Server {
         &self,
         state: &crate::State,
     ) -> Result<ApiServerFeatureLimits, anyhow::Error> {
-        let feature_limits = ApiServerFeatureLimits::init_hooks(&self, state).await?;
+        let feature_limits = ApiServerFeatureLimits::init_hooks(self, state).await?;
 
         let feature_limits = finish_extendible!(
             ApiServerFeatureLimits {

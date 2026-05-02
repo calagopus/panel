@@ -1,6 +1,7 @@
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { forwardRef, useState } from 'react';
-import { NavLink } from 'react-router';
+import { createSearchParams, NavLink } from 'react-router';
 import { z } from 'zod';
 import deleteAssets from '@/api/admin/assets/deleteAssets.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -22,14 +23,19 @@ interface AssetRowProps {
   addSelectedAsset: (asset: z.infer<typeof storageAssetSchema>) => void;
   removeSelectedAsset: (asset: z.infer<typeof storageAssetSchema>) => void;
   invalidateAssets: () => void;
+  onDirectoryClick: (name: string) => void;
 }
 
 const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRow(
-  { asset, isSelected, addSelectedAsset, removeSelectedAsset, invalidateAssets },
+  { asset, isSelected, addSelectedAsset, removeSelectedAsset, invalidateAssets, onDirectoryClick },
   ref,
 ) {
   const { addToast } = useToast();
+  const canDeleteAssets = useAdminCan('assets.delete');
+
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
+
+  const displayName = asset.name.split('/').pop() ?? asset.name;
 
   const toggleSelected = () => (isSelected ? removeSelectedAsset(asset) : addSelectedAsset(asset));
 
@@ -44,6 +50,35 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
         addToast(httpErrorToHuman(msg), 'error');
       });
   };
+
+  if (asset.isDirectory) {
+    return (
+      <TableRow
+        ref={ref}
+        className='cursor-pointer'
+        onClick={(e) => {
+          e.stopPropagation();
+          onDirectoryClick(asset.name);
+        }}
+      >
+        <td className='pl-4 relative cursor-pointer w-10 h-9 text-center flex flex-col'>
+          <FontAwesomeIcon icon={faFolder} className='my-auto' />
+        </td>
+
+        <TableData colSpan={3}>
+          <NavLink
+            to={`?${createSearchParams({ directory: asset.name })}`}
+            className='flex items-center gap-2 text-blue-300 hover:text-blue-200'
+            onClick={(e) => e.preventDefault()}
+          >
+            <Code>{displayName}</Code>
+          </NavLink>
+        </TableData>
+
+        <td />
+      </TableRow>
+    );
+  }
 
   return (
     <>
@@ -64,7 +99,7 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
             label: 'Delete',
             onClick: () => setOpenModal('delete'),
             color: 'red',
-            canAccess: useAdminCan('assets.delete'),
+            canAccess: canDeleteAssets,
           },
         ]}
       >
@@ -96,7 +131,7 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
 
             <TableData>
               <NavLink to={asset.url} target='_blank' className='text-blue-400 hover:text-blue-200 hover:underline'>
-                <Code>{asset.name}</Code>
+                <Code>{displayName}</Code>
               </NavLink>
             </TableData>
 

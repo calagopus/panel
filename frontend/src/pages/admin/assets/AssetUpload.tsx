@@ -12,9 +12,15 @@ import Tooltip from '@/elements/Tooltip.tsx';
 import { bytesToString } from '@/lib/size.ts';
 import { useFileUpload } from '@/plugins/useFileUpload.ts';
 
-export default function AssetUpload({ invalidateAssets }: { invalidateAssets: () => void }) {
+export default function AssetUpload({
+  invalidateAssets,
+  currentDirectory,
+}: {
+  invalidateAssets: () => void;
+  currentDirectory: string;
+}) {
   const { uploadingFiles, handleFileSelect, totalUploadProgress, cancelFileUpload } = useFileUpload(
-    (form, config) => uploadAssets(form, config).then(() => ({ url: '', continuationToken: null })),
+    (form, config) => uploadAssets(form, config, currentDirectory).then(() => ({ url: '', continuationToken: null })),
     invalidateAssets,
   );
 

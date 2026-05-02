@@ -9,10 +9,11 @@ mod delete;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
-    use serde::Serialize;
+    use garde::Validate;
+    use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{Pagination, PaginationParams, user::GetPermissionManager},
+        models::{Pagination, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -23,8 +24,22 @@ mod get {
         assets: Pagination<shared::storage::StorageAsset>,
     }
 
+    #[derive(ToSchema, Validate, Deserialize)]
+    pub struct Params {
+        #[garde(range(min = 1))]
+        #[serde(default = "Pagination::default_page")]
+        page: i64,
+        #[garde(range(min = 1, max = 100))]
+        #[serde(default = "Pagination::default_per_page")]
+        per_page: i64,
+        #[garde(skip)]
+        #[serde(default)]
+        directory: compact_str::CompactString,
+    }
+
     #[utoipa::path(get, path = "/", responses(
         (status = OK, body = inline(Response)),
+        (status = BAD_REQUEST, body = ApiError),
     ), params(
         (
             "page" = i64, Query,
@@ -36,14 +51,28 @@ mod get {
             description = "The number of items per page",
             example = "10",
         ),
+        (
+            "directory" = Option<String>, Query,
+            description = "Directory path to list (relative to assets root)",
+            example = "images",
+        ),
     ))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        Query(params): Query<PaginationParams>,
+        Query(params): Query<Params>,
     ) -> ApiResponseResult {
         if let Err(errors) = shared::utils::validate_data(&params) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
+        let directory = params.directory.as_str();
+        if !directory.is_empty()
+            && (directory.contains("..") || directory.starts_with('/') || directory.ends_with('/'))
+        {
+            return ApiResponse::error("invalid directory path")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }
@@ -52,7 +81,12 @@ mod get {
 
         let assets = state
             .storage
-            .list("assets", params.page as usize, params.per_page as usize)
+            .list(
+                "assets",
+                directory,
+                params.page as usize,
+                params.per_page as usize,
+            )
             .await?;
 
         ApiResponse::new_serialized(Response { assets }).ok()
@@ -60,10 +94,10 @@ mod get {
 }
 
 mod put {
-    use axum::http::StatusCode;
+    use axum::{extract::Query, http::StatusCode};
     use compact_str::ToCompactString;
     use futures_util::TryStreamExt;
-    use serde::Serialize;
+    use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
@@ -76,17 +110,39 @@ mod put {
         assets: Vec<shared::storage::StorageAsset>,
     }
 
+    #[derive(Deserialize)]
+    pub struct Params {
+        #[serde(default)]
+        directory: compact_str::CompactString,
+    }
+
     #[utoipa::path(put, path = "/", responses(
         (status = OK, body = inline(Response)),
         (status = BAD_REQUEST, body = ApiError),
+    ), params(
+        (
+            "directory" = Option<String>, Query,
+            description = "Directory path to upload to (relative to assets root)",
+            example = "images",
+        ),
     ), request_body = String)]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
         activity_logger: GetAdminActivityLogger,
+        Query(query): Query<Params>,
         mut multipart: axum::extract::Multipart,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("assets.upload")?;
+
+        let directory = query.directory.as_str();
+        if !directory.is_empty()
+            && (directory.contains("..") || directory.starts_with('/') || directory.ends_with('/'))
+        {
+            return ApiResponse::error("invalid directory path")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
 
         let mut assets = Vec::new();
 
@@ -108,16 +164,22 @@ mod put {
                 std::io::Error::other(format!("failed to read multipart field: {err}"))
             }));
 
+            let asset_name = if directory.is_empty() {
+                filename.clone()
+            } else {
+                format!("{directory}/{filename}").to_compact_string()
+            };
+
             let size = state
                 .storage
-                .store(format!("assets/{filename}"), reader, &content_type)
+                .store(format!("assets/{asset_name}"), reader, &content_type)
                 .await?;
 
             activity_logger
                 .log(
                     "asset:upload",
                     serde_json::json!({
-                        "name": filename,
+                        "name": asset_name,
                         "size": size,
                     }),
                 )
@@ -128,9 +190,10 @@ mod put {
                     .storage
                     .retrieve_urls()
                     .await?
-                    .get_url(format!("assets/{filename}")),
-                name: filename,
+                    .get_url(format!("assets/{asset_name}")),
+                name: asset_name,
                 size,
+                is_directory: false,
                 created: chrono::Utc::now(),
             });
         }
