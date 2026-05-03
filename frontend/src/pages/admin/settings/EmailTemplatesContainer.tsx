@@ -1,4 +1,4 @@
-import { Divider, Group, NavLink, Paper, ScrollArea, Stack, Text } from '@mantine/core';
+import { Anchor, Divider, Group, NavLink, Paper, ScrollArea, Stack, Text } from '@mantine/core';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import getEmailTemplate from '@/api/admin/settings/email-templates/getEmailTemplate.ts';
@@ -153,7 +153,29 @@ export default function EmailTemplatesContainer() {
         default. This cannot be undone.
       </ConfirmationModal>
 
-      <div className='flex flex-col md:flex-row gap-4'>
+      <Paper withBorder radius='md' p='sm'>
+        <Text size='sm'>
+          Templates use the&nbsp;
+          <Anchor href='https://github.com/mitsuhiko/minijinja' target='_blank' rel='noopener noreferrer' size='sm'>
+            MiniJinja
+          </Anchor>
+          &nbsp; templating syntax. Variables are referenced with{' '}
+          <Text span ff='monospace' size='sm'>
+            {'{{ variable }}'}
+          </Text>{' '}
+          and control structures like{' '}
+          <Text span ff='monospace' size='sm'>
+            {'{% if %}'}
+          </Text>{' '}
+          and{' '}
+          <Text span ff='monospace' size='sm'>
+            {'{% for %}'}
+          </Text>{' '}
+          are supported.
+        </Text>
+      </Paper>
+
+      <div className='mt-4 flex flex-col md:flex-row gap-4'>
         {sidebar}
 
         <Paper withBorder radius='md' className='flex flex-col flex-1 min-w-0 overflow-hidden'>
