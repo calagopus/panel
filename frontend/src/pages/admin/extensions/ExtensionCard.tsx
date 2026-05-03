@@ -31,12 +31,14 @@ export default function ExtensionCard({
   return (
     <Card>
       <div className='mb-3 flex items-start gap-3'>
-        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-zinc-800 text-zinc-400'>
+        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-(--mantine-color-default-hover) text-(--mantine-color-dimmed)'>
           <FontAwesomeIcon icon={faPuzzlePiece} className='text-sm' />
         </div>
         <div className='min-w-0 flex-1'>
-          <h3 className='truncate text-md font-medium leading-tight text-white'>{name}</h3>
-          {packageName && <p className='mt-0.5 truncate font-mono text-[11px] text-zinc-500'>{packageName}</p>}
+          <h3 className='truncate text-md font-medium leading-tight'>{name}</h3>
+          {packageName && (
+            <p className='mt-0.5 truncate font-mono text-[11px] text-(--mantine-color-dimmed)'>{packageName}</p>
+          )}
         </div>
       </div>
 

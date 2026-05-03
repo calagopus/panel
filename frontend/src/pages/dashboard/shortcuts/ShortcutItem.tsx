@@ -19,9 +19,7 @@ export default function ShortcutItem({ keys, description, hideBorder }: Shortcut
         borderBottom: hideBorder ? 'none' : '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Text size='sm' c='dimmed'>
-        {description}
-      </Text>
+      <Text size='sm'>{description}</Text>
       <Flex align='center' justify='flex-end' gap={6} style={{ minWidth: 120 }}>
         {keys.map((key, index) => (
           <Flex key={index} align='center' gap={6}>

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "highlight.js/styles/a11y-light.min.css";
 
 @font-face {
   font-family: "Helvetica";
@@ -75,4 +76,51 @@ button:focus-visible {
 
 strong {
   @apply font-semibold;
+}
+
+[data-mantine-color-scheme="dark"] {
+  .hljs {
+    background: #2b2b2b;
+    color: #f8f8f2;
+  }
+  .hljs-comment,
+  .hljs-quote {
+    color: #d4d0ab;
+  }
+  .hljs-deletion,
+  .hljs-name,
+  .hljs-regexp,
+  .hljs-selector-class,
+  .hljs-selector-id,
+  .hljs-tag,
+  .hljs-template-variable,
+  .hljs-variable {
+    color: #ffa07a;
+  }
+  .hljs-built_in,
+  .hljs-link,
+  .hljs-literal,
+  .hljs-meta,
+  .hljs-number,
+  .hljs-params,
+  .hljs-type {
+    color: #f5ab35;
+  }
+  .hljs-attribute {
+    color: gold;
+  }
+  .hljs-addition,
+  .hljs-bullet,
+  .hljs-string,
+  .hljs-symbol {
+    color: #abe338;
+  }
+  .hljs-section,
+  .hljs-title {
+    color: #00e0e0;
+  }
+  .hljs-keyword,
+  .hljs-selector-tag {
+    color: #dcc6e0;
+  }
 }

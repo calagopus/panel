@@ -109,7 +109,7 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
         />
 
         <p className='mt-2 text-sm md:text-base break-all'>
-          <span className='text-neutral-200'>{t('pages.server.files.modal.copyFile.createdAs', {})}</span>
+          <span>{t('pages.server.files.modal.copyFile.createdAs', {})}</span>
           <Code>
             /home/container/
             <span className='text-cyan-200'>

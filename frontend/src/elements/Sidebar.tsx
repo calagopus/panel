@@ -10,7 +10,7 @@ import {
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Menu, useMantineColorScheme } from '@mantine/core';
+import { Menu, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import classNames from 'classnames';
 import { ReactNode, useEffect, useState } from 'react';
 import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
@@ -152,7 +152,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
               <Button
                 color={isActive ? 'blue' : 'gray'}
                 className={classNames(isActive && 'cursor-default! active', className)}
-                variant='subtle'
+                variant={isActive ? 'outline' : 'subtle'}
                 fullWidth
                 styles={{ label: { width: '100%' } }}
               >
@@ -174,13 +174,14 @@ function Footer() {
   const { t } = useTranslations();
   const { impersonating, user, doLogout } = useAuth();
   const navigate = useNavigate();
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { toggleColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('dark');
 
   if (!user) {
     return null;
   }
 
-  const isDark = colorScheme === 'dark';
+  const isDark = computedColorScheme === 'dark';
 
   return (
     <>

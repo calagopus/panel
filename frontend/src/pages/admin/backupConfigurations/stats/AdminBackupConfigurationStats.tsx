@@ -42,117 +42,93 @@ export default function AdminBackupConfigurationStats({
         <TitleCard title={`Backup Statistics`} icon={<FontAwesomeIcon icon={faArchive} />} className='mt-4'>
           <div className='grid grid-cols-2 xl:grid-cols-5 gap-4'>
             <Card className='col-span-2 xl:col-span-1'>
-              <Title order={3} c='white'>
-                All Time
-              </Title>
+              <Title order={3}>All Time</Title>
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
-                {stats.allTime.total}
-              </Title>
+              <Title order={3}>{stats.allTime.total}</Title>
               Total backups all time
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
+              <Title order={3}>
                 {stats.allTime.successful} ({bytesToString(stats.allTime.successfulBytes)})
               </Title>
               Successful backups all time
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
-                {stats.allTime.failed}
-              </Title>
+              <Title order={3}>{stats.allTime.failed}</Title>
               Failed backups all time
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
+              <Title order={3}>
                 {stats.allTime.deleted} ({bytesToString(stats.allTime.deletedBytes)})
               </Title>
               Deleted backups all time
             </Card>
             <Card className='col-span-2 xl:col-span-1'>
-              <Title order={3} c='white'>
-                Today
-              </Title>
+              <Title order={3}>Today</Title>
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
-                {stats.today.total}
-              </Title>
+              <Title order={3}>{stats.today.total}</Title>
               Total backups today
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
+              <Title order={3}>
                 {stats.today.successful} ({bytesToString(stats.today.successfulBytes)})
               </Title>
               Successful backups today
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
-                {stats.today.failed}
-              </Title>
+              <Title order={3}>{stats.today.failed}</Title>
               Failed backups today
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
+              <Title order={3}>
                 {stats.today.deleted} ({bytesToString(stats.today.deletedBytes)})
               </Title>
               Deleted backups today
             </Card>
             <Card className='col-span-2 xl:col-span-1'>
-              <Title order={3} c='white'>
-                This Week
-              </Title>
+              <Title order={3}>This Week</Title>
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
-                {stats.week.total}
-              </Title>
+              <Title order={3}>{stats.week.total}</Title>
               Total backups this week
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
+              <Title order={3}>
                 {stats.week.successful} ({bytesToString(stats.week.successfulBytes)})
               </Title>
               Successful backups this week
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
-                {stats.week.failed}
-              </Title>
+              <Title order={3}>{stats.week.failed}</Title>
               Failed backups this week
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
+              <Title order={3}>
                 {stats.week.deleted} ({bytesToString(stats.week.deletedBytes)})
               </Title>
               Deleted backups this week
             </Card>
             <Card className='col-span-2 xl:col-span-1'>
-              <Title order={3} c='white'>
-                This Month
-              </Title>
+              <Title order={3}>This Month</Title>
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
-                {stats.month.total}
-              </Title>
+              <Title order={3}>{stats.month.total}</Title>
               Total backups this month
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
+              <Title order={3}>
                 {stats.month.successful} ({bytesToString(stats.month.successfulBytes)})
               </Title>
               Successful backups this month
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
-                {stats.month.failed}
-              </Title>
+              <Title order={3}>{stats.month.failed}</Title>
               Failed backups this month
             </Card>
             <Card className='flex'>
-              <Title order={3} c='white'>
+              <Title order={3}>
                 {stats.month.deleted} ({bytesToString(stats.month.deletedBytes)})
               </Title>
               Deleted backups this month

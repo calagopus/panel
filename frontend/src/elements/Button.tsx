@@ -22,7 +22,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         style={{
           cursor: loading ? 'wait' : undefined,
           fontWeight: 'normal',
-          border: disabled ? '1px solid var(--mantine-color-dark-4)' : undefined,
+          border: disabled ? '1px solid var(--mantine-color-default-border)' : undefined,
           color: disabled ? 'var(--mantine-color-dimmed)' : undefined,
           ...rest.style,
         }}

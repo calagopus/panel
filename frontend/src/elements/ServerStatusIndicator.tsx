@@ -94,15 +94,15 @@ export default function ServerStatusIndicator() {
           {socketConnected ? (
             <>
               <span className={classNames('rounded-full size-4 animate-pulse', statusToColor(state))} />
-              <span className='font-medium text-white leading-none'>{t(`common.enum.serverState.${state}`, {})}</span>
+              <span className='font-medium leading-none'>{t(`common.enum.serverState.${state}`, {})}</span>
             </>
           ) : (
             <>
               <FontAwesomeIcon
                 icon={faTowerBroadcast}
-                className={`${socketConnected ? 'animate-pulse text-green-500' : 'text-white'} w-4`}
+                className={`${socketConnected ? 'animate-pulse text-green-500' : ''} w-4`}
               />
-              <span className='font-medium text-white leading-none'>
+              <span className='font-medium leading-none'>
                 {socketConnected
                   ? t('common.enum.connectionStatus.connected', {})
                   : t('common.enum.connectionStatus.offline', {})}

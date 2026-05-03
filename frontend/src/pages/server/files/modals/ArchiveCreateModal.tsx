@@ -91,7 +91,7 @@ export default function ArchiveCreateModal({ files, opened, onClose }: Props) {
           />
 
           <p className='text-sm md:text-base break-all'>
-            <span className='text-neutral-200'>{t('pages.server.files.modal.createArchive.createdAs', {})}</span>
+            <span>{t('pages.server.files.modal.createArchive.createdAs', {})}</span>
             <Code>
               /home/container/
               <span className='text-cyan-200'>

@@ -83,7 +83,7 @@ export default function EmailTemplatesContainer() {
 
   const sidebar = (
     <Paper withBorder radius='md' className='flex flex-col overflow-hidden shrink-0 md:w-72 w-full md:h-full'>
-      <div className='px-3 py-2.5 bg-neutral-800/60'>
+      <div className='px-3 py-2.5 bg-(--mantine-color-default)'>
         <Text size='xs' fw={600} c='dimmed' tt='uppercase' style={{ letterSpacing: '0.05em' }}>
           Templates
         </Text>
@@ -116,7 +116,7 @@ export default function EmailTemplatesContainer() {
       {template && (
         <>
           <Divider />
-          <div className='px-3 py-2.5 bg-neutral-800/60'>
+          <div className='px-3 py-2.5 bg-(--mantine-color-default)'>
             <Text size='xs' fw={600} c='dimmed' tt='uppercase' style={{ letterSpacing: '0.05em' }}>
               Available Variables
             </Text>
@@ -194,7 +194,7 @@ export default function EmailTemplatesContainer() {
             </div>
           ) : template ? (
             <>
-              <div className='px-4 py-2.5 bg-neutral-800/60 shrink-0'>
+              <div className='px-4 py-2.5 bg-(--mantine-color-default) shrink-0'>
                 <Group justify='space-between'>
                   <Group gap='xs'>
                     <Text size='sm' fw={500} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>

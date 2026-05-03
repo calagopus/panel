@@ -9,6 +9,7 @@ import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
+import Card from '@/elements/Card.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
@@ -63,9 +64,13 @@ function ServerFilesColumnRightSection({ name }: { name: ServerFilesColumn }) {
       <FontAwesomeIcon
         icon={faChevronUp}
         size='xs'
-        className={classNames('-mb-0.5', isActive && isAsc ? 'text-white' : 'text-gray-400')}
+        className={classNames('-mb-0.5', isActive && isAsc ? 'text-(--mantine-color-text)' : 'text-gray-400')}
       />
-      <FontAwesomeIcon icon={faChevronDown} size='xs' className={isActive && !isAsc ? 'text-white' : 'text-gray-400'} />
+      <FontAwesomeIcon
+        icon={faChevronDown}
+        size='xs'
+        className={isActive && !isAsc ? 'text-(--mantine-color-text)' : 'text-gray-400'}
+      />
     </div>
   );
 }
@@ -292,9 +297,7 @@ function ServerFilesComponent() {
 
       <Group justify='space-between' align='center' mb='md'>
         <Group>
-          <Title order={1} c='white'>
-            {t('pages.server.files.title', {})}
-          </Title>
+          <Title order={1}>{t('pages.server.files.title', {})}</Title>
 
           <FileSettings />
         </Group>
@@ -304,9 +307,9 @@ function ServerFilesComponent() {
         </Group>
       </Group>
 
-      <div id='file-breadcrumbs-outer' className='bg-[#282828] border border-[#424242] rounded-lg mb-2 p-4'>
+      <Card mb='sm'>
         <FileBreadcrumbs path={decodeURIComponent(browsingDirectory)} />
-      </div>
+      </Card>
 
       <FileSearchBanner resetEntries={resetEntries} />
 

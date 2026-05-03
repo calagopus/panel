@@ -8,7 +8,7 @@ import {
   faServer,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ComboboxItem, OptionsFilter } from '@mantine/core';
+import { ComboboxItem, OptionsFilter, useComputedColorScheme } from '@mantine/core';
 import { FitAddon } from '@xterm/addon-fit';
 import { SearchAddon } from '@xterm/addon-search';
 import { Unicode11Addon } from '@xterm/addon-unicode11';
@@ -51,10 +51,20 @@ const commandSnippetFilter: OptionsFilter = ({ options, search }) => {
   });
 };
 
+const getXtermTheme = (isDark: boolean) => ({
+  background: '#00000000',
+  foreground: isDark ? '#f8f8f2' : '#1a1a1a',
+  cursor: '#00000000',
+  cursorAccent: '#00000000',
+  selectionBackground: isDark ? '#FFFFFF4D' : '#0000001A',
+  selectionInactiveBackground: isDark ? '#FFFFFF80' : '#00000033',
+});
+
 export default function Terminal() {
   const { t } = useTranslations();
   const { server, updateServer, commandSnippets, imagePulls, socketConnected, socketInstance, state } =
     useServerStore();
+  const computedColorScheme = useComputedColorScheme('dark');
 
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -112,13 +122,7 @@ export default function Terminal() {
     const initOptions: ITerminalOptions & ITerminalInitOnlyOptions = {
       fontSize: consoleFontSize,
       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-      theme: {
-        background: '#00000000',
-        cursor: '#00000000',
-        cursorAccent: '#00000000',
-        selectionBackground: '#FFFFFF4D',
-        selectionInactiveBackground: '#FFFFFF80',
-      },
+      theme: getXtermTheme(computedColorScheme === 'dark'),
       allowTransparency: true,
       lineHeight: 1.2,
       disableStdin: true,
@@ -211,6 +215,12 @@ export default function Terminal() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (xtermInstance.current) {
+      xtermInstance.current.options.theme = getXtermTheme(computedColorScheme === 'dark');
+    }
+  }, [computedColorScheme]);
 
   useEffect(() => {
     const terminalElement = terminalRef.current;

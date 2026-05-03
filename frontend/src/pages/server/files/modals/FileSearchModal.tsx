@@ -119,7 +119,7 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
             placeholder={t('pages.server.files.modal.searchFiles.placeholder', {})}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            leftSection={<FontAwesomeIcon icon={faSearch} style={{ color: 'var(--mantine-color-gray-5)' }} />}
+            leftSection={<FontAwesomeIcon icon={faSearch} style={{ color: 'var(--mantine-color-dimmed)' }} />}
             size='md'
             data-autofocus
           />
@@ -131,8 +131,8 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
               py='xs'
               style={{
                 borderRadius: 6,
-                background: showAdvanced ? 'var(--mantine-color-dark-6)' : 'transparent',
-                border: `1px solid ${showAdvanced ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-dark-5)'}`,
+                background: showAdvanced ? 'var(--mantine-color-default)' : 'transparent',
+                border: `1px solid var(--mantine-color-default-border)`,
                 transition: 'all 0.15s ease',
                 paddingLeft: '14px',
                 paddingRight: '14px',
@@ -146,29 +146,30 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: 5,
-                  background: activeFiltersCount > 0 ? 'var(--mantine-color-blue-9)' : 'var(--mantine-color-dark-5)',
+                  background:
+                    activeFiltersCount > 0 ? 'var(--mantine-color-blue-filled)' : 'var(--mantine-color-default-hover)',
                 }}
               >
                 <FontAwesomeIcon
                   icon={faSliders}
                   size='xs'
                   style={{
-                    color: activeFiltersCount > 0 ? 'var(--mantine-color-blue-2)' : 'var(--mantine-color-gray-5)',
+                    color: activeFiltersCount > 0 ? '#fff' : 'var(--mantine-color-dimmed)',
                   }}
                 />
               </Box>
-              <Text size='sm' c={showAdvanced ? 'gray.2' : 'gray.5'} fw={500}>
+              <Text size='sm' c={showAdvanced ? undefined : 'dimmed'} fw={500}>
                 {t('pages.server.files.modal.searchFiles.advancedFilters', {})}
               </Text>
               {activeFiltersCount > 0 && (
                 <Box
                   style={{
-                    background: 'var(--mantine-color-blue-9)',
+                    background: 'var(--mantine-color-blue-filled)',
                     borderRadius: 10,
                     padding: '2px 8px',
                     fontSize: 11,
                     fontWeight: 600,
-                    color: 'var(--mantine-color-blue-2)',
+                    color: '#fff',
                   }}
                 >
                   {activeFiltersCount}
@@ -179,7 +180,7 @@ export default function FileSearchModal({ opened, onClose }: ModalProps) {
                 icon={faChevronDown}
                 size='xs'
                 style={{
-                  color: 'var(--mantine-color-gray-6)',
+                  color: 'var(--mantine-color-dimmed)',
                   transform: showAdvanced ? 'rotate(0deg)' : 'rotate(-90deg)',
                   transition: 'transform 0.15s ease',
                 }}

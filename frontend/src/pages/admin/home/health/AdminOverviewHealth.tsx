@@ -62,7 +62,7 @@ export default function AdminOverviewHealth() {
             <>
               <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
                 <Card className='flex col-span-2'>
-                  <Title order={3} c='white'>
+                  <Title order={3}>
                     {general.migrations.applied} / {general.migrations.total}
                   </Title>
                   Applied Migrations ({((general.migrations.applied / general.migrations.total) * 100).toFixed(2)}%)

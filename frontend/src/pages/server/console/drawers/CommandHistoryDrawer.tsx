@@ -84,9 +84,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
         {selectedCommand ? (
           <Stack gap='md' className='flex-1 overflow-hidden'>
             <div className='flex items-center justify-between'>
-              <Title order={4} className='text-white'>
-                {t('pages.server.console.drawer.commandHistory.detailTitle', {})}
-              </Title>
+              <Title order={4}>{t('pages.server.console.drawer.commandHistory.detailTitle', {})}</Title>
               <Button
                 variant='subtle'
                 size='xs'

@@ -111,18 +111,18 @@ export default function PermissionSelector({
 
   const selectedPanel = (
     <Card>
-      <Title order={3} c='white'>
+      <Title order={3}>
         {t('elements.permissionSelector.selectedPermissions', { count: selectedPermissions.length })}
       </Title>
       <div className='max-h-96 overflow-y-auto'>
         {selectedPermissions.length === 0 ? (
-          <p className='text-gray-200 text-sm'>{t('elements.permissionSelector.noPermissions', {})}</p>
+          <p className='text-(--mantine-color-dimmed) text-sm'>{t('elements.permissionSelector.noPermissions', {})}</p>
         ) : (
           <div className='space-y-1'>
             {sortedSelectedPermissions.map((permission) => (
-              <Card key={permission} className='border border-neutral-600' padding='xs'>
+              <Card key={permission} className='border border-(--mantine-color-default-border)' padding='xs'>
                 <Group justify='space-between'>
-                  <span className='text-sm font-mono text-white'>{permission}</span>
+                  <span className='text-sm font-mono'>{permission}</span>
                   <ActionIcon color='red' onClick={() => togglePermission(permission)}>
                     <FontAwesomeIcon icon={faX} />
                   </ActionIcon>
@@ -170,7 +170,7 @@ export default function PermissionSelector({
                       />
                     )}
                     <div>
-                      <Title order={5} c='white' className='uppercase'>
+                      <Title order={5} className='uppercase'>
                         {category.replace('-', ' ')}
                       </Title>
                       <p className='text-sm text-gray-200 mt-1'>{description}</p>
@@ -184,9 +184,9 @@ export default function PermissionSelector({
                     />
                     <ActionIcon variant='subtle' onClick={() => toggleCategory(category)}>
                       {isExpanded ? (
-                        <FontAwesomeIcon icon={faChevronUp} className='w-4 h-4 text-gray-200' />
+                        <FontAwesomeIcon icon={faChevronUp} className='w-4 h-4' />
                       ) : (
-                        <FontAwesomeIcon icon={faChevronDown} className='w-4 h-4 text-gray-200' />
+                        <FontAwesomeIcon icon={faChevronDown} className='w-4 h-4' />
                       )}
                     </ActionIcon>
                   </div>
