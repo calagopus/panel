@@ -136,7 +136,7 @@ export default function ServerGroupItem({
       <Card key={serverGroup.uuid} p={0} className='overflow-hidden rounded-xl!'>
         <div
           id='server-group-item-header'
-          className='flex flex-row items-end sm:items-center gap-3 px-3 bg-(--mantine-color-dark-7) justify-between'
+          className='flex flex-row items-end sm:items-center gap-3 px-3 bg-(--mantine-color-default) justify-between'
         >
           <div className='flex flex-col my-3 sm:my-0'>
             <div className='flex flex-row'>
@@ -162,7 +162,7 @@ export default function ServerGroupItem({
                     'transition duration-200 w-3 h-3 text-gray-400 shrink-0',
                   )}
                 />
-                <span className='font-medium text-white truncate'>{serverGroup.name}</span>
+                <span className='font-medium truncate'>{serverGroup.name}</span>
                 <Badge variant='light' color='gray'>
                   {tItem('server', serverCount)}
                 </Badge>

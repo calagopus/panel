@@ -16,17 +16,17 @@ export default function ShortcutItem({ keys, description, hideBorder }: Shortcut
       py='sm'
       px='xs'
       style={{
-        borderBottom: hideBorder ? 'none' : '1px solid var(--mantine-color-dark-5)',
+        borderBottom: hideBorder ? 'none' : '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Text size='sm' c='gray.4'>
+      <Text size='sm' c='dimmed'>
         {description}
       </Text>
       <Flex align='center' justify='flex-end' gap={6} style={{ minWidth: 120 }}>
         {keys.map((key, index) => (
           <Flex key={index} align='center' gap={6}>
             {index > 0 && (
-              <Text size='xs' c='dark.3' fw={500}>
+              <Text size='xs' c='dimmed' fw={500}>
                 +
               </Text>
             )}

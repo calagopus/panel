@@ -65,9 +65,9 @@ export default function DashboardShortcuts() {
           px='sm'
           py={6}
           style={{
-            background: 'var(--mantine-color-dark-6)',
+            background: 'var(--mantine-color-default)',
             borderRadius: 6,
-            border: '1px solid var(--mantine-color-dark-5)',
+            border: '1px solid var(--mantine-color-default-border)',
           }}
         >
           <FontAwesomeIcon icon={isMac ? faApple : faWindows} style={{ color: 'var(--mantine-color-gray-5)' }} />

@@ -41,7 +41,9 @@
 }
 
 body {
-  @apply font-sans bg-neutral-850 text-neutral-200;
+  @apply font-sans;
+  background-color: var(--mantine-color-body);
+  color: var(--mantine-color-text);
 }
 
 h1,
@@ -54,7 +56,8 @@ h6 {
 }
 
 p {
-  @apply text-neutral-200 leading-snug font-sans;
+  @apply leading-snug font-sans;
+  color: var(--mantine-color-text);
 }
 
 form {

@@ -88,7 +88,7 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
     <ErrorBoundary>
       <MantineProvider
         theme={theme}
-        forceColorScheme='dark'
+        defaultColorScheme='dark'
         cssVariablesResolver={v8CssVariablesResolver}
         deduplicateInlineStyles
       >
