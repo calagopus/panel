@@ -92,6 +92,28 @@ impl LocationDatabaseHost {
         row.try_map(|row| Self::map(None, &row))
     }
 
+    pub async fn by_location_uuid_database_host_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        location_uuid: uuid::Uuid,
+        database_host_uuid: uuid::Uuid,
+    ) -> Result<Option<Self>, crate::database::DatabaseError> {
+        let row = sqlx::query(&format!(
+            r#"
+            SELECT {}
+            FROM location_database_hosts
+            JOIN database_hosts ON location_database_hosts.database_host_uuid = database_hosts.uuid
+            WHERE location_database_hosts.location_uuid = $1 AND location_database_hosts.database_host_uuid = $2
+            "#,
+            Self::columns_sql(None)
+        ))
+        .bind(location_uuid)
+        .bind(database_host_uuid)
+        .fetch_optional(&mut **transaction)
+        .await?;
+
+        row.try_map(|row| Self::map(None, &row))
+    }
+
     pub async fn by_location_uuid_with_pagination(
         database: &crate::database::Database,
         location_uuid: uuid::Uuid,
@@ -225,8 +247,8 @@ impl CreatableModel for LocationDatabaseHost {
 
         query_builder.execute(&mut **transaction).await?;
 
-        match Self::by_location_uuid_database_host_uuid(
-            &state.database,
+        match Self::by_location_uuid_database_host_uuid_with_transaction(
+            transaction,
             options.location_uuid,
             options.database_host_uuid,
         )

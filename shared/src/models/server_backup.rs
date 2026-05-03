@@ -1225,25 +1225,13 @@ impl DeletableModel for ServerBackup {
 
     async fn delete_with_transaction(
         &self,
-        state: &crate::State,
-        options: Self::DeleteOptions,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        _state: &crate::State,
+        _options: Self::DeleteOptions,
+        _transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        self.run_delete_handlers(&options, state, transaction)
-            .await?;
-
-        sqlx::query(
-            r#"
-            UPDATE server_backups
-            SET deleted = NOW()
-            WHERE server_backups.uuid = $1
-            "#,
-        )
-        .bind(self.uuid)
-        .execute(&mut **transaction)
-        .await?;
-
-        Ok(())
+        Err(anyhow::anyhow!(
+            "delete_with_transaction is not supported for ServerBackup"
+        ))
     }
 
     async fn delete(
