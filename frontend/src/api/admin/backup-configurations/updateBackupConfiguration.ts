@@ -14,10 +14,21 @@ export default async (
     backup_disk: data.backupDisk,
     backup_configs: data.backupConfigs
       ? {
-          s3: data.backupConfigs.s3 ? transformKeysToSnakeCase(data.backupConfigs.s3) : null,
+          s3: data.backupConfigs.s3
+            ? {
+                access_key: data.backupConfigs.s3.accessKey,
+                secret_key: data.backupConfigs.s3.secretKey,
+                bucket: data.backupConfigs.s3.bucket,
+                region: data.backupConfigs.s3.region,
+                endpoint: data.backupConfigs.s3.endpoint,
+                path_style: data.backupConfigs.s3.pathStyle,
+                part_size: data.backupConfigs.s3.partSize,
+              }
+            : null,
           restic: data.backupConfigs.restic
             ? {
-                ...transformKeysToSnakeCase(data.backupConfigs.restic),
+                repository: data.backupConfigs.restic.repository,
+                retry_lock_seconds: data.backupConfigs.restic.retryLockSeconds,
                 environment: data.backupConfigs.restic.environment,
               }
             : null,
