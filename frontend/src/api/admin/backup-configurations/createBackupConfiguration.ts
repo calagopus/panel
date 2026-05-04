@@ -10,10 +10,13 @@ export default async (
   backupConfigurationData: z.infer<typeof adminBackupConfigurationUpdateSchema>,
 ): Promise<z.infer<typeof adminBackupConfigurationSchema>> => {
   const { data } = await axiosInstance.post('/api/admin/backup-configurations', {
-    ...transformKeysToSnakeCase(backupConfigurationData),
+    name: backupConfigurationData.name,
+    description: backupConfigurationData.description,
+    maintenance_enabled: backupConfigurationData.maintenanceEnabled,
+    backup_disk: backupConfigurationData.backupDisk,
     backup_configs: backupConfigurationData.backupConfigs
       ? {
-          ...transformKeysToSnakeCase(backupConfigurationData.backupConfigs),
+          s3: backupConfigurationData.backupConfigs.s3 ? transformKeysToSnakeCase(backupConfigurationData.backupConfigs.s3) : null,
           restic: backupConfigurationData.backupConfigs.restic
             ? {
                 ...transformKeysToSnakeCase(backupConfigurationData.backupConfigs.restic),

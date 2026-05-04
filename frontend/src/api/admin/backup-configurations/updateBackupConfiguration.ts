@@ -8,10 +8,13 @@ export default async (
   data: z.infer<typeof adminBackupConfigurationUpdateSchema>,
 ): Promise<void> => {
   await axiosInstance.patch(`/api/admin/backup-configurations/${backupConfigUuid}`, {
-    ...transformKeysToSnakeCase(data),
+    name: data.name,
+    description: data.description,
+    maintenance_enabled: data.maintenanceEnabled,
+    backup_disk: data.backupDisk,
     backup_configs: data.backupConfigs
       ? {
-          ...transformKeysToSnakeCase(data.backupConfigs),
+          s3: data.backupConfigs.s3 ? transformKeysToSnakeCase(data.backupConfigs.s3) : null,
           restic: data.backupConfigs.restic
             ? {
                 ...transformKeysToSnakeCase(data.backupConfigs.restic),
