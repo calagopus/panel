@@ -1616,7 +1616,7 @@
                 "cronSchedule": "Cron Zamanlaması"
               },
               "card": {
-                "content": "`{schedule}` Cron aralığında, Sonraki çalışma: {timestamp} - Son çalışma: {lastTimestamp}."
+                "content": "{schedule} Cron aralığında, Sonraki çalışma: {timestamp} - Son çalışma: {lastTimestamp}."
               }
             },
             "powerAction": {

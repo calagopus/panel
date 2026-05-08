@@ -1604,7 +1604,7 @@
                 "cronSchedule": "Lịch Trình Cron"
               },
               "card": {
-                "content": "Trên Khoảng Thời Gian Cron `{schedule}`, Lần Chạy Tiếp Theo Là {timestamp} - Lần Chạy Cuối Là {lastTimestamp}."
+                "content": "Trên Khoảng Thời Gian Cron {schedule}, Lần Chạy Tiếp Theo Là {timestamp} - Lần Chạy Cuối Là {lastTimestamp}."
               }
             },
             "powerAction": {

@@ -1630,7 +1630,7 @@
                 "cronSchedule": "Cron-Zeitplan"
               },
               "card": {
-                "content": "Im Cron-Intervall `{schedule}`, nächste Ausführung ist {timestamp} - letzte Ausführung war {lastTimestamp}."
+                "content": "Im Cron-Intervall {schedule}, nächste Ausführung ist {timestamp} - letzte Ausführung war {lastTimestamp}."
               }
             },
             "powerAction": {

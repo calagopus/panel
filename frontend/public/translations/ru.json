@@ -1604,7 +1604,7 @@
                 "cronSchedule": "Расписание Cron"
               },
               "card": {
-                "content": "По cron-интервалу `{schedule}`, следующий запуск {timestamp} — последний запуск {lastTimestamp}."
+                "content": "По cron-интервалу {schedule}, следующий запуск {timestamp} — последний запуск {lastTimestamp}."
               }
             },
             "powerAction": {

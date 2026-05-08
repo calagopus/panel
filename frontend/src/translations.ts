@@ -1655,8 +1655,9 @@ const baseTranslations = defineTranslations({
                 cronSchedule: 'Cron Schedule',
               },
               card: {
-                content: 'On Cron Interval `{schedule}`, Next run is {timestamp} - Last run was {lastTimestamp}.',
+                content: 'On Cron Interval {schedule}, Next run is {timestamp} - Last run was {lastTimestamp}.',
               },
+              invalidCron: 'Invalid cron expression',
             },
             powerAction: {
               title: 'Power Action',
