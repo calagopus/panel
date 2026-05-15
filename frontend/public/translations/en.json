@@ -1297,7 +1297,8 @@
             "fileSaved": "File has been saved."
           },
           "tooltip": {
-            "fileHistory": "File History"
+            "fileHistory": "File History",
+            "largestDirectories": "Analyze directory sizes"
           },
           "drawer": {
             "revisions": {
@@ -1405,6 +1406,10 @@
               "form": {
                 "fileName": "File Name"
               }
+            },
+            "largestDirectories": {
+              "title": "Largest Directories",
+              "empty": "No directories found."
             },
             "searchFiles": {
               "title": "Search Files",

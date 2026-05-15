@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {
     "node": ">=24.0.0",
-    "pnpm": ">=10.0.0"
+    "pnpm": ">=11.0.0"
   },
   "author": "Calagopus",
   "license": "MIT",
@@ -112,11 +112,5 @@
     "vite": "^8.0.13",
     "vite-multiple-assets": "^2.2.6",
     "vite-plugin-static-copy": "^4.1.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@tailwindcss/oxide",
-      "esbuild"
-    ]
   }
 }
