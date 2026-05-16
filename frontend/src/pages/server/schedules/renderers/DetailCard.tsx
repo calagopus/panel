@@ -17,7 +17,7 @@ export default function DetailCard({ icon, label, value, color = 'blue' }: Detai
       </ThemeIcon>
       <div className='flex flex-col ml-4 w-full'>
         <div className='w-full flex justify-between'>
-          <span className='text-sm text-gray-400 font-bold'>{label}</span>
+          <span className='text-sm text-(--mantine-color-dimmed) font-bold'>{label}</span>
         </div>
         <span className='text-lg font-bold'>{value}</span>
       </div>

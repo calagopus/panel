@@ -136,7 +136,7 @@ export default function ServerGroupItem({
       <Card key={serverGroup.uuid} p={0} className='overflow-hidden rounded-xl!'>
         <div
           id='server-group-item-header'
-          className='flex flex-row items-end sm:items-center gap-3 px-3 bg-(--mantine-color-default) justify-between'
+          className='flex flex-row items-end sm:items-center gap-3 px-3 bg-(--mantine-color-dark-7) light:bg-(--mantine-color-gray-0)! justify-between border-b border-(--mantine-color-default-border)'
         >
           <div className='flex flex-col my-3 sm:my-0'>
             <div className='flex flex-row'>
@@ -145,7 +145,7 @@ export default function ServerGroupItem({
                 variant='subtle'
                 color='gray'
                 style={{ cursor: 'grab', flexShrink: 0 }}
-                className='text-gray-400!'
+                className='text-gray-400! light:text-gray-500!'
                 {...dragHandleProps}
               >
                 <FontAwesomeIcon icon={faGripVertical} style={{ fontSize: 16 }} />
@@ -159,7 +159,7 @@ export default function ServerGroupItem({
                   icon={faChevronRight}
                   className={classNames(
                     isExpanded ? 'rotate-90' : 'rotate-0',
-                    'transition duration-200 w-3 h-3 text-gray-400 shrink-0',
+                    'transition duration-200 w-3 h-3 text-(--mantine-color-dimmed) shrink-0',
                   )}
                 />
                 <span className='font-medium truncate'>{serverGroup.name}</span>
@@ -173,7 +173,7 @@ export default function ServerGroupItem({
               size='xs'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              leftSection={<FontAwesomeIcon icon={faSearch} className='w-3 h-3 text-gray-500' />}
+              leftSection={<FontAwesomeIcon icon={faSearch} className='w-3 h-3 text-(--mantine-color-dimmed)' />}
               className='w-48 mt-1 sm:hidden'
             />
           </div>
@@ -184,7 +184,7 @@ export default function ServerGroupItem({
               size='xs'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              leftSection={<FontAwesomeIcon icon={faSearch} className='w-3 h-3 text-gray-500' />}
+              leftSection={<FontAwesomeIcon icon={faSearch} className='w-3 h-3 text-(--mantine-color-dimmed)' />}
               className='min-w-32 hidden sm:block'
             />
             <div className='flex flex-row items-center gap-1 w-full justify-end'>
@@ -254,7 +254,9 @@ export default function ServerGroupItem({
             {loading ? (
               <Spinner.Centered />
             ) : servers.total === 0 ? (
-              <p className='text-gray-500 text-sm text-center py-4'>{t('pages.account.home.noServers', {})}</p>
+              <p className='text-gray-500 text-sm text-center py-4 light:text-gray-600!'>
+                {t('pages.account.home.noServers', {})}
+              </p>
             ) : (
               <DndContainer
                 items={dndServers}

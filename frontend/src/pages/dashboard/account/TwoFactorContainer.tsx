@@ -22,7 +22,7 @@ export default function TwoFactorContainer() {
           ? t('pages.account.account.containers.twoFactor.twoFactorEnabled', {}).md()
           : t('pages.account.account.containers.twoFactor.twoFactorDisabled', {}).md()}
         {user?.totpLastUsed && (
-          <span className='mt-2 text-sm text-gray-400'>
+          <span className='mt-2 text-sm text-(--mantine-color-dimmed)'>
             {tReact('pages.account.account.containers.twoFactor.twoFactorLastUsed', {
               timestamp: <FormattedTimestamp timestamp={user.totpLastUsed} tooltipClassName='inline-block' />,
             })}

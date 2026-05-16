@@ -117,7 +117,7 @@ export function Pagination<T>({ data, onPageSelect, ...props }: PaginationProps<
 
   return isFirstPage && isLastPage ? null : (
     <Group justify='space-between' hidden={rangeEnd === 0} {...props}>
-      <p className='text-sm leading-5 text-gray-400'>
+      <p className='text-sm leading-5 text-(--mantine-color-dimmed)'>
         {t('common.table.pagination.results', {
           start: rangeStart,
           end: rangeEnd,

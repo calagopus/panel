@@ -196,7 +196,7 @@ export default function ServerStartup() {
             searchable
             disabled={!useServerCan('startup.docker-image') || !settings.server.allowOverwritingCustomDockerImage}
           />
-          <p className='text-gray-400 text-sm mt-4'>
+          <p className='text-(--mantine-color-dimmed) text-sm mt-4'>
             {Object.values(server.egg.dockerImages).includes(server.image) ||
             settings.server.allowOverwritingCustomDockerImage
               ? t('pages.server.startup.dockerImageDescription', {})
@@ -218,7 +218,7 @@ export default function ServerStartup() {
         {variablesLoading ? (
           <Spinner.Centered className='col-span-full' />
         ) : variables.length === 0 ? (
-          <p className='text-gray-400 col-span-full'>{t('pages.server.startup.noVariables', {})}</p>
+          <p className='text-(--mantine-color-dimmed) col-span-full'>{t('pages.server.startup.noVariables', {})}</p>
         ) : null}
         {variables.map((variable) => (
           <VariableContainer

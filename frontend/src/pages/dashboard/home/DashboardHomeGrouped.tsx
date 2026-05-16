@@ -60,7 +60,9 @@ export default function DashboardHomeGrouped() {
       {loading ? (
         <Spinner.Centered />
       ) : serverGroups.length === 0 ? (
-        <p className='text-gray-400'>{t('pages.account.home.tabs.groupedServers.page.noGroups', {})}</p>
+        <p className='text-gray-400 light:text-gray-600!'>
+          {t('pages.account.home.tabs.groupedServers.page.noGroups', {})}
+        </p>
       ) : (
         <DndContainer
           items={dndServerGroups}

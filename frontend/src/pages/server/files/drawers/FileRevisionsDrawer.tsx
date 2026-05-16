@@ -50,7 +50,7 @@ function RevisionRow({
   };
 
   return (
-    <Card className='p-3 rounded-md border border-gray-700'>
+    <Card className='p-3 rounded-md'>
       <div className='flex items-start gap-3'>
         <img
           src={revision.user?.avatar ?? '/icon.svg'}
@@ -69,7 +69,7 @@ function RevisionRow({
               </Badge>
             )}
           </div>
-          <div className='flex items-center gap-2 text-xs text-gray-400'>
+          <div className='flex items-center gap-2 text-xs text-(--mantine-color-dimmed)'>
             <span>{revision.user?.username ?? t('common.system', {})}</span>
             <span>•</span>
             <FormattedTimestamp timestamp={revision.created} />
@@ -113,7 +113,7 @@ export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClo
           {isLoading ? (
             <Spinner.Centered />
           ) : !revisions || revisions.length === 0 ? (
-            <div className='flex items-center justify-center py-12 text-gray-400'>
+            <div className='flex items-center justify-center py-12 text-(--mantine-color-dimmed)'>
               {t('pages.server.files.drawer.revisions.noRevisions', {})}
             </div>
           ) : (

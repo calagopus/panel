@@ -64,12 +64,15 @@ function ServerFilesColumnRightSection({ name }: { name: ServerFilesColumn }) {
       <FontAwesomeIcon
         icon={faChevronUp}
         size='xs'
-        className={classNames('-mb-0.5', isActive && isAsc ? 'text-(--mantine-color-text)' : 'text-gray-400')}
+        className={classNames(
+          '-mb-0.5',
+          isActive && isAsc ? 'text-(--mantine-color-text)' : 'text-(--mantine-color-dimmed)',
+        )}
       />
       <FontAwesomeIcon
         icon={faChevronDown}
         size='xs'
-        className={isActive && !isAsc ? 'text-(--mantine-color-text)' : 'text-gray-400'}
+        className={isActive && !isAsc ? 'text-(--mantine-color-text)' : 'text-(--mantine-color-dimmed)'}
       />
     </div>
   );

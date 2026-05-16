@@ -166,14 +166,14 @@ export default function PermissionSelector({
                     {permissionIcons[permissionIconMap[permissionsMapType]][category] ?? (
                       <FontAwesomeIcon
                         icon={permissionCategoryIconMapping[category]}
-                        className='w-5 h-5 text-gray-50'
+                        className='w-5 h-5 text-(--mantine-color-text)'
                       />
                     )}
                     <div>
                       <Title order={5} className='uppercase'>
                         {category.replaceAll('-', ' ')}
                       </Title>
-                      <p className='text-sm text-gray-200 mt-1'>{description}</p>
+                      <p className='text-sm text-(--mantine-color-dimmed) mt-1'>{description}</p>
                     </div>
                   </div>
                   <div className='flex items-center gap-2'>
@@ -210,10 +210,10 @@ export default function PermissionSelector({
                             <Group wrap='nowrap' align='flex-start'>
                               <Checkbox.Indicator />
                               <div>
-                                <div className='text-gray-50 font-bold'>
+                                <div className='text-(--mantine-color-text) font-bold'>
                                   {permission.charAt(0).toUpperCase() + permission.slice(1)}
                                 </div>
-                                <div className='text-sm text-gray-200 mt-1'>{permDescription}</div>
+                                <div className='text-sm text-(--mantine-color-dimmed) mt-1'>{permDescription}</div>
                               </div>
                             </Group>
                           </Checkbox.Card>

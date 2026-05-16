@@ -97,7 +97,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
               </Button>
             </div>
 
-            <Group gap='xs' className='text-sm text-gray-400'>
+            <Group gap='xs' className='text-sm text-(--mantine-color-dimmed)'>
               <img
                 src={selectedCommand.avatar ?? '/icon.svg'}
                 alt={selectedCommand.user ?? 'System'}
@@ -151,7 +151,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
             {loading && activities.data.length === 0 ? (
               <Spinner.Centered />
             ) : activities.data.length === 0 ? (
-              <div className='flex items-center justify-center py-12 text-gray-400'>
+              <div className='flex items-center justify-center py-12 text-(--mantine-color-dimmed)'>
                 {t('pages.server.console.drawer.commandHistory.noCommands', {})}
               </div>
             ) : (
@@ -164,7 +164,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
                     <Card
                       key={`${activity.created}-${index}`}
                       onClick={() => handleRowClick(activity)}
-                      className='p-3 rounded-md border cursor-pointer transition-all border-gray-700 hover:border-gray-600 hover:bg-gray-800/50'
+                      className='p-3 rounded-md'
                       hoverable
                     >
                       <div className='flex items-start gap-3'>
@@ -175,7 +175,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
                         />
                         <div className='flex-1 min-w-0'>
                           <Code className='block mb-1.5 text-xs wrap-break-word'>{data.command}</Code>
-                          <div className='flex items-center gap-2 text-xs text-gray-400'>
+                          <div className='flex items-center gap-2 text-xs text-(--mantine-color-dimmed)'>
                             <span>
                               {activity.user?.username ??
                                 (activity.isSchedule ? t('common.schedule', {}) : t('common.system', {}))}
