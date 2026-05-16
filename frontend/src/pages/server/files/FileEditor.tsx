@@ -4,7 +4,7 @@ import { Group, Title } from '@mantine/core';
 import { type OnMount } from '@monaco-editor/react';
 import { join } from 'pathe';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
-import { createSearchParams, useNavigate, useParams, useSearchParams } from 'react-router';
+import { createSearchParams, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
@@ -47,6 +47,7 @@ function FileEditorComponent() {
   const { t } = useTranslations();
   const [searchParams, _] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const {
@@ -79,6 +80,12 @@ function FileEditorComponent() {
     setBrowsingDirectory(searchParams.get('directory') || '/');
     setFileName(searchParams.get('file') || '');
   }, [searchParams]);
+
+  useEffect(() => {
+    if (location.state?.openRevisions) {
+      setRevisionsOpen(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!browsingDirectory || !fileName) return;

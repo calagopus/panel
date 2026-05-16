@@ -17,6 +17,7 @@ import ServerActivity from '@/pages/server/activity/ServerActivity.tsx';
 import ServerBackups from '@/pages/server/backups/ServerBackups.tsx';
 import ServerDatabases from '@/pages/server/databases/ServerDatabases.tsx';
 import ServerFilesEditor from '@/pages/server/files/FileEditor.tsx';
+import FileRevisionDiff from '@/pages/server/files/FileRevisionDiff.tsx';
 import ServerFiles from '@/pages/server/files/ServerFiles.tsx';
 import ServerMounts from '@/pages/server/mounts/ServerMounts.tsx';
 import ServerNetwork from '@/pages/server/network/ServerNetwork.tsx';
@@ -43,6 +44,12 @@ const routes: ServerRouteDefinition[] = [
     icon: faFolderOpen,
     path: '/files',
     element: ServerFiles,
+    permission: 'files.read',
+  },
+  {
+    name: undefined,
+    path: '/files/diff',
+    element: FileRevisionDiff,
     permission: 'files.read',
   },
   {

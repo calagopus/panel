@@ -1,8 +1,9 @@
-import { faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsLeftRight, faCodeCompare, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DrawerProps, ScrollArea, Stack } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileRevisionContent from '@/api/server/files/getFileRevisionContent.ts';
@@ -28,13 +29,20 @@ interface Props extends DrawerProps {
 
 function RevisionRow({
   revision,
+  filePath,
+  showDiffVsCurrent,
+  previousRevisionId,
   onRestore,
 }: {
   revision: z.infer<typeof serverFileRevisionSchema>;
+  filePath: string;
+  showDiffVsCurrent: boolean;
+  previousRevisionId: number | null;
   onRestore: (content: string) => void;
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const server = useServerStore((state) => state.server);
   const [loading, setLoading] = useState(false);
 
@@ -47,6 +55,25 @@ function RevisionRow({
       })
       .catch((err) => addToast(httpErrorToHuman(err), 'error'))
       .finally(() => setLoading(false));
+  };
+
+  const handleViewDiff = () => {
+    navigate(
+      `/server/${server.uuidShort}/files/diff?${createSearchParams({
+        file: filePath,
+        revision: String(revision.id),
+      })}`,
+    );
+  };
+
+  const handleCompareToPrevious = () => {
+    navigate(
+      `/server/${server.uuidShort}/files/diff?${createSearchParams({
+        file: filePath,
+        revision: String(revision.id),
+        previousRevision: String(previousRevisionId),
+      })}`,
+    );
   };
 
   return (
@@ -77,11 +104,27 @@ function RevisionRow({
             <span>{bytesToString(revision.size)}</span>
           </div>
         </div>
-        <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.restore', {})}>
-          <ActionIcon size='sm' variant='subtle' color='gray' loading={loading} onClick={handleRestore}>
-            <FontAwesomeIcon icon={faRotateLeft} />
-          </ActionIcon>
-        </Tooltip>
+        <div className='flex items-center gap-1'>
+          {showDiffVsCurrent && (
+            <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.viewDiff', {})}>
+              <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleViewDiff}>
+                <FontAwesomeIcon icon={faCodeCompare} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          {previousRevisionId !== null && (
+            <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.compareToPrevious', {})}>
+              <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleCompareToPrevious}>
+                <FontAwesomeIcon icon={faArrowsLeftRight} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.restore', {})}>
+            <ActionIcon size='sm' variant='subtle' color='gray' loading={loading} onClick={handleRestore}>
+              <FontAwesomeIcon icon={faRotateLeft} />
+            </ActionIcon>
+          </Tooltip>
+        </div>
       </div>
     </Card>
   );
@@ -105,7 +148,7 @@ export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClo
       opened={opened}
       onClose={onClose}
       title={t('pages.server.files.drawer.revisions.title', {})}
-      size='sm'
+      size='lg'
       {...props}
     >
       <Stack gap='md' className='h-full'>
@@ -118,10 +161,13 @@ export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClo
             </div>
           ) : (
             <Stack gap='xs'>
-              {revisions.map((revision) => (
+              {revisions.map((revision, index) => (
                 <RevisionRow
                   key={revision.id}
                   revision={revision}
+                  filePath={filePath}
+                  showDiffVsCurrent={index !== 0}
+                  previousRevisionId={revisions[index + 1]?.id ?? null}
                   onRestore={(content) => {
                     onRestore(content);
                     onClose();
