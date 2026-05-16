@@ -58,6 +58,25 @@ const getXtermTheme = (isDark: boolean) => ({
   cursorAccent: '#00000000',
   selectionBackground: isDark ? '#FFFFFF4D' : '#0000001A',
   selectionInactiveBackground: isDark ? '#FFFFFF80' : '#00000033',
+  // Light-mode ANSI palette
+  ...(!isDark && {
+    black: '#1c1c1c',
+    red: '#b22222',
+    green: '#005f00',
+    yellow: '#8b6800',
+    blue: '#0000cc',
+    magenta: '#7d0070',
+    cyan: '#005f5f',
+    white: '#6c6c6c',
+    brightBlack: '#505050',
+    brightRed: '#c0392b',
+    brightGreen: '#1e8449',
+    brightYellow: '#b07d00',
+    brightBlue: '#2471a3',
+    brightMagenta: '#7d3c98',
+    brightCyan: '#148f77',
+    brightWhite: '#909090',
+  }),
 });
 
 export default function Terminal() {

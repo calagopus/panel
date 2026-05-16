@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "highlight.js/styles/a11y-light.min.css";
 
+@custom-variant dark (&:where([data-mantine-color-scheme="dark"], [data-mantine-color-scheme="dark"] *));
+@custom-variant light (&:where([data-mantine-color-scheme="light"], [data-mantine-color-scheme="light"] *));
+
 @font-face {
   font-family: "Helvetica";
   font-style: normal;
@@ -39,6 +42,10 @@
   .bg-server-status-stopping {
     background-color: var(--color-server-status-stopping);
   }
+}
+
+:root[data-mantine-color-scheme="light"] {
+  --mantine-color-body: #f0eff0;
 }
 
 body {
