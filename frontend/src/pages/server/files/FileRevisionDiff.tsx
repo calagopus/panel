@@ -97,6 +97,15 @@ function FileRevisionDiffComponent() {
     return () => observer.disconnect();
   }, [loading, getParent]);
 
+  const handleSave = () => {
+    const content = diffEditorRef.current?.getModifiedEditor().getValue() ?? modifiedContent;
+    setSaving(true);
+    saveFileContent(server.uuid, filePath, content)
+      .then(() => addToast(t('pages.server.files.toast.fileSaved', {}), 'success'))
+      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
+      .finally(() => setSaving(false));
+  };
+
   const handleRestore = () => {
     setSaving(true);
     saveFileContent(server.uuid, filePath, originalContent)
@@ -151,9 +160,19 @@ function FileRevisionDiffComponent() {
           <Title>{title}</Title>
         </Group>
         {!previousRevisionId && (
-          <Button loading={saving} leftSection={<FontAwesomeIcon icon={faRotateLeft} />} onClick={handleRestore}>
-            {t('pages.server.files.drawer.revisions.tooltip.restore', {})}
-          </Button>
+          <Group>
+            <Button
+              loading={saving}
+              variant='outline'
+              leftSection={<FontAwesomeIcon icon={faRotateLeft} />}
+              onClick={handleRestore}
+            >
+              {t('pages.server.files.drawer.revisions.tooltip.restore', {})}
+            </Button>
+            <Button loading={saving} onClick={handleSave}>
+              {t('common.button.save', {})}
+            </Button>
+          </Group>
         )}
       </div>
 
@@ -169,7 +188,7 @@ function FileRevisionDiffComponent() {
                 height='100%'
                 width='100%'
                 options={{
-                  readOnly: true,
+                  readOnly: !!previousRevisionId,
                   stickyScroll: { enabled: false },
                   minimap: { enabled: editorMinimap },
                   wordWrap: editorLineOverflow ? 'on' : 'off',
