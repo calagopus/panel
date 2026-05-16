@@ -25,6 +25,7 @@ import { useServerStore } from '@/stores/server.ts';
 interface Props extends DrawerProps {
   filePath: string;
   onRestore: (content: string) => void;
+  getContent?: () => string | undefined;
 }
 
 function RevisionRow({
@@ -32,11 +33,13 @@ function RevisionRow({
   filePath,
   previousRevisionId,
   onRestore,
+  getContent,
 }: {
   revision: z.infer<typeof serverFileRevisionSchema>;
   filePath: string;
   previousRevisionId: number | null;
   onRestore: (content: string) => void;
+  getContent?: () => string | undefined;
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
@@ -56,11 +59,13 @@ function RevisionRow({
   };
 
   const handleViewDiff = () => {
+    const currentContent = getContent?.();
     navigate(
       `/server/${server.uuidShort}/files/diff?${createSearchParams({
         file: filePath,
         revision: String(revision.id),
       })}`,
+      currentContent !== undefined ? { state: { currentContent } } : undefined,
     );
   };
 
@@ -126,7 +131,7 @@ function RevisionRow({
   );
 }
 
-export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClose, ...props }: Props) {
+export default function FileRevisionsDrawer({ filePath, onRestore, getContent, opened, onClose, ...props }: Props) {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
 
@@ -163,6 +168,7 @@ export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClo
                   revision={revision}
                   filePath={filePath}
                   previousRevisionId={revisions[index + 1]?.id ?? null}
+                  getContent={getContent}
                   onRestore={(content) => {
                     onRestore(content);
                     onClose();

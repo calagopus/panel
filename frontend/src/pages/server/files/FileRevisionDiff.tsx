@@ -4,7 +4,7 @@ import { Group, Title } from '@mantine/core';
 import type { editor } from 'monaco-editor';
 import { basename, dirname } from 'pathe';
 import { useEffect, useRef, useState } from 'react';
-import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
+import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
 import getFileRevisionContent from '@/api/server/files/getFileRevisionContent.ts';
@@ -27,6 +27,7 @@ function FileRevisionDiffComponent() {
   const server = useServerStore((state) => state.server);
   const { getParent } = useCurrentWindow();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const { editorMinimap, editorLineOverflow } = useFileManager();
 
   const filePath = searchParams.get('file') || '';
@@ -44,11 +45,15 @@ function FileRevisionDiffComponent() {
   useEffect(() => {
     if (!filePath || !revisionId) return;
 
+    const passedContent: string | undefined = (location.state as { currentContent?: string } | null)?.currentContent;
+
     const fetches: [Promise<string>, Promise<string>] = previousRevisionId
       ? [getFileRevisionContent(server.uuid, previousRevisionId), getFileRevisionContent(server.uuid, revisionId)]
       : [
           getFileRevisionContent(server.uuid, revisionId),
-          getFileContent(server.uuid, filePath).then((blob) => blob.text()),
+          passedContent !== undefined
+            ? Promise.resolve(passedContent)
+            : getFileContent(server.uuid, filePath).then((blob) => blob.text()),
         ];
 
     Promise.all(fetches)

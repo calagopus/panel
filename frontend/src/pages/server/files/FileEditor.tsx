@@ -73,7 +73,10 @@ function FileEditorComponent() {
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const contentRef = useRef(content);
-  const blocker = useBlocker(dirty);
+  const blocker = useBlocker(dirty, false, (tx) => {
+    if (!tx.location.pathname.includes('/files/diff')) return true;
+    return new URLSearchParams(tx.location.search).has('previousRevision');
+  });
   const editorContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -271,6 +274,7 @@ function FileEditorComponent() {
         onClose={() => blocker.reset()}
         onConfirmed={() => blocker.proceed()}
         confirm={t('pages.server.files.modal.unsavedChanges.button.leave', {})}
+        zIndex={300}
       >
         {t('pages.server.files.modal.unsavedChanges.content', {}).md()}
       </ConfirmationModal>
@@ -279,6 +283,7 @@ function FileEditorComponent() {
         filePath={join(browsingDirectory, fileName)}
         opened={revisionsOpen}
         onClose={() => setRevisionsOpen(false)}
+        getContent={() => editorRef.current?.getValue()}
         onRestore={(newContent) => {
           editorRef.current?.setValue(newContent);
           setDirty(true);

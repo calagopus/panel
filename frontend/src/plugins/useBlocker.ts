@@ -10,12 +10,18 @@ export interface CustomBlocker {
   proceed: () => void;
 }
 
-export function useBlocker(when: boolean, ignoreQueryChanges: boolean = false): CustomBlocker {
+export function useBlocker(
+  when: boolean,
+  ignoreQueryChanges: boolean = false,
+  shouldBlock?: (transition: Transition) => boolean,
+): CustomBlocker {
   const history = useHistory();
   const [state, setState] = useState<BlockerState>('idle');
 
   const txRef = useRef<Transition | null>(null);
   const unblockRef = useRef<(() => void) | null>(null);
+  const shouldBlockRef = useRef(shouldBlock);
+  shouldBlockRef.current = shouldBlock;
 
   useEffect(() => {
     if (!when || !history) {
@@ -27,6 +33,15 @@ export function useBlocker(when: boolean, ignoreQueryChanges: boolean = false): 
 
     const handleBlock = (transition: Transition) => {
       if (ignoreQueryChanges && history.location.pathname === transition.location.pathname) {
+        unblock();
+        transition.retry();
+
+        unblock = history.block(handleBlock);
+        unblockRef.current = unblock;
+        return;
+      }
+
+      if (shouldBlockRef.current && !shouldBlockRef.current(transition)) {
         unblock();
         transition.retry();
 
