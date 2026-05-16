@@ -88,7 +88,7 @@ export default function EggRepositoryCreateOrUpdate({
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Nest Deletion'
+        title='Confirm Egg Repository Deletion'
         confirm='Delete'
         onConfirmed={doDelete}
       >

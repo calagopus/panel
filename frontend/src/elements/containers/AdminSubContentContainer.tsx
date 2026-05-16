@@ -14,7 +14,7 @@ export type Props<P = {}> = {
   setSearch?: Dispatch<SetStateAction<string>>;
   contentRight?: ReactNode;
   children: ReactNode;
-} & ({ registry: ContainerRegistry<Props<P>>; registryProps: P } | { registry?: never; registryProps?: never });
+} & ({ registry: ContainerRegistry<Props<P>, P>; registryProps: P } | { registry?: never; registryProps?: never });
 
 function AdminSubContentContainer<P>(props: Props<P>) {
   props = useMemo(() => {
@@ -52,7 +52,9 @@ function AdminSubContentContainer<P>(props: Props<P>) {
 
       {hideTitleComponent ? null : setSearch ? (
         <Group justify='space-between' mb='md'>
-          <Title order={titleOrder}>{title}</Title>
+          <div>
+            <Title order={titleOrder}>{title}</Title>
+          </div>
           <Group>
             <TextInput
               placeholder={t('common.input.search', {})}
@@ -65,11 +67,15 @@ function AdminSubContentContainer<P>(props: Props<P>) {
         </Group>
       ) : contentRight ? (
         <Group justify='space-between' mb='md'>
-          <Title order={titleOrder}>{title}</Title>
+          <div>
+            <Title order={titleOrder}>{title}</Title>
+          </div>
           <Group>{contentRight}</Group>
         </Group>
       ) : (
-        <Title order={titleOrder}>{title}</Title>
+        <div className='mb-4'>
+          <Title order={titleOrder}>{title}</Title>
+        </div>
       )}
       {registry?.prependedContentComponents.map((Component, index) => (
         <Component key={`prepended-sub-content-${index}`} {...props} {...registryProps} />

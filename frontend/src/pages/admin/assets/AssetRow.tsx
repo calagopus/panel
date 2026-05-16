@@ -1,4 +1,4 @@
-import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { forwardRef, useState } from 'react';
 import { createSearchParams, NavLink } from 'react-router';
@@ -11,6 +11,7 @@ import Checkbox from '@/elements/input/Checkbox.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { handleRawCopyToClipboard } from '@/lib/copy.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -94,6 +95,12 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
 
       <ContextMenu
         items={[
+          {
+            icon: faCopy,
+            label: 'Copy Link',
+            onClick: () => handleRawCopyToClipboard(asset.url, addToast),
+            color: 'gray',
+          },
           {
             icon: faTrash,
             label: 'Delete',

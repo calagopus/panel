@@ -32,10 +32,11 @@ export default function VariableContainer({
 }: Props) {
   const { t, language } = useTranslations();
 
+  const title = variable.nameTranslations?.[language] || variable.name;
   const description = variable.descriptionTranslations?.[language] || variable.description;
 
   return (
-    <TitleCard title={variable.name} icon={<FontAwesomeIcon icon={faCog} />}>
+    <TitleCard title={title} icon={<FontAwesomeIcon icon={faCog} />}>
       <div className='flex flex-row w-full justify-between items-start'>
         <div className='w-full'>
           {variable.rules.includes('boolean') ||

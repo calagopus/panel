@@ -1625,7 +1625,7 @@
                 "cronSchedule": "جدول Cron"
               },
               "card": {
-                "content": "على فاصل Cron `{schedule}`، التشغيل التالي هو {timestamp} - التشغيل الأخير كان {lastTimestamp}."
+                "content": "على فاصل Cron {schedule}، التشغيل التالي هو {timestamp} - التشغيل الأخير كان {lastTimestamp}."
               }
             },
             "powerAction": {

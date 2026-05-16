@@ -263,7 +263,9 @@ impl CreatableModel for NestEggMount {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let nest_egg_mount = Self::map(None, &row)?;
+        let mut nest_egg_mount = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut nest_egg_mount, &options, state, transaction).await?;
 
         Ok(nest_egg_mount)
     }
@@ -273,8 +275,8 @@ impl CreatableModel for NestEggMount {
 impl DeletableModel for NestEggMount {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<NestEggMount>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<NestEggMount>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -299,6 +301,9 @@ impl DeletableModel for NestEggMount {
         .bind(self.mount.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

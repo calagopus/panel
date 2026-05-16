@@ -95,7 +95,7 @@ function LocalizedTextInput({
         }}
         style={{
           position: 'absolute',
-          top: 0,
+          top: label && !inputProps.description ? 24 : 0,
           right: 0,
         }}
       />

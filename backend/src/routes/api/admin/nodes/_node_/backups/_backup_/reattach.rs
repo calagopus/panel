@@ -72,23 +72,24 @@ mod post {
                 }
             };
 
-        if server.node.uuid != node.uuid && !backup.is_remote() {
+        if server.node.uuid != node.uuid && !backup.shared {
             return ApiResponse::error("server does not belong to the same node as the backup")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }
 
         sqlx::query!(
-            "UPDATE server_backups SET server_uuid = $1 WHERE uuid = $2",
+            "UPDATE server_backups SET server_uuid = $2, node_uuid = $3 WHERE server_backups.uuid = $1",
+            backup.uuid,
             server.uuid,
-            backup.uuid
+            server.node.uuid
         )
         .execute(state.database.write())
         .await?;
 
         activity_logger
             .log(
-                "node:backup.attach",
+                "node:backup.reattach",
                 serde_json::json!({
                     "uuid": backup.uuid,
                     "node_uuid": node.uuid,

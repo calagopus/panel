@@ -231,7 +231,7 @@ impl UserApiKey {
         sqlx::query(
             r#"
             UPDATE user_api_keys
-            SET key_start = $1, key = crypt($2, gen_salt('xdes', 321))
+            SET key_start = $1, key = crypt($2, gen_salt('bf', 12))
             WHERE user_api_keys.uuid = $3
             "#,
         )
@@ -244,6 +244,22 @@ impl UserApiKey {
         self.key_start = new_key[0..16].into();
 
         Ok(new_key)
+    }
+
+    pub async fn count_by_user_uuid(
+        database: &crate::database::Database,
+        user_uuid: uuid::Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar(
+            r#"
+            SELECT COUNT(*)
+            FROM user_api_keys
+            WHERE user_api_keys.user_uuid = $1
+            "#,
+        )
+        .bind(user_uuid)
+        .fetch_one(database.read())
+        .await
     }
 }
 
@@ -335,7 +351,7 @@ impl CreatableModel for UserApiKey {
             .set("user_uuid", options.user_uuid)
             .set("name", &options.name)
             .set("key_start", &key[0..16])
-            .set_expr("key", "crypt($1, gen_salt('xdes', 321))", vec![&key])
+            .set_expr("key", "crypt($1, gen_salt('bf', 12))", vec![&key])
             .set("allowed_ips", &options.allowed_ips)
             .set("user_permissions", &options.user_permissions)
             .set("admin_permissions", &options.admin_permissions)
@@ -348,7 +364,11 @@ impl CreatableModel for UserApiKey {
             .await?;
         let user_api_key = Self::map(None, &row)?;
 
-        Ok((key, user_api_key))
+        let mut result = (key, user_api_key);
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -381,8 +401,8 @@ pub struct UpdateUserApiKeyOptions {
 impl UpdatableModel for UserApiKey {
     type UpdateOptions = UpdateUserApiKeyOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<UserApiKey>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<UserApiKey>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -398,7 +418,7 @@ impl UpdatableModel for UserApiKey {
 
         let mut query_builder = UpdateQueryBuilder::new("user_api_keys");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -436,6 +456,8 @@ impl UpdatableModel for UserApiKey {
         if let Some(expires) = options.expires {
             self.expires = expires.map(|d| d.naive_utc());
         }
+
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -486,8 +508,8 @@ impl ByUuid for UserApiKey {
 impl DeletableModel for UserApiKey {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserApiKey>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserApiKey>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -511,6 +533,9 @@ impl DeletableModel for UserApiKey {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

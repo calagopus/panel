@@ -5,6 +5,7 @@ import { useState } from 'react';
 import getApiKeys from '@/api/me/api-keys/getApiKeys.ts';
 import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
+import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
@@ -12,12 +13,14 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import ApiKeyCreateOrUpdateModal from '@/pages/dashboard/api-keys/modals/ApiKeyCreateOrUpdateModal.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import { useUserStore } from '@/stores/user.ts';
 import ApiKeyRow from './ApiKeyRow.tsx';
 
 export default function DashboardApiKeys() {
   const { t } = useTranslations();
   const { apiKeys, setApiKeys } = useUserStore();
+  const { settings } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
@@ -30,6 +33,7 @@ export default function DashboardApiKeys() {
   return (
     <AccountContentContainer
       title={t('pages.account.apiKeys.title', {})}
+      subtitle={t('pages.account.apiKeys.subtitle', { current: apiKeys.total, max: settings.user.maxApiKeyCount })}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -39,9 +43,19 @@ export default function DashboardApiKeys() {
               {t('pages.account.apiKeys.button.apiDocumentation', {})}
             </Button>
           </Anchor>
-          <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            {t('common.button.create', {})}
-          </Button>
+          <ConditionalTooltip
+            enabled={apiKeys.total >= settings.user.maxApiKeyCount}
+            label={t('pages.account.apiKeys.tooltip.limitReached', { max: settings.user.maxApiKeyCount })}
+          >
+            <Button
+              onClick={() => setOpenModal('create')}
+              color='blue'
+              leftSection={<FontAwesomeIcon icon={faPlus} />}
+              disabled={apiKeys.total >= settings.user.maxApiKeyCount}
+            >
+              {t('common.button.create', {})}
+            </Button>
+          </ConditionalTooltip>
         </Group>
       }
       registry={window.extensionContext.extensionRegistry.pages.dashboard.apiKeys.container}

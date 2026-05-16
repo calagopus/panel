@@ -171,7 +171,7 @@ export default function PermissionSelector({
                     )}
                     <div>
                       <Title order={5} className='uppercase'>
-                        {category.replace('-', ' ')}
+                        {category.replaceAll('-', ' ')}
                       </Title>
                       <p className='text-sm text-gray-200 mt-1'>{description}</p>
                     </div>

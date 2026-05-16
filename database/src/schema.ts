@@ -58,20 +58,47 @@ export const userToastPositionEnum = pgEnum('user_toast_position', [
   'BOTTOM_CENTER',
   'BOTTOM_RIGHT',
 ]);
+export const announcementTypeEnum = pgEnum('announcement_type', ['INFO', 'SUCCESS', 'WARNING', 'ERROR']);
 
 // Tables
 export const settingsTable = pgTable('settings', {
-  key: varchar({ length: 255 }).primaryKey().notNull(),
+  key: varchar({ length: 512 }).primaryKey().notNull(),
   value: text().notNull(),
 });
 
-export const emailTemplatesTable = pgTable(
-  'email_templates',
+export const versionHistoryTable = pgTable(
+  'version_history',
   {
-    identifier: varchar({ length: 255 }).primaryKey().notNull(),
-    content: text().notNull(),
+    extension: varchar({ length: 255 }).notNull(),
+    version: varchar({ length: 255 }).notNull(),
+    installed: timestamp().defaultNow().notNull(),
   },
+  (cols) => [primaryKey({ name: 'version_history_extension_version_pk', columns: [cols.extension, cols.version] })],
 );
+
+export const announcementsTable = pgTable('announcements', {
+  uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+  type: announcementTypeEnum().notNull(),
+  enabled: boolean().default(false).notNull(),
+  enabled_start: timestamp(),
+  enabled_end: timestamp(),
+  dismissible: boolean().default(false).notNull(),
+  dismissible_end: timestamp(),
+  title: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+  title_translations: jsonb().default({}).notNull(),
+  content: text().notNull(),
+  content_translations: jsonb().default({}).notNull(),
+  locations: uuid().array().default([]).notNull(),
+  nodes: uuid().array().default([]).notNull(),
+  backup_configurations: uuid().array().default([]).notNull(),
+  eggs: uuid().array().default([]).notNull(),
+  created: timestamp().defaultNow().notNull(),
+});
+
+export const emailTemplatesTable = pgTable('email_templates', {
+  identifier: varchar({ length: 255 }).primaryKey().notNull(),
+  content: text().notNull(),
+});
 
 export const usersTable = pgTable(
   'users',
@@ -336,7 +363,7 @@ export const oauthProvidersTable = pgTable(
     client_secret: bytea().notNull(),
     auth_url: varchar({ length: 255 }).notNull(),
     token_url: varchar({ length: 255 }).notNull(),
-    info_url: varchar({ length: 64 }).notNull(),
+    info_url: varchar({ length: 255 }).notNull(),
     scopes: varchar({ length: 64 }).array().notNull(),
     identifier_path: varchar({ length: 255 }).notNull(),
     email_path: varchar({ length: 255 }),
@@ -378,6 +405,7 @@ export const backupConfigurationsTable = pgTable(
     uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     maintenance_enabled: boolean().default(false).notNull(),
+    shared: boolean().default(false).notNull(),
     description: text(),
     backup_disk: backupDiskEnum().default('LOCAL').notNull(),
     backup_configs: jsonb().default({}).notNull(),
@@ -609,6 +637,7 @@ export const nestEggVariablesTable = pgTable(
       .references(() => nestEggsTable.uuid, { onDelete: 'cascade' })
       .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    name_translations: jsonb().default({}).notNull(),
     description: text(),
     description_translations: jsonb().default({}).notNull(),
     order_: smallint().default(0).notNull(),
@@ -622,7 +651,6 @@ export const nestEggVariablesTable = pgTable(
   },
   (cols) => [
     index('egg_variables_egg_uuid_idx').on(cols.egg_uuid),
-    uniqueIndex('egg_variables_egg_uuid_name_idx').on(cols.egg_uuid, cols.name),
     uniqueIndex('egg_variables_egg_uuid_env_variable_idx').on(cols.egg_uuid, cols.env_variable),
   ],
 );
@@ -640,9 +668,7 @@ export const databaseHostsTable = pgTable(
     credentials: jsonb().notNull(),
     created: timestamp().defaultNow().notNull(),
   },
-  (cols) => [
-    uniqueIndex('database_hosts_name_idx').on(cols.name),
-  ],
+  (cols) => [uniqueIndex('database_hosts_name_idx').on(cols.name)],
 );
 
 export const serversTable = pgTable(
@@ -814,12 +840,14 @@ export const serverBackupsTable = pgTable(
     successful: boolean().default(false).notNull(),
     browsable: boolean().default(false).notNull(),
     streaming: boolean().default(false).notNull(),
+    shared: boolean().default(false).notNull(),
     locked: boolean().default(false).notNull(),
     ignored_files: text().array().notNull(),
     checksum: varchar({ length: 255 }),
     bytes: bigint({ mode: 'number' }).default(0).notNull(),
     files: bigint({ mode: 'number' }).default(0).notNull(),
     disk: backupDiskEnum().notNull(),
+    metadata: jsonb().default({}).notNull(),
     upload_id: text(),
     upload_path: text(),
     completed: timestamp(),

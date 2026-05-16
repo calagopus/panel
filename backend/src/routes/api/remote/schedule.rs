@@ -79,7 +79,7 @@ mod post {
                     "UPDATE server_schedule_steps
                     SET error = NULL
                     WHERE server_schedule_steps.schedule_uuid = $1
-                        AND array_length($2::uuid[], 1) IS NULL OR server_schedule_steps.uuid != ALL($2)",
+                        AND (array_length($2::uuid[], 1) IS NULL OR server_schedule_steps.uuid != ALL($2))",
                     schedule.uuid,
                     &schedule_status.errors.keys().copied().collect::<Vec<_>>()
                 )
@@ -90,9 +90,10 @@ mod post {
                 futures.push(
                     sqlx::query!(
                         "UPDATE server_schedule_steps
-                        SET error = $2
-                        WHERE server_schedule_steps.uuid = $1",
+                        SET error = $3
+                        WHERE server_schedule_steps.uuid = $1 AND server_schedule_steps.schedule_uuid = $2",
                         step_uuid,
+                        schedule.uuid,
                         error_message
                     )
                     .execute(state.database.write()),

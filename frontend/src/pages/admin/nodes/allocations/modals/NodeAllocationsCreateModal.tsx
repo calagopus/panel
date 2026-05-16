@@ -37,7 +37,7 @@ export default function NodeAllocationsCreateModal({
   useEffect(() => {
     const { resolved, toRemove } = resolvePorts(form.values.ports);
 
-    for (const removable in toRemove) {
+    for (const removable of toRemove) {
       form.setFieldValue('ports', (p) => p.filter((r) => r !== removable));
     }
 

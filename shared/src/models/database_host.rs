@@ -99,6 +99,20 @@ fn validate_connection_string(connection_string: &str, _context: &()) -> Result<
     DatabaseType::from_url_scheme(url.scheme())
         .map_err(|err| garde::Error::new(format!("Invalid connection string: {err}")))?;
 
+    if url.host_str().is_none() {
+        return Err(garde::Error::new("Invalid connection string: missing host"));
+    }
+    if url.username().is_empty() {
+        return Err(garde::Error::new(
+            "Invalid connection string: missing username",
+        ));
+    }
+    if url.password().is_none() {
+        return Err(garde::Error::new(
+            "Invalid connection string: missing password",
+        ));
+    }
+
     Ok(())
 }
 
@@ -659,7 +673,9 @@ impl CreatableModel for DatabaseHost {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let database_host = Self::map(None, &row)?;
+        let mut database_host = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut database_host, &options, state, transaction).await?;
 
         Ok(database_host)
     }
@@ -701,8 +717,8 @@ pub struct UpdateDatabaseHostOptions {
 impl UpdatableModel for DatabaseHost {
     type UpdateOptions = UpdateDatabaseHostOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<DatabaseHost>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<DatabaseHost>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -718,7 +734,7 @@ impl UpdatableModel for DatabaseHost {
 
         let mut query_builder = UpdateQueryBuilder::new("database_hosts");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         if let Some(credentials) = &mut options.credentials {
@@ -768,6 +784,8 @@ impl UpdatableModel for DatabaseHost {
             self.credentials = credentials;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -776,8 +794,8 @@ impl UpdatableModel for DatabaseHost {
 impl DeletableModel for DatabaseHost {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<DatabaseHost>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<DatabaseHost>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -801,6 +819,9 @@ impl DeletableModel for DatabaseHost {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

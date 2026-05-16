@@ -4,6 +4,8 @@ import { z } from 'zod';
 import type { Props as SubContainerProps } from '@/elements/containers/AdminSubContentContainer.tsx';
 import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/servers';
 
+type PageProps = { server: z.infer<typeof adminServerSchema> };
+
 export class MountsRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.subContainer.mergeFrom(other.subContainer);
@@ -12,17 +14,14 @@ export class MountsRegistry implements Registry {
     return this;
   }
 
-  public subContainer: ContainerRegistry<SubContainerProps<{ server: z.infer<typeof adminServerSchema> }>> =
-    new ContainerRegistry();
+  public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
   public contextMenu: ContextMenuRegistry<{
     server: z.infer<typeof adminServerSchema>;
     mount: z.infer<typeof adminServerMountSchema>;
   }> = new ContextMenuRegistry();
 
   public enterSubContainer(
-    callback: (
-      registry: ContainerRegistry<SubContainerProps<{ server: z.infer<typeof adminServerSchema> }>>,
-    ) => unknown,
+    callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
     callback(this.subContainer);
     return this;

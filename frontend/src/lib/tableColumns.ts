@@ -1,3 +1,5 @@
+export const announcementTableColumns = ['ID', 'Type', 'Title', 'Enabled', 'Created'];
+
 export const assetTableColumns = ['', 'Name', 'Size', 'Created'];
 
 export const backupConfigurationTableColumns = ['ID', 'Name', 'Disk', 'Created'];

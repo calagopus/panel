@@ -95,7 +95,7 @@ function LocalizedTextArea({
         }}
         style={{
           position: 'absolute',
-          top: label ? 0 : 6,
+          top: label && !textareaProps.description ? 25 : 6,
           right: 0,
         }}
       />

@@ -20,10 +20,10 @@ import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTabl
 import { useToast } from '@/providers/ToastProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
-import DatabaseHostCreateOrUpdate from './OAuthProviderCreateOrUpdate.tsx';
+import OAuthProviderCreateOrUpdate from './OAuthProviderCreateOrUpdate.tsx';
 import OAuthProviderImportOverlay from './OAuthProviderImportOverlay.tsx';
-import DatabaseHostRow from './OAuthProviderRow.tsx';
-import DatabaseHostView from './OAuthProviderView.tsx';
+import OAuthProviderRow from './OAuthProviderRow.tsx';
+import OAuthProviderView from './OAuthProviderView.tsx';
 
 function OAuthProvidersContainer() {
   const navigate = useNavigate();
@@ -112,7 +112,7 @@ function OAuthProvidersContainer() {
 
       <Table columns={oauthProviderTableColumns} loading={loading} pagination={oauthProviders} onPageSelect={setPage}>
         {oauthProviders.data.map((oauthProvider) => (
-          <DatabaseHostRow key={oauthProvider.uuid} oauthProvider={oauthProvider} />
+          <OAuthProviderRow key={oauthProvider.uuid} oauthProvider={oauthProvider} />
         ))}
       </Table>
     </AdminContentContainer>
@@ -123,9 +123,9 @@ export default function AdminOAuthProviders() {
   return (
     <Routes>
       <Route path='/' element={<OAuthProvidersContainer />} />
-      <Route path='/:id/*' element={<DatabaseHostView />} />
-      <Route element={<AdminPermissionGuard permission='database-hosts.create' />}>
-        <Route path='/new' element={<DatabaseHostCreateOrUpdate />} />
+      <Route path='/:id/*' element={<OAuthProviderView />} />
+      <Route element={<AdminPermissionGuard permission='oauth-providers.create' />}>
+        <Route path='/new' element={<OAuthProviderCreateOrUpdate />} />
       </Route>
     </Routes>
   );

@@ -51,21 +51,19 @@ export default function TwoFactorSetupButton() {
   });
 
   useEffect(() => {
-    if (!open) {
-      stageStack.open('setup');
+    if (stageStack.state.setup) {
+      getTwoFactor()
+        .then((res) => {
+          setToken(res);
+        })
+        .catch((msg) => {
+          addToast(httpErrorToHuman(msg), 'error');
+        });
+    } else {
       setRecoveryCodes([]);
       form.reset();
-      return;
     }
-
-    getTwoFactor()
-      .then((res) => {
-        setToken(res);
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      });
-  }, [open]);
+  }, [stageStack.state.setup]);
 
   const setCanvasRef = useCallback(
     (node: HTMLCanvasElement) => {

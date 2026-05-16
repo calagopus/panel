@@ -11,6 +11,7 @@ import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import LocalizedTextArea from '@/elements/input/LocalizedTextArea.tsx';
+import LocalizedTextInput from '@/elements/input/LocalizedTextInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -40,6 +41,7 @@ export default function EggVariableContainer({
   const form = useForm<z.infer<typeof adminEggVariableUpdateSchema>>({
     initialValues: {
       name: '',
+      nameTranslations: {},
       description: null,
       descriptionTranslations: {},
       order: 0,
@@ -146,7 +148,17 @@ export default function EggVariableContainer({
       <Card className='flex flex-col justify-between h-full'>
         <form onSubmit={form.onSubmit(doCreateOrUpdate)}>
           <Stack>
-            <TextInput withAsterisk label='Name' placeholder='Name' {...form.getInputProps('name')} />
+            <LocalizedTextInput
+              withAsterisk
+              label='Name'
+              placeholder='Name'
+              value={form.values.name}
+              setValue={(value) => form.setFieldValue('name', value ?? '')}
+              valueTranslations={form.values.nameTranslations}
+              setValueTranslations={(translations) => form.setFieldValue('nameTranslations', translations)}
+              languages={languages}
+              error={form.errors.name}
+            />
 
             <LocalizedTextArea
               label='Description'
@@ -157,6 +169,7 @@ export default function EggVariableContainer({
               valueTranslations={form.values.descriptionTranslations}
               setValueTranslations={(translations) => form.setFieldValue('descriptionTranslations', translations)}
               languages={languages}
+              error={form.errors.description}
             />
 
             <Group grow>

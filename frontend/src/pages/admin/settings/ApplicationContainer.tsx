@@ -1,4 +1,4 @@
-import { Group, Stack } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -43,9 +43,10 @@ export default function ApplicationContainer() {
       url: '',
       language: 'en',
       twoFactorRequirement: 'none',
+      sessionCookie: '',
+      sessionDurationSeconds: 3600,
       telemetryEnabled: true,
       registrationEnabled: true,
-      languageChangeEnabled: true,
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(adminSettingsApplicationSchema),
@@ -125,98 +126,97 @@ export default function ApplicationContainer() {
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label='Name'
-              placeholder='Name'
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <Select
-              withAsterisk
-              label='Language'
-              placeholder='Language'
-              data={languages.map((language) => ({
-                label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
-                value: language,
-              }))}
-              searchable
-              key={form.key('language')}
-              {...form.getInputProps('language')}
-            />
-          </Group>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <TextInput
+            withAsterisk
+            label='Name'
+            placeholder='Name'
+            key={form.key('name')}
+            {...form.getInputProps('name')}
+          />
+          <Select
+            withAsterisk
+            label='Language'
+            placeholder='Language'
+            data={languages.map((language) => ({
+              label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
+              value: language,
+            }))}
+            searchable
+            key={form.key('language')}
+            {...form.getInputProps('language')}
+          />
 
-          <Group grow>
-            <Autocomplete
-              withAsterisk
-              label='Icon'
-              placeholder='Icon'
-              data={assets.items.map((asset) => asset.url)}
-              key={form.key('icon')}
-              {...form.getInputProps('icon')}
-            />
-            <Autocomplete
-              label='Banner'
-              placeholder='Banner'
-              data={assets.items.map((asset) => asset.url)}
-              key={form.key('banner')}
-              {...form.getInputProps('banner')}
-            />
-          </Group>
+          <Autocomplete
+            withAsterisk
+            label='Icon'
+            placeholder='Icon'
+            data={assets.items.map((asset) => asset.url)}
+            key={form.key('icon')}
+            {...form.getInputProps('icon')}
+          />
+          <Autocomplete
+            label='Banner'
+            placeholder='Banner'
+            data={assets.items.map((asset) => asset.url)}
+            key={form.key('banner')}
+            {...form.getInputProps('banner')}
+          />
 
-          <Group grow>
-            <TextInput withAsterisk label='URL' placeholder='URL' {...form.getInputProps('url')} />
-            <Select
-              withAsterisk
-              label='Two-Factor Authentication Requirement'
-              data={[
-                { label: 'Admins', value: 'admins' },
-                { label: 'All Users', value: 'all_users' },
-                { label: 'None', value: 'none' },
-              ]}
-              key={form.key('twoFactorRequirement')}
-              {...form.getInputProps('twoFactorRequirement')}
-            />
-          </Group>
+          <TextInput withAsterisk label='URL' placeholder='URL' {...form.getInputProps('url')} />
 
-          <Group grow>
-            <Switch
-              label='Enable Telemetry'
-              description='Allow Calagopus to collect limited and anonymous usage data to help improve the application.'
-              key={form.key('telemetryEnabled')}
-              {...form.getInputProps('telemetryEnabled', { type: 'checkbox' })}
-              onChange={(e) => {
-                if (!e.target.checked) {
-                  setOpenModal('disableTelemetry');
-                } else {
-                  form.setFieldValue('telemetryEnabled', true);
-                }
-              }}
-            />
-            <Switch
-              label='Enable Registration'
-              name='registrationEnabled'
-              key={form.key('registrationEnabled')}
-              {...form.getInputProps('registrationEnabled', { type: 'checkbox' })}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  setOpenModal('enableRegistration');
-                } else {
-                  form.setFieldValue('registrationEnabled', false);
-                }
-              }}
-            />
-          </Group>
+          <TextInput
+            withAsterisk
+            label='Session Cookie'
+            placeholder='Session Cookie'
+            {...form.getInputProps('sessionCookie')}
+          />
+          <TextInput
+            withAsterisk
+            label='Session Duration (seconds)'
+            placeholder='Session Duration (seconds)'
+            {...form.getInputProps('sessionDurationSeconds')}
+          />
+
+          <Select
+            withAsterisk
+            label='Two-Factor Authentication Requirement'
+            data={[
+              { label: 'Admins', value: 'admins' },
+              { label: 'All Users', value: 'all_users' },
+              { label: 'None', value: 'none' },
+            ]}
+            key={form.key('twoFactorRequirement')}
+            {...form.getInputProps('twoFactorRequirement')}
+          />
 
           <Switch
-            label='Allow Users to Change Language'
-            name='languageChangeEnabled'
-            key={form.key('languageChangeEnabled')}
-            {...form.getInputProps('languageChangeEnabled', { type: 'checkbox' })}
+            label='Enable Telemetry'
+            description='Allow Calagopus to collect limited and anonymous usage data to help improve the application.'
+            key={form.key('telemetryEnabled')}
+            {...form.getInputProps('telemetryEnabled', { type: 'checkbox' })}
+            onChange={(e) => {
+              if (!e.target.checked) {
+                setOpenModal('disableTelemetry');
+              } else {
+                form.setFieldValue('telemetryEnabled', true);
+              }
+            }}
           />
-        </Stack>
+          <Switch
+            label='Enable Registration'
+            name='registrationEnabled'
+            key={form.key('registrationEnabled')}
+            {...form.getInputProps('registrationEnabled', { type: 'checkbox' })}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setOpenModal('enableRegistration');
+              } else {
+                form.setFieldValue('registrationEnabled', false);
+              }
+            }}
+          />
+        </div>
 
         <Group mt='md'>
           <AdminCan action='settings.update' cantSave>

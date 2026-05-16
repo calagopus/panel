@@ -16,12 +16,14 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { authRegisterSchema } from '@/lib/schemas/auth.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import AuthWrapper from './AuthWrapper.tsx';
 
 export default function Register() {
   const { doLogin } = useAuth();
   const { t } = useTranslations();
   const navigate = useNavigate();
+  const { settings } = useGlobalStore();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -57,6 +59,18 @@ export default function Register() {
   return (
     <AuthWrapper>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
+        {settings.app.url !== window.location.origin && (
+          <Alert
+            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            color='yellow'
+            title={t('common.alert.warning', {})}
+          >
+            {t('pages.auth.alert.urlMismatch', {
+              appUrl: settings.app.url,
+              currentUrl: window.location.origin,
+            }).md()}
+          </Alert>
+        )}
         {error && (
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}

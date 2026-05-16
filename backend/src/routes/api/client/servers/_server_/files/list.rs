@@ -32,6 +32,7 @@ mod get {
 
     #[derive(ToSchema, Serialize)]
     struct Response {
+        is_filesystem_primary: bool,
         is_filesystem_writable: bool,
         is_filesystem_fast: bool,
 
@@ -117,6 +118,7 @@ mod get {
         };
 
         ApiResponse::new_serialized(Response {
+            is_filesystem_primary: entries.filesystem_primary,
             is_filesystem_writable: entries.filesystem_writable,
             is_filesystem_fast: entries.filesystem_fast,
             entries: Pagination {

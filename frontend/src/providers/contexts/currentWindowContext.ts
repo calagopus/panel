@@ -10,7 +10,7 @@ export const CurrentWindowContext = createContext<CurrentWindowContextType | und
 export const useCurrentWindow = (): CurrentWindowContextType => {
   const context = useContext(CurrentWindowContext);
   if (!context) {
-    throw new Error('useWindows must be used within a WindowProvider');
+    throw new Error('useCurrentWindow must be used within a CurrentWindowProvider');
   }
 
   return context;

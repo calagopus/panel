@@ -1,0 +1,1 @@
+ALTER TABLE "server_backups" ADD COLUMN "metadata" jsonb DEFAULT '{}' NOT NULL;

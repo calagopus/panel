@@ -80,6 +80,8 @@ mod post {
         #[garde(length(chars, min = 3, max = 255))]
         #[schema(min_length = 3, max_length = 255)]
         name: compact_str::CompactString,
+        #[garde(custom(shared::models::nest_egg_variable::validate_name_translations))]
+        name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
         #[garde(length(max = 1024))]
         #[schema(max_length = 1024)]
         description: Option<compact_str::CompactString>,
@@ -142,6 +144,7 @@ mod post {
             CreateNestEggVariableOptions {
                 egg_uuid: egg.uuid,
                 name: data.name,
+                name_translations: data.name_translations,
                 description: data.description,
                 description_translations: data.description_translations,
                 order: data.order,
@@ -173,6 +176,7 @@ mod post {
                     "egg_uuid": egg.uuid,
 
                     "name": egg_variable.name,
+                    "name_translations": egg_variable.name_translations,
                     "description": egg_variable.description,
                     "description_translations": egg_variable.description_translations,
                     "order": egg_variable.order,

@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     ops::{Deref, DerefMut},
-    path::PathBuf,
+    path::Path,
     str::FromStr,
     sync::{
         Arc, LazyLock,
@@ -26,6 +26,7 @@ pub mod activity;
 pub mod app;
 pub mod ratelimits;
 pub mod server;
+pub mod user;
 pub mod webauthn;
 
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
@@ -54,10 +55,13 @@ pub enum StorageDriver {
 }
 
 impl StorageDriver {
-    pub async fn get_cap_filesystem(&self) -> Option<Result<CapFilesystem, std::io::Error>> {
+    pub async fn get_cap_filesystem(
+        &self,
+        relative_path: impl AsRef<Path>,
+    ) -> Option<Result<CapFilesystem, std::io::Error>> {
         match self {
             StorageDriver::Filesystem { path } => {
-                Some(CapFilesystem::async_new(PathBuf::from(path)).await)
+                Some(CapFilesystem::async_new(Path::new(path).join(relative_path.as_ref())).await)
             }
             _ => None,
         }
@@ -209,6 +213,8 @@ pub struct AppSettings {
     pub webauthn: webauthn::AppSettingsWebauthn,
     #[schema(inline)]
     pub server: server::AppSettingsServer,
+    #[schema(inline)]
+    pub user: user::AppSettingsUser,
     #[schema(inline)]
     pub activity: activity::AppSettingsActivity,
     #[schema(inline)]
@@ -452,6 +458,8 @@ impl SettingsSerializeExt for AppSettings {
             .await?
             .nest("server", &self.server)
             .await?
+            .nest("user", &self.user)
+            .await?
             .nest("activity", &self.activity)
             .await?
             .nest("ratelimits", &self.ratelimits)
@@ -683,6 +691,9 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
                 .await?,
             server: deserializer
                 .nest("server", &server::AppSettingsServerDeserializer)
+                .await?,
+            user: deserializer
+                .nest("user", &user::AppSettingsUserDeserializer)
                 .await?,
             activity: deserializer
                 .nest("activity", &activity::AppSettingsActivityDeserializer)

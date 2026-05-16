@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getAvailableNodeAllocations from '@/api/admin/nodes/allocations/getAvailableNodeAllocations.ts';
 import getNodes from '@/api/admin/nodes/getNodes.ts';
+import getServerBackups from '@/api/admin/servers/backups/getServerBackups.ts';
 import postTransfer from '@/api/admin/servers/postTransfer.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
-import getBackups from '@/api/server/backups/getBackups.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
@@ -17,16 +17,13 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import { archiveFormatLabelMapping, compressionLevelLabelMapping } from '@/lib/enums.ts';
+import { compressionLevelLabelMapping, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { NODE_AIO_UUID } from '@/lib/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
-import {
-  archiveFormat as archiveFormatEnum,
-  compressionLevel as compressionLevelEnum,
-} from '@/lib/schemas/server/files.ts';
+import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { transferArchiveFormat } from '@/lib/schemas/generic.ts';
+import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/files.ts';
 import { formatAllocation } from '@/lib/server.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -45,7 +42,7 @@ export default function ServerTransferModal({
   const [selectedAllocationUuids, setSelectedAllocationUuids] = useState<string[]>([]);
   const [selectedBackupUuids, setSelectedBackupsUuids] = useState<string[]>([]);
   const [deleteSourceBackups, setDeleteSourceBackups] = useState(false);
-  const [archiveFormat, setArchiveFormat] = useState<z.infer<typeof archiveFormatEnum>>('tar_lz4');
+  const [archiveFormat, setArchiveFormat] = useState<z.infer<typeof transferArchiveFormat>>('tar_lz4');
   const [compressionLevel, setCompressionLevel] = useState<z.infer<typeof compressionLevelEnum>>('good_compression');
   const [multiplexChannels, setMultiplexChannels] = useState(0);
 
@@ -73,9 +70,9 @@ export default function ServerTransferModal({
         : Promise.resolve(getEmptyPaginationSet()),
     deps: [selectedNodeUuid],
   });
-  const backups = useSearchableResource<z.infer<typeof serverBackupSchema>>({
+  const backups = useSearchableResource<z.infer<typeof adminServerBackupSchema>>({
     queryKey: queryKeys.admin.servers.backups(server.uuid),
-    fetcher: (search) => getBackups(server.uuid, 1, search),
+    fetcher: (search) => getServerBackups(server.uuid, 1, search),
     canRequest: opened,
   });
 
@@ -186,10 +183,12 @@ export default function ServerTransferModal({
             placeholder='Backups to transfer'
             value={selectedBackupUuids}
             onChange={(value) => setSelectedBackupsUuids(value)}
-            data={backups.items.map((backup) => ({
-              label: backup.name,
-              value: backup.uuid,
-            }))}
+            data={backups.items
+              .filter((backup) => !backup.isShared)
+              .map((backup) => ({
+                label: backup.name,
+                value: backup.uuid,
+              }))}
             searchable
             searchValue={backups.search}
             onSearchChange={backups.setSearch}
@@ -207,13 +206,11 @@ export default function ServerTransferModal({
             withAsterisk
             label='Archive Format'
             value={archiveFormat}
-            onChange={(value) => setArchiveFormat(value as z.infer<typeof archiveFormatEnum>)}
-            data={Object.entries(archiveFormatLabelMapping)
-              .filter(([value]) => !['zip', 'seven_zip'].includes(value))
-              .map(([value, label]) => ({
-                value,
-                label,
-              }))}
+            onChange={(value) => setArchiveFormat(value as z.infer<typeof transferArchiveFormat>)}
+            data={Object.entries(transferArchiveFormatLabelMapping).map(([value, label]) => ({
+              value,
+              label,
+            }))}
           />
 
           <Select
@@ -221,7 +218,7 @@ export default function ServerTransferModal({
             label='Compression Level'
             value={compressionLevel}
             onChange={(value) => setCompressionLevel(value as z.infer<typeof compressionLevelEnum>)}
-            disabled={archiveFormat === 'tar'}
+            disabled={archiveFormat === 'tar' || archiveFormat === 'itaf'}
             data={Object.entries(compressionLevelLabelMapping).map(([value, label]) => ({
               value,
               label,

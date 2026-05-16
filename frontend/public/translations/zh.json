@@ -1,0 +1,2192 @@
+{
+  "items": {
+    "byte": {
+      "zero": "{count} 位元組",
+      "one": "{count} 位元組",
+      "two": "{count} 位元組",
+      "few": "{count} 位元組",
+      "many": "{count} 位元組",
+      "other": "{count} 位元組"
+    },
+    "user": {
+      "zero": "{count} 位使用者",
+      "one": "{count} 位使用者",
+      "two": "{count} 位使用者",
+      "few": "{count} 位使用者",
+      "many": "{count} 位使用者",
+      "other": "{count} 位使用者"
+    },
+    "file": {
+      "zero": "{count} 個檔案",
+      "one": "{count} 個檔案",
+      "two": "{count} 個檔案",
+      "few": "{count} 個檔案",
+      "many": "{count} 個檔案",
+      "other": "{count} 個檔案"
+    },
+    "server": {
+      "zero": "{count} 台伺服器",
+      "one": "{count} 台伺服器",
+      "two": "{count} 台伺服器",
+      "few": "{count} 台伺服器",
+      "many": "{count} 台伺服器",
+      "other": "{count} 台伺服器"
+    },
+    "sshKey": {
+      "zero": "{count} 個 SSH 金鑰",
+      "one": "{count} 個 SSH 金鑰",
+      "two": "{count} 個 SSH 金鑰",
+      "few": "{count} 個 SSH 金鑰",
+      "many": "{count} 個 SSH 金鑰",
+      "other": "{count} 個 SSH 金鑰"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "建立",
+        "add": "新增",
+        "save": "儲存",
+        "saveAndStay": "儲存並停留",
+        "edit": "編輯",
+        "delete": "刪除",
+        "remove": "移除",
+        "enable": "啟用",
+        "disable": "停用",
+        "update": "更新",
+        "close": "關閉",
+        "cancel": "取消",
+        "continue": "繼續",
+        "skip": "略過",
+        "okay": "確定",
+        "back": "返回",
+        "next": "下一步",
+        "install": "安裝",
+        "selectAll": "全選",
+        "deselectAll": "取消全選",
+        "restore": "還原",
+        "download": "下載",
+        "downloadAs": "下載為 {format}",
+        "export": "匯出",
+        "exportAs": "匯出為 {format}",
+        "recreate": "重新建立"
+      },
+      "alert": {
+        "error": "錯誤",
+        "warning": "警告",
+        "success": "成功",
+        "clockOffset": "你的系統時鐘與伺服器相差超過 5 秒。這可能會造成通行密鑰驗證與雙因素驗證問題。若發生問題，請同步你的時鐘。目前偏移：{offset} 秒。"
+      },
+      "divider": {
+        "or": "或"
+      },
+      "input": {
+        "search": "搜尋..."
+      },
+      "tooltip": {
+        "resetToDefault": "重設為預設值",
+        "edit": "編輯",
+        "delete": "刪除"
+      },
+      "form": {
+        "name": "名稱",
+        "description": "描述",
+        "password": "密碼",
+        "host": "主機",
+        "username": "使用者名稱",
+        "server": "伺服器",
+        "truncateDirectory": "你要在執行此動作前刪除此伺服器的所有檔案嗎？此操作無法復原。"
+      },
+      "table": {
+        "pagination": {
+          "results": "顯示第 {start} 至 {end} 筆，共 {total} 筆結果。",
+          "empty": "找不到任何項目，它們好像躲起來了。"
+        },
+        "columns": {
+          "name": "名稱",
+          "description": "描述",
+          "username": "使用者名稱",
+          "size": "大小",
+          "lastUsed": "上次使用",
+          "created": "已建立",
+          "actor": "操作者",
+          "event": "事件",
+          "ip": "IP",
+          "when": "時間",
+          "command": "指令"
+        }
+      },
+      "badge": {
+        "active": "作用中",
+        "inactive": "未作用",
+        "enabled": "已啟用",
+        "disabled": "已停用",
+        "successful": "成功",
+        "failed": "失敗",
+        "installed": "已安裝"
+      },
+      "server": {
+        "noAllocation": "無分配",
+        "state": {
+          "suspended": "已停權",
+          "transferring": "伺服器正在轉移",
+          "nodeMaintenance": "節點正在維護中",
+          "restoringBackup": "正在還原備份",
+          "installing": "正在安裝",
+          "installFailed": "安裝失敗"
+        }
+      },
+      "enum": {
+        "userToastPosition": {
+          "topLeft": "左上",
+          "topCenter": "上方置中",
+          "topRight": "右上",
+          "bottomLeft": "左下",
+          "bottomCenter": "下方置中",
+          "bottomRight": "右下"
+        },
+        "serverState": {
+          "unknown": "未知",
+          "offline": "離線",
+          "running": "執行中",
+          "starting": "啟動中",
+          "stopping": "停止中"
+        },
+        "serverPowerAction": {
+          "start": "啟動",
+          "stop": "停止",
+          "restart": "重新啟動",
+          "kill": "強制終止"
+        },
+        "serverBackupStatus": {
+          "starting": "開始中",
+          "finished": "已完成",
+          "failed": "失敗"
+        },
+        "connectionStatus": {
+          "connected": "已連線",
+          "offline": "離線"
+        },
+        "serverAutoStartBehavior": {
+          "always": "永遠",
+          "unlessStopped": "除非已停止",
+          "never": "永不"
+        },
+        "bulkActionServerAction": {
+          "started": "已啟動",
+          "stopped": "已停止",
+          "restarted": "已重新啟動",
+          "killed": "已強制終止"
+        }
+      },
+      "unit": {
+        "bytes": {
+          "bytes": "B",
+          "kibibytes": "KiB",
+          "mebibytes": "MiB",
+          "gibibytes": "GiB",
+          "tebibytes": "TiB",
+          "pebibytes": "PiB"
+        }
+      },
+      "unlimited": "無限制",
+      "readOnly": "唯讀",
+      "na": "N/A",
+      "never": "永不",
+      "yes": "是",
+      "no": "否",
+      "web": "網頁",
+      "api": "API",
+      "default": "預設",
+      "custom": "自訂",
+      "system": "系統",
+      "schedule": "排程",
+      "impersonatedBy": "由 {username} 模擬身分"
+    },
+    "elements": {
+      "errorBoundary": {
+        "message": "呈現此頁面時發生未預期的錯誤。請嘗試重新整理。若問題持續發生，請聯絡你的系統管理員。",
+        "hideDetails": "隱藏詳細資訊",
+        "showDetails": "顯示詳細資訊",
+        "errorMessage": "錯誤訊息：",
+        "stackTrace": "堆疊追蹤：",
+        "componentStack": "元件堆疊："
+      },
+      "copyOnClick": {
+        "toast": {
+          "copied": "已複製到剪貼簿。",
+          "failed": "無法複製到剪貼簿。",
+          "copyManual": "複製到剪貼簿：Ctrl+C 或 Command+C，Enter"
+        }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "正在估算完成時間...",
+          "estimated": "預估完成時間：{time}"
+        },
+        "calculating": "預估時間：計算中...",
+        "calculated": "預估時間：{time}"
+      },
+      "container": {
+        "alert": {
+          "impersonating": "你目前正在模擬某位使用者的身分。請注意，你的操作可能會影響被模擬使用者的帳戶。若要離開模擬身分模式，請點選左下角的「停止模擬身分」按鈕。"
+        }
+      },
+      "sidebar": {
+        "button": {
+          "logout": "登出",
+          "stopImpersonating": "停止模擬身分",
+          "openInVirtualWindow": "在虛擬視窗中開啟",
+          "openInPopup": "在彈出視窗中開啟",
+          "openInNewTab": "在新分頁中開啟"
+        }
+      },
+      "permissionSelector": {
+        "selectedPermissions": "已選取權限（{count}）",
+        "noPermissions": "未選取任何權限。"
+      },
+      "selectInput": {
+        "noResults": "找不到結果。"
+      },
+      "can": {
+        "tooltip": {
+          "cantSave": "你沒有儲存權限。",
+          "cantDelete": "你沒有刪除權限。"
+        }
+      },
+      "activityInfoButton": {
+        "modal": {
+          "info": {
+            "title": "活動詳細資訊"
+          }
+        }
+      },
+      "screenBlock": {
+        "permissionDenied": {
+          "title": "權限不足",
+          "content": "你沒有存取此頁面的權限。"
+        },
+        "notFound": {
+          "title": "找不到",
+          "content": "找不到你要查看的頁面。"
+        },
+        "serverConflict": {
+          "title": "伺服器狀態衝突",
+          "contentSuspended": "此伺服器已停權，無法存取。",
+          "contentNodeMaintenance": "此伺服器所在的節點目前正在維護，無法存取。",
+          "contentTransferring": "此伺服器目前正在轉移，完成前無法存取。",
+          "contentInstallFailed": "此伺服器安裝失敗，在確認前無法存取。",
+          "contentInstalling": "此伺服器目前正在安裝，完成前無法存取。",
+          "contentRestoringBackup": "此伺服器目前正在從備份還原，完成前無法存取。",
+          "button": {
+            "viewInstallLogs": "查看安裝紀錄",
+            "acknowledgeFailure": "確認失敗"
+          },
+          "modal": {
+            "acknowledgeFailure": {
+              "title": "確認安裝失敗",
+              "content": "確認此安裝失敗即表示你知道安裝失敗，並已採取必要步驟解決問題。這會讓你重新取得伺服器控制權。"
+            }
+          }
+        }
+      },
+      "scheduleDynamicInput": {
+        "enterVariable": "請輸入要評估的變數名稱。",
+        "enterData": "請輸入要傳送的資料。",
+        "inputType": "輸入類型",
+        "dataType": "要傳送的資料類型",
+        "selectType": "選取類型",
+        "none": "無",
+        "rawString": "原始字串",
+        "variable": "變數"
+      },
+      "serverWebsocket": {
+        "error": {
+          "connectionFailed": "多次嘗試後仍無法連線。請重新整理頁面。",
+          "connectionClosed": "與伺服器的連線已關閉。正在嘗試重新連線...",
+          "connectionRetry": "連線中斷。正在重試（第 {attempt} 次）...",
+          "authFailed": "驗證失敗。正在嘗試重新整理憑證...（{error}）",
+          "authRefreshFailed": "無法重新整理憑證。請重新整理頁面後再試。",
+          "permissionRevoked": "連線已關閉：你對此伺服器的存取權已被撤銷。",
+          "tokenRefreshLoop": "偵測到驗證循環。請重新整理頁面後再試。"
+        },
+        "banner": {
+          "retrying": "{countdown} 後重試..."
+        },
+        "listener": {
+          "toast": {
+            "backupCompleted": "備份已成功完成。",
+            "backupFailed": "備份失敗。",
+            "backupRestoreCompleted": "備份還原已成功完成。",
+            "installCompleted": "伺服器安裝已成功完成。",
+            "installFailed": "伺服器安裝失敗。",
+            "operations": {
+              "compressing": {
+                "completed": "已在 {time} 內將 {files} 壓縮到 `{path}`。",
+                "failed": "無法將 {files} 壓縮到 `{path}`：\n{error}"
+              },
+              "decompressing": {
+                "completed": "已在 {time} 內將 `{path}` 解壓縮到 `{destination}`。",
+                "failed": "無法將 `{path}` 解壓縮到 `{destination}`：\n{error}"
+              },
+              "pulling": {
+                "completed": "已在 {time} 內拉取 `{destination}`。",
+                "failed": "無法拉取 `{destination}`：\n{error}"
+              },
+              "copying": {
+                "completed": "已在 {time} 內將 `{path}` 複製到 `{destination}`。",
+                "failed": "無法將 `{path}` 複製到 `{destination}`：\n{error}"
+              },
+              "copyingMany": {
+                "completed": "已在 {time} 內複製 {files}。",
+                "failed": "無法複製 {files}：\n{error}"
+              },
+              "copyingRemote": {
+                "completedFrom": "已在 {time} 內從遠端伺服器複製 {files}。",
+                "completedTo": "已在 {time} 內將 {files} 複製到遠端伺服器。",
+                "failedFrom": "無法從遠端伺服器複製 {files}：\n{error}",
+                "failedTo": "無法將 {files} 複製到遠端伺服器：\n{error}"
+              }
+            }
+          }
+        }
+      },
+      "fileUpload": {
+        "toast": {
+          "uploading": "已開始上傳 {files}...",
+          "cancelledFile": "已成功取消上傳 `{file}`。",
+          "cancelledFolder": "已成功取消上傳 `{folder}`（{files}）。",
+          "cancelledAll": "所有上傳都已取消。"
+        }
+      }
+    },
+    "pages": {
+      "oobe": {
+        "welcome": {
+          "title": "歡迎使用 Calagopus",
+          "subtitle": "讓我們開始設定你的遊戲伺服器管理系統！",
+          "wizardIntro": "此設定精靈會引導你完成：",
+          "steps": {
+            "account": "建立你的管理員帳戶",
+            "settings": "設定必要的系統設定",
+            "location": "設定你的伺服器位置",
+            "node": "新增你的第一個節點",
+            "server": "部署你的第一台遊戲伺服器"
+          },
+          "button": {
+            "start": "開始使用"
+          }
+        },
+        "register": {
+          "title": "建立管理員帳戶",
+          "alert": {
+            "title": "安全性提醒",
+            "description": "請選擇強密碼。此帳戶將擁有所有伺服器與設定的完整管理權限。"
+          },
+          "form": {
+            "username": "使用者名稱",
+            "usernamePlaceholder": "admin",
+            "email": "電子郵件地址",
+            "emailPlaceholder": "admin@example.com",
+            "firstName": "名字",
+            "firstNamePlaceholder": "Alan",
+            "lastName": "姓氏",
+            "lastNamePlaceholder": "Turing",
+            "password": "密碼",
+            "passwordPlaceholder": "輸入強密碼",
+            "confirmPassword": "確認密碼",
+            "confirmPasswordPlaceholder": "重新輸入你的密碼"
+          },
+          "button": {
+            "create": "建立帳戶並繼續"
+          }
+        },
+        "login": {
+          "title": "重新登入",
+          "alert": "你在設定過程中被登出。請重新登入以從離開的地方繼續。",
+          "form": {
+            "username": "使用者名稱",
+            "usernamePlaceholder": "admin",
+            "password": "密碼",
+            "passwordPlaceholder": "輸入強密碼"
+          },
+          "button": {
+            "login": "登入並繼續"
+          }
+        },
+        "location": {
+          "title": "位置設定",
+          "form": {
+            "locationName": "位置名稱",
+            "locationNamePlaceholder": "我的家",
+            "backupName": "備份設定名稱",
+            "backupNamePlaceholder": "Unicorn Cloud",
+            "backupDisk": "備份磁碟",
+            "backupDiskPlaceholder": "備份磁碟"
+          },
+          "button": {
+            "create": "建立並繼續"
+          }
+        },
+        "node": {
+          "title": "節點設定",
+          "allocationsTitle": "分配設定",
+          "form": {
+            "name": "名稱",
+            "namePlaceholder": "我的伺服器",
+            "url": "URL",
+            "urlPlaceholder": "URL",
+            "urlDescription": "用於與節點進行內部通訊",
+            "publicUrl": "公開 URL",
+            "publicUrlPlaceholder": "URL",
+            "publicUrlDescription": "用於 websocket/下載",
+            "sftpHost": "SFTP 主機",
+            "sftpHostPlaceholder": "SFTP 主機",
+            "sftpPort": "SFTP 連接埠",
+            "sftpPortPlaceholder": "SFTP 連接埠",
+            "memory": "記憶體",
+            "disk": "磁碟",
+            "ip": "IP",
+            "portRanges": "連接埠範圍",
+            "portRangesPlaceholder": "連接埠範圍（例如 3000-4000）"
+          },
+          "error": {
+            "noLocations": "發生錯誤。找不到任何位置。"
+          },
+          "button": {
+            "create": "建立並繼續"
+          }
+        },
+        "nodeConfiguration": {
+          "title": "節點設定",
+          "error": {
+            "noNodes": "發生錯誤。找不到任何節點。",
+            "connectionError": "發生錯誤。連線錯誤。"
+          },
+          "successMessage": "已成功驗證與節點的連線。你現在可以繼續。",
+          "configurationDescription": "將此內容放入 `{file}` 的設定檔中，或執行：",
+          "button": {
+            "verify": "驗證連線"
+          }
+        },
+        "configuration": {
+          "title": "應用程式設定",
+          "form": {
+            "applicationName": "應用程式名稱",
+            "applicationNamePlaceholder": "Calagopus",
+            "language": "語言",
+            "languagePlaceholder": "語言",
+            "applicationUrl": "應用程式 URL",
+            "applicationUrlPlaceholder": "https://calagop.us",
+            "registration": "啟用註冊",
+            "registrationDescription": "允許新使用者自行註冊帳戶。"
+          },
+          "button": {
+            "submit": "更新設定並繼續"
+          }
+        },
+        "eggRepositories": {
+          "title": "Egg 儲存庫",
+          "description": "這些是你的 Egg 來源儲存庫。你可以隨時變更這些儲存庫。",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "Pterodactyl 遊戲 Egg",
+              "description": "Minecraft、Terraria 等許多遊戲的 Egg。"
+            },
+            "pterodactylApplication": {
+              "title": "Pterodactyl 應用程式 Egg",
+              "description": "Grafana、Meilisearch 與各種資料庫等應用程式的 Egg。"
+            },
+            "pterodactylGeneral": {
+              "title": "Pterodactyl 通用 Egg",
+              "description": "Node JS、Java、Rust 等通用應用程式執行環境的 Egg。"
+            }
+          },
+          "button": {
+            "submit": "匯入"
+          }
+        },
+        "server": {
+          "title": "伺服器",
+          "existingServer": "已建立伺服器。你稍後可以在管理選單中變更設定。",
+          "egg": {
+            "title": "Egg",
+            "description": "讓我們啟動並執行你的第一台伺服器。你想使用哪個 Egg？",
+            "nestDescription": "若要開始使用此 Egg，你需要建立一個 Nest；Nest 是 Egg 的集合。請為它命名："
+          },
+          "server": {
+            "title": "伺服器",
+            "nestDescription": "若要開始使用此 Egg，你需要建立一個 Nest；Nest 是 Egg 的集合。請為它命名："
+          },
+          "error": {
+            "noNodes": "發生錯誤。找不到任何節點。"
+          },
+          "button": {
+            "submit": "匯入",
+            "create": "建立並繼續"
+          }
+        },
+        "finished": {
+          "title": "設定完成！",
+          "subtitle": "你的 Calagopus 面板已可使用",
+          "setupTitle": "我們已設定的內容",
+          "items": {
+            "account": "管理員帳戶",
+            "configuration": {
+              "title": "系統設定",
+              "subtitle": "已設定面板設定與偏好"
+            },
+            "eggRepositories": {
+              "title": "Egg 儲存庫",
+              "subtitle": "{count} 個儲存庫"
+            },
+            "location": "位置",
+            "node": "節點",
+            "server": "伺服器"
+          },
+          "badge": {
+            "skipped": "已略過"
+          },
+          "button": "前往儀表板"
+        }
+      },
+      "auth": {
+        "button": {
+          "login": "登入",
+          "loginWith": "使用 {name} 登入"
+        },
+        "alert": {
+          "urlMismatch": "應用程式 URL 與目前 URL 不符。預期：`{appUrl}`，目前：`{currentUrl}`。"
+        },
+        "login": {
+          "error": {
+            "usernameRequired": "請輸入使用者名稱",
+            "registrationDisabled": "找不到相符帳戶，且目前已停用註冊。",
+            "userAlreadyExists": "已有使用此使用者名稱或電子郵件的帳戶。"
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "你的瀏覽器不支援通行密鑰。",
+              "unexpected": "使用通行密鑰時發生未預期的錯誤。",
+              "cancelled": "通行密鑰要求已取消。",
+              "dismissed": "你關閉或未與通行密鑰提示互動。使用的金鑰也可能尚未註冊。",
+              "invalidState": "此通行密鑰無法使用或已註冊。",
+              "notSupportedType": "你的瀏覽器或裝置不支援此類型的通行密鑰。",
+              "securityError": "通行密鑰只能透過 HTTPS 且使用有效網域。",
+              "authenticatorError": "驗證器發生錯誤。",
+              "constraintError": "驗證器無法符合必要限制。"
+            }
+          },
+          "step": {
+            "username": {
+              "title": "登入",
+              "subtitle": "輸入你的使用者名稱以繼續",
+              "form": {
+                "usernamePlaceholder": "輸入你的使用者名稱"
+              },
+              "link": {
+                "forgotPassword": "忘記密碼",
+                "notRegistered": "尚未註冊？",
+                "createAccount": "建立帳戶"
+              },
+              "button": {
+                "oauthLogin": "OAuth 登入"
+              }
+            },
+            "passkey": {
+              "title": "使用通行密鑰驗證",
+              "subtitle": "我們找到與 {username} 關聯的通行密鑰",
+              "button": {
+                "usePasskey": "使用通行密鑰",
+                "usePassword": "使用密碼"
+              }
+            },
+            "password": {
+              "title": "輸入密碼",
+              "subtitle": "請輸入 {username} 的密碼",
+              "form": {
+                "passwordPlaceholder": "輸入你的密碼"
+              },
+              "button": {
+                "signIn": "登入",
+                "forgotPassword": "忘記密碼"
+              }
+            },
+            "totp": {
+              "title": "雙因素驗證",
+              "welcomeBack": "歡迎回來，{username}！",
+              "enterCode": "輸入驗證器 App 產生的 6 位數代碼",
+              "button": {
+                "verify": "驗證代碼",
+                "useRecoveryCode": "使用復原代碼",
+                "useTotp": "使用 TOTP"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "輸入復原代碼",
+              "form": {
+                "label": "復原代碼",
+                "placeholder": "輸入復原代碼"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "註冊",
+          "subtitle": "請輸入你的詳細資料以註冊",
+          "form": {
+            "email": "電子郵件",
+            "firstName": "名字",
+            "lastName": "姓氏"
+          },
+          "button": {
+            "register": "註冊"
+          }
+        },
+        "forgotPassword": {
+          "title": "忘記密碼",
+          "subtitle": "輸入你的電子郵件以接收重設密碼的指示",
+          "form": {
+            "email": "電子郵件"
+          },
+          "button": {
+            "request": "要求重設密碼"
+          },
+          "success": "已寄出一封包含重設密碼指示的電子郵件給你。"
+        },
+        "resetPassword": {
+          "title": "重設密碼",
+          "subtitle": "請輸入你的新密碼",
+          "form": {
+            "confirmPassword": "確認密碼"
+          },
+          "button": {
+            "reset": "重設密碼"
+          },
+          "toast": {
+            "success": "密碼已重設。"
+          }
+        },
+        "oauth": {
+          "title": "使用 OAuth 驗證",
+          "subtitle": "選擇下方任一提供者登入"
+        }
+      },
+      "account": {
+        "home": {
+          "title": "伺服器",
+          "tooltip": {
+            "removeFromGroup": "從群組移除",
+            "addToGroup": "加入群組",
+            "addServerToGroup": "將伺服器加入群組",
+            "groupActions": "群組動作",
+            "noGroups": "沒有可加入伺服器的群組",
+            "noGroup": "此伺服器不在任何群組中"
+          },
+          "tabs": {
+            "groupedServers": {
+              "title": "已分組伺服器",
+              "page": {
+                "button": {
+                  "createGroup": "建立群組"
+                },
+                "modal": {
+                  "createServerGroup": {
+                    "title": "建立伺服器群組",
+                    "toast": {
+                      "created": "已建立伺服器群組。"
+                    }
+                  },
+                  "editServerGroup": {
+                    "title": "編輯伺服器群組",
+                    "toast": {
+                      "updated": "已更新伺服器群組。"
+                    }
+                  },
+                  "deleteServerGroup": {
+                    "title": "確認刪除伺服器群組",
+                    "content": "你確定要從你的帳戶刪除 **{group}** 嗎？",
+                    "toast": {
+                      "deleted": "已刪除伺服器群組。"
+                    }
+                  },
+                  "addServerToGroup": {
+                    "title": "將伺服器加入 {group}",
+                    "noServers": "所有伺服器都已在此群組中。",
+                    "toast": {
+                      "added": "已將伺服器加入群組。"
+                    }
+                  }
+                },
+                "noGroups": "找不到任何群組，要建立一個嗎？"
+              }
+            },
+            "allServers": {
+              "title": "所有伺服器",
+              "page": {
+                "input": {
+                  "showOtherUsersServers": "顯示其他使用者的伺服器"
+                },
+                "modal": {
+                  "addToServerGroup": {
+                    "title": "將 {server} 加入伺服器群組",
+                    "form": {
+                      "serverGroup": "伺服器群組"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "bulkActions": {
+            "selectionMode": "選取模式",
+            "select": "選取伺服器",
+            "deselect": "取消選取伺服器",
+            "success": "已成功{action} {servers}。",
+            "partial": "已成功{action} {successfulServers}。{failedServers} 失敗。",
+            "groupActions": "群組動作"
+          },
+          "noServers": "找不到任何伺服器，要新增一台嗎？"
+        },
+        "admin": {
+          "title": "管理"
+        },
+        "account": {
+          "title": "帳戶",
+          "alert": {
+            "requireTwoFactor": {
+              "title": "需要雙因素驗證",
+              "description": "你的帳戶需要雙因素驗證。請在下方設定後繼續使用面板。"
+            }
+          },
+          "containers": {
+            "password": {
+              "title": "密碼",
+              "toast": {
+                "updated": "密碼已成功更新。"
+              },
+              "form": {
+                "currentPassword": "目前密碼",
+                "newPassword": "新密碼",
+                "confirmNewPassword": "確認新密碼"
+              }
+            },
+            "email": {
+              "title": "電子郵件",
+              "toast": {
+                "updated": "電子郵件已成功更新。"
+              },
+              "form": {
+                "newEmail": "新電子郵件",
+                "currentPassword": "目前密碼"
+              }
+            },
+            "twoFactor": {
+              "title": "雙因素驗證",
+              "toast": {
+                "disabled": "雙因素驗證已成功停用。",
+                "enabled": "雙因素驗證已成功啟用。請複製你的復原代碼。"
+              },
+              "modal": {
+                "disableTwoFactor": {
+                  "title": "停用雙因素驗證",
+                  "description": "停用雙因素驗證會降低帳戶安全性。",
+                  "form": {
+                    "code": "驗證代碼"
+                  }
+                },
+                "setupTwoFactor": {
+                  "title": "設定雙因素驗證",
+                  "description": "協助保護你的帳戶免於未授權存取。你每次登入時都會被要求輸入驗證碼。",
+                  "descriptionQR": "使用你選擇的雙因素驗證 App 掃描上方 QR code。然後將產生的 6 位數代碼輸入下方欄位。",
+                  "form": {
+                    "code": "驗證代碼"
+                  }
+                },
+                "recoveryCodes": {
+                  "title": "復原代碼",
+                  "description": "以下是你的復原代碼。請將它們存放在安全位置。若你無法使用驗證裝置，可以使用這些代碼重新取得帳戶存取權。"
+                }
+              },
+              "button": {
+                "disableTwoFactor": "停用雙因素",
+                "setupTwoFactor": "設定雙因素"
+              },
+              "twoFactorEnabled": "目前已啟用雙因素驗證。",
+              "twoFactorDisabled": "你的帳戶目前尚未啟用雙因素驗證。請點選下方按鈕開始設定。",
+              "twoFactorLastUsed": "上次使用：{timestamp}"
+            },
+            "account": {
+              "title": "帳戶詳細資料",
+              "toast": {
+                "updated": "帳戶詳細資料已成功更新。"
+              },
+              "form": {
+                "nameFirst": "名字",
+                "nameLast": "姓氏",
+                "username": "使用者名稱",
+                "language": "語言",
+                "toastPosition": "通知位置",
+                "startOnGroupedServers": "從已分組伺服器頁面開始"
+              }
+            },
+            "avatar": {
+              "title": "頭像",
+              "toast": {
+                "updated": "頭像已成功更新。",
+                "removed": "頭像已成功移除。"
+              },
+              "form": {
+                "avatar": "頭像"
+              }
+            }
+          }
+        },
+        "securityKeys": {
+          "title": "安全性金鑰",
+          "subtitle": "已建立 {current} / {max} 個安全性金鑰。",
+          "table": {
+            "columns": {
+              "credentialId": "憑證 ID"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "使用安全性金鑰需要安全內容（HTTPS）。",
+            "limitReached": "你最多只能使用 {max} 個安全性金鑰。"
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "建立安全性金鑰",
+              "toast": {
+                "created": "安全性金鑰已成功建立。",
+                "aborted": "安全性金鑰建立已中止。"
+              }
+            },
+            "editSecurityKey": {
+              "title": "編輯安全性金鑰",
+              "toast": {
+                "updated": "安全性金鑰已成功更新。"
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "確認刪除安全性金鑰",
+              "content": "你確定要從你的帳戶刪除 **{key}** 嗎？",
+              "toast": {
+                "deleted": "安全性金鑰已成功刪除。"
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "工作階段",
+          "table": {
+            "columns": {
+              "ip": "IP",
+              "thisDevice": "此裝置？",
+              "userAgent": "使用者代理"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "確認刪除工作階段",
+              "content": "你確定要從你的帳戶刪除工作階段 **{ip}** 嗎？",
+              "toast": {
+                "deleted": "工作階段已刪除。"
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "鍵盤快捷鍵",
+          "subtitle": "使用這些鍵盤快捷鍵，更有效率地導覽並操作面板。",
+          "detectedMac": "偵測到 macOS",
+          "detectedWindows": "偵測到 Windows/Linux",
+          "fileManager": {
+            "title": "檔案管理器",
+            "selectAll": "選取所有檔案",
+            "cutFiles": "剪下選取的檔案",
+            "copyFiles": "複製選取的檔案",
+            "duplicateFile": "複製所選檔案的副本",
+            "pasteFiles": "貼上檔案",
+            "searchFiles": "搜尋檔案",
+            "moveUpDirectory": "移至上一層目錄",
+            "moveUpSelection": "將選取項目上移",
+            "moveDownSelection": "將選取項目下移",
+            "renameFile": "重新命名檔案",
+            "deselectAll": "取消選取所有檔案",
+            "deleteFiles": "刪除選取的檔案"
+          },
+          "table": {
+            "title": "表格導覽",
+            "previousPage": "上一頁",
+            "nextPage": "下一頁",
+            "firstPage": "第一頁",
+            "lastPage": "最後一頁"
+          },
+          "console": {
+            "title": "伺服器主控台",
+            "searchContent": "搜尋主控台輸出",
+            "previousCommand": "歷史紀錄中的上一個指令",
+            "nextCommand": "歷史紀錄中的下一個指令"
+          },
+          "serverList": {
+            "title": "伺服器清單",
+            "selectServer": "按住 S 並點選以選取/取消選取伺服器"
+          }
+        },
+        "sshKeys": {
+          "title": "SSH 金鑰",
+          "subtitle": "已建立 {current} / {max} 個 SSH 金鑰。",
+          "button": {
+            "import": "匯入"
+          },
+          "tooltip": {
+            "limitReached": "你最多只能使用 {max} 個 SSH 金鑰。"
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "指紋"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "建立 SSH 金鑰",
+              "toast": {
+                "created": "SSH 金鑰已建立。"
+              },
+              "button": {
+                "uploadKeyFile": "上傳金鑰檔案"
+              },
+              "form": {
+                "publicKey": "公開金鑰"
+              }
+            },
+            "editSshKey": {
+              "title": "編輯 SSH 金鑰",
+              "toast": {
+                "updated": "SSH 金鑰已更新。"
+              }
+            },
+            "importSshKeys": {
+              "title": "匯入 SSH 金鑰",
+              "toast": {
+                "created": "已建立 {sshKeys}。"
+              },
+              "form": {
+                "provider": "提供者",
+                "username": "使用者名稱"
+              }
+            },
+            "deleteSshKey": {
+              "title": "確認刪除 SSH 金鑰",
+              "content": "你確定要從你的帳戶刪除 **{name}** 嗎？",
+              "toast": {
+                "removed": "SSH 金鑰已移除。"
+              }
+            }
+          }
+        },
+        "commandSnippets": {
+          "title": "指令片段",
+          "subtitle": "已建立 {current} / {max} 個指令片段。",
+          "tooltip": {
+            "limitReached": "你最多只能使用 {max} 個指令片段。"
+          },
+          "table": {
+            "columns": {
+              "eggs": "Egg"
+            }
+          },
+          "form": {
+            "eggs": "Egg",
+            "command": "指令"
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "建立指令片段",
+              "toast": {
+                "created": "指令片段已建立。"
+              }
+            },
+            "editCommandSnippet": {
+              "title": "編輯指令片段",
+              "toast": {
+                "updated": "指令片段已更新。"
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "確認刪除指令片段",
+              "content": "你確定要從你的帳戶刪除 **{name}** 嗎？",
+              "toast": {
+                "removed": "指令片段已移除。"
+              }
+            }
+          }
+        },
+        "oauthLinks": {
+          "title": "OAuth 連結",
+          "button": {
+            "connect": "連線",
+            "connectTo": "連線到 {provider}"
+          },
+          "table": {
+            "columns": {
+              "providerName": "提供者名稱",
+              "identifier": "識別碼"
+            }
+          },
+          "modal": {
+            "deleteOAuthLink": {
+              "title": "確認刪除 OAuth 連結",
+              "content": "你確定要從你的帳戶刪除 **{provider}** 連線嗎？",
+              "toast": {
+                "removed": "OAuth 連結已移除。"
+              }
+            }
+          }
+        },
+        "apiKeys": {
+          "title": "API 金鑰",
+          "subtitle": "已建立 {current} / {max} 個 API 金鑰。",
+          "button": {
+            "apiDocumentation": "API 文件"
+          },
+          "tooltip": {
+            "limitReached": "你最多只能使用 {max} 個 API 金鑰。"
+          },
+          "table": {
+            "columns": {
+              "key": "金鑰",
+              "permissions": "使用者 / 伺服器 / 管理員權限",
+              "expires": "到期"
+            }
+          },
+          "modal": {
+            "createApiKey": {
+              "title": "建立 API 金鑰",
+              "toast": {
+                "created": "API 金鑰已建立。"
+              }
+            },
+            "updateApiKey": {
+              "title": "更新 API 金鑰",
+              "toast": {
+                "updated": "API 金鑰已更新。"
+              }
+            },
+            "recreateApiKey": {
+              "title": "重新建立 API 金鑰",
+              "content": "重新建立 API 金鑰會產生新的金鑰並使舊金鑰失效。你確定要重新建立 API 金鑰 **{name}** 嗎？",
+              "toast": {
+                "recreated": "API 金鑰已重新建立。"
+              }
+            },
+            "deleteApiKey": {
+              "title": "確認刪除 API 金鑰",
+              "content": "你確定要從你的帳戶刪除 **{name}** 嗎？",
+              "toast": {
+                "removed": "API 金鑰已移除。"
+              }
+            }
+          },
+          "form": {
+            "allowedIps": "允許的 IP",
+            "allowedIpsPlaceholder": "例如 192.168.1.1, 2001:db8::1",
+            "userPermissions": "使用者權限",
+            "serverPermissions": "伺服器權限",
+            "adminPermissions": "管理員權限"
+          }
+        },
+        "activity": {
+          "title": "活動"
+        }
+      },
+      "admin": {},
+      "server": {
+        "viewAdmin": {
+          "title": "查看管理"
+        },
+        "console": {
+          "title": "主控台",
+          "input": {
+            "placeholder": "輸入指令...",
+            "ariaLabel": "主控台指令輸入。"
+          },
+          "toast": {
+            "installCancelled": "伺服器安裝已取消。",
+            "transferCancelled": "伺服器轉移已取消。"
+          },
+          "modal": {
+            "sshDetails": {
+              "title": "SSH 詳細資訊",
+              "form": {
+                "protocol": "通訊協定",
+                "port": "連接埠",
+                "host": "主機",
+                "username": "使用者名稱",
+                "password": "密碼",
+                "yourPassword": "你的控制面板密碼",
+                "command": "SSH 指令"
+              },
+              "launch": "啟動"
+            }
+          },
+          "notification": {
+            "suspended": "你的伺服器目前已停權。在停權解除前無法執行任何動作。",
+            "suspendedAdmin": "此伺服器目前已停權。由於你是管理員，仍可存取伺服器，但可用動作受限。",
+            "nodeMaintenance": "你的伺服器所在的節點目前正在維護。",
+            "transferring": "你的伺服器目前正在轉移到另一個節點。",
+            "restoringBackup": "你的伺服器目前正在從備份還原。請稍候...",
+            "installing": "你的伺服器目前正在安裝。請稍候..."
+          },
+          "message": {
+            "serverMarkedAs": "伺服器已標記為 {state}...",
+            "installFailed": "安裝失敗。",
+            "installCompleted": "安裝已成功完成。",
+            "transferFailed": "轉移失敗。",
+            "transferCompleted": "轉移已成功完成。正在重新連線到伺服器...",
+            "pullingImage": "你的伺服器目前正在拉取其 Docker 映像檔。請稍候...",
+            "pulling": "拉取中",
+            "extracting": "解壓縮中"
+          },
+          "tooltip": {
+            "search": "搜尋",
+            "sshDetails": "SSH 詳細資訊",
+            "commandHistory": "指令歷史紀錄",
+            "decreaseFontSize": "縮小字型大小",
+            "increaseFontSize": "放大字型大小"
+          },
+          "drawer": {
+            "commandHistory": {
+              "title": "指令歷史紀錄",
+              "detailTitle": "指令詳細資訊",
+              "noCommands": "找不到指令。",
+              "copyButton": "複製指令",
+              "sendButton": "傳送指令",
+              "commandSent": "指令已成功傳送。"
+            }
+          },
+          "feature": {
+            "eula": {
+              "title": "Minecraft EULA 協議",
+              "content": "Minecraft 伺服器需要你接受 [Minecraft 使用者授權合約](https://minecraft.net/eula) 後才能啟動。",
+              "contentDetails": "點選「接受 EULA」即表示你同意 Minecraft EULA 的條款，且 **eula.txt** 檔案會更新為 **eula=true**。",
+              "toast": {
+                "accepted": "已成功接受 EULA。"
+              },
+              "button": {
+                "accept": "接受 EULA"
+              }
+            }
+          },
+          "details": {
+            "address": "位址",
+            "port": "連接埠",
+            "uptime": "執行時間",
+            "cpuLoad": "CPU 負載",
+            "memoryLoad": "記憶體負載",
+            "diskUsage": "磁碟使用量",
+            "networkIn": "網路（傳入）",
+            "networkOut": "網路（傳出）",
+            "normalizeCpuLoad": "正規化 CPU 負載（偏移到最大 100%）"
+          },
+          "power": {
+            "modal": {
+              "forceStop": {
+                "title": "強制停止程序",
+                "content": "強制停止伺服器可能導致資料損毀。"
+              }
+            }
+          },
+          "stats": {
+            "cpuLoad": "CPU 負載",
+            "memoryLoad": "記憶體負載",
+            "network": "網路",
+            "inbound": "傳入",
+            "outbound": "傳出"
+          },
+          "socketConnected": "已連線（{ping}ms ping）",
+          "socketDisconnected": "已中斷連線"
+        },
+        "files": {
+          "title": "檔案",
+          "titleEditorViewing": "正在檢視 {file}",
+          "titleEditorEditing": "正在編輯 {file}",
+          "titleEditorNew": "新檔案",
+          "table": {
+            "columns": {
+              "modified": "已修改"
+            }
+          },
+          "button": {
+            "new": "新增",
+            "sftpDetails": "SFTP 詳細資訊",
+            "openInNewWindow": "在新視窗中開啟",
+            "details": "詳細資訊",
+            "rename": "重新命名",
+            "copy": "複製",
+            "move": "移動",
+            "fingerprint": "指紋",
+            "permissions": "權限",
+            "unarchive": "解壓縮",
+            "archive": "壓縮",
+            "more": "更多",
+            "remoteCopy": "遠端複製",
+            "search": "搜尋",
+            "exitBackup": "離開備份",
+            "fileFromEditor": "來自編輯器的檔案",
+            "directory": "目錄",
+            "fileFromPull": "來自拉取的檔案",
+            "fileFromUpload": "來自上傳的檔案",
+            "directoryFromUpload": "來自上傳的目錄"
+          },
+          "actionBar": {
+            "copyHere": "將 {files} 複製到這裡",
+            "moveHere": "將 {files} 移動到這裡"
+          },
+          "searchBanner": {
+            "resultsTitle": "搜尋結果（找到 {files}）",
+            "query": "查詢：",
+            "excluded": "已排除：",
+            "content": "內容：",
+            "size": "大小：",
+            "min": "最小：",
+            "max": "最大："
+          },
+          "operations": {
+            "uploadingFolder": "正在上傳資料夾：{folder}（{files}）",
+            "waiting": "等待中：",
+            "uploading": "上傳中：",
+            "compressing": "正在從 {path} 壓縮 {files}",
+            "decompressing": "正在解壓縮 {path}",
+            "pulling": "正在拉取 {destination}",
+            "copying": "正在將 {path} 複製到 {destination}",
+            "copyingMany": "正在複製 {files}",
+            "receivingRemote": "正在從遠端伺服器接收 {files}",
+            "sendingRemote": "正在傳送 {files} 到遠端伺服器",
+            "rateLimited": "你的上傳受到速率限制。等待中...",
+            "cancelAllUploads": "取消所有上傳",
+            "cancelAllOperations": "取消所有操作"
+          },
+          "dropzone": {
+            "title": "將檔案拖放到此處以上傳",
+            "subtitle": "放開即可開始上傳"
+          },
+          "settings": {
+            "clickOnce": "點選一次即可開啟檔案或資料夾",
+            "preferPhysicalSize": "顯示實體大小而非邏輯大小",
+            "editorMinimap": "顯示檔案迷你地圖",
+            "editorLineOverflow": "換行顯示超出內容",
+            "imageViewerSmoothing": "平滑圖片（反鋸齒）"
+          },
+          "toast": {
+            "operationCancelled": "操作已取消",
+            "allOperationsCancelled": "所有操作都已取消。",
+            "copyingStarted": "{files} 已開始複製。",
+            "filesCouldNotBeMoved": "無法移動檔案。",
+            "filesMoved": "{files} 已移動。",
+            "downloadStarted": "下載已開始。",
+            "filesDeleted": "檔案已刪除。",
+            "archiveCreationStarted": "已開始建立壓縮檔。",
+            "fileCopyingStarted": "已開始複製檔案。",
+            "fileInfoRetrieved": "已成功取得檔案資訊。",
+            "filePullingStarted": "已開始拉取檔案。",
+            "fileRenamed": "檔案已重新命名。",
+            "fileCouldNotBeRenamed": "無法重新命名檔案。",
+            "permissionsUpdated": "權限已更新。",
+            "fileSaved": "檔案已儲存。"
+          },
+          "modal": {
+            "activeUploads": {
+              "title": "進行中的上傳",
+              "content": "你確定要離開此頁面嗎？你有 {files} 個進行中的檔案上傳。若離開此頁面，檔案上傳將會中止。",
+              "button": {
+                "leave": "離開頁面"
+              }
+            },
+            "unsavedChanges": {
+              "title": "未儲存的變更",
+              "content": "檔案編輯器中有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。",
+              "button": {
+                "leave": "離開頁面"
+              }
+            },
+            "createArchive": {
+              "title": "建立壓縮檔",
+              "form": {
+                "archiveName": "壓縮檔名稱",
+                "format": "格式"
+              },
+              "createdAs": "此壓縮檔將建立為 "
+            },
+            "createDirectory": {
+              "title": "建立目錄",
+              "form": {
+                "directoryName": "目錄名稱"
+              },
+              "createdAs": "此目錄將建立為 "
+            },
+            "copyFile": {
+              "title": "複製檔案",
+              "form": {
+                "fileName": "檔案名稱"
+              },
+              "createdAs": "此檔案將建立為 "
+            },
+            "copyRemote": {
+              "title": "遠端複製檔案",
+              "form": {
+                "server": "伺服器",
+                "destination": "目的地"
+              },
+              "createdAs": "這些檔案將建立在遠端伺服器的 "
+            },
+            "fileFingerprints": {
+              "title": "檔案指紋",
+              "form": {
+                "algorithm": "演算法",
+                "fingerprint": "指紋"
+              },
+              "button": {
+                "calculate": "計算指紋"
+              }
+            },
+            "deleteFile": {
+              "title": "刪除檔案",
+              "singleFileWarning": "刪除後將無法復原 {file} 的內容。",
+              "multipleFilesWarning": "刪除後將無法復原以下檔案的內容。"
+            },
+            "createFile": {
+              "title": "建立檔案",
+              "form": {
+                "fileName": "檔案名稱"
+              }
+            },
+            "details": {
+              "title": "檔案詳細資訊",
+              "path": "路徑",
+              "mode": "模式",
+              "logicalSize": "邏輯大小",
+              "physicalSize": "實體大小",
+              "mimeType": "MIME 類型",
+              "lastModifiedAt": "上次修改時間",
+              "createdAt": "建立時間"
+            },
+            "filePermissions": {
+              "title": "檔案權限",
+              "symbolic": "符號：",
+              "octal": "八進位：",
+              "owner": "擁有者",
+              "group": "群組",
+              "other": "其他",
+              "breakdown": "權限明細",
+              "readPermission": "讀取權限（4）",
+              "writePermission": "寫入權限（2）",
+              "executePermission": "執行權限（1）"
+            },
+            "renameFile": {
+              "title": "重新命名檔案",
+              "form": {
+                "fileName": "檔案名稱"
+              }
+            },
+            "searchFiles": {
+              "title": "搜尋檔案",
+              "placeholder": "搜尋檔案...",
+              "advancedFilters": "進階篩選",
+              "pathPatterns": "路徑模式",
+              "include": "包含",
+              "exclude": "排除",
+              "caseInsensitive": "不區分大小寫",
+              "fileContent": "檔案內容",
+              "searchText": "搜尋文字",
+              "maxFileSize": "最大檔案大小",
+              "includeOversized": "包含超大檔案",
+              "includeOversizedDescription": "包含符合其他篩選條件但太大而無法搜尋的檔案",
+              "fileSize": "檔案大小",
+              "minimum": "最小值",
+              "maximum": "最大值"
+            },
+            "pullFile": {
+              "title": "拉取檔案",
+              "form": {
+                "fileUrl": "檔案 URL",
+                "query": "查詢",
+                "fileName": "檔案名稱"
+              },
+              "createdAs": "此檔案將建立為 ",
+              "pull": "拉取"
+            },
+            "sftpDetails": {
+              "title": "SFTP 詳細資訊",
+              "form": {
+                "protocol": "通訊協定",
+                "port": "連接埠",
+                "host": "主機",
+                "username": "使用者名稱",
+                "password": "密碼",
+                "yourPassword": "你的控制面板密碼"
+              },
+              "launch": "啟動"
+            }
+          }
+        },
+        "databases": {
+          "title": "資料庫",
+          "subtitle": "已建立 {current} / {max} 個資料庫。",
+          "tooltip": {
+            "limitReached": "此伺服器最多只能使用 {max} 個資料庫。"
+          },
+          "table": {
+            "columns": {
+              "type": "類型",
+              "address": "位址",
+              "locked": "已鎖定？"
+            }
+          },
+          "button": {
+            "details": "詳細資訊",
+            "rotatePassword": "輪換密碼"
+          },
+          "form": {
+            "databaseName": "資料庫名稱"
+          },
+          "modal": {
+            "createDatabase": {
+              "title": "建立資料庫",
+              "toast": {
+                "created": "資料庫已建立。"
+              },
+              "form": {
+                "databaseHost": "資料庫主機",
+                "noHostsFound": "找不到主機"
+              }
+            },
+            "editDatabase": {
+              "title": "編輯資料庫",
+              "toast": {
+                "updated": "資料庫已更新。"
+              },
+              "form": {
+                "locked": "已鎖定"
+              }
+            },
+            "databaseDetails": {
+              "title": "資料庫連線詳細資訊",
+              "toast": {
+                "passwordRotated": "密碼已輪換。"
+              },
+              "form": {
+                "jdbcConnectionString": "JDBC 連線字串"
+              }
+            },
+            "recreateDatabase": {
+              "title": "確認重新建立資料庫",
+              "content": "重新建立資料庫會永久刪除 **{name}** 資料庫中的所有資料，並以相同連線詳細資訊建立新的資料庫。",
+              "toast": {
+                "recreated": "資料庫已重新建立。"
+              }
+            },
+            "deleteDatabase": {
+              "title": "確認刪除資料庫",
+              "content": "刪除資料庫是永久操作，無法復原。這會永久刪除 **{name}** 資料庫並移除所有相關資料。",
+              "toast": {
+                "deleted": "資料庫已刪除。"
+              }
+            }
+          }
+        },
+        "schedules": {
+          "title": "排程",
+          "subtitle": "已建立 {current} / {max} 個排程。",
+          "dropzone": {
+            "title": "將一些檔案拖放到此處以匯入為排程",
+            "subtitle": "放開即可開始匯入"
+          },
+          "tooltip": {
+            "limitReached": "此伺服器最多只能使用 {max} 個排程。"
+          },
+          "table": {
+            "columns": {
+              "lastRun": "上次執行",
+              "lastFailure": "上次失敗",
+              "status": "狀態"
+            }
+          },
+          "button": {
+            "import": "匯入",
+            "trigger": "觸發",
+            "triggerWithCondition": "觸發（不要略過條件）",
+            "triggerSkipCondition": "觸發（略過條件）",
+            "addTrigger": "新增觸發器",
+            "addCondition": "新增條件",
+            "addStep": "新增步驟",
+            "createFirstStep": "建立第一個步驟",
+            "addOutput": "新增輸出",
+            "addFile": "新增檔案",
+            "exitEditor": "離開編輯器"
+          },
+          "toast": {
+            "imported": "排程已匯入。",
+            "created": "排程已建立。",
+            "updated": "排程已更新。",
+            "deleted": "排程已刪除。",
+            "triggered": "排程已觸發。",
+            "exported": "排程已匯出。",
+            "parseError": "無法剖析排程：{error}",
+            "step": {
+              "created": "排程步驟已建立。",
+              "updated": "排程步驟已更新。",
+              "deleted": "排程步驟已刪除。"
+            }
+          },
+          "enum": {
+            "schedulePreConditionType": {
+              "none": "無",
+              "and": "AND（全部都必須為真）",
+              "or": "OR（任一為真即可）",
+              "not": "NOT（不得為真）",
+              "serverState": "伺服器狀態",
+              "uptime": "執行時間",
+              "cpuUsage": "CPU 使用量",
+              "memoryUsage": "記憶體使用量",
+              "diskUsage": "磁碟使用量",
+              "fileExists": "檔案存在"
+            },
+            "scheduleConditionType": {
+              "none": "無",
+              "and": "AND（全部都必須為真）",
+              "or": "OR（任一為真即可）",
+              "not": "NOT（不得為真）",
+              "variableExists": "變數存在",
+              "variableContains": "變數包含",
+              "variableEquals": "變數等於",
+              "variableStartsWith": "變數開頭為",
+              "variableEndsWith": "變數結尾為"
+            },
+            "scheduleComparator": {
+              "smallerThan": "小於",
+              "smallerThanOrEqual": "小於或等於",
+              "equal": "等於",
+              "greaterThanOrEqual": "大於或等於",
+              "greaterThan": "大於"
+            }
+          },
+          "modal": {
+            "createSchedule": {
+              "title": "建立排程"
+            },
+            "updateSchedule": {
+              "title": "更新排程"
+            },
+            "deleteSchedule": {
+              "title": "確認刪除排程",
+              "content": "你確定要從此伺服器刪除 {name} 嗎？"
+            },
+            "createStep": {
+              "title": "建立排程步驟"
+            },
+            "editStep": {
+              "title": "編輯排程步驟"
+            },
+            "deleteStep": {
+              "title": "確認刪除排程步驟",
+              "content": "你確定要刪除此排程步驟嗎？"
+            }
+          },
+          "view": {
+            "badge": {
+              "running": "執行中"
+            },
+            "tooltip": {
+              "cannotTrigger": "無法觸發已停用的排程"
+            },
+            "tabs": {
+              "actions": "動作",
+              "conditions": "條件",
+              "triggers": "觸發器"
+            },
+            "sections": {
+              "actions": "排程動作",
+              "preConditions": "排程前置條件",
+              "triggers": "排程觸發器"
+            },
+            "alert": {
+              "noActions": "此排程未設定任何動作",
+              "noTriggers": "此排程未設定任何觸發器"
+            }
+          },
+          "form": {
+            "scheduleName": "排程名稱",
+            "enabled": "已啟用",
+            "triggersList": "觸發器",
+            "triggerNumber": "觸發器 {number}",
+            "actionType": "動作類型",
+            "conditionType": "條件類型",
+            "serverState": "伺服器狀態",
+            "comparator": "比較器",
+            "rootPath": "根路徑",
+            "outputInto": "輸出到",
+            "caseInsensitive": "不區分大小寫",
+            "ignoreFailure": "忽略失敗",
+            "runInForeground": "在前景執行"
+          },
+          "condition": {
+            "variable": "變數",
+            "equals": "等於",
+            "contains": "包含",
+            "startsWith": "開頭為",
+            "endsWith": "結尾為",
+            "allMustBeTrue": "所有條件都必須為真：",
+            "anyMustBeTrue": "任一條件必須為真：",
+            "mustNotBeTrue": "條件不得為真："
+          },
+          "preCondition": {
+            "valueSeconds": "值（秒）",
+            "valuePercent": "值（%）",
+            "value": "值",
+            "filePath": "檔案路徑"
+          },
+          "triggers": {
+            "cron": {
+              "title": "Cron",
+              "form": {
+                "cronSchedule": "Cron 排程"
+              },
+              "card": {
+                "content": "在 Cron 間隔 {schedule} 執行，下次執行為 {timestamp}，上次執行為 {lastTimestamp}。"
+              },
+              "invalidCron": "無效的 cron 運算式"
+            },
+            "powerAction": {
+              "title": "電源動作",
+              "form": {
+                "powerAction": "電源動作"
+              },
+              "card": {
+                "content": "當要求電源動作 `{action}` 時。"
+              }
+            },
+            "serverState": {
+              "title": "伺服器狀態",
+              "card": {
+                "content": "當達到伺服器狀態 `{state}` 時。"
+              }
+            },
+            "backupStatus": {
+              "title": "備份狀態",
+              "form": {
+                "backupStatus": "備份狀態"
+              },
+              "card": {
+                "content": "當備份達到狀態 `{status}` 時。"
+              }
+            },
+            "consoleLine": {
+              "title": "主控台行",
+              "form": {
+                "lineContains": "行包含"
+              },
+              "card": {
+                "content": "當主控台輸出到達包含 `{contains}` 的行時"
+              }
+            },
+            "crash": {
+              "title": "當機",
+              "card": {
+                "content": "當伺服器當機時。"
+              }
+            }
+          },
+          "renderer": {
+            "noActionSelected": "選取要設定的動作類型",
+            "noActionDetails": "沒有可用的動作詳細資訊",
+            "ignoreFailure": "忽略失敗：{value}",
+            "foreground": "前景：{value}"
+          },
+          "steps": {
+            "empty": {
+              "title": "未設定步驟",
+              "description": "此排程尚未有任何步驟。新增一些動作即可開始。"
+            },
+            "sleep": {
+              "title": "等待",
+              "form": {
+                "duration": "持續時間（毫秒）"
+              },
+              "renderer": {
+                "compact": "等待 {duration}ms"
+              }
+            },
+            "ensure": {
+              "title": "確保",
+              "renderer": {
+                "compact": "確保符合某個條件"
+              }
+            },
+            "format": {
+              "title": "格式化",
+              "form": {
+                "formatString": "格式字串",
+                "formatStringDescription": "格式字串，可以將變數包在 {wrapper} 中使用"
+              },
+              "renderer": {
+                "compact": "將字串格式化到 {outputInto}"
+              }
+            },
+            "matchRegex": {
+              "title": "比對 Regex",
+              "form": {
+                "input": "輸入",
+                "regex": "Regex",
+                "outputs": "輸出",
+                "outputNumber": "輸出 {number}"
+              },
+              "renderer": {
+                "compact": "使用 regex {regex} 比對 {input}"
+              }
+            },
+            "waitForConsoleLine": {
+              "title": "等待主控台行",
+              "form": {
+                "lineContains": "行包含",
+                "timeout": "逾時（毫秒）"
+              },
+              "renderer": {
+                "compact": "等待 {timeout} 直到主控台行包含 {contains}",
+                "detail": {
+                  "lineContains": "行必須包含：{contains}",
+                  "caseInsensitive": "不區分大小寫：{value}",
+                  "timeout": "逾時：{timeout}"
+                }
+              }
+            },
+            "sendCommand": {
+              "title": "傳送指令",
+              "form": {
+                "command": "指令"
+              },
+              "renderer": {
+                "compact": "執行 {command}",
+                "detail": {
+                  "command": "指令：{command}"
+                }
+              }
+            },
+            "sendPower": {
+              "title": "傳送電源訊號",
+              "form": {
+                "powerAction": "電源動作"
+              },
+              "renderer": {
+                "compact": "執行 {action}",
+                "detail": {
+                  "powerAction": "電源動作：{action}"
+                }
+              }
+            },
+            "createBackup": {
+              "title": "建立備份",
+              "form": {
+                "backupName": "備份名稱",
+                "ignoredFiles": "忽略的檔案"
+              },
+              "renderer": {
+                "compact": "建立 {name}",
+                "detail": {
+                  "backupName": "備份名稱：{name}",
+                  "ignoredFiles": "忽略的檔案：{files}"
+                }
+              }
+            },
+            "createDirectory": {
+              "title": "建立目錄",
+              "form": {
+                "directoryName": "目錄名稱"
+              },
+              "renderer": {
+                "compact": "在 {root} 建立 {name}",
+                "detail": {
+                  "directory": "目錄：{name}",
+                  "root": "根目錄：{root}"
+                }
+              }
+            },
+            "writeFile": {
+              "title": "寫入檔案",
+              "form": {
+                "filePath": "檔案路徑",
+                "content": "內容",
+                "appendToFile": "附加到檔案"
+              },
+              "renderer": {
+                "compact": "寫入 {file}",
+                "detail": {
+                  "file": "檔案：{file}",
+                  "append": "附加：{value}"
+                }
+              }
+            },
+            "copyFile": {
+              "title": "複製檔案",
+              "form": {
+                "sourceFile": "來源檔案",
+                "destination": "目的地"
+              },
+              "renderer": {
+                "compact": "將 {file} 複製到 {destination}",
+                "detail": {
+                  "from": "來源：{file}",
+                  "to": "目的地：{destination}"
+                }
+              }
+            },
+            "deleteFiles": {
+              "title": "刪除檔案",
+              "form": {
+                "filesToDelete": "要刪除的檔案"
+              },
+              "renderer": {
+                "compact": "刪除 {files}",
+                "detail": {
+                  "root": "根目錄：{root}",
+                  "files": "檔案：{files}"
+                }
+              }
+            },
+            "renameFiles": {
+              "title": "重新命名檔案",
+              "form": {
+                "files": "檔案",
+                "from": "從",
+                "to": "到"
+              },
+              "renderer": {
+                "compact": "重新命名 {files}",
+                "detail": {
+                  "root": "根目錄：{root}",
+                  "files": "檔案：{files}"
+                }
+              }
+            },
+            "compressFiles": {
+              "title": "壓縮檔案",
+              "form": {
+                "filesToCompress": "要壓縮的檔案",
+                "archiveFormat": "壓縮格式",
+                "archiveName": "壓縮檔名稱"
+              },
+              "renderer": {
+                "compact": "將 {root} 中的 {files} 壓縮為 {name}",
+                "detail": {
+                  "output": "輸出：{name}",
+                  "root": "根目錄：{root}",
+                  "format": "格式：{format}",
+                  "files": "檔案：{files}"
+                }
+              }
+            },
+            "decompressFile": {
+              "title": "解壓縮檔案",
+              "form": {
+                "file": "檔案"
+              },
+              "renderer": {
+                "compact": "將 {file} 解壓縮到 {root}",
+                "detail": {
+                  "file": "檔案：{file}",
+                  "root": "根目錄：{root}"
+                }
+              }
+            },
+            "updateStartupVariable": {
+              "title": "更新啟動變數",
+              "form": {
+                "envVariable": "環境變數",
+                "value": "值"
+              },
+              "renderer": {
+                "compact": "將 {variable} 設為 {value}",
+                "detail": {
+                  "variable": "變數：{variable}",
+                  "value": "值：{value}"
+                }
+              }
+            },
+            "updateStartupCommand": {
+              "title": "更新啟動指令",
+              "form": {
+                "startupCommand": "啟動指令"
+              },
+              "renderer": {
+                "compact": "設為 {command}",
+                "detail": {
+                  "command": "指令：{command}"
+                }
+              }
+            },
+            "updateStartupDockerImage": {
+              "title": "更新 Docker 映像檔",
+              "form": {
+                "dockerImage": "Docker 映像檔"
+              },
+              "renderer": {
+                "compact": "設為 {image}",
+                "detail": {
+                  "image": "映像檔：{image}"
+                }
+              }
+            }
+          }
+        },
+        "subusers": {
+          "title": "子使用者",
+          "subtitle": "已建立 {current} / {max} 位子使用者。",
+          "tooltip": {
+            "limitReached": "此伺服器最多只能使用 {max} 位子使用者。"
+          },
+          "table": {
+            "columns": {
+              "twoFactorEnabled": "已啟用 2FA",
+              "permissions": "權限",
+              "ignoredFiles": "忽略的檔案"
+            }
+          },
+          "modal": {
+            "createSubuser": {
+              "title": "建立子使用者",
+              "toast": {
+                "created": "子使用者已建立。"
+              },
+              "form": {
+                "email": "電子郵件",
+                "emailPlaceholder": "輸入此子使用者應儲存使用的電子郵件。",
+                "permissions": "權限",
+                "ignoredFiles": "忽略的檔案"
+              }
+            },
+            "updateSubuser": {
+              "title": "更新子使用者",
+              "toast": {
+                "updated": "子使用者已更新。"
+              }
+            },
+            "removeSubuser": {
+              "title": "確認移除子使用者",
+              "content": "你確定要從此伺服器移除 **{username}** 嗎？",
+              "toast": {
+                "removed": "子使用者已移除。"
+              }
+            }
+          }
+        },
+        "backups": {
+          "title": "備份",
+          "subtitle": "已建立 {current} / {max} 個備份。",
+          "tooltip": {
+            "limitReached": "此伺服器最多只能使用 {max} 個備份。"
+          },
+          "table": {
+            "columns": {
+              "checksum": "校驗和",
+              "files": "檔案",
+              "locked": "已鎖定？"
+            }
+          },
+          "button": {
+            "browse": "瀏覽"
+          },
+          "toast": {
+            "downloadStarted": "下載已開始。",
+            "restoringBackup": "正在還原備份..."
+          },
+          "modal": {
+            "createBackup": {
+              "title": "建立備份",
+              "toast": {
+                "created": "備份已建立。"
+              },
+              "form": {
+                "ignoredFiles": "忽略的檔案"
+              }
+            },
+            "editBackup": {
+              "title": "編輯備份",
+              "toast": {
+                "updated": "備份已更新。"
+              },
+              "form": {
+                "locked": "已鎖定"
+              }
+            },
+            "restoreBackup": {
+              "title": "還原備份"
+            },
+            "deleteBackup": {
+              "title": "確認刪除備份",
+              "content": "你確定要從此伺服器刪除 **{name}** 嗎？",
+              "toast": {
+                "deleted": "備份已刪除。"
+              }
+            }
+          }
+        },
+        "network": {
+          "title": "網路",
+          "subtitle": "已指派 {current} / {max} 個分配。",
+          "tooltip": {
+            "limitReached": "此伺服器最多只能使用 {max} 個分配。",
+            "primary": "主要"
+          },
+          "table": {
+            "columns": {
+              "hostname": "主機名稱",
+              "port": "連接埠",
+              "notes": "備註"
+            }
+          },
+          "button": {
+            "setPrimary": "設為主要",
+            "unsetPrimary": "取消主要"
+          },
+          "toast": {
+            "created": "分配已建立。",
+            "updated": "分配已更新。",
+            "removed": "分配已移除。",
+            "setPrimary": "分配已設為主要。",
+            "unsetPrimary": "分配已取消主要。"
+          },
+          "modal": {
+            "editAllocation": {
+              "title": "編輯分配",
+              "form": {
+                "notes": "備註"
+              }
+            },
+            "removeAllocation": {
+              "title": "確認移除分配",
+              "content": "你確定要從此伺服器移除 **{allocation}** 嗎？"
+            }
+          }
+        },
+        "startup": {
+          "title": "啟動",
+          "form": {
+            "startupCommand": "啟動指令",
+            "dockerImage": "Docker 映像檔"
+          },
+          "variables": "變數",
+          "dockerImageDescription": "用來執行此伺服器的 Docker 映像檔。可以改用不同的映像檔。",
+          "dockerImageDescriptionCustom": "用來執行此伺服器的 Docker 映像檔。此值由管理員設定，無法變更。",
+          "toast": {
+            "startupCommandUpdated": "啟動指令已更新。",
+            "dockerImageUpdated": "Docker 映像檔已更新。",
+            "variablesUpdated": "變數已更新。"
+          },
+          "modal": {
+            "unsavedChanges": {
+              "title": "未儲存的變更",
+              "content": "你的啟動變數有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。",
+              "button": {
+                "leave": "離開頁面"
+              }
+            }
+          },
+          "noVariables": "找不到此伺服器的啟動變數。"
+        },
+        "mounts": {
+          "title": "掛載",
+          "table": {
+            "columns": {
+              "target": "目標",
+              "mounted": "已掛載",
+              "readOnly": "唯讀"
+            }
+          },
+          "modal": {
+            "attachMount": {
+              "title": "附加掛載",
+              "content": "你要將 **{name}** 附加到 `{target}` 嗎？",
+              "confirm": "附加",
+              "toast": {
+                "attached": "{name} 已掛載到你的伺服器。"
+              }
+            },
+            "detachMount": {
+              "title": "卸離掛載",
+              "content": "你要將 **{name}** 從 `{target}` 卸離嗎？",
+              "confirm": "卸離",
+              "toast": {
+                "detached": "{name} 已從你的伺服器移除。"
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "設定",
+          "debugInformation": {
+            "title": "偵錯資訊",
+            "form": {
+              "nodeName": "節點（UUID）",
+              "locationName": "位置（UUID）",
+              "serverUuid": "伺服器 UUID"
+            }
+          },
+          "rename": {
+            "title": "重新命名伺服器",
+            "form": {
+              "serverName": "伺服器名稱"
+            },
+            "toast": {
+              "renamed": "伺服器已重新命名。"
+            }
+          },
+          "timezone": {
+            "title": "時區",
+            "form": {
+              "timezone": "時區",
+              "system": "系統"
+            },
+            "toast": {
+              "updated": "伺服器時區已更新。"
+            }
+          },
+          "autokill": {
+            "title": "自動強制終止",
+            "form": {
+              "enabled": "已啟用",
+              "secondsUntilAutoKill": "自動強制終止前秒數"
+            },
+            "toast": {
+              "updated": "伺服器自動強制終止已更新。"
+            }
+          },
+          "autostart": {
+            "title": "自動啟動",
+            "form": {
+              "behavior": "行為"
+            },
+            "toast": {
+              "updated": "伺服器自動啟動行為已更新。"
+            }
+          },
+          "reinstall": {
+            "title": "重新安裝伺服器",
+            "button": "重新安裝伺服器",
+            "content": "重新安裝伺服器會先停止伺服器，然後重新執行最初設定伺服器的安裝腳本。**此過程中可能會刪除或修改某些檔案，請先備份資料再繼續。**",
+            "modal": {
+              "title": "重新安裝伺服器",
+              "button": "重新安裝",
+              "toast": {
+                "reinstalling": "正在重新安裝伺服器..."
+              }
+            }
+          }
+        },
+        "activity": {
+          "title": "活動"
+        }
+      }
+    }
+  }
+}

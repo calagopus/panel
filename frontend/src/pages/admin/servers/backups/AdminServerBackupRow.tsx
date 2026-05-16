@@ -1,13 +1,16 @@
-import { faFileArrowDown, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faFileArrowDown, faInfo, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router';
 import { z } from 'zod';
 import downloadNodeBackup from '@/api/admin/nodes/backups/downloadNodeBackup.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Badge from '@/elements/Badge.tsx';
+import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import HljsCode from '@/elements/HljsCode.tsx';
+import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
@@ -26,7 +29,9 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [openModal, setOpenModal] = useState<'restore' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'restore' | 'delete' | 'metadata' | null>(null);
+  const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
+  const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadNodeBackup(backup.node.uuid, backup.uuid, archiveFormat)
@@ -56,6 +61,22 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
         onClose={() => setOpenModal(null)}
       />
 
+      <Modal
+        title={t('pages.server.backups.modal.viewMetadata.title', {})}
+        onClose={() => setOpenModal(null)}
+        opened={openModal === 'metadata'}
+      >
+        <HljsCode languageName='json' language={jsonLanguage}>
+          {metadataJson}
+        </HljsCode>
+
+        <ModalFooter>
+          <Button variant='default' onClick={() => setOpenModal(null)}>
+            {t('common.button.close', {})}
+          </Button>
+        </ModalFooter>
+      </Modal>
+
       <ContextMenu
         items={[
           {
@@ -81,6 +102,13 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             onClick: () => setOpenModal('restore'),
             color: 'gray',
             canAccess: useAdminCan('nodes.backups'),
+          },
+          {
+            icon: faInfo,
+            label: t('pages.server.backups.modal.viewMetadata.title', {}),
+            hidden: Object.keys(backup.metadata).length === 0,
+            onClick: () => setOpenModal('metadata'),
+            color: 'gray',
           },
           {
             icon: faTrash,

@@ -64,7 +64,7 @@ mod get {
         (
             "egg_configuration" = uuid::Uuid,
             description = "The egg configuration ID",
-            example = "1",
+            example = "123e4567-e89b-12d3-a456-426614174000",
         ),
     ))]
     pub async fn route(

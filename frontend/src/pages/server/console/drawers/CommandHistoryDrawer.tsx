@@ -15,6 +15,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverActivitySchema } from '@/lib/schemas/server/activity.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -45,6 +46,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
     fetcher: (page) => getServerActivity(server.uuid, page, 'server:console.command'),
     setStoreData: setActivities,
     modifyParams: false,
+    canRequest: useServerCan('activity.read'),
     deps: [server.uuid],
   });
 

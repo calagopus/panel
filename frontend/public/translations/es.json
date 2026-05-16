@@ -1625,7 +1625,7 @@
                 "cronSchedule": "Programación cron"
               },
               "card": {
-                "content": "En el intervalo cron `{schedule}`. Próxima ejecución: {timestamp} - Última ejecución: {lastTimestamp}."
+                "content": "En el intervalo cron {schedule}. Próxima ejecución: {timestamp} - Última ejecución: {lastTimestamp}."
               }
             },
             "powerAction": {

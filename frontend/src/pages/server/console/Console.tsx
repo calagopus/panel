@@ -112,7 +112,10 @@ export default function Terminal() {
     localStorage.setItem(CONSOLE_FONT_SIZE_KEY, consoleFontSize.toString());
     if (xtermInstance.current) {
       xtermInstance.current.options.fontSize = consoleFontSize;
-      fitAddonRef.current?.fit();
+      requestAnimationFrame(() => {
+        fitAddonRef.current?.fit();
+        xtermInstance.current?.refresh(0, xtermInstance.current.rows - 1);
+      });
     }
   }, [consoleFontSize, CONSOLE_FONT_SIZE_KEY]);
 

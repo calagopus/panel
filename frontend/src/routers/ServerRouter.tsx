@@ -3,6 +3,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { NavLink, Route, Routes, useParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getEggCommandSnippets from '@/api/me/servers/eggs/getEggCommandSnippets.ts';
+import getServerAnnouncements from '@/api/server/announcements/getAnnouncements.ts';
 import getServer from '@/api/server/getServer.ts';
 import AppIcon from '@/elements/AppIcon.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
@@ -38,6 +39,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   const resetState = useServerStore((state) => state.reset);
   const setServer = useServerStore((state) => state.setServer);
   const setCommandSnippets = useServerStore((state) => state.setCommandSnippets);
+  const setServerAnnouncements = useServerStore((state) => state.setServerAnnouncements);
 
   const allServerRoutes = useMemo(() => {
     const routes = [...serverRoutes, ...window.extensionContext.extensionRegistry.routes.serverRoutes];
@@ -102,6 +104,12 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
             .then((snippets) => {
               setCommandSnippets(snippets);
             })
+            .catch((error) => {
+              addToast(httpErrorToHuman(error), 'error');
+            });
+
+          getServerAnnouncements(data.uuid)
+            .then(setServerAnnouncements)
             .catch((error) => {
               addToast(httpErrorToHuman(error), 'error');
             });

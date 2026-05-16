@@ -137,7 +137,7 @@ mod post {
         let oauth_provider =
             match OAuthProvider::by_uuid_optional(&state.database, data.oauth_provider_uuid).await?
             {
-                Some(user) => user,
+                Some(oauth_provider) => oauth_provider,
                 None => {
                     return ApiResponse::error("oauth provider not found")
                         .with_status(StatusCode::NOT_FOUND)

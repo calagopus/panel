@@ -22,6 +22,7 @@ export type ModalType =
   | 'nameDirectory'
   | 'pullFile'
   | 'search'
+  | 'largestDirectories'
   | null;
 
 export interface SearchInfo {
@@ -48,6 +49,8 @@ export interface FileManagerContextType {
   setBrowsingEntries: (entries: Pagination<z.infer<typeof serverDirectoryEntrySchema>>) => void;
   page: number;
   setPage: (page: number) => void;
+  browsingPrimaryFilesystem: boolean;
+  setBrowsingPrimaryFilesystem: (state: boolean) => void;
   browsingWritableDirectory: boolean;
   setBrowsingWritableDirectory: (state: boolean) => void;
   browsingFastDirectory: boolean;

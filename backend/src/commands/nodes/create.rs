@@ -31,11 +31,7 @@ pub struct CreateArgs {
     public_url: Option<String>,
     #[arg(long = "sftp-host", help = "the SFTP host for the node (optional)")]
     sftp_host: Option<String>,
-    #[arg(
-        long = "sftp-port",
-        help = "the SFTP port for the node",
-        default_value = "2022"
-    )]
+    #[arg(long = "sftp-port", help = "the SFTP port for the node")]
     sftp_port: Option<u16>,
     #[arg(
         long = "memory",

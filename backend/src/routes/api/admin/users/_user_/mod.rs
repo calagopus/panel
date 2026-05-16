@@ -154,7 +154,7 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.delete")?;
 
-        let servers = Server::count_by_user_uuid(&state.database, user.uuid).await;
+        let servers = Server::count_by_user_uuid(&state.database, user.uuid).await?;
         if servers > 0 {
             return ApiResponse::error("user has servers, cannot delete")
                 .with_status(StatusCode::BAD_REQUEST)

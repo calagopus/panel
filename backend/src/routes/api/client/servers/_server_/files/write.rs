@@ -8,7 +8,7 @@ mod post {
         ApiError, GetState,
         models::{
             server::{GetServer, GetServerActivityLogger},
-            user::GetPermissionManager,
+            user::{GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -16,7 +16,7 @@ mod post {
 
     #[derive(ToSchema, Deserialize)]
     pub struct Params {
-        file: String,
+        file: compact_str::CompactString,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -42,6 +42,7 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        user: GetUser,
         mut server: GetServer,
         activity_logger: GetServerActivityLogger,
         Query(params): Query<Params>,
@@ -61,7 +62,7 @@ mod post {
             .await?
             .api_client(&state.database)
             .await?
-            .post_servers_server_files_write(server.uuid, &params.file, body.into())
+            .post_servers_server_files_write(server.uuid, &params.file, user.uuid, body.into())
             .await
         {
             Ok(_) => {}

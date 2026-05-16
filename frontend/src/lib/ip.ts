@@ -83,28 +83,23 @@ interface ResolvedPorts {
   toRemove: string[];
 }
 
+export function isValidPort(port: string): boolean {
+  const int = Number(port);
+  return Number.isFinite(int) && Number.isInteger(int) && int >= 0 && int <= 65535;
+}
+
 export function resolvePorts(ports: string[]): ResolvedPorts {
   const resolved: number[] = [];
   const toRemove: string[] = [];
 
   for (const range of ports) {
-    const integer = Number(range);
-
-    if (Number.isFinite(integer) && Number.isInteger(integer)) {
-      resolved.push(integer);
+    if (isValidPort(range)) {
+      resolved.push(Number(range));
     } else if (range.includes('-')) {
       const [start, end] = range.split('-');
 
-      const startInteger = Number(start);
-      const endInteger = Number(end);
-
-      if (
-        Number.isFinite(startInteger) &&
-        Number.isInteger(startInteger) &&
-        Number.isFinite(endInteger) &&
-        Number.isInteger(endInteger)
-      ) {
-        for (let i = startInteger; i <= endInteger; i++) {
+      if (isValidPort(start) && isValidPort(end)) {
+        for (let i = Number(start); i <= Number(end); i++) {
           resolved.push(i);
         }
       }

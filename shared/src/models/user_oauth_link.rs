@@ -385,7 +385,9 @@ impl CreatableModel for UserOAuthLink {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let oauth_link = Self::map(None, &row)?;
+        let mut oauth_link = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut oauth_link, &options, state, transaction).await?;
 
         Ok(oauth_link)
     }
@@ -395,8 +397,8 @@ impl CreatableModel for UserOAuthLink {
 impl DeletableModel for UserOAuthLink {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserOAuthLink>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserOAuthLink>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -420,6 +422,9 @@ impl DeletableModel for UserOAuthLink {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

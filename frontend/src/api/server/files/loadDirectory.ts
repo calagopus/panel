@@ -3,6 +3,7 @@ import { axiosInstance } from '@/api/axios.ts';
 import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
 
 export interface DirectoryResponse {
+  isFilesystemPrimary: boolean;
   isFilesystemWritable: boolean;
   isFilesystemFast: boolean;
   entries: Pagination<z.infer<typeof serverDirectoryEntrySchema>>;

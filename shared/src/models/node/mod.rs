@@ -1,6 +1,6 @@
 use crate::{
     models::{
-        CreatableModel, CreateListenerList, InsertQueryBuilder, UpdatableModel, UpdateListenerList,
+        CreatableModel, CreateListenerList, InsertQueryBuilder, UpdatableModel, UpdateHandlerList,
         UpdateQueryBuilder,
     },
     prelude::*,
@@ -341,8 +341,14 @@ impl Node {
             FROM nodes
             JOIN locations ON locations.uuid = nodes.location_uuid
             LEFT JOIN server_usage u ON nodes.uuid = u.node_uuid
-            WHERE nodes.location_uuid = ANY($1) AND nodes.deployment_enabled
-            AND $4 OR (COALESCE(u.used_memory, 0) + $2 <= nodes.memory AND COALESCE(u.used_disk, 0) + $3 <= nodes.disk)
+            WHERE nodes.location_uuid = ANY($1)
+            AND nodes.deployment_enabled
+            AND (
+                $4 OR (
+                    COALESCE(u.used_memory, 0) + $2 <= nodes.memory
+                    AND COALESCE(u.used_disk, 0) + $3 <= nodes.disk
+                )
+            )
             ORDER BY
                 (
                     GREATEST(COALESCE(u.used_memory, 0) + $2 - nodes.memory, 0) + 
@@ -390,7 +396,7 @@ impl Node {
     pub async fn count_by_location_uuid(
         database: &crate::database::Database,
         location_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -401,7 +407,6 @@ impl Node {
         .bind(location_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     /// Fetch the current configuration of this node
@@ -423,6 +428,31 @@ impl Node {
                 },
             )
             .await
+    }
+
+    /// Update the configuration of this node
+    ///
+    /// Invalidates the cached configuration.
+    pub async fn update_configuration(
+        &self,
+        database: &crate::database::Database,
+        config_patch: &serde_json::Value,
+    ) -> Result<bool, anyhow::Error> {
+        let response = self
+            .api_client(database)
+            .await?
+            .post_update(config_patch)
+            .await?;
+        if !response.applied {
+            return Ok(false);
+        }
+
+        database
+            .cache
+            .invalidate(&format!("node::{}::configuration", self.uuid))
+            .await?;
+
+        Ok(true)
     }
 
     /// Fetch the current resource usages of all servers on this node.
@@ -751,9 +781,13 @@ impl CreatableModel for Node {
             .returning("uuid")
             .fetch_one(&mut **transaction)
             .await?;
-        let uuid: uuid::Uuid = row.get("uuid");
+        let uuid: uuid::Uuid = row.try_get("uuid")?;
 
-        Self::by_uuid_with_transaction(transaction, uuid).await
+        let mut result = Self::by_uuid_with_transaction(transaction, uuid).await?;
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -817,8 +851,8 @@ pub struct UpdateNodeOptions {
 impl UpdatableModel for Node {
     type UpdateOptions = UpdateNodeOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<Node>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<Node>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -867,7 +901,7 @@ impl UpdatableModel for Node {
 
         let mut query_builder = UpdateQueryBuilder::new("nodes");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -938,6 +972,8 @@ impl UpdatableModel for Node {
             self.disk = disk;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -946,8 +982,8 @@ impl UpdatableModel for Node {
 impl DeletableModel for Node {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<Node>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<Node>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -975,6 +1011,9 @@ impl DeletableModel for Node {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE server_schedule_steps\n                        SET error = $3\n                        WHERE server_schedule_steps.uuid = $1 AND server_schedule_steps.schedule_uuid = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b68d320049fd421d5b4441831b4486c2d0df6e1e03180177052ffb5d092bbb2f"
+}

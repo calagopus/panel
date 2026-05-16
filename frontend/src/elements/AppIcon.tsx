@@ -6,8 +6,8 @@ function AppIcon({ className }: { className?: string }) {
   const { settings } = useGlobalStore();
 
   return settings.app.banner ? (
-    <div className={classNames('h-32 w-full mt-1 select-none', className)}>
-      <img src={settings.app.banner} className='h-32 w-auto object-cover' alt='Calagopus Banner' />
+    <div className={classNames('w-full mt-1 select-none', className)}>
+      <img src={settings.app.banner} className='w-full h-auto' alt='Calagopus Banner' />
     </div>
   ) : (
     <div className={classNames('h-16 w-full flex flex-row items-center justify-between mt-1 select-none', className)}>

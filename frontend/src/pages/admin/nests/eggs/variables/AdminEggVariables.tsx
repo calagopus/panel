@@ -49,6 +49,7 @@ export default function AdminEggVariables({
     addEggVariable({
       uuid: '',
       name: '',
+      nameTranslations: {},
       description: null,
       descriptionTranslations: {},
       order: Number.isFinite(Math.max(...eggVariables.map((s) => s.order)))

@@ -140,14 +140,14 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
               )}
 
               <TableData className='w-full max-w-0'>
-                <span className='flex items-center gap-4 leading-[100%] min-w-0' title={file.name}>
+                <span className='flex items-center gap-4 min-w-0' title={file.name}>
                   <FileRowIcon className='shrink-0 text-gray-400' file={file} />
                   <span className='truncate'>{file.name}</span>
                 </span>
               </TableData>
 
               <TableData>
-                <span className='flex items-center gap-4 leading-[100%] min-w-fit text-nowrap'>
+                <span className='flex items-center gap-4 min-w-fit text-nowrap'>
                   {bytesToString(preferPhysicalSize ? file.sizePhysical : file.size)}
                 </span>
               </TableData>

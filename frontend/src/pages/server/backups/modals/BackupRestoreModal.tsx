@@ -1,4 +1,4 @@
-import { ModalProps, Switch } from '@mantine/core';
+import { ModalProps, Stack, Switch } from '@mantine/core';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -21,13 +21,14 @@ export default function BackupRestoreModal({ backup, opened, onClose }: Props) {
   const { server, updateServer } = useServerStore();
   const navigate = useNavigate();
 
-  const [truncate, setTruncate] = useState(false);
+  const [truncateDirectory, setTruncateDirectory] = useState(false);
+  const [restoreStartup, setRestoreStartup] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const doRestore = () => {
     setLoading(true);
 
-    restoreBackup(server.uuid, backup.uuid, { truncateDirectory: truncate })
+    restoreBackup(server.uuid, backup.uuid, { truncateDirectory, restoreStartup })
       .then(() => {
         onClose();
         addToast(t('pages.server.backups.toast.restoringBackup', {}), 'success');
@@ -43,15 +44,25 @@ export default function BackupRestoreModal({ backup, opened, onClose }: Props) {
 
   return (
     <Modal title={t('pages.server.backups.modal.restoreBackup.title', {})} onClose={onClose} opened={opened}>
-      <Switch
-        label={t('common.form.truncateDirectory', {})}
-        name='truncate'
-        checked={truncate}
-        onChange={(e) => setTruncate(e.target.checked)}
-      />
+      <Stack>
+        <Switch
+          label={t('common.form.truncateDirectory', {})}
+          name='truncateDirectory'
+          checked={truncateDirectory}
+          onChange={(e) => setTruncateDirectory(e.target.checked)}
+        />
+
+        <Switch
+          label={t('pages.server.backups.modal.restoreBackup.form.restoreStartup', {})}
+          name='restoreStartup'
+          checked={restoreStartup}
+          disabled={Object.keys(backup.metadata).length === 0}
+          onChange={(e) => setRestoreStartup(e.target.checked)}
+        />
+      </Stack>
 
       <ModalFooter>
-        <Button color={truncate ? 'red' : undefined} onClick={doRestore} loading={loading}>
+        <Button color={truncateDirectory ? 'red' : undefined} onClick={doRestore} loading={loading}>
           {t('common.button.restore', {})}
         </Button>
         <Button variant='default' onClick={onClose}>

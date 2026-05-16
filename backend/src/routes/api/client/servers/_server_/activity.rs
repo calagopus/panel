@@ -8,7 +8,7 @@ mod get {
         ApiError, GetState,
         models::{
             IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
-            server_activity::ServerActivity,
+            server_activity::ServerActivity, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -45,6 +45,7 @@ mod get {
     ))]
     pub async fn route(
         state: GetState,
+        permissions: GetPermissionManager,
         server: GetServer,
         Query(params): Query<PaginationParamsWithSearch>,
     ) -> ApiResponseResult {
@@ -53,6 +54,8 @@ mod get {
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }
+
+        permissions.has_server_permission("activity.read")?;
 
         let activities = ServerActivity::by_server_uuid_with_pagination(
             &state.database,
@@ -64,10 +67,15 @@ mod get {
         .await?;
 
         let storage_url_retriever = state.storage.retrieve_urls().await?;
+        let can_read_ip = permissions
+            .has_server_permission("activity.read-ip")
+            .is_ok();
 
         ApiResponse::new_serialized(Response {
             activities: activities
-                .try_async_map(|activity| activity.into_api_object(&state, &storage_url_retriever))
+                .try_async_map(|activity| {
+                    activity.into_api_object(&state, (&storage_url_retriever, can_read_ip))
+                })
                 .await?,
         })
         .ok()

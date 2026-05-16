@@ -82,10 +82,19 @@ export default function ServerSchedules() {
       contentRight={
         <>
           <ServerCan action='schedules.create'>
-            <Button onClick={() => fileInputRef.current?.click()} color='blue'>
-              <FontAwesomeIcon icon={faUpload} className='mr-2' />
-              {t('pages.server.schedules.button.import', {})}
-            </Button>
+            <ConditionalTooltip
+              enabled={schedules.total >= server.featureLimits.schedules}
+              label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
+            >
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                color='blue'
+                disabled={schedules.total >= server.featureLimits.schedules}
+              >
+                <FontAwesomeIcon icon={faUpload} className='mr-2' />
+                {t('pages.server.schedules.button.import', {})}
+              </Button>
+            </ConditionalTooltip>
             <ConditionalTooltip
               enabled={schedules.total >= server.featureLimits.schedules}
               label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}

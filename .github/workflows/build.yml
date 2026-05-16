@@ -29,20 +29,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v5
         with:
-          version: 10
+          version: 11
           run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
 
       - name: Install frontend dependencies
         run: |
@@ -209,6 +197,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly
@@ -219,7 +208,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.aio
+          file: ./docker/Dockerfile.aio
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-aio
@@ -261,7 +250,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.heavy
+          file: ./docker/Dockerfile.heavy
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-heavy-${{ matrix.tag_suffix }}
@@ -272,7 +261,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.heavy.aio
+          file: ./docker/Dockerfile.heavy.aio
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-heavy-aio-${{ matrix.tag_suffix }}

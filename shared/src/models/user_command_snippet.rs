@@ -169,7 +169,7 @@ impl UserCommandSnippet {
     pub async fn count_by_user_uuid(
         database: &crate::database::Database,
         user_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -180,7 +180,6 @@ impl UserCommandSnippet {
         .bind(user_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 }
 
@@ -262,7 +261,10 @@ impl CreatableModel for UserCommandSnippet {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let user_command_snippet = Self::map(None, &row)?;
+        let mut user_command_snippet = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut user_command_snippet, &options, state, transaction)
+            .await?;
 
         Ok(user_command_snippet)
     }
@@ -286,8 +288,8 @@ pub struct UpdateUserCommandSnippetOptions {
 impl UpdatableModel for UserCommandSnippet {
     type UpdateOptions = UpdateUserCommandSnippetOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<UserCommandSnippet>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<UserCommandSnippet>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -303,7 +305,7 @@ impl UpdatableModel for UserCommandSnippet {
 
         let mut query_builder = UpdateQueryBuilder::new("user_command_snippets");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -324,6 +326,8 @@ impl UpdatableModel for UserCommandSnippet {
             self.command = command;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -332,8 +336,8 @@ impl UpdatableModel for UserCommandSnippet {
 impl DeletableModel for UserCommandSnippet {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserCommandSnippet>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserCommandSnippet>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -357,6 +361,9 @@ impl DeletableModel for UserCommandSnippet {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

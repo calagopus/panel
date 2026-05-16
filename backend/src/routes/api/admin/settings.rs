@@ -60,12 +60,14 @@ mod put {
         language: Option<compact_str::CompactString>,
         #[garde(skip)]
         two_factor_requirement: Option<shared::settings::app::TwoFactorRequirement>,
+        #[garde(length(chars, min = 1, max = 255))]
+        session_cookie: Option<compact_str::CompactString>,
+        #[garde(range(min = 60, max = 31536000))]
+        session_duration_seconds: Option<u64>,
         #[garde(skip)]
         telemetry_enabled: Option<bool>,
         #[garde(skip)]
         registration_enabled: Option<bool>,
-        #[garde(skip)]
-        language_change_enabled: Option<bool>,
     }
 
     #[derive(ToSchema, Validate, Deserialize)]
@@ -85,7 +87,9 @@ mod put {
         #[garde(skip)]
         max_file_manager_search_results: Option<u64>,
         #[garde(skip)]
-        max_schedules_step_count: Option<u64>,
+        max_subuser_count: Option<u64>,
+        #[garde(skip)]
+        max_schedule_step_count: Option<u64>,
 
         #[garde(skip)]
         allow_overwriting_custom_docker_image: Option<bool>,
@@ -96,13 +100,45 @@ mod put {
     }
 
     #[derive(ToSchema, Validate, Deserialize)]
+    pub struct PayloadUser {
+        #[garde(skip)]
+        max_server_group_count: Option<u64>,
+        #[garde(skip)]
+        max_api_key_count: Option<u64>,
+        #[garde(skip)]
+        max_command_snippet_count: Option<u64>,
+        #[garde(skip)]
+        max_security_key_count: Option<u64>,
+        #[garde(skip)]
+        max_ssh_key_count: Option<u64>,
+
+        #[garde(skip)]
+        allow_changing_language: Option<bool>,
+    }
+
+    #[derive(ToSchema, Validate, Deserialize)]
     pub struct PayloadActivity {
         #[garde(range(min = 1, max = 3650))]
+        #[schema(minimum = 1, maximum = 3650)]
         admin_log_retention_days: Option<u16>,
+        #[garde(range(min = 1))]
+        #[schema(minimum = 1)]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        admin_log_retention_count: Option<Option<u64>>,
         #[garde(range(min = 1, max = 3650))]
+        #[schema(minimum = 1, maximum = 3650)]
         user_log_retention_days: Option<u16>,
+        #[garde(range(min = 1))]
+        #[schema(minimum = 1)]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        user_log_retention_count: Option<Option<u64>>,
         #[garde(range(min = 1, max = 3650))]
+        #[schema(minimum = 1, maximum = 3650)]
         server_log_retention_days: Option<u16>,
+        #[garde(range(min = 1))]
+        #[schema(minimum = 1)]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        server_log_retention_count: Option<Option<u64>>,
 
         #[garde(skip)]
         server_log_admin_activity: Option<bool>,
@@ -155,6 +191,9 @@ mod put {
         #[schema(inline)]
         #[garde(dive)]
         server: Option<PayloadServer>,
+        #[schema(inline)]
+        #[garde(dive)]
+        user: Option<PayloadUser>,
         #[schema(inline)]
         #[garde(dive)]
         activity: Option<PayloadActivity>,
@@ -216,14 +255,37 @@ mod put {
             if let Some(two_factor_requirement) = app.two_factor_requirement {
                 settings.app.two_factor_requirement = two_factor_requirement;
             }
+            if let Some(session_cookie) = app.session_cookie {
+                settings.app.session_cookie = session_cookie;
+            }
+            if let Some(session_duration_seconds) = app.session_duration_seconds {
+                settings.app.session_duration_seconds = session_duration_seconds;
+            }
             if let Some(telemetry_enabled) = app.telemetry_enabled {
                 settings.app.telemetry_enabled = telemetry_enabled;
             }
             if let Some(registration_enabled) = app.registration_enabled {
                 settings.app.registration_enabled = registration_enabled;
             }
-            if let Some(language_change_enabled) = app.language_change_enabled {
-                settings.app.language_change_enabled = language_change_enabled;
+        }
+        if let Some(user) = data.user {
+            if let Some(max_server_group_count) = user.max_server_group_count {
+                settings.user.max_server_group_count = max_server_group_count;
+            }
+            if let Some(max_api_key_count) = user.max_api_key_count {
+                settings.user.max_api_key_count = max_api_key_count;
+            }
+            if let Some(max_command_snippet_count) = user.max_command_snippet_count {
+                settings.user.max_command_snippet_count = max_command_snippet_count;
+            }
+            if let Some(max_security_key_count) = user.max_security_key_count {
+                settings.user.max_security_key_count = max_security_key_count;
+            }
+            if let Some(max_ssh_key_count) = user.max_ssh_key_count {
+                settings.user.max_ssh_key_count = max_ssh_key_count;
+            }
+            if let Some(allow_changing_language) = user.allow_changing_language {
+                settings.user.allow_changing_language = allow_changing_language;
             }
         }
         if let Some(webauthn) = data.webauthn {
@@ -247,8 +309,11 @@ mod put {
             if let Some(max_file_manager_search_results) = server.max_file_manager_search_results {
                 settings.server.max_file_manager_search_results = max_file_manager_search_results;
             }
-            if let Some(max_schedules_step_count) = server.max_schedules_step_count {
-                settings.server.max_schedules_step_count = max_schedules_step_count;
+            if let Some(max_subuser_count) = server.max_subuser_count {
+                settings.server.max_subuser_count = max_subuser_count;
+            }
+            if let Some(max_schedule_step_count) = server.max_schedule_step_count {
+                settings.server.max_schedule_step_count = max_schedule_step_count;
             }
             if let Some(allow_overwriting_custom_docker_image) =
                 server.allow_overwriting_custom_docker_image
@@ -267,11 +332,20 @@ mod put {
             if let Some(admin_log_retention_days) = activity.admin_log_retention_days {
                 settings.activity.admin_log_retention_days = admin_log_retention_days;
             }
+            if let Some(admin_log_retention_count) = activity.admin_log_retention_count {
+                settings.activity.admin_log_retention_count = admin_log_retention_count;
+            }
             if let Some(user_log_retention_days) = activity.user_log_retention_days {
                 settings.activity.user_log_retention_days = user_log_retention_days;
             }
+            if let Some(user_log_retention_count) = activity.user_log_retention_count {
+                settings.activity.user_log_retention_count = user_log_retention_count;
+            }
             if let Some(server_log_retention_days) = activity.server_log_retention_days {
                 settings.activity.server_log_retention_days = server_log_retention_days;
+            }
+            if let Some(server_log_retention_count) = activity.server_log_retention_count {
+                settings.activity.server_log_retention_count = server_log_retention_count;
             }
             if let Some(server_log_admin_activity) = activity.server_log_admin_activity {
                 settings.activity.server_log_admin_activity = server_log_admin_activity;

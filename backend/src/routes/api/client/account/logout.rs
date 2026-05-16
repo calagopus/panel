@@ -43,7 +43,7 @@ mod post {
         let settings = state.settings.get().await?;
 
         cookies.add(
-            Cookie::build(("session", ""))
+            Cookie::build((settings.app.session_cookie.clone(), ""))
                 .http_only(true)
                 .same_site(tower_cookies::cookie::SameSite::Lax)
                 .secure(settings.app.url.starts_with("https://"))

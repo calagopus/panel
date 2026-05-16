@@ -82,6 +82,7 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
           name: form.values.backupName,
           description: existingBackupConfig!.description,
           maintenanceEnabled: existingBackupConfig!.maintenanceEnabled,
+          shared: existingBackupConfig!.shared,
           backupDisk: form.values.backupDisk,
           backupConfigs,
         });
@@ -95,6 +96,7 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
           name: form.values.backupName,
           description: null,
           maintenanceEnabled: false,
+          shared: form.values.backupDisk === 's3' || form.values.backupDisk === 'restic',
           backupDisk: form.values.backupDisk,
           backupConfigs,
         });

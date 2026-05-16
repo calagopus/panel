@@ -1,4 +1,3 @@
-use anyhow::Context;
 use axum::{
     ServiceExt,
     body::Body,
@@ -66,6 +65,7 @@ async fn handle_aio_wings(state: &shared::State) -> Result<(), anyhow::Error> {
                                 name: "Integrated Backup Configuration".into(),
                                 description: None,
                                 maintenance_enabled: false,
+                                shared: false,
                                 backup_disk: shared::models::server_backup::BackupDisk::Local,
                                 backup_configs: Default::default(),
                             }).await?
@@ -141,7 +141,7 @@ async fn handle_aio_wings(state: &shared::State) -> Result<(), anyhow::Error> {
                     serde_norway::from_str(
                         &tokio::fs::read_to_string(config_path)
                             .await
-                            .context("failed to read aio base wings configuration file")?,
+                            .unwrap_or_else(|_| "".into()),
                     )
                     .unwrap_or_else(|_| serde_norway::Mapping::new()),
                 ),
@@ -162,7 +162,7 @@ async fn handle_aio_wings(state: &shared::State) -> Result<(), anyhow::Error> {
 
     mapping.insert(
         serde_norway::Value::String("uuid".into()),
-        serde_norway::Value::String(node.uuid.to_string()),
+        serde_norway::Value::String(Node::AIO_NODE_UUID.to_string()),
     );
     mapping.insert(
         serde_norway::Value::String("token_id".into()),

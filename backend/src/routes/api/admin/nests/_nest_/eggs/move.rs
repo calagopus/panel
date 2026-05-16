@@ -53,7 +53,7 @@ mod post {
 
         let destination_nest =
             match Nest::by_uuid_optional(&state.database, data.destination_nest_uuid).await? {
-                Some(egg) => egg,
+                Some(destination_nest) => destination_nest,
                 None => {
                     return ApiResponse::error("destination nest not found")
                         .with_status(StatusCode::NOT_FOUND)
@@ -70,9 +70,10 @@ mod post {
         let move_egg = async |egg: uuid::Uuid| {
             let affected = sqlx::query!(
                 "UPDATE nest_eggs
-                SET nest_uuid = $2
-                WHERE nest_eggs.uuid = $1",
+                SET nest_uuid = $3
+                WHERE nest_eggs.uuid = $1 AND nest_eggs.nest_uuid = $2",
                 egg,
+                nest.uuid,
                 destination_nest.uuid
             )
             .execute(state.database.write())

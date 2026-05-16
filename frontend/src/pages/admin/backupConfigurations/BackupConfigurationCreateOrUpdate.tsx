@@ -40,6 +40,7 @@ export default function BackupConfigurationCreateOrUpdate({
       name: '',
       description: null,
       maintenanceEnabled: false,
+      shared: false,
       backupDisk: 'local',
     },
     validateInputOnBlur: true,
@@ -113,6 +114,7 @@ export default function BackupConfigurationCreateOrUpdate({
         name: contextBackupConfiguration.name,
         description: contextBackupConfiguration.description,
         maintenanceEnabled: contextBackupConfiguration.maintenanceEnabled,
+        shared: contextBackupConfiguration.shared,
         backupDisk: contextBackupConfiguration.backupDisk,
       });
       if (contextBackupConfiguration.backupConfigs?.s3) {
@@ -174,6 +176,13 @@ export default function BackupConfigurationCreateOrUpdate({
             label='Maintenance Enabled'
             key={form.key('maintenanceEnabled')}
             {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
+          />
+
+          <Switch
+            label='Shared'
+            description='If enabled, backups on this backup configuration will not be transferred between nodes, they will be assumed to be accessible by all nodes.'
+            key={form.key('shared')}
+            {...form.getInputProps('shared', { type: 'checkbox' })}
           />
         </div>
 

@@ -170,10 +170,36 @@ impl UserActivity {
         let result = sqlx::query(
             r#"
             DELETE FROM user_activities
-            WHERE created < $1
+            WHERE user_activities.created < $1
             "#,
         )
         .bind(cutoff.naive_utc())
+        .execute(database.write())
+        .await?;
+
+        Ok(result.rows_affected())
+    }
+
+    pub async fn retain_latest_logs_per_user(
+        database: &crate::database::Database,
+        keep_count: i64,
+    ) -> Result<u64, crate::database::DatabaseError> {
+        let result = sqlx::query(
+            r#"
+            DELETE FROM user_activities
+            WHERE ctid IN (
+                SELECT ctid 
+                FROM (
+                    SELECT
+                        ctid, 
+                        ROW_NUMBER() OVER (PARTITION BY user_activities.user_uuid ORDER BY user_activities.created DESC) rn
+                    FROM user_activities
+                ) sub
+                WHERE sub.rn > $1
+            )
+            "#,
+        )
+        .bind(keep_count)
         .execute(database.write())
         .await?;
 
@@ -271,7 +297,7 @@ impl CreatableModel for UserActivity {
             .set("api_key_uuid", options.api_key_uuid)
             .set("event", &options.event)
             .set("ip", options.ip)
-            .set("data", options.data);
+            .set("data", &options.data);
 
         if let Some(created) = options.created {
             query_builder.set("created", created);
@@ -279,7 +305,11 @@ impl CreatableModel for UserActivity {
 
         query_builder.execute(&mut **transaction).await?;
 
-        Ok(())
+        let mut result = ();
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 

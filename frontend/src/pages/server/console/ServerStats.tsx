@@ -49,7 +49,7 @@ export default function ServerStats() {
   });
 
   useEffect(() => {
-    if (!stats?.state || stats?.state === 'offline') {
+    if (!stats?.state || (stats?.state === 'offline' && server.status !== 'installing')) {
       return;
     }
 

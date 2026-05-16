@@ -60,7 +60,7 @@ export const base64ToArrayBuffer = (base64String: string): ArrayBuffer => {
     console.error('Problematic string:', base64String);
     throw new Error(
       'Failed to decode base64 string: ' +
-        (error && typeof error === 'object' && 'message' in error && error?.message) || 'Unknown error',
+        ((error && typeof error === 'object' && 'message' in error && error?.message) || 'Unknown error'),
     );
   }
 };

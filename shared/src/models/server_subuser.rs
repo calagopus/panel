@@ -151,23 +151,20 @@ impl ServerSubuser {
         })
     }
 
-    pub async fn delete_by_uuids(
+    pub async fn count_by_server_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
-        user_uuid: uuid::Uuid,
-    ) -> Result<(), crate::database::DatabaseError> {
-        sqlx::query(
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar(
             r#"
-            DELETE FROM server_subusers
-            WHERE server_subusers.server_uuid = $1 AND server_subusers.user_uuid = $2
+            SELECT COUNT(*)
+            FROM server_subusers
+            WHERE server_subusers.server_uuid = $1
             "#,
         )
         .bind(server_uuid)
-        .bind(user_uuid)
-        .execute(database.write())
-        .await?;
-
-        Ok(())
+        .fetch_one(database.read())
+        .await
     }
 }
 
@@ -367,7 +364,11 @@ impl CreatableModel for ServerSubuser {
         .fetch_one(&mut **transaction)
         .await?;
 
-        Self::map(None, &row)
+        let mut result = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -383,8 +384,8 @@ pub struct UpdateServerSubuserOptions {
 impl UpdatableModel for ServerSubuser {
     type UpdateOptions = UpdateServerSubuserOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<ServerSubuser>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<ServerSubuser>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -400,7 +401,7 @@ impl UpdatableModel for ServerSubuser {
 
         let mut query_builder = UpdateQueryBuilder::new("server_subusers");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -418,6 +419,8 @@ impl UpdatableModel for ServerSubuser {
             self.ignored_files = ignored_files;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -426,8 +429,8 @@ impl UpdatableModel for ServerSubuser {
 impl DeletableModel for ServerSubuser {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<ServerSubuser>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<ServerSubuser>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -452,6 +455,9 @@ impl DeletableModel for ServerSubuser {
         .bind(self.user.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

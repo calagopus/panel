@@ -8,7 +8,7 @@ export const axiosInstance: AxiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((request) => {
-  request.headers.set('Calagopus-User', localStorage.getItem('impersonatedUser'));
+  request.headers.set('Calagopus-User', localStorage.getItem('impersonated_user'));
 
   return request;
 });
@@ -16,7 +16,8 @@ axiosInstance.interceptors.request.use((request) => {
 // Auto transform all data to camel case keys
 axiosInstance.interceptors.response.use(
   (response) => {
-    if (response.headers['content-type'] === 'application/json') {
+    const contentType = response.headers['content-type'];
+    if (typeof contentType === 'string' && contentType.includes('application/json') && response.data) {
       response.data = transformKeysToCamelCase(response.data);
     }
 
@@ -24,8 +25,12 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.data) {
-      error.response.data = transformKeysToCamelCase(error.response.data);
+      const contentType = error.response.headers['content-type'];
+      if (typeof contentType === 'string' && contentType.includes('application/json')) {
+        error.response.data = transformKeysToCamelCase(error.response.data);
+      }
     }
+
     return Promise.reject(error);
   },
 );
@@ -37,7 +42,7 @@ export const untransformedAxiosInstance: AxiosInstance = axios.create({
 });
 
 untransformedAxiosInstance.interceptors.request.use((request) => {
-  request.headers.set('Calagopus-User', localStorage.getItem('impersonatedUser'));
+  request.headers.set('Calagopus-User', localStorage.getItem('impersonated_user'));
 
   return request;
 });

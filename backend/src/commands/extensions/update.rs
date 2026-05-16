@@ -159,7 +159,7 @@ impl shared::extensions::commands::CliCommand<UpdateArgs> for UpdateCommand {
                 );
 
                 println!(
-                    "sucessfully updated {}",
+                    "successfully updated {}",
                     extension_distr.metadata_toml.name.cyan(),
                 );
                 println!(

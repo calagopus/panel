@@ -1,6 +1,7 @@
 import {
   faBriefcase,
   faBuilding,
+  faBullhorn,
   faCogs,
   faCrow,
   faDatabase,
@@ -19,6 +20,7 @@ import {
 import { faComputer } from '@fortawesome/free-solid-svg-icons/faComputer';
 import type { AdminRouteDefinition } from 'shared';
 import AdminActivity from '@/pages/admin/activity/AdminActivity.tsx';
+import AdminAnnouncements from '@/pages/admin/announcements/AdminAnnouncements.tsx';
 import AdminAssets from '@/pages/admin/assets/AdminAssets.tsx';
 import AdminBackupConfigurations from '@/pages/admin/backupConfigurations/AdminBackupConfigurations.tsx';
 import AdminDatabaseHosts from '@/pages/admin/databaseHosts/AdminDatabaseHosts.tsx';
@@ -52,6 +54,13 @@ const routes: AdminRouteDefinition[] = [
     path: '/settings/*',
     element: AdminSettings,
     permission: ['settings.*'],
+  },
+  {
+    name: 'Announcements',
+    icon: faBullhorn,
+    path: '/announcements/*',
+    element: AdminAnnouncements,
+    permission: ['announcements.*'],
   },
   {
     name: 'Assets',

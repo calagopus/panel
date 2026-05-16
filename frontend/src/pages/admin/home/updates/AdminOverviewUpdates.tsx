@@ -1,5 +1,6 @@
 import {
   faCheck,
+  faClockRotateLeft,
   faExclamationTriangle,
   faInfoCircle,
   faPuzzlePiece,
@@ -7,18 +8,21 @@ import {
   faServer,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import getNodeUpdates from '@/api/admin/system/updates/getNodeUpdates.ts';
+import getUpdateHistory from '@/api/admin/system/updates/getUpdateHistory.ts';
 import recheckUpdates from '@/api/admin/system/updates/recheckUpdates.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
 import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
+import Select from '@/elements/input/Select.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
+import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminExtensionUpdateCheckResultErrorSchema,
@@ -36,6 +40,8 @@ export default function AdminOverviewUpdates() {
   const { updateInformation, setUpdateInformation } = useAdminStore();
 
   const [nodes, setNodes] = useState<Awaited<ReturnType<typeof getNodeUpdates>> | null>(null);
+  const [updateHistory, setUpdateHistory] = useState<Awaited<ReturnType<typeof getUpdateHistory>> | null>(null);
+  const [selectedUpdateHistory, setSelectedUpdateHistory] = useState<string | null>(null);
   const [recheckLoading, setRecheckLoading] = useState(false);
 
   const { loading, setPage, refetch } = useSearchablePaginatedTable({
@@ -44,6 +50,14 @@ export default function AdminOverviewUpdates() {
     setStoreData: setNodes,
     paginationKey: 'outdatedNodes',
   });
+
+  useEffect(() => {
+    getUpdateHistory()
+      .then((history) => setUpdateHistory(history))
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
+  }, []);
 
   const extensionUpdates = useMemo(
     () =>
@@ -117,6 +131,49 @@ export default function AdminOverviewUpdates() {
               Recheck for Updates
             </Button>
           </div>
+        </TitleCard>
+        <TitleCard
+          title='Version History'
+          icon={<FontAwesomeIcon icon={faClockRotateLeft} />}
+          className='max-h-80 overflow-y-scroll'
+        >
+          <Select
+            placeholder='Select an update history to view'
+            value={selectedUpdateHistory || ''}
+            onChange={(value) => setSelectedUpdateHistory(value || null)}
+            data={[
+              { label: 'Panel', value: '' },
+              ...(updateHistory
+                ? Object.keys(updateHistory.extensions).map((ext) => ({
+                    label: `Extension: ${ext}`,
+                    value: ext,
+                  }))
+                : []),
+            ]}
+            className='mb-4'
+          />
+
+          {!updateHistory ? (
+            <Spinner.Centered />
+          ) : (
+            <>
+              <Table columns={['Version', 'Installed']}>
+                {(!selectedUpdateHistory
+                  ? updateHistory.panel
+                  : updateHistory.extensions[selectedUpdateHistory] || []
+                ).map((entry) => (
+                  <TableRow key={entry.version}>
+                    <TableData>
+                      <Code>{entry.version}</Code>
+                    </TableData>
+                    <TableData>
+                      <FormattedTimestamp timestamp={entry.timestamp} />
+                    </TableData>
+                  </TableRow>
+                ))}
+              </Table>
+            </>
+          )}
         </TitleCard>
         <TitleCard title='Outdated Extensions' icon={<FontAwesomeIcon icon={faPuzzlePiece} />}>
           {!updateInformation ? (

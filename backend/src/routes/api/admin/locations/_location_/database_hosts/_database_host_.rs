@@ -43,29 +43,30 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("locations.database-hosts")?;
 
-        let database_host = match LocationDatabaseHost::by_location_uuid_database_host_uuid(
-            &state.database,
-            location.uuid,
-            database_host,
-        )
-        .await?
-        {
-            Some(host) => host.database_host,
-            None => {
-                return ApiResponse::error("database host not found")
-                    .with_status(StatusCode::NOT_FOUND)
-                    .ok();
-            }
-        };
+        let location_database_host =
+            match LocationDatabaseHost::by_location_uuid_database_host_uuid(
+                &state.database,
+                location.uuid,
+                database_host,
+            )
+            .await?
+            {
+                Some(host) => host,
+                None => {
+                    return ApiResponse::error("database host not found")
+                        .with_status(StatusCode::NOT_FOUND)
+                        .ok();
+                }
+            };
 
-        database_host.delete(&state, ()).await?;
+        location_database_host.delete(&state, ()).await?;
 
         activity_logger
             .log(
                 "location:database-host.delete",
                 serde_json::json!({
                     "location_uuid": location.uuid,
-                    "database_host_uuid": database_host.uuid,
+                    "database_host_uuid": location_database_host.database_host.uuid,
                 }),
             )
             .await;

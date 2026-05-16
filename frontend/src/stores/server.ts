@@ -1,6 +1,7 @@
 import { create, StoreApi } from 'zustand';
 import { createContext } from 'zustand-utils';
 import { AllocationsSlice, createAllocationsSlice } from '@/stores/slices/server/allocations.ts';
+import { createServerAnnouncementsSlice, ServerAnnouncementsSlice } from '@/stores/slices/server/announcements.ts';
 import { BackupsSlice, createBackupsSlice } from '@/stores/slices/server/backups.ts';
 import { createDatabasesSlice, DatabasesSlice } from '@/stores/slices/server/databases.ts';
 import { createFilesSlice, FilesSlice } from '@/stores/slices/server/files.ts';
@@ -15,6 +16,7 @@ import { createWebsocketSlice, WebsocketSlice } from '@/stores/slices/server/web
 
 export interface ServerStore
   extends AllocationsSlice,
+    ServerAnnouncementsSlice,
     BackupsSlice,
     TransferSlice,
     DatabasesSlice,
@@ -36,6 +38,7 @@ export const createServerStore = () =>
     const initialState = {} as ServerStore;
     Object.assign(initialState, {
       ...createAllocationsSlice(...a),
+      ...createServerAnnouncementsSlice(...a),
       ...createBackupsSlice(...a),
       ...createTransferSlice(...a),
       ...createDatabasesSlice(...a),

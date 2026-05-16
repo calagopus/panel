@@ -150,13 +150,17 @@ impl UserSession {
         })
     }
 
-    pub async fn delete_unused(database: &crate::database::Database) -> Result<u64, sqlx::Error> {
+    pub async fn delete_unused(
+        database: &crate::database::Database,
+        duration_seconds: i64,
+    ) -> Result<u64, sqlx::Error> {
         Ok(sqlx::query(
             r#"
             DELETE FROM user_sessions
-            WHERE user_sessions.last_used < NOW() - INTERVAL '30 days'
+            WHERE user_sessions.last_used < $1
             "#,
         )
+        .bind(chrono::Utc::now().naive_utc() - chrono::Duration::seconds(duration_seconds))
         .execute(database.write())
         .await?
         .rows_affected())
@@ -202,14 +206,16 @@ impl UserSession {
     ) -> Result<Cookie<'a>, anyhow::Error> {
         let settings = state.settings.get().await?;
 
-        Ok(Cookie::build(("session", key))
+        Ok(Cookie::build((settings.app.session_cookie.clone(), key))
             .http_only(true)
             .same_site(tower_cookies::cookie::SameSite::Lax)
             .secure(settings.app.url.starts_with("https://"))
             .path("/")
             .expires(
                 tower_cookies::cookie::time::OffsetDateTime::now_utc()
-                    + tower_cookies::cookie::time::Duration::days(30),
+                    + tower_cookies::cookie::time::Duration::seconds(
+                        settings.app.session_duration_seconds as i64,
+                    ),
             )
             .build())
     }
@@ -292,13 +298,17 @@ impl CreatableModel for UserSession {
         query_builder
             .set("user_uuid", options.user_uuid)
             .set("key_id", key_id.clone())
-            .set_expr("key", "crypt($1, gen_salt('xdes', 321))", vec![&hash])
+            .set_expr("key", "crypt($1, gen_salt('bf', 12))", vec![&hash])
             .set("ip", options.ip)
             .set("user_agent", &options.user_agent);
 
         query_builder.execute(&mut **transaction).await?;
 
-        Ok(format!("{key_id}:{hash}"))
+        let mut result = format!("{key_id}:{hash}");
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -306,8 +316,8 @@ impl CreatableModel for UserSession {
 impl DeletableModel for UserSession {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserSession>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserSession>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -331,6 +341,9 @@ impl DeletableModel for UserSession {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

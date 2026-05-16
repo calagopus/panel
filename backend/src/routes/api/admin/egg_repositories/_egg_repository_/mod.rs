@@ -195,7 +195,7 @@ mod patch {
 
         activity_logger
             .log(
-                "egg_repository:update",
+                "egg-repository:update",
                 serde_json::json!({
                     "uuid": egg_repository.uuid,
                     "name": egg_repository.name,

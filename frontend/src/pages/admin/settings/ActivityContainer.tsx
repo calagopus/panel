@@ -23,8 +23,11 @@ export default function ActivityContainer() {
   const form = useForm<z.infer<typeof adminSettingsActivitySchema>>({
     initialValues: {
       adminLogRetentionDays: 1,
+      adminLogRetentionCount: null,
       userLogRetentionDays: 1,
+      userLogRetentionCount: null,
       serverLogRetentionDays: 1,
+      serverLogRetentionCount: null,
       serverLogAdminActivity: false,
       serverLogScheduleActivity: false,
     },
@@ -79,6 +82,29 @@ export default function ActivityContainer() {
               placeholder='Server Activity Retention Days'
               key={form.key('serverLogRetentionDays')}
               {...form.getInputProps('serverLogRetentionDays')}
+            />
+          </Group>
+
+          <Group grow>
+            <NumberInput
+              label='Admin Activity Retention Count'
+              placeholder='Admin Activity Retention Count'
+              key={form.key('adminLogRetentionCount')}
+              {...form.getInputProps('adminLogRetentionCount')}
+            />
+
+            <NumberInput
+              label='User Activity Retention Count'
+              placeholder='User Activity Retention Count'
+              key={form.key('userLogRetentionCount')}
+              {...form.getInputProps('userLogRetentionCount')}
+            />
+
+            <NumberInput
+              label='Server Activity Retention Count'
+              placeholder='Server Activity Retention Count'
+              key={form.key('serverLogRetentionCount')}
+              {...form.getInputProps('serverLogRetentionCount')}
             />
           </Group>
 

@@ -36,7 +36,7 @@ mod get {
         user: GetUser,
         Path(oauth_link): Path<uuid::Uuid>,
     ) -> ApiResponseResult {
-        permissions.has_user_permission("users.oauth-links")?;
+        permissions.has_user_permission("oauth-links.read")?;
 
         let oauth_link =
             match UserOAuthLink::by_user_uuid_uuid(&state.database, user.uuid, oauth_link).await? {

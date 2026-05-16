@@ -11,6 +11,7 @@ export const serverBackupSchema = z.object({
   checksum: z.string().nullable(),
   bytes: z.number(),
   files: z.number(),
+  metadata: z.record(z.string(), z.unknown()),
   completed: z.date().nullable(),
   created: z.date(),
 });

@@ -12,10 +12,12 @@ mod decompress;
 mod delete;
 mod download;
 mod fingerprint;
+mod largest_directories;
 mod list;
 mod operations;
 mod pull;
 mod rename;
+mod revisions;
 mod search;
 mod upload;
 mod write;
@@ -36,9 +38,11 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/decompress", decompress::router(state))
         .nest("/delete", delete::router(state))
         .nest("/create-directory", create_directory::router(state))
+        .nest("/largest-directories", largest_directories::router(state))
         .nest("/chmod", chmod::router(state))
         .nest("/search", search::router(state))
         .nest("/pull", pull::router(state))
         .nest("/operations", operations::router(state))
+        .nest("/revisions", revisions::router(state))
         .with_state(state.clone())
 }

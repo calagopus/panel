@@ -72,7 +72,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
   useEffect(() => {
     const { resolved, toRemove } = resolvePorts(allocationsForm.values.ports);
 
-    for (const removable in toRemove) {
+    for (const removable of toRemove) {
       allocationsForm.setFieldValue('ports', (p) => p.filter((r) => r !== removable));
     }
 

@@ -7,7 +7,13 @@ mod post {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{CreatableModel, node::GetNode, server_activity::ServerActivity},
+        models::{
+            ByUuid, CreatableModel, EventEmittingModel,
+            node::GetNode,
+            server::Server,
+            server_activity::ServerActivity,
+            server_backup::{ServerBackup, ServerBackupEvent},
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -97,6 +103,22 @@ mod post {
                 "failed to log server activity: {:#?}",
                 err
             );
+        }
+
+        match Server::by_uuid(&state.database, server_uuid).await {
+            Ok(server) => {
+                ServerBackup::get_event_emitter().emit(
+                    state.0.clone(),
+                    ServerBackupEvent::RestoreCompleted {
+                        backup: Box::new(backup.0),
+                        server: Box::new(server),
+                        successful: data.successful,
+                    },
+                );
+            }
+            Err(err) => {
+                tracing::warn!(backup = %backup.uuid, "failed to fetch server for RestoreCompleted event: {:#?}", err);
+            }
         }
 
         ApiResponse::new_serialized(Response {}).ok()

@@ -1630,7 +1630,7 @@
                 "cronSchedule": "Cron Schema"
               },
               "card": {
-                "content": "På Cron-intervallet `{schedule}` är nästa körning {timestamp} - Senaste körningen var {lastTimestamp}."
+                "content": "På Cron-intervallet {schedule} är nästa körning {timestamp} - Senaste körningen var {lastTimestamp}."
               }
             },
             "powerAction": {

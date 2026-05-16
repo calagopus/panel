@@ -9,7 +9,7 @@ export default function Copyright({ className }: { className?: string }) {
       ))}
 
       <span className='flex flex-row gap-2'>
-        <Anchor href='https://calagopus.com' target='_blank' className='underline'>
+        <Anchor size='xs' href='https://calagopus.com' target='_blank' className='underline'>
           Calagopus
         </Anchor>
         &copy; 2025 - {new Date().getFullYear()}

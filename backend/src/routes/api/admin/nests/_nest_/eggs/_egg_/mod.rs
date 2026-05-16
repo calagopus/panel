@@ -146,7 +146,8 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("eggs.delete")?;
 
-        if Server::count_by_egg_uuid(&state.database, egg.uuid).await > 0 {
+        let servers = Server::count_by_egg_uuid(&state.database, egg.uuid).await?;
+        if servers > 0 {
             return ApiResponse::error("egg has servers, cannot delete")
                 .with_status(StatusCode::CONFLICT)
                 .ok();

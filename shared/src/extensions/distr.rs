@@ -36,6 +36,52 @@ impl MetadataToml {
         package_name.replace('.', "_")
     }
 
+    /// Validate that a package identifier matches the same constraints as the package name
+    /// validation in `ExtensionDistrFile::validate`, but with `_` instead of `.` as the separator.
+    #[inline]
+    pub fn is_valid_package_identifier(identifier: &str) -> bool {
+        let mut segments = identifier.split('_');
+        let tld = segments.next();
+        let author = segments.next();
+        let ident = segments.next();
+
+        if segments.next().is_some() {
+            return false;
+        }
+
+        let Some(tld) = tld else { return false };
+        let Some(author) = author else { return false };
+        let Some(ident) = ident else { return false };
+
+        if !(2..=6).contains(&tld.len()) {
+            return false;
+        }
+        if !(3..=30).contains(&author.len()) {
+            return false;
+        }
+        if !(4..=30).contains(&ident.len()) {
+            return false;
+        }
+
+        if !tld.chars().all(|c| c.is_ascii_lowercase()) {
+            return false;
+        }
+        if !author
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+        {
+            return false;
+        }
+        if !ident
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+        {
+            return false;
+        }
+
+        true
+    }
+
     /// Convert an identifier to a package name by replacing `_` with `.`.
     ///
     /// Example: `com_example_myextension` becomes `com.example.myextension`.

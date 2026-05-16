@@ -159,6 +159,7 @@ mod patch {
                     "egg_uuid": egg.uuid,
 
                     "name": egg_variable.name,
+                    "name_translations": egg_variable.name_translations,
                     "description": egg_variable.description,
                     "description_translations": egg_variable.description_translations,
                     "order": egg_variable.order,

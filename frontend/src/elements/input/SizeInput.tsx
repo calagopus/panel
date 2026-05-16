@@ -80,10 +80,12 @@ function SizeInput({ mode, min, value, onChange, ...rest }: SizeInputProps) {
     onChange(mode === 'b' ? newBytes : newBytes / (1024 * 1024));
   };
 
+  const displayMin = min === -1 ? -1 : formatUnitBytes(unit, mode === 'b' ? min : mbToBytes(min));
+
   return (
     <NumberInput
       {...rest}
-      min={min}
+      min={displayMin}
       value={displayValue}
       onChange={handleValueChange}
       hideControls

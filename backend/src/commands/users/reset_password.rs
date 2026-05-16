@@ -9,7 +9,7 @@ use std::io::IsTerminal;
 pub struct ResetPasswordArgs {
     #[arg(
         long = "user",
-        help = "the username, email or uuid of the user to disable 2FA for"
+        help = "the username, email or uuid of the user to reset the password for"
     )]
     user: Option<String>,
 

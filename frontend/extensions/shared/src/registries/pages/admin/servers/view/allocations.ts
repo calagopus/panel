@@ -5,6 +5,8 @@ import type { Props as SubContainerProps } from '@/elements/containers/AdminSubC
 import { adminServerSchema } from '@/lib/schemas/admin/servers';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations';
 
+type PageProps = { server: z.infer<typeof adminServerSchema> };
+
 export class AllocationsRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.subContainer.mergeFrom(other.subContainer);
@@ -13,21 +15,14 @@ export class AllocationsRegistry implements Registry {
     return this;
   }
 
-  public subContainer: ContainerRegistry<SubContainerProps<{ server: z.infer<typeof adminServerSchema> }>> =
-    new ContainerRegistry();
+  public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
   public contextMenu: ContextMenuRegistry<{
     server: z.infer<typeof adminServerSchema>;
     allocation: z.infer<typeof serverAllocationSchema>;
   }> = new ContextMenuRegistry();
 
   public enterSubContainer(
-    callback: (
-      registry: ContainerRegistry<
-        SubContainerProps<{
-          server: z.infer<typeof adminServerSchema>;
-        }>
-      >,
-    ) => unknown,
+    callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
     callback(this.subContainer);
     return this;

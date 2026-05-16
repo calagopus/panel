@@ -68,10 +68,8 @@ mod get {
                 .ok();
         }
 
-        let directory = params.directory.as_str();
-        if !directory.is_empty()
-            && (directory.contains("..") || directory.starts_with('/') || directory.ends_with('/'))
-        {
+        let directory = params.directory.trim_matches('/');
+        if directory.contains("..") {
             return ApiResponse::error("invalid directory path")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -135,10 +133,8 @@ mod put {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("assets.upload")?;
 
-        let directory = query.directory.as_str();
-        if !directory.is_empty()
-            && (directory.contains("..") || directory.starts_with('/') || directory.ends_with('/'))
-        {
+        let directory = query.directory.trim_matches('/');
+        if directory.contains("..") {
             return ApiResponse::error("invalid directory path")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();

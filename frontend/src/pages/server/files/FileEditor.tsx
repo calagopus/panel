@@ -1,3 +1,5 @@
+import { faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Title } from '@mantine/core';
 import { type OnMount } from '@monaco-editor/react';
 import { join } from 'pathe';
@@ -7,6 +9,7 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
 import saveFileContent from '@/api/server/files/saveFileContent.ts';
+import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
@@ -14,6 +17,7 @@ import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/monaco.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
@@ -21,6 +25,7 @@ import { FileManagerProvider, useFileManager } from '@/providers/FileManagerProv
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import FileRevisionsDrawer from './drawers/FileRevisionsDrawer.tsx';
 import FileBreadcrumbs from './FileBreadcrumbs.tsx';
 import FileEditorSettings from './FileEditorSettings.tsx';
 import FileImageViewerSettings from './FileImageViewerSettings.tsx';
@@ -48,6 +53,7 @@ function FileEditorComponent() {
     editorMinimap,
     editorLineOverflow,
     imageViewerSmoothing,
+    browsingPrimaryFilesystem,
     browsingWritableDirectory,
     browsingDirectory,
     setBrowsingDirectory,
@@ -59,6 +65,7 @@ function FileEditorComponent() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [nameModalOpen, setNameModalOpen] = useState(false);
+  const [revisionsOpen, setRevisionsOpen] = useState(false);
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
   const [blobContent, setBlobContent] = useState(new Blob());
@@ -220,11 +227,26 @@ function FileEditorComponent() {
         ) : (
           <div hidden={!browsingWritableDirectory || params.action === 'image'}>
             {params.action === 'edit' ? (
-              <ServerCan action='files.update'>
-                <Button loading={saving} onClick={() => saveFile()}>
-                  {t('common.button.save', {})}
-                </Button>
-              </ServerCan>
+              <div className='flex flex-row items-center'>
+                {fileName && browsingPrimaryFilesystem && (
+                  <Tooltip label={t('pages.server.files.tooltip.fileHistory', {})}>
+                    <ActionIcon
+                      size='sm'
+                      variant='subtle'
+                      color='gray'
+                      onClick={() => setRevisionsOpen(true)}
+                      className='mr-2'
+                    >
+                      <FontAwesomeIcon icon={faClockRotateLeft} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+                <ServerCan action='files.update'>
+                  <Button loading={saving} onClick={() => saveFile()}>
+                    {t('common.button.save', {})}
+                  </Button>
+                </ServerCan>
+              </div>
             ) : (
               <ServerCan action='files.create'>
                 <Button loading={saving} onClick={() => setNameModalOpen(true)}>
@@ -245,6 +267,16 @@ function FileEditorComponent() {
       >
         {t('pages.server.files.modal.unsavedChanges.content', {}).md()}
       </ConfirmationModal>
+
+      <FileRevisionsDrawer
+        filePath={join(browsingDirectory, fileName)}
+        opened={revisionsOpen}
+        onClose={() => setRevisionsOpen(false)}
+        onRestore={(newContent) => {
+          editorRef.current?.setValue(newContent);
+          setDirty(true);
+        }}
+      />
 
       {loading ? (
         <div className='w-full h-screen flex items-center justify-center'>

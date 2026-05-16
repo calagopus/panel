@@ -155,8 +155,8 @@ mod patch {
         (status = CONFLICT, body = ApiError),
     ), params(
         (
-            "user" = uuid::Uuid,
-            description = "The user ID",
+            "role" = uuid::Uuid,
+            description = "The role ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
     ), request_body = inline(UpdateRoleOptions))]

@@ -154,13 +154,29 @@ mod post {
                 .ok();
         }
 
+        permissions.has_server_permission("subusers.create")?;
+
         if let Err(error) = state.captcha.verify(ip, data.captcha).await {
             return ApiResponse::error(&error)
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }
 
-        permissions.has_server_permission("subusers.create")?;
+        let subusers_lock = state
+            .cache
+            .lock(
+                format!("servers::{}::subusers", server.uuid),
+                Some(30),
+                Some(5),
+            )
+            .await?;
+
+        let subusers = ServerSubuser::count_by_server_uuid(&state.database, server.uuid).await?;
+        if subusers >= state.settings.get().await?.server.max_subuser_count as i64 {
+            return ApiResponse::error("maximum number of subusers reached")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
 
         let options = shared::models::server_subuser::CreateServerSubuserOptions {
             server: &server,
@@ -182,6 +198,8 @@ mod post {
             }
             Err(err) => return ApiResponse::from(err).ok(),
         };
+
+        drop(subusers_lock);
 
         activity_logger
             .log(

@@ -393,7 +393,9 @@ impl CreatableModel for ServerMount {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let server_mount = Self::map(None, &row)?;
+        let mut server_mount = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut server_mount, &options, state, transaction).await?;
 
         Ok(server_mount)
     }
@@ -403,8 +405,8 @@ impl CreatableModel for ServerMount {
 impl DeletableModel for ServerMount {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<ServerMount>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<ServerMount>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -438,6 +440,9 @@ impl DeletableModel for ServerMount {
         .bind(self.mount.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

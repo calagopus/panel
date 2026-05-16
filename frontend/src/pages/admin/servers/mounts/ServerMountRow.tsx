@@ -29,7 +29,7 @@ export default function ServerMountRow({
     await deleteServerMount(server.uuid, mount.mount.uuid)
       .then(() => {
         removeServerMount(mount);
-        addToast('Node Mount deleted.', 'success');
+        addToast('Server Mount deleted.', 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

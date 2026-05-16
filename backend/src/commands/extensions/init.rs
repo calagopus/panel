@@ -183,7 +183,7 @@ impl shared::extensions::commands::CliCommand<InitArgs> for InitCommand {
                 }
 
                 println!(
-                    "sucessfully initialized extension {} using template {}",
+                    "successfully initialized extension {} using template {}",
                     args.package_name.cyan(),
                     extension_distr.metadata_toml.name.cyan()
                 );

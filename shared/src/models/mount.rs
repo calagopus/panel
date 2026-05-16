@@ -288,7 +288,9 @@ impl CreatableModel for Mount {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let mount = Self::map(None, &row)?;
+        let mut mount = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut mount, &options, state, transaction).await?;
 
         Ok(mount)
     }
@@ -323,8 +325,8 @@ pub struct UpdateMountOptions {
 impl UpdatableModel for Mount {
     type UpdateOptions = UpdateMountOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<Mount>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<Mount>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -340,7 +342,7 @@ impl UpdatableModel for Mount {
 
         let mut query_builder = UpdateQueryBuilder::new("mounts");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -376,6 +378,8 @@ impl UpdatableModel for Mount {
             self.user_mountable = user_mountable;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -384,8 +388,8 @@ impl UpdatableModel for Mount {
 impl DeletableModel for Mount {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<Mount>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<Mount>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -409,6 +413,9 @@ impl DeletableModel for Mount {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

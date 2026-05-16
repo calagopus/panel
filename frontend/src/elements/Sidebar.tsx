@@ -67,7 +67,7 @@ function Sidebar({ children, header, footer }: SidebarProps) {
         </Drawer>
 
         <Card
-          className='my-2 ml-2 top-2 sticky! hidden! lg:block! h-[calc(100vh-16px)] min-w-64! transition-[width] duration-200 ease-in-out'
+          className='my-2 ml-2 top-2 sticky! hidden! lg:block! h-[calc(100vh-16px)] w-64! overflow-hidden transition-[width] duration-200 ease-in-out'
           p='sm'
           id='sidebar-desktop'
         >

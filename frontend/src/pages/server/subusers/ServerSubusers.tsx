@@ -7,6 +7,7 @@ import createSubuser from '@/api/server/subusers/createSubuser.ts';
 import getSubusers from '@/api/server/subusers/getSubusers.ts';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
+import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
@@ -23,7 +24,7 @@ export default function ServerSubusers() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { server, subusers, setSubusers, addSubuser } = useServerStore();
-  const { setAvailablePermissions } = useGlobalStore();
+  const { settings, setAvailablePermissions } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
@@ -54,13 +55,24 @@ export default function ServerSubusers() {
   return (
     <ServerContentContainer
       title={t('pages.server.subusers.title', {})}
+      subtitle={t('pages.server.subusers.subtitle', { current: subusers.total, max: settings.server.maxSubuserCount })}
       search={search}
       setSearch={setSearch}
       contentRight={
         <ServerCan action='subusers.create'>
-          <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            {t('common.button.create', {})}
-          </Button>
+          <ConditionalTooltip
+            enabled={subusers.total >= settings.server.maxSubuserCount}
+            label={t('pages.server.subusers.tooltip.limitReached', { max: settings.server.maxSubuserCount })}
+          >
+            <Button
+              onClick={() => setOpenModal('create')}
+              color='blue'
+              leftSection={<FontAwesomeIcon icon={faPlus} />}
+              disabled={subusers.total >= settings.server.maxSubuserCount}
+            >
+              {t('common.button.create', {})}
+            </Button>
+          </ConditionalTooltip>
         </ServerCan>
       }
       registry={window.extensionContext.extensionRegistry.pages.server.subusers.container}

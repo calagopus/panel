@@ -48,7 +48,7 @@ pub async fn auth(
     let backup_configuration = match backup_configuration {
         Ok(Some(backup_configuration)) => backup_configuration,
         Ok(None) => {
-            return Ok(ApiResponse::error("location not found")
+            return Ok(ApiResponse::error("backup configuration not found")
                 .with_status(StatusCode::NOT_FOUND)
                 .into_response());
         }

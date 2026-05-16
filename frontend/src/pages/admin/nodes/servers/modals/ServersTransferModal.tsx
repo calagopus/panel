@@ -12,15 +12,13 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
-import { archiveFormatLabelMapping, compressionLevelLabelMapping } from '@/lib/enums.ts';
+import { compressionLevelLabelMapping, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import {
-  archiveFormat as archiveFormatEnum,
-  compressionLevel as compressionLevelEnum,
-} from '@/lib/schemas/server/files.ts';
+import { transferArchiveFormat } from '@/lib/schemas/generic.ts';
+import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/files.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 
@@ -45,7 +43,7 @@ export default function ServersTransferModal({
   >('random_all');
   const [transferBackups, setTransferBackups] = useState(false);
   const [deleteSourceBackups, setDeleteSourceBackups] = useState(false);
-  const [archiveFormat, setArchiveFormat] = useState<z.infer<typeof archiveFormatEnum>>('tar_lz4');
+  const [archiveFormat, setArchiveFormat] = useState<z.infer<typeof transferArchiveFormat>>('tar_lz4');
   const [compressionLevel, setCompressionLevel] = useState<z.infer<typeof compressionLevelEnum>>('good_compression');
   const [multiplexChannels, setMultiplexChannels] = useState(0);
 
@@ -170,13 +168,11 @@ export default function ServersTransferModal({
             withAsterisk
             label='Archive Format'
             value={archiveFormat}
-            onChange={(value) => setArchiveFormat(value as z.infer<typeof archiveFormatEnum>)}
-            data={Object.entries(archiveFormatLabelMapping)
-              .filter(([value]) => !['zip', 'seven_zip'].includes(value))
-              .map(([value, label]) => ({
-                value,
-                label,
-              }))}
+            onChange={(value) => setArchiveFormat(value as z.infer<typeof transferArchiveFormat>)}
+            data={Object.entries(transferArchiveFormatLabelMapping).map(([value, label]) => ({
+              value,
+              label,
+            }))}
           />
 
           <Select
@@ -184,7 +180,7 @@ export default function ServersTransferModal({
             label='Compression Level'
             value={compressionLevel}
             onChange={(value) => setCompressionLevel(value as z.infer<typeof compressionLevelEnum>)}
-            disabled={archiveFormat === 'tar'}
+            disabled={archiveFormat === 'tar' || archiveFormat === 'itaf'}
             data={Object.entries(compressionLevelLabelMapping).map(([value, label]) => ({
               value,
               label,

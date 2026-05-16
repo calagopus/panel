@@ -138,7 +138,7 @@ impl ServerScheduleStep {
     pub async fn count_by_schedule_uuid(
         database: &crate::database::Database,
         schedule_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -149,7 +149,6 @@ impl ServerScheduleStep {
         .bind(schedule_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     #[inline]
@@ -231,7 +230,9 @@ impl CreatableModel for ServerScheduleStep {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let step = Self::map(None, &row)?;
+        let mut step = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut step, &options, state, transaction).await?;
 
         Ok(step)
     }
@@ -249,8 +250,8 @@ pub struct UpdateServerScheduleStepOptions {
 impl UpdatableModel for ServerScheduleStep {
     type UpdateOptions = UpdateServerScheduleStepOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<ServerScheduleStep>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<ServerScheduleStep>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -266,7 +267,7 @@ impl UpdatableModel for ServerScheduleStep {
 
         let mut query_builder = UpdateQueryBuilder::new("server_schedule_steps");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -290,6 +291,8 @@ impl UpdatableModel for ServerScheduleStep {
             self.order = order;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -298,8 +301,8 @@ impl UpdatableModel for ServerScheduleStep {
 impl DeletableModel for ServerScheduleStep {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<ServerScheduleStep>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<ServerScheduleStep>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -323,6 +326,9 @@ impl DeletableModel for ServerScheduleStep {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

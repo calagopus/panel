@@ -56,9 +56,9 @@ mod post {
                 .ok();
         }
 
-        if let Err(err) = state
-            .mail
-            .send_foreground(
+        match tokio::time::timeout(
+            std::time::Duration::from_secs(15),
+            state.mail.send_foreground(
                 data.email.clone(),
                 subject.into(),
                 state
@@ -68,12 +68,21 @@ mod post {
                     .get_content(&state)
                     .await?,
                 minijinja::context! {},
-            )
-            .await
+            ),
+        )
+        .await
         {
-            return ApiResponse::error(format!("failed to send test email: {err}"))
-                .with_status(StatusCode::INTERNAL_SERVER_ERROR)
-                .ok();
+            Ok(Ok(_)) => {}
+            Ok(Err(err)) => {
+                return ApiResponse::error(format!("failed to send test email: {err}"))
+                    .with_status(StatusCode::INTERNAL_SERVER_ERROR)
+                    .ok();
+            }
+            Err(_) => {
+                return ApiResponse::error("sending test email timed out after 15 seconds")
+                    .with_status(StatusCode::INTERNAL_SERVER_ERROR)
+                    .ok();
+            }
         }
 
         activity_logger

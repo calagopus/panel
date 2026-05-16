@@ -194,7 +194,7 @@ impl User {
         let row = sqlx::query(
             r#"
             INSERT INTO users (username, email, name_first, name_last, password, admin)
-            VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf', 8)), (SELECT COUNT(*) = 0 FROM users))
+            VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf', 12)), (SELECT COUNT(*) = 0 FROM users))
             RETURNING users.uuid
             "#,
         )
@@ -247,11 +247,14 @@ impl User {
             .cached(&format!("user::session::{session}"), 5, || async {
                 let row = sqlx::query(&format!(
                     r#"
+                    WITH user_sessions AS MATERIALIZED (
+                        SELECT * FROM user_sessions WHERE key_id = $1
+                    )
                     SELECT {}, {}
                     FROM users
                     LEFT JOIN roles ON roles.uuid = users.role_uuid
                     JOIN user_sessions ON user_sessions.user_uuid = users.uuid
-                    WHERE user_sessions.key_id = $1 AND user_sessions.key = crypt($2, user_sessions.key)
+                    WHERE user_sessions.key = crypt($2, user_sessions.key)
                     "#,
                     Self::columns_sql(None),
                     super::user_session::UserSession::columns_sql(Some("session_"))
@@ -283,11 +286,16 @@ impl User {
             .cached(&format!("user::api_key::{key}"), 5, || async {
                 let row = sqlx::query(&format!(
                     r#"
+                    WITH user_api_keys AS MATERIALIZED (
+                        SELECT * FROM user_api_keys 
+                        WHERE user_api_keys.key_start = $1 
+                        AND (user_api_keys.expires IS NULL OR user_api_keys.expires > NOW())
+                    )
                     SELECT {}, {}
                     FROM users
                     LEFT JOIN roles ON roles.uuid = users.role_uuid
                     JOIN user_api_keys ON user_api_keys.user_uuid = users.uuid
-                    WHERE user_api_keys.key_start = $1 AND user_api_keys.key = crypt($2, user_api_keys.key)
+                    WHERE user_api_keys.key = crypt($2, user_api_keys.key)
                     "#,
                     Self::columns_sql(None),
                     super::user_api_key::UserApiKey::columns_sql(Some("api_key_"))
@@ -572,7 +580,7 @@ impl User {
             sqlx::query(
                 r#"
 		            UPDATE users
-		            SET password = crypt($2, gen_salt('bf'))
+		            SET password = crypt($2, gen_salt('bf', 12))
 		            WHERE users.uuid = $1
 		            "#,
             )
@@ -611,7 +619,7 @@ impl User {
             sqlx::query(
                 r#"
 		            UPDATE users
-		            SET password = crypt($2, gen_salt('bf'))
+		            SET password = crypt($2, gen_salt('bf', 12))
 		            WHERE users.uuid = $1
 		            "#,
             )
@@ -854,7 +862,7 @@ impl CreatableModel for User {
             .set("name_last", &options.name_last);
 
         if let Some(password) = &options.password {
-            query_builder.set_expr("password", "crypt($1, gen_salt('bf', 8))", vec![password]);
+            query_builder.set_expr("password", "crypt($1, gen_salt('bf', 12))", vec![password]);
         }
 
         query_builder
@@ -867,7 +875,11 @@ impl CreatableModel for User {
             .await?;
         let uuid: uuid::Uuid = row.get("uuid");
 
-        Self::by_uuid_with_transaction(transaction, uuid).await
+        let mut result = Self::by_uuid_with_transaction(transaction, uuid).await?;
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 
     async fn create(
@@ -937,8 +949,8 @@ pub struct UpdateUserOptions {
 impl UpdatableModel for User {
     type UpdateOptions = UpdateUserOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<User>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<User>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -968,7 +980,7 @@ impl UpdatableModel for User {
 
         let mut query_builder = UpdateQueryBuilder::new("users");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -1022,6 +1034,8 @@ impl UpdatableModel for User {
                 .await?;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -1030,8 +1044,8 @@ impl UpdatableModel for User {
 impl DeletableModel for User {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<User>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<User>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -1055,6 +1069,9 @@ impl DeletableModel for User {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

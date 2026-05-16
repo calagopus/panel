@@ -148,7 +148,7 @@ mod post {
             )
             .await?;
 
-        let schedules = ServerSchedule::count_by_server_uuid(&state.database, server.uuid).await;
+        let schedules = ServerSchedule::count_by_server_uuid(&state.database, server.uuid).await?;
         if schedules >= server.schedule_limit as i64 {
             return ApiResponse::error("maximum number of schedules reached")
                 .with_status(StatusCode::EXPECTATION_FAILED)

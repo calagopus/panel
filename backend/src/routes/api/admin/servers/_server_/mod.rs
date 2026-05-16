@@ -103,7 +103,9 @@ mod delete {
 
     #[derive(ToSchema, Deserialize)]
     pub struct Payload {
+        #[serde(default)]
         force: bool,
+        #[serde(default)]
         delete_backups: bool,
     }
 

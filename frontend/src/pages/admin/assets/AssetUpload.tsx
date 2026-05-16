@@ -11,6 +11,8 @@ import RingProgress from '@/elements/RingProgress.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { bytesToString } from '@/lib/size.ts';
 import { useFileUpload } from '@/plugins/useFileUpload.ts';
+import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
+import AssetDropOverlay from './AssetDropOverlay.tsx';
 
 export default function AssetUpload({
   invalidateAssets,
@@ -19,15 +21,26 @@ export default function AssetUpload({
   invalidateAssets: () => void;
   currentDirectory: string;
 }) {
-  const { uploadingFiles, handleFileSelect, totalUploadProgress, cancelFileUpload } = useFileUpload(
-    (form, config) => uploadAssets(form, config, currentDirectory).then(() => ({ url: '', continuationToken: null })),
-    invalidateAssets,
+  const { uploadingFiles, handleFileSelect, totalUploadProgress, cancelFileUpload, uploadFiles } = useFileUpload(
+    (form, config) =>
+      uploadAssets(form, config, currentDirectory).then(() => {
+        invalidateAssets();
+        return { url: '', continuationToken: null };
+      }),
+    () => null,
   );
+
+  const { isDragging } = useImportDragAndDrop({
+    onDrop: uploadFiles,
+    filterFile: () => true,
+  });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
     <>
+      <AssetDropOverlay visible={isDragging} />
+
       {uploadingFiles.size > 0 ? (
         <Popover position='bottom-start' shadow='md'>
           <Popover.Target>

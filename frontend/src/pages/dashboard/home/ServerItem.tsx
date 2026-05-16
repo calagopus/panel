@@ -76,12 +76,12 @@ export default function ServerItem({
             }}
           >
             <Card
-              className='duration-200 h-full flex flex-col justify-between rounded-xl!'
+              className='duration-200 h-full flex flex-col justify-between rounded-xl! overflow-hidden'
               leftStripeClassName={statusToColor(stats?.state)}
               hoverable
             >
-              <div className='flex items-center gap-2 justify-between'>
-                <div className='flex gap-2 items-center'>
+              <div className='flex flex-col sm:flex-row sm:items-center gap-2 justify-between overflow-hidden min-w-0'>
+                <div className='flex gap-2 items-center min-w-0 flex-1'>
                   {showSelection && (
                     <Tooltip
                       label={
@@ -104,42 +104,46 @@ export default function ServerItem({
                       </ActionIcon>
                     </Tooltip>
                   )}
-                  <span className='text-xl font-medium flex items-center gap-2' title={server.name}>
-                    {server.name}
+                  <span className='text-xl font-medium flex items-center gap-2 min-w-0 flex-1' title={server.name}>
+                    <span className='truncate flex-1'>{server.name}</span>
                     {!serverListShowOthers && serverGroups.every((g) => !g.serverOrder.includes(server.uuid)) && (
                       <Tooltip label={t('pages.account.home.tooltip.noGroup', {})}>
-                        <FontAwesomeIcon size='sm' icon={faInfoCircle} />
+                        <FontAwesomeIcon size='sm' icon={faInfoCircle} className='shrink-0' />
                       </Tooltip>
                     )}
                   </span>
                 </div>
-                <div className='flex flex-row items-center'>
+                <div className='flex flex-row items-center min-w-0 sm:justify-end sm:max-w-none'>
                   {server.allocation ? (
                     server.egg.separatePort ? (
-                      <div className='flex flex-row gap-2'>
-                        <CopyOnClick content={server.allocation.ipAlias ?? server.allocation.ip} className='w-fit'>
-                          <Card p='xs' hoverable className='leading-[100%] text-nowrap rounded-lg!'>
-                            <p className='text-sm text-(--mantine-color-dimmed)'>
+                      <div className='flex flex-row gap-2 min-w-0'>
+                        <CopyOnClick content={server.allocation.ipAlias ?? server.allocation.ip} className='min-w-0'>
+                          <Card p='xs' hoverable className='leading-[100%] min-w-0 rounded-lg!'>
+                            <p className='text-sm text-(--mantine-color-dimmed) truncate'>
                               {server.allocation.ipAlias ?? server.allocation.ip}
                             </p>
                           </Card>
                         </CopyOnClick>
-                        <CopyOnClick content={server.allocation.port.toString()} className='w-fit'>
+                        <CopyOnClick content={server.allocation.port.toString()} className='shrink-0'>
                           <Card p='xs' hoverable className='leading-[100%] text-nowrap rounded-lg!'>
                             <p className='text-sm text-(--mantine-color-dimmed)'>{server.allocation.port.toString()}</p>
                           </Card>
                         </CopyOnClick>
                       </div>
                     ) : (
-                      <CopyOnClick content={formatAllocation(server.allocation)} className='w-fit'>
-                        <Card p='xs' hoverable className='leading-[100%] text-nowrap rounded-lg!'>
-                          <p className='text-sm text-(--mantine-color-dimmed)'>{formatAllocation(server.allocation)}</p>
+                      <CopyOnClick content={formatAllocation(server.allocation)} className='min-w-0'>
+                        <Card p='xs' hoverable className='leading-[100%] min-w-0 rounded-lg!'>
+                          <p className='text-sm text-(--mantine-color-dimmed) truncate'>
+                            {formatAllocation(server.allocation)}
+                          </p>
                         </Card>
                       </CopyOnClick>
                     )
                   ) : (
-                    <Card p='xs' className='leading-[100%] text-nowrap rounded-lg!'>
-                      {t('common.server.noAllocation', {})}
+                    <Card p='xs' className='leading-[100%] min-w-0 rounded-lg! max-w-full'>
+                      <p className='text-sm text-(--mantine-color-dimmed) truncate'>
+                        {t('common.server.noAllocation', {})}
+                      </p>
                     </Card>
                   )}
                   {showGroupAddButton && (
@@ -229,7 +233,8 @@ export default function ServerItem({
                       </div>
                     </div>
 
-                    <Divider mx='sm' orientation='vertical' />
+                    <Divider mx='sm' orientation='vertical' className='hidden sm:block' />
+                    <Divider my='xs' className='sm:hidden' />
 
                     <div className='flex gap-2 text-sm justify-start sm:justify-center items-center'>
                       <FontAwesomeIcon icon={faMemory} className='size-5 flex-none' />
@@ -239,7 +244,8 @@ export default function ServerItem({
                       </div>
                     </div>
 
-                    <Divider mx='sm' orientation='vertical' />
+                    <Divider mx='sm' orientation='vertical' className='hidden sm:block' />
+                    <Divider my='xs' className='sm:hidden' />
 
                     <div className='flex gap-2 text-sm justify-start sm:justify-center items-center'>
                       <FontAwesomeIcon icon={faHardDrive} className='size-5 flex-none' />

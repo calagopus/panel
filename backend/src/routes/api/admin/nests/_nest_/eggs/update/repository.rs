@@ -8,7 +8,9 @@ mod post {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{ByUuid, admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
+        models::{
+            admin_activity::GetAdminActivityLogger, nest_egg::NestEgg, user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use std::collections::HashSet;
@@ -45,13 +47,11 @@ mod post {
         permissions.has_admin_permission("eggs.update")?;
 
         let update_egg = async |egg: uuid::Uuid| {
-            let nest_egg =
-                match shared::models::nest_egg::NestEgg::by_uuid_optional(&state.database, egg)
-                    .await?
-                {
-                    Some(nest_egg) => nest_egg,
-                    None => return Ok(false),
-                };
+            let nest_egg = match NestEgg::by_nest_uuid_uuid(&state.database, nest.uuid, egg).await?
+            {
+                Some(nest_egg) => nest_egg,
+                None => return Ok(false),
+            };
 
             let egg_repository_egg = match &nest_egg.egg_repository_egg {
                 Some(egg_repository_egg) => egg_repository_egg.fetch(&state.database).await?,

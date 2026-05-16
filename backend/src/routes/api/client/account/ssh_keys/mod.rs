@@ -127,6 +127,18 @@ mod post {
 
         permissions.has_user_permission("ssh-keys.create")?;
 
+        let ssh_keys_lock = state
+            .cache
+            .lock(format!("users::{}::ssh_keys", user.uuid), Some(30), Some(5))
+            .await?;
+
+        let ssh_keys = UserSshKey::count_by_user_uuid(&state.database, user.uuid).await?;
+        if ssh_keys >= state.settings.get().await?.user.max_ssh_key_count as i64 {
+            return ApiResponse::error("maximum number of ssh keys reached")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         let options = shared::models::user_ssh_key::CreateUserSshKeyOptions {
             user_uuid: user.uuid,
             name: data.name,
@@ -141,6 +153,8 @@ mod post {
             }
             Err(err) => return ApiResponse::from(err).ok(),
         };
+
+        drop(ssh_keys_lock);
 
         activity_logger
             .log(

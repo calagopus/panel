@@ -120,6 +120,7 @@ export default function AdminExtensions() {
             : prev,
         );
         addToast(`Extension \`${backendExtension.metadataToml.packageName}\` removed successfully.`.md(), 'success');
+        setRemovalExtension(null);
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -272,11 +273,9 @@ export default function AdminExtensions() {
                 key={extension.packageName}
                 extension={extension}
                 backendExtension={backendExtension}
-                isRemoved={
-                  extensionStatus?.removedExtensions.some(
-                    (e) => e.metadataToml.packageName === extension.packageName,
-                  ) && false
-                }
+                isRemoved={extensionStatus?.removedExtensions.some(
+                  (e) => e.metadataToml.packageName === extension.packageName,
+                )}
                 onRemove={extensionStatus && backendExtension ? () => setRemovalExtension(backendExtension) : undefined}
               />
             ),

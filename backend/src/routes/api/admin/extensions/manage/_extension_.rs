@@ -40,6 +40,12 @@ mod delete {
         permissions.has_admin_permission("extensions.manage")?;
 
         let extension_identifier = MetadataToml::convert_package_name_to_identifier(&package_name);
+        if !MetadataToml::is_valid_package_identifier(&extension_identifier) {
+            return ApiResponse::error("invalid package name")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         if data.remove_migrations
             && let Ok(migrations) = tokio::task::spawn_blocking(move || {
                 database_migrator::collect_embedded_extension_migrations(&extension_identifier)

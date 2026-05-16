@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE users\n                    SET totp_last_used = NOW()\n                    WHERE users.uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "66589683f0abd49b9881e6f693a130e8f26e7aef526d151105f1fc756af8a504"
+}

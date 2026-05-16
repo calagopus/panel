@@ -7,6 +7,7 @@ import {
   faRobot,
   faServer,
   faToolbox,
+  faUser,
   faUserCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
@@ -25,6 +26,7 @@ import EmailContainer from './EmailContainer.tsx';
 import RatelimitsContainer from './RatelimitsContainer.tsx';
 import ServerContainer from './ServerContainer.tsx';
 import StorageContainer from './StorageContainer.tsx';
+import UserContainer from './UserContainer.tsx';
 import WebauthnContainer from './WebauthnContainer.tsx';
 
 export default function AdminSettings() {
@@ -90,6 +92,12 @@ export default function AdminSettings() {
             icon: faServer,
             path: '/server',
             element: <ServerContainer />,
+          },
+          {
+            name: 'User',
+            icon: faUser,
+            path: '/user',
+            element: <UserContainer />,
           },
           {
             name: 'Activity',

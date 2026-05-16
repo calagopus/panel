@@ -115,9 +115,18 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_user_permission("command-snippets.create")?;
 
+        let command_snippets_lock = state
+            .cache
+            .lock(
+                format!("users::{}::command_snippets", user.uuid),
+                Some(30),
+                Some(5),
+            )
+            .await?;
+
         let command_snippets =
-            UserCommandSnippet::count_by_user_uuid(&state.database, user.uuid).await;
-        if command_snippets >= 100 {
+            UserCommandSnippet::count_by_user_uuid(&state.database, user.uuid).await?;
+        if command_snippets >= state.settings.get().await?.user.max_command_snippet_count as i64 {
             return ApiResponse::error("maximum number of command snippets reached")
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
@@ -138,6 +147,8 @@ mod post {
             }
             Err(err) => return ApiResponse::from(err).ok(),
         };
+
+        drop(command_snippets_lock);
 
         activity_logger
             .log(

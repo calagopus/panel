@@ -169,6 +169,15 @@ mod post {
                         err
                     );
                 }
+
+                sqlx::query!(
+                    "UPDATE users
+                    SET totp_last_used = NOW()
+                    WHERE users.uuid = $1",
+                    user.uuid
+                )
+                .execute(state.database.write())
+                .await?;
             }
             10 => {
                 if UserRecoveryCode::delete_by_user_uuid_code(
@@ -231,15 +240,6 @@ mod post {
                     .into(),
             },
         )
-        .await?;
-
-        sqlx::query!(
-            "UPDATE users
-            SET totp_last_used = NOW()
-            WHERE users.uuid = $1",
-            user.uuid
-        )
-        .execute(state.database.write())
         .await?;
 
         cookies.add(UserSession::get_cookie(&state, key).await?);

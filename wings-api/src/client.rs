@@ -475,6 +475,22 @@ impl WingsClient {
         .await
     }
 
+    pub async fn get_servers_server_files_largest_directories(
+        &self,
+        server: uuid::Uuid,
+        directory: &str,
+    ) -> Result<super::servers_server_files_largest_directories::get::Response, ApiHttpError> {
+        let directory = urlencoding::encode(directory);
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/largest-directories?directory={directory}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn get_servers_server_files_list(
         &self,
         server: uuid::Uuid,
@@ -503,6 +519,20 @@ impl WingsClient {
             self,
             Method::GET,
             format!("/api/servers/{server}/files/list-directory?directory={directory}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_operations(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_files_operations::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/operations"),
             None::<&()>,
             None,
         )
@@ -599,6 +629,37 @@ impl WingsClient {
         .await
     }
 
+    pub async fn get_servers_server_files_revisions(
+        &self,
+        server: uuid::Uuid,
+        file: &str,
+    ) -> Result<super::servers_server_files_revisions::get::Response, ApiHttpError> {
+        let file = urlencoding::encode(file);
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/revisions?file={file}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_revisions_revision(
+        &self,
+        server: uuid::Uuid,
+        revision: i64,
+    ) -> Result<super::servers_server_files_revisions_revision::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/revisions/{revision}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn post_servers_server_files_search(
         &self,
         server: uuid::Uuid,
@@ -618,13 +679,14 @@ impl WingsClient {
         &self,
         server: uuid::Uuid,
         file: &str,
+        user: uuid::Uuid,
         data: super::servers_server_files_write::post::RequestBody,
     ) -> Result<super::servers_server_files_write::post::Response, ApiHttpError> {
         let file = urlencoding::encode(file);
         request_impl(
             self,
             Method::POST,
-            format!("/api/servers/{server}/files/write?file={file}"),
+            format!("/api/servers/{server}/files/write?file={file}&user={user}"),
             None::<&()>,
             Some(data),
         )

@@ -152,6 +152,22 @@ mod post {
         )
         .await?;
 
+        let security_keys_lock = state
+            .cache
+            .lock(
+                format!("users::{}::security_keys", user.uuid),
+                Some(30),
+                Some(5),
+            )
+            .await?;
+
+        let security_keys = UserSecurityKey::count_by_user_uuid(&state.database, user.uuid).await?;
+        if security_keys >= state.settings.get().await?.user.max_security_key_count as i64 {
+            return ApiResponse::error("maximum number of security keys reached")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         let options = shared::models::user_security_key::CreateUserSecurityKeyOptions {
             user_uuid: user.uuid,
             name: data.name,
@@ -166,6 +182,8 @@ mod post {
             }
             Err(err) => return ApiResponse::from(err).ok(),
         };
+
+        drop(security_keys_lock);
 
         ApiResponse::new_serialized(Response {
             security_key: security_key.into_api_object(&state, ()).await?,

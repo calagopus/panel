@@ -51,7 +51,7 @@ function EggRepositoriesContainer() {
   );
 }
 
-export default function AdminNests() {
+export default function AdminEggRepositories() {
   return (
     <Routes>
       <Route path='/' element={<EggRepositoriesContainer />} />

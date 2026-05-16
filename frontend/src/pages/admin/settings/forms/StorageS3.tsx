@@ -1,7 +1,11 @@
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
+import Alert from '@/elements/Alert.tsx';
+import Code from '@/elements/Code.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -21,6 +25,22 @@ export default function StorageS3({ form }: { form: UseFormReturnType<z.infer<ty
 
   return (
     <Stack mt='md'>
+      <Alert icon={<FontAwesomeIcon icon={faInfoCircle} />} title='Note on Permissions' color='blue'>
+        To ensure that the storage backend works correctly, please make sure the following subdirectories are publicly
+        accessible over the "Public URL" you provided:
+        <ul className='mt-2'>
+          <li>
+            <Code>assets/</Code>: This is where all admin assets (e.g., icons) will be stored.
+          </li>
+          <li>
+            <Code>avatars/</Code>: This is where all user avatars will be stored.
+          </li>
+          <li>
+            <Code>publicdata/</Code>: This is where extensions can store public data (e.g., images).
+          </li>
+        </ul>
+      </Alert>
+
       <Group grow>
         <TextInput
           withAsterisk

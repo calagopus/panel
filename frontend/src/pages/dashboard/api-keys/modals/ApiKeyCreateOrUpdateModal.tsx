@@ -58,14 +58,22 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
         adminPermissions: contextApiKey.adminPermissions,
         expires: contextApiKey.expires ? new Date(contextApiKey.expires) : null,
       });
+    } else {
+      form.reset();
     }
   }, [contextApiKey]);
 
   useEffect(() => {
-    getPermissions().then((res) => {
-      setAvailablePermissions(res);
-      setLoading(false);
-    });
+    getPermissions()
+      .then((res) => {
+        setAvailablePermissions(res);
+      })
+      .catch((err) => {
+        addToast(httpErrorToHuman(err), 'error');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const doCreateOrUpdate = () => {

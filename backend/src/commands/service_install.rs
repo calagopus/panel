@@ -38,7 +38,7 @@ Description=Calagopus Panel Daemon
 User=root
 WorkingDirectory=/etc/calagopus
 LimitNOFILE=4096
-PIDFile=/var/run/calagopus-panel/daemon.pid
+PIDFile=/run/calagopus-panel/daemon.pid
 ExecStart={}
 Restart=on-failure
 StartLimitInterval=180
@@ -60,7 +60,7 @@ description="Calagopus Panel Daemon"
 
 command="{}"
 supervisor="supervise-daemon"
-pidfile="/var/run/calagopus-panel/daemon.pid"
+pidfile="/run/calagopus-panel.pid"
 directory="/etc/calagopus"
 rc_ulimit="-n 4096"
 

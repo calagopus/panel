@@ -54,7 +54,7 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
       eggs: commandSnippet.eggs,
       command: commandSnippet.command,
     });
-  }, []);
+  }, [commandSnippet]);
 
   const doUpdate = () => {
     setLoading(true);

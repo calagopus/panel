@@ -4,6 +4,8 @@ import { z } from 'zod';
 import type { Props as SubContainerProps } from '@/elements/containers/AdminSubContentContainer.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers';
 
+type PageProps = { server: z.infer<typeof adminServerSchema> };
+
 export class ManagementRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.subContainer.mergeFrom(other.subContainer);
@@ -12,23 +14,17 @@ export class ManagementRegistry implements Registry {
     return this;
   }
 
-  public subContainer: ContainerRegistry<SubContainerProps<{ server: z.infer<typeof adminServerSchema> }>> =
-    new ContainerRegistry();
-  public managementContainers: ComponentListRegistry<{ server: z.infer<typeof adminServerSchema> }> =
-    new ComponentListRegistry();
+  public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  public managementContainers: ComponentListRegistry<PageProps> = new ComponentListRegistry();
 
   public enterSubContainer(
-    callback: (
-      registry: ContainerRegistry<SubContainerProps<{ server: z.infer<typeof adminServerSchema> }>>,
-    ) => unknown,
+    callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
     callback(this.subContainer);
     return this;
   }
 
-  public enterManagementContainers(
-    callback: (registry: ComponentListRegistry<{ server: z.infer<typeof adminServerSchema> }>) => unknown,
-  ): this {
+  public enterManagementContainers(callback: (registry: ComponentListRegistry<PageProps>) => unknown): this {
     callback(this.managementContainers);
     return this;
   }

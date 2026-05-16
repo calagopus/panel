@@ -11,7 +11,8 @@ pub struct AppSettingsServer {
     pub max_file_manager_view_size: u64,
     pub max_file_manager_content_search_size: u64,
     pub max_file_manager_search_results: u64,
-    pub max_schedules_step_count: u64,
+    pub max_subuser_count: u64,
+    pub max_schedule_step_count: u64,
 
     pub allow_overwriting_custom_docker_image: bool,
     pub allow_viewing_installation_logs: bool,
@@ -40,8 +41,12 @@ impl SettingsSerializeExt for AppSettingsServer {
                 self.max_file_manager_search_results.to_compact_string(),
             )
             .write_raw_setting(
-                "max_schedules_step_count",
-                self.max_schedules_step_count.to_compact_string(),
+                "max_subuser_count",
+                self.max_subuser_count.to_compact_string(),
+            )
+            .write_raw_setting(
+                "max_schedule_step_count",
+                self.max_schedule_step_count.to_compact_string(),
             )
             .write_raw_setting(
                 "allow_overwriting_custom_docker_image",
@@ -85,10 +90,14 @@ impl SettingsDeserializeExt for AppSettingsServerDeserializer {
                 .take_raw_setting("max_file_manager_search_results")
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(100),
-            max_schedules_step_count: deserializer
-                .take_raw_setting("max_schedules_step_count")
+            max_subuser_count: deserializer
+                .take_raw_setting("max_subuser_count")
                 .and_then(|s| s.parse().ok())
-                .unwrap_or(100),
+                .unwrap_or(25),
+            max_schedule_step_count: deserializer
+                .take_raw_setting("max_schedule_step_count")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(50),
             allow_overwriting_custom_docker_image: deserializer
                 .take_raw_setting("allow_overwriting_custom_docker_image")
                 .map(|s| s == "true")

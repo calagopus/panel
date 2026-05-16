@@ -197,6 +197,8 @@
       "no": "Nein",
       "web": "Web",
       "api": "API",
+      "default": "Standard",
+      "custom": "Benutzerdefiniert",
       "system": "System",
       "schedule": "Zeitplan",
       "impersonatedBy": "Impersoniert von {username}"
@@ -353,7 +355,8 @@
         "toast": {
           "uploading": "Hochladen von {files} gestartet...",
           "cancelledFile": "Upload von `{file}` erfolgreich abgebrochen.",
-          "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen."
+          "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen.",
+          "cancelledAll": "Alle Uploads wurden abgebrochen."
         }
       }
     },
@@ -551,6 +554,9 @@
         "button": {
           "login": "Anmelden",
           "loginWith": "Anmelden mit {name}"
+        },
+        "alert": {
+          "urlMismatch": "Die Anwendungs-URL stimmt nicht mit der aktuellen URL überein. Erwartet: `{appUrl}`, Aktuell: `{currentUrl}`."
         },
         "login": {
           "error": {
@@ -838,13 +844,15 @@
         },
         "securityKeys": {
           "title": "Sicherheitsschlüssel",
+          "subtitle": "{current} von maximal {max} Sicherheitsschlüsseln erstellt.",
           "table": {
             "columns": {
               "credentialId": "Credential-ID"
             }
           },
           "tooltip": {
-            "secureContextRequired": "Ein sicherer Kontext (HTTPS) ist erforderlich, um Sicherheitsschlüssel zu verwenden."
+            "secureContextRequired": "Ein sicherer Kontext (HTTPS) ist erforderlich, um Sicherheitsschlüssel zu verwenden.",
+            "limitReached": "Du bist auf {max} Sicherheitsschlüssel limitiert."
           },
           "modal": {
             "createSecurityKey": {
@@ -928,8 +936,12 @@
         },
         "sshKeys": {
           "title": "SSH-Schlüssel",
+          "subtitle": "{current} von maximal {max} SSH-Schlüsseln erstellt.",
           "button": {
             "import": "Importieren"
+          },
+          "tooltip": {
+            "limitReached": "Du bist auf {max} SSH-Schlüssel limitiert."
           },
           "table": {
             "columns": {
@@ -976,6 +988,10 @@
         },
         "commandSnippets": {
           "title": "Befehlskürzel",
+          "subtitle": "{current} von maximal {max} Befehlskürzeln erstellt.",
+          "tooltip": {
+            "limitReached": "Du bist auf {max} Befehlskürzel limitiert."
+          },
           "table": {
             "columns": {
               "eggs": "Eggs"
@@ -1031,8 +1047,12 @@
         },
         "apiKeys": {
           "title": "API-Schlüssel",
+          "subtitle": "{current} von maximal {max} API-Schlüsseln erstellt.",
           "button": {
             "apiDocumentation": "API Dokumentation"
+          },
+          "tooltip": {
+            "limitReached": "Du bist auf {max} API-Schlüssel limitiert."
           },
           "table": {
             "columns": {
@@ -1243,7 +1263,10 @@
             "copying": "Kopiere {path} nach {destination}",
             "copyingMany": "Kopiere {files}",
             "receivingRemote": "Empfange {files} vom Remote-Server",
-            "sendingRemote": "Sende {files} an Remote-Server"
+            "sendingRemote": "Sende {files} an Remote-Server",
+            "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
+            "cancelAllUploads": "Alle Uploads abbrechen",
+            "cancelAllOperations": "Alle Vorgänge abbrechen"
           },
           "dropzone": {
             "title": "Dateien hier ablegen, um sie hochzuladen",
@@ -1258,6 +1281,7 @@
           },
           "toast": {
             "operationCancelled": "Vorgang abgebrochen",
+            "allOperationsCancelled": "Alle Vorgänge wurden abgebrochen.",
             "copyingStarted": "Kopieren von {files} gestartet.",
             "filesCouldNotBeMoved": "Dateien konnten nicht verschoben werden.",
             "filesMoved": "{files} verschoben.",
@@ -1630,8 +1654,9 @@
                 "cronSchedule": "Cron-Zeitplan"
               },
               "card": {
-                "content": "Im Cron-Intervall `{schedule}`, nächste Ausführung ist {timestamp} - letzte Ausführung war {lastTimestamp}."
-              }
+                "content": "Im Cron-Intervall {schedule}, nächste Ausführung ist {timestamp} - letzte Ausführung war {lastTimestamp}."
+              },
+              "invalidCron": "Ungültiger Cron-Ausdruck"
             },
             "powerAction": {
               "title": "Power-Aktion",
@@ -1916,6 +1941,10 @@
         },
         "subusers": {
           "title": "Subuser",
+          "subtitle": "{current} von maximal {max} Subusern erstellt.",
+          "tooltip": {
+            "limitReached": "Dieser Server ist auf {max} Subuser limitiert."
+          },
           "table": {
             "columns": {
               "twoFactorEnabled": "2FA Aktiv",

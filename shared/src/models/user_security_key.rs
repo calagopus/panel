@@ -206,6 +206,22 @@ impl UserSecurityKey {
         .await?
         .rows_affected())
     }
+
+    pub async fn count_by_user_uuid(
+        database: &crate::database::Database,
+        user_uuid: uuid::Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar(
+            r#"
+            SELECT COUNT(*)
+            FROM user_security_keys
+            WHERE user_security_keys.user_uuid = $1
+            "#,
+        )
+        .bind(user_uuid)
+        .fetch_one(database.read())
+        .await
+    }
 }
 
 #[async_trait::async_trait]
@@ -270,6 +286,8 @@ impl CreatableModel for UserSecurityKey {
         mut options: Self::CreateOptions<'_>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
         let mut query_builder = InsertQueryBuilder::new("user_security_keys");
 
         Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
@@ -281,13 +299,15 @@ impl CreatableModel for UserSecurityKey {
                 "credential_id",
                 rand::random_iter().take(16).collect::<Vec<u8>>(),
             )
-            .set("registration", serde_json::to_value(options.registration)?);
+            .set("registration", serde_json::to_value(&options.registration)?);
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let security_key = Self::map(None, &row)?;
+        let mut security_key = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut security_key, &options, state, transaction).await?;
 
         Ok(security_key)
     }
@@ -304,8 +324,8 @@ pub struct UpdateUserSecurityKeyOptions {
 impl UpdatableModel for UserSecurityKey {
     type UpdateOptions = UpdateUserSecurityKeyOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<UserSecurityKey>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<UserSecurityKey>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -321,7 +341,7 @@ impl UpdatableModel for UserSecurityKey {
 
         let mut query_builder = UpdateQueryBuilder::new("user_security_keys");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -334,6 +354,8 @@ impl UpdatableModel for UserSecurityKey {
             self.name = name;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -342,8 +364,8 @@ impl UpdatableModel for UserSecurityKey {
 impl DeletableModel for UserSecurityKey {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserSecurityKey>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserSecurityKey>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -367,6 +389,9 @@ impl DeletableModel for UserSecurityKey {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

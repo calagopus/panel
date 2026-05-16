@@ -38,12 +38,9 @@ export default function NewDirectoryModal({
 
     const fullPath = currentDirectory ? `${currentDirectory}/${form.values.name}` : form.values.name;
 
-    const alreadyExists = existingEntries.some((e) => e.isDirectory && e.name === fullPath);
-
     onNavigate(fullPath);
     handleClose();
 
-    void alreadyExists;
     setLoading(false);
   };
 

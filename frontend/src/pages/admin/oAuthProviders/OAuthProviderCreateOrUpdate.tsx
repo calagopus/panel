@@ -171,7 +171,7 @@ export default function OAuthProviderCreateOrUpdate({
         Are you sure you want to delete <Code>{form.getValues().name}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'oauthProviderslocations']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'oauthProviders']))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
@@ -363,7 +363,7 @@ export default function OAuthProviderCreateOrUpdate({
             )}
           </AdminCan>
           {contextOAuthProvider && (
-            <AdminCan action='oauth-provider.delete' cantDelete>
+            <AdminCan action='oauth-providers.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
                 Delete
               </Button>

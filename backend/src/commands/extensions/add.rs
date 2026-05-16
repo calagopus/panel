@@ -156,14 +156,24 @@ impl shared::extensions::commands::CliCommand<AddArgs> for AddCommand {
                     return Ok(1);
                 }
 
-                let frontend_path = Path::new("frontend/extensions")
-                    .join(extension_distr.metadata_toml.get_package_identifier());
+                let package_identifier = extension_distr.metadata_toml.get_package_identifier();
+                if !shared::extensions::distr::MetadataToml::is_valid_package_identifier(
+                    &package_identifier,
+                ) {
+                    eprintln!(
+                        "{} {}",
+                        "invalid package identifier:".red(),
+                        package_identifier.bright_red()
+                    );
+                    return Ok(1);
+                }
+
+                let frontend_path = Path::new("frontend/extensions").join(&package_identifier);
                 tokio::fs::create_dir_all(&frontend_path).await?;
-                let backend_path = Path::new("backend-extensions")
-                    .join(extension_distr.metadata_toml.get_package_identifier());
+                let backend_path = Path::new("backend-extensions").join(&package_identifier);
                 tokio::fs::create_dir_all(&backend_path).await?;
-                let migrations_path = Path::new("database/extension-migrations")
-                    .join(extension_distr.metadata_toml.get_package_identifier());
+                let migrations_path =
+                    Path::new("database/extension-migrations").join(&package_identifier);
                 tokio::fs::create_dir_all(&migrations_path).await?;
 
                 let mut extension_distr = tokio::task::spawn_blocking(move || {
@@ -223,7 +233,7 @@ impl shared::extensions::commands::CliCommand<AddArgs> for AddCommand {
                 );
 
                 println!(
-                    "sucessfully added {}",
+                    "successfully added {}",
                     extension_distr.metadata_toml.name.cyan(),
                 );
                 println!(

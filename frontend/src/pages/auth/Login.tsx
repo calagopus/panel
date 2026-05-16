@@ -208,6 +208,18 @@ export default function Login() {
             })}
           </Alert>
         )}
+        {settings.app.url !== window.location.origin && (
+          <Alert
+            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            color='yellow'
+            title={t('common.alert.warning', {})}
+          >
+            {t('pages.auth.alert.urlMismatch', {
+              appUrl: settings.app.url,
+              currentUrl: window.location.origin,
+            }).md()}
+          </Alert>
+        )}
         {error && (
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}

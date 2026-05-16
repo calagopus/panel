@@ -40,24 +40,43 @@ impl<T: DeserializeOwned> Payload<T> {
         self.0
     }
 
-    pub fn from_bytes(content_type: mime::Mime, bytes: &Bytes) -> Result<Self, PayloadRejection> {
+    pub fn from_bytes(
+        content_type: mime::Mime,
+        mut bytes: Bytes,
+    ) -> Result<Self, PayloadRejection> {
         match content_type.essence_str() {
             m if m == mime::APPLICATION_JSON.essence_str() => {
-                let value = serde_json::from_slice(bytes).map_err(anyhow::Error::from)?;
+                if bytes.is_empty() {
+                    bytes = Bytes::from_static(b"{}");
+                }
+
+                let value = serde_json::from_slice(&bytes).map_err(anyhow::Error::from)?;
                 Ok(Payload(value))
             }
             m if m == mime::APPLICATION_MSGPACK.essence_str() => {
+                if bytes.is_empty() {
+                    bytes = Bytes::from_static(&[0x80]);
+                }
+
                 let mut de = rmp_serde::Deserializer::new(bytes.as_ref()).with_human_readable();
                 let value = T::deserialize(&mut de).map_err(anyhow::Error::from)?;
                 Ok(Payload(value))
             }
             m if m == mime::TEXT_XML.essence_str() => {
+                if bytes.is_empty() {
+                    bytes = Bytes::from_static(b"<root></root>");
+                }
+
                 let value =
                     serde_xml_rs::from_reader(bytes.as_ref()).map_err(anyhow::Error::from)?;
                 Ok(Payload(value))
             }
             "application/yaml" => {
-                let value = serde_norway::from_slice(bytes).map_err(anyhow::Error::from)?;
+                if bytes.is_empty() {
+                    bytes = Bytes::from_static(b"{}");
+                }
+
+                let value = serde_norway::from_slice(&bytes).map_err(anyhow::Error::from)?;
                 Ok(Payload(value))
             }
             _ => Err(PayloadRejection(anyhow::anyhow!(
@@ -78,7 +97,9 @@ impl<T: DeserializeOwned, S: Send + Sync> FromRequest<S> for Payload<T> {
             .and_then(|s| s.parse::<mime::Mime>().ok());
 
         let Some(content_type) = content_type else {
-            return Err(PayloadRejection(anyhow::anyhow!("missing content type")));
+            return Err(PayloadRejection(anyhow::anyhow!(
+                "missing content type header"
+            )));
         };
 
         if !AVAILABLE_DESERIALIZERS.contains(&content_type) {
@@ -91,7 +112,7 @@ impl<T: DeserializeOwned, S: Send + Sync> FromRequest<S> for Payload<T> {
             Ok(b) => b,
             Err(_) => return Err(PayloadRejection(anyhow::anyhow!("failed to read body"))),
         };
-        Self::from_bytes(content_type, &bytes)
+        Self::from_bytes(content_type, bytes)
     }
 }
 
@@ -122,6 +143,6 @@ where
             Ok(b) => b,
             Err(_) => return Err(PayloadRejection(anyhow::anyhow!("failed to read body"))),
         };
-        Self::from_bytes(content_type, &bytes).map(Some)
+        Self::from_bytes(content_type, bytes).map(Some)
     }
 }

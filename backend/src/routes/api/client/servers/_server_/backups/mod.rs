@@ -145,7 +145,7 @@ mod post {
             )
             .await?;
 
-        let backups = ServerBackup::count_by_server_uuid(&state.database, server.uuid).await;
+        let backups = ServerBackup::count_by_server_uuid(&state.database, server.uuid).await?;
         if backups >= server.backup_limit as i64 {
             return ApiResponse::error("maximum number of backups reached")
                 .with_status(StatusCode::EXPECTATION_FAILED)
@@ -170,6 +170,7 @@ mod post {
             server: &server,
             name: data.name.unwrap_or_else(ServerBackup::default_name),
             ignored_files: data.ignored_files,
+            metadata: ServerBackup::generate_metadata(&state, &server).await?,
         };
         let backup = ServerBackup::create(&state, options).await?;
 

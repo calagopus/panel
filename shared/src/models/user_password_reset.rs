@@ -97,7 +97,7 @@ impl UserPasswordReset {
         sqlx::query(
             r#"
             INSERT INTO user_password_resets (user_uuid, token, created)
-            VALUES ($1, crypt($2, gen_salt('bf')), NOW())
+            VALUES ($1, crypt($2, gen_salt('bf', 12)), NOW())
             "#,
         )
         .bind(user_uuid)

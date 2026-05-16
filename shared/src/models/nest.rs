@@ -248,7 +248,9 @@ impl CreatableModel for Nest {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let nest = Self::map(None, &row)?;
+        let mut nest = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut nest, &options, state, transaction).await?;
 
         Ok(nest)
     }
@@ -276,8 +278,8 @@ pub struct UpdateNestOptions {
 impl UpdatableModel for Nest {
     type UpdateOptions = UpdateNestOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<Nest>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<Nest>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -293,7 +295,7 @@ impl UpdatableModel for Nest {
 
         let mut query_builder = UpdateQueryBuilder::new("nests");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
@@ -317,6 +319,8 @@ impl UpdatableModel for Nest {
             self.description = description;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -325,8 +329,8 @@ impl UpdatableModel for Nest {
 impl DeletableModel for Nest {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<Nest>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<Nest>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -350,6 +354,9 @@ impl DeletableModel for Nest {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

@@ -23,7 +23,7 @@ interface DndServerGroup extends z.infer<typeof userServerGroupSchema>, DndItem 
 
 const MemoizedServerGroupItem = memo(ServerGroupItem);
 
-export default function DashboardHome() {
+export default function DashboardHomeGrouped() {
   const { t } = useTranslations();
   const { serverGroups, setServerGroups } = useUserStore();
   const { addToast } = useToast();

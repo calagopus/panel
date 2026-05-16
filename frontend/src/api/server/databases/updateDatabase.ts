@@ -1,11 +1,12 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
 import { serverDatabaseEditSchema } from '@/lib/schemas/server/databases.ts';
+import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   uuid: string,
   databaseUuid: string,
   data: z.infer<typeof serverDatabaseEditSchema>,
 ): Promise<void> => {
-  await axiosInstance.patch(`/api/client/servers/${uuid}/databases/${databaseUuid}`, data);
+  await axiosInstance.patch(`/api/client/servers/${uuid}/databases/${databaseUuid}`, transformKeysToSnakeCase(data));
 };

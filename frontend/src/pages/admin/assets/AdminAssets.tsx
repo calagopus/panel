@@ -41,9 +41,9 @@ export default function AdminAssets() {
     queryFn: () => getAssets(page, currentDirectory),
   });
 
-  const invalidateAssets = () => {
+  const invalidateAssets = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['admin', 'assets'] }).catch((e) => console.error(e));
-  };
+  }, [queryClient]);
 
   const navigateToDirectory = useCallback(
     (dir: string) => {

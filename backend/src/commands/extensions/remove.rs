@@ -45,9 +45,18 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                     return Ok(1);
                 }
 
-                let frontend_path = Path::new("frontend/extensions").join(
-                    MetadataToml::convert_package_name_to_identifier(&args.package_name),
-                );
+                let package_identifier =
+                    MetadataToml::convert_package_name_to_identifier(&args.package_name);
+                if !MetadataToml::is_valid_package_identifier(&package_identifier) {
+                    eprintln!(
+                        "{} {}",
+                        "invalid package identifier:".red(),
+                        package_identifier.bright_red()
+                    );
+                    return Ok(1);
+                }
+
+                let frontend_path = Path::new("frontend/extensions").join(&package_identifier);
                 if tokio::fs::metadata(&frontend_path)
                     .await
                     .ok()
@@ -56,19 +65,13 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                     eprintln!(
                         "{} {} {}",
                         "failed to find".red(),
-                        format!(
-                            "frontend/extensions/{}",
-                            MetadataToml::convert_package_name_to_identifier(&args.package_name),
-                        )
-                        .bright_red(),
+                        format!("frontend/extensions/{}", package_identifier).bright_red(),
                         "directory, make sure you are in the panel root.".red()
                     );
                     return Ok(1);
                 }
 
-                let backend_path = Path::new("backend-extensions").join(
-                    MetadataToml::convert_package_name_to_identifier(&args.package_name),
-                );
+                let backend_path = Path::new("backend-extensions").join(&package_identifier);
                 if tokio::fs::metadata(&backend_path)
                     .await
                     .ok()
@@ -89,9 +92,8 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
 
                 let frontend_translations_path = Path::new("frontend/public/translations/en")
                     .join(format!("{}.json", &args.package_name));
-                let migrations_path = Path::new("database/extension-migrations").join(
-                    MetadataToml::convert_package_name_to_identifier(&args.package_name),
-                );
+                let migrations_path =
+                    Path::new("database/extension-migrations").join(&package_identifier);
 
                 let cargo_bin = which("cargo")
                     .await
@@ -261,7 +263,7 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                     println!("removed and rolled back database migrations for this extension");
                 }
 
-                println!("sucessfully removed {}", args.package_name.cyan());
+                println!("successfully removed {}", args.package_name.cyan());
 
                 Ok(0)
             })

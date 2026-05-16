@@ -585,7 +585,9 @@ impl CreatableModel for OAuthProvider {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let oauth_provider = Self::map(None, &row)?;
+        let mut oauth_provider = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut oauth_provider, &options, state, transaction).await?;
 
         Ok(oauth_provider)
     }
@@ -678,8 +680,8 @@ pub struct UpdateOAuthProviderOptions {
 impl UpdatableModel for OAuthProvider {
     type UpdateOptions = UpdateOAuthProviderOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<OAuthProvider>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<OAuthProvider>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
@@ -695,7 +697,7 @@ impl UpdatableModel for OAuthProvider {
 
         let mut query_builder = UpdateQueryBuilder::new("oauth_providers");
 
-        Self::run_update_handlers(self, &mut options, &mut query_builder, state, transaction)
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         let encrypted_client_secret = if let Some(ref client_secret) = options.client_secret {
@@ -811,6 +813,8 @@ impl UpdatableModel for OAuthProvider {
             self.name_last_path = name_last_path;
         }
 
+        self.run_after_update_handlers(state, transaction).await?;
+
         Ok(())
     }
 }
@@ -819,8 +823,8 @@ impl UpdatableModel for OAuthProvider {
 impl DeletableModel for OAuthProvider {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<OAuthProvider>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<OAuthProvider>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
@@ -844,6 +848,9 @@ impl DeletableModel for OAuthProvider {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

@@ -35,6 +35,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     getEmptyPaginationSet(),
   );
   const [page, setPage] = useState(1);
+  const [browsingPrimaryFilesystem, setBrowsingPrimaryFilesystem] = useState(true);
   const [browsingWritableDirectory, setBrowsingWritableDirectory] = useState(true);
   const [browsingFastDirectory, setBrowsingFastDirectory] = useState(true);
   const [openModal, setOpenModal] = useState<ModalType>(null);
@@ -64,6 +65,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     if (!data) return;
 
     setBrowsingEntries(data.entries);
+    setBrowsingPrimaryFilesystem(data.isFilesystemPrimary);
     setBrowsingWritableDirectory(data.isFilesystemWritable);
     setBrowsingFastDirectory(data.isFilesystemFast);
   }, [data]);
@@ -200,6 +202,8 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         setBrowsingEntries,
         page,
         setPage,
+        browsingPrimaryFilesystem,
+        setBrowsingPrimaryFilesystem,
         browsingWritableDirectory,
         setBrowsingWritableDirectory,
         browsingFastDirectory,

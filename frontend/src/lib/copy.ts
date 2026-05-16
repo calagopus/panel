@@ -27,17 +27,21 @@ export function copyToClipboard(text: string) {
   return navigator.clipboard.writeText(text);
 }
 
+export function handleRawCopyToClipboard(text: string, addToast?: ReturnType<typeof useToast>['addToast']) {
+  copyToClipboard(text)
+    .then(() => {
+      addToast?.(getTranslations().t('elements.copyOnClick.toast.copied', {}), 'success');
+    })
+    .catch((err) => {
+      console.error(err);
+      addToast?.(getTranslations().t('elements.copyOnClick.toast.failed', {}), 'error');
+    });
+}
+
 export function handleCopyToClipboard(text: string, addToast?: ReturnType<typeof useToast>['addToast']) {
   return (e: React.MouseEvent) => {
     e.preventDefault();
 
-    copyToClipboard(text)
-      .then(() => {
-        addToast?.(getTranslations().t('elements.copyOnClick.toast.copied', {}), 'success');
-      })
-      .catch((err) => {
-        console.error(err);
-        addToast?.(getTranslations().t('elements.copyOnClick.toast.failed', {}), 'error');
-      });
+    handleRawCopyToClipboard(text, addToast);
   };
 }

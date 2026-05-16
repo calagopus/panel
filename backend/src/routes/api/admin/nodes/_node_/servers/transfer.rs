@@ -94,14 +94,15 @@ mod post {
             }
 
             let backups = if data.transfer_backups {
-                ServerBackup::all_uuids_by_server_uuid(&state.database, server.uuid).await?
+                ServerBackup::all_uuids_by_server_uuid_not_shared(&state.database, server.uuid)
+                    .await?
             } else {
                 Vec::new()
             };
 
             let has_primary = server.allocation.is_some();
             let total_allocations =
-                ServerAllocation::count_by_server_uuid(&state.database, server.uuid).await;
+                ServerAllocation::count_by_server_uuid(&state.database, server.uuid).await?;
 
             let mut allocation_uuid = None;
             let mut allocation_uuids = Vec::new();

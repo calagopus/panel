@@ -14,6 +14,7 @@ interface UseSearchablePaginatedTableOptions<T> {
   debounceMs?: number;
   initialPage?: number;
   modifyParams?: boolean;
+  canRequest?: boolean;
 }
 
 function parseNumber(num: string | null): number | null {
@@ -33,6 +34,7 @@ export function useSearchablePaginatedTable<T>({
   debounceMs = 150,
   initialPage = 1,
   modifyParams = true,
+  canRequest = true,
 }: UseSearchablePaginatedTableOptions<T>) {
   const { addToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,6 +67,7 @@ export function useSearchablePaginatedTable<T>({
     queryKey: [...queryKey, ...deps, { page, search: debouncedSearch }],
     queryFn: () => fetcher(page, debouncedSearch),
     placeholderData: keepPreviousData,
+    enabled: canRequest,
   });
 
   useEffect(() => {

@@ -1,2 +1,7 @@
 packages:
   - 'extensions/*'
+allowBuilds:
+  "@tailwindcss/oxide": true
+  esbuild: true
+minimumReleaseAge: 4320 # 3 days
+blockExoticSubdeps: true

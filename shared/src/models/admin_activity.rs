@@ -180,13 +180,35 @@ impl AdminActivity {
         database: &crate::database::Database,
         cutoff: chrono::DateTime<chrono::Utc>,
     ) -> Result<u64, crate::database::DatabaseError> {
-        let result = sqlx::query!(
+        let result = sqlx::query(
             r#"
             DELETE FROM admin_activities
-            WHERE created < $1
+            WHERE admin_activities.created < $1
             "#,
-            cutoff.naive_utc()
         )
+        .bind(cutoff.naive_utc())
+        .execute(database.write())
+        .await?;
+
+        Ok(result.rows_affected())
+    }
+
+    pub async fn retain_latest_logs(
+        database: &crate::database::Database,
+        keep_count: i64,
+    ) -> Result<u64, crate::database::DatabaseError> {
+        let result = sqlx::query(
+            r#"
+            DELETE FROM admin_activities
+            WHERE ctid IN (
+                SELECT ctid 
+                FROM admin_activities
+                ORDER BY admin_activities.created DESC
+                OFFSET $1
+            )
+            "#,
+        )
+        .bind(keep_count)
         .execute(database.write())
         .await?;
 
@@ -291,7 +313,7 @@ impl CreatableModel for AdminActivity {
             .set("api_key_uuid", options.api_key_uuid)
             .set("event", &options.event)
             .set("ip", options.ip)
-            .set("data", options.data);
+            .set("data", &options.data);
 
         if let Some(created) = options.created {
             query_builder.set("created", created);
@@ -299,7 +321,11 @@ impl CreatableModel for AdminActivity {
 
         query_builder.execute(&mut **transaction).await?;
 
-        Ok(())
+        let mut result = ();
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 

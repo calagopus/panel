@@ -127,7 +127,8 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("nests.delete")?;
 
-        if NestEgg::count_by_nest_uuid(&state.database, nest.uuid).await > 0 {
+        let nest_eggs = NestEgg::count_by_nest_uuid(&state.database, nest.uuid).await?;
+        if nest_eggs > 0 {
             return ApiResponse::error("nest has eggs, cannot delete")
                 .with_status(StatusCode::CONFLICT)
                 .ok();

@@ -1,11 +1,12 @@
 import { faGlobe, faHeart, faHeartBroken } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { NavLink } from 'react-router';
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
 import Code from '@/elements/Code.tsx';
 import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import Checkbox from '@/elements/input/Checkbox.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
@@ -15,15 +16,18 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { parseVersion } from '@/lib/version.ts';
 import { useAdminStore } from '@/stores/admin.tsx';
 
-export default function NodeRow({
-  node,
-  desync,
-  contextMenuProps,
-}: {
+interface NodeRowProps {
   node: z.infer<typeof adminNodeSchema>;
   desync?: number;
+  isSelected?: boolean;
+  onSelectionChange?: (selected: boolean) => void;
   contextMenuProps?: ContextMenuChildrenProps;
-}) {
+}
+
+const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
+  { node, desync, isSelected, onSelectionChange, contextMenuProps },
+  ref,
+) {
   const { updateInformation } = useAdminStore();
 
   const [version, setVersion] = useState<string | null>(null);
@@ -46,13 +50,34 @@ export default function NodeRow({
 
   return (
     <TableRow
+      bg={isSelected ? 'var(--mantine-color-blue-light)' : undefined}
+      onClick={(e) => {
+        if (e.ctrlKey || e.metaKey) {
+          onSelectionChange?.(true);
+          return true;
+        }
+        return false;
+      }}
       onContextMenu={(e) => {
         if (!contextMenuProps) return;
 
         e.preventDefault();
         contextMenuProps.openMenu(e.pageX, e.pageY);
       }}
+      ref={ref}
     >
+      {onSelectionChange !== undefined && (
+        <TableData className='pl-4 relative cursor-pointer w-10 text-center'>
+          <Checkbox
+            id={node.uuid}
+            checked={isSelected}
+            onChange={(e) => onSelectionChange(e.target.checked)}
+            onClick={(e) => e.stopPropagation()}
+            classNames={{ input: 'cursor-pointer!' }}
+          />
+        </TableData>
+      )}
+
       <TableData>
         {version ? (
           version === 'Unavailable' ? (
@@ -121,4 +146,6 @@ export default function NodeRow({
       )}
     </TableRow>
   );
-}
+});
+
+export default NodeRow;

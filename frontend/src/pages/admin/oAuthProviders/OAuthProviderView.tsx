@@ -32,7 +32,7 @@ export default function OAuthProviderView() {
           {
             name: 'Users',
             icon: faUsers,
-            path: `/admin/oauth-providers/${params.id}/users`,
+            path: `/users`,
             element: <AdminOAuthProviderUsers oauthProvider={oauthProvider} />,
             permission: 'users.read',
           },

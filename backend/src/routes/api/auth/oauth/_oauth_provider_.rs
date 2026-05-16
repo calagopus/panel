@@ -66,8 +66,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
             if state
                 .cache
                 .get::<u16>(&format!("oauth_state::{}", params.state))
-                .await
-                .is_err()
+                .await?
+                .is_none()
             {
                 return ApiResponse::error("oauth csrf state not found, please try again")
                     .with_status(StatusCode::NOT_FOUND)
@@ -101,6 +101,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                     settings.app.url.trim_end_matches('/'),
                     oauth_provider.uuid
                 ))?);
+            let session_cookie = settings.app.session_cookie.clone();
 
             drop(settings);
 
@@ -119,7 +120,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                 }
             };
 
-            if let Some(session_id) = cookies.get("session") {
+            if let Some(session_id) = cookies.get(&session_cookie) {
                 if !oauth_provider.user_manageable {
                     return ApiResponse::error("you cannot link with this oauth provider")
                         .with_status(StatusCode::CONFLICT)
@@ -362,7 +363,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                     }
                     None => {
                         let settings = state.settings.get().await?;
-                        if !settings.app.registration_enabled {
+                        if oauth_provider.login_only {
                             return ApiResponse::new(Body::empty())
                                 .with_header("Location", format!("{}/auth/login?error=registration_disabled", settings.app.url.trim_end_matches('/')))
                                 .with_status(StatusCode::TEMPORARY_REDIRECT)

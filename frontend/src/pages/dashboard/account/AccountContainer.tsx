@@ -104,7 +104,7 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
               autoComplete='username'
               {...form.getInputProps('username')}
             />
-            {settings.app.languageChangeEnabled && (
+            {settings.user.allowChangingLanguage && (
               <Select
                 withAsterisk
                 label={t('pages.account.account.containers.account.form.language', {})}

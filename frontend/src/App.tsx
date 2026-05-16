@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createBrowserHistory } from 'history';
 import { useEffect, useRef, useState } from 'react';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router';
+import getAnnouncements from './api/getAnnouncements.ts';
 import getLanguages from './api/getLanguages.ts';
 import getSettings from './api/getSettings.ts';
 import ErrorBoundary from './elements/ErrorBoundary.tsx';
@@ -17,6 +18,7 @@ import RouterRoutes from './RouterRoutes.tsx';
 import { useGlobalStore } from './stores/global.ts';
 
 import '@mantine/core/styles.css';
+import '@mantine/charts/styles.css';
 import '@mantine/dates/styles.css';
 import '@gfazioli/mantine-window/styles.css';
 
@@ -34,7 +36,7 @@ const browserHistory = createBrowserHistory();
 const MAX_RETRIES = 10;
 
 export default function App({ theme }: { theme: MantineThemeOverride }) {
-  const { settings, setSettings, setLanguages, setTimeOffset } = useGlobalStore();
+  const { settings, setSettings, setLanguages, setTimeOffset, setAnnouncements } = useGlobalStore();
   const [loadWarning, setLoadWarning] = useState(false);
   const retryCount = useRef(0);
 
@@ -63,6 +65,14 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
           if (retryCount.current < MAX_RETRIES) {
             timer = setTimeout(loadData, Math.min(retryCount.current * 2000, 10000));
           }
+        });
+
+      getAnnouncements()
+        .then((announcements) => {
+          setAnnouncements(announcements);
+        })
+        .catch((err) => {
+          console.error('Failed to load announcements:', err);
         });
     };
 

@@ -4,6 +4,7 @@ import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 interface Data {
   serverUuid: string;
   truncateDirectory: boolean;
+  restoreStartup: boolean;
 }
 
 export default async (nodeUuid: string, backupUuid: string, data: Data): Promise<void> => {

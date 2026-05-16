@@ -542,6 +542,10 @@ const baseTranslations = defineTranslations({
           login: 'Login',
           loginWith: 'Login with {name}',
         },
+        alert: {
+          urlMismatch:
+            'The application URL does not match the current URL. Expected: `{appUrl}`, Current: `{currentUrl}`.',
+        },
         login: {
           error: {
             usernameRequired: 'Please enter a username',
@@ -834,6 +838,7 @@ const baseTranslations = defineTranslations({
         },
         securityKeys: {
           title: 'Security Keys',
+          subtitle: '{current} of {max} maximum security keys created.',
           table: {
             columns: {
               credentialId: 'Credential ID',
@@ -841,6 +846,7 @@ const baseTranslations = defineTranslations({
           },
           tooltip: {
             secureContextRequired: 'A secure context (HTTPS) is required to use security keys.',
+            limitReached: 'You are limited to {max} security keys.',
           },
           modal: {
             createSecurityKey: {
@@ -924,8 +930,12 @@ const baseTranslations = defineTranslations({
         },
         sshKeys: {
           title: 'SSH Keys',
+          subtitle: '{current} of {max} maximum ssh keys created.',
           button: {
             import: 'Import',
+          },
+          tooltip: {
+            limitReached: 'You are limited to {max} ssh keys.',
           },
           table: {
             columns: {
@@ -972,6 +982,10 @@ const baseTranslations = defineTranslations({
         },
         commandSnippets: {
           title: 'Command Snippets',
+          subtitle: '{current} of {max} maximum command snippets created.',
+          tooltip: {
+            limitReached: 'You are limited to {max} command snippets.',
+          },
           table: {
             columns: {
               eggs: 'Eggs',
@@ -1027,8 +1041,12 @@ const baseTranslations = defineTranslations({
         },
         apiKeys: {
           title: 'API Keys',
+          subtitle: '{current} of {max} maximum api keys created.',
           button: {
             apiDocumentation: 'API Documentation',
+          },
+          tooltip: {
+            limitReached: 'You are limited to {max} api keys.',
           },
           table: {
             columns: {
@@ -1277,6 +1295,23 @@ const baseTranslations = defineTranslations({
             permissionsUpdated: 'Permissions have been updated.',
             fileSaved: 'File has been saved.',
           },
+          tooltip: {
+            fileHistory: 'File History',
+            largestDirectories: 'Analyze directory sizes',
+          },
+          drawer: {
+            revisions: {
+              title: 'File History',
+              noRevisions: 'No revisions found for this file.',
+              restored: 'Revision restored into editor.',
+              badge: {
+                fullSnapshot: 'Full Snapshot',
+              },
+              tooltip: {
+                restore: 'Restore this revision into the editor',
+              },
+            },
+          },
           modal: {
             activeUploads: {
               title: 'Active Uploads',
@@ -1372,6 +1407,10 @@ const baseTranslations = defineTranslations({
               form: {
                 fileName: 'File Name',
               },
+            },
+            largestDirectories: {
+              title: 'Largest Directories',
+              empty: 'No directories found.',
             },
             searchFiles: {
               title: 'Search Files',
@@ -1639,8 +1678,9 @@ const baseTranslations = defineTranslations({
                 cronSchedule: 'Cron Schedule',
               },
               card: {
-                content: 'On Cron Interval `{schedule}`, Next run is {timestamp} - Last run was {lastTimestamp}.',
+                content: 'On Cron Interval {schedule}, Next run is {timestamp} - Last run was {lastTimestamp}.',
               },
+              invalidCron: 'Invalid cron expression',
             },
             powerAction: {
               title: 'Power Action',
@@ -1925,6 +1965,10 @@ const baseTranslations = defineTranslations({
         },
         subusers: {
           title: 'Subusers',
+          subtitle: '{current} of {max} maximum subusers created.',
+          tooltip: {
+            limitReached: 'This server is limited to {max} subusers.',
+          },
           table: {
             columns: {
               twoFactorEnabled: '2FA Enabled',
@@ -2001,6 +2045,9 @@ const baseTranslations = defineTranslations({
             },
             restoreBackup: {
               title: 'Restore Backup',
+              form: {
+                restoreStartup: 'Restore the startup command, image, and variables from this backup.',
+              },
             },
             deleteBackup: {
               title: 'Confirm Backup Deletion',
@@ -2008,6 +2055,9 @@ const baseTranslations = defineTranslations({
               toast: {
                 deleted: 'Backup deleted.',
               },
+            },
+            viewMetadata: {
+              title: 'Backup Metadata',
             },
           },
         },

@@ -162,10 +162,36 @@ impl ServerActivity {
         let result = sqlx::query(
             r#"
             DELETE FROM server_activities
-            WHERE created < $1
+            WHERE server_activities.created < $1
             "#,
         )
         .bind(cutoff.naive_utc())
+        .execute(database.write())
+        .await?;
+
+        Ok(result.rows_affected())
+    }
+
+    pub async fn retain_latest_logs_per_server(
+        database: &crate::database::Database,
+        keep_count: i64,
+    ) -> Result<u64, crate::database::DatabaseError> {
+        let result = sqlx::query(
+            r#"
+            DELETE FROM server_activities
+            WHERE ctid IN (
+                SELECT ctid 
+                FROM (
+                    SELECT
+                        ctid, 
+                        ROW_NUMBER() OVER (PARTITION BY server_activities.server_uuid ORDER BY server_activities.created DESC) rn
+                    FROM server_activities
+                ) sub
+                WHERE sub.rn > $1
+            )
+            "#,
+        )
+        .bind(keep_count)
         .execute(database.write())
         .await?;
 
@@ -176,12 +202,12 @@ impl ServerActivity {
 #[async_trait::async_trait]
 impl IntoApiObject for ServerActivity {
     type ApiObject = ApiServerActivity;
-    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+    type ExtraArgs<'a> = (&'a crate::storage::StorageUrlRetriever<'a>, bool);
 
     async fn into_api_object<'a>(
         self,
         state: &crate::State,
-        storage_url_retriever: Self::ExtraArgs<'a>,
+        (storage_url_retriever, show_ip): Self::ExtraArgs<'a>,
     ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
         let api_object = ApiServerActivity::init_hooks(&self, state).await?;
 
@@ -208,7 +234,11 @@ impl IntoApiObject for ServerActivity {
                 user,
                 impersonator,
                 event: self.event,
-                ip: self.ip.map(|ip| ip.ip().to_compact_string()),
+                ip: if show_ip {
+                    self.ip.map(|ip| ip.ip().to_compact_string())
+                } else {
+                    None
+                },
                 data: self.data,
                 is_api: self.api_key.is_some(),
                 is_schedule: self.schedule.is_some(),
@@ -278,7 +308,7 @@ impl CreatableModel for ServerActivity {
             .set("schedule_uuid", options.schedule_uuid)
             .set("event", &options.event)
             .set("ip", options.ip)
-            .set("data", options.data);
+            .set("data", &options.data);
 
         if let Some(created) = options.created {
             query_builder.set("created", created);
@@ -286,7 +316,11 @@ impl CreatableModel for ServerActivity {
 
         query_builder.execute(&mut **transaction).await?;
 
-        Ok(())
+        let mut result = ();
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 

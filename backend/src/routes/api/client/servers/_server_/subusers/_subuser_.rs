@@ -7,6 +7,7 @@ mod delete {
     use shared::{
         ApiError, GetState,
         models::{
+            DeletableModel,
             server::{GetServer, GetServerActivityLogger},
             server_subuser::ServerSubuser,
             user::GetPermissionManager,
@@ -55,7 +56,7 @@ mod delete {
                 }
             };
 
-        ServerSubuser::delete_by_uuids(&state.database, server.uuid, subuser.user.uuid).await?;
+        subuser.delete(&state, ()).await?;
 
         activity_logger
             .log(

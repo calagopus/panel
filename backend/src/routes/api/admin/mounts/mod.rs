@@ -106,7 +106,7 @@ mod post {
         let mount = match Mount::create(&state, data).await {
             Ok(mount) => mount,
             Err(err) if err.is_unique_violation() => {
-                return ApiResponse::error("mount with name/source/location already exists")
+                return ApiResponse::error("mount with name/source/target already exists")
                     .with_status(StatusCode::CONFLICT)
                     .ok();
             }

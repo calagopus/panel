@@ -6,6 +6,7 @@ import { ContainerRegistry, makeComponentHookable } from 'shared';
 import cancelTransfer from '@/api/admin/servers/cancelTransfer.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelServerInstall from '@/api/server/settings/cancelServerInstall.ts';
+import DismissibleAnnouncementAlert from '@/elements/DismissibleAnnouncementAlert.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { bytesToString } from '@/lib/size.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -63,6 +64,7 @@ function ServerContentContainer(props: Props) {
   const { t } = useTranslations();
   const {
     server,
+    serverAnnouncements,
     updateServer,
     backupRestoreProgress,
     transferProgressArchive,
@@ -114,6 +116,10 @@ function ServerContentContainer(props: Props) {
 
   return (
     <ContentContainer title={`${title} | ${server.name}`}>
+      {serverAnnouncements.map((announcement) => (
+        <DismissibleAnnouncementAlert key={announcement.uuid} announcement={announcement} />
+      ))}
+
       {fullscreen ? null : server.isTransferring ? (
         <div className='mt-2 px-4 lg:px-6 mb-4'>
           <Notification loading>

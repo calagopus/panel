@@ -1616,7 +1616,7 @@
                 "cronSchedule": "Cron-planning"
               },
               "card": {
-                "content": "Op cron-interval `{schedule}`, volgende uitvoering is {timestamp} - laatste uitvoering was {lastTimestamp}."
+                "content": "Op cron-interval {schedule}, volgende uitvoering is {timestamp} - laatste uitvoering was {lastTimestamp}."
               }
             },
             "powerAction": {

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { archiveFormatLabelMapping } from '@/lib/enums.ts';
+import { userSchema } from '@/lib/schemas/user.ts';
 import { nullableString } from '@/lib/transformers.ts';
 
 export const serverFilesArchiveCreateSchema = z.object({
@@ -188,4 +189,12 @@ export const downloadSchema = z.object({
   destination: z.string(),
   progress: z.number(),
   total: z.number(),
+});
+
+export const serverFileRevisionSchema = z.object({
+  id: z.number(),
+  user: userSchema.nullable(),
+  size: z.number(),
+  isSnapshot: z.boolean(),
+  created: z.date(),
 });

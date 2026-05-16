@@ -119,9 +119,10 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("database-hosts.delete")?;
 
-        if ServerDatabase::count_by_database_host_uuid(&state.database, database_host.uuid).await
-            > 0
-        {
+        let databases =
+            ServerDatabase::count_by_database_host_uuid(&state.database, database_host.uuid)
+                .await?;
+        if databases > 0 {
             return ApiResponse::error("database host has databases, cannot delete")
                 .with_status(StatusCode::CONFLICT)
                 .ok();
