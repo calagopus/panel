@@ -40,7 +40,13 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                 <AppIcon />
               </NavLink>
               <Sidebar.Divider />
-              <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
+              <Sidebar.Link
+                to='/'
+                end
+                icon={faServer}
+                name={t('pages.account.home.title', {})}
+                activeMatches={['/grouped']}
+              />
               {isAdmin(user) && (
                 <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
               )}

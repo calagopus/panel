@@ -48,6 +48,16 @@
   --mantine-color-body: #f0eff0;
 }
 
+:root[data-mantine-color-scheme="dark"] {
+  --mantine-color-blue-light: rgba(34, 139, 230, 0.15);
+  --mantine-color-blue-light-color: var(--mantine-color-blue-3);
+  --mantine-color-blue-light-hover: rgba(34, 139, 230, 0.2);
+
+  --mantine-color-red-light: rgba(250, 82, 82, 0.15);
+  --mantine-color-red-light-color: var(--mantine-color-red-3);
+  --mantine-color-red-light-hover: rgba(250, 82, 82, 0.2);
+}
+
 body {
   @apply font-sans;
   background-color: var(--mantine-color-body);
