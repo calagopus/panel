@@ -10,6 +10,7 @@ import {
   PointElement,
 } from 'chart.js';
 import 'chartjs-adapter-moment';
+import { useComputedColorScheme } from '@mantine/core';
 import { deepmerge, deepmergeCustom } from 'deepmerge-ts';
 import { useState } from 'react';
 import { hexToRgba } from '@/lib/color.ts';
@@ -38,9 +39,7 @@ const defaultOptions: ChartOptions<'line'> = {
     y: {
       type: 'linear',
       min: 0,
-      grid: { display: true, color: '#424242' },
-      ticks: { color: '#f3f4f6', count: 3, font: { size: 11, weight: 'lighter' } },
-      border: { color: '#424242' },
+      ticks: { count: 3, font: { size: 11, weight: 'lighter' } },
     },
   },
   elements: {
@@ -52,6 +51,20 @@ const defaultOptions: ChartOptions<'line'> = {
 
 function getOptions(opts?: Partial<ChartOptions<'line'>>): ChartOptions<'line'> {
   return deepmerge(defaultOptions, opts ?? {});
+}
+
+function getThemeOverrides(isDark: boolean): Partial<ChartOptions<'line'>> {
+  const gridColor = isDark ? '#424242' : '#e5e7eb';
+  const tickColor = isDark ? '#f3f4f6' : '#374151';
+  return {
+    scales: {
+      y: {
+        grid: { display: true, color: gridColor },
+        ticks: { color: tickColor },
+        border: { color: gridColor },
+      },
+    },
+  };
 }
 
 type ChartDatasetCallback = (value: ChartDataset<'line'>, index: number) => ChartDataset<'line'>;
@@ -86,10 +99,12 @@ interface UseChartOptions {
 }
 
 function useChart(label: string, opts?: UseChartOptions) {
-  const options =
+  const isDark = useComputedColorScheme('dark') === 'dark';
+  const baseOptions =
     typeof opts?.options === 'number'
       ? getOptions({ scales: { y: { min: 0, suggestedMax: opts.options } } })
       : getOptions(opts?.options);
+  const options = deepmerge(baseOptions, getThemeOverrides(isDark)) as ChartOptions<'line'>;
 
   const [data, setData] = useState(getEmptyData(label, opts?.sets || 1, opts?.callback));
 

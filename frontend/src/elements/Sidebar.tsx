@@ -96,6 +96,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
   const { t } = useTranslations();
   const { addWindow } = useWindows();
   const { pathname } = useLocation();
+  const isLight = useComputedColorScheme('dark') === 'light';
   const extraActive = activeMatches?.some((pattern) => matchPath({ path: pattern, end: false }, pathname)) ?? false;
 
   if (to.endsWith('/*')) to = to.slice(0, to.length - 2);
@@ -152,7 +153,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
               <Button
                 color={isActive ? 'blue' : 'gray'}
                 className={classNames(isActive && 'cursor-default! active', className)}
-                variant={isActive ? 'outline' : 'subtle'}
+                variant={isLight && isActive ? 'outline' : 'subtle'}
                 fullWidth
                 styles={{ label: { width: '100%' } }}
               >
