@@ -52,12 +52,12 @@ const commandSnippetFilter: OptionsFilter = ({ options, search }) => {
 };
 
 const getXtermTheme = (isDark: boolean) => ({
-  background: '#00000000',
+  background: isDark ? '#00000000' : '#ffffff',
   foreground: isDark ? '#f8f8f2' : '#1a1a1a',
   cursor: '#00000000',
   cursorAccent: '#00000000',
-  selectionBackground: isDark ? '#FFFFFF4D' : '#0000001A',
-  selectionInactiveBackground: isDark ? '#FFFFFF80' : '#00000033',
+  selectionBackground: isDark ? '#FFFFFF4D' : '#0000004D',
+  selectionInactiveBackground: isDark ? '#FFFFFF80' : '#00000080',
   // Light-mode ANSI palette
   ...(!isDark && {
     black: '#1c1c1c',
