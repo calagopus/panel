@@ -334,7 +334,6 @@ function FileEditorComponent() {
                 <MonacoEditor
                   height='100%'
                   width='100%'
-                  theme='vs-dark'
                   defaultValue={content}
                   path={fileName}
                   options={{

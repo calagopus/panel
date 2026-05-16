@@ -30,13 +30,11 @@ interface Props extends DrawerProps {
 function RevisionRow({
   revision,
   filePath,
-  showDiffVsCurrent,
   previousRevisionId,
   onRestore,
 }: {
   revision: z.infer<typeof serverFileRevisionSchema>;
   filePath: string;
-  showDiffVsCurrent: boolean;
   previousRevisionId: number | null;
   onRestore: (content: string) => void;
 }) {
@@ -105,13 +103,11 @@ function RevisionRow({
           </div>
         </div>
         <div className='flex items-center gap-1'>
-          {showDiffVsCurrent && (
-            <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.viewDiff', {})}>
-              <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleViewDiff}>
-                <FontAwesomeIcon icon={faCodeCompare} />
-              </ActionIcon>
-            </Tooltip>
-          )}
+          <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.viewDiff', {})}>
+            <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleViewDiff}>
+              <FontAwesomeIcon icon={faCodeCompare} />
+            </ActionIcon>
+          </Tooltip>
           {previousRevisionId !== null && (
             <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.compareToPrevious', {})}>
               <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleCompareToPrevious}>
@@ -166,7 +162,6 @@ export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClo
                   key={revision.id}
                   revision={revision}
                   filePath={filePath}
-                  showDiffVsCurrent={index !== 0}
                   previousRevisionId={revisions[index + 1]?.id ?? null}
                   onRestore={(content) => {
                     onRestore(content);

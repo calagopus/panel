@@ -1210,6 +1210,8 @@ const baseTranslations = defineTranslations({
           titleEditorViewing: 'Viewing {file}',
           titleEditorEditing: 'Editing {file}',
           titleEditorNew: 'New File',
+          titleDiffRevisionVsCurrent: '{file} - Revision #{revision} vs Current',
+          titleDiffRevisionVsRevision: '{file} - Revision #{previousRevision} vs #{revision}',
           table: {
             columns: {
               modified: 'Modified',

@@ -1,7 +1,6 @@
 import { faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Title } from '@mantine/core';
-import { DiffEditor } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { basename, dirname } from 'pathe';
 import { useEffect, useRef, useState } from 'react';
@@ -13,9 +12,10 @@ import saveFileContent from '@/api/server/files/saveFileContent.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
+import { MonacoDiffEditor } from '@/elements/MonacoEditor.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
-import { FileManagerProvider } from '@/providers/FileManagerProvider.tsx';
+import { FileManagerProvider, useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -27,6 +27,7 @@ function FileRevisionDiffComponent() {
   const server = useServerStore((state) => state.server);
   const { getParent } = useCurrentWindow();
   const [searchParams] = useSearchParams();
+  const { editorMinimap, editorLineOverflow } = useFileManager();
 
   const filePath = searchParams.get('file') || '';
   const revisionId = parseInt(searchParams.get('revision') || '0', 10);
@@ -113,8 +114,15 @@ function FileRevisionDiffComponent() {
   };
 
   const title = previousRevisionId
-    ? `${basename(filePath)} — Revision #${previousRevisionId} vs #${revisionId}`
-    : `${basename(filePath)} — Revision #${revisionId} vs Current`;
+    ? t('pages.server.files.titleDiffRevisionVsRevision', {
+        file: basename(filePath),
+        revision: String(revisionId),
+        previousRevision: String(previousRevisionId),
+      })
+    : t('pages.server.files.titleDiffRevisionVsCurrent', {
+        file: basename(filePath),
+        revision: String(revisionId),
+      });
 
   const originalModelPath = previousRevisionId
     ? `revision-${previousRevisionId}-${filePath}`
@@ -154,27 +162,38 @@ function FileRevisionDiffComponent() {
           <Spinner size={75} />
         </div>
       ) : (
-        <div className='flex flex-col relative'>
+        <div className='flex flex-col relative mt-4'>
           <div className='relative'>
             <div ref={editorContainerRef} className='flex max-w-full w-full z-1 absolute'>
-              <DiffEditor
+              <MonacoDiffEditor
                 height='100%'
                 width='100%'
-                theme='vs-dark'
-                original={originalContent}
-                modified={modifiedContent}
-                originalModelPath={originalModelPath}
-                modifiedModelPath={modifiedModelPath}
                 options={{
                   readOnly: true,
-                  renderSideBySide: true,
-                  minimap: { enabled: false },
+                  stickyScroll: { enabled: false },
+                  minimap: { enabled: editorMinimap },
+                  wordWrap: editorLineOverflow ? 'on' : 'off',
+                  codeLens: false,
                   scrollBeyondLastLine: false,
                   smoothScrolling: true,
+                  // @ts-expect-error this is valid
+                  touchScrollEnabled: true,
                   fixedOverflowWidgets: true,
                 }}
-                onMount={(diffEditor) => {
+                onMount={(diffEditor, monaco) => {
                   diffEditorRef.current = diffEditor;
+
+                  const originalUri = monaco.Uri.parse(originalModelPath);
+                  const modifiedUri = monaco.Uri.parse(modifiedModelPath);
+
+                  const originalModel =
+                    monaco.editor.getModel(originalUri) ??
+                    monaco.editor.createModel(originalContent, null, originalUri);
+                  const modifiedModel =
+                    monaco.editor.getModel(modifiedUri) ??
+                    monaco.editor.createModel(modifiedContent, null, modifiedUri);
+
+                  diffEditor.setModel({ original: originalModel, modified: modifiedModel });
                 }}
               />
             </div>
