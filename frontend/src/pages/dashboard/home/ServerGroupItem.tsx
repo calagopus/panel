@@ -10,7 +10,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Collapse, Menu } from '@mantine/core';
+import { Collapse, Menu, useComputedColorScheme } from '@mantine/core';
 import classNames from 'classnames';
 import { ComponentProps, memo, startTransition, useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -66,6 +66,7 @@ export default function ServerGroupItem({
   const { t, tItem } = useTranslations();
   const { updateServerGroup: updateStateServerGroup, removeServerGroup } = useUserStore();
   const { addToast } = useToast();
+  const isDark = useComputedColorScheme('dark') === 'dark';
 
   const [isExpanded, setIsExpanded] = useState(
     localStorage.getItem(`server-group-expanded-${serverGroup.uuid}`) !== 'false',
@@ -163,7 +164,7 @@ export default function ServerGroupItem({
                   )}
                 />
                 <span className='font-medium truncate'>{serverGroup.name}</span>
-                <Badge variant='light' color='gray'>
+                <Badge variant={isDark ? 'light' : 'filled'} color='gray'>
                   {tItem('server', serverCount)}
                 </Badge>
               </button>

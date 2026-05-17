@@ -221,7 +221,6 @@ export default function EmailTemplatesContainer() {
               <Divider />
               <MonacoEditor
                 height='60vh'
-                theme='vs-dark'
                 language='html'
                 value={effectiveContent}
                 options={{
