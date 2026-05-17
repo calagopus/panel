@@ -1,7 +1,7 @@
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
@@ -10,12 +10,9 @@ export default function DatabaseHostRow({ databaseHost }: { databaseHost: z.infe
   return (
     <TableRow>
       <TableData>
-        <NavLink
-          to={`/admin/database-hosts/${databaseHost.uuid}`}
-          className='text-blue-400 hover:text-blue-200 hover:underline'
-        >
+        <TableLink to={`/admin/database-hosts/${databaseHost.uuid}`}>
           <Code>{databaseHost.uuid}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       <TableData>{databaseHost.name}</TableData>

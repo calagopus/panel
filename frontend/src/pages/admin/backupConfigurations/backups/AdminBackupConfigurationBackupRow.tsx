@@ -1,7 +1,6 @@
 import { faFileArrowDown, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import downloadNodeBackup from '@/api/admin/nodes/backups/downloadNodeBackup.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -10,6 +9,7 @@ import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
@@ -108,12 +108,7 @@ export default function AdminBackupConfigurationBackupRow({
             <TableData>
               <Code>
                 {backup.server ? (
-                  <NavLink
-                    to={`/admin/servers/${backup.server.uuid}`}
-                    className='text-blue-400 hover:text-blue-200 hover:underline'
-                  >
-                    {backup.server.name}
-                  </NavLink>
+                  <TableLink to={`/admin/servers/${backup.server.uuid}`}>{backup.server.name}</TableLink>
                 ) : (
                   '-'
                 )}
@@ -122,12 +117,7 @@ export default function AdminBackupConfigurationBackupRow({
 
             <TableData className='flex flex-row items-center'>
               <Code>
-                <NavLink
-                  to={`/admin/nodes/${backup.node.uuid}`}
-                  className='text-blue-400 hover:text-blue-200 hover:underline'
-                >
-                  {backup.node.name}
-                </NavLink>
+                <TableLink to={`/admin/nodes/${backup.node.uuid}`}>{backup.node.name}</TableLink>
               </Code>
               {backup.server && backup.server.node.uuid !== backup.node.uuid && (
                 <Tooltip label='This backup is on a different node than the server. It is not viewable from the Client API.'>

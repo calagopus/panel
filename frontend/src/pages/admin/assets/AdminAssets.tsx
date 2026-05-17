@@ -7,6 +7,7 @@ import { z } from 'zod';
 import getAssets from '@/api/admin/assets/getAssets.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import Card from '@/elements/Card.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
@@ -132,9 +133,9 @@ export default function AdminAssets() {
         onNavigate={navigateToDirectory}
       />
 
-      <div id='asset-breadcrumbs-outer' className='bg-[#282828] border border-[#424242] rounded-lg mb-2 p-4'>
+      <Card mb='sm'>
         <AssetBreadcrumbs directory={currentDirectory} />
-      </div>
+      </Card>
 
       <AssetActionBar
         selectedAssets={selectedAssets}

@@ -107,7 +107,7 @@ export default function PullFileModal({ opened, onClose }: ModalProps) {
         />
 
         <p className='mt-2 text-sm md:text-base break-all'>
-          <span className='text-neutral-200'>{t('pages.server.files.modal.pullFile.createdAs', {})}</span>
+          <span>{t('pages.server.files.modal.pullFile.createdAs', {})}</span>
           <Code>
             /home/container/
             <span className='text-cyan-200'>

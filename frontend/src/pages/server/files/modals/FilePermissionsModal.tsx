@@ -108,9 +108,7 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
     perms: Record<PermissionType, boolean>;
   }) => (
     <Card>
-      <Title order={3} c='white'>
-        {title}
-      </Title>
+      <Title order={3}>{title}</Title>
       <Stack mt='sm'>
         {Object.entries(perms).map(([type, value]: [string, boolean]) => (
           <Checkbox
@@ -151,17 +149,13 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
     <Modal title={t('pages.server.files.modal.filePermissions.title', {})} onClose={onClose} opened={opened} size='lg'>
       <Card>
         <div className='flex flex-row justify-between'>
-          <Title order={3} c='white'>
-            {t('pages.server.files.modal.filePermissions.symbolic', {})}
-          </Title>
+          <Title order={3}>{t('pages.server.files.modal.filePermissions.symbolic', {})}</Title>
           <Badge variant='light' color='blue' size='xl' className='lowercase!'>
             {getPermissionString()}
           </Badge>
         </div>
         <div className='mt-2 flex flex-row justify-between'>
-          <Title order={3} c='white'>
-            {t('pages.server.files.modal.filePermissions.octal', {})}
-          </Title>
+          <Title order={3}>{t('pages.server.files.modal.filePermissions.octal', {})}</Title>
           <Badge variant='light' color='green' size='xl'>
             {getOctalValue()}
           </Badge>
@@ -187,9 +181,7 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
       </Group>
 
       <Card mt='md'>
-        <Title order={3} c='white'>
-          {t('pages.server.files.modal.filePermissions.breakdown', {})}
-        </Title>
+        <Title order={3}>{t('pages.server.files.modal.filePermissions.breakdown', {})}</Title>
         <div className='text-sm space-y-1'>
           <div>
             <Code className='font-bold'>r</Code> - {t('pages.server.files.modal.filePermissions.readPermission', {})}

@@ -14,7 +14,7 @@ export default function AssetBreadcrumbs({ directory }: { directory: string }) {
       <NavLink
         key='root'
         to={`?${createSearchParams({ directory: '' })}`}
-        className='text-blue-300 hover:text-blue-200'
+        className='text-(--mantine-color-anchor) hover:underline'
       >
         assets
       </NavLink>
@@ -25,7 +25,7 @@ export default function AssetBreadcrumbs({ directory }: { directory: string }) {
       <NavLink
         key={item.path}
         to={`?${createSearchParams({ directory: item.path })}`}
-        className='text-blue-300 hover:text-blue-200'
+        className='text-(--mantine-color-anchor) hover:underline'
       >
         {item.name}
       </NavLink>

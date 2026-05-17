@@ -11,7 +11,6 @@ import { Line } from 'react-chartjs-2';
 import ChartBlock from '@/elements/ChartBlock.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { useChart, useChartTickLabel } from '@/lib/chart.ts';
-import { hexToRgba } from '@/lib/color.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -42,8 +41,6 @@ export default function ServerStats() {
       return {
         ...opts,
         label: !index ? t('pages.server.console.stats.inbound', {}) : t('pages.server.console.stats.outbound', {}),
-        borderColor: !index ? '#22d3ee' : '#facc15', // cyan-400 & yellow-400
-        backgroundColor: hexToRgba(!index ? '#0e7490' : '#a16207', 0.5), // cyan-700 & yellow-700
       };
     },
   });
@@ -77,10 +74,10 @@ export default function ServerStats() {
         legend={
           <>
             <Tooltip label={t('pages.server.console.stats.inbound', {})}>
-              <FontAwesomeIcon icon={faCloudArrowDown} className='mr-2 h-4 w-4 text-yellow-400' />
+              <FontAwesomeIcon icon={faCloudArrowDown} className='mr-2 h-4 w-4 text-cyan-400 light:text-cyan-600' />
             </Tooltip>
             <Tooltip label={t('pages.server.console.stats.outbound', {})}>
-              <FontAwesomeIcon icon={faCloudArrowUp} className='h-4 w-4 text-cyan-400' />
+              <FontAwesomeIcon icon={faCloudArrowUp} className='h-4 w-4 text-yellow-400 light:text-amber-600' />
             </Tooltip>
           </>
         }

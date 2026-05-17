@@ -1,6 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import deleteUserOAuthLink from '@/api/admin/users/oauthLinks/deleteUserOAuthLink.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -8,6 +7,7 @@ import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminUserOAuthLinkSchema } from '@/lib/schemas/admin/users.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
@@ -73,12 +73,9 @@ export default function UserOAuthLinkRow({
             </TableData>
 
             <TableData>
-              <NavLink
-                to={`/admin/oauth-providers/${userOAuthLink.oauthProvider.uuid}`}
-                className='text-blue-400 hover:text-blue-200 hover:underline'
-              >
+              <TableLink to={`/admin/oauth-providers/${userOAuthLink.oauthProvider.uuid}`}>
                 <Code>{userOAuthLink.oauthProvider.name}</Code>
-              </NavLink>
+              </TableLink>
             </TableData>
 
             <TableData>

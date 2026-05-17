@@ -3,12 +3,14 @@ import {
   faBars,
   faEllipsisVertical,
   faGraduationCap,
+  faMoon,
+  faSun,
   faUserCog,
   faWindowRestore,
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Menu } from '@mantine/core';
+import { Menu, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import classNames from 'classnames';
 import { ReactNode, useEffect, useState } from 'react';
 import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
@@ -94,6 +96,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
   const { t } = useTranslations();
   const { addWindow } = useWindows();
   const { pathname } = useLocation();
+  const isLight = useComputedColorScheme('dark') === 'light';
   const extraActive = activeMatches?.some((pattern) => matchPath({ path: pattern, end: false }, pathname)) ?? false;
 
   if (to.endsWith('/*')) to = to.slice(0, to.length - 2);
@@ -150,7 +153,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
               <Button
                 color={isActive ? 'blue' : 'gray'}
                 className={classNames(isActive && 'cursor-default! active', className)}
-                variant='subtle'
+                variant={isLight && isActive ? 'outline' : 'subtle'}
                 fullWidth
                 styles={{ label: { width: '100%' } }}
               >
@@ -172,15 +175,19 @@ function Footer() {
   const { t } = useTranslations();
   const { impersonating, user, doLogout } = useAuth();
   const navigate = useNavigate();
+  const { toggleColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('dark');
 
   if (!user) {
     return null;
   }
 
+  const isDark = computedColorScheme === 'dark';
+
   return (
     <>
       <div
-        className='border border-neutral-700 rounded-lg p-2 flex flex-row justify-between items-center min-h-fit'
+        className='border border-(--mantine-color-default-border) rounded-lg p-2 flex flex-row justify-between items-center min-h-fit'
         id='sidebar-account-card'
       >
         <NavLink
@@ -196,7 +203,7 @@ function Footer() {
             alt={user.username}
             className='h-10 w-10 rounded-full select-none shrink-0'
           />
-          <span className='font-sans font-normal text-sm text-neutral-50 whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
+          <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
             {user.username}
           </span>
         </NavLink>
@@ -220,6 +227,10 @@ function Footer() {
                 </Menu.Item>
               </>
             )}
+            <Menu.Divider />
+            <Menu.Item leftSection={<FontAwesomeIcon icon={isDark ? faSun : faMoon} />} onClick={toggleColorScheme}>
+              {isDark ? t('elements.sidebar.button.switchToLight', {}) : t('elements.sidebar.button.switchToDark', {})}
+            </Menu.Item>
             <Menu.Divider />
             <Menu.Item leftSection={<FontAwesomeIcon icon={faArrowRightFromBracket} />} color='red' onClick={doLogout}>
               {impersonating

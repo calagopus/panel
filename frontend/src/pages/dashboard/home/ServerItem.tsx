@@ -119,27 +119,31 @@ export default function ServerItem({
                       <div className='flex flex-row gap-2 min-w-0'>
                         <CopyOnClick content={server.allocation.ipAlias ?? server.allocation.ip} className='min-w-0'>
                           <Card p='xs' hoverable className='leading-[100%] min-w-0 rounded-lg!'>
-                            <p className='text-sm text-gray-400 truncate'>
+                            <p className='text-sm text-(--mantine-color-dimmed) truncate'>
                               {server.allocation.ipAlias ?? server.allocation.ip}
                             </p>
                           </Card>
                         </CopyOnClick>
                         <CopyOnClick content={server.allocation.port.toString()} className='shrink-0'>
                           <Card p='xs' hoverable className='leading-[100%] text-nowrap rounded-lg!'>
-                            <p className='text-sm text-gray-400'>{server.allocation.port.toString()}</p>
+                            <p className='text-sm text-(--mantine-color-dimmed)'>{server.allocation.port.toString()}</p>
                           </Card>
                         </CopyOnClick>
                       </div>
                     ) : (
                       <CopyOnClick content={formatAllocation(server.allocation)} className='min-w-0'>
                         <Card p='xs' hoverable className='leading-[100%] min-w-0 rounded-lg!'>
-                          <p className='text-sm text-gray-400 truncate'>{formatAllocation(server.allocation)}</p>
+                          <p className='text-sm text-(--mantine-color-dimmed) truncate'>
+                            {formatAllocation(server.allocation)}
+                          </p>
                         </Card>
                       </CopyOnClick>
                     )
                   ) : (
                     <Card p='xs' className='leading-[100%] min-w-0 rounded-lg! max-w-full'>
-                      <p className='text-sm text-gray-400 truncate'>{t('common.server.noAllocation', {})}</p>
+                      <p className='text-sm text-(--mantine-color-dimmed) truncate'>
+                        {t('common.server.noAllocation', {})}
+                      </p>
                     </Card>
                   )}
                   {showGroupAddButton && (
@@ -225,7 +229,7 @@ export default function ServerItem({
                       <FontAwesomeIcon icon={faMicrochip} className='size-5 flex-none' />
                       <div>
                         <span className='mr-1'>{stats.cpuAbsolute.toFixed(2)}%</span>
-                        <span className='inline-block text-xs text-gray-400'>/ {cpuLimit}</span>
+                        <span className='inline-block text-xs text-(--mantine-color-dimmed)'>/ {cpuLimit}</span>
                       </div>
                     </div>
 
@@ -236,7 +240,7 @@ export default function ServerItem({
                       <FontAwesomeIcon icon={faMemory} className='size-5 flex-none' />
                       <div>
                         <span className='mr-1'>{bytesToString(stats.memoryBytes)}</span>
-                        <span className='inline-block text-xs text-gray-400'>/ {memoryLimit}</span>
+                        <span className='inline-block text-xs text-(--mantine-color-dimmed)'>/ {memoryLimit}</span>
                       </div>
                     </div>
 
@@ -247,7 +251,7 @@ export default function ServerItem({
                       <FontAwesomeIcon icon={faHardDrive} className='size-5 flex-none' />
                       <div>
                         <span className='mr-1'>{bytesToString(stats.diskBytes)}</span>
-                        <span className='inline-block text-xs text-gray-400'>/ {diskLimit}</span>
+                        <span className='inline-block text-xs text-(--mantine-color-dimmed)'>/ {diskLimit}</span>
                       </div>
                     </div>
                   </div>

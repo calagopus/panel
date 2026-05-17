@@ -137,7 +137,7 @@ export default function DashboardHomeAll() {
       {loading ? (
         <Spinner.Centered />
       ) : servers.total === 0 ? (
-        <p className='text-gray-400'>{t('pages.account.home.noServers', {})}</p>
+        <p className='text-(--mantine-color-dimmed)'>{t('pages.account.home.noServers', {})}</p>
       ) : (
         <div className='gap-4 grid md:grid-cols-2'>
           {servers.data.map((server) => (

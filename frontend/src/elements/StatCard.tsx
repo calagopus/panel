@@ -32,7 +32,7 @@ export default function StatCard({
       </ThemeIcon>
       <div className='flex flex-col ml-4 w-full min-w-0'>
         <div className='w-full flex justify-between'>
-          <span className='text-sm text-left text-gray-400 font-bold'>{label}</span>
+          <span className='text-sm text-left text-(--mantine-color-dimmed) font-bold'>{label}</span>
           {popover && (
             <Popover position='bottom' withArrow shadow='md'>
               <Popover.Target>
@@ -47,13 +47,13 @@ export default function StatCard({
         <span className='text-lg font-bold truncate max-w-full block'>
           {copyOnClick ? (
             <CopyOnClick content={value} className='text-left truncate block'>
-              {value} {limit && <span className='text-sm text-gray-400'>/ {limit}</span>}{' '}
-              {details && <span className='text-sm text-gray-400'>({details})</span>}
+              {value} {limit && <span className='text-sm text-(--mantine-color-dimmed)'>/ {limit}</span>}{' '}
+              {details && <span className='text-sm text-(--mantine-color-dimmed)'>({details})</span>}
             </CopyOnClick>
           ) : (
             <>
-              {value} {limit && <span className='text-sm text-gray-400'>/ {limit}</span>}{' '}
-              {details && <span className='text-sm text-gray-400'>({details})</span>}
+              {value} {limit && <span className='text-sm text-(--mantine-color-dimmed)'>/ {limit}</span>}{' '}
+              {details && <span className='text-sm text-(--mantine-color-dimmed)'>({details})</span>}
             </>
           )}
         </span>

@@ -28,14 +28,11 @@ function TitleCard({
   rightSection,
 }: TitleCardProps) {
   return (
-    <Card withBorder radius='md' p={0} bg='dark.7' className={className}>
+    <Card withBorder radius='md' p={0} className={className}>
       <Group
         id='title-card-header'
-        className={titleClassName}
-        style={{
-          borderBottom: '1px solid var(--mantine-color-dark-5)',
-          background: 'var(--mantine-color-dark-6)',
-        }}
+        className={classNames('bg-(--mantine-color-default) light:bg-(--mantine-color-gray-0)!', titleClassName)}
+        style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}
         gap='sm'
         px='md'
         py='sm'
@@ -43,7 +40,7 @@ function TitleCard({
         {leftSection}
         <Box
           id='title-card-icon'
-          className={iconClassName}
+          className={classNames('bg-(--mantine-color-default-hover) light:bg-(--mantine-color-gray-2)!', iconClassName)}
           style={{
             width: 28,
             height: 28,
@@ -51,12 +48,11 @@ function TitleCard({
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 6,
-            background: 'var(--mantine-color-dark-5)',
           }}
         >
           {icon}
         </Box>
-        <Title order={5} c='gray.2' fw={600}>
+        <Title order={5} fw={600}>
           {title}
         </Title>
         {rightSection}

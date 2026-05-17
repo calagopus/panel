@@ -17,8 +17,8 @@ function CollapsibleSection({ icon, title, className, enabled, onToggle, childre
     <Box
       className={className}
       style={{
-        background: enabled ? 'var(--mantine-color-dark-6)' : 'transparent',
-        border: `1px solid ${enabled ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-dark-5)'}`,
+        background: enabled ? 'var(--mantine-color-default)' : 'transparent',
+        border: `1px solid var(--mantine-color-default-border)`,
         borderRadius: 8,
         overflow: 'hidden',
         transition: 'all 0.15s ease',
@@ -42,14 +42,14 @@ function CollapsibleSection({ icon, title, className, enabled, onToggle, childre
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 6,
-            background: enabled ? 'var(--mantine-color-blue-9)' : 'var(--mantine-color-dark-5)',
+            background: enabled ? 'var(--mantine-color-blue-9)' : 'var(--mantine-color-default-hover)',
             color: enabled ? 'var(--mantine-color-blue-2)' : 'var(--mantine-color-gray-5)',
             transition: 'background 0.15s ease',
           }}
         >
           {icon}
         </Box>
-        <Text size='sm' fw={500} c={enabled ? 'gray.2' : 'gray.5'} style={{ flex: 1, textAlign: 'left' }}>
+        <Text size='sm' fw={500} c={enabled ? undefined : 'dimmed'} style={{ flex: 1, textAlign: 'left' }}>
           {title}
         </Text>
         <FontAwesomeIcon

@@ -1,6 +1,6 @@
 import { faArrowUpRightFromSquare, faGripVertical, faMinus, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Group, Paper, Stack, Text } from '@mantine/core';
+import { Box, Group, Paper, Stack, Text, useComputedColorScheme } from '@mantine/core';
 import { ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import { ServerRouteDefinition } from 'shared';
 import { z } from 'zod';
@@ -49,6 +49,8 @@ export default function RouteOrderEditor({
   languages,
   readOnly = false,
 }: RouteOrderEditorProps) {
+  const isDark = useComputedColorScheme('dark') === 'dark';
+
   const [addType, setAddType] = useState<'route' | 'divider' | 'redirect'>('route');
 
   const counterRef = useRef(0);
@@ -140,7 +142,7 @@ export default function RouteOrderEditor({
               </ActionIcon>
             )}
 
-            <Badge variant='light' color='blue' size='sm' style={{ flexShrink: 0 }}>
+            <Badge variant={isDark ? 'light' : 'filled'} color='blue' size='sm' style={{ flexShrink: 0 }}>
               Route
             </Badge>
 
@@ -186,7 +188,7 @@ export default function RouteOrderEditor({
               </ActionIcon>
             )}
 
-            <Badge variant='light' color='gray' size='sm' style={{ flexShrink: 0 }}>
+            <Badge variant={isDark ? 'light' : 'filled'} color='gray' size='sm' style={{ flexShrink: 0 }}>
               <Group gap={4}>
                 <FontAwesomeIcon icon={faMinus} style={{ fontSize: 10 }} />
                 Divider
@@ -246,7 +248,7 @@ export default function RouteOrderEditor({
                 </ActionIcon>
               )}
 
-              <Badge variant='light' color='orange' size='sm' style={{ flexShrink: 0 }}>
+              <Badge variant={isDark ? 'light' : 'filled'} color='orange' size='sm' style={{ flexShrink: 0 }}>
                 <Group gap={4}>
                   <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize: 10 }} />
                   Redirect

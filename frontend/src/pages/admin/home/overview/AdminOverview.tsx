@@ -93,13 +93,13 @@ export default function AdminOverview() {
             <>
               <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
                 <Card className='flex col-span-2'>
-                  <Title order={3} c='white'>
+                  <Title order={3}>
                     <FontAwesomeIcon icon={faMicrochip} /> {systemOverview.cpu.brand}
                   </Title>
                   CPU
                 </Card>
                 <Card className='flex col-span-2'>
-                  <Title order={3} c='white'>
+                  <Title order={3}>
                     <FontAwesomeIcon icon={faMemory} /> {bytesToString(systemOverview.memory.usedBytes)} /{' '}
                     {bytesToString(systemOverview.memory.totalBytes)} (
                     {((systemOverview.memory.usedBytes / systemOverview.memory.totalBytes) * 100).toFixed(2)}%)
@@ -110,13 +110,13 @@ export default function AdminOverview() {
 
               <div className='grid grid-cols-2 xl:grid-cols-4 gap-4 mt-4'>
                 <Card className='flex'>
-                  <Title order={3} c='white'>
+                  <Title order={3}>
                     <FontAwesomeIcon icon={faServer} /> {systemOverview.kernelVersion}
                   </Title>
                   Kernel Version ({systemOverview.architecture})
                 </Card>
                 <Card className='flex'>
-                  <Title order={3} c='white'>
+                  <Title order={3}>
                     <FontAwesomeIcon
                       icon={
                         systemOverview.containerType === 'unknown'
@@ -139,13 +139,13 @@ export default function AdminOverview() {
                   Container Type
                 </Card>
                 <Card className='flex'>
-                  <Title order={3} c='white'>
+                  <Title order={3}>
                     <FontAwesomeIcon icon={faDatabase} /> PostgreSQL {systemOverview.database.version}
                   </Title>
                   Database Version ({bytesToString(systemOverview.database.sizeBytes)})
                 </Card>
                 <Card className='flex'>
-                  <Title order={3} c='white'>
+                  <Title order={3}>
                     <FontAwesomeIcon icon={faDatabase} /> {systemOverview.cache.version}
                   </Title>
                   Cache Version
@@ -154,28 +154,20 @@ export default function AdminOverview() {
 
               <div className='grid grid-cols-2 xl:grid-cols-4 gap-4 mt-4'>
                 <Card className='flex'>
-                  <Title order={3} c='white'>
-                    {systemOverview.cache.totalCalls}
-                  </Title>
+                  <Title order={3}>{systemOverview.cache.totalCalls}</Title>
                   Cache Calls
                 </Card>
                 <Card className='flex'>
-                  <Title order={3} c='white'>
-                    {systemOverview.cache.totalHits}
-                  </Title>
+                  <Title order={3}>{systemOverview.cache.totalHits}</Title>
                   Cache Hits ({((systemOverview.cache.totalHits / systemOverview.cache.totalCalls) * 100).toFixed(2)}%)
                 </Card>
                 <Card className='flex'>
-                  <Title order={3} c='white'>
-                    {systemOverview.cache.totalMisses}
-                  </Title>
+                  <Title order={3}>{systemOverview.cache.totalMisses}</Title>
                   Cache Misses (
                   {((systemOverview.cache.totalMisses / systemOverview.cache.totalCalls) * 100).toFixed(2)}%)
                 </Card>
                 <Card className='flex'>
-                  <Title order={3} c='white'>
-                    {(systemOverview.cache.averageCallLatencyNs / 1_000 / 1_000).toFixed(2)} ms
-                  </Title>
+                  <Title order={3}>{(systemOverview.cache.averageCallLatencyNs / 1_000 / 1_000).toFixed(2)} ms</Title>
                   Avg. Cached Call Latency
                 </Card>
               </div>
@@ -189,49 +181,49 @@ export default function AdminOverview() {
           ) : (
             <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   <FontAwesomeIcon icon={faUsers} /> {generalStats.users}
                 </Title>
                 Users
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   <FontAwesomeIcon icon={faComputer} /> {generalStats.servers}
                 </Title>
                 Servers
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   <FontAwesomeIcon icon={faEarth} /> {generalStats.locations}
                 </Title>
                 Locations
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   <FontAwesomeIcon icon={faServer} /> {generalStats.nodes}
                 </Title>
                 Nodes
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   <FontAwesomeIcon icon={faEgg} /> {generalStats.nestEggs}
                 </Title>
                 Nest Eggs
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   <FontAwesomeIcon icon={faDatabase} /> {generalStats.databaseHosts}
                 </Title>
                 Database Hosts
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   <FontAwesomeIcon icon={faArchive} /> {generalStats.backupConfigurations}
                 </Title>
                 Backup Configurations
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   <FontAwesomeIcon icon={faScroll} /> {generalStats.roles}
                 </Title>
                 Roles
@@ -246,124 +238,100 @@ export default function AdminOverview() {
           ) : (
             <div className='grid grid-cols-2 xl:grid-cols-5 gap-4'>
               <Card className='col-span-2 xl:col-span-1'>
-                <Title order={3} c='white'>
-                  All Time
-                </Title>
+                <Title order={3}>All Time</Title>
               </Card>
 
               <Card className='flex'>
-                <Title order={3} c='white'>
-                  {backupStats.allTime.total}
-                </Title>
+                <Title order={3}>{backupStats.allTime.total}</Title>
                 Total backups all time
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   {backupStats.allTime.successful} ({bytesToString(backupStats.allTime.successfulBytes)})
                 </Title>
                 Successful backups all time
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
-                  {backupStats.allTime.failed}
-                </Title>
+                <Title order={3}>{backupStats.allTime.failed}</Title>
                 Failed backups all time
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   {backupStats.allTime.deleted} ({bytesToString(backupStats.allTime.deletedBytes)})
                 </Title>
                 Deleted backups all time
               </Card>
 
               <Card className='col-span-2 xl:col-span-1'>
-                <Title order={3} c='white'>
-                  Today
-                </Title>
+                <Title order={3}>Today</Title>
               </Card>
 
               <Card className='flex'>
-                <Title order={3} c='white'>
-                  {backupStats.today.total}
-                </Title>
+                <Title order={3}>{backupStats.today.total}</Title>
                 Total backups today
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   {backupStats.today.successful} ({bytesToString(backupStats.today.successfulBytes)})
                 </Title>
                 Successful backups today
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
-                  {backupStats.today.failed}
-                </Title>
+                <Title order={3}>{backupStats.today.failed}</Title>
                 Failed backups today
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   {backupStats.today.deleted} ({bytesToString(backupStats.today.deletedBytes)})
                 </Title>
                 Deleted backups today
               </Card>
 
               <Card className='col-span-2 xl:col-span-1'>
-                <Title order={3} c='white'>
-                  This Week
-                </Title>
+                <Title order={3}>This Week</Title>
               </Card>
 
               <Card className='flex'>
-                <Title order={3} c='white'>
-                  {backupStats.week.total}
-                </Title>
+                <Title order={3}>{backupStats.week.total}</Title>
                 Total backups this week
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   {backupStats.week.successful} ({bytesToString(backupStats.week.successfulBytes)})
                 </Title>
                 Successful backups this week
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
-                  {backupStats.week.failed}
-                </Title>
+                <Title order={3}>{backupStats.week.failed}</Title>
                 Failed backups this week
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   {backupStats.week.deleted} ({bytesToString(backupStats.week.deletedBytes)})
                 </Title>
                 Deleted backups this week
               </Card>
 
               <Card className='col-span-2 xl:col-span-1'>
-                <Title order={3} c='white'>
-                  This Month
-                </Title>
+                <Title order={3}>This Month</Title>
               </Card>
 
               <Card className='flex'>
-                <Title order={3} c='white'>
-                  {backupStats.month.total}
-                </Title>
+                <Title order={3}>{backupStats.month.total}</Title>
                 Total backups this month
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   {backupStats.month.successful} ({bytesToString(backupStats.month.successfulBytes)})
                 </Title>
                 Successful backups this month
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
-                  {backupStats.month.failed}
-                </Title>
+                <Title order={3}>{backupStats.month.failed}</Title>
                 Failed backups this month
               </Card>
               <Card className='flex'>
-                <Title order={3} c='white'>
+                <Title order={3}>
                   {backupStats.month.deleted} ({bytesToString(backupStats.month.deletedBytes)})
                 </Title>
                 Deleted backups this month

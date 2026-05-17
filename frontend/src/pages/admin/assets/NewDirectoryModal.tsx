@@ -56,7 +56,7 @@ export default function NewDirectoryModal({
         />
 
         <p className='mt-2 text-sm break-all'>
-          <span className='text-neutral-200'>Will be created at </span>
+          <span>Will be created at </span>
           <Code>
             assets/
             <span className='text-cyan-200'>

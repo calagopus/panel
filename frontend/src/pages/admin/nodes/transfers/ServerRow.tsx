@@ -1,9 +1,9 @@
 import { forwardRef, memo, useRef } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import Progress from '@/elements/Progress.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminNodeTransferProgressSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -35,9 +35,9 @@ const ServerRow = memo(
     return (
       <TableRow ref={ref}>
         <TableData>
-          <NavLink to={`/admin/servers/${server.uuid}`} className='text-blue-400 hover:text-blue-200 hover:underline'>
+          <TableLink to={`/admin/servers/${server.uuid}`}>
             <Code>{server.uuid}</Code>
-          </NavLink>
+          </TableLink>
         </TableData>
 
         <TableData>
@@ -56,21 +56,15 @@ const ServerRow = memo(
         <TableData>{server.name}</TableData>
 
         <TableData>
-          <NavLink
-            to={`/admin/nodes/${server.node.uuid}`}
-            className='text-blue-400 hover:text-blue-200 hover:underline'
-          >
+          <TableLink to={`/admin/nodes/${server.node.uuid}`}>
             <Code>{server.node.name}</Code>
-          </NavLink>
+          </TableLink>
         </TableData>
 
         <TableData>
-          <NavLink
-            to={`/admin/users/${server.owner.uuid}`}
-            className='text-blue-400 hover:text-blue-200 hover:underline'
-          >
+          <TableLink to={`/admin/users/${server.owner.uuid}`}>
             <Code>{server.owner.username}</Code>
-          </NavLink>
+          </TableLink>
         </TableData>
 
         <TableData>

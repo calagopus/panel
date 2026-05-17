@@ -1,4 +1,4 @@
-import { Group, Title, TitleOrder } from '@mantine/core';
+import { Group, Text, Title, TitleOrder } from '@mantine/core';
 import { Dispatch, ReactNode, SetStateAction, useMemo } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
@@ -60,10 +60,12 @@ function AccountContentContainer(props: Props) {
         {hideTitleComponent ? null : setSearch ? (
           <Group justify='space-between' mb='md'>
             <div>
-              <Title order={titleOrder} c='white'>
-                {title}
-              </Title>
-              {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+              <Title order={titleOrder}>{title}</Title>
+              {subtitle ? (
+                <Text size='xs' c='dimmed'>
+                  {subtitle}
+                </Text>
+              ) : null}
             </div>
             <Group>
               <TextInput
@@ -78,19 +80,23 @@ function AccountContentContainer(props: Props) {
         ) : contentRight ? (
           <Group justify='space-between' mb='md'>
             <div>
-              <Title order={titleOrder} c='white'>
-                {title}
-              </Title>
-              {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+              <Title order={titleOrder}>{title}</Title>
+              {subtitle ? (
+                <Text size='xs' c='dimmed'>
+                  {subtitle}
+                </Text>
+              ) : null}
             </div>
             <Group>{contentRight}</Group>
           </Group>
         ) : (
           <div className='mb-4'>
-            <Title order={titleOrder} c='white'>
-              {title}
-            </Title>
-            {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+            <Title order={titleOrder}>{title}</Title>
+            {subtitle ? (
+              <Text size='xs' c='dimmed'>
+                {subtitle}
+              </Text>
+            ) : null}
           </div>
         )}
         {registry?.prependedContentComponents.map((Component, index) => (

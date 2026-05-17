@@ -1,7 +1,7 @@
 import { faCopy, faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { forwardRef, useState } from 'react';
-import { createSearchParams, NavLink } from 'react-router';
+import { createSearchParams } from 'react-router';
 import { z } from 'zod';
 import deleteAssets from '@/api/admin/assets/deleteAssets.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -10,6 +10,7 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { handleRawCopyToClipboard } from '@/lib/copy.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
@@ -67,13 +68,13 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
         </td>
 
         <TableData colSpan={3}>
-          <NavLink
+          <TableLink
             to={`?${createSearchParams({ directory: asset.name })}`}
-            className='flex items-center gap-2 text-blue-300 hover:text-blue-200'
+            className='flex items-center gap-2'
             onClick={(e) => e.preventDefault()}
           >
             <Code>{displayName}</Code>
-          </NavLink>
+          </TableLink>
         </TableData>
 
         <td />
@@ -137,9 +138,9 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
             </td>
 
             <TableData>
-              <NavLink to={asset.url} target='_blank' className='text-blue-400 hover:text-blue-200 hover:underline'>
+              <TableLink to={asset.url} target='_blank'>
                 <Code>{displayName}</Code>
-              </NavLink>
+              </TableLink>
             </TableData>
 
             <TableData>{bytesToString(asset.size)}</TableData>

@@ -1,4 +1,4 @@
-import { MantineProvider, type MantineThemeOverride, v8CssVariablesResolver } from '@mantine/core';
+import { MantineProvider, type MantineThemeOverride } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createBrowserHistory } from 'history';
@@ -96,12 +96,7 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
 
   return Object.keys(settings).length > 0 ? (
     <ErrorBoundary>
-      <MantineProvider
-        theme={theme}
-        forceColorScheme='dark'
-        cssVariablesResolver={v8CssVariablesResolver}
-        deduplicateInlineStyles
-      >
+      <MantineProvider theme={theme} defaultColorScheme='dark' deduplicateInlineStyles>
         <QueryClientProvider client={queryClient}>
           <TranslationProvider>
             <ToastProvider>

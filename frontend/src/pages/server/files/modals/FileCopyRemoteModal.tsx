@@ -110,7 +110,7 @@ export default function FileCopyRemoteModal({ files, opened, onClose }: Props) {
         </Stack>
 
         <p className='mt-2 text-sm md:text-base break-all'>
-          <span className='text-neutral-200'>{t('pages.server.files.modal.copyRemote.createdAs', {})}</span>
+          <span>{t('pages.server.files.modal.copyRemote.createdAs', {})}</span>
           <Code>
             /home/container/
             <span className='text-cyan-200'>{form.values.destination.replace(/^(\.\.\/|\/)+/, '')}</span>

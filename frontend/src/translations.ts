@@ -217,6 +217,8 @@ const baseTranslations = defineTranslations({
           openInVirtualWindow: 'Open in Virtual Window',
           openInPopup: 'Open in Popup',
           openInNewTab: 'Open in New Tab',
+          switchToDark: 'Switch to Dark Mode',
+          switchToLight: 'Switch to Light Mode',
         },
       },
       permissionSelector: {

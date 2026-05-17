@@ -10,8 +10,9 @@ import {
   PointElement,
 } from 'chart.js';
 import 'chartjs-adapter-moment';
+import { useComputedColorScheme } from '@mantine/core';
 import { deepmerge, deepmergeCustom } from 'deepmerge-ts';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { hexToRgba } from '@/lib/color.ts';
 
 ChartJS.register(LineElement, PointElement, Filler, LinearScale, StreamingPlugin);
@@ -38,9 +39,7 @@ const defaultOptions: ChartOptions<'line'> = {
     y: {
       type: 'linear',
       min: 0,
-      grid: { display: true, color: '#424242' },
-      ticks: { color: '#f3f4f6', count: 3, font: { size: 11, weight: 'lighter' } },
-      border: { color: '#424242' },
+      ticks: { count: 3, font: { size: 11, weight: 'lighter' } },
     },
   },
   elements: {
@@ -54,10 +53,39 @@ function getOptions(opts?: Partial<ChartOptions<'line'>>): ChartOptions<'line'> 
   return deepmerge(defaultOptions, opts ?? {});
 }
 
-type ChartDatasetCallback = (value: ChartDataset<'line'>, index: number) => ChartDataset<'line'>;
+function getDatasetColors(isDark: boolean, index: number) {
+  const colors = [
+    {
+      borderColor: isDark ? '#22d3ee' : '#0891b2',
+      backgroundColor: hexToRgba(isDark ? '#0e7490' : '#0891b2', isDark ? 0.5 : 0.15),
+    },
+    {
+      borderColor: isDark ? '#facc15' : '#d97706',
+      backgroundColor: hexToRgba(isDark ? '#a16207' : '#d97706', isDark ? 0.5 : 0.15),
+    },
+  ];
 
-function getEmptyData(label: string, sets = 1, callback?: ChartDatasetCallback): ChartData<'line'> {
-  const next = callback || ((v) => v);
+  return colors[index];
+}
+
+function getThemeOverrides(isDark: boolean): Partial<ChartOptions<'line'>> {
+  const gridColor = isDark ? '#424242' : '#e5e7eb';
+  const tickColor = isDark ? '#f3f4f6' : '#374151';
+  return {
+    scales: {
+      y: {
+        grid: { display: true, color: gridColor },
+        ticks: { color: tickColor },
+        border: { color: gridColor },
+      },
+    },
+  };
+}
+
+type ChartDatasetCallback = (value: ChartDataset<'line'>, index: number, isDark: boolean) => ChartDataset<'line'>;
+
+function getEmptyData(label: string, sets = 1, callback?: ChartDatasetCallback, isDark = true): ChartData<'line'> {
+  const next = callback || ((v: ChartDataset<'line'>) => v);
 
   return {
     datasets: Array(sets)
@@ -68,10 +96,10 @@ function getEmptyData(label: string, sets = 1, callback?: ChartDatasetCallback):
             fill: true,
             label,
             data: [],
-            borderColor: '#22d3ee',
-            backgroundColor: hexToRgba('#0e7490', 0.5),
+            ...getDatasetColors(isDark, index),
           },
           index,
+          isDark,
         ),
       ),
   };
@@ -86,12 +114,33 @@ interface UseChartOptions {
 }
 
 function useChart(label: string, opts?: UseChartOptions) {
-  const options =
+  const isDark = useComputedColorScheme('dark') === 'dark';
+  const baseOptions =
     typeof opts?.options === 'number'
       ? getOptions({ scales: { y: { min: 0, suggestedMax: opts.options } } })
       : getOptions(opts?.options);
+  const options = deepmerge(baseOptions, getThemeOverrides(isDark)) as ChartOptions<'line'>;
 
-  const [data, setData] = useState(getEmptyData(label, opts?.sets || 1, opts?.callback));
+  const [data, setData] = useState(() => getEmptyData(label, opts?.sets || 1, opts?.callback, isDark));
+
+  const callbackRef = useRef(opts?.callback);
+  useEffect(() => {
+    callbackRef.current = opts?.callback;
+  });
+
+  useEffect(() => {
+    setData((state) => ({
+      ...state,
+      datasets: state.datasets.map((ds, index) => {
+        const colors = getDatasetColors(isDark, index);
+        if (callbackRef.current) {
+          const result = callbackRef.current({ ...ds, ...colors, data: [] }, index, isDark);
+          return { ...ds, ...colors, ...result, data: ds.data };
+        }
+        return { ...ds, ...colors };
+      }),
+    }));
+  }, [isDark]);
 
   const push = (items: number | (number | null)[]) => {
     const time = Date.now();

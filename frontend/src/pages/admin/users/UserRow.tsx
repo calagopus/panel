@@ -1,9 +1,9 @@
 import { faCrown, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { isAdmin } from '@/lib/permissions.ts';
@@ -19,9 +19,9 @@ export default function UserRow({ user }: { user: z.infer<typeof fullUserSchema>
       </TableData>
 
       <TableData>
-        <NavLink to={`/admin/users/${user.uuid}`} className='text-blue-400 hover:text-blue-200 hover:underline'>
+        <TableLink to={`/admin/users/${user.uuid}`}>
           <Code>{user.uuid}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       <TableData>
@@ -45,18 +45,7 @@ export default function UserRow({ user }: { user: z.infer<typeof fullUserSchema>
       </TableData>
 
       <TableData>
-        <Code>
-          {user.role ? (
-            <NavLink
-              to={`/admin/roles/${user.role.uuid}`}
-              className='text-blue-400 hover:text-blue-200 hover:underline'
-            >
-              {user.role.name}
-            </NavLink>
-          ) : (
-            '-'
-          )}
-        </Code>
+        <Code>{user.role ? <TableLink to={`/admin/roles/${user.role.uuid}`}>{user.role.name}</TableLink> : '-'}</Code>
       </TableData>
 
       <TableData>

@@ -1,10 +1,10 @@
 import { forwardRef } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
@@ -56,12 +56,9 @@ const EggRow = forwardRef<HTMLTableRowElement, EggRowProps>(function EggRow(
       )}
 
       <TableData>
-        <NavLink
-          to={`/admin/nests/${nest.uuid}/eggs/${egg.uuid}`}
-          className='text-blue-400 hover:text-blue-200 hover:underline'
-        >
+        <TableLink to={`/admin/nests/${nest.uuid}/eggs/${egg.uuid}`}>
           <Code>{egg.uuid}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       <TableData>{egg.name}</TableData>

@@ -123,7 +123,7 @@ export default function VariableContainer({
               }
             />
           )}
-          <p className='text-gray-400 text-sm mt-4'>{description?.md()}</p>
+          <p className='text-(--mantine-color-dimmed) text-sm mt-4'>{description?.md()}</p>
         </div>
         {!variable.isEditable ? <Badge className='min-w-fit ml-4'>{t('common.readOnly', {})}</Badge> : null}
       </div>

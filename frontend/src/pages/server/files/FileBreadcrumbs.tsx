@@ -69,7 +69,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
             })}`
           : `/server/${server?.uuidShort}/files`
       }
-      className=' text-blue-300 hover:text-blue-200'
+      className='text-(--mantine-color-anchor) hover:underline'
     >
       {browsingBackup ? browsingBackup.name : 'container'}
     </NavLink>,
@@ -80,7 +80,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
         <NavLink
           key={item.path}
           to={`/server/${server?.uuidShort}/files?${createSearchParams({ directory: join('/', item.path) })}`}
-          className=' text-blue-300 hover:text-blue-200'
+          className='text-(--mantine-color-anchor) hover:underline'
           onClick={() => setBrowsingDirectory(item.path)}
         >
           {item.name}
@@ -131,7 +131,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
             </ActionIcon>
           </Tooltip>
           <Button
-            variant='light'
+            variant='outline'
             leftSection={<FontAwesomeIcon icon={faSearch} />}
             onClick={() => doOpenModal('search')}
           >

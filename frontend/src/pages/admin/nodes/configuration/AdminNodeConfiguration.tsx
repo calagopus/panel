@@ -89,7 +89,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
     >
       <Stack gap='xl'>
         <div>
-          <Title order={4} c='white' mb='md'>
+          <Title order={4} mb='md'>
             Initial Setup
           </Title>
           <div className='grid md:grid-cols-4 grid-cols-1 gap-4'>
@@ -146,7 +146,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
         <Divider />
 
         <div>
-          <Title order={4} c='white' mb='md'>
+          <Title order={4} mb='md'>
             Live Configuration
           </Title>
           {liveConfigError ? (

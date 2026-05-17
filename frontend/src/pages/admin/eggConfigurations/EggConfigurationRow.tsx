@@ -1,7 +1,7 @@
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminEggConfigurationSchema } from '@/lib/schemas/admin/eggConfigurations.ts';
 
@@ -13,12 +13,9 @@ export default function EggConfigurationRow({
   return (
     <TableRow>
       <TableData>
-        <NavLink
-          to={`/admin/egg-configurations/${eggConfiguration.uuid}`}
-          className='text-blue-400 hover:text-blue-200 hover:underline'
-        >
+        <TableLink to={`/admin/egg-configurations/${eggConfiguration.uuid}`}>
           <Code>{eggConfiguration.uuid}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       <TableData>{eggConfiguration.order}</TableData>
