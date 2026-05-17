@@ -24,7 +24,6 @@ import Spinner from '@/elements/Spinner.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { useChart, useChartTickLabel } from '@/lib/chart.ts';
-import { hexToRgba } from '@/lib/color.ts';
 import { getNodeUrl } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString } from '@/lib/size.ts';
@@ -78,12 +77,7 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
       },
     },
     callback(opts, index) {
-      return {
-        ...opts,
-        label: !index ? 'Disk Read' : 'Disk Write',
-        borderColor: !index ? '#22d3ee' : '#facc15', // cyan-400 & yellow-400
-        backgroundColor: hexToRgba(!index ? '#0e7490' : '#a16207', 0.5), // cyan-700 & yellow-700
-      };
+      return { ...opts, label: !index ? 'Disk Read' : 'Disk Write' };
     },
   });
   const network = useChart('Network', {
@@ -100,12 +94,7 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
       },
     },
     callback(opts, index) {
-      return {
-        ...opts,
-        label: !index ? 'Network In' : 'Network Out',
-        borderColor: !index ? '#22d3ee' : '#facc15', // cyan-400 & yellow-400
-        backgroundColor: hexToRgba(!index ? '#0e7490' : '#a16207', 0.5), // cyan-700 & yellow-700
-      };
+      return { ...opts, label: !index ? 'Network In' : 'Network Out' };
     },
   });
 
@@ -232,10 +221,10 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                   legend={
                     <>
                       <Tooltip label='Disk Read'>
-                        <FontAwesomeIcon icon={faSearch} className='mr-2 h-4 w-4 text-yellow-400' />
+                        <FontAwesomeIcon icon={faSearch} className='mr-2 h-4 w-4 text-cyan-400 light:text-cyan-600' />
                       </Tooltip>
                       <Tooltip label='Disk Write'>
-                        <FontAwesomeIcon icon={faPen} className='h-4 w-4 text-cyan-400' />
+                        <FontAwesomeIcon icon={faPen} className='h-4 w-4 text-yellow-400 light:text-amber-600' />
                       </Tooltip>
                     </>
                   }
@@ -248,10 +237,16 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                   legend={
                     <>
                       <Tooltip label='Inbound'>
-                        <FontAwesomeIcon icon={faCloudArrowDown} className='mr-2 h-4 w-4 text-yellow-400' />
+                        <FontAwesomeIcon
+                          icon={faCloudArrowDown}
+                          className='mr-2 h-4 w-4 text-cyan-400 light:text-cyan-600'
+                        />
                       </Tooltip>
                       <Tooltip label='Outbound'>
-                        <FontAwesomeIcon icon={faCloudArrowUp} className='h-4 w-4 text-cyan-400' />
+                        <FontAwesomeIcon
+                          icon={faCloudArrowUp}
+                          className='h-4 w-4 text-yellow-400 light:text-amber-600'
+                        />
                       </Tooltip>
                     </>
                   }
