@@ -1,6 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import deleteEggMount from '@/api/admin/nests/eggs/mounts/deleteEggMount.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -8,6 +7,7 @@ import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
@@ -72,12 +72,9 @@ export default function EggMountRow({
             }}
           >
             <TableData>
-              <NavLink
-                to={`/admin/mounts/${mount.mount.uuid}`}
-                className='text-blue-400 hover:text-blue-200 hover:underline'
-              >
+              <TableLink to={`/admin/mounts/${mount.mount.uuid}`}>
                 <Code>{mount.mount.uuid}</Code>
-              </NavLink>
+              </TableLink>
             </TableData>
             <TableData>{mount.mount.name}</TableData>
             <TableData>

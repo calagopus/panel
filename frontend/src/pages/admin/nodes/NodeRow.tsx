@@ -1,7 +1,6 @@
 import { faGlobe, faHeart, faHeartBroken } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { forwardRef, useEffect, useState } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
 import Code from '@/elements/Code.tsx';
@@ -9,6 +8,7 @@ import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/ContextM
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { getNodeUrl, isNodeAIO } from '@/lib/node.ts';
@@ -99,9 +99,9 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
       </TableData>
 
       <TableData>
-        <NavLink to={`/admin/nodes/${node.uuid}`} className='text-blue-400 hover:text-blue-200 hover:underline'>
+        <TableLink to={`/admin/nodes/${node.uuid}`}>
           <Code>{node.uuid}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       {desync !== undefined && <TableData>{desync}ms</TableData>}
@@ -127,12 +127,9 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
       </TableData>
 
       <TableData>
-        <NavLink
-          to={`/admin/locations/${node.location.uuid}`}
-          className='text-blue-400 hover:text-blue-200 hover:underline'
-        >
+        <TableLink to={`/admin/locations/${node.location.uuid}`}>
           <Code>{node.location.name}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       <TableData>

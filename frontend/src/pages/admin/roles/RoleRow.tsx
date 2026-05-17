@@ -1,7 +1,7 @@
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { roleSchema } from '@/lib/schemas/user.ts';
 
@@ -9,9 +9,9 @@ export default function RoleRow({ role }: { role: z.infer<typeof roleSchema> }) 
   return (
     <TableRow>
       <TableData>
-        <NavLink to={`/admin/roles/${role.uuid}`} className='text-blue-400 hover:text-blue-200 hover:underline'>
+        <TableLink to={`/admin/roles/${role.uuid}`}>
           <Code>{role.uuid}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       <TableData>{role.name}</TableData>

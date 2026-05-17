@@ -159,7 +159,7 @@ export default ({ columns, loading, pagination, onPageSelect, allowSelect = true
       style={{
         borderRadius: 'var(--mantine-radius-md)',
         border: '1px solid var(--mantine-color-default-border)',
-        background: 'var(--mantine-color-body)',
+        background: 'var(--mantine-color-default)',
       }}
     >
       {pagination && onPageSelect && pagination.total > pagination.perPage && (

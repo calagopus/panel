@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import getDatabaseSize from '@/api/server/databases/getDatabaseSize.ts';
 import Code from '@/elements/Code.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { adminServerDatabaseSchema } from '@/lib/schemas/admin/servers.ts';
@@ -28,12 +28,9 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof adm
         <TableData>{database.name}</TableData>
 
         <TableData>
-          <NavLink
-            to={`/admin/servers/${database.server.uuid}`}
-            className='text-blue-400 hover:text-blue-200 hover:underline'
-          >
+          <TableLink to={`/admin/servers/${database.server.uuid}`}>
             <Code>{database.server.name}</Code>
-          </NavLink>
+          </TableLink>
         </TableData>
 
         <TableData>{databaseTypeLabelMapping[database.type]}</TableData>
