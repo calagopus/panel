@@ -47,7 +47,9 @@ mod post {
         let mut deleted = 0;
 
         while let Some(result) = results_stream.next().await {
-            if result.is_ok() {
+            if let Err(err) = result {
+                tracing::warn!("failed to delete asset: {:?}", err);
+            } else {
                 deleted += 1;
             }
         }

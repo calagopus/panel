@@ -4,7 +4,7 @@ import { Group, Title } from '@mantine/core';
 import { type OnMount } from '@monaco-editor/react';
 import { join } from 'pathe';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
-import { createSearchParams, useNavigate, useParams, useSearchParams } from 'react-router';
+import { createSearchParams, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
@@ -47,6 +47,7 @@ function FileEditorComponent() {
   const { t } = useTranslations();
   const [searchParams, _] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const {
@@ -72,13 +73,22 @@ function FileEditorComponent() {
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const contentRef = useRef(content);
-  const blocker = useBlocker(dirty);
+  const blocker = useBlocker(dirty, false, (tx) => {
+    if (!tx.location.pathname.includes('/files/diff')) return true;
+    return new URLSearchParams(tx.location.search).has('previousRevision');
+  });
   const editorContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setBrowsingDirectory(searchParams.get('directory') || '/');
     setFileName(searchParams.get('file') || '');
   }, [searchParams]);
+
+  useEffect(() => {
+    if (location.state?.openRevisions) {
+      setRevisionsOpen(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!browsingDirectory || !fileName) return;
@@ -264,6 +274,7 @@ function FileEditorComponent() {
         onClose={() => blocker.reset()}
         onConfirmed={() => blocker.proceed()}
         confirm={t('pages.server.files.modal.unsavedChanges.button.leave', {})}
+        zIndex={300}
       >
         {t('pages.server.files.modal.unsavedChanges.content', {}).md()}
       </ConfirmationModal>
@@ -272,6 +283,7 @@ function FileEditorComponent() {
         filePath={join(browsingDirectory, fileName)}
         opened={revisionsOpen}
         onClose={() => setRevisionsOpen(false)}
+        getContent={() => editorRef.current?.getValue()}
         onRestore={(newContent) => {
           editorRef.current?.setValue(newContent);
           setDirty(true);
@@ -327,7 +339,6 @@ function FileEditorComponent() {
                 <MonacoEditor
                   height='100%'
                   width='100%'
-                  theme='vs-dark'
                   defaultValue={content}
                   path={fileName}
                   options={{

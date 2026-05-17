@@ -74,8 +74,11 @@ mod post {
         {
             Ok(Ok(_)) => {}
             Ok(Err(err)) => {
+                let (err, status) = shared::response::extract_readable_error(&err)
+                    .unwrap_or_else(|| (err.to_string(), StatusCode::INTERNAL_SERVER_ERROR));
+
                 return ApiResponse::error(format!("failed to send test email: {err}"))
-                    .with_status(StatusCode::INTERNAL_SERVER_ERROR)
+                    .with_status(status)
                     .ok();
             }
             Err(_) => {

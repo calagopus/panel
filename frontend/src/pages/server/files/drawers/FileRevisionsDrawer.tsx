@@ -1,8 +1,9 @@
-import { faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsLeftRight, faCodeCompare, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DrawerProps, ScrollArea, Stack } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileRevisionContent from '@/api/server/files/getFileRevisionContent.ts';
@@ -24,17 +25,25 @@ import { useServerStore } from '@/stores/server.ts';
 interface Props extends DrawerProps {
   filePath: string;
   onRestore: (content: string) => void;
+  getContent?: () => string | undefined;
 }
 
 function RevisionRow({
   revision,
+  filePath,
+  previousRevisionId,
   onRestore,
+  getContent,
 }: {
   revision: z.infer<typeof serverFileRevisionSchema>;
+  filePath: string;
+  previousRevisionId: number | null;
   onRestore: (content: string) => void;
+  getContent?: () => string | undefined;
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const server = useServerStore((state) => state.server);
   const [loading, setLoading] = useState(false);
 
@@ -47,6 +56,27 @@ function RevisionRow({
       })
       .catch((err) => addToast(httpErrorToHuman(err), 'error'))
       .finally(() => setLoading(false));
+  };
+
+  const handleViewDiff = () => {
+    const currentContent = getContent?.();
+    navigate(
+      `/server/${server.uuidShort}/files/diff?${createSearchParams({
+        file: filePath,
+        revision: String(revision.id),
+      })}`,
+      currentContent !== undefined ? { state: { currentContent } } : undefined,
+    );
+  };
+
+  const handleCompareToPrevious = () => {
+    navigate(
+      `/server/${server.uuidShort}/files/diff?${createSearchParams({
+        file: filePath,
+        revision: String(revision.id),
+        previousRevision: String(previousRevisionId),
+      })}`,
+    );
   };
 
   return (
@@ -77,17 +107,31 @@ function RevisionRow({
             <span>{bytesToString(revision.size)}</span>
           </div>
         </div>
-        <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.restore', {})}>
-          <ActionIcon size='sm' variant='subtle' color='gray' loading={loading} onClick={handleRestore}>
-            <FontAwesomeIcon icon={faRotateLeft} />
-          </ActionIcon>
-        </Tooltip>
+        <div className='flex items-center gap-1'>
+          <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.viewDiff', {})}>
+            <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleViewDiff}>
+              <FontAwesomeIcon icon={faCodeCompare} />
+            </ActionIcon>
+          </Tooltip>
+          {previousRevisionId !== null && (
+            <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.compareToPrevious', {})}>
+              <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleCompareToPrevious}>
+                <FontAwesomeIcon icon={faArrowsLeftRight} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.restore', {})}>
+            <ActionIcon size='sm' variant='subtle' color='gray' loading={loading} onClick={handleRestore}>
+              <FontAwesomeIcon icon={faRotateLeft} />
+            </ActionIcon>
+          </Tooltip>
+        </div>
       </div>
     </Card>
   );
 }
 
-export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClose, ...props }: Props) {
+export default function FileRevisionsDrawer({ filePath, onRestore, getContent, opened, onClose, ...props }: Props) {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
 
@@ -105,7 +149,7 @@ export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClo
       opened={opened}
       onClose={onClose}
       title={t('pages.server.files.drawer.revisions.title', {})}
-      size='sm'
+      size='lg'
       {...props}
     >
       <Stack gap='md' className='h-full'>
@@ -118,10 +162,13 @@ export default function FileRevisionsDrawer({ filePath, onRestore, opened, onClo
             </div>
           ) : (
             <Stack gap='xs'>
-              {revisions.map((revision) => (
+              {revisions.map((revision, index) => (
                 <RevisionRow
                   key={revision.id}
                   revision={revision}
+                  filePath={filePath}
+                  previousRevisionId={revisions[index + 1]?.id ?? null}
+                  getContent={getContent}
                   onRestore={(content) => {
                     onRestore(content);
                     onClose();
