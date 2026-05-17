@@ -143,12 +143,13 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
               <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
                 <Card>
                   <Group grow>
-                    <SemiCircleProgress
-                      value={stats.cpu.used}
-                      label={<>{stats.cpu.used.toFixed(1)}%</>}
-                      filledSegmentColor={stats.cpu.used >= 90 ? 'red' : undefined}
-                      mr='md'
-                    />
+                    <div className='flex justify-center'>
+                      <SemiCircleProgress
+                        value={stats.cpu.used}
+                        label={<>{stats.cpu.used.toFixed(1)}%</>}
+                        filledSegmentColor={stats.cpu.used >= 90 ? 'red' : undefined}
+                      />
+                    </div>
                     <div className='flex flex-col text-right flex-1'>
                       <Title order={2}>CPU</Title>
                       <h2>
@@ -159,12 +160,13 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                 </Card>
                 <Card>
                   <Group grow>
-                    <SemiCircleProgress
-                      value={(stats.memory.used / stats.memory.total) * 100}
-                      label={<>{((stats.memory.used / stats.memory.total) * 100).toFixed(1)}%</>}
-                      filledSegmentColor={stats.memory.used / stats.memory.total >= 0.9 ? 'red' : undefined}
-                      mr='md'
-                    />
+                    <div className='flex justify-center'>
+                      <SemiCircleProgress
+                        value={(stats.memory.used / stats.memory.total) * 100}
+                        label={<>{((stats.memory.used / stats.memory.total) * 100).toFixed(1)}%</>}
+                        filledSegmentColor={stats.memory.used / stats.memory.total >= 0.9 ? 'red' : undefined}
+                      />
+                    </div>
                     <div className='flex flex-col text-right flex-1'>
                       <Title order={2}>Memory</Title>
                       <h2>
@@ -176,12 +178,13 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                 </Card>
                 <Card>
                   <Group grow>
-                    <SemiCircleProgress
-                      value={(stats.disk.used / stats.disk.total) * 100}
-                      label={<>{((stats.disk.used / stats.disk.total) * 100).toFixed(1)}%</>}
-                      filledSegmentColor={stats.disk.used / stats.disk.total >= 0.9 ? 'red' : undefined}
-                      mr='md'
-                    />
+                    <div className='flex justify-center'>
+                      <SemiCircleProgress
+                        value={(stats.disk.used / stats.disk.total) * 100}
+                        label={<>{((stats.disk.used / stats.disk.total) * 100).toFixed(1)}%</>}
+                        filledSegmentColor={stats.disk.used / stats.disk.total >= 0.9 ? 'red' : undefined}
+                      />
+                    </div>
                     <div className='flex flex-col text-right flex-1'>
                       <Title order={2}>Disk</Title>
                       <h2>
@@ -192,7 +195,9 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                 </Card>
                 <Card>
                   <Group grow>
-                    <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' mr='md' />
+                    <div className='flex justify-center'>
+                      <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' />
+                    </div>
                     <div className='flex flex-col text-right flex-1'>
                       <Title order={2}>Network</Title>
                       <h2>
