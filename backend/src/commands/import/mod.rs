@@ -157,7 +157,41 @@ where
             .collect::<Result<Vec<_>, _>>()?
             .join(", ")
     } else {
-        "*".to_string()
+        let info_query = format!(
+            "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS \
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{table}' \
+             ORDER BY ORDINAL_POSITION"
+        );
+        let columns: Vec<DB::Row> = sqlx::query::<DB>(&info_query)
+            .fetch_all(source_database)
+            .await?;
+        if columns.is_empty() {
+            "*".to_string()
+        } else {
+            columns
+                .into_iter()
+                .map(|column| {
+                    let name: String = column.try_get("COLUMN_NAME")?;
+                    let data_type: String = column.try_get("DATA_TYPE")?;
+                    Ok::<_, anyhow::Error>(
+                        match data_type.to_ascii_lowercase().as_str() {
+                            "datetime" | "timestamp" | "date" | "time" | "year" => {
+                                format!("CAST(`{name}` AS CHAR) AS `{name}`")
+                            }
+                            "tinyint" | "bit" => {
+                                format!("CAST(`{name}` AS SIGNED) AS `{name}`")
+                            }
+                            "tinytext" | "text" | "mediumtext" | "longtext"
+                            | "tinyblob" | "blob" | "mediumblob" | "longblob" => {
+                                format!("CAST(`{name}` AS CHAR) AS `{name}`")
+                            }
+                            _ => format!("`{name}`"),
+                        },
+                    )
+                })
+                .collect::<Result<Vec<_>, _>>()?
+                .join(", ")
+        }
     };
 
     let total: i64 = sqlx::query_scalar::<DB, i64>(&format!(
