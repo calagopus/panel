@@ -173,21 +173,19 @@ where
                 .map(|column| {
                     let name: String = column.try_get("COLUMN_NAME")?;
                     let data_type: String = column.try_get("DATA_TYPE")?;
-                    Ok::<_, anyhow::Error>(
-                        match data_type.to_ascii_lowercase().as_str() {
-                            "datetime" | "timestamp" | "date" | "time" | "year" => {
-                                format!("CAST(`{name}` AS CHAR) AS `{name}`")
-                            }
-                            "tinyint" | "bit" => {
-                                format!("CAST(`{name}` AS SIGNED) AS `{name}`")
-                            }
-                            "tinytext" | "text" | "mediumtext" | "longtext"
-                            | "tinyblob" | "blob" | "mediumblob" | "longblob" => {
-                                format!("CAST(`{name}` AS CHAR) AS `{name}`")
-                            }
-                            _ => format!("`{name}`"),
-                        },
-                    )
+                    Ok::<_, anyhow::Error>(match data_type.to_ascii_lowercase().as_str() {
+                        "datetime" | "timestamp" | "date" | "time" | "year" => {
+                            format!("CAST(`{name}` AS CHAR) AS `{name}`")
+                        }
+                        "tinyint" | "bit" => {
+                            format!("CAST(`{name}` AS SIGNED) AS `{name}`")
+                        }
+                        "tinytext" | "text" | "mediumtext" | "longtext" | "tinyblob" | "blob"
+                        | "mediumblob" | "longblob" => {
+                            format!("CAST(`{name}` AS CHAR) AS `{name}`")
+                        }
+                        _ => format!("`{name}`"),
+                    })
                 })
                 .collect::<Result<Vec<_>, _>>()?
                 .join(", ")

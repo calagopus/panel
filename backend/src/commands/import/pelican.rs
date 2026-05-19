@@ -1,4 +1,6 @@
-use super::{BASE64_ENGINE, collect_mappings, decrypt_laravel_value, is_sqlite_source, process_table};
+use super::{
+    BASE64_ENGINE, collect_mappings, decrypt_laravel_value, is_sqlite_source, process_table,
+};
 use anyhow::Context;
 use base64::Engine;
 use clap::{Args, FromArgMatches};
@@ -214,7 +216,6 @@ fn source_bool(row: &SourceRow, column: &str) -> Result<bool, anyhow::Error> {
         "1" | "true" | "yes" | "on"
     ))
 }
-
 
 #[derive(Args)]
 pub struct PelicanArgs {
