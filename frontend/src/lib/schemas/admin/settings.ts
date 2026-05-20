@@ -103,16 +103,19 @@ export const adminSettingsEmailTemplateListSchema = z.array(
 
 export const adminSettingsEmailTemplateSchema = z.object({
   availableVariables: z.array(z.string()),
+  defaultEnabled: z.boolean(),
+  enabled: z.boolean(),
+  defaultSubject: z.string(),
+  subject: z.string().nullable(),
   defaultContent: z.string(),
   content: z.string().nullable(),
 });
 
-export const adminSettingsEmailTemplateUpdateSchema = z.lazy(() =>
-  adminSettingsEmailTemplateSchema.omit({
-    availableVariables: true,
-    defaultContent: true,
-  }),
-);
+export const adminSettingsEmailTemplateUpdateSchema = z.object({
+  content: z.string().min(1).nullable().optional(),
+  subject: z.string().min(1).max(255).nullable().optional(),
+  enabled: z.boolean().optional(),
+});
 
 export const adminSettingsServerSchema = z.object({
   maxFileManagerViewSize: z.number().min(0),

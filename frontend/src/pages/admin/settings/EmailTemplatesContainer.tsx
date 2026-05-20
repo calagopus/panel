@@ -1,6 +1,9 @@
 import { Divider, Group, NavLink, Paper, ScrollArea, Stack, Text } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { useEffect, useState } from 'react';
+import { z } from 'zod';
 import getEmailTemplate from '@/api/admin/settings/email-templates/getEmailTemplate.ts';
 import getEmailTemplates from '@/api/admin/settings/email-templates/getEmailTemplates.ts';
 import updateEmailTemplate from '@/api/admin/settings/email-templates/updateEmailTemplate.ts';
@@ -11,10 +14,17 @@ import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Switch from '@/elements/input/Switch.tsx';
+import TextInput from '@/elements/input/TextInput.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+
+const templateFormSchema = z.object({
+  subject: z.string().min(1).max(255),
+  enabled: z.boolean(),
+});
 
 export default function EmailTemplatesContainer() {
   const { addToast } = useToast();
@@ -24,6 +34,12 @@ export default function EmailTemplatesContainer() {
   const [editorContent, setEditorContent] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+
+  const form = useForm<z.infer<typeof templateFormSchema>>({
+    initialValues: { subject: '', enabled: true },
+    validateInputOnBlur: true,
+    validate: zod4Resolver(templateFormSchema),
+  });
 
   const { data: templates, isLoading: templatesLoading } = useQuery({
     queryKey: queryKeys.admin.emailTemplates.all(),
@@ -36,6 +52,19 @@ export default function EmailTemplatesContainer() {
     enabled: selectedIdentifier !== null,
   });
 
+  useEffect(() => {
+    if (!template) return;
+
+    const values = {
+      subject: template.subject ?? template.defaultSubject,
+      enabled: template.enabled,
+    };
+
+    form.setValues(values);
+    form.resetDirty(values);
+    setEditorContent('');
+  }, [template]);
+
   const handleSelect = (identifier: string) => {
     setSelectedIdentifier(identifier);
     setEditorContent('');
@@ -46,22 +75,26 @@ export default function EmailTemplatesContainer() {
       ? editorContent
       : (template.content ?? template.defaultContent)
     : '';
-
-  const isDirty =
+  const isContentDirty =
     template !== undefined && editorContent !== '' && editorContent !== (template.content ?? template.defaultContent);
 
   const doSave = () => {
-    if (!selectedIdentifier) return;
+    if (!selectedIdentifier || !template) return;
 
     setSaving(true);
-    updateEmailTemplate(selectedIdentifier, { content: editorContent })
+
+    const payload: { content?: string | null; subject?: string | null; enabled?: boolean } = {
+      subject: form.values.subject,
+      enabled: form.values.enabled,
+    };
+    if (isContentDirty) payload.content = editorContent;
+
+    updateEmailTemplate(selectedIdentifier, payload)
       .then(() => {
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.emailTemplates.detail(selectedIdentifier!) });
         addToast('Email template saved.', 'success');
       })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      })
+      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
       .finally(() => setSaving(false));
   };
 
@@ -70,15 +103,17 @@ export default function EmailTemplatesContainer() {
 
     setConfirmReset(false);
     setSaving(true);
-    updateEmailTemplate(selectedIdentifier, { content: null })
+    updateEmailTemplate(selectedIdentifier, {
+      content: null,
+      subject: null,
+      enabled: template.defaultEnabled,
+    })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.emailTemplates.detail(selectedIdentifier!) });
         setEditorContent('');
         addToast('Email template reset to default.', 'success');
       })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      })
+      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
       .finally(() => setSaving(false));
   };
 
@@ -201,18 +236,13 @@ export default function EmailTemplatesContainer() {
                     <Text size='sm' fw={500} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>
                       {selectedIdentifier}
                     </Text>
-                    {template.content !== null && (
-                      <Badge variant='light' color='yellow' size='sm'>
-                        Custom
-                      </Badge>
-                    )}
                   </Group>
                   <Group gap='xs'>
                     <Button size='xs' variant='subtle' onClick={() => setConfirmReset(true)} disabled={saving}>
                       Reset to default
                     </Button>
                     <AdminCan action='settings.update' cantSave>
-                      <Button size='xs' loading={saving} disabled={!isDirty} onClick={doSave}>
+                      <Button size='xs' loading={saving} disabled={!isContentDirty && !form.isDirty()} onClick={doSave}>
                         Save
                       </Button>
                     </AdminCan>
@@ -220,6 +250,26 @@ export default function EmailTemplatesContainer() {
                 </Group>
               </div>
               <Divider />
+              <Stack gap='md' p='md'>
+                <Group align='flex-start'>
+                  <TextInput
+                    label='Subject'
+                    className='flex-1'
+                    required
+                    key={form.key('subject')}
+                    {...form.getInputProps('subject')}
+                  />
+                  <Switch
+                    label='Enabled'
+                    mt='xl'
+                    key={form.key('enabled')}
+                    {...form.getInputProps('enabled', { type: 'checkbox' })}
+                  />
+                </Group>
+              </Stack>
+
+              <Divider />
+
               <MonacoEditor
                 height='60vh'
                 language='html'

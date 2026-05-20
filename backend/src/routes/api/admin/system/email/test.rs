@@ -40,17 +40,11 @@ mod post {
 
         permissions.has_admin_permission("settings.read")?;
 
-        let (subject, is_none) = state
+        if state
             .settings
-            .get_as(|s| {
-                (
-                    format!("{} - Email Connection Test", s.app.name),
-                    matches!(s.mail_mode, MailMode::None),
-                )
-            })
-            .await?;
-
-        if is_none {
+            .get_as(|s| matches!(s.mail_mode, MailMode::None))
+            .await?
+        {
             return ApiResponse::error("email functionality is disabled in settings")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -58,15 +52,10 @@ mod post {
 
         match tokio::time::timeout(
             std::time::Duration::from_secs(15),
-            state.mail.send_foreground(
+            state.mail.send_template_foreground(
+                &state,
+                "connection_test",
                 data.email.clone(),
-                subject.into(),
-                state
-                    .mail
-                    .templates
-                    .get_template("connection_test")?
-                    .get_content(&state)
-                    .await?,
                 minijinja::context! {},
             ),
         )

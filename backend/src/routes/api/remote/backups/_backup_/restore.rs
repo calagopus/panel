@@ -107,6 +107,26 @@ mod post {
 
         match Server::by_uuid(&state.database, server_uuid).await {
             Ok(server) => {
+                let settings = state.settings.get().await?;
+                state
+                    .mail
+                    .send_template(
+                        &state,
+                        "server_restored",
+                        server.owner.email.clone(),
+                        minijinja::context! {
+                            user => server.owner,
+                            server => server,
+                            server_link => format!(
+                                "{}/server/{:08x}",
+                                settings.app.url,
+                                server.uuid_short,
+                            )
+                        },
+                    )
+                    .await;
+                drop(settings);
+
                 ServerBackup::get_event_emitter().emit(
                     state.0.clone(),
                     ServerBackupEvent::RestoreCompleted {

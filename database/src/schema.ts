@@ -109,6 +109,8 @@ export const announcementsTable = pgTable(
 
 export const emailTemplatesTable = pgTable('email_templates', {
   identifier: varchar({ length: 255 }).primaryKey().notNull(),
+  enabled: boolean().default(true).notNull(),
+  subject: varchar({ length: 255 }).notNull(),
   content: text().notNull(),
 });
 

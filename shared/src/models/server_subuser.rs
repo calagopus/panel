@@ -294,15 +294,10 @@ impl CreatableModel for ServerSubuser {
 
                         state
                             .mail
-                            .send(
+                            .send_template(
+                                state,
+                                "account_created",
                                 user.email.clone(),
-                                format!("{} - Account Created", settings.app.name).into(),
-                                state
-                                    .mail
-                                    .templates
-                                    .get_template("account_created")?
-                                    .get_content(state)
-                                    .await?,
                                 minijinja::context! {
                                     user => user,
                                     reset_link => format!(
@@ -367,6 +362,25 @@ impl CreatableModel for ServerSubuser {
         let mut result = Self::map(None, &row)?;
 
         Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        let settings = state.settings.get().await?;
+        state
+            .mail
+            .send_template(
+                &state,
+                "added_to_server",
+                user.email.clone(),
+                minijinja::context! {
+                    user => user,
+                    server => options.server,
+                    server_link => format!(
+                        "{}/server/{:08x}",
+                        settings.app.url,
+                        options.server.uuid_short,
+                    )
+                },
+            )
+            .await;
 
         Ok(result)
     }
@@ -458,6 +472,18 @@ impl DeletableModel for ServerSubuser {
 
         self.run_after_delete_handlers(&options, state, transaction)
             .await?;
+
+        state
+            .mail
+            .send_template(
+                state,
+                "removed_from_server",
+                self.user.email.clone(),
+                minijinja::context! {
+                    user => self.user,
+                },
+            )
+            .await;
 
         Ok(())
     }
