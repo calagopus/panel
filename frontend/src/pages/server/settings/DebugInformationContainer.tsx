@@ -39,7 +39,7 @@ export default function DebugInformationContainer() {
                 <img
                   src={`/flags/${server.locationFlag}.svg`}
                   alt={server.locationName}
-                  className='w-5 h-5 rounded-md my-auto'
+                  className='w-5 h-5 rounded-md shrink-0 my-auto'
                 />
               ) : undefined
             }

@@ -24,7 +24,7 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-const flags = import.meta.glob('/node_modules/svg-country-flags/svg/*.svg');
+const flags = import.meta.glob('/node_modules/svg-country-flags/svg/*.svg', { import: 'metadata' });
 
 export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLocationSchema> }) => {
   const { language } = useTranslations();
