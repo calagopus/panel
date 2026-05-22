@@ -8,7 +8,7 @@ export default async (backupConfigUuid: string): Promise<z.infer<typeof adminBac
   return {
     ...transformKeysToCamelCase(data.backup_configuration),
     backupConfigs: {
-      ...data.backup_configuration.backup_configs,
+      ...transformKeysToCamelCase(data.backup_configuration.backup_configs),
       restic: data.backup_configuration.backup_configs.restic
         ? {
             ...transformKeysToCamelCase(data.backup_configuration.backup_configs.restic),
