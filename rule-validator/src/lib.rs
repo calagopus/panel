@@ -1,3 +1,14 @@
+//! Laravel-style validation rules for game-server startup environment
+//! variables ("egg" variables). Rule names follow Laravel 13.x conventions;
+//! inputs from Pterodactyl (Laravel 10.x) and Pelican (Laravel 13.x) panels
+//! are both supported. See <https://laravel.com/docs/12.x/validation> for the
+//! upstream rule reference.
+//!
+//! Two entry points: [`validate_rules`] checks that a slice of rule strings
+//! parses without error (used as a `garde` custom validator on egg-variable
+//! definitions), while [`Validator::new`] + [`Validator::validate`] runs the
+//! full rule set against actual data.
+
 use std::collections::HashMap;
 
 mod rules;
