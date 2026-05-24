@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { makeComponentHookable } from 'shared';
 import Copyright from '@/elements/Copyright.tsx';
 import { useAuth } from '@/providers/AuthProvider.tsx';
+import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import Alert from './Alert.tsx';
@@ -17,6 +18,7 @@ interface LayoutProps {
 function Container({ children, isNormal }: LayoutProps) {
   const { t } = useTranslations();
   const { impersonating } = useAuth();
+  const { id } = useCurrentWindow();
   const { announcements } = useGlobalStore();
 
   return (
@@ -33,9 +35,10 @@ function Container({ children, isNormal }: LayoutProps) {
             {t('elements.container.alert.impersonating', {})}
           </Alert>
         )}
-        {announcements.map((announcement) => (
-          <DismissibleAnnouncementAlert key={announcement.uuid} announcement={announcement} />
-        ))}
+        {!id &&
+          announcements.map((announcement) => (
+            <DismissibleAnnouncementAlert key={announcement.uuid} announcement={announcement} />
+          ))}
 
         {children}
       </div>

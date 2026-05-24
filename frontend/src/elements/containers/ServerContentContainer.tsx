@@ -117,11 +117,12 @@ function ServerContentContainer(props: Props) {
 
   return (
     <ContentContainer title={`${title} | ${server.name}`}>
-      {serverAnnouncements.map((announcement) => (
-        <DismissibleAnnouncementAlert key={announcement.uuid} announcement={announcement} />
-      ))}
+      {!id &&
+        serverAnnouncements.map((announcement) => (
+          <DismissibleAnnouncementAlert key={announcement.uuid} announcement={announcement} />
+        ))}
 
-      {fullscreen ? null : server.isTransferring ? (
+      {fullscreen || id ? null : server.isTransferring ? (
         <div className='mt-2 px-4 lg:px-6 mb-4'>
           <Notification loading>
             <div className='flex flex-row items-center'>

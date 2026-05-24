@@ -1,11 +1,12 @@
-import { faX } from '@fortawesome/free-solid-svg-icons';
+import { faCodeBranch, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { NavLink, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getServerActivity from '@/api/server/getServerActivity.ts';
+import ActionIcon from '@/elements/ActionIcon.tsx';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
@@ -126,6 +127,15 @@ export default function ServerActivity() {
 
             <TableData>
               <Group gap={4} justify='right' wrap='nowrap'>
+                {activity.event === 'server:file.write' && activity.data?.file && activity.data?.revisionId ? (
+                  <NavLink
+                    to={`/server/${server.uuidShort}/files/diff?file=${encodeURIComponent(activity.data.file)}&revision=${activity.data.revisionId}`}
+                  >
+                    <ActionIcon>
+                      <FontAwesomeIcon icon={faCodeBranch} />
+                    </ActionIcon>
+                  </NavLink>
+                ) : null}
                 {Object.keys(activity.data ?? {}).length > 0 ? <ActivityInfoButton activity={activity} /> : null}
               </Group>
             </TableData>

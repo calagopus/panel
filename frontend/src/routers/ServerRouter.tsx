@@ -145,15 +145,15 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
         >
           <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
           {isAdmin(user) && (
-            <>
-              <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
-              <Sidebar.Link
-                to={`/admin/servers/${params.id}`}
-                end
-                icon={faArrowUpRightFromSquare}
-                name={t('pages.server.viewAdmin.title', {})}
-              />
-            </>
+            <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
+          )}
+          {isAdmin(user, 'servers.read') && (
+            <Sidebar.Link
+              to={`/admin/servers/${params.id}`}
+              end
+              icon={faArrowUpRightFromSquare}
+              name={t('pages.server.viewAdmin.title', {})}
+            />
           )}
 
           <Sidebar.Divider />
