@@ -17,7 +17,6 @@ import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import LocationCreateOrUpdateModal from './LocationCreateOrUpdateModal.tsx';
 import NodeActionBar from './NodeActionBar.tsx';
 import NodeCreateOrUpdate from './NodeCreateOrUpdate.tsx';
@@ -26,16 +25,20 @@ import NodeView from './NodeView.tsx';
 
 function NodesContainer() {
   const navigate = useNavigate();
-  const { nodes, setNodes } = useAdminStore();
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [checkingLocations, setCheckingLocations] = useState(true);
   const [selectedNodes, setSelectedNodes] = useState(new ObjectSet<z.infer<typeof adminNodeSchema>, 'uuid'>('uuid'));
   const selectedNodesPreviousRef = useRef<z.infer<typeof adminNodeSchema>[]>([]);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: nodes,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nodes.all(),
     fetcher: getNodes,
-    setStoreData: setNodes,
   });
 
   useEffect(() => {
@@ -86,14 +89,14 @@ function NodesContainer() {
       {
         key: 'a',
         modifiers: ['ctrlOrMeta'],
-        callback: () => setSelectedNodes(new ObjectSet('uuid', nodes.data)),
+        callback: () => setSelectedNodes(new ObjectSet('uuid', nodes?.data)),
       },
       {
         key: 'Escape',
         callback: () => setSelectedNodes(new ObjectSet('uuid')),
       },
     ],
-    deps: [nodes.data],
+    deps: [nodes?.data],
   });
 
   const columns = ['', ...nodeTableColumns];
@@ -120,7 +123,7 @@ function NodesContainer() {
 
         <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
           <Table columns={columns} loading={loading} pagination={nodes} onPageSelect={setPage} allowSelect={false}>
-            {nodes.data.map((node) => (
+            {nodes?.data.map((node) => (
               <SelectionArea.Selectable key={node.uuid} item={node}>
                 {(innerRef: Ref<HTMLElement>) => (
                   <NodeRow

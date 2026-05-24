@@ -10,19 +10,22 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { announcementTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import AnnouncementCreateOrUpdate from './AnnouncementCreateOrUpdate.tsx';
 import AnnouncementRow from './AnnouncementRow.tsx';
 import AnnouncementView from './AnnouncementView.tsx';
 
 function AnnouncementsContainer() {
   const navigate = useNavigate();
-  const { announcements, setAnnouncements } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: announcements,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.announcements.all(),
     fetcher: getAnnouncements,
-    setStoreData: setAnnouncements,
   });
 
   return (
@@ -43,7 +46,7 @@ function AnnouncementsContainer() {
       }
     >
       <Table columns={announcementTableColumns} loading={loading} pagination={announcements} onPageSelect={setPage}>
-        {announcements.data.map((announcement) => (
+        {announcements?.data.map((announcement) => (
           <AnnouncementRow key={announcement.uuid} announcement={announcement} />
         ))}
       </Table>

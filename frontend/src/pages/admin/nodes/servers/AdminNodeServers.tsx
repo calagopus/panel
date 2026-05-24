@@ -3,7 +3,7 @@ import { Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import getNodeServers from '@/api/admin/nodes/servers/getNodeServers.ts';
 import sendNodeServersPowerAction from '@/api/admin/nodes/servers/sendNodeServersPowerAction.ts';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
@@ -25,9 +25,6 @@ import ServersTransferModal from './modals/ServersTransferModal.tsx';
 export default function AdminNodeServers({ node }: { node: z.infer<typeof adminNodeSchema> }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const [nodeServers, setNodeServers] = useState<Pagination<z.infer<typeof adminServerSchema>>>(
-    getEmptyPaginationSet(),
-  );
   const [selectedServers, setSelectedServers] = useState(
     new ObjectSet<z.infer<typeof adminServerSchema>, 'uuid'>('uuid'),
   );
@@ -37,10 +34,15 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
   const [allActionLoading, setAllActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
   const [openModal, setOpenModal] = useState<'transfer' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: nodeServers,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nodes.servers(node.uuid),
     fetcher: (page, search) => getNodeServers(node.uuid, page, search),
-    setStoreData: setNodeServers,
   });
 
   const onSelectedStart = useCallback(
@@ -150,7 +152,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
 
     sendNodeServersPowerAction(node.uuid, [], action)
       .then((successful) => {
-        const failed = nodeServers.total - successful;
+        const failed = (nodeServers?.total ?? 0) - successful;
 
         const actionPastTenseMap: Record<
           z.infer<typeof serverPowerAction>,
@@ -195,14 +197,14 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
       {
         key: 'a',
         modifiers: ['ctrlOrMeta'],
-        callback: () => setSelectedServers(new ObjectSet('uuid', nodeServers.data)),
+        callback: () => setSelectedServers(new ObjectSet('uuid', nodeServers?.data ?? [])),
       },
       {
         key: 'Escape',
         callback: () => setSelectedServers(new ObjectSet('uuid')),
       },
     ],
-    deps: [nodeServers.data],
+    deps: [nodeServers?.data],
   });
 
   const columns = ['', ...serverTableColumns];
@@ -228,32 +230,32 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
               color='green'
               onClick={() => handleAllPowerAction('start')}
               loading={allActionLoading === 'start'}
-              disabled={(allActionLoading !== null && allActionLoading !== 'start') || nodeServers.total === 0}
+              disabled={(allActionLoading !== null && allActionLoading !== 'start') || nodeServers?.total === 0}
             >
-              {t('common.enum.serverPowerAction.start', {})} ({nodeServers.total})
+              {t('common.enum.serverPowerAction.start', {})} ({nodeServers?.total})
             </Button>
             <Button
               color='gray'
               onClick={() => handleAllPowerAction('restart')}
               loading={allActionLoading === 'restart'}
-              disabled={(allActionLoading !== null && allActionLoading !== 'restart') || nodeServers.total === 0}
+              disabled={(allActionLoading !== null && allActionLoading !== 'restart') || nodeServers?.total === 0}
             >
-              {t('common.enum.serverPowerAction.restart', {})} ({nodeServers.total})
+              {t('common.enum.serverPowerAction.restart', {})} ({nodeServers?.total})
             </Button>
             <Button
               color='red'
               onClick={() => handleAllPowerAction('stop')}
               loading={allActionLoading === 'stop'}
-              disabled={(allActionLoading !== null && allActionLoading !== 'stop') || nodeServers.total === 0}
+              disabled={(allActionLoading !== null && allActionLoading !== 'stop') || nodeServers?.total === 0}
             >
-              {t('common.enum.serverPowerAction.stop', {})} ({nodeServers.total})
+              {t('common.enum.serverPowerAction.stop', {})} ({nodeServers?.total})
             </Button>
             <Button
               color='gray'
               onClick={() => setOpenModal('transfer')}
-              disabled={allActionLoading !== null || nodeServers.total === 0}
+              disabled={allActionLoading !== null || nodeServers?.total === 0}
             >
-              Transfer ({nodeServers.total})
+              Transfer ({nodeServers?.total})
             </Button>
           </Group>
         }
@@ -266,7 +268,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
             onPageSelect={setPage}
             allowSelect={false}
           >
-            {nodeServers.data.map((server) => (
+            {nodeServers?.data.map((server) => (
               <SelectionArea.Selectable key={server.uuid} item={server}>
                 {(innerRef: Ref<HTMLElement>) => (
                   <ServerRow

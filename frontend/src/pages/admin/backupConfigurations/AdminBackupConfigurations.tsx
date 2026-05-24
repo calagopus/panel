@@ -13,16 +13,19 @@ import BackupConfigurationRow from '@/pages/admin/backupConfigurations/BackupCon
 import BackupConfigurationView from '@/pages/admin/backupConfigurations/BackupConfigurationView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 function BackupConfigurationsContainer() {
   const navigate = useNavigate();
-  const { backupConfigurations, setBackupConfigurations } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: backupConfigurations,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.backupConfigurations.all(),
     fetcher: getBackupConfigurations,
-    setStoreData: setBackupConfigurations,
   });
 
   return (
@@ -48,7 +51,7 @@ function BackupConfigurationsContainer() {
         pagination={backupConfigurations}
         onPageSelect={setPage}
       >
-        {backupConfigurations.data.map((bc) => (
+        {backupConfigurations?.data.map((bc) => (
           <BackupConfigurationRow key={bc.uuid} backupConfiguration={bc} />
         ))}
       </Table>

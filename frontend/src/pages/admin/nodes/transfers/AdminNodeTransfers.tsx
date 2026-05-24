@@ -1,29 +1,25 @@
-import { Ref, useEffect, useState } from 'react';
+import { Ref, useEffect } from 'react';
 import { z } from 'zod';
 import getNodeTransferringServers from '@/api/admin/nodes/servers/getNodeTransferringServers.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminNodeSchema, adminNodeTransferProgressSchema } from '@/lib/schemas/admin/nodes.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import ServerRow from './ServerRow.tsx';
 
 export default function AdminNodeTransfers({ node }: { node: z.infer<typeof adminNodeSchema> }) {
-  const [nodeTransferringServers, setNodeTransferringServers] = useState<{
-    servers: Pagination<z.infer<typeof adminServerSchema>>;
-    transfers: Record<string, z.infer<typeof adminNodeTransferProgressSchema>>;
-  }>({
-    servers: getEmptyPaginationSet(),
-    transfers: {},
-  });
-
-  const { loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
+  const {
+    data: nodeTransferringServers,
+    loading,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nodes.transfers(node.uuid),
     fetcher: (page, search) => getNodeTransferringServers(node.uuid, page, search),
-    setStoreData: setNodeTransferringServers,
     paginationKey: 'servers',
   });
 
@@ -41,11 +37,11 @@ export default function AdminNodeTransfers({ node }: { node: z.infer<typeof admi
         <Table
           columns={['ID', 'Progress', 'Archive Rate', 'Network Rate', 'Name', 'Node', 'Owner', 'Created']}
           loading={loading}
-          pagination={nodeTransferringServers.servers}
+          pagination={nodeTransferringServers?.servers}
           onPageSelect={setPage}
           allowSelect={false}
         >
-          {nodeTransferringServers.servers.data.map((server) => (
+          {nodeTransferringServers?.servers.data.map((server) => (
             <SelectionArea.Selectable key={server.uuid} item={server}>
               {(innerRef: Ref<HTMLElement>) => (
                 <ServerRow

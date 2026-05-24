@@ -11,18 +11,21 @@ import { userTableColumns } from '@/lib/tableColumns.ts';
 import UserView from '@/pages/admin/users/UserView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import UserCreateOrUpdate from './UserCreateOrUpdate.tsx';
 import UserRow from './UserRow.tsx';
 
 function UsersContainer() {
   const navigate = useNavigate();
-  const { users, setUsers } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: users,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.users.all(),
     fetcher: getUsers,
-    setStoreData: setUsers,
   });
 
   return (
@@ -43,7 +46,7 @@ function UsersContainer() {
       }
     >
       <Table columns={userTableColumns} loading={loading} pagination={users} onPageSelect={setPage}>
-        {users.data.map((user) => (
+        {users?.data.map((user) => (
           <UserRow key={user.uuid} user={user} />
         ))}
       </Table>

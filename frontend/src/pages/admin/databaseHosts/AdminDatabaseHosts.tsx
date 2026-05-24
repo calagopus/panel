@@ -10,19 +10,22 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { databaseHostTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import DatabaseHostCreateOrUpdate from './DatabaseHostCreateOrUpdate.tsx';
 import DatabaseHostRow from './DatabaseHostRow.tsx';
 import DatabaseHostView from './DatabaseHostView.tsx';
 
 function DatabaseHostsContainer() {
   const navigate = useNavigate();
-  const { databaseHosts, setDatabaseHosts } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: databaseHosts,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.databaseHosts.all(),
     fetcher: getDatabaseHosts,
-    setStoreData: setDatabaseHosts,
   });
 
   return (
@@ -43,7 +46,7 @@ function DatabaseHostsContainer() {
       }
     >
       <Table columns={databaseHostTableColumns} loading={loading} pagination={databaseHosts} onPageSelect={setPage}>
-        {databaseHosts.data.map((dh) => (
+        {databaseHosts?.data.map((dh) => (
           <DatabaseHostRow key={dh.uuid} databaseHost={dh} />
         ))}
       </Table>

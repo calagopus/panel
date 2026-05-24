@@ -189,7 +189,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.update.subContainer}
       registryProps={{ server: contextServer }}
     >
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'servers']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.servers.all()))}>
         <Stack>
           {contextServer.isSuspended && (
             <Alert title='Server Suspended' color='orange' icon={<FontAwesomeIcon icon={faCircleInfo} />}>

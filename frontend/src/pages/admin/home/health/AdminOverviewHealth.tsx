@@ -26,12 +26,14 @@ export default function AdminOverviewHealth() {
   const { addToast } = useToast();
 
   const [general, setGeneral] = useState<Awaited<ReturnType<typeof getGeneralHealth>> | null>(null);
-  const [nodes, setNodes] = useState<Awaited<ReturnType<typeof getNodesHealth>> | null>(null);
 
-  const { loading, setPage } = useSearchablePaginatedTable({
+  const {
+    data: nodes,
+    loading,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.health.nodes(),
     fetcher: (page) => getNodesHealth(page),
-    setStoreData: setNodes,
     paginationKey: 'desyncNodes',
   });
 

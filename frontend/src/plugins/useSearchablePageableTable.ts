@@ -8,7 +8,7 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 interface UseSearchablePaginatedTableOptions<T> {
   queryKey: readonly unknown[];
   fetcher: (page: number, search: string) => Promise<T>;
-  setStoreData: (data: T) => void;
+  setStoreData?: (data: T) => void;
   paginationKey?: string;
   deps?: unknown[];
   debounceMs?: number;
@@ -64,7 +64,7 @@ export function useSearchablePaginatedTable<T>({
     }
   }, [search]);
 
-  const { data, isFetching, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: [...queryKey, ...deps, { page, search: debouncedSearch }],
     queryFn: () => fetcher(page, debouncedSearch),
     placeholderData: keepPreviousData,
@@ -103,15 +103,16 @@ export function useSearchablePaginatedTable<T>({
       } else if (page > totalPages && totalPages !== 0) {
         setPage(totalPages);
       } else {
-        setStoreData(data);
+        setStoreData?.(data);
       }
     } else {
-      setStoreData(data);
+      setStoreData?.(data);
     }
   }, [data]);
 
   return {
-    loading: isFetching,
+    data: data as T | undefined,
+    loading: isLoading,
     search,
     setSearch,
     page,

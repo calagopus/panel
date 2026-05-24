@@ -10,19 +10,22 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import ServerCreate from './ServerCreate.tsx';
 import ServerRow from './ServerRow.tsx';
 import ServerView from './ServerView.tsx';
 
 function ServersContainer() {
   const navigate = useNavigate();
-  const { servers, setServers } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: servers,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.servers.all(),
     fetcher: getServers,
-    setStoreData: setServers,
   });
 
   return (
@@ -44,7 +47,7 @@ function ServersContainer() {
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.container}
     >
       <Table columns={serverTableColumns} loading={loading} pagination={servers} onPageSelect={setPage}>
-        {servers.data.map((server) => (
+        {servers?.data.map((server) => (
           <ServerRow key={server.uuid} server={server} />
         ))}
       </Table>

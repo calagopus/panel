@@ -10,19 +10,22 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { eggConfigurationTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import EggConfigurationCreateOrUpdate from './EggConfigurationCreateOrUpdate.tsx';
 import EggConfigurationRow from './EggConfigurationRow.tsx';
 import EggConfigurationView from './EggConfigurationView.tsx';
 
 function EggConfigurationsContainer() {
   const navigate = useNavigate();
-  const { eggConfigurations, setEggConfigurations } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggConfigurations,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.eggConfigurations.all(),
     fetcher: getEggConfigurations,
-    setStoreData: setEggConfigurations,
   });
 
   return (
@@ -48,7 +51,7 @@ function EggConfigurationsContainer() {
         pagination={eggConfigurations}
         onPageSelect={setPage}
       >
-        {eggConfigurations.data.map((ec) => (
+        {eggConfigurations?.data.map((ec) => (
           <EggConfigurationRow key={ec.uuid} eggConfiguration={ec} />
         ))}
       </Table>

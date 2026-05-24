@@ -157,7 +157,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
         Are you sure you want to send a password reset email to <Code>{form.getValues().email}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'users']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.users.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk

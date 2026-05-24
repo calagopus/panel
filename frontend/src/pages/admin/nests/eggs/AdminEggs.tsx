@@ -23,7 +23,6 @@ import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import EggActionBar from './EggActionBar.tsx';
 import EggCreateOrUpdate from './EggCreateOrUpdate.tsx';
 import EggImportOverlay from './EggImportOverlay.tsx';
@@ -32,17 +31,22 @@ import EggRow from './EggRow.tsx';
 function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestSchema> }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const { eggs, setEggs, addEgg } = useAdminStore();
 
   const selectedEggsPreviousRef = useRef<z.infer<typeof adminEggSchema>[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedEggs, setSelectedEggs] = useState(new ObjectSet<z.infer<typeof adminEggSchema>, 'uuid'>('uuid'));
 
-  const { loading, refetch, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggs,
+    loading,
+    refetch,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nests.eggs(contextNest.uuid),
     fetcher: (page, search) => getEggs(contextNest.uuid, page, search),
-    setStoreData: setEggs,
   });
 
   const handleImport = async (file: File) => {
@@ -60,8 +64,8 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
     }
 
     importEgg(contextNest.uuid, data)
-      .then((data) => {
-        addEgg(data);
+      .then(() => {
+        refetch();
         addToast('Egg imported.', 'success');
       })
       .catch((msg) => {
@@ -170,7 +174,7 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
 
       <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
         <Table columns={columns} loading={loading} pagination={eggs} onPageSelect={setPage} allowSelect={false}>
-          {eggs.data.map((egg) => (
+          {eggs?.data.map((egg) => (
             <SelectionArea.Selectable key={egg.uuid} item={egg}>
               {(innerRef: Ref<HTMLElement>) => (
                 <EggRow

@@ -14,6 +14,7 @@ import SelectionArea from '@/elements/SelectionArea.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Table from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { assetTableColumns } from '@/lib/tableColumns.ts';
 import AssetUpload from '@/pages/admin/assets/AssetUpload.tsx';
@@ -37,7 +38,7 @@ export default function AdminAssets() {
   const [openModal, setOpenModal] = useState<'newDirectory' | null>(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin', 'assets', { page, currentDirectory }],
+    queryKey: [...queryKeys.admin.assets.all(), { page, currentDirectory }],
     queryFn: () => getAssets(page, currentDirectory),
   });
 

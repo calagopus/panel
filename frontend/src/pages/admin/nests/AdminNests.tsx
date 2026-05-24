@@ -10,19 +10,22 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { nestTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import NestCreateOrUpdate from './NestCreateOrUpdate.tsx';
 import NestRow from './NestRow.tsx';
 import NestView from './NestView.tsx';
 
 function NestsContainer() {
   const navigate = useNavigate();
-  const { nests, setNests } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: nests,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nests.all(),
     fetcher: getNests,
-    setStoreData: setNests,
   });
 
   return (
@@ -43,7 +46,7 @@ function NestsContainer() {
       }
     >
       <Table columns={nestTableColumns} loading={loading} pagination={nests} onPageSelect={setPage}>
-        {nests.data.map((nest) => (
+        {nests?.data.map((nest) => (
           <NestRow key={nest.uuid} nest={nest} />
         ))}
       </Table>

@@ -17,6 +17,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema, adminMountUpdateSchema } from '@/lib/schemas/admin/mounts.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 
@@ -86,7 +87,7 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
         creating or updating them.
       </Alert>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'mounts']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.mounts.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk

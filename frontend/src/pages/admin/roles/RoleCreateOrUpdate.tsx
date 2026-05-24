@@ -19,6 +19,7 @@ import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminRoleUpdateSchema } from '@/lib/schemas/admin/roles.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
@@ -100,7 +101,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
         </Alert>
       )}
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'roles']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.roles.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk

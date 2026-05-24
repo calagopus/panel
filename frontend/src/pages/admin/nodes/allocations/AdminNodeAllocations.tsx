@@ -22,28 +22,12 @@ import NodeAllocationsCreateModal from './modals/NodeAllocationsCreateModal.tsx'
 import NodeAllocationRow from './NodeAllocationRow.tsx';
 
 export default function AdminNodeAllocations({ node }: { node: z.infer<typeof adminNodeSchema> }) {
-  const { nodeAllocations, setNodeAllocations, selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
+  const { selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
   const [ipFilter, setIpFilter] = useState('');
   const [portFilter, setPortFilter] = useState('');
   const selectedNodeAllocationsPreviousRef = useRef(selectedNodeAllocations.values());
-
-  const uniqueIps = useMemo(() => {
-    const ips = new Set<string>();
-    nodeAllocations.data.forEach((alloc) => ips.add(alloc.ip));
-    return Array.from(ips)
-      .sort()
-      .map((ip) => ({ label: ip, value: ip }));
-  }, [nodeAllocations.data]);
-
-  const uniquePorts = useMemo(() => {
-    const ports = new Set<string>();
-    nodeAllocations.data.forEach((alloc) => ports.add(alloc.port.toString()));
-    return Array.from(ports)
-      .sort((a, b) => Number(a) - Number(b))
-      .map((port) => ({ label: port, value: port }));
-  }, [nodeAllocations.data]);
 
   const buildSearch = useCallback((generalSearch: string, ip: string, port: string) => {
     const parts: string[] = [];
@@ -53,15 +37,37 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
     return parts.length > 0 ? parts.join(':') : undefined;
   }, []);
 
-  const { loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
+  const {
+    data: nodeAllocations,
+    loading,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nodes.allocations(node.uuid),
     fetcher: (page, generalSearch) => {
       const finalSearch = buildSearch(generalSearch || '', ipFilter, portFilter);
       return getNodeAllocations(node.uuid, page, finalSearch);
     },
-    setStoreData: setNodeAllocations,
     deps: [ipFilter, portFilter, node.uuid],
   });
+
+  const uniqueIps = useMemo(() => {
+    const ips = new Set<string>();
+    nodeAllocations?.data.forEach((alloc) => ips.add(alloc.ip));
+    return Array.from(ips)
+      .sort()
+      .map((ip) => ({ label: ip, value: ip }));
+  }, [nodeAllocations?.data]);
+
+  const uniquePorts = useMemo(() => {
+    const ports = new Set<string>();
+    nodeAllocations?.data.forEach((alloc) => ports.add(alloc.port.toString()));
+    return Array.from(ports)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((port) => ({ label: port, value: port }));
+  }, [nodeAllocations?.data]);
 
   useEffect(() => {
     refetch();
@@ -87,19 +93,20 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
       {
         key: 'a',
         modifiers: ['ctrlOrMeta'],
-        callback: () => setSelectedNodeAllocations(nodeAllocations.data),
+        callback: () => setSelectedNodeAllocations(nodeAllocations?.data ?? []),
       },
       {
         key: 'Escape',
         callback: () => setSelectedNodeAllocations([]),
       },
     ],
-    deps: [nodeAllocations.data],
+    deps: [nodeAllocations?.data],
   });
 
   const handleSelectAll = useCallback(() => {
+    if (!nodeAllocations?.data) return;
     setSelectedNodeAllocations(nodeAllocations.data);
-  }, [nodeAllocations.data]);
+  }, [nodeAllocations?.data]);
 
   const handleClearSelection = useCallback(() => {
     setSelectedNodeAllocations([]);
@@ -176,7 +183,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
           onPageSelect={setPage}
           allowSelect={false}
         >
-          {nodeAllocations.data.map((allocation) => (
+          {nodeAllocations?.data.map((allocation) => (
             <SelectionArea.Selectable key={allocation.uuid} item={allocation}>
               {(innerRef: Ref<HTMLElement>) => (
                 <NodeAllocationRow

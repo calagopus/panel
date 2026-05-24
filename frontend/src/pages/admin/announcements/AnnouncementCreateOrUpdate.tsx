@@ -158,7 +158,7 @@ export default function AnnouncementCreateOrUpdate({
         Are you sure you want to delete <Code>{form.getValues().title}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'announcements']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, [queryKeys.admin.announcements.all()]))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <Select
             withAsterisk

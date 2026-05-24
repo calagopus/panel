@@ -13,16 +13,19 @@ import RoleRow from '@/pages/admin/roles/RoleRow.tsx';
 import RoleView from '@/pages/admin/roles/RoleView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 function RolesContainer() {
   const navigate = useNavigate();
-  const { roles, setRoles } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: roles,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.roles.all(),
     fetcher: getRoles,
-    setStoreData: setRoles,
   });
 
   return (
@@ -43,7 +46,7 @@ function RolesContainer() {
       }
     >
       <Table columns={roleTableColumns} loading={loading} pagination={roles} onPageSelect={setPage}>
-        {roles.data.map((role) => (
+        {roles?.data.map((role) => (
           <RoleRow key={role.uuid} role={role} />
         ))}
       </Table>

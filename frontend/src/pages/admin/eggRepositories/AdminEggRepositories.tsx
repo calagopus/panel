@@ -10,19 +10,22 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { eggRepositoryTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import EggRepositoryCreateOrUpdate from './EggRepositoryCreateOrUpdate.tsx';
 import EggRepositoryRow from './EggRepositoryRow.tsx';
 import EggRepositoryView from './EggRepositoryView.tsx';
 
 function EggRepositoriesContainer() {
   const navigate = useNavigate();
-  const { eggRepositories, setEggRepositories } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggRepositories,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.eggRepositories.all(),
     fetcher: getEggRepositories,
-    setStoreData: setEggRepositories,
   });
 
   return (
@@ -43,7 +46,7 @@ function EggRepositoriesContainer() {
       }
     >
       <Table columns={eggRepositoryTableColumns} loading={loading} pagination={eggRepositories} onPageSelect={setPage}>
-        {eggRepositories.data.map((eggRepository) => (
+        {eggRepositories?.data.map((eggRepository) => (
           <EggRepositoryRow key={eggRepository.uuid} eggRepository={eggRepository} />
         ))}
       </Table>

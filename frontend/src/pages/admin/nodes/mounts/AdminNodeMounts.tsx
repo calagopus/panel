@@ -11,19 +11,21 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { nodeMountTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
-import { useAdminStore } from '@/stores/admin.tsx';
 import NodeMountAddModal from './modals/NodeMountAddModal.tsx';
 import NodeMountRow from './NodeMountRow.tsx';
 
 export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNodeSchema> }) {
-  const { nodeMounts, setNodeMounts } = useAdminStore();
-
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: nodeMounts,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nodes.mounts(node.uuid),
     fetcher: (page, search) => getNodeMounts(node.uuid, page, search),
-    setStoreData: setNodeMounts,
   });
 
   return (
@@ -42,7 +44,7 @@ export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNo
 
       <ContextMenuProvider>
         <Table columns={nodeMountTableColumns} loading={loading} pagination={nodeMounts} onPageSelect={setPage}>
-          {nodeMounts.data.map((mount) => (
+          {nodeMounts?.data.map((mount) => (
             <NodeMountRow key={mount.mount.uuid} node={node} mount={mount} />
           ))}
         </Table>

@@ -39,15 +39,18 @@ export default function AdminOverviewUpdates() {
   const { addToast } = useToast();
   const { updateInformation, setUpdateInformation } = useAdminStore();
 
-  const [nodes, setNodes] = useState<Awaited<ReturnType<typeof getNodeUpdates>> | null>(null);
   const [updateHistory, setUpdateHistory] = useState<Awaited<ReturnType<typeof getUpdateHistory>> | null>(null);
   const [selectedUpdateHistory, setSelectedUpdateHistory] = useState<string | null>(null);
   const [recheckLoading, setRecheckLoading] = useState(false);
 
-  const { loading, setPage, refetch } = useSearchablePaginatedTable({
+  const {
+    data: nodes,
+    loading,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.updates.nodes(),
     fetcher: (page) => getNodeUpdates(page),
-    setStoreData: setNodes,
     paginationKey: 'outdatedNodes',
   });
 

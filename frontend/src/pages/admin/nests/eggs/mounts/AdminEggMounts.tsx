@@ -11,7 +11,6 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
-import { useAdminStore } from '@/stores/admin.tsx';
 import EggMountRow from './EggMountRow.tsx';
 import EggMountAddModal from './modals/EggMountAddModal.tsx';
 
@@ -22,14 +21,17 @@ export default function AdminEggMounts({
   contextNest: z.infer<typeof adminNestSchema>;
   contextEgg: z.infer<typeof adminEggSchema>;
 }) {
-  const { eggMounts, setEggMounts } = useAdminStore();
-
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggMounts,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.eggs.mounts(contextEgg.uuid),
     fetcher: (page, search) => getEggMounts(contextNest.uuid, contextEgg.uuid, page, search),
-    setStoreData: setEggMounts,
   });
 
   return (
@@ -58,7 +60,7 @@ export default function AdminEggMounts({
           pagination={eggMounts}
           onPageSelect={setPage}
         >
-          {eggMounts.data.map((mount) => (
+          {eggMounts?.data.map((mount) => (
             <EggMountRow key={mount.mount.uuid} nest={contextNest} egg={contextEgg} mount={mount} />
           ))}
         </Table>

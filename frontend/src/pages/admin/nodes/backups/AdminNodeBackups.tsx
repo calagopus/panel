@@ -8,18 +8,20 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
-import { useAdminStore } from '@/stores/admin.tsx';
 import NodeBackupRow from './NodeBackupRow.tsx';
 
 export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminNodeSchema> }) {
-  const { nodeBackups, setNodeBackups } = useAdminStore();
-
   const [showDetachedNodeBackups, setShowDetachedNodeBackups] = useState(false);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: nodeBackups,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nodes.backups(node.uuid),
     fetcher: (page, search) => getNodeBackups(node.uuid, page, search, showDetachedNodeBackups),
-    setStoreData: setNodeBackups,
     deps: [showDetachedNodeBackups],
   });
 
@@ -44,7 +46,7 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
           pagination={nodeBackups}
           onPageSelect={setPage}
         >
-          {nodeBackups.data.map((backup) => (
+          {nodeBackups?.data.map((backup) => (
             <NodeBackupRow key={backup.uuid} node={node} backup={backup} />
           ))}
         </Table>

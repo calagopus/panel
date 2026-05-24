@@ -10,19 +10,22 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { locationTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import LocationCreateOrUpdate from './LocationCreateOrUpdate.tsx';
 import LocationRow from './LocationRow.tsx';
 import LocationView from './LocationView.tsx';
 
 function LocationsContainer() {
   const navigate = useNavigate();
-  const { locations, setLocations } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: locations,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.locations.all(),
     fetcher: getLocations,
-    setStoreData: setLocations,
   });
 
   return (
@@ -43,7 +46,7 @@ function LocationsContainer() {
       }
     >
       <Table columns={locationTableColumns} loading={loading} pagination={locations} onPageSelect={setPage}>
-        {locations.data.map((location) => (
+        {locations?.data.map((location) => (
           <LocationRow key={location.uuid} location={location} />
         ))}
       </Table>

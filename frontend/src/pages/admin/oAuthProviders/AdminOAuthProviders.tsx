@@ -19,7 +19,6 @@ import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import OAuthProviderCreateOrUpdate from './OAuthProviderCreateOrUpdate.tsx';
 import OAuthProviderImportOverlay from './OAuthProviderImportOverlay.tsx';
 import OAuthProviderRow from './OAuthProviderRow.tsx';
@@ -28,14 +27,19 @@ import OAuthProviderView from './OAuthProviderView.tsx';
 function OAuthProvidersContainer() {
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const { oauthProviders, addOAuthProvider, setOAuthProviders } = useAdminStore();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: oauthProviders,
+    loading,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.oAuthProviders.all(),
     fetcher: getOAuthProviders,
-    setStoreData: setOAuthProviders,
   });
 
   const handleImport = async (file: File) => {
@@ -57,8 +61,8 @@ function OAuthProvidersContainer() {
       clientId: 'example',
       clientSecret: 'example',
     })
-      .then((data) => {
-        addOAuthProvider(data);
+      .then(() => {
+        refetch();
         addToast('OAuth Provider imported.', 'success');
       })
       .catch((msg) => {
@@ -111,7 +115,7 @@ function OAuthProvidersContainer() {
       <OAuthProviderImportOverlay visible={isDragging} />
 
       <Table columns={oauthProviderTableColumns} loading={loading} pagination={oauthProviders} onPageSelect={setPage}>
-        {oauthProviders.data.map((oauthProvider) => (
+        {oauthProviders?.data.map((oauthProvider) => (
           <OAuthProviderRow key={oauthProvider.uuid} oauthProvider={oauthProvider} />
         ))}
       </Table>

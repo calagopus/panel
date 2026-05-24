@@ -11,18 +11,21 @@ import { mountTableColumns } from '@/lib/tableColumns.ts';
 import MountView from '@/pages/admin/mounts/MountView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import MountCreateOrUpdate from './MountCreateOrUpdate.tsx';
 import MountRow from './MountRow.tsx';
 
 function MountsContainer() {
   const navigate = useNavigate();
-  const { mounts, setMounts } = useAdminStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: mounts,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mounts.all(),
     fetcher: getMounts,
-    setStoreData: setMounts,
   });
 
   return (
@@ -43,7 +46,7 @@ function MountsContainer() {
       }
     >
       <Table columns={mountTableColumns} loading={loading} pagination={mounts} onPageSelect={setPage}>
-        {mounts.data.map((m) => (
+        {mounts?.data.map((m) => (
           <MountRow key={m.uuid} mount={m} />
         ))}
       </Table>
