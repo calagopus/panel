@@ -23,7 +23,6 @@ export default function AdminUserActivity({ user }: { user: z.infer<typeof fullU
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.users.activity(user.uuid),
     fetcher: (page, search) => getUserActivity(user.uuid, page, search),
-    setStoreData: setUserActivity,
   });
 
   return (
