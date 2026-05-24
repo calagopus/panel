@@ -1,7 +1,7 @@
 use super::{
     BASE64_ENGINE, SourceRow, collect_mappings, connect_source_database_any, decrypt_laravel_value,
-    is_sqlite_source, process_table, source_bool, source_datetime, source_optional_datetime,
-    source_optional_text, source_text, source_uuid,
+    is_postgres_source, is_sqlite_source, process_table, source_bool, source_datetime,
+    source_optional_datetime, source_optional_text, source_text, source_uuid,
 };
 use anyhow::Context;
 use base64::Engine;
@@ -447,9 +447,15 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                 };
 
                 let location_mappings = match async {
-                    let cast_as = if is_sqlite_source() { "TEXT" } else { "CHAR" };
+                    let (cast_as, q) = if is_postgres_source() {
+                        ("TEXT", '"')
+                    } else if is_sqlite_source() {
+                        ("TEXT", '`')
+                    } else {
+                        ("CHAR", '`')
+                    };
                     let rows: Vec<SourceRow> = sqlx::query(sqlx::AssertSqlSafe(format!(
-                        "SELECT `id`, CAST(`tags` AS {cast_as}) AS `tags`, CAST(`created_at` AS {cast_as}) AS `created_at` FROM `nodes`"
+                        "SELECT {q}id{q}, CAST({q}tags{q} AS {cast_as}) AS {q}tags{q}, CAST({q}created_at{q} AS {cast_as}) AS {q}created_at{q} FROM {q}nodes{q}"
                     )))
                     .fetch_all(&source_database)
                     .await?;
@@ -596,9 +602,15 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                 drop(location_mappings);
 
                 let nest_mappings = match async {
-                    let cast_as = if is_sqlite_source() { "TEXT" } else { "CHAR" };
+                    let (cast_as, q) = if is_postgres_source() {
+                        ("TEXT", '"')
+                    } else if is_sqlite_source() {
+                        ("TEXT", '`')
+                    } else {
+                        ("CHAR", '`')
+                    };
                     let rows: Vec<SourceRow> = sqlx::query(sqlx::AssertSqlSafe(format!(
-                        "SELECT `id`, `author`, CAST(`tags` AS {cast_as}) AS `tags`, CAST(`created_at` AS {cast_as}) AS `created_at` FROM `eggs`"
+                        "SELECT {q}id{q}, {q}author{q}, CAST({q}tags{q} AS {cast_as}) AS {q}tags{q}, CAST({q}created_at{q} AS {cast_as}) AS {q}created_at{q} FROM {q}eggs{q}"
                     )))
                     .fetch_all(&source_database)
                     .await?;
