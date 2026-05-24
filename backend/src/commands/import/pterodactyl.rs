@@ -76,19 +76,41 @@ impl shared::extensions::commands::CliCommand<PterodactylArgs> for PterodactylCo
                         return Ok(1);
                     }
                 };
-                let source_app_key = match std::env::var("APP_KEY").map(|v| {
-                    BASE64_ENGINE
-                        .decode(v.trim_start_matches("base64:"))
-                        .unwrap_or_else(|_| v.into_bytes())
-                }) {
-                    Ok(value) => Arc::new(value),
+                let source_app_key = match std::env::var("APP_KEY") {
+                    Ok(v) => {
+                        let bytes = if let Some(encoded) = v.strip_prefix("base64:") {
+                            match BASE64_ENGINE.decode(encoded) {
+                                Ok(b) => b,
+                                Err(err) => {
+                                    eprintln!(
+                                        "{}: {:#?}",
+                                        "failed to base64-decode pterodactyl APP_KEY".red(),
+                                        err
+                                    );
+                                    return Ok(1);
+                                }
+                            }
+                        } else {
+                            v.into_bytes()
+                        };
+
+                        if bytes.len() != 32 {
+                            eprintln!(
+                                "{}: expected 32 bytes, got {}",
+                                "pterodactyl APP_KEY has wrong length".red(),
+                                bytes.len()
+                            );
+                            return Ok(1);
+                        }
+
+                        Arc::new(bytes)
+                    }
                     Err(err) => {
                         eprintln!(
                             "{}: {:#?}",
                             "failed to read pterodactyl environment APP_KEY".red(),
                             err
                         );
-
                         return Ok(1);
                     }
                 };
