@@ -9,7 +9,7 @@ import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { assetDirectoryCreateSchema, storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 
-interface NewDirectoryModalProps extends ModalProps {
+interface NewDirectoryModalProps extends Omit<ModalProps, 'onSubmit'> {
   currentDirectory: string;
   existingEntries: z.infer<typeof storageAssetSchema>[];
   onNavigate: (dir: string) => void;
@@ -20,7 +20,6 @@ export default function NewDirectoryModal({
   existingEntries,
   onNavigate,
   onClose,
-  onSubmit: _,
   ...props
 }: NewDirectoryModalProps) {
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
