@@ -96,9 +96,36 @@ pub(super) async fn connect_source_database_any(
                 }
             }
         }
+        "pgsql" | "postgres" | "postgresql" => {
+            let source_database_host =
+                std::env::var("DB_HOST").context("failed to read source environment DB_HOST")?;
+            let source_database_port = std::env::var("DB_PORT")
+                .unwrap_or_else(|_| "5432".to_string())
+                .parse::<u16>()
+                .context("failed to parse source environment DB_PORT")?;
+            let source_database_database = std::env::var("DB_DATABASE")
+                .context("failed to read source environment DB_DATABASE")?;
+            let source_database_username = std::env::var("DB_USERNAME")
+                .context("failed to read source environment DB_USERNAME")?;
+            let source_database_password = std::env::var("DB_PASSWORD")
+                .context("failed to read source environment DB_PASSWORD")?;
+
+            let mut url = reqwest::Url::parse("postgres://localhost")
+                .context("failed to construct source postgres database url")?;
+            url.set_host(Some(source_database_host.trim_matches('"')))
+                .context("failed to set source postgres database host")?;
+            url.set_port(Some(source_database_port))
+                .map_err(|_| anyhow::anyhow!("failed to set source postgres database port"))?;
+            url.set_username(source_database_username.trim_matches('"'))
+                .map_err(|_| anyhow::anyhow!("failed to set source postgres database username"))?;
+            url.set_password(Some(source_database_password.trim_matches('"')))
+                .map_err(|_| anyhow::anyhow!("failed to set source postgres database password"))?;
+            url.set_path(source_database_database.trim_matches('"'));
+            url.to_string()
+        }
         _ => {
             return Err(anyhow::anyhow!(
-                "unsupported source database driver `{connection}`; expected mysql, mariadb, sqlite, or sqlite3"
+                "unsupported source database driver `{connection}`; expected mysql, mariadb, pgsql, postgres, postgresql, sqlite, or sqlite3"
             ));
         }
     };
@@ -290,6 +317,18 @@ pub(crate) fn is_sqlite_source() -> bool {
 }
 
 #[inline]
+pub(crate) fn is_postgres_source() -> bool {
+    matches!(
+        std::env::var("DB_CONNECTION")
+            .unwrap_or_else(|_| "mysql".to_string())
+            .trim_matches('"')
+            .to_ascii_lowercase()
+            .as_str(),
+        "pgsql" | "postgres" | "postgresql"
+    )
+}
+
+#[inline]
 pub(crate) fn is_datetime_column(column: &str) -> bool {
     matches!(
         column,
@@ -319,6 +358,9 @@ where
     for<'r> i64: sqlx::Decode<'r, DB> + sqlx::Type<DB>,
     for<'r> String: sqlx::Decode<'r, DB> + sqlx::Type<DB>,
 {
+    let is_pg = is_postgres_source();
+    let q = if is_pg { '"' } else { '`' };
+
     let projection = if is_sqlite_source() {
         let pragma_query = format!("PRAGMA table_info(`{table}`)");
         let columns: Vec<DB::Row> = sqlx::query::<DB>(sqlx::AssertSqlSafe(pragma_query))
@@ -336,6 +378,36 @@ where
             })
             .collect::<Result<Vec<_>, _>>()?
             .join(", ")
+    } else if is_pg {
+        let info_query = format!(
+            "SELECT column_name::TEXT, data_type::TEXT FROM information_schema.columns \
+            WHERE table_schema = 'public' AND table_name = '{table}' \
+            ORDER BY ordinal_position"
+        );
+        let columns: Vec<DB::Row> = sqlx::query::<DB>(sqlx::AssertSqlSafe(info_query))
+            .fetch_all(source_database)
+            .await?;
+        if columns.is_empty() {
+            "*".to_string()
+        } else {
+            columns
+                .into_iter()
+                .map(|column| {
+                    let name: String = column.try_get("column_name")?;
+                    let data_type: String = column.try_get("data_type")?;
+                    Ok::<_, anyhow::Error>(match data_type.as_str() {
+                        "timestamp without time zone" | "timestamp with time zone"
+                        | "date" | "time without time zone" | "time with time zone"
+                        | "uuid" | "json" | "jsonb" => {
+                            format!("CAST(\"{name}\" AS TEXT) AS \"{name}\"")
+                        }
+                        "smallint" => format!("CAST(\"{name}\" AS INTEGER) AS \"{name}\""),
+                        _ => format!("\"{name}\""),
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?
+                .join(", ")
+        }
     } else {
         let info_query = format!(
             "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS \
@@ -373,7 +445,7 @@ where
     };
 
     let total: i64 = sqlx::query_scalar::<DB, i64>(sqlx::AssertSqlSafe(format!(
-        "SELECT COUNT(*) FROM `{table}` {}",
+        "SELECT COUNT(*) FROM {q}{table}{q} {}",
         if let Some(where_clause) = sql_where {
             format!("WHERE {where_clause}")
         } else {
@@ -385,7 +457,7 @@ where
     .context("failed to count total rows for table")?;
 
     let query = format!(
-        "SELECT {projection} FROM `{table}` {}",
+        "SELECT {projection} FROM {q}{table}{q} {}",
         if let Some(where_clause) = sql_where {
             format!("WHERE {where_clause}")
         } else {
