@@ -1,11 +1,11 @@
 import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useState } from 'react';
 import { z } from 'zod';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { assetDirectoryCreateSchema, storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 
@@ -20,60 +20,56 @@ export default function NewDirectoryModal({
   existingEntries,
   onNavigate,
   onClose,
+  onSubmit: _,
   ...props
 }: NewDirectoryModalProps) {
-  const [loading, setLoading] = useState(false);
-
-  const { form, onClose: handleClose } = useModalForm<z.infer<typeof assetDirectoryCreateSchema>>(
-    {
-      initialValues: { name: '' },
-      validateInputOnBlur: true,
-      validate: zod4Resolver(assetDirectoryCreateSchema),
-    },
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
+    z.infer<typeof assetDirectoryCreateSchema>
+  >({
+    initialValues: { name: '' },
+    validate: zod4Resolver(assetDirectoryCreateSchema),
     onClose,
-  );
-
-  const submit = () => {
-    setLoading(true);
-
-    const fullPath = currentDirectory ? `${currentDirectory}/${form.values.name}` : form.values.name;
-
-    onNavigate(fullPath);
-    handleClose();
-
-    setLoading(false);
-  };
+    onSubmit: async (values) => {
+      const fullPath = currentDirectory ? `${currentDirectory}/${values.name}` : values.name;
+      onNavigate(fullPath);
+    },
+  });
 
   return (
-    <Modal title='New Directory' onClose={handleClose} {...props}>
-      <form onSubmit={form.onSubmit(() => submit())}>
-        <TextInput
-          withAsterisk
-          label='Directory name'
-          placeholder='Directory name'
-          data-autofocus
-          {...form.getInputProps('name')}
-        />
+    <FormModal
+      title='New Directory'
+      onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
+      {...props}
+    >
+      <TextInput
+        withAsterisk
+        label='Directory name'
+        placeholder='Directory name'
+        data-autofocus
+        {...form.getInputProps('name')}
+      />
 
-        <p className='mt-2 text-sm break-all'>
-          <span>Will be created at </span>
-          <Code>
-            assets/
-            <span className='text-cyan-200'>
-              {currentDirectory ? `${currentDirectory}/${form.values.name}` : form.values.name}
-            </span>
-          </Code>
-        </p>
+      <p className='mt-2 text-sm break-all'>
+        <span>Will be created at </span>
+        <Code>
+          assets/
+          <span className='text-cyan-200'>
+            {currentDirectory ? `${currentDirectory}/${form.values.name}` : form.values.name}
+          </span>
+        </Code>
+      </p>
 
-        <ModalFooter>
-          <Button type='submit' loading={loading} disabled={!form.isValid()}>
-            Create
-          </Button>
-          <Button variant='default' onClick={handleClose}>
-            Cancel
-          </Button>
-        </ModalFooter>
-      </form>
-    </Modal>
+      <ModalFooter>
+        <Button type='submit' loading={loading} disabled={!form.isValid()}>
+          Create
+        </Button>
+        <Button variant='default' onClick={handleClose}>
+          Cancel
+        </Button>
+      </ModalFooter>
+    </FormModal>
   );
 }

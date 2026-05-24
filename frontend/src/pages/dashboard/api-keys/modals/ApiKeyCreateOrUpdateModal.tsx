@@ -1,6 +1,6 @@
 import { Group, ModalProps, Stack } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getPermissions from '@/api/getPermissions.ts';
@@ -10,7 +10,8 @@ import Button from '@/elements/Button.tsx';
 import DateTimePicker from '@/elements/input/DateTimePicker.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import { userApiKeySchema, userApiKeyUpdateSchema } from '@/lib/schemas/user/apiKeys.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
@@ -31,22 +32,29 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
   const { availablePermissions, setAvailablePermissions } = useGlobalStore();
   const { user } = useAuth();
 
-  const [loading, setLoading] = useState(false);
-  const { form, onClose: handleClose } = useModalForm<z.infer<typeof userApiKeyUpdateSchema>>(
-    {
-      initialValues: {
-        name: '',
-        allowedIps: [],
-        userPermissions: [],
-        serverPermissions: [],
-        adminPermissions: [],
-        expires: null,
-      },
-      validateInputOnBlur: true,
-      validate: zod4Resolver(userApiKeyUpdateSchema),
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof userApiKeyUpdateSchema>>({
+    initialValues: {
+      name: '',
+      allowedIps: [],
+      userPermissions: [],
+      serverPermissions: [],
+      adminPermissions: [],
+      expires: null,
     },
+    validate: zod4Resolver(userApiKeyUpdateSchema),
     onClose,
-  );
+    onSubmit: async (values) => {
+      if (contextApiKey) {
+        await updateApiKey(contextApiKey.uuid, values);
+        addToast(t('pages.account.apiKeys.modal.updateApiKey.toast.updated', {}), 'success');
+        updateStateApiKey(contextApiKey.uuid, values);
+      } else {
+        const key = await createApiKey(values);
+        addToast(t('pages.account.apiKeys.modal.createApiKey.toast.created', {}), 'success');
+        addApiKey({ ...key.apiKey, keyStart: key.key });
+      }
+    },
+  });
 
   useEffect(() => {
     if (contextApiKey) {
@@ -70,52 +78,20 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
       })
       .catch((err) => {
         addToast(httpErrorToHuman(err), 'error');
-      })
-      .finally(() => {
-        setLoading(false);
       });
   }, []);
 
-  const doCreateOrUpdate = () => {
-    setLoading(true);
-
-    if (contextApiKey) {
-      updateApiKey(contextApiKey.uuid, form.values)
-        .then(() => {
-          addToast(t('pages.account.apiKeys.modal.updateApiKey.toast.updated', {}), 'success');
-          handleClose();
-          updateStateApiKey(contextApiKey.uuid, form.values);
-        })
-        .catch((msg) => {
-          addToast(httpErrorToHuman(msg), 'error');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      createApiKey(form.values)
-        .then((key) => {
-          addToast(t('pages.account.apiKeys.modal.createApiKey.toast.created', {}), 'success');
-          handleClose();
-          addApiKey({ ...key.apiKey, keyStart: key.key });
-        })
-        .catch((msg) => {
-          addToast(httpErrorToHuman(msg), 'error');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  };
-
   return (
-    <Modal
+    <FormModal
       title={
         contextApiKey
           ? t('pages.account.apiKeys.modal.updateApiKey.title', {})
           : t('pages.account.apiKeys.modal.createApiKey.title', {})
       }
       onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
       opened={opened}
       size='95%'
     >
@@ -172,7 +148,7 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
         )}
 
         <ModalFooter>
-          <Button onClick={doCreateOrUpdate} loading={loading} disabled={!form.isValid()}>
+          <Button type='submit' loading={loading} disabled={!form.isValid()}>
             {t('common.button.save', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
@@ -180,6 +156,6 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

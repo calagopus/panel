@@ -1,11 +1,10 @@
 import { ModalProps, Stack, Text } from '@mantine/core';
-import { useState } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
 import recreateDatabase from '@/api/server/databases/recreateDatabase.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -22,32 +21,26 @@ export default function DatabaseRecreateModal({ database, setSizeLoading, opened
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
 
-  const { form, onClose: handleClose } = useModalForm(
-    {
-      name: '',
-    },
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm({
+    initialValues: { name: '' },
+    validate: { name: (value) => (value !== database.name ? 'Name does not match' : null) },
     onClose,
-  );
-  const [loading, setLoading] = useState(false);
-
-  const doRecreate = () => {
-    setLoading(true);
-
-    recreateDatabase(server.uuid, database.uuid)
-      .then(() => {
-        addToast(t('pages.server.databases.modal.recreateDatabase.toast.recreated', {}), 'success');
-        setSizeLoading(true);
-        handleClose();
-      })
-      .catch((error) => {
-        console.error(error);
-        addToast(httpErrorToHuman(error), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
+    onSubmit: async () => {
+      await recreateDatabase(server.uuid, database.uuid);
+      addToast(t('pages.server.databases.modal.recreateDatabase.toast.recreated', {}), 'success');
+      setSizeLoading(true);
+    },
+  });
 
   return (
-    <Modal title={t('pages.server.databases.modal.recreateDatabase.title', {})} onClose={handleClose} opened={opened}>
+    <FormModal
+      title={t('pages.server.databases.modal.recreateDatabase.title', {})}
+      onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
+      opened={opened}
+    >
       <Stack>
         <Text>{t('pages.server.databases.modal.recreateDatabase.content', { name: database.name }).md()}</Text>
 
@@ -59,7 +52,7 @@ export default function DatabaseRecreateModal({ database, setSizeLoading, opened
         />
 
         <ModalFooter>
-          <Button color='red' onClick={doRecreate} loading={loading} disabled={database.name !== form.getValues().name}>
+          <Button color='red' type='submit' loading={loading} disabled={!form.isValid()}>
             {t('common.button.recreate', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
@@ -67,6 +60,6 @@ export default function DatabaseRecreateModal({ database, setSizeLoading, opened
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

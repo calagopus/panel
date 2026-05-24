@@ -8,7 +8,7 @@ export interface ButtonProps extends Omit<MantineButtonProps, 'onClick'> {
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, className, type, onClick, loading, disabled, variant = 'filled', ...rest }, ref) => {
+  ({ children, className, type = 'button', onClick, loading, disabled, variant = 'filled', ...rest }, ref) => {
     return (
       <MantineButton
         ref={ref}
