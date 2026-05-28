@@ -1,4 +1,5 @@
 use base64::Engine;
+use sha2::Digest;
 use sqlx::postgres::PgPoolOptions;
 use std::{collections::HashMap, fmt::Display, pin::Pin, sync::Arc};
 use tokio::sync::Mutex;
@@ -105,8 +106,9 @@ impl Database {
     }
 
     pub async fn flush_batch_actions(&self) {
-        let mut actions = self.batch_actions.lock().await;
-        for (key, action) in actions.drain() {
+        let actions = self.batch_actions.lock().await.drain().collect::<Vec<_>>();
+
+        for (key, action) in actions {
             tracing::debug!("executing batch action for {}:{}", key.0, key.1);
             if let Err(err) = action.await {
                 tracing::error!(
@@ -190,7 +192,7 @@ impl Database {
                 .cached(
                     &format!(
                         "decryption_cache::{}",
-                        base32::encode(base32::Alphabet::Z, data.as_ref())
+                        hex::encode(sha2::Sha256::digest(data.as_ref()))
                     ),
                     30,
                     || async {
@@ -216,6 +218,39 @@ impl Database {
         }
     }
 
+    pub async fn decrypt_raw(
+        &self,
+        data: impl AsRef<[u8]> + Send + 'static,
+    ) -> Result<Vec<u8>, anyhow::Error> {
+        if self.use_decryption_cache {
+            self.cache
+                .cached(
+                    &format!(
+                        "decryption_cache::{}::raw",
+                        hex::encode(sha2::Sha256::digest(data.as_ref()))
+                    ),
+                    30,
+                    || async {
+                        let encryption_key = self.encryption_key.clone();
+                        let data = data.as_ref().to_vec();
+
+                        tokio::task::spawn_blocking(move || {
+                            simple_crypt::decrypt(&data, encryption_key.as_bytes())
+                        })
+                        .await?
+                    },
+                )
+                .await
+        } else {
+            let encryption_key = self.encryption_key.clone();
+
+            tokio::task::spawn_blocking(move || {
+                simple_crypt::decrypt(data.as_ref(), encryption_key.as_bytes())
+            })
+            .await?
+        }
+    }
+
     pub async fn decrypt_base64(
         &self,
         data: impl AsRef<str>,
@@ -224,12 +259,30 @@ impl Database {
         self.decrypt(decoded).await
     }
 
+    pub async fn decrypt_base64_raw(
+        &self,
+        data: impl AsRef<str>,
+    ) -> Result<Vec<u8>, anyhow::Error> {
+        let decoded = BASE64_ENGINE.decode(data.as_ref())?;
+        self.decrypt_raw(decoded).await
+    }
+
     pub async fn decrypt_base64_optional(
         &self,
         data: impl AsRef<str>,
     ) -> Result<Option<compact_str::CompactString>, anyhow::Error> {
         match BASE64_ENGINE.decode(data.as_ref()) {
             Ok(decoded) => Ok(Some(self.decrypt(decoded).await?)),
+            Err(_) => Ok(None),
+        }
+    }
+
+    pub async fn decrypt_base64_raw_optional(
+        &self,
+        data: impl AsRef<str>,
+    ) -> Result<Option<Vec<u8>>, anyhow::Error> {
+        match BASE64_ENGINE.decode(data.as_ref()) {
+            Ok(decoded) => Ok(Some(self.decrypt_raw(decoded).await?)),
             Err(_) => Ok(None),
         }
     }
@@ -244,12 +297,48 @@ impl Database {
     }
 
     #[inline]
+    pub fn blocking_decrypt_raw(&self, data: impl AsRef<[u8]>) -> Result<Vec<u8>, anyhow::Error> {
+        simple_crypt::decrypt(data.as_ref(), self.encryption_key.as_bytes())
+    }
+
+    #[inline]
     pub fn blocking_decrypt_base64(
         &self,
         data: impl AsRef<str>,
     ) -> Result<compact_str::CompactString, anyhow::Error> {
         let decoded = BASE64_ENGINE.decode(data.as_ref())?;
         self.blocking_decrypt(decoded)
+    }
+
+    #[inline]
+    pub fn blocking_decrypt_base64_raw(
+        &self,
+        data: impl AsRef<str>,
+    ) -> Result<Vec<u8>, anyhow::Error> {
+        let decoded = BASE64_ENGINE.decode(data.as_ref())?;
+        self.blocking_decrypt_raw(decoded)
+    }
+
+    #[inline]
+    pub fn blocking_decrypt_base64_optional(
+        &self,
+        data: impl AsRef<str>,
+    ) -> Result<Option<compact_str::CompactString>, anyhow::Error> {
+        match BASE64_ENGINE.decode(data.as_ref()) {
+            Ok(decoded) => Ok(Some(self.blocking_decrypt(decoded)?)),
+            Err(_) => Ok(None),
+        }
+    }
+
+    #[inline]
+    pub fn blocking_decrypt_base64_raw_optional(
+        &self,
+        data: impl AsRef<str>,
+    ) -> Result<Option<Vec<u8>>, anyhow::Error> {
+        match BASE64_ENGINE.decode(data.as_ref()) {
+            Ok(decoded) => Ok(Some(self.blocking_decrypt_raw(decoded)?)),
+            Err(_) => Ok(None),
+        }
     }
 
     #[inline]

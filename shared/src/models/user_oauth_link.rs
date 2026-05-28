@@ -27,7 +27,7 @@ impl BaseModel for UserOAuthLink {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -94,14 +94,14 @@ impl UserOAuthLink {
         oauth_provider_uuid: uuid::Uuid,
         identifier: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM user_oauth_links
             WHERE user_oauth_links.oauth_provider_uuid = $1 AND user_oauth_links.identifier = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(oauth_provider_uuid)
         .bind(identifier)
         .fetch_optional(database.read())
@@ -115,14 +115,14 @@ impl UserOAuthLink {
         oauth_provider_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM user_oauth_links
             WHERE user_oauth_links.oauth_provider_uuid = $1 AND user_oauth_links.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(oauth_provider_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -136,14 +136,14 @@ impl UserOAuthLink {
         user_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM user_oauth_links
             WHERE user_oauth_links.user_uuid = $1 AND user_oauth_links.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -161,7 +161,7 @@ impl UserOAuthLink {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM user_oauth_links
@@ -170,7 +170,7 @@ impl UserOAuthLink {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(search)
         .bind(per_page)
@@ -199,7 +199,7 @@ impl UserOAuthLink {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM user_oauth_links
@@ -209,7 +209,7 @@ impl UserOAuthLink {
             LIMIT $2 OFFSET $3
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(per_page)
         .bind(offset)
@@ -238,7 +238,7 @@ impl UserOAuthLink {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM user_oauth_links
@@ -247,7 +247,7 @@ impl UserOAuthLink {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(oauth_provider_uuid)
         .bind(search)
         .bind(per_page)
@@ -358,9 +358,10 @@ impl CreatableModel for UserOAuthLink {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -371,12 +372,9 @@ impl CreatableModel for UserOAuthLink {
         .await?
         .ok_or(crate::database::InvalidRelationError("oauth_provider"))?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("user_oauth_links");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("user_uuid", options.user_uuid)
@@ -385,12 +383,11 @@ impl CreatableModel for UserOAuthLink {
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
+        let mut oauth_link = Self::map(None, &row)?;
 
-        let oauth_link = Self::map(None, &row)?;
-
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut oauth_link, &options, state, transaction).await?;
 
         Ok(oauth_link)
     }
@@ -400,21 +397,20 @@ impl CreatableModel for UserOAuthLink {
 impl DeletableModel for UserOAuthLink {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserOAuthLink>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserOAuthLink>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -424,10 +420,11 @@ impl DeletableModel for UserOAuthLink {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

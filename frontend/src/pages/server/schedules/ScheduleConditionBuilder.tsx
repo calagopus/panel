@@ -32,7 +32,7 @@ export default function ScheduleConditionBuilder({ condition, onChange, depth = 
         onChange({ type: 'or', conditions: [] });
         break;
       case 'not':
-        onChange({ type: 'not', conditions: [] });
+        onChange({ type: 'not', condition: { type: 'none' } });
         break;
       case 'variable_exists':
         onChange({ type: 'variable_exists', variable: { variable: '' } });
@@ -175,8 +175,8 @@ export default function ScheduleConditionBuilder({ condition, onChange, depth = 
 
             <div style={{ flex: 1 }}>
               <ScheduleConditionBuilder
-                condition={condition}
-                onChange={(nestedCondition) => onChange(nestedCondition)}
+                condition={condition.condition}
+                onChange={(nestedCondition) => onChange({ ...condition, condition: nestedCondition })}
                 depth={depth + 1}
               />
             </div>

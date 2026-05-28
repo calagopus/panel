@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO nest_egg_variables (\n                    egg_uuid, name, name_translations, description, description_translations, order_, env_variable,\n                    default_value, user_viewable, user_editable, rules\n                )\n                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)\n                ON CONFLICT (egg_uuid, env_variable) DO UPDATE SET\n                    name = EXCLUDED.name,\n                    name_translations = EXCLUDED.name_translations,\n                    description = EXCLUDED.description,\n                    description_translations = EXCLUDED.description_translations,\n                    order_ = EXCLUDED.order_,\n                    default_value = EXCLUDED.default_value,\n                    user_viewable = EXCLUDED.user_viewable,\n                    user_editable = EXCLUDED.user_editable,\n                    rules = EXCLUDED.rules",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Jsonb",
+        "Text",
+        "Jsonb",
+        "Int2",
+        "Varchar",
+        "Text",
+        "Bool",
+        "Bool",
+        "TextArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b7f8cc6c4d95183890c51bdc4c80a526fc4f517ec73d74841e6ff58761c75ef4"
+}

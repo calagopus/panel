@@ -167,7 +167,7 @@ function MultiKeyValueInput({
     const { key, value } = item;
 
     return (
-      <Card p={6} className='h-11'>
+      <Card p={6}>
         {editingKey === key ? (
           <Group gap={4} wrap='nowrap' h='100%' align='center'>
             <ActionIcon size='sm' variant='subtle' color='gray' {...dragHandleProps} hidden={!allowReordering}>
@@ -202,10 +202,23 @@ function MultiKeyValueInput({
             <ActionIcon size='sm' variant='subtle' color='gray' {...dragHandleProps} hidden={!allowReordering}>
               <FontAwesomeIcon icon={faGripVertical} size='xs' />
             </ActionIcon>
-            <Badge variant='light' size='sm' radius='sm' className='normal-case!'>
+            <Badge
+              variant='light'
+              size='sm'
+              radius='sm'
+              className='normal-case!'
+              title={key}
+              style={{
+                maxWidth: '20%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
               {key}
             </Badge>
-            <Text size='xs' className='flex-1' truncate c='dimmed'>
+            <Text size='xs' className='flex-1' c='dimmed' style={{ minWidth: 0, wordBreak: 'break-all' }}>
               {transformValue ? transformValue(key, value) : value}
             </Text>
             <ActionIcon size='sm' variant='subtle' color='blue' onClick={() => handleStartEdit(key)}>

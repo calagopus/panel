@@ -48,6 +48,7 @@ impl Mail {
                 username,
                 password,
                 use_tls,
+                skip_cert_validation,
                 from_address,
                 from_name,
             } => {
@@ -61,8 +62,8 @@ impl Mail {
                             lettre::transport::smtp::client::TlsParametersBuilder::new(
                                 host.to_string(),
                             )
-                            .build_native()
-                            .unwrap(),
+                            .dangerous_accept_invalid_certs(*skip_cert_validation)
+                            .build_rustls()?,
                         )
                     } else {
                         lettre::transport::smtp::client::Tls::None
@@ -117,10 +118,76 @@ impl Mail {
         Ok((settings, transport))
     }
 
+    pub async fn send_template_foreground(
+        &self,
+        state: &crate::State,
+        identifier: &str,
+        destination: compact_str::CompactString,
+        context: minijinja::Value,
+    ) -> Result<(), anyhow::Error> {
+        let template = self.templates.get_template(identifier)?;
+        let fetched_template = template.get(state).await?;
+
+        if !fetched_template.enabled {
+            tracing::debug!(
+                "email template '{}' is disabled, skipping sending email",
+                identifier
+            );
+            return Ok(());
+        }
+
+        self.send_foreground(
+            destination,
+            fetched_template.subject,
+            fetched_template.content,
+            context,
+        )
+        .await
+    }
+
+    pub async fn send_template(
+        &self,
+        state: &crate::State,
+        identifier: &str,
+        destination: compact_str::CompactString,
+        context: minijinja::Value,
+    ) {
+        let template = match self.templates.get_template(identifier) {
+            Ok(template) => template,
+            Err(err) => {
+                tracing::error!("failed to get email template: {:#?}", err);
+                return;
+            }
+        };
+        let fetched_template = match template.get(state).await {
+            Ok(template) => template,
+            Err(err) => {
+                tracing::error!("failed to get email template content: {:#?}", err);
+                return;
+            }
+        };
+
+        if !fetched_template.enabled {
+            tracing::debug!(
+                "email template '{}' is disabled, skipping sending email",
+                identifier
+            );
+            return;
+        }
+
+        self.send(
+            destination,
+            fetched_template.subject,
+            fetched_template.content,
+            context,
+        )
+        .await
+    }
+
     pub async fn send_foreground(
         &self,
         destination: compact_str::CompactString,
-        subject: compact_str::CompactString,
+        subject: impl AsRef<str>,
         body: impl AsRef<str>,
         context: minijinja::Value,
     ) -> Result<(), anyhow::Error> {
@@ -129,8 +196,13 @@ impl Mail {
         let mut environment = minijinja::Environment::new();
         environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
         environment.add_global("settings", minijinja::Value::from_serialize(&*settings));
+        environment.add_global(
+            "subject",
+            minijinja::Value::from_serialize(subject.as_ref()),
+        );
         drop(settings);
 
+        let rendered_subject = environment.render_str(subject.as_ref(), context.clone())?;
         let rendered_body = environment.render_str(body.as_ref(), context)?;
 
         match transport {
@@ -143,7 +215,7 @@ impl Mail {
                 transport
                     .send(
                         lettre::message::Message::builder()
-                            .subject(subject)
+                            .subject(rendered_subject)
                             .to(lettre::message::Mailbox::new(None, destination.parse()?))
                             .from(lettre::message::Mailbox::new(
                                 from_name.map(String::from),
@@ -162,7 +234,7 @@ impl Mail {
                 transport
                     .send(
                         lettre::message::Message::builder()
-                            .subject(subject)
+                            .subject(rendered_subject)
                             .to(lettre::message::Mailbox::new(None, destination.parse()?))
                             .from(lettre::message::Mailbox::new(
                                 from_name.map(String::from),
@@ -181,7 +253,7 @@ impl Mail {
                 transport
                     .send(
                         lettre::message::Message::builder()
-                            .subject(subject)
+                            .subject(rendered_subject)
                             .to(lettre::message::Mailbox::new(None, destination.parse()?))
                             .from(lettre::message::Mailbox::new(
                                 from_name.map(String::from),
@@ -200,7 +272,7 @@ impl Mail {
     pub async fn send(
         &self,
         destination: compact_str::CompactString,
-        subject: compact_str::CompactString,
+        subject: impl AsRef<str>,
         body: impl AsRef<str>,
         context: minijinja::Value,
     ) {
@@ -215,15 +287,31 @@ impl Mail {
         let mut environment = minijinja::Environment::new();
         environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
         environment.add_global("settings", minijinja::Value::from_serialize(&*settings));
+        environment.add_global(
+            "subject",
+            minijinja::Value::from_serialize(subject.as_ref()),
+        );
         drop(settings);
 
+        let rendered_subject = match environment.render_str(subject.as_ref(), &context) {
+            Ok(subject) => subject,
+            Err(err) => {
+                tracing::error!(
+                    transport = ?transport,
+                    destination = ?destination,
+                    "error while rendering email template: {:?}",
+                    err
+                );
+
+                return;
+            }
+        };
         let rendered_body = match environment.render_str(body.as_ref(), context) {
             Ok(body) => body,
             Err(err) => {
                 tracing::error!(
                     transport = ?transport,
                     destination = ?destination,
-                    subject = ?subject,
                     "error while rendering email template: {:?}",
                     err
                 );
@@ -235,7 +323,6 @@ impl Mail {
         tracing::debug!(
             transport = ?transport,
             destination = ?destination,
-            subject = ?subject,
             "sending email"
         );
 
@@ -251,7 +338,7 @@ impl Mail {
                         transport
                             .send(
                                 lettre::message::Message::builder()
-                                    .subject(subject)
+                                    .subject(rendered_subject)
                                     .to(lettre::message::Mailbox::new(None, destination.parse()?))
                                     .from(lettre::message::Mailbox::new(
                                         from_name.map(String::from),
@@ -270,7 +357,7 @@ impl Mail {
                         transport
                             .send(
                                 lettre::message::Message::builder()
-                                    .subject(subject)
+                                    .subject(rendered_subject)
                                     .to(lettre::message::Mailbox::new(None, destination.parse()?))
                                     .from(lettre::message::Mailbox::new(
                                         from_name.map(String::from),
@@ -289,7 +376,7 @@ impl Mail {
                         transport
                             .send(
                                 lettre::message::Message::builder()
-                                    .subject(subject)
+                                    .subject(rendered_subject)
                                     .to(lettre::message::Mailbox::new(None, destination.parse()?))
                                     .from(lettre::message::Mailbox::new(
                                         from_name.map(String::from),

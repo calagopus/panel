@@ -15,6 +15,10 @@ mod get {
     #[derive(ToSchema, Serialize)]
     struct ResponseTemplate<'a> {
         available_variables: &'a [&'static str],
+        default_enabled: bool,
+        enabled: bool,
+        default_subject: &'static str,
+        subject: Option<String>,
         default_content: &'static str,
         content: Option<String>,
     }
@@ -40,12 +44,20 @@ mod get {
                 .with_status(StatusCode::NOT_FOUND)
                 .ok();
         };
+        let fetched_template = template.get(&state).await?;
 
         ApiResponse::new_serialized(Response {
             email_template: ResponseTemplate {
                 available_variables: &template.available_variables,
+                default_enabled: template.default_enabled,
+                enabled: fetched_template.enabled,
+                default_subject: template.default_subject,
+                subject: match fetched_template.subject {
+                    Cow::Owned(subject) => Some(subject),
+                    Cow::Borrowed(_) => None,
+                },
                 default_content: template.default_content,
-                content: match template.get_content(&state).await? {
+                content: match fetched_template.content {
                     Cow::Owned(content) => Some(content),
                     Cow::Borrowed(_) => None,
                 },
@@ -57,32 +69,29 @@ mod get {
 
 mod put {
     use axum::{extract::Path, http::StatusCode};
-    use serde::{Deserialize, Serialize};
+    use serde::Serialize;
     use shared::{
         GetState,
+        extensions::email_templates::UpdateEmailTemplate,
         models::{admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
-
-    #[derive(ToSchema, Deserialize)]
-    pub struct Payload {
-        content: Option<String>,
-    }
 
     #[derive(ToSchema, Serialize)]
     struct Response {}
 
     #[utoipa::path(put, path = "/", responses(
         (status = OK, body = inline(Response)),
-    ), request_body = inline(Payload))]
+    ), request_body = inline(UpdateEmailTemplate))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
         activity_logger: GetAdminActivityLogger,
         Path(identifier): Path<String>,
-        shared::Payload(data): shared::Payload<Payload>,
+        shared::Payload(data): shared::Payload<UpdateEmailTemplate>,
     ) -> ApiResponseResult {
+        permissions.has_admin_permission("settings.read")?;
         permissions.has_admin_permission("email-templates.update")?;
 
         let Ok(template) = state.mail.templates.get_template(&identifier) else {
@@ -91,11 +100,7 @@ mod put {
                 .ok();
         };
 
-        if let Some(content) = data.content {
-            template.set_content(&state, &content).await?;
-        } else {
-            template.reset_content(&state).await?;
-        }
+        template.update(&state, data).await?;
 
         activity_logger
             .log(

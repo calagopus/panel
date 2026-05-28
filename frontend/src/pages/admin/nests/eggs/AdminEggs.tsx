@@ -6,7 +6,7 @@ import { Route, Routes, useNavigate } from 'react-router';
 import { z } from 'zod';
 import getEggs from '@/api/admin/nests/eggs/getEggs.ts';
 import importEgg from '@/api/admin/nests/eggs/importEgg.ts';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -37,12 +37,17 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
 
   const [selectedEggs, setSelectedEggs] = useState(new ObjectSet<z.infer<typeof adminEggSchema>, 'uuid'>('uuid'));
 
-  const { data, loading, refetch, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggs,
+    loading,
+    refetch,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nests.eggs(contextNest.uuid),
     fetcher: (page, search) => getEggs(contextNest.uuid, page, search),
   });
-
-  const eggs = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const handleImport = async (file: File) => {
     const text = await file.text().then((t) => t.trim());
@@ -59,7 +64,7 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
     }
 
     importEgg(contextNest.uuid, data)
-      .then((data) => {
+      .then(() => {
         refetch();
         addToast('Egg imported.', 'success');
       })
@@ -169,7 +174,7 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
 
       <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
         <Table columns={columns} loading={loading} pagination={eggs} onPageSelect={setPage} allowSelect={false}>
-          {eggs.data.map((egg) => (
+          {eggs?.data.map((egg) => (
             <SelectionArea.Selectable key={egg.uuid} item={egg}>
               {(innerRef: Ref<HTMLElement>) => (
                 <EggRow

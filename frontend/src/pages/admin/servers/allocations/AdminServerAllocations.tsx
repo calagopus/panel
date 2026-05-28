@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import getServerAllocations from '@/api/admin/servers/allocations/getServerAllocations.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
@@ -19,12 +18,16 @@ import ServerAllocationRow from './ServerAllocationRow.tsx';
 export default function AdminServerAllocations({ server }: { server: z.infer<typeof adminServerSchema> }) {
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: serverAllocations,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.servers.allocations(server.uuid),
     fetcher: (page, search) => getServerAllocations(server.uuid, page, search),
   });
-
-  const serverAllocations = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminSubContentContainer
@@ -53,7 +56,7 @@ export default function AdminServerAllocations({ server }: { server: z.infer<typ
           pagination={serverAllocations}
           onPageSelect={setPage}
         >
-          {serverAllocations.data.map((allocation) => (
+          {serverAllocations?.data.map((allocation) => (
             <ServerAllocationRow key={allocation.uuid} server={server} allocation={allocation} />
           ))}
         </Table>

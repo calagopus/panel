@@ -46,6 +46,23 @@ export const eggConfigurationRouteItemSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
+export const transferArchiveFormat = z.enum([
+  'tar',
+  'tar_gz',
+  'tar_xz',
+  'tar_lzip',
+  'tar_bz2',
+  'tar_lz4',
+  'tar_zstd',
+  'itaf',
+  'itaf_gz',
+  'itaf_xz',
+  'itaf_lzip',
+  'itaf_bz2',
+  'itaf_lz4',
+  'itaf_zstd',
+]);
+
 export const streamingArchiveFormat = z.enum([
   'tar',
   'tar_gz',

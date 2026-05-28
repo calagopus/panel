@@ -3,14 +3,17 @@ import {
   faBars,
   faEllipsisVertical,
   faGraduationCap,
+  faMoon,
+  faSun,
   faUserCog,
   faWindowRestore,
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Menu } from '@mantine/core';
+import { Menu, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import classNames from 'classnames';
 import { ReactNode, useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
 import { makeComponentHookable } from 'shared';
 import ActionIcon from '@/elements/ActionIcon.tsx';
@@ -29,9 +32,10 @@ import ContextMenu, { ContextMenuProvider } from './ContextMenu.tsx';
 type SidebarProps = {
   children: ReactNode;
   header?: ReactNode;
+  footer?: ReactNode;
 };
 
-function Sidebar({ children, header }: SidebarProps) {
+function Sidebar({ children, header, footer }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -59,17 +63,19 @@ function Sidebar({ children, header }: SidebarProps) {
           <div id='sidebar-content' className='h-full flex flex-col'>
             {header && <div className='shrink-0'>{header}</div>}
             <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+            {footer && <div className='shrink-0 pt-2'>{footer}</div>}
           </div>
         </Drawer>
 
         <Card
-          className='my-2 ml-2 top-2 sticky! hidden! lg:block! h-[calc(100vh-16px)]  min-w-64!'
+          className='my-2 ml-2 top-2 sticky! hidden! lg:block! h-[calc(100vh-16px)] w-64! overflow-hidden transition-[width] duration-200 ease-in-out'
           p='sm'
           id='sidebar-desktop'
         >
           <div id='sidebar-content' className='h-full flex flex-col'>
             {header && <div className='shrink-0'>{header}</div>}
             <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+            {footer && <div className='shrink-0 pt-2'>{footer}</div>}
           </div>
         </Card>
       </ContextMenuProvider>
@@ -91,6 +97,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
   const { t } = useTranslations();
   const { addWindow } = useWindows();
   const { pathname } = useLocation();
+  const isLight = useComputedColorScheme('dark') === 'light';
   const extraActive = activeMatches?.some((pattern) => matchPath({ path: pattern, end: false }, pathname)) ?? false;
 
   if (to.endsWith('/*')) to = to.slice(0, to.length - 2);
@@ -147,7 +154,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
               <Button
                 color={isActive ? 'blue' : 'gray'}
                 className={classNames(isActive && 'cursor-default! active', className)}
-                variant='subtle'
+                variant={isLight && isActive ? 'outline' : 'subtle'}
                 fullWidth
                 styles={{ label: { width: '100%' } }}
               >
@@ -169,15 +176,54 @@ function Footer() {
   const { t } = useTranslations();
   const { impersonating, user, doLogout } = useAuth();
   const navigate = useNavigate();
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('dark');
 
   if (!user) {
     return null;
   }
 
+  const isDark = computedColorScheme === 'dark';
+
+  const toggleTheme = async (event: React.MouseEvent) => {
+    const nextTheme = isDark ? 'light' : 'dark';
+
+    if (!document.startViewTransition) {
+      setColorScheme(nextTheme);
+      return;
+    }
+
+    const x = event.clientX;
+    const y = event.clientY;
+
+    const endRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+
+    const transition = document.startViewTransition(() => {
+      flushSync(() => {
+        setColorScheme(nextTheme);
+      });
+    });
+
+    transition.ready.then(() => {
+      const clipPath = [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`];
+
+      document.documentElement.animate(
+        { clipPath },
+        {
+          duration: 500,
+          easing: 'ease-in-out',
+          pseudoElement: '::view-transition-new(root)',
+        },
+      );
+    });
+  };
+
   return (
     <>
-      <div
-        className='border border-neutral-700 rounded-lg mt-auto p-2 flex flex-row justify-between items-center min-h-fit'
+      <Card
+        className='flex flex-row! justify-between items-center min-h-fit'
+        p='xs'
+        hoverable
         id='sidebar-account-card'
       >
         <NavLink
@@ -193,7 +239,7 @@ function Footer() {
             alt={user.username}
             className='h-10 w-10 rounded-full select-none shrink-0'
           />
-          <span className='font-sans font-normal text-sm text-neutral-50 whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
+          <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
             {user.username}
           </span>
         </NavLink>
@@ -218,6 +264,10 @@ function Footer() {
               </>
             )}
             <Menu.Divider />
+            <Menu.Item leftSection={<FontAwesomeIcon icon={isDark ? faSun : faMoon} />} onClick={toggleTheme}>
+              {isDark ? t('elements.sidebar.button.switchToLight', {}) : t('elements.sidebar.button.switchToDark', {})}
+            </Menu.Item>
+            <Menu.Divider />
             <Menu.Item leftSection={<FontAwesomeIcon icon={faArrowRightFromBracket} />} color='red' onClick={doLogout}>
               {impersonating
                 ? t('elements.sidebar.button.stopImpersonating', {})
@@ -225,7 +275,7 @@ function Footer() {
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
-      </div>
+      </Card>
     </>
   );
 }

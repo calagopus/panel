@@ -35,7 +35,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
   const [error, setError] = useState('');
   const [resolvedPorts, setResolvedPorts] = useState<number[]>([]);
 
-  const existingNode = data.nodes[0];
+  const [existingNode, setExistingNode] = useState(data.nodes[0]);
   const isEdit = !!existingNode;
   const locationUuid = existingNode?.location.uuid ?? data.locations[0]?.uuid;
 
@@ -72,7 +72,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
   useEffect(() => {
     const { resolved, toRemove } = resolvePorts(allocationsForm.values.ports);
 
-    for (const removable in toRemove) {
+    for (const removable of toRemove) {
       allocationsForm.setFieldValue('ports', (p) => p.filter((r) => r !== removable));
     }
 
@@ -121,6 +121,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
           locationUuid: locationUuid!,
           backupConfigurationUuid: null,
         });
+        setExistingNode(node);
 
         await createNodeAllocations(node.uuid, {
           ip: allocationsForm.values.ip,
@@ -203,7 +204,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
                 label={t('pages.oobe.node.form.memory', {})}
                 mode='mb'
                 min={0}
-                flex={1}
+                className='flex-1'
                 value={form.values.memory}
                 onChange={(value) => form.setFieldValue('memory', value)}
               />
@@ -212,7 +213,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
                 label={t('pages.oobe.node.form.disk', {})}
                 mode='mb'
                 min={0}
-                flex={1}
+                className='flex-1'
                 value={form.values.disk}
                 onChange={(value) => form.setFieldValue('disk', value)}
               />

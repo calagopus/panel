@@ -1,4 +1,4 @@
-import { Group, Tooltip } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { UseFormReturnType, useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -17,13 +17,15 @@ import {
   adminSettingsStorageSchema,
 } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import StorageFilesystem from './forms/StorageFilesystem.tsx';
 import StorageS3 from './forms/StorageS3.tsx';
 
 export default function StorageContainer() {
   const { addToast } = useToast();
-  const { storageDriver } = useAdminStore();
+  const { t } = useTranslations();
+  const { storageDriver, updateSettings } = useAdminStore();
 
   const [openModal, setOpenModal] = useState<'changeStorageType' | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,7 +49,8 @@ export default function StorageContainer() {
     setLoading(true);
     updateStorageSettings(adminSettingsStorageSchema.parse(form.getValues()))
       .then(() => {
-        addToast('Storage settings updated.', 'success');
+        addToast(t('pages.admin.settings.tabs.storage.page.toast.updated', {}), 'success');
+        updateSettings({ storageDriver: adminSettingsStorageSchema.parse(form.getValues()) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -56,20 +59,18 @@ export default function StorageContainer() {
   };
 
   return (
-    <AdminSubContentContainer title='Storage Settings' titleOrder={2}>
+    <AdminSubContentContainer title={t('pages.admin.settings.tabs.storage.page.title', {})} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'changeStorageType'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Changing Storage Type'
-        confirm='Update'
+        title={t('pages.admin.settings.tabs.storage.page.modal.changeStorageType.title', {})}
+        confirm={t('pages.admin.settings.tabs.storage.page.modal.changeStorageType.button.confirm', {})}
         onConfirmed={() => {
           doUpdate();
           setOpenModal(null);
         }}
       >
-        Are you sure you want to change the storage type? Changing the storage type will cause the application to look
-        for assets (e.g. profile pictures) in a different location, which may result in missing assets if they are not
-        moved to the new location manually.
+        {t('pages.admin.settings.tabs.storage.page.modal.changeStorageType.content', {})}
       </ConfirmationModal>
 
       <form
@@ -78,10 +79,10 @@ export default function StorageContainer() {
         )}
       >
         <Select
-          label='Driver'
+          label={t('pages.admin.settings.tabs.storage.page.form.driver', {})}
           data={Object.entries(storageDriverTypeLabelMapping).map(([value, label]) => ({
             value,
-            label,
+            label: label(),
           }))}
           key={form.key('type')}
           {...form.getInputProps('type')}
@@ -94,16 +95,9 @@ export default function StorageContainer() {
         ) : null}
 
         <Group mt='md'>
-          <AdminCan
-            action='settings.update'
-            renderOnCant={
-              <Tooltip label='You do not have permission to update settings.'>
-                <Button disabled>Save</Button>
-              </Tooltip>
-            }
-          >
+          <AdminCan action='settings.update' cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
           </AdminCan>
         </Group>

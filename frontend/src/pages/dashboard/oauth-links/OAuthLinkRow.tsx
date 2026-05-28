@@ -18,7 +18,7 @@ export default function OAuthLinkRow({ oauthLink }: { oauthLink: z.infer<typeof 
   const { addToast } = useToast();
   const { removeOAuthLink } = useUserStore();
 
-  const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const doDelete = async () => {
     await deleteOAuthLink(oauthLink.uuid)

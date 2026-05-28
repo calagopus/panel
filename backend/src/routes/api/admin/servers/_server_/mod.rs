@@ -103,7 +103,9 @@ mod delete {
 
     #[derive(ToSchema, Deserialize)]
     pub struct Payload {
+        #[serde(default)]
         force: bool,
+        #[serde(default)]
         delete_backups: bool,
     }
 
@@ -145,8 +147,11 @@ mod delete {
         {
             tracing::error!("failed to delete server: {:?}", err);
 
+            let (err, status) = shared::response::extract_readable_error(&err)
+                .unwrap_or_else(|| (err.to_string(), StatusCode::EXPECTATION_FAILED));
+
             return ApiResponse::error(format!("failed to delete server: {err}"))
-                .with_status(StatusCode::EXPECTATION_FAILED)
+                .with_status(status)
                 .ok();
         }
 
@@ -157,9 +162,12 @@ mod delete {
                 if let Err(err) = backup.delete(&state, Default::default()).await {
                     tracing::error!(server = %server.uuid, backup = %backup_uuid, "failed to delete backup: {:?}", err);
 
+                    let (err, status) = shared::response::extract_readable_error(&err)
+                        .unwrap_or_else(|| (err.to_string(), StatusCode::EXPECTATION_FAILED));
+
                     if !data.force {
                         return ApiResponse::error(format!("failed to delete backup: {err}"))
-                            .with_status(StatusCode::EXPECTATION_FAILED)
+                            .with_status(status)
                             .ok();
                     }
                 }

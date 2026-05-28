@@ -1,12 +1,11 @@
 import { ModalProps, Stack } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useState } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
 import updateSshKey from '@/api/me/ssh-keys/updateSshKey.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { userSshKeySchema } from '@/lib/schemas/user/sshKeys.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -26,37 +25,28 @@ export default function SshKeyEditModal({ sshKey, opened, onClose }: Props) {
   const { addToast } = useToast();
   const { updateSshKey: updateStateSshKey } = useUserStore();
 
-  const [loading, setLoading] = useState(false);
-
-  const { form, onClose: handleClose } = useModalForm<z.infer<typeof schema>>(
-    {
-      initialValues: {
-        name: sshKey.name,
-      },
-      validateInputOnBlur: true,
-      validate: zod4Resolver(schema),
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
+    initialValues: {
+      name: sshKey.name,
     },
+    validate: zod4Resolver(schema),
     onClose,
-  );
-
-  const doUpdate = () => {
-    setLoading(true);
-
-    updateSshKey(sshKey.uuid, form.values)
-      .then(() => {
-        updateStateSshKey(sshKey.uuid, form.values);
-
-        handleClose();
-        addToast(t('pages.account.sshKeys.modal.editSshKey.toast.updated', {}), 'success');
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
+    onSubmit: async (values) => {
+      await updateSshKey(sshKey.uuid, values);
+      updateStateSshKey(sshKey.uuid, values);
+      addToast(t('pages.account.sshKeys.modal.editSshKey.toast.updated', {}), 'success');
+    },
+  });
 
   return (
-    <Modal title={t('pages.account.sshKeys.modal.editSshKey.title', {})} onClose={handleClose} opened={opened}>
+    <FormModal
+      title={t('pages.account.sshKeys.modal.editSshKey.title', {})}
+      onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
+      opened={opened}
+    >
       <Stack>
         <TextInput
           withAsterisk
@@ -66,7 +56,7 @@ export default function SshKeyEditModal({ sshKey, opened, onClose }: Props) {
         />
 
         <ModalFooter>
-          <Button onClick={doUpdate} loading={loading} disabled={!form.isValid()}>
+          <Button type='submit' loading={loading} disabled={!form.isValid()}>
             {t('common.button.edit', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
@@ -74,6 +64,6 @@ export default function SshKeyEditModal({ sshKey, opened, onClose }: Props) {
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

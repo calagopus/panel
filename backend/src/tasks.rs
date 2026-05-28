@@ -1,4 +1,11 @@
 use rand::RngExt;
+use shared::models::{
+    admin_activity::AdminActivity, announcement::Announcement, egg_configuration::EggConfiguration,
+    server_activity::ServerActivity, user_activity::UserActivity, user_api_key::UserApiKey,
+    user_command_snippet::UserCommandSnippet, user_security_key::UserSecurityKey,
+    user_server_group::UserServerGroup, user_session::UserSession,
+};
+use std::str::FromStr;
 
 pub async fn define_background_tasks(
     background_task_builder: &shared::extensions::background_tasks::BackgroundTaskBuilder,
@@ -74,91 +81,186 @@ pub async fn define_background_tasks(
         })
         .await;
     background_task_builder
-        .add_task("delete_expired_sessions", async |state| {
-            tokio::time::sleep(std::time::Duration::from_mins(5)).await;
+        .add_cron_task(
+            "delete_expired_sessions",
+            cron::Schedule::from_str("0 */5 * * * *").unwrap(),
+            async |state| {
+                let session_duration = state
+                    .settings
+                    .get_as(|s| s.app.session_duration_seconds)
+                    .await?;
 
-            let deleted_sessions =
-                shared::models::user_session::UserSession::delete_unused(&state.database).await?;
-            if deleted_sessions > 0 {
-                tracing::info!("deleted {} expired user sessions", deleted_sessions);
-            }
+                let deleted_sessions =
+                    UserSession::delete_unused(&state.database, session_duration as i64).await?;
+                if deleted_sessions > 0 {
+                    tracing::info!("deleted {} expired user sessions", deleted_sessions);
+                }
 
-            Ok(())
-        })
+                Ok(())
+            },
+        )
         .await;
     background_task_builder
-        .add_task("delete_expired_api_keys", async |state| {
-            tokio::time::sleep(std::time::Duration::from_mins(30)).await;
+        .add_cron_task(
+            "delete_expired_api_keys",
+            cron::Schedule::from_str("0 */30 * * * *").unwrap(),
+            async |state| {
+                let deleted_api_keys = UserApiKey::delete_expired(&state.database).await?;
+                if deleted_api_keys > 0 {
+                    tracing::info!("deleted {} expired user api keys", deleted_api_keys);
+                }
 
-            let deleted_api_keys =
-                shared::models::user_api_key::UserApiKey::delete_expired(&state.database).await?;
-            if deleted_api_keys > 0 {
-                tracing::info!("deleted {} expired user api keys", deleted_api_keys);
-            }
-
-            Ok(())
-        })
+                Ok(())
+            },
+        )
         .await;
     background_task_builder
-        .add_task("delete_unconfigured_security_keys", async |state| {
-            tokio::time::sleep(std::time::Duration::from_mins(30)).await;
+        .add_cron_task(
+            "delete_unconfigured_security_keys",
+            cron::Schedule::from_str("0 */30 * * * *").unwrap(),
+            async |state| {
+                let deleted_security_keys =
+                    UserSecurityKey::delete_unconfigured(&state.database).await?;
+                if deleted_security_keys > 0 {
+                    tracing::info!(
+                        "deleted {} unconfigured user security keys",
+                        deleted_security_keys
+                    );
+                }
 
-            let deleted_security_keys =
-                shared::models::user_security_key::UserSecurityKey::delete_unconfigured(
-                    &state.database,
-                )
-                .await?;
-            if deleted_security_keys > 0 {
-                tracing::info!(
-                    "deleted {} unconfigured user security keys",
-                    deleted_security_keys
-                );
-            }
-
-            Ok(())
-        })
+                Ok(())
+            },
+        )
         .await;
     background_task_builder
-        .add_task("delete_old_activity", async |state| {
-            tokio::time::sleep(std::time::Duration::from_hours(1)).await;
+        .add_cron_task(
+            "cleanup_uuid_arrays",
+            cron::Schedule::from_str("0 * * * * *").unwrap(),
+            async |state| {
+                let cleaned_announcements =
+                    Announcement::cleanup_uuid_arrays(&state.database).await?;
+                if cleaned_announcements > 0 {
+                    tracing::info!(
+                        "cleaned up {} invalid UUIDs in announcements",
+                        cleaned_announcements
+                    );
+                }
 
+                let cleaned_egg_configurations =
+                    EggConfiguration::cleanup_uuid_arrays(&state.database).await?;
+                if cleaned_egg_configurations > 0 {
+                    tracing::info!(
+                        "cleaned up {} invalid UUIDs in egg configurations",
+                        cleaned_egg_configurations
+                    );
+                }
+
+                let cleaned_user_command_snippets =
+                    UserCommandSnippet::cleanup_uuid_arrays(&state.database).await?;
+                if cleaned_user_command_snippets > 0 {
+                    tracing::info!(
+                        "cleaned up {} invalid UUIDs in user command snippets",
+                        cleaned_user_command_snippets
+                    );
+                }
+
+                let cleaned_user_server_groups =
+                    UserServerGroup::cleanup_uuid_arrays(&state.database).await?;
+                if cleaned_user_server_groups > 0 {
+                    tracing::info!(
+                        "cleaned up {} invalid UUIDs in user server groups",
+                        cleaned_user_server_groups
+                    );
+                }
+
+                Ok(())
+            },
+        )
+        .await;
+    background_task_builder
+        .add_cron_task("delete_old_activity", cron::Schedule::from_str("0 */30 * * * *").unwrap(), async |state| {
             let settings = state.settings.get().await?;
             let admin_retention_days = settings.activity.admin_log_retention_days;
+            let admin_retention_count = settings.activity.admin_log_retention_count;
             let user_retention_days = settings.activity.user_log_retention_days;
+            let user_retention_count = settings.activity.user_log_retention_count;
             let server_retention_days = settings.activity.server_log_retention_days;
+            let server_retention_count = settings.activity.server_log_retention_count;
             drop(settings);
 
-            let deleted_admin_activity =
-                shared::models::admin_activity::AdminActivity::delete_older_than(
-                    &state.database,
-                    chrono::Utc::now() - chrono::Duration::days(admin_retention_days as i64),
-                )
-                .await?;
+            let deleted_admin_activity = AdminActivity::delete_older_than(
+                &state.database,
+                chrono::Utc::now() - chrono::Duration::days(admin_retention_days as i64),
+            )
+            .await?;
             if deleted_admin_activity > 0 {
                 tracing::info!("deleted {} old admin activity logs", deleted_admin_activity);
             }
 
-            let deleted_user_activity =
-                shared::models::user_activity::UserActivity::delete_older_than(
+            if let Some(admin_retention_count) = admin_retention_count {
+                let deleted_admin_activity = AdminActivity::retain_latest_logs(
                     &state.database,
-                    chrono::Utc::now() - chrono::Duration::days(user_retention_days as i64),
+                    admin_retention_count as i64,
                 )
                 .await?;
+                if deleted_admin_activity > 0 {
+                    tracing::info!(
+                        "deleted {} old admin activity logs to retain latest {} logs",
+                        deleted_admin_activity,
+                        admin_retention_count
+                    );
+                }
+            }
+
+            let deleted_user_activity = UserActivity::delete_older_than(
+                &state.database,
+                chrono::Utc::now() - chrono::Duration::days(user_retention_days as i64),
+            )
+            .await?;
             if deleted_user_activity > 0 {
                 tracing::info!("deleted {} old user activity logs", deleted_user_activity);
             }
 
-            let deleted_server_activity =
-                shared::models::server_activity::ServerActivity::delete_older_than(
+            if let Some(user_retention_count) = user_retention_count {
+                let deleted_user_activity = UserActivity::retain_latest_logs_per_user(
                     &state.database,
-                    chrono::Utc::now() - chrono::Duration::days(server_retention_days as i64),
+                    user_retention_count as i64,
                 )
                 .await?;
+                if deleted_user_activity > 0 {
+                    tracing::info!(
+                        "deleted {} old user activity logs to retain latest {} logs",
+                        deleted_user_activity,
+                        user_retention_count
+                    );
+                }
+            }
+
+            let deleted_server_activity = ServerActivity::delete_older_than(
+                &state.database,
+                chrono::Utc::now() - chrono::Duration::days(server_retention_days as i64),
+            )
+            .await?;
             if deleted_server_activity > 0 {
                 tracing::info!(
                     "deleted {} old server activity logs",
                     deleted_server_activity
                 );
+            }
+
+            if let Some(server_retention_count) = server_retention_count {
+                let deleted_server_activity = ServerActivity::retain_latest_logs_per_server(
+                    &state.database,
+                    server_retention_count as i64,
+                )
+                .await?;
+                if deleted_server_activity > 0 {
+                    tracing::info!(
+                        "deleted {} old server activity logs to retain latest {} logs per server",
+                        deleted_server_activity,
+                        server_retention_count
+                    );
+                }
             }
 
             Ok(())

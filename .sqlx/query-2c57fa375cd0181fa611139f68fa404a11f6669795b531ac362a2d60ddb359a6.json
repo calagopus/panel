@@ -6,12 +6,19 @@
       {
         "ordinal": 0,
         "name": "language",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "language"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "count",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": "Expression"
       }
     ],
     "parameters": {

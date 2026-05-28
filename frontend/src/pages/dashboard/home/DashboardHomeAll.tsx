@@ -1,7 +1,7 @@
 import { Group } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
 import getServers from '@/api/server/getServers.ts';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -26,7 +26,7 @@ import ServerItem from './ServerItem.tsx';
 
 export default function DashboardHomeAll() {
   const { t } = useTranslations();
-  const { setServerGroups } = useUserStore();
+  const { servers, setServers, setServerGroups } = useUserStore();
   const { serverListShowOthers, setServerListShowOthers } = useGlobalStore();
   const { addToast } = useToast();
 
@@ -71,13 +71,12 @@ export default function DashboardHomeAll() {
     };
   }, []);
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.servers.all(),
     fetcher: (page, search) => getServers(page, search, serverListShowOthers),
+    setStoreData: setServers,
     deps: [serverListShowOthers],
   });
-
-  const servers = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const handleServerSelectionChange = (server: z.infer<typeof serverSchema>, selected: boolean) => {
     setSelectedServers((prev) => {
@@ -116,7 +115,7 @@ export default function DashboardHomeAll() {
           placeholder={t('common.input.search', {})}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          w={250}
+          w={{ base: '100%', sm: 250 }}
         />
         <AdminCan action='servers.read'>
           <Switch
@@ -138,7 +137,7 @@ export default function DashboardHomeAll() {
       {loading ? (
         <Spinner.Centered />
       ) : servers.total === 0 ? (
-        <p className='text-gray-400'>{t('pages.account.home.noServers', {})}</p>
+        <p className='text-(--mantine-color-dimmed)'>{t('pages.account.home.noServers', {})}</p>
       ) : (
         <div className='gap-4 grid md:grid-cols-2'>
           {servers.data.map((server) => (

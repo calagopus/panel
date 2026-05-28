@@ -6,6 +6,7 @@ interface Props {
   files: {
     file: string;
     mode: string;
+    recursive: boolean;
   }[];
 }
 

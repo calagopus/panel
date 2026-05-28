@@ -29,20 +29,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v5
         with:
-          version: 10
+          version: 11
           run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
 
       - name: Install frontend dependencies
         run: |
@@ -265,6 +253,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ${{ env.DOCKER_TAGS }}
@@ -275,7 +264,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.aio
+          file: ./docker/Dockerfile.aio
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ${{ env.AIO_TAGS }}
@@ -283,7 +272,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   build-heavy-image:
-    name: Build Heavy Docker images (${{ matrix.platform }})
+    name: Build Heavy Docker image (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -317,26 +306,57 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.heavy
+          file: ./docker/Dockerfile.heavy
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:heavy-build-${{ matrix.tag_suffix }}
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
 
+  build-heavy-aio-image:
+    name: Build Heavy AIO Docker image (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            tag_suffix: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            tag_suffix: arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build & push heavy AIO platform image
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.heavy.aio
+          file: ./docker/Dockerfile.heavy.aio
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:heavy-aio-build-${{ matrix.tag_suffix }}
-          cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
-          cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
+          cache-from: type=gha,scope=heavy-aio-${{ matrix.tag_suffix }}
+          cache-to: type=gha,mode=max,scope=heavy-aio-${{ matrix.tag_suffix }}
 
   merge-heavy-image:
-    name: Merge Heavy Docker manifests
+    name: Merge Heavy Docker manifest
     needs: [build-heavy-image]
     runs-on: ubuntu-24.04
     permissions:
@@ -358,25 +378,20 @@ jobs:
           VERSION="${RAW_TAG#release-}"
 
           HEAVY_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy"
-          HEAVY_AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy-aio"
 
           if [[ "$VERSION" == *-* ]]; then
             HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy-pre"
-            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio-pre"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
               HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
-              HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
             fi
           else
             HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
-            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
           fi
 
           echo "HEAVY_TAGS=$HEAVY_TAGS" >> $GITHUB_ENV
-          echo "HEAVY_AIO_TAGS=$HEAVY_AIO_TAGS" >> $GITHUB_ENV
 
-      - name: Create and push multi-arch manifests
+      - name: Create and push multi-arch manifest
         run: |
           SOURCE_AMD64="ghcr.io/${{ github.repository }}:heavy-build-amd64"
           SOURCE_ARM64="ghcr.io/${{ github.repository }}:heavy-build-arm64"
@@ -386,6 +401,44 @@ jobs:
             docker buildx imagetools create -t "$TAG" "$SOURCE_AMD64" "$SOURCE_ARM64"
           done
 
+  merge-heavy-aio-image:
+    name: Merge Heavy AIO Docker manifest
+    needs: [build-heavy-aio-image]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version and determine tags
+        id: prep_tags
+        run: |
+          RAW_TAG="${{ github.ref_name }}"
+          VERSION="${RAW_TAG#release-}"
+
+          HEAVY_AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy-aio"
+
+          if [[ "$VERSION" == *-* ]]; then
+            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio-pre"
+
+            if [[ "$VERSION" == 1.0.0-* ]]; then
+              HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
+            fi
+          else
+            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
+          fi
+
+          echo "HEAVY_AIO_TAGS=$HEAVY_AIO_TAGS" >> $GITHUB_ENV
+
+      - name: Create and push multi-arch manifest
+        run: |
           AIO_SOURCE_AMD64="ghcr.io/${{ github.repository }}:heavy-aio-build-amd64"
           AIO_SOURCE_ARM64="ghcr.io/${{ github.repository }}:heavy-aio-build-arm64"
 

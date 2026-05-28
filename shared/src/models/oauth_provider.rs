@@ -49,7 +49,7 @@ impl BaseModel for OAuthProvider {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -199,7 +199,7 @@ impl OAuthProvider {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM oauth_providers
@@ -208,7 +208,7 @@ impl OAuthProvider {
             LIMIT $2 OFFSET $3
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(search)
         .bind(per_page)
         .bind(offset)
@@ -231,7 +231,7 @@ impl OAuthProvider {
     pub async fn all_by_usable(
         database: &crate::database::Database,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM oauth_providers
@@ -239,7 +239,7 @@ impl OAuthProvider {
             ORDER BY oauth_providers.created
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .fetch_all(database.read())
         .await?;
 
@@ -438,16 +438,35 @@ impl ByUuid for OAuthProvider {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM oauth_providers
             WHERE oauth_providers.uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM oauth_providers
+            WHERE oauth_providers.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)
@@ -524,18 +543,16 @@ impl CreatableModel for OAuthProvider {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("oauth_providers");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         let encrypted_client_secret = state
             .database
@@ -566,11 +583,11 @@ impl CreatableModel for OAuthProvider {
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
-        let oauth_provider = Self::map(None, &row)?;
+        let mut oauth_provider = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut oauth_provider, &options, state, transaction).await?;
 
         Ok(oauth_provider)
     }
@@ -663,32 +680,25 @@ pub struct UpdateOAuthProviderOptions {
 impl UpdatableModel for OAuthProvider {
     type UpdateOptions = UpdateOAuthProviderOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<OAuthProvider>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<OAuthProvider>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("oauth_providers");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         let encrypted_client_secret = if let Some(ref client_secret) = options.client_secret {
             Some(
@@ -739,7 +749,7 @@ impl UpdatableModel for OAuthProvider {
             .set("basic_auth", options.basic_auth)
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(name) = options.name {
             self.name = name;
@@ -803,7 +813,7 @@ impl UpdatableModel for OAuthProvider {
             self.name_last_path = name_last_path;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -813,21 +823,20 @@ impl UpdatableModel for OAuthProvider {
 impl DeletableModel for OAuthProvider {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<OAuthProvider>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<OAuthProvider>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -837,10 +846,11 @@ impl DeletableModel for OAuthProvider {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

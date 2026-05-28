@@ -1011,8 +1011,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Sağlayıcı Adı",
-              "identifier": "Tanımlayıcı"
+              "providerName": "Sağlayıcı Adı"
             }
           },
           "modal": {
@@ -1616,7 +1615,7 @@
                 "cronSchedule": "Cron Zamanlaması"
               },
               "card": {
-                "content": "`{schedule}` Cron aralığında, Sonraki çalışma: {timestamp} - Son çalışma: {lastTimestamp}."
+                "content": "{schedule} Cron aralığında, Sonraki çalışma: {timestamp} - Son çalışma: {lastTimestamp}."
               }
             },
             "powerAction": {
@@ -2051,11 +2050,14 @@
               "readOnly": "Salt Okunur"
             }
           },
+          "button": {
+            "attach": "Bağla",
+            "detach": "Ayır"
+          },
           "modal": {
             "attachMount": {
               "title": "Mount Ekle",
               "content": "**{name}** öğesini `{target}` konumuna bağlamak istiyor musunuz?",
-              "confirm": "Bağla",
               "toast": {
                 "attached": "{name} sunucunuza bağlandı."
               }
@@ -2063,7 +2065,6 @@
             "detachMount": {
               "title": "Mount Kaldır",
               "content": "**{name}** öğesini `{target}` konumundan ayırmak istiyor musunuz?",
-              "confirm": "Ayır",
               "toast": {
                 "detached": "{name} sunucunuzdan kaldırıldı."
               }

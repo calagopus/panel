@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { GetPlaceholders, globalTranslationHandle, TranslationContext } from 'shared';
+import { globalTranslationHandle, TranslationContext } from 'shared';
 import baseTranslations from '@/translations.ts';
 
 export const useTranslations = () => {
@@ -11,22 +11,16 @@ export const useTranslations = () => {
   return {
     language: context.language,
     setLanguage: context.setLanguage,
-    t<K extends (typeof baseTranslations)['paths']>(
-      key: K,
-      values: Record<GetPlaceholders<(typeof baseTranslations)['mapping'][K]>[number], string | number>,
-    ): string {
+    t(key, values) {
       return context.t(key, values);
     },
-    tReact<K extends (typeof baseTranslations)['paths']>(
-      key: K,
-      values: Record<GetPlaceholders<(typeof baseTranslations)['mapping'][K]>[number], React.ReactNode>,
-    ): React.ReactNode {
+    tReact(key, values) {
       return context.tReact(key, values);
     },
-    tItem(key: keyof (typeof baseTranslations)['items'], count: number): string {
-      return context.tItem(key as string, count);
+    tItem(key, count) {
+      return context.tItem(key, count);
     },
-  };
+  } as ReturnType<typeof baseTranslations.useTranslations>;
 };
 
 export const getTranslations = (): ReturnType<typeof useTranslations> => {

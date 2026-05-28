@@ -130,15 +130,25 @@ mod post {
 
         permissions.has_server_permission("schedules.update")?;
 
+        let steps_lock = state
+            .cache
+            .lock(
+                format!(
+                    "servers::{}::schedules::{}::steps",
+                    server.uuid, schedule.uuid
+                ),
+                Some(30),
+                Some(5),
+            )
+            .await?;
+
         let schedule_steps =
-            ServerScheduleStep::count_by_schedule_uuid(&state.database, schedule.uuid).await;
-        let settings = state.settings.get().await?;
-        if schedule_steps >= settings.server.max_schedules_step_count as i64 {
+            ServerScheduleStep::count_by_schedule_uuid(&state.database, schedule.uuid).await?;
+        if schedule_steps >= state.settings.get().await?.server.max_schedule_step_count as i64 {
             return ApiResponse::error("maximum number of schedule steps reached")
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
         }
-        drop(settings);
 
         let schedule_step = match ServerScheduleStep::create(
             &state,
@@ -159,6 +169,8 @@ mod post {
                     .ok();
             }
         };
+
+        drop(steps_lock);
 
         activity_logger
             .log(

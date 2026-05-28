@@ -625,8 +625,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Nom du fournisseur",
-              "identifier": "Identifiant"
+              "providerName": "Nom du fournisseur"
             }
           },
           "modal": {

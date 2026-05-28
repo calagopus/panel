@@ -97,6 +97,8 @@ mod put {
             )
             .await;
 
+        server.0.batch_sync(&state.database).await;
+
         ApiResponse::new_serialized(Response {}).ok()
     }
 }

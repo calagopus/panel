@@ -1,5 +1,6 @@
 import {
   DragEndEvent,
+  DragStartEvent,
   DropAnimation,
   defaultDropAnimationSideEffects,
   MouseSensor,
@@ -37,7 +38,7 @@ export function useDndState<T extends DndItem>(items: T[], callbacks: DndCallbac
     setLocalItems(items);
   }, [items]);
 
-  const handleDragStart = (event: DragEndEvent) => {
+  const handleDragStart = (event: DragStartEvent) => {
     const activeItem = items.find((item) => item.id === event.active.id);
     setActiveId(event.active.id as string);
 

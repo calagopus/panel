@@ -45,9 +45,8 @@ clap = { workspace = true }
 dialoguer = { workspace = true }
 cron = { workspace = true }
 webauthn-rs = { workspace = true }
-openssl = { version = "0.10.73", features = ["vendored"] }
 base64 = { workspace = true }
-rust-s3 = { workspace = true }
+aws-sdk-s3 = { workspace = true }
 dotenvy = { workspace = true }
 oauth2 = { workspace = true }
 human_bytes = "0.4.3"
@@ -61,3 +60,7 @@ serde_norway = { workspace = true }
 hyper = "1.8.1"
 hyper-util = { version = "0.1", features = ["tokio"] }
 hex = { workspace = true }
+aes = "0.9.0"
+cbc = "0.2.1"
+spki = "0.8.0"
+rsa = "0.9.10"

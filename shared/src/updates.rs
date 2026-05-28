@@ -1,7 +1,15 @@
 use compact_str::ToCompactString;
 use serde::{Deserialize, Serialize};
+use sqlx::Row;
 use std::{collections::BTreeMap, fmt::Display, str::FromStr, sync::Arc};
+use tokio::sync::{RwLock, RwLockReadGuard};
 use utoipa::ToSchema;
+
+#[derive(ToSchema, Serialize, Deserialize, Clone)]
+pub struct VersionHistoryEntry {
+    version: compact_str::CompactString,
+    timestamp: chrono::DateTime<chrono::Utc>,
+}
 
 /// Accepted formats:
 /// - `1.0.0`
@@ -98,7 +106,9 @@ pub struct UpdateManager {
     recheck_finished_receiver: tokio::sync::broadcast::Receiver<ChannelData>,
     recheck_finished_sender: tokio::sync::broadcast::Sender<ChannelData>,
 
-    latest_info: Arc<tokio::sync::RwLock<Option<Arc<UpdateInformation>>>>,
+    latest_info: Arc<RwLock<Option<Arc<UpdateInformation>>>>,
+    panel_version_history: Arc<RwLock<Vec<VersionHistoryEntry>>>,
+    extension_version_history: Arc<RwLock<BTreeMap<&'static str, Vec<VersionHistoryEntry>>>>,
 }
 
 impl Default for UpdateManager {
@@ -110,7 +120,9 @@ impl Default for UpdateManager {
             recheck_notifier: Arc::new(tokio::sync::Notify::new()),
             recheck_finished_receiver,
             recheck_finished_sender,
-            latest_info: Arc::new(tokio::sync::RwLock::new(None)),
+            latest_info: Arc::new(RwLock::new(None)),
+            panel_version_history: Arc::new(RwLock::new(Vec::new())),
+            extension_version_history: Arc::new(RwLock::new(BTreeMap::new())),
         }
     }
 }
@@ -125,96 +137,175 @@ impl UpdateManager {
         let recheck_finished_sender = self.recheck_finished_sender.clone();
         let latest_info = self.latest_info.clone();
 
-        tokio::spawn(async move {
-            loop {
-                let run_inner = async || -> Result<(), anyhow::Error> {
-                    let data: Response = state
-                        .client
-                        .get("https://calagopus.com/api/latest")
-                        .send()
-                        .await?
-                        .json()
-                        .await?;
+        tokio::spawn({
+            let state = state.clone();
 
-                    #[derive(Deserialize)]
-                    struct Response {
-                        versions: ResponseVersions,
-                    }
+            async move {
+                loop {
+                    let run_inner = async || -> Result<(), anyhow::Error> {
+                        let data: Response = state
+                            .client
+                            .get("https://calagopus.com/api/latest")
+                            .send()
+                            .await?
+                            .json()
+                            .await?;
 
-                    #[derive(Deserialize)]
-                    struct ResponseVersions {
-                        panel: semver::Version,
-                        wings: semver::Version,
-                    }
+                        #[derive(Deserialize)]
+                        struct Response {
+                            versions: ResponseVersions,
+                        }
 
-                    let mut update_info = UpdateInformation {
-                        panel_version: state.version.to_compact_string(),
-                        latest_panel_version: data.versions.panel,
-                        latest_wings_version: data.versions.wings,
-                        extensions: BTreeMap::new(),
-                    };
+                        #[derive(Deserialize)]
+                        struct ResponseVersions {
+                            panel: semver::Version,
+                            wings: semver::Version,
+                        }
 
-                    for extension in state.extensions.extensions().await.iter() {
-                        let update_information = match extension
-                            .check_for_updates(state.clone(), &extension.version)
-                            .await
-                        {
-                            Ok(info) => info,
-                            Err(err) => {
-                                tracing::error!(
-                                    "failed to check for updates for extension {}: {:#?}",
-                                    extension.package_name,
-                                    err
-                                );
-
-                                update_info.extensions.insert(
-                                    extension.package_name,
-                                    ExtensionUpdateCheckResult::Error {
-                                        error: err.to_compact_string(),
-                                    },
-                                );
-
-                                continue;
-                            }
+                        let mut update_info = UpdateInformation {
+                            panel_version: state.version.to_compact_string(),
+                            latest_panel_version: data.versions.panel,
+                            latest_wings_version: data.versions.wings,
+                            extensions: BTreeMap::new(),
                         };
 
-                        if let Some(info) = update_information {
-                            update_info.extensions.insert(
-                                extension.package_name,
-                                ExtensionUpdateCheckResult::UpdateAvailable {
-                                    version: extension.version.clone(),
-                                    latest_version: info.version,
-                                    changes: info.changes,
-                                },
-                            );
-                        } else {
-                            update_info.extensions.insert(
-                                extension.package_name,
-                                ExtensionUpdateCheckResult::NoUpdate,
-                            );
+                        for extension in state.extensions.extensions().await.iter() {
+                            let update_information = match extension
+                                .check_for_updates(state.clone(), &extension.version)
+                                .await
+                            {
+                                Ok(info) => info,
+                                Err(err) => {
+                                    tracing::error!(
+                                        "failed to check for updates for extension {}: {:#?}",
+                                        extension.package_name,
+                                        err
+                                    );
+
+                                    update_info.extensions.insert(
+                                        extension.package_name,
+                                        ExtensionUpdateCheckResult::Error {
+                                            error: err.to_compact_string(),
+                                        },
+                                    );
+
+                                    continue;
+                                }
+                            };
+
+                            if let Some(info) = update_information {
+                                update_info.extensions.insert(
+                                    extension.package_name,
+                                    ExtensionUpdateCheckResult::UpdateAvailable {
+                                        version: extension.version.clone(),
+                                        latest_version: info.version,
+                                        changes: info.changes,
+                                    },
+                                );
+                            } else {
+                                update_info.extensions.insert(
+                                    extension.package_name,
+                                    ExtensionUpdateCheckResult::NoUpdate,
+                                );
+                            }
                         }
+
+                        let update_info = Arc::new(update_info);
+                        *latest_info.write().await = Some(update_info.clone());
+                        let _ = recheck_finished_sender.send(Ok(update_info));
+
+                        Ok(())
+                    };
+
+                    if let Err(err) = run_inner().await {
+                        tracing::error!("failed to check for updates: {:#?}", err);
+                        let _ = recheck_finished_sender.send(Err(Arc::new(err)));
                     }
 
-                    let update_info = Arc::new(update_info);
-                    *latest_info.write().await = Some(update_info.clone());
-                    let _ = recheck_finished_sender.send(Ok(update_info));
+                    tracing::info!("finished update check, waiting for 12h or recheck trigger");
 
-                    Ok(())
-                };
-
-                if let Err(err) = run_inner().await {
-                    tracing::error!("failed to check for updates: {:#?}", err);
-                    let _ = recheck_finished_sender.send(Err(Arc::new(err)));
-                }
-
-                tracing::info!("finished update check, waiting for 12h or recheck trigger");
-
-                tokio::select! {
-                    _ = recheck_notifier.notified() => {}
-                    _ = tokio::time::sleep(std::time::Duration::from_hours(12)) => {}
+                    tokio::select! {
+                        _ = recheck_notifier.notified() => {}
+                        _ = tokio::time::sleep(std::time::Duration::from_hours(12)) => {}
+                    }
                 }
             }
         });
+
+        tokio::spawn(async move {
+            let run = async || -> Result<(), anyhow::Error> {
+                sqlx::query(
+                    "INSERT INTO version_history (extension, version) VALUES ('', $1)
+                    ON CONFLICT (extension, version) DO NOTHING",
+                )
+                .bind(&state.version)
+                .execute(state.database.write())
+                .await?;
+
+                for extension in state.extensions.extensions().await.iter() {
+                    sqlx::query(
+                        "INSERT INTO version_history (extension, version) VALUES ($1, $2)
+                        ON CONFLICT (extension, version) DO NOTHING",
+                    )
+                    .bind(extension.package_name)
+                    .bind(extension.version.to_string())
+                    .execute(state.database.write())
+                    .await?;
+                }
+
+                let rows = sqlx::query("SELECT extension, version, installed FROM version_history ORDER BY version_history.installed DESC")
+                    .fetch_all(state.database.read())
+                    .await?;
+
+                let mut panel_history = Vec::new();
+                let mut extension_history = BTreeMap::new();
+
+                for row in rows {
+                    let extension: compact_str::CompactString = row.try_get("extension")?;
+
+                    let entry = VersionHistoryEntry {
+                        version: row.try_get("version")?,
+                        timestamp: row
+                            .try_get::<chrono::NaiveDateTime, _>("installed")?
+                            .and_utc(),
+                    };
+
+                    if extension.is_empty() {
+                        panel_history.push(entry);
+                    } else if let Some(ext) = state
+                        .extensions
+                        .extensions()
+                        .await
+                        .iter()
+                        .find(|ext| ext.package_name == extension)
+                    {
+                        extension_history
+                            .entry(ext.package_name)
+                            .or_insert_with(Vec::new)
+                            .push(entry);
+                    }
+                }
+
+                *state.updates.panel_version_history.write().await = panel_history;
+                *state.updates.extension_version_history.write().await = extension_history;
+
+                Ok(())
+            };
+
+            if let Err(err) = run().await {
+                tracing::error!("failed to track version history: {:#?}", err);
+            }
+        });
+    }
+
+    pub async fn get_panel_version_history(&self) -> RwLockReadGuard<'_, Vec<VersionHistoryEntry>> {
+        self.panel_version_history.read().await
+    }
+
+    pub async fn get_extension_version_history(
+        &self,
+    ) -> RwLockReadGuard<'_, BTreeMap<&'static str, Vec<VersionHistoryEntry>>> {
+        self.extension_version_history.read().await
     }
 
     pub async fn get_update_information(&self) -> Option<Arc<UpdateInformation>> {

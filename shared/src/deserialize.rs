@@ -140,9 +140,7 @@ where
 {
     let value: serde_json::Value = serde_json::Value::deserialize(deserializer)?;
     let value: serde_json::Value = match value {
-        serde_json::Value::String(value) => {
-            serde_json::from_str(&value).map_err(serde::de::Error::custom)?
-        }
+        serde_json::Value::String(value) => serde_json::from_str(&value).unwrap_or_default(),
         value => value,
     };
 

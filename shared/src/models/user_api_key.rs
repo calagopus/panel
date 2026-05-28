@@ -36,7 +36,7 @@ impl BaseModel for UserApiKey {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -126,14 +126,14 @@ impl UserApiKey {
         user_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM user_api_keys
             WHERE user_api_keys.user_uuid = $1 AND user_api_keys.uuid = $2 AND (user_api_keys.expires IS NULL OR user_api_keys.expires > NOW())
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -151,7 +151,7 @@ impl UserApiKey {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM user_api_keys
@@ -161,7 +161,7 @@ impl UserApiKey {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(search)
         .bind(per_page)
@@ -231,7 +231,7 @@ impl UserApiKey {
         sqlx::query(
             r#"
             UPDATE user_api_keys
-            SET key_start = $1, key = crypt($2, gen_salt('xdes', 321))
+            SET key_start = $1, key = crypt($2, gen_salt('bf', 12))
             WHERE user_api_keys.uuid = $3
             "#,
         )
@@ -244,6 +244,22 @@ impl UserApiKey {
         self.key_start = new_key[0..16].into();
 
         Ok(new_key)
+    }
+
+    pub async fn count_by_user_uuid(
+        database: &crate::database::Database,
+        user_uuid: uuid::Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar(
+            r#"
+            SELECT COUNT(*)
+            FROM user_api_keys
+            WHERE user_api_keys.user_uuid = $1
+            "#,
+        )
+        .bind(user_uuid)
+        .fetch_one(database.read())
+        .await
     }
 }
 
@@ -315,9 +331,10 @@ impl CreatableModel for UserApiKey {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self::CreateResult, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -326,18 +343,15 @@ impl CreatableModel for UserApiKey {
             rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 43)
         );
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("user_api_keys");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("user_uuid", options.user_uuid)
             .set("name", &options.name)
             .set("key_start", &key[0..16])
-            .set_expr("key", "crypt($1, gen_salt('xdes', 321))", vec![&key])
+            .set_expr("key", "crypt($1, gen_salt('bf', 12))", vec![&key])
             .set("allowed_ips", &options.allowed_ips)
             .set("user_permissions", &options.user_permissions)
             .set("admin_permissions", &options.admin_permissions)
@@ -346,13 +360,15 @@ impl CreatableModel for UserApiKey {
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
         let user_api_key = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        let mut result = (key, user_api_key);
 
-        Ok((key, user_api_key))
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -385,32 +401,25 @@ pub struct UpdateUserApiKeyOptions {
 impl UpdatableModel for UserApiKey {
     type UpdateOptions = UpdateUserApiKeyOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<UserApiKey>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<UserApiKey>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("user_api_keys");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("name", options.name.as_ref())
@@ -427,7 +436,7 @@ impl UpdatableModel for UserApiKey {
             )
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(name) = options.name {
             self.name = name;
@@ -448,7 +457,7 @@ impl UpdatableModel for UserApiKey {
             self.expires = expires.map(|d| d.naive_utc());
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -460,16 +469,35 @@ impl ByUuid for UserApiKey {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM user_api_keys
             WHERE user_api_keys.uuid = $1 AND (user_api_keys.expires IS NULL OR user_api_keys.expires > NOW())
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM user_api_keys
+            WHERE user_api_keys.uuid = $1 AND (user_api_keys.expires IS NULL OR user_api_keys.expires > NOW())
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)
@@ -480,21 +508,20 @@ impl ByUuid for UserApiKey {
 impl DeletableModel for UserApiKey {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserApiKey>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserApiKey>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -504,10 +531,11 @@ impl DeletableModel for UserApiKey {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "credential_id",
-        "type_info": "Bytea"
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "user_security_keys",
+            "name": "credential_id"
+          }
+        }
       }
     ],
     "parameters": {

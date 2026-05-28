@@ -172,8 +172,12 @@ export const serverScheduleConditionVariableEndsWith = z.object({
 export type ServerScheduleCondition =
   | z.infer<typeof serverScheduleConditionNoneSchema>
   | {
-      type: 'and' | 'or' | 'not';
+      type: 'and' | 'or';
       conditions: ServerScheduleCondition[];
+    }
+  | {
+      type: 'not';
+      condition: ServerScheduleCondition;
     }
   | z.infer<typeof serverScheduleConditionVariableExists>
   | z.infer<typeof serverScheduleConditionVariableEquals>
@@ -195,7 +199,7 @@ export const serverScheduleConditionSchema: ZodType<ServerScheduleCondition> = z
     }),
     z.object({
       type: z.literal('not'),
-      conditions: z.array(serverScheduleConditionSchema),
+      condition: serverScheduleConditionSchema,
     }),
 
     serverScheduleConditionVariableExists,

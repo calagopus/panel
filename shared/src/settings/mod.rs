@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     ops::{Deref, DerefMut},
-    path::PathBuf,
+    path::Path,
     str::FromStr,
     sync::{
         Arc, LazyLock,
@@ -26,6 +26,7 @@ pub mod activity;
 pub mod app;
 pub mod ratelimits;
 pub mod server;
+pub mod user;
 pub mod webauthn;
 
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
@@ -54,10 +55,13 @@ pub enum StorageDriver {
 }
 
 impl StorageDriver {
-    pub async fn get_cap_filesystem(&self) -> Option<Result<CapFilesystem, std::io::Error>> {
+    pub async fn get_cap_filesystem(
+        &self,
+        relative_path: impl AsRef<Path>,
+    ) -> Option<Result<CapFilesystem, std::io::Error>> {
         match self {
             StorageDriver::Filesystem { path } => {
-                Some(CapFilesystem::async_new(PathBuf::from(path)).await)
+                Some(CapFilesystem::async_new(Path::new(path).join(relative_path.as_ref())).await)
             }
             _ => None,
         }
@@ -79,6 +83,9 @@ pub enum MailMode {
         password: Option<compact_str::CompactString>,
         #[garde(skip)]
         use_tls: bool,
+        #[garde(skip)]
+        #[serde(default)]
+        skip_cert_validation: bool,
 
         #[garde(length(chars, min = 1, max = 255), email)]
         from_address: compact_str::CompactString,
@@ -209,6 +216,8 @@ pub struct AppSettings {
     pub webauthn: webauthn::AppSettingsWebauthn,
     #[schema(inline)]
     pub server: server::AppSettingsServer,
+    #[schema(inline)]
+    pub user: user::AppSettingsUser,
     #[schema(inline)]
     pub activity: activity::AppSettingsActivity,
     #[schema(inline)]
@@ -344,6 +353,7 @@ impl SettingsSerializeExt for AppSettings {
                 username,
                 password,
                 use_tls,
+                skip_cert_validation,
                 from_address,
                 from_name,
             } => {
@@ -368,6 +378,10 @@ impl SettingsSerializeExt for AppSettings {
                         },
                     )
                     .write_raw_setting("mail_smtp_use_tls", use_tls.to_compact_string())
+                    .write_raw_setting(
+                        "mail_smtp_skip_cert_validation",
+                        skip_cert_validation.to_compact_string(),
+                    )
                     .write_raw_setting("mail_smtp_from_address", &**from_address)
                     .write_raw_setting(
                         "mail_smtp_from_name",
@@ -452,6 +466,8 @@ impl SettingsSerializeExt for AppSettings {
             .await?
             .nest("server", &self.server)
             .await?
+            .nest("user", &self.user)
+            .await?
             .nest("activity", &self.activity)
             .await?
             .nest("ratelimits", &self.ratelimits)
@@ -466,8 +482,8 @@ impl SettingsSerializeExt for AppSettings {
 }
 
 pub(crate) static SETTINGS_DESER_EXTENSIONS: LazyLock<
-    std::sync::RwLock<HashMap<&'static str, ExtensionSettingsDeserializer>>,
-> = LazyLock::new(|| std::sync::RwLock::new(HashMap::new()));
+    parking_lot::RwLock<HashMap<&'static str, ExtensionSettingsDeserializer>>,
+> = LazyLock::new(|| parking_lot::RwLock::new(HashMap::new()));
 
 pub struct AppSettingsDeserializer;
 
@@ -480,7 +496,7 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
         let mut extensions = HashMap::new();
 
         let extension_deserializers = {
-            let ext_deser_lock = SETTINGS_DESER_EXTENSIONS.read().unwrap();
+            let ext_deser_lock = SETTINGS_DESER_EXTENSIONS.read();
 
             ext_deser_lock
                 .iter()
@@ -611,6 +627,10 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
                         .take_raw_setting("mail_smtp_use_tls")
                         .map(|s| s == "true")
                         .unwrap_or(true),
+                    skip_cert_validation: deserializer
+                        .take_raw_setting("mail_smtp_skip_cert_validation")
+                        .map(|s| s == "true")
+                        .unwrap_or(false),
                     from_address: deserializer
                         .take_raw_setting("mail_smtp_from_address")
                         .unwrap_or_else(|| "noreply@example.com".into()),
@@ -683,6 +703,9 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
                 .await?,
             server: deserializer
                 .nest("server", &server::AppSettingsServerDeserializer)
+                .await?,
+            user: deserializer
+                .nest("user", &user::AppSettingsUserDeserializer)
                 .await?,
             activity: deserializer
                 .nest("activity", &activity::AppSettingsActivityDeserializer)

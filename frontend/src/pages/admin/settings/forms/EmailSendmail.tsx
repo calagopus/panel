@@ -4,12 +4,15 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { adminSettingsEmailSendmailSchema } from '@/lib/schemas/admin/settings.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EmailSendmail({
   form,
 }: {
   form: UseFormReturnType<z.infer<typeof adminSettingsEmailSendmailSchema>>;
 }) {
+  const { t } = useTranslations();
+
   useEffect(() => {
     form.setValues({
       command: form.values.command ?? 'sendmail',
@@ -20,18 +23,23 @@ export default function EmailSendmail({
 
   return (
     <Stack mt='md'>
-      <TextInput label='Command' placeholder='Command' key={form.key('command')} {...form.getInputProps('command')} />
+      <TextInput
+        label={t('common.form.command', {})}
+        placeholder={t('common.form.command', {})}
+        key={form.key('command')}
+        {...form.getInputProps('command')}
+      />
 
       <Group grow>
         <TextInput
           withAsterisk
-          label='From Address'
-          placeholder='From Address'
+          label={t('common.form.fromAddress', {})}
+          placeholder={t('common.form.fromAddress', {})}
           {...form.getInputProps('fromAddress')}
         />
         <TextInput
-          label='From Name'
-          placeholder='From Name'
+          label={t('common.form.fromName', {})}
+          placeholder={t('common.form.fromName', {})}
           key={form.key('fromName')}
           {...form.getInputProps('fromName')}
         />

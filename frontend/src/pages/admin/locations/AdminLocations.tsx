@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getLocations from '@/api/admin/locations/getLocations.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,12 +17,16 @@ import LocationView from './LocationView.tsx';
 function LocationsContainer() {
   const navigate = useNavigate();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: locations,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.locations.all(),
     fetcher: getLocations,
   });
-
-  const locations = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminContentContainer
@@ -43,7 +46,7 @@ function LocationsContainer() {
       }
     >
       <Table columns={locationTableColumns} loading={loading} pagination={locations} onPageSelect={setPage}>
-        {locations.data.map((location) => (
+        {locations?.data.map((location) => (
           <LocationRow key={location.uuid} location={location} />
         ))}
       </Table>

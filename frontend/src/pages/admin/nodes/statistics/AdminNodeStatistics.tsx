@@ -24,7 +24,6 @@ import Spinner from '@/elements/Spinner.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { useChart, useChartTickLabel } from '@/lib/chart.ts';
-import { hexToRgba } from '@/lib/color.ts';
 import { getNodeUrl } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString } from '@/lib/size.ts';
@@ -78,12 +77,7 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
       },
     },
     callback(opts, index) {
-      return {
-        ...opts,
-        label: !index ? 'Disk Read' : 'Disk Write',
-        borderColor: !index ? '#22d3ee' : '#facc15', // cyan-400 & yellow-400
-        backgroundColor: hexToRgba(!index ? '#0e7490' : '#a16207', 0.5), // cyan-700 & yellow-700
-      };
+      return { ...opts, label: !index ? 'Disk Read' : 'Disk Write' };
     },
   });
   const network = useChart('Network', {
@@ -100,12 +94,7 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
       },
     },
     callback(opts, index) {
-      return {
-        ...opts,
-        label: !index ? 'Network In' : 'Network Out',
-        borderColor: !index ? '#22d3ee' : '#facc15', // cyan-400 & yellow-400
-        backgroundColor: hexToRgba(!index ? '#0e7490' : '#a16207', 0.5), // cyan-700 & yellow-700
-      };
+      return { ...opts, label: !index ? 'Network In' : 'Network Out' };
     },
   });
 
@@ -154,12 +143,13 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
               <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
                 <Card>
                   <Group grow>
-                    <SemiCircleProgress
-                      value={stats.cpu.used}
-                      label={<>{stats.cpu.used.toFixed(1)}%</>}
-                      filledSegmentColor={stats.cpu.used >= 90 ? 'red' : undefined}
-                      mr='md'
-                    />
+                    <div className='flex justify-center'>
+                      <SemiCircleProgress
+                        value={stats.cpu.used}
+                        label={<>{stats.cpu.used.toFixed(1)}%</>}
+                        filledSegmentColor={stats.cpu.used >= 90 ? 'red' : undefined}
+                      />
+                    </div>
                     <div className='flex flex-col text-right flex-1'>
                       <Title order={2}>CPU</Title>
                       <h2>
@@ -170,12 +160,13 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                 </Card>
                 <Card>
                   <Group grow>
-                    <SemiCircleProgress
-                      value={(stats.memory.used / stats.memory.total) * 100}
-                      label={<>{((stats.memory.used / stats.memory.total) * 100).toFixed(1)}%</>}
-                      filledSegmentColor={stats.memory.used / stats.memory.total >= 0.9 ? 'red' : undefined}
-                      mr='md'
-                    />
+                    <div className='flex justify-center'>
+                      <SemiCircleProgress
+                        value={(stats.memory.used / stats.memory.total) * 100}
+                        label={<>{((stats.memory.used / stats.memory.total) * 100).toFixed(1)}%</>}
+                        filledSegmentColor={stats.memory.used / stats.memory.total >= 0.9 ? 'red' : undefined}
+                      />
+                    </div>
                     <div className='flex flex-col text-right flex-1'>
                       <Title order={2}>Memory</Title>
                       <h2>
@@ -187,12 +178,13 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                 </Card>
                 <Card>
                   <Group grow>
-                    <SemiCircleProgress
-                      value={(stats.disk.used / stats.disk.total) * 100}
-                      label={<>{((stats.disk.used / stats.disk.total) * 100).toFixed(1)}%</>}
-                      filledSegmentColor={stats.disk.used / stats.disk.total >= 0.9 ? 'red' : undefined}
-                      mr='md'
-                    />
+                    <div className='flex justify-center'>
+                      <SemiCircleProgress
+                        value={(stats.disk.used / stats.disk.total) * 100}
+                        label={<>{((stats.disk.used / stats.disk.total) * 100).toFixed(1)}%</>}
+                        filledSegmentColor={stats.disk.used / stats.disk.total >= 0.9 ? 'red' : undefined}
+                      />
+                    </div>
                     <div className='flex flex-col text-right flex-1'>
                       <Title order={2}>Disk</Title>
                       <h2>
@@ -203,7 +195,9 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                 </Card>
                 <Card>
                   <Group grow>
-                    <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' mr='md' />
+                    <div className='flex justify-center'>
+                      <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' />
+                    </div>
                     <div className='flex flex-col text-right flex-1'>
                       <Title order={2}>Network</Title>
                       <h2>
@@ -232,10 +226,10 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                   legend={
                     <>
                       <Tooltip label='Disk Read'>
-                        <FontAwesomeIcon icon={faSearch} className='mr-2 h-4 w-4 text-yellow-400' />
+                        <FontAwesomeIcon icon={faSearch} className='mr-2 h-4 w-4 text-cyan-400 light:text-cyan-600' />
                       </Tooltip>
                       <Tooltip label='Disk Write'>
-                        <FontAwesomeIcon icon={faPen} className='h-4 w-4 text-cyan-400' />
+                        <FontAwesomeIcon icon={faPen} className='h-4 w-4 text-yellow-400 light:text-amber-600' />
                       </Tooltip>
                     </>
                   }
@@ -248,10 +242,16 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
                   legend={
                     <>
                       <Tooltip label='Inbound'>
-                        <FontAwesomeIcon icon={faCloudArrowDown} className='mr-2 h-4 w-4 text-yellow-400' />
+                        <FontAwesomeIcon
+                          icon={faCloudArrowDown}
+                          className='mr-2 h-4 w-4 text-cyan-400 light:text-cyan-600'
+                        />
                       </Tooltip>
                       <Tooltip label='Outbound'>
-                        <FontAwesomeIcon icon={faCloudArrowUp} className='h-4 w-4 text-cyan-400' />
+                        <FontAwesomeIcon
+                          icon={faCloudArrowUp}
+                          className='h-4 w-4 text-yellow-400 light:text-amber-600'
+                        />
                       </Tooltip>
                     </>
                   }

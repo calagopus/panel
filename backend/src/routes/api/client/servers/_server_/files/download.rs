@@ -4,6 +4,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 mod get {
     use axum::http::StatusCode;
     use axum_extra::extract::Query;
+    use compact_str::ToCompactString;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
@@ -101,13 +102,14 @@ mod get {
                 &state.jwt,
                 &FileDownloadJwt {
                     base: BasePayload {
+                        scope: "file-download".into(),
                         issuer: "panel".into(),
                         subject: None,
                         audience: Vec::new(),
                         expiration_time: Some(chrono::Utc::now().timestamp() + 900),
                         not_before: None,
                         issued_at: Some(chrono::Utc::now().timestamp()),
-                        jwt_id: user.uuid.to_string(),
+                        jwt_id: user.uuid.to_compact_string(),
                     },
                     file_path: Path::new(&params.root).join(&params.files[0]),
                     server_uuid: server.uuid,
@@ -149,13 +151,14 @@ mod get {
                 &state.jwt,
                 &FilesDownloadJwt {
                     base: BasePayload {
+                        scope: "file-download".into(),
                         issuer: "panel".into(),
                         subject: None,
                         audience: Vec::new(),
                         expiration_time: Some(chrono::Utc::now().timestamp() + 900),
                         not_before: None,
                         issued_at: Some(chrono::Utc::now().timestamp()),
-                        jwt_id: user.uuid.to_string(),
+                        jwt_id: user.uuid.to_compact_string(),
                     },
                     file_path: &params.root,
                     file_paths: &params.files,

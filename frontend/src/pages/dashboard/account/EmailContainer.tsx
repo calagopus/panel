@@ -74,8 +74,8 @@ export default function EmailContainer({ requireTwoFactorActivation }: AccountCa
       icon={<FontAwesomeIcon icon={faAt} />}
       className={classNames('h-full order-20', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
+      <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
+        <Stack h='100%'>
           <TextInput
             withAsterisk
             label={t('pages.account.account.containers.email.form.newEmail', {})}
@@ -92,12 +92,13 @@ export default function EmailContainer({ requireTwoFactorActivation }: AccountCa
               {...form.getInputProps('password')}
             />
           )}
+
+          <Group mt='auto'>
+            <Button type='submit' disabled={!form.isValid()} loading={loading}>
+              {t('common.button.update', {})}
+            </Button>
+          </Group>
         </Stack>
-        <Group className='mt-auto pt-4'>
-          <Button type='submit' disabled={!form.isValid()} loading={loading}>
-            {t('common.button.update', {})}
-          </Button>
-        </Group>
       </form>
     </TitleCard>
   );

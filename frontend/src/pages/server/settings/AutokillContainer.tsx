@@ -50,8 +50,8 @@ export default function AutokillContainer() {
       icon={<FontAwesomeIcon icon={faSkull} />}
       className='h-full order-20'
     >
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
+      <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
+        <Stack h='100%'>
           <Switch
             label={t('pages.server.settings.autokill.form.enabled', {})}
             {...form.getInputProps('enabled', { type: 'checkbox' })}

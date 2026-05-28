@@ -39,6 +39,14 @@
       "few": "{count} SSH-Schlüssel",
       "many": "{count} SSH-Schlüssel",
       "other": "{count} SSH-Schlüssel"
+    },
+    "asset": {
+      "zero": "{count} Assets",
+      "one": "{count} Asset",
+      "two": "{count} Assets",
+      "few": "{count} Assets",
+      "many": "{count} Assets",
+      "other": "{count} Assets"
     }
   },
   "translations": {
@@ -65,6 +73,7 @@
         "selectAll": "Alle auswählen",
         "deselectAll": "Alle abwählen",
         "restore": "Wiederherstellen",
+        "discard": "Verwerfen",
         "download": "Herunterladen",
         "downloadAs": "Als {format} herunterladen",
         "export": "Exportieren",
@@ -95,7 +104,28 @@
         "host": "Host",
         "username": "Benutzername",
         "server": "Server",
-        "truncateDirectory": "Möchtest du alle Dateien dieses Servers löschen, bevor diese Aktion ausgeführt wird? Dies kann nicht rückgängig gemacht werden."
+        "truncateDirectory": "Möchtest du alle Dateien dieses Servers löschen, bevor diese Aktion ausgeführt wird? Dies kann nicht rückgängig gemacht werden.",
+        "url": "URL",
+        "email": "E-Mail",
+        "path": "Pfad",
+        "port": "Port",
+        "provider": "Anbieter",
+        "command": "Befehl",
+        "fromAddress": "Absenderadresse",
+        "fromName": "Absendername",
+        "siteKey": "Site-Key",
+        "secretKey": "Secret-Key",
+        "apiKey": "API-Key",
+        "accessKey": "Access-Key",
+        "bucket": "Bucket",
+        "region": "Region",
+        "endpoint": "Endpunkt",
+        "publicUrl": "Öffentliche URL",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "language": "Sprache",
+        "identifier": "Kennung",
+        "enabled": "Aktiviert"
       },
       "table": {
         "pagination": {
@@ -113,7 +143,12 @@
           "event": "Ereignis",
           "ip": "IP",
           "when": "Wann",
-          "command": "Befehl"
+          "command": "Befehl",
+          "id": "ID",
+          "type": "Typ",
+          "title": "Titel",
+          "enabled": "Aktiviert",
+          "location": "Standort"
         }
       },
       "badge": {
@@ -197,9 +232,14 @@
       "no": "Nein",
       "web": "Web",
       "api": "API",
+      "default": "Standard",
+      "custom": "Benutzerdefiniert",
       "system": "System",
       "schedule": "Zeitplan",
-      "impersonatedBy": "Impersoniert von {username}"
+      "impersonatedBy": "Impersoniert von {username}",
+      "tabs": {
+        "general": "Allgemein"
+      }
     },
     "elements": {
       "errorBoundary": {
@@ -215,6 +255,13 @@
           "copied": "In die Zwischenablage kopiert.",
           "failed": "Kopieren in die Zwischenablage fehlgeschlagen.",
           "copyManual": "In die Zwischenablage kopieren: Strg+C oder Cmd+C, Eingabe"
+        }
+      },
+      "pasteOnClick": {
+        "toast": {
+          "pasted": "Aus der Zwischenablage eingefügt.",
+          "failed": "Einfügen aus der Zwischenablage fehlgeschlagen.",
+          "pasteManual": "Aus der Zwischenablage einfügen: Strg+V oder Command+V, Eingabe"
         }
       },
       "estimatedTimeArrival": {
@@ -236,10 +283,16 @@
           "stopImpersonating": "Impersonierung beenden",
           "openInVirtualWindow": "In virtuellem Fenster öffnen",
           "openInPopup": "In Popup öffnen",
-          "openInNewTab": "In neuem Tab öffnen"
+          "openInNewTab": "In neuem Tab öffnen",
+          "switchToDark": "Zum dunklen Modus wechseln",
+          "switchToLight": "Zum hellen Modus wechseln"
         }
       },
       "permissionSelector": {
+        "button": {
+          "copyPermissions": "Berechtigungen kopieren",
+          "pastePermissions": "Berechtigungen einfügen"
+        },
         "selectedPermissions": "Ausgewählte Berechtigungen ({count})",
         "noPermissions": "Keine Berechtigungen ausgewählt."
       },
@@ -250,6 +303,13 @@
         "tooltip": {
           "cantSave": "Du hast keine Berechtigung zum Speichern.",
           "cantDelete": "Du hast keine Berechtigung zum Löschen."
+        }
+      },
+      "resource": {
+        "tooltip": {
+          "created": "{resource} erstellt.",
+          "updated": "{resource} aktualisiert.",
+          "deleted": "{resource} gelöscht."
         }
       },
       "activityInfoButton": {
@@ -353,7 +413,8 @@
         "toast": {
           "uploading": "Hochladen von {files} gestartet...",
           "cancelledFile": "Upload von `{file}` erfolgreich abgebrochen.",
-          "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen."
+          "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen.",
+          "cancelledAll": "Alle Uploads wurden abgebrochen."
         }
       }
     },
@@ -416,6 +477,8 @@
           "form": {
             "locationName": "Standort-Name",
             "locationNamePlaceholder": "Mein Zuhause",
+            "locationFlag": "Standort-Flagge",
+            "locationFlagPlaceholder": "Das beste Land",
             "backupName": "Backup Konfigurations-Name",
             "backupNamePlaceholder": "Unicorn Cloud",
             "backupDisk": "Backup Festplatte",
@@ -551,6 +614,9 @@
         "button": {
           "login": "Anmelden",
           "loginWith": "Anmelden mit {name}"
+        },
+        "alert": {
+          "urlMismatch": "Die Anwendungs-URL stimmt nicht mit der aktuellen URL überein. Erwartet: `{appUrl}`, Aktuell: `{currentUrl}`."
         },
         "login": {
           "error": {
@@ -838,13 +904,15 @@
         },
         "securityKeys": {
           "title": "Sicherheitsschlüssel",
+          "subtitle": "{current} von maximal {max} Sicherheitsschlüsseln erstellt.",
           "table": {
             "columns": {
               "credentialId": "Credential-ID"
             }
           },
           "tooltip": {
-            "secureContextRequired": "Ein sicherer Kontext (HTTPS) ist erforderlich, um Sicherheitsschlüssel zu verwenden."
+            "secureContextRequired": "Ein sicherer Kontext (HTTPS) ist erforderlich, um Sicherheitsschlüssel zu verwenden.",
+            "limitReached": "Du bist auf {max} Sicherheitsschlüssel limitiert."
           },
           "modal": {
             "createSecurityKey": {
@@ -928,8 +996,12 @@
         },
         "sshKeys": {
           "title": "SSH-Schlüssel",
+          "subtitle": "{current} von maximal {max} SSH-Schlüsseln erstellt.",
           "button": {
             "import": "Importieren"
+          },
+          "tooltip": {
+            "limitReached": "Du bist auf {max} SSH-Schlüssel limitiert."
           },
           "table": {
             "columns": {
@@ -976,6 +1048,10 @@
         },
         "commandSnippets": {
           "title": "Befehlskürzel",
+          "subtitle": "{current} von maximal {max} Befehlskürzeln erstellt.",
+          "tooltip": {
+            "limitReached": "Du bist auf {max} Befehlskürzel limitiert."
+          },
           "table": {
             "columns": {
               "eggs": "Eggs"
@@ -1015,8 +1091,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Anbieter Name",
-              "identifier": "Kennung (Identifier)"
+              "providerName": "Anbieter Name"
             }
           },
           "modal": {
@@ -1031,8 +1106,12 @@
         },
         "apiKeys": {
           "title": "API-Schlüssel",
+          "subtitle": "{current} von maximal {max} API-Schlüsseln erstellt.",
           "button": {
             "apiDocumentation": "API Dokumentation"
+          },
+          "tooltip": {
+            "limitReached": "Du bist auf {max} API-Schlüssel limitiert."
           },
           "table": {
             "columns": {
@@ -1081,7 +1160,720 @@
           "title": "Aktivität"
         }
       },
-      "admin": {},
+      "admin": {
+        "home": {
+          "title": "Startseite",
+          "alert": {
+            "newPanelVersion": "Eine neue Version für das Panel ist verfügbar! Du nutzt aktuell {current} und die neueste Version ist {latest}. Du solltest ein Upgrade in Betracht ziehen. [Klicke hier]({upgradeUrl}), um die Upgrade-Anweisungen anzuzeigen."
+          },
+          "tabs": {
+            "overview": {
+              "title": "Übersicht",
+              "page": {
+                "permissionDenied": "Du hast keine Berechtigung, die Statistiken zu lesen, die andernfalls hier wären. Genieße stattdessen diesen Vogel",
+                "card": {
+                  "systemOverview": "Systemübersicht",
+                  "generalStatistics": "Allgemeine Statistiken",
+                  "backupStatistics": "Backup-Statistiken"
+                },
+                "system": {
+                  "cpu": "CPU",
+                  "memoryUsage": "Arbeitsspeichernutzung ({process} vom Panel verwendet)",
+                  "memoryValue": "{used} / {total} ({percent}%)",
+                  "kernelVersion": "Kernel-Version ({architecture})",
+                  "containerType": "Container-Typ",
+                  "databaseVersion": "Datenbank-Version ({size})",
+                  "cacheVersion": "Cache-Version",
+                  "cacheCalls": "Cache-Aufrufe",
+                  "cacheHits": "Cache-Treffer ({percent}%)",
+                  "cacheMisses": "Cache-Fehlversuche ({percent}%)",
+                  "avgCachedCallLatency": "Durchschnittliche Cache-Aufruflatenz"
+                },
+                "containerType": {
+                  "unknown": "Unbekannt",
+                  "none": "Keine erkannt",
+                  "official": "Offiziell",
+                  "officialAio": "Offiziell (AIO)",
+                  "officialHeavy": "Offiziell (Heavy)"
+                },
+                "stats": {
+                  "users": "Benutzer",
+                  "servers": "Server",
+                  "locations": "Standorte",
+                  "nodes": "Nodes",
+                  "nestEggs": "Nest Eggs",
+                  "databaseHosts": "Datenbank-Hosts",
+                  "backupConfigurations": "Backup-Konfigurationen",
+                  "roles": "Rollen"
+                },
+                "backup": {
+                  "allTime": "Gesamtzeit",
+                  "today": "Heute",
+                  "week": "Diese Woche",
+                  "month": "Diesen Monat",
+                  "totalAllTime": "Backups insgesamt (Gesamtzeit)",
+                  "successfulAllTime": "Erfolgreiche Backups (Gesamtzeit)",
+                  "failedAllTime": "Fehlgeschlagene Backups (Gesamtzeit)",
+                  "deletedAllTime": "Gelöschte Backups (Gesamtzeit)",
+                  "totalToday": "Backups insgesamt (Heute)",
+                  "successfulToday": "Erfolgreiche Backups (Heute)",
+                  "failedToday": "Fehlgeschlagene Backups (Heute)",
+                  "deletedToday": "Gelöschte Backups (Heute)",
+                  "totalWeek": "Backups insgesamt (Diese Woche)",
+                  "successfulWeek": "Erfolgreiche Backups (Diese Woche)",
+                  "failedWeek": "Fehlgeschlagene Backups (Diese Woche)",
+                  "deletedWeek": "Gelöschte Backups (Diese Woche)",
+                  "totalMonth": "Backups insgesamt (Diesen Monat)",
+                  "successfulMonth": "Erfolgreiche Backups (Diesen Monat)",
+                  "failedMonth": "Fehlgeschlagene Backups (Diesen Monat)",
+                  "deletedMonth": "Gelöschte Backups (Diesen Monat)",
+                  "successfulValue": "{count} ({size})",
+                  "deletedValue": "{count} ({size})"
+                }
+              }
+            },
+            "updates": {
+              "title": "Updates",
+              "page": {
+                "alert": {
+                  "extensionUpdateErrors": "Beim Überprüfen auf Updates für einige Erweiterungen sind Fehler aufgetreten."
+                },
+                "card": {
+                  "panelVersion": "Panel-Version",
+                  "versionHistory": "Versionsverlauf",
+                  "outdatedExtensions": "Veraltete Erweiterungen",
+                  "outdatedNodes": "Veraltete Nodes"
+                },
+                "panelVersion": "Dein Panel läuft derzeit auf Version `{current}`. Die neueste verfügbare Version ist `{latest}`.",
+                "unknown": "unbekannt",
+                "button": {
+                  "recheck": "Erneut auf Updates prüfen"
+                },
+                "toast": {
+                  "recheckComplete": "Prüfung abgeschlossen."
+                },
+                "selectHistory": "Wähle einen Update-Verlauf zum Anzeigen aus",
+                "historyPanel": "Panel",
+                "historyExtension": "Erweiterung: {name}",
+                "extensionsUpToDate": "Alle Erweiterungen sind auf dem neuesten Stand.",
+                "extensionsOutdated": "Einige Erweiterungen sind veraltet oder es traten Fehler bei der Update-Prüfung auf.",
+                "noChangelog": "Kein Änderungsprotokoll",
+                "nodesUpToDate": "Es scheint, als wären alle Nodes auf dem neuesten Stand. ({failed} Prüfungen fehlgeschlagen)",
+                "nodesOutdated": "Einige Nodes sind veraltet, die neueste verfügbare Version ist `{latest}`. ({outdated} veraltet, {failed} Prüfungen fehlgeschlagen)",
+                "table": {
+                  "version": "Version",
+                  "installed": "Installiert",
+                  "packageName": "Paketname",
+                  "latestVersion": "Neueste Version",
+                  "changes": "Änderungen",
+                  "error": "Fehler"
+                }
+              }
+            },
+            "health": {
+              "title": "Systemzustand",
+              "page": {
+                "card": {
+                  "generalHealth": "Allgemeiner Zustand",
+                  "extensionMigrationHealth": "Erweiterungsmigrations-Zustand",
+                  "desyncNodes": "Asynchrone Nodes",
+                  "debugMode": "Debug-Modus"
+                },
+                "appliedMigrations": "Angewendete Migrationen ({percent}%)",
+                "migrationsValue": "{applied} / {total}",
+                "avgNtpOffset": "Durchschnittliche NTP-Abweichung",
+                "noExtensions": "Keine Erweiterungen gefunden.",
+                "nodesSynced": "Es scheint, als hätten alle Nodes eine synchrone Uhr (innerhalb von 5 Sekunden zur Panel-Uhr). ({failed} Prüfungen fehlgeschlagen)",
+                "nodesDesync": "Einige Nodes haben asynchrone Uhren (mehr als 5 Sekunden Abweichung von der Panel-Uhr). Dies kann zu Problemen beim Dateidownload oder der Konsole führen. ({desync} asynchron, {failed} Prüfungen fehlgeschlagen)",
+                "table": {
+                  "packageName": "Paketname",
+                  "applied": "Angewendet",
+                  "total": "Gesamt",
+                  "id": "ID",
+                  "desync": "Asynchron",
+                  "appliedValue": "{applied} ({percent}%)"
+                },
+                "debugEnabled": "Der Debug-Modus ist derzeit aktiviert. Im Debug-Modus werden zusätzliche Informationen protokolliert, die bei der Fehlersuche helfen können. Du solltest den Debug-Modus in der Produktion nicht aktiviert lassen.",
+                "debugDisabled": "Der Debug-Modus ist derzeit deaktiviert. Aktiviere den Debug-Modus nur, wenn du Probleme untersuchst.",
+                "debugResetNote": "Hinweis: Diese Einstellung wird beim nächsten Neustart der Anwendung auf den Standardwert ({default}) zurückgesetzt.",
+                "button": {
+                  "enableDebug": "Debug-Modus aktivieren",
+                  "disableDebug": "Debug-Modus deaktivieren"
+                },
+                "toast": {
+                  "debugEnabled": "Debug-Modus aktiviert.",
+                  "debugDisabled": "Debug-Modus deaktiviert."
+                }
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Einstellungen",
+          "tabs": {
+            "application": {
+              "title": "Anwendung",
+              "page": {
+                "title": "Anwendungseinstellungen",
+                "form": {
+                  "language": "Sprache",
+                  "icon": "Symbol",
+                  "banner": "Banner",
+                  "sessionCookie": "Session-Cookie",
+                  "sessionDurationSeconds": "Sitzungsdauer (Sekunden)",
+                  "twoFactorRequirement": "Zwei-Faktor-Authentifizierung-Anforderung",
+                  "telemetryEnabled": "Telemetrie aktivieren",
+                  "telemetryEnabledDescription": "Erlaube Calagopus, begrenzte und anonyme Nutzungsdaten zu sammeln, um die Anwendung zu verbessern.",
+                  "registrationEnabled": "Registrierung aktivieren"
+                },
+                "enum": {
+                  "twoFactorRequirement": {
+                    "admins": "Admins",
+                    "allUsers": "Alle Benutzer",
+                    "none": "Keine"
+                  }
+                },
+                "button": {
+                  "previewTelemetry": "Telemetrie-Vorschau"
+                },
+                "toast": {
+                  "updated": "Anwendungseinstellungen aktualisiert."
+                },
+                "modal": {
+                  "disableTelemetry": {
+                    "title": "Telemetrie-Deaktivierung bestätigen",
+                    "content": "Bist du sicher, dass du die Telemetrie deaktivieren möchtest? Telemetrie hilft uns, Calagopus durch anonyme Nutzungsdaten zu verbessern. Das Deaktivieren der Telemetrie verhindert, dass irgendwelche Daten gesendet werden.",
+                    "button": {
+                      "confirm": "Deaktivieren"
+                    }
+                  },
+                  "enableRegistration": {
+                    "title": "Registrierungs-Aktivierung bestätigen",
+                    "content": "Bist du sicher, dass du die Registrierung aktivieren möchtest? Das Aktivieren der Registrierung erlaubt es jedem, ein Konto in diesem Panel zu erstellen. Wenn du keine Captcha konfiguriert hast, könnte dies ein Fehler sein.",
+                    "button": {
+                      "confirm": "Aktivieren"
+                    }
+                  },
+                  "telemetryPreview": {
+                    "title": "Telemetrie-Vorschau"
+                  }
+                }
+              }
+            },
+            "storage": {
+              "title": "Speicher",
+              "page": {
+                "title": "Speichereinstellungen",
+                "form": {
+                  "driver": "Treiber"
+                },
+                "toast": {
+                  "updated": "Speichereinstellungen aktualisiert."
+                },
+                "modal": {
+                  "changeStorageType": {
+                    "title": "Speichertyp-Änderung bestätigen",
+                    "content": "Bist du sicher, dass du den Speichertyp ändern möchtest? Das Ändern des Speichertyps führt dazu, dass die Anwendung Assets (z. B. Profilbilder) an einem anderen Ort sucht, was zu fehlenden Assets führen kann, wenn sie nicht manuell an den neuen Ort verschoben werden.",
+                    "button": {
+                      "confirm": "Aktualisieren"
+                    }
+                  }
+                },
+                "s3": {
+                  "alert": {
+                    "permissionsTitle": "Hinweis zu Berechtigungen",
+                    "permissionsIntro": "Um sicherzustellen, dass das Speicher-Backend korrekt funktioniert, stelle bitte sicher, dass die folgenden Unterverzeichnisse über die von dir angegebene „Öffentliche URL“ öffentlich zugänglich sind:",
+                    "permissionsAssets": "Hier werden alle Admin-Assets (z. B. Symbole) gespeichert.",
+                    "permissionsAvatars": "Hier werden alle Benutzeravatare gespeichert.",
+                    "permissionsPublicData": "Hier können Erweiterungen öffentliche Daten (z. B. Bilder) speichern."
+                  },
+                  "form": {
+                    "pathStyleOn": "Pfad-Stil-URLs verwenden",
+                    "pathStyleOff": "Virtual-Hosted-Stil-URLs verwenden"
+                  }
+                },
+                "enum": {
+                  "driver": {
+                    "filesystem": "Dateisystem",
+                    "s3": "S3"
+                  }
+                }
+              }
+            },
+            "mail": {
+              "title": "E-Mail",
+              "page": {
+                "title": "E-Mail-Einstellungen",
+                "button": {
+                  "sendTestEmail": "Test-E-Mail senden"
+                },
+                "toast": {
+                  "updated": "E-Mail-Einstellungen aktualisiert."
+                },
+                "modal": {
+                  "sendTestEmail": {
+                    "title": "Test-E-Mail senden",
+                    "button": {
+                      "submit": "Test-E-Mail senden"
+                    },
+                    "toast": {
+                      "sent": "Test-E-Mail wurde erfolgreich versendet."
+                    }
+                  }
+                },
+                "smtp": {
+                  "form": {
+                    "useTls": "TLS verwenden",
+                    "skipCertValidation": "Zertifikatsvalidierung überspringen"
+                  }
+                },
+                "enum": {
+                  "provider": {
+                    "none": "Keine",
+                    "smtp": "SMTP",
+                    "sendmail": "Sendmail-Befehl",
+                    "filesystem": "Dateisystem"
+                  }
+                }
+              }
+            },
+            "mailTemplates": {
+              "title": "E-Mail-Vorlagen",
+              "page": {
+                "title": "E-Mail-Vorlagen-Einstellungen",
+                "sidebar": {
+                  "templates": "Vorlagen",
+                  "loading": "Wird geladen…",
+                  "availableVariables": "Verfügbare Variablen"
+                },
+                "alert": {
+                  "syntaxBefore": "Vorlagen verwenden die",
+                  "syntaxLink": "MiniJinja",
+                  "syntaxMiddle": "Templating-Syntax. Variablen werden referenziert mit",
+                  "syntaxAnd": "und Kontrollstrukturen wie",
+                  "syntaxOr": "und",
+                  "syntaxAfter": "werden unterstützt."
+                },
+                "empty": "Wähle eine Vorlage aus der Seitenleiste zum Bearbeiten aus",
+                "loadingTemplate": "Vorlage wird geladen…",
+                "form": {
+                  "subject": "Betreff"
+                },
+                "button": {
+                  "resetToDefault": "Auf Standard zurücksetzen"
+                },
+                "toast": {
+                  "saved": "E-Mail-Vorlage gespeichert.",
+                  "reset": "E-Mail-Vorlage auf Standard zurückgesetzt."
+                },
+                "modal": {
+                  "reset": {
+                    "title": "Auf Standard zurücksetzen",
+                    "content": "Dies verwirft deine benutzerdefinierte Vorlage für **{identifier}** und stellt den eingebauten Standard wieder her. Dies kann nicht rückgängig gemacht werden.",
+                    "button": {
+                      "confirm": "Zurücksetzen"
+                    }
+                  }
+                }
+              }
+            },
+            "captcha": {
+              "title": "Captcha",
+              "page": {
+                "title": "Captcha-Einstellungen",
+                "toast": {
+                  "updated": "Captcha-Einstellungen aktualisiert."
+                },
+                "recaptcha": {
+                  "form": {
+                    "v3": "V3"
+                  }
+                }
+              }
+            },
+            "webauthn": {
+              "title": "Webauthn",
+              "page": {
+                "title": "Webauthn-Einstellungen",
+                "form": {
+                  "rpId": "RP-Id",
+                  "rpOrigin": "RP-Origin"
+                },
+                "button": {
+                  "autofill": "Automatisch ausfüllen"
+                },
+                "toast": {
+                  "updated": "Webauthn-Einstellungen aktualisiert.",
+                  "ipNotAllowed": "WebAuthn kann nicht mit einer IP-Adresse verwendet werden."
+                },
+                "modal": {
+                  "changeRpId": {
+                    "title": "Änderung der RP-Id bestätigen",
+                    "content": "Bist du sicher, dass du die RP-Id ändern möchtest? Das Ändern der RP-Id macht alle bestehenden Webauthn-Anmeldedaten ungültig und erfordert, dass Benutzer ihre Geräte erneut registrieren. Dies kann erhebliche Folgen haben, bitte stelle daher sicher, dass du die Auswirkungen verstehst, bevor du fortfährst.",
+                    "button": {
+                      "confirm": "Aktualisieren"
+                    }
+                  }
+                }
+              }
+            },
+            "server": {
+              "title": "Server",
+              "page": {
+                "title": "Server-Einstellungen",
+                "form": {
+                  "maxFileManagerViewSize": "Max. Anzeigegröße im Dateimanager",
+                  "maxScheduleStepCount": "Max. Zeitplan-Schritte",
+                  "maxFileManagerContentSearchSize": "Max. Inhaltssuchgröße im Dateimanager",
+                  "maxFileManagerSearchResults": "Max. Suchergebnisse im Dateimanager",
+                  "maxSubuserCount": "Max. Anzahl Subbenutzer",
+                  "allowOverwritingCustomDockerImage": "Überschreiben des benutzerdefinierten Docker-Images erlauben",
+                  "allowOverwritingCustomDockerImageDescription": "Wenn aktiviert, können Benutzer das in der Server-Konfiguration angegebene Docker-Image über die Eggs-Liste überschreiben, selbst wenn ein Admin ein benutzerdefiniertes Docker-Image festgelegt hat.",
+                  "allowViewingInstallationLogs": "Anzeigen von Installationsprotokollen erlauben",
+                  "allowViewingInstallationLogsDescription": "Wenn aktiviert, können Benutzer mit Lesezugriff auf die Konsole auch Installationsprotokolle über die WebSocket-Verbindung sehen. Wenn deaktiviert, sind Installationsprotokolle nur für Admins verfügbar.",
+                  "allowAcknowledgingInstallationFailure": "Bestätigen von Installationsfehlern erlauben",
+                  "allowAcknowledgingInstallationFailureDescription": "Wenn aktiviert, können Benutzer Installationsfehler für Server bestätigen, die sich im Zustand „Install Failed“ befinden, und versuchen, den Server zu starten, anstatt auf einen Admin warten zu müssen. Wenn deaktiviert, können nur Admins Installationsfehler bestätigen.",
+                  "allowViewingTransferProgress": "Anzeigen des Übertragungsfortschritts erlauben",
+                  "allowViewingTransferProgressDescription": "Wenn aktiviert, können Benutzer mit Lesezugriff auf die Konsole auch Übertragungsfortschritts-Protokolle über die WebSocket-Verbindung sehen. Wenn deaktiviert, sind Übertragungsfortschritts-Protokolle nur für Admins verfügbar."
+                },
+                "toast": {
+                  "updated": "Server-Einstellungen aktualisiert."
+                }
+              }
+            },
+            "user": {
+              "title": "Benutzer",
+              "page": {
+                "title": "Benutzereinstellungen",
+                "form": {
+                  "maxServerGroupCount": "Max. Server-Gruppen",
+                  "maxApiKeyCount": "Max. API-Schlüssel",
+                  "maxCommandSnippetCount": "Max. Befehls-Snippets",
+                  "maxSecurityKeyCount": "Max. Sicherheitsschlüssel",
+                  "maxSshKeyCount": "Max. SSH-Schlüssel",
+                  "allowChangingLanguage": "Sprache ändern erlauben",
+                  "allowChangingLanguageDescription": "Wenn aktiviert, können Benutzer ihre Spracheinstellungen ändern."
+                },
+                "toast": {
+                  "updated": "Benutzereinstellungen aktualisiert."
+                }
+              }
+            },
+            "activity": {
+              "title": "Aktivität",
+              "page": {
+                "title": "Aktivitätseinstellungen",
+                "form": {
+                  "adminLogRetentionDays": "Aufbewahrungstage für Admin-Aktivität",
+                  "userLogRetentionDays": "Aufbewahrungstage für Benutzer-Aktivität",
+                  "serverLogRetentionDays": "Aufbewahrungstage für Server-Aktivität",
+                  "adminLogRetentionCount": "Aufbewahrungsanzahl für Admin-Aktivität",
+                  "userLogRetentionCount": "Aufbewahrungsanzahl für Benutzer-Aktivität",
+                  "serverLogRetentionCount": "Aufbewahrungsanzahl für Server-Aktivität",
+                  "serverLogAdminActivity": "Server-Admin-Aktivität protokollieren",
+                  "serverLogAdminActivityDescription": "Aktiviere oder deaktiviere das Protokollieren der Admin-Aktivität auf Servern, bei denen der Admin weder Besitzer noch Subbenutzer ist.",
+                  "serverLogScheduleActivity": "Server-Zeitplan-Aktivität protokollieren",
+                  "serverLogScheduleActivityDescription": "Aktiviere oder deaktiviere das Protokollieren von Aktivitäten, die durch Server-Zeitpläne ausgeführt werden."
+                },
+                "toast": {
+                  "updated": "Aktivitätseinstellungen aktualisiert."
+                }
+              }
+            },
+            "ratelimits": {
+              "title": "Ratenbegrenzungen",
+              "page": {
+                "title": "Ratenbegrenzungs-Einstellungen",
+                "form": {
+                  "hits": "Treffer",
+                  "hitsDescription": "Max. Anfragen",
+                  "windowSeconds": "Fenster",
+                  "windowSecondsDescription": "Sekunden"
+                },
+                "toast": {
+                  "updated": "Ratenbegrenzungs-Einstellungen aktualisiert."
+                }
+              }
+            }
+          }
+        },
+        "announcements": {
+          "title": "Ankündigungen",
+          "resourceName": "Ankündigung",
+          "modal": {
+            "delete": {
+              "title": "Ankündigungslöschung bestätigen",
+              "content": "Möchtest du **{title}** wirklich löschen?"
+            }
+          },
+          "form": {
+            "type": "Typ",
+            "title": "Titel",
+            "content": "Inhalt",
+            "dismissibleEnd": "Ende der Ausblendbarkeit",
+            "enabledStart": "Aktivierungsstart",
+            "enabledEnd": "Aktivierungsende",
+            "locations": "Standorte",
+            "locationsDescription": "Leer lassen, um auf alle Standorte anzuwenden.",
+            "nodes": "Nodes",
+            "nodesDescription": "Leer lassen, um auf alle Nodes anzuwenden.",
+            "backupConfigurations": "Backup-Konfigurationen",
+            "backupConfigurationsDescription": "Leer lassen, um auf alle Backup-Konfigurationen anzuwenden.",
+            "eggs": "Eggs",
+            "eggsPlaceholder": "Eggs auswählen",
+            "dismissible": "Ausblendbar"
+          },
+          "enum": {
+            "announcementType": {
+              "info": "Info",
+              "success": "Erfolg",
+              "warning": "Warnung",
+              "error": "Fehler"
+            }
+          },
+          "create": {
+            "title": "Ankündigung erstellen"
+          },
+          "update": {
+            "title": "Ankündigung aktualisieren"
+          }
+        },
+        "assets": {
+          "title": "Assets",
+          "button": {
+            "newDirectory": "Neues Verzeichnis",
+            "upload": "Hochladen",
+            "copyLink": "Link kopieren"
+          },
+          "dropzone": {
+            "title": "Dateien hier ablegen zum Hochladen",
+            "subtitle": "Loslassen um den Upload zu starten"
+          },
+          "operations": {
+            "waiting": "Warten: ",
+            "uploading": "Wird hochgeladen: "
+          },
+          "toast": {
+            "assetDeleted": "Asset gelöscht.",
+            "assetsDeleted": "{assets} gelöscht."
+          },
+          "modal": {
+            "createDirectory": {
+              "title": "Neues Verzeichnis",
+              "form": {
+                "directoryName": "Verzeichnisname"
+              },
+              "createdAs": "Wird erstellt unter "
+            },
+            "deleteAssets": {
+              "title": "Asset-Löschung bestätigen",
+              "content": "Bist du sicher, dass du `{count}` Assets löschen möchtest?"
+            },
+            "deleteAsset": {
+              "title": "Asset löschen",
+              "content": "Bist du sicher, dass du dieses Asset löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden."
+            }
+          }
+        },
+        "extensions": {
+          "title": "Erweiterungen",
+          "unknownExtension": "Unbekannte Erweiterung",
+          "unknown": "Unbekannt",
+          "alert": {
+            "noExtensions": "Keine Erweiterungen installiert.",
+            "heavyImageMissing": "Du scheinst nicht das Heavy-Image zu verwenden, das zum Installieren von Erweiterungen benötigt wird. Siehe [hier]({docsUrl}), wie du dazu wechselst."
+          },
+          "button": {
+            "viewBuildLogs": "Build-Logs anzeigen",
+            "install": "Erweiterung installieren",
+            "rebuild": "Erweiterungen neu erstellen",
+            "configure": "Konfigurieren",
+            "back": "Zurück zu Erweiterungen",
+            "accept": "Akzeptieren",
+            "decline": "Ablehnen"
+          },
+          "tooltip": {
+            "building": "Das Panel erstellt gerade Erweiterungs-Code. Bitte warte.",
+            "noPendingBuild": "Keine ausstehenden Erweiterungen zum Erstellen.",
+            "noBackend": "Eine Backend-Erweiterung ist erforderlich, um diese Erweiterung zu konfigurieren.",
+            "noConfigurationPage": "Diese Erweiterung hat keine Konfigurationsseite definiert.",
+            "removeExtension": "Erweiterung entfernen"
+          },
+          "badge": {
+            "frontendMissing": "Frontend fehlt",
+            "backendMissing": "Backend fehlt",
+            "pendingBuild": "Build ausstehend",
+            "pendingRemoval": "Entfernung ausstehend"
+          },
+          "card": {
+            "version": "Version",
+            "authors": "Autoren"
+          },
+          "section": {
+            "pendingExtensions": "Ausstehende Erweiterungen",
+            "noPendingExtensions": "Keine ausstehenden Erweiterungen."
+          },
+          "dropzone": {
+            "title": "Dateien hier ablegen, um sie als Erweiterungen zu installieren",
+            "subtitle": "Loslassen, um die Installation zu starten"
+          },
+          "toast": {
+            "buildStarted": "Erweiterungs-Build erfolgreich gestartet.",
+            "buildCompleted": "Erweiterungs-Build abgeschlossen. Möglicherweise musst du die Seite neu laden.",
+            "added": "Erweiterung `{packageName}` erfolgreich hinzugefügt.",
+            "removed": "Erweiterung `{packageName}` erfolgreich entfernt."
+          },
+          "notFound": {
+            "title": "Erweiterung nicht gefunden",
+            "content": "Erweiterung mit Paketname \"{packageName}\" nicht gefunden."
+          },
+          "configure": {
+            "title": "{packageName} konfigurieren",
+            "noConfigurationPage": "Diese Erweiterung hat keine Konfigurationsseite."
+          },
+          "modal": {
+            "buildLogs": {
+              "title": "Build-Logs",
+              "empty": "Keine Logs gefunden."
+            },
+            "license": {
+              "title": "Lizenzvereinbarung",
+              "description": "Die Erweiterung `{packageName}` erfordert, dass du die folgende Lizenz akzeptierst, bevor sie installiert werden kann."
+            },
+            "remove": {
+              "title": "Erweiterung entfernen",
+              "content": "Bist du sicher, dass du die Erweiterung `{packageName}` entfernen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+              "form": {
+                "removeMigrations": "Möchtest du die Datenbank-Migrationen dieser Erweiterung entfernen & zurückrollen?"
+              }
+            }
+          }
+        },
+        "users": {
+          "title": "Benutzer",
+          "resourceName": "Benutzer",
+          "tooltip": {
+            "admin": "Administrator",
+            "twoFactorEnabled": "2FA aktiviert",
+            "twoFactorDisabled": "2FA deaktiviert",
+            "cannotImpersonateSelf": "Du kannst dich nicht selbst impersonieren."
+          },
+          "tabs": {
+            "servers": "Server",
+            "oauthLinks": "OAuth-Verknüpfungen",
+            "activity": "Aktivität"
+          },
+          "button": {
+            "disableTwoFactor": "Zwei-Faktor deaktivieren",
+            "sendPasswordResetEmail": "Passwort-Zurücksetzungs-E-Mail senden",
+            "impersonate": "Impersonieren"
+          },
+          "form": {
+            "admin": "Administrator",
+            "role": "Rolle",
+            "externalId": "Externe ID"
+          },
+          "table": {
+            "columns": {
+              "role": "Rolle"
+            }
+          },
+          "modal": {
+            "delete": {
+              "title": "Benutzerlöschung bestätigen",
+              "content": "Bist du sicher, dass du **{username}** löschen möchtest?"
+            },
+            "disableTwoFactor": {
+              "title": "Zwei-Faktor des Benutzers deaktivieren",
+              "content": "Bist du sicher, dass du den Zwei-Faktor von **{username}** entfernen möchtest?",
+              "button": {
+                "confirm": "Deaktivieren"
+              },
+              "toast": {
+                "disabled": "Zwei-Faktor des Benutzers deaktiviert."
+              }
+            },
+            "sendPasswordResetEmail": {
+              "title": "Passwort-Zurücksetzungs-E-Mail senden",
+              "content": "Bist du sicher, dass du eine Passwort-Zurücksetzungs-E-Mail an **{email}** senden möchtest?",
+              "button": {
+                "confirm": "Senden"
+              },
+              "toast": {
+                "sent": "Passwort-Zurücksetzungs-E-Mail gesendet."
+              }
+            }
+          },
+          "create": {
+            "title": "Benutzer erstellen"
+          },
+          "update": {
+            "title": "Benutzer aktualisieren"
+          },
+          "activity": {
+            "title": "Benutzer Aktivität"
+          },
+          "servers": {
+            "title": "Benutzer Server",
+            "showOwnedOnly": "Nur eigene Server des Benutzers anzeigen"
+          },
+          "oauthLinks": {
+            "title": "Benutzer OAuth-Verknüpfungen",
+            "toast": {
+              "added": "OAuth-Verknüpfung hinzugefügt.",
+              "removed": "OAuth-Verknüpfung entfernt."
+            },
+            "modal": {
+              "add": {
+                "title": "OAuth-Verknüpfung hinzufügen",
+                "form": {
+                  "oauthProvider": "OAuth-Anbieter"
+                }
+              },
+              "delete": {
+                "title": "Löschung der OAuth-Verknüpfung bestätigen",
+                "content": "Bist du sicher, dass du die **{provider}**-Verbindung von **{username}** löschen möchtest?"
+              }
+            }
+          }
+        },
+        "locations": {
+          "title": "Standorte"
+        },
+        "nodes": {
+          "title": "Nodes"
+        },
+        "servers": {
+          "title": "Server"
+        },
+        "nests": {
+          "title": "Nests"
+        },
+        "eggConfigurations": {
+          "title": "Egg-Konfigurationen"
+        },
+        "eggRepositories": {
+          "title": "Egg-Repositories"
+        },
+        "databaseHosts": {
+          "title": "Datenbank-Hosts"
+        },
+        "oAuthProviders": {
+          "title": "OAuth-Anbieter"
+        },
+        "backupConfigurations": {
+          "title": "Backup-Konfigurationen"
+        },
+        "mounts": {
+          "title": "Mounts"
+        },
+        "roles": {
+          "title": "Rollen"
+        },
+        "activity": {
+          "title": "Aktivität"
+        }
+      },
       "server": {
         "viewAdmin": {
           "title": "Im Admin-Bereich ansehen"
@@ -1117,7 +1909,8 @@
             "nodeMaintenance": "Dein Server befindet sich auf einer Node, die derzeit gewartet wird.",
             "transferring": "Dein Server wird derzeit auf eine andere Node übertragen.",
             "restoringBackup": "Dein Server stellt gerade ein Backup wieder her. Bitte warten...",
-            "installing": "Dein Server wird gerade installiert. Bitte warten..."
+            "installing": "Dein Server wird gerade installiert. Bitte warten...",
+            "pendingRestart": "Dein Server hat ausstehende Änderungen, die einen Neustart erfordern. Bitte starte deinen Server neu, um diese Änderungen zu übernehmen."
           },
           "message": {
             "serverMarkedAs": "Server markiert als {state}...",
@@ -1193,6 +1986,8 @@
           "titleEditorViewing": "Betrachte {file}",
           "titleEditorEditing": "Bearbeite {file}",
           "titleEditorNew": "Neue Datei",
+          "titleDiffRevisionVsCurrent": "{file} - Revision #{revision} vs Aktuell",
+          "titleDiffRevisionVsRevision": "{file} - Revision #{previousRevision} vs #{revision}",
           "table": {
             "columns": {
               "modified": "Geändert"
@@ -1243,7 +2038,10 @@
             "copying": "Kopiere {path} nach {destination}",
             "copyingMany": "Kopiere {files}",
             "receivingRemote": "Empfange {files} vom Remote-Server",
-            "sendingRemote": "Sende {files} an Remote-Server"
+            "sendingRemote": "Sende {files} an Remote-Server",
+            "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
+            "cancelAllUploads": "Alle Uploads abbrechen",
+            "cancelAllOperations": "Alle Vorgänge abbrechen"
           },
           "dropzone": {
             "title": "Dateien hier ablegen, um sie hochzuladen",
@@ -1258,6 +2056,7 @@
           },
           "toast": {
             "operationCancelled": "Vorgang abgebrochen",
+            "allOperationsCancelled": "Alle Vorgänge wurden abgebrochen.",
             "copyingStarted": "Kopieren von {files} gestartet.",
             "filesCouldNotBeMoved": "Dateien konnten nicht verschoben werden.",
             "filesMoved": "{files} verschoben.",
@@ -1270,7 +2069,32 @@
             "fileRenamed": "Datei wurde umbenannt.",
             "fileCouldNotBeRenamed": "Datei konnte nicht umbenannt werden.",
             "permissionsUpdated": "Berechtigungen wurden aktualisiert.",
+            "permissionsUpdatedMany": "Berechtigungen für {files} wurden aktualisiert.",
+            "permissionsCouldNotBeUpdated": "Berechtigungen konnten nicht aktualisiert werden.",
             "fileSaved": "Datei wurde gespeichert."
+          },
+          "tooltip": {
+            "fileHistory": "Dateiverlauf",
+            "largestDirectories": "Verzeichnisgrößen analysieren"
+          },
+          "drawer": {
+            "revisions": {
+              "title": "Dateiverlauf",
+              "noRevisions": "Keine Revisionen für diese Datei gefunden.",
+              "restored": "Revision im Editor wiederhergestellt.",
+              "badge": {
+                "fullSnapshot": "Vollständiger Snapshot"
+              },
+              "tooltip": {
+                "restore": "Diese Revision im Editor wiederherstellen",
+                "viewDiff": "Unterschiede zur aktuellen Datei anzeigen",
+                "compareToPrevious": "Mit vorheriger Revision vergleichen"
+              },
+              "diff": {
+                "original": "Revision",
+                "current": "Aktuell"
+              }
+            }
           },
           "modal": {
             "activeUploads": {
@@ -1286,6 +2110,11 @@
               "button": {
                 "leave": "Seite verlassen"
               }
+            },
+            "draftRestore": {
+              "title": "Entwurf wiederherstellen",
+              "content": "Ein Entwurf dieser Datei wurde in deinem Browser gefunden. Möchtest du ihn wiederherstellen?",
+              "contentHashMismatch": "Die Datei wurde auf dem Server geändert, seit dieser Entwurf gespeichert wurde. Das Wiederherstellen des Entwurfs überschreibt möglicherweise diese Änderungen."
             },
             "createArchive": {
               "title": "Archiv erstellen",
@@ -1350,6 +2179,9 @@
             },
             "filePermissions": {
               "title": "Dateiberechtigungen",
+              "form": {
+                "recursive": "Änderungen rekursiv auf alle Dateien und Unterverzeichnisse in diesem Verzeichnis anwenden"
+              },
               "symbolic": "Symbolisch:",
               "octal": "Oktal:",
               "owner": "Besitzer (Owner)",
@@ -1365,6 +2197,10 @@
               "form": {
                 "fileName": "Dateiname"
               }
+            },
+            "largestDirectories": {
+              "title": "Größte Verzeichnisse",
+              "empty": "Keine Verzeichnisse gefunden."
             },
             "searchFiles": {
               "title": "Dateien suchen",
@@ -1630,8 +2466,9 @@
                 "cronSchedule": "Cron-Zeitplan"
               },
               "card": {
-                "content": "Im Cron-Intervall `{schedule}`, nächste Ausführung ist {timestamp} - letzte Ausführung war {lastTimestamp}."
-              }
+                "content": "Im Cron-Intervall {schedule}, nächste Ausführung ist {timestamp} - letzte Ausführung war {lastTimestamp}."
+              },
+              "invalidCron": "Ungültiger Cron-Ausdruck"
             },
             "powerAction": {
               "title": "Power-Aktion",
@@ -1916,6 +2753,10 @@
         },
         "subusers": {
           "title": "Subuser",
+          "subtitle": "{current} von maximal {max} Subusern erstellt.",
+          "tooltip": {
+            "limitReached": "Dieser Server ist auf {max} Subuser limitiert."
+          },
           "table": {
             "columns": {
               "twoFactorEnabled": "2FA Aktiv",
@@ -1933,7 +2774,8 @@
                 "email": "E-Mail",
                 "emailPlaceholder": "Gib die E-Mail ein, unter der dieser Subuser gespeichert werden soll.",
                 "permissions": "Berechtigungen",
-                "ignoredFiles": "Ignorierte Dateien"
+                "ignoredFiles": "Ignorierte Dateien",
+                "ignoredFilesDescription": "Dateien und Verzeichnisse, die diesen Mustern entsprechen, werden vor diesem Subuser verborgen. Verwendet Glob-Muster im gitignore-Stil (z. B. `*.env`, `secrets/`). Stelle einem Muster ein `!` voran, um einen Pfad wieder anzuzeigen, den ein allgemeineres Muster andernfalls ausschließen würde."
               }
             },
             "updateSubuser": {
@@ -1991,7 +2833,10 @@
               }
             },
             "restoreBackup": {
-              "title": "Backup wiederherstellen"
+              "title": "Backup wiederherstellen",
+              "form": {
+                "restoreStartup": "Startbefehl, Image und Variablen aus diesem Backup wiederherstellen."
+              }
             },
             "deleteBackup": {
               "title": "Löschen des Backups bestätigen",
@@ -1999,6 +2844,9 @@
               "toast": {
                 "deleted": "Backup gelöscht."
               }
+            },
+            "viewMetadata": {
+              "title": "Backup-Metadaten"
             }
           }
         },
@@ -2074,11 +2922,14 @@
               "readOnly": "Schreibgeschützt"
             }
           },
+          "button": {
+            "attach": "Einbinden",
+            "detach": "Trennen"
+          },
           "modal": {
             "attachMount": {
               "title": "Mount einbinden",
               "content": "Möchtest du **{name}** in `{target}` einbinden?",
-              "confirm": "Einbinden",
               "toast": {
                 "attached": "{name} wurde in deinen Server eingebunden."
               }
@@ -2086,7 +2937,6 @@
             "detachMount": {
               "title": "Mount trennen",
               "content": "Möchtest du **{name}** von `{target}` trennen?",
-              "confirm": "Trennen",
               "toast": {
                 "detached": "{name} wurde von deinem Server getrennt."
               }
@@ -2155,7 +3005,10 @@
           }
         },
         "activity": {
-          "title": "Aktivität"
+          "title": "Aktivität",
+          "button": {
+            "clearUserFilter": "Benutzerfilter löschen"
+          }
         }
       }
     }

@@ -20,7 +20,7 @@ export class UpdateRegistry implements Registry {
     return this;
   }
 
-  public subContainer: ContainerRegistry<SubContainerProps<PageProps>> = new ContainerRegistry();
+  public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
   public formContainers: FormContainerRegistry<typeof adminServerUpdateSchema, PageProps> = new FormContainerRegistry();
   public basicInformationFormContainer: FormContainerRegistry<typeof adminServerUpdateSchema, PageProps> =
     new FormContainerRegistry();
@@ -35,7 +35,9 @@ export class UpdateRegistry implements Registry {
   public allocationsFormContainer: FormContainerRegistry<typeof adminServerUpdateSchema, PageProps> =
     new FormContainerRegistry();
 
-  public enterSubContainer(callback: (registry: ContainerRegistry<SubContainerProps<PageProps>>) => unknown): this {
+  public enterSubContainer(
+    callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
+  ): this {
     callback(this.subContainer);
     return this;
   }

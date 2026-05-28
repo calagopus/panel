@@ -2,9 +2,10 @@ use super::apply::which;
 use anyhow::Context;
 use clap::{Args, FromArgMatches};
 use colored::Colorize;
+use dialoguer::{Confirm, theme::ColorfulTheme};
 use serde::Deserialize;
 use shared::extensions::distr::{ExtensionDistrFile, SlimExtensionDistrFile};
-use std::{collections::HashMap, path::Path};
+use std::{collections::HashMap, io::IsTerminal, path::Path};
 use tokio::process::Command;
 
 #[derive(Args)]
@@ -17,6 +18,12 @@ pub struct AddArgs {
         default_value = "false"
     )]
     skip_version_check: bool,
+    #[arg(
+        long = "accept-license",
+        help = "whether to automatically accept the extension's license (if it has one). This is required to add extensions that have a license, and can be used to skip the confirmation prompt when adding such extensions.",
+        default_value = "false"
+    )]
+    accept_license: bool,
 }
 
 pub struct AddCommand;
@@ -156,14 +163,60 @@ impl shared::extensions::commands::CliCommand<AddArgs> for AddCommand {
                     return Ok(1);
                 }
 
-                let frontend_path = Path::new("frontend/extensions")
-                    .join(extension_distr.metadata_toml.get_package_identifier());
+                let package_identifier = extension_distr.metadata_toml.get_package_identifier();
+                if !shared::extensions::distr::MetadataToml::is_valid_package_identifier(
+                    &package_identifier,
+                ) {
+                    eprintln!(
+                        "{} {}",
+                        "invalid package identifier:".red(),
+                        package_identifier.bright_red()
+                    );
+                    return Ok(1);
+                }
+
+                if let Some(license_text) = &extension_distr.metadata_toml.license_text
+                    && !args.accept_license
+                {
+                    println!(
+                        "{} {} {}",
+                        "extension has the following license:".yellow(),
+                        extension_distr.metadata_toml.name.bright_yellow(),
+                        "- you must accept the license to add this extension.".yellow()
+                    );
+                    println!();
+                    println!("{}", license_text);
+                    println!();
+
+                    let accept = match args.accept_license {
+                        true => true,
+                        false => {
+                            if std::io::stdout().is_terminal() {
+                                let accept: bool = Confirm::with_theme(&ColorfulTheme::default())
+                                    .with_prompt("Accept license?")
+                                    .interact()?;
+                                accept
+                            } else {
+                                false
+                            }
+                        }
+                    };
+
+                    if !accept {
+                        println!("{}", "license not accepted, aborting.".yellow());
+                        if !std::io::stdout().is_terminal() {
+                            eprintln!("{}", "you can use the --accept-license flag to automatically accept the license when not running in an interactive terminal.".yellow());
+                        }
+                        return Ok(1);
+                    }
+                }
+
+                let frontend_path = Path::new("frontend/extensions").join(&package_identifier);
                 tokio::fs::create_dir_all(&frontend_path).await?;
-                let backend_path = Path::new("backend-extensions")
-                    .join(extension_distr.metadata_toml.get_package_identifier());
+                let backend_path = Path::new("backend-extensions").join(&package_identifier);
                 tokio::fs::create_dir_all(&backend_path).await?;
-                let migrations_path = Path::new("database/extension-migrations")
-                    .join(extension_distr.metadata_toml.get_package_identifier());
+                let migrations_path =
+                    Path::new("database/extension-migrations").join(&package_identifier);
                 tokio::fs::create_dir_all(&migrations_path).await?;
 
                 let mut extension_distr = tokio::task::spawn_blocking(move || {
@@ -223,7 +276,7 @@ impl shared::extensions::commands::CliCommand<AddArgs> for AddCommand {
                 );
 
                 println!(
-                    "sucessfully added {}",
+                    "successfully added {}",
                     extension_distr.metadata_toml.name.cyan(),
                 );
                 println!(

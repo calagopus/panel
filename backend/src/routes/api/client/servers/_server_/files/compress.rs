@@ -40,7 +40,7 @@ mod post {
 
     #[utoipa::path(post, path = "/", responses(
         (status = OK, body = inline(Response)),
-        (status = ACCEPTED, body = inline(Response)),
+        (status = ACCEPTED, body = inline(ResponseAccepted)),
         (status = UNAUTHORIZED, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
         (status = EXPECTATION_FAILED, body = ApiError),

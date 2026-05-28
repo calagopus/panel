@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface HasUuid {
   uuid: string;
@@ -30,6 +31,7 @@ interface UseResourceFormReturn {
 export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = unknown, DArgs = unknown>(
   options: UseResourceFormOptions<T, U, CArgs, UArgs, DArgs>,
 ): UseResourceFormReturn => {
+  const { t } = useTranslations();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = u
     if (doUpdate && updateFn) {
       updateFn(args as UArgs)
         .then(() => {
-          addToast(`${resourceName} updated.`, 'success');
+          addToast(t('elements.resource.tooltip.updated', { resource: resourceName }), 'success');
           doBustCache();
         })
         .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
@@ -61,7 +63,7 @@ export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = u
     } else if (createFn) {
       createFn(args as CArgs)
         .then((result: U) => {
-          addToast(`${resourceName} created.`, 'success');
+          addToast(t('elements.resource.tooltip.created', { resource: resourceName }), 'success');
           doBustCache();
           if (stay) {
             toResetOnStay.forEach((field) => form.resetField(field));
@@ -81,7 +83,7 @@ export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = u
 
     deleteFn(args as DArgs)
       .then(() => {
-        addToast(`${resourceName} deleted.`, 'success');
+        addToast(t('elements.resource.tooltip.deleted', { resource: resourceName }), 'success');
         navigate(basePath);
       })
       .catch((msg) => {

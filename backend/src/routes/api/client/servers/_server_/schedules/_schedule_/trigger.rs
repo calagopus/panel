@@ -61,10 +61,13 @@ mod post {
             )
             .await?;
 
-        match server.clone().sync(&state.database).await {
+        let server_uuid = server.uuid;
+        let node = server.node.fetch_cached(&state.database).await?;
+
+        match server.0.sync(&state.database).await {
             Ok(_) => {}
             Err(err) => {
-                tracing::error!(server = %server.uuid, "failed to post server sync: {:?}", err);
+                tracing::error!(server = %server_uuid, "failed to post server sync: {:?}", err);
 
                 return ApiResponse::error("failed to send sync signal to server")
                     .with_status(StatusCode::INTERNAL_SERVER_ERROR)
@@ -72,14 +75,10 @@ mod post {
             }
         }
 
-        server
-            .node
-            .fetch_cached(&state.database)
-            .await?
-            .api_client(&state.database)
+        node.api_client(&state.database)
             .await?
             .post_servers_server_schedules_schedule_trigger(
-                server.uuid,
+                server_uuid,
                 schedule.uuid,
                 &wings_api::servers_server_schedules_schedule_trigger::post::RequestBody {
                     skip_condition: data.skip_condition,

@@ -23,7 +23,7 @@ interface DndServerGroup extends z.infer<typeof userServerGroupSchema>, DndItem 
 
 const MemoizedServerGroupItem = memo(ServerGroupItem);
 
-export default function DashboardHome() {
+export default function DashboardHomeGrouped() {
   const { t } = useTranslations();
   const { serverGroups, setServerGroups } = useUserStore();
   const { addToast } = useToast();
@@ -60,7 +60,9 @@ export default function DashboardHome() {
       {loading ? (
         <Spinner.Centered />
       ) : serverGroups.length === 0 ? (
-        <p className='text-gray-400'>{t('pages.account.home.tabs.groupedServers.page.noGroups', {})}</p>
+        <p className='text-gray-400 light:text-gray-600!'>
+          {t('pages.account.home.tabs.groupedServers.page.noGroups', {})}
+        </p>
       ) : (
         <DndContainer
           items={dndServerGroups}

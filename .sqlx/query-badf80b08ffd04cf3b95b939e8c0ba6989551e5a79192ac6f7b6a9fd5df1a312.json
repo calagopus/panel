@@ -20,12 +20,19 @@
               ]
             }
           }
+        },
+        "origin": {
+          "Table": {
+            "table": "server_backups",
+            "name": "disk"
+          }
         }
       },
       {
         "ordinal": 1,
         "name": "count",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": "Expression"
       }
     ],
     "parameters": {

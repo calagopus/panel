@@ -1,6 +1,7 @@
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
+import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -72,11 +73,11 @@ export default function SshDetailsModal({ opened, onClose }: ModalProps) {
       </div>
 
       <ModalFooter>
-        <a href={`ssh://${user!.username}.${server.uuidShort}@${server.sftpHost}:${server.sftpPort}`}>
+        <Anchor href={`ssh://${user!.username}.${server.uuidShort}@${server.sftpHost}:${server.sftpPort}`}>
           <Button onClick={onClose} leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
             {t('pages.server.console.modal.sshDetails.launch', {})}
           </Button>
-        </a>
+        </Anchor>
         <Button variant='default' onClick={onClose}>
           {t('common.button.close', {})}
         </Button>

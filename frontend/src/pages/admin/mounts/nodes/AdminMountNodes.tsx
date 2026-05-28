@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getMountNodes from '@/api/admin/mounts/nodes/getMountNodes.ts';
 import deleteNodeMount from '@/api/admin/nodes/mounts/deleteNodeMount.ts';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
@@ -77,12 +77,17 @@ function MountNodeRow({
 export default function AdminMountNodes({ mount }: { mount: z.infer<typeof adminMountSchema> }) {
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
-  const { data, loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
+  const {
+    data: mountNodes,
+    loading,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mounts.nodes(mount.uuid),
     fetcher: (page, search) => getMountNodes(mount.uuid, page, search),
   });
-
-  const mountNodes = data ?? getEmptyPaginationSet<AndCreated<{ node: z.infer<typeof adminNodeSchema> }>>();
 
   return (
     <AdminSubContentContainer
@@ -104,8 +109,8 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
       />
 
       <ContextMenuProvider>
-        <Table columns={[...nodeTableColumns, '']} loading={loading} pagination={mountNodes} onPageSelect={setPage}>
-          {mountNodes.data.map((nodeMount) => (
+        <Table columns={[...nodeTableColumns(), '']} loading={loading} pagination={mountNodes} onPageSelect={setPage}>
+          {mountNodes?.data.map((nodeMount) => (
             <MountNodeRow key={nodeMount.node.uuid} node={nodeMount.node} mount={mount} refetch={refetch} />
           ))}
         </Table>

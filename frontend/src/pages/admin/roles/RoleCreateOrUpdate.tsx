@@ -1,3 +1,5 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -7,6 +9,7 @@ import createRole from '@/api/admin/roles/createRole.ts';
 import deleteRole from '@/api/admin/roles/deleteRole.ts';
 import updateRole from '@/api/admin/roles/updateRole.ts';
 import getPermissions from '@/api/getPermissions.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Code from '@/elements/Code.tsx';
@@ -16,6 +19,7 @@ import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminRoleUpdateSchema } from '@/lib/schemas/admin/roles.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
@@ -89,7 +93,15 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
         Are you sure you want to delete <Code>{form.getValues().name}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'roles']))}>
+      {form.values.adminPermissions.includes('users.impersonate') && (
+        <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+          This role has the <Code>users.impersonate</Code> permission, which allows users with this role to impersonate
+          any other user, including administrators. Be cautious when assigning this permission to roles with less
+          trusted users.
+        </Alert>
+      )}
+
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.roles.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk

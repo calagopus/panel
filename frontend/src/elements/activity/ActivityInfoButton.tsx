@@ -27,6 +27,7 @@ export default function ActivityInfoButton({
         title={t('elements.activityInfoButton.modal.info.title', {})}
         onClose={() => setOpenModal(null)}
         opened={openModal === 'view'}
+        size='lg'
       >
         <HljsCode languageName='json' language={jsonLanguage}>
           {JSON.stringify(activity.data, null, 2)}

@@ -70,12 +70,14 @@ mod delete {
 
         activity_logger
             .log(
-                "server:mount.detach",
+                "server:mounts.detach",
                 serde_json::json!({
                     "mount_uuid": server_mount.mount.uuid,
                 }),
             )
             .await;
+
+        server.0.batch_sync(&state.database).await;
 
         ApiResponse::new_serialized(Response {}).ok()
     }

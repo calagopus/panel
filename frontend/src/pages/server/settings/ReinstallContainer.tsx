@@ -19,7 +19,7 @@ export default function ReinstallContainer() {
     >
       <SettingsReinstallModal opened={modalOpen} onClose={() => setModalOpen(false)} />
 
-      <Stack>
+      <Stack h='100%'>
         {t('pages.server.settings.reinstall.content', {}).md()}
 
         <Group mt='auto'>

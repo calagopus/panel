@@ -1,14 +1,13 @@
 import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
-import { useState } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverDirectoryEntrySchema, serverFilesCopySchema } from '@/lib/schemas/server/files.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
@@ -26,18 +25,18 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
   const { server } = useServerStore();
   const { browsingDirectory, browsingEntries } = useFileManager();
 
-  const [loading, setLoading] = useState(false);
-
-  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverFilesCopySchema>>(
-    {
-      initialValues: {
-        name: '',
-      },
-      validateInputOnBlur: true,
-      validate: zod4Resolver(serverFilesCopySchema),
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverFilesCopySchema>>({
+    initialValues: {
+      name: '',
     },
+    validate: zod4Resolver(serverFilesCopySchema),
     onClose,
-  );
+    onSubmit: async (values) => {
+      if (!file) return;
+      await copyFile(server.uuid, join(browsingDirectory, file.name), values.name || null);
+      addToast(t('pages.server.files.toast.fileCopyingStarted', {}), 'success');
+    },
+  });
 
   const generateNewName = () => {
     if (!file) return '';
@@ -82,51 +81,40 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
     return baseName.concat(suffix, extension);
   };
 
-  const doCopy = () => {
-    if (!file) return;
-
-    setLoading(true);
-
-    copyFile(server.uuid, join(browsingDirectory, file.name), form.values.name || null)
-      .then(() => {
-        addToast(t('pages.server.files.toast.fileCopyingStarted', {}), 'success');
-        handleClose();
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
-
   return (
-    <Modal title={t('pages.server.files.modal.copyFile.title', {})} onClose={handleClose} opened={opened}>
-      <form onSubmit={form.onSubmit(() => doCopy())}>
-        <TextInput
-          label={t('pages.server.files.modal.copyFile.form.fileName', {})}
-          placeholder={t('pages.server.files.modal.copyFile.form.fileName', {})}
-          data-autofocus
-          {...form.getInputProps('name')}
-        />
+    <FormModal
+      title={t('pages.server.files.modal.copyFile.title', {})}
+      onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
+      opened={opened}
+    >
+      <TextInput
+        label={t('pages.server.files.modal.copyFile.form.fileName', {})}
+        placeholder={t('pages.server.files.modal.copyFile.form.fileName', {})}
+        data-autofocus
+        {...form.getInputProps('name')}
+      />
 
-        <p className='mt-2 text-sm md:text-base break-all'>
-          <span className='text-neutral-200'>{t('pages.server.files.modal.copyFile.createdAs', {})}</span>
-          <Code>
-            /home/container/
-            <span className='text-cyan-200'>
-              {join(browsingDirectory, form.getValues().name || generateNewName()).replace(/^(\.\.\/|\/)+/, '')}
-            </span>
-          </Code>
-        </p>
+      <p className='mt-2 text-sm md:text-base break-all'>
+        <span>{t('pages.server.files.modal.copyFile.createdAs', {})}</span>
+        <Code>
+          /home/container/
+          <span className='text-cyan-200'>
+            {join(browsingDirectory, form.getValues().name || generateNewName()).replace(/^(\.\.\/|\/)+/, '')}
+          </span>
+        </Code>
+      </p>
 
-        <ModalFooter>
-          <Button type='submit' loading={loading}>
-            {t('pages.server.files.button.copy', {})}
-          </Button>
-          <Button variant='default' onClick={handleClose}>
-            {t('common.button.close', {})}
-          </Button>
-        </ModalFooter>
-      </form>
-    </Modal>
+      <ModalFooter>
+        <Button type='submit' loading={loading}>
+          {t('pages.server.files.button.copy', {})}
+        </Button>
+        <Button variant='default' onClick={handleClose}>
+          {t('common.button.close', {})}
+        </Button>
+      </ModalFooter>
+    </FormModal>
   );
 }

@@ -1,15 +1,14 @@
 import { ModalProps, Stack } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useState } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
 import createCommandSnippet from '@/api/me/command-snippets/createCommandSnippet.ts';
 import getUserEggs from '@/api/me/servers/eggs/getUserEggs.ts';
 import Button from '@/elements/Button.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverEggSchema } from '@/lib/schemas/server/server.ts';
 import { userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
@@ -24,46 +23,35 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
   const { addToast } = useToast();
   const { addCommandSnippet } = useUserStore();
 
-  const [loading, setLoading] = useState(false);
-
   const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
     queryKey: [...queryKeys.user.servers.all(), 'eggs'],
     fetcher: (search) => getUserEggs(1, search),
   });
 
-  const { form, onClose: handleClose } = useModalForm<z.infer<typeof userCommandSnippetUpdateSchema>>(
-    {
-      initialValues: {
-        name: '',
-        eggs: [],
-        command: 'say hello world',
-      },
-      validateInputOnBlur: true,
-      validate: zod4Resolver(userCommandSnippetUpdateSchema),
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
+    z.infer<typeof userCommandSnippetUpdateSchema>
+  >({
+    initialValues: {
+      name: '',
+      eggs: [],
+      command: 'say hello world',
     },
+    validate: zod4Resolver(userCommandSnippetUpdateSchema),
     onClose,
-  );
-
-  const doCreate = () => {
-    setLoading(true);
-
-    createCommandSnippet(form.values)
-      .then((snippet) => {
-        addToast(t('pages.account.commandSnippets.modal.createCommandSnippet.toast.created', {}), 'success');
-
-        handleClose();
-        addCommandSnippet(snippet);
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
+    onSubmit: async (values) => {
+      const snippet = await createCommandSnippet(values);
+      addToast(t('pages.account.commandSnippets.modal.createCommandSnippet.toast.created', {}), 'success');
+      addCommandSnippet(snippet);
+    },
+  });
 
   return (
-    <Modal
+    <FormModal
       title={t('pages.account.commandSnippets.modal.createCommandSnippet.title', {})}
       onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
       opened={opened}
     >
       <Stack>
@@ -98,7 +86,7 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
         />
 
         <ModalFooter>
-          <Button onClick={doCreate} loading={loading} disabled={!form.isValid()}>
+          <Button type='submit' loading={loading} disabled={!form.isValid()}>
             {t('common.button.create', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
@@ -106,6 +94,6 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

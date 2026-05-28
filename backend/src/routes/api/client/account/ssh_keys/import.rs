@@ -62,6 +62,15 @@ mod post {
 
         permissions.has_user_permission("ssh-keys.create")?;
 
+        let ssh_keys_lock = state
+            .cache
+            .lock(format!("users::{}::ssh_keys", user.uuid), Some(30), Some(5))
+            .await?;
+
+        let ssh_keys = UserSshKey::count_by_user_uuid(&state.database, user.uuid).await?;
+        let ssh_keys_take =
+            (state.settings.get().await?.user.max_ssh_key_count as i64 - ssh_keys) as usize;
+
         fn limit_string(string: &str, limit: usize) -> String {
             string.chars().take(limit).collect::<String>()
         }
@@ -93,7 +102,7 @@ mod post {
                     }
                 };
 
-                for raw_ssh_key in raw_ssh_keys.into_iter().take(50) {
+                for raw_ssh_key in raw_ssh_keys.into_iter().take(ssh_keys_take) {
                     let public_key = match russh::keys::PublicKey::from_openssh(&raw_ssh_key.key) {
                         Ok(key) => key,
                         Err(_) => continue,
@@ -144,7 +153,7 @@ mod post {
                     }
                 };
 
-                for raw_ssh_key in raw_ssh_keys.into_iter().take(50) {
+                for raw_ssh_key in raw_ssh_keys.into_iter().take(ssh_keys_take) {
                     let public_key = match russh::keys::PublicKey::from_openssh(&raw_ssh_key.key) {
                         Ok(key) => key,
                         Err(_) => continue,
@@ -209,7 +218,12 @@ mod post {
                     }
                 };
 
-                for (i, raw_ssh_key) in raw_ssh_keys.entries.into_iter().take(50).enumerate() {
+                for (i, raw_ssh_key) in raw_ssh_keys
+                    .entries
+                    .into_iter()
+                    .take(ssh_keys_take)
+                    .enumerate()
+                {
                     let public_key = match russh::keys::PublicKey::from_openssh(&format!(
                         "ssh-{} {}",
                         raw_ssh_key.keytype.to_lowercase(),
@@ -238,6 +252,8 @@ mod post {
                 }
             }
         }
+
+        drop(ssh_keys_lock);
 
         activity_logger
             .log(

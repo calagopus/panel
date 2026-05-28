@@ -150,6 +150,18 @@ mod post {
                 .ok();
         }
 
+        let api_keys_lock = state
+            .cache
+            .lock(format!("users::{}::api_keys", user.uuid), Some(30), Some(5))
+            .await?;
+
+        let api_keys = UserApiKey::count_by_user_uuid(&state.database, user.uuid).await?;
+        if api_keys >= state.settings.get().await?.user.max_api_key_count as i64 {
+            return ApiResponse::error("maximum number of api keys reached")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         let options = CreateUserApiKeyOptions {
             user_uuid: user.uuid,
             name: data.name,
@@ -168,6 +180,8 @@ mod post {
             }
             Err(err) => return ApiResponse::from(err).ok(),
         };
+
+        drop(api_keys_lock);
 
         activity_logger
             .log(

@@ -23,7 +23,7 @@ impl BaseModel for LocationDatabaseHost {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -75,7 +75,7 @@ impl LocationDatabaseHost {
         location_uuid: uuid::Uuid,
         database_host_uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM location_database_hosts
@@ -83,10 +83,32 @@ impl LocationDatabaseHost {
             WHERE location_database_hosts.location_uuid = $1 AND location_database_hosts.database_host_uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(location_uuid)
         .bind(database_host_uuid)
         .fetch_optional(database.read())
+        .await?;
+
+        row.try_map(|row| Self::map(None, &row))
+    }
+
+    pub async fn by_location_uuid_database_host_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        location_uuid: uuid::Uuid,
+        database_host_uuid: uuid::Uuid,
+    ) -> Result<Option<Self>, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM location_database_hosts
+            JOIN database_hosts ON location_database_hosts.database_host_uuid = database_hosts.uuid
+            WHERE location_database_hosts.location_uuid = $1 AND location_database_hosts.database_host_uuid = $2
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(location_uuid)
+        .bind(database_host_uuid)
+        .fetch_optional(&mut **transaction)
         .await?;
 
         row.try_map(|row| Self::map(None, &row))
@@ -101,7 +123,7 @@ impl LocationDatabaseHost {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM location_database_hosts
@@ -111,7 +133,7 @@ impl LocationDatabaseHost {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(location_uuid)
         .bind(search)
         .bind(per_page)
@@ -136,7 +158,7 @@ impl LocationDatabaseHost {
         database: &crate::database::Database,
         location_uuid: uuid::Uuid,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM location_database_hosts
@@ -145,7 +167,7 @@ impl LocationDatabaseHost {
             ORDER BY location_database_hosts.created DESC
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(location_uuid)
         .fetch_all(database.read())
         .await?;
@@ -201,9 +223,10 @@ impl CreatableModel for LocationDatabaseHost {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -214,31 +237,30 @@ impl CreatableModel for LocationDatabaseHost {
         .await?
         .ok_or(crate::database::InvalidRelationError("database_host"))?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("location_database_hosts");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("location_uuid", options.location_uuid)
             .set("database_host_uuid", options.database_host_uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
-        transaction.commit().await?;
-
-        match Self::by_location_uuid_database_host_uuid(
-            &state.database,
+        let mut result = match Self::by_location_uuid_database_host_uuid_with_transaction(
+            transaction,
             options.location_uuid,
             options.database_host_uuid,
         )
         .await?
         {
-            Some(location_database_host) => Ok(location_database_host),
-            None => Err(sqlx::Error::RowNotFound.into()),
-        }
+            Some(location_database_host) => location_database_host,
+            None => return Err(sqlx::Error::RowNotFound.into()),
+        };
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -246,21 +268,20 @@ impl CreatableModel for LocationDatabaseHost {
 impl DeletableModel for LocationDatabaseHost {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<LocationDatabaseHost>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<LocationDatabaseHost>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -271,10 +292,11 @@ impl DeletableModel for LocationDatabaseHost {
         )
         .bind(self.location.uuid)
         .bind(self.database_host.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

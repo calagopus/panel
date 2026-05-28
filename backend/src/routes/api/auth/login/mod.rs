@@ -7,6 +7,7 @@ mod security_key;
 mod post {
     use crate::routes::api::auth::login::checkpoint::TwoFactorRequiredJwt;
     use axum::http::StatusCode;
+    use compact_str::ToCompactString;
     use garde::Validate;
     use serde::{Deserialize, Serialize};
     use shared::{
@@ -102,13 +103,14 @@ mod post {
         if user.totp_enabled {
             let token = state.jwt.create(&TwoFactorRequiredJwt {
                 base: BasePayload {
+                    scope: "two-factor-checkpoint".into(),
                     issuer: "panel".into(),
                     subject: None,
                     audience: Vec::new(),
                     expiration_time: Some(chrono::Utc::now().timestamp() + 300),
                     not_before: None,
                     issued_at: Some(chrono::Utc::now().timestamp()),
-                    jwt_id: user.uuid.to_string(),
+                    jwt_id: user.uuid.to_compact_string(),
                 },
                 user_uuid: user.uuid,
             })?;

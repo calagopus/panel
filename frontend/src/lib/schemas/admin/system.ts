@@ -23,6 +23,16 @@ export const adminExtensionUpdateCheckResultSchema = z.discriminatedUnion('type'
   adminExtensionUpdateCheckResultErrorSchema,
 ]);
 
+export const adminUpdateHistoryEntrySchema = z.object({
+  version: z.string(),
+  timestamp: z.string(),
+});
+
+export const adminUpdateHistorySchema = z.object({
+  panel: adminUpdateHistoryEntrySchema.array(),
+  extensions: z.record(z.string(), adminUpdateHistoryEntrySchema.array()),
+});
+
 export const adminUpdateInformationSchema = z.object({
   panelVersion: z.string(),
   latestPanelVersion: z.string(),

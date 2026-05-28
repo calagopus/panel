@@ -32,11 +32,11 @@ export default function TwoFactorDisableButton() {
   });
 
   useEffect(() => {
-    if (!open) {
+    if (!openModal) {
       form.reset();
       return;
     }
-  }, [open]);
+  }, [openModal]);
 
   const doDisable = () => {
     setLoading(true);

@@ -79,7 +79,7 @@ mod post {
             CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             role::{CreateRoleOptions, Role},
-            user::GetPermissionManager,
+            user::{GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -98,10 +98,38 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        caller: GetUser,
         activity_logger: GetAdminActivityLogger,
         shared::Payload(data): shared::Payload<CreateRoleOptions>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("roles.create")?;
+
+        if !caller.admin {
+            let caller_admin = caller
+                .role
+                .as_ref()
+                .map(|r| r.admin_permissions.as_slice())
+                .unwrap_or(&[]);
+            let caller_server = caller
+                .role
+                .as_ref()
+                .map(|r| r.server_permissions.as_slice())
+                .unwrap_or(&[]);
+
+            if !data
+                .admin_permissions
+                .iter()
+                .all(|p| caller_admin.contains(p))
+                || !data
+                    .server_permissions
+                    .iter()
+                    .all(|p| caller_server.contains(p))
+            {
+                return ApiResponse::error("permissions: more permissions than self")
+                    .with_status(StatusCode::FORBIDDEN)
+                    .ok();
+            }
+        }
 
         let role = match Role::create(&state, data).await {
             Ok(role) => role,

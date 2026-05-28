@@ -1,4 +1,4 @@
-import { Group, Tooltip } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { UseFormReturnType, useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -18,6 +18,7 @@ import {
   adminSettingsCaptchaProviderTurnstileSchema,
 } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import CaptchaFriendlyCaptcha from './forms/CaptchaFriendlyCaptcha.tsx';
 import CaptchaHcaptcha from './forms/CaptchaHcaptcha.tsx';
@@ -26,7 +27,8 @@ import CaptchaTurnstile from './forms/CaptchaTurnstile.tsx';
 
 export default function CaptchaContainer() {
   const { addToast } = useToast();
-  const { captchaProvider } = useAdminStore();
+  const { t } = useTranslations();
+  const { captchaProvider, updateSettings } = useAdminStore();
 
   const [loading, setLoading] = useState(false);
 
@@ -49,7 +51,8 @@ export default function CaptchaContainer() {
 
     updateCaptchaSettings(adminSettingsCaptchaProviderSchema.parse(form.getValues()))
       .then(() => {
-        addToast('Captcha settings updated.', 'success');
+        addToast(t('pages.admin.settings.tabs.captcha.page.toast.updated', {}), 'success');
+        updateSettings({ captchaProvider: adminSettingsCaptchaProviderSchema.parse(form.getValues()) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -58,10 +61,10 @@ export default function CaptchaContainer() {
   };
 
   return (
-    <AdminSubContentContainer title='Captcha Settings' titleOrder={2}>
+    <AdminSubContentContainer title={t('pages.admin.settings.tabs.captcha.page.title', {})} titleOrder={2}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
         <Select
-          label='Provider'
+          label={t('common.form.provider', {})}
           data={Object.entries(captchaProviderTypeLabelMapping).map(([value, label]) => ({
             value,
             label,
@@ -89,16 +92,9 @@ export default function CaptchaContainer() {
         ) : null}
 
         <Group mt='md'>
-          <AdminCan
-            action='settings.update'
-            renderOnCant={
-              <Tooltip label='You do not have permission to update settings.'>
-                <Button disabled>Save</Button>
-              </Tooltip>
-            }
-          >
+          <AdminCan action='settings.update' cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
           </AdminCan>
         </Group>

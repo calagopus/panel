@@ -1,4 +1,4 @@
-import { Group, Stack, Tooltip } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -13,12 +13,14 @@ import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { adminSettingsServerSchema } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 export default function ServerContainer() {
   const { addToast } = useToast();
-  const { server } = useAdminStore();
+  const { t } = useTranslations();
+  const { server, updateSettings: updateAdminSettings } = useAdminStore();
   const { updateSettings } = useGlobalStore();
 
   const [loading, setLoading] = useState(false);
@@ -28,7 +30,8 @@ export default function ServerContainer() {
       maxFileManagerViewSize: 0,
       maxFileManagerContentSearchSize: 0,
       maxFileManagerSearchResults: 1,
-      maxSchedulesStepCount: 0,
+      maxSubuserCount: 0,
+      maxScheduleStepCount: 0,
       allowOverwritingCustomDockerImage: false,
       allowEditingStartupCommand: false,
       allowViewingInstallationLogs: false,
@@ -50,8 +53,9 @@ export default function ServerContainer() {
 
     updateServerSettings(adminSettingsServerSchema.parse(form.getValues()))
       .then(() => {
-        addToast('Server settings updated.', 'success');
+        addToast(t('pages.admin.settings.tabs.server.page.toast.updated', {}), 'success');
         updateSettings({ server: { ...form.getValues() } });
+        updateAdminSettings({ server: adminSettingsServerSchema.parse(form.getValues()) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -60,94 +64,90 @@ export default function ServerContainer() {
   };
 
   return (
-    <AdminSubContentContainer title='Server Settings' titleOrder={2}>
+    <AdminSubContentContainer title={t('pages.admin.settings.tabs.server.page.title', {})} titleOrder={2}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
-          <Group grow>
-            <SizeInput
-              withAsterisk
-              label='Max File Manager View Size'
-              mode='b'
-              min={0}
-              value={form.getValues().maxFileManagerViewSize}
-              onChange={(v) => form.setFieldValue('maxFileManagerViewSize', v)}
-            />
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <SizeInput
+            withAsterisk
+            label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerViewSize', {})}
+            mode='b'
+            min={0}
+            value={form.getValues().maxFileManagerViewSize}
+            onChange={(v) => form.setFieldValue('maxFileManagerViewSize', v)}
+          />
 
-            <NumberInput
-              withAsterisk
-              label='Max Server Schedule Steps'
-              placeholder='Max Server Schedule Steps'
-              key={form.key('maxSchedulesStepCount')}
-              {...form.getInputProps('maxSchedulesStepCount')}
-            />
-          </Group>
+          <NumberInput
+            withAsterisk
+            label={t('pages.admin.settings.tabs.server.page.form.maxScheduleStepCount', {})}
+            placeholder={t('pages.admin.settings.tabs.server.page.form.maxScheduleStepCount', {})}
+            key={form.key('maxScheduleStepCount')}
+            {...form.getInputProps('maxScheduleStepCount')}
+          />
 
-          <Group grow>
-            <SizeInput
-              withAsterisk
-              label='Max File Manager Content Search Size'
-              mode='b'
-              min={0}
-              value={form.getValues().maxFileManagerContentSearchSize}
-              onChange={(v) => form.setFieldValue('maxFileManagerContentSearchSize', v)}
-            />
+          <SizeInput
+            withAsterisk
+            label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerContentSearchSize', {})}
+            mode='b'
+            min={0}
+            value={form.getValues().maxFileManagerContentSearchSize}
+            onChange={(v) => form.setFieldValue('maxFileManagerContentSearchSize', v)}
+          />
 
-            <NumberInput
-              withAsterisk
-              label='Max File Manager Search Results'
-              placeholder='Max File Manager Search Results'
-              key={form.key('maxFileManagerSearchResults')}
-              {...form.getInputProps('maxFileManagerSearchResults')}
-            />
-          </Group>
+          <NumberInput
+            withAsterisk
+            label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerSearchResults', {})}
+            placeholder={t('pages.admin.settings.tabs.server.page.form.maxFileManagerSearchResults', {})}
+            key={form.key('maxFileManagerSearchResults')}
+            {...form.getInputProps('maxFileManagerSearchResults')}
+          />
 
-          <Group grow>
-            <Switch
-              label='Allow Overwriting Custom Docker Image'
-              description='If enabled, users will be able to overwrite the Docker image specified in the server configuration using the Eggs list, even if an admin has set a custom Docker image.'
-              key={form.key('allowOverwritingCustomDockerImage')}
-              {...form.getInputProps('allowOverwritingCustomDockerImage', { type: 'checkbox' })}
-            />
-
-            <Switch
-              label='Allow Editing Startup Command'
-              key={form.key('allowEditingStartupCommand')}
-              {...form.getInputProps('allowEditingStartupCommand', { type: 'checkbox' })}
-            />
-          </Group>
+          <NumberInput
+            withAsterisk
+            label={t('pages.admin.settings.tabs.server.page.form.maxSubuserCount', {})}
+            placeholder={t('pages.admin.settings.tabs.server.page.form.maxSubuserCount', {})}
+            key={form.key('maxSubuserCount')}
+            {...form.getInputProps('maxSubuserCount')}
+          />
 
           <Switch
-            label='Allow Viewing Installation Logs'
-            description='If enabled, users with console read permissions will also be able to view installation logs via the websocket connection. If disabled, installation logs will only be available for admins.'
+            label={t('pages.admin.settings.tabs.server.page.form.allowOverwritingCustomDockerImage', {})}
+            description={t(
+              'pages.admin.settings.tabs.server.page.form.allowOverwritingCustomDockerImageDescription',
+              {},
+            )}
+            key={form.key('allowOverwritingCustomDockerImage')}
+            {...form.getInputProps('allowOverwritingCustomDockerImage', { type: 'checkbox' })}
+          />
+
+          <Switch
+            label={t('pages.admin.settings.tabs.server.page.form.allowViewingInstallationLogs', {})}
+            description={t('pages.admin.settings.tabs.server.page.form.allowViewingInstallationLogsDescription', {})}
             key={form.key('allowViewingInstallationLogs')}
             {...form.getInputProps('allowViewingInstallationLogs', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Allow Acknowledging Installation Failure'
-            description='If enabled, users will be able to acknowledge installation failures for servers that are in the "Install Failed" state, allowing them to attempt to start the server instead of having to wait for an admin. If disabled, only admins will be able to acknowledge installation failures.'
+            label={t('pages.admin.settings.tabs.server.page.form.allowAcknowledgingInstallationFailure', {})}
+            description={t(
+              'pages.admin.settings.tabs.server.page.form.allowAcknowledgingInstallationFailureDescription',
+              {},
+            )}
+            key={form.key('allowAcknowledgingInstallationFailure')}
             {...form.getInputProps('allowAcknowledgingInstallationFailure', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Allow Viewing Transfer Progress'
-            description='If enabled, users with console read permissions will also be able to view transfer progress logs via the websocket connection. If disabled, transfer progress logs will only be available for admins.'
+            label={t('pages.admin.settings.tabs.server.page.form.allowViewingTransferProgress', {})}
+            description={t('pages.admin.settings.tabs.server.page.form.allowViewingTransferProgressDescription', {})}
             key={form.key('allowViewingTransferProgress')}
             {...form.getInputProps('allowViewingTransferProgress', { type: 'checkbox' })}
           />
-        </Stack>
+        </div>
 
         <Group mt='md'>
-          <AdminCan
-            action='settings.update'
-            renderOnCant={
-              <Tooltip label='You do not have permission to update settings.'>
-                <Button disabled>Save</Button>
-              </Tooltip>
-            }
-          >
+          <AdminCan action='settings.update' cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
           </AdminCan>
         </Group>

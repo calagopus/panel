@@ -45,8 +45,8 @@ mod get {
         (status = UNAUTHORIZED, body = ApiError),
     ), params(
         (
-            "node" = uuid::Uuid,
-            description = "The node ID",
+            "server" = uuid::Uuid,
+            description = "The server ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
         (

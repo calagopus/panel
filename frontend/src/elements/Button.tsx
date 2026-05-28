@@ -8,7 +8,7 @@ export interface ButtonProps extends Omit<MantineButtonProps, 'onClick'> {
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, className, type, onClick, loading, disabled, variant = 'filled', ...rest }, ref) => {
+  ({ children, className, type = 'button', onClick, loading, disabled, variant = 'filled', ...rest }, ref) => {
     return (
       <MantineButton
         ref={ref}
@@ -22,7 +22,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         style={{
           cursor: loading ? 'wait' : undefined,
           fontWeight: 'normal',
-          border: disabled ? '1px solid var(--mantine-color-dark-4)' : undefined,
+          border: disabled ? '1px solid var(--mantine-color-default-border)' : undefined,
           color: disabled ? 'var(--mantine-color-dimmed)' : undefined,
           ...rest.style,
         }}

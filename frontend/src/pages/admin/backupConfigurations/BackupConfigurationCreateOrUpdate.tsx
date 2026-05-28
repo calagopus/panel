@@ -1,4 +1,4 @@
-import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle, faExternalLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -8,6 +8,8 @@ import { z } from 'zod';
 import createBackupConfiguration from '@/api/admin/backup-configurations/createBackupConfiguration.ts';
 import deleteBackupConfiguration from '@/api/admin/backup-configurations/deleteBackupConfiguration.ts';
 import updateBackupConfiguration from '@/api/admin/backup-configurations/updateBackupConfiguration.ts';
+import Alert from '@/elements/Alert.tsx';
+import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Code from '@/elements/Code.tsx';
@@ -18,6 +20,7 @@ import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { backupDiskLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminBackupConfigurationResticSchema,
   adminBackupConfigurationS3Schema,
@@ -40,6 +43,7 @@ export default function BackupConfigurationCreateOrUpdate({
       name: '',
       description: null,
       maintenanceEnabled: false,
+      shared: false,
       backupDisk: 'local',
     },
     validateInputOnBlur: true,
@@ -113,6 +117,7 @@ export default function BackupConfigurationCreateOrUpdate({
         name: contextBackupConfiguration.name,
         description: contextBackupConfiguration.description,
         maintenanceEnabled: contextBackupConfiguration.maintenanceEnabled,
+        shared: contextBackupConfiguration.shared,
         backupDisk: contextBackupConfiguration.backupDisk,
       });
       if (contextBackupConfiguration.backupConfigs?.s3) {
@@ -140,7 +145,40 @@ export default function BackupConfigurationCreateOrUpdate({
         Are you sure you want to delete <Code>{form.getValues().name}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'backupConfigurations']))}>
+      {form.values.backupDisk === 'ddup-bak' && (
+        <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+          Ddup-Bak is Technology Preview software, it is technically not recommended for production use. If you
+          acknowledge, sail ahead as you wish.
+        </Alert>
+      )}
+      {form.values.backupDisk === 'btrfs' && (
+        <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+          Btrfs requires additional setup on the node to work, please{' '}
+          <Anchor
+            href='https://calagopus.com/docs/wings/disk-limiters/btrfs-subvolume'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            see the documentation
+          </Anchor>{' '}
+          for more details.
+        </Alert>
+      )}
+      {form.values.backupDisk === 'zfs' && (
+        <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+          ZFS requires additional setup on the node to work, please{' '}
+          <Anchor
+            href='https://calagopus.com/docs/wings/disk-limiters/zfs-dataset'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            see the documentation
+          </Anchor>{' '}
+          for more details.
+        </Alert>
+      )}
+
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.backupConfigurations.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
@@ -172,8 +210,16 @@ export default function BackupConfigurationCreateOrUpdate({
 
           <Switch
             label='Maintenance Enabled'
+            description='If enabled, any server using this backup configuration will not be able to create new backups, or manage existing ones.'
             key={form.key('maintenanceEnabled')}
             {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
+          />
+
+          <Switch
+            label='Shared'
+            description='If enabled, backups on this backup configuration will not be transferred between nodes, they will be assumed to be accessible by all nodes.'
+            key={form.key('shared')}
+            {...form.getInputProps('shared', { type: 'checkbox' })}
           />
         </div>
 

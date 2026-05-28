@@ -1,6 +1,6 @@
 use crate::{
     models::{
-        CreatableModel, CreateListenerList, InsertQueryBuilder, UpdatableModel, UpdateListenerList,
+        CreatableModel, CreateListenerList, InsertQueryBuilder, UpdatableModel, UpdateHandlerList,
         UpdateQueryBuilder,
     },
     prelude::*,
@@ -9,6 +9,7 @@ use compact_str::ToCompactString;
 use garde::Validate;
 use rand::distr::SampleString;
 use serde::{Deserialize, Serialize};
+use sha2::Digest;
 use sqlx::{Row, postgres::PgRow};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -54,7 +55,7 @@ impl BaseModel for Node {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -171,35 +172,42 @@ impl Node {
     ) -> Result<Option<Self>, anyhow::Error> {
         database
             .cache
-            .cached(&format!("node::token::{token_id}.{token}"), 10, || async {
-                let row = sqlx::query(&format!(
-                    r#"
-                    SELECT {}
-                    FROM nodes
-                    JOIN locations ON locations.uuid = nodes.location_uuid
-                    WHERE nodes.token_id = $1
-                    "#,
-                    Self::columns_sql(None)
-                ))
-                .bind(token_id)
-                .fetch_optional(database.read())
-                .await?;
+            .cached(
+                &format!(
+                    "node::token::{token_id}.{}",
+                    hex::encode(sha2::Sha256::digest(token.as_bytes()))
+                ),
+                10,
+                || async {
+                    let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+                        r#"
+                        SELECT {}
+                        FROM nodes
+                        JOIN locations ON locations.uuid = nodes.location_uuid
+                        WHERE nodes.token_id = $1
+                        "#,
+                        Self::columns_sql(None)
+                    )))
+                    .bind(token_id)
+                    .fetch_optional(database.read())
+                    .await?;
 
-                Ok::<_, anyhow::Error>(
-                    if let Some(node) = row.try_map(|row| Self::map(None, &row))? {
-                        if constant_time_eq::constant_time_eq(
-                            database.decrypt(node.token.clone()).await?.as_bytes(),
-                            token.as_bytes(),
-                        ) {
-                            Some(node)
+                    Ok::<_, anyhow::Error>(
+                        if let Some(node) = row.try_map(|row| Self::map(None, &row))? {
+                            if constant_time_eq::constant_time_eq(
+                                database.decrypt(node.token.clone()).await?.as_bytes(),
+                                token.as_bytes(),
+                            ) {
+                                Some(node)
+                            } else {
+                                None
+                            }
                         } else {
                             None
-                        }
-                    } else {
-                        None
-                    },
-                )
-            })
+                        },
+                    )
+                },
+            )
             .await
     }
 
@@ -212,7 +220,7 @@ impl Node {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM nodes
@@ -222,7 +230,7 @@ impl Node {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(location_uuid)
         .bind(search)
         .bind(per_page)
@@ -252,7 +260,7 @@ impl Node {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM nodes
@@ -262,7 +270,7 @@ impl Node {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(backup_configuration_uuid)
         .bind(search)
         .bind(per_page)
@@ -291,7 +299,7 @@ impl Node {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM nodes
@@ -301,7 +309,7 @@ impl Node {
             LIMIT $2 OFFSET $3
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(search)
         .bind(per_page)
         .bind(offset)
@@ -327,7 +335,7 @@ impl Node {
         limits: super::server::AdminApiServerLimits,
         allow_overallocation: bool,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             WITH server_usage AS (
                 SELECT
@@ -341,8 +349,14 @@ impl Node {
             FROM nodes
             JOIN locations ON locations.uuid = nodes.location_uuid
             LEFT JOIN server_usage u ON nodes.uuid = u.node_uuid
-            WHERE nodes.location_uuid = ANY($1) AND nodes.deployment_enabled
-            AND $4 OR (COALESCE(u.used_memory, 0) + $2 <= nodes.memory AND COALESCE(u.used_disk, 0) + $3 <= nodes.disk)
+            WHERE nodes.location_uuid = ANY($1)
+            AND nodes.deployment_enabled
+            AND (
+                $4 OR (
+                    COALESCE(u.used_memory, 0) + $2 <= nodes.memory
+                    AND COALESCE(u.used_disk, 0) + $3 <= nodes.disk
+                )
+            )
             ORDER BY
                 (
                     GREATEST(COALESCE(u.used_memory, 0) + $2 - nodes.memory, 0) + 
@@ -354,7 +368,7 @@ impl Node {
                 )
             "#,
             Self::columns_sql(None),
-        ))
+        )))
         .bind(location_uuids)
         .bind(limits.memory)
         .bind(limits.disk)
@@ -371,7 +385,7 @@ impl Node {
         database: &crate::database::Database,
         name: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nodes
@@ -379,7 +393,7 @@ impl Node {
             WHERE nodes.name = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(name)
         .fetch_optional(database.read())
         .await?;
@@ -390,7 +404,7 @@ impl Node {
     pub async fn count_by_location_uuid(
         database: &crate::database::Database,
         location_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -401,7 +415,6 @@ impl Node {
         .bind(location_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     /// Fetch the current configuration of this node
@@ -423,6 +436,31 @@ impl Node {
                 },
             )
             .await
+    }
+
+    /// Update the configuration of this node
+    ///
+    /// Invalidates the cached configuration.
+    pub async fn update_configuration(
+        &self,
+        database: &crate::database::Database,
+        config_patch: &serde_json::Value,
+    ) -> Result<bool, anyhow::Error> {
+        let response = self
+            .api_client(database)
+            .await?
+            .post_update(config_patch)
+            .await?;
+        if !response.applied {
+            return Ok(false);
+        }
+
+        database
+            .cache
+            .invalidate(&format!("node::{}::configuration", self.uuid))
+            .await?;
+
+        Ok(true)
     }
 
     /// Fetch the current resource usages of all servers on this node.
@@ -539,11 +577,8 @@ impl Node {
         database: &crate::database::Database,
         jwt: &crate::jwt::Jwt,
         payload: &T,
-    ) -> Result<String, jsonwebtoken::errors::Error> {
-        jwt.create_custom(
-            database.blocking_decrypt(&self.token).unwrap().as_bytes(),
-            payload,
-        )
+    ) -> Result<String, anyhow::Error> {
+        Ok(jwt.create_custom(database.blocking_decrypt(&self.token)?.as_bytes(), payload)?)
     }
 }
 
@@ -616,7 +651,7 @@ impl ByUuid for Node {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, {}
             FROM nodes
@@ -625,9 +660,30 @@ impl ByUuid for Node {
             "#,
             Self::columns_sql(None),
             super::location::Location::columns_sql(Some("location_")),
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}, {}
+            FROM nodes
+            JOIN locations ON locations.uuid = nodes.location_uuid
+            WHERE nodes.uuid = $1
+            "#,
+            Self::columns_sql(None),
+            super::location::Location::columns_sql(Some("location_")),
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)
@@ -682,13 +738,12 @@ impl CreatableModel for Node {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
-
-        let mut transaction = state.database.write().begin().await?;
 
         if let Some(backup_configuration_uuid) = &options.backup_configuration_uuid {
             super::backup_configuration::BackupConfiguration::by_uuid_optional(
@@ -703,8 +758,7 @@ impl CreatableModel for Node {
 
         let mut query_builder = InsertQueryBuilder::new("nodes");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         let token_id = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 16);
         let token = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 64);
@@ -730,13 +784,15 @@ impl CreatableModel for Node {
 
         let row = query_builder
             .returning("uuid")
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
-        let uuid: uuid::Uuid = row.get("uuid");
+        let uuid: uuid::Uuid = row.try_get("uuid")?;
 
-        transaction.commit().await?;
+        let mut result = Self::by_uuid_with_transaction(transaction, uuid).await?;
 
-        Self::by_uuid(&state.database, uuid).await
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -800,17 +856,18 @@ pub struct UpdateNodeOptions {
 impl UpdatableModel for Node {
     type UpdateOptions = UpdateNodeOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<Node>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<Node>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
@@ -847,18 +904,10 @@ impl UpdatableModel for Node {
                 None
             };
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("nodes");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("location_uuid", options.location_uuid.as_ref())
@@ -887,7 +936,7 @@ impl UpdatableModel for Node {
             .set("disk", options.disk.as_ref())
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(location) = location {
             self.location = location;
@@ -928,7 +977,7 @@ impl UpdatableModel for Node {
             self.disk = disk;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -938,25 +987,24 @@ impl UpdatableModel for Node {
 impl DeletableModel for Node {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<Node>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<Node>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
         if self.is_all_in_one_node() && state.container_type.is_all_in_one() {
             return Err(anyhow::anyhow!("The AIO node cannot be deleted"));
         }
 
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -966,10 +1014,11 @@ impl DeletableModel for Node {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

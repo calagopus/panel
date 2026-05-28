@@ -89,6 +89,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
       .then(() => {
         removeAllocation(allocation);
         addToast(t('pages.server.network.toast.removed', {}), 'success');
+        setOpenModal(null);
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

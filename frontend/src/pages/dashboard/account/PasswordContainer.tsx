@@ -68,8 +68,8 @@ export default function PasswordContainer({ requireTwoFactorActivation }: Accoun
       icon={<FontAwesomeIcon icon={faUserLock} />}
       className={classNames('h-full order-10', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
+      <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
+        <Stack h='100%'>
           {user.hasPassword && (
             <PasswordInput
               withAsterisk
@@ -93,7 +93,8 @@ export default function PasswordContainer({ requireTwoFactorActivation }: Accoun
             autoComplete='new-password'
             {...form.getInputProps('confirmNewPassword')}
           />
-          <Group>
+
+          <Group mt='auto'>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
               {t('common.button.update', {})}
             </Button>

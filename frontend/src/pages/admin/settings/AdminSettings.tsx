@@ -7,6 +7,7 @@ import {
   faRobot,
   faServer,
   faToolbox,
+  faUser,
   faUserCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
@@ -17,6 +18,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import EmailTemplatesContainer from '@/pages/admin/settings/EmailTemplatesContainer.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import ActivityContainer from './ActivityContainer.tsx';
 import ApplicationContainer from './ApplicationContainer.tsx';
@@ -25,10 +27,12 @@ import EmailContainer from './EmailContainer.tsx';
 import RatelimitsContainer from './RatelimitsContainer.tsx';
 import ServerContainer from './ServerContainer.tsx';
 import StorageContainer from './StorageContainer.tsx';
+import UserContainer from './UserContainer.tsx';
 import WebauthnContainer from './WebauthnContainer.tsx';
 
 export default function AdminSettings() {
   const { addToast } = useToast();
+  const { t } = useTranslations();
   const { setSettings } = useAdminStore();
 
   const [loading, setLoading] = useState(true);
@@ -45,60 +49,66 @@ export default function AdminSettings() {
   return loading ? (
     <Spinner.Centered />
   ) : (
-    <AdminContentContainer title='Settings'>
+    <AdminContentContainer title={t('pages.admin.settings.title', {})}>
       <SubNavigation
         baseUrl='/admin/settings'
         items={[
           {
-            name: 'Application',
+            name: t('pages.admin.settings.tabs.application.title', {}),
             icon: faLayerGroup,
             path: '/',
             element: <ApplicationContainer />,
           },
           {
-            name: 'Storage',
+            name: t('pages.admin.settings.tabs.storage.title', {}),
             icon: faDatabase,
             path: '/storage',
             element: <StorageContainer />,
           },
           {
-            name: 'Mail',
+            name: t('pages.admin.settings.tabs.mail.title', {}),
             icon: faAt,
             path: '/mail',
             element: <EmailContainer />,
           },
           {
-            name: 'Mail Templates',
+            name: t('pages.admin.settings.tabs.mailTemplates.title', {}),
             icon: faEnvelopesBulk,
             path: '/mail-templates',
             element: <EmailTemplatesContainer />,
           },
           {
-            name: 'Captcha',
+            name: t('pages.admin.settings.tabs.captcha.title', {}),
             icon: faRobot,
             path: '/captcha',
             element: <CaptchaContainer />,
           },
           {
-            name: 'Webauthn',
+            name: t('pages.admin.settings.tabs.webauthn.title', {}),
             icon: faUserCheck,
             path: '/webauthn',
             element: <WebauthnContainer />,
           },
           {
-            name: 'Server',
+            name: t('pages.admin.settings.tabs.server.title', {}),
             icon: faServer,
             path: '/server',
             element: <ServerContainer />,
           },
           {
-            name: 'Activity',
+            name: t('pages.admin.settings.tabs.user.title', {}),
+            icon: faUser,
+            path: '/user',
+            element: <UserContainer />,
+          },
+          {
+            name: t('pages.admin.settings.tabs.activity.title', {}),
             icon: faToolbox,
             path: '/activity',
             element: <ActivityContainer />,
           },
           {
-            name: 'Ratelimits',
+            name: t('pages.admin.settings.tabs.ratelimits.title', {}),
             icon: faBan,
             path: '/ratelimits',
             element: <RatelimitsContainer />,

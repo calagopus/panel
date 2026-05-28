@@ -1,14 +1,66 @@
 use super::State;
+use axum::{
+    extract::{Path, Request},
+    http::StatusCode,
+    middleware::Next,
+    response::{IntoResponse, Response},
+};
+use shared::{
+    GetState,
+    models::{server::GetServer, server_subuser::ServerSubuser, user::GetPermissionManager},
+    response::ApiResponse,
+};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+pub type GetServerSubuser = shared::extract::ConsumingExtension<ServerSubuser>;
+
+pub async fn auth(
+    state: GetState,
+    permissions: GetPermissionManager,
+    server: GetServer,
+    Path(subuser): Path<Vec<String>>,
+    mut req: Request,
+    next: Next,
+) -> Result<Response, StatusCode> {
+    let subuser = match subuser.get(1).map(|s| s.parse::<uuid::Uuid>()) {
+        Some(Ok(id)) => id,
+        _ => {
+            return Ok(ApiResponse::error("invalid subuser uuid")
+                .with_status(StatusCode::BAD_REQUEST)
+                .into_response());
+        }
+    };
+
+    if let Err(err) = permissions.has_server_permission("subusers.read") {
+        return Ok(err.into_response());
+    }
+
+    let subuser =
+        ServerSubuser::by_server_uuid_user_uuid(&state.database, server.uuid, subuser).await;
+    let subuser = match subuser {
+        Ok(Some(subuser)) => subuser,
+        Ok(None) => {
+            return Ok(ApiResponse::error("subuser not found")
+                .with_status(StatusCode::NOT_FOUND)
+                .into_response());
+        }
+        Err(err) => return Ok(ApiResponse::from(err).into_response()),
+    };
+
+    req.extensions_mut().insert(server.0);
+    req.extensions_mut().insert(subuser);
+
+    Ok(next.run(req).await)
+}
+
 mod delete {
-    use axum::{extract::Path, http::StatusCode};
+    use crate::routes::api::client::servers::_server_::subusers::_subuser_::GetServerSubuser;
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
         models::{
+            DeletableModel,
             server::{GetServer, GetServerActivityLogger},
-            server_subuser::ServerSubuser,
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -29,9 +81,9 @@ mod delete {
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
         (
-            "subuser" = String,
-            description = "The username of the subuser",
-            example = "0x7d8",
+            "subuser" = uuid::Uuid,
+            description = "The subuser ID",
+            example = "123e4567-e89b-12d3-a456-426614174000",
         ),
     ))]
     pub async fn route(
@@ -39,23 +91,11 @@ mod delete {
         permissions: GetPermissionManager,
         server: GetServer,
         activity_logger: GetServerActivityLogger,
-        Path((_server, subuser)): Path<(String, String)>,
+        subuser: GetServerSubuser,
     ) -> ApiResponseResult {
         permissions.has_server_permission("subusers.delete")?;
 
-        let subuser =
-            match ServerSubuser::by_server_uuid_username(&state.database, server.uuid, &subuser)
-                .await?
-            {
-                Some(subuser) => subuser,
-                None => {
-                    return ApiResponse::error("subuser not found")
-                        .with_status(StatusCode::NOT_FOUND)
-                        .ok();
-                }
-            };
-
-        ServerSubuser::delete_by_uuids(&state.database, server.uuid, subuser.user.uuid).await?;
+        subuser.delete(&state, ()).await?;
 
         activity_logger
             .log(
@@ -122,7 +162,8 @@ mod delete {
 }
 
 mod patch {
-    use axum::{extract::Path, http::StatusCode};
+    use crate::routes::api::client::servers::_server_::subusers::_subuser_::GetServerSubuser;
+    use axum::http::StatusCode;
     use garde::Validate;
     use serde::{Deserialize, Serialize};
     use shared::{
@@ -130,7 +171,6 @@ mod patch {
         models::{
             UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
-            server_subuser::ServerSubuser,
             user::{GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
@@ -160,9 +200,9 @@ mod patch {
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
         (
-            "subuser" = String,
-            description = "The username of the subuser",
-            example = "0x7d8",
+            "subuser" = uuid::Uuid,
+            description = "The subuser ID",
+            example = "123e4567-e89b-12d3-a456-426614174000",
         ),
     ), request_body = inline(Payload))]
     pub async fn route(
@@ -171,7 +211,7 @@ mod patch {
         user: GetUser,
         server: GetServer,
         activity_logger: GetServerActivityLogger,
-        Path((_server, subuser)): Path<(String, String)>,
+        mut subuser: GetServerSubuser,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         if let Err(errors) = shared::utils::validate_data(&data) {
@@ -183,7 +223,7 @@ mod patch {
         if let Some(permissions) = &data.permissions
             && !user.admin
             && let Some(subuser_permissions) = &server.subuser_permissions
-            && !permissions.iter().all(|p| subuser_permissions.contains(p))
+            && permissions.iter().any(|p| !subuser_permissions.contains(p))
         {
             return ApiResponse::error("permissions: more permissions than self")
                 .with_status(StatusCode::BAD_REQUEST)
@@ -191,18 +231,6 @@ mod patch {
         }
 
         permissions.has_server_permission("subusers.update")?;
-
-        let mut subuser =
-            match ServerSubuser::by_server_uuid_username(&state.database, server.uuid, &subuser)
-                .await?
-            {
-                Some(subuser) => subuser,
-                None => {
-                    return ApiResponse::error("subuser not found")
-                        .with_status(StatusCode::NOT_FOUND)
-                        .ok();
-                }
-            };
 
         if subuser.user.uuid == user.uuid {
             return ApiResponse::error("cannot update permissions for self")
@@ -269,7 +297,7 @@ mod patch {
                                 .into_iter()
                                 .map(compact_str::CompactString::from)
                                 .collect(),
-                            ignored_files: subuser.ignored_files,
+                            ignored_files: subuser.0.ignored_files,
                         }]
                     }
                 )
@@ -287,5 +315,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
+        .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }

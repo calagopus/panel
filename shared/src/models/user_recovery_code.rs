@@ -18,7 +18,7 @@ impl BaseModel for UserRecoveryCode {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -92,14 +92,14 @@ impl UserRecoveryCode {
         user_uuid: uuid::Uuid,
         code: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             DELETE FROM user_recovery_codes
             WHERE user_recovery_codes.user_uuid = $1 AND user_recovery_codes.code = $2
             RETURNING {}
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(code)
         .fetch_optional(database.write())

@@ -40,12 +40,14 @@ pub async fn write_extension(
         tokio::task::spawn_blocking(move || ExtensionDistrFile::parse_from_reader(tmp_file))
             .await??;
 
+    let identifier = distr.metadata_toml.get_package_identifier();
+    if !MetadataToml::is_valid_package_identifier(&identifier) {
+        return Err(anyhow::anyhow!("invalid package identifier `{identifier}`"));
+    }
+
     tokio::fs::copy(
         tmp_path,
-        Path::new(EXTENSION_DIR).join(format!(
-            "{}.c7s.zip",
-            distr.metadata_toml.get_package_identifier()
-        )),
+        Path::new(EXTENSION_DIR).join(format!("{}.c7s.zip", identifier)),
     )
     .await?;
 
@@ -53,10 +55,15 @@ pub async fn write_extension(
 }
 
 pub async fn remove_extension(package_name: &str) -> Result<(), std::io::Error> {
-    let path = Path::new(EXTENSION_DIR).join(format!(
-        "{}.c7s.zip",
-        MetadataToml::convert_package_name_to_identifier(package_name)
-    ));
+    let identifier = MetadataToml::convert_package_name_to_identifier(package_name);
+    if !MetadataToml::is_valid_package_identifier(&identifier) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("invalid package identifier `{identifier}`"),
+        ));
+    }
+
+    let path = Path::new(EXTENSION_DIR).join(format!("{}.c7s.zip", identifier));
 
     tokio::fs::remove_file(path).await?;
 

@@ -93,8 +93,13 @@ const admin = {
     detail: (uuid: string) => ['admin', 'egg-configurations', { uuid }] as const,
   },
 
+  announcements: {
+    all: () => ['admin', 'announcements'] as const,
+    detail: (uuid: string) => ['admin', 'announcements', { uuid }] as const,
+  },
+
   activity: {
-    all: () => ['admin', 'activity'] as const,
+    all: (userUuid: string | null) => ['admin', 'activity', { uuid: userUuid }] as const,
   },
 
   assets: {
@@ -117,7 +122,7 @@ const admin = {
 
 const server = (serverUuid: string) => ({
   activity: {
-    all: () => ['server', serverUuid, 'activity'] as const,
+    all: (userUuid: string | null) => ['server', serverUuid, 'activity', { uuid: userUuid }] as const,
   },
   allocations: {
     all: () => ['server', serverUuid, 'allocations'] as const,
@@ -132,6 +137,7 @@ const server = (serverUuid: string) => ({
   files: {
     all: () => ['server', serverUuid, 'files'] as const,
     directory: (path: string) => ['server', serverUuid, 'files', 'directory', path] as const,
+    fileRevisions: (path: string) => ['server', serverUuid, 'files', 'revisions', path] as const,
   },
   mounts: {
     all: () => ['server', serverUuid, 'mounts'] as const,

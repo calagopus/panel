@@ -1,6 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import deleteLocationDatabaseHost from '@/api/admin/locations/database-hosts/deleteLocationDatabaseHost.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -8,6 +7,7 @@ import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { adminLocationDatabaseHostSchema, adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
@@ -69,12 +69,9 @@ export default function LocationDatabaseHostRow({
             }}
           >
             <TableData>
-              <NavLink
-                to={`/admin/database-hosts/${databaseHost.databaseHost.uuid}`}
-                className='text-blue-400 hover:text-blue-200 hover:underline'
-              >
+              <TableLink to={`/admin/database-hosts/${databaseHost.databaseHost.uuid}`}>
                 <Code>{databaseHost.databaseHost.uuid}</Code>
-              </NavLink>
+              </TableLink>
             </TableData>
             <TableData>{databaseHost.databaseHost.name}</TableData>
             <TableData>{databaseTypeLabelMapping[databaseHost.databaseHost.type]}</TableData>

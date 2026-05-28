@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { basename } from 'pathe';
 import { useState } from 'react';
 import { z } from 'zod';
 import createBackupConfiguration from '@/api/admin/backup-configurations/createBackupConfiguration.ts';
@@ -25,8 +26,10 @@ import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 import BackupRestic from '../admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '../admin/backupConfigurations/forms/BackupS3.tsx';
 
+const flags = import.meta.glob('/node_modules/svg-country-flags/svg/*.svg', { import: 'metadata' });
+
 export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data }: OobeComponentProps) {
-  const { t } = useTranslations();
+  const { t, language } = useTranslations();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -37,6 +40,7 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
   const form = useForm<z.infer<typeof oobeLocationSchema>>({
     initialValues: {
       locationName: existingLocation?.name ?? '',
+      locationFlag: existingLocation?.flag ?? null,
       backupName: existingBackupConfig?.name ?? '',
       backupDisk: existingBackupConfig?.backupDisk ?? 'local',
     },
@@ -82,12 +86,14 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
           name: form.values.backupName,
           description: existingBackupConfig!.description,
           maintenanceEnabled: existingBackupConfig!.maintenanceEnabled,
+          shared: existingBackupConfig!.shared,
           backupDisk: form.values.backupDisk,
           backupConfigs,
         });
         await updateLocation(existingLocation.uuid, {
           name: form.values.locationName,
           description: existingLocation.description,
+          flag: form.values.locationFlag,
           backupConfigurationUuid: existingBackupConfig!.uuid,
         });
       } else {
@@ -95,12 +101,14 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
           name: form.values.backupName,
           description: null,
           maintenanceEnabled: false,
+          shared: form.values.backupDisk === 's3' || form.values.backupDisk === 'restic',
           backupDisk: form.values.backupDisk,
           backupConfigs,
         });
         await createLocation({
           name: form.values.locationName,
           description: null,
+          flag: form.values.locationFlag,
           backupConfigurationUuid: backupConfig.uuid,
         });
       }
@@ -132,6 +140,36 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
                 className='flex-1'
                 {...form.getInputProps('locationName')}
               />
+              <Select
+                label={t('pages.oobe.location.form.locationFlag', {})}
+                placeholder={t('pages.oobe.location.form.locationFlagPlaceholder', {})}
+                renderOption={({ option }) => (
+                  <div className='flex items-center gap-2'>
+                    <img
+                      src={`/flags/${option.value}.svg`}
+                      alt={option.label}
+                      className='w-4 h-4 rounded-md shrink-0'
+                    />
+                    <span className='truncate'>{option.label}</span>
+                  </div>
+                )}
+                data={Object.keys(flags)
+                  .filter((flag) => basename(flag, '.svg').length === 2)
+                  .map((flag) => {
+                    const countryCode = basename(flag, '.svg');
+                    const regionNames = new Intl.DisplayNames([language], { type: 'region' });
+
+                    return {
+                      label: regionNames.of(countryCode.toUpperCase()) || countryCode,
+                      value: countryCode,
+                    };
+                  })}
+                clearable
+                searchable
+                {...form.getInputProps('locationFlag')}
+              />
+            </div>
+            <div className='flex flex-col md:flex-row gap-4'>
               <TextInput
                 label={t('pages.oobe.location.form.backupName', {})}
                 placeholder={t('pages.oobe.location.form.backupNamePlaceholder', {})}
@@ -140,18 +178,18 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
                 className='flex-1'
                 {...form.getInputProps('backupName')}
               />
+              <Select
+                withAsterisk
+                label={t('pages.oobe.location.form.backupDisk', {})}
+                placeholder={t('pages.oobe.location.form.backupDiskPlaceholder', {})}
+                leftSection={<FontAwesomeIcon icon={faFloppyDisk} size='sm' />}
+                data={Object.entries(backupDiskLabelMapping).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+                {...form.getInputProps('backupDisk')}
+              />
             </div>
-            <Select
-              withAsterisk
-              label={t('pages.oobe.location.form.backupDisk', {})}
-              placeholder={t('pages.oobe.location.form.backupDiskPlaceholder', {})}
-              leftSection={<FontAwesomeIcon icon={faFloppyDisk} size='sm' />}
-              data={Object.entries(backupDiskLabelMapping).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-              {...form.getInputProps('backupDisk')}
-            />
             {form.values.backupDisk === 's3' ? <BackupS3 form={backupConfigS3Form} /> : null}
             {form.values.backupDisk === 'restic' ? <BackupRestic form={backupConfigResticForm} /> : null}
           </div>

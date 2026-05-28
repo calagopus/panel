@@ -1,0 +1,1 @@
+ALTER TABLE "oauth_providers" ALTER COLUMN "info_url" SET DATA TYPE varchar(255) USING "info_url"::varchar(255);

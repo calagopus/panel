@@ -8,7 +8,7 @@ import {
   faServer,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ComboboxItem, OptionsFilter } from '@mantine/core';
+import { ComboboxItem, OptionsFilter, useComputedColorScheme } from '@mantine/core';
 import { FitAddon } from '@xterm/addon-fit';
 import { SearchAddon } from '@xterm/addon-search';
 import { Unicode11Addon } from '@xterm/addon-unicode11';
@@ -51,10 +51,39 @@ const commandSnippetFilter: OptionsFilter = ({ options, search }) => {
   });
 };
 
+const getXtermTheme = (isDark: boolean) => ({
+  background: isDark ? '#00000000' : '#ffffff',
+  foreground: isDark ? '#f8f8f2' : '#1a1a1a',
+  cursor: '#00000000',
+  cursorAccent: '#00000000',
+  selectionBackground: isDark ? '#FFFFFF4D' : '#0000004D',
+  selectionInactiveBackground: isDark ? '#FFFFFF80' : '#00000080',
+  // Light-mode ANSI palette
+  ...(!isDark && {
+    black: '#1c1c1c',
+    red: '#b22222',
+    green: '#005f00',
+    yellow: '#8b6800',
+    blue: '#0000cc',
+    magenta: '#7d0070',
+    cyan: '#005f5f',
+    white: '#6c6c6c',
+    brightBlack: '#505050',
+    brightRed: '#c0392b',
+    brightGreen: '#1e8449',
+    brightYellow: '#b07d00',
+    brightBlue: '#2471a3',
+    brightMagenta: '#7d3c98',
+    brightCyan: '#148f77',
+    brightWhite: '#909090',
+  }),
+});
+
 export default function Terminal() {
   const { t } = useTranslations();
   const { server, updateServer, commandSnippets, imagePulls, socketConnected, socketInstance, state } =
     useServerStore();
+  const computedColorScheme = useComputedColorScheme('dark');
 
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -102,7 +131,10 @@ export default function Terminal() {
     localStorage.setItem(CONSOLE_FONT_SIZE_KEY, consoleFontSize.toString());
     if (xtermInstance.current) {
       xtermInstance.current.options.fontSize = consoleFontSize;
-      fitAddonRef.current?.fit();
+      requestAnimationFrame(() => {
+        fitAddonRef.current?.fit();
+        xtermInstance.current?.refresh(0, xtermInstance.current.rows - 1);
+      });
     }
   }, [consoleFontSize, CONSOLE_FONT_SIZE_KEY]);
 
@@ -112,13 +144,7 @@ export default function Terminal() {
     const initOptions: ITerminalOptions & ITerminalInitOnlyOptions = {
       fontSize: consoleFontSize,
       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-      theme: {
-        background: '#00000000',
-        cursor: '#00000000',
-        cursorAccent: '#00000000',
-        selectionBackground: '#FFFFFF4D',
-        selectionInactiveBackground: '#FFFFFF80',
-      },
+      theme: getXtermTheme(computedColorScheme === 'dark'),
       allowTransparency: true,
       lineHeight: 1.2,
       disableStdin: true,
@@ -211,6 +237,12 @@ export default function Terminal() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (xtermInstance.current) {
+      xtermInstance.current.options.theme = getXtermTheme(computedColorScheme === 'dark');
+    }
+  }, [computedColorScheme]);
 
   useEffect(() => {
     const terminalElement = terminalRef.current;

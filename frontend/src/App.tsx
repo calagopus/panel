@@ -1,9 +1,10 @@
-import { MantineProvider, type MantineThemeOverride, v8CssVariablesResolver } from '@mantine/core';
+import { MantineProvider, type MantineThemeOverride } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createBrowserHistory } from 'history';
 import { useEffect, useRef, useState } from 'react';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router';
+import getAnnouncements from './api/getAnnouncements.ts';
 import getLanguages from './api/getLanguages.ts';
 import getSettings from './api/getSettings.ts';
 import ErrorBoundary from './elements/ErrorBoundary.tsx';
@@ -17,8 +18,10 @@ import RouterRoutes from './RouterRoutes.tsx';
 import { useGlobalStore } from './stores/global.ts';
 
 import '@mantine/core/styles.css';
+import '@mantine/charts/styles.css';
 import '@mantine/dates/styles.css';
 import '@gfazioli/mantine-window/styles.css';
+import '@gfazioli/mantine-audio/styles.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,7 +37,7 @@ const browserHistory = createBrowserHistory();
 const MAX_RETRIES = 10;
 
 export default function App({ theme }: { theme: MantineThemeOverride }) {
-  const { settings, setSettings, setLanguages, setTimeOffset } = useGlobalStore();
+  const { settings, setSettings, setLanguages, setTimeOffset, setAnnouncements } = useGlobalStore();
   const [loadWarning, setLoadWarning] = useState(false);
   const retryCount = useRef(0);
 
@@ -64,6 +67,14 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
             timer = setTimeout(loadData, Math.min(retryCount.current * 2000, 10000));
           }
         });
+
+      getAnnouncements()
+        .then((announcements) => {
+          setAnnouncements(announcements);
+        })
+        .catch((err) => {
+          console.error('Failed to load announcements:', err);
+        });
     };
 
     loadData();
@@ -86,12 +97,7 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
 
   return Object.keys(settings).length > 0 ? (
     <ErrorBoundary>
-      <MantineProvider
-        theme={theme}
-        forceColorScheme='dark'
-        cssVariablesResolver={v8CssVariablesResolver}
-        deduplicateInlineStyles
-      >
+      <MantineProvider theme={theme} defaultColorScheme='dark' deduplicateInlineStyles>
         <QueryClientProvider client={queryClient}>
           <TranslationProvider>
             <ToastProvider>
@@ -121,10 +127,14 @@ export default function App({ theme }: { theme: MantineThemeOverride }) {
     </ErrorBoundary>
   ) : (
     <>
-      <Spinner.Centered />
-      {loadWarning && (
-        <p className='text-center text-sm text-slate-400 -mt-4'>Having trouble connecting to the server. Retrying...</p>
-      )}
+      <MantineProvider theme={theme} defaultColorScheme='dark' deduplicateInlineStyles>
+        <Spinner.Centered />
+        {loadWarning && (
+          <p className='text-center text-sm text-slate-400 -mt-4'>
+            Having trouble connecting to the server. Retrying...
+          </p>
+        )}
+      </MantineProvider>
     </>
   );
 }

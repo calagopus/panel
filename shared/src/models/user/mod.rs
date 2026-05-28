@@ -5,6 +5,7 @@ use crate::{
 };
 use garde::Validate;
 use serde::{Deserialize, Serialize};
+use sha2::Digest;
 use sqlx::{Row, postgres::PgRow, prelude::Type};
 use std::{
     collections::BTreeMap,
@@ -62,7 +63,7 @@ impl BaseModel for User {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -194,7 +195,7 @@ impl User {
         let row = sqlx::query(
             r#"
             INSERT INTO users (username, email, name_first, name_last, password, admin)
-            VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf', 8)), (SELECT COUNT(*) = 0 FROM users))
+            VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf', 12)), (SELECT COUNT(*) = 0 FROM users))
             RETURNING users.uuid
             "#,
         )
@@ -213,7 +214,7 @@ impl User {
         database: &crate::database::Database,
         external_id: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM users
@@ -222,7 +223,7 @@ impl User {
             WHERE users.external_id = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(external_id)
         .fetch_optional(database.read())
         .await?;
@@ -244,30 +245,40 @@ impl User {
 
         database
             .cache
-            .cached(&format!("user::session::{session}"), 5, || async {
-                let row = sqlx::query(&format!(
-                    r#"
-                    SELECT {}, {}
-                    FROM users
-                    LEFT JOIN roles ON roles.uuid = users.role_uuid
-                    JOIN user_sessions ON user_sessions.user_uuid = users.uuid
-                    WHERE user_sessions.key_id = $1 AND user_sessions.key = crypt($2, user_sessions.key)
-                    "#,
-                    Self::columns_sql(None),
-                    super::user_session::UserSession::columns_sql(Some("session_"))
-                ))
-                .bind(key_id)
-                .bind(key)
-                .fetch_optional(database.read())
-                .await?;
+            .cached(
+                &format!(
+                    "user::session::{}",
+                    hex::encode(sha2::Sha256::digest(session.as_bytes()))
+                ),
+                5,
+                || async {
+                    let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+                        r#"
+                        WITH user_sessions AS MATERIALIZED (
+                            SELECT * FROM user_sessions WHERE key_id = $1
+                        )
+                        SELECT {}, {}
+                        FROM users
+                        LEFT JOIN roles ON roles.uuid = users.role_uuid
+                        JOIN user_sessions ON user_sessions.user_uuid = users.uuid
+                        WHERE user_sessions.key = crypt($2, user_sessions.key)
+                        "#,
+                        Self::columns_sql(None),
+                        super::user_session::UserSession::columns_sql(Some("session_"))
+                    )))
+                    .bind(key_id)
+                    .bind(key)
+                    .fetch_optional(database.read())
+                    .await?;
 
-                row.try_map(|row| {
-                    Ok::<_, anyhow::Error>((
-                        Self::map(None, &row)?,
-                        super::user_session::UserSession::map(Some("session_"), &row)?,
-                    ))
-                })
-            })
+                    row.try_map(|row| {
+                        Ok::<_, anyhow::Error>((
+                            Self::map(None, &row)?,
+                            super::user_session::UserSession::map(Some("session_"), &row)?,
+                        ))
+                    })
+                },
+            )
             .await
     }
 
@@ -280,30 +291,42 @@ impl User {
     ) -> Result<Option<(Self, super::user_api_key::UserApiKey)>, anyhow::Error> {
         database
             .cache
-            .cached(&format!("user::api_key::{key}"), 5, || async {
-                let row = sqlx::query(&format!(
-                    r#"
-                    SELECT {}, {}
-                    FROM users
-                    LEFT JOIN roles ON roles.uuid = users.role_uuid
-                    JOIN user_api_keys ON user_api_keys.user_uuid = users.uuid
-                    WHERE user_api_keys.key_start = $1 AND user_api_keys.key = crypt($2, user_api_keys.key)
-                    "#,
-                    Self::columns_sql(None),
-                    super::user_api_key::UserApiKey::columns_sql(Some("api_key_"))
-                ))
-                .bind(&key[0..16])
-                .bind(key)
-                .fetch_optional(database.read())
-                .await?;
+            .cached(
+                &format!(
+                    "user::api_key::{}",
+                    hex::encode(sha2::Sha256::digest(key.as_bytes()))
+                ),
+                5,
+                || async {
+                    let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+                        r#"
+                        WITH user_api_keys AS MATERIALIZED (
+                            SELECT * FROM user_api_keys 
+                            WHERE user_api_keys.key_start = $1 
+                            AND (user_api_keys.expires IS NULL OR user_api_keys.expires > NOW())
+                        )
+                        SELECT {}, {}
+                        FROM users
+                        LEFT JOIN roles ON roles.uuid = users.role_uuid
+                        JOIN user_api_keys ON user_api_keys.user_uuid = users.uuid
+                        WHERE user_api_keys.key = crypt($2, user_api_keys.key)
+                        "#,
+                        Self::columns_sql(None),
+                        super::user_api_key::UserApiKey::columns_sql(Some("api_key_"))
+                    )))
+                    .bind(&key[0..16])
+                    .bind(key)
+                    .fetch_optional(database.read())
+                    .await?;
 
-                row.try_map(|row| {
-                    Ok::<_, anyhow::Error>((
-                        Self::map(None, &row)?,
-                        super::user_api_key::UserApiKey::map(Some("api_key_"), &row)?,
-                    ))
-                })
-            })
+                    row.try_map(|row| {
+                        Ok::<_, anyhow::Error>((
+                            Self::map(None, &row)?,
+                            super::user_api_key::UserApiKey::map(Some("api_key_"), &row)?,
+                        ))
+                    })
+                },
+            )
             .await
     }
 
@@ -314,7 +337,7 @@ impl User {
         Option<(Self, super::user_security_key::UserSecurityKey)>,
         crate::database::DatabaseError,
     > {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, {}
             FROM users
@@ -324,7 +347,7 @@ impl User {
             "#,
             Self::columns_sql(None),
             super::user_security_key::UserSecurityKey::columns_sql(Some("security_key_"))
-        ))
+        )))
         .bind(credential_id.to_vec())
         .fetch_optional(database.read())
         .await?;
@@ -341,7 +364,7 @@ impl User {
         database: &crate::database::Database,
         email: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM users
@@ -349,7 +372,7 @@ impl User {
             WHERE lower(users.email) = lower($1)
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(email)
         .fetch_optional(database.read())
         .await?;
@@ -362,7 +385,7 @@ impl User {
         email: &str,
         password: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM users
@@ -370,7 +393,7 @@ impl User {
             WHERE lower(users.email) = lower($1) AND users.password IS NOT NULL AND users.password = crypt($2, users.password)
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(email)
         .bind(password)
         .fetch_optional(database.read())
@@ -383,7 +406,7 @@ impl User {
         database: &crate::database::Database,
         username: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM users
@@ -391,7 +414,7 @@ impl User {
             WHERE lower(users.username) = lower($1)
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(username)
         .fetch_optional(database.read())
         .await?;
@@ -404,7 +427,7 @@ impl User {
         username: &str,
         password: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM users
@@ -412,7 +435,7 @@ impl User {
             WHERE lower(users.username) = lower($1) AND users.password IS NOT NULL AND users.password = crypt($2, users.password)
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(username)
         .bind(password)
         .fetch_optional(database.read())
@@ -426,7 +449,7 @@ impl User {
         username: &str,
         public_key: russh::keys::PublicKey,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM users
@@ -435,7 +458,7 @@ impl User {
             WHERE lower(users.username) = lower($1) AND user_ssh_keys.fingerprint = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(username)
         .bind(
             public_key
@@ -457,7 +480,7 @@ impl User {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM users
@@ -467,7 +490,7 @@ impl User {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(role_uuid)
         .bind(search)
         .bind(per_page)
@@ -496,7 +519,7 @@ impl User {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM users
@@ -506,7 +529,7 @@ impl User {
             LIMIT $2 OFFSET $3
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(search)
         .bind(per_page)
         .bind(offset)
@@ -572,7 +595,7 @@ impl User {
             sqlx::query(
                 r#"
 		            UPDATE users
-		            SET password = crypt($2, gen_salt('bf'))
+		            SET password = crypt($2, gen_salt('bf', 12))
 		            WHERE users.uuid = $1
 		            "#,
             )
@@ -593,6 +616,45 @@ impl User {
             .bind(self.uuid)
             .bind(password)
             .execute(database.write())
+            .await?;
+
+            self.has_password = false;
+        }
+
+        Ok(())
+    }
+
+    /// Update the User password, `None` will disallow password login and not require one when changing
+    pub async fn update_password_with_transaction(
+        &mut self,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        password: Option<&str>,
+    ) -> Result<(), crate::database::DatabaseError> {
+        if let Some(password) = password {
+            sqlx::query(
+                r#"
+		            UPDATE users
+		            SET password = crypt($2, gen_salt('bf', 12))
+		            WHERE users.uuid = $1
+		            "#,
+            )
+            .bind(self.uuid)
+            .bind(password)
+            .execute(&mut **transaction)
+            .await?;
+
+            self.has_password = true;
+        } else {
+            sqlx::query(
+                r#"
+		            UPDATE users
+		            SET password = NULL
+		            WHERE users.uuid = $1
+		            "#,
+            )
+            .bind(self.uuid)
+            .bind(password)
+            .execute(&mut **transaction)
             .await?;
 
             self.has_password = false;
@@ -789,9 +851,10 @@ impl CreatableModel for User {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -801,12 +864,9 @@ impl CreatableModel for User {
                 .ok_or(crate::database::InvalidRelationError("role"))?;
         }
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("users");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("role_uuid", options.role_uuid)
@@ -817,7 +877,7 @@ impl CreatableModel for User {
             .set("name_last", &options.name_last);
 
         if let Some(password) = &options.password {
-            query_builder.set_expr("password", "crypt($1, gen_salt('bf', 8))", vec![password]);
+            query_builder.set_expr("password", "crypt($1, gen_salt('bf', 12))", vec![password]);
         }
 
         query_builder
@@ -826,13 +886,25 @@ impl CreatableModel for User {
 
         let row = query_builder
             .returning("uuid")
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
         let uuid: uuid::Uuid = row.get("uuid");
 
-        transaction.commit().await?;
+        let mut result = Self::by_uuid_with_transaction(transaction, uuid).await?;
 
-        Self::by_uuid(&state.database, uuid).await
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
+    }
+
+    async fn create(
+        state: &crate::State,
+        options: Self::CreateOptions<'_>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let mut transaction = state.database.write().begin().await?;
+        let result = Self::create_with_transaction(state, options, &mut transaction).await?;
+        transaction.commit().await?;
+        Ok(result)
     }
 }
 
@@ -892,17 +964,18 @@ pub struct UpdateUserOptions {
 impl UpdatableModel for User {
     type UpdateOptions = UpdateUserOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<User>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<User>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
@@ -920,18 +993,10 @@ impl UpdatableModel for User {
             None
         };
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("users");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("role_uuid", options.role_uuid.as_ref())
@@ -946,7 +1011,7 @@ impl UpdatableModel for User {
             .set("start_on_grouped_servers", options.start_on_grouped_servers)
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(role) = role {
             self.role = role;
@@ -979,12 +1044,12 @@ impl UpdatableModel for User {
             self.language = language;
         }
 
-        transaction.commit().await?;
-
         if let Some(password) = options.password {
-            self.update_password(&state.database, password.as_deref())
+            self.update_password_with_transaction(transaction, password.as_deref())
                 .await?;
         }
+
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -994,21 +1059,20 @@ impl UpdatableModel for User {
 impl DeletableModel for User {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<User>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<User>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -1018,12 +1082,26 @@ impl DeletableModel for User {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        state.storage.remove(self.avatar.as_deref()).await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
+        Ok(())
+    }
+
+    async fn delete(
+        &self,
+        state: &crate::State,
+        options: Self::DeleteOptions,
+    ) -> Result<(), anyhow::Error> {
+        let mut transaction = state.database.write().begin().await?;
+        self.delete_with_transaction(state, options, &mut transaction)
+            .await?;
         transaction.commit().await?;
+
+        state.storage.remove(self.avatar.as_deref()).await?;
 
         Ok(())
     }
@@ -1035,7 +1113,7 @@ impl ByUuid for User {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM users
@@ -1043,9 +1121,29 @@ impl ByUuid for User {
             WHERE users.uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM users
+            LEFT JOIN roles ON roles.uuid = users.role_uuid
+            WHERE users.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)

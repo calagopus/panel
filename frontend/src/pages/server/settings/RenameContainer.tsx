@@ -51,8 +51,8 @@ export default function RenameContainer() {
       icon={<FontAwesomeIcon icon={faPenToSquare} />}
       className='h-full order-10'
     >
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
+      <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
+        <Stack h='100%'>
           <TextInput
             withAsterisk
             label={t('pages.server.settings.rename.form.serverName', {})}

@@ -54,6 +54,12 @@ mod post {
                 .ok();
         }
 
+        if server.destination_node.is_some() {
+            return ApiResponse::error("server is transferring")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         let backups_lock = state
             .cache
             .lock(
@@ -63,7 +69,7 @@ mod post {
             )
             .await?;
 
-        let backups = ServerBackup::count_by_server_uuid(&state.database, server.uuid).await;
+        let backups = ServerBackup::count_by_server_uuid(&state.database, server.uuid).await?;
         if backups >= server.backup_limit as i64
             && let Err(err) = ServerBackup::delete_oldest_by_server_uuid(&state, &server).await
         {
@@ -92,6 +98,7 @@ mod post {
             server: &server,
             name: data.name.unwrap_or_else(ServerBackup::default_name),
             ignored_files: data.ignored_files,
+            metadata: ServerBackup::generate_metadata(&state, &server).await?,
         };
         let backup = ServerBackup::create_raw(&state, options).await?;
 

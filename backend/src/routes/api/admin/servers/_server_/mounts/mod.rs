@@ -122,6 +122,12 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("servers.mounts")?;
 
+        if let Err(errors) = shared::utils::validate_data(&data) {
+            return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         let mount = match Mount::by_node_uuid_egg_uuid_uuid(
             &state.database,
             server.node.uuid,
@@ -137,12 +143,6 @@ mod post {
                     .ok();
             }
         };
-
-        if let Err(errors) = shared::utils::validate_data(&data) {
-            return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
-                .with_status(StatusCode::BAD_REQUEST)
-                .ok();
-        }
 
         let options = shared::models::server_mount::CreateServerMountOptions {
             server_uuid: server.uuid,

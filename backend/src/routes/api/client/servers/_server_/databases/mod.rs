@@ -200,7 +200,7 @@ mod post {
             )
             .await?;
 
-        let databases = ServerDatabase::count_by_server_uuid(&state.database, server.uuid).await;
+        let databases = ServerDatabase::count_by_server_uuid(&state.database, server.uuid).await?;
         if databases >= server.database_limit as i64 {
             return ApiResponse::error("maximum number of databases reached")
                 .with_status(StatusCode::EXPECTATION_FAILED)

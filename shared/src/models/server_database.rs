@@ -37,7 +37,7 @@ impl BaseModel for ServerDatabase {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -109,32 +109,12 @@ impl BaseModel for ServerDatabase {
 }
 
 impl ServerDatabase {
-    pub async fn by_uuid(
-        database: &crate::database::Database,
-        uuid: uuid::Uuid,
-    ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
-            r#"
-            SELECT {}
-            FROM server_databases
-            JOIN database_hosts ON database_hosts.uuid = server_databases.database_host_uuid
-            WHERE server_databases.uuid = $1
-            "#,
-            Self::columns_sql(None)
-        ))
-        .bind(uuid)
-        .fetch_optional(database.read())
-        .await?;
-
-        row.try_map(|row| Self::map(None, &row))
-    }
-
     pub async fn by_server_uuid_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM server_databases
@@ -142,7 +122,7 @@ impl ServerDatabase {
             WHERE server_databases.server_uuid = $1 AND server_databases.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -160,7 +140,7 @@ impl ServerDatabase {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM server_databases
@@ -170,7 +150,7 @@ impl ServerDatabase {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(database_host_uuid)
         .bind(search)
         .bind(per_page)
@@ -200,7 +180,7 @@ impl ServerDatabase {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM server_databases
@@ -210,7 +190,7 @@ impl ServerDatabase {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
         .bind(search)
         .bind(per_page)
@@ -235,7 +215,7 @@ impl ServerDatabase {
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM server_databases
@@ -243,7 +223,7 @@ impl ServerDatabase {
             WHERE server_databases.server_uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
         .fetch_all(database.read())
         .await?;
@@ -256,7 +236,7 @@ impl ServerDatabase {
     pub async fn count_by_server_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -267,13 +247,12 @@ impl ServerDatabase {
         .bind(server_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     pub async fn count_by_database_host_uuid(
         database: &crate::database::Database,
         database_host_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -284,7 +263,6 @@ impl ServerDatabase {
         .bind(database_host_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     pub async fn rotate_password(
@@ -295,18 +273,18 @@ impl ServerDatabase {
 
         match self.database_host.get_connection(database).await? {
             crate::models::database_host::DatabasePool::Mysql(pool) => {
-                sqlx::query(&format!(
+                sqlx::query(sqlx::AssertSqlSafe(format!(
                     "ALTER USER '{}'@'%' IDENTIFIED BY '{}'",
                     self.username, new_password
-                ))
+                )))
                 .execute(&pool)
                 .await?;
             }
             crate::models::database_host::DatabasePool::Postgres(pool) => {
-                sqlx::query(&format!(
+                sqlx::query(sqlx::AssertSqlSafe(format!(
                     "ALTER USER \"{}\" WITH PASSWORD '{}'",
                     self.username, new_password
-                ))
+                )))
                 .execute(&pool)
                 .await?;
             }
@@ -380,21 +358,27 @@ impl ServerDatabase {
         let mut run_recreate = async || {
             match self.database_host.get_connection(database).await? {
                 crate::models::database_host::DatabasePool::Mysql(pool) => {
-                    sqlx::query(&format!("DROP DATABASE IF EXISTS `{}`", self.name))
-                        .execute(&pool)
-                        .await?;
-                    sqlx::query(&format!("CREATE DATABASE `{}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", self.name))
+                    sqlx::query(sqlx::AssertSqlSafe(format!(
+                        "DROP DATABASE IF EXISTS `{}`",
+                        self.name
+                    )))
+                    .execute(&pool)
+                    .await?;
+                    sqlx::query(sqlx::AssertSqlSafe(format!("CREATE DATABASE `{}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", self.name)))
                         .execute(&pool)
                         .await?;
                 }
                 crate::models::database_host::DatabasePool::Postgres(pool) => {
-                    sqlx::query(&format!("DROP DATABASE IF EXISTS \"{}\"", self.name))
-                        .execute(&pool)
-                        .await?;
-                    sqlx::query(&format!(
+                    sqlx::query(sqlx::AssertSqlSafe(format!(
+                        "DROP DATABASE IF EXISTS \"{}\"",
+                        self.name
+                    )))
+                    .execute(&pool)
+                    .await?;
+                    sqlx::query(sqlx::AssertSqlSafe(format!(
                         "CREATE DATABASE \"{}\" WITH OWNER \"{}\" ENCODING 'UTF8'",
                         self.name, self.username
-                    ))
+                    )))
                     .execute(&pool)
                     .await?;
                 }
@@ -540,6 +524,49 @@ impl IntoApiObject for ServerDatabase {
     }
 }
 
+#[async_trait::async_trait]
+impl ByUuid for ServerDatabase {
+    async fn by_uuid(
+        database: &crate::database::Database,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM server_databases
+            JOIN database_hosts ON database_hosts.uuid = server_databases.database_host_uuid
+            WHERE server_databases.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM server_databases
+            JOIN database_hosts ON database_hosts.uuid = server_databases.database_host_uuid
+            WHERE server_databases.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
+        .await?;
+
+        Self::map(None, &row)
+    }
+}
+
 #[derive(Validate)]
 pub struct CreateServerDatabaseOptions<'a> {
     #[garde(skip)]
@@ -563,9 +590,10 @@ impl CreatableModel for ServerDatabase {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -578,7 +606,7 @@ impl CreatableModel for ServerDatabase {
         );
         let password = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 24);
 
-        let transaction: DatabaseTransaction = match options
+        let db_transaction: DatabaseTransaction = match options
             .database_host
             .clone()
             .get_connection(&state.database)
@@ -587,17 +615,17 @@ impl CreatableModel for ServerDatabase {
             crate::models::database_host::DatabasePool::Mysql(pool) => {
                 let mut transaction = pool.begin().await?;
 
-                sqlx::query(&format!(
+                sqlx::query(sqlx::AssertSqlSafe(format!(
                     "CREATE USER IF NOT EXISTS '{username}'@'%' IDENTIFIED BY '{password}'"
-                ))
+                )))
                 .execute(&mut *transaction)
                 .await?;
-                sqlx::query(&format!("CREATE DATABASE IF NOT EXISTS `{name}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"))
+                sqlx::query(sqlx::AssertSqlSafe(format!("CREATE DATABASE IF NOT EXISTS `{name}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")))
                     .execute(&mut *transaction)
                     .await?;
-                sqlx::query(&format!(
+                sqlx::query(sqlx::AssertSqlSafe(format!(
                     "GRANT ALL PRIVILEGES ON `{name}`.* TO '{username}'@'%' WITH GRANT OPTION"
-                ))
+                )))
                 .execute(&mut *transaction)
                 .await?;
 
@@ -606,14 +634,14 @@ impl CreatableModel for ServerDatabase {
             crate::models::database_host::DatabasePool::Postgres(pool) => {
                 let transaction = pool.begin().await?;
 
-                sqlx::query(&format!(
+                sqlx::query(sqlx::AssertSqlSafe(format!(
                     "CREATE USER \"{username}\" WITH PASSWORD '{password}'"
-                ))
+                )))
                 .execute(&pool)
                 .await?;
-                sqlx::query(&format!(
+                sqlx::query(sqlx::AssertSqlSafe(format!(
                     "CREATE DATABASE \"{name}\" WITH OWNER \"{username}\" ENCODING 'UTF8'"
-                ))
+                )))
                 .execute(&pool)
                 .await?;
 
@@ -634,17 +662,9 @@ impl CreatableModel for ServerDatabase {
             }
         };
 
-        let mut panel_transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("server_databases");
 
-        Self::run_create_handlers(
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut panel_transaction,
-        )
-        .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("server_uuid", options.server.uuid)
@@ -655,24 +675,24 @@ impl CreatableModel for ServerDatabase {
 
         let row = match query_builder
             .returning("uuid")
-            .fetch_one(&mut *panel_transaction)
+            .fetch_one(&mut **transaction)
             .await
         {
             Ok(row) => row,
             Err(err) => {
-                match transaction {
-                    DatabaseTransaction::Mysql(transaction) => {
-                        transaction.rollback().await?;
+                match db_transaction {
+                    DatabaseTransaction::Mysql(db_tx) => {
+                        db_tx.rollback().await?;
                     }
-                    DatabaseTransaction::Postgres(transaction, pool) => {
-                        transaction.rollback().await?;
+                    DatabaseTransaction::Postgres(db_tx, pool) => {
+                        db_tx.rollback().await?;
 
                         let drop_database = format!("DROP DATABASE IF EXISTS \"{name}\"");
                         let drop_user = format!("DROP USER IF EXISTS \"{username}\"");
 
                         let (_, _) = tokio::join!(
-                            sqlx::query(&drop_database).execute(&pool),
-                            sqlx::query(&drop_user).execute(&pool)
+                            sqlx::query(sqlx::AssertSqlSafe(drop_database)).execute(&pool),
+                            sqlx::query(sqlx::AssertSqlSafe(drop_user)).execute(&pool)
                         );
                     }
                     DatabaseTransaction::Mongodb(client) => {
@@ -686,9 +706,9 @@ impl CreatableModel for ServerDatabase {
 
         let uuid: uuid::Uuid = row.try_get("uuid")?;
 
-        match match transaction {
-            DatabaseTransaction::Mysql(transaction) => transaction.commit().await,
-            DatabaseTransaction::Postgres(transaction, _) => transaction.commit().await,
+        match match db_transaction {
+            DatabaseTransaction::Mysql(db_tx) => db_tx.commit().await,
+            DatabaseTransaction::Postgres(db_tx, _) => db_tx.commit().await,
             DatabaseTransaction::Mongodb(_) => Ok(()),
         } {
             Ok(_) => {}
@@ -700,7 +720,7 @@ impl CreatableModel for ServerDatabase {
                     "#,
                 )
                 .bind(uuid)
-                .execute(&mut *panel_transaction)
+                .execute(&mut **transaction)
                 .await
                 .ok();
 
@@ -708,11 +728,11 @@ impl CreatableModel for ServerDatabase {
             }
         }
 
-        panel_transaction.commit().await?;
+        let mut result = Self::by_uuid_with_transaction(transaction, uuid).await?;
 
-        Self::by_uuid(&state.database, uuid)
-            .await?
-            .ok_or(sqlx::Error::RowNotFound.into())
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -726,50 +746,43 @@ pub struct UpdateServerDatabaseOptions {
 impl UpdatableModel for ServerDatabase {
     type UpdateOptions = UpdateServerDatabaseOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<ServerDatabase>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<ServerDatabase>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("server_databases");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("locked", options.locked)
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(locked) = options.locked {
             self.locked = locked;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct DeleteServerDatabaseOptions {
     pub force: bool,
 }
@@ -778,11 +791,36 @@ pub struct DeleteServerDatabaseOptions {
 impl DeletableModel for ServerDatabase {
     type DeleteOptions = DeleteServerDatabaseOptions;
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<ServerDatabase>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<ServerDatabase>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
+    }
+
+    async fn delete_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), anyhow::Error> {
+        self.run_delete_handlers(&options, state, transaction)
+            .await?;
+
+        sqlx::query(
+            r#"
+            DELETE FROM server_databases
+            WHERE server_databases.uuid = $1
+            "#,
+        )
+        .bind(self.uuid)
+        .execute(&mut **transaction)
+        .await?;
+
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
+
+        Ok(())
     }
 
     async fn delete(
@@ -790,8 +828,6 @@ impl DeletableModel for ServerDatabase {
         state: &crate::State,
         options: Self::DeleteOptions,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
         if self.name.contains(|c| ['"', '\'', '`'].contains(&c))
             || self.username.contains(|c| ['"', '\'', '`'].contains(&c))
         {
@@ -800,9 +836,6 @@ impl DeletableModel for ServerDatabase {
             ));
         }
 
-        self.run_delete_handlers(&options, state, &mut transaction)
-            .await?;
-
         let connection = self
             .database_host
             .clone()
@@ -810,26 +843,39 @@ impl DeletableModel for ServerDatabase {
             .await?;
         let database_name = self.name.clone();
         let database_username = self.username.trim_end().to_string();
-        let database_uuid = self.uuid;
+        let self_clone = self.clone();
+        let state_clone = state.clone();
 
         tokio::spawn(async move {
             let run_delete = async || {
                 match connection {
                     crate::models::database_host::DatabasePool::Mysql(pool) => {
-                        sqlx::query(&format!("DROP DATABASE IF EXISTS `{}`", database_name))
-                            .execute(&pool)
-                            .await?;
-                        sqlx::query(&format!("DROP USER IF EXISTS '{}'@'%'", database_username))
-                            .execute(&pool)
-                            .await?;
+                        sqlx::query(sqlx::AssertSqlSafe(format!(
+                            "DROP DATABASE IF EXISTS `{}`",
+                            database_name
+                        )))
+                        .execute(&pool)
+                        .await?;
+                        sqlx::query(sqlx::AssertSqlSafe(format!(
+                            "DROP USER IF EXISTS '{}'@'%'",
+                            database_username
+                        )))
+                        .execute(&pool)
+                        .await?;
                     }
                     crate::models::database_host::DatabasePool::Postgres(pool) => {
-                        sqlx::query(&format!("DROP DATABASE IF EXISTS \"{}\"", database_name))
-                            .execute(&pool)
-                            .await?;
-                        sqlx::query(&format!("DROP USER IF EXISTS \"{}\"", database_username))
-                            .execute(&pool)
-                            .await?;
+                        sqlx::query(sqlx::AssertSqlSafe(format!(
+                            "DROP DATABASE IF EXISTS \"{}\"",
+                            database_name
+                        )))
+                        .execute(&pool)
+                        .await?;
+                        sqlx::query(sqlx::AssertSqlSafe(format!(
+                            "DROP USER IF EXISTS \"{}\"",
+                            database_username
+                        )))
+                        .execute(&pool)
+                        .await?;
                     }
                     crate::models::database_host::DatabasePool::Mongodb(client) => {
                         let db = client.database(&database_name);
@@ -861,16 +907,10 @@ impl DeletableModel for ServerDatabase {
                 return Err(err);
             }
 
-            sqlx::query(
-                r#"
-                DELETE FROM server_databases
-                WHERE server_databases.uuid = $1
-                "#,
-            )
-            .bind(database_uuid)
-            .execute(&mut *transaction)
-            .await?;
-
+            let mut transaction = state_clone.database.write().begin().await?;
+            self_clone
+                .delete_with_transaction(&state_clone, options, &mut transaction)
+                .await?;
             transaction.commit().await?;
 
             Ok(())

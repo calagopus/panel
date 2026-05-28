@@ -44,6 +44,7 @@ export const serverSchema = z.object({
   permissions: z.array(z.string()),
   locationUuid: z.string(),
   locationName: z.string(),
+  locationFlag: z.string().nullable(),
   nodeUuid: z.string(),
   nodeName: z.string(),
   nodeMaintenanceEnabled: z.boolean(),

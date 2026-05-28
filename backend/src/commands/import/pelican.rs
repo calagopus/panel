@@ -1,24 +1,22 @@
 use super::{
-    BASE64_ENGINE, collect_mappings, decrypt_laravel_value, is_datetime_column, is_sqlite_source,
-    process_table,
+    BASE64_ENGINE, SourceRow, collect_mappings, connect_source_database_any,
+    convert_der_public_key, decrypt_laravel_value, is_postgres_source, is_sqlite_source,
+    process_table, source_bool, source_datetime, source_optional_datetime, source_optional_text,
+    source_text, source_uuid,
 };
 use anyhow::Context;
 use base64::Engine;
 use clap::{Args, FromArgMatches};
 use colored::Colorize;
 use compact_str::ToCompactString;
+use indexmap::IndexMap;
 use shared::models::database_host::DatabaseCredentials;
 use sqlx::Row;
-use sqlx::any::AnyPoolOptions;
 use std::{
     collections::{HashMap, HashSet},
-    path::{Path, PathBuf},
     str::FromStr,
     sync::Arc,
 };
-
-type SourcePool = sqlx::AnyPool;
-type SourceRow = sqlx::any::AnyRow;
 
 #[inline]
 fn first_import_tag(raw_tags: Option<&str>, fallback: &str) -> compact_str::CompactString {
@@ -44,179 +42,6 @@ fn derive_name_parts(username: &str) -> (compact_str::CompactString, compact_str
     let last = parts.next().unwrap_or_else(|| username.to_compact_string());
 
     (first, last)
-}
-
-async fn connect_source_database_any(environment_path: &str) -> Result<SourcePool, anyhow::Error> {
-    sqlx::any::install_default_drivers();
-
-    let connection = std::env::var("DB_CONNECTION")
-        .unwrap_or_else(|_| "mysql".to_string())
-        .trim_matches('"')
-        .to_ascii_lowercase();
-
-    let database_url = match connection.as_str() {
-        "mysql" | "mariadb" => {
-            let source_database_host =
-                std::env::var("DB_HOST").context("failed to read pelican environment DB_HOST")?;
-            let source_database_port = std::env::var("DB_PORT")
-                .unwrap_or_else(|_| "3306".to_string())
-                .parse::<u16>()
-                .context("failed to parse pelican environment DB_PORT")?;
-            let source_database_database = std::env::var("DB_DATABASE")
-                .context("failed to read pelican environment DB_DATABASE")?;
-            let source_database_username = std::env::var("DB_USERNAME")
-                .context("failed to read pelican environment DB_USERNAME")?;
-            let source_database_password = std::env::var("DB_PASSWORD")
-                .context("failed to read pelican environment DB_PASSWORD")?;
-
-            let mut url = reqwest::Url::parse("mysql://localhost")
-                .context("failed to construct pelican mysql database url")?;
-            url.set_host(Some(source_database_host.trim_matches('"')))
-                .context("failed to set pelican mysql database host")?;
-            url.set_port(Some(source_database_port))
-                .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database port"))?;
-            url.set_username(source_database_username.trim_matches('"'))
-                .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database username"))?;
-            url.set_password(Some(source_database_password.trim_matches('"')))
-                .map_err(|_| anyhow::anyhow!("failed to set pelican mysql database password"))?;
-            url.set_path(source_database_database.trim_matches('"'));
-            url.to_string()
-        }
-        "sqlite" | "sqlite3" => {
-            let source_database_database = std::env::var("DB_DATABASE")
-                .context("failed to read pelican environment DB_DATABASE")?;
-            let source_database_database = source_database_database.trim_matches('"');
-
-            match source_database_database {
-                ":memory:" | "file::memory:" => {
-                    return Err(anyhow::anyhow!(
-                        "refusing to import from an in-memory sqlite database"
-                    ));
-                }
-                _ => {
-                    let source_database_database = Path::new(source_database_database);
-                    let source_database_database: PathBuf =
-                        if source_database_database.is_absolute() {
-                            source_database_database.to_path_buf()
-                        } else {
-                            Path::new(environment_path)
-                                .parent()
-                                .unwrap_or_else(|| Path::new("."))
-                                .join(source_database_database)
-                        };
-
-                    format!("sqlite://{}", source_database_database.to_string_lossy())
-                }
-            }
-        }
-        _ => {
-            return Err(anyhow::anyhow!(
-                "unsupported source database driver `{connection}`; expected mysql, mariadb, sqlite, or sqlite3"
-            ));
-        }
-    };
-
-    AnyPoolOptions::new()
-        .connect(&database_url)
-        .await
-        .with_context(|| format!("failed to connect to source database using `{connection}`"))
-}
-
-fn source_uuid(row: &SourceRow, column: &str) -> Result<uuid::Uuid, anyhow::Error> {
-    row.try_get::<String, _>(column)
-        .with_context(|| format!("failed to read source uuid column `{column}`"))?
-        .parse::<uuid::Uuid>()
-        .with_context(|| format!("failed to parse source uuid column `{column}`"))
-}
-
-fn source_datetime(
-    row: &SourceRow,
-    column: &str,
-) -> Result<chrono::DateTime<chrono::Utc>, anyhow::Error> {
-    let value: String = row
-        .try_get(column)
-        .with_context(|| format!("failed to read source datetime column `{column}`"))?;
-
-    chrono::DateTime::parse_from_rfc3339(&value)
-        .map(|value| value.with_timezone(&chrono::Utc))
-        .or_else(|_| {
-            chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S%.f")
-                .map(|value| value.and_utc())
-        })
-        .or_else(|_| {
-            chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                .map(|value| value.and_utc())
-        })
-        .with_context(|| format!("failed to parse source datetime column `{column}`"))
-}
-
-fn source_optional_datetime(
-    row: &SourceRow,
-    column: &str,
-) -> Result<Option<chrono::DateTime<chrono::Utc>>, anyhow::Error> {
-    let value = row
-        .try_get::<Option<String>, _>(column)
-        .with_context(|| format!("failed to read source datetime column `{column}`"))?;
-
-    value
-        .map(|value| {
-            chrono::DateTime::parse_from_rfc3339(&value)
-                .map(|value| value.with_timezone(&chrono::Utc))
-                .or_else(|_| {
-                    chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S%.f")
-                        .map(|value| value.and_utc())
-                })
-                .or_else(|_| {
-                    chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                        .map(|value| value.and_utc())
-                })
-                .with_context(|| format!("failed to parse source datetime column `{column}`"))
-        })
-        .transpose()
-}
-
-fn source_bool(row: &SourceRow, column: &str) -> Result<bool, anyhow::Error> {
-    if let Ok(value) = row.try_get::<bool, _>(column) {
-        return Ok(value);
-    }
-
-    if let Ok(value) = row.try_get::<i64, _>(column) {
-        return Ok(value != 0);
-    }
-
-    if let Ok(value) = row.try_get::<i32, _>(column) {
-        return Ok(value != 0);
-    }
-
-    let value: String = row
-        .try_get(column)
-        .with_context(|| format!("failed to read source bool column `{column}`"))?;
-
-    Ok(matches!(
-        value.trim().to_ascii_lowercase().as_str(),
-        "1" | "true" | "yes" | "on"
-    ))
-}
-
-async fn source_query_rows(
-    source_database: &SourcePool,
-    table: &str,
-    columns: &[&str],
-) -> Result<Vec<SourceRow>, anyhow::Error> {
-    let projection = columns
-        .iter()
-        .map(|column| {
-            if is_sqlite_source() && is_datetime_column(column) {
-                format!("CAST(`{column}` AS TEXT) AS `{column}`")
-            } else {
-                format!("`{column}`")
-            }
-        })
-        .collect::<Vec<_>>()
-        .join(", ");
-
-    let query = format!("SELECT {projection} FROM `{table}`");
-    Ok(sqlx::query(&query).fetch_all(source_database).await?)
 }
 
 #[derive(Args)]
@@ -279,19 +104,41 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         return Ok(1);
                     }
                 };
-                let source_app_key = match std::env::var("APP_KEY").map(|v| {
-                    BASE64_ENGINE
-                        .decode(v.trim_start_matches("base64:"))
-                        .unwrap_or_else(|_| v.into_bytes())
-                }) {
-                    Ok(value) => Arc::new(value),
+                let source_app_key = match std::env::var("APP_KEY") {
+                    Ok(v) => {
+                        let bytes = if let Some(encoded) = v.strip_prefix("base64:") {
+                            match BASE64_ENGINE.decode(encoded) {
+                                Ok(b) => b,
+                                Err(err) => {
+                                    eprintln!(
+                                        "{}: {:#?}",
+                                        "failed to base64-decode pelican APP_KEY".red(),
+                                        err
+                                    );
+                                    return Ok(1);
+                                }
+                            }
+                        } else {
+                            v.into_bytes()
+                        };
+
+                        if bytes.len() != 32 {
+                            eprintln!(
+                                "{}: expected 32 bytes, got {}",
+                                "pelican APP_KEY has wrong length".red(),
+                                bytes.len()
+                            );
+                            return Ok(1);
+                        }
+
+                        Arc::new(bytes)
+                    }
                     Err(err) => {
                         eprintln!(
                             "{}: {:#?}",
                             "failed to read pelican environment APP_KEY".red(),
                             err
                         );
-
                         return Ok(1);
                     }
                 };
@@ -323,13 +170,18 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                     async |rows| {
                         let mut settings = settings.get_mut().await?;
 
-                        let mut source_settings: HashMap<&str, compact_str::CompactString> = rows
+                        let mut source_settings: HashMap<String, compact_str::CompactString> = rows
                             .iter()
                             .map(|r| {
-                                (
-                                    r.get::<&str, _>("key"),
-                                    r.get::<&str, _>("value").to_compact_string(),
-                                )
+                                let key = r.get::<String, _>("key");
+                                let value = r
+                                    .try_get::<String, _>("value")
+                                    .or_else(|_| {
+                                        r.try_get::<Vec<u8>, _>("value")
+                                            .map(|b| String::from_utf8_lossy(&b).into_owned())
+                                    })
+                                    .unwrap_or_default();
+                                (key, value.to_compact_string())
                             })
                             .collect();
 
@@ -358,6 +210,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 use_tls: source_settings
                                     .remove("settings::mail:mailers:smtp:encryption")
                                     .is_some_and(|e| e == "tls"),
+                                skip_cert_validation: false,
                                 from_address,
                                 from_name: source_settings.remove("settings::mail:from:name"),
                             };
@@ -409,18 +262,19 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             mapping.insert(id, uuid);
 
                             let admin_user_ids = admin_user_ids.clone();
+                            let source_app_key = source_app_key.clone();
                             let database = database.clone();
                             futures.push(async move {
-                                let external_id: Option<&str> = row.try_get("external_id")?;
-                                let username: &str = row.try_get("username")?;
-                                let email: &str = row.try_get("email")?;
-                                let password: &str = row.try_get("password")?;
-                                let language: Option<&str> = row.try_get("language")?;
-                                let mfa_app_secret: Option<&str> = row.try_get("mfa_app_secret")?;
+                                let external_id: Option<String> = source_optional_text(&row, "external_id")?;
+                                let username = source_text(&row, "username")?;
+                                let email = source_text(&row, "email")?;
+                                let password = source_text(&row, "password")?;
+                                let language: Option<String> = source_optional_text(&row, "language")?;
+                                let mfa_app_secret: Option<String> = source_optional_text(&row, "mfa_app_secret")?;
                                 let created = source_datetime(&row, "created_at")?;
-                                let (name_first, name_last) = derive_name_parts(username);
+                                let (name_first, name_last) = derive_name_parts(&username);
                                 let admin = admin_user_ids.contains(&id);
-                                let totp_secret = mfa_app_secret.map(compact_str::CompactString::from);
+                                let totp_secret = mfa_app_secret.and_then(|s| decrypt_laravel_value(&s, &source_app_key).ok());
                                 let totp_enabled = totp_secret.is_some();
 
                                 sqlx::query(
@@ -432,15 +286,15 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 )
                                 .bind(uuid)
                                 .bind(external_id)
-                                .bind(username)
-                                .bind(email)
+                                .bind(&username)
+                                .bind(&email)
                                 .bind(name_first)
                                 .bind(name_last)
                                 .bind(password.replace("$2y$", "$2a$"))
                                 .bind(admin)
                                 .bind(totp_enabled)
                                 .bind(totp_secret)
-                                .bind(language.unwrap_or("en"))
+                                .bind(language.as_deref().unwrap_or("en"))
                                 .bind(created)
                                 .execute(database.write())
                                 .await?;
@@ -476,8 +330,8 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let database = database.clone();
                             futures.push(async move {
                                 let user_id: i32 = row.try_get("user_id")?;
-                                let name: &str = row.try_get("name")?;
-                                let public_key: &str = row.try_get("public_key")?;
+                                let name = source_text(&row, "name")?;
+                                let public_key = source_text(&row, "public_key")?;
                                 let created = source_datetime(&row, "created_at")?;
 
                                 let user_uuid = match user_mappings.get(&user_id) {
@@ -492,31 +346,17 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     .replace("\n", "");
                                 let base64_data = BASE64_ENGINE.decode(base64_data)?;
 
-                                let pkey = openssl::pkey::PKey::public_key_from_der(&base64_data)?;
-                                let public_key = russh::keys::PublicKey::from(match pkey.id() {
-                                    openssl::pkey::Id::RSA => {
-                                        let rsa = pkey.rsa()?;
-
-                                        russh::keys::ssh_key::public::KeyData::Rsa(
-                                            russh::keys::ssh_key::public::RsaPublicKey {
-                                                e: rsa.e().to_vec().as_slice().try_into()?,
-                                                n: rsa.n().to_vec().as_slice().try_into()?,
-                                            },
-                                        )
+                                let public_key = match convert_der_public_key(&base64_data) {
+                                    Ok(key) => key,
+                                    Err(err) => {
+                                        tracing::warn!(
+                                            user_id = user_id,
+                                            "failed to parse SSH public key for user: {:?}",
+                                            err
+                                        );
+                                        return Ok(());
                                     }
-                                    openssl::pkey::Id::ED25519 => {
-                                        let data = pkey.raw_public_key()?;
-
-                                        russh::keys::ssh_key::public::KeyData::Ed25519(
-                                            russh::keys::ssh_key::public::Ed25519PublicKey(
-                                                data.try_into().map_err(|_| {
-                                                    anyhow::anyhow!("invalid ed25519 public key length")
-                                                })?,
-                                            ),
-                                        )
-                                    }
-                                    _ => return Ok(()),
-                                });
+                                };
 
                                 sqlx::query(
                                     r#"
@@ -553,6 +393,51 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                     return Ok(1);
                 }
 
+                let mut disk = shared::models::server_backup::BackupDisk::Local;
+                let mut backup_configs =
+                    shared::models::backup_configuration::BackupConfigs::default();
+
+                match std::env::var("APP_BACKUP_DRIVER").as_deref() {
+                    Ok("wings") => {
+                        disk = shared::models::server_backup::BackupDisk::Local;
+                    }
+                    Ok("btrfs") => {
+                        disk = shared::models::server_backup::BackupDisk::Btrfs;
+                    }
+                    Ok("zfs") => {
+                        disk = shared::models::server_backup::BackupDisk::Zfs;
+                    }
+                    Ok("s3") => {
+                        disk = shared::models::server_backup::BackupDisk::S3;
+                        backup_configs.s3 =
+                            Some(shared::models::backup_configuration::BackupConfigsS3 {
+                                region: std::env::var("AWS_DEFAULT_REGION")
+                                    .unwrap_or_default()
+                                    .into(),
+                                access_key: std::env::var("AWS_ACCESS_KEY_ID")
+                                    .unwrap_or_default()
+                                    .into(),
+                                secret_key: std::env::var("AWS_SECRET_ACCESS_KEY")
+                                    .unwrap_or_default()
+                                    .into(),
+                                bucket: std::env::var("AWS_BACKUPS_BUCKET")
+                                    .unwrap_or_default()
+                                    .into(),
+                                endpoint: std::env::var("AWS_ENDPOINT").unwrap_or_default().into(),
+                                path_style: std::env::var("AWS_USE_PATH_STYLE_ENDPOINT")
+                                    .map(|v| v == "true")
+                                    .unwrap_or_default(),
+                                part_size: std::env::var("BACKUP_MAX_PART_SIZE")
+                                    .ok()
+                                    .and_then(|v| v.parse::<u64>().ok())
+                                    .unwrap_or(1024 * 1024 * 1024),
+                            });
+
+                        backup_configs.encrypt(&database).await?;
+                    }
+                    _ => {}
+                }
+
                 let backup_configuration_uuid: uuid::Uuid = {
                     let row = sqlx::query(
                         r#"
@@ -563,12 +448,8 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                     )
                     .bind("global")
                     .bind("automatically generated by import")
-                    .bind(shared::models::server_backup::BackupDisk::Local)
-                    .bind(
-                        serde_json::to_value(
-                            shared::models::backup_configuration::BackupConfigs::default(),
-                        )?,
-                    )
+                    .bind(disk)
+                    .bind(serde_json::to_value(backup_configs)?)
                     .fetch_one(database.write())
                     .await?;
 
@@ -576,16 +457,26 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                 };
 
                 let location_mappings = match async {
-                    let rows = source_query_rows(&source_database, "nodes", &["id", "tags", "created_at"])
-                        .await?;
-                        let mut mapping = HashMap::with_capacity(rows.len());
+                    let (cast_as, q) = if is_postgres_source() {
+                        ("TEXT", '"')
+                    } else if is_sqlite_source() {
+                        ("TEXT", '`')
+                    } else {
+                        ("CHAR", '`')
+                    };
+                    let rows: Vec<SourceRow> = sqlx::query(sqlx::AssertSqlSafe(format!(
+                        "SELECT {q}id{q}, CAST({q}tags{q} AS {cast_as}) AS {q}tags{q}, CAST({q}created_at{q} AS {cast_as}) AS {q}created_at{q} FROM {q}nodes{q}"
+                    )))
+                    .fetch_all(&source_database)
+                    .await?;
+                    let mut mapping = HashMap::with_capacity(rows.len());
                         let mut created_locations: HashMap<compact_str::CompactString, uuid::Uuid> =
                             HashMap::new();
 
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
                             let tag = first_import_tag(
-                                row.try_get::<Option<&str>, _>("tags")?,
+                                source_optional_text(&row, "tags")?.as_deref(),
                                 "pelican",
                             );
                             let created = source_optional_datetime(&row, "created_at")?;
@@ -647,16 +538,16 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let location_mappings = location_mappings.clone();
                             let database = database.clone();
                             futures.push(async move {
-                                let name: &str = row.try_get("name")?;
-                                let description: Option<&str> = row.try_get("description")?;
+                                let name = source_text(&row, "name")?;
+                                let description = source_optional_text(&row, "description")?;
                                 let public = source_bool(&row, "public")?;
                                 let maintenance_mode = source_bool(&row, "maintenance_mode")?;
-                                let fqdn: &str = row.try_get("fqdn")?;
-                                let scheme: &str = row.try_get("scheme")?;
+                                let fqdn = source_text(&row, "fqdn")?;
+                                let scheme = source_text(&row, "scheme")?;
                                 let memory: i64 = row.try_get("memory")?;
                                 let disk: i64 = row.try_get("disk")?;
-                                let token_id: &str = row.try_get("daemon_token_id")?;
-                                let token: &str = row.try_get("daemon_token")?;
+                                let token_id = source_text(&row, "daemon_token_id")?;
+                                let token = source_text(&row, "daemon_token")?;
                                 let daemon_listen: i32 = row.try_get("daemon_listen")?;
                                 let daemon_sftp: i32 = row.try_get("daemon_sftp")?;
                                 let created = source_datetime(&row, "created_at")?;
@@ -666,7 +557,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     None => return Ok(()),
                                 };
 
-                                let token = match decrypt_laravel_value(token, &source_app_key) {
+                                let token = match decrypt_laravel_value(&token, &source_app_key) {
                                     Ok(token) => token,
                                     Err(_) => return Ok(()),
                                 };
@@ -721,18 +612,27 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                 drop(location_mappings);
 
                 let nest_mappings = match async {
-                    let rows =
-                        source_query_rows(&source_database, "eggs", &["id", "author", "tags", "created_at"])
-                            .await?;
-                        let mut mapping = HashMap::with_capacity(rows.len());
+                    let (cast_as, q) = if is_postgres_source() {
+                        ("TEXT", '"')
+                    } else if is_sqlite_source() {
+                        ("TEXT", '`')
+                    } else {
+                        ("CHAR", '`')
+                    };
+                    let rows: Vec<SourceRow> = sqlx::query(sqlx::AssertSqlSafe(format!(
+                        "SELECT {q}id{q}, {q}author{q}, CAST({q}tags{q} AS {cast_as}) AS {q}tags{q}, CAST({q}created_at{q} AS {cast_as}) AS {q}created_at{q} FROM {q}eggs{q}"
+                    )))
+                    .fetch_all(&source_database)
+                    .await?;
+                    let mut mapping = HashMap::with_capacity(rows.len());
                         let mut created_nests: HashMap<compact_str::CompactString, uuid::Uuid> =
                             HashMap::new();
 
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
-                            let author: &str = row.try_get("author")?;
+                            let author = source_text(&row, "author")?;
                             let tag = first_import_tag(
-                                row.try_get::<Option<&str>, _>("tags")?,
+                                source_optional_text(&row, "tags")?.as_deref(),
                                 "pelican",
                             );
                             let created = source_optional_datetime(&row, "created_at")?;
@@ -786,23 +686,22 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
                             let uuid = source_uuid(&row, "uuid")?;
-                            let author: &str = row.try_get("author")?;
-                            let name: &str = row.try_get("name")?;
-                            let description: Option<&str> = row.try_get("description")?;
-                            let features: Option<&str> = row.try_get("features")?;
-                            let docker_images: &str = row.try_get("docker_images")?;
-                            let file_denylist: Option<&str> = row.try_get("file_denylist")?;
-                            let config_files: Option<&str> = row.try_get("config_files")?;
-                            let config_startup: Option<&str> = row.try_get("config_startup")?;
-                            let config_stop = row
-                                .try_get::<Option<&str>, _>("config_stop")?
+                            let author = source_text(&row, "author")?;
+                            let name = source_text(&row, "name")?;
+                            let description = source_optional_text(&row, "description")?;
+                            let features = source_optional_text(&row, "features")?;
+                            let docker_images = source_text(&row, "docker_images")?;
+                            let file_denylist = source_optional_text(&row, "file_denylist")?;
+                            let config_files = source_optional_text(&row, "config_files")?;
+                            let config_startup = source_optional_text(&row, "config_startup")?;
+                            let config_stop = source_optional_text(&row, "config_stop")?
                                 .map(compact_str::CompactString::from);
                             let config_script = shared::models::nest_egg::NestEggConfigScript {
-                                container: row.try_get::<String, _>("script_container")?.into(),
-                                entrypoint: row.try_get::<String, _>("script_entry")?.into(),
-                                content: row.try_get("script_install").unwrap_or_default(),
+                                container: source_text(&row, "script_container")?.into(),
+                                entrypoint: source_text(&row, "script_entry")?.into(),
+                                content: source_optional_text(&row, "script_install")?.unwrap_or_default(),
                             };
-                            let startup_commands: Option<&str> = row.try_get("startup_commands")?;
+                            let startup_commands = source_optional_text(&row, "startup_commands")?;
                             let force_outgoing_ip = source_bool(&row, "force_outgoing_ip")?;
                             let created = source_datetime(&row, "created_at")?;
 
@@ -812,32 +711,34 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             };
 
                             let features: Vec<String> = features
-                                .and_then(|value| serde_json::from_str(value).ok())
+                                .as_deref().and_then(|value| serde_json::from_str(value).ok())
                                 .unwrap_or_default();
                             let docker_images: serde_json::Value =
-                                serde_json::from_str(docker_images).unwrap_or_default();
+                                serde_json::from_str(&docker_images).unwrap_or_default();
                             let file_denylist: Vec<String> = file_denylist
-                                .and_then(|value| serde_json::from_str(value).ok())
+                                .as_deref().and_then(|value| serde_json::from_str(value).ok())
                                 .unwrap_or_default();
 
-                            let config_files: Vec<
-                                shared::models::nest_egg::ProcessConfigurationFile,
-                            > = config_files
-                                .and_then(|value| serde_json::from_str(value).ok())
-                                .unwrap_or_default();
+                            let config_files: Vec<_> = shared::deserialize::deserialize_nest_egg_config_files(
+                                serde_json::from_str::<serde_json::Value>(config_files.as_deref().unwrap_or_default()).unwrap_or_default()
+                            )
+                                .unwrap_or_default()
+                                .into_iter()
+                                .map(|(file, config)| shared::models::nest_egg::ProcessConfigurationFile {
+                                    file,
+                                    create_new: config.create_new,
+                                    parser: config.parser,
+                                    replace: config.replace,
+                                })
+                                .collect();
                             let mut config_startup: shared::models::nest_egg::NestEggConfigStartup =
                                 config_startup
-                                    .and_then(|value| serde_json::from_str(value).ok())
+                                    .as_deref().and_then(|value| serde_json::from_str(value).ok())
                                     .unwrap_or_default();
-                            let startup = startup_commands
-                                .and_then(|value| {
-                                    serde_json::from_str::<HashMap<String, String>>(value)
+                            let startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString> = startup_commands
+                                .as_deref().and_then(|value| {
+                                    serde_json::from_str(value)
                                         .ok()
-                                        .and_then(|mut commands| {
-                                            commands
-                                                .remove("Default")
-                                                .or_else(|| commands.into_values().next())
-                                        })
                                 })
                                 .unwrap_or_default();
                             let config_stop: shared::models::nest_egg::NestEggConfigStop =
@@ -866,7 +767,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 INSERT INTO nest_eggs (
                                     uuid, nest_uuid, author, name, description, features, docker_images,
                                     file_denylist, config_files, config_startup, config_stop,
-                                    config_script, startup, force_outgoing_ip, created
+                                    config_script, startup_commands, force_outgoing_ip, created
                                 )
                                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
                                 ON CONFLICT (nest_uuid, name) DO UPDATE SET description = EXCLUDED.description
@@ -885,7 +786,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             .bind(serde_json::to_value(config_startup)?)
                             .bind(serde_json::to_value(config_stop)?)
                             .bind(serde_json::to_value(config_script)?)
-                            .bind(startup)
+                            .bind(serde_json::to_value(startup_commands)?)
                             .bind(force_outgoing_ip)
                             .bind(created)
                             .fetch_one(database.write())
@@ -919,20 +820,20 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
                             let egg_id: i32 = row.try_get("egg_id")?;
-                            let name: &str = row.try_get("name")?;
-                            let description: Option<&str> = row.try_get("description")?;
-                            let env_variable: &str = row.try_get("env_variable")?;
-                            let default_value: Option<&str> = row.try_get("default_value")?;
+                            let name = source_text(&row, "name")?;
+                            let description = source_optional_text(&row, "description")?;
+                            let env_variable = source_text(&row, "env_variable")?;
+                            let default_value = source_optional_text(&row, "default_value")?;
                             let user_viewable = source_bool(&row, "user_viewable")?;
                             let user_editable = source_bool(&row, "user_editable")?;
-                            let rules: &str = row.try_get("rules")?;
+                            let rules = source_text(&row, "rules")?;
                             let created = source_datetime(&row, "created_at")?;
 
                             let egg_uuid = match egg_mappings.get(&egg_id) {
                                 Some(uuid) => uuid,
                                 None => continue,
                             };
-                            let rules = serde_json::from_str::<Vec<String>>(rules)
+                            let rules = serde_json::from_str::<Vec<String>>(&rules)
                                 .map(|rules| {
                                     rules
                                         .into_iter()
@@ -996,14 +897,14 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
 
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
-                            let name: &str = row.try_get("name")?;
-                            let host: &str = row.try_get("host")?;
+                            let name = source_text(&row, "name")?;
+                            let host = source_text(&row, "host")?;
                             let port: i32 = row.try_get("port")?;
-                            let username: &str = row.try_get("username")?;
-                            let password: &str = row.try_get("password")?;
+                            let username = source_text(&row, "username")?;
+                            let password = source_text(&row, "password")?;
                             let created = source_datetime(&row, "created_at")?;
 
-                            let password = match decrypt_laravel_value(password, &source_app_key) {
+                            let password = match decrypt_laravel_value(&password, &source_app_key) {
                                 Ok(password) => password,
                                 Err(_) => continue,
                             };
@@ -1068,11 +969,11 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             let egg_mappings = egg_mappings.clone();
                             let database = database.clone();
                             futures.push(async move {
-                                let external_id: Option<&str> = row.try_get("external_id")?;
+                                let external_id = source_optional_text(&row, "external_id")?;
                                 let node_id: i32 = row.try_get("node_id")?;
-                                let name: &str = row.try_get("name")?;
-                                let description: Option<&str> = row.try_get("description")?;
-                                let status: Option<&str> = row.try_get("status")?;
+                                let name = source_text(&row, "name")?;
+                                let description = source_optional_text(&row, "description")?;
+                                let status = source_optional_text(&row, "status")?;
                                 let owner_id: i32 = row.try_get("owner_id")?;
                                 let memory: i32 = row.try_get("memory")?;
                                 let swap: i32 = row.try_get("swap")?;
@@ -1080,11 +981,11 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let io_weight: i32 = row.try_get("io")?;
                                 let cpu: i32 = row.try_get("cpu")?;
                                 let egg_id: i32 = row.try_get("egg_id")?;
-                                let startup: &str = row.try_get("startup")?;
-                                let image: &str = row.try_get("image")?;
-                                let allocation_limit: Option<i32> = row.try_get("allocation_limit")?;
-                                let database_limit: i32 = row.try_get("database_limit")?;
-                                let backup_limit: i32 = row.try_get("backup_limit")?;
+                                let startup = source_text(&row, "startup")?;
+                                let image = source_text(&row, "image")?;
+                                let allocation_limit: i32 = row.try_get::<Option<i32>, _>("allocation_limit")?.unwrap_or(0);
+                                let database_limit: i32 = row.try_get::<Option<i32>, _>("database_limit")?.unwrap_or(0);
+                                let backup_limit: i32 = row.try_get::<Option<i32>, _>("backup_limit")?.unwrap_or(0);
                                 let created = source_datetime(&row, "created_at")?;
 
                                 let node_uuid = match node_mappings.get(&node_id) {
@@ -1102,7 +1003,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     None => return Ok(()),
                                 };
 
-                                let (status, suspended) = match status {
+                                let (status, suspended) = match status.as_deref() {
                                     Some("installing") => (Some(shared::models::server::ServerStatus::Installing), false),
                                     Some("install_failed") => (Some(shared::models::server::ServerStatus::InstallFailed), false),
                                     Some("reinstall_failed") => (Some(shared::models::server::ServerStatus::InstallFailed), false),
@@ -1118,9 +1019,9 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     INSERT INTO servers (
                                         uuid, uuid_short, external_id, node_uuid, name, description, status, suspended,
                                         owner_uuid, memory, swap, disk, io_weight, cpu, pinned_cpus, allocation_limit,
-                                        database_limit, backup_limit, egg_uuid, startup, image, created
+                                        database_limit, backup_limit, schedule_limit, egg_uuid, startup, image, created
                                     )
-                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
                                     ON CONFLICT DO NOTHING
                                     "#,
                                 )
@@ -1139,9 +1040,10 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 .bind(io_weight as i16)
                                 .bind(cpu)
                                 .bind(&[] as &[i32])
-                                .bind(allocation_limit.unwrap_or_default())
+                                .bind(allocation_limit)
                                 .bind(database_limit)
                                 .bind(backup_limit)
+                                .bind(10)
                                 .bind(egg_uuid)
                                 .bind(startup)
                                 .bind(image)
@@ -1188,9 +1090,9 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             futures.push(async move {
                                 let server_id: i32 = row.try_get("server_id")?;
                                 let database_host_id: i32 = row.try_get("database_host_id")?;
-                                let database_name: &str = row.try_get("database")?;
-                                let username: &str = row.try_get("username")?;
-                                let password: &str = row.try_get("password")?;
+                                let database_name = source_text(&row, "database")?;
+                                let username = source_text(&row, "username")?;
+                                let password = source_text(&row, "password")?;
                                 let created = source_datetime(&row, "created_at")?;
 
                                 let server_uuid = match server_mappings.get(&server_id) {
@@ -1203,7 +1105,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     None => return Ok(()),
                                 };
 
-                                let password = match decrypt_laravel_value(password, &source_app_key) {
+                                let password = match decrypt_laravel_value(&password, &source_app_key) {
                                     Ok(password) => password,
                                     Err(_) => return Ok(()),
                                 };
@@ -1248,7 +1150,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         for row in rows {
                             let server_id: i32 = row.try_get("server_id")?;
                             let variable_id: i32 = row.try_get("variable_id")?;
-                            let variable_value: Option<&str> = row.try_get("variable_value")?;
+                            let variable_value = source_optional_text(&row, "variable_value")?;
                             let created = source_optional_datetime(&row, "created_at")?;
 
                             let server_uuid = match server_mappings.get(&server_id) {
@@ -1301,10 +1203,10 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let server_id: i32 = row.try_get("server_id")?;
                                 let successful = source_bool(&row, "is_successful")?;
                                 let locked = source_bool(&row, "is_locked")?;
-                                let name: &str = row.try_get("name")?;
-                                let ignored_files: Option<&str> = row.try_get("ignored_files")?;
-                                let disk: &str = row.try_get("disk")?;
-                                let checksum: Option<&str> = row.try_get("checksum")?;
+                                let name = source_text(&row, "name")?;
+                                let ignored_files = source_optional_text(&row, "ignored_files")?;
+                                let disk = source_text(&row, "disk")?;
+                                let checksum = source_optional_text(&row, "checksum")?;
                                 let bytes: i64 = row.try_get("bytes")?;
                                 let completed = source_optional_datetime(&row, "completed_at")?;
                                 let created = source_datetime(&row, "created_at")?;
@@ -1316,7 +1218,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 };
 
                                 let ignored_files: Vec<String> = ignored_files
-                                    .and_then(|value| serde_json::from_str(value).ok())
+                                    .as_deref().and_then(|value| serde_json::from_str(value).ok())
                                     .unwrap_or_default();
 
                                 sqlx::query(
@@ -1331,11 +1233,11 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 .bind(backup_configuration_uuid)
                                 .bind(name)
                                 .bind(successful)
-                                .bind(matches!(disk, "ddup-bak" | "btrfs" | "zfs" | "restic"))
-                                .bind(matches!(disk, "ddup-bak" | "btrfs" | "zfs" | "restic"))
+                                .bind(matches!(disk.as_str(), "ddup-bak" | "btrfs" | "zfs" | "restic"))
+                                .bind(matches!(disk.as_str(), "ddup-bak" | "btrfs" | "zfs" | "restic"))
                                 .bind(locked)
                                 .bind(ignored_files)
-                                .bind(match disk {
+                                .bind(match disk.as_str() {
                                     "wings" => shared::models::server_backup::BackupDisk::Local,
                                     "s3" => shared::models::server_backup::BackupDisk::S3,
                                     "ddup-bak" => shared::models::server_backup::BackupDisk::DdupBak,
@@ -1382,7 +1284,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             futures.push(async move {
                                 let user_id: i32 = row.try_get("user_id")?;
                                 let server_id: i32 = row.try_get("server_id")?;
-                                let permissions: Option<&str> = row.try_get("permissions")?;
+                                let permissions = source_optional_text(&row, "permissions")?;
                                 let created = source_datetime(&row, "created_at")?;
 
                                 let user_uuid = match user_mappings.get(&user_id) {
@@ -1396,7 +1298,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 };
 
                                 let raw_permissions: Vec<String> = permissions
-                                    .and_then(|value| serde_json::from_str(value).ok())
+                                    .as_deref().and_then(|value| serde_json::from_str(value).ok())
                                     .unwrap_or_default();
                                 let mut permissions = HashSet::with_capacity(raw_permissions.len());
 
@@ -1491,10 +1393,10 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
                             let uuid = source_uuid(&row, "uuid")?;
-                            let name: &str = row.try_get("name")?;
-                            let description: Option<&str> = row.try_get("description")?;
-                            let source: &str = row.try_get("source")?;
-                            let target: &str = row.try_get("target")?;
+                            let name = source_text(&row, "name")?;
+                            let description = source_optional_text(&row, "description")?;
+                            let source = source_text(&row, "source")?;
+                            let target = source_text(&row, "target")?;
                             let read_only = source_bool(&row, "read_only")?;
                             let user_mountable = source_bool(&row, "user_mountable")?;
 
@@ -1669,14 +1571,14 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
                             let server_id: i32 = row.try_get("server_id")?;
-                            let name: &str = row.try_get("name")?;
+                            let name = source_text(&row, "name")?;
                             let enabled = source_bool(&row, "is_active")?;
                             let only_when_online = source_bool(&row, "only_when_online")?;
-                            let cron_day_of_week: &str = row.try_get("cron_day_of_week")?;
-                            let cron_month: &str = row.try_get("cron_month")?;
-                            let cron_day_of_month: &str = row.try_get("cron_day_of_month")?;
-                            let cron_hour: &str = row.try_get("cron_hour")?;
-                            let cron_minute: &str = row.try_get("cron_minute")?;
+                            let cron_day_of_week = source_text(&row, "cron_day_of_week")?;
+                            let cron_month = source_text(&row, "cron_month")?;
+                            let cron_day_of_month = source_text(&row, "cron_day_of_month")?;
+                            let cron_hour = source_text(&row, "cron_hour")?;
+                            let cron_minute = source_text(&row, "cron_minute")?;
                             let last_run = source_optional_datetime(&row, "last_run_at")?;
                             let created = source_datetime(&row, "created_at")?;
 
@@ -1750,8 +1652,8 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         for row in rows {
                             let schedule_id: i32 = row.try_get("schedule_id")?;
                             let sequence_id: i32 = row.try_get("sequence_id")?;
-                            let action: &str = row.try_get("action")?;
-                            let payload: &str = row.try_get("payload")?;
+                            let action = source_text(&row, "action")?;
+                            let payload = source_text(&row, "payload")?;
                             let time_offset: i32 = row.try_get("time_offset")?;
                             let continue_on_failure = source_bool(&row, "continue_on_failure")?;
                             let created = source_datetime(&row, "created_at")?;
@@ -1770,7 +1672,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 });
                             }
 
-                            match action {
+                            match action.as_str() {
                                 "command" => {
                                     actions.push(wings_api::ScheduleActionInner::SendCommand {
                                         command: wings_api::ScheduleDynamicParameter::Raw(payload.into()),
@@ -1778,7 +1680,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                     })
                                 }
                                 "power" => {
-                                    let power_action = match payload {
+                                    let power_action = match payload.as_str() {
                                         "start" => wings_api::ServerPowerAction::Start,
                                         "stop" => wings_api::ServerPowerAction::Stop,
                                         "restart" => wings_api::ServerPowerAction::Restart,
@@ -1842,12 +1744,12 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                         for row in rows {
                             let id: i32 = row.try_get("id")?;
                             let node_id: i32 = row.try_get("node_id")?;
-                            let ip: &str = row.try_get("ip")?;
-                            let ip_alias: Option<&str> = row.try_get("ip_alias")?;
+                            let ip = source_text(&row, "ip")?;
+                            let ip_alias = source_optional_text(&row, "ip_alias")?;
                             let port: i32 = row.try_get("port")?;
                             let server_id: Option<i32> = row.try_get("server_id")?;
-                            let notes: Option<&str> = if server_id.is_some() {
-                                row.try_get("notes")?
+                            let notes: Option<String> = if server_id.is_some() {
+                                source_optional_text(&row, "notes")?
                             } else {
                                 None
                             };
@@ -1864,7 +1766,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 None
                             };
 
-                            let ip = match sqlx::types::ipnetwork::IpNetwork::from_str(ip) {
+                            let ip = match sqlx::types::ipnetwork::IpNetwork::from_str(&ip) {
                                 Ok(ip) => ip,
                                 Err(_) => continue,
                             };

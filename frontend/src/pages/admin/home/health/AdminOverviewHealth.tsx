@@ -1,4 +1,5 @@
 import {
+  faBug,
   faCheck,
   faExclamationTriangle,
   faInfoCircle,
@@ -8,9 +9,14 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import getDebugMode from '@/api/admin/system/debug/getDebugMode.ts';
+import setDebugMode from '@/api/admin/system/debug/setDebugMode.ts';
 import getGeneralHealth from '@/api/admin/system/health/getGeneralHealth.ts';
 import getNodesHealth from '@/api/admin/system/health/getNodesHealth.ts';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { httpErrorToHuman } from '@/api/axios.ts';
+import Badge from '@/elements/Badge.tsx';
+import Button from '@/elements/Button.tsx';
+import { AdminCan } from '@/elements/Can.tsx';
 import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -18,22 +24,30 @@ import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
+import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
 
 export default function AdminOverviewHealth() {
   const { addToast } = useToast();
+  const { t, tReact } = useTranslations();
 
   const [general, setGeneral] = useState<Awaited<ReturnType<typeof getGeneralHealth>> | null>(null);
+  const [debugMode, setDebugModeState] = useState<Awaited<ReturnType<typeof getDebugMode>> | null>(null);
+  const [debugLoading, setDebugLoading] = useState(false);
+  const canReadSettings = useAdminCan('settings.read');
 
-  const { data, loading, setPage } = useSearchablePaginatedTable({
+  const {
+    data: nodes,
+    loading,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.health.nodes(),
     fetcher: (page) => getNodesHealth(page),
     paginationKey: 'desyncNodes',
   });
-
-  const nodes = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   useEffect(() => {
     getGeneralHealth()
@@ -41,7 +55,33 @@ export default function AdminOverviewHealth() {
       .catch((err) => {
         addToast(httpErrorToHuman(err), 'error');
       });
+
+    if (canReadSettings) {
+      getDebugMode()
+        .then(setDebugModeState)
+        .catch((err) => {
+          addToast(httpErrorToHuman(err), 'error');
+        });
+    }
   }, []);
+
+  const handleToggleDebug = (enabled: boolean) => {
+    setDebugLoading(true);
+    setDebugMode(enabled)
+      .then(() => {
+        setDebugModeState((prev) => prev && { ...prev, enabled });
+        addToast(
+          enabled
+            ? t('pages.admin.home.tabs.health.page.toast.debugEnabled', {})
+            : t('pages.admin.home.tabs.health.page.toast.debugDisabled', {}),
+          'success',
+        );
+      })
+      .catch((err) => {
+        addToast(httpErrorToHuman(err), 'error');
+      })
+      .finally(() => setDebugLoading(false));
+  };
 
   const avgNtpOffset =
     general && general.ntpOffsets
@@ -55,45 +95,68 @@ export default function AdminOverviewHealth() {
   return (
     <>
       <div className='2xl:columns-2 gap-4 space-y-4'>
-        <TitleCard title='General Health' icon={<FontAwesomeIcon icon={faInfoCircle} />}>
+        <TitleCard
+          title={t('pages.admin.home.tabs.health.page.card.generalHealth', {})}
+          icon={<FontAwesomeIcon icon={faInfoCircle} />}
+        >
           {!general ? (
             <Spinner.Centered />
           ) : (
             <>
               <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
                 <Card className='flex col-span-2'>
-                  <Title order={3} c='white'>
-                    {general.migrations.applied} / {general.migrations.total}
+                  <Title order={3}>
+                    {t('pages.admin.home.tabs.health.page.migrationsValue', {
+                      applied: general.migrations.applied,
+                      total: general.migrations.total,
+                    })}
                   </Title>
-                  Applied Migrations ({((general.migrations.applied / general.migrations.total) * 100).toFixed(2)}%)
+                  {t('pages.admin.home.tabs.health.page.appliedMigrations', {
+                    percent: ((general.migrations.applied / general.migrations.total) * 100).toFixed(2),
+                  })}
                 </Card>
                 <Card className='flex col-span-2'>
                   <Title order={3} c={avgNtpOffset > 100 ? 'yellow' : 'white'}>
                     {avgNtpOffset.toFixed(2)} ms
                   </Title>
-                  Avg. NTP Offset
+                  {t('pages.admin.home.tabs.health.page.avgNtpOffset', {})}
                 </Card>
               </div>
             </>
           )}
         </TitleCard>
-        <TitleCard title='Extension Migration Health' icon={<FontAwesomeIcon icon={faPuzzlePiece} />}>
+        <TitleCard
+          title={t('pages.admin.home.tabs.health.page.card.extensionMigrationHealth', {})}
+          icon={<FontAwesomeIcon icon={faPuzzlePiece} />}
+        >
           {!general ? (
             <Spinner.Centered />
           ) : !Object.keys(general.migrations.extensions).length ? (
-            <>No extensions found.</>
+            <>{t('pages.admin.home.tabs.health.page.noExtensions', {})}</>
           ) : (
             <>
               {Object.keys(general.migrations.extensions).length > 0 && (
-                <Table columns={['Package Name', 'Applied', 'Total']} loading={loading}>
+                <Table
+                  columns={[
+                    t('pages.admin.home.tabs.health.page.table.packageName', {}),
+                    t('pages.admin.home.tabs.health.page.table.applied', {}),
+                    t('pages.admin.home.tabs.health.page.table.total', {}),
+                  ]}
+                  loading={loading}
+                >
                   {Object.entries(general.migrations.extensions).map(([identifier, migrations]) => (
                     <TableRow key={identifier}>
                       <TableData>
                         <Code>{identifier}</Code>
                       </TableData>
                       <TableData>
-                        {migrations.applied} (
-                        {(migrations.total === 0 ? 100 : (migrations.applied / migrations.total) * 100).toFixed(2)}%)
+                        {t('pages.admin.home.tabs.health.page.table.appliedValue', {
+                          applied: migrations.applied,
+                          percent: (migrations.total === 0
+                            ? 100
+                            : (migrations.applied / migrations.total) * 100
+                          ).toFixed(2),
+                        })}
                       </TableData>
                       <TableData>{migrations.total}</TableData>
                     </TableRow>
@@ -103,22 +166,77 @@ export default function AdminOverviewHealth() {
             </>
           )}
         </TitleCard>
-        <TitleCard title='Desync Nodes' icon={<FontAwesomeIcon icon={faServer} />}>
+        <AdminCan action='settings.read'>
+          <TitleCard
+            title={t('pages.admin.home.tabs.health.page.card.debugMode', {})}
+            icon={<FontAwesomeIcon icon={faBug} />}
+          >
+            {!debugMode ? (
+              <Spinner.Centered />
+            ) : (
+              <div className='flex flex-row justify-between'>
+                <span>
+                  <FontAwesomeIcon icon={debugMode.enabled ? faExclamationTriangle : faCheck} />{' '}
+                  {debugMode.enabled
+                    ? t('pages.admin.home.tabs.health.page.debugEnabled', {})
+                    : t('pages.admin.home.tabs.health.page.debugDisabled', {})}
+                  <br />
+                  <span className='text-sm text-gray-400'>
+                    {tReact('pages.admin.home.tabs.health.page.debugResetNote', {
+                      default: (
+                        <Badge color={debugMode.default ? 'green' : 'red'} size='xs'>
+                          {debugMode.default ? t('common.badge.enabled', {}) : t('common.badge.disabled', {})}
+                        </Badge>
+                      ),
+                    })}
+                  </span>
+                </span>
+                <AdminCan action='settings.update'>
+                  {debugMode.enabled ? (
+                    <Button
+                      color='red'
+                      loading={debugLoading}
+                      onClick={() => handleToggleDebug(false)}
+                      className='min-w-fit'
+                    >
+                      {t('pages.admin.home.tabs.health.page.button.disableDebug', {})}
+                    </Button>
+                  ) : (
+                    <Button loading={debugLoading} onClick={() => handleToggleDebug(true)} className='min-w-fit'>
+                      {t('pages.admin.home.tabs.health.page.button.enableDebug', {})}
+                    </Button>
+                  )}
+                </AdminCan>
+              </div>
+            )}
+          </TitleCard>
+        </AdminCan>
+        <TitleCard
+          title={t('pages.admin.home.tabs.health.page.card.desyncNodes', {})}
+          icon={<FontAwesomeIcon icon={faServer} />}
+        >
           {loading || !nodes?.desyncNodes ? (
             <Spinner.Centered />
           ) : !nodes?.desyncNodes.total ? (
             <>
-              <FontAwesomeIcon icon={faCheck} /> Seems like all nodes have a synced clock (within 5 seconds of panel
-              clock). ({nodes?.failedNodes} failed to check)
+              <FontAwesomeIcon icon={faCheck} />{' '}
+              {t('pages.admin.home.tabs.health.page.nodesSynced', { failed: nodes?.failedNodes ?? 0 })}
             </>
           ) : (
             <>
-              <FontAwesomeIcon icon={faExclamationTriangle} /> Some nodes have desync clocks (over 5 seconds off of the
-              panel's clock). This can cause file download/console issues. ({nodes?.desyncNodes.total} desync,{' '}
-              {nodes?.failedNodes} failed to check)
+              <FontAwesomeIcon icon={faExclamationTriangle} />{' '}
+              {t('pages.admin.home.tabs.health.page.nodesDesync', {
+                desync: nodes?.desyncNodes.total ?? 0,
+                failed: nodes?.failedNodes ?? 0,
+              })}
               <div className='mt-4' />
               <Table
-                columns={['', 'ID', 'Desync', ...nodeTableColumns.slice(2)]}
+                columns={[
+                  '',
+                  t('pages.admin.home.tabs.health.page.table.id', {}),
+                  t('pages.admin.home.tabs.health.page.table.desync', {}),
+                  ...nodeTableColumns().slice(2),
+                ]}
                 loading={loading}
                 pagination={nodes.desyncNodes}
                 onPageSelect={setPage}

@@ -479,7 +479,8 @@ pub async fn mark_extension_migration_as_rolled_back(
 pub async fn run_migration(pool: &sqlx::PgPool, migration: &Migration) -> Result<(), sqlx::Error> {
     let mut transaction = pool.begin().await?;
 
-    let mut query_stream = (&mut transaction).execute_many(&*migration.sql);
+    let mut query_stream =
+        (&mut transaction).execute_many(sqlx::AssertSqlSafe(migration.sql.as_str()));
     while let Some(result) = query_stream.next().await {
         result?;
     }
@@ -503,7 +504,8 @@ pub async fn run_extension_migration(
 ) -> Result<(), sqlx::Error> {
     let mut transaction = pool.begin().await?;
 
-    let mut query_stream = (&mut transaction).execute_many(&*migration.sql);
+    let mut query_stream =
+        (&mut transaction).execute_many(sqlx::AssertSqlSafe(migration.sql.as_str()));
     while let Some(result) = query_stream.next().await {
         result?;
     }
@@ -527,7 +529,8 @@ pub async fn rollback_extension_migration(
 ) -> Result<(), sqlx::Error> {
     let mut transaction = pool.begin().await?;
 
-    let mut query_stream = (&mut transaction).execute_many(&*migration.sql_down);
+    let mut query_stream =
+        (&mut transaction).execute_many(sqlx::AssertSqlSafe(migration.sql_down.as_str()));
     while let Some(result) = query_stream.next().await {
         result?;
     }

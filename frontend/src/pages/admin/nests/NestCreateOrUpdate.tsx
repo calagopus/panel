@@ -13,6 +13,7 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNestSchema, adminNestUpdateSchema } from '@/lib/schemas/admin/nests.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 
@@ -70,7 +71,7 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
         Are you sure you want to delete <Code>{form.getValues().name}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'nests']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nests.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk

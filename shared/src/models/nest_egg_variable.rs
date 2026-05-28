@@ -11,6 +11,32 @@ use std::{
 };
 use utoipa::ToSchema;
 
+pub fn validate_name_translations(
+    name_translations: &BTreeMap<compact_str::CompactString, compact_str::CompactString>,
+    _context: &(),
+) -> Result<(), garde::Error> {
+    if name_translations.len() > 512 {
+        return Err(garde::Error::new("cannot have more than 512 entries"));
+    }
+
+    for (lang, translation) in name_translations {
+        if lang.len() < 2 || lang.len() > 15 {
+            return Err(garde::Error::new(format!(
+                "language code '{}' must be between 2 and 15 characters",
+                lang
+            )));
+        }
+        if translation.is_empty() || translation.len() > 255 {
+            return Err(garde::Error::new(format!(
+                "translation for language '{}' must be between 1 and 255 characters",
+                lang
+            )));
+        }
+    }
+
+    Ok(())
+}
+
 pub fn validate_description_translations(
     description_translations: &BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     _context: &(),
@@ -42,6 +68,9 @@ pub struct ExportedNestEggVariable {
     #[garde(length(chars, min = 1, max = 255))]
     #[schema(min_length = 1, max_length = 255)]
     pub name: compact_str::CompactString,
+    #[garde(custom(validate_name_translations))]
+    #[serde(default)]
+    pub name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     #[garde(length(max = 1024))]
     #[schema(max_length = 1024)]
     pub description: Option<compact_str::CompactString>,
@@ -83,6 +112,7 @@ pub struct NestEggVariable {
     pub uuid: uuid::Uuid,
 
     pub name: compact_str::CompactString,
+    pub name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     pub description: Option<compact_str::CompactString>,
     pub description_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     pub order: i16,
@@ -104,7 +134,7 @@ impl BaseModel for NestEggVariable {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -125,6 +155,10 @@ impl BaseModel for NestEggVariable {
             (
                 "nest_egg_variables.name",
                 compact_str::format_compact!("{prefix}name"),
+            ),
+            (
+                "nest_egg_variables.name_translations",
+                compact_str::format_compact!("{prefix}name_translations"),
             ),
             (
                 "nest_egg_variables.description",
@@ -176,6 +210,9 @@ impl BaseModel for NestEggVariable {
         Ok(Self {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
+            name_translations: serde_json::from_value(
+                row.try_get(compact_str::format_compact!("{prefix}name_translations").as_str())?,
+            )?,
             description: row
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             description_translations: serde_json::from_value(row.try_get(
@@ -204,14 +241,14 @@ impl NestEggVariable {
         egg_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nest_egg_variables
             WHERE nest_egg_variables.egg_uuid = $1 AND nest_egg_variables.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(egg_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -224,7 +261,7 @@ impl NestEggVariable {
         database: &crate::database::Database,
         egg_uuid: uuid::Uuid,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nest_egg_variables
@@ -232,7 +269,7 @@ impl NestEggVariable {
             ORDER BY nest_egg_variables.order_, nest_egg_variables.created
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(egg_uuid)
         .fetch_all(database.read())
         .await?;
@@ -246,6 +283,7 @@ impl NestEggVariable {
     pub fn into_exported(self) -> ExportedNestEggVariable {
         ExportedNestEggVariable {
             name: self.name,
+            name_translations: self.name_translations,
             description: self.description,
             description_translations: self.description_translations,
             order: self.order,
@@ -275,6 +313,7 @@ impl IntoAdminApiObject for NestEggVariable {
             AdminApiNestEggVariable {
                 uuid: self.uuid,
                 name: self.name,
+                name_translations: self.name_translations,
                 description: self.description,
                 description_translations: self.description_translations,
                 order: self.order,
@@ -302,6 +341,8 @@ pub struct CreateNestEggVariableOptions {
     #[garde(length(chars, min = 3, max = 255))]
     #[schema(min_length = 3, max_length = 255)]
     pub name: compact_str::CompactString,
+    #[garde(custom(validate_name_translations))]
+    pub name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     #[garde(length(chars, min = 1, max = 1024))]
     #[schema(min_length = 1, max_length = 1024)]
     pub description: Option<compact_str::CompactString>,
@@ -342,22 +383,24 @@ impl CreatableModel for NestEggVariable {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self::CreateResult, crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("nest_egg_variables");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("egg_uuid", options.egg_uuid)
             .set("name", &options.name)
+            .set(
+                "name_translations",
+                serde_json::to_value(&options.name_translations)?,
+            )
             .set("description", &options.description)
             .set(
                 "description_translations",
@@ -373,11 +416,12 @@ impl CreatableModel for NestEggVariable {
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
-        let nest_egg_variable = Self::map(None, &row)?;
+        let mut nest_egg_variable = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut nest_egg_variable, &options, state, transaction)
+            .await?;
 
         Ok(nest_egg_variable)
     }
@@ -388,6 +432,8 @@ pub struct UpdateNestEggVariableOptions {
     #[garde(length(chars, min = 3, max = 255))]
     #[schema(min_length = 3, max_length = 255)]
     pub name: Option<compact_str::CompactString>,
+    #[garde(inner(custom(validate_name_translations)))]
+    pub name_translations: Option<BTreeMap<compact_str::CompactString, compact_str::CompactString>>,
     #[garde(length(chars, min = 1, max = 1024))]
     #[schema(min_length = 1, max_length = 1024)]
     #[serde(
@@ -431,35 +477,36 @@ pub struct UpdateNestEggVariableOptions {
 impl UpdatableModel for NestEggVariable {
     type UpdateOptions = UpdateNestEggVariableOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<NestEggVariable>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<NestEggVariable>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("nest_egg_variables");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("name", options.name.as_ref())
+            .set(
+                "name_translations",
+                options
+                    .name_translations
+                    .as_ref()
+                    .map(serde_json::to_value)
+                    .transpose()?,
+            )
             .set(
                 "description",
                 options.description.as_ref().map(|d| d.as_ref()),
@@ -484,10 +531,13 @@ impl UpdatableModel for NestEggVariable {
             .set("rules", options.rules.as_ref())
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(name) = options.name {
             self.name = name;
+        }
+        if let Some(name_translations) = options.name_translations {
+            self.name_translations = name_translations;
         }
         if let Some(description) = options.description {
             self.description = description;
@@ -517,7 +567,7 @@ impl UpdatableModel for NestEggVariable {
             self.rules = rules;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -527,21 +577,20 @@ impl UpdatableModel for NestEggVariable {
 impl DeletableModel for NestEggVariable {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<NestEggVariable>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<NestEggVariable>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -551,10 +600,11 @@ impl DeletableModel for NestEggVariable {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }
@@ -569,6 +619,7 @@ pub struct AdminApiNestEggVariable {
     pub uuid: uuid::Uuid,
 
     pub name: compact_str::CompactString,
+    pub name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     pub description: Option<compact_str::CompactString>,
     pub description_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     pub order: i16,

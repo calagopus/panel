@@ -124,7 +124,7 @@
         "failed": "Thất bại"
       },
       "server": {
-        "noAllocation": "Thật không may, không có phân bổ nào có sẵn cho máy chủ này.",
+        "noAllocation": "Không có địa chỉ ip.",
         "state": {
           "suspended": "Máy chủ bị khóa",
           "transferring": "Máy chủ đang được di dời",
@@ -1007,8 +1007,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Tên Nhà Cung Cấp",
-              "identifier": "Định Danh"
+              "providerName": "Tên Nhà Cung Cấp"
             }
           },
           "modal": {
@@ -1604,7 +1603,7 @@
                 "cronSchedule": "Lịch Trình Cron"
               },
               "card": {
-                "content": "Trên Khoảng Thời Gian Cron `{schedule}`, Lần Chạy Tiếp Theo Là {timestamp} - Lần Chạy Cuối Là {lastTimestamp}."
+                "content": "Trên Khoảng Thời Gian Cron {schedule}, Lần Chạy Tiếp Theo Là {timestamp} - Lần Chạy Cuối Là {lastTimestamp}."
               }
             },
             "powerAction": {
@@ -2038,11 +2037,14 @@
               "readOnly": "Chỉ Đọc"
             }
           },
+          "button": {
+            "attach": "Gắn",
+            "detach": "Tháo"
+          },
           "modal": {
             "attachMount": {
               "title": "Gắn Điểm Gắn",
               "content": "Bạn có muốn gắn **{name}** vào `{target}` không?",
-              "confirm": "Gắn",
               "toast": {
                 "attached": "{name} đã được gắn vào máy chủ của bạn."
               }
@@ -2050,7 +2052,6 @@
             "detachMount": {
               "title": "Tháo Điểm Gắn",
               "content": "Bạn có muốn tháo **{name}** từ `{target}` không?",
-              "confirm": "Tháo",
               "toast": {
                 "detached": "{name} đã được xóa khỏi máy chủ của bạn."
               }

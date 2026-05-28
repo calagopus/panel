@@ -182,7 +182,7 @@ impl shared::extensions::commands::CliCommand<ClearArgs> for ClearCommand {
                     }
 
                     println!(
-                        "sucessfully removed {}",
+                        "successfully removed {}",
                         extension.metadata_toml.package_name.cyan()
                     );
                 }
@@ -220,7 +220,7 @@ impl shared::extensions::commands::CliCommand<ClearArgs> for ClearCommand {
                 }
 
                 println!(
-                    "sucessfully removed {} extensions.",
+                    "successfully removed {} extensions.",
                     installed_extensions.len().to_compact_string().cyan()
                 );
 

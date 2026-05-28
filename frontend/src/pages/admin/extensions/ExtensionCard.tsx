@@ -11,6 +11,7 @@ import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import Divider from '@/elements/Divider.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { adminBackendExtensionSchema } from '@/lib/schemas/admin/backendExtension.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ExtensionCard({
   extension,
@@ -25,18 +26,22 @@ export default function ExtensionCard({
   isRemoved?: boolean;
   onRemove?: () => void;
 }) {
-  const name = backendExtension?.metadataToml.name || extension?.packageName || 'Unknown Extension';
+  const { t } = useTranslations();
+  const name =
+    backendExtension?.metadataToml.name || extension?.packageName || t('pages.admin.extensions.unknownExtension', {});
   const packageName = backendExtension?.metadataToml.packageName || extension?.packageName;
 
   return (
     <Card>
       <div className='mb-3 flex items-start gap-3'>
-        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-zinc-800 text-zinc-400'>
+        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-(--mantine-color-default-hover) text-(--mantine-color-dimmed)'>
           <FontAwesomeIcon icon={faPuzzlePiece} className='text-sm' />
         </div>
         <div className='min-w-0 flex-1'>
-          <h3 className='truncate text-md font-medium leading-tight text-white'>{name}</h3>
-          {packageName && <p className='mt-0.5 truncate font-mono text-[11px] text-zinc-500'>{packageName}</p>}
+          <h3 className='truncate text-md font-medium leading-tight'>{name}</h3>
+          {packageName && (
+            <p className='mt-0.5 truncate font-mono text-[11px] text-(--mantine-color-dimmed)'>{packageName}</p>
+          )}
         </div>
       </div>
 
@@ -44,22 +49,22 @@ export default function ExtensionCard({
         <div className='mb-2.5 flex flex-wrap gap-1.5'>
           {!extension && (
             <Badge color='red' variant='light' size='sm'>
-              Frontend missing
+              {t('pages.admin.extensions.badge.frontendMissing', {})}
             </Badge>
           )}
           {!backendExtension && (
             <Badge color='red' variant='light' size='sm'>
-              Backend missing
+              {t('pages.admin.extensions.badge.backendMissing', {})}
             </Badge>
           )}
           {isPending && (
             <Badge color='yellow' variant='light' size='sm'>
-              Pending build
+              {t('pages.admin.extensions.badge.pendingBuild', {})}
             </Badge>
           )}
           {isRemoved && (
             <Badge color='yellow' variant='light' size='sm'>
-              Pending removal
+              {t('pages.admin.extensions.badge.pendingRemoval', {})}
             </Badge>
           )}
         </div>
@@ -68,12 +73,14 @@ export default function ExtensionCard({
       {backendExtension && (
         <div className='mb-3 flex flex-col gap-1.5'>
           <div className='flex items-center justify-between'>
-            <span className='text-xs text-zinc-500'>Version</span>
+            <span className='text-xs text-zinc-500'>{t('pages.admin.extensions.card.version', {})}</span>
             <span className='font-mono text-xs text-zinc-300'>{backendExtension.version}</span>
           </div>
           <div className='flex items-center justify-between'>
-            <span className='text-xs text-zinc-500'>Authors</span>
-            <span className='truncate text-xs text-zinc-300'>{backendExtension.authors.join(', ') || 'Unknown'}</span>
+            <span className='text-xs text-zinc-500'>{t('pages.admin.extensions.card.authors', {})}</span>
+            <span className='truncate text-xs text-zinc-300'>
+              {backendExtension.authors.join(', ') || t('pages.admin.extensions.unknown', {})}
+            </span>
           </div>
         </div>
       )}
@@ -97,8 +104,8 @@ export default function ExtensionCard({
           enabled={!backendExtension || !extension?.cardConfigurationPage}
           label={
             !backendExtension
-              ? 'Backend extension is required to configure this extension.'
-              : 'This extension does not have a configuration page defined.'
+              ? t('pages.admin.extensions.tooltip.noBackend', {})
+              : t('pages.admin.extensions.tooltip.noConfigurationPage', {})
           }
           className='flex-1'
         >
@@ -108,12 +115,12 @@ export default function ExtensionCard({
               disabled={!backendExtension || !extension?.cardConfigurationPage}
               className='w-full!'
             >
-              Configure
+              {t('pages.admin.extensions.button.configure', {})}
             </Button>
           </Link>
         </ConditionalTooltip>
         {backendExtension && onRemove && (
-          <Tooltip label='Remove extension'>
+          <Tooltip label={t('pages.admin.extensions.tooltip.removeExtension', {})}>
             <ActionIcon color='red' variant='subtle' size='input-md' disabled={isRemoved} onClick={onRemove}>
               <FontAwesomeIcon icon={faTrash} />
             </ActionIcon>

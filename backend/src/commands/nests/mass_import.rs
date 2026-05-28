@@ -16,7 +16,7 @@ pub struct MassImportArgs {
     #[arg(
         short = 'r',
         long = "recursive",
-        help = "whether the recursively scan the import directory for eggs",
+        help = "whether to recursively scan the import directory for eggs",
         default_value = "false"
     )]
     recursive: bool,

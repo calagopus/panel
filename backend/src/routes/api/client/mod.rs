@@ -22,6 +22,39 @@ mod account;
 mod permissions;
 pub mod servers;
 
+fn can_impersonate(impersonator: &User, target: &User) -> bool {
+    if impersonator.admin {
+        return true;
+    }
+    if target.admin {
+        return false;
+    }
+
+    let imp_admin = impersonator
+        .role
+        .as_ref()
+        .map(|r| r.admin_permissions.as_slice())
+        .unwrap_or(&[]);
+    let imp_server = impersonator
+        .role
+        .as_ref()
+        .map(|r| r.server_permissions.as_slice())
+        .unwrap_or(&[]);
+    let tgt_admin = target
+        .role
+        .as_ref()
+        .map(|r| r.admin_permissions.as_slice())
+        .unwrap_or(&[]);
+    let tgt_server = target
+        .role
+        .as_ref()
+        .map(|r| r.server_permissions.as_slice())
+        .unwrap_or(&[]);
+
+    tgt_admin.iter().all(|p| imp_admin.contains(p))
+        && tgt_server.iter().all(|p| imp_server.contains(p))
+}
+
 pub async fn auth(
     state: GetState,
     ip: shared::GetIp,
@@ -47,6 +80,11 @@ pub async fn auth(
         return Ok(err.into_response());
     }
 
+    let settings = match state.settings.get().await {
+        Ok(settings) => settings,
+        Err(err) => return Ok(ApiResponse::from(err).into_response()),
+    };
+
     const IGNORED_TWO_FACTOR_PATHS: &[&str] = &[
         "/api/client/account",
         "/api/client/account/two-factor",
@@ -54,10 +92,6 @@ pub async fn auth(
     ];
 
     if let Some((auth_user, auth_method)) = req.extensions_mut().remove::<(User, AuthMethod)>() {
-        let settings = match state.settings.get().await {
-            Ok(settings) => settings,
-            Err(err) => return Ok(ApiResponse::from(err).into_response()),
-        };
         let require_two_factor = auth_user.require_two_factor(&settings);
         drop(settings);
 
@@ -111,6 +145,14 @@ pub async fn auth(
                 Err(err) => return Ok(ApiResponse::from(err).into_response()),
             };
 
+            if !can_impersonate(&auth_user, &user) {
+                return Ok(
+                    ApiResponse::error("cannot impersonate a user with more permissions")
+                        .with_status(StatusCode::FORBIDDEN)
+                        .into_response(),
+                );
+            }
+
             req.extensions_mut().insert(PermissionManager::new(&user));
             req.extensions_mut().insert(UserActivityLogger {
                 state: Arc::clone(&state),
@@ -136,7 +178,9 @@ pub async fn auth(
         }
 
         req.extensions_mut().insert(auth_method);
-    } else if let Some(session_id) = cookies.get("session") {
+    } else if let Some(session_id) = cookies.get(&settings.app.session_cookie) {
+        drop(settings);
+
         if session_id.value().len() != 81 {
             return Ok(ApiResponse::error("invalid authorization cookie")
                 .with_status(StatusCode::UNAUTHORIZED)
@@ -211,6 +255,14 @@ pub async fn auth(
                 Err(err) => return Ok(ApiResponse::from(err).into_response()),
             };
 
+            if !can_impersonate(&auth_user, &user) {
+                return Ok(
+                    ApiResponse::error("cannot impersonate a user with more permissions")
+                        .with_status(StatusCode::FORBIDDEN)
+                        .into_response(),
+                );
+            }
+
             req.extensions_mut().insert(PermissionManager::new(&user));
             req.extensions_mut().insert(UserActivityLogger {
                 state: Arc::clone(&state),
@@ -237,6 +289,8 @@ pub async fn auth(
 
         req.extensions_mut().insert(AuthMethod::Session(session));
     } else if let Some(api_token) = req.headers().get("Authorization") {
+        drop(settings);
+
         if api_token.len() != 55 {
             return Ok(ApiResponse::error("invalid authorization header")
                 .with_status(StatusCode::UNAUTHORIZED)
@@ -310,6 +364,14 @@ pub async fn auth(
                 }
                 Err(err) => return Ok(ApiResponse::from(err).into_response()),
             };
+
+            if !can_impersonate(&auth_user, &user) {
+                return Ok(
+                    ApiResponse::error("cannot impersonate a user with more permissions")
+                        .with_status(StatusCode::FORBIDDEN)
+                        .into_response(),
+                );
+            }
 
             req.extensions_mut().insert(PermissionManager::new(&user));
             req.extensions_mut().insert(UserActivityLogger {

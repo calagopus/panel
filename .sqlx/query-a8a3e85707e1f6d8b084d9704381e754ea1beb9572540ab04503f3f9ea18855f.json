@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "source",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mounts",
+            "name": "source"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "target",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mounts",
+            "name": "target"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "read_only",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "mounts",
+            "name": "read_only"
+          }
+        }
       }
     ],
     "parameters": {

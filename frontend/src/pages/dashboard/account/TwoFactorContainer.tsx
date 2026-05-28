@@ -1,5 +1,6 @@
 import { faMobilePhone } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Stack } from '@mantine/core';
 import TitleCard from '@/elements/TitleCard.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -17,19 +18,20 @@ export default function TwoFactorContainer() {
       icon={<FontAwesomeIcon icon={faMobilePhone} />}
       className='h-full order-30'
     >
-      <div>
+      <Stack h='100%'>
         {user!.totpEnabled
           ? t('pages.account.account.containers.twoFactor.twoFactorEnabled', {}).md()
           : t('pages.account.account.containers.twoFactor.twoFactorDisabled', {}).md()}
         {user?.totpLastUsed && (
-          <span className='mt-2 text-sm text-gray-400'>
+          <span className='-mt-2 text-sm text-(--mantine-color-dimmed)'>
             {tReact('pages.account.account.containers.twoFactor.twoFactorLastUsed', {
               timestamp: <FormattedTimestamp timestamp={user.totpLastUsed} tooltipClassName='inline-block' />,
             })}
           </span>
         )}
-      </div>
-      <div className='mt-4'>{user!.totpEnabled ? <TwoFactorDisableButton /> : <TwoFactorSetupButton />}</div>
+
+        <div className='mt-auto'>{user!.totpEnabled ? <TwoFactorDisableButton /> : <TwoFactorSetupButton />}</div>
+      </Stack>
     </TitleCard>
   );
 }

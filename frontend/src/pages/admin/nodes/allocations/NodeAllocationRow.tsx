@@ -1,9 +1,9 @@
 import { forwardRef, memo } from 'react';
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useAdminStore } from '@/stores/admin.tsx';
@@ -53,12 +53,7 @@ const NodeAllocationRow = memo(
         <TableData>
           <Code>
             {allocation.server ? (
-              <NavLink
-                to={`/admin/servers/${allocation.server.uuid}`}
-                className='text-blue-400 hover:text-blue-200 hover:underline'
-              >
-                {allocation.server.name}
-              </NavLink>
+              <TableLink to={`/admin/servers/${allocation.server.uuid}`}>{allocation.server.name}</TableLink>
             ) : (
               '-'
             )}

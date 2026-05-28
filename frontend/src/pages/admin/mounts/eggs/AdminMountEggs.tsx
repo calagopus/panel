@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getMountNestEggs from '@/api/admin/mounts/nest-eggs/getMountNestEggs.ts';
 import deleteEggMount from '@/api/admin/nests/eggs/mounts/deleteEggMount.ts';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
@@ -80,16 +80,17 @@ function MountEggRow({
 export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof adminMountSchema> }) {
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
-  const { data, loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
+  const {
+    data: mountNestEggs,
+    loading,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mounts.eggs(mount.uuid),
     fetcher: (page, search) => getMountNestEggs(mount.uuid, page, search),
   });
-
-  const mountNestEggs =
-    data ??
-    getEmptyPaginationSet<
-      AndCreated<{ nest: z.infer<typeof adminNestSchema>; nestEgg: z.infer<typeof adminEggSchema> }>
-    >();
 
   return (
     <AdminSubContentContainer
@@ -112,7 +113,7 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
 
       <ContextMenuProvider>
         <Table columns={[...eggTableColumns, '']} loading={loading} pagination={mountNestEggs} onPageSelect={setPage}>
-          {mountNestEggs.data.map((nestEggMount) => (
+          {mountNestEggs?.data.map((nestEggMount) => (
             <MountEggRow
               key={nestEggMount.nestEgg.uuid}
               nest={nestEggMount.nest}

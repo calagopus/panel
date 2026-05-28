@@ -1,0 +1,18 @@
+DROP INDEX "nodes_uuid_idx";
+DROP INDEX "server_backups_uuid_idx";
+DROP INDEX "egg_configurations_eggs_idx";
+CREATE INDEX "egg_configurations_eggs_idx" ON "egg_configurations" USING gin ("eggs");
+CREATE INDEX "admin_activities_api_key_uuid_idx" ON "admin_activities" ("api_key_uuid");
+CREATE INDEX "announcements_enabled_idx" ON "announcements" ("enabled");
+CREATE INDEX "announcements_enabled_start_idx" ON "announcements" ("enabled_start");
+CREATE INDEX "announcements_enabled_end_idx" ON "announcements" ("enabled_end");
+CREATE INDEX "announcements_locations_idx" ON "announcements" USING gin ("locations");
+CREATE INDEX "announcements_nodes_idx" ON "announcements" USING gin ("nodes");
+CREATE INDEX "announcements_backup_configurations_idx" ON "announcements" USING gin ("backup_configurations");
+CREATE INDEX "announcements_eggs_idx" ON "announcements" USING gin ("eggs");
+CREATE INDEX "server_activities_api_key_uuid_idx" ON "server_activities" ("api_key_uuid");
+CREATE INDEX "server_activities_schedule_uuid_idx" ON "server_activities" ("schedule_uuid");
+CREATE INDEX "servers_destination_node_uuid_idx" ON "servers" ("destination_node_uuid");
+CREATE INDEX "user_activities_api_key_uuid_idx" ON "user_activities" ("api_key_uuid");
+CREATE INDEX "command_snippets_eggs_idx" ON "user_command_snippets" USING gin ("eggs");
+CREATE INDEX "users_role_uuid_idx" ON "users" ("role_uuid");

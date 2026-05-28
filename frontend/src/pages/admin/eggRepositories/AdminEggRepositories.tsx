@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getEggRepositories from '@/api/admin/egg-repositories/getEggRepositories.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,12 +17,16 @@ import EggRepositoryView from './EggRepositoryView.tsx';
 function EggRepositoriesContainer() {
   const navigate = useNavigate();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggRepositories,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.eggRepositories.all(),
     fetcher: getEggRepositories,
   });
-
-  const eggRepositories = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminContentContainer
@@ -43,7 +46,7 @@ function EggRepositoriesContainer() {
       }
     >
       <Table columns={eggRepositoryTableColumns} loading={loading} pagination={eggRepositories} onPageSelect={setPage}>
-        {eggRepositories.data.map((eggRepository) => (
+        {eggRepositories?.data.map((eggRepository) => (
           <EggRepositoryRow key={eggRepository.uuid} eggRepository={eggRepository} />
         ))}
       </Table>
@@ -51,7 +54,7 @@ function EggRepositoriesContainer() {
   );
 }
 
-export default function AdminNests() {
+export default function AdminEggRepositories() {
   return (
     <Routes>
       <Route path='/' element={<EggRepositoriesContainer />} />

@@ -10,7 +10,7 @@ rule-validator = { workspace = true }
 schema-extension-core = { workspace = true }
 schema-extension-derive = { workspace = true }
 rustis = { workspace = true }
-rust-s3 = { workspace = true }
+aws-sdk-s3 = { workspace = true }
 reqwest = { workspace = true }
 tokio = { workspace = true }
 tokio-util = { workspace = true }
@@ -24,7 +24,7 @@ clap = { workspace = true }
 include_dir = { workspace = true }
 tower-cookies = { workspace = true }
 cron = { workspace = true }
-lettre = { version = "0.11.17", default-features = false, features = ["tokio1-native-tls", "builder", "pool", "smtp-transport", "sendmail-transport", "file-transport"] }
+lettre = { version = "0.11.17", default-features = false, features = ["tokio1-rustls-tls", "builder", "pool", "smtp-transport", "sendmail-transport", "file-transport"] }
 zip = { version = "8.0.0", default-features = false, features = ["deflate"] }
 toml = "1.0.1"
 serde = { workspace = true }
@@ -32,7 +32,7 @@ serde_json_path = "0.7.2"
 serde_json = { workspace = true }
 serde_norway = { workspace = true }
 rmp-serde = { workspace = true }
-serde-xml-rs = { workspace = true }
+quick-xml = { workspace = true }
 erased-serde = "0.4.10"
 utoipa-axum = { workspace = true }
 base32 = { workspace = true }
@@ -63,7 +63,7 @@ ignore = { version = "0.4.23", features = ["simd-accel"] }
 futures-util = { workspace = true }
 cap-std = "4.0.0"
 semver = { workspace = true }
-git2 = "0.20.2"
+gix = { version = "0.83.0", features = ["blocking-http-transport-reqwest-rust-tls"] }
 tempfile = { workspace = true }
 compact_str = { workspace = true }
 nestify = { workspace = true }
@@ -74,7 +74,9 @@ moka = { version = "0.12.12", features = ["future"] }
 serde_with = { workspace = true }
 minijinja = { workspace = true }
 sntpc-net-tokio = "1.0.1"
-sntpc = { version = "0.9.0", features = ["std"] }
+sntpc = { version = "0.10.1", features = ["std"] }
 xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 hex = { workspace = true }
 tower = "0.5.3"
+parking_lot = { workspace = true }
+ipnetwork = { version = "0.21.1", features = ["serde"] }

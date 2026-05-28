@@ -40,40 +40,41 @@ mod post {
 
         permissions.has_admin_permission("settings.read")?;
 
-        let (subject, is_none) = state
+        if state
             .settings
-            .get_as(|s| {
-                (
-                    format!("{} - Email Connection Test", s.app.name),
-                    matches!(s.mail_mode, MailMode::None),
-                )
-            })
-            .await?;
-
-        if is_none {
+            .get_as(|s| matches!(s.mail_mode, MailMode::None))
+            .await?
+        {
             return ApiResponse::error("email functionality is disabled in settings")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }
 
-        if let Err(err) = state
-            .mail
-            .send_foreground(
+        match tokio::time::timeout(
+            std::time::Duration::from_secs(15),
+            state.mail.send_template_foreground(
+                &state,
+                "connection_test",
                 data.email.clone(),
-                subject.into(),
-                state
-                    .mail
-                    .templates
-                    .get_template("connection_test")?
-                    .get_content(&state)
-                    .await?,
                 minijinja::context! {},
-            )
-            .await
+            ),
+        )
+        .await
         {
-            return ApiResponse::error(format!("failed to send test email: {err}"))
-                .with_status(StatusCode::INTERNAL_SERVER_ERROR)
-                .ok();
+            Ok(Ok(_)) => {}
+            Ok(Err(err)) => {
+                let (err, status) = shared::response::extract_readable_error(&err)
+                    .unwrap_or_else(|| (err.to_string(), StatusCode::INTERNAL_SERVER_ERROR));
+
+                return ApiResponse::error(format!("failed to send test email: {err}"))
+                    .with_status(status)
+                    .ok();
+            }
+            Err(_) => {
+                return ApiResponse::error("sending test email timed out after 15 seconds")
+                    .with_status(StatusCode::INTERNAL_SERVER_ERROR)
+                    .ok();
+            }
         }
 
         activity_logger

@@ -37,7 +37,7 @@ impl BaseModel for ServerScheduleStep {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -97,14 +97,14 @@ impl ServerScheduleStep {
         schedule_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM server_schedule_steps
             WHERE server_schedule_steps.schedule_uuid = $1 AND server_schedule_steps.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(schedule_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -117,7 +117,7 @@ impl ServerScheduleStep {
         database: &crate::database::Database,
         schedule_uuid: uuid::Uuid,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM server_schedule_steps
@@ -125,7 +125,7 @@ impl ServerScheduleStep {
             ORDER BY server_schedule_steps.order_, server_schedule_steps.created
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(schedule_uuid)
         .fetch_all(database.read())
         .await?;
@@ -138,7 +138,7 @@ impl ServerScheduleStep {
     pub async fn count_by_schedule_uuid(
         database: &crate::database::Database,
         schedule_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -149,7 +149,6 @@ impl ServerScheduleStep {
         .bind(schedule_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     #[inline]
@@ -211,18 +210,16 @@ impl CreatableModel for ServerScheduleStep {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("server_schedule_steps");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("schedule_uuid", options.schedule_uuid)
@@ -231,11 +228,11 @@ impl CreatableModel for ServerScheduleStep {
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
-        let step = Self::map(None, &row)?;
+        let mut step = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut step, &options, state, transaction).await?;
 
         Ok(step)
     }
@@ -253,32 +250,25 @@ pub struct UpdateServerScheduleStepOptions {
 impl UpdatableModel for ServerScheduleStep {
     type UpdateOptions = UpdateServerScheduleStepOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<ServerScheduleStep>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<ServerScheduleStep>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("server_schedule_steps");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set(
@@ -292,7 +282,7 @@ impl UpdatableModel for ServerScheduleStep {
             .set("order_", options.order)
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(action) = options.action {
             self.action = action;
@@ -301,7 +291,7 @@ impl UpdatableModel for ServerScheduleStep {
             self.order = order;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -311,21 +301,20 @@ impl UpdatableModel for ServerScheduleStep {
 impl DeletableModel for ServerScheduleStep {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<ServerScheduleStep>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<ServerScheduleStep>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -335,10 +324,11 @@ impl DeletableModel for ServerScheduleStep {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

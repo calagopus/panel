@@ -162,11 +162,15 @@ impl Cache {
         let version: String = client.info([InfoSection::Server]).await?;
         let version = version
             .lines()
-            .find(|line| line.starts_with("redis_version:"))
-            .unwrap_or("redis_version:unknown")
-            .split(':')
-            .nth(1)
-            .unwrap_or("unknown")
+            .find(|line| line.starts_with("valkey_version:"))
+            .or_else(|| {
+                version
+                    .lines()
+                    .find(|line| line.starts_with("redis_version:"))
+            })
+            .unwrap_or("_:unknown")
+            .split_once(':')
+            .map_or("unknown", |(_, v)| v.trim())
             .into();
 
         Ok(version)
@@ -262,7 +266,7 @@ impl Cache {
         let lock_id = lock_id.into();
         let redis_key = compact_str::format_compact!("lock::{}", lock_id);
         let ttl_secs = ttl.unwrap_or(30);
-        let deadline = timeout.map(|ms| Instant::now() + Duration::from_secs(ms));
+        let deadline = timeout.map(|ms| Instant::now() + Duration::from_millis(ms));
 
         tracing::debug!("acquiring cache lock");
 
@@ -566,6 +570,24 @@ impl Cache {
             Ok(client.exists(key).await? > 0)
         } else {
             Ok(false)
+        }
+    }
+
+    pub async fn list(
+        &self,
+        prefix: &str,
+    ) -> Result<Vec<compact_str::CompactString>, anyhow::Error> {
+        if let Some(client) = &self.client {
+            let keys = client.keys(format!("{}*", prefix)).await?;
+            Ok(keys)
+        } else {
+            let mut keys = Vec::new();
+            for (key, _) in self.local.iter() {
+                if key.starts_with(prefix) {
+                    keys.push(key.to_compact_string());
+                }
+            }
+            Ok(keys)
         }
     }
 

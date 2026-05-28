@@ -29,20 +29,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v5
         with:
-          version: 10
+          version: 11
           run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
 
       - name: Install frontend dependencies
         run: |
@@ -209,6 +197,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly
@@ -219,7 +208,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.aio
+          file: ./docker/Dockerfile.aio
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-aio
@@ -227,7 +216,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   build-heavy-image:
-    name: Build Heavy Docker images (${{ matrix.platform }})
+    name: Build Heavy Docker image (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -261,26 +250,57 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.heavy
+          file: ./docker/Dockerfile.heavy
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-heavy-${{ matrix.tag_suffix }}
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
 
+  build-heavy-aio-image:
+    name: Build Heavy AIO Docker image (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            tag_suffix: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            tag_suffix: arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build & push heavy AIO platform image
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: Dockerfile.heavy.aio
+          file: ./docker/Dockerfile.heavy.aio
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-heavy-aio-${{ matrix.tag_suffix }}
-          cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
-          cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
+          cache-from: type=gha,scope=heavy-aio-${{ matrix.tag_suffix }}
+          cache-to: type=gha,mode=max,scope=heavy-aio-${{ matrix.tag_suffix }}
 
   merge-heavy-image:
-    name: Merge Heavy Docker manifests
+    name: Merge Heavy Docker manifest
     needs: [build-heavy-image]
     runs-on: ubuntu-24.04
     permissions:
@@ -295,12 +315,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create and push multi-arch manifests
+      - name: Create and push multi-arch manifest
         run: |
           docker buildx imagetools create -t ghcr.io/${{ github.repository }}:nightly-heavy \
             ghcr.io/${{ github.repository }}:nightly-heavy-amd64 \
             ghcr.io/${{ github.repository }}:nightly-heavy-arm64
 
+  merge-heavy-aio-image:
+    name: Merge Heavy AIO Docker manifest
+    needs: [build-heavy-aio-image]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        run: |
           docker buildx imagetools create -t ghcr.io/${{ github.repository }}:nightly-heavy-aio \
             ghcr.io/${{ github.repository }}:nightly-heavy-aio-amd64 \
             ghcr.io/${{ github.repository }}:nightly-heavy-aio-arm64

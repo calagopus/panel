@@ -1,17 +1,20 @@
-import { faFileArrowDown, faLink, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faFileArrowDown, faInfo, faLink, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
-import { NavLink } from 'react-router';
+import { useMemo, useState } from 'react';
 import { z } from 'zod';
 import detachNodeBackup from '@/api/admin/nodes/backups/detachNodeBackup.ts';
 import downloadNodeBackup from '@/api/admin/nodes/backups/downloadNodeBackup.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Badge from '@/elements/Badge.tsx';
+import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import HljsCode from '@/elements/HljsCode.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
@@ -36,7 +39,9 @@ export default function NodeBackupRow({
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [openModal, setOpenModal] = useState<'restore' | 'reattach' | 'detach' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'restore' | 'reattach' | 'detach' | 'delete' | 'metadata' | null>(null);
+  const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
+  const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadNodeBackup(node.uuid, backup.uuid, archiveFormat)
@@ -93,6 +98,22 @@ export default function NodeBackupRow({
         onClose={() => setOpenModal(null)}
       />
 
+      <Modal
+        title={t('pages.server.backups.modal.viewMetadata.title', {})}
+        onClose={() => setOpenModal(null)}
+        opened={openModal === 'metadata'}
+      >
+        <HljsCode languageName='json' language={jsonLanguage}>
+          {metadataJson}
+        </HljsCode>
+
+        <ModalFooter>
+          <Button variant='default' onClick={() => setOpenModal(null)}>
+            {t('common.button.close', {})}
+          </Button>
+        </ModalFooter>
+      </Modal>
+
       <ContextMenu
         items={[
           {
@@ -136,6 +157,13 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            icon: faInfo,
+            label: t('pages.server.backups.modal.viewMetadata.title', {}),
+            hidden: Object.keys(backup.metadata).length === 0,
+            onClick: () => setOpenModal('metadata'),
+            color: 'gray',
+          },
+          {
             icon: faTrash,
             hidden: !backup.completed,
             label: t('common.button.delete', {}),
@@ -157,12 +185,7 @@ export default function NodeBackupRow({
             <TableData className='flex flex-row items-center'>
               <Code>
                 {backup.server ? (
-                  <NavLink
-                    to={`/admin/servers/${backup.server.uuid}`}
-                    className='text-blue-400 hover:text-blue-200 hover:underline'
-                  >
-                    {backup.server.name}
-                  </NavLink>
+                  <TableLink to={`/admin/servers/${backup.server.uuid}`}>{backup.server.name}</TableLink>
                 ) : (
                   '-'
                 )}

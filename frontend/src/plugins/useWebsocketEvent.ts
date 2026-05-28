@@ -13,6 +13,7 @@ export enum SocketEvent {
   CONSOLE_OUTPUT = 'console output',
   STATUS = 'status',
   STATS = 'stats',
+  PENDING_RESTART = 'pending restart',
   TRANSFER_LOGS = 'transfer logs',
   TRANSFER_STATUS = 'transfer status',
   TRANSFER_PROGRESS = 'transfer progress',

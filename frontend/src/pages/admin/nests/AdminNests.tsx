@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getNests from '@/api/admin/nests/getNests.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,12 +17,16 @@ import NestView from './NestView.tsx';
 function NestsContainer() {
   const navigate = useNavigate();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: nests,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nests.all(),
     fetcher: getNests,
   });
-
-  const nests = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminContentContainer
@@ -43,7 +46,7 @@ function NestsContainer() {
       }
     >
       <Table columns={nestTableColumns} loading={loading} pagination={nests} onPageSelect={setPage}>
-        {nests.data.map((nest) => (
+        {nests?.data.map((nest) => (
           <NestRow key={nest.uuid} nest={nest} />
         ))}
       </Table>

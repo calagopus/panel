@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "uuid",
-        "type_info": "Uuid"
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_schedule_steps",
+            "name": "uuid"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "schedule_uuid",
-        "type_info": "Uuid"
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_schedule_steps",
+            "name": "schedule_uuid"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "action",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "server_schedule_steps",
+            "name": "action"
+          }
+        }
       }
     ],
     "parameters": {

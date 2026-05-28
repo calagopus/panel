@@ -1,4 +1,4 @@
-import { faDoorOpen, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faDoorOpen, faMagnifyingGlassChart, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Breadcrumbs } from '@mantine/core';
 import { join } from 'pathe';
@@ -6,8 +6,10 @@ import { ReactNode, useEffect } from 'react';
 import { createSearchParams, NavLink } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getBackup from '@/api/server/backups/getBackup.ts';
+import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -21,6 +23,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
     selectedFiles,
     browsingBackup,
     browsingEntries,
+    browsingPrimaryFilesystem,
     setBrowsingDirectory,
     actingFiles,
     doSelectFiles,
@@ -66,7 +69,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
             })}`
           : `/server/${server?.uuidShort}/files`
       }
-      className=' text-blue-300 hover:text-blue-200'
+      className='text-(--mantine-color-anchor) hover:underline'
     >
       {browsingBackup ? browsingBackup.name : 'container'}
     </NavLink>,
@@ -77,7 +80,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
         <NavLink
           key={item.path}
           to={`/server/${server?.uuidShort}/files?${createSearchParams({ directory: join('/', item.path) })}`}
-          className=' text-blue-300 hover:text-blue-200'
+          className='text-(--mantine-color-anchor) hover:underline'
           onClick={() => setBrowsingDirectory(item.path)}
         >
           {item.name}
@@ -116,9 +119,19 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
             {t('pages.server.files.button.exitBackup', {})}
           </Button>
         </NavLink>
-        <span hidden={inFileEditor}>
+        <span hidden={inFileEditor} className='flex flex-row space-x-2'>
+          <Tooltip label={t('pages.server.files.tooltip.largestDirectories', {})}>
+            <ActionIcon
+              variant='light'
+              size='input-sm'
+              hidden={!browsingPrimaryFilesystem}
+              onClick={() => doOpenModal('largestDirectories')}
+            >
+              <FontAwesomeIcon icon={faMagnifyingGlassChart} />
+            </ActionIcon>
+          </Tooltip>
           <Button
-            variant='light'
+            variant='outline'
             leftSection={<FontAwesomeIcon icon={faSearch} />}
             onClick={() => doOpenModal('search')}
           >

@@ -27,7 +27,7 @@ impl BaseModel for EggRepositoryEgg {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -104,7 +104,7 @@ impl EggRepositoryEgg {
         author: &str,
         exported_egg: &super::nest_egg::ExportedNestEgg,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             INSERT INTO egg_repository_eggs (egg_repository_uuid, path, author, name, description, exported_egg)
             VALUES ($1, $2, $3, $4, $5, $6)
@@ -116,7 +116,7 @@ impl EggRepositoryEgg {
             RETURNING {}
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(egg_repository_uuid)
         .bind(path.as_ref())
         .bind(author)
@@ -134,14 +134,14 @@ impl EggRepositoryEgg {
         egg_repository_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM egg_repository_eggs
             WHERE egg_repository_eggs.egg_repository_uuid = $1 AND egg_repository_eggs.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(egg_repository_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -162,7 +162,7 @@ impl EggRepositoryEgg {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM egg_repository_eggs
@@ -171,7 +171,7 @@ impl EggRepositoryEgg {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(egg_repository_uuid)
         .bind(search)
         .bind(per_page)
@@ -268,16 +268,35 @@ impl ByUuid for EggRepositoryEgg {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM egg_repository_eggs
             WHERE egg_repository_eggs.uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM egg_repository_eggs
+            WHERE egg_repository_eggs.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)
@@ -288,21 +307,20 @@ impl ByUuid for EggRepositoryEgg {
 impl DeletableModel for EggRepositoryEgg {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<EggRepositoryEgg>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<EggRepositoryEgg>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -312,10 +330,11 @@ impl DeletableModel for EggRepositoryEgg {
             "#,
         )
         .bind(&self.path)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

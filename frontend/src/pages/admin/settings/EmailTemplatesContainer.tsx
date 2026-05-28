@@ -1,27 +1,47 @@
 import { Divider, Group, NavLink, Paper, ScrollArea, Stack, Text } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { useEffect, useState } from 'react';
+import { z } from 'zod';
 import getEmailTemplate from '@/api/admin/settings/email-templates/getEmailTemplate.ts';
 import getEmailTemplates from '@/api/admin/settings/email-templates/getEmailTemplates.ts';
 import updateEmailTemplate from '@/api/admin/settings/email-templates/updateEmailTemplate.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
+import Anchor from '@/elements/Anchor.tsx';
 import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Switch from '@/elements/input/Switch.tsx';
+import TextInput from '@/elements/input/TextInput.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
+
+const templateFormSchema = z.object({
+  subject: z.string().min(1).max(255),
+  enabled: z.boolean(),
+});
 
 export default function EmailTemplatesContainer() {
   const { addToast } = useToast();
+  const { t, tReact } = useTranslations();
   const queryClient = useQueryClient();
 
   const [selectedIdentifier, setSelectedIdentifier] = useState<string | null>(null);
   const [editorContent, setEditorContent] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+
+  const form = useForm<z.infer<typeof templateFormSchema>>({
+    initialValues: { subject: '', enabled: true },
+    validateInputOnBlur: true,
+    validate: zod4Resolver(templateFormSchema),
+  });
 
   const { data: templates, isLoading: templatesLoading } = useQuery({
     queryKey: queryKeys.admin.emailTemplates.all(),
@@ -34,6 +54,19 @@ export default function EmailTemplatesContainer() {
     enabled: selectedIdentifier !== null,
   });
 
+  useEffect(() => {
+    if (!template) return;
+
+    const values = {
+      subject: template.subject ?? template.defaultSubject,
+      enabled: template.enabled,
+    };
+
+    form.setValues(values);
+    form.resetDirty(values);
+    setEditorContent('');
+  }, [template]);
+
   const handleSelect = (identifier: string) => {
     setSelectedIdentifier(identifier);
     setEditorContent('');
@@ -44,22 +77,26 @@ export default function EmailTemplatesContainer() {
       ? editorContent
       : (template.content ?? template.defaultContent)
     : '';
-
-  const isDirty =
+  const isContentDirty =
     template !== undefined && editorContent !== '' && editorContent !== (template.content ?? template.defaultContent);
 
   const doSave = () => {
-    if (!selectedIdentifier) return;
+    if (!selectedIdentifier || !template) return;
 
     setSaving(true);
-    updateEmailTemplate(selectedIdentifier, { content: editorContent })
+
+    const payload: { content?: string | null; subject?: string | null; enabled?: boolean } = {
+      subject: form.values.subject,
+      enabled: form.values.enabled,
+    };
+    if (isContentDirty) payload.content = editorContent;
+
+    updateEmailTemplate(selectedIdentifier, payload)
       .then(() => {
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.emailTemplates.detail(selectedIdentifier!) });
-        addToast('Email template saved.', 'success');
+        addToast(t('pages.admin.settings.tabs.mailTemplates.page.toast.saved', {}), 'success');
       })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      })
+      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
       .finally(() => setSaving(false));
   };
 
@@ -68,23 +105,25 @@ export default function EmailTemplatesContainer() {
 
     setConfirmReset(false);
     setSaving(true);
-    updateEmailTemplate(selectedIdentifier, { content: null })
+    updateEmailTemplate(selectedIdentifier, {
+      content: null,
+      subject: null,
+      enabled: template.defaultEnabled,
+    })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.emailTemplates.detail(selectedIdentifier!) });
         setEditorContent('');
-        addToast('Email template reset to default.', 'success');
+        addToast(t('pages.admin.settings.tabs.mailTemplates.page.toast.reset', {}), 'success');
       })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      })
+      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
       .finally(() => setSaving(false));
   };
 
   const sidebar = (
     <Paper withBorder radius='md' className='flex flex-col overflow-hidden shrink-0 md:w-72 w-full md:h-full'>
-      <div className='px-3 py-2.5 bg-neutral-800/60'>
+      <div className='px-3 py-2.5 bg-(--mantine-color-default)'>
         <Text size='xs' fw={600} c='dimmed' tt='uppercase' style={{ letterSpacing: '0.05em' }}>
-          Templates
+          {t('pages.admin.settings.tabs.mailTemplates.page.sidebar.templates', {})}
         </Text>
       </div>
       <Divider />
@@ -92,15 +131,15 @@ export default function EmailTemplatesContainer() {
         <Stack gap={0} p='xs'>
           {templatesLoading && (
             <Text size='sm' c='dimmed' p='xs'>
-              Loading...
+              {t('pages.admin.settings.tabs.mailTemplates.page.sidebar.loading', {})}
             </Text>
           )}
-          {templates?.map((t) => (
+          {templates?.map((tpl) => (
             <NavLink
-              key={t.identifier}
-              label={t.identifier}
-              active={selectedIdentifier === t.identifier}
-              onClick={() => handleSelect(t.identifier)}
+              key={tpl.identifier}
+              label={tpl.identifier}
+              active={selectedIdentifier === tpl.identifier}
+              onClick={() => handleSelect(tpl.identifier)}
               styles={{
                 label: {
                   fontSize: 'var(--mantine-font-size-sm)',
@@ -115,9 +154,9 @@ export default function EmailTemplatesContainer() {
       {template && (
         <>
           <Divider />
-          <div className='px-3 py-2.5 bg-neutral-800/60'>
+          <div className='px-3 py-2.5 bg-(--mantine-color-default)'>
             <Text size='xs' fw={600} c='dimmed' tt='uppercase' style={{ letterSpacing: '0.05em' }}>
-              Available Variables
+              {t('pages.admin.settings.tabs.mailTemplates.page.sidebar.availableVariables', {})}
             </Text>
           </div>
           <Divider />
@@ -141,64 +180,103 @@ export default function EmailTemplatesContainer() {
   );
 
   return (
-    <AdminSubContentContainer title='Email Template Settings' titleOrder={2}>
+    <AdminSubContentContainer title={t('pages.admin.settings.tabs.mailTemplates.page.title', {})} titleOrder={2}>
       <ConfirmationModal
-        title='Reset to default'
+        title={t('pages.admin.settings.tabs.mailTemplates.page.modal.reset.title', {})}
         opened={confirmReset}
         onClose={() => setConfirmReset(false)}
         onConfirmed={doReset}
-        confirm='Reset'
+        confirm={t('pages.admin.settings.tabs.mailTemplates.page.modal.reset.button.confirm', {})}
       >
-        This will discard your custom template for <strong>{selectedIdentifier}</strong> and restore the built-in
-        default. This cannot be undone.
+        {tReact('pages.admin.settings.tabs.mailTemplates.page.modal.reset.content', {
+          identifier: selectedIdentifier ?? '',
+        })}
       </ConfirmationModal>
 
-      <div className='flex flex-col md:flex-row gap-4'>
+      <Alert>
+        <Text size='sm'>
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxBefore', {})}
+          &nbsp;
+          <Anchor href='https://github.com/mitsuhiko/minijinja' target='_blank' rel='noopener noreferrer' size='sm'>
+            {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxLink', {})}
+          </Anchor>
+          &nbsp;
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxMiddle', {})}{' '}
+          <Text span ff='monospace' size='sm'>
+            {'{{ variable }}'}
+          </Text>{' '}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxAnd', {})}{' '}
+          <Text span ff='monospace' size='sm'>
+            {'{% if %}'}
+          </Text>{' '}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxOr', {})}{' '}
+          <Text span ff='monospace' size='sm'>
+            {'{% for %}'}
+          </Text>{' '}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxAfter', {})}
+        </Text>
+      </Alert>
+
+      <div className='mt-4 flex flex-col md:flex-row gap-4'>
         {sidebar}
 
         <Paper withBorder radius='md' className='flex flex-col flex-1 min-w-0 overflow-hidden'>
           {selectedIdentifier === null ? (
             <div className='flex items-center justify-center h-64'>
               <Text c='dimmed' size='sm'>
-                Select a template from the sidebar to edit it
+                {t('pages.admin.settings.tabs.mailTemplates.page.empty', {})}
               </Text>
             </div>
           ) : templateLoading ? (
             <div className='flex items-center justify-center h-64'>
               <Text c='dimmed' size='sm'>
-                Loading template...
+                {t('pages.admin.settings.tabs.mailTemplates.page.loadingTemplate', {})}
               </Text>
             </div>
           ) : template ? (
             <>
-              <div className='px-4 py-2.5 bg-neutral-800/60 shrink-0'>
+              <div className='px-4 py-2.5 bg-(--mantine-color-default) shrink-0'>
                 <Group justify='space-between'>
                   <Group gap='xs'>
                     <Text size='sm' fw={500} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>
                       {selectedIdentifier}
                     </Text>
-                    {template.content !== null && (
-                      <Badge variant='light' color='yellow' size='sm'>
-                        Custom
-                      </Badge>
-                    )}
                   </Group>
                   <Group gap='xs'>
                     <Button size='xs' variant='subtle' onClick={() => setConfirmReset(true)} disabled={saving}>
-                      Reset to default
+                      {t('pages.admin.settings.tabs.mailTemplates.page.button.resetToDefault', {})}
                     </Button>
                     <AdminCan action='settings.update' cantSave>
-                      <Button size='xs' loading={saving} disabled={!isDirty} onClick={doSave}>
-                        Save
+                      <Button size='xs' loading={saving} disabled={!isContentDirty && !form.isDirty()} onClick={doSave}>
+                        {t('common.button.save', {})}
                       </Button>
                     </AdminCan>
                   </Group>
                 </Group>
               </div>
               <Divider />
+              <Stack gap='md' p='md'>
+                <Group align='flex-start'>
+                  <TextInput
+                    label={t('pages.admin.settings.tabs.mailTemplates.page.form.subject', {})}
+                    className='flex-1'
+                    required
+                    key={form.key('subject')}
+                    {...form.getInputProps('subject')}
+                  />
+                  <Switch
+                    label={t('common.form.enabled', {})}
+                    mt='xl'
+                    key={form.key('enabled')}
+                    {...form.getInputProps('enabled', { type: 'checkbox' })}
+                  />
+                </Group>
+              </Stack>
+
+              <Divider />
+
               <MonacoEditor
                 height='60vh'
-                theme='vs-dark'
                 language='html'
                 value={effectiveContent}
                 options={{

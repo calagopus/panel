@@ -1011,8 +1011,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Nombre del proveedor",
-              "identifier": "Identificador"
+              "providerName": "Nombre del proveedor"
             }
           },
           "modal": {
@@ -1625,7 +1624,7 @@
                 "cronSchedule": "Programación cron"
               },
               "card": {
-                "content": "En el intervalo cron `{schedule}`. Próxima ejecución: {timestamp} - Última ejecución: {lastTimestamp}."
+                "content": "En el intervalo cron {schedule}. Próxima ejecución: {timestamp} - Última ejecución: {lastTimestamp}."
               }
             },
             "powerAction": {
@@ -2069,11 +2068,14 @@
               "readOnly": "Solo lectura"
             }
           },
+          "button": {
+            "attach": "Adjuntar",
+            "detach": "Desmontar"
+          },
           "modal": {
             "attachMount": {
               "title": "Adjuntar montaje",
               "content": "¿Quieres adjuntar **{name}** a `{target}`?",
-              "confirm": "Adjuntar",
               "toast": {
                 "attached": "{name} se ha montado en tu servidor."
               }
@@ -2081,7 +2083,6 @@
             "detachMount": {
               "title": "Desmontar montaje",
               "content": "¿Quieres desmontar **{name}** de `{target}`?",
-              "confirm": "Desmontar",
               "toast": {
                 "detached": "{name} se ha eliminado de tu servidor."
               }

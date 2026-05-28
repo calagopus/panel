@@ -8,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
+import Switch from '@/elements/input/Switch.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { permissionStringToNumber } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
@@ -24,7 +25,7 @@ type PermissionKey = 'owner' | 'group' | 'other';
 type PermissionType = 'read' | 'write' | 'execute';
 
 export default function FilePermissionsModal({ file, opened, onClose }: Props) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const { server } = useServerStore();
   const { browsingWritableDirectory, browsingDirectory } = useFileManager();
@@ -34,14 +35,20 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
     group: { read: false, write: false, execute: false },
     other: { read: false, write: false, execute: false },
   });
+  const [recursive, setRecursive] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!opened) {
+      setRecursive(false);
+    }
+  }, [opened]);
 
   useEffect(() => {
     if (file?.mode) {
       const octalValue = permissionStringToNumber(file.mode);
       const octalString = octalValue.toString().padStart(3, '0');
 
-      // Parse octal permissions (e.g., "755" -> [7, 5, 5])
       const [ownerPerms, groupPerms, otherPerms] = octalString.split('').map(Number);
 
       setPermissions({
@@ -81,7 +88,6 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
       return (perms.read ? 'r' : '-') + (perms.write ? 'w' : '-') + (perms.execute ? 'x' : '-');
     };
 
-    // Determine file type indicator from original file.mode
     const fileTypeIndicator = file?.mode?.[0] || '-';
     return fileTypeIndicator + getTriad(owner) + getTriad(group) + getTriad(other);
   };
@@ -108,9 +114,7 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
     perms: Record<PermissionType, boolean>;
   }) => (
     <Card>
-      <Title order={3} c='white'>
-        {title}
-      </Title>
+      <Title order={3}>{title}</Title>
       <Stack mt='sm'>
         {Object.entries(perms).map(([type, value]: [string, boolean]) => (
           <Checkbox
@@ -135,11 +139,22 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
     chmodFiles({
       uuid: server.uuid,
       root: browsingDirectory,
-      files: [{ file: file.name, mode: newPermissions.toString() }],
+      files: [{ file: file.name, mode: newPermissions.toString(), recursive }],
     })
-      .then(() => {
+      .then(({ updated }) => {
         onClose();
-        addToast(t('pages.server.files.toast.permissionsUpdated', {}), 'success');
+        if (updated > 0) {
+          if (updated === 1) {
+            addToast(t('pages.server.files.toast.permissionsUpdated', {}), 'success');
+          } else {
+            addToast(
+              t('pages.server.files.toast.permissionsUpdatedMany', { files: tItem('file', updated) }),
+              'success',
+            );
+          }
+        } else {
+          addToast(t('pages.server.files.toast.permissionsCouldNotBeUpdated', {}), 'error');
+        }
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -151,17 +166,13 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
     <Modal title={t('pages.server.files.modal.filePermissions.title', {})} onClose={onClose} opened={opened} size='lg'>
       <Card>
         <div className='flex flex-row justify-between'>
-          <Title order={3} c='white'>
-            {t('pages.server.files.modal.filePermissions.symbolic', {})}
-          </Title>
+          <Title order={3}>{t('pages.server.files.modal.filePermissions.symbolic', {})}</Title>
           <Badge variant='light' color='blue' size='xl' className='lowercase!'>
             {getPermissionString()}
           </Badge>
         </div>
         <div className='mt-2 flex flex-row justify-between'>
-          <Title order={3} c='white'>
-            {t('pages.server.files.modal.filePermissions.octal', {})}
-          </Title>
+          <Title order={3}>{t('pages.server.files.modal.filePermissions.octal', {})}</Title>
           <Badge variant='light' color='green' size='xl'>
             {getOctalValue()}
           </Badge>
@@ -187,9 +198,7 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
       </Group>
 
       <Card mt='md'>
-        <Title order={3} c='white'>
-          {t('pages.server.files.modal.filePermissions.breakdown', {})}
-        </Title>
+        <Title order={3}>{t('pages.server.files.modal.filePermissions.breakdown', {})}</Title>
         <div className='text-sm space-y-1'>
           <div>
             <Code className='font-bold'>r</Code> - {t('pages.server.files.modal.filePermissions.readPermission', {})}
@@ -202,6 +211,16 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
           </div>
         </div>
       </Card>
+
+      {browsingWritableDirectory && file?.directory && (
+        <Switch
+          label={t('pages.server.files.modal.filePermissions.form.recursive', {})}
+          name='recursive'
+          checked={recursive}
+          onChange={(e) => setRecursive(e.target.checked)}
+          className='mt-4'
+        />
+      )}
 
       <ModalFooter>
         <Button onClick={doChmod} loading={loading} disabled={!browsingWritableDirectory}>

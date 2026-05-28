@@ -9,6 +9,7 @@ import { z } from 'zod';
 import createOAuthProvider from '@/api/admin/oauth-providers/createOAuthProvider.ts';
 import deleteOAuthProvider from '@/api/admin/oauth-providers/deleteOAuthProvider.ts';
 import updateOAuthProvider from '@/api/admin/oauth-providers/updateOAuthProvider.ts';
+import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Card from '@/elements/Card.tsx';
@@ -20,6 +21,7 @@ import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
@@ -170,7 +172,7 @@ export default function OAuthProviderCreateOrUpdate({
         Are you sure you want to delete <Code>{form.getValues().name}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'oauthProviderslocations']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.oAuthProviders.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
@@ -362,17 +364,17 @@ export default function OAuthProviderCreateOrUpdate({
             )}
           </AdminCan>
           {contextOAuthProvider && (
-            <AdminCan action='oauth-provider.delete' cantDelete>
+            <AdminCan action='oauth-providers.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
                 Delete
               </Button>
             </AdminCan>
           )}
-          <a href='https://calagopus.com/docs/advanced/oauth' target='_blank' rel='noopener noreferrer'>
+          <Anchor href='https://calagopus.com/docs/advanced/oauth' target='_blank' rel='noopener noreferrer'>
             <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
               View Documentation
             </Button>
-          </a>
+          </Anchor>
         </Group>
       </form>
     </AdminContentContainer>

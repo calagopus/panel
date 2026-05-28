@@ -15,6 +15,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverActivitySchema } from '@/lib/schemas/server/activity.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -35,16 +36,19 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
   const state = useServerStore((state) => state.state);
   const socketInstance = useServerStore((state) => state.socketInstance);
 
+  const [activities, setActivities] = useState<Pagination<z.infer<typeof serverActivitySchema>>>(
+    getEmptyPaginationSet(),
+  );
   const [selectedCommand, setSelectedCommand] = useState<CommandDetail | null>(null);
 
-  const { data, loading, setPage } = useSearchablePaginatedTable({
-    queryKey: queryKeys.server(server.uuid).activity.all(),
-    fetcher: (page) => getServerActivity(server.uuid, page, 'server:console.command'),
+  const { loading, setPage } = useSearchablePaginatedTable({
+    queryKey: queryKeys.server(server.uuid).activity.all(null),
+    fetcher: (page) => getServerActivity(server.uuid, null, page, 'server:console.command'),
+    setStoreData: setActivities,
     modifyParams: false,
+    canRequest: useServerCan('activity.read'),
     deps: [server.uuid],
   });
-
-  const activities = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const handleRowClick = (activity: z.infer<typeof serverActivitySchema>) => {
     const data = activity.data as { command?: string } | null;
@@ -82,9 +86,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
         {selectedCommand ? (
           <Stack gap='md' className='flex-1 overflow-hidden'>
             <div className='flex items-center justify-between'>
-              <Title order={4} className='text-white'>
-                {t('pages.server.console.drawer.commandHistory.detailTitle', {})}
-              </Title>
+              <Title order={4}>{t('pages.server.console.drawer.commandHistory.detailTitle', {})}</Title>
               <Button
                 variant='subtle'
                 size='xs'
@@ -95,7 +97,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
               </Button>
             </div>
 
-            <Group gap='xs' className='text-sm text-gray-400'>
+            <Group gap='xs' className='text-sm text-(--mantine-color-dimmed)'>
               <img
                 src={selectedCommand.avatar ?? '/icon.svg'}
                 alt={selectedCommand.user ?? 'System'}
@@ -149,7 +151,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
             {loading && activities.data.length === 0 ? (
               <Spinner.Centered />
             ) : activities.data.length === 0 ? (
-              <div className='flex items-center justify-center py-12 text-gray-400'>
+              <div className='flex items-center justify-center py-12 text-(--mantine-color-dimmed)'>
                 {t('pages.server.console.drawer.commandHistory.noCommands', {})}
               </div>
             ) : (
@@ -162,7 +164,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
                     <Card
                       key={`${activity.created}-${index}`}
                       onClick={() => handleRowClick(activity)}
-                      className='p-3 rounded-md border cursor-pointer transition-all border-gray-700 hover:border-gray-600 hover:bg-gray-800/50'
+                      className='p-3 rounded-md'
                       hoverable
                     >
                       <div className='flex items-start gap-3'>
@@ -173,7 +175,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
                         />
                         <div className='flex-1 min-w-0'>
                           <Code className='block mb-1.5 text-xs wrap-break-word'>{data.command}</Code>
-                          <div className='flex items-center gap-2 text-xs text-gray-400'>
+                          <div className='flex items-center gap-2 text-xs text-(--mantine-color-dimmed)'>
                             <span>
                               {activity.user?.username ??
                                 (activity.isSchedule ? t('common.schedule', {}) : t('common.system', {}))}

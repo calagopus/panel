@@ -50,7 +50,10 @@ mod get {
                 .ok();
         }
 
-        let settings = state.settings.get().await?;
+        let max_file_manager_view_size = state
+            .settings
+            .get_as(|s| s.server.max_file_manager_view_size)
+            .await?;
 
         let contents = match server
             .node
@@ -62,7 +65,7 @@ mod get {
                 server.uuid,
                 &params.file,
                 false,
-                settings.server.max_file_manager_view_size,
+                max_file_manager_view_size,
             )
             .await
         {

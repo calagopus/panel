@@ -9,12 +9,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';
 import Checkbox from '@/elements/input/Checkbox.tsx';
+import StatCard from '@/elements/StatCard.tsx';
 import { formatAllocation } from '@/lib/server.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { formatMilliseconds } from '@/lib/time.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
-import StatCard from './StatCard.tsx';
 
 export default function ServerDetails() {
   const { t } = useTranslations();
@@ -78,14 +78,18 @@ export default function ServerDetails() {
         icon={faClock}
         label={t('pages.server.console.details.uptime', {})}
         order={30}
-        value={state === 'offline' ? t('common.enum.serverState.offline', {}) : formatMilliseconds(stats?.uptime || 0)}
+        value={
+          state === 'offline' && server.status !== 'installing'
+            ? t('common.enum.serverState.offline', {})
+            : formatMilliseconds(stats?.uptime || 0)
+        }
       />
       <StatCard
         icon={faMicrochip}
         label={t('pages.server.console.details.cpuLoad', {})}
         order={40}
         value={
-          state === 'offline'
+          state === 'offline' && server.status !== 'installing'
             ? t('common.enum.serverState.offline', {})
             : doNormalizeCpuLoad
               ? `${(((stats?.cpuAbsolute || 0) / (server.limits.cpu || 100)) * 100).toFixed(2)}%`
@@ -106,7 +110,11 @@ export default function ServerDetails() {
         icon={faMemory}
         label={t('pages.server.console.details.memoryLoad', {})}
         order={50}
-        value={state === 'offline' ? t('common.enum.serverState.offline', {}) : bytesToString(stats?.memoryBytes || 0)}
+        value={
+          state === 'offline' && server.status !== 'installing'
+            ? t('common.enum.serverState.offline', {})
+            : bytesToString(stats?.memoryBytes || 0)
+        }
         limit={server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : t('common.unlimited', {})}
       />
       <StatCard
@@ -121,10 +129,14 @@ export default function ServerDetails() {
         label={t('pages.server.console.details.networkIn', {})}
         order={70}
         value={
-          state === 'offline' ? t('common.enum.serverState.offline', {}) : bytesToString(stats?.network.rxBytes || 0)
+          state === 'offline' && server.status !== 'installing'
+            ? t('common.enum.serverState.offline', {})
+            : bytesToString(stats?.network.rxBytes || 0)
         }
         details={
-          state === 'offline' ? null : `${bytesToString(Math.round(networkRef.current.rxSpeed), undefined, true)}/s`
+          state === 'offline' && server.status !== 'installing'
+            ? null
+            : `${bytesToString(Math.round(networkRef.current.rxSpeed), undefined, true)}/s`
         }
       />
       <StatCard
@@ -132,10 +144,14 @@ export default function ServerDetails() {
         label={t('pages.server.console.details.networkOut', {})}
         order={80}
         value={
-          state === 'offline' ? t('common.enum.serverState.offline', {}) : bytesToString(stats?.network.txBytes || 0)
+          state === 'offline' && server.status !== 'installing'
+            ? t('common.enum.serverState.offline', {})
+            : bytesToString(stats?.network.txBytes || 0)
         }
         details={
-          state === 'offline' ? null : `${bytesToString(Math.round(networkRef.current.txSpeed), undefined, true)}/s`
+          state === 'offline' && server.status !== 'installing'
+            ? null
+            : `${bytesToString(Math.round(networkRef.current.txSpeed), undefined, true)}/s`
         }
       />
       {window.extensionContext.extensionRegistry.pages.server.console.statCards.map((StatCard, i) => (

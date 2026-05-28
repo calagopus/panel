@@ -26,7 +26,7 @@ interface TwoFactorInformation {
 
 export default function LoginCheckpoint() {
   const { doLogin } = useAuth();
-  const { timeOffset } = useGlobalStore();
+  const { settings, timeOffset } = useGlobalStore();
   const { t } = useTranslations();
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -85,6 +85,18 @@ export default function LoginCheckpoint() {
             {t('common.alert.clockOffset', {
               offset: String(Math.round(timeOffset / 1000)),
             })}
+          </Alert>
+        )}
+        {settings.app.url !== window.location.origin && (
+          <Alert
+            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            color='yellow'
+            title={t('common.alert.warning', {})}
+          >
+            {t('pages.auth.alert.urlMismatch', {
+              appUrl: settings.app.url,
+              currentUrl: window.location.origin,
+            }).md()}
           </Alert>
         )}
         {error && (

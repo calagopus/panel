@@ -11,10 +11,12 @@ import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { adminSettingsEmailTestSchema } from '@/lib/schemas/admin/settings.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EmailSendTestModal({ opened, onClose }: ModalProps) {
   const { user } = useAuth();
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +33,7 @@ export default function EmailSendTestModal({ opened, onClose }: ModalProps) {
 
     testSystemEmail(form.values.email)
       .then(() => {
-        addToast('Test email has been sent successfully.', 'success');
+        addToast(t('pages.admin.settings.tabs.mail.page.modal.sendTestEmail.toast.sent', {}), 'success');
         onClose();
       })
       .catch((msg) => {
@@ -41,16 +43,25 @@ export default function EmailSendTestModal({ opened, onClose }: ModalProps) {
   };
 
   return (
-    <Modal title='Send Test Email' onClose={onClose} opened={opened}>
+    <Modal
+      title={t('pages.admin.settings.tabs.mail.page.modal.sendTestEmail.title', {})}
+      onClose={onClose}
+      opened={opened}
+    >
       <form onSubmit={form.onSubmit(() => doSendTestEmail())}>
-        <TextInput withAsterisk label='Email' placeholder='Email' {...form.getInputProps('email')} />
+        <TextInput
+          withAsterisk
+          label={t('common.form.email', {})}
+          placeholder={t('common.form.email', {})}
+          {...form.getInputProps('email')}
+        />
 
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!form.isValid()}>
-            Send Test Email
+            {t('pages.admin.settings.tabs.mail.page.modal.sendTestEmail.button.submit', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </form>

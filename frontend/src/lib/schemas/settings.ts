@@ -45,15 +45,24 @@ export const publicSettingsSchema = z.object({
     name: z.string(),
     language: z.string(),
     registrationEnabled: z.boolean(),
-    languageChangeEnabled: z.boolean(),
     debug: z.boolean(),
   }),
   server: z.object({
     maxFileManagerViewSize: z.number(),
     maxFileManagerContentSearchSize: z.number(),
     maxFileManagerSearchResults: z.number(),
-    maxSchedulesStepCount: z.number(),
+    maxSubuserCount: z.number(),
+    maxScheduleStepCount: z.number(),
     allowOverwritingCustomDockerImage: z.boolean(),
     allowAcknowledgingInstallationFailure: z.boolean(),
+  }),
+  user: z.object({
+    maxServerGroupCount: z.number(),
+    maxApiKeyCount: z.number(),
+    maxCommandSnippetCount: z.number(),
+    maxSecurityKeyCount: z.number(),
+    maxSshKeyCount: z.number(),
+
+    allowChangingLanguage: z.boolean(),
   }),
 });

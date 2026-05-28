@@ -13,3 +13,8 @@ export const serverSubuserCreateSchema = z.object({
   permissions: z.array(z.string()),
   ignoredFiles: z.array(z.string()),
 });
+
+export const serverSubuserUpdateSchema = z.object({
+  permissions: z.array(z.string()),
+  ignoredFiles: z.array(z.string()),
+});

@@ -1,9 +1,6 @@
 use indexmap::IndexMap;
 use serde::Serialize;
-use std::{
-    collections::HashSet,
-    sync::{LazyLock, RwLock, RwLockReadGuard},
-};
+use std::{collections::HashSet, sync::LazyLock};
 use utoipa::ToSchema;
 
 #[derive(ToSchema, Serialize, Clone)]
@@ -77,6 +74,10 @@ pub(crate) static BASE_USER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permiss
                 PermissionGroup {
                     description: "Permissions that control the ability to change account settings.",
                     permissions: IndexMap::from([
+                        (
+                            "infos",
+                            "Allows changing the account's basic account information.",
+                        ),
                         ("email", "Allows changing the account's email address."),
                         ("password", "Allows changing the account's password."),
                         (
@@ -185,12 +186,12 @@ pub(crate) static BASE_USER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permiss
         ])
     });
 
-pub(crate) static USER_PERMISSIONS: LazyLock<RwLock<PermissionMap>> =
-    LazyLock::new(|| RwLock::new(PermissionMap::new()));
+pub(crate) static USER_PERMISSIONS: LazyLock<parking_lot::RwLock<PermissionMap>> =
+    LazyLock::new(|| parking_lot::RwLock::new(PermissionMap::new()));
 
 #[inline]
-pub fn get_user_permissions() -> RwLockReadGuard<'static, PermissionMap> {
-    USER_PERMISSIONS.read().unwrap()
+pub fn get_user_permissions() -> parking_lot::RwLockReadGuard<'static, PermissionMap> {
+    USER_PERMISSIONS.read()
 }
 
 #[inline]
@@ -241,6 +242,18 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                             "manage",
                             "Allows installing, updating, and removing panel extensions, usually also used to manage extension settings.",
                         ),
+                    ]),
+                },
+            ),
+            (
+                "announcements",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage announcements for the panel.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new announcements."),
+                        ("read", "Allows viewing announcements."),
+                        ("update", "Allows modifying announcements."),
+                        ("delete", "Allows deleting announcements."),
                     ]),
                 },
             ),
@@ -442,6 +455,7 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("read", "Allows viewing database hosts."),
                         ("update", "Allows modifying database hosts."),
                         ("delete", "Allows deleting database hosts."),
+                        ("test", "Allows testing database host connections."),
                     ]),
                 },
             ),
@@ -482,12 +496,12 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
         ])
     });
 
-pub(crate) static ADMIN_PERMISSIONS: LazyLock<RwLock<PermissionMap>> =
-    LazyLock::new(|| RwLock::new(PermissionMap::new()));
+pub(crate) static ADMIN_PERMISSIONS: LazyLock<parking_lot::RwLock<PermissionMap>> =
+    LazyLock::new(|| parking_lot::RwLock::new(PermissionMap::new()));
 
 #[inline]
-pub fn get_admin_permissions() -> RwLockReadGuard<'static, PermissionMap> {
-    ADMIN_PERMISSIONS.read().unwrap()
+pub fn get_admin_permissions() -> parking_lot::RwLockReadGuard<'static, PermissionMap> {
+    ADMIN_PERMISSIONS.read()
 }
 
 #[inline]
@@ -697,21 +711,24 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                 "activity",
                 PermissionGroup {
                     description: "Permissions that control the ability to view the activity log on this server.",
-                    permissions: IndexMap::from([(
-                        "read",
-                        "Allows viewing the server's activity logs.",
-                    )]),
+                    permissions: IndexMap::from([
+                        ("read", "Allows viewing the server's activity logs."),
+                        (
+                            "read-ip",
+                            "Allows viewing IP addresses associated with activity logs.",
+                        ),
+                    ]),
                 },
             ),
         ])
     });
 
-pub(crate) static SERVER_PERMISSIONS: LazyLock<RwLock<PermissionMap>> =
-    LazyLock::new(|| RwLock::new(PermissionMap::new()));
+pub(crate) static SERVER_PERMISSIONS: LazyLock<parking_lot::RwLock<PermissionMap>> =
+    LazyLock::new(|| parking_lot::RwLock::new(PermissionMap::new()));
 
 #[inline]
-pub fn get_server_permissions() -> RwLockReadGuard<'static, PermissionMap> {
-    SERVER_PERMISSIONS.read().unwrap()
+pub fn get_server_permissions() -> parking_lot::RwLockReadGuard<'static, PermissionMap> {
+    SERVER_PERMISSIONS.read()
 }
 
 #[inline]

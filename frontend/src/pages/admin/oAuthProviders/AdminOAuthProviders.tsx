@@ -6,7 +6,7 @@ import { Route, Routes, useNavigate } from 'react-router';
 import { z } from 'zod';
 import createOAuthProvider from '@/api/admin/oauth-providers/createOAuthProvider.ts';
 import getOAuthProviders from '@/api/admin/oauth-providers/getOAuthProviders.ts';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -19,10 +19,10 @@ import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import DatabaseHostCreateOrUpdate from './OAuthProviderCreateOrUpdate.tsx';
+import OAuthProviderCreateOrUpdate from './OAuthProviderCreateOrUpdate.tsx';
 import OAuthProviderImportOverlay from './OAuthProviderImportOverlay.tsx';
-import DatabaseHostRow from './OAuthProviderRow.tsx';
-import DatabaseHostView from './OAuthProviderView.tsx';
+import OAuthProviderRow from './OAuthProviderRow.tsx';
+import OAuthProviderView from './OAuthProviderView.tsx';
 
 function OAuthProvidersContainer() {
   const navigate = useNavigate();
@@ -30,12 +30,17 @@ function OAuthProvidersContainer() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { data, loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
+  const {
+    data: oauthProviders,
+    loading,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.oAuthProviders.all(),
     fetcher: getOAuthProviders,
   });
-
-  const oauthProviders = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   const handleImport = async (file: File) => {
     const text = await file.text().then((t) => t.trim());
@@ -110,8 +115,8 @@ function OAuthProvidersContainer() {
       <OAuthProviderImportOverlay visible={isDragging} />
 
       <Table columns={oauthProviderTableColumns} loading={loading} pagination={oauthProviders} onPageSelect={setPage}>
-        {oauthProviders.data.map((oauthProvider) => (
-          <DatabaseHostRow key={oauthProvider.uuid} oauthProvider={oauthProvider} />
+        {oauthProviders?.data.map((oauthProvider) => (
+          <OAuthProviderRow key={oauthProvider.uuid} oauthProvider={oauthProvider} />
         ))}
       </Table>
     </AdminContentContainer>
@@ -122,9 +127,9 @@ export default function AdminOAuthProviders() {
   return (
     <Routes>
       <Route path='/' element={<OAuthProvidersContainer />} />
-      <Route path='/:id/*' element={<DatabaseHostView />} />
-      <Route element={<AdminPermissionGuard permission='database-hosts.create' />}>
-        <Route path='/new' element={<DatabaseHostCreateOrUpdate />} />
+      <Route path='/:id/*' element={<OAuthProviderView />} />
+      <Route element={<AdminPermissionGuard permission='oauth-providers.create' />}>
+        <Route path='/new' element={<OAuthProviderCreateOrUpdate />} />
       </Route>
     </Routes>
   );

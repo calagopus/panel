@@ -48,8 +48,8 @@ export default function AutostartContainer() {
       icon={<FontAwesomeIcon icon={faPlay} />}
       className='h-full order-30'
     >
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
+      <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
+        <Stack h='100%'>
           <Select
             withAsterisk
             label={t('pages.server.settings.autostart.form.behavior', {})}

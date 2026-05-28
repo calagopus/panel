@@ -1,7 +1,7 @@
 use anyhow::Context;
 use axum::{
     body::Body,
-    extract::{ConnectInfo, Path, Request},
+    extract::{ConnectInfo, Request},
     http::{HeaderValue, StatusCode},
     middleware::Next,
     response::Response,
@@ -16,7 +16,7 @@ use shared::{
     models::{ByUuid, node::Node},
     response::ApiResponse,
 };
-use std::{net::SocketAddr, path::PathBuf, sync::Arc};
+use std::{net::SocketAddr, sync::Arc};
 use tokio::sync::RwLock;
 use tower_cookies::CookieManagerLayer;
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
@@ -179,8 +179,8 @@ pub async fn handle_startup() -> (
     let debug = *matches.get_one::<bool>("debug").unwrap();
 
     if debug && let Ok((env, _)) = &env {
-        env.app_debug
-            .store(true, std::sync::atomic::Ordering::Relaxed);
+        env.set_debug(true)
+            .expect("failed to set debug mode from cli argument");
     }
 
     match matches.remove_subcommand() {
@@ -514,58 +514,6 @@ pub async fn handle_startup() -> (
     let app = OpenApiRouter::new()
         .merge(routes::router(&state))
         .merge(extension_router)
-        .route(
-            "/avatars/{user}/{file}",
-            axum::routing::get(
-                |state: GetState, Path::<(uuid::Uuid, String)>((user, file))| async move {
-                    if file.len() != 13 || file.contains("..") || !file.ends_with(".webp") {
-                        return ApiResponse::error("file not found")
-                            .with_status(StatusCode::NOT_FOUND)
-                            .ok();
-                    }
-
-                    let settings = state.settings.get().await?;
-
-                    let base_filesystem = match settings.storage_driver.get_cap_filesystem().await {
-                        Some(filesystem) => filesystem?,
-                        None => {
-                            return ApiResponse::error("file not found")
-                                .with_status(StatusCode::NOT_FOUND)
-                                .ok();
-                        }
-                    };
-
-                    drop(settings);
-
-                    let path = PathBuf::from(format!("avatars/{user}/{file}"));
-                    let size = match base_filesystem.async_metadata(&path).await {
-                        Ok(metadata) => metadata.len(),
-                        Err(_) => {
-                            return ApiResponse::error("file not found")
-                                .with_status(StatusCode::NOT_FOUND)
-                                .ok();
-                        }
-                    };
-
-                    let tokio_file = match base_filesystem.async_open(path).await {
-                        Ok(file) => file,
-                        Err(_) => {
-                            return ApiResponse::error("file not found")
-                                .with_status(StatusCode::NOT_FOUND)
-                                .ok();
-                        }
-                    };
-
-                    ApiResponse::new(Body::from_stream(tokio_util::io::ReaderStream::new(
-                        tokio_file,
-                    )))
-                    .with_header("Content-Type", "image/webp")
-                    .with_header("Content-Length", size.to_compact_string())
-                    .with_header("ETag", file.trim_end_matches(".webp"))
-                    .ok()
-                },
-            ),
-        )
         .fallback(
             |state: GetState, ip: GetIp, mut req: Request<Body>| async move {
                 let is_upgrade = req
@@ -681,14 +629,18 @@ pub async fn handle_startup() -> (
                 }
 
                 if !path.starts_with("/api") {
-                    let path = &path[1.min(path.len())..];
+                    let path = urlencoding::decode(&path[1.min(path.len())..])?;
 
-                    let (is_index, entry) = match FRONTEND_ASSETS.get_entry(path) {
+                    let (is_index, entry) = match FRONTEND_ASSETS.get_entry(&*path) {
                         Some(entry) => (false, entry),
                         None => (true, FRONTEND_ASSETS.get_entry("index.html").unwrap()),
                     };
 
-                    if (entry.as_file().is_none() || is_index) && path.starts_with("assets") {
+                    if (entry.as_file().is_none() || is_index)
+                        && (path.starts_with("assets")
+                            || path.starts_with("avatars")
+                            || path.starts_with("publicdata"))
+                    {
                         // technically not needed (cap filesystem) but never hurts
                         if path.contains("..") {
                             return ApiResponse::error("file not found")
@@ -698,8 +650,20 @@ pub async fn handle_startup() -> (
 
                         let settings = state.settings.get().await?;
 
+                        let base_dir = if path.starts_with("assets") {
+                            "assets"
+                        } else if path.starts_with("avatars") {
+                            "avatars"
+                        } else if path.starts_with("publicdata") {
+                            "publicdata"
+                        } else {
+                            return ApiResponse::error("file not found")
+                                .with_status(StatusCode::NOT_FOUND)
+                                .ok();
+                        };
+
                         let base_filesystem =
-                            match settings.storage_driver.get_cap_filesystem().await {
+                            match settings.storage_driver.get_cap_filesystem(base_dir).await {
                                 Some(filesystem) => filesystem?,
                                 None => {
                                     return ApiResponse::error("file not found")
@@ -709,9 +673,11 @@ pub async fn handle_startup() -> (
                             };
                         drop(settings);
 
-                        let path = urlencoding::decode(path)?;
+                        let path = path
+                            .strip_prefix(&format!("{}/", base_dir))
+                            .unwrap_or(&path);
 
-                        let metadata = match base_filesystem.async_metadata(&*path).await {
+                        let metadata = match base_filesystem.async_metadata(path).await {
                             Ok(metadata) => metadata,
                             Err(_) => {
                                 return ApiResponse::error("file not found")
@@ -720,7 +686,7 @@ pub async fn handle_startup() -> (
                             }
                         };
 
-                        let tokio_file = match base_filesystem.async_open(&*path).await {
+                        let tokio_file = match base_filesystem.async_open(path).await {
                             Ok(file) => file,
                             Err(_) => {
                                 return ApiResponse::error("file not found")
@@ -792,7 +758,7 @@ pub async fn handle_startup() -> (
                                     script-src 'self' blob: {script_csp}; \
                                     frame-src *; \
                                     style-src 'self' 'unsafe-inline' {style_csp}; \
-                                    connect-src *; \
+                                    connect-src * blob:; \
                                     font-src 'self' blob: data:; \
                                     img-src * blob: data:; \
                                     media-src 'self' blob: data:; \
@@ -842,17 +808,20 @@ pub async fn handle_startup() -> (
         utoipa::openapi::Server::new("/"),
         utoipa::openapi::Server::new(settings.app.url.clone()),
     ]);
-    drop(settings);
 
     let components = openapi.components.as_mut().unwrap();
     components.add_security_scheme(
         "cookie",
-        SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new("session"))),
+        SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new(
+            settings.app.session_cookie.clone(),
+        ))),
     );
     components.add_security_scheme(
         "api_key",
         SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("Authorization"))),
     );
+
+    drop(settings);
 
     for (original_path, item) in openapi.paths.paths.iter_mut() {
         let operations = [

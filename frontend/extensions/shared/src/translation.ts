@@ -30,17 +30,36 @@ export type TranslationItemRecord = {
   [k: string]: TranslationItem;
 };
 
+type LeafPaths<T, Prefix extends string = ''> = T extends TranslationRecord
+  ? {
+      [K in keyof T & string]: T[K] extends TranslationRecord ? LeafPaths<T[K], `${Prefix}${K}.`> : `${Prefix}${K}`;
+    }[keyof T & string]
+  : never;
+export type PathValue<T, P extends string> = P extends `${infer Head}.${infer Rest}`
+  ? Head extends keyof T
+    ? T[Head] extends TranslationRecord
+      ? PathValue<T[Head], Rest>
+      : never
+    : never
+  : P extends keyof T
+    ? T[P]
+    : never;
+
+export type GetPlaceholders<S extends string> = S extends `${string}{${infer W}}${infer RE}`
+  ? [W, ...GetPlaceholders<RE>]
+  : [];
+
 export class DefinedTranslations<
   I extends TranslationItemRecord,
   O extends TranslationRecord,
-  P = UnionToIntersection<PathImplObj<O>>,
+  P extends string = LeafPaths<O>,
 > {
   namespace: string;
   items: I;
   itemsObj: I;
   obj: O;
   paths: keyof P;
-  mapping: P;
+  mapping: Record<string, string>;
 
   subTranslations: Record<string, LanguageData>;
 
@@ -59,7 +78,7 @@ export class DefinedTranslations<
       this.items[`${other.namespace}.${item}` as keyof I] = other.items[item];
     }
     for (const key in other.mapping) {
-      (this.mapping as Record<string, string>)[`${other.namespace}.${key}` as string] = other.mapping[key] as string;
+      this.mapping[`${other.namespace}.${key}` as string] = other.mapping[key];
     }
     this.subTranslations[other.namespace] = {
       items: other.itemsObj,
@@ -80,17 +99,15 @@ export class DefinedTranslations<
     return {
       language: context.language,
       setLanguage: context.setLanguage,
-      t<K extends keyof P>(
+      t<K extends P>(
         key: K,
-        // @ts-expect-error this is fine
-        values: Record<GetPlaceholders<P[K]>[number], string | number>,
+        values: Record<GetPlaceholders<PathValue<O, K> & string>[number], string | number>,
       ): string {
         return context.t(`${namespace}.${key as string}`, values);
       },
-      tReact<K extends keyof P>(
+      tReact<K extends P>(
         key: K,
-        // @ts-expect-error this is fine
-        values: Record<GetPlaceholders<P[K]>[number], ReactNode>,
+        values: Record<GetPlaceholders<PathValue<O, K> & string>[number], ReactNode>,
       ): ReactNode {
         return context.tReact(`${namespace}.${key as string}`, values);
       },
@@ -111,17 +128,15 @@ export class DefinedTranslations<
     return {
       language: context.language,
       setLanguage: context.setLanguage,
-      t<K extends keyof P>(
+      t<K extends P>(
         key: K,
-        // @ts-expect-error this is fine
-        values: Record<GetPlaceholders<P[K]>[number], string | number>,
+        values: Record<GetPlaceholders<PathValue<O, K> & string>[number], string | number>,
       ): string {
         return context.t(`${namespace}.${key as string}`, values);
       },
-      tReact<K extends keyof P>(
+      tReact<K extends P>(
         key: K,
-        // @ts-expect-error this is fine
-        values: Record<GetPlaceholders<P[K]>[number], ReactNode>,
+        values: Record<GetPlaceholders<PathValue<O, K> & string>[number], ReactNode>,
       ): ReactNode {
         return context.tReact(`${namespace}.${key as string}`, values);
       },
@@ -131,26 +146,6 @@ export class DefinedTranslations<
     };
   }
 }
-
-type UnionToIntersection<U> = (U extends unknown ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
-
-type PathImplObj<T> = T extends TranslationRecord
-  ? {
-      [K in keyof T]: T[K] extends TranslationRecord
-        ? PathImplObj<T[K]> extends infer Nested
-          ? {
-              [P in keyof Nested as `${K & string}.${P & string}`]: Nested[P];
-            }
-          : never
-        : {
-            [P in K]: T[K];
-          };
-    }[keyof T]
-  : never;
-
-export type GetPlaceholders<S extends string> = S extends `${string}{${infer W}}${infer RE}`
-  ? [W, ...GetPlaceholders<RE>]
-  : [];
 
 export function defineEnglishItem(singular: string, plural: string): TranslationItem {
   return {

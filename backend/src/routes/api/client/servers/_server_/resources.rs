@@ -33,13 +33,10 @@ mod get {
             .fetch_server_resources(&state.database)
             .await?;
 
-        let resources = match resource_usages.get(&server.uuid) {
-            Some(resources) => resources,
-            None => {
-                return ApiResponse::error("no resource usage data found for server")
-                    .with_status(StatusCode::NOT_FOUND)
-                    .ok();
-            }
+        let Some(resources) = resource_usages.get(&server.uuid) else {
+            return ApiResponse::error("no resource usage data found for server")
+                .with_status(StatusCode::NOT_FOUND)
+                .ok();
         };
 
         ApiResponse::new_serialized(Response { resources }).ok()

@@ -11,17 +11,38 @@ import RingProgress from '@/elements/RingProgress.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { bytesToString } from '@/lib/size.ts';
 import { useFileUpload } from '@/plugins/useFileUpload.ts';
+import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import AssetDropOverlay from './AssetDropOverlay.tsx';
 
-export default function AssetUpload({ invalidateAssets }: { invalidateAssets: () => void }) {
-  const { uploadingFiles, handleFileSelect, totalUploadProgress, cancelFileUpload } = useFileUpload(
-    (form, config) => uploadAssets(form, config).then(() => ({ url: '', continuationToken: null })),
-    invalidateAssets,
+export default function AssetUpload({
+  invalidateAssets,
+  currentDirectory,
+}: {
+  invalidateAssets: () => void;
+  currentDirectory: string;
+}) {
+  const { t } = useTranslations();
+  const { uploadingFiles, handleFileSelect, totalUploadProgress, cancelFileUpload, uploadFiles } = useFileUpload(
+    (form, config) =>
+      uploadAssets(form, config, currentDirectory).then(() => {
+        invalidateAssets();
+        return { url: '', continuationToken: null };
+      }),
+    () => null,
   );
+
+  const { isDragging } = useImportDragAndDrop({
+    onDrop: uploadFiles,
+    filterFile: () => true,
+  });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
     <>
+      <AssetDropOverlay visible={isDragging} />
+
       {uploadingFiles.size > 0 ? (
         <Popover position='bottom-start' shadow='md'>
           <Popover.Target>
@@ -49,7 +70,9 @@ export default function AssetUpload({ invalidateAssets }: { invalidateAssets: ()
               <div key={key} className='flex flex-row items-center mb-2'>
                 <div className='flex flex-col grow'>
                   <p className='break-all mb-1 text-sm'>
-                    {file.status === 'pending' ? 'Waiting: ' : 'Uploading: '}
+                    {file.status === 'pending'
+                      ? t('pages.admin.assets.operations.waiting', {})
+                      : t('pages.admin.assets.operations.uploading', {})}
                     {file.filePath}
                   </p>
                   <Tooltip
@@ -71,7 +94,7 @@ export default function AssetUpload({ invalidateAssets }: { invalidateAssets: ()
         color='blue'
         leftSection={<FontAwesomeIcon icon={faPlus} />}
       >
-        Upload
+        {t('pages.admin.assets.button.upload', {})}
       </Button>
 
       <input

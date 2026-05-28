@@ -58,20 +58,61 @@ export const userToastPositionEnum = pgEnum('user_toast_position', [
   'BOTTOM_CENTER',
   'BOTTOM_RIGHT',
 ]);
+export const announcementTypeEnum = pgEnum('announcement_type', ['INFO', 'SUCCESS', 'WARNING', 'ERROR']);
 
 // Tables
 export const settingsTable = pgTable('settings', {
-  key: varchar({ length: 255 }).primaryKey().notNull(),
+  key: varchar({ length: 512 }).primaryKey().notNull(),
   value: text().notNull(),
 });
 
-export const emailTemplatesTable = pgTable(
-  'email_templates',
+export const versionHistoryTable = pgTable(
+  'version_history',
   {
-    identifier: varchar({ length: 255 }).primaryKey().notNull(),
-    content: text().notNull(),
+    extension: varchar({ length: 255 }).notNull(),
+    version: varchar({ length: 255 }).notNull(),
+    installed: timestamp().defaultNow().notNull(),
   },
+  (cols) => [primaryKey({ name: 'version_history_extension_version_pk', columns: [cols.extension, cols.version] })],
 );
+
+export const announcementsTable = pgTable(
+  'announcements',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    type: announcementTypeEnum().notNull(),
+    enabled: boolean().default(false).notNull(),
+    enabled_start: timestamp(),
+    enabled_end: timestamp(),
+    dismissible: boolean().default(false).notNull(),
+    dismissible_end: timestamp(),
+    title: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    title_translations: jsonb().default({}).notNull(),
+    content: text().notNull(),
+    content_translations: jsonb().default({}).notNull(),
+    locations: uuid().array().default([]).notNull(),
+    nodes: uuid().array().default([]).notNull(),
+    backup_configurations: uuid().array().default([]).notNull(),
+    eggs: uuid().array().default([]).notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('announcements_enabled_idx').on(cols.enabled),
+    index('announcements_enabled_start_idx').on(cols.enabled_start),
+    index('announcements_enabled_end_idx').on(cols.enabled_end),
+    index('announcements_locations_idx').using('gin', cols.locations),
+    index('announcements_nodes_idx').using('gin', cols.nodes),
+    index('announcements_backup_configurations_idx').using('gin', cols.backup_configurations),
+    index('announcements_eggs_idx').using('gin', cols.eggs),
+  ],
+);
+
+export const emailTemplatesTable = pgTable('email_templates', {
+  identifier: varchar({ length: 255 }).primaryKey().notNull(),
+  enabled: boolean().default(true).notNull(),
+  subject: varchar({ length: 255 }).notNull(),
+  content: text().notNull(),
+});
 
 export const usersTable = pgTable(
   'users',
@@ -95,6 +136,7 @@ export const usersTable = pgTable(
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
+    index('users_role_uuid_idx').on(cols.role_uuid),
     uniqueIndex('users_external_id_idx').on(cols.external_id),
     uniqueIndex('users_username_idx').on(sql`lower(${cols.username})`),
     uniqueIndex('users_email_idx').on(sql`lower(${cols.email})`),
@@ -115,6 +157,7 @@ export const adminActivitiesTable = pgTable(
   (cols) => [
     index('admin_activities_user_uuid_idx').on(cols.user_uuid),
     index('admin_activities_impersonator_uuid_idx').on(cols.impersonator_uuid),
+    index('admin_activities_api_key_uuid_idx').on(cols.api_key_uuid),
     index('admin_activities_event_idx').on(cols.event),
     index('admin_activities_user_uuid_event_idx').on(cols.user_uuid, cols.event),
   ],
@@ -136,6 +179,7 @@ export const userActivitiesTable = pgTable(
   (cols) => [
     index('user_activities_user_uuid_idx').on(cols.user_uuid),
     index('user_activities_impersonator_uuid_idx').on(cols.impersonator_uuid),
+    index('user_activities_api_key_uuid_idx').on(cols.api_key_uuid),
     index('user_activities_user_uuid_event_idx').on(cols.user_uuid, cols.event),
   ],
 );
@@ -293,6 +337,7 @@ export const userCommandSnippetsTable = pgTable(
   },
   (cols) => [
     index('command_snippets_user_uuid_idx').on(cols.user_uuid),
+    index('command_snippets_eggs_idx').using('gin', cols.eggs),
     uniqueIndex('command_snippets_user_uuid_name_idx').on(cols.user_uuid, cols.name),
   ],
 );
@@ -336,7 +381,7 @@ export const oauthProvidersTable = pgTable(
     client_secret: bytea().notNull(),
     auth_url: varchar({ length: 255 }).notNull(),
     token_url: varchar({ length: 255 }).notNull(),
-    info_url: varchar({ length: 64 }).notNull(),
+    info_url: varchar({ length: 255 }).notNull(),
     scopes: varchar({ length: 64 }).array().notNull(),
     identifier_path: varchar({ length: 255 }).notNull(),
     email_path: varchar({ length: 255 }),
@@ -378,6 +423,7 @@ export const backupConfigurationsTable = pgTable(
     uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     maintenance_enabled: boolean().default(false).notNull(),
+    shared: boolean().default(false).notNull(),
     description: text(),
     backup_disk: backupDiskEnum().default('LOCAL').notNull(),
     backup_configs: jsonb().default({}).notNull(),
@@ -393,6 +439,7 @@ export const locationsTable = pgTable(
     backup_configuration_uuid: uuid().references(() => backupConfigurationsTable.uuid, { onDelete: 'set null' }),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
+    flag: char({ length: 2 }),
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
@@ -444,7 +491,6 @@ export const nodesTable = pgTable(
   (cols) => [
     index('nodes_location_uuid_idx').on(cols.location_uuid),
     index('nodes_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
-    uniqueIndex('nodes_uuid_idx').on(cols.uuid),
     uniqueIndex('nodes_name_idx').on(cols.name),
     uniqueIndex('nodes_token_id_idx').on(cols.token_id),
     uniqueIndex('nodes_token_idx').on(cols.token),
@@ -537,7 +583,7 @@ export const eggConfigurationsTable = pgTable(
   },
   (cols) => [
     uniqueIndex('egg_configurations_name_idx').on(cols.name),
-    index('egg_configurations_eggs_idx').on(cols.eggs),
+    index('egg_configurations_eggs_idx').using('gin', cols.eggs),
   ],
 );
 
@@ -609,6 +655,7 @@ export const nestEggVariablesTable = pgTable(
       .references(() => nestEggsTable.uuid, { onDelete: 'cascade' })
       .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    name_translations: jsonb().default({}).notNull(),
     description: text(),
     description_translations: jsonb().default({}).notNull(),
     order_: smallint().default(0).notNull(),
@@ -622,7 +669,6 @@ export const nestEggVariablesTable = pgTable(
   },
   (cols) => [
     index('egg_variables_egg_uuid_idx').on(cols.egg_uuid),
-    uniqueIndex('egg_variables_egg_uuid_name_idx').on(cols.egg_uuid, cols.name),
     uniqueIndex('egg_variables_egg_uuid_env_variable_idx').on(cols.egg_uuid, cols.env_variable),
   ],
 );
@@ -640,9 +686,7 @@ export const databaseHostsTable = pgTable(
     credentials: jsonb().notNull(),
     created: timestamp().defaultNow().notNull(),
   },
-  (cols) => [
-    uniqueIndex('database_hosts_name_idx').on(cols.name),
-  ],
+  (cols) => [uniqueIndex('database_hosts_name_idx').on(cols.name)],
 );
 
 export const serversTable = pgTable(
@@ -694,6 +738,7 @@ export const serversTable = pgTable(
     index('servers_external_id_idx').on(cols.external_id),
     index('servers_allocation_uuid_idx').on(cols.allocation_uuid),
     index('servers_node_uuid_idx').on(cols.node_uuid),
+    index('servers_destination_node_uuid_idx').on(cols.destination_node_uuid),
     index('servers_owner_uuid_idx').on(cols.owner_uuid),
     index('servers_egg_uuid_idx').on(cols.egg_uuid),
     index('servers_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
@@ -759,6 +804,8 @@ export const serverActivitiesTable = pgTable(
     index('server_activities_server_uuid_idx').on(cols.server_uuid),
     index('server_activities_user_uuid_idx').on(cols.user_uuid),
     index('server_activities_impersonator_uuid_idx').on(cols.impersonator_uuid),
+    index('server_activities_api_key_uuid_idx').on(cols.api_key_uuid),
+    index('server_activities_schedule_uuid_idx').on(cols.schedule_uuid),
     index('server_activities_server_uuid_event_idx').on(cols.server_uuid, cols.event),
     index('server_activities_user_uuid_event_idx').on(cols.user_uuid, cols.event),
   ],
@@ -814,12 +861,14 @@ export const serverBackupsTable = pgTable(
     successful: boolean().default(false).notNull(),
     browsable: boolean().default(false).notNull(),
     streaming: boolean().default(false).notNull(),
+    shared: boolean().default(false).notNull(),
     locked: boolean().default(false).notNull(),
     ignored_files: text().array().notNull(),
     checksum: varchar({ length: 255 }),
     bytes: bigint({ mode: 'number' }).default(0).notNull(),
     files: bigint({ mode: 'number' }).default(0).notNull(),
     disk: backupDiskEnum().notNull(),
+    metadata: jsonb().default({}).notNull(),
     upload_id: text(),
     upload_path: text(),
     completed: timestamp(),
@@ -831,7 +880,6 @@ export const serverBackupsTable = pgTable(
     index('server_backups_node_uuid_idx').on(cols.node_uuid),
     index('server_backups_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
     index('server_backups_successful_idx').on(cols.successful),
-    uniqueIndex('server_backups_uuid_idx').on(cols.uuid),
   ],
 );
 

@@ -6,8 +6,10 @@ import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function BuildLogsModal({ opened, onClose }: ModalProps) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const [logs, setLogs] = useState('');
@@ -58,15 +60,15 @@ export default function BuildLogsModal({ opened, onClose }: ModalProps) {
   };
 
   return (
-    <Modal title='Build Logs' onClose={onClose} opened={opened} size='lg'>
+    <Modal title={t('pages.admin.extensions.modal.buildLogs.title', {})} onClose={onClose} opened={opened} size='lg'>
       <Stack>
         <div ref={scrollRef} onScroll={handleScroll} className='overflow-y-auto max-h-96'>
-          <Code block>{logs || 'No logs found.'}</Code>
+          <Code block>{logs || t('pages.admin.extensions.modal.buildLogs.empty', {})}</Code>
         </div>
 
         <ModalFooter>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

@@ -138,8 +138,10 @@ mod patch {
     use shared::{
         ApiError, GetState,
         models::{
-            UpdatableModel, admin_activity::GetAdminActivityLogger, role::UpdateRoleOptions,
-            user::GetPermissionManager,
+            UpdatableModel,
+            admin_activity::GetAdminActivityLogger,
+            role::UpdateRoleOptions,
+            user::{GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -155,19 +157,51 @@ mod patch {
         (status = CONFLICT, body = ApiError),
     ), params(
         (
-            "user" = uuid::Uuid,
-            description = "The user ID",
+            "role" = uuid::Uuid,
+            description = "The role ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
     ), request_body = inline(UpdateRoleOptions))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        user: GetUser,
         mut role: GetRole,
         activity_logger: GetAdminActivityLogger,
         shared::Payload(data): shared::Payload<UpdateRoleOptions>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("roles.update")?;
+
+        if !user.admin {
+            let caller_admin = user
+                .role
+                .as_ref()
+                .map(|r| r.admin_permissions.as_slice())
+                .unwrap_or(&[]);
+            let caller_server = user
+                .role
+                .as_ref()
+                .map(|r| r.server_permissions.as_slice())
+                .unwrap_or(&[]);
+
+            if data
+                .admin_permissions
+                .as_deref()
+                .unwrap_or(&[])
+                .iter()
+                .any(|p| !caller_admin.contains(p))
+                || data
+                    .server_permissions
+                    .as_deref()
+                    .unwrap_or(&[])
+                    .iter()
+                    .any(|p| !caller_server.contains(p))
+            {
+                return ApiResponse::error("permissions: more permissions than self")
+                    .with_status(StatusCode::FORBIDDEN)
+                    .ok();
+            }
+        }
 
         match role.update(&state, data).await {
             Ok(_) => {}

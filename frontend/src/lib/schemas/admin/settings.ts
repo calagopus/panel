@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { oobeStepKey } from '@/lib/schemas/oobe.ts';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableNumber, nullableString } from '@/lib/transformers.ts';
 import { hostnameSchema } from '../generic.ts';
 
 export const adminSettingsApplicationSchema = z.object({
@@ -10,9 +10,10 @@ export const adminSettingsApplicationSchema = z.object({
   url: z.url({ protocol: /^https?$/ }).max(255),
   language: z.string(),
   twoFactorRequirement: z.enum(['admins', 'all_users', 'none']),
+  sessionCookie: z.string().min(1).max(255),
+  sessionDurationSeconds: z.number().min(60).max(31536000),
   telemetryEnabled: z.boolean(),
   registrationEnabled: z.boolean(),
-  languageChangeEnabled: z.boolean(),
 });
 
 export const adminSettingsCaptchaProviderNoneSchema = z.object({
@@ -63,6 +64,7 @@ export const adminSettingsEmailSmtpSchema = z.object({
   username: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   password: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   useTls: z.boolean(),
+  skipCertValidation: z.boolean(),
   fromAddress: z.email().max(255),
   fromName: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
 });
@@ -101,22 +103,26 @@ export const adminSettingsEmailTemplateListSchema = z.array(
 
 export const adminSettingsEmailTemplateSchema = z.object({
   availableVariables: z.array(z.string()),
+  defaultEnabled: z.boolean(),
+  enabled: z.boolean(),
+  defaultSubject: z.string(),
+  subject: z.string().nullable(),
   defaultContent: z.string(),
   content: z.string().nullable(),
 });
 
-export const adminSettingsEmailTemplateUpdateSchema = z.lazy(() =>
-  adminSettingsEmailTemplateSchema.omit({
-    availableVariables: true,
-    defaultContent: true,
-  }),
-);
+export const adminSettingsEmailTemplateUpdateSchema = z.object({
+  content: z.string().min(1).nullable().optional(),
+  subject: z.string().min(1).max(255).nullable().optional(),
+  enabled: z.boolean().optional(),
+});
 
 export const adminSettingsServerSchema = z.object({
   maxFileManagerViewSize: z.number().min(0),
   maxFileManagerContentSearchSize: z.number().min(0),
   maxFileManagerSearchResults: z.number().min(1),
-  maxSchedulesStepCount: z.number().min(0),
+  maxSubuserCount: z.number().min(0),
+  maxScheduleStepCount: z.number().min(0),
   allowOverwritingCustomDockerImage: z.boolean(),
   allowEditingStartupCommand: z.boolean(),
   allowViewingInstallationLogs: z.boolean(),
@@ -124,10 +130,22 @@ export const adminSettingsServerSchema = z.object({
   allowViewingTransferProgress: z.boolean(),
 });
 
+export const adminSettingsUserSchema = z.object({
+  maxServerGroupCount: z.number().min(0),
+  maxApiKeyCount: z.number().min(0),
+  maxCommandSnippetCount: z.number().min(0),
+  maxSecurityKeyCount: z.number().min(0),
+  maxSshKeyCount: z.number().min(0),
+  allowChangingLanguage: z.boolean(),
+});
+
 export const adminSettingsActivitySchema = z.object({
   adminLogRetentionDays: z.number().min(1).max(3650),
+  adminLogRetentionCount: z.preprocess(nullableNumber, z.number().min(1).nullable()),
   userLogRetentionDays: z.number().min(1).max(3650),
+  userLogRetentionCount: z.preprocess(nullableNumber, z.number().min(1).nullable()),
   serverLogRetentionDays: z.number().min(1).max(3650),
+  serverLogRetentionCount: z.preprocess(nullableNumber, z.number().min(1).nullable()),
   serverLogAdminActivity: z.boolean(),
   serverLogScheduleActivity: z.boolean(),
 });
@@ -182,37 +200,10 @@ export const adminSettingsSchema = z.object({
   storageDriver: adminSettingsStorageSchema,
   mailMode: adminSettingsEmailSchema,
   captchaProvider: adminSettingsCaptchaProviderSchema,
-  app: z.object({
-    name: z.string(),
-    icon: z.string(),
-    url: z.string(),
-    language: z.string(),
-    twoFactorRequirement: twoFactorRequirement,
-    telemetryEnabled: z.boolean(),
-    registrationEnabled: z.boolean(),
-  }),
-  webauthn: z.object({
-    rpId: z.string(),
-    rpOrigin: z.string(),
-  }),
-  server: z.object({
-    maxFileManagerViewSize: z.number(),
-    maxFileManagerContentSearchSize: z.number(),
-    maxFileManagerSearchResults: z.number(),
-    maxSchedulesStepCount: z.number(),
-    allowOverwritingCustomDockerImage: z.boolean(),
-    allowEditingStartupCommand: z.boolean(),
-    allowViewingInstallationLogs: z.boolean(),
-    allowAcknowledgingInstallationFailure: z.boolean(),
-    allowViewingTransferProgress: z.boolean(),
-  }),
-  activity: z.object({
-    adminLogRetentionDays: z.number(),
-    userLogRetentionDays: z.number(),
-    serverLogRetentionDays: z.number(),
-
-    serverLogAdminActivity: z.boolean(),
-    serverLogScheduleActivity: z.boolean(),
-  }),
+  app: adminSettingsApplicationSchema,
+  webauthn: adminSettingsWebauthnSchema,
+  server: adminSettingsServerSchema,
+  user: adminSettingsUserSchema,
+  activity: adminSettingsActivitySchema,
   ratelimits: adminSettingsRatelimitsSchema,
 });

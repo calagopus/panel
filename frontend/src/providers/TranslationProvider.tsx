@@ -1,9 +1,12 @@
+import { Text, Title, TitleOrder } from '@mantine/core';
 import { Fragment, ReactNode, startTransition, useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { getTranslationMapping, setGlobalTranslationHandle, TranslationContext, TranslationItemRecord } from 'shared';
 import { z } from 'zod';
 import { $ZodConfig } from 'zod/v4/core';
 import { axiosInstance } from '@/api/axios.ts';
+import Anchor from '@/elements/Anchor.tsx';
+import Code from '@/elements/Code.tsx';
 import { getGlobalStore } from '@/stores/global.ts';
 import baseTranslations from '@/translations.ts';
 
@@ -20,8 +23,55 @@ declare global {
   }
 }
 
+const SafeMarkdownLink = ({ href, children }: { href?: string; children?: ReactNode }) => {
+  if (href && /^(javascript|data|vbscript):/i.test(href)) {
+    return <span>{children}</span>;
+  }
+  return <Anchor href={href}>{children}</Anchor>;
+};
+
+const Header =
+  ({ order }: { order: TitleOrder }) =>
+  (props: React.ComponentProps<typeof Title>) => <Title order={order} {...props} />;
+
 String.prototype.md = function (): ReactNode {
-  return <Markdown>{this.toString()}</Markdown>;
+  return (
+    <Markdown
+      components={{
+        a: SafeMarkdownLink,
+        p: ({ children }) => <Text component='span'>{children}</Text>,
+        h1: Header({ order: 1 }),
+        h2: Header({ order: 2 }),
+        h3: Header({ order: 3 }),
+        h4: Header({ order: 4 }),
+        h5: Header({ order: 5 }),
+        h6: Header({ order: 6 }),
+        code: ({ children }) => <Code>{children}</Code>,
+        strong: ({ children }) => (
+          <Text component='span' fw={700}>
+            {children}
+          </Text>
+        ),
+        em: ({ children }) => (
+          <Text component='span' td='italic'>
+            {children}
+          </Text>
+        ),
+        ins: ({ children }) => (
+          <Text component='span' td='underline'>
+            {children}
+          </Text>
+        ),
+        del: ({ children }) => (
+          <Text component='span' td='line-through'>
+            {children}
+          </Text>
+        ),
+      }}
+    >
+      {this.toString()}
+    </Markdown>
+  );
 };
 
 const TranslationProvider = ({ children }: { children: ReactNode }) => {
@@ -126,6 +176,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
           <Markdown
             components={{
               p: ({ children }) => <>{children}</>,
+              a: SafeMarkdownLink,
             }}
           >
             {translation}
@@ -161,6 +212,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
                 <Markdown
                   components={{
                     p: ({ children }) => <>{children}</>,
+                    a: SafeMarkdownLink,
                   }}
                 >
                   {trimmed}
@@ -177,6 +229,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
       <Markdown
         components={{
           p: ({ children }) => <>{children}</>,
+          a: SafeMarkdownLink,
         }}
       >
         {translation}

@@ -108,13 +108,14 @@ mod post {
             &state.jwt,
             &FileTransferUploadJwt {
                 base: BasePayload {
+                    scope: "transfer".into(),
                     issuer: "panel".into(),
-                    subject: Some(destination_server.uuid.to_string()),
+                    subject: Some(destination_server.uuid.to_compact_string()),
                     audience: Vec::new(),
                     expiration_time: Some(chrono::Utc::now().timestamp() + 600),
                     not_before: None,
                     issued_at: Some(chrono::Utc::now().timestamp()),
-                    jwt_id: destination_server.node.uuid.to_string(),
+                    jwt_id: destination_server.node.uuid.to_compact_string(),
                 },
                 server: server.uuid,
                 root: data.root.clone(),

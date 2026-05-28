@@ -50,7 +50,7 @@ mod patch {
         ApiError, GetState,
         models::{
             UpdatableModel,
-            user::{GetUser, UpdateUserOptions, UserToastPosition},
+            user::{GetPermissionManager, GetUser, UpdateUserOptions, UserToastPosition},
             user_activity::GetUserActivityLogger,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -90,6 +90,7 @@ mod patch {
     ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
+        permissions: GetPermissionManager,
         mut user: GetUser,
         activity_logger: GetUserActivityLogger,
         shared::Payload(mut data): shared::Payload<Payload>,
@@ -100,7 +101,9 @@ mod patch {
                 .ok();
         }
 
-        if !state.settings.get().await?.app.language_change_enabled {
+        permissions.has_user_permission("account.infos")?;
+
+        if !state.settings.get().await?.user.allow_changing_language {
             data.language = None;
         }
 

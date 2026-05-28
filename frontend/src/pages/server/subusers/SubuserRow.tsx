@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteSubuser from '@/api/server/subusers/deleteSubuser.ts';
-import updateSubuser from '@/api/server/subusers/updateSubuser.ts';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
@@ -13,7 +12,7 @@ import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
-import SubuserCreateOrUpdateModal from './modals/SubuserCreateOrUpdateModal.tsx';
+import SubuserUpdateModal from './modals/SubuserUpdateModal.tsx';
 
 export default function SubuserRow({ subuser }: { subuser: z.infer<typeof serverSubuserSchema> }) {
   const { t } = useTranslations();
@@ -22,21 +21,8 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
 
   const [openModal, setOpenModal] = useState<'update' | 'remove' | null>(null);
 
-  const doUpdate = (permissions: string[], ignoredFiles: string[]) => {
-    updateSubuser(server.uuid, subuser.user.username, { permissions, ignoredFiles })
-      .then(() => {
-        subuser.permissions = permissions;
-        subuser.ignoredFiles = ignoredFiles;
-        setOpenModal(null);
-        addToast(t('pages.server.subusers.modal.updateSubuser.toast.updated', {}), 'success');
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      });
-  };
-
   const doRemove = async () => {
-    await deleteSubuser(server.uuid, subuser.user.username)
+    await deleteSubuser(server.uuid, subuser.user.uuid)
       .then(() => {
         addToast(t('pages.server.subusers.modal.removeSubuser.toast.removed', {}), 'success');
         removeSubuser(subuser);
@@ -48,12 +34,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
 
   return (
     <>
-      <SubuserCreateOrUpdateModal
-        subuser={subuser}
-        onUpdate={doUpdate}
-        opened={openModal === 'update'}
-        onClose={() => setOpenModal(null)}
-      />
+      <SubuserUpdateModal subuser={subuser} opened={openModal === 'update'} onClose={() => setOpenModal(null)} />
 
       <ConfirmationModal
         opened={openModal === 'remove'}

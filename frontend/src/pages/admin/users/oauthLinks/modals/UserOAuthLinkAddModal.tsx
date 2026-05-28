@@ -13,6 +13,7 @@ import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts'
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function UserOAuthLinkAddModal({
@@ -21,6 +22,7 @@ export default function UserOAuthLinkAddModal({
   onClose,
 }: ModalProps & { user: z.infer<typeof fullUserSchema> }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
   const { addUserOAuthLink } = useAdminStore();
 
   const [loading, setLoading] = useState(false);
@@ -50,7 +52,7 @@ export default function UserOAuthLinkAddModal({
 
     createUserOAuthLink(user.uuid, selectedOAuthProvider.uuid, identifier)
       .then((oauthLink) => {
-        addToast('OAuth Link added.', 'success');
+        addToast(t('pages.admin.users.oauthLinks.toast.added', {}), 'success');
 
         onClose();
         addUserOAuthLink(oauthLink);
@@ -62,12 +64,12 @@ export default function UserOAuthLinkAddModal({
   };
 
   return (
-    <Modal title='Add OAuth Link' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.users.oauthLinks.modal.add.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label='OAuth Provider'
-          placeholder='OAuth Provider'
+          label={t('pages.admin.users.oauthLinks.modal.add.form.oauthProvider', {})}
+          placeholder={t('pages.admin.users.oauthLinks.modal.add.form.oauthProvider', {})}
           value={selectedOAuthProvider?.uuid}
           onChange={(value) => setSelectedOAuthProvider(oauthProviders.items.find((p) => p.uuid === value) || null)}
           data={oauthProviders.items.map((oauthProvider) => ({
@@ -82,18 +84,18 @@ export default function UserOAuthLinkAddModal({
 
         <TextInput
           withAsterisk
-          label='Identifier'
-          placeholder='Identifier'
+          label={t('common.form.identifier', {})}
+          placeholder={t('common.form.identifier', {})}
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
         />
 
         <ModalFooter>
           <Button onClick={doAdd} loading={loading} disabled={!selectedOAuthProvider || !identifier}>
-            Add
+            {t('common.button.add', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

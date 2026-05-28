@@ -225,29 +225,29 @@ fn expand(
         }
 
         static #schema_static: ::std::sync::LazyLock<
-            ::std::sync::RwLock<::utoipa::openapi::schema::Object>
+            ::parking_lot::RwLock<::utoipa::openapi::schema::Object>
         > = ::std::sync::LazyLock::new(|| {
             match <#inner_struct as ::utoipa::PartialSchema>::schema() {
                 ::utoipa::openapi::RefOr::T(::utoipa::openapi::Schema::Object(o)) =>
-                    ::std::sync::RwLock::new(o),
-                _ => ::std::sync::RwLock::new(::utoipa::openapi::schema::Object::default()),
+                    ::parking_lot::RwLock::new(o),
+                _ => ::parking_lot::RwLock::new(::utoipa::openapi::schema::Object::default()),
             }
         });
 
         static #hooks_static: ::std::sync::LazyLock<
-            ::std::sync::RwLock<::std::vec::Vec<#hook_fn_type>>
-        > = ::std::sync::LazyLock::new(|| ::std::sync::RwLock::new(::std::vec::Vec::new()));
+            ::parking_lot::RwLock<::std::vec::Vec<#hook_fn_type>>
+        > = ::std::sync::LazyLock::new(|| ::parking_lot::RwLock::new(::std::vec::Vec::new()));
 
         static #validators_static: ::std::sync::LazyLock<
-            ::std::sync::RwLock<::std::vec::Vec<#validator_fn_type>>
-        > = ::std::sync::LazyLock::new(|| ::std::sync::RwLock::new(::std::vec::Vec::new()));
+            ::parking_lot::RwLock<::std::vec::Vec<#validator_fn_type>>
+        > = ::std::sync::LazyLock::new(|| ::parking_lot::RwLock::new(::std::vec::Vec::new()));
 
         impl ::schema_extension_core::Extendible for #ident {
             fn schema_mut() -> &'static ::std::sync::LazyLock<
-                ::std::sync::RwLock<::utoipa::openapi::schema::Object>
+                ::parking_lot::RwLock<::utoipa::openapi::schema::Object>
             > { &#schema_static }
 
-            fn validators() -> &'static ::std::sync::RwLock<::std::vec::Vec<#validator_fn_type>> {
+            fn validators() -> &'static ::parking_lot::RwLock<::std::vec::Vec<#validator_fn_type>> {
                 &*#validators_static
             }
 
@@ -275,7 +275,7 @@ fn expand(
             ) {
                 let ext_schema = <__E as ::utoipa::PartialSchema>::schema();
                 if let ::utoipa::openapi::RefOr::T(::utoipa::openapi::Schema::Object(ext_obj)) = ext_schema {
-                    let mut schema = <Self as ::schema_extension_core::Extendible>::schema_mut().write().unwrap();
+                    let mut schema = <Self as ::schema_extension_core::Extendible>::schema_mut().write();
                     ::schema_extension_core::merge_schema_object(&mut schema, ext_obj);
                 }
 
@@ -297,7 +297,7 @@ fn expand(
                     })
                 });
 
-                #hooks_static.write().unwrap().push(hook);
+                #hooks_static.write().push(hook);
             }
 
             pub fn extend_validated<
@@ -323,7 +323,7 @@ fn expand(
             pub async fn init_hooks(#(#ia_n: &#ia),*) -> ::std::result::Result<#ready_type, ::anyhow::Error> {
                 let mut ready: #ready_type = ::std::vec::Vec::new();
                 let futs: ::std::vec::Vec<_> = {
-                    let hooks = #hooks_static.read().unwrap();
+                    let hooks = #hooks_static.read();
                     hooks.iter().map(|hook| hook(#(#ia_n),*)).collect()
                 };
                 for fut in futs {

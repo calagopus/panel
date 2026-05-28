@@ -1,6 +1,6 @@
 import { faFileText, faRefresh, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Stack, Title } from '@mantine/core';
+import { Group, Title } from '@mantine/core';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import getAdminExtensions from '@/api/admin/extensions/getAdminExtensions.ts';
@@ -11,20 +11,21 @@ import removeExtension from '@/api/admin/extensions/manage/removeExtension.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { adminBackendExtensionSchema } from '@/lib/schemas/admin/backendExtension.ts';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ExtensionCard from './ExtensionCard.tsx';
 import ExtensionInstallOverlay from './ExtensionInstallOverlay.tsx';
 import BuildLogsModal from './modals/BuildLogsModal.tsx';
+import LicenseModal from './modals/LicenseModal.tsx';
+import RemoveExtensionModal from './modals/RemoveExtensionModal.tsx';
 
 export default function AdminExtensions() {
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const [backendExtensions, setBackendExtensions] = useState<z.infer<typeof adminBackendExtensionSchema>[] | null>(
@@ -32,8 +33,11 @@ export default function AdminExtensions() {
   );
   const [extensionStatus, setExtensionStatus] = useState<ExtensionStatus | null>(null);
   const [removalExtension, setRemovalExtension] = useState<z.infer<typeof adminBackendExtensionSchema> | null>(null);
+  const [pendingLicense, setPendingLicense] = useState<{
+    file: File;
+    extension: Awaited<ReturnType<typeof addExtension>>['extension'];
+  } | null>(null);
   const [openModal, setOpenModal] = useState<'logs' | null>(null);
-  const [removeMigrations, setRemoveMigrations] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const statusIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -50,7 +54,7 @@ export default function AdminExtensions() {
             getAdminExtensions()
               .then((extensions) => {
                 setBackendExtensions(extensions);
-                addToast('Extension build completed. You may need to refresh the page.', 'success');
+                addToast(t('pages.admin.extensions.toast.buildCompleted', {}), 'success');
                 setOpenModal(null);
               })
               .catch((err) => {
@@ -89,7 +93,7 @@ export default function AdminExtensions() {
   const handleRebuild = () => {
     rebuildExtensions()
       .then(() => {
-        addToast('Extension rebuild started successfully.', 'success');
+        addToast(t('pages.admin.extensions.toast.buildStarted', {}), 'success');
         setExtensionStatus((prev) => prev && { ...prev, isBuilding: true });
 
         createStatusInterval();
@@ -100,7 +104,7 @@ export default function AdminExtensions() {
       });
   };
 
-  const handleRemove = (backendExtension: z.infer<typeof adminBackendExtensionSchema>) => {
+  const handleRemove = (backendExtension: z.infer<typeof adminBackendExtensionSchema>, removeMigrations: boolean) => {
     removeExtension(backendExtension.metadataToml.packageName, removeMigrations)
       .then(() => {
         setExtensionStatus((prev) =>
@@ -119,52 +123,73 @@ export default function AdminExtensions() {
               }
             : prev,
         );
-        addToast(`Extension \`${backendExtension.metadataToml.packageName}\` removed successfully.`.md(), 'success');
+        addToast(
+          t('pages.admin.extensions.toast.removed', { packageName: backendExtension.metadataToml.packageName }).md(),
+          'success',
+        );
+        setRemovalExtension(null);
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
   };
 
-  const handleAdd = async (file: File) => {
-    addExtension(file)
-      .then((extension) => {
-        setExtensionStatus((prev) => {
-          if (!prev) return prev;
+  const applyExtension = (extension: Awaited<ReturnType<typeof addExtension>>['extension']) => {
+    setExtensionStatus((prev) => {
+      if (!prev) return prev;
 
-          const appliedMatch = backendExtensions?.find(
-            (e) => e.metadataToml.packageName === extension.metadataToml.packageName && e.version === extension.version,
-          );
+      const appliedMatch = backendExtensions?.find(
+        (e) => e.metadataToml.packageName === extension.metadataToml.packageName && e.version === extension.version,
+      );
 
-          return {
-            ...prev,
-            pendingExtensions: appliedMatch
-              ? prev.pendingExtensions.filter((e) => e.metadataToml.packageName !== extension.metadataToml.packageName)
-              : [
-                  ...prev.pendingExtensions.filter(
-                    (e) => e.metadataToml.packageName !== extension.metadataToml.packageName,
-                  ),
-                  extension,
-                ],
-            removedExtensions: prev.removedExtensions.filter(
-              (e) => e.metadataToml.packageName !== extension.metadataToml.packageName,
-            ),
-          };
-        });
-        addToast(`Extension \`${extension.metadataToml.packageName}\` added successfully.`.md(), 'success');
+      return {
+        ...prev,
+        pendingExtensions: appliedMatch
+          ? prev.pendingExtensions.filter((e) => e.metadataToml.packageName !== extension.metadataToml.packageName)
+          : [
+              ...prev.pendingExtensions.filter(
+                (e) => e.metadataToml.packageName !== extension.metadataToml.packageName,
+              ),
+              extension,
+            ],
+        removedExtensions: prev.removedExtensions.filter(
+          (e) => e.metadataToml.packageName !== extension.metadataToml.packageName,
+        ),
+      };
+    });
+    addToast(
+      t('pages.admin.extensions.toast.added', { packageName: extension.metadataToml.packageName }).md(),
+      'success',
+    );
+  };
+
+  const handleAdd = (file: File, acceptLicense = false) => {
+    addExtension(file, acceptLicense)
+      .then(({ extension, needsLicenseAcceptance }) => {
+        if (needsLicenseAcceptance) {
+          setPendingLicense({ file, extension });
+          return;
+        }
+        applyExtension(extension);
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
+  };
+
+  const handleLicenseAccept = () => {
+    if (!pendingLicense) return;
+    setPendingLicense(null);
+    handleAdd(pendingLicense.file, true);
   };
 
   const { isDragging } = useImportDragAndDrop({
-    onDrop: (files) => Promise.all(files.map(handleAdd)),
+    onDrop: (files) => Promise.all(files.map((file) => handleAdd(file))),
     enabled: extensionStatus ? !extensionStatus.isBuilding : false,
     filterFile: (file) => file.name.toLowerCase().endsWith('.zip'),
   });
 
-  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -181,7 +206,7 @@ export default function AdminExtensions() {
 
   return (
     <AdminContentContainer
-      title='Extensions'
+      title={t('pages.admin.extensions.title', {})}
       contentRight={
         <AdminCan action='extensions.manage'>
           <Group hidden={!extensionStatus} gap='xs'>
@@ -190,11 +215,11 @@ export default function AdminExtensions() {
               leftSection={<FontAwesomeIcon icon={faFileText} />}
               onClick={() => setOpenModal('logs')}
             >
-              View build logs
+              {t('pages.admin.extensions.button.viewBuildLogs', {})}
             </Button>
             <ConditionalTooltip
               enabled={extensionStatus?.isBuilding || false}
-              label='The panel is currently building extension code. Please wait.'
+              label={t('pages.admin.extensions.tooltip.building', {})}
             >
               <Button
                 color='blue'
@@ -202,7 +227,7 @@ export default function AdminExtensions() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={extensionStatus?.isBuilding}
               >
-                Install extension
+                {t('pages.admin.extensions.button.install', {})}
               </Button>
             </ConditionalTooltip>
 
@@ -212,28 +237,23 @@ export default function AdminExtensions() {
       }
     >
       <BuildLogsModal opened={openModal === 'logs'} onClose={() => setOpenModal(null)} />
-      <Modal opened={!!removalExtension} onClose={() => setRemovalExtension(null)} title='Remove extension'>
-        <p>
-          Are you sure you want to remove the extension <Code>{removalExtension?.metadataToml.packageName}</Code>? This
-          action cannot be undone.
-        </p>
-
-        <Stack mt='md'>
-          <Switch
-            label='Do you want to remove & rollback the database migrations of this extension?'
-            name='remove_migrations'
-            defaultChecked={removeMigrations}
-            onChange={(e) => setRemoveMigrations(e.target.checked)}
-          />
-        </Stack>
-
-        <ModalFooter>
-          <Button color='red'>Delete</Button>
-          <Button variant='default' onClick={() => setRemovalExtension(null)}>
-            Close
-          </Button>
-        </ModalFooter>
-      </Modal>
+      {pendingLicense && (
+        <LicenseModal
+          opened
+          packageName={pendingLicense.extension.metadataToml.packageName}
+          licenseText={pendingLicense.extension.metadataToml.licenseText ?? ''}
+          onAccept={handleLicenseAccept}
+          onClose={() => setPendingLicense(null)}
+        />
+      )}
+      {removalExtension && (
+        <RemoveExtensionModal
+          opened
+          extension={removalExtension}
+          onRemove={(removeMigrations) => handleRemove(removalExtension, removeMigrations)}
+          onClose={() => setRemovalExtension(null)}
+        />
+      )}
 
       <ExtensionInstallOverlay visible={isDragging} />
 
@@ -241,19 +261,12 @@ export default function AdminExtensions() {
         <Spinner.Centered />
       ) : installedCount === 0 ? (
         <span>
-          No extensions installed.{' '}
+          {t('pages.admin.extensions.alert.noExtensions', {})}{' '}
           {!extensionStatus && (
             <span>
-              You don't seem to be using the heavy image required to install extensions, see{' '}
-              <a
-                href='https://calagopus.com/docs/panel/extensions/switching-to-the-heavy-image'
-                className='underline text-blue-400'
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                here
-              </a>{' '}
-              on how to switch to it.
+              {t('pages.admin.extensions.alert.heavyImageMissing', {
+                docsUrl: 'https://calagopus.com/docs/panel/extensions/switching-to-the-heavy-image',
+              }).md()}
             </span>
           )}
         </span>
@@ -270,11 +283,9 @@ export default function AdminExtensions() {
                 key={extension.packageName}
                 extension={extension}
                 backendExtension={backendExtension}
-                isRemoved={
-                  extensionStatus?.removedExtensions.some(
-                    (e) => e.metadataToml.packageName === extension.packageName,
-                  ) && false
-                }
+                isRemoved={extensionStatus?.removedExtensions.some(
+                  (e) => e.metadataToml.packageName === extension.packageName,
+                )}
                 onRemove={extensionStatus && backendExtension ? () => setRemovalExtension(backendExtension) : undefined}
               />
             ),
@@ -300,7 +311,7 @@ export default function AdminExtensions() {
         <section className='mt-10'>
           <div className='mb-4 flex items-center justify-between border-b border-zinc-700/60 pb-3'>
             <Title order={2}>
-              Pending extensions
+              {t('pages.admin.extensions.section.pendingExtensions', {})}
               {extensionStatus.pendingExtensions.length > 0 && (
                 <span className='ml-2 text-xs text-zinc-500'>({extensionStatus.pendingExtensions.length})</span>
               )}
@@ -314,8 +325,8 @@ export default function AdminExtensions() {
                 }
                 label={
                   extensionStatus.isBuilding
-                    ? 'The panel is currently building extension code. Please wait.'
-                    : 'No pending extensions to build.'
+                    ? t('pages.admin.extensions.tooltip.building', {})
+                    : t('pages.admin.extensions.tooltip.noPendingBuild', {})
                 }
               >
                 <Button
@@ -324,14 +335,14 @@ export default function AdminExtensions() {
                   loading={extensionStatus.isBuilding}
                   onClick={handleRebuild}
                 >
-                  Rebuild extensions
+                  {t('pages.admin.extensions.button.rebuild', {})}
                 </Button>
               </ConditionalTooltip>
             </AdminCan>
           </div>
 
           {!extensionStatus.pendingExtensions.length ? (
-            <p className='text-sm text-zinc-500'>No pending extensions.</p>
+            <p className='text-sm text-zinc-500'>{t('pages.admin.extensions.section.noPendingExtensions', {})}</p>
           ) : (
             <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3'>
               {extensionStatus.pendingExtensions.map((extension) => (
@@ -339,7 +350,7 @@ export default function AdminExtensions() {
                   key={extension.metadataToml.packageName}
                   backendExtension={extension}
                   isPending
-                  onRemove={extensionStatus ? () => handleRemove(extension) : undefined}
+                  onRemove={extensionStatus ? () => handleRemove(extension, false) : undefined}
                 />
               ))}
             </div>

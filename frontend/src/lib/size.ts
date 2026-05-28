@@ -45,8 +45,9 @@ export function bytesToString(bytes: number, decimals = 2, shortBytes = false): 
   let unit = UNITS[i];
 
   if (unitOverflow >= 1) {
-    value = Number((value * k ** unitOverflow).toFixed(decimals));
-    unit = UNITS[UNITS.length - unitOverflow];
+    const maxIndex = UNITS.length - 1;
+    value = Number((bytes / k ** maxIndex).toFixed(decimals));
+    unit = UNITS[maxIndex];
   }
 
   return unit === 'B'

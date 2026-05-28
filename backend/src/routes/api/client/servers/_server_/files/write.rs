@@ -8,7 +8,7 @@ mod post {
         ApiError, GetState,
         models::{
             server::{GetServer, GetServerActivityLogger},
-            user::GetPermissionManager,
+            user::{GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -16,7 +16,7 @@ mod post {
 
     #[derive(ToSchema, Deserialize)]
     pub struct Params {
-        file: String,
+        file: compact_str::CompactString,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -42,6 +42,7 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        user: GetUser,
         mut server: GetServer,
         activity_logger: GetServerActivityLogger,
         Query(params): Query<Params>,
@@ -55,16 +56,16 @@ mod post {
                 .ok();
         }
 
-        match server
+        let revision_id = match server
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
             .await?
-            .post_servers_server_files_write(server.uuid, &params.file, body.into())
+            .post_servers_server_files_write(server.uuid, &params.file, user.uuid, body.into())
             .await
         {
-            Ok(_) => {}
+            Ok(data) => data.revision_id,
             Err(wings_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, err)) => {
                 return ApiResponse::new_serialized(ApiError::new_wings_value(err))
                     .with_status(StatusCode::NOT_FOUND)
@@ -83,6 +84,7 @@ mod post {
                 "server:file.write",
                 serde_json::json!({
                     "file": params.file,
+                    "revision_id": revision_id,
                 }),
             )
             .await;

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getOAuthProviders from '@/api/auth/getOAuthProviders.ts';
+import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
@@ -47,11 +48,11 @@ export default function LoginOAuth() {
         <Card>
           <Stack>
             {oAuthProviders.map((oAuthProvider) => (
-              <a key={oAuthProvider.uuid} href={`/api/auth/oauth/redirect/${oAuthProvider.uuid}`}>
+              <Anchor key={oAuthProvider.uuid} href={`/api/auth/oauth/redirect/${oAuthProvider.uuid}`}>
                 <Button leftSection={<FontAwesomeIcon icon={faFingerprint} />} size='md' fullWidth>
                   {t('pages.auth.button.loginWith', { name: oAuthProvider.name })}
                 </Button>
-              </a>
+              </Anchor>
             ))}
 
             <Divider label={t('common.divider.or', {})} labelPosition='center' />

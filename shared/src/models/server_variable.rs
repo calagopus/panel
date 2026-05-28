@@ -18,7 +18,7 @@ impl BaseModel for ServerVariable {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -97,12 +97,34 @@ impl ServerVariable {
         Ok(())
     }
 
+    pub async fn create_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        server_uuid: uuid::Uuid,
+        variable_uuid: uuid::Uuid,
+        value: &str,
+    ) -> Result<(), crate::database::DatabaseError> {
+        sqlx::query(
+            r#"
+            INSERT INTO server_variables (server_uuid, variable_uuid, value)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (server_uuid, variable_uuid) DO UPDATE SET value = EXCLUDED.value
+            "#,
+        )
+        .bind(server_uuid)
+        .bind(variable_uuid)
+        .bind(value)
+        .execute(&mut **transaction)
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn all_by_server_uuid_egg_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
         egg_uuid: uuid::Uuid,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nest_egg_variables
@@ -111,7 +133,7 @@ impl ServerVariable {
             ORDER BY nest_egg_variables.order_, nest_egg_variables.created
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
         .bind(egg_uuid)
         .fetch_all(database.read())
@@ -138,6 +160,7 @@ impl IntoApiObject for ServerVariable {
         let api_object = finish_extendible!(
             ApiServerVariable {
                 name: self.variable.name,
+                name_translations: self.variable.name_translations,
                 description: self.variable.description,
                 description_translations: self.variable.description_translations,
                 env_variable: self.variable.env_variable,
@@ -163,6 +186,7 @@ impl IntoApiObject for ServerVariable {
 #[schema(title = "ServerVariable")]
 pub struct ApiServerVariable {
     pub name: compact_str::CompactString,
+    pub name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     pub description: Option<compact_str::CompactString>,
     pub description_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
 

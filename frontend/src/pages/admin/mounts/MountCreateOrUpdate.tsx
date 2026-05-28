@@ -1,3 +1,5 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -6,6 +8,7 @@ import { z } from 'zod';
 import createMount from '@/api/admin/mounts/createMount.ts';
 import deleteMount from '@/api/admin/mounts/deleteMount.ts';
 import updateMount from '@/api/admin/mounts/updateMount.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Code from '@/elements/Code.tsx';
@@ -14,6 +17,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema, adminMountUpdateSchema } from '@/lib/schemas/admin/mounts.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 
@@ -77,7 +81,13 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
         Are you sure you want to delete <Code>{form.getValues().name}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'mounts']))}>
+      <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+        Mounts are a powerful and potentially dangerous feature. Improper use can lead to data loss or security
+        vulnerabilities (including container escapes). Make sure you understand the implications of using mounts before
+        creating or updating them.
+      </Alert>
+
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.mounts.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk

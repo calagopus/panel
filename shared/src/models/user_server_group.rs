@@ -29,7 +29,7 @@ impl BaseModel for UserServerGroup {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -88,14 +88,14 @@ impl UserServerGroup {
         user_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM user_server_groups
             WHERE user_server_groups.user_uuid = $1 AND user_server_groups.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -108,7 +108,7 @@ impl UserServerGroup {
         database: &crate::database::Database,
         user_uuid: uuid::Uuid,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM user_server_groups
@@ -116,7 +116,7 @@ impl UserServerGroup {
             ORDER BY user_server_groups.order_, user_server_groups.created
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .fetch_all(database.read())
         .await?;
@@ -129,7 +129,7 @@ impl UserServerGroup {
     pub async fn count_by_user_uuid(
         database: &crate::database::Database,
         user_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -140,7 +140,27 @@ impl UserServerGroup {
         .bind(user_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
+    }
+
+    pub async fn cleanup_uuid_arrays(
+        database: &crate::database::Database,
+    ) -> Result<u64, crate::database::DatabaseError> {
+        let result = sqlx::query(
+            "UPDATE user_server_groups
+            SET server_order = COALESCE(
+                (SELECT array_agg(u) FROM unnest(server_order) AS u
+                WHERE EXISTS (SELECT 1 FROM servers WHERE uuid = u)),
+                '{}'::uuid[]
+            )
+            WHERE EXISTS (
+                SELECT 1 FROM unnest(server_order) AS u
+                WHERE NOT EXISTS (SELECT 1 FROM servers WHERE uuid = u)
+            )",
+        )
+        .execute(database.write())
+        .await?;
+
+        Ok(result.rows_affected())
     }
 }
 
@@ -198,18 +218,16 @@ impl CreatableModel for UserServerGroup {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("user_server_groups");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("user_uuid", options.user_uuid)
@@ -218,11 +236,12 @@ impl CreatableModel for UserServerGroup {
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
-        let user_server_group = Self::map(None, &row)?;
+        let mut user_server_group = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut user_server_group, &options, state, transaction)
+            .await?;
 
         Ok(user_server_group)
     }
@@ -243,39 +262,32 @@ pub struct UpdateUserServerGroupOptions {
 impl UpdatableModel for UserServerGroup {
     type UpdateOptions = UpdateUserServerGroupOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<UserServerGroup>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<UserServerGroup>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("user_server_groups");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("name", options.name.as_ref())
             .set("server_order", options.server_order.as_ref())
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(name) = options.name {
             self.name = name;
@@ -284,7 +296,7 @@ impl UpdatableModel for UserServerGroup {
             self.server_order = server_order;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -294,21 +306,20 @@ impl UpdatableModel for UserServerGroup {
 impl DeletableModel for UserServerGroup {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserServerGroup>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserServerGroup>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -318,10 +329,11 @@ impl DeletableModel for UserServerGroup {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

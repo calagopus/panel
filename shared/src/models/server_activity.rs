@@ -30,7 +30,7 @@ impl BaseModel for ServerActivity {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -123,7 +123,7 @@ impl ServerActivity {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM server_activities
@@ -134,8 +134,52 @@ impl ServerActivity {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
+        .bind(search)
+        .bind(per_page)
+        .bind(offset)
+        .fetch_all(database.read())
+        .await?;
+
+        Ok(super::Pagination {
+            total: rows
+                .first()
+                .map_or(Ok(0), |row| row.try_get("total_count"))?,
+            per_page,
+            page,
+            data: rows
+                .into_iter()
+                .map(|row| Self::map(None, &row))
+                .try_collect_vec()?,
+        })
+    }
+
+    pub async fn by_server_uuid_user_uuid_with_pagination(
+        database: &crate::database::Database,
+        server_uuid: uuid::Uuid,
+        user_uuid: uuid::Uuid,
+        page: i64,
+        per_page: i64,
+        search: Option<&str>,
+    ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let offset = (page - 1) * per_page;
+
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}, COUNT(*) OVER() AS total_count
+            FROM server_activities
+            LEFT JOIN users ON users.uuid = server_activities.user_uuid
+            LEFT JOIN roles ON roles.uuid = users.role_uuid
+            WHERE server_activities.server_uuid = $1 AND server_activities.user_uuid = $2
+                AND ($3 IS NULL OR server_activities.event ILIKE '%' || $3 || '%')
+            ORDER BY server_activities.created DESC
+            LIMIT $4 OFFSET $5
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(server_uuid)
+        .bind(user_uuid)
         .bind(search)
         .bind(per_page)
         .bind(offset)
@@ -162,10 +206,36 @@ impl ServerActivity {
         let result = sqlx::query(
             r#"
             DELETE FROM server_activities
-            WHERE created < $1
+            WHERE server_activities.created < $1
             "#,
         )
         .bind(cutoff.naive_utc())
+        .execute(database.write())
+        .await?;
+
+        Ok(result.rows_affected())
+    }
+
+    pub async fn retain_latest_logs_per_server(
+        database: &crate::database::Database,
+        keep_count: i64,
+    ) -> Result<u64, crate::database::DatabaseError> {
+        let result = sqlx::query(
+            r#"
+            DELETE FROM server_activities
+            WHERE ctid IN (
+                SELECT ctid 
+                FROM (
+                    SELECT
+                        ctid, 
+                        ROW_NUMBER() OVER (PARTITION BY server_activities.server_uuid ORDER BY server_activities.created DESC) rn
+                    FROM server_activities
+                ) sub
+                WHERE sub.rn > $1
+            )
+            "#,
+        )
+        .bind(keep_count)
         .execute(database.write())
         .await?;
 
@@ -176,12 +246,12 @@ impl ServerActivity {
 #[async_trait::async_trait]
 impl IntoApiObject for ServerActivity {
     type ApiObject = ApiServerActivity;
-    type ExtraArgs<'a> = &'a crate::storage::StorageUrlRetriever<'a>;
+    type ExtraArgs<'a> = (&'a crate::storage::StorageUrlRetriever<'a>, bool);
 
     async fn into_api_object<'a>(
         self,
         state: &crate::State,
-        storage_url_retriever: Self::ExtraArgs<'a>,
+        (storage_url_retriever, show_ip): Self::ExtraArgs<'a>,
     ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
         let api_object = ApiServerActivity::init_hooks(&self, state).await?;
 
@@ -208,7 +278,11 @@ impl IntoApiObject for ServerActivity {
                 user,
                 impersonator,
                 event: self.event,
-                ip: self.ip.map(|ip| ip.ip().to_compact_string()),
+                ip: if show_ip {
+                    self.ip.map(|ip| ip.ip().to_compact_string())
+                } else {
+                    None
+                },
                 data: self.data,
                 is_api: self.api_key.is_some(),
                 is_schedule: self.schedule.is_some(),
@@ -259,18 +333,16 @@ impl CreatableModel for ServerActivity {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self::CreateResult, crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("server_activities");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("server_uuid", options.server_uuid)
@@ -280,17 +352,19 @@ impl CreatableModel for ServerActivity {
             .set("schedule_uuid", options.schedule_uuid)
             .set("event", &options.event)
             .set("ip", options.ip)
-            .set("data", options.data);
+            .set("data", &options.data);
 
         if let Some(created) = options.created {
             query_builder.set("created", created);
         }
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
-        transaction.commit().await?;
+        let mut result = ();
 
-        Ok(())
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 

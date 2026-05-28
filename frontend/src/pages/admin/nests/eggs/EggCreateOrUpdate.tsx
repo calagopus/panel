@@ -276,7 +276,7 @@ export default function EggCreateOrUpdate({
         Are you sure you want to delete <Code>{form.getValues().name}</Code>?
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'eggs']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nests.eggs(contextNest.uuid)))}>
         <Stack>
           <Group grow>
             <TextInput

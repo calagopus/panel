@@ -3,6 +3,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod put {
     use axum::http::StatusCode;
+    use garde::Validate;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
@@ -14,14 +15,35 @@ mod put {
     };
     use utoipa::ToSchema;
 
-    #[derive(ToSchema, Deserialize)]
+    fn validate_mode(mode: &str, _context: &()) -> Result<(), garde::Error> {
+        if mode.len() != 3 || !mode.chars().all(|c| c.is_digit(8)) {
+            return Err(garde::Error::new("must be a 3-digit octal string"));
+        }
+
+        Ok(())
+    }
+
+    #[derive(ToSchema, Validate, Deserialize)]
+    pub struct PayloadFiles {
+        #[garde(skip)]
+        file: compact_str::CompactString,
+        #[garde(custom(validate_mode))]
+        mode: compact_str::CompactString,
+        #[garde(skip)]
+        #[serde(default)]
+        recursive: bool,
+    }
+
+    #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
         #[serde(default)]
         #[schema(default = "/")]
+        #[garde(skip)]
         root: compact_str::CompactString,
 
         #[schema(inline)]
-        files: Vec<wings_api::servers_server_files_chmod::post::RequestBodyFiles>,
+        #[garde(dive)]
+        files: Vec<PayloadFiles>,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -48,6 +70,12 @@ mod put {
         activity_logger: GetServerActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
+        if let Err(errors) = shared::utils::validate_data(&data) {
+            return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         permissions.has_server_permission("files.update")?;
 
         let request_body = wings_api::servers_server_files_chmod::post::RequestBody {
@@ -56,6 +84,13 @@ mod put {
                 .files
                 .into_iter()
                 .filter(|f| !server.is_ignored(&f.file, false))
+                .map(
+                    |f| wings_api::servers_server_files_chmod::post::RequestBodyFiles {
+                        file: f.file,
+                        mode: f.mode,
+                        recursive: f.recursive,
+                    },
+                )
                 .collect(),
         };
 

@@ -141,7 +141,7 @@ mod post {
             .await?;
 
         let allocations =
-            ServerAllocation::count_by_server_uuid(&state.database, server.uuid).await;
+            ServerAllocation::count_by_server_uuid(&state.database, server.uuid).await?;
         if allocations >= server.allocation_limit as i64 {
             return ApiResponse::error("maximum number of allocations reached")
                 .with_status(StatusCode::EXPECTATION_FAILED)

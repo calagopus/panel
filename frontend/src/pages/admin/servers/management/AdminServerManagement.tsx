@@ -1,9 +1,12 @@
-import { Stack, Text, Title } from '@mantine/core';
+import { faPause, faPlay, faReply, faSatellite, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Group, Stack } from '@mantine/core';
 import { useState } from 'react';
 import { z } from 'zod';
 import Button from '@/elements/Button.tsx';
-import Card from '@/elements/Card.tsx';
+import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import TitleCard from '@/elements/TitleCard.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import ServerDeleteModal from '@/pages/admin/servers/management/modals/ServerDeleteModal.tsx';
 import ServerSuspendModal from '@/pages/admin/servers/management/modals/ServerSuspendModal.tsx';
@@ -41,64 +44,71 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
           ),
         )}
 
-        <Card className='h-fit! order-10'>
-          <Stack gap='xs'>
-            <Title order={2}>Transfer</Title>
-            <Text size='sm'>Move this server to another node within this system.</Text>
-            {canTransfer ? (
-              <Button onClick={() => setOpenModal('transfer')} variant='outline' size='xs'>
-                Transfer
-              </Button>
-            ) : (
-              <Text size='sm'>You do not have permission to transfer this server.</Text>
-            )}
-          </Stack>
-        </Card>
-        <Card className='h-fit! order-20'>
-          <Stack gap='xs'>
-            {server.isSuspended ? (
-              <>
-                <Title order={2}>Unsuspend</Title>
-                <Text size='sm'>
+        {canTransfer && (
+          <TitleCard title='Transfer' icon={<FontAwesomeIcon icon={faReply} />} className='order-10'>
+            <Stack h='100%'>
+              Transfer this server and it's data to another node within this system.
+              <Group mt='auto'>
+                <Button onClick={() => setOpenModal('transfer')}>Transfer</Button>
+              </Group>
+            </Stack>
+          </TitleCard>
+        )}
+        <AdminCan action='servers.update'>
+          <TitleCard
+            title={server.isSuspended ? 'Unsuspend' : 'Suspend'}
+            icon={<FontAwesomeIcon icon={server.isSuspended ? faPlay : faPause} />}
+            className='order-20'
+          >
+            <Stack h='100%'>
+              {server.isSuspended ? (
+                <>
                   This will unsuspend the server, allowing it to start again. The user will be able to access their
                   files and otherwise manage the server through the panel or API.
-                </Text>
-                <Button onClick={() => setOpenModal('unsuspend')} variant='outline' size='xs' color='green'>
-                  Unsuspend
-                </Button>
-              </>
-            ) : (
-              <>
-                <Title order={2}>Suspend</Title>
-                <Text size='sm'>
+                  <Group mt='auto'>
+                    <Button onClick={() => setOpenModal('unsuspend')} color='green'>
+                      Unsuspend
+                    </Button>
+                  </Group>
+                </>
+              ) : (
+                <>
                   This will suspend the server, stop any running processes, and immediately block the user from being
                   able to access their files or otherwise manage the server through the panel or API.
-                </Text>
-                <Button onClick={() => setOpenModal('suspend')} variant='outline' size='xs' color='orange'>
-                  Suspend
+                  <Group mt='auto'>
+                    <Button onClick={() => setOpenModal('suspend')} color='red'>
+                      Suspend
+                    </Button>
+                  </Group>
+                </>
+              )}
+            </Stack>
+          </TitleCard>
+        </AdminCan>
+        <AdminCan action='servers.update'>
+          <TitleCard title='Clear State' icon={<FontAwesomeIcon icon={faSatellite} />} className='order-30'>
+            <Stack h='100%'>
+              This will clear the server state known by the panel.
+              <Group mt='auto'>
+                <Button onClick={() => setOpenModal('clear-state')} color='red'>
+                  Clear State
                 </Button>
-              </>
-            )}
-          </Stack>
-        </Card>
-        <Card className='h-fit! order-30'>
-          <Stack gap='xs'>
-            <Title order={2}>Clear State</Title>
-            <Text size='sm'>This will clear the server state known by the panel.</Text>
-            <Button onClick={() => setOpenModal('clear-state')} variant='outline' size='xs' color='red'>
-              Clear State
-            </Button>
-          </Stack>
-        </Card>
-        <Card className='h-fit! order-40'>
-          <Stack gap='xs'>
-            <Title order={2}>Delete</Title>
-            <Text size='sm'>This will delete the server and all of its data. This action cannot be undone.</Text>
-            <Button onClick={() => setOpenModal('delete')} variant='outline' size='xs' color='red'>
-              Delete
-            </Button>
-          </Stack>
-        </Card>
+              </Group>
+            </Stack>
+          </TitleCard>
+        </AdminCan>
+        <AdminCan action='servers.delete'>
+          <TitleCard title='Delete' icon={<FontAwesomeIcon icon={faTrash} />} className='order-40'>
+            <Stack h='100%'>
+              This will delete the server and all of its data. This action cannot be undone.
+              <Group mt='auto'>
+                <Button onClick={() => setOpenModal('delete')} color='red'>
+                  Delete
+                </Button>
+              </Group>
+            </Stack>
+          </TitleCard>
+        </AdminCan>
 
         {window.extensionContext.extensionRegistry.pages.admin.servers.view.management.managementContainers.appendedComponents.map(
           (Component, i) => (

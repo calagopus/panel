@@ -111,18 +111,19 @@ mod patch {
         permissions.has_user_permission("api-keys.update")?;
 
         if let AuthMethod::ApiKey(api_key) = &*auth
-            && (!data
-                .user_permissions
-                .as_ref()
-                .is_some_and(|p| p.iter().all(|p| api_key.user_permissions.contains(p)))
-                || !data
-                    .admin_permissions
-                    .as_ref()
-                    .is_some_and(|p| p.iter().all(|p| api_key.admin_permissions.contains(p)))
-                || !data
-                    .server_permissions
-                    .as_ref()
-                    .is_some_and(|p| p.iter().all(|p| api_key.server_permissions.contains(p))))
+            && (data.user_permissions.as_ref().is_some_and(|req_perms| {
+                req_perms
+                    .iter()
+                    .any(|perm| !api_key.user_permissions.contains(perm))
+            }) || data.admin_permissions.as_ref().is_some_and(|req_perms| {
+                req_perms
+                    .iter()
+                    .any(|perm| !api_key.admin_permissions.contains(perm))
+            }) || data.server_permissions.as_ref().is_some_and(|req_perms| {
+                req_perms
+                    .iter()
+                    .any(|perm| !api_key.server_permissions.contains(perm))
+            }))
         {
             return ApiResponse::error("permissions: more permissions than self")
                 .with_status(StatusCode::BAD_REQUEST)

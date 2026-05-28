@@ -84,9 +84,7 @@ mod get {
 
         permissions.has_user_permission("servers.read")?;
 
-        let servers = if params.other
-            && (user.admin || permissions.has_admin_permission("servers.read").is_ok())
-        {
+        let servers = if params.other && permissions.has_admin_permission("servers.read").is_ok() {
             Server::by_not_user_uuid_with_pagination(
                 &state.database,
                 user.uuid,

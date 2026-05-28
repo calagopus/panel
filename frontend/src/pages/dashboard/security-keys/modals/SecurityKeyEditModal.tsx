@@ -1,12 +1,11 @@
 import { ModalProps, Stack } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useState } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
 import updateSecurityKey from '@/api/me/security-keys/updateSecurityKey.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -26,39 +25,26 @@ export default function SecurityKeyEditModal({ securityKey, opened, onClose }: P
   const { addToast } = useToast();
   const { updateSecurityKey: updateStateSecurityKey } = useUserStore();
 
-  const [loading, setLoading] = useState(false);
-
-  const { form, onClose: handleClose } = useModalForm<z.infer<typeof schema>>(
-    {
-      initialValues: {
-        name: securityKey.name,
-      },
-      validateInputOnBlur: true,
-      validate: zod4Resolver(schema),
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
+    initialValues: {
+      name: securityKey.name,
     },
+    validate: zod4Resolver(schema),
     onClose,
-  );
-
-  const doUpdate = () => {
-    setLoading(true);
-
-    updateSecurityKey(securityKey.uuid, form.values)
-      .then(() => {
-        updateStateSecurityKey(securityKey.uuid, form.values);
-
-        handleClose();
-        addToast(t('pages.account.securityKeys.modal.editSecurityKey.toast.updated', {}), 'success');
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
+    onSubmit: async (values) => {
+      await updateSecurityKey(securityKey.uuid, values);
+      updateStateSecurityKey(securityKey.uuid, values);
+      addToast(t('pages.account.securityKeys.modal.editSecurityKey.toast.updated', {}), 'success');
+    },
+  });
 
   return (
-    <Modal
+    <FormModal
       title={t('pages.account.securityKeys.modal.editSecurityKey.title', {})}
       onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
       opened={opened}
     >
       <Stack>
@@ -70,7 +56,7 @@ export default function SecurityKeyEditModal({ securityKey, opened, onClose }: P
         />
 
         <ModalFooter>
-          <Button onClick={doUpdate} loading={loading} disabled={!form.isValid()}>
+          <Button type='submit' loading={loading} disabled={!form.isValid()}>
             {t('common.button.update', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
@@ -78,6 +64,6 @@ export default function SecurityKeyEditModal({ securityKey, opened, onClose }: P
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

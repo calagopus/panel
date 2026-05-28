@@ -52,7 +52,6 @@ export default function SessionRow({ session }: { session: z.infer<typeof userSe
             disabled: session.isUsing,
             onClick: () => setOpenModal('delete'),
             color: 'red',
-            canAccess: !session.isUsing,
           },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.dashboard.sessions.sessionContextMenu}

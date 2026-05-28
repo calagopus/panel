@@ -466,8 +466,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Nume furnizor",
-              "identifier": "Identificator"
+              "providerName": "Nume furnizor"
             }
           },
           "modal": {

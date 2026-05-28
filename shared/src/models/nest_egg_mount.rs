@@ -23,7 +23,7 @@ impl BaseModel for NestEggMount {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -75,15 +75,14 @@ impl NestEggMount {
         egg_uuid: uuid::Uuid,
         mount_uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nest_egg_mounts
-            JOIN mounts ON mounts.uuid = nest_egg_mounts.mount_uuid
             WHERE nest_egg_mounts.egg_uuid = $1 AND nest_egg_mounts.mount_uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(egg_uuid)
         .bind(mount_uuid)
         .fetch_optional(database.read())
@@ -101,7 +100,7 @@ impl NestEggMount {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM nest_egg_mounts
@@ -111,7 +110,7 @@ impl NestEggMount {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(egg_uuid)
         .bind(search)
         .bind(per_page)
@@ -141,7 +140,7 @@ impl NestEggMount {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM nest_egg_mounts
@@ -151,7 +150,7 @@ impl NestEggMount {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(mount_uuid)
         .bind(search)
         .bind(per_page)
@@ -241,9 +240,10 @@ impl CreatableModel for NestEggMount {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -251,27 +251,23 @@ impl CreatableModel for NestEggMount {
             .await?
             .ok_or(crate::database::InvalidRelationError("mount"))?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("nest_egg_mounts");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("egg_uuid", options.egg_uuid)
             .set("mount_uuid", options.mount_uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut nest_egg_mount = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut nest_egg_mount, &options, state, transaction).await?;
 
-        match Self::by_egg_uuid_mount_uuid(&state.database, options.egg_uuid, options.mount_uuid)
-            .await?
-        {
-            Some(nest_egg_mount) => Ok(nest_egg_mount),
-            None => Err(sqlx::Error::RowNotFound.into()),
-        }
+        Ok(nest_egg_mount)
     }
 }
 
@@ -279,21 +275,20 @@ impl CreatableModel for NestEggMount {
 impl DeletableModel for NestEggMount {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<NestEggMount>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<NestEggMount>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -304,10 +299,11 @@ impl DeletableModel for NestEggMount {
         )
         .bind(self.nest_egg.uuid)
         .bind(self.mount.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

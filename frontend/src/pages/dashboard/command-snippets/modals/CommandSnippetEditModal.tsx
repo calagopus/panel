@@ -1,15 +1,15 @@
 import { ModalProps, Stack } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
 import updateCommandSnippet from '@/api/me/command-snippets/updateCommandSnippet.ts';
 import getUserEggs from '@/api/me/servers/eggs/getUserEggs.ts';
 import Button from '@/elements/Button.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverEggSchema } from '@/lib/schemas/server/server.ts';
 import { userCommandSnippetSchema, userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
@@ -28,25 +28,27 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
   const { addToast } = useToast();
   const { updateCommandSnippet: updateStateCommandSnippet } = useUserStore();
 
-  const [loading, setLoading] = useState(false);
-
   const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
     queryKey: [...queryKeys.user.servers.all(), 'eggs'],
     fetcher: (search) => getUserEggs(1, search),
   });
 
-  const { form, onClose: handleClose } = useModalForm<z.infer<typeof userCommandSnippetUpdateSchema>>(
-    {
-      initialValues: {
-        name: '',
-        eggs: [],
-        command: '',
-      },
-      validateInputOnBlur: true,
-      validate: zod4Resolver(userCommandSnippetUpdateSchema),
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
+    z.infer<typeof userCommandSnippetUpdateSchema>
+  >({
+    initialValues: {
+      name: '',
+      eggs: [],
+      command: '',
     },
+    validate: zod4Resolver(userCommandSnippetUpdateSchema),
     onClose,
-  );
+    onSubmit: async (values) => {
+      await updateCommandSnippet(commandSnippet.uuid, values);
+      updateStateCommandSnippet(commandSnippet.uuid, values);
+      addToast(t('pages.account.commandSnippets.modal.editCommandSnippet.toast.updated', {}), 'success');
+    },
+  });
 
   useEffect(() => {
     form.setValues({
@@ -54,28 +56,15 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
       eggs: commandSnippet.eggs,
       command: commandSnippet.command,
     });
-  }, []);
-
-  const doUpdate = () => {
-    setLoading(true);
-
-    updateCommandSnippet(commandSnippet.uuid, form.values)
-      .then(() => {
-        updateStateCommandSnippet(commandSnippet.uuid, form.values);
-
-        handleClose();
-        addToast(t('pages.account.commandSnippets.modal.editCommandSnippet.toast.updated', {}), 'success');
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
+  }, [commandSnippet]);
 
   return (
-    <Modal
+    <FormModal
       title={t('pages.account.commandSnippets.modal.editCommandSnippet.title', {})}
       onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
       opened={opened}
     >
       <Stack>
@@ -110,7 +99,7 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
         />
 
         <ModalFooter>
-          <Button onClick={doUpdate} loading={loading} disabled={!form.isValid()}>
+          <Button type='submit' loading={loading} disabled={!form.isValid()}>
             {t('common.button.edit', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
@@ -118,6 +107,6 @@ export default function CommandSnippetEditModal({ commandSnippet, opened, onClos
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

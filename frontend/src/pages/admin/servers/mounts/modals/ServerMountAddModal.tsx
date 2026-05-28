@@ -44,7 +44,7 @@ export default function ServerMountAddModal({
 
     createServerMount(server.uuid, { mountUuid: selectedMount.mount.uuid })
       .then(() => {
-        addToast('Node Mount added.', 'success');
+        addToast('Server Mount added.', 'success');
 
         onClose();
         addServerMount({ mount: selectedMount.mount, created: new Date() });
@@ -56,7 +56,7 @@ export default function ServerMountAddModal({
   };
 
   return (
-    <Modal title='Add Node Mount' onClose={onClose} opened={opened}>
+    <Modal title='Add Server Mount' onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk

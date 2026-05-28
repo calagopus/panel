@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getDatabaseHosts from '@/api/admin/database-hosts/getDatabaseHosts.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,12 +17,16 @@ import DatabaseHostView from './DatabaseHostView.tsx';
 function DatabaseHostsContainer() {
   const navigate = useNavigate();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: databaseHosts,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.databaseHosts.all(),
     fetcher: getDatabaseHosts,
   });
-
-  const databaseHosts = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminContentContainer
@@ -43,7 +46,7 @@ function DatabaseHostsContainer() {
       }
     >
       <Table columns={databaseHostTableColumns} loading={loading} pagination={databaseHosts} onPageSelect={setPage}>
-        {databaseHosts.data.map((dh) => (
+        {databaseHosts?.data.map((dh) => (
           <DatabaseHostRow key={dh.uuid} databaseHost={dh} />
         ))}
       </Table>

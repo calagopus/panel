@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getMounts from '@/api/admin/mounts/getMounts.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,12 +17,16 @@ import MountRow from './MountRow.tsx';
 function MountsContainer() {
   const navigate = useNavigate();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: mounts,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mounts.all(),
     fetcher: getMounts,
   });
-
-  const mounts = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminContentContainer
@@ -43,7 +46,7 @@ function MountsContainer() {
       }
     >
       <Table columns={mountTableColumns} loading={loading} pagination={mounts} onPageSelect={setPage}>
-        {mounts.data.map((m) => (
+        {mounts?.data.map((m) => (
           <MountRow key={m.uuid} mount={m} />
         ))}
       </Table>

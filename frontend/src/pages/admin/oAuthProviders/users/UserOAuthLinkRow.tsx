@@ -1,7 +1,7 @@
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminOAuthUserLinkSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 
@@ -17,12 +17,9 @@ export default function UserOAuthLinkRow({
       </TableData>
 
       <TableData>
-        <NavLink
-          to={`/admin/users/${userOAuthLink.user.uuid}`}
-          className='text-blue-400 hover:text-blue-200 hover:underline'
-        >
+        <TableLink to={`/admin/users/${userOAuthLink.user.uuid}`}>
           <Code>{userOAuthLink.user.username}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       <TableData>

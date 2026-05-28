@@ -127,7 +127,6 @@ mod post {
                     "basic_auth": oauth_provider.basic_auth,
 
                     "client_id": oauth_provider.client_id,
-                    "client_secret": oauth_provider.client_secret,
 
                     "auth_url": oauth_provider.auth_url,
                     "token_url": oauth_provider.token_url,

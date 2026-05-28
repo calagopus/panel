@@ -35,12 +35,10 @@ export function useSearchableResource<T>({
     updateDebouncedSearch(search);
   }, [search]);
 
-  const enabled = canRequest && (!deps.length || deps.every(Boolean));
-
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: [...queryKey, ...deps, { search: debouncedSearch }],
     queryFn: () => fetcher(debouncedSearch),
-    enabled,
+    enabled: canRequest && (!deps.length || deps.every(Boolean)),
   });
 
   useEffect(() => {

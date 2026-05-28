@@ -1011,8 +1011,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "اسم الموفر",
-              "identifier": "المعرف"
+              "providerName": "اسم الموفر"
             }
           },
           "modal": {
@@ -1625,7 +1624,7 @@
                 "cronSchedule": "جدول Cron"
               },
               "card": {
-                "content": "على فاصل Cron `{schedule}`، التشغيل التالي هو {timestamp} - التشغيل الأخير كان {lastTimestamp}."
+                "content": "على فاصل Cron {schedule}، التشغيل التالي هو {timestamp} - التشغيل الأخير كان {lastTimestamp}."
               }
             },
             "powerAction": {
@@ -2069,11 +2068,14 @@
               "readOnly": "قراءة فقط"
             }
           },
+          "button": {
+            "attach": "تثبيت نقطة",
+            "detach": "فك نقطة"
+          },
           "modal": {
             "attachMount": {
               "title": "تثبيت نقطة",
               "content": "هل تريد تثبيت **{name}** على `{target}`؟",
-              "confirm": "تثبيت",
               "toast": {
                 "attached": "تم تثبيت {name} على خادمك."
               }
@@ -2081,7 +2083,6 @@
             "detachMount": {
               "title": "فك نقطة",
               "content": "هل تريد فك **{name}** من `{target}`؟",
-              "confirm": "فك",
               "toast": {
                 "detached": "تم إزالة {name} من خادمك."
               }

@@ -8,6 +8,7 @@ export interface SettingsSlice extends z.infer<typeof adminSettingsSchema> {
   updateInformation: z.infer<typeof adminUpdateInformationSchema> | null;
 
   setSettings: (settings: z.infer<typeof adminSettingsSchema>) => void;
+  updateSettings: (settings: Partial<z.infer<typeof adminSettingsSchema>>) => void;
   setUpdateInformation: (updateInformation: z.infer<typeof adminUpdateInformationSchema> | null) => void;
 }
 
@@ -28,7 +29,10 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     icon: '',
     language: '',
     url: '',
+    banner: null,
     twoFactorRequirement: 'none',
+    sessionCookie: '',
+    sessionDurationSeconds: 3600,
     telemetryEnabled: true,
     registrationEnabled: true,
   },
@@ -36,12 +40,21 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     maxFileManagerViewSize: 10 * 1024 * 1024 * 1024,
     maxFileManagerContentSearchSize: 5 * 1024 * 1024 * 1024,
     maxFileManagerSearchResults: 100,
-    maxSchedulesStepCount: 100,
+    maxSubuserCount: 25,
+    maxScheduleStepCount: 50,
     allowOverwritingCustomDockerImage: true,
     allowEditingStartupCommand: false,
     allowViewingInstallationLogs: true,
     allowAcknowledgingInstallationFailure: true,
     allowViewingTransferProgress: true,
+  },
+  user: {
+    maxServerGroupCount: 25,
+    maxApiKeyCount: 50,
+    maxCommandSnippetCount: 100,
+    maxSecurityKeyCount: 50,
+    maxSshKeyCount: 50,
+    allowChangingLanguage: true,
   },
   webauthn: {
     rpId: '',
@@ -49,8 +62,11 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
   },
   activity: {
     adminLogRetentionDays: 180,
+    adminLogRetentionCount: null,
     userLogRetentionDays: 90,
+    userLogRetentionCount: null,
     serverLogRetentionDays: 90,
+    serverLogRetentionCount: null,
     serverLogAdminActivity: true,
     serverLogScheduleActivity: true,
   },
@@ -105,6 +121,18 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
       state.webauthn = value.webauthn;
       state.activity = value.activity;
       state.ratelimits = value.ratelimits;
+      return state;
+    }),
+  updateSettings: (value) =>
+    set((state) => {
+      if (value.storageDriver) state.storageDriver = value.storageDriver;
+      if (value.mailMode) state.mailMode = value.mailMode;
+      if (value.captchaProvider) state.captchaProvider = value.captchaProvider;
+      if (value.app) state.app = { ...state.app, ...value.app };
+      if (value.server) state.server = { ...state.server, ...value.server };
+      if (value.webauthn) state.webauthn = { ...state.webauthn, ...value.webauthn };
+      if (value.activity) state.activity = { ...state.activity, ...value.activity };
+      if (value.ratelimits) state.ratelimits = { ...state.ratelimits, ...value.ratelimits };
       return state;
     }),
   setUpdateInformation: (value) => set((state) => ({ ...state, updateInformation: value })),

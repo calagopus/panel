@@ -39,6 +39,14 @@
       "few": "{count} SSH Keys",
       "many": "{count} SSH Keys",
       "other": "{count} SSH Keys"
+    },
+    "asset": {
+      "zero": "{count} Assets",
+      "one": "{count} Asset",
+      "two": "{count} Assets",
+      "few": "{count} Assets",
+      "many": "{count} Assets",
+      "other": "{count} Assets"
     }
   },
   "translations": {
@@ -65,6 +73,7 @@
         "selectAll": "Select All",
         "deselectAll": "Deselect All",
         "restore": "Restore",
+        "discard": "Discard",
         "download": "Download",
         "downloadAs": "Download as {format}",
         "export": "Export",
@@ -95,6 +104,27 @@
         "host": "Host",
         "username": "Username",
         "server": "Server",
+        "url": "URL",
+        "email": "Email",
+        "path": "Path",
+        "port": "Port",
+        "provider": "Provider",
+        "command": "Command",
+        "fromAddress": "From Address",
+        "fromName": "From Name",
+        "siteKey": "Site Key",
+        "secretKey": "Secret Key",
+        "apiKey": "API Key",
+        "accessKey": "Access Key",
+        "bucket": "Bucket",
+        "region": "Region",
+        "endpoint": "Endpoint",
+        "publicUrl": "Public URL",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "language": "Language",
+        "identifier": "Identifier",
+        "enabled": "Enabled",
         "truncateDirectory": "Do you want to delete all files of this server before performing this action? This cannot be undone."
       },
       "table": {
@@ -103,7 +133,11 @@
           "empty": "No items could be found, it's almost like they are hiding."
         },
         "columns": {
+          "id": "ID",
           "name": "Name",
+          "type": "Type",
+          "title": "Title",
+          "enabled": "Enabled",
           "description": "Description",
           "username": "Username",
           "size": "Size",
@@ -113,8 +147,12 @@
           "event": "Event",
           "ip": "IP",
           "when": "When",
-          "command": "Command"
+          "command": "Command",
+          "location": "Location"
         }
+      },
+      "tabs": {
+        "general": "General"
       },
       "badge": {
         "active": "Active",
@@ -219,6 +257,13 @@
           "copyManual": "Copy to clipboard: Ctrl+C or Command+C, Enter"
         }
       },
+      "pasteOnClick": {
+        "toast": {
+          "pasted": "Pasted from clipboard.",
+          "failed": "Failed to paste from clipboard.",
+          "pasteManual": "Paste from clipboard: Ctrl+V or Command+V, Enter"
+        }
+      },
       "estimatedTimeArrival": {
         "tooltip": {
           "estimating": "Estimating completion time...",
@@ -238,10 +283,16 @@
           "stopImpersonating": "Stop Impersonating",
           "openInVirtualWindow": "Open in Virtual Window",
           "openInPopup": "Open in Popup",
-          "openInNewTab": "Open in New Tab"
+          "openInNewTab": "Open in New Tab",
+          "switchToDark": "Switch to Dark Mode",
+          "switchToLight": "Switch to Light Mode"
         }
       },
       "permissionSelector": {
+        "button": {
+          "copyPermissions": "Copy Permissions",
+          "pastePermissions": "Paste Permissions"
+        },
         "selectedPermissions": "Selected Permissions ({count})",
         "noPermissions": "No permissions selected."
       },
@@ -252,6 +303,13 @@
         "tooltip": {
           "cantSave": "You do not have permission to save.",
           "cantDelete": "You do not have permission to delete."
+        }
+      },
+      "resource": {
+        "tooltip": {
+          "created": "{resource} created.",
+          "updated": "{resource} updated.",
+          "deleted": "{resource} deleted."
         }
       },
       "activityInfoButton": {
@@ -419,6 +477,8 @@
           "form": {
             "locationName": "Location Name",
             "locationNamePlaceholder": "My home",
+            "locationFlag": "Location Flag",
+            "locationFlagPlaceholder": "The best country",
             "backupName": "Backup Configuration Name",
             "backupNamePlaceholder": "Unicorn Cloud",
             "backupDisk": "Backup Disk",
@@ -554,6 +614,9 @@
         "button": {
           "login": "Login",
           "loginWith": "Login with {name}"
+        },
+        "alert": {
+          "urlMismatch": "The application URL does not match the current URL. Expected: `{appUrl}`, Current: `{currentUrl}`."
         },
         "login": {
           "error": {
@@ -841,13 +904,15 @@
         },
         "securityKeys": {
           "title": "Security Keys",
+          "subtitle": "{current} of {max} maximum security keys created.",
           "table": {
             "columns": {
               "credentialId": "Credential ID"
             }
           },
           "tooltip": {
-            "secureContextRequired": "A secure context (HTTPS) is required to use security keys."
+            "secureContextRequired": "A secure context (HTTPS) is required to use security keys.",
+            "limitReached": "You are limited to {max} security keys."
           },
           "modal": {
             "createSecurityKey": {
@@ -931,8 +996,12 @@
         },
         "sshKeys": {
           "title": "SSH Keys",
+          "subtitle": "{current} of {max} maximum ssh keys created.",
           "button": {
             "import": "Import"
+          },
+          "tooltip": {
+            "limitReached": "You are limited to {max} ssh keys."
           },
           "table": {
             "columns": {
@@ -979,6 +1048,10 @@
         },
         "commandSnippets": {
           "title": "Command Snippets",
+          "subtitle": "{current} of {max} maximum command snippets created.",
+          "tooltip": {
+            "limitReached": "You are limited to {max} command snippets."
+          },
           "table": {
             "columns": {
               "eggs": "Eggs"
@@ -1018,8 +1091,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Provider Name",
-              "identifier": "Identifier"
+              "providerName": "Provider Name"
             }
           },
           "modal": {
@@ -1034,8 +1106,12 @@
         },
         "apiKeys": {
           "title": "API Keys",
+          "subtitle": "{current} of {max} maximum api keys created.",
           "button": {
             "apiDocumentation": "API Documentation"
+          },
+          "tooltip": {
+            "limitReached": "You are limited to {max} api keys."
           },
           "table": {
             "columns": {
@@ -1084,7 +1160,720 @@
           "title": "Activity"
         }
       },
-      "admin": {},
+      "admin": {
+        "home": {
+          "title": "Home",
+          "alert": {
+            "newPanelVersion": "A new version is available for the panel! You are currently on {current} and the latest version is {latest}. You may want to consider upgrading. [Click here]({upgradeUrl}) to view upgrade instructions."
+          },
+          "tabs": {
+            "overview": {
+              "title": "Overview",
+              "page": {
+                "permissionDenied": "You do not have permission to read the statistics that would have been here otherwise. For now, enjoy this bird",
+                "card": {
+                  "systemOverview": "System Overview",
+                  "generalStatistics": "General Statistics",
+                  "backupStatistics": "Backup Statistics"
+                },
+                "system": {
+                  "cpu": "CPU",
+                  "memoryUsage": "Memory Usage ({process} used by Panel)",
+                  "memoryValue": "{used} / {total} ({percent}%)",
+                  "kernelVersion": "Kernel Version ({architecture})",
+                  "containerType": "Container Type",
+                  "databaseVersion": "Database Version ({size})",
+                  "cacheVersion": "Cache Version",
+                  "cacheCalls": "Cache Calls",
+                  "cacheHits": "Cache Hits ({percent}%)",
+                  "cacheMisses": "Cache Misses ({percent}%)",
+                  "avgCachedCallLatency": "Avg. Cached Call Latency"
+                },
+                "containerType": {
+                  "unknown": "Unknown",
+                  "none": "None detected",
+                  "official": "Official",
+                  "officialAio": "Official AIO",
+                  "officialHeavy": "Official Heavy"
+                },
+                "stats": {
+                  "users": "Users",
+                  "servers": "Servers",
+                  "locations": "Locations",
+                  "nodes": "Nodes",
+                  "nestEggs": "Nest Eggs",
+                  "databaseHosts": "Database Hosts",
+                  "backupConfigurations": "Backup Configurations",
+                  "roles": "Roles"
+                },
+                "backup": {
+                  "allTime": "All Time",
+                  "today": "Today",
+                  "week": "This Week",
+                  "month": "This Month",
+                  "totalAllTime": "Total backups all time",
+                  "successfulAllTime": "Successful backups all time",
+                  "failedAllTime": "Failed backups all time",
+                  "deletedAllTime": "Deleted backups all time",
+                  "totalToday": "Total backups today",
+                  "successfulToday": "Successful backups today",
+                  "failedToday": "Failed backups today",
+                  "deletedToday": "Deleted backups today",
+                  "totalWeek": "Total backups this week",
+                  "successfulWeek": "Successful backups this week",
+                  "failedWeek": "Failed backups this week",
+                  "deletedWeek": "Deleted backups this week",
+                  "totalMonth": "Total backups this month",
+                  "successfulMonth": "Successful backups this month",
+                  "failedMonth": "Failed backups this month",
+                  "deletedMonth": "Deleted backups this month",
+                  "successfulValue": "{count} ({size})",
+                  "deletedValue": "{count} ({size})"
+                }
+              }
+            },
+            "updates": {
+              "title": "Updates",
+              "page": {
+                "alert": {
+                  "extensionUpdateErrors": "There were errors checking for updates for some extensions."
+                },
+                "card": {
+                  "panelVersion": "Panel Version",
+                  "versionHistory": "Version History",
+                  "outdatedExtensions": "Outdated Extensions",
+                  "outdatedNodes": "Outdated Nodes"
+                },
+                "panelVersion": "Your panel is currently running version `{current}`. The latest available version is `{latest}`.",
+                "unknown": "unknown",
+                "button": {
+                  "recheck": "Recheck for Updates"
+                },
+                "toast": {
+                  "recheckComplete": "Recheck complete."
+                },
+                "selectHistory": "Select an update history to view",
+                "historyPanel": "Panel",
+                "historyExtension": "Extension: {name}",
+                "extensionsUpToDate": "All extensions are up to date.",
+                "extensionsOutdated": "Some extensions are outdated or had errors when checking for updates.",
+                "noChangelog": "No changelog",
+                "nodesUpToDate": "Seems like all nodes are up to date. ({failed} failed to check)",
+                "nodesOutdated": "Some nodes are outdated, the latest available version is `{latest}`. ({outdated} outdated, {failed} failed to check)",
+                "table": {
+                  "version": "Version",
+                  "installed": "Installed",
+                  "packageName": "Package Name",
+                  "latestVersion": "Latest Version",
+                  "changes": "Changes",
+                  "error": "Error"
+                }
+              }
+            },
+            "health": {
+              "title": "Health",
+              "page": {
+                "card": {
+                  "generalHealth": "General Health",
+                  "extensionMigrationHealth": "Extension Migration Health",
+                  "desyncNodes": "Desync Nodes",
+                  "debugMode": "Debug Mode"
+                },
+                "appliedMigrations": "Applied Migrations ({percent}%)",
+                "migrationsValue": "{applied} / {total}",
+                "avgNtpOffset": "Avg. NTP Offset",
+                "noExtensions": "No extensions found.",
+                "nodesSynced": "Seems like all nodes have a synced clock (within 5 seconds of panel clock). ({failed} failed to check)",
+                "nodesDesync": "Some nodes have desync clocks (over 5 seconds off of the panel's clock). This can cause file download/console issues. ({desync} desync, {failed} failed to check)",
+                "debugEnabled": "Debug mode is currently enabled.",
+                "debugDisabled": "Debug mode is currently disabled.",
+                "debugResetNote": "This setting will be reset to the default ({default}) when the application restarts.",
+                "table": {
+                  "packageName": "Package Name",
+                  "applied": "Applied",
+                  "total": "Total",
+                  "id": "ID",
+                  "desync": "Desync",
+                  "appliedValue": "{applied} ({percent}%)"
+                },
+                "button": {
+                  "enableDebug": "Enable Debug Mode",
+                  "disableDebug": "Disable Debug Mode"
+                },
+                "toast": {
+                  "debugEnabled": "Debug mode enabled.",
+                  "debugDisabled": "Debug mode disabled."
+                }
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Settings",
+          "tabs": {
+            "application": {
+              "title": "Application",
+              "page": {
+                "title": "Application Settings",
+                "form": {
+                  "language": "Language",
+                  "icon": "Icon",
+                  "banner": "Banner",
+                  "sessionCookie": "Session Cookie",
+                  "sessionDurationSeconds": "Session Duration (seconds)",
+                  "twoFactorRequirement": "Two-Factor Authentication Requirement",
+                  "telemetryEnabled": "Enable Telemetry",
+                  "telemetryEnabledDescription": "Allow Calagopus to collect limited and anonymous usage data to help improve the application.",
+                  "registrationEnabled": "Enable Registration"
+                },
+                "enum": {
+                  "twoFactorRequirement": {
+                    "admins": "Admins",
+                    "allUsers": "All Users",
+                    "none": "None"
+                  }
+                },
+                "button": {
+                  "previewTelemetry": "Preview Telemetry"
+                },
+                "toast": {
+                  "updated": "Application settings updated."
+                },
+                "modal": {
+                  "disableTelemetry": {
+                    "title": "Confirm Disabling Telemetry",
+                    "content": "Are you sure you want to disable telemetry? Telemetry helps us improve Calagopus by providing anonymous usage data. Disabling telemetry will prevent any data from being sent.",
+                    "button": {
+                      "confirm": "Disable"
+                    }
+                  },
+                  "enableRegistration": {
+                    "title": "Confirm Enabling Registration",
+                    "content": "Are you sure you want to enable registration? Enabling registration allows anyone to create an account on this panel. If you do not have a captcha configured, this may be a mistake.",
+                    "button": {
+                      "confirm": "Enable"
+                    }
+                  },
+                  "telemetryPreview": {
+                    "title": "Telemetry Preview"
+                  }
+                }
+              }
+            },
+            "storage": {
+              "title": "Storage",
+              "page": {
+                "title": "Storage Settings",
+                "form": {
+                  "driver": "Driver"
+                },
+                "enum": {
+                  "driver": {
+                    "filesystem": "Filesystem",
+                    "s3": "S3"
+                  }
+                },
+                "toast": {
+                  "updated": "Storage settings updated."
+                },
+                "modal": {
+                  "changeStorageType": {
+                    "title": "Confirm Changing Storage Type",
+                    "content": "Are you sure you want to change the storage type? Changing the storage type will cause the application to look for assets (e.g. profile pictures) in a different location, which may result in missing assets if they are not moved to the new location manually.",
+                    "button": {
+                      "confirm": "Update"
+                    }
+                  }
+                },
+                "s3": {
+                  "alert": {
+                    "permissionsTitle": "Note on Permissions",
+                    "permissionsIntro": "To ensure that the storage backend works correctly, please make sure the following subdirectories are publicly accessible over the \"Public URL\" you provided:",
+                    "permissionsAssets": "This is where all admin assets (e.g., icons) will be stored.",
+                    "permissionsAvatars": "This is where all user avatars will be stored.",
+                    "permissionsPublicData": "This is where extensions can store public data (e.g., images)."
+                  },
+                  "form": {
+                    "pathStyleOn": "Using path-style URLs",
+                    "pathStyleOff": "Using virtual-hosted-style URLs"
+                  }
+                }
+              }
+            },
+            "mail": {
+              "title": "Mail",
+              "page": {
+                "title": "Email Settings",
+                "enum": {
+                  "provider": {
+                    "none": "None",
+                    "smtp": "SMTP",
+                    "sendmail": "Sendmail Command",
+                    "filesystem": "Filesystem"
+                  }
+                },
+                "button": {
+                  "sendTestEmail": "Send Test Email"
+                },
+                "toast": {
+                  "updated": "Email settings updated."
+                },
+                "modal": {
+                  "sendTestEmail": {
+                    "title": "Send Test Email",
+                    "button": {
+                      "submit": "Send Test Email"
+                    },
+                    "toast": {
+                      "sent": "Test email has been sent successfully."
+                    }
+                  }
+                },
+                "smtp": {
+                  "form": {
+                    "useTls": "Use TLS",
+                    "skipCertValidation": "Skip Certificate Validation"
+                  }
+                }
+              }
+            },
+            "mailTemplates": {
+              "title": "Mail Templates",
+              "page": {
+                "title": "Email Template Settings",
+                "sidebar": {
+                  "templates": "Templates",
+                  "loading": "Loading...",
+                  "availableVariables": "Available Variables"
+                },
+                "alert": {
+                  "syntaxBefore": "Templates use the",
+                  "syntaxLink": "MiniJinja",
+                  "syntaxMiddle": "templating syntax. Variables are referenced with",
+                  "syntaxAnd": "and control structures like",
+                  "syntaxOr": "and",
+                  "syntaxAfter": "are supported."
+                },
+                "empty": "Select a template from the sidebar to edit it",
+                "loadingTemplate": "Loading template...",
+                "form": {
+                  "subject": "Subject"
+                },
+                "button": {
+                  "resetToDefault": "Reset to default"
+                },
+                "toast": {
+                  "saved": "Email template saved.",
+                  "reset": "Email template reset to default."
+                },
+                "modal": {
+                  "reset": {
+                    "title": "Reset to default",
+                    "content": "This will discard your custom template for **{identifier}** and restore the built-in default. This cannot be undone.",
+                    "button": {
+                      "confirm": "Reset"
+                    }
+                  }
+                }
+              }
+            },
+            "captcha": {
+              "title": "Captcha",
+              "page": {
+                "title": "Captcha Settings",
+                "toast": {
+                  "updated": "Captcha settings updated."
+                },
+                "recaptcha": {
+                  "form": {
+                    "v3": "V3"
+                  }
+                }
+              }
+            },
+            "webauthn": {
+              "title": "Webauthn",
+              "page": {
+                "title": "Webauthn Settings",
+                "form": {
+                  "rpId": "RP Id",
+                  "rpOrigin": "RP Origin"
+                },
+                "button": {
+                  "autofill": "Autofill"
+                },
+                "toast": {
+                  "updated": "Webauthn settings updated.",
+                  "ipNotAllowed": "Cannot use WebAuthn on an IP address."
+                },
+                "modal": {
+                  "changeRpId": {
+                    "title": "Confirm Changing RP Id",
+                    "content": "Are you sure you want to change the RP Id? Changing the RP Id will break all existing Webauthn credentials and require users to re-register their devices. This can have significant consequences, so please make sure you understand the implications before proceeding.",
+                    "button": {
+                      "confirm": "Update"
+                    }
+                  }
+                }
+              }
+            },
+            "server": {
+              "title": "Server",
+              "page": {
+                "title": "Server Settings",
+                "form": {
+                  "maxFileManagerViewSize": "Max File Manager View Size",
+                  "maxScheduleStepCount": "Max Schedule Steps",
+                  "maxFileManagerContentSearchSize": "Max File Manager Content Search Size",
+                  "maxFileManagerSearchResults": "Max File Manager Search Results",
+                  "maxSubuserCount": "Max Subuser Count",
+                  "allowOverwritingCustomDockerImage": "Allow Overwriting Custom Docker Image",
+                  "allowOverwritingCustomDockerImageDescription": "If enabled, users will be able to overwrite the Docker image specified in the server configuration using the Eggs list, even if an admin has set a custom Docker image.",
+                  "allowViewingInstallationLogs": "Allow Viewing Installation Logs",
+                  "allowViewingInstallationLogsDescription": "If enabled, users with console read permissions will also be able to view installation logs via the websocket connection. If disabled, installation logs will only be available for admins.",
+                  "allowAcknowledgingInstallationFailure": "Allow Acknowledging Installation Failure",
+                  "allowAcknowledgingInstallationFailureDescription": "If enabled, users will be able to acknowledge installation failures for servers that are in the \"Install Failed\" state, allowing them to attempt to start the server instead of having to wait for an admin. If disabled, only admins will be able to acknowledge installation failures.",
+                  "allowViewingTransferProgress": "Allow Viewing Transfer Progress",
+                  "allowViewingTransferProgressDescription": "If enabled, users with console read permissions will also be able to view transfer progress logs via the websocket connection. If disabled, transfer progress logs will only be available for admins."
+                },
+                "toast": {
+                  "updated": "Server settings updated."
+                }
+              }
+            },
+            "user": {
+              "title": "User",
+              "page": {
+                "title": "User Settings",
+                "form": {
+                  "maxServerGroupCount": "Max Server Groups",
+                  "maxApiKeyCount": "Max API Keys",
+                  "maxCommandSnippetCount": "Max Command Snippets",
+                  "maxSecurityKeyCount": "Max Security Keys",
+                  "maxSshKeyCount": "Max SSH Keys",
+                  "allowChangingLanguage": "Allow Changing Language",
+                  "allowChangingLanguageDescription": "If enabled, users will be able to change their language preferences."
+                },
+                "toast": {
+                  "updated": "User settings updated."
+                }
+              }
+            },
+            "activity": {
+              "title": "Activity",
+              "page": {
+                "title": "Activity Settings",
+                "form": {
+                  "adminLogRetentionDays": "Admin Activity Retention Days",
+                  "userLogRetentionDays": "User Activity Retention Days",
+                  "serverLogRetentionDays": "Server Activity Retention Days",
+                  "adminLogRetentionCount": "Admin Activity Retention Count",
+                  "userLogRetentionCount": "User Activity Retention Count",
+                  "serverLogRetentionCount": "Server Activity Retention Count",
+                  "serverLogAdminActivity": "Log Server Admin Activity",
+                  "serverLogAdminActivityDescription": "Enable or disable logging of admin activity on servers where the admin isn't an owner or subuser.",
+                  "serverLogScheduleActivity": "Log Server Schedule Activity",
+                  "serverLogScheduleActivityDescription": "Enable or disable logging of activity done by server schedules."
+                },
+                "toast": {
+                  "updated": "Activity settings updated."
+                }
+              }
+            },
+            "ratelimits": {
+              "title": "Ratelimits",
+              "page": {
+                "title": "Ratelimit Settings",
+                "form": {
+                  "hits": "Hits",
+                  "hitsDescription": "Max requests",
+                  "windowSeconds": "Window",
+                  "windowSecondsDescription": "Seconds"
+                },
+                "toast": {
+                  "updated": "Rate limit settings updated."
+                }
+              }
+            }
+          }
+        },
+        "announcements": {
+          "title": "Announcements",
+          "resourceName": "Announcement",
+          "modal": {
+            "delete": {
+              "title": "Confirm Announcement Deletion",
+              "content": "Are you sure you want to delete **{title}**?"
+            }
+          },
+          "form": {
+            "type": "Type",
+            "title": "Title",
+            "content": "Content",
+            "dismissibleEnd": "Dismissible End",
+            "enabledStart": "Enabled Start",
+            "enabledEnd": "Enabled End",
+            "locations": "Locations",
+            "locationsDescription": "Leave empty to apply to all locations.",
+            "nodes": "Nodes",
+            "nodesDescription": "Leave empty to apply to all nodes.",
+            "backupConfigurations": "Backup Configurations",
+            "backupConfigurationsDescription": "Leave empty to apply to all backup configurations.",
+            "eggs": "Eggs",
+            "eggsPlaceholder": "Select Eggs",
+            "dismissible": "Dismissible"
+          },
+          "enum": {
+            "announcementType": {
+              "info": "Info",
+              "success": "Success",
+              "warning": "Warning",
+              "error": "Error"
+            }
+          },
+          "create": {
+            "title": "Create Announcement"
+          },
+          "update": {
+            "title": "Update Announcement"
+          }
+        },
+        "assets": {
+          "title": "Assets",
+          "button": {
+            "newDirectory": "New Directory",
+            "upload": "Upload",
+            "copyLink": "Copy Link"
+          },
+          "dropzone": {
+            "title": "Drop files here to upload",
+            "subtitle": "Release to start uploading"
+          },
+          "operations": {
+            "waiting": "Waiting: ",
+            "uploading": "Uploading: "
+          },
+          "toast": {
+            "assetDeleted": "Asset deleted.",
+            "assetsDeleted": "{assets} deleted."
+          },
+          "modal": {
+            "createDirectory": {
+              "title": "New Directory",
+              "form": {
+                "directoryName": "Directory name"
+              },
+              "createdAs": "Will be created at "
+            },
+            "deleteAssets": {
+              "title": "Confirm Asset Deletion",
+              "content": "Are you sure you want to delete `{count}` assets?"
+            },
+            "deleteAsset": {
+              "title": "Delete Asset",
+              "content": "Are you sure you want to delete this asset? This action cannot be undone."
+            }
+          }
+        },
+        "extensions": {
+          "title": "Extensions",
+          "unknownExtension": "Unknown Extension",
+          "unknown": "Unknown",
+          "alert": {
+            "noExtensions": "No extensions installed.",
+            "heavyImageMissing": "You don't seem to be using the heavy image required to install extensions, see [here]({docsUrl}) on how to switch to it."
+          },
+          "button": {
+            "viewBuildLogs": "View build logs",
+            "install": "Install extension",
+            "rebuild": "Rebuild extensions",
+            "configure": "Configure",
+            "back": "Back to Extensions",
+            "accept": "Accept",
+            "decline": "Decline"
+          },
+          "tooltip": {
+            "building": "The panel is currently building extension code. Please wait.",
+            "noPendingBuild": "No pending extensions to build.",
+            "noBackend": "Backend extension is required to configure this extension.",
+            "noConfigurationPage": "This extension does not have a configuration page defined.",
+            "removeExtension": "Remove extension"
+          },
+          "badge": {
+            "frontendMissing": "Frontend missing",
+            "backendMissing": "Backend missing",
+            "pendingBuild": "Pending build",
+            "pendingRemoval": "Pending removal"
+          },
+          "card": {
+            "version": "Version",
+            "authors": "Authors"
+          },
+          "section": {
+            "pendingExtensions": "Pending extensions",
+            "noPendingExtensions": "No pending extensions."
+          },
+          "dropzone": {
+            "title": "Drop some files here to install as Extensions",
+            "subtitle": "Release to start installing"
+          },
+          "toast": {
+            "buildStarted": "Extension rebuild started successfully.",
+            "buildCompleted": "Extension build completed. You may need to refresh the page.",
+            "added": "Extension `{packageName}` added successfully.",
+            "removed": "Extension `{packageName}` removed successfully."
+          },
+          "notFound": {
+            "title": "Extension Not Found",
+            "content": "Extension with package name \"{packageName}\" not found."
+          },
+          "configure": {
+            "title": "Configure {packageName}",
+            "noConfigurationPage": "This extension does not have a configuration page."
+          },
+          "modal": {
+            "buildLogs": {
+              "title": "Build Logs",
+              "empty": "No logs found."
+            },
+            "license": {
+              "title": "License agreement",
+              "description": "The extension `{packageName}` requires you to accept the following license before it can be installed."
+            },
+            "remove": {
+              "title": "Remove extension",
+              "content": "Are you sure you want to remove the extension `{packageName}`? This action cannot be undone.",
+              "form": {
+                "removeMigrations": "Do you want to remove & rollback the database migrations of this extension?"
+              }
+            }
+          }
+        },
+        "users": {
+          "title": "Users",
+          "resourceName": "User",
+          "tooltip": {
+            "admin": "Admin",
+            "twoFactorEnabled": "2FA Enabled",
+            "twoFactorDisabled": "2FA Disabled",
+            "cannotImpersonateSelf": "You cannot impersonate yourself."
+          },
+          "tabs": {
+            "servers": "Servers",
+            "oauthLinks": "OAuth Links",
+            "activity": "Activity"
+          },
+          "button": {
+            "disableTwoFactor": "Disable Two Factor",
+            "sendPasswordResetEmail": "Send Password Reset Email",
+            "impersonate": "Impersonate"
+          },
+          "form": {
+            "admin": "Admin",
+            "role": "Role",
+            "externalId": "External ID"
+          },
+          "table": {
+            "columns": {
+              "role": "Role"
+            }
+          },
+          "modal": {
+            "delete": {
+              "title": "Confirm User Deletion",
+              "content": "Are you sure you want to delete **{username}**?"
+            },
+            "disableTwoFactor": {
+              "title": "Disable User Two Factor",
+              "content": "Are you sure you want to remove the two factor of **{username}**?",
+              "button": {
+                "confirm": "Disable"
+              },
+              "toast": {
+                "disabled": "User two factor disabled."
+              }
+            },
+            "sendPasswordResetEmail": {
+              "title": "Send Password Reset Email",
+              "content": "Are you sure you want to send a password reset email to **{email}**?",
+              "button": {
+                "confirm": "Send"
+              },
+              "toast": {
+                "sent": "Password reset email sent."
+              }
+            }
+          },
+          "create": {
+            "title": "Create User"
+          },
+          "update": {
+            "title": "Update User"
+          },
+          "activity": {
+            "title": "User Activity"
+          },
+          "servers": {
+            "title": "User Servers",
+            "showOwnedOnly": "Only show users' owned servers"
+          },
+          "oauthLinks": {
+            "title": "User OAuth Links",
+            "toast": {
+              "added": "OAuth Link added.",
+              "removed": "OAuth Link removed."
+            },
+            "modal": {
+              "add": {
+                "title": "Add OAuth Link",
+                "form": {
+                  "oauthProvider": "OAuth Provider"
+                }
+              },
+              "delete": {
+                "title": "Confirm OAuth Link Deletion",
+                "content": "Are you sure you want to delete the **{provider}** connection from **{username}**?"
+              }
+            }
+          }
+        },
+        "locations": {
+          "title": "Locations"
+        },
+        "nodes": {
+          "title": "Nodes"
+        },
+        "servers": {
+          "title": "Servers"
+        },
+        "nests": {
+          "title": "Nests"
+        },
+        "eggConfigurations": {
+          "title": "Egg Configurations"
+        },
+        "eggRepositories": {
+          "title": "Egg Repositories"
+        },
+        "databaseHosts": {
+          "title": "Database Hosts"
+        },
+        "oAuthProviders": {
+          "title": "OAuth Providers"
+        },
+        "backupConfigurations": {
+          "title": "Backup Configs"
+        },
+        "mounts": {
+          "title": "Mounts"
+        },
+        "roles": {
+          "title": "Roles"
+        },
+        "activity": {
+          "title": "Activity"
+        }
+      },
       "server": {
         "viewAdmin": {
           "title": "View admin"
@@ -1120,7 +1909,8 @@
             "nodeMaintenance": "Your Server is on a node that is currently under maintenance.",
             "transferring": "Your Server is currently being transferred to another node.",
             "restoringBackup": "Your Server is currently restoring from a backup. Please wait...",
-            "installing": "Your Server is currently being installed. Please wait..."
+            "installing": "Your Server is currently being installed. Please wait...",
+            "pendingRestart": "Your Server has pending changes that require a restart. Please restart your server to apply these changes."
           },
           "message": {
             "serverMarkedAs": "Server marked as {state}...",
@@ -1194,8 +1984,11 @@
         "files": {
           "title": "Files",
           "titleEditorViewing": "Viewing {file}",
+          "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "Editing {file}",
           "titleEditorNew": "New File",
+          "titleDiffRevisionVsCurrent": "{file} - Revision #{revision} vs Current",
+          "titleDiffRevisionVsRevision": "{file} - Revision #{previousRevision} vs #{revision}",
           "table": {
             "columns": {
               "modified": "Modified"
@@ -1277,7 +2070,38 @@
             "fileRenamed": "File has been renamed.",
             "fileCouldNotBeRenamed": "File could not be renamed.",
             "permissionsUpdated": "Permissions have been updated.",
+            "permissionsUpdatedMany": "Permissions have been updated for {files}.",
+            "permissionsCouldNotBeUpdated": "Permissions could not be updated.",
             "fileSaved": "File has been saved."
+          },
+          "tooltip": {
+            "fileHistory": "File History",
+            "largestDirectories": "Analyze directory sizes",
+            "back": "Back {seconds} seconds",
+            "forward": "Forward {seconds} seconds",
+            "play": "Play",
+            "pause": "Pause",
+            "mute": "Mute",
+            "unmute": "Unmute"
+          },
+          "drawer": {
+            "revisions": {
+              "title": "File History",
+              "noRevisions": "No revisions found for this file.",
+              "restored": "Revision restored into editor.",
+              "badge": {
+                "fullSnapshot": "Full Snapshot"
+              },
+              "tooltip": {
+                "restore": "Restore this revision into the editor",
+                "viewDiff": "View diff against current file",
+                "compareToPrevious": "Compare to previous revision"
+              },
+              "diff": {
+                "original": "Revision",
+                "current": "Current"
+              }
+            }
           },
           "modal": {
             "activeUploads": {
@@ -1293,6 +2117,11 @@
               "button": {
                 "leave": "Leave Page"
               }
+            },
+            "draftRestore": {
+              "title": "Restore Draft",
+              "content": "A draft of this file was found in your browser. Would you like to restore it?",
+              "contentHashMismatch": "The file has been modified on the server since this draft was saved. Restoring the draft may overwrite those changes."
             },
             "createArchive": {
               "title": "Create Archive",
@@ -1357,6 +2186,9 @@
             },
             "filePermissions": {
               "title": "File Permissions",
+              "form": {
+                "recursive": "Apply changes recursively to all files and subdirectories within this directory"
+              },
               "symbolic": "Symbolic:",
               "octal": "Octal:",
               "owner": "Owner",
@@ -1372,6 +2204,10 @@
               "form": {
                 "fileName": "File Name"
               }
+            },
+            "largestDirectories": {
+              "title": "Largest Directories",
+              "empty": "No directories found."
             },
             "searchFiles": {
               "title": "Search Files",
@@ -1637,8 +2473,9 @@
                 "cronSchedule": "Cron Schedule"
               },
               "card": {
-                "content": "On Cron Interval `{schedule}`, Next run is {timestamp} - Last run was {lastTimestamp}."
-              }
+                "content": "On Cron Interval {schedule}, Next run is {timestamp} - Last run was {lastTimestamp}."
+              },
+              "invalidCron": "Invalid cron expression"
             },
             "powerAction": {
               "title": "Power Action",
@@ -1923,6 +2760,10 @@
         },
         "subusers": {
           "title": "Subusers",
+          "subtitle": "{current} of {max} maximum subusers created.",
+          "tooltip": {
+            "limitReached": "This server is limited to {max} subusers."
+          },
           "table": {
             "columns": {
               "twoFactorEnabled": "2FA Enabled",
@@ -1940,7 +2781,8 @@
                 "email": "Email",
                 "emailPlaceholder": "Enter the email that this subuser should be saved as.",
                 "permissions": "Permissions",
-                "ignoredFiles": "Ignored Files"
+                "ignoredFiles": "Ignored Files",
+                "ignoredFilesDescription": "Files and directories matching these patterns will be hidden from this subuser. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`). Prefix a pattern with `!` to un-hide a path that a broader pattern would otherwise exclude."
               }
             },
             "updateSubuser": {
@@ -1998,7 +2840,10 @@
               }
             },
             "restoreBackup": {
-              "title": "Restore Backup"
+              "title": "Restore Backup",
+              "form": {
+                "restoreStartup": "Restore the startup command, image, and variables from this backup."
+              }
             },
             "deleteBackup": {
               "title": "Confirm Backup Deletion",
@@ -2006,6 +2851,9 @@
               "toast": {
                 "deleted": "Backup deleted."
               }
+            },
+            "viewMetadata": {
+              "title": "Backup Metadata"
             }
           }
         },
@@ -2081,11 +2929,14 @@
               "readOnly": "Read Only"
             }
           },
+          "button": {
+            "attach": "Attach",
+            "detach": "Detach"
+          },
           "modal": {
             "attachMount": {
               "title": "Attach Mount",
               "content": "Do you want to attach **{name}** to `{target}`?",
-              "confirm": "Attach",
               "toast": {
                 "attached": "{name} has been mounted to your server."
               }
@@ -2093,7 +2944,6 @@
             "detachMount": {
               "title": "Detach Mount",
               "content": "Do you want to detach **{name}** from `{target}`?",
-              "confirm": "Detach",
               "toast": {
                 "detached": "{name} has been removed from your server."
               }
@@ -2162,7 +3012,10 @@
           }
         },
         "activity": {
-          "title": "Activity"
+          "title": "Activity",
+          "button": {
+            "clearUserFilter": "Clear User Filter"
+          }
         }
       }
     }

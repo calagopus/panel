@@ -9,6 +9,7 @@ mod post {
         ApiError, GetState,
         models::{
             server::{GetServer, GetServerActivityLogger},
+            server_backup::ServerBackupRestoreOptions,
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -17,7 +18,10 @@ mod post {
 
     #[derive(ToSchema, Deserialize)]
     pub struct Payload {
+        #[serde(default)]
         truncate_directory: bool,
+        #[serde(default)]
+        restore_startup: bool,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -88,7 +92,15 @@ mod post {
         let uuid = server.uuid;
         if let Err(err) = backup
             .0
-            .restore(&state.database, server.0, data.truncate_directory)
+            .restore(
+                &state,
+                &mut transaction,
+                server.0,
+                ServerBackupRestoreOptions {
+                    truncate_directory: data.truncate_directory,
+                    restore_startup: data.restore_startup,
+                },
+            )
             .await
         {
             transaction.rollback().await?;
@@ -108,6 +120,7 @@ mod post {
                     "uuid": backup_uuid,
                     "name": backup_name,
                     "truncate_directory": data.truncate_directory,
+                    "restore_startup": data.restore_startup,
                 }),
             )
             .await;

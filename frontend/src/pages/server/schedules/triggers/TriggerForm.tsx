@@ -1,5 +1,6 @@
-import { Popover, Stack } from '@mantine/core';
+import { Popover, Stack, Text } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
+import cronstrue from 'cronstrue/i18n';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import Select from '@/elements/input/Select.tsx';
@@ -22,7 +23,7 @@ interface CrontabEditorProps {
 }
 
 function CrontabEditor({ value, setValue }: CrontabEditorProps) {
-  const [segments, setSegments] = useState(['*', '*', '*', '*', '*', '*']);
+  const [segments, setSegments] = useState(['0', '*', '*', '*', '*', '*']);
 
   useEffect(() => {
     const newSegments = value.split(' ');
@@ -32,7 +33,7 @@ function CrontabEditor({ value, setValue }: CrontabEditorProps) {
 
     for (let i = 0; i < CRON_SEGMENTS.length; i++) {
       if (!newSegments[i]) {
-        newSegments[i] = '*';
+        newSegments[i] = i === 0 ? '0' : '*';
       }
     }
 
@@ -91,6 +92,21 @@ function CronTriggerForm({ form, index }: TriggerFormProps) {
       </Popover.Dropdown>
     </Popover>
   );
+}
+
+function CronTriggerExtraForm({ form, index }: TriggerFormProps) {
+  const { t, language } = useTranslations();
+
+  if (form.values.triggers[index].type !== 'cron') return null;
+
+  let description: string;
+  try {
+    description = cronstrue.toString(form.values.triggers[index].schedule, { locale: language });
+  } catch {
+    description = t('pages.server.schedules.triggers.cron.invalidCron', {});
+  }
+
+  return <Text c='dimmed'>{description}</Text>;
 }
 
 function PowerActionTriggerForm({ form, index }: TriggerFormProps) {
@@ -205,7 +221,7 @@ const TRIGGER_INLINE_FORMS: Record<ServerScheduleTriggerType, React.FC<TriggerFo
 };
 
 const TRIGGER_EXTRA_FORMS: Record<ServerScheduleTriggerType, React.FC<TriggerFormProps> | null> = {
-  cron: null,
+  cron: CronTriggerExtraForm,
   power_action: null,
   server_state: null,
   backup_status: null,

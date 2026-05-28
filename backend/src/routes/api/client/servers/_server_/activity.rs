@@ -3,16 +3,37 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
-    use serde::Serialize;
+    use garde::Validate;
+    use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
-            IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
-            server_activity::ServerActivity,
+            IntoApiObject, Pagination, server::GetServer, server_activity::ServerActivity,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
+
+    #[derive(ToSchema, Validate, Deserialize)]
+    pub struct Params {
+        #[garde(range(min = 1))]
+        #[serde(default = "Pagination::default_page")]
+        page: i64,
+        #[garde(range(min = 1, max = 100))]
+        #[serde(default = "Pagination::default_per_page")]
+        per_page: i64,
+        #[garde(length(chars, min = 1, max = 128))]
+        #[schema(min_length = 1, max_length = 128)]
+        #[serde(
+            default,
+            deserialize_with = "shared::deserialize::deserialize_string_option"
+        )]
+        search: Option<compact_str::CompactString>,
+
+        #[garde(skip)]
+        user: Option<uuid::Uuid>,
+    }
 
     #[derive(ToSchema, Serialize)]
     struct Response {
@@ -26,6 +47,11 @@ mod get {
         (
             "server" = uuid::Uuid,
             description = "The server ID",
+            example = "123e4567-e89b-12d3-a456-426614174000",
+        ),
+        (
+            "user" = Option<uuid::Uuid>, Query,
+            description = "The user ID to filter activities",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
         (
@@ -45,8 +71,9 @@ mod get {
     ))]
     pub async fn route(
         state: GetState,
+        permissions: GetPermissionManager,
         server: GetServer,
-        Query(params): Query<PaginationParamsWithSearch>,
+        Query(params): Query<Params>,
     ) -> ApiResponseResult {
         if let Err(errors) = shared::utils::validate_data(&params) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
@@ -54,20 +81,39 @@ mod get {
                 .ok();
         }
 
-        let activities = ServerActivity::by_server_uuid_with_pagination(
-            &state.database,
-            server.uuid,
-            params.page,
-            params.per_page,
-            params.search.as_deref(),
-        )
-        .await?;
+        permissions.has_server_permission("activity.read")?;
+
+        let activities = if let Some(user_uuid) = params.user {
+            ServerActivity::by_server_uuid_user_uuid_with_pagination(
+                &state.database,
+                server.uuid,
+                user_uuid,
+                params.page,
+                params.per_page,
+                params.search.as_deref(),
+            )
+            .await?
+        } else {
+            ServerActivity::by_server_uuid_with_pagination(
+                &state.database,
+                server.uuid,
+                params.page,
+                params.per_page,
+                params.search.as_deref(),
+            )
+            .await?
+        };
 
         let storage_url_retriever = state.storage.retrieve_urls().await?;
+        let can_read_ip = permissions
+            .has_server_permission("activity.read-ip")
+            .is_ok();
 
         ApiResponse::new_serialized(Response {
             activities: activities
-                .try_async_map(|activity| activity.into_api_object(&state, &storage_url_retriever))
+                .try_async_map(|activity| {
+                    activity.into_api_object(&state, (&storage_url_retriever, can_read_ip))
+                })
                 .await?,
         })
         .ok()

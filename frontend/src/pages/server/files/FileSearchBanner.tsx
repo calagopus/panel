@@ -32,26 +32,28 @@ export default function FileSearchBanner({ resetEntries }: { resetEntries: () =>
         <div className='flex flex-col gap-1 text-sm'>
           {searchInfo.query && (
             <div>
-              <span className='font-medium text-white/80'>{t('pages.server.files.searchBanner.query', {})}</span>{' '}
-              <span className='text-white/60'>&quot;{searchInfo.query}&quot;</span>
+              <span className='font-medium'>{t('pages.server.files.searchBanner.query', {})}</span>{' '}
+              <span className='text-(--mantine-color-dimmed)'>&quot;{searchInfo.query}&quot;</span>
             </div>
           )}
           {searchInfo.filters.pathFilter?.exclude && searchInfo.filters.pathFilter.exclude.length > 0 && (
             <div>
-              <span className='font-medium text-white/80'>{t('pages.server.files.searchBanner.excluded', {})}</span>{' '}
-              <span className='text-white/60'>{searchInfo.filters.pathFilter.exclude.join(', ')}</span>
+              <span className='font-medium'>{t('pages.server.files.searchBanner.excluded', {})}</span>{' '}
+              <span className='text-(--mantine-color-dimmed)'>{searchInfo.filters.pathFilter.exclude.join(', ')}</span>
             </div>
           )}
           {searchInfo.filters.contentFilter && (
             <div>
-              <span className='font-medium text-white/80'>{t('pages.server.files.searchBanner.content', {})}</span>{' '}
-              <span className='text-white/60'>{searchInfo.filters.contentFilter.query || '(empty)'}</span>
+              <span className='font-medium'>{t('pages.server.files.searchBanner.content', {})}</span>{' '}
+              <span className='text-(--mantine-color-dimmed)'>
+                {searchInfo.filters.contentFilter.query || '(empty)'}
+              </span>
             </div>
           )}
           {searchInfo.filters.sizeFilter && (
             <div>
-              <span className='font-medium text-white/80'>{t('pages.server.files.searchBanner.size', {})}</span>{' '}
-              <span className='text-white/60'>
+              <span className='font-medium'>{t('pages.server.files.searchBanner.size', {})}</span>{' '}
+              <span className='text-(--mantine-color-dimmed)'>
                 {searchInfo.filters.sizeFilter.min > 0 && (
                   <span>
                     {t('pages.server.files.searchBanner.min', {})} {bytesToString(searchInfo.filters.sizeFilter.min)}

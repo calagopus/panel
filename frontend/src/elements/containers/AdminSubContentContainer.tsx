@@ -1,3 +1,5 @@
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Title, TitleOrder } from '@mantine/core';
 import { Dispatch, ReactNode, SetStateAction, useMemo } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
@@ -14,7 +16,7 @@ export type Props<P = {}> = {
   setSearch?: Dispatch<SetStateAction<string>>;
   contentRight?: ReactNode;
   children: ReactNode;
-} & ({ registry: ContainerRegistry<Props<P>>; registryProps: P } | { registry?: never; registryProps?: never });
+} & ({ registry: ContainerRegistry<Props<P>, P>; registryProps: P } | { registry?: never; registryProps?: never });
 
 function AdminSubContentContainer<P>(props: Props<P>) {
   props = useMemo(() => {
@@ -52,14 +54,15 @@ function AdminSubContentContainer<P>(props: Props<P>) {
 
       {hideTitleComponent ? null : setSearch ? (
         <Group justify='space-between' mb='md'>
-          <Title order={titleOrder} c='white'>
-            {title}
-          </Title>
+          <div>
+            <Title order={titleOrder}>{title}</Title>
+          </div>
           <Group>
             <TextInput
               placeholder={t('common.input.search', {})}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              leftSection={<FontAwesomeIcon icon={faSearch} />}
               w={250}
             />
             {contentRight}
@@ -67,15 +70,15 @@ function AdminSubContentContainer<P>(props: Props<P>) {
         </Group>
       ) : contentRight ? (
         <Group justify='space-between' mb='md'>
-          <Title order={titleOrder} c='white'>
-            {title}
-          </Title>
+          <div>
+            <Title order={titleOrder}>{title}</Title>
+          </div>
           <Group>{contentRight}</Group>
         </Group>
       ) : (
-        <Title order={titleOrder} c='white'>
-          {title}
-        </Title>
+        <div className='mb-4'>
+          <Title order={titleOrder}>{title}</Title>
+        </div>
       )}
       {registry?.prependedContentComponents.map((Component, index) => (
         <Component key={`prepended-sub-content-${index}`} {...props} {...registryProps} />

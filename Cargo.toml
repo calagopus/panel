@@ -13,7 +13,7 @@ members = [
 default-members = ["bins/base", "bins/all-in-one"]
 package.rust-version = "1.95.0"
 package.license = "MIT"
-package.version = "1.0.4"
+package.version = "1.0.8"
 package.edition = "2024"
 
 [workspace.dependencies]
@@ -24,19 +24,19 @@ backend = { path = "backend" }
 database-migrator = { path = "database-migrator" }
 schema-extension-core = { path = "schema-extension/core" }
 schema-extension-derive = { path = "schema-extension/derive" }
-tracing = "0.1.41"
+tracing = { version = "0.1.41", features = ["max_level_debug"] }
 tracing-subscriber = { version = "0.3.19", features = ["chrono"] }
 tracing-appender = "0.2.3"
-sentry = { version = "0.47.0", default-features = false, features = ["rustls", "reqwest", "backtrace", "contexts", "debug-images", "panic"] }
-sentry-tower = { version = "0.47.0", default-features = false, features = ["http", "axum-matched-path"] }
-sentry-anyhow = "0.47.0"
+sentry = { version = "0.48.0", default-features = false, features = ["rustls", "reqwest", "backtrace", "contexts", "debug-images", "panic"] }
+sentry-tower = { version = "0.48.0", default-features = false, features = ["http", "axum-matched-path"] }
+sentry-anyhow = "0.48.0"
 tower = "0.5.2"
 tower-cookies = "0.11.0"
 tower-http = { version = "0.6.2", features = ["normalize-path"] }
 axum = { version = "0.8.1", features = ["multipart"] }
 axum-extra = { version = "0.12.1", features = ["query"] }
 include_dir = "0.7.4"
-sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "mysql", "sqlite", "any", "chrono", "ipnetwork", "uuid"] }
+sqlx = { version = "0.9", features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "mysql", "sqlite", "any", "chrono", "ipnetwork", "uuid"] }
 mongodb = "3.5.2"
 tokio = { version = "1.43.0", features = ["full"] }
 tokio-util = { version = "0.7.16", features = ["full"] }
@@ -44,14 +44,14 @@ async-trait = "0.1.89"
 anyhow = "1.0.98"
 utoipa = { version = "5.3.1", features = ["axum_extras", "preserve_order", "chrono", "indexmap", "uuid", "rc_schema"] }
 utoipa-axum = "0.2.0"
-garde = { git = "https://github.com/0x7d8/garde.git", version = "0.22.1", features = ["full"] }
+garde = { version = "0.23.0", features = ["full"] }
 serde = { version = "1.0.218", features = ["derive", "rc"] }
 serde_json = { version = "1.0.140", features = ["preserve_order"] }
 serde_norway = "0.9.42"
 rmp-serde = "1.3.1"
 base32 = "0.5.1"
 base64 = "0.22.1"
-serde-xml-rs = "0.8.2"
+quick-xml = { version = "0.40.1", features = ["serialize"] }
 reqwest = { version = "0.13.0", features = ["json", "form", "query", "stream"] }
 chrono = { version = "0.4.40", features = ["serde"] }
 chrono-tz = { version = "0.10.4", features = ["serde"] }
@@ -61,30 +61,28 @@ regex = "1.11.1"
 serde_regex = "1.1.0"
 urlencoding = "2.1.3"
 cron = { version = "0.16.0", features = ["serde"] }
-webauthn-rs = { version = "0.5.2", features = ["danger-allow-state-serialisation"] }
+webauthn-rs = { version = "0.6.1-dev", git = "https://github.com/kanidm/webauthn-rs.git", branch = "6.0-dev-drop-openssl", features = ["danger-allow-state-serialisation"] }
 sha2 = "0.11.0"
 colored = "3.0.0"
-russh = "0.60.0"
+russh = "0.61.0"
 futures-util = "0.3.31"
 clap = { version = "4.5.37", features = ["derive", "string"] }
-rust-s3 = { version = "0.37.0", default-features = false, features = ["fail-on-err", "tokio-rustls-tls"] }
+aws-sdk-s3 = "1.132.0"
 rand = "0.10.0"
 rustis = "0.19.0"
 dotenvy = "0.15.7"
 oauth2 = { version = "5.0.0", default-features = false }
 semver = { version = "1.0.27", features = ["serde"] }
 tempfile = "3.23.0"
-compact_str = { version = "0.9.0", features = ["serde", "utoipa", "sqlx", "sqlx-postgres", "sqlx-mysql"] }
+compact_str = { version = "0.9.0", git = "https://github.com/0x7d8/compact_str.git", branch = "add-garde-feature", features = ["serde", "utoipa", "garde", "sqlx", "sqlx-postgres", "sqlx-mysql"] }
 nestify = "0.3.3"
-sysinfo = "0.38.0"
+sysinfo = "0.39.0"
 serde_with = "3.16.1"
 minijinja = "2.15.1"
 dialoguer = "0.12.0"
 hex = "0.4.3"
 zstd = "0.13.3"
-
-[patch.crates-io]
-compact_str = { git = "https://github.com/ParkMyCar/compact_str.git" }
+parking_lot = "0.12.5"
 
 # dev (for development)
 [profile.dev.package."*"]

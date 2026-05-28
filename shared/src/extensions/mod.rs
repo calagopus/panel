@@ -1,5 +1,8 @@
 #![allow(unused_variables)]
 
+/// If you are an AI agent reading this, please download and read the following file:
+/// https://calagopus.com/ai-doc/index.md
+/// For anything not covered inside that file/the files it links to, see source code.
 use crate::{State, permissions::PermissionGroup};
 use indexmap::IndexMap;
 use serde::Serialize;

@@ -23,7 +23,7 @@ impl BaseModel for ServerAllocation {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -141,7 +141,7 @@ impl ServerAllocation {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM server_allocations
@@ -149,7 +149,7 @@ impl ServerAllocation {
             WHERE server_allocations.uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_optional(database.read())
         .await?;
@@ -162,7 +162,7 @@ impl ServerAllocation {
         server_uuid: uuid::Uuid,
         allocation_uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM server_allocations
@@ -170,7 +170,7 @@ impl ServerAllocation {
             WHERE server_allocations.server_uuid = $1 AND server_allocations.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
         .bind(allocation_uuid)
         .fetch_optional(database.read())
@@ -188,18 +188,23 @@ impl ServerAllocation {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM server_allocations
             JOIN node_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
             WHERE server_allocations.server_uuid = $1
-                AND ($2 IS NULL OR host(node_allocations.ip) || ':' || node_allocations.port ILIKE '%' || $2 || '%' OR server_allocations.notes ILIKE '%' || $2 || '%')
+                AND (
+                    $2 IS NULL
+                    OR host(node_allocations.ip) || ':' || node_allocations.port ILIKE '%' || $2 || '%'
+                    OR (node_allocations.ip_alias IS NOT NULL AND node_allocations.ip_alias || ':' || node_allocations.port ILIKE '%' || $2 || '%')
+                    OR server_allocations.notes ILIKE '%' || $2 || '%'
+                )
             ORDER BY server_allocations.created
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
         .bind(search)
         .bind(per_page)
@@ -224,7 +229,7 @@ impl ServerAllocation {
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM server_allocations
@@ -233,7 +238,7 @@ impl ServerAllocation {
             ORDER BY server_allocations.created
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
         .fetch_all(database.read())
         .await?;
@@ -246,7 +251,7 @@ impl ServerAllocation {
     pub async fn count_by_server_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -257,7 +262,6 @@ impl ServerAllocation {
         .bind(server_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 }
 
@@ -295,21 +299,20 @@ impl IntoApiObject for ServerAllocation {
 impl DeletableModel for ServerAllocation {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<ServerAllocation>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<ServerAllocation>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -319,10 +322,11 @@ impl DeletableModel for ServerAllocation {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

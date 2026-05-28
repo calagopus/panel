@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE server_schedule_steps\n                    SET error = NULL\n                    WHERE server_schedule_steps.schedule_uuid = $1\n                        AND (array_length($2::uuid[], 1) IS NULL OR server_schedule_steps.uuid != ALL($2))",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "UuidArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "99791112b2c561bc375066f553c742a315e158a0abd2bfedd3608384a4fa57a1"
+}

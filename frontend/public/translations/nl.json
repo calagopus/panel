@@ -1011,8 +1011,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Aanbiedernaam",
-              "identifier": "Identificatie"
+              "providerName": "Aanbiedernaam"
             }
           },
           "modal": {
@@ -1616,7 +1615,7 @@
                 "cronSchedule": "Cron-planning"
               },
               "card": {
-                "content": "Op cron-interval `{schedule}`, volgende uitvoering is {timestamp} - laatste uitvoering was {lastTimestamp}."
+                "content": "Op cron-interval {schedule}, volgende uitvoering is {timestamp} - laatste uitvoering was {lastTimestamp}."
               }
             },
             "powerAction": {
@@ -2051,11 +2050,14 @@
               "readOnly": "Alleen-lezen"
             }
           },
+          "button": {
+            "attach": "Koppelen",
+            "detach": "Loskoppelen"
+          },
           "modal": {
             "attachMount": {
               "title": "Koppeling toevoegen",
               "content": "Wilt u **{name}** koppelen aan `{target}`?",
-              "confirm": "Koppelen",
               "toast": {
                 "attached": "{name} is gekoppeld aan uw server."
               }
@@ -2063,7 +2065,6 @@
             "detachMount": {
               "title": "Koppeling verwijderen",
               "content": "Wilt u **{name}** loskoppelen van `{target}`?",
-              "confirm": "Loskoppelen",
               "toast": {
                 "detached": "{name} is verwijderd van uw server."
               }

@@ -1,10 +1,20 @@
+import { useMantineColorScheme } from '@mantine/core';
 import classNames from 'classnames';
 import { ReactNode, Suspense } from 'react';
 import { ClipLoader } from 'react-spinners';
 import { makeComponentHookable } from 'shared';
 
 function Spinner({ size }: { size?: number }) {
-  return <ClipLoader size={size} aria-label='Loading Spinner' data-testid='loader' color='#fff' />;
+  const { colorScheme } = useMantineColorScheme();
+
+  return (
+    <ClipLoader
+      size={size}
+      aria-label='Loading Spinner'
+      data-testid='loader'
+      color={colorScheme === 'dark' ? '#fff' : '#000'}
+    />
+  );
 }
 
 export default makeComponentHookable(Spinner, {

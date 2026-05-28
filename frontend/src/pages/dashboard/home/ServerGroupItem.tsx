@@ -10,10 +10,9 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Collapse, Menu } from '@mantine/core';
-import { useQueryClient } from '@tanstack/react-query';
+import { Collapse, Menu, useComputedColorScheme } from '@mantine/core';
 import classNames from 'classnames';
-import { ComponentProps, memo, useEffect, useMemo, useState } from 'react';
+import { ComponentProps, memo, startTransition, useEffect, useState } from 'react';
 import { z } from 'zod';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import deleteServerGroup from '@/api/me/servers/groups/deleteServerGroup.ts';
@@ -67,28 +66,22 @@ export default function ServerGroupItem({
   const { t, tItem } = useTranslations();
   const { updateServerGroup: updateStateServerGroup, removeServerGroup } = useUserStore();
   const { addToast } = useToast();
-  const queryClient = useQueryClient();
+  const isDark = useComputedColorScheme('dark') === 'dark';
 
   const [isExpanded, setIsExpanded] = useState(
     localStorage.getItem(`server-group-expanded-${serverGroup.uuid}`) !== 'false',
   );
-
+  const [servers, setServers] = useState(getEmptyPaginationSet<z.infer<typeof serverSchema>>());
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | 'add-server' | null>(null);
 
   const { handleBulkPowerAction, bulkActionLoading: groupActionLoading } = useBulkPowerActions();
 
-  const { data, loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
+  const { loading, search, setSearch, setPage, refetch } = useSearchablePaginatedTable({
     queryKey: [...queryKeys.user.servers.all(), serverGroup.uuid],
     fetcher: (page, search) => getServerGroupServers(serverGroup.uuid, page, search),
+    setStoreData: setServers,
     modifyParams: false,
   });
-
-  const servers = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
-
-  const queryKey = useMemo(
-    () => [...queryKeys.user.servers.all(), serverGroup.uuid, servers.page, search],
-    [serverGroup.uuid, servers.page, search],
-  );
 
   useEffect(() => {
     localStorage.setItem(`server-group-expanded-${serverGroup.uuid}`, String(isExpanded));
@@ -115,17 +108,6 @@ export default function ServerGroupItem({
   }));
 
   const serverCount = servers?.total ?? serverGroup.serverOrder.length;
-
-  const doOptimisticUpdate = (items: DndServer[], serverOrder: string[]) => {
-    queryClient.setQueryData(queryKey, (old) => {
-      if (!old) return old;
-      return { ...old, data: items };
-    });
-
-    updateStateServerGroup(serverGroup.uuid, {
-      serverOrder,
-    });
-  };
 
   return (
     <>
@@ -155,7 +137,7 @@ export default function ServerGroupItem({
       <Card key={serverGroup.uuid} p={0} className='overflow-hidden rounded-xl!'>
         <div
           id='server-group-item-header'
-          className='flex flex-row items-end sm:items-center gap-3 px-3 bg-(--mantine-color-dark-7) justify-between'
+          className='flex flex-row items-end sm:items-center gap-3 px-3 bg-(--mantine-color-dark-7) light:bg-(--mantine-color-gray-0)! justify-between border-b border-(--mantine-color-default-border)'
         >
           <div className='flex flex-col my-3 sm:my-0'>
             <div className='flex flex-row'>
@@ -164,7 +146,7 @@ export default function ServerGroupItem({
                 variant='subtle'
                 color='gray'
                 style={{ cursor: 'grab', flexShrink: 0 }}
-                className='text-gray-400!'
+                className='text-gray-400! light:text-gray-500!'
                 {...dragHandleProps}
               >
                 <FontAwesomeIcon icon={faGripVertical} style={{ fontSize: 16 }} />
@@ -178,11 +160,11 @@ export default function ServerGroupItem({
                   icon={faChevronRight}
                   className={classNames(
                     isExpanded ? 'rotate-90' : 'rotate-0',
-                    'transition duration-200 w-3 h-3 text-gray-400 shrink-0',
+                    'transition duration-200 w-3 h-3 text-(--mantine-color-dimmed) shrink-0',
                   )}
                 />
-                <span className='font-medium text-white truncate'>{serverGroup.name}</span>
-                <Badge variant='light' color='gray'>
+                <span className='font-medium truncate'>{serverGroup.name}</span>
+                <Badge variant={isDark ? 'light' : 'filled'} color='gray'>
                   {tItem('server', serverCount)}
                 </Badge>
               </button>
@@ -192,7 +174,7 @@ export default function ServerGroupItem({
               size='xs'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              leftSection={<FontAwesomeIcon icon={faSearch} className='w-3 h-3 text-gray-500' />}
+              leftSection={<FontAwesomeIcon icon={faSearch} />}
               className='w-48 mt-1 sm:hidden'
             />
           </div>
@@ -203,7 +185,7 @@ export default function ServerGroupItem({
               size='xs'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              leftSection={<FontAwesomeIcon icon={faSearch} className='w-3 h-3 text-gray-500' />}
+              leftSection={<FontAwesomeIcon icon={faSearch} />}
               className='min-w-32 hidden sm:block'
             />
             <div className='flex flex-row items-center gap-1 w-full justify-end'>
@@ -273,40 +255,41 @@ export default function ServerGroupItem({
             {loading ? (
               <Spinner.Centered />
             ) : servers.total === 0 ? (
-              <p className='text-gray-500 text-sm text-center py-4'>{t('pages.account.home.noServers', {})}</p>
+              <p className='text-gray-500 text-sm text-center py-4 light:text-gray-600!'>
+                {t('pages.account.home.noServers', {})}
+              </p>
             ) : (
               <DndContainer
                 items={dndServers}
                 strategy={rectSortingStrategy}
                 callbacks={{
                   onDragEnd: async (items) => {
-                    const startIndex = (servers.page - 1) * servers.perPage;
-
                     const serverOrder = insertItems(
                       serverGroup.serverOrder,
                       items.map((s) => s.uuid),
-                      startIndex,
+                      (servers.page - 1) * servers.perPage,
                     );
 
-                    const previous = queryClient.getQueryData(queryKey);
+                    startTransition(() => {
+                      setServers({ ...servers, data: items });
+                    });
 
-                    doOptimisticUpdate(items, serverOrder);
-
-                    try {
-                      await updateServerGroup(serverGroup.uuid, { serverOrder });
-                    } catch (err) {
-                      queryClient.setQueryData(queryKey, previous);
+                    await updateServerGroup(serverGroup.uuid, { serverOrder }).catch((err) => {
+                      addToast(httpErrorToHuman(err), 'error');
                       updateStateServerGroup(serverGroup.uuid, {
                         serverOrder: serverGroup.serverOrder,
                       });
-                      addToast(httpErrorToHuman(err), 'error');
-                    }
+                      setServers({ ...servers, data: servers.data });
+                    });
+                  },
+                  onError: (error) => {
+                    console.error('Drag error:', error);
                   },
                 }}
-                renderOverlay={(active) =>
-                  active ? (
+                renderOverlay={(activeServer) =>
+                  activeServer ? (
                     <div style={{ cursor: 'grabbing' }}>
-                      <MemoizedServerItem server={active} showSelection={false} />
+                      <MemoizedServerItem server={activeServer} onGroupRemove={() => null} showSelection={false} />
                     </div>
                   ) : null
                 }
@@ -319,19 +302,16 @@ export default function ServerGroupItem({
                           server={server}
                           showSelection={false}
                           onGroupRemove={() => {
-                            const previous = queryClient.getQueryData(queryKey);
-
                             const serverOrder = serverGroup.serverOrder.filter(
-                              (_, idx) => (servers.page - 1) * servers.perPage + i !== idx,
+                              (_, orderI) => (servers.page - 1) * servers.perPage + i !== orderI,
                             );
+                            updateStateServerGroup(serverGroup.uuid, {
+                              serverOrder,
+                            });
+                            setServers((prev) => ({ ...prev, data: prev.data.filter((_, dataI) => i !== dataI) }));
 
-                            const newItems = items.filter((_, idx) => idx !== i);
-
-                            doOptimisticUpdate(newItems, serverOrder);
-
-                            updateServerGroup(serverGroup.uuid, { serverOrder }).catch((err) => {
-                              queryClient.setQueryData(queryKey, previous);
-                              addToast(httpErrorToHuman(err), 'error');
+                            updateServerGroup(serverGroup.uuid, { serverOrder }).catch((msg) => {
+                              addToast(httpErrorToHuman(msg), 'error');
                             });
                           }}
                         />

@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getRoles from '@/api/admin/roles/getRoles.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,12 +17,16 @@ import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 function RolesContainer() {
   const navigate = useNavigate();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: roles,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.roles.all(),
     fetcher: getRoles,
   });
-
-  const roles = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminContentContainer
@@ -43,7 +46,7 @@ function RolesContainer() {
       }
     >
       <Table columns={roleTableColumns} loading={loading} pagination={roles} onPageSelect={setPage}>
-        {roles.data.map((role) => (
+        {roles?.data.map((role) => (
           <RoleRow key={role.uuid} role={role} />
         ))}
       </Table>

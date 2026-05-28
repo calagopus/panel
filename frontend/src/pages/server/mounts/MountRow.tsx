@@ -10,6 +10,7 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Code from '@/elements/Code.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { serverMountSchema } from '@/lib/schemas/server/mounts.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/contexts/translationContext.ts';
@@ -22,8 +23,8 @@ export const MountRow = ({ contextMount }: { contextMount: z.infer<typeof server
 
   const [openModal, setOpenModal] = useState<'attach' | 'detach' | null>(null);
 
-  const doAttach = () => {
-    attachMount(server.uuid, contextMount.uuid)
+  const doAttach = async () => {
+    await attachMount(server.uuid, contextMount.uuid)
       .then(() => {
         addToast(
           t('pages.server.mounts.modal.attachMount.toast.attached', {
@@ -39,8 +40,8 @@ export const MountRow = ({ contextMount }: { contextMount: z.infer<typeof server
       });
   };
 
-  const doDetach = () => {
-    detachMount(server.uuid, contextMount.uuid)
+  const doDetach = async () => {
+    await detachMount(server.uuid, contextMount.uuid)
       .then(() => {
         addToast(
           t('pages.server.mounts.modal.detachMount.toast.detached', {
@@ -55,13 +56,14 @@ export const MountRow = ({ contextMount }: { contextMount: z.infer<typeof server
         addToast(httpErrorToHuman(msg), 'error');
       });
   };
+
   return (
     <>
       <ConfirmationModal
         opened={openModal === 'attach'}
         onClose={() => setOpenModal(null)}
         title={t('pages.server.mounts.modal.attachMount.title', {})}
-        confirm={t('pages.server.mounts.modal.attachMount.confirm', {})}
+        confirm={t('pages.server.mounts.button.attach', {})}
         confirmColor='green'
         onConfirmed={doAttach}
       >
@@ -75,7 +77,7 @@ export const MountRow = ({ contextMount }: { contextMount: z.infer<typeof server
         opened={openModal === 'detach'}
         onClose={() => setOpenModal(null)}
         title={t('pages.server.mounts.modal.detachMount.title', {})}
-        confirm={t('pages.server.mounts.modal.detachMount.confirm', {})}
+        confirm={t('pages.server.mounts.button.detach', {})}
         onConfirmed={doDetach}
       >
         {t('pages.server.mounts.modal.detachMount.content', {
@@ -111,15 +113,23 @@ export const MountRow = ({ contextMount }: { contextMount: z.infer<typeof server
 
         <TableData>
           <Group gap={4} justify='right' wrap='nowrap'>
-            {contextMount.created ? (
-              <ActionIcon color='red' onClick={() => setOpenModal('detach')}>
-                <FontAwesomeIcon icon={faMinus} />
-              </ActionIcon>
-            ) : (
-              <ActionIcon color='green' onClick={() => setOpenModal('attach')}>
-                <FontAwesomeIcon icon={faPlus} />
-              </ActionIcon>
-            )}
+            <Tooltip
+              label={
+                contextMount.created
+                  ? t('pages.server.mounts.button.detach', {})
+                  : t('pages.server.mounts.button.attach', {})
+              }
+            >
+              {contextMount.created ? (
+                <ActionIcon color='red' onClick={() => setOpenModal('detach')}>
+                  <FontAwesomeIcon icon={faMinus} />
+                </ActionIcon>
+              ) : (
+                <ActionIcon color='green' onClick={() => setOpenModal('attach')}>
+                  <FontAwesomeIcon icon={faPlus} />
+                </ActionIcon>
+              )}
+            </Tooltip>
           </Group>
         </TableData>
       </TableRow>

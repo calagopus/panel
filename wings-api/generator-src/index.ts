@@ -5,6 +5,8 @@ import generateSchemaObject from "@/generate-schema-object"
 import { pascalCase, snakeCase } from "change-case"
 import { convertType } from "@/generate-schema-property"
 
+// TODO 1.1.x: Make query params use defaultable structs instead of function arguments
+
 const openapi: oas31.OpenAPIObject = JSON.parse(fs.readFileSync('../openapi.json', 'utf-8'))
 const output = fs.createWriteStream('../src/lib.rs', { flags: 'w' })
 

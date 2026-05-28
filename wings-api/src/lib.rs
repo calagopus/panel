@@ -83,6 +83,15 @@ pub enum CompressionLevel {
 }
 
 nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct CopyFile {
+        #[schema(inline)]
+        pub from: compact_str::CompactString,
+        #[schema(inline)]
+        pub to: compact_str::CompactString,
+    }
+}
+
+nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct DirectoryEntry {
         #[schema(inline)]
         pub name: compact_str::CompactString,
@@ -141,6 +150,11 @@ nestify::nest! {
 }
 
 nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct FilesystemOperation {
+    }
+}
+
+nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct InstallationScript {
         #[schema(inline)]
         pub container_image: compact_str::CompactString,
@@ -188,6 +202,23 @@ nestify::nest! {
         pub cpu_absolute: f64,
         #[schema(inline)]
         pub uptime: u64,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RevisionInfo {
+        #[schema(inline)]
+        pub id: i64,
+        #[schema(inline)]
+        pub size: u64,
+        #[schema(inline)]
+        pub stored_size: u64,
+        #[schema(inline)]
+        pub user: Option<uuid::Uuid>,
+        #[schema(inline)]
+        pub is_snapshot: bool,
+        #[schema(inline)]
+        pub created: chrono::DateTime<chrono::Local>,
     }
 }
 
@@ -449,6 +480,20 @@ pub enum TransferArchiveFormat {
     TarLz4,
     #[serde(rename = "tar_zstd")]
     TarZstd,
+    #[serde(rename = "itaf")]
+    Itaf,
+    #[serde(rename = "itaf_gz")]
+    ItafGz,
+    #[serde(rename = "itaf_xz")]
+    ItafXz,
+    #[serde(rename = "itaf_lzip")]
+    ItafLzip,
+    #[serde(rename = "itaf_bz2")]
+    ItafBz2,
+    #[serde(rename = "itaf_lz4")]
+    ItafLz4,
+    #[serde(rename = "itaf_zstd")]
+    ItafZstd,
 }
 
 nestify::nest! {
@@ -496,6 +541,8 @@ pub enum WebsocketEvent {
     Stats,
     #[serde(rename = "status")]
     Status,
+    #[serde(rename = "pending restart")]
+    PendingRestart,
     #[serde(rename = "custom event")]
     CustomEvent,
     #[serde(rename = "console output")]
@@ -813,6 +860,8 @@ pub mod servers_server_files_chmod {
                     pub file: compact_str::CompactString,
                     #[schema(inline)]
                     pub mode: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub recursive: bool,
                 }>,
             }
         }
@@ -1142,6 +1191,21 @@ pub mod servers_server_files_fingerprints {
         pub type Response = Response200;
     }
 }
+pub mod servers_server_files_largest_directories {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        pub type Response200 = Vec<DirectoryEntry>;
+
+        pub type Response404 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
 pub mod servers_server_files_list {
     use super::*;
 
@@ -1152,6 +1216,8 @@ pub mod servers_server_files_list {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
                 pub total: u64,
+                #[schema(inline)]
+                pub filesystem_primary: bool,
                 #[schema(inline)]
                 pub filesystem_writable: bool,
                 #[schema(inline)]
@@ -1179,6 +1245,22 @@ pub mod servers_server_files_list_directory {
         pub type Response404 = ApiError;
 
         pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod servers_server_files_operations {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub operations: Vec<FilesystemOperation>,
+            }
+        }
 
         pub type Response = Response200;
     }
@@ -1334,6 +1416,35 @@ pub mod servers_server_files_rename {
         pub type Response = Response200;
     }
 }
+pub mod servers_server_files_revisions {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub revisions: Vec<RevisionInfo>,
+            }
+        }
+
+        pub type Response = Response200;
+    }
+}
+pub mod servers_server_files_revisions_revision {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        pub type Response200 = AsyncResponseReader;
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
 pub mod servers_server_files_search {
     use super::*;
 
@@ -1398,6 +1509,8 @@ pub mod servers_server_files_write {
 
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub revision_id: Option<i64>,
             }
         }
 
@@ -1561,14 +1674,7 @@ pub mod servers_server_script {
 
         pub type RequestBody = InstallationScript;
 
-        nestify::nest! {
-            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
-                #[schema(inline)]
-                pub stdout: compact_str::CompactString,
-                #[schema(inline)]
-                pub stderr: compact_str::CompactString,
-            }
-        }
+        pub type Response200 = AsyncResponseReader;
 
         pub type Response = Response200;
     }
@@ -1889,7 +1995,17 @@ pub mod system_config {
                     },
 
                     #[schema(inline)]
+                    pub machine_id: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemMachineId {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                    },
+
+                    #[schema(inline)]
+                    pub disk_check_concurrency: u64,
+                    #[schema(inline)]
                     pub disk_check_interval: u64,
+                    #[schema(inline)]
+                    pub full_disk_check_every: u64,
                     #[schema(inline)]
                     pub disk_check_use_inotify: bool,
                     #[schema(inline)]
@@ -1962,6 +2078,26 @@ pub mod system_config {
                         pub detect_clean_exit_as_crash: bool,
                         #[schema(inline)]
                         pub timeout: u64,
+                    },
+
+                    #[schema(inline)]
+                    pub file_history: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemFileHistory {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                        #[schema(inline)]
+                        pub zstd_level: i32,
+                        #[schema(inline)]
+                        pub anchor_interval: u64,
+                        #[schema(inline)]
+                        pub keep_chains: u64,
+                        #[schema(inline)]
+                        pub file_size_cap: u64,
+                        #[schema(inline)]
+                        pub per_file_disk_budget: u64,
+                        #[schema(inline)]
+                        pub per_server_disk_budget: u64,
+                        #[schema(inline)]
+                        pub maintenance_interval: u64,
                     },
 
                     #[schema(inline)]
@@ -2393,48 +2529,7 @@ pub mod update {
     pub mod post {
         use super::*;
 
-        nestify::nest! {
-            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
-                #[schema(inline)]
-                pub debug: Option<bool>,
-                #[schema(inline)]
-                pub app_name: Option<compact_str::CompactString>,
-                #[schema(inline)]
-                pub api: Option<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBodyApi {
-                    #[schema(inline)]
-                    pub host: Option<compact_str::CompactString>,
-                    #[schema(inline)]
-                    pub port: Option<u32>,
-                    #[schema(inline)]
-                    pub ssl: Option<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBodyApiSsl {
-                        #[schema(inline)]
-                        pub enabled: Option<bool>,
-                        #[schema(inline)]
-                        pub cert: Option<compact_str::CompactString>,
-                        #[schema(inline)]
-                        pub key: Option<compact_str::CompactString>,
-                    }>,
-                    #[schema(inline)]
-                    pub upload_limit: Option<MiB>,
-                }>,
-                #[schema(inline)]
-                pub system: Option<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBodySystem {
-                    #[schema(inline)]
-                    pub sftp: Option<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBodySystemSftp {
-                        #[schema(inline)]
-                        pub bind_address: Option<compact_str::CompactString>,
-                        #[schema(inline)]
-                        pub bind_port: Option<u32>,
-                    }>,
-                }>,
-                #[schema(inline)]
-                pub allowed_origins: Option<Vec<compact_str::CompactString>>,
-                #[schema(inline)]
-                pub allow_cors_private_network: Option<bool>,
-                #[schema(inline)]
-                pub ignore_panel_config_updates: Option<bool>,
-            }
-        }
+        pub type RequestBody = serde_json::Value;
 
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {

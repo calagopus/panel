@@ -1,4 +1,4 @@
-import { Group, Stack, Tooltip } from '@mantine/core';
+import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -13,11 +13,13 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { isIP } from '@/lib/ip.ts';
 import { adminSettingsWebauthnSchema } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function WebauthnContainer() {
   const { addToast } = useToast();
-  const { webauthn } = useAdminStore();
+  const { t } = useTranslations();
+  const { webauthn, updateSettings } = useAdminStore();
 
   const [openModal, setOpenModal] = useState<'changeRpId' | null>(null);
   const [loading, setLoading] = useState(false);
@@ -41,7 +43,8 @@ export default function WebauthnContainer() {
     setLoading(true);
     updateWebauthnSettings(adminSettingsWebauthnSchema.parse(form.getValues()))
       .then(() => {
-        addToast('Webauthn settings updated.', 'success');
+        addToast(t('pages.admin.settings.tabs.webauthn.page.toast.updated', {}), 'success');
+        updateSettings({ webauthn: adminSettingsWebauthnSchema.parse(form.getValues()) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -51,7 +54,7 @@ export default function WebauthnContainer() {
 
   const doAutofill = () => {
     if (isIP(window.location.hostname)) {
-      addToast('Cannot use Webauthn on an IP Address', 'error');
+      addToast(t('pages.admin.settings.tabs.webauthn.page.toast.ipNotAllowed', {}), 'error');
       return;
     }
 
@@ -62,20 +65,18 @@ export default function WebauthnContainer() {
   };
 
   return (
-    <AdminSubContentContainer title='Webauthn Settings' titleOrder={2}>
+    <AdminSubContentContainer title={t('pages.admin.settings.tabs.webauthn.page.title', {})} titleOrder={2}>
       <ConfirmationModal
         opened={openModal === 'changeRpId'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Changing RP Id'
-        confirm='Update'
+        title={t('pages.admin.settings.tabs.webauthn.page.modal.changeRpId.title', {})}
+        confirm={t('pages.admin.settings.tabs.webauthn.page.modal.changeRpId.button.confirm', {})}
         onConfirmed={() => {
           doUpdate();
           setOpenModal(null);
         }}
       >
-        Are you sure you want to change the RP Id? Changing the RP Id will break all existing Webauthn credentials and
-        require users to re-register their devices. This can have significant consequences, so please make sure you
-        understand the implications before proceeding.
+        {t('pages.admin.settings.tabs.webauthn.page.modal.changeRpId.content', {})}
       </ConfirmationModal>
 
       <form
@@ -85,15 +86,15 @@ export default function WebauthnContainer() {
           <Group grow>
             <TextInput
               withAsterisk
-              label='RP Id'
-              placeholder='RP Id'
+              label={t('pages.admin.settings.tabs.webauthn.page.form.rpId', {})}
+              placeholder={t('pages.admin.settings.tabs.webauthn.page.form.rpId', {})}
               key={form.key('rpId')}
               {...form.getInputProps('rpId')}
             />
             <TextInput
               withAsterisk
-              label='RP Origin'
-              placeholder='RP Origin'
+              label={t('pages.admin.settings.tabs.webauthn.page.form.rpOrigin', {})}
+              placeholder={t('pages.admin.settings.tabs.webauthn.page.form.rpOrigin', {})}
               key={form.key('rpOrigin')}
               {...form.getInputProps('rpOrigin')}
             />
@@ -101,20 +102,13 @@ export default function WebauthnContainer() {
         </Stack>
 
         <Group mt='md'>
-          <AdminCan
-            action='settings.update'
-            renderOnCant={
-              <Tooltip label='You do not have permission to update settings.'>
-                <Button disabled>Save</Button>
-              </Tooltip>
-            }
-          >
+          <AdminCan action='settings.update' cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
           </AdminCan>
           <Button variant='outline' onClick={doAutofill} disabled={loading}>
-            Autofill
+            {t('pages.admin.settings.tabs.webauthn.page.button.autofill', {})}
           </Button>
         </Group>
       </form>

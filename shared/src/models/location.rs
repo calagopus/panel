@@ -19,6 +19,8 @@ pub struct Location {
     pub name: compact_str::CompactString,
     pub description: Option<compact_str::CompactString>,
 
+    pub flag: Option<compact_str::CompactString>,
+
     pub created: chrono::NaiveDateTime,
 
     extension_data: super::ModelExtensionData,
@@ -29,7 +31,7 @@ impl BaseModel for Location {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -60,6 +62,10 @@ impl BaseModel for Location {
                 compact_str::format_compact!("{prefix}description"),
             ),
             (
+                "locations.flag",
+                compact_str::format_compact!("{prefix}flag"),
+            ),
+            (
                 "locations.created",
                 compact_str::format_compact!("{prefix}created"),
             ),
@@ -80,6 +86,7 @@ impl BaseModel for Location {
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
             description: row
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
+            flag: row.try_get(compact_str::format_compact!("{prefix}flag").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
         })
@@ -96,7 +103,7 @@ impl Location {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM locations
@@ -105,7 +112,7 @@ impl Location {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(backup_configuration_uuid)
         .bind(search)
         .bind(per_page)
@@ -134,7 +141,7 @@ impl Location {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM locations
@@ -143,7 +150,7 @@ impl Location {
             LIMIT $2 OFFSET $3
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(search)
         .bind(per_page)
         .bind(offset)
@@ -196,6 +203,7 @@ impl IntoAdminApiObject for Location {
                 },
                 name: self.name,
                 description: self.description,
+                flag: self.flag,
                 created: self.created.and_utc(),
             },
             api_object,
@@ -212,16 +220,35 @@ impl ByUuid for Location {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM locations
             WHERE locations.uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM locations
+            WHERE locations.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)
@@ -238,6 +265,9 @@ pub struct CreateLocationOptions {
     #[garde(length(chars, min = 1, max = 1024))]
     #[schema(min_length = 1, max_length = 1024)]
     pub description: Option<compact_str::CompactString>,
+    #[garde(length(chars, min = 2, max = 2))]
+    #[schema(min_length = 2, max_length = 2)]
+    pub flag: Option<compact_str::CompactString>,
 }
 
 #[async_trait::async_trait]
@@ -252,9 +282,10 @@ impl CreatableModel for Location {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -269,12 +300,9 @@ impl CreatableModel for Location {
             ))?;
         }
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("locations");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set(
@@ -282,15 +310,16 @@ impl CreatableModel for Location {
                 options.backup_configuration_uuid,
             )
             .set("name", &options.name)
-            .set("description", &options.description);
+            .set("description", &options.description)
+            .set("flag", &options.flag);
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
-        let location = Self::map(None, &row)?;
+        let mut location = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut location, &options, state, transaction).await?;
 
         Ok(location)
     }
@@ -316,23 +345,32 @@ pub struct UpdateLocationOptions {
         with = "::serde_with::rust::double_option"
     )]
     pub description: Option<Option<compact_str::CompactString>>,
+    #[garde(length(chars, min = 2, max = 2))]
+    #[schema(min_length = 2, max_length = 2)]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub flag: Option<Option<compact_str::CompactString>>,
 }
 
 #[async_trait::async_trait]
 impl UpdatableModel for Location {
     type UpdateOptions = UpdateLocationOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<Location>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<Location>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
@@ -359,35 +397,22 @@ impl UpdatableModel for Location {
                 None
             };
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("locations");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set(
                 "backup_configuration_uuid",
-                options
-                    .backup_configuration_uuid
-                    .as_ref()
-                    .map(|u| u.as_ref()),
+                options.backup_configuration_uuid.as_ref(),
             )
             .set("name", options.name.as_ref())
-            .set(
-                "description",
-                options.description.as_ref().map(|d| d.as_ref()),
-            )
+            .set("description", options.description.as_ref())
+            .set("flag", options.flag.as_ref())
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(backup_configuration) = backup_configuration {
             self.backup_configuration = backup_configuration;
@@ -398,8 +423,11 @@ impl UpdatableModel for Location {
         if let Some(description) = options.description {
             self.description = description;
         }
+        if let Some(flag) = options.flag {
+            self.flag = flag;
+        }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -409,21 +437,20 @@ impl UpdatableModel for Location {
 impl DeletableModel for Location {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<Location>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<Location>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -433,10 +460,11 @@ impl DeletableModel for Location {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }
@@ -453,6 +481,8 @@ pub struct AdminApiLocation {
 
     pub name: compact_str::CompactString,
     pub description: Option<compact_str::CompactString>,
+
+    pub flag: Option<compact_str::CompactString>,
 
     pub created: chrono::DateTime<chrono::Utc>,
 }

@@ -258,7 +258,7 @@ impl BaseModel for NestEgg {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -445,6 +445,7 @@ impl NestEgg {
                 CreateNestEggVariableOptions {
                     egg_uuid: egg.uuid,
                     name: variable.name,
+                    name_translations: variable.name_translations,
                     description: variable.description,
                     description_translations: variable.description_translations,
                     order: variable.order,
@@ -542,12 +543,13 @@ impl NestEgg {
 
             if let Err(err) = sqlx::query!(
                 "INSERT INTO nest_egg_variables (
-                    egg_uuid, name, description, description_translations, order_, env_variable,
+                    egg_uuid, name, name_translations, description, description_translations, order_, env_variable,
                     default_value, user_viewable, user_editable, rules
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
                 ON CONFLICT (egg_uuid, env_variable) DO UPDATE SET
                     name = EXCLUDED.name,
+                    name_translations = EXCLUDED.name_translations,
                     description = EXCLUDED.description,
                     description_translations = EXCLUDED.description_translations,
                     order_ = EXCLUDED.order_,
@@ -557,6 +559,7 @@ impl NestEgg {
                     rules = EXCLUDED.rules",
                 self.uuid,
                 &variable.name,
+                serde_json::to_value(&variable.name_translations)?,
                 variable.description.as_deref(),
                 serde_json::to_value(&variable.description_translations)?,
                 if variable.order == 0 {
@@ -609,14 +612,14 @@ impl NestEgg {
     pub async fn all(
         database: &crate::database::Database,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nest_eggs
             ORDER BY nest_eggs.created
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .fetch_all(database.read())
         .await?;
 
@@ -634,7 +637,7 @@ impl NestEgg {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM nest_eggs
@@ -643,7 +646,7 @@ impl NestEgg {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(nest_uuid)
         .bind(search)
         .bind(per_page)
@@ -673,7 +676,7 @@ impl NestEgg {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT *, COUNT(*) OVER() AS total_count
             FROM (
@@ -690,9 +693,9 @@ impl NestEgg {
             LIMIT $4 OFFSET $5
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user.uuid)
-        .bind(user.admin || user.role.as_ref().is_some_and(|r| r.admin_permissions.iter().any(|p| p == "servers.read")))
+        .bind(user.role.as_ref().map_or(user.admin, |r| r.admin_permissions.iter().any(|p| p == "servers.read")))
         .bind(search)
         .bind(per_page)
         .bind(offset)
@@ -717,14 +720,14 @@ impl NestEgg {
         nest_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nest_eggs
             WHERE nest_eggs.nest_uuid = $1 AND nest_eggs.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(nest_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -738,14 +741,14 @@ impl NestEgg {
         nest_uuid: uuid::Uuid,
         name: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nest_eggs
             WHERE nest_eggs.nest_uuid = $1 AND nest_eggs.name = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(nest_uuid)
         .bind(name)
         .fetch_optional(database.read())
@@ -757,7 +760,7 @@ impl NestEgg {
     pub async fn count_by_nest_uuid(
         database: &crate::database::Database,
         nest_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -768,7 +771,6 @@ impl NestEgg {
         .bind(nest_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     pub async fn configuration(
@@ -923,16 +925,35 @@ impl ByUuid for NestEgg {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM nest_eggs
             WHERE nest_eggs.uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM nest_eggs
+            WHERE nest_eggs.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)
@@ -992,9 +1013,10 @@ impl CreatableModel for NestEgg {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -1007,12 +1029,9 @@ impl CreatableModel for NestEgg {
             .ok_or(crate::database::InvalidRelationError("egg_repository_egg"))?;
         }
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("nest_eggs");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("nest_uuid", options.nest_uuid)
@@ -1039,11 +1058,11 @@ impl CreatableModel for NestEgg {
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
-        let nest_egg = Self::map(None, &row)?;
+        let mut nest_egg = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut nest_egg, &options, state, transaction).await?;
 
         Ok(nest_egg)
     }
@@ -1102,17 +1121,18 @@ pub struct UpdateNestEggOptions {
 impl UpdatableModel for NestEgg {
     type UpdateOptions = UpdateNestEggOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<NestEgg>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<NestEgg>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
@@ -1136,18 +1156,10 @@ impl UpdatableModel for NestEgg {
                 None
             };
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("nest_eggs");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set(
@@ -1206,7 +1218,7 @@ impl UpdatableModel for NestEgg {
             .set("file_denylist", options.file_denylist.as_ref())
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(egg_repository_egg) = egg_repository_egg {
             self.egg_repository_egg = egg_repository_egg;
@@ -1251,7 +1263,7 @@ impl UpdatableModel for NestEgg {
             self.file_denylist = file_denylist;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -1261,21 +1273,20 @@ impl UpdatableModel for NestEgg {
 impl DeletableModel for NestEgg {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<NestEgg>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<NestEgg>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -1285,10 +1296,11 @@ impl DeletableModel for NestEgg {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

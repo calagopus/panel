@@ -1,15 +1,18 @@
-import { faFileArrowDown, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faFileArrowDown, faInfo, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
-import { NavLink } from 'react-router';
+import { useMemo, useState } from 'react';
 import { z } from 'zod';
 import downloadNodeBackup from '@/api/admin/nodes/backups/downloadNodeBackup.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Badge from '@/elements/Badge.tsx';
+import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import HljsCode from '@/elements/HljsCode.tsx';
+import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
@@ -26,7 +29,9 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [openModal, setOpenModal] = useState<'restore' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'restore' | 'delete' | 'metadata' | null>(null);
+  const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
+  const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadNodeBackup(backup.node.uuid, backup.uuid, archiveFormat)
@@ -56,6 +61,22 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
         onClose={() => setOpenModal(null)}
       />
 
+      <Modal
+        title={t('pages.server.backups.modal.viewMetadata.title', {})}
+        onClose={() => setOpenModal(null)}
+        opened={openModal === 'metadata'}
+      >
+        <HljsCode languageName='json' language={jsonLanguage}>
+          {metadataJson}
+        </HljsCode>
+
+        <ModalFooter>
+          <Button variant='default' onClick={() => setOpenModal(null)}>
+            {t('common.button.close', {})}
+          </Button>
+        </ModalFooter>
+      </Modal>
+
       <ContextMenu
         items={[
           {
@@ -83,6 +104,13 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            icon: faInfo,
+            label: t('pages.server.backups.modal.viewMetadata.title', {}),
+            hidden: Object.keys(backup.metadata).length === 0,
+            onClick: () => setOpenModal('metadata'),
+            color: 'gray',
+          },
+          {
             icon: faTrash,
             label: t('common.button.delete', {}),
             hidden: !backup.completed,
@@ -103,12 +131,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
 
             <TableData className='flex flex-row items-center'>
               <Code>
-                <NavLink
-                  to={`/admin/nodes/${backup.node.uuid}`}
-                  className='text-blue-400 hover:text-blue-200 hover:underline'
-                >
-                  {backup.node.name}
-                </NavLink>
+                <TableLink to={`/admin/nodes/${backup.node.uuid}`}>{backup.node.name}</TableLink>
               </Code>
               {backup.server && backup.server.node.uuid !== backup.node.uuid && (
                 <Tooltip label='This backup is on a different node than the server. It is not viewable from the Client API.'>

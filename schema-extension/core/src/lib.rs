@@ -1,5 +1,6 @@
+use parking_lot::RwLock;
 use serde::Serialize;
-use std::sync::{LazyLock, RwLock};
+use std::sync::LazyLock;
 use utoipa::openapi::{RefOr, Schema, schema::Object};
 
 pub use std::future::Future;
@@ -33,7 +34,7 @@ where
             ),
         }
     });
-    validators.write().unwrap().push(validator);
+    validators.write().push(validator);
 }
 
 #[derive(Debug, Clone, Default)]
@@ -75,7 +76,7 @@ impl<T: Extendible> garde::Validate for ExtensionOverlay<T> {
         parent: &mut dyn FnMut() -> garde::Path,
         report: &mut garde::Report,
     ) {
-        for validator in T::validators().read().unwrap().iter() {
+        for validator in T::validators().read().iter() {
             validator(&self.map, parent, report);
         }
     }
@@ -85,7 +86,7 @@ pub trait Extendible: Serialize + Sized + 'static {
     fn schema_mut() -> &'static LazyLock<RwLock<Object>>;
 
     fn merged_schema() -> RefOr<Schema> {
-        RefOr::T(Schema::Object(Self::schema_mut().read().unwrap().clone()))
+        RefOr::T(Schema::Object(Self::schema_mut().read().clone()))
     }
 
     fn validators() -> &'static RwLock<Vec<ExtensionValidatorFn>>;

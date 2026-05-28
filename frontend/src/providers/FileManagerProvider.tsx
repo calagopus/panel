@@ -35,6 +35,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     getEmptyPaginationSet(),
   );
   const [page, setPage] = useState(1);
+  const [browsingPrimaryFilesystem, setBrowsingPrimaryFilesystem] = useState(true);
   const [browsingWritableDirectory, setBrowsingWritableDirectory] = useState(true);
   const [browsingFastDirectory, setBrowsingFastDirectory] = useState(true);
   const [openModal, setOpenModal] = useState<ModalType>(null);
@@ -54,6 +55,12 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const [imageViewerSmoothing, setImageViewerSmoothing] = useState(
     localStorage.getItem('file_image_viewer_smoothing') !== 'false',
   );
+  const [audioPlayerVolume, setAudioPlayerVolume] = useState(
+    Number(localStorage.getItem('file_audio_player_volume')) || 0.5,
+  );
+  const [audioPlayerPlaybackRate, setAudioPlayerPlaybackRate] = useState(
+    Number(localStorage.getItem('file_audio_player_playback_rate')) || 1,
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ['server', server.uuid, 'files', { browsingDirectory, page, sortMode }],
@@ -64,6 +71,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     if (!data) return;
 
     setBrowsingEntries(data.entries);
+    setBrowsingPrimaryFilesystem(data.isFilesystemPrimary);
     setBrowsingWritableDirectory(data.isFilesystemWritable);
     setBrowsingFastDirectory(data.isFilesystemFast);
   }, [data]);
@@ -181,6 +189,14 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('file_image_viewer_smoothing', imageViewerSmoothing.toString());
   }, [imageViewerSmoothing]);
 
+  useEffect(() => {
+    localStorage.setItem('file_audio_player_volume', audioPlayerVolume.toString());
+  }, [audioPlayerVolume]);
+
+  useEffect(() => {
+    localStorage.setItem('file_audio_player_playback_rate', audioPlayerPlaybackRate.toString());
+  }, [audioPlayerPlaybackRate]);
+
   return (
     <FileManagerContext.Provider
       value={{
@@ -200,6 +216,8 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         setBrowsingEntries,
         page,
         setPage,
+        browsingPrimaryFilesystem,
+        setBrowsingPrimaryFilesystem,
         browsingWritableDirectory,
         setBrowsingWritableDirectory,
         browsingFastDirectory,
@@ -223,6 +241,10 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         setEditorLineOverflow,
         imageViewerSmoothing,
         setImageViewerSmoothing,
+        audioPlayerVolume,
+        setAudioPlayerVolume,
+        audioPlayerPlaybackRate,
+        setAudioPlayerPlaybackRate,
 
         resetEntries,
         invalidateFilemanager,

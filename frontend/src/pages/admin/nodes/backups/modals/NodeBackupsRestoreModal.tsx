@@ -22,13 +22,14 @@ type Props = ModalProps & {
 export default function NodeBackupsRestoreModal({ node, backup, opened, onClose }: Props) {
   const { addToast } = useToast();
 
-  const [truncate, setTruncate] = useState(false);
+  const [truncateDirectory, setTruncateDirectory] = useState(false);
+  const [restoreStartup, setRestoreStartup] = useState(false);
   const [selectedServer, setSelectedServer] = useState<z.infer<typeof adminServerSchema> | null>(null);
   const [loading, setLoading] = useState(false);
 
   const servers = useSearchableResource<z.infer<typeof adminServerSchema>>({
-    queryKey: backup.isRemote ? queryKeys.admin.servers.all() : queryKeys.admin.nodes.servers(node.uuid),
-    fetcher: (search) => (backup.isRemote ? getServers(1, search) : getNodeServers(node.uuid, 1, search)),
+    queryKey: backup.isShared ? queryKeys.admin.servers.all() : queryKeys.admin.nodes.servers(node.uuid),
+    fetcher: (search) => (backup.isShared ? getServers(1, search) : getNodeServers(node.uuid, 1, search)),
   });
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
 
     setLoading(true);
 
-    restoreNodeBackup(node.uuid, backup.uuid, { serverUuid: selectedServer.uuid, truncateDirectory: truncate })
+    restoreNodeBackup(node.uuid, backup.uuid, { serverUuid: selectedServer.uuid, truncateDirectory, restoreStartup })
       .then(() => {
         onClose();
         addToast(`Restoring backup to ${selectedServer.name}...`, 'success');
@@ -77,14 +78,22 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
 
         <Switch
           label='Do you want to empty the filesystem of this server before restoring the backup?'
-          name='truncate'
-          checked={truncate}
-          onChange={(e) => setTruncate(e.target.checked)}
+          name='truncateDirectory'
+          checked={truncateDirectory}
+          onChange={(e) => setTruncateDirectory(e.target.checked)}
+        />
+
+        <Switch
+          label='Restore the startup command, image, and variables from this backup.'
+          name='restoreStartup'
+          checked={restoreStartup}
+          disabled={Object.keys(backup.metadata).length === 0}
+          onChange={(e) => setRestoreStartup(e.target.checked)}
         />
       </Stack>
 
       <ModalFooter>
-        <Button color={truncate ? 'red' : undefined} onClick={doRestore} loading={loading}>
+        <Button color={truncateDirectory ? 'red' : undefined} onClick={doRestore} loading={loading}>
           Restore
         </Button>
         <Button variant='default' onClick={onClose}>

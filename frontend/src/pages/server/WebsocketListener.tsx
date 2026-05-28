@@ -26,6 +26,7 @@ export default function WebsocketListener() {
     setImagePull,
     removeImagePull,
     clearImagePulls,
+    setPendingRestart,
     setStats,
     setBackupProgress,
     setBackupRestoreProgress,
@@ -71,6 +72,10 @@ export default function WebsocketListener() {
     const resourceUsage = transformKeysToCamelCase(wsStats) as z.infer<typeof serverResourceUsageSchema>;
     setStats(resourceUsage);
     addServerResourceUsage(server.uuid, resourceUsage);
+  });
+
+  useWebsocketEvent(SocketEvent.PENDING_RESTART, (pending) => {
+    setPendingRestart(pending === 'true');
   });
 
   useWebsocketEvent(SocketEvent.IMAGE_PULL_PROGRESS, (id, data) => {

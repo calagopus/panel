@@ -13,11 +13,13 @@ import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { authForgotPasswordSchema } from '@/lib/schemas/auth.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import AuthWrapper from './AuthWrapper.tsx';
 
 export default function ForgotPassword() {
   const { t } = useTranslations();
   const navigate = useNavigate();
+  const { settings } = useGlobalStore();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -52,6 +54,18 @@ export default function ForgotPassword() {
   return (
     <AuthWrapper>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
+        {settings.app.url !== window.location.origin && (
+          <Alert
+            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            color='yellow'
+            title={t('common.alert.warning', {})}
+          >
+            {t('pages.auth.alert.urlMismatch', {
+              appUrl: settings.app.url,
+              currentUrl: window.location.origin,
+            }).md()}
+          </Alert>
+        )}
         {error && (
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}

@@ -4,12 +4,15 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { adminSettingsEmailFilesystemSchema } from '@/lib/schemas/admin/settings.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EmailFile({
   form,
 }: {
   form: UseFormReturnType<z.infer<typeof adminSettingsEmailFilesystemSchema>>;
 }) {
+  const { t } = useTranslations();
+
   useEffect(() => {
     form.setValues({
       path: form.values.path ?? '',
@@ -20,18 +23,24 @@ export default function EmailFile({
 
   return (
     <Stack mt='md'>
-      <TextInput withAsterisk label='Path' placeholder='Path' key={form.key('path')} {...form.getInputProps('path')} />
+      <TextInput
+        withAsterisk
+        label={t('common.form.path', {})}
+        placeholder={t('common.form.path', {})}
+        key={form.key('path')}
+        {...form.getInputProps('path')}
+      />
 
       <Group grow>
         <TextInput
           withAsterisk
-          label='From Address'
-          placeholder='From Address'
+          label={t('common.form.fromAddress', {})}
+          placeholder={t('common.form.fromAddress', {})}
           {...form.getInputProps('fromAddress')}
         />
         <TextInput
-          label='From Name'
-          placeholder='From Name'
+          label={t('common.form.fromName', {})}
+          placeholder={t('common.form.fromName', {})}
           key={form.key('fromName')}
           {...form.getInputProps('fromName')}
         />

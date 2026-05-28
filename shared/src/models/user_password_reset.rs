@@ -21,7 +21,7 @@ impl BaseModel for UserPasswordReset {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -97,7 +97,7 @@ impl UserPasswordReset {
         sqlx::query(
             r#"
             INSERT INTO user_password_resets (user_uuid, token, created)
-            VALUES ($1, crypt($2, gen_salt('bf')), NOW())
+            VALUES ($1, crypt($2, gen_salt('bf', 12)), NOW())
             "#,
         )
         .bind(user_uuid)
@@ -112,7 +112,7 @@ impl UserPasswordReset {
         database: &crate::database::Database,
         token: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, {} FROM user_password_resets
             JOIN users ON users.uuid = user_password_resets.user_uuid
@@ -123,7 +123,7 @@ impl UserPasswordReset {
             "#,
             Self::columns_sql(None),
             super::user::User::columns_sql(Some("user_"))
-        ))
+        )))
         .bind(token)
         .fetch_optional(database.read())
         .await?;

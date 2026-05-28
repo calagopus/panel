@@ -1,13 +1,16 @@
-import { faChevronDown, faChevronUp, faX } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faClipboard, faPaste, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Checkbox, Group, Input, Stack, Title } from '@mantine/core';
+import { Checkbox, Group, Input, Menu, Stack, Text, Title } from '@mantine/core';
 import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
+import { handleRawCopyToClipboard } from '@/lib/copy.ts';
 import { permissionCategoryIconMapping } from '@/lib/enums.ts';
+import { handleRawPasteFromClipboard } from '@/lib/paste.ts';
 import { apiPermissionsSchema, permissionMapSchema } from '@/lib/schemas/generic.ts';
+import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const permissionIconMap: Record<
@@ -37,6 +40,7 @@ export default function PermissionSelector({
   setSelectedPermissions: (selected: string[]) => void;
 }) {
   const { t } = useTranslations();
+  const { addToast } = useToast();
 
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const permissionIcons = window.extensionContext.extensionRegistry.permissionIcons;
@@ -111,19 +115,21 @@ export default function PermissionSelector({
 
   const selectedPanel = (
     <Card>
-      <Title order={3} c='white'>
+      <Title order={3} className='pb-4'>
         {t('elements.permissionSelector.selectedPermissions', { count: selectedPermissions.length })}
       </Title>
       <div className='max-h-96 overflow-y-auto'>
         {selectedPermissions.length === 0 ? (
-          <p className='text-gray-200 text-sm'>{t('elements.permissionSelector.noPermissions', {})}</p>
+          <Text className='text-sm' c='dimmed'>
+            {t('elements.permissionSelector.noPermissions', {})}
+          </Text>
         ) : (
           <div className='space-y-1'>
             {sortedSelectedPermissions.map((permission) => (
-              <Card key={permission} className='border border-neutral-600' padding='xs'>
+              <Card key={permission} className='border border-(--mantine-color-default-border)' padding='xs'>
                 <Group justify='space-between'>
-                  <span className='text-sm font-mono text-white'>{permission}</span>
-                  <ActionIcon color='red' onClick={() => togglePermission(permission)}>
+                  <span className='text-sm font-mono'>{permission}</span>
+                  <ActionIcon color='red' variant='light' onClick={() => togglePermission(permission)}>
                     <FontAwesomeIcon icon={faX} />
                   </ActionIcon>
                 </Group>
@@ -145,6 +151,31 @@ export default function PermissionSelector({
         >
           {t('common.button.deselectAll', {})}
         </Button>
+        <Menu shadow='md' width={200} position='top-end'>
+          <Menu.Target>
+            <ActionIcon size='input-sm' className='ml-2'>
+              <FontAwesomeIcon icon={faClipboard} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item
+              leftSection={<FontAwesomeIcon icon={faClipboard} />}
+              onClick={() => handleRawCopyToClipboard(selectedPermissions.join('\n'), addToast)}
+            >
+              {t('elements.permissionSelector.button.copyPermissions', {})}
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<FontAwesomeIcon icon={faPaste} />}
+              onClick={() =>
+                handleRawPasteFromClipboard((text) => {
+                  setSelectedPermissions(text.split('\n').filter((perm) => allPermissionKeys.includes(perm)));
+                }, addToast)
+              }
+            >
+              {t('elements.permissionSelector.button.pastePermissions', {})}
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </div>
     </Card>
   );
@@ -164,16 +195,15 @@ export default function PermissionSelector({
                 <div className='flex items-center justify-between gap-1'>
                   <div className='flex items-center gap-3'>
                     {permissionIcons[permissionIconMap[permissionsMapType]][category] ?? (
-                      <FontAwesomeIcon
-                        icon={permissionCategoryIconMapping[category]}
-                        className='w-5 h-5 text-gray-50'
-                      />
+                      <FontAwesomeIcon icon={permissionCategoryIconMapping[category]} />
                     )}
                     <div>
-                      <Title order={5} c='white' className='uppercase'>
-                        {category.replace('-', ' ')}
+                      <Title order={5} className='uppercase'>
+                        {category.replaceAll('-', ' ')}
                       </Title>
-                      <p className='text-sm text-gray-200 mt-1'>{description}</p>
+                      <Text className='mt-1' size='xs' c='dimmed'>
+                        {description}
+                      </Text>
                     </div>
                   </div>
                   <div className='flex items-center gap-2'>
@@ -184,9 +214,9 @@ export default function PermissionSelector({
                     />
                     <ActionIcon variant='subtle' onClick={() => toggleCategory(category)}>
                       {isExpanded ? (
-                        <FontAwesomeIcon icon={faChevronUp} className='w-4 h-4 text-gray-200' />
+                        <FontAwesomeIcon icon={faChevronUp} className='w-4 h-4' />
                       ) : (
-                        <FontAwesomeIcon icon={faChevronDown} className='w-4 h-4 text-gray-200' />
+                        <FontAwesomeIcon icon={faChevronDown} className='w-4 h-4' />
                       )}
                     </ActionIcon>
                   </div>
@@ -210,10 +240,10 @@ export default function PermissionSelector({
                             <Group wrap='nowrap' align='flex-start'>
                               <Checkbox.Indicator />
                               <div>
-                                <div className='text-gray-50 font-bold'>
-                                  {permission.charAt(0).toUpperCase() + permission.slice(1)}
-                                </div>
-                                <div className='text-sm text-gray-200 mt-1'>{permDescription}</div>
+                                <Text>{permission.charAt(0).toUpperCase() + permission.slice(1)}</Text>
+                                <Text className='mt-1' size='xs' c='dimmed'>
+                                  {permDescription}
+                                </Text>
                               </div>
                             </Group>
                           </Checkbox.Card>

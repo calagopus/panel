@@ -1,7 +1,6 @@
 import { Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import getEggRepositoryEggs from '@/api/admin/egg-repositories/eggs/getEggRepositoryEggs.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
@@ -54,26 +53,30 @@ export default function EggRepositoryEggs({
     [],
   );
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggRepositoryEggs,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.eggRepositories.eggs(contextEggRepository.uuid),
     fetcher: (page, search) => getEggRepositoryEggs(contextEggRepository.uuid, page, search),
   });
-
-  const eggRepositoryEggs = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   useKeyboardShortcuts({
     shortcuts: [
       {
         key: 'a',
         modifiers: ['ctrlOrMeta'],
-        callback: () => setSelectedEggs(new ObjectSet('uuid', eggRepositoryEggs.data)),
+        callback: () => setSelectedEggs(new ObjectSet('uuid', eggRepositoryEggs?.data)),
       },
       {
         key: 'Escape',
         callback: () => setSelectedEggs(new ObjectSet('uuid')),
       },
     ],
-    deps: [eggRepositoryEggs.data],
+    deps: [eggRepositoryEggs?.data],
   });
 
   return (
@@ -92,7 +95,7 @@ export default function EggRepositoryEggs({
           onPageSelect={setPage}
           allowSelect={false}
         >
-          {eggRepositoryEggs.data.map((eggRepositoryEgg) => (
+          {eggRepositoryEggs?.data.map((eggRepositoryEgg) => (
             <SelectionArea.Selectable key={eggRepositoryEgg.uuid} item={eggRepositoryEgg}>
               {(innerRef: Ref<HTMLElement>) => (
                 <EggRepositoryEggRow

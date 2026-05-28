@@ -3,12 +3,14 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
 #[derive(Deserialize, Serialize)]
 pub struct BasePayload {
+    pub scope: compact_str::CompactString,
+
     #[serde(rename = "iss")]
-    pub issuer: String,
+    pub issuer: compact_str::CompactString,
     #[serde(rename = "sub")]
-    pub subject: Option<String>,
+    pub subject: Option<compact_str::CompactString>,
     #[serde(rename = "aud")]
-    pub audience: Vec<String>,
+    pub audience: Vec<compact_str::CompactString>,
     #[serde(rename = "exp")]
     pub expiration_time: Option<i64>,
     #[serde(rename = "nbf")]
@@ -16,11 +18,11 @@ pub struct BasePayload {
     #[serde(rename = "iat")]
     pub issued_at: Option<i64>,
     #[serde(rename = "jti")]
-    pub jwt_id: String,
+    pub jwt_id: compact_str::CompactString,
 }
 
 impl BasePayload {
-    pub fn validate(&self) -> bool {
+    pub fn validate(&self, scope: Option<&str>) -> bool {
         let now = chrono::Utc::now().timestamp();
         if let Some(exp) = self.expiration_time {
             if exp < now {
@@ -41,6 +43,13 @@ impl BasePayload {
         } else {
             return false;
         }
+
+        if let Some(scope) = scope
+            && self.scope != scope
+        {
+            return false;
+        }
+
         true
     }
 }

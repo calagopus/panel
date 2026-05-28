@@ -12,7 +12,7 @@ use std::{
 };
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ServerSubuser {
     pub user: super::user::User,
     pub server: Fetchable<super::server::Server>,
@@ -30,7 +30,7 @@ impl BaseModel for ServerSubuser {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -87,23 +87,23 @@ impl BaseModel for ServerSubuser {
 }
 
 impl ServerSubuser {
-    pub async fn by_server_uuid_username(
+    pub async fn by_server_uuid_user_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
-        username: &str,
+        user_uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM server_subusers
             JOIN users ON users.uuid = server_subusers.user_uuid
             LEFT JOIN roles ON roles.uuid = users.role_uuid
-            WHERE server_subusers.server_uuid = $1 AND users.username = $2
+            WHERE server_subusers.server_uuid = $1 AND server_subusers.user_uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
-        .bind(username)
+        .bind(user_uuid)
         .fetch_optional(database.read())
         .await?;
 
@@ -119,7 +119,7 @@ impl ServerSubuser {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM server_subusers
@@ -130,7 +130,7 @@ impl ServerSubuser {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(server_uuid)
         .bind(search)
         .bind(per_page)
@@ -151,23 +151,20 @@ impl ServerSubuser {
         })
     }
 
-    pub async fn delete_by_uuids(
+    pub async fn count_by_server_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
-        user_uuid: uuid::Uuid,
-    ) -> Result<(), crate::database::DatabaseError> {
-        sqlx::query(
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar(
             r#"
-            DELETE FROM server_subusers
-            WHERE server_subusers.server_uuid = $1 AND server_subusers.user_uuid = $2
+            SELECT COUNT(*)
+            FROM server_subusers
+            WHERE server_subusers.server_uuid = $1
             "#,
         )
         .bind(server_uuid)
-        .bind(user_uuid)
-        .execute(database.write())
-        .await?;
-
-        Ok(())
+        .fetch_one(database.read())
+        .await
     }
 }
 
@@ -226,9 +223,10 @@ impl CreatableModel for ServerSubuser {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -296,15 +294,10 @@ impl CreatableModel for ServerSubuser {
 
                         state
                             .mail
-                            .send(
+                            .send_template(
+                                state,
+                                "account_created",
                                 user.email.clone(),
-                                format!("{} - Account Created", settings.app.name).into(),
-                                state
-                                    .mail
-                                    .templates
-                                    .get_template("account_created")?
-                                    .get_content(state)
-                                    .await?,
                                 minijinja::context! {
                                     user => user,
                                     reset_link => format!(
@@ -336,12 +329,12 @@ impl CreatableModel for ServerSubuser {
             .into());
         }
 
-        let mut transaction = state.database.write().begin().await?;
+        let server_uuid = options.server.uuid;
+        let username = user.username.clone();
 
         let mut query_builder = InsertQueryBuilder::new("server_subusers");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("server_uuid", options.server.uuid)
@@ -349,21 +342,47 @@ impl CreatableModel for ServerSubuser {
             .set("permissions", &options.permissions)
             .set("ignored_files", &options.ignored_files);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
-        transaction.commit().await?;
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM server_subusers
+            JOIN users ON users.uuid = server_subusers.user_uuid
+            LEFT JOIN roles ON roles.uuid = users.role_uuid
+            WHERE server_subusers.server_uuid = $1 AND users.username = $2
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(server_uuid)
+        .bind(username.as_str())
+        .fetch_one(&mut **transaction)
+        .await?;
 
-        let subuser =
-            Self::by_server_uuid_username(&state.database, options.server.uuid, &user.username)
-                .await?
-                .ok_or_else(|| {
-                    anyhow::anyhow!(
-                        "subuser with username {} not found after creation",
-                        user.username
+        let mut result = Self::map(None, &row)?;
+
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        let settings = state.settings.get().await?;
+        state
+            .mail
+            .send_template(
+                state,
+                "added_to_server",
+                user.email.clone(),
+                minijinja::context! {
+                    user => user,
+                    server => options.server,
+                    server_link => format!(
+                        "{}/server/{:08x}",
+                        settings.app.url,
+                        options.server.uuid_short,
                     )
-                })?;
+                },
+            )
+            .await;
 
-        Ok(subuser)
+        Ok(result)
     }
 }
 
@@ -379,32 +398,25 @@ pub struct UpdateServerSubuserOptions {
 impl UpdatableModel for ServerSubuser {
     type UpdateOptions = UpdateServerSubuserOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<ServerSubuser>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<ServerSubuser>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("server_subusers");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("permissions", options.permissions.as_ref())
@@ -412,7 +424,7 @@ impl UpdatableModel for ServerSubuser {
             .where_eq("server_uuid", self.server.uuid)
             .where_eq("user_uuid", self.user.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(permissions) = options.permissions {
             self.permissions = permissions;
@@ -421,7 +433,7 @@ impl UpdatableModel for ServerSubuser {
             self.ignored_files = ignored_files;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -431,21 +443,20 @@ impl UpdatableModel for ServerSubuser {
 impl DeletableModel for ServerSubuser {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<ServerSubuser>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<ServerSubuser>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -456,10 +467,23 @@ impl DeletableModel for ServerSubuser {
         )
         .bind(self.server.uuid)
         .bind(self.user.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
+
+        state
+            .mail
+            .send_template(
+                state,
+                "removed_from_server",
+                self.user.email.clone(),
+                minijinja::context! {
+                    user => self.user,
+                },
+            )
+            .await;
 
         Ok(())
     }

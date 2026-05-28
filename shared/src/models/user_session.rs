@@ -37,7 +37,7 @@ impl BaseModel for UserSession {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -95,14 +95,14 @@ impl UserSession {
         user_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM user_sessions
             WHERE user_sessions.user_uuid = $1 AND user_sessions.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -120,7 +120,7 @@ impl UserSession {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM user_sessions
@@ -129,7 +129,7 @@ impl UserSession {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(search)
         .bind(per_page)
@@ -150,13 +150,17 @@ impl UserSession {
         })
     }
 
-    pub async fn delete_unused(database: &crate::database::Database) -> Result<u64, sqlx::Error> {
+    pub async fn delete_unused(
+        database: &crate::database::Database,
+        duration_seconds: i64,
+    ) -> Result<u64, sqlx::Error> {
         Ok(sqlx::query(
             r#"
             DELETE FROM user_sessions
-            WHERE user_sessions.last_used < NOW() - INTERVAL '30 days'
+            WHERE user_sessions.last_used < $1
             "#,
         )
+        .bind(chrono::Utc::now().naive_utc() - chrono::Duration::seconds(duration_seconds))
         .execute(database.write())
         .await?
         .rows_affected())
@@ -202,14 +206,16 @@ impl UserSession {
     ) -> Result<Cookie<'a>, anyhow::Error> {
         let settings = state.settings.get().await?;
 
-        Ok(Cookie::build(("session", key))
+        Ok(Cookie::build((settings.app.session_cookie.clone(), key))
             .http_only(true)
-            .same_site(tower_cookies::cookie::SameSite::Strict)
+            .same_site(tower_cookies::cookie::SameSite::Lax)
             .secure(settings.app.url.starts_with("https://"))
             .path("/")
             .expires(
                 tower_cookies::cookie::time::OffsetDateTime::now_utc()
-                    + tower_cookies::cookie::time::Duration::days(30),
+                    + tower_cookies::cookie::time::Duration::seconds(
+                        settings.app.session_duration_seconds as i64,
+                    ),
             )
             .build())
     }
@@ -271,18 +277,16 @@ impl CreatableModel for UserSession {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self::CreateResult, crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("user_sessions");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         let key_id = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 16);
 
@@ -294,15 +298,17 @@ impl CreatableModel for UserSession {
         query_builder
             .set("user_uuid", options.user_uuid)
             .set("key_id", key_id.clone())
-            .set_expr("key", "crypt($1, gen_salt('xdes', 321))", vec![&hash])
+            .set_expr("key", "crypt($1, gen_salt('bf', 12))", vec![&hash])
             .set("ip", options.ip)
             .set("user_agent", &options.user_agent);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
-        transaction.commit().await?;
+        let mut result = format!("{key_id}:{hash}");
 
-        Ok(format!("{key_id}:{hash}"))
+        Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        Ok(result)
     }
 }
 
@@ -310,21 +316,20 @@ impl CreatableModel for UserSession {
 impl DeletableModel for UserSession {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<UserSession>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<UserSession>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -334,10 +339,11 @@ impl DeletableModel for UserSession {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

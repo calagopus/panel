@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getServers from '@/api/admin/servers/getServers.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,12 +17,16 @@ import ServerView from './ServerView.tsx';
 function ServersContainer() {
   const navigate = useNavigate();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: servers,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.servers.all(),
     fetcher: getServers,
   });
-
-  const servers = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminContentContainer
@@ -44,7 +47,7 @@ function ServersContainer() {
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.container}
     >
       <Table columns={serverTableColumns} loading={loading} pagination={servers} onPageSelect={setPage}>
-        {servers.data.map((server) => (
+        {servers?.data.map((server) => (
           <ServerRow key={server.uuid} server={server} />
         ))}
       </Table>

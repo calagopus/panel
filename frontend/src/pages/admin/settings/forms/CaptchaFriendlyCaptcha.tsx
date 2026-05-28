@@ -5,12 +5,15 @@ import { z } from 'zod';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { adminSettingsCaptchaProviderFriendlyCaptchaSchema } from '@/lib/schemas/admin/settings.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function CaptchaFriendlyCaptcha({
   form,
 }: {
   form: UseFormReturnType<z.infer<typeof adminSettingsCaptchaProviderFriendlyCaptchaSchema>>;
 }) {
+  const { t } = useTranslations();
+
   useEffect(() => {
     form.setValues({
       siteKey: form.values.siteKey ?? '',
@@ -23,15 +26,15 @@ export default function CaptchaFriendlyCaptcha({
       <Group grow>
         <TextInput
           withAsterisk
-          label='Site Key'
-          placeholder='Site Key'
+          label={t('common.form.siteKey', {})}
+          placeholder={t('common.form.siteKey', {})}
           key={form.key('siteKey')}
           {...form.getInputProps('siteKey')}
         />
         <PasswordInput
           withAsterisk
-          label='API Key'
-          placeholder='API Key'
+          label={t('common.form.apiKey', {})}
+          placeholder={t('common.form.apiKey', {})}
           key={form.key('apiKey')}
           {...form.getInputProps('apiKey')}
         />

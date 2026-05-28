@@ -14,6 +14,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod allocations;
 mod backups;
+mod config;
 mod mounts;
 mod reset_token;
 mod servers;
@@ -129,7 +130,8 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("nodes.delete")?;
 
-        if Server::count_by_node_uuid(&state.database, node.uuid).await > 0 {
+        let servers = Server::count_by_node_uuid(&state.database, node.uuid).await?;
+        if servers > 0 {
             return ApiResponse::error("node has servers, cannot delete")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -236,6 +238,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/servers", servers::router(state))
         .nest("/mounts", mounts::router(state))
         .nest("/backups", backups::router(state))
+        .nest("/config", config::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }

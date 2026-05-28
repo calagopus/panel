@@ -2,6 +2,13 @@ use crate::{
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
 };
+use aws_sdk_s3::{
+    Client as S3Client,
+    config::{
+        BehaviorVersion, Config as S3Config, Credentials, Region, retry::RetryConfig,
+        timeout::TimeoutConfig,
+    },
+};
 use garde::Validate;
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
@@ -64,28 +71,30 @@ impl BackupConfigsS3 {
         self.secret_key = "".into();
     }
 
-    pub fn into_client(self) -> Result<Box<s3::Bucket>, s3::error::S3Error> {
-        let mut bucket = s3::Bucket::new(
-            &self.bucket,
-            s3::Region::Custom {
-                region: self.region.into(),
-                endpoint: self.endpoint.into(),
-            },
-            s3::creds::Credentials::new(
-                Some(&self.access_key),
-                Some(&self.secret_key),
-                None,
-                None,
-                None,
-            )
-            .unwrap(),
-        )?;
+    pub fn into_client(self) -> (S3Client, compact_str::CompactString) {
+        let credentials = Credentials::new(
+            self.access_key,
+            self.secret_key,
+            None,
+            None,
+            "calagopus-static",
+        );
 
-        if self.path_style {
-            bucket.set_path_style();
-        }
+        let timeout_config = TimeoutConfig::builder()
+            .connect_timeout(std::time::Duration::from_secs(10))
+            .build();
 
-        Ok(bucket)
+        let config = S3Config::builder()
+            .behavior_version(BehaviorVersion::latest())
+            .credentials_provider(credentials)
+            .region(Region::new(self.region.to_string()))
+            .endpoint_url(self.endpoint)
+            .force_path_style(self.path_style)
+            .timeout_config(timeout_config)
+            .retry_config(RetryConfig::standard())
+            .build();
+
+        (S3Client::from_conf(config), self.bucket)
     }
 }
 
@@ -191,6 +200,7 @@ pub struct BackupConfiguration {
     pub description: Option<compact_str::CompactString>,
 
     pub maintenance_enabled: bool,
+    pub shared: bool,
 
     pub backup_disk: super::server_backup::BackupDisk,
     pub backup_configs: BackupConfigs,
@@ -205,7 +215,7 @@ impl BaseModel for BackupConfiguration {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -236,6 +246,10 @@ impl BaseModel for BackupConfiguration {
                 compact_str::format_compact!("{prefix}maintenance_enabled"),
             ),
             (
+                "backup_configurations.shared",
+                compact_str::format_compact!("{prefix}shared"),
+            ),
+            (
                 "backup_configurations.backup_disk",
                 compact_str::format_compact!("{prefix}backup_disk"),
             ),
@@ -261,6 +275,7 @@ impl BaseModel for BackupConfiguration {
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             maintenance_enabled: row
                 .try_get(compact_str::format_compact!("{prefix}maintenance_enabled").as_str())?,
+            shared: row.try_get(compact_str::format_compact!("{prefix}shared").as_str())?,
             backup_disk: row
                 .try_get(compact_str::format_compact!("{prefix}backup_disk").as_str())?,
             backup_configs: serde_json::from_value(
@@ -282,7 +297,7 @@ impl BackupConfiguration {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM backup_configurations
@@ -291,7 +306,7 @@ impl BackupConfiguration {
             LIMIT $2 OFFSET $3
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(search)
         .bind(per_page)
         .bind(offset)
@@ -330,8 +345,9 @@ impl IntoAdminApiObject for BackupConfiguration {
             AdminApiBackupConfiguration {
                 uuid: self.uuid,
                 name: self.name,
-                maintenance_enabled: self.maintenance_enabled,
                 description: self.description,
+                maintenance_enabled: self.maintenance_enabled,
+                shared: self.shared,
                 backup_disk: self.backup_disk,
                 backup_configs: self.backup_configs,
                 created: self.created.and_utc(),
@@ -350,16 +366,35 @@ impl ByUuid for BackupConfiguration {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM backup_configurations
             WHERE backup_configurations.uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM backup_configurations
+            WHERE backup_configurations.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)
@@ -376,6 +411,8 @@ pub struct CreateBackupConfigurationOptions {
     pub description: Option<compact_str::CompactString>,
     #[garde(skip)]
     pub maintenance_enabled: bool,
+    #[garde(skip)]
+    pub shared: bool,
     #[garde(skip)]
     pub backup_disk: super::server_backup::BackupDisk,
     #[garde(dive)]
@@ -394,18 +431,16 @@ impl CreatableModel for BackupConfiguration {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("backup_configurations");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         options.backup_configs.encrypt(&state.database).await?;
 
@@ -413,6 +448,7 @@ impl CreatableModel for BackupConfiguration {
             .set("name", &options.name)
             .set("description", &options.description)
             .set("maintenance_enabled", options.maintenance_enabled)
+            .set("shared", options.shared)
             .set("backup_disk", options.backup_disk)
             .set(
                 "backup_configs",
@@ -421,11 +457,12 @@ impl CreatableModel for BackupConfiguration {
 
         let row = query_builder
             .returning(&Self::columns_sql(None))
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?;
-        let backup_configuration = Self::map(None, &row)?;
+        let mut backup_configuration = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut backup_configuration, &options, state, transaction)
+            .await?;
 
         Ok(backup_configuration)
     }
@@ -447,6 +484,8 @@ pub struct UpdateBackupConfigurationOptions {
     #[garde(skip)]
     pub maintenance_enabled: Option<bool>,
     #[garde(skip)]
+    pub shared: Option<bool>,
+    #[garde(skip)]
     pub backup_disk: Option<super::server_backup::BackupDisk>,
     #[garde(dive)]
     pub backup_configs: Option<BackupConfigs>,
@@ -456,32 +495,25 @@ pub struct UpdateBackupConfigurationOptions {
 impl UpdatableModel for BackupConfiguration {
     type UpdateOptions = UpdateBackupConfigurationOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<BackupConfiguration>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<BackupConfiguration>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("backup_configurations");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("name", options.name.as_ref())
@@ -490,6 +522,7 @@ impl UpdatableModel for BackupConfiguration {
                 options.description.as_ref().map(|d| d.as_ref()),
             )
             .set("maintenance_enabled", options.maintenance_enabled)
+            .set("shared", options.shared)
             .set("backup_disk", options.backup_disk)
             .set(
                 "backup_configs",
@@ -503,7 +536,7 @@ impl UpdatableModel for BackupConfiguration {
             )
             .where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(name) = options.name {
             self.name = name;
@@ -514,6 +547,9 @@ impl UpdatableModel for BackupConfiguration {
         if let Some(maintenance_enabled) = options.maintenance_enabled {
             self.maintenance_enabled = maintenance_enabled;
         }
+        if let Some(shared) = options.shared {
+            self.shared = shared;
+        }
         if let Some(backup_disk) = options.backup_disk {
             self.backup_disk = backup_disk;
         }
@@ -521,7 +557,7 @@ impl UpdatableModel for BackupConfiguration {
             self.backup_configs = backup_configs;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
@@ -531,21 +567,20 @@ impl UpdatableModel for BackupConfiguration {
 impl DeletableModel for BackupConfiguration {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<BackupConfiguration>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<BackupConfiguration>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -555,10 +590,11 @@ impl DeletableModel for BackupConfiguration {
             "#,
         )
         .bind(self.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }
@@ -573,8 +609,10 @@ pub struct AdminApiBackupConfiguration {
     pub uuid: uuid::Uuid,
 
     pub name: compact_str::CompactString,
-    pub maintenance_enabled: bool,
     pub description: Option<compact_str::CompactString>,
+
+    pub maintenance_enabled: bool,
+    pub shared: bool,
 
     pub backup_disk: super::server_backup::BackupDisk,
     pub backup_configs: BackupConfigs,

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE nest_eggs\n                SET nest_uuid = $3\n                WHERE nest_eggs.uuid = $1 AND nest_eggs.nest_uuid = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7425e46e30538fc586612e9f8ab8540fd7f5755eb720def57caaf9e6866cef44"
+}

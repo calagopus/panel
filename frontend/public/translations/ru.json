@@ -1006,8 +1006,7 @@
           },
           "table": {
             "columns": {
-              "providerName": "Название провайдера",
-              "identifier": "Идентификатор"
+              "providerName": "Название провайдера"
             }
           },
           "modal": {
@@ -1604,7 +1603,7 @@
                 "cronSchedule": "Расписание Cron"
               },
               "card": {
-                "content": "По cron-интервалу `{schedule}`, следующий запуск {timestamp} — последний запуск {lastTimestamp}."
+                "content": "По cron-интервалу {schedule}, следующий запуск {timestamp} — последний запуск {lastTimestamp}."
               }
             },
             "powerAction": {
@@ -2038,11 +2037,14 @@
               "readOnly": "Только чтение"
             }
           },
+          "button": {
+            "attach": "Подключить",
+            "detach": "Отключить"
+          },
           "modal": {
             "attachMount": {
               "title": "Подключить Маунт",
               "content": "Вы хотите подключить **{name}** к `{target}`?",
-              "confirm": "Подключить",
               "toast": {
                 "attached": "{name} был подключен к вашему серверу."
               }
@@ -2050,7 +2052,6 @@
             "detachMount": {
               "title": "Отключить раздел",
               "content": "Вы хотите отключить **{name}** от `{target}`?",
-              "confirm": "Отключить",
               "toast": {
                 "detached": "{name} был отключен от вашего сервера."
               }

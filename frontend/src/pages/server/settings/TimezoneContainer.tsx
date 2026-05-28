@@ -72,8 +72,8 @@ export default function TimezoneContainer() {
       icon={<FontAwesomeIcon icon={faClock} />}
       className='h-full order-40'
     >
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
+      <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
+        <Stack h='100%'>
           <Stack gap='xs'>
             <Select
               withAsterisk

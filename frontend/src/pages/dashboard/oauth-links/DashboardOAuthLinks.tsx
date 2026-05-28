@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getOAuthProviders from '@/api/auth/getOAuthProviders.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getOAuthLinks from '@/api/me/oauth-links/getOAuthLinks.ts';
 import Button from '@/elements/Button.tsx';
 import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
@@ -11,13 +10,14 @@ import AccountContentContainer from '@/elements/containers/AccountContentContain
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
-import { userOAuthLinkSchema } from '@/lib/schemas/user/oAuth.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useUserStore } from '@/stores/user.ts';
 import OAuthLinkRow from './OAuthLinkRow.tsx';
 
 export default function DashboardOAuthLinks() {
   const { t } = useTranslations();
+  const { oauthLinks, setOAuthLinks } = useUserStore();
   const [oAuthProviders, setOAuthProviders] = useState<z.infer<typeof oAuthProviderSchema>[]>([]);
 
   useEffect(() => {
@@ -26,12 +26,11 @@ export default function DashboardOAuthLinks() {
     });
   }, []);
 
-  const { data, loading, setPage } = useSearchablePaginatedTable({
+  const { loading, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.oauthLinks.all(),
     fetcher: getOAuthLinks,
+    setStoreData: setOAuthLinks,
   });
-
-  const oauthLinks = data ?? getEmptyPaginationSet<z.infer<typeof userOAuthLinkSchema>>();
 
   return (
     <AccountContentContainer
@@ -77,7 +76,7 @@ export default function DashboardOAuthLinks() {
         <Table
           columns={[
             t('pages.account.oauthLinks.table.columns.providerName', {}),
-            t('pages.account.oauthLinks.table.columns.identifier', {}),
+            t('common.form.identifier', {}),
             t('common.table.columns.lastUsed', {}),
             t('common.table.columns.created', {}),
             '',

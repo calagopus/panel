@@ -11,6 +11,7 @@ import getSecurityKeys from '@/api/auth/getSecurityKeys.ts';
 import login from '@/api/auth/login.ts';
 import postSecurityKeyChallenge from '@/api/auth/postSecurityKeyChallenge.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
 import Card from '@/elements/Card.tsx';
@@ -207,6 +208,18 @@ export default function Login() {
             })}
           </Alert>
         )}
+        {settings.app.url !== window.location.origin && (
+          <Alert
+            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            color='yellow'
+            title={t('common.alert.warning', {})}
+          >
+            {t('pages.auth.alert.urlMismatch', {
+              appUrl: settings.app.url,
+              currentUrl: window.location.origin,
+            }).md()}
+          </Alert>
+        )}
         {error && (
           <Alert
             icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
@@ -272,13 +285,13 @@ export default function Login() {
                   oAuthProviders.length > 0 && (
                     <>
                       {oAuthProviders.map((oAuthProvider) => (
-                        <a key={oAuthProvider.uuid} href={`/api/auth/oauth/redirect/${oAuthProvider.uuid}`}>
+                        <Anchor key={oAuthProvider.uuid} href={`/api/auth/oauth/redirect/${oAuthProvider.uuid}`}>
                           <Button leftSection={<FontAwesomeIcon icon={faFingerprint} />} size='md' fullWidth>
                             {t('pages.auth.button.loginWith', {
                               name: oAuthProvider.name,
                             })}
                           </Button>
-                        </a>
+                        </Anchor>
                       ))}
                     </>
                   )

@@ -74,7 +74,7 @@ export default function ServerDeleteModal({
 
         <ModalFooter>
           <Button color='red' disabled={server.name != deleteServerName} loading={loading} onClick={doDelete}>
-            Okay
+            Delete
           </Button>
           <Button variant='default' onClick={() => onClose()}>
             Cancel

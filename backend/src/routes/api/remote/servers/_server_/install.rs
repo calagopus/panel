@@ -77,6 +77,26 @@ mod post {
         .execute(state.database.write())
         .await?;
 
+        let settings = state.settings.get().await?;
+        state
+            .mail
+            .send_template(
+                &state,
+                "server_installed",
+                server.owner.email.clone(),
+                minijinja::context! {
+                    user => server.owner,
+                    server => *server,
+                    server_link => format!(
+                        "{}/server/{:08x}",
+                        settings.app.url,
+                        server.uuid_short,
+                    )
+                },
+            )
+            .await;
+        drop(settings);
+
         shared::models::server::Server::get_event_emitter().emit(
             state.0,
             shared::models::server::ServerEvent::InstallCompleted {

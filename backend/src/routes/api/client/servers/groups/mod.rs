@@ -90,9 +90,19 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_user_permission("servers.create")?;
 
-        let server_groups = UserServerGroup::count_by_user_uuid(&state.database, user.uuid).await;
-        if server_groups >= 25 {
-            return ApiResponse::error("maximum number of server groups reached")
+        let user_server_groups_lock = state
+            .cache
+            .lock(
+                format!("users::{}::server_groups", user.uuid),
+                Some(30),
+                Some(5),
+            )
+            .await?;
+
+        let user_server_groups =
+            UserServerGroup::count_by_user_uuid(&state.database, user.uuid).await?;
+        if user_server_groups >= state.settings.get().await?.user.max_server_group_count as i64 {
+            return ApiResponse::error("maximum number of user server groups reached")
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
         }
@@ -103,6 +113,8 @@ mod post {
             server_order: data.server_order,
         };
         let server_group = UserServerGroup::create(&state, options).await?;
+
+        drop(user_server_groups_lock);
 
         activity_logger
             .log(

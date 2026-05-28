@@ -44,7 +44,6 @@ impl ExtensionManager {
             let deserializer = ext.settings_deserializer(state.clone()).await;
             crate::settings::SETTINGS_DESER_EXTENSIONS
                 .write()
-                .unwrap()
                 .insert(ext.package_name, deserializer);
         }
         state.settings.invalidate_cache().await;
@@ -77,19 +76,16 @@ impl ExtensionManager {
                 .await;
         }
 
-        *state.mail.templates.templates.write().unwrap() = email_templates_builder.finish();
+        *state.mail.templates.templates.write() = email_templates_builder.finish();
 
         crate::permissions::USER_PERMISSIONS
             .write()
-            .unwrap()
             .replace(permissions_builder.user_permissions);
         crate::permissions::ADMIN_PERMISSIONS
             .write()
-            .unwrap()
             .replace(permissions_builder.admin_permissions);
         crate::permissions::SERVER_PERMISSIONS
             .write()
-            .unwrap()
             .replace(permissions_builder.server_permissions);
 
         (

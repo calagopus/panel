@@ -23,7 +23,7 @@ impl BaseModel for NodeMount {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -75,14 +75,14 @@ impl NodeMount {
         node_uuid: uuid::Uuid,
         mount_uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM node_mounts
             WHERE node_mounts.node_uuid = $1 AND node_mounts.mount_uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(node_uuid)
         .bind(mount_uuid)
         .fetch_optional(database.read())
@@ -100,7 +100,7 @@ impl NodeMount {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM node_mounts
@@ -110,7 +110,7 @@ impl NodeMount {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(node_uuid)
         .bind(search)
         .bind(per_page)
@@ -140,7 +140,7 @@ impl NodeMount {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM node_mounts
@@ -150,7 +150,7 @@ impl NodeMount {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(mount_uuid)
         .bind(search)
         .bind(per_page)
@@ -239,9 +239,10 @@ impl CreatableModel for NodeMount {
         &CREATE_LISTENERS
     }
 
-    async fn create(
+    async fn create_with_transaction(
         state: &crate::State,
         mut options: Self::CreateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
@@ -249,27 +250,23 @@ impl CreatableModel for NodeMount {
             .await?
             .ok_or(crate::database::InvalidRelationError("mount"))?;
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = InsertQueryBuilder::new("node_mounts");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, &mut transaction)
-            .await?;
+        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
         query_builder
             .set("node_uuid", options.node_uuid)
             .set("mount_uuid", options.mount_uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut node_mount = Self::map(None, &row)?;
 
-        transaction.commit().await?;
+        Self::run_after_create_handlers(&mut node_mount, &options, state, transaction).await?;
 
-        match Self::by_node_uuid_mount_uuid(&state.database, options.node_uuid, options.mount_uuid)
-            .await?
-        {
-            Some(node_mount) => Ok(node_mount),
-            None => Err(sqlx::Error::RowNotFound.into()),
-        }
+        Ok(node_mount)
     }
 }
 
@@ -277,21 +274,20 @@ impl CreatableModel for NodeMount {
 impl DeletableModel for NodeMount {
     type DeleteOptions = ();
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<NodeMount>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<NodeMount>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
     }
 
-    async fn delete(
+    async fn delete_with_transaction(
         &self,
         state: &crate::State,
         options: Self::DeleteOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
+        self.run_delete_handlers(&options, state, transaction)
             .await?;
 
         sqlx::query(
@@ -302,10 +298,11 @@ impl DeletableModel for NodeMount {
         )
         .bind(self.node.uuid)
         .bind(self.mount.uuid)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
-        transaction.commit().await?;
+        self.run_after_delete_handlers(&options, state, transaction)
+            .await?;
 
         Ok(())
     }

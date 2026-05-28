@@ -19,7 +19,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<z.infer<typeof fullUserSchema> | null>(null);
-  const [impersonating, setImpersonating] = useState(window.localStorage.getItem('impersonatedUser') !== null);
+  const [impersonating, setImpersonating] = useState(window.localStorage.getItem('impersonated_user') !== null);
 
   useEffect(() => {
     if (user) {

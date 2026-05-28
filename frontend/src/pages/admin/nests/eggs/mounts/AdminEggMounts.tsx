@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import getEggMounts from '@/api/admin/nests/eggs/mounts/getEggMounts.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -24,12 +23,16 @@ export default function AdminEggMounts({
 }) {
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggMounts,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.eggs.mounts(contextEgg.uuid),
     fetcher: (page, search) => getEggMounts(contextNest.uuid, contextEgg.uuid, page, search),
   });
-
-  const eggMounts = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminSubContentContainer
@@ -57,7 +60,7 @@ export default function AdminEggMounts({
           pagination={eggMounts}
           onPageSelect={setPage}
         >
-          {eggMounts.data.map((mount) => (
+          {eggMounts?.data.map((mount) => (
             <EggMountRow key={mount.mount.uuid} nest={contextNest} egg={contextEgg} mount={mount} />
           ))}
         </Table>

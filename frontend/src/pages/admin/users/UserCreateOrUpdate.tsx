@@ -11,7 +11,7 @@ import updateUser from '@/api/admin/users/updateUser.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
+import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -25,12 +25,14 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.infer<typeof adminFullUserSchema> }) {
-  const { doImpersonate } = useAuth();
+  const { user, doImpersonate } = useAuth();
   const { settings, languages } = useGlobalStore();
   const { addToast } = useToast();
+  const { t } = useTranslations();
   const canReadRoles = useAdminCan('roles.read');
 
   const [openModal, setOpenModal] = useState<'delete' | 'disable_two_factor' | 'send_password_reset_email' | null>(
@@ -63,7 +65,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
     deleteFn: contextUser ? () => deleteUser(contextUser.uuid) : undefined,
     doUpdate: !!contextUser,
     basePath: '/admin/users',
-    resourceName: 'User',
+    resourceName: t('pages.admin.users.resourceName', {}),
   });
 
   useEffect(() => {
@@ -96,7 +98,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
 
     await disableUserTwoFactor(contextUser.uuid)
       .then(() => {
-        addToast('User two factor disabled.', 'success');
+        addToast(t('pages.admin.users.modal.disableTwoFactor.toast.disabled', {}), 'success');
         contextUser!.totpEnabled = false;
 
         setOpenModal(null);
@@ -113,7 +115,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
 
     await sendPasswordResetEmail(contextUser.uuid)
       .then(() => {
-        addToast('Password reset email sent.', 'success');
+        addToast(t('pages.admin.users.modal.sendPasswordResetEmail.toast.sent', {}), 'success');
 
         setOpenModal(null);
       })
@@ -124,51 +126,51 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
 
   return (
     <AdminContentContainer
-      title={`${contextUser ? 'Update' : 'Create'} User`}
+      title={t(contextUser ? 'pages.admin.users.update.title' : 'pages.admin.users.create.title', {})}
       fullscreen={!!contextUser}
       titleOrder={2}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm User Deletion'
-        confirm='Delete'
+        title={t('pages.admin.users.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().username}</Code>?
+        {t('pages.admin.users.modal.delete.content', { username: form.getValues().username }).md()}
       </ConfirmationModal>
       <ConfirmationModal
         opened={openModal === 'disable_two_factor'}
         onClose={() => setOpenModal(null)}
-        title='Disable User Two Factor'
-        confirm='Disable'
+        title={t('pages.admin.users.modal.disableTwoFactor.title', {})}
+        confirm={t('pages.admin.users.modal.disableTwoFactor.button.confirm', {})}
         onConfirmed={doDisableTwoFactor}
       >
-        Are you sure you want to remove the two factor of <Code>{form.getValues().username}</Code>?
+        {t('pages.admin.users.modal.disableTwoFactor.content', { username: form.getValues().username }).md()}
       </ConfirmationModal>
       <ConfirmationModal
         opened={openModal === 'send_password_reset_email'}
         onClose={() => setOpenModal(null)}
-        title='Send Password Reset Email'
-        confirm='Send'
+        title={t('pages.admin.users.modal.sendPasswordResetEmail.title', {})}
+        confirm={t('pages.admin.users.modal.sendPasswordResetEmail.button.confirm', {})}
         onConfirmed={doSendPasswordResetEmail}
       >
-        Are you sure you want to send a password reset email to <Code>{form.getValues().email}</Code>?
+        {t('pages.admin.users.modal.sendPasswordResetEmail.content', { email: form.getValues().email }).md()}
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, ['admin', 'users']))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.users.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Username'
-            placeholder='Username'
+            label={t('common.table.columns.username', {})}
+            placeholder={t('common.table.columns.username', {})}
             key={form.key('username')}
             {...form.getInputProps('username')}
           />
           <TextInput
             withAsterisk
-            label='Email'
-            placeholder='Email'
+            label={t('common.form.email', {})}
+            placeholder={t('common.form.email', {})}
             type='email'
             key={form.key('email')}
             {...form.getInputProps('email')}
@@ -176,23 +178,23 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
 
           <TextInput
             withAsterisk
-            label='First Name'
-            placeholder='First Name'
+            label={t('common.form.firstName', {})}
+            placeholder={t('common.form.firstName', {})}
             key={form.key('nameFirst')}
             {...form.getInputProps('nameFirst')}
           />
           <TextInput
             withAsterisk
-            label='Last Name'
-            placeholder='Last Name'
+            label={t('common.form.lastName', {})}
+            placeholder={t('common.form.lastName', {})}
             key={form.key('nameLast')}
             {...form.getInputProps('nameLast')}
           />
 
           <Select
             withAsterisk
-            label='Language'
-            placeholder='Language'
+            label={t('common.form.language', {})}
+            placeholder={t('common.form.language', {})}
             data={languages.map((language) => ({
               label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
               value: language,
@@ -203,8 +205,8 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
           />
 
           <Select
-            label='Role'
-            placeholder='None'
+            label={t('pages.admin.users.form.role', {})}
+            placeholder={t('pages.admin.users.form.role', {})}
             data={roles.items.map((role) => ({
               label: role.name,
               value: role.uuid,
@@ -221,31 +223,35 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
           />
 
           <TextInput
-            label='External ID'
-            placeholder='External ID'
+            label={t('pages.admin.users.form.externalId', {})}
+            placeholder={t('pages.admin.users.form.externalId', {})}
             key={form.key('externalId')}
             {...form.getInputProps('externalId')}
           />
           <TextInput
             withAsterisk={!contextUser}
-            label='Password'
-            placeholder='Password'
+            label={t('common.form.password', {})}
+            placeholder={t('common.form.password', {})}
             type='password'
             key={form.key('password')}
             {...form.getInputProps('password')}
           />
 
-          <Switch label='Admin' key={form.key('admin')} {...form.getInputProps('admin', { type: 'checkbox' })} />
+          <Switch
+            label={t('pages.admin.users.form.admin', {})}
+            key={form.key('admin')}
+            {...form.getInputProps('admin', { type: 'checkbox' })}
+          />
         </div>
 
         <Group mt='md'>
           <AdminCan action={contextUser ? 'users.update' : 'users.create'} cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
             {!contextUser && (
               <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             )}
           </AdminCan>
@@ -259,7 +265,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
                   loading={loading}
                   disabled={!contextUser.totpEnabled}
                 >
-                  Disable Two Factor
+                  {t('pages.admin.users.button.disableTwoFactor', {})}
                 </Button>
               </AdminCan>
               <AdminCan action='users.email'>
@@ -269,17 +275,27 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
                   onClick={() => setOpenModal('send_password_reset_email')}
                   loading={loading}
                 >
-                  Send Password Reset Email
+                  {t('pages.admin.users.button.sendPasswordResetEmail', {})}
                 </Button>
               </AdminCan>
               <AdminCan action='users.impersonate'>
-                <Button variant='outline' onClick={() => doImpersonate(contextUser)}>
-                  Impersonate
-                </Button>
+                <ConditionalTooltip
+                  enabled={user?.uuid === contextUser.uuid}
+                  label={t('pages.admin.users.tooltip.cannotImpersonateSelf', {})}
+                >
+                  <Button
+                    variant='outline'
+                    onClick={() => doImpersonate(contextUser)}
+                    disabled={user?.uuid === contextUser.uuid}
+                    loading={loading}
+                  >
+                    {t('pages.admin.users.button.impersonate', {})}
+                  </Button>
+                </ConditionalTooltip>
               </AdminCan>
               <AdminCan action='users.delete' cantDelete>
                 <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  Delete
+                  {t('common.button.delete', {})}
                 </Button>
               </AdminCan>
             </>

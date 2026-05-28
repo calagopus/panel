@@ -1,7 +1,7 @@
-import { NavLink } from 'react-router';
 import { z } from 'zod';
 import Code from '@/elements/Code.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 
@@ -9,9 +9,9 @@ export default ({ location }: { location: z.infer<typeof adminLocationSchema> })
   return (
     <TableRow>
       <TableData>
-        <NavLink to={`/admin/locations/${location.uuid}`} className='text-blue-400 hover:text-blue-200 hover:underline'>
+        <TableLink to={`/admin/locations/${location.uuid}`}>
           <Code>{location.uuid}</Code>
-        </NavLink>
+        </TableLink>
       </TableData>
 
       <TableData>{location.name}</TableData>
@@ -19,12 +19,9 @@ export default ({ location }: { location: z.infer<typeof adminLocationSchema> })
       <TableData>
         <Code>
           {location.backupConfiguration ? (
-            <NavLink
-              to={`/admin/backup-configurations/${location.backupConfiguration.uuid}`}
-              className='text-blue-400 hover:text-blue-200 hover:underline'
-            >
+            <TableLink to={`/admin/backup-configurations/${location.backupConfiguration.uuid}`}>
               {location.backupConfiguration.name}
-            </NavLink>
+            </TableLink>
           ) : (
             '-'
           )}

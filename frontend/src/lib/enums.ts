@@ -4,6 +4,8 @@ import {
   faBoxArchive,
   faBriefcase,
   faChartPie,
+  faCheckCircle,
+  faCircleXmark,
   faCloud,
   faCode,
   faCog,
@@ -18,6 +20,7 @@ import {
   faEgg,
   faEnvelope,
   faEquals,
+  faExclamationTriangle,
   faExpand,
   faFile,
   faFileZipper,
@@ -26,6 +29,7 @@ import {
   faFolderOpen,
   faGear,
   faHourglass,
+  faInfoCircle,
   faKey,
   faKiwiBird,
   faNetworkWired,
@@ -49,7 +53,7 @@ import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfig
 import { adminEggConfigurationDeploymentSchema } from '@/lib/schemas/admin/eggConfigurations.ts';
 import { processConfigurationConfigParser } from '@/lib/schemas/admin/eggs.ts';
 import { adminSettingsEmailSchema, adminSettingsStorageSchema } from '@/lib/schemas/admin/settings.ts';
-import { databaseType, streamingArchiveFormat } from '@/lib/schemas/generic.ts';
+import { databaseType, streamingArchiveFormat, transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
 import {
   serverScheduleComparator,
@@ -63,6 +67,7 @@ import { publicSettingsCaptchaProviderSchema } from '@/lib/schemas/settings.ts';
 import { userSshKeyProvider } from '@/lib/schemas/user/sshKeys.ts';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 import { adminDatabaseCredentialsSchema } from './schemas/admin/databaseHosts.ts';
+import { announcementType } from './schemas/announcements.ts';
 
 export const captchaProviderTypeLabelMapping: Record<
   z.infer<typeof publicSettingsCaptchaProviderSchema>['type'],
@@ -101,6 +106,27 @@ export const databaseTypeLabelMapping: Record<z.infer<typeof databaseType>, stri
   mongodb: 'MongoDB',
 };
 
+export const announcementTypeLabelMapping: Record<z.infer<typeof announcementType>, () => string> = {
+  info: () => getTranslations().t('pages.admin.announcements.enum.announcementType.info', {}),
+  success: () => getTranslations().t('pages.admin.announcements.enum.announcementType.success', {}),
+  warning: () => getTranslations().t('pages.admin.announcements.enum.announcementType.warning', {}),
+  error: () => getTranslations().t('pages.admin.announcements.enum.announcementType.error', {}),
+};
+
+export const announcementTypeColorMapping: Record<z.infer<typeof announcementType>, string> = {
+  info: 'blue',
+  success: 'green',
+  warning: 'yellow',
+  error: 'red',
+};
+
+export const announcementTypeIconMapping: Record<z.infer<typeof announcementType>, IconDefinition> = {
+  info: faInfoCircle,
+  success: faCheckCircle,
+  warning: faExclamationTriangle,
+  error: faCircleXmark,
+};
+
 export const databaseCredentialTypeLabelMapping: Record<
   z.infer<typeof adminDatabaseCredentialsSchema>['type'],
   string
@@ -118,16 +144,16 @@ export const backupDiskLabelMapping: Record<z.infer<typeof adminBackupConfigurat
   restic: 'Restic',
 };
 
-export const storageDriverTypeLabelMapping: Record<z.infer<typeof adminSettingsStorageSchema>['type'], string> = {
-  filesystem: 'Filesystem',
-  s3: 'S3',
+export const storageDriverTypeLabelMapping: Record<z.infer<typeof adminSettingsStorageSchema>['type'], () => string> = {
+  filesystem: () => getTranslations().t('pages.admin.settings.tabs.storage.page.enum.driver.filesystem', {}),
+  s3: () => getTranslations().t('pages.admin.settings.tabs.storage.page.enum.driver.s3', {}),
 };
 
-export const mailModeTypeLabelMapping: Record<z.infer<typeof adminSettingsEmailSchema>['type'], string> = {
-  none: 'None',
-  smtp: 'SMTP',
-  sendmail: 'Sendmail Command',
-  filesystem: 'Filesystem',
+export const mailModeTypeLabelMapping: Record<z.infer<typeof adminSettingsEmailSchema>['type'], () => string> = {
+  none: () => getTranslations().t('pages.admin.settings.tabs.mail.page.enum.provider.none', {}),
+  smtp: () => getTranslations().t('pages.admin.settings.tabs.mail.page.enum.provider.smtp', {}),
+  sendmail: () => getTranslations().t('pages.admin.settings.tabs.mail.page.enum.provider.sendmail', {}),
+  filesystem: () => getTranslations().t('pages.admin.settings.tabs.mail.page.enum.provider.filesystem', {}),
 };
 
 export const archiveFormatLabelMapping: Record<z.infer<typeof archiveFormat>, string> = {
@@ -140,6 +166,23 @@ export const archiveFormatLabelMapping: Record<z.infer<typeof archiveFormat>, st
   tar_zstd: '.tar.zst',
   zip: '.zip',
   seven_zip: '.7z',
+};
+
+export const transferArchiveFormatLabelMapping: Record<z.infer<typeof transferArchiveFormat>, string> = {
+  tar: '.tar',
+  tar_gz: '.tar.gz',
+  tar_xz: '.tar.xz',
+  tar_lzip: '.tar.lz',
+  tar_bz2: '.tar.bz2',
+  tar_lz4: '.tar.lz4',
+  tar_zstd: '.tar.zst',
+  itaf: '.itaf',
+  itaf_gz: '.itaf.gz',
+  itaf_xz: '.itaf.xz',
+  itaf_lzip: '.itaf.lz',
+  itaf_bz2: '.itaf.bz2',
+  itaf_lz4: '.itaf.lz4',
+  itaf_zstd: '.itaf.zst',
 };
 
 export const streamingArchiveFormatLabelMapping: Record<z.infer<typeof streamingArchiveFormat>, string> = {

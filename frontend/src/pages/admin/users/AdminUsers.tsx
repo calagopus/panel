@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getUsers from '@/api/admin/users/getUsers.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -11,23 +10,29 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { userTableColumns } from '@/lib/tableColumns.ts';
 import UserView from '@/pages/admin/users/UserView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import UserCreateOrUpdate from './UserCreateOrUpdate.tsx';
 import UserRow from './UserRow.tsx';
 
 function UsersContainer() {
   const navigate = useNavigate();
+  const { t } = useTranslations();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: users,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.users.all(),
     fetcher: getUsers,
   });
 
-  const users = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
-
   return (
     <AdminContentContainer
-      title='Users'
+      title={t('pages.admin.users.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -37,13 +42,13 @@ function UsersContainer() {
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </AdminCan>
       }
     >
-      <Table columns={userTableColumns} loading={loading} pagination={users} onPageSelect={setPage}>
-        {users.data.map((user) => (
+      <Table columns={userTableColumns()} loading={loading} pagination={users} onPageSelect={setPage}>
+        {users?.data.map((user) => (
           <UserRow key={user.uuid} user={user} />
         ))}
       </Table>

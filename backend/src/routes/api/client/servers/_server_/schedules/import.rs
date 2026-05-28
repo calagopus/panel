@@ -57,12 +57,14 @@ mod post {
             )
             .await?;
 
-        let schedules = ServerSchedule::count_by_server_uuid(&state.database, server.uuid).await;
+        let schedules = ServerSchedule::count_by_server_uuid(&state.database, server.uuid).await?;
         if schedules >= server.schedule_limit as i64 {
             return ApiResponse::error("maximum number of schedules reached")
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
         }
+
+        let mut transaction = state.database.write().begin().await?;
 
         let options = shared::models::server_schedule::CreateServerScheduleOptions {
             server_uuid: server.uuid,
@@ -71,7 +73,13 @@ mod post {
             triggers: data.triggers,
             condition: data.condition,
         };
-        let schedule = match ServerSchedule::create(&state, options).await {
+        let schedule = match ServerSchedule::create_with_transaction(
+            &state,
+            options,
+            &mut transaction,
+        )
+        .await
+        {
             Ok(schedule) => schedule,
             Err(err) if err.is_unique_violation() => {
                 return ApiResponse::error("schedule with name already exists")
@@ -81,22 +89,22 @@ mod post {
             Err(err) => return ApiResponse::from(err).ok(),
         };
 
-        let settings = state.settings.get().await?;
+        let max_schedule_step_count = state
+            .settings
+            .get_as(|s| s.server.max_schedule_step_count as usize)
+            .await?;
 
-        for schedule_step in data
-            .steps
-            .iter()
-            .take(settings.server.max_schedules_step_count as usize)
-        {
+        for schedule_step in data.steps.iter().take(max_schedule_step_count) {
             let options = shared::models::server_schedule_step::CreateServerScheduleStepOptions {
                 schedule_uuid: schedule.uuid,
                 action: schedule_step.action.clone(),
                 order: schedule_step.order,
             };
-            ServerScheduleStep::create(&state, options).await?;
+            ServerScheduleStep::create_with_transaction(&state, options, &mut transaction).await?;
         }
 
-        drop(settings);
+        transaction.commit().await?;
+
         drop(schedules_lock);
 
         activity_logger

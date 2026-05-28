@@ -1,4 +1,4 @@
-import { Group, Paper, SimpleGrid, Stack } from '@mantine/core';
+import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -7,12 +7,13 @@ import updateRatelimitSettings from '@/api/admin/settings/updateRatelimitSetting
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
 import { adminSettingsRatelimitsSchema } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 type RatelimitsSchema = z.infer<typeof adminSettingsRatelimitsSchema>;
@@ -41,7 +42,8 @@ const DEFAULT_VALUES: RatelimitsSchema = Object.fromEntries(
 
 export default function RatelimitsContainer() {
   const { addToast } = useToast();
-  const { ratelimits } = useAdminStore();
+  const { t } = useTranslations();
+  const { ratelimits, updateSettings } = useAdminStore();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<RatelimitsSchema>({
@@ -59,17 +61,22 @@ export default function RatelimitsContainer() {
   const doUpdate = () => {
     setLoading(true);
     updateRatelimitSettings(adminSettingsRatelimitsSchema.parse(form.getValues()))
-      .then(() => addToast('Rate limit settings updated.', 'success'))
-      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
+      .then(() => {
+        addToast(t('pages.admin.settings.tabs.ratelimits.page.toast.updated', {}), 'success');
+        updateSettings({ ratelimits: adminSettingsRatelimitsSchema.parse(form.getValues()) });
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      })
       .finally(() => setLoading(false));
   };
 
   return (
-    <AdminSubContentContainer title='Ratelimit Settings' titleOrder={2}>
+    <AdminSubContentContainer title={t('pages.admin.settings.tabs.ratelimits.page.title', {})} titleOrder={2}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} spacing='sm'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2'>
           {ENDPOINTS.map(({ label, key }) => (
-            <Paper key={key} withBorder radius='md' p='md'>
+            <Card key={key} withBorder radius='md' p='md'>
               <Stack gap='xs'>
                 <Code w='fit-content' title={label}>
                   {label}
@@ -77,35 +84,28 @@ export default function RatelimitsContainer() {
                 <Group grow>
                   <NumberInput
                     withAsterisk
-                    label='Hits'
-                    description='Max requests'
+                    label={t('pages.admin.settings.tabs.ratelimits.page.form.hits', {})}
+                    description={t('pages.admin.settings.tabs.ratelimits.page.form.hitsDescription', {})}
                     key={form.key(`${key}.hits`)}
                     {...form.getInputProps(`${key}.hits`)}
                   />
                   <NumberInput
                     withAsterisk
-                    label='Window'
-                    description='Seconds'
+                    label={t('pages.admin.settings.tabs.ratelimits.page.form.windowSeconds', {})}
+                    description={t('pages.admin.settings.tabs.ratelimits.page.form.windowSecondsDescription', {})}
                     key={form.key(`${key}.windowSeconds`)}
                     {...form.getInputProps(`${key}.windowSeconds`)}
                   />
                 </Group>
               </Stack>
-            </Paper>
+            </Card>
           ))}
-        </SimpleGrid>
+        </div>
 
         <Group mt='md'>
-          <AdminCan
-            action='settings.update'
-            renderOnCant={
-              <Tooltip label='You do not have permission to update settings.'>
-                <Button disabled>Save</Button>
-              </Tooltip>
-            }
-          >
+          <AdminCan action='settings.update' cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
           </AdminCan>
         </Group>

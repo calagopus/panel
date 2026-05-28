@@ -3,6 +3,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { NavLink, Route, Routes, useParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getEggCommandSnippets from '@/api/me/servers/eggs/getEggCommandSnippets.ts';
+import getServerAnnouncements from '@/api/server/announcements/getAnnouncements.ts';
 import getServer from '@/api/server/getServer.ts';
 import AppIcon from '@/elements/AppIcon.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
@@ -38,6 +39,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   const resetState = useServerStore((state) => state.reset);
   const setServer = useServerStore((state) => state.setServer);
   const setCommandSnippets = useServerStore((state) => state.setCommandSnippets);
+  const setServerAnnouncements = useServerStore((state) => state.setServerAnnouncements);
 
   const allServerRoutes = useMemo(() => {
     const routes = [...serverRoutes, ...window.extensionContext.extensionRegistry.routes.serverRoutes];
@@ -105,6 +107,12 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
             .catch((error) => {
               addToast(httpErrorToHuman(error), 'error');
             });
+
+          getServerAnnouncements(data.uuid)
+            .then(setServerAnnouncements)
+            .catch((error) => {
+              addToast(httpErrorToHuman(error), 'error');
+            });
         })
         .catch((error) => {
           addToast(httpErrorToHuman(error), 'error');
@@ -128,18 +136,24 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
               <Sidebar.Divider />
             </>
           }
+          footer={
+            <>
+              <ServerSwitcher isServer className='mb-2' />
+              <Sidebar.Footer />
+            </>
+          }
         >
           <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
           {isAdmin(user) && (
-            <>
-              <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
-              <Sidebar.Link
-                to={`/admin/servers/${params.id}`}
-                end
-                icon={faArrowUpRightFromSquare}
-                name={t('pages.server.viewAdmin.title', {})}
-              />
-            </>
+            <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
+          )}
+          {isAdmin(user, 'servers.read') && (
+            <Sidebar.Link
+              to={`/admin/servers/${params.id}`}
+              end
+              icon={faArrowUpRightFromSquare}
+              name={t('pages.server.viewAdmin.title', {})}
+            />
           )}
 
           <Sidebar.Divider />
@@ -190,11 +204,6 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
 
             return null;
           })}
-
-          <div className='mt-auto pt-4'>
-            <ServerSwitcher isServer className='mb-2' />
-            <Sidebar.Footer />
-          </div>
         </Sidebar>
       )}
 

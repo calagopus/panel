@@ -1,6 +1,7 @@
 use super::State;
 use utoipa_axum::router::OpenApiRouter;
 
+mod debug;
 mod email;
 mod health;
 mod overview;
@@ -14,5 +15,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/updates", updates::router(state))
         .nest("/health", health::router(state))
         .nest("/email", email::router(state))
+        .nest("/debug", debug::router(state))
         .with_state(state.clone())
 }

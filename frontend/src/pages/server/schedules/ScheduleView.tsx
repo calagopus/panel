@@ -99,9 +99,7 @@ export default function ScheduleView() {
       <Stack gap='lg'>
         <Group justify='space-between'>
           <Group gap='md'>
-            <Title order={1} c='white'>
-              {schedule.name}
-            </Title>
+            <Title order={1}>{schedule.name}</Title>
             <Badge color={schedule.enabled ? 'green' : 'red'} size='lg'>
               {schedule.enabled ? t('common.badge.active', {}) : t('common.badge.inactive', {})}
             </Badge>

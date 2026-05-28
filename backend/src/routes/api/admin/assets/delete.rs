@@ -31,11 +31,15 @@ mod post {
         activity_logger: GetAdminActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
-        permissions.has_server_permission("assets.delete")?;
+        permissions.has_admin_permission("assets.delete")?;
 
         let mut futures = Vec::new();
 
         for name in &data.names {
+            if name.contains("..") {
+                continue;
+            }
+
             futures.push(state.storage.remove(Some(format!("assets/{name}"))));
         }
 
@@ -43,7 +47,9 @@ mod post {
         let mut deleted = 0;
 
         while let Some(result) = results_stream.next().await {
-            if result.is_ok() {
+            if let Err(err) = result {
+                tracing::warn!("failed to delete asset: {:?}", err);
+            } else {
                 deleted += 1;
             }
         }

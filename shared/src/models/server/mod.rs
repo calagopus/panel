@@ -173,7 +173,7 @@ impl BaseModel for Server {
 
     fn get_extension_list() -> &'static super::ModelExtensionList {
         static EXTENSIONS: LazyLock<super::ModelExtensionList> =
-            LazyLock::new(|| std::sync::RwLock::new(Vec::new()));
+            LazyLock::new(|| parking_lot::RwLock::new(Vec::new()));
 
         &EXTENSIONS
     }
@@ -402,7 +402,7 @@ impl Server {
         node_uuid: uuid::Uuid,
         uuid: uuid::Uuid,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM servers
@@ -415,7 +415,7 @@ impl Server {
             WHERE (servers.node_uuid = $1 OR servers.destination_node_uuid = $1) AND servers.uuid = $2
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(node_uuid)
         .bind(uuid)
         .fetch_optional(database.read())
@@ -428,7 +428,7 @@ impl Server {
         database: &crate::database::Database,
         external_id: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM servers
@@ -441,7 +441,7 @@ impl Server {
             WHERE servers.external_id = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(external_id)
         .fetch_optional(database.read())
         .await?;
@@ -473,7 +473,7 @@ impl Server {
             }
         );
 
-        let mut row = sqlx::query(&query);
+        let mut row = sqlx::query(sqlx::AssertSqlSafe(query));
         row = match identifier.len() {
             8 => row.bind(u32::from_str_radix(identifier, 16).map_err(anyhow::Error::new)? as i32),
             36 => row.bind(uuid::Uuid::parse_str(identifier).map_err(anyhow::Error::new)?),
@@ -516,11 +516,10 @@ impl Server {
                     }
                 );
 
-                let mut row = sqlx::query(&query)
+                let mut row = sqlx::query(sqlx::AssertSqlSafe(query))
                     .bind(user.uuid)
                     .bind(
-                        user.admin
-                            || user.role.as_ref().is_some_and(|r| r.admin_permissions.iter().any(|p| p == "servers.read"))
+                        user.role.as_ref().map_or(user.admin, |r| r.admin_permissions.iter().any(|p| p == "servers.read"))
                     );
                 row = match identifier.len() {
                     8 => row.bind(u32::from_str_radix(identifier, 16)? as i32),
@@ -543,7 +542,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM servers
@@ -558,7 +557,7 @@ impl Server {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(owner_uuid)
         .bind(search)
         .bind(per_page)
@@ -589,7 +588,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM servers
@@ -607,7 +606,7 @@ impl Server {
             LIMIT $4 OFFSET $5
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(owner_uuid)
         .bind(server_order)
         .bind(search)
@@ -638,7 +637,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT DISTINCT ON (servers.uuid, servers.created) {}, server_subusers.permissions, server_subusers.ignored_files, COUNT(*) OVER() AS total_count
             FROM servers
@@ -656,7 +655,7 @@ impl Server {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(search)
         .bind(per_page)
@@ -711,7 +710,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT DISTINCT ON (servers.uuid, servers.created) {}, server_subusers.permissions, server_subusers.ignored_files, COUNT(*) OVER() AS total_count
             FROM servers
@@ -729,7 +728,7 @@ impl Server {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(user_uuid)
         .bind(search)
         .bind(per_page)
@@ -759,7 +758,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM servers
@@ -774,7 +773,7 @@ impl Server {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(node_uuid)
         .bind(search)
         .bind(per_page)
@@ -804,7 +803,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM servers
@@ -820,7 +819,7 @@ impl Server {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(node_uuid)
         .bind(search)
         .bind(per_page)
@@ -850,7 +849,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM servers
@@ -865,7 +864,7 @@ impl Server {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(egg_uuid)
         .bind(search)
         .bind(per_page)
@@ -895,7 +894,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM servers
@@ -910,7 +909,7 @@ impl Server {
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(backup_configuration_uuid)
         .bind(search)
         .bind(per_page)
@@ -939,7 +938,7 @@ impl Server {
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(&format!(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM servers
@@ -954,7 +953,7 @@ impl Server {
             LIMIT $2 OFFSET $3
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(search)
         .bind(per_page)
         .bind(offset)
@@ -977,7 +976,7 @@ impl Server {
     pub async fn count_by_user_uuid(
         database: &crate::database::Database,
         user_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -988,13 +987,12 @@ impl Server {
         .bind(user_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     pub async fn count_by_node_uuid(
         database: &crate::database::Database,
         node_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -1005,13 +1003,12 @@ impl Server {
         .bind(node_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     pub async fn count_by_egg_uuid(
         database: &crate::database::Database,
         egg_uuid: uuid::Uuid,
-    ) -> i64 {
+    ) -> Result<i64, sqlx::Error> {
         sqlx::query_scalar(
             r#"
             SELECT COUNT(*)
@@ -1022,7 +1019,6 @@ impl Server {
         .bind(egg_uuid)
         .fetch_one(database.read())
         .await
-        .unwrap_or(0)
     }
 
     /// Fetches the current status of the server from the database. This is the most up-to-date status, as opposed to the potentially cached status in the `Server` struct.
@@ -1234,17 +1230,28 @@ impl Server {
             .await?;
         }
 
+        sqlx::query!(
+            "UPDATE server_backups
+            SET node_uuid = $2
+            WHERE server_backups.server_uuid = $1 AND server_backups.shared = true",
+            self.uuid,
+            options.destination_node.uuid
+        )
+        .execute(&mut *transaction)
+        .await?;
+
         let token = options.destination_node.create_jwt(
             &state.database,
             &state.jwt,
             &crate::jwt::BasePayload {
+                scope: "transfer".into(),
                 issuer: "panel".into(),
-                subject: Some(self.uuid.to_string()),
+                subject: Some(self.uuid.to_compact_string()),
                 audience: Vec::new(),
                 expiration_time: Some(chrono::Utc::now().timestamp() + 600),
                 not_before: None,
                 issued_at: Some(chrono::Utc::now().timestamp()),
-                jwt_id: self.node.uuid.to_string(),
+                jwt_id: self.node.uuid.to_compact_string(),
             },
         )?;
 
@@ -1365,6 +1372,27 @@ impl Server {
         }
 
         permissions
+    }
+
+    /// Gets the feature limits for the server, useful in case you need to loop over them or want to pass them to the frontend individually.
+    pub async fn feature_limits(
+        &self,
+        state: &crate::State,
+    ) -> Result<ApiServerFeatureLimits, anyhow::Error> {
+        let feature_limits = ApiServerFeatureLimits::init_hooks(self, state).await?;
+
+        let feature_limits = finish_extendible!(
+            ApiServerFeatureLimits {
+                allocations: self.allocation_limit,
+                databases: self.database_limit,
+                backups: self.backup_limit,
+                schedules: self.schedule_limit,
+            },
+            feature_limits,
+            state
+        )?;
+
+        Ok(feature_limits)
     }
 
     pub async fn backup_configuration(
@@ -1761,6 +1789,7 @@ impl super::IntoApiObject for Server {
                 },
                 location_uuid: node.location.uuid,
                 location_name: node.location.name,
+                location_flag: node.location.flag,
                 node_uuid: node.uuid,
                 node_name: node.name,
                 node_maintenance_enabled: node.maintenance_enabled,
@@ -1806,7 +1835,7 @@ impl ByUuid for Server {
         database: &crate::database::Database,
         uuid: uuid::Uuid,
     ) -> Result<Self, crate::database::DatabaseError> {
-        let row = sqlx::query(&format!(
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM servers
@@ -1819,9 +1848,34 @@ impl ByUuid for Server {
             WHERE servers.uuid = $1
             "#,
             Self::columns_sql(None)
-        ))
+        )))
         .bind(uuid)
         .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM servers
+            LEFT JOIN server_allocations ON server_allocations.uuid = servers.allocation_uuid
+            LEFT JOIN node_allocations ON node_allocations.uuid = server_allocations.allocation_uuid
+            JOIN users ON users.uuid = servers.owner_uuid
+            LEFT JOIN roles ON roles.uuid = users.role_uuid
+            JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
+            JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            WHERE servers.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
         .await?;
 
         Self::map(None, &row)
@@ -1895,6 +1949,14 @@ impl CreatableModel for Server {
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &CREATE_LISTENERS
+    }
+
+    async fn create_with_transaction(
+        _state: &crate::State,
+        _options: Self::CreateOptions<'_>,
+        _transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        Err(anyhow::anyhow!("create_with_transaction is not supported for Server").into())
     }
 
     async fn create(
@@ -2043,6 +2105,12 @@ impl CreatableModel for Server {
                         .await?;
                     }
 
+                    let mut result =
+                        Self::by_uuid_with_transaction(&mut transaction, server_uuid).await?;
+
+                    Self::run_after_create_handlers(&mut result, &options, state, &mut transaction)
+                        .await?;
+
                     transaction.commit().await?;
 
                     if let Err(err) = node
@@ -2064,10 +2132,13 @@ impl CreatableModel for Server {
                         return Err(err.into());
                     }
 
-                    return Self::by_uuid(&state.database, server_uuid).await;
+                    return Ok(result);
                 }
-                Err(_) if attempts < 8 => {
+                Err(_) if attempts < 3 => {
                     attempts += 1;
+                    transaction.rollback().await?;
+                    transaction = state.database.write().begin().await?;
+
                     continue;
                 }
                 Err(err) => {
@@ -2149,17 +2220,18 @@ pub struct UpdateServerOptions {
 impl UpdatableModel for Server {
     type UpdateOptions = UpdateServerOptions;
 
-    fn get_update_handlers() -> &'static LazyLock<UpdateListenerList<Self>> {
-        static UPDATE_LISTENERS: LazyLock<UpdateListenerList<Server>> =
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<Server>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
     }
 
-    async fn update(
+    async fn update_with_transaction(
         &mut self,
         state: &crate::State,
         mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
@@ -2206,18 +2278,10 @@ impl UpdatableModel for Server {
                 None
             };
 
-        let mut transaction = state.database.write().begin().await?;
-
         let mut query_builder = UpdateQueryBuilder::new("servers");
 
-        Self::run_update_handlers(
-            self,
-            &mut options,
-            &mut query_builder,
-            state,
-            &mut transaction,
-        )
-        .await?;
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
 
         query_builder
             .set("owner_uuid", options.owner_uuid.as_ref())
@@ -2275,7 +2339,7 @@ impl UpdatableModel for Server {
 
         query_builder.where_eq("uuid", self.uuid);
 
-        query_builder.execute(&mut *transaction).await?;
+        query_builder.execute(&mut **transaction).await?;
 
         if let Some(owner) = owner {
             self.owner = owner;
@@ -2331,13 +2395,13 @@ impl UpdatableModel for Server {
             self.schedule_limit = feature_limits.schedules;
         }
 
-        transaction.commit().await?;
+        self.run_after_update_handlers(state, transaction).await?;
 
         Ok(())
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct DeleteServerOptions {
     pub force: bool,
 }
@@ -2346,11 +2410,22 @@ pub struct DeleteServerOptions {
 impl DeletableModel for Server {
     type DeleteOptions = DeleteServerOptions;
 
-    fn get_delete_handlers() -> &'static LazyLock<DeleteListenerList<Self>> {
-        static DELETE_LISTENERS: LazyLock<DeleteListenerList<Server>> =
+    fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>> {
+        static DELETE_LISTENERS: LazyLock<DeleteHandlerList<Server>> =
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
+    }
+
+    async fn delete_with_transaction(
+        &self,
+        _state: &crate::State,
+        _options: Self::DeleteOptions,
+        _transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), anyhow::Error> {
+        Err(anyhow::anyhow!(
+            "delete_with_transaction is not supported for Server"
+        ))
     }
 
     async fn delete(
@@ -2542,6 +2617,7 @@ pub struct ApiServer {
 
     pub location_uuid: uuid::Uuid,
     pub location_name: compact_str::CompactString,
+    pub location_flag: Option<compact_str::CompactString>,
     pub node_uuid: uuid::Uuid,
     pub node_name: compact_str::CompactString,
     pub node_maintenance_enabled: bool,

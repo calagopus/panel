@@ -17,7 +17,7 @@ export default function DebugInformationContainer() {
       icon={<FontAwesomeIcon icon={faInfoCircle} />}
       className='h-full order-10'
     >
-      <Stack>
+      <Stack h='100%'>
         <CopyOnClick content={`${server.nodeName} (${server.nodeUuid})`} className='text-left'>
           <TextInput
             label={t('pages.server.settings.debugInformation.form.nodeName', {})}
@@ -34,6 +34,15 @@ export default function DebugInformationContainer() {
             placeholder={t('pages.server.settings.debugInformation.form.locationName', {})}
             value={`${server.locationName} (${server.locationUuid})`}
             className='pointer-events-none'
+            leftSection={
+              server.locationFlag ? (
+                <img
+                  src={`/flags/${server.locationFlag}.svg`}
+                  alt={server.locationName}
+                  className='w-5 h-5 rounded-md shrink-0 my-auto'
+                />
+              ) : undefined
+            }
             readOnly
           />
         </CopyOnClick>

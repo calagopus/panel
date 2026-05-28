@@ -45,6 +45,20 @@ export function isViewableImage(file: z.infer<typeof serverDirectoryEntrySchema>
   return file.mime.startsWith('image/') && /^image\/(?!svg\+xml)/.test(file.mime);
 }
 
+export function isListenableAudio(file: z.infer<typeof serverDirectoryEntrySchema>) {
+  if (file.size > getGlobalStore().settings.server.maxFileManagerViewSize) {
+    return false;
+  }
+
+  return [
+    'audio/mpeg', // .mp3
+    'audio/wav', // .wav
+    'audio/ogg', // .ogg
+    'audio/flac', // .flac
+    'audio/aac', // .aac
+  ].includes(file.mime);
+}
+
 export function isOpenableFile(
   file: z.infer<typeof serverDirectoryEntrySchema>,
   fileManagerContext: FileManagerContextType,
@@ -74,6 +88,15 @@ export function isOpenableFile(
       openable: true,
       handleOpen: ({ handleFileOpen }) => {
         handleFileOpen(file.name, 'image', {});
+      },
+    };
+  }
+
+  if (isListenableAudio(file)) {
+    return {
+      openable: true,
+      handleOpen: ({ handleFileOpen }) => {
+        handleFileOpen(file.name, 'audio', {});
       },
     };
   }

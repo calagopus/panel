@@ -73,9 +73,10 @@ export default function ServerSwitcher({ className, isServer }: { className?: st
     (value: string | null) => {
       if (value) {
         const currentPath = location.pathname.replace(/^\/server\/[^/]+/, '');
+        const uuidShort = value.slice(0, 8);
 
-        if (isServer) navigate(`/server/${value}${currentPath}${location.search}${location.hash}`);
-        else navigate(`/server/${value}`);
+        if (isServer) navigate(`/server/${uuidShort}${currentPath}${location.search}${location.hash}`);
+        else navigate(`/server/${uuidShort}`);
       }
     },
     [location, isServer],

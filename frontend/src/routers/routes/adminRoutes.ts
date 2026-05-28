@@ -1,6 +1,7 @@
 import {
   faBriefcase,
   faBuilding,
+  faBullhorn,
   faCogs,
   faCrow,
   faDatabase,
@@ -19,6 +20,7 @@ import {
 import { faComputer } from '@fortawesome/free-solid-svg-icons/faComputer';
 import type { AdminRouteDefinition } from 'shared';
 import AdminActivity from '@/pages/admin/activity/AdminActivity.tsx';
+import AdminAnnouncements from '@/pages/admin/announcements/AdminAnnouncements.tsx';
 import AdminAssets from '@/pages/admin/assets/AdminAssets.tsx';
 import AdminBackupConfigurations from '@/pages/admin/backupConfigurations/AdminBackupConfigurations.tsx';
 import AdminDatabaseHosts from '@/pages/admin/databaseHosts/AdminDatabaseHosts.tsx';
@@ -36,10 +38,11 @@ import AdminRoles from '@/pages/admin/roles/AdminRoles.tsx';
 import AdminServers from '@/pages/admin/servers/AdminServers.tsx';
 import AdminSettings from '@/pages/admin/settings/AdminSettings.tsx';
 import AdminUsers from '@/pages/admin/users/AdminUsers.tsx';
+import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
 const routes: AdminRouteDefinition[] = [
   {
-    name: 'Home',
+    name: () => getTranslations().t('pages.admin.home.title', {}),
     icon: faBuilding,
     path: '/*',
     activeMatches: ['/admin/updates', '/admin/health'],
@@ -47,21 +50,28 @@ const routes: AdminRouteDefinition[] = [
     exact: true,
   },
   {
-    name: 'Settings',
+    name: () => getTranslations().t('pages.admin.settings.title', {}),
     icon: faWrench,
     path: '/settings/*',
     element: AdminSettings,
     permission: ['settings.*'],
   },
   {
-    name: 'Assets',
+    name: () => getTranslations().t('pages.admin.announcements.title', {}),
+    icon: faBullhorn,
+    path: '/announcements/*',
+    element: AdminAnnouncements,
+    permission: ['announcements.*'],
+  },
+  {
+    name: () => getTranslations().t('pages.admin.assets.title', {}),
     icon: faFolderOpen,
     path: '/assets',
     element: AdminAssets,
     permission: ['assets.*'],
   },
   {
-    name: 'Extensions',
+    name: () => getTranslations().t('pages.admin.extensions.title', {}),
     icon: faPuzzlePiece,
     path: '/extensions',
     element: AdminExtensions,
@@ -74,91 +84,91 @@ const routes: AdminRouteDefinition[] = [
     permission: ['extensions.*'],
   },
   {
-    name: 'Users',
+    name: () => getTranslations().t('pages.admin.users.title', {}),
     icon: faUsers,
     path: '/users/*',
     element: AdminUsers,
     permission: ['users.*'],
   },
   {
-    name: 'Locations',
+    name: () => getTranslations().t('pages.admin.locations.title', {}),
     icon: faEarthAmerica,
     path: '/locations/*',
     element: AdminLocations,
     permission: ['locations.*'],
   },
   {
-    name: 'Nodes',
+    name: () => getTranslations().t('pages.admin.nodes.title', {}),
     icon: faServer,
     path: '/nodes/*',
     element: AdminNodes,
     permission: ['nodes.*'],
   },
   {
-    name: 'Servers',
+    name: () => getTranslations().t('pages.admin.servers.title', {}),
     icon: faComputer,
     path: '/servers/*',
     element: AdminServers,
     permission: ['servers.*'],
   },
   {
-    name: 'Nests',
+    name: () => getTranslations().t('pages.admin.nests.title', {}),
     icon: faCrow,
     path: '/nests/*',
     element: AdminNests,
     permission: ['nests.*'],
   },
   {
-    name: 'Egg Configurations',
+    name: () => getTranslations().t('pages.admin.eggConfigurations.title', {}),
     icon: faCogs,
     path: '/egg-configurations/*',
     element: AdminEggConfigurations,
     permission: ['egg-configurations.*'],
   },
   {
-    name: 'Egg Repositories',
+    name: () => getTranslations().t('pages.admin.eggRepositories.title', {}),
     icon: faDownload,
     path: '/egg-repositories/*',
     element: AdminEggRepositories,
     permission: ['egg-repositories.*'],
   },
   {
-    name: 'Database Hosts',
+    name: () => getTranslations().t('pages.admin.databaseHosts.title', {}),
     icon: faDatabase,
     path: '/database-hosts/*',
     element: AdminDatabaseHosts,
     permission: ['database-hosts.*'],
   },
   {
-    name: 'OAuth Providers',
+    name: () => getTranslations().t('pages.admin.oAuthProviders.title', {}),
     icon: faFingerprint,
     path: '/oauth-providers/*',
     element: AdminOAuthProviders,
     permission: ['oauth-providers.*'],
   },
   {
-    name: 'Backup Configs',
+    name: () => getTranslations().t('pages.admin.backupConfigurations.title', {}),
     icon: faFileZipper,
     path: '/backup-configurations/*',
     element: AdminBackupConfigurations,
     permission: ['backup-configurations.*'],
   },
   {
-    name: 'Mounts',
+    name: () => getTranslations().t('pages.admin.mounts.title', {}),
     icon: faFolderTree,
     path: '/mounts/*',
     element: AdminMounts,
     permission: ['mounts.*'],
   },
   {
-    name: 'Roles',
+    name: () => getTranslations().t('pages.admin.roles.title', {}),
     icon: faScroll,
     path: '/roles/*',
     element: AdminRoles,
     permission: ['roles.*'],
   },
   {
-    name: 'Activity',
+    name: () => getTranslations().t('pages.admin.activity.title', {}),
     icon: faBriefcase,
     path: '/activity',
     element: AdminActivity,

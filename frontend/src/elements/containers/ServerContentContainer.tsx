@@ -1,11 +1,12 @@
-import { faCancel } from '@fortawesome/free-solid-svg-icons';
+import { faCancel, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Title, TitleOrder } from '@mantine/core';
+import { Group, Text, Title, TitleOrder } from '@mantine/core';
 import { Dispatch, ReactNode, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
 import cancelTransfer from '@/api/admin/servers/cancelTransfer.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelServerInstall from '@/api/server/settings/cancelServerInstall.ts';
+import DismissibleAnnouncementAlert from '@/elements/DismissibleAnnouncementAlert.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { bytesToString } from '@/lib/size.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -63,7 +64,9 @@ function ServerContentContainer(props: Props) {
   const { t } = useTranslations();
   const {
     server,
+    serverAnnouncements,
     updateServer,
+    pendingRestart,
     backupRestoreProgress,
     transferProgressArchive,
     backupRestoreTotal,
@@ -114,7 +117,12 @@ function ServerContentContainer(props: Props) {
 
   return (
     <ContentContainer title={`${title} | ${server.name}`}>
-      {fullscreen ? null : server.isTransferring ? (
+      {!id &&
+        serverAnnouncements.map((announcement) => (
+          <DismissibleAnnouncementAlert key={announcement.uuid} announcement={announcement} />
+        ))}
+
+      {fullscreen || id ? null : server.isTransferring ? (
         <div className='mt-2 px-4 lg:px-6 mb-4'>
           <Notification loading>
             <div className='flex flex-row items-center'>
@@ -197,7 +205,11 @@ function ServerContentContainer(props: Props) {
         </div>
       ) : server.nodeMaintenanceEnabled ? (
         <div className='mt-2 px-4 lg:px-6 mb-4'>
-          <Notification>{t('pages.server.console.notification.nodeMaintenance', {})}</Notification>
+          <Notification color='yellow'>{t('pages.server.console.notification.nodeMaintenance', {})}</Notification>
+        </div>
+      ) : pendingRestart ? (
+        <div className='mt-2 px-4 lg:px-6 mb-4'>
+          <Notification color='yellow'>{t('pages.server.console.notification.pendingRestart', {})}</Notification>
         </div>
       ) : null}
 
@@ -209,16 +221,19 @@ function ServerContentContainer(props: Props) {
         {hideTitleComponent ? null : setSearch ? (
           <Group justify='space-between' mb='md'>
             <div>
-              <Title order={titleOrder} c='white'>
-                {title}
-              </Title>
-              {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+              <Title order={titleOrder}>{title}</Title>
+              {subtitle ? (
+                <Text size='xs' c='dimmed'>
+                  {subtitle}
+                </Text>
+              ) : null}
             </div>
             <Group>
               <TextInput
                 placeholder={t('common.input.search', {})}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                leftSection={<FontAwesomeIcon icon={faSearch} />}
                 w={250}
               />
               {contentRight}
@@ -227,19 +242,23 @@ function ServerContentContainer(props: Props) {
         ) : contentRight ? (
           <Group justify='space-between' mb='md'>
             <div>
-              <Title order={titleOrder} c='white'>
-                {title}
-              </Title>
-              {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+              <Title order={titleOrder}>{title}</Title>
+              {subtitle ? (
+                <Text size='xs' c='dimmed'>
+                  {subtitle}
+                </Text>
+              ) : null}
             </div>
             <Group>{contentRight}</Group>
           </Group>
         ) : (
           <div className='mb-4'>
-            <Title order={titleOrder} c='white'>
-              {title}
-            </Title>
-            {subtitle ? <p className='text-xs text-gray-300!'>{subtitle}</p> : null}
+            <Title order={titleOrder}>{title}</Title>
+            {subtitle ? (
+              <Text size='xs' c='dimmed'>
+                {subtitle}
+              </Text>
+            ) : null}
           </div>
         )}
         {registry?.prependedContentComponents.map((Component, index) => (

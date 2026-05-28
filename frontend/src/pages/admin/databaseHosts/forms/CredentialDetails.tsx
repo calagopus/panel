@@ -2,6 +2,7 @@ import { Group, Stack } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
+import NumberInput from '@/elements/input/NumberInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { adminDatabaseCredentialsDetailsSchema } from '@/lib/schemas/admin/databaseHosts.ts';
@@ -50,7 +51,7 @@ export default function CredentialDetails({
           key={form.key('credentials.host')}
           {...form.getInputProps('credentials.host')}
         />
-        <TextInput
+        <NumberInput
           withAsterisk
           label='Port'
           placeholder='Port'

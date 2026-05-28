@@ -127,7 +127,8 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_admin_permission("locations.delete")?;
 
-        if Node::count_by_location_uuid(&state.database, location.uuid).await > 0 {
+        let nodes = Node::count_by_location_uuid(&state.database, location.uuid).await?;
+        if nodes > 0 {
             return ApiResponse::error("location has nodes, cannot delete")
                 .with_status(StatusCode::CONFLICT)
                 .ok();

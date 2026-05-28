@@ -116,6 +116,11 @@ export default function OobeRouter() {
       return;
     }
 
+    if (!user && isLoginRoute && currentAllowedStep?.preAuth) {
+      navigate(to(currentAllowedStep.path, '/oobe'));
+      return;
+    }
+
     if (user && currentAllowedStep) {
       if (isPreAuth) {
         navigate(to(currentAllowedStep.path, '/oobe'));
@@ -171,10 +176,15 @@ export default function OobeRouter() {
 
   return (
     <div className='lg:flex h-full'>
-      <Sidebar>
-        <AppIcon />
-        <Sidebar.Divider />
-
+      <Sidebar
+        header={
+          <>
+            <AppIcon />
+            <Sidebar.Divider />
+          </>
+        }
+        footer={<OobeSidebarFooter complete={currentStepIndex} total={filteredSteps.length} />}
+      >
         <Stepper
           active={currentStepIndex}
           size='sm'
@@ -199,7 +209,6 @@ export default function OobeRouter() {
             />
           ))}
         </Stepper>
-        <OobeSidebarFooter complete={currentStepIndex} total={filteredSteps.length} />
       </Sidebar>
       <div className='max-w-[100vw] flex-1 lg:ml-0'>
         <ContentContainer title={`Setting up ${settings.app.name}`}>

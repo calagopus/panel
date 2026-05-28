@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import debounce from 'debounce';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -8,11 +8,13 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 interface UseSearchablePaginatedTableOptions<T> {
   queryKey: readonly unknown[];
   fetcher: (page: number, search: string) => Promise<T>;
+  setStoreData?: (data: T) => void;
   paginationKey?: string;
   deps?: unknown[];
   debounceMs?: number;
   initialPage?: number;
   modifyParams?: boolean;
+  canRequest?: boolean;
 }
 
 function parseNumber(num: string | null): number | null {
@@ -23,14 +25,17 @@ function parseNumber(num: string | null): number | null {
   return Number.isFinite(parsed) && parsed >= 1 ? parsed : null;
 }
 
+// TODO 1.1.x: Rename this to match file name/rename file
 export function useSearchablePaginatedTable<T>({
   queryKey = [],
   fetcher,
+  setStoreData,
   paginationKey,
   deps = [],
   debounceMs = 150,
   initialPage = 1,
   modifyParams = true,
+  canRequest = true,
 }: UseSearchablePaginatedTableOptions<T>) {
   const { addToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,7 +50,10 @@ export function useSearchablePaginatedTable<T>({
     }
   }, [modifyParams, page, search]);
 
-  const updateDebouncedSearch = useMemo(() => debounce((s: string) => setDebouncedSearch(s), debounceMs), [debounceMs]);
+  const updateDebouncedSearch = useCallback(
+    debounce((s: string) => setDebouncedSearch(s), debounceMs),
+    [],
+  );
 
   useEffect(() => {
     if (!search) {
@@ -60,6 +68,7 @@ export function useSearchablePaginatedTable<T>({
     queryKey: [...queryKey, ...deps, { page, search: debouncedSearch }],
     queryFn: () => fetcher(page, debouncedSearch),
     placeholderData: keepPreviousData,
+    enabled: canRequest,
   });
 
   useEffect(() => {
@@ -93,12 +102,16 @@ export function useSearchablePaginatedTable<T>({
         setPage(1);
       } else if (page > totalPages && totalPages !== 0) {
         setPage(totalPages);
+      } else {
+        setStoreData?.(data);
       }
+    } else {
+      setStoreData?.(data);
     }
   }, [data]);
 
   return {
-    data,
+    data: data as T | undefined,
     loading: isLoading,
     search,
     setSearch,

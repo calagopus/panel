@@ -40,11 +40,23 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                 <AppIcon />
               </NavLink>
               <Sidebar.Divider />
-              <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
+              <Sidebar.Link
+                to='/'
+                end
+                icon={faServer}
+                name={t('pages.account.home.title', {})}
+                activeMatches={['/grouped']}
+              />
               {isAdmin(user) && (
                 <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
               )}
               <Sidebar.Divider />
+            </>
+          }
+          footer={
+            <>
+              <ServerSwitcher className='mb-2' />
+              <Sidebar.Footer />
             </>
           }
         >
@@ -60,11 +72,6 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                 activeMatches={route.activeMatches}
               />
             ))}
-
-          <div className='mt-auto pt-4'>
-            <ServerSwitcher className='mb-2' />
-            <Sidebar.Footer />
-          </div>
         </Sidebar>
       )}
 

@@ -47,6 +47,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
               <Sidebar.Divider />
             </>
           }
+          footer={<Sidebar.Footer />}
         >
           {allAdminRoutes
             .filter((route) => !!route.name && (!route.filter || route.filter()))
@@ -73,8 +74,6 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
                 />
               ),
             )}
-
-          <Sidebar.Footer />
         </Sidebar>
       )}
 

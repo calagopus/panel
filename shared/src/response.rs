@@ -89,7 +89,7 @@ impl ApiResponse {
                 }
             }
             m if m.essence_str() == mime::TEXT_XML.essence_str() => {
-                let string = serde_xml_rs::to_string(&body).unwrap_or_else(|err| {
+                let string = quick_xml::se::to_string(&body).unwrap_or_else(|err| {
                     tracing::error!("failed to serialize response body to XML: {:?}", err);
                     "<error>serialization failed</error>".to_string()
                 });
@@ -186,18 +186,8 @@ where
     fn from(err: T) -> Self {
         let err: anyhow::Error = err.into();
 
-        if let Some(error) = err.downcast_ref::<DisplayError>() {
-            return ApiResponse::error(&error.message).with_status(error.status);
-        } else if let Some(DatabaseError::Validation(error)) = err.downcast_ref::<DatabaseError>() {
-            let error_messages = crate::utils::flatten_validation_errors(error);
-
-            return ApiResponse::new_serialized(ApiError::new_strings_value(error_messages))
-                .with_status(axum::http::StatusCode::BAD_REQUEST);
-        } else if let Some(DatabaseError::InvalidRelation(error)) =
-            err.downcast_ref::<DatabaseError>()
-        {
-            return ApiResponse::error(error.to_string())
-                .with_status(axum::http::StatusCode::BAD_REQUEST);
+        if let Some((message, status)) = extract_readable_error(&err) {
+            return ApiResponse::error(message).with_status(status);
         }
 
         tracing::error!("a request error occurred: {:?}", err);
@@ -223,6 +213,24 @@ impl IntoResponse for ApiResponse {
 
         response
     }
+}
+
+pub fn extract_readable_error(err: &anyhow::Error) -> Option<(String, axum::http::StatusCode)> {
+    if let Some(error) = err.downcast_ref::<DisplayError>() {
+        return Some((error.message.to_string(), error.status));
+    } else if let Some(DatabaseError::Validation(error)) = err.downcast_ref::<DatabaseError>() {
+        let error_messages = crate::utils::flatten_validation_errors(error);
+
+        return Some((
+            ApiError::new_strings_value(error_messages).to_string(),
+            axum::http::StatusCode::BAD_REQUEST,
+        ));
+    } else if let Some(DatabaseError::InvalidRelation(error)) = err.downcast_ref::<DatabaseError>()
+    {
+        return Some((error.to_string(), axum::http::StatusCode::BAD_REQUEST));
+    }
+
+    None
 }
 
 #[derive(Debug)]

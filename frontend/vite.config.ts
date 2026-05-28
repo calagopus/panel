@@ -179,6 +179,9 @@ const translationsPlugin = (): Plugin => {
 const monacoVsDir = normalizePath(
   path.join(path.dirname(fileURLToPath(import.meta.resolve('monaco-editor/package.json'))), 'min/vs'),
 );
+const svgCountryFlagsDir = normalizePath(
+  path.join(path.dirname(fileURLToPath(import.meta.resolve('svg-country-flags/package.json'))), 'svg'),
+);
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -214,6 +217,13 @@ export default defineConfig({
         {
           src: monacoVsDir,
           dest: 'monaco',
+          rename: {
+            stripBase: 7,
+          },
+        },
+        {
+          src: svgCountryFlagsDir,
+          dest: 'flags',
           rename: {
             stripBase: 7,
           },

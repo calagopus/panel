@@ -1,14 +1,17 @@
 import { Group } from '@mantine/core';
+import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
 import Code from '@/elements/Code.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { activitySchema } from '@/lib/schemas/activity.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ActivityRow({ activity }: { activity: z.infer<typeof activitySchema> }) {
   const { t } = useTranslations();
+  const [searchParams] = useSearchParams();
 
   return (
     <TableRow>
@@ -23,9 +26,16 @@ export default function ActivityRow({ activity }: { activity: z.infer<typeof act
       </TableData>
 
       <TableData>
-        {activity.user
-          ? `${activity.user.username} (${activity.isApi ? t('common.api', {}) : t('common.web', {})})`
-          : 'System'}
+        {activity.user ? (
+          <>
+            <TableLink to={{ search: `?${searchParams.toString()}&user=${activity.user.uuid}` }}>
+              {activity.user.username}
+            </TableLink>{' '}
+            ({activity.isApi ? t('common.api', {}) : t('common.web', {})})
+          </>
+        ) : (
+          'System'
+        )}
         {activity.impersonator && ` (${t('common.impersonatedBy', { username: activity.impersonator.username })})`}
       </TableData>
 

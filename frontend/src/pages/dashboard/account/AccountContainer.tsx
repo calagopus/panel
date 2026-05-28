@@ -78,8 +78,8 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
       icon={<FontAwesomeIcon icon={faUser} />}
       className={classNames('h-full order-40', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
+      <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
+        <Stack h='100%'>
           <Group grow>
             <TextInput
               withAsterisk
@@ -104,7 +104,7 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
               autoComplete='username'
               {...form.getInputProps('username')}
             />
-            {settings.app.languageChangeEnabled && (
+            {settings.user.allowChangingLanguage && (
               <Select
                 withAsterisk
                 label={t('pages.account.account.containers.account.form.language', {})}
@@ -155,7 +155,8 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
               {...form.getInputProps('startOnGroupedServers', { type: 'checkbox' })}
             />
           </Group>
-          <Group>
+
+          <Group mt='auto'>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
               {t('common.button.update', {})}
             </Button>

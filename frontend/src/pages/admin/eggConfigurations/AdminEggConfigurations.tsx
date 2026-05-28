@@ -2,7 +2,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Route, Routes, useNavigate } from 'react-router';
 import getEggConfigurations from '@/api/admin/egg-configurations/getEggConfigurations.ts';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,12 +17,16 @@ import EggConfigurationView from './EggConfigurationView.tsx';
 function EggConfigurationsContainer() {
   const navigate = useNavigate();
 
-  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: eggConfigurations,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.eggConfigurations.all(),
     fetcher: getEggConfigurations,
   });
-
-  const eggConfigurations = (data ?? getEmptyPaginationSet()) as NonNullable<typeof data>;
 
   return (
     <AdminContentContainer
@@ -48,7 +51,7 @@ function EggConfigurationsContainer() {
         pagination={eggConfigurations}
         onPageSelect={setPage}
       >
-        {eggConfigurations.data.map((ec) => (
+        {eggConfigurations?.data.map((ec) => (
           <EggConfigurationRow key={ec.uuid} eggConfiguration={ec} />
         ))}
       </Table>

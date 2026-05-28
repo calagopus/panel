@@ -2,14 +2,14 @@ import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Divider, ModalProps, Stack, Text } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
 import createScheduleStep from '@/api/server/schedules/steps/createScheduleStep.ts';
 import updateScheduleStep from '@/api/server/schedules/steps/updateScheduleStep.ts';
 import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { scheduleStepDefaultMapping, scheduleStepLabelMapping } from '@/lib/enums.ts';
 import {
   serverScheduleSchema,
@@ -61,19 +61,27 @@ export default function StepCreateOrUpdateModal({
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
 
-  const [loading, setLoading] = useState(false);
-
-  const { form, onClose: handleClose } = useModalForm<z.infer<typeof serverScheduleStepUpdateSchema>>(
-    {
-      initialValues: {
-        order: nextStepOrder ?? 1,
-        action: scheduleStepDefaultMapping.sleep,
-      },
-      validateInputOnBlur: true,
-      validate: zod4Resolver(serverScheduleStepSchema),
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
+    z.infer<typeof serverScheduleStepUpdateSchema>
+  >({
+    initialValues: {
+      order: nextStepOrder ?? 1,
+      action: scheduleStepDefaultMapping.sleep,
     },
+    validate: zod4Resolver(serverScheduleStepSchema),
     onClose,
-  );
+    onSubmit: async (values) => {
+      if (propStep) {
+        await updateScheduleStep(server.uuid, schedule.uuid, propStep.uuid, values);
+        addToast(t('pages.server.schedules.toast.step.updated', {}), 'success');
+        onStepUpdate?.({ ...propStep, ...values });
+      } else {
+        const step = await createScheduleStep(server.uuid, schedule.uuid, values);
+        addToast(t('pages.server.schedules.toast.step.created', {}), 'success');
+        onStepCreate?.(step);
+      }
+    },
+  });
 
   useEffect(() => {
     if (propStep) {
@@ -84,38 +92,13 @@ export default function StepCreateOrUpdateModal({
     }
   }, [propStep]);
 
-  const doCreateOrUpdate = () => {
-    setLoading(true);
-
-    if (propStep) {
-      updateScheduleStep(server.uuid, schedule.uuid, propStep.uuid, form.values)
-        .then(() => {
-          handleClose();
-          addToast(t('pages.server.schedules.toast.step.updated', {}), 'success');
-          onStepUpdate?.({ ...propStep, ...form.values });
-        })
-        .catch((msg) => {
-          addToast(httpErrorToHuman(msg), 'error');
-        })
-        .finally(() => setLoading(false));
-    } else {
-      createScheduleStep(server.uuid, schedule.uuid, form.values)
-        .then((step) => {
-          handleClose();
-          addToast(t('pages.server.schedules.toast.step.created', {}), 'success');
-          onStepCreate?.(step);
-        })
-        .catch((msg) => {
-          addToast(httpErrorToHuman(msg), 'error');
-        })
-        .finally(() => setLoading(false));
-    }
-  };
-
   return (
-    <Modal
+    <FormModal
       opened={opened}
       onClose={handleClose}
+      onSubmit={handleSubmit}
+      isDirty={isDirty}
+      loading={loading}
       title={
         propStep
           ? t('pages.server.schedules.modal.editStep.title', {})
@@ -182,7 +165,7 @@ export default function StepCreateOrUpdateModal({
         )}
 
         <ModalFooter>
-          <Button onClick={doCreateOrUpdate} leftSection={<FontAwesomeIcon icon={faSave} />} loading={loading}>
+          <Button type='submit' leftSection={<FontAwesomeIcon icon={faSave} />} loading={loading}>
             {propStep ? t('common.button.update', {}) : t('common.button.create', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
@@ -190,6 +173,6 @@ export default function StepCreateOrUpdateModal({
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }
