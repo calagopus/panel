@@ -235,11 +235,11 @@ impl shared::extensions::commands::CliCommand<ApplyArgs> for ApplyCommand {
                 #[cfg(not(windows))]
                 let output_location = Path::new("target")
                     .join(args.profile.to_target_path())
-                    .join("panel-rs");
+                    .join(&args.bin);
                 #[cfg(windows)]
                 let output_location = Path::new("target")
                     .join(args.profile.to_target_path())
-                    .join("panel-rs.exe");
+                    .join(format!("{}.exe", &args.bin));
 
                 let output_metadata = tokio::fs::metadata(&output_location).await?;
 
