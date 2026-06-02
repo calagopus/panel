@@ -108,6 +108,45 @@ impl UserPasswordReset {
         Ok(token)
     }
 
+    pub async fn create_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        user_uuid: uuid::Uuid,
+    ) -> Result<String, anyhow::Error> {
+        let existing = sqlx::query(
+            r#"
+            SELECT COUNT(*)
+            FROM user_password_resets
+            WHERE user_password_resets.user_uuid = $1 AND user_password_resets.created > NOW() - INTERVAL '20 minutes'
+            "#,
+        )
+        .bind(user_uuid)
+        .fetch_optional(&mut **transaction)
+        .await?;
+
+        if let Some(row) = existing
+            && row.get::<i64, _>(0) > 0
+        {
+            return Err(anyhow::anyhow!(
+                "a password reset was already requested recently"
+            ));
+        }
+
+        let token = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 96);
+
+        sqlx::query(
+            r#"
+            INSERT INTO user_password_resets (user_uuid, token, created)
+            VALUES ($1, crypt($2, gen_salt('bf', 12)), NOW())
+            "#,
+        )
+        .bind(user_uuid)
+        .bind(&token)
+        .execute(&mut **transaction)
+        .await?;
+
+        Ok(token)
+    }
+
     pub async fn delete_by_token(
         database: &crate::database::Database,
         token: &str,

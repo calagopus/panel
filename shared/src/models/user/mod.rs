@@ -898,8 +898,8 @@ impl CreatableModel for User {
         Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
 
         if options.send_email {
-            match super::user_password_reset::UserPasswordReset::create(
-                &state.database,
+            match super::user_password_reset::UserPasswordReset::create_with_transaction(
+                transaction,
                 result.uuid,
             )
             .await
@@ -907,7 +907,7 @@ impl CreatableModel for User {
                 Ok(token) => {
                     let settings = state.settings.get().await?;
 
-                    super::user_activity::UserActivity::create(
+                    super::user_activity::UserActivity::create_with_transaction(
                         state,
                         super::user_activity::CreateUserActivityOptions {
                             user_uuid: result.uuid,
@@ -918,6 +918,7 @@ impl CreatableModel for User {
                             data: serde_json::json!({}),
                             created: None,
                         },
+                        transaction,
                     )
                     .await?;
 
