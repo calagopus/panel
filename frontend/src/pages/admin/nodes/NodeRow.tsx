@@ -64,7 +64,7 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
         if (!contextMenuProps) return;
 
         e.preventDefault();
-        contextMenuProps.openMenu(e.pageX, e.pageY);
+        contextMenuProps.openMenu(e.clientX, e.clientY);
       }}
       ref={ref}
     >

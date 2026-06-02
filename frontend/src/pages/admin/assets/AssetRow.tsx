@@ -126,7 +126,7 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
             }}
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
             ref={ref}
           >

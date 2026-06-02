@@ -41,7 +41,9 @@ export default function SessionRow({ session }: { session: z.infer<typeof userSe
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.sessions.modal.deleteSession.content', { ip: session.ip }).md()}
+        {t('pages.account.sessions.modal.deleteSession.content', {
+          ip: session.ip,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
@@ -61,7 +63,7 @@ export default function SessionRow({ session }: { session: z.infer<typeof userSe
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>

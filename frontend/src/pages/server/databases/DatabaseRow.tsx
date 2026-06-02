@@ -87,7 +87,7 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>{database.name}</TableData>

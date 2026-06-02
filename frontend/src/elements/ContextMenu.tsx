@@ -166,40 +166,54 @@ export type ContextMenuChildrenProps = {
 
 type ContextMenuProps<P = unknown> = {
   items: ContextMenuItem[];
+  enabled?: boolean;
   children: (ctx: ContextMenuChildrenProps) => ReactNode;
 } & ({ registry: ContextMenuRegistry<P>; registryProps: P } | { registry?: never; registryProps?: never });
 
-function ContextMenuBase<P>({ items: rawItems = [], registry, registryProps, children }: ContextMenuProps<P>) {
+function ContextMenuBase<P>({
+  items: rawItems = [],
+  registry,
+  registryProps,
+  enabled = true,
+  children,
+}: ContextMenuProps<P>) {
   const context = useContext(ContextMenuContext);
 
-  if (!context) {
+  if (enabled && !context) {
     throw new Error('ContextMenu must be used within a ContextMenuProvider');
   }
 
   const items = useMemo(() => {
     const combinedItems = [...rawItems];
 
-    if (registry && registryProps) {
+    if (enabled && registry && registryProps) {
       for (const interceptor of registry.itemInterceptors) {
         interceptor(combinedItems, registryProps);
       }
     }
 
     return combinedItems.filter((item) => item);
-  }, [rawItems, registry, registryProps]);
+  }, [rawItems, registry, registryProps, enabled]);
 
-  const { showMenu, hideMenu } = context;
+  const showMenu = context?.showMenu;
+  const contextHideMenu = context?.hideMenu;
 
   const openMenu = useCallback(
     (x: number, y: number) => {
-      showMenu(x, y, items);
+      if (!enabled) return;
+      showMenu?.(x, y, items);
     },
-    [items, showMenu],
+    [items, showMenu, enabled],
   );
+
+  const hideMenu = useCallback(() => {
+    contextHideMenu?.();
+  }, [contextHideMenu]);
 
   return (
     <>
-      {registry &&
+      {enabled &&
+        registry &&
         registryProps &&
         registry.componentItemInterceptors.map((Interceptor, idx) => (
           <Interceptor key={`context-menu-interceptor-${idx}`} items={items} {...registryProps} />

@@ -45,7 +45,9 @@ export default function ServerAllocationRow({
 
   const setDebouncedNotes = useCallback(
     debounce((notes: string) => {
-      updateServerAllocation(server.uuid, allocation.uuid, { notes: notes || null })
+      updateServerAllocation(server.uuid, allocation.uuid, {
+        notes: notes || null,
+      })
         .then(() => {
           addToast(t('pages.admin.servers.tabs.allocations.page.toast.updated', {}), 'success');
           allocation.notes = notes;
@@ -95,7 +97,9 @@ export default function ServerAllocationRow({
     await deleteServerAllocation(server.uuid, allocation.uuid)
       .then(async () => {
         removeServerAllocation(allocation);
-        await queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.servers.allocations(server.uuid),
+        });
         setOpenModal(null);
         addToast(t('pages.admin.servers.tabs.allocations.page.toast.removed', {}), 'success');
       })
@@ -148,7 +152,7 @@ export default function ServerAllocationRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData className='relative w-10 text-center'>

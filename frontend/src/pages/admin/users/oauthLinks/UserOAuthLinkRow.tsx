@@ -68,7 +68,7 @@ export default function UserOAuthLinkRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>

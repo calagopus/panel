@@ -47,7 +47,9 @@ export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<t
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.securityKeys.modal.deleteSecurityKey.content', { key: securityKey.name }).md()}
+        {t('pages.account.securityKeys.modal.deleteSecurityKey.content', {
+          key: securityKey.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
@@ -72,7 +74,7 @@ export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<t
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>{securityKey.name}</TableData>

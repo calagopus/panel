@@ -124,7 +124,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>{backup.name}</TableData>

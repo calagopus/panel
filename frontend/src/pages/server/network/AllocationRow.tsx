@@ -143,7 +143,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <td className='relative w-10 text-center'>

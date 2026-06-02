@@ -1,10 +1,11 @@
 import { Group } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
 import getServers from '@/api/server/getServers.ts';
 import { AdminCan } from '@/elements/Can.tsx';
+import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Divider from '@/elements/Divider.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -31,7 +32,7 @@ export default function DashboardHomeAll() {
   const { addToast } = useToast();
 
   const [selectedServers, setSelectedServers] = useState(new ObjectSet<z.infer<typeof serverSchema>, 'uuid'>('uuid'));
-  const [sKeyPressed, setSKeyPressed] = useState(false);
+  const sKeyPressedRef = useRef(false);
 
   const { handleBulkPowerAction, bulkActionLoading } = useBulkPowerActions();
 
@@ -47,18 +48,17 @@ export default function DashboardHomeAll() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only track 'S' key if not typing in an input field
       if (e.key === 's' || e.key === 'S') {
         const target = e.target as HTMLElement;
         if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
-          setSKeyPressed(true);
+          sKeyPressedRef.current = true;
         }
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.key === 's' || e.key === 'S') {
-        setSKeyPressed(false);
+        sKeyPressedRef.current = false;
       }
     };
 
@@ -91,7 +91,7 @@ export default function DashboardHomeAll() {
   };
 
   const handleServerClick = (server: z.infer<typeof serverSchema>, event: React.MouseEvent) => {
-    if (sKeyPressed) {
+    if (sKeyPressedRef.current) {
       event.preventDefault();
       event.stopPropagation();
       handleServerSelectionChange(server, !selectedServers.has(server));
@@ -134,25 +134,28 @@ export default function DashboardHomeAll() {
           <Divider my='md' />
         </>
       )}
-      {loading ? (
-        <Spinner.Centered />
-      ) : servers.total === 0 ? (
-        <p className='text-(--mantine-color-dimmed)'>{t('pages.account.home.noServers', {})}</p>
-      ) : (
-        <div className='gap-4 grid md:grid-cols-2'>
-          {servers.data.map((server) => (
-            <ServerItem
-              key={server.uuid}
-              server={server}
-              showGroupAddButton={!serverListShowOthers}
-              isSelected={selectedServers.has(server.uuid)}
-              onSelectionChange={(selected) => handleServerSelectionChange(server, selected)}
-              onClick={(e) => handleServerClick(server, e)}
-              sKeyPressed={sKeyPressed}
-            />
-          ))}
-        </div>
-      )}
+      <ContextMenuProvider>
+        {loading ? (
+          <Spinner.Centered />
+        ) : servers.total === 0 ? (
+          <p className='text-(--mantine-color-dimmed)'>{t('pages.account.home.noServers', {})}</p>
+        ) : (
+          <div className='gap-4 grid md:grid-cols-2'>
+            {servers.data.map((server) => (
+              <ServerItem
+                key={server.uuid}
+                server={server}
+                showContextMenu
+                showGroupAddButton={!serverListShowOthers}
+                isSelected={selectedServers.has(server.uuid)}
+                onSelectionChange={(selected) => handleServerSelectionChange(server, selected)}
+                onClick={(e) => handleServerClick(server, e)}
+                sKeyPressedRef={sKeyPressedRef}
+              />
+            ))}
+          </div>
+        )}
+      </ContextMenuProvider>
       <BulkActionBar
         selectedCount={selectedServers.size}
         onClear={() => setSelectedServers(new ObjectSet('uuid'))}
