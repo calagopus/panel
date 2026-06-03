@@ -2,6 +2,7 @@ import {
   faFile,
   faFileAudio,
   faFilePen,
+  faFileVideo,
   faFolder,
   faFolderPlus,
   faFolderTree,
@@ -11,7 +12,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { memo } from 'react';
 import { z } from 'zod';
-import { isListenableAudio, isOpenableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
+import { isListenableAudio, isOpenableFile, isPlayableVideo, isViewableArchive, isViewableImage } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { getFileManager } from '@/providers/contexts/fileManagerContext.ts';
 
@@ -35,6 +36,8 @@ function getFileIcon(file: z.infer<typeof serverDirectoryEntrySchema>): IconDefi
 
   if (isViewableImage(file)) {
     return faImage;
+  } else if (isPlayableVideo(file)) {
+    return faFileVideo;
   } else if (isListenableAudio(file)) {
     return faFileAudio;
   } else if (isViewableArchive(file, fileManagerContext)) {

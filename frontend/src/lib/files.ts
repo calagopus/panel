@@ -38,24 +38,25 @@ export function isViewableArchive(
 }
 
 export function isViewableImage(file: z.infer<typeof serverDirectoryEntrySchema>) {
-  if (file.size > getGlobalStore().settings.server.maxFileManagerViewSize) {
-    return false;
-  }
-
   return file.mime.startsWith('image/') && /^image\/(?!svg\+xml)/.test(file.mime);
 }
 
 export function isListenableAudio(file: z.infer<typeof serverDirectoryEntrySchema>) {
-  if (file.size > getGlobalStore().settings.server.maxFileManagerViewSize) {
-    return false;
-  }
-
   return [
     'audio/mpeg', // .mp3
     'audio/x-wav', // .wav
     'audio/ogg', // .ogg
     'audio/flac', // .flac
     'audio/aac', // .aac
+  ].includes(file.mime);
+}
+
+export function isPlayableVideo(file: z.infer<typeof serverDirectoryEntrySchema>) {
+  return [
+    'video/mp4',
+    'video/webm',
+    'video/ogg',
+    'video/quicktime',
   ].includes(file.mime);
 }
 
@@ -79,15 +80,20 @@ export function isOpenableFile(
     }
   }
 
-  if (file.size > getGlobalStore().settings.server.maxFileManagerViewSize) {
-    return { openable: false };
-  }
-
   if (isViewableImage(file)) {
     return {
       openable: true,
       handleOpen: ({ handleFileOpen }) => {
         handleFileOpen(file.name, 'image', {});
+      },
+    };
+  }
+
+  if (isPlayableVideo(file)) {
+    return {
+      openable: true,
+      handleOpen: ({ handleFileOpen }) => {
+        handleFileOpen(file.name, 'video', {});
       },
     };
   }
@@ -99,6 +105,10 @@ export function isOpenableFile(
         handleFileOpen(file.name, 'audio', {});
       },
     };
+  }
+
+  if (file.size > getGlobalStore().settings.server.maxFileManagerViewSize) {
+    return { openable: false };
   }
 
   const matches = [

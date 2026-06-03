@@ -115,6 +115,12 @@ function FileEditorComponent() {
   const [blobContent, setBlobContent] = useState(new Blob());
   const [pendingDraft, setPendingDraft] = useState<{ content: string; hashMismatch: boolean } | null>(null);
 
+  const mediaUrl = useMemo(() => {
+    if (!server.uuid || !browsingDirectory || !fileName) return '';
+    return `/api/client/servers/${server.uuid}/files/contents?file=${encodeURIComponent(join(browsingDirectory, fileName))}`;
+  }, [server.uuid, browsingDirectory, fileName]);
+
+
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const contentRef = useRef(content);
   const originalHashRef = useRef('');
@@ -143,7 +149,13 @@ function FileEditorComponent() {
     if (!browsingDirectory || !fileName) return;
     if (params.action === 'new') return;
 
+    if (params.action === 'video' || params.action === 'audio') {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
+
     getFileContent(server.uuid, join(browsingDirectory, fileName))
       .then((content) => {
         if (matchedFileEditorAction?.contentType === 'blob') {
@@ -272,7 +284,7 @@ function FileEditorComponent() {
       });
   };
 
-  if (!matchedFileEditorAction && !['new', 'edit', 'image', 'audio'].includes(params.action!)) {
+  if (!matchedFileEditorAction && !['new', 'edit', 'image', 'audio', 'video'].includes(params.action!)) {
     return (
       <ServerContentContainer title='Not found' hideTitleComponent>
         <ScreenBlock title='404' content='Editor not found' />
@@ -285,7 +297,7 @@ function FileEditorComponent() {
     : fileName
       ? params.action === 'image'
         ? t('pages.server.files.titleEditorViewing', { file: fileName })
-        : params.action === 'audio'
+        : params.action === 'audio' || params.action === 'video'
           ? t('pages.server.files.titleEditorPlaying', { file: fileName })
           : t('pages.server.files.titleEditorEditing', { file: fileName })
       : t('pages.server.files.titleEditorNew', {});
@@ -312,7 +324,7 @@ function FileEditorComponent() {
         {matchedFileEditorAction?.header.rightSection ? (
           <matchedFileEditorAction.header.rightSection />
         ) : (
-          <div hidden={!browsingWritableDirectory || params.action === 'image' || params.action === 'audio'}>
+          <div hidden={!browsingWritableDirectory || params.action === 'image' || params.action === 'audio' || params.action === 'video'}>
             {params.action === 'edit' ? (
               <div className='flex flex-row items-center'>
                 <ServerCan action='files.read-content'>
@@ -457,12 +469,21 @@ function FileEditorComponent() {
                     </TransformComponent>
                   </TransformWrapper>
                 </div>
+              ) : params.action === 'video' ? (
+                <div className='h-full w-full flex flex-row justify-center items-center p-4 bg-black rounded-md'>
+                  <video
+                    src={mediaUrl}
+                    preload='auto'
+                    controls
+                    className='max-h-full max-w-full rounded-md shadow-md'
+                  />
+                </div>
               ) : params.action === 'audio' ? (
                 <div className='h-full w-full flex flex-row justify-center items-center'>
                   <Audio
                     size='xl'
                     w='50%'
-                    src={content}
+                    src={mediaUrl}
                     volume={audioPlayerVolume}
                     onVolumeChange={(volume) => setAudioPlayerVolume(volume)}
                     playbackRate={audioPlayerPlaybackRate}

@@ -38,7 +38,11 @@ impl From<ApiHttpError> for anyhow::Error {
     }
 }
 
-pub struct AsyncResponseReader(Box<dyn AsyncRead + Send + Unpin>);
+pub struct AsyncResponseReader {
+    pub stream: Box<dyn AsyncRead + Send + Unpin>,
+    pub status: StatusCode,
+    pub headers: reqwest::header::HeaderMap,
+}
 
 impl AsyncRead for AsyncResponseReader {
     fn poll_read(
@@ -46,7 +50,7 @@ impl AsyncRead for AsyncResponseReader {
         cx: &mut Context<'_>,
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> Poll<std::io::Result<()>> {
-        Pin::new(&mut self.0).poll_read(cx, buf)
+        Pin::new(&mut self.stream).poll_read(cx, buf)
     }
 }
 
@@ -55,16 +59,22 @@ impl<'de> Deserialize<'de> for AsyncResponseReader {
     where
         D: serde::Deserializer<'de>,
     {
-        Ok(Self(Box::new(tokio::io::empty())))
+        Ok(Self {
+            stream: Box::new(tokio::io::empty()),
+            status: StatusCode::OK,
+            headers: reqwest::header::HeaderMap::new(),
+        })
     }
 }
 
-async fn request_impl<T: DeserializeOwned + 'static>(
+
+async fn request_impl_with_headers<T: DeserializeOwned + 'static>(
     client: &WingsClient,
     method: Method,
     endpoint: impl AsRef<str>,
     body: Option<&impl Serialize>,
     body_raw: Option<compact_str::CompactString>,
+    headers: Option<reqwest::header::HeaderMap>,
 ) -> Result<T, ApiHttpError> {
     let url = format!(
         "{}{}",
@@ -76,6 +86,12 @@ async fn request_impl<T: DeserializeOwned + 'static>(
 
     if !client.token.is_empty() {
         request = request.header("Authorization", format!("Bearer {}", client.token));
+    }
+
+    if let Some(headers) = headers {
+        for (key, value) in headers.iter() {
+            request = request.header(key, value);
+        }
     }
 
     if let Some(body) = body {
@@ -97,12 +113,20 @@ async fn request_impl<T: DeserializeOwned + 'static>(
         Ok(response) => {
             if response.status().is_success() {
                 if std::any::type_name::<T>() == std::any::type_name::<AsyncResponseReader>() {
+                    let status = response.status();
+                    let headers = response.headers().clone();
                     let stream = response.bytes_stream().map_err(|err| {
                         std::io::Error::other(format!("failed to read multipart field: {err}"))
                     });
                     let stream_reader = tokio_util::io::StreamReader::new(stream);
 
-                    return Ok(*(Box::new(AsyncResponseReader(Box::new(stream_reader)))
+                    let reader = AsyncResponseReader {
+                        stream: Box::new(stream_reader),
+                        status,
+                        headers,
+                    };
+
+                    return Ok(*(Box::new(reader)
                         as Box<dyn std::any::Any>)
                         .downcast::<T>()
                         .unwrap());
@@ -144,6 +168,17 @@ async fn request_impl<T: DeserializeOwned + 'static>(
     }
 }
 
+async fn request_impl<T: DeserializeOwned + 'static>(
+    client: &WingsClient,
+    method: Method,
+    endpoint: impl AsRef<str>,
+    body: Option<&impl Serialize>,
+    body_raw: Option<compact_str::CompactString>,
+) -> Result<T, ApiHttpError> {
+    request_impl_with_headers(client, method, endpoint, body, body_raw, None).await
+}
+
+
 pub struct WingsClient {
     base_url: String,
     token: String,
@@ -173,6 +208,60 @@ impl WingsClient {
 
         request
     }
+
+    pub async fn get_download_stream(
+        &self,
+        token: &str,
+        headers: Option<reqwest::header::HeaderMap>,
+    ) -> Result<AsyncResponseReader, ApiHttpError> {
+        let mut url = reqwest::Url::parse(&self.base_url).map_err(|e| {
+            ApiHttpError::Http(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                super::ApiError {
+                    error: e.to_string().into(),
+                }
+            )
+        })?;
+        url.set_path("/download/file");
+        url.set_query(Some(&format!("token={}", urlencoding::encode(token))));
+
+        let mut request = CLIENT.request(Method::GET, url);
+        if let Some(headers) = headers {
+            for (key, value) in headers.iter() {
+                request = request.header(key, value);
+            }
+        }
+
+        match request.send().await {
+            Ok(response) => {
+                if response.status().is_success() {
+                    let status = response.status();
+                    let headers = response.headers().clone();
+                    let stream = response.bytes_stream().map_err(|err| {
+                        std::io::Error::other(format!("failed to read download stream: {err}"))
+                    });
+                    let stream_reader = tokio_util::io::StreamReader::new(stream);
+
+                    let reader = AsyncResponseReader {
+                        stream: Box::new(stream_reader),
+                        status,
+                        headers,
+                    };
+
+                    Ok(reader)
+                } else {
+                    Err(ApiHttpError::Http(
+                        response.status(),
+                        super::ApiError {
+                            error: "failed to fetch download stream".into(),
+                        }
+                    ))
+                }
+            }
+            Err(err) => Err(ApiHttpError::Reqwest(err)),
+        }
+    }
+
 
     pub async fn delete_backups_backup(
         &self,
@@ -359,9 +448,10 @@ impl WingsClient {
         file: &str,
         download: bool,
         max_size: u64,
+        headers: Option<reqwest::header::HeaderMap>,
     ) -> Result<super::servers_server_files_contents::get::Response, ApiHttpError> {
         let file = urlencoding::encode(file);
-        request_impl(self, Method::GET, format!("/api/servers/{server}/files/contents?file={file}&download={download}&max_size={max_size}"), None::<&()>, None).await
+        request_impl_with_headers(self, Method::GET, format!("/api/servers/{server}/files/contents?file={file}&download={download}&max_size={max_size}"), None::<&()>, None, headers).await
     }
 
     pub async fn post_servers_server_files_copy(
