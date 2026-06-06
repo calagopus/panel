@@ -210,12 +210,12 @@ impl Cache {
                     expiry - now
                 ))
                 .with_status(StatusCode::TOO_MANY_REQUESTS)
-                .with_header("X-RateLimit-Limit", limit.to_string())
+                .with_header("X-RateLimit-Limit", limit.to_compact_string())
                 .with_header(
                     "X-RateLimit-Remaining",
-                    limit.saturating_sub(limit_used).to_string(),
+                    limit.saturating_sub(limit_used).to_compact_string(),
                 )
-                .with_header("X-RateLimit-Reset", expire_unix.to_string())
+                .with_header("X-RateLimit-Reset", expire_unix.to_compact_string())
                 .with_header("Retry-After", (expiry - now).to_compact_string()));
             }
         } else {
@@ -240,12 +240,12 @@ impl Cache {
                     expire_unix.saturating_sub(now as u64)
                 ))
                 .with_status(StatusCode::TOO_MANY_REQUESTS)
-                .with_header("X-RateLimit-Limit", limit.to_string())
+                .with_header("X-RateLimit-Limit", limit.to_compact_string())
                 .with_header(
                     "X-RateLimit-Remaining",
-                    limit.saturating_sub(limit_used).to_string(),
+                    limit.saturating_sub(limit_used).to_compact_string(),
                 )
-                .with_header("X-RateLimit-Reset", expire_unix.to_string())
+                .with_header("X-RateLimit-Reset", expire_unix.to_compact_string())
                 .with_header(
                     "Retry-After",
                     (expire_unix.saturating_sub(now as u64)).to_compact_string(),

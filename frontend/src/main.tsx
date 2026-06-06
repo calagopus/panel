@@ -25,11 +25,17 @@ window.extensionContext = new ExtensionContext(extensions);
 
 window.addEventListener('vite:preloadError', (event) => {
   event.preventDefault();
-  const key = 'vite_preload_error_reloaded';
-  if (!sessionStorage.getItem(key)) {
-    sessionStorage.setItem(key, '1');
-    window.location.reload();
+
+  const lastReload = localStorage.getItem('lastReload') || '0';
+  const now = Date.now();
+
+  if (now - parseInt(lastReload) < 5000) {
+    document.body.innerHTML = 'Failed to load application: Preload error occurred multiple times. Please check the console for more details.';
+    throw new Error('Preload error occurred multiple times');
   }
+
+  localStorage.setItem('lastReload', now.toString());
+  window.location.reload();
 });
 
 const root = document.getElementById('root');
