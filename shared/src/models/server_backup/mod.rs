@@ -1064,25 +1064,32 @@ impl ServerBackup {
     pub async fn into_admin_node_api_object(
         self,
         state: &crate::State,
-        storage_url_retriever: &StorageUrlRetriever<'_>,
+        _storage_url_retriever: &StorageUrlRetriever<'_>,
     ) -> Result<AdminApiNodeServerBackup, crate::database::DatabaseError> {
         Ok(AdminApiNodeServerBackup {
             uuid: self.uuid,
             server: match self.server {
-                Some(server) => Some(
-                    server
-                        .fetch_cached(&state.database)
-                        .await?
-                        .into_admin_api_object(state, storage_url_retriever)
-                        .await?,
-                ),
+                Some(server) => {
+                    let server = server.fetch_cached(&state.database).await?;
+
+                    Some(AdminApiBackupServer {
+                        uuid: server.uuid,
+                        name: server.name,
+                        node: server
+                            .node
+                            .fetch_cached(&state.database)
+                            .await?
+                            .into_admin_api_summary_object(state)
+                            .await?,
+                    })
+                }
                 None => None,
             },
             node: self
                 .node
                 .fetch_cached(&state.database)
                 .await?
-                .into_admin_api_object(state, ())
+                .into_admin_api_summary_object(state)
                 .await?,
             name: self.name,
             ignored_files: self.ignored_files,
@@ -1628,11 +1635,19 @@ impl DeletableModel for ServerBackup {
 }
 
 #[derive(ToSchema, Serialize)]
+#[schema(title = "AdminBackupServer")]
+pub struct AdminApiBackupServer {
+    pub uuid: uuid::Uuid,
+    pub name: compact_str::CompactString,
+    pub node: super::node::AdminApiNodeSummary,
+}
+
+#[derive(ToSchema, Serialize)]
 #[schema(title = "AdminNodeServerBackup")]
 pub struct AdminApiNodeServerBackup {
     pub uuid: uuid::Uuid,
-    pub server: Option<super::server::AdminApiServer>,
-    pub node: super::node::AdminApiNode,
+    pub server: Option<AdminApiBackupServer>,
+    pub node: super::node::AdminApiNodeSummary,
 
     pub name: compact_str::CompactString,
     pub ignored_files: Vec<compact_str::CompactString>,

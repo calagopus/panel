@@ -580,20 +580,11 @@ impl Node {
     ) -> Result<String, anyhow::Error> {
         Ok(jwt.create_custom(database.blocking_decrypt(&self.token)?.as_bytes(), payload)?)
     }
-}
 
-#[async_trait::async_trait]
-impl IntoAdminApiObject for Node {
-    type AdminApiObject = AdminApiNode;
-    type ExtraArgs<'a> = ();
-
-    async fn into_admin_api_object<'a>(
+    pub async fn into_admin_api_summary_object(
         self,
         state: &crate::State,
-        _args: Self::ExtraArgs<'a>,
-    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
-        let api_object = AdminApiNode::init_hooks(&self, state).await?;
-
+    ) -> Result<AdminApiNodeSummary, crate::database::DatabaseError> {
         let public_url = if self.is_all_in_one_node() {
             Some(self.public_url(state, "/").await?.to_string())
         } else {
@@ -618,24 +609,58 @@ impl IntoAdminApiObject for Node {
                 }
             });
 
+        Ok(AdminApiNodeSummary {
+            uuid: self.uuid,
+            location: location?,
+            backup_configuration,
+            name: self.name,
+            description: self.description,
+            deployment_enabled: self.deployment_enabled,
+            maintenance_enabled: self.maintenance_enabled,
+            public_url,
+            url: self.url.to_string(),
+            sftp_host: self.sftp_host,
+            sftp_port: self.sftp_port,
+            memory: self.memory,
+            disk: self.disk,
+            created: self.created.and_utc(),
+        })
+    }
+}
+
+#[async_trait::async_trait]
+impl IntoAdminApiObject for Node {
+    type AdminApiObject = AdminApiNode;
+    type ExtraArgs<'a> = ();
+
+    async fn into_admin_api_object<'a>(
+        self,
+        state: &crate::State,
+        _args: Self::ExtraArgs<'a>,
+    ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let api_object = AdminApiNode::init_hooks(&self, state).await?;
+        let token_id = self.token_id;
+        let token = self.token;
+        let summary = self.into_admin_api_summary_object(state).await?;
+
         let api_object = finish_extendible!(
             AdminApiNode {
-                uuid: self.uuid,
-                location: location?,
-                backup_configuration,
-                name: self.name,
-                description: self.description,
-                deployment_enabled: self.deployment_enabled,
-                maintenance_enabled: self.maintenance_enabled,
-                public_url,
-                url: self.url.to_string(),
-                sftp_host: self.sftp_host,
-                sftp_port: self.sftp_port,
-                memory: self.memory,
-                disk: self.disk,
-                token_id: self.token_id,
-                token: state.database.decrypt(self.token).await?,
-                created: self.created.and_utc(),
+                uuid: summary.uuid,
+                location: summary.location,
+                backup_configuration: summary.backup_configuration,
+                name: summary.name,
+                description: summary.description,
+                deployment_enabled: summary.deployment_enabled,
+                maintenance_enabled: summary.maintenance_enabled,
+                public_url: summary.public_url,
+                url: summary.url,
+                sftp_host: summary.sftp_host,
+                sftp_port: summary.sftp_port,
+                memory: summary.memory,
+                disk: summary.disk,
+                token_id,
+                token: state.database.decrypt(token).await?,
+                created: summary.created,
             },
             api_object,
             state
@@ -1052,6 +1077,32 @@ pub struct AdminApiNode {
 
     pub token_id: compact_str::CompactString,
     pub token: compact_str::CompactString,
+
+    pub created: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(ToSchema, Serialize)]
+#[schema(title = "AdminNodeSummary")]
+pub struct AdminApiNodeSummary {
+    pub uuid: uuid::Uuid,
+    pub location: super::location::AdminApiLocation,
+    pub backup_configuration: Option<super::backup_configuration::AdminApiBackupConfiguration>,
+
+    pub name: compact_str::CompactString,
+    pub description: Option<compact_str::CompactString>,
+
+    pub deployment_enabled: bool,
+    pub maintenance_enabled: bool,
+
+    #[schema(format = "uri")]
+    pub public_url: Option<String>,
+    #[schema(format = "uri")]
+    pub url: String,
+    pub sftp_host: Option<compact_str::CompactString>,
+    pub sftp_port: i32,
+
+    pub memory: i64,
+    pub disk: i64,
 
     pub created: chrono::DateTime<chrono::Utc>,
 }

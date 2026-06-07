@@ -6,14 +6,14 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { adminNodeSummarySchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 type Props = ModalProps & {
-  node: z.infer<typeof adminNodeSchema>;
+  node: z.infer<typeof adminNodeSummarySchema>;
   backup: z.infer<typeof adminServerBackupSchema>;
 };
 
