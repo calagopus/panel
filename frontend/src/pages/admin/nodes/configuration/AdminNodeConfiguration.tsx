@@ -2,9 +2,10 @@ import { faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Divider, Group, Stack, Title } from '@mantine/core';
 import jsYaml from 'js-yaml';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import getNodeConfig from '@/api/admin/nodes/getNodeConfig.ts';
+import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
 import updateNodeConfig from '@/api/admin/nodes/updateNodeConfig.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
@@ -21,8 +22,9 @@ import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { getNodeConfiguration, getNodeConfigurationCommand } from '@/lib/node.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { useNodeToken } from '@/plugins/useNodeToken.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -33,14 +35,29 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
   const [remote, setRemote] = useState(window.location.origin);
   const [apiPort, setApiPort] = useState(parseInt(new URL(node.url).port || '8080'));
   const [sftpPort, setSftpPort] = useState(node.sftpPort);
-  const { token } = useNodeToken(node.uuid);
+  const { data: nodeToken } = useResource({
+    queryKey: queryKeys.admin.nodes.token(node.uuid),
+    queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
+  });
+  const tokenId = nodeToken?.tokenId;
+  const bearerToken = nodeToken?.token;
 
-  const nodeConfiguration = token
-    ? getNodeConfiguration({ node, tokenId: token.tokenId, token: token.token, remote, apiPort, sftpPort })
-    : null;
-  const command = token
-    ? getNodeConfigurationCommand({ node, tokenId: token.tokenId, token: token.token, remote, apiPort, sftpPort })
-    : null;
+  const configurationParams = useMemo(() => {
+    if (!tokenId || !bearerToken) {
+      return null;
+    }
+
+    return { node, tokenId, token: bearerToken, remote, apiPort, sftpPort };
+  }, [node, tokenId, bearerToken, remote, apiPort, sftpPort]);
+
+  const nodeConfiguration = useMemo(
+    () => (configurationParams ? getNodeConfiguration(configurationParams) : null),
+    [configurationParams],
+  );
+  const command = useMemo(
+    () => (configurationParams ? getNodeConfigurationCommand(configurationParams) : null),
+    [configurationParams],
+  );
 
   const [yaml, setYaml] = useState<string | null>(null);
   const [liveConfigError, setLiveConfigError] = useState<string | null>(null);

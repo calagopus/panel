@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
-import { adminBackupServerSchema, adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { nullableString } from '@/lib/transformers.ts';
 import { hostnameSchema } from '../generic.ts';
 
@@ -55,7 +55,6 @@ export const adminNodeUpdateSchema = z.lazy(() =>
 export const adminNodeServerBackupSchema = z.lazy(() =>
   adminServerBackupSchema.extend({
     node: adminNodeSchema,
-    server: z.lazy(() => adminBackupServerSchema).nullable(),
   }),
 );
 

@@ -101,12 +101,6 @@ export const adminServerUpdateSchema = z.lazy(() =>
   }),
 );
 
-export const adminBackupServerSchema = z.object({
-  uuid: z.string(),
-  name: z.string(),
-  node: z.lazy(() => adminNodeSchema),
-});
-
 export const adminServerBackupSchema = z.object({
   uuid: z.string(),
   server: z.lazy(() => adminServerSchema).nullable(),

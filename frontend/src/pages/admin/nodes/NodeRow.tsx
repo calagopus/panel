@@ -1,7 +1,8 @@
 import { faGlobe, faHeart, faHeartBroken } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
+import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
 import { axiosInstance } from '@/api/axios.ts';
 import Code from '@/elements/Code.tsx';
 import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/ContextMenu.tsx';
@@ -12,9 +13,10 @@ import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { getNodeUrl, isNodeAIO } from '@/lib/node.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { parseVersion } from '@/lib/version.ts';
-import { useNodeToken } from '@/plugins/useNodeToken.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
@@ -34,17 +36,22 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
   const { updateInformation } = useAdminStore();
 
   const [version, setVersion] = useState<string | null>(null);
-  const { token } = useNodeToken(node.uuid, { silent: true });
+  const { data: nodeToken } = useResource({
+    queryKey: queryKeys.admin.nodes.token(node.uuid),
+    queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
+    silent: true,
+  });
+  const bearerToken = nodeToken?.token;
 
   useEffect(() => {
-    if (!token) {
+    if (!bearerToken) {
       return;
     }
 
     axiosInstance
       .get(getNodeUrl(node, '/api/system'), {
         headers: {
-          Authorization: `Bearer ${token.token}`,
+          Authorization: `Bearer ${bearerToken}`,
         },
       })
       .then(({ data }) => {
@@ -54,7 +61,7 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
         console.error('Error while connecting to node', msg);
         setVersion('Unavailable');
       });
-  }, [node, token]);
+  }, [node, bearerToken]);
 
   return (
     <TableRow

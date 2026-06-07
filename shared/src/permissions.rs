@@ -353,6 +353,7 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("read", "Allows viewing nodes."),
                         ("update", "Allows modifying nodes."),
                         ("delete", "Allows deleting nodes."),
+                        ("token", "Allows viewing a node's token."),
                         ("reset-token", "Allows resetting a node's token."),
                         (
                             "allocations",

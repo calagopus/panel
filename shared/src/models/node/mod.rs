@@ -580,16 +580,6 @@ impl Node {
     ) -> Result<String, anyhow::Error> {
         Ok(jwt.create_custom(database.blocking_decrypt(&self.token)?.as_bytes(), payload)?)
     }
-
-    pub async fn into_admin_api_token_object(
-        &self,
-        state: &crate::State,
-    ) -> Result<AdminApiNodeToken, crate::database::DatabaseError> {
-        Ok(AdminApiNodeToken {
-            token_id: self.token_id.clone(),
-            token: state.database.decrypt(self.token.clone()).await?,
-        })
-    }
 }
 
 #[async_trait::async_trait]
@@ -1059,11 +1049,4 @@ pub struct AdminApiNode {
     pub disk: i64,
 
     pub created: chrono::DateTime<chrono::Utc>,
-}
-
-#[derive(ToSchema, Serialize)]
-#[schema(title = "AdminNodeToken")]
-pub struct AdminApiNodeToken {
-    pub token_id: compact_str::CompactString,
-    pub token: compact_str::CompactString,
 }

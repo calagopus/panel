@@ -2,14 +2,22 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod get {
+    use serde::Serialize;
     use shared::{
         ApiError, GetState,
         models::{node::GetNode, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
+    use utoipa::ToSchema;
+
+    #[derive(ToSchema, Serialize)]
+    struct Response {
+        token_id: String,
+        token: String,
+    }
 
     #[utoipa::path(get, path = "/", responses(
-        (status = OK, body = inline(shared::models::node::AdminApiNodeToken)),
+        (status = OK, body = inline(Response)),
         (status = NOT_FOUND, body = ApiError),
     ), params(
         (
@@ -23,10 +31,13 @@ mod get {
         permissions: GetPermissionManager,
         node: GetNode,
     ) -> ApiResponseResult {
-        permissions.has_admin_permission("nodes.read")?;
+        permissions.has_admin_permission("nodes.token")?;
 
-        ApiResponse::new_serialized(node.into_admin_api_token_object(&state).await?)
-            .ok()
+        ApiResponse::new_serialized(Response {
+            token_id: node.token_id.to_string(),
+            token: state.database.decrypt(node.token.clone()).await?,
+        })
+        .ok()
     }
 }
 

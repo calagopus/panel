@@ -3,6 +3,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod post {
     use axum::http::StatusCode;
+    use serde::Serialize;
     use shared::{
         ApiError, GetState,
         models::{
@@ -10,9 +11,16 @@ mod post {
         },
         response::{ApiResponse, ApiResponseResult},
     };
+    use utoipa::ToSchema;
+
+    #[derive(ToSchema, Serialize)]
+    struct Response {
+        token_id: String,
+        token: String,
+    }
 
     #[utoipa::path(post, path = "/", responses(
-        (status = OK, body = inline(shared::models::node::AdminApiNodeToken)),
+        (status = OK, body = inline(Response)),
         (status = NOT_FOUND, body = ApiError),
     ), params(
         (
@@ -46,11 +54,7 @@ mod post {
             )
             .await;
 
-        ApiResponse::new_serialized(shared::models::node::AdminApiNodeToken {
-            token_id: token_id.into(),
-            token: token.into(),
-        })
-        .ok()
+        ApiResponse::new_serialized(Response { token_id, token }).ok()
     }
 }
 
