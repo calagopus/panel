@@ -10,12 +10,14 @@ export const isNodeAIO = (node: z.infer<typeof adminNodeSchema>) => {
 
 interface NodeConfigurationParams {
   node: z.infer<typeof adminNodeSchema>;
+  tokenId: string;
+  token: string;
   remote: string;
   apiPort: number;
   sftpPort: number;
 }
 
-export const getNodeConfiguration = ({ node, remote, apiPort, sftpPort }: NodeConfigurationParams) => {
+export const getNodeConfiguration = ({ node, tokenId, token, remote, apiPort, sftpPort }: NodeConfigurationParams) => {
   let origin = window.location.origin;
   try {
     origin = new URL(remote).origin;
@@ -25,8 +27,8 @@ export const getNodeConfiguration = ({ node, remote, apiPort, sftpPort }: NodeCo
 
   return {
     uuid: node.uuid,
-    token_id: node.tokenId,
-    token: node.token,
+    token_id: tokenId,
+    token,
     api: {
       port: apiPort,
       disable_openapi_docs: true,
@@ -42,8 +44,15 @@ export const getNodeConfiguration = ({ node, remote, apiPort, sftpPort }: NodeCo
   };
 };
 
-export const getNodeConfigurationCommand = ({ node, remote, apiPort, sftpPort }: NodeConfigurationParams) => {
-  return `wings configure --join-data ${btoa(jsYaml.dump(getNodeConfiguration({ node, remote, apiPort, sftpPort }), { condenseFlow: true, indent: 1, noArrayIndent: true }))}`;
+export const getNodeConfigurationCommand = ({
+  node,
+  tokenId,
+  token,
+  remote,
+  apiPort,
+  sftpPort,
+}: NodeConfigurationParams) => {
+  return `wings configure --join-data ${btoa(jsYaml.dump(getNodeConfiguration({ node, tokenId, token, remote, apiPort, sftpPort }), { condenseFlow: true, indent: 1, noArrayIndent: true }))}`;
 };
 
 export const getNodeUrl = (node: z.infer<typeof adminNodeSchema>, path: string = '') => {

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
@@ -37,6 +38,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
 
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
@@ -113,10 +115,9 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
     setLoading(true);
 
     resetNodeToken(contextNode.uuid)
-      .then(({ tokenId, token }) => {
+      .then(() => {
         addToast(t('pages.admin.nodes.tabs.general.page.toast.tokenReset', {}), 'success');
-        contextNode.tokenId = tokenId;
-        contextNode.token = token;
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.token(contextNode.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

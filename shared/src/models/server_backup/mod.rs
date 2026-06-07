@@ -1079,7 +1079,7 @@ impl ServerBackup {
                             .node
                             .fetch_cached(&state.database)
                             .await?
-                            .into_admin_api_summary_object(state)
+                            .into_admin_api_object(state, ())
                             .await?,
                     })
                 }
@@ -1089,7 +1089,7 @@ impl ServerBackup {
                 .node
                 .fetch_cached(&state.database)
                 .await?
-                .into_admin_api_summary_object(state)
+                .into_admin_api_object(state, ())
                 .await?,
             name: self.name,
             ignored_files: self.ignored_files,
@@ -1639,7 +1639,7 @@ impl DeletableModel for ServerBackup {
 pub struct AdminApiBackupServer {
     pub uuid: uuid::Uuid,
     pub name: compact_str::CompactString,
-    pub node: super::node::AdminApiNodeSummary,
+    pub node: super::node::AdminApiNode,
 }
 
 #[derive(ToSchema, Serialize)]
@@ -1647,7 +1647,7 @@ pub struct AdminApiBackupServer {
 pub struct AdminApiNodeServerBackup {
     pub uuid: uuid::Uuid,
     pub server: Option<AdminApiBackupServer>,
-    pub node: super::node::AdminApiNodeSummary,
+    pub node: super::node::AdminApiNode,
 
     pub name: compact_str::CompactString,
     pub ignored_files: Vec<compact_str::CompactString>,

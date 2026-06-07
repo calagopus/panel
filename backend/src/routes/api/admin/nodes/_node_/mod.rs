@@ -17,6 +17,7 @@ mod backups;
 mod config;
 mod mounts;
 mod reset_token;
+mod token;
 mod servers;
 mod system;
 
@@ -233,6 +234,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
         .nest("/reset-token", reset_token::router(state))
+        .nest("/token", token::router(state))
         .nest("/allocations", allocations::router(state))
         .nest("/system", system::router(state))
         .nest("/servers", servers::router(state))

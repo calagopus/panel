@@ -3,7 +3,7 @@ import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfig
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
-import { adminNodeSchema, adminNodeSummarySchema } from '@/lib/schemas/admin/nodes.ts';
+import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { databaseType } from '@/lib/schemas/generic.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
@@ -104,7 +104,7 @@ export const adminServerUpdateSchema = z.lazy(() =>
 export const adminBackupServerSchema = z.object({
   uuid: z.string(),
   name: z.string(),
-  node: z.lazy(() => adminNodeSummarySchema),
+  node: z.lazy(() => adminNodeSchema),
 });
 
 export const adminServerBackupSchema = z.object({

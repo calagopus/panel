@@ -9,14 +9,14 @@ import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminNodeSummarySchema } from '@/lib/schemas/admin/nodes.ts';
+import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type Props = ModalProps & {
-  node: z.infer<typeof adminNodeSummarySchema>;
+  node: z.infer<typeof adminNodeSchema>;
   backup: z.infer<typeof adminServerBackupSchema>;
 };
 

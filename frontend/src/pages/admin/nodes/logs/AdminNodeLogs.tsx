@@ -11,6 +11,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import { getNodeUrl } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString } from '@/lib/size.ts';
+import { useNodeToken } from '@/plugins/useNodeToken.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -29,12 +30,17 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   const [selectedLog, setSelectedLog] = useState<NodeLog | null>(null);
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { token } = useNodeToken(node.uuid);
 
   useEffect(() => {
+    if (!token) {
+      return;
+    }
+
     axiosInstance
       .get(getNodeUrl(node, '/api/system/logs'), {
         headers: {
-          Authorization: `Bearer ${node.token}`,
+          Authorization: `Bearer ${token.token}`,
         },
       })
       .then(({ data }) => {
@@ -43,7 +49,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  }, []);
+  }, [node, token]);
 
   useEffect(() => {
     if (selectedLog) return;
@@ -52,7 +58,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   }, [selectedLog]);
 
   const doDownload = () => {
-    if (!selectedLog) {
+    if (!selectedLog || !token) {
       return;
     }
 
@@ -61,7 +67,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
     axiosInstance
       .get(getNodeUrl(node, `/api/system/logs/${selectedLog.name}`), {
         headers: {
-          Authorization: `Bearer ${node.token}`,
+          Authorization: `Bearer ${token.token}`,
         },
         responseType: 'blob',
       })
@@ -83,14 +89,14 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   };
 
   const doView = () => {
-    if (!selectedLog) return;
+    if (!selectedLog || !token) return;
 
     setLoading(true);
 
     axiosInstance
       .get(getNodeUrl(node, `/api/system/logs/${selectedLog.name}?lines=${lines}`), {
         headers: {
-          Authorization: `Bearer ${node.token}`,
+          Authorization: `Bearer ${token.token}`,
         },
         responseType: 'text',
       })

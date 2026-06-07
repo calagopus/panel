@@ -12,6 +12,7 @@ import Code from '@/elements/Code.tsx';
 import HljsCode from '@/elements/HljsCode.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { getNodeConfiguration, getNodeConfigurationCommand, getNodeUrl } from '@/lib/node.ts';
+import { useNodeToken } from '@/plugins/useNodeToken.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
@@ -27,6 +28,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
   const [command, setCommand] = useState('');
 
   const node = data.nodes[0] ?? null;
+  const { token } = useNodeToken(node?.uuid);
 
   useEffect(() => {
     if (!node) {
@@ -34,16 +36,24 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
       return;
     }
 
+    if (!token) {
+      return;
+    }
+
     const remote = window.location.origin;
     const apiPort = parseInt(new URL(node.url).port || '8080');
     const sftpPort = node.sftpPort;
 
-    setNodeConfiguration(getNodeConfiguration({ node, remote, apiPort, sftpPort }));
-    setCommand(getNodeConfigurationCommand({ node, remote, apiPort, sftpPort }));
-  }, [node]);
+    setNodeConfiguration(
+      getNodeConfiguration({ node, tokenId: token.tokenId, token: token.token, remote, apiPort, sftpPort }),
+    );
+    setCommand(
+      getNodeConfigurationCommand({ node, tokenId: token.tokenId, token: token.token, remote, apiPort, sftpPort }),
+    );
+  }, [node, token, t]);
 
   const verifyNode = async () => {
-    if (!node) return;
+    if (!node || !token) return;
 
     setLoading(true);
     setIsVerified(false);
@@ -51,7 +61,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
     axiosInstance
       .get(getNodeUrl(node, '/api/system'), {
         headers: {
-          Authorization: `Bearer ${node.token}`,
+          Authorization: `Bearer ${token.token}`,
           'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
       })

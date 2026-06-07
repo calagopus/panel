@@ -22,6 +22,7 @@ import Tooltip from '@/elements/Tooltip.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { getNodeConfiguration, getNodeConfigurationCommand } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { useNodeToken } from '@/plugins/useNodeToken.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -32,9 +33,14 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
   const [remote, setRemote] = useState(window.location.origin);
   const [apiPort, setApiPort] = useState(parseInt(new URL(node.url).port || '8080'));
   const [sftpPort, setSftpPort] = useState(node.sftpPort);
+  const { token } = useNodeToken(node.uuid);
 
-  const nodeConfiguration = getNodeConfiguration({ node, remote, apiPort, sftpPort });
-  const command = getNodeConfigurationCommand({ node, remote, apiPort, sftpPort });
+  const nodeConfiguration = token
+    ? getNodeConfiguration({ node, tokenId: token.tokenId, token: token.token, remote, apiPort, sftpPort })
+    : null;
+  const command = token
+    ? getNodeConfigurationCommand({ node, tokenId: token.tokenId, token: token.token, remote, apiPort, sftpPort })
+    : null;
 
   const [yaml, setYaml] = useState<string | null>(null);
   const [liveConfigError, setLiveConfigError] = useState<string | null>(null);
@@ -99,26 +105,32 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
           </Title>
           <div className='grid md:grid-cols-4 grid-cols-1 gap-4'>
             <div className='flex flex-col md:col-span-3'>
-              <HljsCode
-                languageName='yaml'
-                language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
-              >
-                {jsYaml.dump(nodeConfiguration)}
-              </HljsCode>
+              {nodeConfiguration && command ? (
+                <>
+                  <HljsCode
+                    languageName='yaml'
+                    language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
+                  >
+                    {jsYaml.dump(nodeConfiguration)}
+                  </HljsCode>
 
-              <div className='mt-2'>
-                <p>{t('pages.admin.nodes.tabs.configuration.page.description.placeFile', {}).md()}</p>
-                <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
-                  <Code block className='flex-1'>
-                    {command}
-                  </Code>
-                  <Tooltip label={t('pages.admin.nodes.tabs.configuration.page.tooltip.copyCommand', {})}>
-                    <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
-                      <FontAwesomeIcon icon={faCopy} />
-                    </ActionIcon>
-                  </Tooltip>
-                </Group>
-              </div>
+                  <div className='mt-2'>
+                    <p>{t('pages.admin.nodes.tabs.configuration.page.description.placeFile', {}).md()}</p>
+                    <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
+                      <Code block className='flex-1'>
+                        {command}
+                      </Code>
+                      <Tooltip label={t('pages.admin.nodes.tabs.configuration.page.tooltip.copyCommand', {})}>
+                        <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
+                          <FontAwesomeIcon icon={faCopy} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Group>
+                  </div>
+                </>
+              ) : (
+                <Spinner.Centered />
+              )}
             </div>
             <Card>
               <Title className='text-right'>{t('pages.admin.nodes.tabs.configuration.page.title', {})}</Title>

@@ -16,6 +16,7 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import { isNodeAIO } from '@/lib/node.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminNodeAllocations from './allocations/AdminNodeAllocations.tsx';
 import AdminNodeBackups from './backups/AdminNodeBackups.tsx';
@@ -32,7 +33,7 @@ export default function NodeView() {
   const params = useParams<'id'>();
 
   const { data: node, isLoading } = useQuery({
-    queryKey: ['admin', 'nodes', { uuid: params.id }],
+    queryKey: queryKeys.admin.nodes.detail(params.id!),
     queryFn: () => getNode(params.id!),
   });
 

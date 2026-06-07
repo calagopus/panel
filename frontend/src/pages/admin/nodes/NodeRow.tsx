@@ -14,6 +14,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { getNodeUrl, isNodeAIO } from '@/lib/node.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { parseVersion } from '@/lib/version.ts';
+import { useNodeToken } from '@/plugins/useNodeToken.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
@@ -33,12 +34,17 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
   const { updateInformation } = useAdminStore();
 
   const [version, setVersion] = useState<string | null>(null);
+  const { token } = useNodeToken(node.uuid, { silent: true });
 
   useEffect(() => {
+    if (!token) {
+      return;
+    }
+
     axiosInstance
       .get(getNodeUrl(node, '/api/system'), {
         headers: {
-          Authorization: `Bearer ${node.token}`,
+          Authorization: `Bearer ${token.token}`,
         },
       })
       .then(({ data }) => {
@@ -48,7 +54,7 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
         console.error('Error while connecting to node', msg);
         setVersion('Unavailable');
       });
-  }, []);
+  }, [node, token]);
 
   return (
     <TableRow
