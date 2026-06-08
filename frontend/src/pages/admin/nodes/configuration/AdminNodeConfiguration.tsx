@@ -39,16 +39,14 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
     queryKey: queryKeys.admin.nodes.token(node.uuid),
     queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
   });
-  const tokenId = nodeToken?.tokenId;
-  const bearerToken = nodeToken?.token;
 
   const configurationParams = useMemo(() => {
-    if (!tokenId || !bearerToken) {
+    if (!nodeToken) {
       return null;
     }
 
-    return { node, tokenId, token: bearerToken, remote, apiPort, sftpPort };
-  }, [node, tokenId, bearerToken, remote, apiPort, sftpPort]);
+    return { node, token: nodeToken, remote, apiPort, sftpPort };
+  }, [node, nodeToken, remote, apiPort, sftpPort]);
 
   const nodeConfiguration = useMemo(
     () => (configurationParams ? getNodeConfiguration(configurationParams) : null),

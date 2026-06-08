@@ -33,8 +33,6 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
     queryFn: useCallback(() => getNodeToken(node!.uuid), [node]),
     enabled: !!node,
   });
-  const tokenId = nodeToken?.tokenId;
-  const bearerToken = nodeToken?.token;
 
   useEffect(() => {
     if (!node) {
@@ -43,19 +41,18 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
   }, [node, t]);
 
   const configurationParams = useMemo(() => {
-    if (!node || !tokenId || !bearerToken) {
+    if (!node || !nodeToken) {
       return null;
     }
 
     return {
       node,
-      tokenId,
-      token: bearerToken,
+      token: nodeToken,
       remote: window.location.origin,
       apiPort: parseInt(new URL(node.url).port || '8080'),
       sftpPort: node.sftpPort,
     };
-  }, [node, tokenId, bearerToken]);
+  }, [node, nodeToken]);
 
   const nodeConfiguration = useMemo(
     () => (configurationParams ? getNodeConfiguration(configurationParams) : null),
@@ -67,7 +64,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
   );
 
   const verifyNode = async () => {
-    if (!node || !bearerToken) return;
+    if (!node || !nodeToken) return;
 
     setLoading(true);
     setIsVerified(false);
@@ -75,7 +72,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
     axiosInstance
       .get(getNodeUrl(node, '/api/system'), {
         headers: {
-          Authorization: `Bearer ${bearerToken}`,
+          Authorization: `Bearer ${nodeToken.token}`,
           'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
       })

@@ -1,6 +1,6 @@
 import jsYaml from 'js-yaml';
 import { z } from 'zod';
-import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { adminNodeSchema, adminNodeTokenSchema } from '@/lib/schemas/admin/nodes.ts';
 
 export const NODE_AIO_UUID = '7dbbbb63-1734-48c4-e1de-d1a65f62cada';
 
@@ -10,14 +10,13 @@ export const isNodeAIO = (node: z.infer<typeof adminNodeSchema>) => {
 
 interface NodeConfigurationParams {
   node: z.infer<typeof adminNodeSchema>;
-  tokenId: string;
-  token: string;
+  token: z.infer<typeof adminNodeTokenSchema>;
   remote: string;
   apiPort: number;
   sftpPort: number;
 }
 
-export const getNodeConfiguration = ({ node, tokenId, token, remote, apiPort, sftpPort }: NodeConfigurationParams) => {
+export const getNodeConfiguration = ({ node, token, remote, apiPort, sftpPort }: NodeConfigurationParams) => {
   let origin = window.location.origin;
   try {
     origin = new URL(remote).origin;
@@ -27,8 +26,8 @@ export const getNodeConfiguration = ({ node, tokenId, token, remote, apiPort, sf
 
   return {
     uuid: node.uuid,
-    token_id: tokenId,
-    token,
+    token_id: token.tokenId,
+    token: token.token,
     api: {
       port: apiPort,
       disable_openapi_docs: true,
@@ -44,15 +43,8 @@ export const getNodeConfiguration = ({ node, tokenId, token, remote, apiPort, sf
   };
 };
 
-export const getNodeConfigurationCommand = ({
-  node,
-  tokenId,
-  token,
-  remote,
-  apiPort,
-  sftpPort,
-}: NodeConfigurationParams) => {
-  return `wings configure --join-data ${btoa(jsYaml.dump(getNodeConfiguration({ node, tokenId, token, remote, apiPort, sftpPort }), { condenseFlow: true, indent: 1, noArrayIndent: true }))}`;
+export const getNodeConfigurationCommand = ({ node, token, remote, apiPort, sftpPort }: NodeConfigurationParams) => {
+  return `wings configure --join-data ${btoa(jsYaml.dump(getNodeConfiguration({ node, token, remote, apiPort, sftpPort }), { condenseFlow: true, indent: 1, noArrayIndent: true }))}`;
 };
 
 export const getNodeUrl = (node: z.infer<typeof adminNodeSchema>, path: string = '') => {
