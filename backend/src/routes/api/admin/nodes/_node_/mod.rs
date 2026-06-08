@@ -17,9 +17,9 @@ mod backups;
 mod config;
 mod mounts;
 mod reset_token;
-mod token;
 mod servers;
 mod system;
+mod token;
 
 pub async fn auth(
     state: GetState,
