@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import stripAnsi from 'strip-ansi';
 import { z } from 'zod';
-import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
 import { axiosInstance, httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -10,10 +9,8 @@ import Select from '@/elements/input/Select.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { getNodeUrl } from '@/lib/node.ts';
-import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString } from '@/lib/size.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -32,21 +29,12 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   const [selectedLog, setSelectedLog] = useState<NodeLog | null>(null);
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { data: nodeToken } = useResource({
-    queryKey: queryKeys.admin.nodes.token(node.uuid),
-    queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
-  });
-  const bearerToken = nodeToken?.token;
 
   useEffect(() => {
-    if (!bearerToken) {
-      return;
-    }
-
     axiosInstance
       .get(getNodeUrl(node, '/api/system/logs'), {
         headers: {
-          Authorization: `Bearer ${bearerToken}`,
+          Authorization: `Bearer ${node.token}`,
         },
       })
       .then(({ data }) => {
@@ -55,7 +43,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  }, [node, bearerToken]);
+  }, []);
 
   useEffect(() => {
     if (selectedLog) return;
@@ -64,7 +52,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   }, [selectedLog]);
 
   const doDownload = () => {
-    if (!selectedLog || !bearerToken) {
+    if (!selectedLog) {
       return;
     }
 
@@ -73,7 +61,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
     axiosInstance
       .get(getNodeUrl(node, `/api/system/logs/${selectedLog.name}`), {
         headers: {
-          Authorization: `Bearer ${bearerToken}`,
+          Authorization: `Bearer ${node.token}`,
         },
         responseType: 'blob',
       })
@@ -95,14 +83,14 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   };
 
   const doView = () => {
-    if (!selectedLog || !bearerToken) return;
+    if (!selectedLog) return;
 
     setLoading(true);
 
     axiosInstance
       .get(getNodeUrl(node, `/api/system/logs/${selectedLog.name}?lines=${lines}`), {
         headers: {
-          Authorization: `Bearer ${bearerToken}`,
+          Authorization: `Bearer ${node.token}`,
         },
         responseType: 'text',
       })

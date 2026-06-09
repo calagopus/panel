@@ -13,7 +13,7 @@ mod get {
     #[derive(ToSchema, Serialize)]
     struct Response {
         token_id: String,
-        token: String,
+        token: compact_str::CompactString,
     }
 
     #[utoipa::path(get, path = "/", responses(
