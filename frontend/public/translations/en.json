@@ -71,6 +71,22 @@
       "few": "{count} Eggs",
       "many": "{count} Eggs",
       "other": "{count} Eggs"
+    },
+    "shortcut": {
+      "zero": "{count} Shortcuts",
+      "one": "{count} Shortcut",
+      "two": "{count} Shortcuts",
+      "few": "{count} Shortcuts",
+      "many": "{count} Shortcuts",
+      "other": "{count} Shortcuts"
+    },
+    "line": {
+      "zero": "{count} Lines",
+      "one": "{count} Line",
+      "two": "{count} Lines",
+      "few": "{count} Lines",
+      "many": "{count} Lines",
+      "other": "{count} Lines"
     }
   },
   "translations": {
@@ -1057,6 +1073,23 @@
           "subtitle": "Use these keyboard shortcuts to navigate and interact with the panel more efficiently.",
           "detectedMac": "macOS detected",
           "detectedWindows": "Windows/Linux detected",
+          "label": {
+            "disabled": "Disabled",
+            "modified": "Modified",
+            "recording": "Press keys..."
+          },
+          "button": {
+            "rebind": "Rebind",
+            "resetAll": "Reset All",
+            "copy": "Copy All",
+            "paste": "Paste"
+          },
+          "toast": {
+            "imported": "Updated {shortcuts}.",
+            "importedNone": "No shortcuts were changed.",
+            "importErrors": "Ignored {unknown} and {invalid}.",
+            "resetAll": "All shortcuts reset to defaults."
+          },
           "fileManager": {
             "title": "File Manager",
             "selectAll": "Select all files",
@@ -3272,6 +3305,17 @@
               },
               "button": {
                 "accept": "Accept EULA"
+              }
+            },
+            "javaVersion": {
+              "title": "Unsupported Java Version",
+              "content": "This server is currently running an unsupported version of Java and cannot be started.",
+              "contentDetails": "Please select a supported Docker image from the list below to continue starting the server.",
+              "toast": {
+                "updated": "Docker image updated successfully."
+              },
+              "button": {
+                "update": "Update Docker Image"
               }
             }
           },

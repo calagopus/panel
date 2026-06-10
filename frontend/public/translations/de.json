@@ -71,6 +71,22 @@
       "few": "{count} Eggs",
       "many": "{count} Eggs",
       "other": "{count} Eggs"
+    },
+    "shortcut": {
+      "zero": "{count} Tastaturkürzel",
+      "one": "{count} Tastaturkürzel",
+      "two": "{count} Tastaturkürzel",
+      "few": "{count} Tastaturkürzel",
+      "many": "{count} Tastaturkürzel",
+      "other": "{count} Tastaturkürzel"
+    },
+    "line": {
+      "zero": "{count} Zeilen",
+      "one": "{count} Zeile",
+      "two": "{count} Zeilen",
+      "few": "{count} Zeilen",
+      "many": "{count} Zeilen",
+      "other": "{count} Zeilen"
     }
   },
   "translations": {
@@ -1057,6 +1073,23 @@
           "subtitle": "Verwende diese Tastaturkürzel, um effizienter durch das Panel zu navigieren und damit zu interagieren.",
           "detectedMac": "macOS erkannt",
           "detectedWindows": "Windows/Linux erkannt",
+          "label": {
+            "disabled": "Deaktiviert",
+            "modified": "Geändert",
+            "recording": "Tasten drücken..."
+          },
+          "button": {
+            "rebind": "Neu belegen",
+            "resetAll": "Alle zurücksetzen",
+            "copy": "Alle kopieren",
+            "paste": "Einfügen"
+          },
+          "toast": {
+            "imported": "{shortcuts} aktualisiert.",
+            "importedNone": "Keine Tastenkürzel wurden geändert.",
+            "importErrors": "{unknown} und {invalid} ignoriert.",
+            "resetAll": "Alle Tastenkürzel auf Standard zurückgesetzt."
+          },
           "fileManager": {
             "title": "Dateimanager",
             "selectAll": "Alle Dateien auswählen",

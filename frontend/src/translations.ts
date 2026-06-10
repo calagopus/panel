@@ -18,6 +18,8 @@ const baseTranslations = defineTranslations({
     node: defineEnglishItem('Node', 'Nodes'),
     allocation: defineEnglishItem('Node Allocation', 'Node Allocations'),
     egg: defineEnglishItem('Egg', 'Eggs'),
+    shortcut: defineEnglishItem('Shortcut', 'Shortcuts'),
+    line: defineEnglishItem('Line', 'Lines'),
   },
   translations: {
     common: {
@@ -1025,6 +1027,23 @@ const baseTranslations = defineTranslations({
           subtitle: 'Use these keyboard shortcuts to navigate and interact with the panel more efficiently.',
           detectedMac: 'macOS detected',
           detectedWindows: 'Windows/Linux detected',
+          label: {
+            disabled: 'Disabled',
+            modified: 'Modified',
+            recording: 'Press keys...',
+          },
+          button: {
+            rebind: 'Rebind',
+            resetAll: 'Reset All',
+            copy: 'Copy All',
+            paste: 'Paste',
+          },
+          toast: {
+            imported: 'Updated {shortcuts}.',
+            importedNone: 'No shortcuts were changed.',
+            importErrors: 'Ignored {unknown} and {invalid}.',
+            resetAll: 'All shortcuts reset to defaults.',
+          },
           fileManager: {
             title: 'File Manager',
             selectAll: 'Select all files',

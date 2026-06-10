@@ -113,7 +113,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
         {items}
       </Breadcrumbs>
 
-      <div className='space-x-2'>
+      <div className='flex flex-row space-x-2'>
         <NavLink to={`/server/${server?.uuidShort}/files`} hidden={!browsingBackup || inFileEditor}>
           <Button variant='light' leftSection={<FontAwesomeIcon icon={faDoorOpen} />}>
             {t('pages.server.files.button.exitBackup', {})}

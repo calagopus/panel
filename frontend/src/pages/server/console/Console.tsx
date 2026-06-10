@@ -26,7 +26,7 @@ import Popover from '@/elements/Popover.tsx';
 import Progress from '@/elements/Progress.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
+import { matchesShortcut, useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -409,7 +409,7 @@ export default function Terminal() {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowUp' && !inputValueRef.current.startsWith('!')) {
+      if (matchesShortcut(e.nativeEvent, 'console.previousCommand') && !inputValueRef.current.startsWith('!')) {
         const newIndex = Math.min(historyIndex + 1, history.length - 1);
         setHistoryIndex(newIndex);
         setInputValue(history[newIndex] || '');
@@ -417,7 +417,7 @@ export default function Terminal() {
         e.preventDefault();
       }
 
-      if (e.key === 'ArrowDown' && !inputValueRef.current.startsWith('!')) {
+      if (matchesShortcut(e.nativeEvent, 'console.nextCommand') && !inputValueRef.current.startsWith('!')) {
         const newIndex = Math.max(historyIndex - 1, -1);
         setHistoryIndex(newIndex);
         setInputValue(history[newIndex] || '');
@@ -456,7 +456,7 @@ export default function Terminal() {
       setOpenModal(openModal ? null : 'search');
     },
     {
-      modifiers: ['ctrlOrMeta'],
+      id: 'console.search',
       allowWhenInputFocused: true,
       deps: [openModal],
     },
@@ -468,7 +468,7 @@ export default function Terminal() {
       <CommandHistoryDrawer opened={openModal === 'commandHistory'} onClose={() => setOpenModal(null)} />
       <SshDetailsModal opened={openModal === 'sshDetails'} onClose={() => setOpenModal(null)} />
 
-      <Card className='h-full flex flex-col font-mono text-sm relative p-2!'>
+      <Card className='h-full flex flex-col font-mono text-sm relative isolate p-2!'>
         <div className='flex flex-row justify-between items-center mb-2 text-xs'>
           <div className='flex flex-row items-center'>
             {window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderLeftComponents.prependedComponents.map(

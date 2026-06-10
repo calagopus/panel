@@ -36,7 +36,6 @@ export default function JavaVersionModal() {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(server.image);
-
   const lastMatchAt = useRef<number | null>(null);
 
   useWebsocketEvent(SocketEvent.CONSOLE_OUTPUT, (line) => {

@@ -199,17 +199,15 @@ function ServerFilesComponent() {
   useKeyboardShortcuts({
     shortcuts: [
       {
-        key: 'a',
-        modifiers: ['ctrlOrMeta'],
+        id: 'files.selectAll',
         callback: () => doSelectFiles(browsingEntries.data),
       },
       {
-        key: 'k',
-        modifiers: ['ctrlOrMeta'],
+        id: 'files.search',
         callback: () => doOpenModal('search'),
       },
       {
-        key: 'ArrowUp',
+        id: 'files.moveUpSelection',
         callback: () => {
           if (selectedFiles.size === 0) return;
 
@@ -229,7 +227,7 @@ function ServerFilesComponent() {
         },
       },
       {
-        key: 'ArrowDown',
+        id: 'files.moveDownSelection',
         callback: () => {
           if (selectedFiles.size === 0) return;
 
@@ -249,15 +247,14 @@ function ServerFilesComponent() {
         },
       },
       {
-        key: 'ArrowUp',
-        modifiers: ['alt'],
+        id: 'files.moveUpDirectory',
         callback: () =>
           setSearchParams({
             directory: join(browsingDirectory, '..'),
           }),
       },
       {
-        key: 'd',
+        id: 'files.duplicate',
         callback: () => {
           if (selectedFiles.size === 1 && browsingWritableDirectory) {
             const file = selectedFiles.values()[0];
@@ -273,7 +270,7 @@ function ServerFilesComponent() {
         },
       },
       {
-        key: 'f2',
+        id: 'files.rename',
         callback: () => {
           if (selectedFiles.size === 1 && browsingWritableDirectory) {
             doOpenModal('rename', [selectedFiles.values()[0]]);
