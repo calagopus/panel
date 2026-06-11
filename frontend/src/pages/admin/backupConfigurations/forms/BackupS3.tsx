@@ -1,6 +1,7 @@
-import { Divider, Group, Stack, Title } from '@mantine/core';
+import { Group, Stack, Title } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
+import Divider from '@/elements/Divider.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';

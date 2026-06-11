@@ -1,12 +1,13 @@
 import { faCheck, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Badge, Group, Paper, Stack, Text, Title } from '@mantine/core';
+import { Group, Paper, Stack, Text, Title } from '@mantine/core';
 import { useState } from 'react';
 import { z } from 'zod';
 import createEggRepository from '@/api/admin/egg-repositories/createEggRepository.ts';
 import syncEggRepository from '@/api/admin/egg-repositories/syncEggRepository.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import AlertError from '@/elements/alerts/AlertError.tsx';
+import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import { adminEggRepositoryUpdateSchema } from '@/lib/schemas/admin/eggRepositories.ts';

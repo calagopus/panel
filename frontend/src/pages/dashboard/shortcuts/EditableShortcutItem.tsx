@@ -11,9 +11,10 @@ import {
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Badge, Flex, Group, Text } from '@mantine/core';
+import { Flex, Group, Text } from '@mantine/core';
 import { useEffect } from 'react';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Badge from '@/elements/Badge.tsx';
 import KbdKey from '@/elements/KbdKey.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { bindingFromEvent, ModifierKey, ShortcutBinding, ShortcutDefinition } from '@/lib/shortcuts.ts';

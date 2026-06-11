@@ -1,12 +1,14 @@
 import { faBroom, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Card, Divider, Group, Stack, Text, Title } from '@mantine/core';
+import { Group, Stack, Text, Title } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import cronstrue from 'cronstrue/i18n';
 import { z } from 'zod';
 import getNodes from '@/api/admin/nodes/getNodes.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
+import Card from '@/elements/Card.tsx';
+import Divider from '@/elements/Divider.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';

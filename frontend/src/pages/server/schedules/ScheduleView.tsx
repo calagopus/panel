@@ -8,13 +8,14 @@ import {
   faReply,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Alert, Group, Stack, Tabs, Timeline, Title } from '@mantine/core';
+import { Group, Stack, Tabs, Timeline, Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import getSchedule from '@/api/server/schedules/getSchedule.ts';
 import getScheduleSteps from '@/api/server/schedules/steps/getScheduleSteps.ts';
 import triggerSchedule from '@/api/server/schedules/triggerSchedule.ts';
 import updateSchedule from '@/api/server/schedules/updateSchedule.ts';
+import Alert from '@/elements/Alert.tsx';
 import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';

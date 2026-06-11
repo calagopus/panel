@@ -1,6 +1,6 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Alert } from '@mantine/core';
+import Alert from '@/elements/Alert.tsx';
 import { bytesToString } from '@/lib/size.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

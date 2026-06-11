@@ -1,6 +1,6 @@
 import { faArrowLeft, faClipboard, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Divider, DrawerProps, Group, ScrollArea, Stack, Title } from '@mantine/core';
+import { DrawerProps, Group, ScrollArea, Stack, Title } from '@mantine/core';
 import { useState } from 'react';
 import { z } from 'zod';
 import { getEmptyPaginationSet } from '@/api/axios.ts';
@@ -8,6 +8,7 @@ import getServerActivity from '@/api/server/getServerActivity.ts';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
+import Divider from '@/elements/Divider.tsx';
 import Drawer from '@/elements/Drawer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { Pagination } from '@/elements/Table.tsx';

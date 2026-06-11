@@ -1,12 +1,13 @@
 import { faEnvelope, faLock, faShieldHalved, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Alert, Stack, Title } from '@mantine/core';
+import { Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 import { z } from 'zod';
 import register from '@/api/auth/register.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
 import AlertError from '@/elements/alerts/AlertError.tsx';
 import Button from '@/elements/Button.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';

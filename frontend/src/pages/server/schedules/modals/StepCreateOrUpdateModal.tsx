@@ -1,12 +1,13 @@
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Divider, ModalProps, Stack, Text } from '@mantine/core';
+import { ModalProps, Stack, Text } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
 import createScheduleStep from '@/api/server/schedules/steps/createScheduleStep.ts';
 import updateScheduleStep from '@/api/server/schedules/steps/updateScheduleStep.ts';
 import Button from '@/elements/Button.tsx';
+import Divider from '@/elements/Divider.tsx';
 import Select from '@/elements/input/Select.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';

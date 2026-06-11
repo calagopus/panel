@@ -1,4 +1,4 @@
-import { Divider, Group, NavLink, Paper, ScrollArea, Stack, Text } from '@mantine/core';
+import { Group, NavLink, Paper, ScrollArea, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -14,6 +14,7 @@ import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Divider from '@/elements/Divider.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
