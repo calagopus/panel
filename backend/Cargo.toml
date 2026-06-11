@@ -30,6 +30,7 @@ reqwest = { workspace = true }
 sha2 = { workspace = true }
 image = "0.25.5"
 tower-cookies = { workspace = true }
+tower-http = { workspace = true }
 rand = { workspace = true }
 futures-util = { workspace = true }
 include_dir = { workspace = true }

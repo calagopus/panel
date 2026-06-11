@@ -4,7 +4,7 @@ use axum::{
     extract::{ConnectInfo, Request},
     http::{HeaderValue, StatusCode},
     middleware::Next,
-    response::Response,
+    response::{IntoResponse, Response},
 };
 use colored::Colorize;
 use compact_str::ToCompactString;
@@ -59,6 +59,22 @@ pub async fn handle_request(
                 .await
         })
         .await)
+}
+
+fn handle_panic(err: Box<dyn std::any::Any + Send + 'static>) -> Response<Body> {
+    let details = if let Some(s) = err.downcast_ref::<String>() {
+        s.as_str()
+    } else if let Some(s) = err.downcast_ref::<&str>() {
+        s
+    } else {
+        "unknown panic"
+    };
+
+    tracing::error!("a panic occurred while handling a request: {}", details);
+
+    ApiResponse::error("internal server error")
+        .with_status(StatusCode::INTERNAL_SERVER_ERROR)
+        .into_response()
 }
 
 pub async fn handle_postprocessing(req: Request, next: Next) -> Result<Response, StatusCode> {
@@ -572,9 +588,26 @@ pub async fn handle_startup() -> (
 
                         request.headers_mut().remove(axum::http::header::HOST);
                         request.headers_mut().remove("X-Forwarded-For");
+
+                        request
+                            .headers_mut()
+                            .remove(axum::http::header::TRANSFER_ENCODING);
+                        request
+                            .headers_mut()
+                            .remove(axum::http::header::CONTENT_LENGTH);
+
+                        if !is_upgrade {
+                            request.headers_mut().remove(axum::http::header::CONNECTION);
+                        }
+
                         request
                             .headers_mut()
                             .insert("X-Real-Ip", ip.to_string().parse()?);
+
+                        tracing::debug!(
+                            "proxying request to wings-proxy upstream: {}",
+                            request.url()
+                        );
 
                         let response = match tokio::time::timeout(
                             std::time::Duration::from_secs(30),
@@ -583,7 +616,12 @@ pub async fn handle_startup() -> (
                         .await
                         {
                             Ok(Ok(response)) => response,
-                            Ok(Err(_)) => {
+                            Ok(Err(err)) => {
+                                tracing::warn!(
+                                    "failed to connect to wings-proxy upstream: {:#?}",
+                                    err
+                                );
+
                                 return ApiResponse::error("failed to connect to upstream")
                                     .with_status(StatusCode::BAD_GATEWAY)
                                     .ok();
@@ -623,6 +661,15 @@ pub async fn handle_startup() -> (
                                 .with_status(status)
                                 .with_headers(&headers)
                                 .ok();
+                        }
+
+                        let mut headers = headers;
+                        for header in [
+                            axum::http::header::TRANSFER_ENCODING,
+                            axum::http::header::CONNECTION,
+                            axum::http::header::CONTENT_LENGTH,
+                        ] {
+                            headers.remove(header);
                         }
 
                         return ApiResponse::new(Body::from_stream(response.bytes_stream()))
@@ -791,6 +838,9 @@ pub async fn handle_startup() -> (
         ))
         .layer(CookieManagerLayer::new())
         .layer(axum::middleware::from_fn(handle_postprocessing))
+        .layer(tower_http::catch_panic::CatchPanicLayer::custom(
+            handle_panic,
+        ))
         .route_layer(SentryHttpLayer::new().enable_transaction())
         .with_state(state.clone());
 

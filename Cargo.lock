@@ -1042,6 +1042,7 @@ dependencies = [
  "tokio-util",
  "totp-rs",
  "tower-cookies",
+ "tower-http",
  "tracing",
  "urlencoding",
  "utoipa",
@@ -9069,10 +9070,12 @@ dependencies = [
  "futures-util",
  "http 1.4.2",
  "http-body 1.0.1",
+ "http-body-util",
  "pin-project-lite",
  "tower",
  "tower-layer",
  "tower-service",
+ "tracing",
  "url",
 ]
 
