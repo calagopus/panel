@@ -48,7 +48,7 @@ export default function BulkActionBar({
         {t('common.enum.serverPowerAction.stop', {})} ({selectedCount})
       </Button>
       <Button color='gray' onClick={onTransfer} disabled={loading !== null}>
-        Transfer ({selectedCount})
+        {t('common.button.transfer', {})} ({selectedCount})
       </Button>
       <Button variant='default' onClick={onClear}>
         {t('common.button.cancel', {})}

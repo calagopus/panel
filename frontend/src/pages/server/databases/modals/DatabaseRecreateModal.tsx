@@ -47,7 +47,6 @@ export default function DatabaseRecreateModal({ database, setSizeLoading, opened
         <TextInput
           withAsterisk
           label={t('pages.server.databases.form.databaseName', {})}
-          placeholder={t('pages.server.databases.form.databaseName', {})}
           {...form.getInputProps('name')}
         />
 

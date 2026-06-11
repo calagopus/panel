@@ -26,21 +26,14 @@ export default function EmailFile({
       <TextInput
         withAsterisk
         label={t('common.form.path', {})}
-        placeholder={t('common.form.path', {})}
         key={form.key('path')}
         {...form.getInputProps('path')}
       />
 
       <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.fromAddress', {})}
-          placeholder={t('common.form.fromAddress', {})}
-          {...form.getInputProps('fromAddress')}
-        />
+        <TextInput withAsterisk label={t('common.form.fromAddress', {})} {...form.getInputProps('fromAddress')} />
         <TextInput
           label={t('common.form.fromName', {})}
-          placeholder={t('common.form.fromName', {})}
           key={form.key('fromName')}
           {...form.getInputProps('fromName')}
         />

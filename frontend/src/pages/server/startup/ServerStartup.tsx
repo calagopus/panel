@@ -128,20 +128,20 @@ export default function ServerStartup() {
         opened={blocker.state === 'blocked'}
         onClose={() => blocker.reset()}
         onConfirmed={() => blocker.proceed()}
-        confirm={t('pages.server.startup.modal.unsavedChanges.button.leave', {})}
+        confirm={t('common.button.leavePage', {})}
       >
         {t('pages.server.startup.modal.unsavedChanges.content', {}).md()}
       </ConfirmationModal>
 
       <div className='flex flex-col md:grid md:grid-cols-3 gap-4 mt-2.5'>
         <TitleCard
-          title={t('pages.server.startup.form.startupCommand', {})}
+          title={t('common.form.startupCommand', {})}
           icon={<FontAwesomeIcon icon={faPlay} />}
           className='col-span-2'
         >
           <TextArea
             withAsterisk
-            placeholder={t('pages.server.startup.form.startupCommand', {})}
+            placeholder={t('common.form.startupCommand', {})}
             value={command}
             onChange={(e) => setCommand(e.target.value)}
             readOnly={!useServerCan('startup.command') || !server.eggConfiguration?.startupAllowCustomStartupCommand}
@@ -184,7 +184,7 @@ export default function ServerStartup() {
             }
           />
         </TitleCard>
-        <TitleCard title={t('pages.server.startup.form.dockerImage', {})} icon={<FontAwesomeIcon icon={faDocker} />}>
+        <TitleCard title={t('common.form.dockerImage', {})} icon={<FontAwesomeIcon icon={faDocker} />}>
           <Select
             withAsterisk
             value={dockerImage}

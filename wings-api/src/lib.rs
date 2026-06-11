@@ -206,6 +206,36 @@ nestify::nest! {
 }
 
 nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ResticBackupConfiguration {
+        #[schema(inline)]
+        pub repository: compact_str::CompactString,
+        #[schema(inline)]
+        pub password_file: Option<compact_str::CompactString>,
+        #[schema(inline)]
+        pub retry_lock_seconds: u64,
+        #[schema(inline)]
+        pub environment: IndexMap<compact_str::CompactString, compact_str::CompactString>,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ResticTaskResult {
+        #[schema(inline)]
+        pub started: chrono::DateTime<chrono::Local>,
+        #[schema(inline)]
+        pub finished: chrono::DateTime<chrono::Local>,
+        #[schema(inline)]
+        pub duration_ms: u64,
+        #[schema(inline)]
+        pub successful: bool,
+        #[schema(inline)]
+        pub data: serde_json::Value,
+        #[schema(inline)]
+        pub stderr: compact_str::CompactString,
+    }
+}
+
+nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RevisionInfo {
         #[schema(inline)]
         pub id: i64,
@@ -2046,6 +2076,14 @@ pub mod system_config {
                             pub authentication_pubkey_attempts: u64,
                             #[schema(inline)]
                             pub authentication_cooldown: u64,
+                            #[schema(inline)]
+                            pub max_connections_per_user: u64,
+                            #[schema(inline)]
+                            pub max_channels_per_connection: u64,
+                            #[schema(inline)]
+                            pub max_handles_per_channel: u64,
+                            #[schema(inline)]
+                            pub max_handles_total: u64,
                         },
 
                         #[schema(inline)]
@@ -2241,6 +2279,8 @@ pub mod system_config {
                     #[schema(inline)]
                     pub container_pid_limit: u64,
                     #[schema(inline)]
+                    pub container_apply_seccomp: bool,
+                    #[schema(inline)]
                     pub installer_limits: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerInstallerLimits {
                         #[schema(inline)]
                         pub timeout: u64,
@@ -2406,6 +2446,170 @@ pub mod system_overview {
         }
 
         pub type Response = Response200;
+    }
+}
+pub mod system_restic_prune {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub result: ResticTaskResult,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub configuration: Option<ResticBackupConfiguration>,
+                #[schema(inline)]
+                pub dry_run: bool,
+                #[schema(inline)]
+                pub foreground: bool,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub result: ResticTaskResult,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response202 {
+            }
+        }
+
+        pub type Response409 = ApiError;
+
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        pub enum Response {
+            Ok(Response200),
+            Accepted(Response202),
+        }
+    }
+}
+pub mod system_restic_stats {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub result: ResticTaskResult,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub configuration: Option<ResticBackupConfiguration>,
+                #[schema(inline)]
+                pub mode: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub foreground: bool,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub result: ResticTaskResult,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response202 {
+            }
+        }
+
+        pub type Response409 = ApiError;
+
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        pub enum Response {
+            Ok(Response200),
+            Accepted(Response202),
+        }
+    }
+}
+pub mod system_restic_unlock {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub result: ResticTaskResult,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub configuration: Option<ResticBackupConfiguration>,
+                #[schema(inline)]
+                pub remove_all: bool,
+                #[schema(inline)]
+                pub foreground: bool,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub result: ResticTaskResult,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response202 {
+            }
+        }
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        pub enum Response {
+            Ok(Response200),
+            Accepted(Response202),
+        }
     }
 }
 pub mod system_stats {

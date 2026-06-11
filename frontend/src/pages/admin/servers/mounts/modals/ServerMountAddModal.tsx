@@ -12,6 +12,7 @@ import { adminNodeMountSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerMountAddModal({
@@ -19,6 +20,7 @@ export default function ServerMountAddModal({
   opened,
   onClose,
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { addServerMount } = useAdminStore();
 
@@ -44,7 +46,7 @@ export default function ServerMountAddModal({
 
     createServerMount(server.uuid, { mountUuid: selectedMount.mount.uuid })
       .then(() => {
-        addToast('Server Mount added.', 'success');
+        addToast(t('pages.admin.servers.tabs.mounts.page.toast.added', {}), 'success');
 
         onClose();
         addServerMount({ mount: selectedMount.mount, created: new Date() });
@@ -56,12 +58,11 @@ export default function ServerMountAddModal({
   };
 
   return (
-    <Modal title='Add Server Mount' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.servers.tabs.mounts.page.modal.add.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label='Mount'
-          placeholder='Mount'
+          label={t('common.form.mount', {})}
           value={selectedMount?.mount.uuid}
           onChange={(value) => setSelectedMount(mounts.items.find((m) => m.mount.uuid === value) ?? null)}
           data={mounts.items.map((mount) => ({
@@ -76,10 +77,10 @@ export default function ServerMountAddModal({
 
         <ModalFooter>
           <Button onClick={doAdd} loading={loading} disabled={!selectedMount}>
-            Add
+            {t('common.button.add', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

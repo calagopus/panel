@@ -83,15 +83,13 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
           <Group grow>
             <TextInput
               withAsterisk
-              label={t('pages.account.account.containers.account.form.nameFirst', {})}
-              placeholder={t('pages.account.account.containers.account.form.nameFirst', {})}
+              label={t('common.form.firstName', {})}
               autoComplete='given-name'
               {...form.getInputProps('nameFirst')}
             />
             <TextInput
               withAsterisk
-              label={t('pages.account.account.containers.account.form.nameLast', {})}
-              placeholder={t('pages.account.account.containers.account.form.nameLast', {})}
+              label={t('common.form.lastName', {})}
               autoComplete='family-name'
               {...form.getInputProps('nameLast')}
             />
@@ -99,16 +97,14 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
           <Group grow>
             <TextInput
               withAsterisk
-              label={t('pages.account.account.containers.account.form.username', {})}
-              placeholder={t('pages.account.account.containers.account.form.username', {})}
+              label={t('common.form.username', {})}
               autoComplete='username'
               {...form.getInputProps('username')}
             />
             {settings.user.allowChangingLanguage && (
               <Select
                 withAsterisk
-                label={t('pages.account.account.containers.account.form.language', {})}
-                placeholder={t('pages.account.account.containers.account.form.language', {})}
+                label={t('common.form.language', {})}
                 data={languages.map((language) => ({
                   label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
                   value: language,
@@ -121,7 +117,6 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
             <Select
               withAsterisk
               label={t('pages.account.account.containers.account.form.toastPosition', {})}
-              placeholder={t('pages.account.account.containers.account.form.toastPosition', {})}
               data={[
                 {
                   label: t('common.enum.userToastPosition.topLeft', {}),

@@ -127,6 +127,8 @@ export const usersTable = pgTable(
     name_last: varchar({ length: 255 }).notNull(),
     password: text(),
     admin: boolean().default(false).notNull(),
+    frozen: boolean().default(false).notNull(),
+    suspended: boolean().default(false).notNull(),
     totp_enabled: boolean().default(false).notNull(),
     totp_last_used: timestamp(),
     totp_secret: char({ length: 32 }),
@@ -397,6 +399,20 @@ export const oauthProvidersTable = pgTable(
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [uniqueIndex('oauth_providers_name_idx').on(cols.name)],
+);
+
+export const oauthProviderMappingsTable = pgTable(
+  'oauth_provider_mappings',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    oauth_provider_uuid: uuid()
+      .references(() => oauthProvidersTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    scopes: varchar({ length: 255 }).array().notNull(),
+    mapping: jsonb().notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [index('oauth_provider_mappings_oauth_provider_uuid_idx').on(cols.oauth_provider_uuid)],
 );
 
 export const mountsTable = pgTable(

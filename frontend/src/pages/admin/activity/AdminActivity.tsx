@@ -51,7 +51,7 @@ export default function AdminActivity() {
 
   return (
     <AdminContentContainer
-      title='Activity'
+      title={t('pages.admin.activity.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -62,7 +62,7 @@ export default function AdminActivity() {
         ) : null
       }
     >
-      <Table columns={adminActivityColumns} loading={loading} pagination={activities} onPageSelect={setPage}>
+      <Table columns={adminActivityColumns()} loading={loading} pagination={activities} onPageSelect={setPage}>
         {activities?.data.map((activity) => (
           <ActivityRow key={activity.created.toString()} activity={activity} />
         ))}

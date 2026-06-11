@@ -9,12 +9,14 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { eggRepositoryTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import EggRepositoryCreateOrUpdate from './EggRepositoryCreateOrUpdate.tsx';
 import EggRepositoryRow from './EggRepositoryRow.tsx';
 import EggRepositoryView from './EggRepositoryView.tsx';
 
 function EggRepositoriesContainer() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const {
@@ -30,7 +32,7 @@ function EggRepositoriesContainer() {
 
   return (
     <AdminContentContainer
-      title='Egg Repositories'
+      title={t('pages.admin.eggRepositories.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -40,12 +42,17 @@ function EggRepositoriesContainer() {
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </AdminCan>
       }
     >
-      <Table columns={eggRepositoryTableColumns} loading={loading} pagination={eggRepositories} onPageSelect={setPage}>
+      <Table
+        columns={eggRepositoryTableColumns()}
+        loading={loading}
+        pagination={eggRepositories}
+        onPageSelect={setPage}
+      >
         {eggRepositories?.data.map((eggRepository) => (
           <EggRepositoryRow key={eggRepository.uuid} eggRepository={eggRepository} />
         ))}

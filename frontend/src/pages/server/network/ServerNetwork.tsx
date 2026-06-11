@@ -72,7 +72,7 @@ export default function ServerNetwork() {
             '',
             t('pages.server.network.table.columns.hostname', {}),
             t('pages.server.network.table.columns.port', {}),
-            t('pages.server.network.table.columns.notes', {}),
+            t('common.table.columns.notes', {}),
             t('common.table.columns.created', {}),
             '',
           ]}

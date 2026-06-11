@@ -321,6 +321,36 @@ pub enum ScheduleActionInner {
     },
 }
 
+impl ScheduleActionInner {
+    pub fn permission(&self) -> Option<&'static str> {
+        match self {
+            ScheduleActionInner::Sleep { .. } => None,
+            ScheduleActionInner::Ensure { .. } => None,
+            ScheduleActionInner::Format { .. } => None,
+            ScheduleActionInner::MatchRegex { .. } => None,
+            ScheduleActionInner::WaitForConsoleLine { .. } => Some("control.read-console"),
+            ScheduleActionInner::SendPower { action, .. } => match action {
+                super::ServerPowerAction::Start => Some("control.start"),
+                super::ServerPowerAction::Stop => Some("control.stop"),
+                super::ServerPowerAction::Restart => Some("control.restart"),
+                super::ServerPowerAction::Kill => Some("control.stop"),
+            },
+            ScheduleActionInner::SendCommand { .. } => Some("control.console"),
+            ScheduleActionInner::CreateBackup { .. } => Some("backups.create"),
+            ScheduleActionInner::CreateDirectory { .. } => Some("files.create"),
+            ScheduleActionInner::WriteFile { .. } => Some("files.update"),
+            ScheduleActionInner::CopyFile { .. } => Some("files.update"),
+            ScheduleActionInner::DeleteFiles { .. } => Some("files.delete"),
+            ScheduleActionInner::RenameFiles { .. } => Some("files.update"),
+            ScheduleActionInner::CompressFiles { .. } => Some("files.archive"),
+            ScheduleActionInner::DecompressFile { .. } => Some("files.archive"),
+            ScheduleActionInner::UpdateStartupVariable { .. } => Some("startup.update"),
+            ScheduleActionInner::UpdateStartupCommand { .. } => Some("startup.command"),
+            ScheduleActionInner::UpdateStartupDockerImage { .. } => Some("startup.docker-image"),
+        }
+    }
+}
+
 #[derive(ToSchema, Validate, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case", tag = "type")]
 pub enum ScheduleTrigger {

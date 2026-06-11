@@ -34,6 +34,7 @@ import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -54,6 +55,7 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const timezones = Object.keys(zones)
   .sort()
@@ -63,6 +65,7 @@ const timezones = Object.keys(zones)
   }));
 
 export default function ServerCreate() {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const canReadNodes = useAdminCan('nodes.read');
   const canReadUsers = useAdminCan('users.read');
@@ -135,7 +138,7 @@ export default function ServerCreate() {
     createFn: () => createServer(formSchema.parse(form.getValues())),
     doUpdate: false,
     basePath: '/admin/servers',
-    resourceName: 'Server',
+    resourceName: t('pages.admin.servers.resourceName', {}),
     toResetOnStay: ['allocationUuid', 'allocationUuids'],
   });
 
@@ -219,18 +222,18 @@ export default function ServerCreate() {
 
   return (
     <AdminContentContainer
-      title='Create Server'
+      title={t('pages.admin.servers.tabs.general.page.titleCreate', {})}
       titleOrder={2}
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.create.container}
     >
       <ConfirmationModal
         opened={openModal === 'confirm-no-allocation'}
         onClose={() => setOpenModal(null)}
-        title='No Primary Allocation Assigned'
-        confirm='Create Anyway'
+        title={t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.title', {})}
+        confirm={t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.button.confirm', {})}
         onConfirmed={() => doCreateOrUpdate(false)}
       >
-        You are creating a server without assigning any primary allocation. Are you sure you want to continue?
+        {t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.content', {})}
       </ConfirmationModal>
 
       <form
@@ -246,7 +249,10 @@ export default function ServerCreate() {
               ),
             )}
 
-            <TitleCard title='Basic Information' icon={<FontAwesomeIcon icon={faInfoCircle} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
+              icon={<FontAwesomeIcon icon={faInfoCircle} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.create.basicInformationFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -256,21 +262,21 @@ export default function ServerCreate() {
 
                 <TextInput
                   withAsterisk
-                  label='Server Name'
-                  placeholder='My Game Server'
+                  label={t('common.form.serverName', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.serverNamePlaceholder', {})}
                   key={form.key('name')}
                   {...form.getInputProps('name')}
                 />
                 <TextInput
-                  label='External ID'
-                  placeholder='Optional external identifier'
+                  label={t('common.form.externalId', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.externalIdPlaceholder', {})}
                   key={form.key('externalId')}
                   {...form.getInputProps('externalId')}
                 />
 
                 <TextArea
-                  label='Description'
-                  placeholder='Server description'
+                  label={t('common.form.description', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.descriptionPlaceholder', {})}
                   className='col-span-full'
                   rows={3}
                   key={form.key('description')}
@@ -285,7 +291,10 @@ export default function ServerCreate() {
               </div>
             </TitleCard>
 
-            <TitleCard title='Server Assignment' icon={<FontAwesomeIcon icon={faAddressCard} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.serverAssignment', {})}
+              icon={<FontAwesomeIcon icon={faAddressCard} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.create.serverAssignmentFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -295,8 +304,7 @@ export default function ServerCreate() {
 
                 <Select
                   withAsterisk
-                  label='Node'
-                  placeholder='Node'
+                  label={t('common.form.node', {})}
                   data={nodes.items.map((node) => ({
                     label: node.name,
                     value: node.uuid,
@@ -311,8 +319,7 @@ export default function ServerCreate() {
                 />
                 <Select
                   withAsterisk
-                  label='Owner'
-                  placeholder='Owner'
+                  label={t('pages.admin.servers.tabs.general.page.form.owner', {})}
                   data={users.items.map((user) => ({
                     label: user.username,
                     value: user.uuid,
@@ -328,8 +335,7 @@ export default function ServerCreate() {
 
                 <Select
                   withAsterisk
-                  label='Nest'
-                  placeholder='Nest'
+                  label={t('common.form.nest', {})}
                   value={selectedNestUuid}
                   onChange={(value) => setSelectedNestUuid(value)}
                   data={nests.items.map((nest) => ({
@@ -344,8 +350,7 @@ export default function ServerCreate() {
                 />
                 <Select
                   withAsterisk
-                  label='Egg'
-                  placeholder='Egg'
+                  label={t('pages.admin.servers.tabs.general.page.form.egg', {})}
                   disabled={!canReadEggs || !selectedNestUuid}
                   data={eggs.items.map((egg) => ({
                     label: egg.name,
@@ -360,8 +365,8 @@ export default function ServerCreate() {
                 />
 
                 <Select
-                  label='Backup Configuration'
-                  placeholder='Inherit from Node/Location'
+                  label={t('common.form.backupConfiguration', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.backupConfigurationPlaceholder', {})}
                   data={backupConfigurations.items.map((backupConfiguration) => ({
                     label: backupConfiguration.name,
                     value: backupConfiguration.uuid,
@@ -377,15 +382,18 @@ export default function ServerCreate() {
                   {...form.getInputProps('backupConfigurationUuid')}
                 />
 
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.prependedComponents.map(
+                {window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.appendedComponents.map(
                   (Component, i) => (
-                    <Component key={`resource-limits-form-container-prepended-${i}`} form={form as never} />
+                    <Component key={`resource-limits-form-container-appended-${i}`} form={form as never} />
                   ),
                 )}
               </div>
             </TitleCard>
 
-            <TitleCard title='Resource Limits' icon={<FontAwesomeIcon icon={faStopwatch} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})}
+              icon={<FontAwesomeIcon icon={faStopwatch} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -395,8 +403,8 @@ export default function ServerCreate() {
 
                 <NumberInput
                   withAsterisk
-                  label='CPU Limit (%)'
-                  description='The CPU Limit in % that the server can use, 1 thread = 100%'
+                  label={t('pages.admin.servers.tabs.general.page.form.cpuLimit', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.cpuLimitDescription', {})}
                   placeholder='100'
                   min={0}
                   key={form.key('limits.cpu')}
@@ -404,8 +412,8 @@ export default function ServerCreate() {
                 />
                 <SizeInput
                   withAsterisk
-                  label='Swap'
-                  description='The amount of swap to give this server, -1 will not set a limit'
+                  label={t('pages.admin.servers.tabs.general.page.form.swap', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.swapDescription', {})}
                   mode='mb'
                   min={-1}
                   value={form.getValues().limits.swap}
@@ -414,8 +422,8 @@ export default function ServerCreate() {
 
                 <SizeInput
                   withAsterisk
-                  label='Memory'
-                  description='The Memory limit of the server container, 0 will not set a limit'
+                  label={t('common.form.memory', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.memoryDescription', {})}
                   mode='mb'
                   min={0}
                   value={form.getValues().limits.memory}
@@ -423,8 +431,8 @@ export default function ServerCreate() {
                 />
                 <SizeInput
                   withAsterisk
-                  label='Memory Overhead'
-                  description='Hidden Memory that will be added to the container'
+                  label={t('pages.admin.servers.tabs.general.page.form.memoryOverhead', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.memoryOverheadDescription', {})}
                   mode='mb'
                   min={0}
                   value={form.getValues().limits.memoryOverhead}
@@ -433,18 +441,31 @@ export default function ServerCreate() {
 
                 <SizeInput
                   withAsterisk
-                  label='Disk Space'
-                  description='The disk limit of the server, this is a soft-limit unless disk limiter configured on wings'
+                  label={t('pages.admin.servers.tabs.general.page.form.diskSpace', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.diskSpaceDescription', {})}
                   mode='mb'
                   min={0}
                   value={form.getValues().limits.disk}
                   onChange={(value) => form.setFieldValue('limits.disk', value)}
                 />
                 <NumberInput
-                  label='IO Weight'
-                  description='The relative IO Weight of the server container compared to other containers, 0-1000, may not work on all systems'
+                  label={t('pages.admin.servers.tabs.general.page.form.ioWeight', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.ioWeightDescription', {})}
                   key={form.key('limits.ioWeight')}
                   {...form.getInputProps('limits.ioWeight')}
+                />
+                <TagsInput
+                  label={t('pages.admin.servers.tabs.general.page.form.pinnedCpus', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.pinnedCpusDescription', {})}
+                  placeholder='0'
+                  allowReordering={false}
+                  value={form.getValues().pinnedCpus.map(String)}
+                  onChange={(tags) =>
+                    form.setFieldValue(
+                      'pinnedCpus',
+                      tags.map((tag) => Number.parseInt(tag, 10)).filter((n) => Number.isInteger(n) && n >= 0),
+                    )
+                  }
                 />
 
                 {window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.appendedComponents.map(
@@ -455,7 +476,10 @@ export default function ServerCreate() {
               </div>
             </TitleCard>
 
-            <TitleCard title='Server Configuration' icon={<FontAwesomeIcon icon={faWrench} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})}
+              icon={<FontAwesomeIcon icon={faWrench} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.create.serverConfigurationFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -465,8 +489,8 @@ export default function ServerCreate() {
 
                 <Select
                   withAsterisk
-                  label='Docker Image'
-                  placeholder='ghcr.io/...'
+                  label={t('common.form.dockerImage', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.dockerImagePlaceholder', {})}
                   data={Object.entries(
                     eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.dockerImages || {},
                   ).map(([label, value]) => ({
@@ -478,11 +502,11 @@ export default function ServerCreate() {
                   {...form.getInputProps('image')}
                 />
                 <Select
-                  label='Timezone'
-                  placeholder='Europe/Amsterdam'
+                  label={t('common.form.timezone', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.timezonePlaceholder', {})}
                   data={[
                     {
-                      label: 'System',
+                      label: t('common.form.timezoneSystem', {}),
                       value: '',
                     },
                     ...timezones,
@@ -493,8 +517,8 @@ export default function ServerCreate() {
                 />
 
                 <TextArea
-                  label='Startup Command'
-                  placeholder='npm start'
+                  label={t('common.form.startupCommand', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.startupCommandPlaceholder', {})}
                   className='col-span-full'
                   required
                   rows={2}
@@ -509,7 +533,7 @@ export default function ServerCreate() {
                         <Select
                           data={[
                             {
-                              label: 'Custom',
+                              label: t('pages.admin.servers.tabs.general.page.form.startupCommandCustom', {}),
                               value: '',
                             },
                             ...Object.entries(
@@ -534,16 +558,16 @@ export default function ServerCreate() {
                 />
 
                 <Switch
-                  label='Start on Completion'
-                  description='Start server after installation completes'
+                  label={t('pages.admin.servers.tabs.general.page.form.startOnCompletion', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.startOnCompletionDescription', {})}
                   key={form.key('startOnCompletion')}
                   {...form.getInputProps('startOnCompletion', {
                     type: 'checkbox',
                   })}
                 />
                 <Switch
-                  label='Skip Installer'
-                  description='Skip running the install script'
+                  label={t('pages.admin.servers.tabs.general.page.form.skipInstaller', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.skipInstallerDescription', {})}
                   key={form.key('skipInstaller')}
                   {...form.getInputProps('skipInstaller', {
                     type: 'checkbox',
@@ -551,8 +575,11 @@ export default function ServerCreate() {
                 />
 
                 <Switch
-                  label='Enable Hugepages Passthrough'
-                  description='Enable hugepages passthrough for the server (mounts /dev/hugepages into the container)'
+                  label={t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {})}
+                  description={t(
+                    'pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription',
+                    {},
+                  )}
                   key={form.key('hugepagesPassthroughEnabled')}
                   {...form.getInputProps('hugepagesPassthroughEnabled', {
                     type: 'checkbox',
@@ -560,8 +587,8 @@ export default function ServerCreate() {
                 />
 
                 <Switch
-                  label='Enable KVM Passthrough'
-                  description='Enable KVM passthrough for the server (allows access to /dev/kvm inside the container)'
+                  label={t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {})}
                   key={form.key('kvmPassthroughEnabled')}
                   {...form.getInputProps('kvmPassthroughEnabled', {
                     type: 'checkbox',
@@ -576,7 +603,10 @@ export default function ServerCreate() {
               </div>
             </TitleCard>
 
-            <TitleCard title='Feature Limits' icon={<FontAwesomeIcon icon={faIcons} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})}
+              icon={<FontAwesomeIcon icon={faIcons} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.create.featureLimitsFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -586,7 +616,7 @@ export default function ServerCreate() {
 
                 <NumberInput
                   withAsterisk
-                  label='Allocations'
+                  label={t('pages.admin.servers.tabs.general.page.form.allocationsLimit', {})}
                   placeholder='0'
                   min={0}
                   key={form.key('featureLimits.allocations')}
@@ -594,7 +624,7 @@ export default function ServerCreate() {
                 />
                 <NumberInput
                   withAsterisk
-                  label='Databases'
+                  label={t('pages.admin.servers.tabs.general.page.form.databasesLimit', {})}
                   placeholder='0'
                   min={0}
                   key={form.key('featureLimits.databases')}
@@ -602,7 +632,7 @@ export default function ServerCreate() {
                 />
                 <NumberInput
                   withAsterisk
-                  label='Backups'
+                  label={t('pages.admin.servers.tabs.general.page.form.backupsLimit', {})}
                   placeholder='0'
                   min={0}
                   key={form.key('featureLimits.backups')}
@@ -610,7 +640,7 @@ export default function ServerCreate() {
                 />
                 <NumberInput
                   withAsterisk
-                  label='Schedules'
+                  label={t('pages.admin.servers.tabs.general.page.form.schedulesLimit', {})}
                   placeholder='0'
                   min={0}
                   key={form.key('featureLimits.schedules')}
@@ -625,7 +655,10 @@ export default function ServerCreate() {
               </div>
             </TitleCard>
 
-            <TitleCard title='Allocations' icon={<FontAwesomeIcon icon={faNetworkWired} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.allocations', {})}
+              icon={<FontAwesomeIcon icon={faNetworkWired} />}
+            >
               <Stack>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.create.allocationsFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -635,8 +668,7 @@ export default function ServerCreate() {
 
                 <Group grow>
                   <Select
-                    label='Primary Allocation'
-                    placeholder='Primary Allocation'
+                    label={t('common.form.primaryAllocation', {})}
                     disabled={!form.getValues().nodeUuid}
                     data={availablePrimaryAllocations.items
                       .filter((alloc) => !form.getValues().allocationUuids.includes(alloc.uuid))
@@ -652,8 +684,7 @@ export default function ServerCreate() {
                     {...form.getInputProps('allocationUuid')}
                   />
                   <MultiSelect
-                    label='Additional Allocations'
-                    placeholder='Additional Allocations'
+                    label={t('common.form.additionalAllocations', {})}
                     disabled={!form.getValues().nodeUuid}
                     data={availableAllocations.items
                       .filter((alloc) => alloc.uuid !== form.getValues().allocationUuid)
@@ -677,10 +708,14 @@ export default function ServerCreate() {
               </Stack>
             </TitleCard>
 
-            <TitleCard title='Variables' icon={<FontAwesomeIcon icon={faPlay} />} className='col-span-full'>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.variables', {})}
+              icon={<FontAwesomeIcon icon={faPlay} />}
+              className='col-span-full'
+            >
               <Stack>
                 {!selectedNestUuid || !form.getValues().eggUuid ? (
-                  <Alert>Please select an egg before you can configure variables.</Alert>
+                  <Alert>{t('pages.admin.servers.tabs.general.page.alert.selectEggForVariables', {})}</Alert>
                 ) : eggVariablesLoading ? (
                   <Spinner.Centered />
                 ) : (
@@ -723,10 +758,10 @@ export default function ServerCreate() {
           <Group>
             <AdminCan action='servers.create' cantSave>
               <Button type='submit' disabled={!isValid} loading={loading}>
-                Save
+                {t('common.button.save', {})}
               </Button>
               <Button onClick={() => doCreateOrUpdate(true)} disabled={!isValid} loading={loading}>
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             </AdminCan>
           </Group>

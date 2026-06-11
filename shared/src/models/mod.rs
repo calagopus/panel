@@ -36,6 +36,7 @@ pub mod node;
 pub mod node_allocation;
 pub mod node_mount;
 pub mod oauth_provider;
+pub mod oauth_provider_mapping;
 pub mod role;
 pub mod server;
 pub mod server_activity;

@@ -395,7 +395,7 @@ function FileEditorComponent() {
           localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, fileName)));
           blocker.proceed();
         }}
-        confirm={t('pages.server.files.modal.unsavedChanges.button.leave', {})}
+        confirm={t('common.button.leavePage', {})}
         zIndex={300}
       >
         {t('pages.server.files.modal.unsavedChanges.content', {}).md()}

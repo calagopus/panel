@@ -7,8 +7,10 @@ import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import RoleCreateOrUpdate from '@/pages/admin/roles/RoleCreateOrUpdate.tsx';
 import AdminRoleUsers from '@/pages/admin/roles/users/AdminRoleUsers.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function RoleView() {
+  const { t } = useTranslations();
   const params = useParams<'id'>();
 
   const { data: role, isLoading } = useQuery({
@@ -24,13 +26,13 @@ export default function RoleView() {
         baseUrl={`/admin/roles/${params.id}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: `/`,
             element: <RoleCreateOrUpdate contextRole={role} />,
           },
           {
-            name: 'Users',
+            name: t('pages.admin.roles.tabs.users.title', {}),
             icon: faUsers,
             path: `/users`,
             element: <AdminRoleUsers role={role} />,

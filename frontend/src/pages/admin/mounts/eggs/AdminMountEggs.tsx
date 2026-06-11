@@ -6,7 +6,6 @@ import getMountNestEggs from '@/api/admin/mounts/nest-eggs/getMountNestEggs.ts';
 import deleteEggMount from '@/api/admin/nests/eggs/mounts/deleteEggMount.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -18,6 +17,7 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { eggTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggRow from '../../nests/eggs/EggRow.tsx';
 import MountAddEggModal from './modals/MountAddEggModal.tsx';
 
@@ -33,13 +33,14 @@ function MountEggRow({
   refetch: () => void;
 }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
 
   const doRemove = async () => {
     await deleteEggMount(nest.uuid, egg.uuid, mount.uuid)
       .then(() => {
-        addToast('Mount Egg deleted.', 'success');
+        addToast(t('pages.admin.mounts.tabs.eggs.page.toast.removed', {}), 'success');
         refetch();
       })
       .catch((msg) => {
@@ -52,20 +53,18 @@ function MountEggRow({
       <ConfirmationModal
         opened={openModal === 'remove'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Mount Egg Removal'
-        confirm='Remove'
+        title={t('pages.admin.mounts.tabs.eggs.page.modal.remove.title', {})}
+        confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        Are you sure you want to remove the mount
-        <Code>{mount.name}</Code>
-        from <Code>{egg.name}</Code>?
+        {t('pages.admin.mounts.tabs.eggs.page.modal.remove.content', { mount: mount.name, name: egg.name }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
           {
             icon: faTrash,
-            label: 'Remove',
+            label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),
             color: 'red',
           },
@@ -78,6 +77,7 @@ function MountEggRow({
 }
 
 export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof adminMountSchema> }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -94,13 +94,13 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
 
   return (
     <AdminSubContentContainer
-      title='Mount Eggs'
+      title={t('pages.admin.mounts.tabs.eggs.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-          Add
+          {t('common.button.add', {})}
         </Button>
       }
     >
@@ -112,7 +112,7 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
       />
 
       <ContextMenuProvider>
-        <Table columns={[...eggTableColumns, '']} loading={loading} pagination={mountNestEggs} onPageSelect={setPage}>
+        <Table columns={[...eggTableColumns(), '']} loading={loading} pagination={mountNestEggs} onPageSelect={setPage}>
           {mountNestEggs?.data.map((nestEggMount) => (
             <MountEggRow
               key={nestEggMount.nestEgg.uuid}

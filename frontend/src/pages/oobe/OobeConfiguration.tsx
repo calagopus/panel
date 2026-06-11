@@ -65,7 +65,9 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
     updateApplicationSettings({
       name: form.values.applicationName,
       icon: '/icon.svg',
+      iconLight: null,
       banner: null,
+      bannerLight: null,
       language: form.values.applicationLanguage,
       url: form.values.applicationUrl,
       twoFactorRequirement: 'none',
@@ -113,7 +115,7 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
               />
               <Select
                 withAsterisk
-                label={t('pages.oobe.configuration.form.language', {})}
+                label={t('common.form.language', {})}
                 placeholder={t('pages.oobe.configuration.form.languagePlaceholder', {})}
                 data={languages.map((language) => ({
                   label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,

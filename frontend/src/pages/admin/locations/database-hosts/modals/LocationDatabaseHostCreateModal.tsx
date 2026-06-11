@@ -13,6 +13,7 @@ import { adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function LocationDatabaseHostCreateModal({
@@ -20,6 +21,7 @@ export default function LocationDatabaseHostCreateModal({
   opened,
   onClose,
 }: ModalProps & { location: z.infer<typeof adminLocationSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { addLocationDatabaseHost } = useAdminStore();
 
@@ -40,7 +42,7 @@ export default function LocationDatabaseHostCreateModal({
 
     createLocationDatabaseHost(location.uuid, databaseHost.uuid)
       .then(() => {
-        addToast('Location Database Host created.', 'success');
+        addToast(t('pages.admin.locations.tabs.databaseHosts.page.toast.created', {}), 'success');
 
         onClose();
         addLocationDatabaseHost({ databaseHost, created: new Date() });
@@ -52,12 +54,15 @@ export default function LocationDatabaseHostCreateModal({
   };
 
   return (
-    <Modal title='Create Location Database Host' onClose={onClose} opened={opened}>
+    <Modal
+      title={t('pages.admin.locations.tabs.databaseHosts.page.modal.create.title', {})}
+      onClose={onClose}
+      opened={opened}
+    >
       <Stack>
         <Select
           withAsterisk
-          label='Database Host'
-          placeholder='Database Host'
+          label={t('common.form.databaseHost', {})}
           value={databaseHost?.uuid}
           onChange={(value) => setDatabaseHost(databaseHosts.items.find((dh) => dh.uuid === value) ?? null)}
           data={Object.values(
@@ -80,10 +85,10 @@ export default function LocationDatabaseHostCreateModal({
 
         <ModalFooter>
           <Button onClick={doCreate} loading={loading} disabled={!databaseHost}>
-            Create
+            {t('common.button.create', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

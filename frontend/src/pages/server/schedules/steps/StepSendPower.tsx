@@ -18,7 +18,7 @@ export default function StepSendPower({
     <Stack>
       <Select
         withAsterisk
-        label={t('pages.server.schedules.steps.sendPower.form.powerAction', {})}
+        label={t('common.form.powerAction', {})}
         data={Object.entries(serverPowerActionLabelMapping).map(([value, label]) => ({
           value,
           label: label(),

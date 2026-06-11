@@ -55,16 +55,10 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
       opened={opened}
     >
       <Stack>
-        <TextInput
-          withAsterisk
-          label={t('common.form.name', {})}
-          placeholder={t('common.form.name', {})}
-          {...form.getInputProps('name')}
-        />
+        <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
         <MultiSelect
-          label={t('pages.account.commandSnippets.form.eggs', {})}
-          placeholder={t('pages.account.commandSnippets.form.eggs', {})}
+          label={t('common.form.eggs', {})}
           data={eggs.items.map((egg) => ({
             label: egg.name,
             value: egg.uuid,
@@ -78,8 +72,7 @@ export default function CommandSnippetCreateModal({ opened, onClose }: ModalProp
 
         <TextArea
           withAsterisk
-          label={t('pages.account.commandSnippets.form.command', {})}
-          placeholder={t('pages.account.commandSnippets.form.command', {})}
+          label={t('common.form.command', {})}
           rows={3}
           resize='none'
           {...form.getInputProps('command')}

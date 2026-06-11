@@ -56,10 +56,18 @@
         "selectAll": "Sélectionner Tout",
         "deselectAll": "Désélectionner Tout",
         "download": "Télécharger",
-        "downloadAs": "Télécharger en {format}"
+        "downloadAs": "Télécharger en {format}",
+        "import": "Importer",
+        "details": "Détails",
+        "setPrimary": "Définir primaire",
+        "unsetPrimary": "Retirer primarité",
+        "leavePage": "Quitter la page"
       },
       "input": {
         "search": "Chercher..."
+      },
+      "tooltip": {
+        "primary": "Primaire"
       },
       "form": {
         "name": "Nom",
@@ -68,6 +76,33 @@
         "host": "Hôte",
         "username": "Nom d'utilisateur",
         "server": "Serveur",
+        "url": "URL",
+        "email": "E-mail",
+        "port": "Port",
+        "firstName": "Prénom",
+        "lastName": "Nom de famille",
+        "language": "Langue",
+        "enabled": "Activé",
+        "fileName": "Nom du fichier",
+        "sftpPort": "Port SFTP",
+        "sftpHost": "Hôte SFTP",
+        "dockerImage": "Image Docker",
+        "memory": "Mémoire",
+        "disk": "Disque",
+        "serverName": "Nom du serveur",
+        "startupCommand": "Commande de démarrage",
+        "archiveName": "Nom de l'archive",
+        "databaseHost": "Hôte de base de données",
+        "timezone": "Fuseau horaire",
+        "protocol": "Protocole",
+        "destination": "Destination",
+        "directoryName": "Nom du répertoire",
+        "locked": "Verrouillé",
+        "currentPassword": "Mot de passe actuel",
+        "confirmPassword": "Confirmer le mot de passe",
+        "authenticationCode": "Code d'authentification",
+        "ignoredFiles": "Fichiers ignorés",
+        "yourControlPanelPassword": "Votre mot de passe de panel de contrôle",
         "truncateDirectory": "Souhaitez-vous supprimer tous les fichiers de ce serveur avant d'effectuer cette action ? Ceci n'est pas réversible."
       },
       "table": {
@@ -86,7 +121,8 @@
           "event": "Événement",
           "ip": "IP",
           "when": "Quand",
-          "command": "Commande"
+          "command": "Commande",
+          "notes": "Notes"
         }
       },
       "server": {
@@ -215,17 +251,12 @@
             "description": "Choisissez un mot de passe fort. Ce compte aura un accès administratif complet à tous les serveurs et paramètres."
           },
           "form": {
-            "username": "Nom d'utilisateur",
             "usernamePlaceholder": "admin",
             "email": "Adresse e-mail",
             "emailPlaceholder": "admin@exemple.com",
-            "firstName": "Prénom",
             "firstNamePlaceholder": "Alan",
-            "lastName": "Nom de famille",
             "lastNamePlaceholder": "Turing",
-            "password": "Mot de passe",
             "passwordPlaceholder": "Entrez un mot de passe fort",
-            "confirmPassword": "Confirmer le mot de passe",
             "confirmPasswordPlaceholder": "Entrez à nouveau votre mot de passe"
           },
           "button": {
@@ -236,9 +267,7 @@
           "title": "Se reconnecter",
           "alert": "Vous vous êtes fait déconnecté durant le processus de configuration. Veuillez vous reconnecter pour continuer de là où vous vous êtes arrêté.",
           "form": {
-            "username": "Nom d'utilisateur",
             "usernamePlaceholder": "admin",
-            "password": "Mot de passe",
             "passwordPlaceholder": "Entrez un mot de passe fort"
           },
           "button": {
@@ -264,18 +293,13 @@
           "form": {
             "name": "Nom",
             "namePlaceholder": "Mon serveur",
-            "url": "URL",
             "urlPlaceholder": "URL",
             "urlDescription": "utilisé pour la communication interne avec le nœud",
             "publicUrl": "URL publique",
             "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "utilisé pour websocket/téléchargements",
-            "sftpHost": "Hôte SFTP",
             "sftpHostPlaceholder": "Hôte SFTP",
-            "sftpPort": "Port SFTP",
-            "sftpPortPlaceholder": "Port SFTP",
-            "memory": "Mémoire",
-            "disk": "Disque"
+            "sftpPortPlaceholder": "Port SFTP"
           },
           "error": {
             "noLocations": "Quelque chose s'est mal placé. Pas d'emplacements trouvés."
@@ -289,7 +313,6 @@
           "form": {
             "applicationName": "Nom d'application",
             "applicationNamePlaceholder": "Calagopus",
-            "language": "Langue",
             "languagePlaceholder": "Langue",
             "applicationUrl": "URL d'application",
             "applicationUrlPlaceholder": "https://calagop.us",
@@ -411,7 +434,6 @@
                 "updated": "Mot de passe mis à jour avec succès."
               },
               "form": {
-                "currentPassword": "Mot de passe actuel",
                 "newPassword": "Nouveau mot de passe",
                 "confirmNewPassword": "Confirmer le nouveau mot de passe"
               }
@@ -422,8 +444,7 @@
                 "updated": "E-mail mise à jour avec succès."
               },
               "form": {
-                "newEmail": "Nouvelle e-mail",
-                "currentPassword": "Mot de passe actuel"
+                "newEmail": "Nouvelle e-mail"
               }
             },
             "twoFactor": {
@@ -435,18 +456,12 @@
               "modal": {
                 "disableTwoFactor": {
                   "title": "Désactiver l'authentification à double facteurs",
-                  "description": "Désactiver l'authentification à double facteurs rendra votre compte moins sécurisé.",
-                  "form": {
-                    "code": "Code d'authentification"
-                  }
+                  "description": "Désactiver l'authentification à double facteurs rendra votre compte moins sécurisé."
                 },
                 "setupTwoFactor": {
                   "title": "Configurer l'authentification à double facteurs",
                   "description": "Protégez votre compte des accès non-autorisés. Un code de vérification vous sera demandé à chaque connexion.",
-                  "descriptionQR": "Scannez le QR code ci-dessus en utilisant l'application à double facteurs de votre choix. Ensuite, entrez le code à 6 chiffres généré dans le champ ci-dessous.",
-                  "form": {
-                    "code": "Code d'authentification"
-                  }
+                  "descriptionQR": "Scannez le QR code ci-dessus en utilisant l'application à double facteurs de votre choix. Ensuite, entrez le code à 6 chiffres généré dans le champ ci-dessous."
                 },
                 "recoveryCodes": {
                   "title": "Codes de récupération",
@@ -467,10 +482,6 @@
                 "updated": "Détails du compte mis à jour avec succès."
               },
               "form": {
-                "nameFirst": "Prénom",
-                "nameLast": "Nom de famille",
-                "username": "Nom d'utilisateur",
-                "language": "Langue",
                 "toastPosition": "Position du toast",
                 "startOnGroupedServers": "Commencer sur la page des serveurs groupés"
               }
@@ -571,9 +582,6 @@
         },
         "sshKeys": {
           "title": "Clés SSH",
-          "button": {
-            "import": "Importer"
-          },
           "table": {
             "columns": {
               "fingerprint": "Empreinte"
@@ -604,8 +612,7 @@
                 "created": "{sshKeys} créées."
               },
               "form": {
-                "provider": "Fournisseur",
-                "username": "Nom d'utilisateur"
+                "provider": "Fournisseur"
               }
             },
             "deleteSshKey": {
@@ -781,7 +788,6 @@
             "openInNewWindow": "Ouvrir dans une nouvelle fenêtre",
             "rename": "Renommer",
             "copy": "Copier",
-            "move": "Déplacer",
             "permissions": "Permissions",
             "unarchive": "Désarchiver",
             "archive": "Archiver",
@@ -844,45 +850,31 @@
           "modal": {
             "activeUploads": {
               "title": "Téléversements actifs",
-              "content": "Êtes-vous sûr de vouloir quitter la page ? Vous avez {files} téléversements de fichier actifs. Si vous quittez la page, les téléversements seront annulés.",
-              "button": {
-                "leave": "Quitter la page"
-              }
+              "content": "Êtes-vous sûr de vouloir quitter la page ? Vous avez {files} téléversements de fichier actifs. Si vous quittez la page, les téléversements seront annulés."
             },
             "unsavedChanges": {
               "title": "Changements non sauvegardées",
-              "content": "Vous avez des changements non sauvegardés dans l'éditeur de fichiers. Êtes-vous sûr de vouloir quitter cette page ? Si vous quittez, vos changements seront perdus.",
-              "button": {
-                "leave": "Quitter la page"
-              }
+              "content": "Vous avez des changements non sauvegardés dans l'éditeur de fichiers. Êtes-vous sûr de vouloir quitter cette page ? Si vous quittez, vos changements seront perdus."
             },
             "createArchive": {
               "title": "Créer archive",
               "form": {
-                "archiveName": "Nom de l'archive",
                 "format": "Format"
               },
               "createdAs": "Cette archive sera créée en tant que "
             },
             "createDirectory": {
               "title": "Créer répertoire",
-              "form": {
-                "directoryName": "Nom du répertoire"
-              },
               "createdAs": "Ce répertoire sera créé en tant que "
             },
             "copyFile": {
               "title": "Copier fichier",
-              "form": {
-                "fileName": "Nom du fichier"
-              },
               "createdAs": "Ce fichier sera créé en tant que "
             },
             "copyRemote": {
               "title": "Copier des fichiers à distance",
               "form": {
-                "server": "Serveur",
-                "destination": "Destination"
+                "server": "Serveur"
               },
               "createdAs": "Ces fichiers seront créés sur le serveur distant en tant que "
             },
@@ -892,10 +884,7 @@
               "multipleFilesWarning": "Vous ne serez plus en mesure de récupérer le contenu des fichiers suivants une fois supprimés."
             },
             "createFile": {
-              "title": "Créer fichier",
-              "form": {
-                "fileName": "Nom du fichier"
-              }
+              "title": "Créer fichier"
             },
             "filePermissions": {
               "title": "Permissions du fichier",
@@ -910,10 +899,7 @@
               "executePermission": "Permission exécution (1)"
             },
             "renameFile": {
-              "title": "Renommer fichier",
-              "form": {
-                "fileName": "Nom du fichier"
-              }
+              "title": "Renommer fichier"
             },
             "searchFiles": {
               "title": "Rechercher fichiers",
@@ -927,7 +913,7 @@
               "searchText": "Chercher texte",
               "maxFileSize": "Taille de fichier maximale",
               "includeOversized": "Inclure fichiers surdimensionnés",
-              "includeOversizedDescription": "Inclure les fichiers qui correspondent aux autres filtres mais qui sont trop grands pour être cherchés",
+              "includeOversizedDescription": "Inclut les fichiers qui correspondent à d'autres filtres mais sont trop volumineux pour être recherchés.",
               "fileSize": "Taille de fichier",
               "minimum": "Minimum",
               "maximum": "Maximum"
@@ -936,22 +922,13 @@
               "title": "Récupérer fichier",
               "form": {
                 "fileUrl": "URL du fichier",
-                "query": "Tester",
-                "fileName": "Nom du fichier"
+                "query": "Tester"
               },
               "createdAs": "Ce fichier sera créé en tant que ",
               "pull": "Récupérer"
             },
             "sftpDetails": {
               "title": "Détails SFTP",
-              "form": {
-                "protocol": "Protocole",
-                "port": "Port",
-                "host": "Hôte",
-                "username": "Nom d'utilisateur",
-                "password": "Mot de passe",
-                "yourPassword": "Votre mot de passe de panel de contrôle"
-              },
               "launch": "Lancer"
             }
           }
@@ -964,13 +941,10 @@
           },
           "table": {
             "columns": {
-              "type": "Type",
-              "address": "Adresse",
               "locked": "Verrouillé ?"
             }
           },
           "button": {
-            "details": "Détails",
             "rotatePassword": "Régénérer mot de passe"
           },
           "form": {
@@ -983,7 +957,6 @@
                 "created": "Base de données créée."
               },
               "form": {
-                "databaseHost": "Hôte de base de données",
                 "noHostsFound": "Pas d'hôtes trouvés"
               }
             },
@@ -991,9 +964,6 @@
               "title": "Modifier la base de données",
               "toast": {
                 "updated": "Base de données modifiée."
-              },
-              "form": {
-                "locked": "Verrouillée"
               }
             },
             "databaseDetails": {
@@ -1033,10 +1003,8 @@
                 "created": "Sous-utilisateur créé."
               },
               "form": {
-                "email": "E-mail",
                 "emailPlaceholder": "Entrez l'adresse e-mail du sous-utilisateur.",
-                "permissions": "Permissions",
-                "ignoredFiles": "Fichiers ignorés"
+                "permissions": "Permissions"
               }
             },
             "updateSubuser": {
@@ -1079,18 +1047,12 @@
               "title": "Créer sauvegarde",
               "toast": {
                 "created": "Sauvegarde créée."
-              },
-              "form": {
-                "ignoredFiles": "Fichiers ignorés"
               }
             },
             "editBackup": {
               "title": "Modifier la sauvegarde",
               "toast": {
                 "updated": "Sauvegarde mise à jour."
-              },
-              "form": {
-                "locked": "Verrouillé"
               }
             },
             "restoreBackup": {
@@ -1109,19 +1071,13 @@
           "title": "Réseau",
           "subtitle": "{current} de {max} allocations maximum assignées.",
           "tooltip": {
-            "limitReached": "Ce serveur est limité à {max} allocations.",
-            "primary": "Primaire"
+            "limitReached": "Ce serveur est limité à {max} allocations."
           },
           "table": {
             "columns": {
               "hostname": "Nom d'hôte",
-              "port": "Port",
-              "notes": "Notes"
+              "port": "Port"
             }
-          },
-          "button": {
-            "setPrimary": "Définir primaire",
-            "unsetPrimary": "Retirer primarité"
           },
           "toast": {
             "created": "Allocation créée.",
@@ -1132,10 +1088,7 @@
           },
           "modal": {
             "editAllocation": {
-              "title": "Modifier l'allocation",
-              "form": {
-                "notes": "Notes"
-              }
+              "title": "Modifier l'allocation"
             },
             "removeAllocation": {
               "title": "Confirmer la suppression de l'allocation",
@@ -1145,10 +1098,6 @@
         },
         "startup": {
           "title": "Démarrage",
-          "form": {
-            "startupCommand": "Commande de démarrage",
-            "dockerImage": "Image Docker"
-          },
           "variables": "Variables",
           "dockerImageDescription": "L'image Docker utilisée pour lancer ce serveur. Elle peut être changée pour utiliser une autre image.",
           "dockerImageDescriptionCustom": "L'image Docker utilisée pour lancer ce serveur. Elle a été définie par un administrateur et ne peut pas être changée.",
@@ -1162,19 +1111,12 @@
           "title": "Paramètres",
           "rename": {
             "title": "Renommer serveur",
-            "form": {
-              "serverName": "Nom du serveur"
-            },
             "toast": {
               "renamed": "Serveur renommé."
             }
           },
           "timezone": {
             "title": "Fuseau horaire",
-            "form": {
-              "timezone": "Fuseau horaire",
-              "system": "Système"
-            },
             "toast": {
               "updated": "Fuseau horaire du serveur mis à jour."
             }
@@ -1182,7 +1124,6 @@
           "autokill": {
             "title": "Auto-tuage",
             "form": {
-              "enabled": "Activé",
               "secondsUntilAutoKill": "Secondes avant auto-tuage"
             },
             "toast": {

@@ -67,7 +67,6 @@ export default function FileCopyRemoteModal({ files, opened, onClose }: Props) {
         <Select
           withAsterisk
           label={t('pages.server.files.modal.copyRemote.form.server', {})}
-          placeholder={t('pages.server.files.modal.copyRemote.form.server', {})}
           data={servers.items
             .filter((s) => s.uuid !== server.uuid)
             .reduce(
@@ -94,11 +93,7 @@ export default function FileCopyRemoteModal({ files, opened, onClose }: Props) {
           onChange={(value) => form.setFieldValue('destinationServer', value || '')}
         />
 
-        <TextInput
-          label={t('pages.server.files.modal.copyRemote.form.destination', {})}
-          placeholder={t('pages.server.files.modal.copyRemote.form.destination', {})}
-          {...form.getInputProps('destination')}
-        />
+        <TextInput label={t('common.form.destination', {})} {...form.getInputProps('destination')} />
       </Stack>
 
       <p className='mt-2 text-sm md:text-base break-all'>

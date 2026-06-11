@@ -17,8 +17,8 @@ export default function StepUpdateStartupCommand({
     <Stack>
       <ScheduleDynamicParameterInput
         withAsterisk
-        label={t('pages.server.schedules.steps.updateStartupCommand.form.startupCommand', {})}
-        placeholder={t('pages.server.schedules.steps.updateStartupCommand.form.startupCommand', {})}
+        label={t('common.form.startupCommand', {})}
+        placeholder={t('common.form.startupCommand', {})}
         value={form.getInputProps('action.command').value}
         onChange={(v) => form.setFieldValue('action.command', v)}
       />

@@ -8,9 +8,11 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminServerBackupRow from './AdminServerBackupRow.tsx';
 
 export default function AdminServerBackups({ server }: { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const [showPartiallyDetachedServerBackups, setShowPartiallyDetachedServerBackups] = useState(false);
 
   const {
@@ -27,13 +29,13 @@ export default function AdminServerBackups({ server }: { server: z.infer<typeof 
 
   return (
     <AdminSubContentContainer
-      title='Server Backups'
+      title={t('pages.admin.servers.tabs.backups.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Switch
-          label='Only show partially detached backups'
+          label={t('pages.admin.servers.tabs.backups.page.input.partiallyDetachedOnly', {})}
           checked={showPartiallyDetachedServerBackups}
           onChange={(e) => setShowPartiallyDetachedServerBackups(e.currentTarget.checked)}
         />
@@ -41,7 +43,15 @@ export default function AdminServerBackups({ server }: { server: z.infer<typeof 
     >
       <ContextMenuProvider>
         <Table
-          columns={['Name', 'Node', 'Checksum', 'Size', 'Files', 'Created', '']}
+          columns={[
+            t('common.table.columns.name', {}),
+            t('common.table.columns.node', {}),
+            t('common.table.columns.checksum', {}),
+            t('common.table.columns.size', {}),
+            t('common.table.columns.files', {}),
+            t('common.table.columns.created', {}),
+            '',
+          ]}
           loading={loading}
           pagination={serverBackups}
           onPageSelect={setPage}

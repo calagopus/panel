@@ -14,6 +14,7 @@ import { adminEggSchema, adminEggVariableSchema } from '@/lib/schemas/admin/eggs
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import EggVariableContainer from '@/pages/admin/nests/eggs/variables/EggVariableContainer.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 interface DndEggVariable extends z.infer<typeof adminEggVariableSchema>, DndItem {
@@ -31,6 +32,7 @@ export default function AdminEggVariables({
 }) {
   const { eggVariables, setEggVariables, addEggVariable } = useAdminStore();
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const [loading, setLoading] = useState(true);
 
@@ -74,11 +76,11 @@ export default function AdminEggVariables({
 
   return (
     <AdminSubContentContainer
-      title='Egg Variables'
+      title={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.title', {})}
       titleOrder={2}
       contentRight={
         <Button onClick={addVariable} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-          Add
+          {t('common.button.add', {})}
         </Button>
       }
     >

@@ -30,7 +30,6 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Card from '@/elements/Card.tsx';
-import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
@@ -49,6 +48,7 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggMoveModal from './modals/EggMoveModal.tsx';
 
 export default function EggCreateOrUpdate({
@@ -59,6 +59,7 @@ export default function EggCreateOrUpdate({
   contextEgg?: z.infer<typeof adminEggSchema>;
 }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'move' | 'delete' | null>(null);
@@ -116,7 +117,7 @@ export default function EggCreateOrUpdate({
     deleteFn: contextEgg ? () => deleteEgg(contextNest.uuid, contextEgg.uuid) : undefined,
     doUpdate: !!contextEgg,
     basePath: `/admin/nests/${contextNest.uuid}/eggs`,
-    resourceName: 'Egg',
+    resourceName: t('pages.admin.nests.tabs.eggs.page.resourceName', {}),
   });
 
   useEffect(() => {
@@ -161,7 +162,7 @@ export default function EggCreateOrUpdate({
 
     exportEgg(contextNest?.uuid, contextEgg!.uuid)
       .then((data) => {
-        addToast('Egg exported.', 'success');
+        addToast(t('pages.admin.nests.tabs.eggs.page.tabs.general.page.toast.exported', {}), 'success');
 
         if (format === 'json') {
           const jsonData = JSON.stringify(data, undefined, 2);
@@ -206,7 +207,7 @@ export default function EggCreateOrUpdate({
           ...egg,
           eggRepositoryEggUuid: egg.eggRepositoryEgg?.uuid || null,
         });
-        addToast('Egg updated.', 'success');
+        addToast(t('pages.admin.nests.tabs.eggs.page.tabs.general.page.toast.updated', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -232,7 +233,7 @@ export default function EggCreateOrUpdate({
         data = jsYaml.load(text) as object;
       }
     } catch (err) {
-      addToast(`Failed to parse egg: ${err}`, 'error');
+      addToast(t('pages.admin.nests.tabs.eggs.page.toast.parseFailed', { error: String(err) }), 'error');
       setLoading(false);
       return;
     }
@@ -244,7 +245,7 @@ export default function EggCreateOrUpdate({
           ...egg,
           eggRepositoryEggUuid: egg.eggRepositoryEgg?.uuid || null,
         });
-        addToast('Egg updated.', 'success');
+        addToast(t('pages.admin.nests.tabs.eggs.page.tabs.general.page.toast.updated', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -254,7 +255,11 @@ export default function EggCreateOrUpdate({
 
   return (
     <AdminContentContainer
-      title={`${contextEgg ? 'Update' : 'Create'} Egg`}
+      title={
+        contextEgg
+          ? t('pages.admin.nests.tabs.eggs.page.tabs.general.page.titleUpdate', {})
+          : t('pages.admin.nests.tabs.eggs.page.tabs.general.page.titleCreate', {})
+      }
       fullscreen={!!contextEgg}
       hideTitleComponent
     >
@@ -269,11 +274,13 @@ export default function EggCreateOrUpdate({
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Egg Deletion'
-        confirm='Delete'
+        title={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.modal.delete.content', {
+          name: form.getValues().name,
+        }).md()}
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nests.eggs(contextNest.uuid)))}>
@@ -281,23 +288,20 @@ export default function EggCreateOrUpdate({
           <Group grow>
             <TextInput
               withAsterisk
-              label='Author'
-              placeholder='Author'
+              label={t('common.form.author', {})}
               key={form.key('author')}
               {...form.getInputProps('author')}
             />
             <TextInput
               withAsterisk
-              label='Name'
-              placeholder='Name'
+              label={t('common.form.name', {})}
               key={form.key('name')}
               {...form.getInputProps('name')}
             />
           </Group>
 
           <TextArea
-            label='Description'
-            placeholder='Description'
+            label={t('common.form.description', {})}
             rows={3}
             key={form.key('description')}
             {...form.getInputProps('description')}
@@ -305,8 +309,7 @@ export default function EggCreateOrUpdate({
 
           <Group grow>
             <Select
-              label='Egg Repository'
-              placeholder='Egg Repository'
+              label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.eggRepository', {})}
               value={selectedEggRepositoryUuid}
               onChange={(value) => setSelectedEggRepositoryUuid(value ?? '')}
               data={eggRepositories.items.map((eggRepository) => ({
@@ -319,8 +322,8 @@ export default function EggCreateOrUpdate({
               loading={eggRepositories.loading}
             />
             <Select
-              label='Egg Repository Egg'
-              placeholder='None'
+              label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.eggRepositoryEgg', {})}
+              placeholder={t('common.none', {})}
               disabled={!selectedEggRepositoryUuid}
               data={eggRepositoryEggs.items.map((eggRepositoryEgg) => ({
                 label: eggRepositoryEgg.name,
@@ -337,20 +340,22 @@ export default function EggCreateOrUpdate({
             />
           </Group>
 
-          <TitleCard title='Startup Configuration' icon={<FontAwesomeIcon icon={faPlay} size='sm' />}>
+          <TitleCard
+            title={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.card.startupConfiguration', {})}
+            icon={<FontAwesomeIcon icon={faPlay} size='sm' />}
+          >
             <Group grow align='top'>
               <TagsInput
                 withAsterisk
-                label='Startup Done'
-                placeholder='Startup Done'
-                description='Console message indicating startup completion.'
+                label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.startupDone', {})}
+                description={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.startupDoneDescription', {})}
                 key={form.key('configStartup.done')}
                 {...form.getInputProps('configStartup.done')}
               />
 
               <Switch
-                label='Strip ANSI from startup messages'
-                description='Removes ANSI control characters from the console output before matching startup completion.'
+                label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stripAnsi', {})}
+                description={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stripAnsiDescription', {})}
                 key={form.key('configStartup.stripAnsi')}
                 {...form.getInputProps('configStartup.stripAnsi', {
                   type: 'checkbox',
@@ -359,16 +364,27 @@ export default function EggCreateOrUpdate({
             </Group>
           </TitleCard>
 
-          <TitleCard title='Stop Configuration' icon={<FontAwesomeIcon icon={faStop} size='sm' />}>
+          <TitleCard
+            title={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.card.stopConfiguration', {})}
+            icon={<FontAwesomeIcon icon={faStop} size='sm' />}
+          >
             <Group grow>
               <Select
                 withAsterisk
-                label='Stop Type'
-                placeholder='Stop Type'
+                label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stopType', {})}
                 data={[
-                  { label: 'Send Command', value: 'command' },
-                  { label: 'Send Signal', value: 'signal' },
-                  { label: 'Docker Stop', value: 'docker' },
+                  {
+                    label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.enum.stopType.command', {}),
+                    value: 'command',
+                  },
+                  {
+                    label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.enum.stopType.signal', {}),
+                    value: 'signal',
+                  },
+                  {
+                    label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.enum.stopType.docker', {}),
+                    value: 'docker',
+                  },
                 ]}
                 key={form.key('configStop.type')}
                 {...form.getInputProps('configStop.type')}
@@ -376,16 +392,14 @@ export default function EggCreateOrUpdate({
               {form.getValues().configStop.type === 'command' ? (
                 <TextInput
                   withAsterisk
-                  label='Stop Command'
-                  placeholder='Stop Command'
+                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stopCommand', {})}
                   key={form.key('configStop.value')}
                   {...form.getInputProps('configStop.value')}
                 />
               ) : form.getValues().configStop.type === 'signal' ? (
                 <Select
                   withAsterisk
-                  label='Stop Signal'
-                  placeholder='Stop Signal'
+                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stopSignal', {})}
                   data={[
                     { label: 'SIGABRT', value: 'SIGABRT' },
                     { label: 'SIGINT (^C)', value: 'SIGINT' },
@@ -401,9 +415,12 @@ export default function EggCreateOrUpdate({
             </Group>
           </TitleCard>
 
-          <TitleCard title='Config Files Configuration' icon={<FontAwesomeIcon icon={faFileText} size='sm' />}>
+          <TitleCard
+            title={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.card.configFiles', {})}
+            icon={<FontAwesomeIcon icon={faFileText} size='sm' />}
+          >
             {form.getValues().configFiles.length === 0 ? (
-              <p className='mb-2'>No config files defined.</p>
+              <p className='mb-2'>{t('pages.admin.nests.tabs.eggs.page.tabs.general.page.emptyConfigFiles', {})}</p>
             ) : (
               form.getValues().configFiles.map((_, index) => (
                 <Card key={index} className='flex flex-row! justify-between mb-2'>
@@ -411,15 +428,13 @@ export default function EggCreateOrUpdate({
                     <Group grow>
                       <TextInput
                         withAsterisk
-                        label='File Path'
-                        placeholder='File Path'
+                        label={t('common.form.filePath', {})}
                         key={form.key(`configFiles.${index}.file`)}
                         {...form.getInputProps(`configFiles.${index}.file`)}
                       />
                       <Select
                         withAsterisk
-                        label='Parser'
-                        placeholder='Parser'
+                        label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.parser', {})}
                         data={Object.entries(processConfigurationParserLabelMapping).map(([value, label]) => ({
                           label,
                           value,
@@ -430,8 +445,11 @@ export default function EggCreateOrUpdate({
                     </Group>
 
                     <Switch
-                      label='Create New File'
-                      description='If enabled, the file will be created if it does not exist. If disabled, the file must already exist or the replacement will fail.'
+                      label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.createNewFile', {})}
+                      description={t(
+                        'pages.admin.nests.tabs.eggs.page.tabs.general.page.form.createNewFileDescription',
+                        {},
+                      )}
                       key={form.key(`configFiles.${index}.createNew`)}
                       {...form.getInputProps(`configFiles.${index}.createNew`, {
                         type: 'checkbox',
@@ -440,7 +458,9 @@ export default function EggCreateOrUpdate({
 
                     <div className='flex flex-col'>
                       {form.getValues().configFiles[index].replace.length === 0 ? (
-                        <p className='mb-2'>No replacements defined.</p>
+                        <p className='mb-2'>
+                          {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.emptyReplacements', {})}
+                        </p>
                       ) : (
                         form.getValues().configFiles[index].replace.map((_, replaceIndex) => (
                           <Card key={replaceIndex} className='flex flex-row! mb-2'>
@@ -448,37 +468,43 @@ export default function EggCreateOrUpdate({
                               <Group grow w='100%'>
                                 <TextInput
                                   withAsterisk
-                                  label='Match'
-                                  placeholder='Match'
+                                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.match', {})}
                                   key={form.key(`configFiles.${index}.replace.${replaceIndex}.match`)}
                                   {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.match`)}
                                 />
                                 <TextInput
-                                  label='If Value'
-                                  placeholder='If Value'
+                                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.ifValue', {})}
                                   key={form.key(`configFiles.${index}.replace.${replaceIndex}.ifValue`)}
                                   {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.ifValue`)}
                                 />
                                 <TextInput
                                   withAsterisk
-                                  label='Replace With'
-                                  placeholder='Replace With'
+                                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.replaceWith', {})}
                                   key={form.key(`configFiles.${index}.replace.${replaceIndex}.replaceWith`)}
                                   {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.replaceWith`)}
                                 />
                               </Group>
                               <Group grow mt='md'>
                                 <Switch
-                                  label='Insert New'
-                                  description='If enabled, if no existing value matches the "Match" field, the "Replace With" value will be inserted into the file. If disabled, if no match is found, no changes will be made to the file.'
+                                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.insertNew', {})}
+                                  description={t(
+                                    'pages.admin.nests.tabs.eggs.page.tabs.general.page.form.insertNewDescription',
+                                    {},
+                                  )}
                                   key={form.key(`configFiles.${index}.replace.${replaceIndex}.insertNew`)}
                                   {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.insertNew`, {
                                     type: 'checkbox',
                                   })}
                                 />
                                 <Switch
-                                  label='Update Existing'
-                                  description='If enabled, if a match is found, it will be replaced with the "Replace With" value. If disabled, the replacement will only insert new values and will fail if a match is found.'
+                                  label={t(
+                                    'pages.admin.nests.tabs.eggs.page.tabs.general.page.form.updateExisting',
+                                    {},
+                                  )}
+                                  description={t(
+                                    'pages.admin.nests.tabs.eggs.page.tabs.general.page.form.updateExistingDescription',
+                                    {},
+                                  )}
                                   key={form.key(`configFiles.${index}.replace.${replaceIndex}.updateExisting`)}
                                   {...form.getInputProps(
                                     `configFiles.${index}.replace.${replaceIndex}.updateExisting`,
@@ -538,7 +564,7 @@ export default function EggCreateOrUpdate({
                         className='w-fit!'
                         leftSection={<FontAwesomeIcon icon={faPlus} />}
                       >
-                        Add Replacement
+                        {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.addReplacement', {})}
                       </Button>
                     </div>
                   </Stack>
@@ -580,12 +606,12 @@ export default function EggCreateOrUpdate({
               className='w-fit!'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
             >
-              Add Config File
+              {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.addConfigFile', {})}
             </Button>
           </TitleCard>
 
           <MultiKeyValueInput
-            label='Startup Commands'
+            label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.startupCommands', {})}
             withAsterisk
             options={form.getValues().startupCommands}
             onChange={(e) => form.setFieldValue('startupCommands', e)}
@@ -593,13 +619,13 @@ export default function EggCreateOrUpdate({
 
           <Group grow>
             <Switch
-              label='Force Outgoing IP'
+              label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.forceOutgoingIp', {})}
               key={form.key('forceOutgoingIp')}
               {...form.getInputProps('forceOutgoingIp', { type: 'checkbox' })}
             />
             <Switch
-              label='Separate IP and Port'
-              description='Separates the primary IP and Port in the Console page instead of joining them with ":"'
+              label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.separatePort', {})}
+              description={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.separatePortDescription', {})}
               key={form.key('separatePort')}
               {...form.getInputProps('separatePort', { type: 'checkbox' })}
             />
@@ -607,21 +633,20 @@ export default function EggCreateOrUpdate({
 
           <Group grow align='top'>
             <TagsInput
-              label='Features'
-              placeholder='Feature'
+              label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.features', {})}
+              placeholder={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.featurePlaceholder', {})}
               key={form.key('features')}
               {...form.getInputProps('features')}
             />
             <TagsInput
-              label='File Deny List'
-              placeholder='File Deny List'
+              label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.fileDenylist', {})}
               key={form.key('fileDenylist')}
               {...form.getInputProps('fileDenylist')}
             />
           </Group>
 
           <MultiKeyValueInput
-            label='Docker Images'
+            label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.dockerImages', {})}
             withAsterisk
             options={form.getValues().dockerImages}
             onChange={(e) => form.setFieldValue('dockerImages', e)}
@@ -631,7 +656,7 @@ export default function EggCreateOrUpdate({
         <Group mt='md'>
           <AdminCan action={contextEgg ? 'eggs.update' : 'eggs.create'} cantSave>
             <Button type='submit' disabled={!isValid} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
             {contextEgg && (
               <>
@@ -640,13 +665,13 @@ export default function EggCreateOrUpdate({
                     items={[
                       {
                         icon: faUpload,
-                        label: 'from File',
+                        label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.fromFile', {}),
                         onClick: () => fileInputRef.current?.click(),
                         color: 'gray',
                       },
                       {
                         icon: faRefresh,
-                        label: 'from Repository',
+                        label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.fromRepository', {}),
                         disabled: !contextEgg.eggRepositoryEgg,
                         onClick: doRepositoryUpdate,
                         color: 'gray',
@@ -664,7 +689,7 @@ export default function EggCreateOrUpdate({
                         variant='outline'
                         rightSection={<FontAwesomeIcon icon={faChevronDown} />}
                       >
-                        Update
+                        {t('common.button.update', {})}
                       </Button>
                     )}
                   </ContextMenu>
@@ -674,13 +699,13 @@ export default function EggCreateOrUpdate({
                     items={[
                       {
                         icon: faFileDownload,
-                        label: 'as JSON',
+                        label: t('common.button.exportAs', { format: 'JSON' }),
                         onClick: () => doExport('json'),
                         color: 'gray',
                       },
                       {
                         icon: faFileDownload,
-                        label: 'as YAML',
+                        label: t('common.button.exportAs', { format: 'YAML' }),
                         onClick: () => doExport('yaml'),
                         color: 'gray',
                       },
@@ -697,7 +722,7 @@ export default function EggCreateOrUpdate({
                         variant='outline'
                         rightSection={<FontAwesomeIcon icon={faChevronDown} />}
                       >
-                        Export
+                        {t('common.button.export', {})}
                       </Button>
                     )}
                   </ContextMenu>
@@ -715,13 +740,13 @@ export default function EggCreateOrUpdate({
           </AdminCan>
           {contextEgg && (
             <Button variant='outline' onClick={() => setOpenModal('move')} loading={loading}>
-              Move
+              {t('common.button.move', {})}
             </Button>
           )}
           {contextEgg && (
             <AdminCan action='eggs.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                Delete
+                {t('common.button.delete', {})}
               </Button>
             </AdminCan>
           )}

@@ -10,7 +10,7 @@ use compact_str::ToCompactString;
 use garde::Validate;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
+    collections::{BTreeMap, HashMap},
     ops::{Deref, DerefMut},
     path::Path,
     str::FromStr,
@@ -28,6 +28,31 @@ pub mod ratelimits;
 pub mod server;
 pub mod user;
 pub mod webauthn;
+
+#[derive(ToSchema, Serialize, Deserialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum RouteOrderItem {
+    Route {
+        path: compact_str::CompactString,
+    },
+    Divider {
+        name: Option<compact_str::CompactString>,
+        name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
+    },
+    Redirect {
+        name: compact_str::CompactString,
+        name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
+        destination: compact_str::CompactString,
+    },
+}
+
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum TlsMode {
+    None,
+    StartTls,
+    ImplicitTls,
+}
 
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
@@ -82,7 +107,7 @@ pub enum MailMode {
         #[garde(length(chars, min = 1, max = 255))]
         password: Option<compact_str::CompactString>,
         #[garde(skip)]
-        use_tls: bool,
+        tls_mode: TlsMode,
         #[garde(skip)]
         #[serde(default)]
         skip_cert_validation: bool,
@@ -352,7 +377,7 @@ impl SettingsSerializeExt for AppSettings {
                 port,
                 username,
                 password,
-                use_tls,
+                tls_mode,
                 skip_cert_validation,
                 from_address,
                 from_name,
@@ -377,7 +402,14 @@ impl SettingsSerializeExt for AppSettings {
                             "".into()
                         },
                     )
-                    .write_raw_setting("mail_smtp_use_tls", use_tls.to_compact_string())
+                    .write_raw_setting(
+                        "mail_smtp_tls_mode",
+                        match tls_mode {
+                            TlsMode::None => "none",
+                            TlsMode::StartTls => "starttls",
+                            TlsMode::ImplicitTls => "implicit_tls",
+                        },
+                    )
                     .write_raw_setting(
                         "mail_smtp_skip_cert_validation",
                         skip_cert_validation.to_compact_string(),
@@ -623,10 +655,15 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
                     } else {
                         None
                     },
-                    use_tls: deserializer
-                        .take_raw_setting("mail_smtp_use_tls")
-                        .map(|s| s == "true")
-                        .unwrap_or(true),
+                    tls_mode: match deserializer
+                        .take_raw_setting("mail_smtp_tls_mode")
+                        .as_deref()
+                    {
+                        Some("none") => TlsMode::None,
+                        Some("starttls") => TlsMode::StartTls,
+                        Some("implicit_tls") => TlsMode::ImplicitTls,
+                        _ => TlsMode::StartTls,
+                    },
                     skip_cert_validation: deserializer
                         .take_raw_setting("mail_smtp_skip_cert_validation")
                         .map(|s| s == "true")

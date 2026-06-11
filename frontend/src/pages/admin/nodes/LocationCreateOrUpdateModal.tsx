@@ -33,7 +33,7 @@ export default function LocationCreateOrUpdateModal({
   onClose,
   onLocationCreated,
 }: LocationCreateOrUpdateModalProps) {
-  const { language } = useTranslations();
+  const { language, t } = useTranslations();
   const { addToast } = useToast();
 
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
@@ -50,7 +50,10 @@ export default function LocationCreateOrUpdateModal({
       onClose,
       onSubmit: async (values) => {
         await createLocation(adminLocationUpdateSchema.parse(values));
-        addToast('Location created.', 'success');
+        addToast(
+          t('elements.resource.tooltip.created', { resource: t('pages.admin.locations.resourceName', {}) }),
+          'success',
+        );
         onLocationCreated();
       },
     },
@@ -70,26 +73,24 @@ export default function LocationCreateOrUpdateModal({
       onSubmit={handleSubmit}
       isDirty={isDirty}
       loading={loading}
-      title='Create Location'
+      title={t('pages.admin.locations.tabs.general.page.titleCreate', {})}
       size='lg'
     >
       <Stack gap='md'>
         <Text size='sm' c='dimmed'>
-          You need to create at least one location before you can create nodes. Locations help organize your nodes
-          geographically or logically.
+          {t('pages.admin.nodes.tabs.general.page.alert.noLocations', {})}
         </Text>
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
           <Select
-            label='Backup Configuration'
-            placeholder='None'
+            label={t('common.form.backupConfiguration', {})}
+            placeholder={t('common.none', {})}
             data={backupConfigurations.items.map((backupConfiguration) => ({
               label: backupConfiguration.name,
               value: backupConfiguration.uuid,
@@ -105,11 +106,11 @@ export default function LocationCreateOrUpdateModal({
             {...form.getInputProps('backupConfigurationUuid')}
           />
 
-          <TextArea label='Description' placeholder='Description' rows={3} {...form.getInputProps('description')} />
+          <TextArea label={t('common.form.description', {})} rows={3} {...form.getInputProps('description')} />
 
           <Select
-            label='Flag'
-            placeholder='None'
+            label={t('pages.admin.locations.tabs.general.page.form.flag', {})}
+            placeholder={t('common.none', {})}
             renderOption={({ option }) => (
               <div className='flex items-center gap-2'>
                 <img src={`/flags/${option.value}.svg`} alt={option.label} className='w-4 h-4 rounded-md shrink-0' />
@@ -137,11 +138,11 @@ export default function LocationCreateOrUpdateModal({
         <ModalFooter>
           <AdminCan action='locations.create' cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Create Location
+              {t('pages.admin.locations.tabs.general.page.titleCreate', {})}
             </Button>
           </AdminCan>
           <Button variant='default' onClick={handleClose}>
-            Cancel
+            {t('common.button.cancel', {})}
           </Button>
         </ModalFooter>
       </Stack>

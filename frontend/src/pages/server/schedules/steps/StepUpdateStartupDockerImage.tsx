@@ -19,7 +19,7 @@ export default function StepUpdateStartupDockerImage({
     <Stack>
       <Select
         withAsterisk
-        label={t('pages.server.schedules.steps.updateStartupDockerImage.form.dockerImage', {})}
+        label={t('common.form.dockerImage', {})}
         data={Object.entries(server.egg.dockerImages).map(([key, value]) => ({
           value,
           label: key,

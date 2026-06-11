@@ -49,13 +49,25 @@ export default function CommandSnippetRow({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.commandSnippets.modal.deleteCommandSnippet.content', { name: commandSnippet.name }).md()}
+        {t('pages.account.commandSnippets.modal.deleteCommandSnippet.content', {
+          name: commandSnippet.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
-          { icon: faPencil, label: t('common.button.edit', {}), onClick: () => setOpenModal('edit'), color: 'gray' },
-          { icon: faTrash, label: t('common.button.delete', {}), onClick: () => setOpenModal('delete'), color: 'red' },
+          {
+            icon: faPencil,
+            label: t('common.button.edit', {}),
+            onClick: () => setOpenModal('edit'),
+            color: 'gray',
+          },
+          {
+            icon: faTrash,
+            label: t('common.button.delete', {}),
+            onClick: () => setOpenModal('delete'),
+            color: 'red',
+          },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.dashboard.commandSnippets.commandSnippetContextMenu}
         registryProps={{ commandSnippet }}
@@ -64,7 +76,7 @@ export default function CommandSnippetRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>!{commandSnippet.name}</TableData>

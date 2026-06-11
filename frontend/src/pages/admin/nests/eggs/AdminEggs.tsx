@@ -22,6 +22,7 @@ import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import EggActionBar from './EggActionBar.tsx';
 import EggCreateOrUpdate from './EggCreateOrUpdate.tsx';
@@ -31,6 +32,7 @@ import EggRow from './EggRow.tsx';
 function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestSchema> }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const selectedEggsPreviousRef = useRef<z.infer<typeof adminEggSchema>[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -59,14 +61,14 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
         data = jsYaml.load(text) as object;
       }
     } catch (err) {
-      addToast(`Failed to parse egg: ${err}`, 'error');
+      addToast(t('pages.admin.nests.tabs.eggs.page.toast.parseFailed', { error: String(err) }), 'error');
       return;
     }
 
     importEgg(contextNest.uuid, data)
       .then(() => {
         refetch();
-        addToast('Egg imported.', 'success');
+        addToast(t('pages.admin.nests.tabs.eggs.page.toast.imported', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -130,11 +132,11 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
     deps: [eggs],
   });
 
-  const columns = ['', ...eggTableColumns];
+  const columns = ['', ...eggTableColumns()];
 
   return (
     <AdminSubContentContainer
-      title='Eggs'
+      title={t('pages.admin.nests.tabs.eggs.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
@@ -142,14 +144,14 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
         <AdminCan action='eggs.create'>
           <Button onClick={() => fileInputRef.current?.click()} color='blue'>
             <FontAwesomeIcon icon={faUpload} className='mr-2' />
-            Import
+            {t('common.button.import', {})}
           </Button>
           <Button
             onClick={() => navigate(`/admin/nests/${contextNest.uuid}/eggs/new`)}
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
 
           <input

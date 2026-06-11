@@ -49,6 +49,12 @@ mod put {
 
         permissions.has_user_permission("account.email")?;
 
+        if user.frozen {
+            return ApiResponse::error("account is frozen")
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+        }
+
         if !user
             .validate_password(&state.database, &data.password)
             .await?

@@ -51,18 +51,9 @@ export default function BackupCreateModal({ opened, onClose }: ModalProps) {
       opened={opened}
     >
       <Stack>
-        <TextInput
-          withAsterisk
-          label={t('common.form.name', {})}
-          placeholder={t('common.form.name', {})}
-          {...form.getInputProps('name')}
-        />
+        <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
-        <TagsInput
-          label={t('pages.server.backups.modal.createBackup.form.ignoredFiles', {})}
-          placeholder={t('pages.server.backups.modal.createBackup.form.ignoredFiles', {})}
-          {...form.getInputProps('ignoredFiles')}
-        />
+        <TagsInput label={t('common.form.ignoredFiles', {})} {...form.getInputProps('ignoredFiles')} />
 
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!form.isValid()}>

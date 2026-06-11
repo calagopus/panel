@@ -8,6 +8,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function NodeAllocationsUpdateModal({
@@ -16,6 +17,7 @@ export default function NodeAllocationsUpdateModal({
   opened,
   onClose,
 }: ModalProps & { node: z.infer<typeof adminNodeSchema>; loadAllocations: () => void }) {
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const { selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
 
@@ -95,7 +97,12 @@ export default function NodeAllocationsUpdateModal({
       ipAlias: ipAlias || null,
     })
       .then(({ updated }) => {
-        addToast(`${updated} Node Allocation${updated === 1 ? '' : 's'} updated.`, 'success');
+        addToast(
+          t('pages.admin.nodes.tabs.allocations.page.modal.update.toast.updated', {
+            allocations: tItem('allocation', updated),
+          }),
+          'success',
+        );
         setSelectedNodeAllocations([]);
 
         onClose();
@@ -108,23 +115,31 @@ export default function NodeAllocationsUpdateModal({
   };
 
   return (
-    <Modal title='Update Node Allocations' onClose={onClose} opened={opened}>
+    <Modal
+      title={t('pages.admin.nodes.tabs.allocations.page.modal.update.title', {})}
+      onClose={onClose}
+      opened={opened}
+    >
       <Stack>
-        <TextInput withAsterisk label='IP' placeholder='IP' value={ip} onChange={(e) => setIp(e.target.value)} />
+        <TextInput
+          withAsterisk
+          label={t('common.table.columns.ip', {})}
+          value={ip}
+          onChange={(e) => setIp(e.target.value)}
+        />
 
         <TextInput
-          label='IP Alias'
-          placeholder='IP Alias'
+          label={t('pages.admin.nodes.tabs.allocations.page.form.ipAlias', {})}
           value={ipAlias}
           onChange={(e) => setIpAlias(e.target.value)}
         />
 
         <ModalFooter>
           <Button onClick={doUpdate} loading={loading} disabled={!ip}>
-            Update
+            {t('common.button.update', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

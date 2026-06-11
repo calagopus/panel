@@ -26,6 +26,7 @@ import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/
 import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 export default function OAuthProviderCreateOrUpdate({
@@ -34,6 +35,7 @@ export default function OAuthProviderCreateOrUpdate({
   contextOAuthProvider?: z.infer<typeof adminOAuthProviderSchema>;
 }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
   const { settings } = useGlobalStore();
 
   const [isValid, setIsValid] = useState(false);
@@ -79,7 +81,7 @@ export default function OAuthProviderCreateOrUpdate({
     deleteFn: contextOAuthProvider ? () => deleteOAuthProvider(contextOAuthProvider.uuid) : undefined,
     doUpdate: !!contextOAuthProvider,
     basePath: '/admin/oauth-providers',
-    resourceName: 'OAuth Provider',
+    resourceName: t('pages.admin.oAuthProviders.resourceName', {}),
   });
 
   useEffect(() => {
@@ -111,7 +113,7 @@ export default function OAuthProviderCreateOrUpdate({
   const doExport = (format: 'json' | 'yaml') => {
     if (!contextOAuthProvider) return;
 
-    addToast('OAuth Provider exported.', 'success');
+    addToast(t('pages.admin.oAuthProviders.tabs.general.page.toast.exported', {}), 'success');
 
     let data: Partial<z.infer<typeof adminOAuthProviderSchema>> & {
       uuid?: string;
@@ -158,57 +160,60 @@ export default function OAuthProviderCreateOrUpdate({
 
   return (
     <AdminContentContainer
-      title={`${contextOAuthProvider ? 'Update' : 'Create'} OAuth Provider`}
+      title={t(
+        contextOAuthProvider
+          ? 'pages.admin.oAuthProviders.tabs.general.page.titleUpdate'
+          : 'pages.admin.oAuthProviders.tabs.general.page.titleCreate',
+        {},
+      )}
       fullscreen={!!contextOAuthProvider}
       titleOrder={2}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm OAuth Provider Deletion'
-        confirm='Delete'
+        title={t('pages.admin.oAuthProviders.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.oAuthProviders.tabs.general.page.modal.delete.content', {
+          name: form.getValues().name,
+        }).md()}
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.oAuthProviders.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
           <TextArea
-            label='Description'
-            placeholder='Description'
+            label={t('common.form.description', {})}
             rows={3}
             key={form.key('description')}
             {...form.getInputProps('description')}
           />
 
           <Card className='flex flex-row! items-center justify-between col-span-full'>
-            <Title order={4}>Redirect URL</Title>
+            <Title order={4}>{t('pages.admin.oAuthProviders.tabs.general.page.card.redirectUrl.title', {})}</Title>
             <Code>
               {contextOAuthProvider
                 ? `${settings.app.url}/api/auth/oauth/${contextOAuthProvider.uuid}`
-                : 'Available after creation'}
+                : t('pages.admin.oAuthProviders.tabs.general.page.card.redirectUrl.unavailable', {})}
             </Code>
           </Card>
 
           <TextInput
             withAsterisk
-            label='Client Id'
-            placeholder='Client Id'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.clientId', {})}
             key={form.key('clientId')}
             {...form.getInputProps('clientId')}
           />
           <TextInput
             withAsterisk={!contextOAuthProvider}
-            label='Client Secret'
-            placeholder='Client Secret'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.clientSecret', {})}
             type='password'
             key={form.key('clientSecret')}
             {...form.getInputProps('clientSecret')}
@@ -216,115 +221,111 @@ export default function OAuthProviderCreateOrUpdate({
 
           <TextInput
             withAsterisk
-            label='Auth URL'
-            placeholder='Auth URL'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.authUrl', {})}
             key={form.key('authUrl')}
             {...form.getInputProps('authUrl')}
           />
           <TextInput
             withAsterisk
-            label='Token URL'
-            placeholder='Token URL'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.tokenUrl', {})}
             key={form.key('tokenUrl')}
             {...form.getInputProps('tokenUrl')}
           />
 
           <TextInput
             withAsterisk
-            label='Info URL'
-            placeholder='Info URL'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.infoUrl', {})}
             key={form.key('infoUrl')}
             {...form.getInputProps('infoUrl')}
           />
           <Switch
-            label='Basic Auth'
-            description='Uses HTTP Basic Authentication to transmit client id and secret, not common anymore'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.basicAuth', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.basicAuthDescription', {})}
             key={form.key('basicAuth')}
             {...form.getInputProps('basicAuth', { type: 'checkbox' })}
           />
 
           <TagsInput
-            label='Scopes'
-            placeholder='Scopes'
-            description='The OAuth2 Scopes to request, make sure to include scopes for email/profile info when needed'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.scopes', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.scopesDescription', {})}
             key={form.key('scopes')}
             {...form.getInputProps('scopes')}
           />
           <TextInput
             withAsterisk
-            label='Identifier Path'
-            placeholder='Identifier Path'
-            description='The Path to use to extract the unique user identifier from the Info URL response (https://serdejsonpath.live)'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.identifierPath', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.identifierPathDescription', {})}
             key={form.key('identifierPath')}
             {...form.getInputProps('identifierPath')}
           />
 
           <TextInput
-            label='Email Path'
-            placeholder='Email Path'
-            description='The Path to use to extract the email from the Info URL response (https://serdejsonpath.live)'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.emailPath', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.emailPathDescription', {})}
             key={form.key('emailPath')}
             {...form.getInputProps('emailPath')}
           />
           <TextInput
-            label='Username Path'
-            placeholder='Username Path'
-            description='The Path to use to extract the username from the Info URL response (https://serdejsonpath.live)'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.usernamePath', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.usernamePathDescription', {})}
             key={form.key('usernamePath')}
             {...form.getInputProps('usernamePath')}
           />
 
           <TextInput
-            label='First Name Path'
-            placeholder='First Name URL'
-            description='The Path to use to extract the first name from the Info URL response (https://serdejsonpath.live)'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPath', {})}
+            placeholder={t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPathPlaceholder', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPathDescription', {})}
             key={form.key('nameFirstPath')}
             {...form.getInputProps('nameFirstPath')}
           />
           <TextInput
-            label='Last Name Path'
-            placeholder='Last Name Path'
-            description='The Path to use to extract the last name from the Info URL response (https://serdejsonpath.live)'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.nameLastPath', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.nameLastPathDescription', {})}
             key={form.key('nameLastPath')}
             {...form.getInputProps('nameLastPath')}
           />
 
           <Switch
-            label='Only allow Login'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.loginOnly', {})}
             key={form.key('loginOnly')}
             {...form.getInputProps('loginOnly', { type: 'checkbox' })}
           />
           <Switch
-            label='Bypass 2FA on Login'
-            description='Allows users logging in with this provider to bypass their panel 2FA'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypass2fa', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypass2faDescription', {})}
             key={form.key('loginBypass2fa')}
             {...form.getInputProps('loginBypass2fa', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Link Viewable to User'
-            description='Allows the User to see the Connection and its identifier in the Client UI'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.linkViewable', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.linkViewableDescription', {})}
             key={form.key('linkViewable')}
             {...form.getInputProps('linkViewable', { type: 'checkbox' })}
           />
           <Switch
-            label='Link Manageable by User'
-            description='Allows the User to connect and disconnect with this provider'
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.userManageable', {})}
+            description={t('pages.admin.oAuthProviders.tabs.general.page.form.userManageableDescription', {})}
             key={form.key('userManageable')}
             {...form.getInputProps('userManageable', { type: 'checkbox' })}
           />
 
-          <Switch label='Enabled' key={form.key('enabled')} {...form.getInputProps('enabled', { type: 'checkbox' })} />
+          <Switch
+            label={t('common.form.enabled', {})}
+            key={form.key('enabled')}
+            {...form.getInputProps('enabled', { type: 'checkbox' })}
+          />
         </div>
 
         <Group mt='md'>
           <AdminCan action={contextOAuthProvider ? 'oauth-providers.update' : 'oauth-providers.create'} cantSave>
             <Button type='submit' disabled={!isValid} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
             {!contextOAuthProvider && (
               <Button onClick={() => doCreateOrUpdate(true)} disabled={!isValid} loading={loading}>
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             )}
             {contextOAuthProvider && (
@@ -333,13 +334,13 @@ export default function OAuthProviderCreateOrUpdate({
                   items={[
                     {
                       icon: faFileDownload,
-                      label: 'as JSON',
+                      label: t('common.button.exportAs', { format: 'JSON' }),
                       onClick: () => doExport('json'),
                       color: 'gray',
                     },
                     {
                       icon: faFileDownload,
-                      label: 'as YAML',
+                      label: t('common.button.exportAs', { format: 'YAML' }),
                       onClick: () => doExport('yaml'),
                       color: 'gray',
                     },
@@ -356,7 +357,7 @@ export default function OAuthProviderCreateOrUpdate({
                       variant='outline'
                       rightSection={<FontAwesomeIcon icon={faChevronDown} />}
                     >
-                      Export
+                      {t('common.button.export', {})}
                     </Button>
                   )}
                 </ContextMenu>
@@ -366,13 +367,13 @@ export default function OAuthProviderCreateOrUpdate({
           {contextOAuthProvider && (
             <AdminCan action='oauth-providers.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                Delete
+                {t('common.button.delete', {})}
               </Button>
             </AdminCan>
           )}
           <Anchor href='https://calagopus.com/docs/advanced/oauth' target='_blank' rel='noopener noreferrer'>
             <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
-              View Documentation
+              {t('common.button.viewDocumentation', {})}
             </Button>
           </Anchor>
         </Group>

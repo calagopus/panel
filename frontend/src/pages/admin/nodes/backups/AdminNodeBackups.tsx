@@ -8,9 +8,11 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeBackupRow from './NodeBackupRow.tsx';
 
 export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminNodeSchema> }) {
+  const { t } = useTranslations();
   const [showDetachedNodeBackups, setShowDetachedNodeBackups] = useState(false);
 
   const {
@@ -27,13 +29,13 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
 
   return (
     <AdminSubContentContainer
-      title='Node Backups'
+      title={t('pages.admin.nodes.tabs.backups.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Switch
-          label='Only show detached backups'
+          label={t('pages.admin.nodes.tabs.backups.page.input.detachedOnly', {})}
           checked={showDetachedNodeBackups}
           onChange={(e) => setShowDetachedNodeBackups(e.currentTarget.checked)}
         />
@@ -41,7 +43,15 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
     >
       <ContextMenuProvider>
         <Table
-          columns={['Name', 'Server', 'Checksum', 'Size', 'Files', 'Created', '']}
+          columns={[
+            t('common.table.columns.name', {}),
+            t('common.table.columns.server', {}),
+            t('common.table.columns.checksum', {}),
+            t('common.table.columns.size', {}),
+            t('common.table.columns.files', {}),
+            t('common.table.columns.created', {}),
+            '',
+          ]}
           loading={loading}
           pagination={nodeBackups}
           onPageSelect={setPage}

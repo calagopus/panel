@@ -11,6 +11,25 @@ env:
   PROJECT_NAME: panel-rs
 
 jobs:
+  generate-sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+
+      - name: Generate source SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom-source.cyclonedx.json
+          artifact-name: sbom-source.cyclonedx.json
+          upload-artifact: true
+
   build-frontend:
     name: Build Frontend
     runs-on: ubuntu-24.04
@@ -145,7 +164,7 @@ jobs:
 
   publish-draft-release:
     name: Publish Draft Release
-    needs: [dist]
+    needs: [dist, generate-sbom]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -177,19 +196,29 @@ jobs:
           draft: true
           prerelease: ${{ steps.release_info.outputs.is_prerelease == 'true' }}
           generate_release_notes: true
-          files: artifacts/${{ env.PROJECT_NAME }}-*/*
+          files: |
+            artifacts/${{ env.PROJECT_NAME }}-*/*
+            artifacts/sbom-source.cyclonedx.json/sbom-source.cyclonedx.json
 
   create-multiarch-image:
     name: Create multi-arch Docker images
-    needs: [dist]
+    needs: [dist, generate-sbom]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Download source SBOM
+        uses: actions/download-artifact@v8
+        with:
+          name: sbom-source.cyclonedx.json
+          path: sbom
 
       - name: Download all artifacts
         uses: actions/download-artifact@v8
@@ -250,6 +279,7 @@ jobs:
           echo "AIO_TAGS=$AIO_TAGS" >> $GITHUB_ENV
 
       - name: Build & push multi-arch image
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -257,10 +287,21 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ${{ env.DOCKER_TAGS }}
+          sbom: true
+          provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Attach source SBOM attestation to image
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: sbom/sbom-source.cyclonedx.json
+          push-to-registry: true
+
       - name: Build & push multi-arch AIO image
+        id: build-aio
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -268,8 +309,18 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ${{ env.AIO_TAGS }}
+          sbom: true
+          provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Attach source SBOM attestation to AIO image
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build-aio.outputs.digest }}
+          sbom-path: sbom/sbom-source.cyclonedx.json
+          push-to-registry: true
 
   build-heavy-image:
     name: Build Heavy Docker image (${{ matrix.platform }})
@@ -277,6 +328,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
     strategy:
       fail-fast: false
       matrix:
@@ -310,6 +363,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:heavy-build-${{ matrix.tag_suffix }}
+          sbom: scan-stages=true
+          provenance: true
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
 
@@ -319,6 +374,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
     strategy:
       fail-fast: false
       matrix:
@@ -352,6 +409,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:heavy-aio-build-${{ matrix.tag_suffix }}
+          sbom: scan-stages=true
+          provenance: true
           cache-from: type=gha,scope=heavy-aio-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-aio-${{ matrix.tag_suffix }}
 

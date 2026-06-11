@@ -22,6 +22,8 @@ import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositoryEggSchema } from '@/lib/schemas/admin/eggRepositories.ts';
+import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
+import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { oobeServerSchema } from '@/lib/schemas/oobe.ts';
 import { formatAllocation } from '@/lib/server.ts';
@@ -36,6 +38,8 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [createdNest, setCreatedNest] = useState<z.infer<typeof adminNestSchema> | null>(null);
+  const [installedEgg, setInstalledEgg] = useState<z.infer<typeof adminEggSchema> | null>(null);
 
   const node = data.nodes[0] ?? null;
   const existingServer = data.servers[0] ?? null;
@@ -96,13 +100,17 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
     setLoading(true);
 
     try {
-      const nest = await createNest({
-        author: user!.email,
-        name: form.getValues().nestName,
-        description: null,
-      });
+      const nest =
+        createdNest ??
+        (await createNest({
+          author: user!.email,
+          name: form.getValues().nestName,
+          description: null,
+        }));
+      setCreatedNest(nest);
 
-      const installedEgg = await installEgg(selectedEggRepositoryUuid!, selectedEgg!.uuid, nest.uuid);
+      const egg = installedEgg ?? (await installEgg(selectedEggRepositoryUuid!, selectedEgg!.uuid, nest.uuid));
+      setInstalledEgg(egg);
 
       await createServer({
         externalId: null,
@@ -119,7 +127,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
           ioWeight: null,
         },
         pinnedCpus: [],
-        startup: installedEgg.startupCommands['Default'] || Object.values(installedEgg.startupCommands)[0] || '',
+        startup: egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '',
         image: form.getValues().image,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         hugepagesPassthroughEnabled: false,
@@ -132,7 +140,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
         },
         nodeUuid: node!.uuid,
         ownerUuid: user!.uuid,
-        eggUuid: installedEgg.uuid,
+        eggUuid: egg.uuid,
         backupConfigurationUuid: null,
         allocationUuid: form.getValues().allocationUuid,
         allocationUuids: form.getValues().allocationUuids,
@@ -176,7 +184,6 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                     withAsterisk
                     className='flex-1'
                     label='Egg Repository'
-                    placeholder='Egg Repository'
                     data={data.eggRepositories.map((repo) => ({
                       label: repo.name,
                       value: repo.uuid,
@@ -188,7 +195,6 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                     withAsterisk
                     className='flex-1'
                     label='Egg'
-                    placeholder='Egg'
                     data={eggs.items.map((egg) => ({
                       label: egg.name,
                       value: egg.uuid,
@@ -208,7 +214,6 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                   <TextInput
                     withAsterisk
                     label='Nest Name'
-                    placeholder='Nest Name'
                     key={form.key('nestName')}
                     {...form.getInputProps('nestName')}
                   />
@@ -334,7 +339,6 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                   <Select
                     className='flex-1'
                     label='Primary Allocation'
-                    placeholder='Primary Allocation'
                     data={availablePrimaryAllocations.items
                       .filter((alloc) => !form.getValues().allocationUuids.includes(alloc.uuid))
                       .map((alloc) => ({
@@ -351,7 +355,6 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                   <MultiSelect
                     className='flex-1'
                     label='Additional Allocations'
-                    placeholder='Additional Allocations'
                     data={availableAllocations.items
                       .filter((alloc) => alloc.uuid !== form.getValues().allocationUuid)
                       .map((alloc) => ({

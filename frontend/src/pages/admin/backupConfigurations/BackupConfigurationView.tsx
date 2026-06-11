@@ -9,10 +9,12 @@ import AdminBackupConfigurationLocations from '@/pages/admin/backupConfiguration
 import AdminBackupConfigurationNodes from '@/pages/admin/backupConfigurations/nodes/AdminBackupConfigurationNodes.tsx';
 import AdminBackupConfigurationServers from '@/pages/admin/backupConfigurations/servers/AdminBackupConfigurationServers.tsx';
 import AdminBackupConfigurationStats from '@/pages/admin/backupConfigurations/stats/AdminBackupConfigurationStats.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BackupConfigurationCreateOrUpdate from './BackupConfigurationCreateOrUpdate.tsx';
 import AdminBackupConfigurationBackups from './backups/AdminBackupConfigurationBackups.tsx';
 
 export default function BackupConfigurationView() {
+  const { t } = useTranslations();
   const params = useParams<'id'>();
 
   const { data: backupConfiguration, isLoading } = useQuery({
@@ -28,40 +30,40 @@ export default function BackupConfigurationView() {
         baseUrl={`/admin/backup-configurations/${params.id}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: `/`,
             element: <BackupConfigurationCreateOrUpdate contextBackupConfiguration={backupConfiguration} />,
           },
           {
-            name: 'Stats',
+            name: t('pages.admin.backupConfigurations.tabs.stats.title', {}),
             icon: faChartBar,
             path: `/stats`,
             element: <AdminBackupConfigurationStats backupConfiguration={backupConfiguration} />,
           },
           {
-            name: 'Backups',
+            name: t('pages.admin.backupConfigurations.tabs.backups.title', {}),
             icon: faArchive,
             path: `/backups`,
             permission: 'backup-configurations.backups',
             element: <AdminBackupConfigurationBackups backupConfiguration={backupConfiguration} />,
           },
           {
-            name: 'Locations',
+            name: t('pages.admin.backupConfigurations.tabs.locations.title', {}),
             icon: faEarthAmerica,
             path: `/locations`,
             permission: 'locations.read',
             element: <AdminBackupConfigurationLocations backupConfiguration={backupConfiguration} />,
           },
           {
-            name: 'Nodes',
+            name: t('pages.admin.backupConfigurations.tabs.nodes.title', {}),
             icon: faServer,
             path: `/nodes`,
             permission: 'nodes.read',
             element: <AdminBackupConfigurationNodes backupConfiguration={backupConfiguration} />,
           },
           {
-            name: 'Servers',
+            name: t('pages.admin.backupConfigurations.tabs.servers.title', {}),
             icon: faDesktop,
             path: `/servers`,
             permission: 'servers.read',

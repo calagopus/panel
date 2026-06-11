@@ -47,8 +47,7 @@ export default function NewDirectoryModal({
     >
       <TextInput
         withAsterisk
-        label={t('pages.admin.assets.modal.createDirectory.form.directoryName', {})}
-        placeholder={t('pages.admin.assets.modal.createDirectory.form.directoryName', {})}
+        label={t('common.form.directoryName', {})}
         data-autofocus
         {...form.getInputProps('name')}
       />

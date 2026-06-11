@@ -1,10 +1,16 @@
 import { z } from 'zod';
 import { nullableString } from '@/lib/transformers.ts';
 
+export const adminBackupConfigurationResticPruneJobSchema = z.object({
+  cron: z.string().min(1),
+  nodes: z.array(z.string()),
+});
+
 export const adminBackupConfigurationResticSchema = z.object({
   repository: z.string(),
   retryLockSeconds: z.number().min(0),
   environment: z.record(z.string(), z.string()),
+  pruneJobs: z.array(adminBackupConfigurationResticPruneJobSchema),
 });
 
 export const adminBackupConfigurationS3Schema = z.object({

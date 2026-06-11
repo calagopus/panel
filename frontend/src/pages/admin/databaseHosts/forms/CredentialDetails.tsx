@@ -6,12 +6,15 @@ import NumberInput from '@/elements/input/NumberInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { adminDatabaseCredentialsDetailsSchema } from '@/lib/schemas/admin/databaseHosts.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function CredentialDetails({
   form,
 }: {
   form: UseFormReturnType<{ credentials: z.infer<typeof adminDatabaseCredentialsDetailsSchema> }>;
 }) {
+  const { t } = useTranslations();
+
   useEffect(() => {
     form.setValues({
       credentials: {
@@ -29,15 +32,13 @@ export default function CredentialDetails({
       <Group grow>
         <TextInput
           withAsterisk
-          label='Username'
-          placeholder='Username'
+          label={t('common.form.username', {})}
           key={form.key('credentials.username')}
           {...form.getInputProps('credentials.username')}
         />
         <PasswordInput
           withAsterisk
-          label='Password'
-          placeholder='Password'
+          label={t('common.form.password', {})}
           key={form.key('credentials.password')}
           {...form.getInputProps('credentials.password')}
         />
@@ -46,15 +47,13 @@ export default function CredentialDetails({
       <Group grow>
         <TextInput
           withAsterisk
-          label='Host'
-          placeholder='Host'
+          label={t('common.form.host', {})}
           key={form.key('credentials.host')}
           {...form.getInputProps('credentials.host')}
         />
         <NumberInput
           withAsterisk
-          label='Port'
-          placeholder='Port'
+          label={t('common.form.port', {})}
           key={form.key('credentials.port')}
           {...form.getInputProps('credentials.port')}
         />

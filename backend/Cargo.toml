@@ -10,7 +10,6 @@ wings-api = { workspace = true }
 rule-validator = { workspace = true }
 shared = { workspace = true }
 database-migrator = { workspace = true }
-extension-internal-list = { path = "../backend-extensions/internal-list" }
 tracing = { workspace = true }
 sentry = { workspace = true }
 sentry-tower = { workspace = true }

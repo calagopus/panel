@@ -11,7 +11,6 @@ import updateMount from '@/api/admin/mounts/updateMount.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
@@ -20,8 +19,10 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema, adminMountUpdateSchema } from '@/lib/schemas/admin/mounts.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z.infer<typeof adminMountSchema> }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const form = useForm<z.infer<typeof adminMountUpdateSchema>>({
@@ -49,7 +50,7 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
     deleteFn: contextMount ? () => deleteMount(contextMount.uuid) : undefined,
     doUpdate: !!contextMount,
     basePath: '/admin/mounts',
-    resourceName: 'Mount',
+    resourceName: t('pages.admin.mounts.resourceName', {}),
   });
 
   useEffect(() => {
@@ -67,38 +68,39 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
 
   return (
     <AdminContentContainer
-      title={`${contextMount ? 'Update' : 'Create'} Mount`}
+      title={t(
+        contextMount
+          ? 'pages.admin.mounts.tabs.general.page.titleUpdate'
+          : 'pages.admin.mounts.tabs.general.page.titleCreate',
+        {},
+      )}
       fullscreen={!!contextMount}
       titleOrder={2}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Mount Deletion'
-        confirm='Delete'
+        title={t('pages.admin.mounts.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.mounts.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
       </ConfirmationModal>
 
       <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
-        Mounts are a powerful and potentially dangerous feature. Improper use can lead to data loss or security
-        vulnerabilities (including container escapes). Make sure you understand the implications of using mounts before
-        creating or updating them.
+        {t('pages.admin.mounts.tabs.general.page.alert', {})}
       </Alert>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.mounts.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
           <TextArea
-            label='Description'
-            placeholder='Description'
+            label={t('common.form.description', {})}
             rows={3}
             key={form.key('description')}
             {...form.getInputProps('description')}
@@ -106,26 +108,24 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
 
           <TextInput
             withAsterisk
-            label='Source'
-            placeholder='Source'
+            label={t('pages.admin.mounts.tabs.general.page.form.source', {})}
             key={form.key('source')}
             {...form.getInputProps('source')}
           />
           <TextInput
             withAsterisk
-            label='Target'
-            placeholder='Target'
+            label={t('pages.admin.mounts.tabs.general.page.form.target', {})}
             key={form.key('target')}
             {...form.getInputProps('target')}
           />
 
           <Switch
-            label='Read Only'
+            label={t('pages.admin.mounts.tabs.general.page.form.readOnly', {})}
             key={form.key('readOnly')}
             {...form.getInputProps('readOnly', { type: 'checkbox' })}
           />
           <Switch
-            label='User Mountable'
+            label={t('pages.admin.mounts.tabs.general.page.form.userMountable', {})}
             key={form.key('userMountable')}
             {...form.getInputProps('userMountable', { type: 'checkbox' })}
           />
@@ -134,18 +134,18 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
         <Group mt='md'>
           <AdminCan action={contextMount ? 'mounts.update' : 'mounts.create'} cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
             {!contextMount && (
               <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             )}
           </AdminCan>
           {contextMount && (
             <AdminCan action='mounts.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                Delete
+                {t('common.button.delete', {})}
               </Button>
             </AdminCan>
           )}

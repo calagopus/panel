@@ -27,7 +27,7 @@ export default function AdminUserActivity({ user }: { user: z.infer<typeof fullU
 
   return (
     <AdminSubContentContainer
-      title={t('pages.admin.users.activity.title', {})}
+      title={t('pages.admin.users.tabs.activity.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}

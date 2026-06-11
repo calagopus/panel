@@ -163,9 +163,16 @@ if [ -f "$BINARY_PATH" ]; then
   echo "Found existing binary for current extensions."
   start_panel "$BINARY_PATH"
 else
-  # Check for the most recently compiled binary as a fallback
+  # Check for the most recently compiled binary for this version as a fallback
   LAST_COMPILED=$(ls -t /app/binaries/"$PANEL_VERSION"/*/panel-rs-aio 2>/dev/null | head -n 1)
-  
+
+  # If nothing was built for this version yet (e.g. right after a version
+  # upgrade) fall back to the most recently compiled binary from any previous
+  # version.
+  if [ -z "$LAST_COMPILED" ]; then
+    LAST_COMPILED=$(ls -t /app/binaries/*/*/panel-rs-aio 2>/dev/null | head -n 1)
+  fi
+
   if [ -n "$LAST_COMPILED" ] && [ -f "$LAST_COMPILED" ]; then
     echo "No exact match found for current extensions. Temporarily using the last compiled binary: $LAST_COMPILED"
     start_panel "$LAST_COMPILED"

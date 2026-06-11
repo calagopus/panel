@@ -11,10 +11,12 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { nodeMountTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeMountAddModal from './modals/NodeMountAddModal.tsx';
 import NodeMountRow from './NodeMountRow.tsx';
 
 export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNodeSchema> }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -30,20 +32,20 @@ export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNo
 
   return (
     <AdminSubContentContainer
-      title='Node Mounts'
+      title={t('pages.admin.nodes.tabs.mounts.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-          Add
+          {t('common.button.add', {})}
         </Button>
       }
     >
       <NodeMountAddModal node={node} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
 
       <ContextMenuProvider>
-        <Table columns={nodeMountTableColumns} loading={loading} pagination={nodeMounts} onPageSelect={setPage}>
+        <Table columns={nodeMountTableColumns()} loading={loading} pagination={nodeMounts} onPageSelect={setPage}>
           {nodeMounts?.data.map((mount) => (
             <NodeMountRow key={mount.mount.uuid} node={node} mount={mount} />
           ))}

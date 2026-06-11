@@ -44,13 +44,25 @@ export default function SshKeyRow({ sshKey }: { sshKey: z.infer<typeof userSshKe
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.sshKeys.modal.deleteSshKey.content', { name: sshKey.name }).md()}
+        {t('pages.account.sshKeys.modal.deleteSshKey.content', {
+          name: sshKey.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
-          { icon: faPencil, label: t('common.button.edit', {}), onClick: () => setOpenModal('edit'), color: 'gray' },
-          { icon: faTrash, label: t('common.button.delete', {}), onClick: () => setOpenModal('delete'), color: 'red' },
+          {
+            icon: faPencil,
+            label: t('common.button.edit', {}),
+            onClick: () => setOpenModal('edit'),
+            color: 'gray',
+          },
+          {
+            icon: faTrash,
+            label: t('common.button.delete', {}),
+            onClick: () => setOpenModal('delete'),
+            color: 'red',
+          },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.dashboard.sshKeys.sshKeyContextMenu}
         registryProps={{ sshKey }}
@@ -59,7 +71,7 @@ export default function SshKeyRow({ sshKey }: { sshKey: z.infer<typeof userSshKe
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>{sshKey.name}</TableData>

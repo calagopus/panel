@@ -45,7 +45,7 @@ export default function DatabaseEditModal({ database, opened, onClose }: Props) 
     >
       <Stack>
         <Switch
-          label={t('pages.server.databases.modal.editDatabase.form.locked', {})}
+          label={t('common.form.locked', {})}
           name='locked'
           {...form.getInputProps('locked', { type: 'checkbox' })}
         />

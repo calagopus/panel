@@ -47,15 +47,10 @@ export default function BackupEditModal({ backup, opened, onClose }: Props) {
       opened={opened}
     >
       <Stack>
-        <TextInput
-          withAsterisk
-          label={t('common.form.name', {})}
-          placeholder={t('common.form.name', {})}
-          {...form.getInputProps('name')}
-        />
+        <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
         <Switch
-          label={t('pages.server.backups.modal.editBackup.form.locked', {})}
+          label={t('common.form.locked', {})}
           name='locked'
           {...form.getInputProps('locked', { type: 'checkbox' })}
         />

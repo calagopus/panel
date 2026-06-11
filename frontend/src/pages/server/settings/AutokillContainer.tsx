@@ -20,6 +20,7 @@ export default function AutokillContainer() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
+  const updateServer = useServerStore((state) => state.updateServer);
 
   const [loading, setLoading] = useState(false);
 
@@ -37,6 +38,7 @@ export default function AutokillContainer() {
     updateAutokill(server.uuid, form.values)
       .then(() => {
         addToast(t('pages.server.settings.autokill.toast.updated', {}), 'success');
+        updateServer({ autoKill: form.values });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -52,10 +54,7 @@ export default function AutokillContainer() {
     >
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
         <Stack h='100%'>
-          <Switch
-            label={t('pages.server.settings.autokill.form.enabled', {})}
-            {...form.getInputProps('enabled', { type: 'checkbox' })}
-          />
+          <Switch label={t('common.form.enabled', {})} {...form.getInputProps('enabled', { type: 'checkbox' })} />
           <NumberInput
             label={t('pages.server.settings.autokill.form.secondsUntilAutoKill', {})}
             {...form.getInputProps('seconds')}

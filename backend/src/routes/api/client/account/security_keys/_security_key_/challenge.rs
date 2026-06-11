@@ -3,6 +3,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod post {
     use axum::{extract::Path, http::StatusCode};
+    use base64::Engine;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
@@ -23,7 +24,9 @@ mod post {
     }
 
     #[derive(ToSchema, Serialize)]
-    struct Response {}
+    struct Response {
+        credential_id: String,
+    }
 
     #[utoipa::path(post, path = "/", responses(
         (status = OK, body = inline(Response)),
@@ -89,7 +92,7 @@ mod post {
             WHERE user_security_keys.uuid = $1",
             security_key.uuid,
             passkey.cred_id().to_vec(),
-            serde_json::to_value(passkey)?
+            serde_json::to_value(&passkey)?
         )
         .execute(state.database.write())
         .await?;
@@ -104,7 +107,11 @@ mod post {
             )
             .await;
 
-        ApiResponse::new_serialized(Response {}).ok()
+        ApiResponse::new_serialized(Response {
+            credential_id: base64::engine::general_purpose::URL_SAFE_NO_PAD
+                .encode(passkey.cred_id()),
+        })
+        .ok()
     }
 }
 

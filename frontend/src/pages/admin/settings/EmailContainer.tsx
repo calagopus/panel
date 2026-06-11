@@ -41,7 +41,7 @@ export default function EmailContainer() {
   });
 
   useEffect(() => {
-    form.setValues({
+    form.setValues<z.infer<typeof adminSettingsEmailSchema>>({
       ...mailMode,
     });
   }, [mailMode]);
@@ -90,7 +90,7 @@ export default function EmailContainer() {
           </AdminCan>
           <AdminCan action='settings.read'>
             <Button variant='outline' loading={loading} onClick={() => setOpenModal('sendTestEmail')}>
-              {t('pages.admin.settings.tabs.mail.page.button.sendTestEmail', {})}
+              {t('common.button.sendTestEmail', {})}
             </Button>
           </AdminCan>
         </Group>

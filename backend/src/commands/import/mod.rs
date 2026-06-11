@@ -300,7 +300,7 @@ fn decrypt_laravel_value(
 
     let Ok(key) = <&[u8; 32]>::try_from(decoded_key) else {
         return Err(anyhow::anyhow!(
-            "decoded key must be at least 32 bytes, got {}",
+            "decoded key must be exactly 32 bytes, got {}",
             decoded_key.len()
         ));
     };
@@ -313,7 +313,7 @@ fn decrypt_laravel_value(
 
     let decrypted = cbc::Decryptor::<aes::Aes256>::new(key.into(), iv.into())
         .decrypt_padded::<Pkcs7>(&mut value)
-        .map_err(|e| anyhow::anyhow!("AES-256-CBC decryption failed: {e}"))?;
+        .map_err(|err| anyhow::anyhow!("AES-256-CBC decryption failed: {err}"))?;
 
     let result = compact_str::CompactString::from_utf8(decrypted)?;
 

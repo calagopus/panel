@@ -13,6 +13,7 @@ import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeMountSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function EggMountRow({
@@ -26,6 +27,7 @@ export default function EggMountRow({
 }) {
   const { addToast } = useToast();
   const { removeEggMount } = useAdminStore();
+  const { t } = useTranslations();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
 
@@ -33,7 +35,7 @@ export default function EggMountRow({
     await deleteEggMount(nest.uuid, egg.uuid, mount.mount.uuid)
       .then(() => {
         removeEggMount(mount);
-        addToast('Egg Mount deleted.', 'success');
+        addToast(t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.toast.deleted', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -45,20 +47,21 @@ export default function EggMountRow({
       <ConfirmationModal
         opened={openModal === 'remove'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Egg Mount Removal'
-        confirm='Delete'
+        title={t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doRemove}
       >
-        Are you sure you want to remove the mount
-        <Code>{mount.mount.name}</Code>
-        from <Code>{egg.name}</Code>?
+        {t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.modal.delete.content', {
+          mount: mount.mount.name,
+          egg: egg.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
           {
             icon: faTrash,
-            label: 'Remove',
+            label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),
             color: 'red',
           },
@@ -68,7 +71,7 @@ export default function EggMountRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>

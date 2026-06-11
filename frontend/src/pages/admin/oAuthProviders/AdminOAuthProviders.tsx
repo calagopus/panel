@@ -18,6 +18,7 @@ import { transformKeysToCamelCase } from '@/lib/transformers.ts';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import OAuthProviderCreateOrUpdate from './OAuthProviderCreateOrUpdate.tsx';
 import OAuthProviderImportOverlay from './OAuthProviderImportOverlay.tsx';
@@ -27,6 +28,7 @@ import OAuthProviderView from './OAuthProviderView.tsx';
 function OAuthProvidersContainer() {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -52,7 +54,7 @@ function OAuthProvidersContainer() {
         data = jsYaml.load(text) as object;
       }
     } catch (err) {
-      addToast(`Failed to parse oauth provider: ${err}`, 'error');
+      addToast(t('pages.admin.oAuthProviders.toast.parseFailed', { error: String(err) }), 'error');
       return;
     }
 
@@ -63,7 +65,7 @@ function OAuthProvidersContainer() {
     })
       .then(() => {
         refetch();
-        addToast('OAuth Provider imported.', 'success');
+        addToast(t('pages.admin.oAuthProviders.toast.imported', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -85,21 +87,21 @@ function OAuthProvidersContainer() {
 
   return (
     <AdminContentContainer
-      title='OAuth Providers'
+      title={t('pages.admin.oAuthProviders.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
         <AdminCan action='oauth-providers.create'>
           <Button onClick={() => fileInputRef.current?.click()} color='blue'>
             <FontAwesomeIcon icon={faUpload} className='mr-2' />
-            Import
+            {t('common.button.import', {})}
           </Button>
           <Button
             onClick={() => navigate('/admin/oauth-providers/new')}
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
 
           <input
@@ -114,7 +116,7 @@ function OAuthProvidersContainer() {
     >
       <OAuthProviderImportOverlay visible={isDragging} />
 
-      <Table columns={oauthProviderTableColumns} loading={loading} pagination={oauthProviders} onPageSelect={setPage}>
+      <Table columns={oauthProviderTableColumns()} loading={loading} pagination={oauthProviders} onPageSelect={setPage}>
         {oauthProviders?.data.map((oauthProvider) => (
           <OAuthProviderRow key={oauthProvider.uuid} oauthProvider={oauthProvider} />
         ))}

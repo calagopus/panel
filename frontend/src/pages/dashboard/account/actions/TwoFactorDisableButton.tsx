@@ -65,7 +65,7 @@ export default function TwoFactorDisableButton() {
 
           <TextInput
             withAsterisk
-            label={t('pages.account.account.containers.twoFactor.modal.disableTwoFactor.form.code', {})}
+            label={t('common.form.authenticationCode', {})}
             placeholder='000000'
             autoComplete='one-time-code'
             {...form.getInputProps('code')}
@@ -74,7 +74,6 @@ export default function TwoFactorDisableButton() {
           <PasswordInput
             withAsterisk
             label={t('common.form.password', {})}
-            placeholder={t('common.form.password', {})}
             autoComplete='current-password'
             {...form.getInputProps('password')}
           />

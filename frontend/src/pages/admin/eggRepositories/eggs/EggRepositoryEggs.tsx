@@ -10,6 +10,7 @@ import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/sch
 import { eggRepositoryEggTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggActionBar from './EggActionBar.tsx';
 import EggRepositoryEggRow from './EggRepositoryEggRow.tsx';
 
@@ -18,6 +19,7 @@ export default function EggRepositoryEggs({
 }: {
   contextEggRepository: z.infer<typeof adminEggRepositorySchema>;
 }) {
+  const { t } = useTranslations();
   const [selectedEggs, setSelectedEggs] = useState(
     new ObjectSet<z.infer<typeof adminEggRepositoryEggSchema>, 'uuid'>('uuid'),
   );
@@ -80,7 +82,12 @@ export default function EggRepositoryEggs({
   });
 
   return (
-    <AdminSubContentContainer title='Egg Repository Eggs' search={search} setSearch={setSearch} titleOrder={2}>
+    <AdminSubContentContainer
+      title={t('pages.admin.eggRepositories.tabs.eggs.page.title', {})}
+      search={search}
+      setSearch={setSearch}
+      titleOrder={2}
+    >
       <EggActionBar
         eggRepository={contextEggRepository}
         selectedEggs={selectedEggs}
@@ -89,7 +96,7 @@ export default function EggRepositoryEggs({
 
       <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
         <Table
-          columns={eggRepositoryEggTableColumns}
+          columns={eggRepositoryEggTableColumns()}
           loading={loading}
           pagination={eggRepositoryEggs}
           onPageSelect={setPage}

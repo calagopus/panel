@@ -129,10 +129,11 @@ export const announcementTypeIconMapping: Record<z.infer<typeof announcementType
 
 export const databaseCredentialTypeLabelMapping: Record<
   z.infer<typeof adminDatabaseCredentialsSchema>['type'],
-  string
+  () => string
 > = {
-  connection_string: 'Connection String',
-  details: 'Details',
+  connection_string: () =>
+    getTranslations().t('pages.admin.databaseHosts.tabs.general.page.enum.credentialType.connectionString', {}),
+  details: () => getTranslations().t('pages.admin.databaseHosts.tabs.general.page.enum.credentialType.details', {}),
 };
 
 export const backupDiskLabelMapping: Record<z.infer<typeof adminBackupConfigurationSchema>['backupDisk'], string> = {
@@ -239,14 +240,18 @@ export const eggConfigurationDeploymentDefaultMapping: Record<
 
 export const eggConfigurationDeploymentTypeLabelMapping: Record<
   z.infer<typeof adminEggConfigurationDeploymentSchema>['mode']['type'],
-  string
+  () => string
 > = {
-  random: 'Random',
-  range: 'Port Range',
-  add_primary: 'Add to Primary',
-  subtract_primary: 'Subtract from Primary',
-  multiply_primary: 'Multiply Primary',
-  divide_primary: 'Divide Primary',
+  random: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.random', {}),
+  range: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.range', {}),
+  add_primary: () =>
+    getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.addPrimary', {}),
+  subtract_primary: () =>
+    getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.subtractPrimary', {}),
+  multiply_primary: () =>
+    getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.multiplyPrimary', {}),
+  divide_primary: () =>
+    getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.dividePrimary', {}),
 };
 
 export const schedulePreConditionLabelMapping: Record<

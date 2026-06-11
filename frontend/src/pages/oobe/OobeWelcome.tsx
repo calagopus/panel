@@ -33,7 +33,11 @@ export default function OobeWelcome({ onNext }: OobeComponentProps) {
         </List>
       </div>
 
-      <Button className='md:max-w-fit md:ml-auto' leftSection={<FontAwesomeIcon icon={faRocket} />} onClick={onNext}>
+      <Button
+        className='md:max-w-fit md:ml-auto'
+        leftSection={<FontAwesomeIcon icon={faRocket} />}
+        onClick={() => onNext()}
+      >
         {t('pages.oobe.welcome.button.start', {})}
       </Button>
     </div>

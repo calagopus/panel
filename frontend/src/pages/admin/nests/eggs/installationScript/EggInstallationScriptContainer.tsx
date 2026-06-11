@@ -12,6 +12,7 @@ import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import { adminEggConfigScriptSchema, adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggInstallationScriptContainer({
   contextNest,
@@ -21,6 +22,7 @@ export default function EggInstallationScriptContainer({
   contextEgg: z.infer<typeof adminEggSchema>;
 }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const [loading, setLoading] = useState(false);
 
@@ -49,7 +51,7 @@ export default function EggInstallationScriptContainer({
 
     updateEggScript(contextNest.uuid, contextEgg.uuid, adminEggConfigScriptSchema.parse(form.values))
       .then(() => {
-        addToast('Egg script updated.', 'success');
+        addToast(t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.toast.updated', {}), 'success');
         contextEgg.configScript = form.values;
       })
       .catch((msg) => {
@@ -62,20 +64,21 @@ export default function EggInstallationScriptContainer({
 
   return (
     <>
-      <AdminSubContentContainer title='Egg Installation Script' titleOrder={2}>
+      <AdminSubContentContainer
+        title={t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.title', {})}
+        titleOrder={2}
+      >
         <form onSubmit={form.onSubmit(doUpdate)}>
           <Stack>
             <Group grow>
               <TextInput
                 withAsterisk
-                label='Installation Container'
-                placeholder='Installation Container'
+                label={t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.form.container', {})}
                 {...form.getInputProps('container')}
               />
               <TextInput
                 withAsterisk
-                label='Container Entrypoint'
-                placeholder='Container Entrypoint'
+                label={t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.form.entrypoint', {})}
                 {...form.getInputProps('entrypoint')}
               />
             </Group>
@@ -102,7 +105,7 @@ export default function EggInstallationScriptContainer({
 
           <Group pt='md' mt='auto'>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
           </Group>
         </form>

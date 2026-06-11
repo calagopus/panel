@@ -52,7 +52,7 @@ export default function UserOAuthLinkAddModal({
 
     createUserOAuthLink(user.uuid, selectedOAuthProvider.uuid, identifier)
       .then((oauthLink) => {
-        addToast(t('pages.admin.users.oauthLinks.toast.added', {}), 'success');
+        addToast(t('pages.admin.users.tabs.oauthLinks.page.toast.added', {}), 'success');
 
         onClose();
         addUserOAuthLink(oauthLink);
@@ -64,12 +64,12 @@ export default function UserOAuthLinkAddModal({
   };
 
   return (
-    <Modal title={t('pages.admin.users.oauthLinks.modal.add.title', {})} onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.users.tabs.oauthLinks.page.modal.add.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label={t('pages.admin.users.oauthLinks.modal.add.form.oauthProvider', {})}
-          placeholder={t('pages.admin.users.oauthLinks.modal.add.form.oauthProvider', {})}
+          label={t('pages.admin.users.tabs.oauthLinks.page.modal.add.form.oauthProvider', {})}
+          placeholder={t('pages.admin.users.tabs.oauthLinks.page.modal.add.form.oauthProvider', {})}
           value={selectedOAuthProvider?.uuid}
           onChange={(value) => setSelectedOAuthProvider(oauthProviders.items.find((p) => p.uuid === value) || null)}
           data={oauthProviders.items.map((oauthProvider) => ({

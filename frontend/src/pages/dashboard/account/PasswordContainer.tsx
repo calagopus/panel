@@ -73,8 +73,7 @@ export default function PasswordContainer({ requireTwoFactorActivation }: Accoun
           {user.hasPassword && (
             <PasswordInput
               withAsterisk
-              label={t('pages.account.account.containers.password.form.currentPassword', {})}
-              placeholder={t('pages.account.account.containers.password.form.currentPassword', {})}
+              label={t('common.form.currentPassword', {})}
               autoComplete='current-password'
               {...form.getInputProps('currentPassword')}
             />
@@ -82,14 +81,12 @@ export default function PasswordContainer({ requireTwoFactorActivation }: Accoun
           <PasswordInput
             withAsterisk
             label={t('pages.account.account.containers.password.form.newPassword', {})}
-            placeholder={t('pages.account.account.containers.password.form.newPassword', {})}
             autoComplete='new-password'
             {...form.getInputProps('newPassword')}
           />
           <PasswordInput
             withAsterisk
             label={t('pages.account.account.containers.password.form.confirmNewPassword', {})}
-            placeholder={t('pages.account.account.containers.password.form.confirmNewPassword', {})}
             autoComplete='new-password'
             {...form.getInputProps('confirmNewPassword')}
           />

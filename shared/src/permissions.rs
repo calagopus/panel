@@ -350,9 +350,10 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                     description: "Permissions that control the ability to manage nodes for the panel.",
                     permissions: IndexMap::from([
                         ("create", "Allows creating new nodes."),
-                        ("read", "Allows viewing nodes and their tokens."),
+                        ("read", "Allows viewing nodes."),
                         ("update", "Allows modifying nodes."),
                         ("delete", "Allows deleting nodes."),
+                        ("token", "Allows viewing a node's token."),
                         ("reset-token", "Allows resetting a node's token."),
                         (
                             "allocations",
@@ -568,7 +569,10 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                             "Allows updating the contents of an existing file or directory.",
                         ),
                         ("delete", "Allows deleting files or directories."),
-                        ("archive", "Allows archiving the contents of a directory."),
+                        (
+                            "archive",
+                            "Allows archiving the contents of a directory and decompressing files.",
+                        ),
                         ("sftp", "Allows connecting via SFTP to manage files."),
                     ]),
                 },

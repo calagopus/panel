@@ -13,6 +13,7 @@ import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/sch
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggRepositoryEggsInstallModal({
   eggRepository,
@@ -25,6 +26,7 @@ export default function EggRepositoryEggsInstallModal({
   selectedEggs: ObjectSet<z.infer<typeof adminEggRepositoryEggSchema>, 'uuid'>;
   setSelectedEggs: (eggs: ObjectSet<z.infer<typeof adminEggRepositoryEggSchema>, 'uuid'>) => void;
 }) {
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
 
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,10 @@ export default function EggRepositoryEggsInstallModal({
 
     installEggs(eggRepository.uuid, selectedEggs.keys(), selectedNest.uuid)
       .then((installed) => {
-        addToast(`${installed} Egg${installed !== 1 ? 's' : ''} installed.`, 'success');
+        addToast(
+          t('pages.admin.eggRepositories.tabs.eggs.page.toast.installedBulk', { eggs: tItem('egg', installed) }),
+          'success',
+        );
         setSelectedEggs(new ObjectSet('uuid'));
 
         onClose();
@@ -65,12 +70,15 @@ export default function EggRepositoryEggsInstallModal({
   };
 
   return (
-    <Modal title='Install Egg Repository Eggs' onClose={onClose} opened={opened}>
+    <Modal
+      title={t('pages.admin.eggRepositories.tabs.eggs.page.modal.installBulk.title', {})}
+      onClose={onClose}
+      opened={opened}
+    >
       <Stack>
         <Select
           withAsterisk
-          label='Nest'
-          placeholder='Nest'
+          label={t('common.form.nest', {})}
           value={selectedNest?.uuid}
           onChange={(value) => setSelectedNest(nests.items.find((m) => m.uuid === value) ?? null)}
           data={nests.items.map((mount) => ({
@@ -85,10 +93,12 @@ export default function EggRepositoryEggsInstallModal({
 
         <ModalFooter>
           <Button onClick={doInstall} loading={loading} disabled={!selectedNest}>
-            Install {selectedEggs.size} Egg{selectedEggs.size !== 1 && 's'}
+            {t('pages.admin.eggRepositories.tabs.eggs.page.modal.installBulk.button', {
+              eggs: tItem('egg', selectedEggs.size),
+            })}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

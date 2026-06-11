@@ -34,6 +34,34 @@ pub struct Params {
     state: String,
 }
 
+async fn apply_oauth_provider_mappings(
+    state: &shared::State,
+    oauth_provider: &OAuthProvider,
+    user_uuid: uuid::Uuid,
+    token: &impl TokenResponse,
+) {
+    let granted_scopes: Vec<compact_str::CompactString> = token
+        .scopes()
+        .map(|scopes| scopes.iter().map(|scope| scope.as_ref().into()).collect())
+        .unwrap_or_default();
+
+    if let Err(err) = shared::models::oauth_provider_mapping::OAuthProviderMapping::apply_for_user(
+        state,
+        oauth_provider.uuid,
+        user_uuid,
+        &granted_scopes,
+    )
+    .await
+    {
+        tracing::warn!(
+            user = %user_uuid,
+            oauth_provider = %oauth_provider.uuid,
+            "failed to apply oauth provider mappings: {:#?}",
+            err
+        );
+    }
+}
+
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .route("/", get(|state: GetState,
@@ -186,6 +214,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                     }
                     Err(err) => return ApiResponse::from(err).ok(),
                 }
+
+                apply_oauth_provider_mappings(&state, &oauth_provider, user.uuid, &token).await;
 
                 if let Err(err) = UserActivity::create(
                     &state,
@@ -385,6 +415,9 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                             name_last,
                             password: None,
                             admin: false,
+                            frozen: false,
+                            suspended: false,
+                            send_email: false,
                             language: settings.app.language.clone(),
                         };
                         let app_url = settings.app.url.clone();
@@ -410,6 +443,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                             Ok(_) => {},
                             Err(err) => return ApiResponse::from(err).ok(),
                         }
+
+                        apply_oauth_provider_mappings(&state, &oauth_provider, user.uuid, &token).await;
 
                         let key = UserSession::create(
                             &state,

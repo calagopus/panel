@@ -155,10 +155,20 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Generate source SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom-source.cyclonedx.json
+          upload-artifact: false
 
       - name: Download all artifacts
         uses: actions/download-artifact@v8
@@ -194,6 +204,7 @@ jobs:
           chmod +x .docker/*/panel-rs .docker/*/panel-rs-aio
 
       - name: Build & push multi-arch image
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -201,10 +212,21 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly
+          sbom: true
+          provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Attach source SBOM attestation to image
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: sbom-source.cyclonedx.json
+          push-to-registry: true
+
       - name: Build & push multi-arch AIO image
+        id: build-aio
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -212,8 +234,18 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-aio
+          sbom: true
+          provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Attach source SBOM attestation to AIO image
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build-aio.outputs.digest }}
+          sbom-path: sbom-source.cyclonedx.json
+          push-to-registry: true
 
   build-heavy-image:
     name: Build Heavy Docker image (${{ matrix.platform }})
@@ -221,6 +253,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
     strategy:
       fail-fast: false
       matrix:
@@ -254,6 +288,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-heavy-${{ matrix.tag_suffix }}
+          sbom: scan-stages=true
+          provenance: true
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-${{ matrix.tag_suffix }}
 
@@ -263,6 +299,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
     strategy:
       fail-fast: false
       matrix:
@@ -296,6 +334,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: ghcr.io/${{ github.repository }}:nightly-heavy-aio-${{ matrix.tag_suffix }}
+          sbom: scan-stages=true
+          provenance: true
           cache-from: type=gha,scope=heavy-aio-${{ matrix.tag_suffix }}
           cache-to: type=gha,mode=max,scope=heavy-aio-${{ matrix.tag_suffix }}
 

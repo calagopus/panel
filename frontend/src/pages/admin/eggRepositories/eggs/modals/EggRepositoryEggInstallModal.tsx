@@ -12,6 +12,7 @@ import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/sch
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggRepositoryEggInstallModal({
   eggRepository,
@@ -22,6 +23,7 @@ export default function EggRepositoryEggInstallModal({
   eggRepository: z.infer<typeof adminEggRepositorySchema>;
   egg: z.infer<typeof adminEggRepositoryEggSchema>;
 }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const [loading, setLoading] = useState(false);
@@ -50,7 +52,7 @@ export default function EggRepositoryEggInstallModal({
 
     installEgg(eggRepository.uuid, egg.uuid, selectedNest.uuid)
       .then(() => {
-        addToast('Egg installed.', 'success');
+        addToast(t('pages.admin.eggRepositories.tabs.eggs.page.toast.installed', {}), 'success');
 
         onClose();
       })
@@ -61,12 +63,15 @@ export default function EggRepositoryEggInstallModal({
   };
 
   return (
-    <Modal title='Install Egg Repository Egg' onClose={onClose} opened={opened}>
+    <Modal
+      title={t('pages.admin.eggRepositories.tabs.eggs.page.modal.install.title', {})}
+      onClose={onClose}
+      opened={opened}
+    >
       <Stack>
         <Select
           withAsterisk
-          label='Nest'
-          placeholder='Nest'
+          label={t('common.form.nest', {})}
           value={selectedNest?.uuid}
           onChange={(value) => setSelectedNest(nests.items.find((m) => m.uuid === value) ?? null)}
           data={nests.items.map((mount) => ({
@@ -81,10 +86,10 @@ export default function EggRepositoryEggInstallModal({
 
         <ModalFooter>
           <Button onClick={doInstall} loading={loading} disabled={!selectedNest}>
-            Install
+            {t('common.button.install', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

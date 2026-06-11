@@ -30,9 +30,12 @@ export const adminNodeSchema = z.object({
   sftpPort: z.number().min(0).max(65535),
   memory: z.number().min(0),
   disk: z.number().min(0),
+  created: z.date(),
+});
+
+export const adminNodeTokenSchema = z.object({
   tokenId: z.string(),
   token: z.string(),
-  created: z.date(),
 });
 
 export const adminNodeUpdateSchema = z.lazy(() =>
@@ -41,8 +44,6 @@ export const adminNodeUpdateSchema = z.lazy(() =>
       uuid: true,
       location: true,
       backupConfiguration: true,
-      tokenId: true,
-      token: true,
       created: true,
     })
     .extend({

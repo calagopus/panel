@@ -13,6 +13,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type Props = ModalProps & {
   node: z.infer<typeof adminNodeSchema>;
@@ -20,6 +21,7 @@ type Props = ModalProps & {
 };
 
 export default function NodeBackupsRestoreModal({ node, backup, opened, onClose }: Props) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const [truncateDirectory, setTruncateDirectory] = useState(false);
@@ -49,7 +51,7 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
     restoreNodeBackup(node.uuid, backup.uuid, { serverUuid: selectedServer.uuid, truncateDirectory, restoreStartup })
       .then(() => {
         onClose();
-        addToast(`Restoring backup to ${selectedServer.name}...`, 'success');
+        addToast(t('pages.admin.nodes.tabs.backups.page.toast.restoring', { name: selectedServer.name }), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -58,12 +60,12 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
   };
 
   return (
-    <Modal title='Restore Node Backup' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.nodes.tabs.backups.page.modal.restore.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label='Server'
-          placeholder='Server'
+          label={t('common.table.columns.server', {})}
+          placeholder={t('common.table.columns.server', {})}
           value={selectedServer?.uuid}
           onChange={(value) => setSelectedServer(servers.items.find((m) => m.uuid === value) ?? null)}
           data={servers.items.map((server) => ({
@@ -77,14 +79,14 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
         />
 
         <Switch
-          label='Do you want to empty the filesystem of this server before restoring the backup?'
+          label={t('pages.admin.nodes.tabs.backups.page.modal.restore.form.truncateDirectory', {})}
           name='truncateDirectory'
           checked={truncateDirectory}
           onChange={(e) => setTruncateDirectory(e.target.checked)}
         />
 
         <Switch
-          label='Restore the startup command, image, and variables from this backup.'
+          label={t('common.form.restoreStartup', {})}
           name='restoreStartup'
           checked={restoreStartup}
           disabled={Object.keys(backup.metadata).length === 0}
@@ -94,10 +96,10 @@ export default function NodeBackupsRestoreModal({ node, backup, opened, onClose 
 
       <ModalFooter>
         <Button color={truncateDirectory ? 'red' : undefined} onClick={doRestore} loading={loading}>
-          Restore
+          {t('common.button.restore', {})}
         </Button>
         <Button variant='default' onClick={onClose}>
-          Close
+          {t('common.button.close', {})}
         </Button>
       </ModalFooter>
     </Modal>

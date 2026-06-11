@@ -13,7 +13,9 @@ mod get {
     struct ResponseApp<'a> {
         url: &'a str,
         icon: &'a str,
+        icon_light: Option<&'a str>,
         banner: Option<&'a str>,
+        banner_light: Option<&'a str>,
         name: &'a str,
         language: &'a str,
         registration_enabled: bool,
@@ -21,7 +23,7 @@ mod get {
     }
 
     #[derive(ToSchema, Serialize)]
-    struct ResponseServer {
+    struct ResponseServer<'a> {
         max_file_manager_view_size: u64,
         max_file_manager_content_search_size: u64,
         max_file_manager_search_results: u64,
@@ -30,10 +32,12 @@ mod get {
 
         allow_overwriting_custom_docker_image: bool,
         allow_acknowledging_installation_failure: bool,
+
+        container_prelude: &'a str,
     }
 
     #[derive(ToSchema, Serialize)]
-    struct ResponseUser {
+    struct ResponseUser<'a> {
         max_server_group_count: u64,
         max_api_key_count: u64,
         max_command_snippet_count: u64,
@@ -41,6 +45,8 @@ mod get {
         max_ssh_key_count: u64,
 
         allow_changing_language: bool,
+
+        route_order: Option<&'a [shared::settings::RouteOrderItem]>,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -53,9 +59,9 @@ mod get {
         #[schema(inline)]
         app: ResponseApp<'a>,
         #[schema(inline)]
-        server: ResponseServer,
+        server: ResponseServer<'a>,
         #[schema(inline)]
-        user: ResponseUser,
+        user: ResponseUser<'a>,
     }
 
     #[utoipa::path(get, path = "/", responses(
@@ -71,7 +77,9 @@ mod get {
             app: ResponseApp {
                 url: &settings.app.url,
                 icon: &settings.app.icon,
+                icon_light: settings.app.icon_light.as_deref(),
                 banner: settings.app.banner.as_deref(),
+                banner_light: settings.app.banner_light.as_deref(),
                 name: &settings.app.name,
                 language: &settings.app.language,
                 registration_enabled: settings.app.registration_enabled,
@@ -92,6 +100,7 @@ mod get {
                 allow_acknowledging_installation_failure: settings
                     .server
                     .allow_acknowledging_installation_failure,
+                container_prelude: &settings.server.container_prelude,
             },
             user: ResponseUser {
                 max_server_group_count: settings.user.max_server_group_count,
@@ -101,6 +110,8 @@ mod get {
                 max_ssh_key_count: settings.user.max_ssh_key_count,
 
                 allow_changing_language: settings.user.allow_changing_language,
+
+                route_order: settings.user.route_order.as_deref(),
             },
         })
         .ok()

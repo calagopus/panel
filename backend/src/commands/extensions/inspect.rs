@@ -39,10 +39,16 @@ impl shared::extensions::commands::CliCommand<InspectArgs> for InspectCommand {
                 );
                 println!(
                     "  status:        {}",
-                    if let Some(ext) = extension_internal_list::list()
-                        .into_iter()
-                        .find(|e| e.metadata_toml.package_name
-                            == extension_distr.metadata_toml.package_name)
+                    if let Some(ext) = crate::EXTENSIONS
+                        .get()
+                        .expect("Extensions not initialized")
+                        .extensions()
+                        .await
+                        .iter()
+                        .find(|ext| {
+                            ext.metadata_toml.package_name
+                                == extension_distr.metadata_toml.package_name
+                        })
                     {
                         if ext.version == extension_distr.cargo_toml.package.version {
                             "installed".green()

@@ -58,7 +58,7 @@ export default function EmailSendTestModal({ opened, onClose }: ModalProps) {
 
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!form.isValid()}>
-            {t('pages.admin.settings.tabs.mail.page.modal.sendTestEmail.button.submit', {})}
+            {t('common.button.sendTestEmail', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
             {t('common.button.close', {})}

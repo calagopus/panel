@@ -207,7 +207,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
     deps: [nodeServers?.data],
   });
 
-  const columns = ['', ...serverTableColumns];
+  const columns = ['', ...serverTableColumns()];
 
   return (
     <>
@@ -220,7 +220,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
       />
 
       <AdminSubContentContainer
-        title='Node Servers'
+        title={t('pages.admin.nodes.tabs.servers.page.title', {})}
         titleOrder={2}
         search={search}
         setSearch={setSearch}
@@ -255,7 +255,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
               onClick={() => setOpenModal('transfer')}
               disabled={allActionLoading !== null || nodeServers?.total === 0}
             >
-              Transfer ({nodeServers?.total})
+              {t('common.button.transfer', {})} ({nodeServers?.total})
             </Button>
           </Group>
         }

@@ -7,12 +7,14 @@ import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfig
 import { locationTableColumns } from '@/lib/tableColumns.ts';
 import LocationRow from '@/pages/admin/locations/LocationRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminBackupConfigurationLocations({
   backupConfiguration,
 }: {
   backupConfiguration: z.infer<typeof adminBackupConfigurationSchema>;
 }) {
+  const { t } = useTranslations();
   const {
     data: backupConfigurationLocations,
     loading,
@@ -25,9 +27,14 @@ export default function AdminBackupConfigurationLocations({
   });
 
   return (
-    <AdminSubContentContainer title={`Backup Config Locations`} titleOrder={2} search={search} setSearch={setSearch}>
+    <AdminSubContentContainer
+      title={t('pages.admin.backupConfigurations.tabs.locations.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
       <Table
-        columns={locationTableColumns}
+        columns={locationTableColumns()}
         loading={loading}
         pagination={backupConfigurationLocations}
         onPageSelect={setPage}

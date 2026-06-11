@@ -103,6 +103,17 @@ mod patch {
 
         permissions.has_user_permission("account.infos")?;
 
+        if user.frozen {
+            return ApiResponse::error("account is frozen")
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+        }
+        if user.suspended {
+            return ApiResponse::error("account is suspended")
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+        }
+
         if !state.settings.get().await?.user.allow_changing_language {
             data.language = None;
         }

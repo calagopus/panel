@@ -67,7 +67,6 @@ export default function GroupAddServerModal({ serverGroup, opened, onClose, onSe
       <Select
         withAsterisk
         label={t('common.form.server', {})}
-        placeholder={t('common.form.server', {})}
         data={otherServers.map((server) => ({
           label: server.name,
           value: server.uuid,

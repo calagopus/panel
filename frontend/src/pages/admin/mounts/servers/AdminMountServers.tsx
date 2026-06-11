@@ -6,9 +6,11 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ServerRow from '../../servers/ServerRow.tsx';
 
 export default function AdminMountServers({ mount }: { mount: z.infer<typeof adminMountSchema> }) {
+  const { t } = useTranslations();
   const {
     data: mountServers,
     loading,
@@ -21,8 +23,13 @@ export default function AdminMountServers({ mount }: { mount: z.infer<typeof adm
   });
 
   return (
-    <AdminSubContentContainer title='Mount Servers' titleOrder={2} search={search} setSearch={setSearch}>
-      <Table columns={serverTableColumns} loading={loading} pagination={mountServers} onPageSelect={setPage}>
+    <AdminSubContentContainer
+      title={t('pages.admin.mounts.tabs.servers.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
+      <Table columns={serverTableColumns()} loading={loading} pagination={mountServers} onPageSelect={setPage}>
         {mountServers?.data.map((serverMount) => (
           <ServerRow key={serverMount.server.uuid} server={serverMount.server} />
         ))}

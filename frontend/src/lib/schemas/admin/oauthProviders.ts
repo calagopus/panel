@@ -40,3 +40,28 @@ export const adminOAuthUserLinkSchema = z.object({
   lastUsed: z.date().nullable(),
   created: z.date(),
 });
+
+export const adminOAuthProviderMappingTypeSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('role'),
+    roleUuid: z.string(),
+  }),
+  z.object({
+    type: z.literal('server_subuser'),
+    serverUuid: z.string(),
+    permissions: z.array(z.string()),
+    ignoredFiles: z.array(z.string()),
+  }),
+]);
+
+export const adminOAuthProviderMappingSchema = z.object({
+  uuid: z.string(),
+  scopes: z.array(z.string()),
+  mapping: adminOAuthProviderMappingTypeSchema,
+  created: z.date(),
+});
+
+export const adminOAuthProviderMappingCreateSchema = z.object({
+  scopes: z.array(z.string().max(255)).max(255),
+  mapping: adminOAuthProviderMappingTypeSchema,
+});

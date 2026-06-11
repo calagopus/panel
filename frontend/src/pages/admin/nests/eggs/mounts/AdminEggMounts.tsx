@@ -10,7 +10,9 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
+import { eggMountTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggMountRow from './EggMountRow.tsx';
 import EggMountAddModal from './modals/EggMountAddModal.tsx';
 
@@ -22,6 +24,7 @@ export default function AdminEggMounts({
   contextEgg: z.infer<typeof adminEggSchema>;
 }) {
   const [openModal, setOpenModal] = useState<'add' | null>(null);
+  const { t } = useTranslations();
 
   const {
     data: eggMounts,
@@ -36,13 +39,13 @@ export default function AdminEggMounts({
 
   return (
     <AdminSubContentContainer
-      title='Egg Mounts'
+      title={t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-          Add
+          {t('common.button.add', {})}
         </Button>
       }
     >
@@ -54,12 +57,7 @@ export default function AdminEggMounts({
       />
 
       <ContextMenuProvider>
-        <Table
-          columns={['ID', 'Name', 'Source', 'Target', 'Added', '']}
-          loading={loading}
-          pagination={eggMounts}
-          onPageSelect={setPage}
-        >
+        <Table columns={eggMountTableColumns()} loading={loading} pagination={eggMounts} onPageSelect={setPage}>
           {eggMounts?.data.map((mount) => (
             <EggMountRow key={mount.mount.uuid} nest={contextNest} egg={contextEgg} mount={mount} />
           ))}

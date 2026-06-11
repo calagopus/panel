@@ -28,6 +28,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { Pagination } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
@@ -59,9 +60,17 @@ const MemoizedServerItem = memo(ServerItem);
 export default function ServerGroupItem({
   serverGroup,
   dragHandleProps,
+  selectedServers,
+  onServerSelectionChange,
+  onServerClick,
+  sKeyPressedRef,
 }: {
   serverGroup: z.infer<typeof userServerGroupSchema>;
   dragHandleProps: ComponentProps<'button'>;
+  selectedServers?: ObjectSet<z.infer<typeof serverSchema>, 'uuid'>;
+  onServerSelectionChange?: (server: z.infer<typeof serverSchema>, selected: boolean) => void;
+  onServerClick?: (server: z.infer<typeof serverSchema>, event: React.MouseEvent) => void;
+  sKeyPressedRef: React.MutableRefObject<boolean>;
 }) {
   const { t, tItem } = useTranslations();
   const { updateServerGroup: updateStateServerGroup, removeServerGroup } = useUserStore();
@@ -289,7 +298,7 @@ export default function ServerGroupItem({
                 renderOverlay={(activeServer) =>
                   activeServer ? (
                     <div style={{ cursor: 'grabbing' }}>
-                      <MemoizedServerItem server={activeServer} onGroupRemove={() => null} showSelection={false} />
+                      <MemoizedServerItem server={activeServer} showForeignServerBadge onGroupRemove={() => null} />
                     </div>
                   ) : null
                 }
@@ -300,7 +309,15 @@ export default function ServerGroupItem({
                       <SortableItem key={server.id} id={server.id}>
                         <MemoizedServerItem
                           server={server}
-                          showSelection={false}
+                          showContextMenu
+                          isSelected={selectedServers?.has(server)}
+                          onSelectionChange={
+                            onServerSelectionChange
+                              ? (selected) => onServerSelectionChange(server, selected)
+                              : undefined
+                          }
+                          showForeignServerBadge
+                          onClick={onServerClick ? (event) => onServerClick(server, event) : undefined}
                           onGroupRemove={() => {
                             const serverOrder = serverGroup.serverOrder.filter(
                               (_, orderI) => (servers.page - 1) * servers.perPage + i !== orderI,
@@ -314,6 +331,7 @@ export default function ServerGroupItem({
                               addToast(httpErrorToHuman(msg), 'error');
                             });
                           }}
+                          sKeyPressedRef={sKeyPressedRef}
                         />
                       </SortableItem>
                     ))}

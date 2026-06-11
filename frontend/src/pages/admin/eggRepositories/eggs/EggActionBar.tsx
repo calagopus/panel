@@ -6,6 +6,7 @@ import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/Button.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggRepositoryEggsInstallModal from './modals/EggRepositoryEggsInstallModal.tsx';
 
 export default function EggActionBar({
@@ -17,6 +18,7 @@ export default function EggActionBar({
   selectedEggs: ObjectSet<z.infer<typeof adminEggRepositoryEggSchema>, 'uuid'>;
   setSelectedEggs: (eggs: ObjectSet<z.infer<typeof adminEggRepositoryEggSchema>, 'uuid'>) => void;
 }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'install' | null>(null);
 
   return (
@@ -31,7 +33,7 @@ export default function EggActionBar({
 
       <ActionBar opened={selectedEggs.size > 0}>
         <Button onClick={() => setOpenModal('install')} className='col-span-full'>
-          <FontAwesomeIcon icon={faDownload} className='mr-2' /> Install
+          <FontAwesomeIcon icon={faDownload} className='mr-2' /> {t('common.button.install', {})}
         </Button>
       </ActionBar>
     </>

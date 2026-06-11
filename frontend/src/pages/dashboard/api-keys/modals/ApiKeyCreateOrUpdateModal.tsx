@@ -97,16 +97,10 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, opened, onClo
     >
       <Stack>
         <Group grow>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            placeholder={t('common.form.name', {})}
-            {...form.getInputProps('name')}
-          />
+          <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
           <DateTimePicker
             label={t('pages.account.apiKeys.table.columns.expires', {})}
-            placeholder={t('pages.account.apiKeys.table.columns.expires', {})}
             clearable
             value={form.values.expires}
             onChange={(value) => form.setFieldValue('expires', value ? new Date(value) : null)}

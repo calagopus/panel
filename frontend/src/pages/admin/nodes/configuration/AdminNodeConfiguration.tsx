@@ -2,9 +2,10 @@ import { faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Divider, Group, Stack, Title } from '@mantine/core';
 import jsYaml from 'js-yaml';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import getNodeConfig from '@/api/admin/nodes/getNodeConfig.ts';
+import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
 import updateNodeConfig from '@/api/admin/nodes/updateNodeConfig.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
@@ -21,18 +22,40 @@ import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { getNodeConfiguration, getNodeConfigurationCommand } from '@/lib/node.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof adminNodeSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const [remote, setRemote] = useState(window.location.origin);
   const [apiPort, setApiPort] = useState(parseInt(new URL(node.url).port || '8080'));
   const [sftpPort, setSftpPort] = useState(node.sftpPort);
+  const { data: nodeToken } = useResource({
+    queryKey: queryKeys.admin.nodes.token(node.uuid),
+    queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
+  });
 
-  const nodeConfiguration = getNodeConfiguration({ node, remote, apiPort, sftpPort });
-  const command = getNodeConfigurationCommand({ node, remote, apiPort, sftpPort });
+  const configurationParams = useMemo(() => {
+    if (!nodeToken) {
+      return null;
+    }
+
+    return { node, token: nodeToken, remote, apiPort, sftpPort };
+  }, [node, nodeToken, remote, apiPort, sftpPort]);
+
+  const nodeConfiguration = useMemo(
+    () => (configurationParams ? getNodeConfiguration(configurationParams) : null),
+    [configurationParams],
+  );
+  const command = useMemo(
+    () => (configurationParams ? getNodeConfigurationCommand(configurationParams) : null),
+    [configurationParams],
+  );
 
   const [yaml, setYaml] = useState<string | null>(null);
   const [liveConfigError, setLiveConfigError] = useState<string | null>(null);
@@ -56,7 +79,10 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
     try {
       parsed = jsYaml.load(yaml) as object;
     } catch (err) {
-      addToast(`Invalid YAML: ${(err as Error).message}`, 'error');
+      addToast(
+        t('pages.admin.nodes.tabs.configuration.page.toast.invalidYaml', { error: (err as Error).message }),
+        'error',
+      );
       return;
     }
 
@@ -64,9 +90,9 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
     updateNodeConfig(node.uuid, parsed)
       .then((applied) => {
         if (applied) {
-          addToast('Configuration applied successfully.', 'success');
+          addToast(t('pages.admin.nodes.tabs.configuration.page.toast.applied', {}), 'success');
         } else {
-          addToast('Configuration was submitted but not applied.', 'warning');
+          addToast(t('pages.admin.nodes.tabs.configuration.page.toast.submittedNotApplied', {}), 'warning');
         }
       })
       .catch((err) => {
@@ -79,52 +105,61 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
 
   return (
     <AdminSubContentContainer
-      title='Configuration'
+      title={t('pages.admin.nodes.tabs.configuration.page.title', {})}
       titleOrder={2}
       contentRight={
         <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>
-          Save Configuration
+          {t('pages.admin.nodes.tabs.configuration.page.button.save', {})}
         </Button>
       }
     >
       <Stack gap='xl'>
         <div>
           <Title order={4} mb='md'>
-            Initial Setup
+            {t('pages.admin.nodes.tabs.configuration.page.section.initialSetup', {})}
           </Title>
           <div className='grid md:grid-cols-4 grid-cols-1 gap-4'>
             <div className='flex flex-col md:col-span-3'>
-              <HljsCode
-                languageName='yaml'
-                language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
-              >
-                {jsYaml.dump(nodeConfiguration)}
-              </HljsCode>
+              {nodeConfiguration && command ? (
+                <>
+                  <HljsCode
+                    languageName='yaml'
+                    language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
+                  >
+                    {jsYaml.dump(nodeConfiguration)}
+                  </HljsCode>
 
-              <div className='mt-2'>
-                <p>
-                  Place this into the configuration file at <Code>/etc/pterodactyl/config.yml</Code> or run
-                </p>
-                <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
-                  <Code block className='flex-1'>
-                    {command}
-                  </Code>
-                  <Tooltip label='Copy command'>
-                    <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
-                      <FontAwesomeIcon icon={faCopy} />
-                    </ActionIcon>
-                  </Tooltip>
-                </Group>
-              </div>
+                  <div className='mt-2'>
+                    <p>{t('pages.admin.nodes.tabs.configuration.page.description.placeFile', {}).md()}</p>
+                    <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
+                      <Code block className='flex-1'>
+                        {command}
+                      </Code>
+                      <Tooltip label={t('pages.admin.nodes.tabs.configuration.page.tooltip.copyCommand', {})}>
+                        <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
+                          <FontAwesomeIcon icon={faCopy} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Group>
+                  </div>
+                </>
+              ) : (
+                <Spinner.Centered />
+              )}
             </div>
             <Card>
-              <Title className='text-right'>Configuration</Title>
+              <Title className='text-right'>{t('pages.admin.nodes.tabs.configuration.page.title', {})}</Title>
 
               <Stack>
-                <TextInput name='remote' label='Panel URL' value={remote} onChange={(e) => setRemote(e.target.value)} />
+                <TextInput
+                  name='remote'
+                  label={t('pages.admin.nodes.tabs.configuration.page.form.panelUrl', {})}
+                  value={remote}
+                  onChange={(e) => setRemote(e.target.value)}
+                />
                 <NumberInput
                   name='api_port'
-                  label='API Port'
+                  label={t('pages.admin.nodes.tabs.configuration.page.form.apiPort', {})}
                   value={apiPort}
                   min={1}
                   max={65535}
@@ -132,7 +167,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
                 />
                 <NumberInput
                   name='sftp_port'
-                  label='SFTP Port'
+                  label={t('common.form.sftpPort', {})}
                   value={sftpPort}
                   min={1}
                   max={65535}
@@ -147,11 +182,11 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
 
         <div>
           <Title order={4} mb='md'>
-            Live Configuration
+            {t('pages.admin.nodes.tabs.configuration.page.section.liveConfiguration', {})}
           </Title>
           {liveConfigError ? (
             <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
-              Could not reach the node: {liveConfigError}
+              {t('pages.admin.nodes.tabs.configuration.page.alert.couldNotReach', { error: liveConfigError })}
             </Alert>
           ) : yaml === null ? (
             <Spinner.Centered />

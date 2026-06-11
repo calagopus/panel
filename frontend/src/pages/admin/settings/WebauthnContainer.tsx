@@ -70,7 +70,7 @@ export default function WebauthnContainer() {
         opened={openModal === 'changeRpId'}
         onClose={() => setOpenModal(null)}
         title={t('pages.admin.settings.tabs.webauthn.page.modal.changeRpId.title', {})}
-        confirm={t('pages.admin.settings.tabs.webauthn.page.modal.changeRpId.button.confirm', {})}
+        confirm={t('common.button.update', {})}
         onConfirmed={() => {
           doUpdate();
           setOpenModal(null);
@@ -87,14 +87,12 @@ export default function WebauthnContainer() {
             <TextInput
               withAsterisk
               label={t('pages.admin.settings.tabs.webauthn.page.form.rpId', {})}
-              placeholder={t('pages.admin.settings.tabs.webauthn.page.form.rpId', {})}
               key={form.key('rpId')}
               {...form.getInputProps('rpId')}
             />
             <TextInput
               withAsterisk
               label={t('pages.admin.settings.tabs.webauthn.page.form.rpOrigin', {})}
-              placeholder={t('pages.admin.settings.tabs.webauthn.page.form.rpOrigin', {})}
               key={form.key('rpOrigin')}
               {...form.getInputProps('rpOrigin')}
             />

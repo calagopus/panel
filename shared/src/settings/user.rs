@@ -15,6 +15,8 @@ pub struct AppSettingsUser {
     pub max_ssh_key_count: u64,
 
     pub allow_changing_language: bool,
+
+    pub route_order: Option<Vec<super::RouteOrderItem>>,
 }
 
 #[async_trait::async_trait]
@@ -47,7 +49,8 @@ impl SettingsSerializeExt for AppSettingsUser {
             .write_raw_setting(
                 "allow_changing_language",
                 self.allow_changing_language.to_compact_string(),
-            ))
+            )
+            .write_serde_setting("route_order", &self.route_order)?)
     }
 }
 
@@ -84,6 +87,9 @@ impl SettingsDeserializeExt for AppSettingsUserDeserializer {
                 .take_raw_setting("allow_changing_language")
                 .map(|s| s == "true")
                 .unwrap_or(true),
+            route_order: deserializer
+                .read_serde_setting("route_order")
+                .unwrap_or_default(),
         }))
     }
 }

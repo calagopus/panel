@@ -32,7 +32,7 @@ export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof ful
 
   return (
     <AdminSubContentContainer
-      title={t('pages.admin.users.oauthLinks.title', {})}
+      title={t('pages.admin.users.tabs.oauthLinks.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}

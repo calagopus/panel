@@ -10,7 +10,6 @@ import deleteLocation from '@/api/admin/locations/deleteLocation.ts';
 import updateLocation from '@/api/admin/locations/updateLocation.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
@@ -27,7 +26,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 const flags = import.meta.glob('/node_modules/svg-country-flags/svg/*.svg', { import: 'metadata' });
 
 export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLocationSchema> }) => {
-  const { language } = useTranslations();
+  const { t, language } = useTranslations();
 
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
@@ -55,7 +54,7 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
     deleteFn: contextLocation ? () => deleteLocation(contextLocation.uuid) : undefined,
     doUpdate: !!contextLocation,
     basePath: '/admin/locations',
-    resourceName: 'Location',
+    resourceName: t('pages.admin.locations.resourceName', {}),
   });
 
   useEffect(() => {
@@ -78,32 +77,36 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
 
   return (
     <AdminContentContainer
-      title={`${contextLocation ? 'Update' : 'Create'} Location`}
+      title={t(
+        contextLocation
+          ? 'pages.admin.locations.tabs.general.page.titleUpdate'
+          : 'pages.admin.locations.tabs.general.page.titleCreate',
+        {},
+      )}
       fullscreen={!!contextLocation}
       titleOrder={2}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Location Deletion'
-        confirm='Delete'
+        title={t('pages.admin.locations.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.locations.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.locations.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
           <Select
-            label='Backup Configuration'
-            placeholder='None'
+            label={t('common.form.backupConfiguration', {})}
+            placeholder={t('common.none', {})}
             data={backupConfigurations.items.map((backupConfiguration) => ({
               label: backupConfiguration.name,
               value: backupConfiguration.uuid,
@@ -120,16 +123,15 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
           />
 
           <TextArea
-            label='Description'
-            placeholder='Description'
+            label={t('common.form.description', {})}
             rows={3}
             key={form.key('description')}
             {...form.getInputProps('description')}
           />
 
           <Select
-            label='Flag'
-            placeholder='None'
+            label={t('pages.admin.locations.tabs.general.page.form.flag', {})}
+            placeholder={t('common.none', {})}
             renderOption={({ option }) => (
               <div className='flex items-center gap-2'>
                 <img src={`/flags/${option.value}.svg`} alt={option.label} className='w-4 h-4 rounded-md shrink-0' />
@@ -157,18 +159,18 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
         <Group mt='md'>
           <AdminCan action={contextLocation ? 'locations.update' : 'locations.create'} cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
             {!contextLocation && (
               <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             )}
           </AdminCan>
           {contextLocation && (
             <AdminCan action='locations.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                Delete
+                {t('common.button.delete', {})}
               </Button>
             </AdminCan>
           )}

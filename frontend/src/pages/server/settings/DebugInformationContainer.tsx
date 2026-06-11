@@ -21,7 +21,6 @@ export default function DebugInformationContainer() {
         <CopyOnClick content={`${server.nodeName} (${server.nodeUuid})`} className='text-left'>
           <TextInput
             label={t('pages.server.settings.debugInformation.form.nodeName', {})}
-            placeholder={t('pages.server.settings.debugInformation.form.nodeName', {})}
             value={`${server.nodeName} (${server.nodeUuid})`}
             className='pointer-events-none'
             readOnly
@@ -31,7 +30,6 @@ export default function DebugInformationContainer() {
         <CopyOnClick content={`${server.locationName} (${server.locationUuid})`} className='text-left'>
           <TextInput
             label={t('pages.server.settings.debugInformation.form.locationName', {})}
-            placeholder={t('pages.server.settings.debugInformation.form.locationName', {})}
             value={`${server.locationName} (${server.locationUuid})`}
             className='pointer-events-none'
             leftSection={
@@ -50,7 +48,6 @@ export default function DebugInformationContainer() {
         <CopyOnClick content={server.uuid} className='text-left'>
           <TextInput
             label={t('pages.server.settings.debugInformation.form.serverUuid', {})}
-            placeholder={t('pages.server.settings.debugInformation.form.serverUuid', {})}
             value={server.uuid}
             className='pointer-events-none'
             readOnly

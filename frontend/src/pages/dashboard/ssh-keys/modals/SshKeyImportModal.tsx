@@ -65,8 +65,7 @@ export default function SshKeyImportModal({ opened, onClose }: ModalProps) {
 
           <TextInput
             withAsterisk
-            label={t('pages.account.sshKeys.modal.importSshKeys.form.username', {})}
-            placeholder={t('pages.account.sshKeys.modal.importSshKeys.form.username', {})}
+            label={t('common.form.username', {})}
             className='col-span-2'
             {...form.getInputProps('username')}
           />
@@ -74,7 +73,7 @@ export default function SshKeyImportModal({ opened, onClose }: ModalProps) {
 
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!form.isValid()}>
-            {t('pages.account.sshKeys.button.import', {})}
+            {t('common.button.import', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}

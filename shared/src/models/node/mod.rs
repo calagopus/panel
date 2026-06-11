@@ -633,8 +633,6 @@ impl IntoAdminApiObject for Node {
                 sftp_port: self.sftp_port,
                 memory: self.memory,
                 disk: self.disk,
-                token_id: self.token_id,
-                token: state.database.decrypt(self.token).await?,
                 created: self.created.and_utc(),
             },
             api_object,
@@ -1049,9 +1047,6 @@ pub struct AdminApiNode {
 
     pub memory: i64,
     pub disk: i64,
-
-    pub token_id: compact_str::CompactString,
-    pub token: compact_str::CompactString,
 
     pub created: chrono::DateTime<chrono::Utc>,
 }

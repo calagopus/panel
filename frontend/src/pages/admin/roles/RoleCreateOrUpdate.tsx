@@ -12,7 +12,6 @@ import getPermissions from '@/api/getPermissions.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
@@ -23,9 +22,11 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminRoleUpdateSchema } from '@/lib/schemas/admin/roles.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.infer<typeof roleSchema> }) {
+  const { t } = useTranslations();
   const { availablePermissions, setAvailablePermissions } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
@@ -54,7 +55,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
     deleteFn: contextRole ? () => deleteRole(contextRole.uuid) : undefined,
     doUpdate: !!contextRole,
     basePath: '/admin/roles',
-    resourceName: 'Role',
+    resourceName: t('pages.admin.roles.resourceName', {}),
   });
 
   useEffect(() => {
@@ -79,25 +80,28 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
 
   return (
     <AdminContentContainer
-      title={`${contextRole ? 'Update' : 'Create'} Role`}
+      title={t(
+        contextRole
+          ? 'pages.admin.roles.tabs.general.page.titleUpdate'
+          : 'pages.admin.roles.tabs.general.page.titleCreate',
+        {},
+      )}
       fullscreen={!!contextRole}
       titleOrder={2}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Role Deletion'
-        confirm='Delete'
+        title={t('pages.admin.roles.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.roles.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
       </ConfirmationModal>
 
       {form.values.adminPermissions.includes('users.impersonate') && (
         <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
-          This role has the <Code>users.impersonate</Code> permission, which allows users with this role to impersonate
-          any other user, including administrators. Be cautious when assigning this permission to roles with less
-          trusted users.
+          {t('pages.admin.roles.tabs.general.page.alert.impersonate', {}).md()}
         </Alert>
       )}
 
@@ -105,30 +109,28 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
 
           <TextArea
-            label='Description'
-            placeholder='Description'
+            label={t('common.form.description', {})}
             rows={3}
             key={form.key('description')}
             {...form.getInputProps('description')}
           />
 
           <Switch
-            label='Require Two Factor'
-            description='Require users with this role to use two factor authentication.'
+            label={t('pages.admin.roles.tabs.general.page.form.requireTwoFactor', {})}
+            description={t('pages.admin.roles.tabs.general.page.form.requireTwoFactorDescription', {})}
             key={form.key('requireTwoFactor')}
             {...form.getInputProps('requireTwoFactor', { type: 'checkbox' })}
           />
 
           {availablePermissions?.serverPermissions && (
             <PermissionSelector
-              label='Server Permissions'
+              label={t('pages.admin.roles.tabs.general.page.form.serverPermissions', {})}
               className='col-span-full'
               permissionsMapType='serverPermissions'
               permissions={availablePermissions.serverPermissions}
@@ -138,7 +140,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
           )}
           {availablePermissions?.adminPermissions && (
             <PermissionSelector
-              label='Admin Permissions'
+              label={t('pages.admin.roles.tabs.general.page.form.adminPermissions', {})}
               className='col-span-full'
               permissionsMapType='adminPermissions'
               permissions={availablePermissions.adminPermissions}
@@ -151,18 +153,18 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
         <Group mt='md'>
           <AdminCan action={contextRole ? 'roles.update' : 'roles.create'} cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
             {!contextRole && (
               <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             )}
           </AdminCan>
           {contextRole && (
             <AdminCan action='roles.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                Delete
+                {t('common.button.delete', {})}
               </Button>
             </AdminCan>
           )}

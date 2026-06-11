@@ -48,12 +48,7 @@ export default function SshKeyEditModal({ sshKey, opened, onClose }: Props) {
       opened={opened}
     >
       <Stack>
-        <TextInput
-          withAsterisk
-          label={t('common.form.name', {})}
-          placeholder={t('common.form.name', {})}
-          {...form.getInputProps('name')}
-        />
+        <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!form.isValid()}>

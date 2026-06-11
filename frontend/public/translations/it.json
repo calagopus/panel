@@ -33,17 +33,44 @@
         "close": "Chiudi",
         "cancel": "Annulla",
         "continue": "Continua",
-        "skip": "Salta"
+        "skip": "Salta",
+        "import": "Importa",
+        "details": "Dettagli",
+        "setPrimary": "Imposta come primaria",
+        "unsetPrimary": "Rimuovi come primaria"
       },
       "input": {
         "search": "Cerca..."
+      },
+      "tooltip": {
+        "primary": "Primaria"
       },
       "form": {
         "name": "Nome",
         "description": "Descrizione",
         "password": "Password",
         "host": "Host",
-        "username": "Nome utente"
+        "username": "Nome utente",
+        "url": "URL",
+        "email": "Email",
+        "firstName": "Nome",
+        "lastName": "Cognome",
+        "language": "Lingua",
+        "enabled": "Abilitato",
+        "sftpPort": "Porta SFTP",
+        "sftpHost": "Host SFTP",
+        "dockerImage": "Immagine Docker",
+        "memory": "Memoria",
+        "disk": "Disco",
+        "serverName": "Nome server",
+        "startupCommand": "Comando di avvio",
+        "databaseHost": "Host database",
+        "timezone": "Fuso orario",
+        "locked": "Bloccato",
+        "currentPassword": "Password attuale",
+        "confirmPassword": "Conferma password",
+        "authenticationCode": "Codice di autenticazione",
+        "ignoredFiles": "File ignorati"
       },
       "table": {
         "pagination": {
@@ -60,7 +87,8 @@
           "actor": "Attore",
           "event": "Evento",
           "ip": "IP",
-          "when": "Quando"
+          "when": "Quando",
+          "notes": "Note"
         }
       },
       "server": {
@@ -117,17 +145,12 @@
             "description": "Scegli una password forte. Questo account avrà accesso amministrativo completo a tutti i server e le impostazioni."
           },
           "form": {
-            "username": "Nome utente",
             "usernamePlaceholder": "admin",
             "email": "Indirizzo email",
             "emailPlaceholder": "admin@example.com",
-            "firstName": "Nome",
             "firstNamePlaceholder": "Alan",
-            "lastName": "Cognome",
             "lastNamePlaceholder": "Turing",
-            "password": "Password",
             "passwordPlaceholder": "Inserisci una password forte",
-            "confirmPassword": "Conferma password",
             "confirmPasswordPlaceholder": "Reinserisci la tua password"
           },
           "button": {
@@ -138,9 +161,7 @@
           "title": "Accedi nuovamente",
           "alert": "Sei stato disconnesso durante il processo di configurazione. Accedi nuovamente per continuare da dove hai lasciato.",
           "form": {
-            "username": "Nome utente",
             "usernamePlaceholder": "admin",
-            "password": "Password",
             "passwordPlaceholder": "Inserisci una password forte"
           },
           "button": {
@@ -166,18 +187,13 @@
           "form": {
             "name": "Nome",
             "namePlaceholder": "Il mio server",
-            "url": "URL",
             "urlPlaceholder": "URL",
             "urlDescription": "utilizzato per la comunicazione interna con il nodo",
             "publicUrl": "URL pubblico",
             "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "utilizzato per websocket/download",
-            "sftpHost": "Host SFTP",
             "sftpHostPlaceholder": "Host SFTP",
-            "sftpPort": "Porta SFTP",
-            "sftpPortPlaceholder": "Porta SFTP",
-            "memory": "Memoria",
-            "disk": "Disco"
+            "sftpPortPlaceholder": "Porta SFTP"
           },
           "error": {
             "noLocations": "Qualcosa è andato storto. Nessuna posizione trovata."
@@ -191,7 +207,6 @@
           "form": {
             "applicationName": "Nome applicazione",
             "applicationNamePlaceholder": "Calagopus",
-            "language": "Lingua",
             "languagePlaceholder": "Lingua",
             "applicationUrl": "URL applicazione",
             "applicationUrlPlaceholder": "https://calagop.us",
@@ -295,7 +310,6 @@
                 "updated": "Password aggiornata con successo."
               },
               "form": {
-                "currentPassword": "Password attuale",
                 "newPassword": "Nuova password",
                 "confirmNewPassword": "Conferma nuova password"
               }
@@ -306,8 +320,7 @@
                 "updated": "Email aggiornata con successo."
               },
               "form": {
-                "newEmail": "Nuova email",
-                "currentPassword": "Password attuale"
+                "newEmail": "Nuova email"
               }
             },
             "twoFactor": {
@@ -318,18 +331,12 @@
               "modal": {
                 "disableTwoFactor": {
                   "title": "Disabilita autenticazione a due fattori",
-                  "description": "Disabilitare l'autenticazione a due fattori renderà il tuo account meno sicuro.",
-                  "form": {
-                    "code": "Codice di autenticazione"
-                  }
+                  "description": "Disabilitare l'autenticazione a due fattori renderà il tuo account meno sicuro."
                 },
                 "setupTwoFactor": {
                   "title": "Configura autenticazione a due fattori",
                   "description": "Aiuta a proteggere il tuo account da accessi non autorizzati. Ti verrà richiesto un codice di verifica ogni volta che accedi.",
-                  "descriptionQR": "Scansiona il codice QR qui sopra utilizzando l'app di autenticazione a due fattori di tua scelta. Quindi, inserisci il codice a 6 cifre generato nel campo sottostante.",
-                  "form": {
-                    "code": "Codice di autenticazione"
-                  }
+                  "descriptionQR": "Scansiona il codice QR qui sopra utilizzando l'app di autenticazione a due fattori di tua scelta. Quindi, inserisci il codice a 6 cifre generato nel campo sottostante."
                 },
                 "recoveryCodes": {
                   "title": "Codici di recupero",
@@ -349,10 +356,6 @@
                 "updated": "Dettagli account aggiornati con successo."
               },
               "form": {
-                "nameFirst": "Nome",
-                "nameLast": "Cognome",
-                "username": "Nome utente",
-                "language": "Lingua",
                 "toastPosition": "Posizione notifiche",
                 "startOnGroupedServers": "Inizia nella pagina Server raggruppati"
               }
@@ -415,9 +418,6 @@
         },
         "sshKeys": {
           "title": "Chiavi SSH",
-          "button": {
-            "import": "Importa"
-          },
           "table": {
             "columns": {
               "fingerprint": "Impronta digitale"
@@ -445,8 +445,7 @@
                 "created": "{sshKeys} create."
               },
               "form": {
-                "provider": "Provider",
-                "username": "Nome utente"
+                "provider": "Provider"
               }
             },
             "deleteSshKey": {
@@ -570,13 +569,10 @@
           },
           "table": {
             "columns": {
-              "type": "Tipo",
-              "address": "Indirizzo",
               "locked": "Bloccato?"
             }
           },
           "button": {
-            "details": "Dettagli",
             "rotatePassword": "Ruota password"
           },
           "form": {
@@ -589,7 +585,6 @@
                 "created": "Database creato."
               },
               "form": {
-                "databaseHost": "Host database",
                 "noHostsFound": "Nessun host trovato"
               }
             },
@@ -597,9 +592,6 @@
               "title": "Modifica database",
               "toast": {
                 "updated": "Database aggiornato."
-              },
-              "form": {
-                "locked": "Bloccato"
               }
             },
             "databaseDetails": {
@@ -636,10 +628,8 @@
                 "created": "Sottoutente creato."
               },
               "form": {
-                "email": "Email",
                 "emailPlaceholder": "Inserisci l'email con cui salvare questo sottoutente.",
-                "permissions": "Permessi",
-                "ignoredFiles": "File ignorati"
+                "permissions": "Permessi"
               }
             },
             "updateSubuser": {
@@ -682,18 +672,12 @@
               "title": "Crea backup",
               "toast": {
                 "created": "Backup creato."
-              },
-              "form": {
-                "ignoredFiles": "File ignorati"
               }
             },
             "editBackup": {
               "title": "Modifica backup",
               "toast": {
                 "updated": "Backup aggiornato."
-              },
-              "form": {
-                "locked": "Bloccato"
               }
             },
             "restoreBackup": {
@@ -712,19 +696,13 @@
           "title": "Rete",
           "subtitle": "{current} di {max} allocazioni massime assegnate.",
           "tooltip": {
-            "limitReached": "Questo server è limitato a {max} allocazioni.",
-            "primary": "Primaria"
+            "limitReached": "Questo server è limitato a {max} allocazioni."
           },
           "table": {
             "columns": {
               "hostname": "Hostname",
-              "port": "Porta",
-              "notes": "Note"
+              "port": "Porta"
             }
-          },
-          "button": {
-            "setPrimary": "Imposta come primaria",
-            "unsetPrimary": "Rimuovi come primaria"
           },
           "toast": {
             "created": "Allocazione creata.",
@@ -735,10 +713,7 @@
           },
           "modal": {
             "editAllocation": {
-              "title": "Modifica allocazione",
-              "form": {
-                "notes": "Note"
-              }
+              "title": "Modifica allocazione"
             },
             "removeAllocation": {
               "title": "Conferma rimozione allocazione",
@@ -748,10 +723,6 @@
         },
         "startup": {
           "title": "Avvio",
-          "form": {
-            "startupCommand": "Comando di avvio",
-            "dockerImage": "Immagine Docker"
-          },
           "variables": "Variabili",
           "dockerImageDescription": "L'immagine Docker utilizzata per eseguire questo server. Può essere modificata per utilizzare un'immagine diversa.",
           "dockerImageDescriptionCustom": "L'immagine Docker utilizzata per eseguire questo server. È stata impostata da un amministratore e non può essere modificata.",
@@ -765,19 +736,12 @@
           "title": "Impostazioni",
           "rename": {
             "title": "Rinomina server",
-            "form": {
-              "serverName": "Nome server"
-            },
             "toast": {
               "renamed": "Server rinominato."
             }
           },
           "timezone": {
             "title": "Fuso orario",
-            "form": {
-              "timezone": "Fuso orario",
-              "system": "Sistema"
-            },
             "toast": {
               "updated": "Fuso orario del server aggiornato."
             }
@@ -785,7 +749,6 @@
           "autokill": {
             "title": "Auto-Kill",
             "form": {
-              "enabled": "Abilitato",
               "secondsUntilAutoKill": "Secondi prima dell'auto-kill"
             },
             "toast": {

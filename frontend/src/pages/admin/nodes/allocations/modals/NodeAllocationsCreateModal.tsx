@@ -12,6 +12,7 @@ import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { resolvePorts } from '@/lib/ip.ts';
 import { adminNodeAllocationsSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function NodeAllocationsCreateModal({
   node,
@@ -19,6 +20,7 @@ export default function NodeAllocationsCreateModal({
   opened,
   onClose,
 }: ModalProps & { node: z.infer<typeof adminNodeSchema>; loadAllocations: () => void }) {
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
 
   const [resolvedPorts, setResolvedPorts] = useState<number[]>([]);
@@ -53,7 +55,12 @@ export default function NodeAllocationsCreateModal({
       ports: resolvedPorts,
     })
       .then(({ created }) => {
-        addToast(`${created} Node Allocation${created === 1 ? '' : 's'} created.`, 'success');
+        addToast(
+          t('pages.admin.nodes.tabs.allocations.page.modal.create.toast.created', {
+            allocations: tItem('allocation', created),
+          }),
+          'success',
+        );
 
         onClose();
         loadAllocations();
@@ -65,25 +72,38 @@ export default function NodeAllocationsCreateModal({
   };
 
   return (
-    <Modal title='Create Node Allocations' onClose={onClose} opened={opened}>
+    <Modal
+      title={t('pages.admin.nodes.tabs.allocations.page.modal.create.title', {})}
+      onClose={onClose}
+      opened={opened}
+    >
       <Stack>
-        <TextInput withAsterisk label='IP' placeholder='IP' {...form.getInputProps('ip')} />
+        <TextInput
+          withAsterisk
+          label={t('common.table.columns.ip', {})}
+          placeholder={t('common.table.columns.ip', {})}
+          {...form.getInputProps('ip')}
+        />
 
-        <TextInput label='IP Alias' placeholder='IP Alias' {...form.getInputProps('ipAlias')} />
+        <TextInput
+          label={t('pages.admin.nodes.tabs.allocations.page.form.ipAlias', {})}
+          placeholder={t('pages.admin.nodes.tabs.allocations.page.form.ipAlias', {})}
+          {...form.getInputProps('ipAlias')}
+        />
 
         <TagsInput
           withAsterisk
-          label='Port Ranges'
-          placeholder='Port Ranges (eg. 3000-4000)'
+          label={t('common.form.portRanges', {})}
+          placeholder={t('common.form.portRangesPlaceholder', {})}
           {...form.getInputProps('ports')}
         />
 
         <ModalFooter>
           <Button onClick={doCreate} loading={loading} disabled={!form.isValid() || !resolvedPorts.length}>
-            Create {resolvedPorts.length}
+            {t('pages.admin.nodes.tabs.allocations.page.modal.create.button.create', { count: resolvedPorts.length })}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

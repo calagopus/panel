@@ -60,7 +60,9 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
         confirm={t('common.button.recreate', {})}
         onConfirmed={doRecreate}
       >
-        {t('pages.account.apiKeys.modal.recreateApiKey.content', { name: apiKey.name }).md()}
+        {t('pages.account.apiKeys.modal.recreateApiKey.content', {
+          name: apiKey.name,
+        }).md()}
       </ConfirmationModal>
       <ConfirmationModal
         opened={openModal === 'delete'}
@@ -69,19 +71,31 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.apiKeys.modal.deleteApiKey.content', { name: apiKey.name }).md()}
+        {t('pages.account.apiKeys.modal.deleteApiKey.content', {
+          name: apiKey.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
-          { icon: faPencil, label: t('common.button.edit', {}), onClick: () => setOpenModal('edit'), color: 'gray' },
+          {
+            icon: faPencil,
+            label: t('common.button.edit', {}),
+            onClick: () => setOpenModal('edit'),
+            color: 'gray',
+          },
           {
             icon: faRefresh,
             label: t('common.button.recreate', {}),
             onClick: () => setOpenModal('recreate'),
             color: 'red',
           },
-          { icon: faTrash, label: t('common.button.remove', {}), onClick: () => setOpenModal('delete'), color: 'red' },
+          {
+            icon: faTrash,
+            label: t('common.button.remove', {}),
+            onClick: () => setOpenModal('delete'),
+            color: 'red',
+          },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.dashboard.apiKeys.apiKeyContextMenu}
         registryProps={{ apiKey }}
@@ -90,7 +104,7 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>{apiKey.name}</TableData>

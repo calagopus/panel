@@ -1,14 +1,29 @@
 import { type DependencyList, useEffect, useRef } from 'react';
+import { getShortcutDefinition } from '@/lib/coreShortcuts.tsx';
+import { effectiveBinding, eventMatchesBinding, ModifierKey, ShortcutBinding } from '@/lib/shortcuts.ts';
+import { getGlobalStore } from '@/stores/global.ts';
 
-type ModifierKey = 'ctrl' | 'meta' | 'shift' | 'alt' | 'ctrlOrMeta';
+export type { ModifierKey };
 
-interface ShortcutConfig {
-  key: string;
-  modifiers?: ModifierKey[];
+interface ShortcutConfigBase {
   callback: (event: KeyboardEvent) => void;
   preventDefault?: boolean;
   allowWhenInputFocused?: boolean;
 }
+
+interface RegisteredShortcutConfig extends ShortcutConfigBase {
+  id: string;
+  key?: never;
+  modifiers?: never;
+}
+
+interface InlineShortcutConfig extends ShortcutConfigBase {
+  id?: never;
+  key: string;
+  modifiers?: ModifierKey[];
+}
+
+type ShortcutConfig = RegisteredShortcutConfig | InlineShortcutConfig;
 
 interface UseKeyboardShortcutsOptions {
   shortcuts: ShortcutConfig[];
@@ -16,47 +31,31 @@ interface UseKeyboardShortcutsOptions {
   deps?: DependencyList;
 }
 
-function checkModifiers(event: KeyboardEvent, modifiers: ModifierKey[] = []): boolean {
-  const hasCtrl = event.ctrlKey;
-  const hasMeta = event.metaKey;
-  const hasShift = event.shiftKey;
-  const hasAlt = event.altKey;
+interface ResolvedShortcut {
+  binding: ShortcutBinding | null;
+  allowWhenInputFocused: boolean;
+  preventDefault: boolean;
+}
 
-  for (const modifier of modifiers) {
-    switch (modifier) {
-      case 'ctrl':
-        if (!hasCtrl) return false;
-        break;
-      case 'meta':
-        if (!hasMeta) return false;
-        break;
-      case 'ctrlOrMeta':
-        if (!hasCtrl && !hasMeta) return false;
-        break;
-      case 'shift':
-        if (!hasShift) return false;
-        break;
-      case 'alt':
-        if (!hasAlt) return false;
-        break;
-    }
+function resolveShortcut(shortcut: ShortcutConfig): ResolvedShortcut {
+  if (shortcut.id !== undefined) {
+    const definition = getShortcutDefinition(shortcut.id);
+    return {
+      binding: definition ? effectiveBinding(definition, getGlobalStore().shortcutOverrides) : null,
+      allowWhenInputFocused: shortcut.allowWhenInputFocused ?? definition?.allowWhenInputFocused ?? false,
+      preventDefault: shortcut.preventDefault ?? definition?.preventDefault ?? true,
+    };
   }
 
-  const expectedCtrl = modifiers.includes('ctrl') || modifiers.includes('ctrlOrMeta');
-  const expectedMeta = modifiers.includes('meta') || modifiers.includes('ctrlOrMeta');
-  const expectedShift = modifiers.includes('shift');
-  const expectedAlt = modifiers.includes('alt');
-
-  if (hasCtrl && !expectedCtrl && modifiers.length > 0) return false;
-  if (hasMeta && !expectedMeta && modifiers.length > 0) return false;
-  if (hasShift && !expectedShift) return false;
-  if (hasAlt && !expectedAlt) return false;
-
-  return true;
+  return {
+    binding: { key: shortcut.key, modifiers: shortcut.modifiers ?? [] },
+    allowWhenInputFocused: shortcut.allowWhenInputFocused ?? false,
+    preventDefault: shortcut.preventDefault ?? true,
+  };
 }
 
 function isInputFocused(): boolean {
-  const target = document.activeElement as HTMLElement;
+  const target = document.activeElement as HTMLElement | null;
   return target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable === true;
 }
 
@@ -71,21 +70,13 @@ export function useKeyboardShortcuts({ shortcuts, enabled = true, deps = [] }: U
       const inputFocused = isInputFocused();
 
       for (const shortcut of shortcutsRef.current) {
-        if (inputFocused && !shortcut.allowWhenInputFocused) {
-          continue;
-        }
+        const { binding, allowWhenInputFocused, preventDefault } = resolveShortcut(shortcut);
 
-        if (event.key.toLowerCase() !== shortcut.key.toLowerCase()) {
-          continue;
-        }
+        if (!binding) continue;
+        if (inputFocused && !allowWhenInputFocused) continue;
+        if (!eventMatchesBinding(event, binding)) continue;
 
-        if (!checkModifiers(event, shortcut.modifiers)) {
-          continue;
-        }
-
-        if (shortcut.preventDefault !== false) {
-          event.preventDefault();
-        }
+        if (preventDefault) event.preventDefault();
         shortcut.callback(event);
         return;
       }
@@ -100,6 +91,7 @@ export function useKeyboardShortcut(
   key: string,
   callback: (event: KeyboardEvent) => void,
   options: {
+    id?: string;
     modifiers?: ModifierKey[];
     preventDefault?: boolean;
     allowWhenInputFocused?: boolean;
@@ -107,19 +99,19 @@ export function useKeyboardShortcut(
     deps?: DependencyList;
   } = {},
 ) {
-  const { modifiers, preventDefault, allowWhenInputFocused, enabled = true, deps = [] } = options;
+  const { id, modifiers, preventDefault, allowWhenInputFocused, enabled = true, deps = [] } = options;
 
-  useKeyboardShortcuts({
-    shortcuts: [
-      {
-        key,
-        modifiers,
-        callback,
-        preventDefault,
-        allowWhenInputFocused,
-      },
-    ],
-    enabled,
-    deps,
-  });
+  const shortcut: ShortcutConfig = id
+    ? { id, callback, preventDefault, allowWhenInputFocused }
+    : { key, modifiers, callback, preventDefault, allowWhenInputFocused };
+
+  useKeyboardShortcuts({ shortcuts: [shortcut], enabled, deps });
+}
+
+export function matchesShortcut(event: KeyboardEvent, id: string): boolean {
+  const definition = getShortcutDefinition(id);
+  if (!definition) return false;
+
+  const binding = effectiveBinding(definition, getGlobalStore().shortcutOverrides);
+  return binding ? eventMatchesBinding(event, binding) : false;
 }

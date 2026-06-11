@@ -79,15 +79,13 @@ export default function EmailContainer({ requireTwoFactorActivation }: AccountCa
           <TextInput
             withAsterisk
             label={t('pages.account.account.containers.email.form.newEmail', {})}
-            placeholder={t('pages.account.account.containers.email.form.newEmail', {})}
             autoComplete='email'
             {...form.getInputProps('email')}
           />
           {user.hasPassword && (
             <PasswordInput
               withAsterisk
-              label={t('pages.account.account.containers.email.form.currentPassword', {})}
-              placeholder={t('pages.account.account.containers.email.form.currentPassword', {})}
+              label={t('common.form.currentPassword', {})}
               autoComplete='current-password'
               {...form.getInputProps('password')}
             />

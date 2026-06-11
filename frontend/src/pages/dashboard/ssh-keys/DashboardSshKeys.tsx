@@ -48,7 +48,7 @@ export default function DashboardSshKeys() {
               leftSection={<FontAwesomeIcon icon={faDownload} />}
               disabled={sshKeys.total >= settings.user.maxSshKeyCount}
             >
-              {t('pages.account.sshKeys.button.import', {})}
+              {t('common.button.import', {})}
             </Button>
           </ConditionalTooltip>
           <ConditionalTooltip

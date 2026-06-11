@@ -184,6 +184,7 @@ function Footer() {
   }
 
   const isDark = computedColorScheme === 'dark';
+  const suspended = Boolean(user.suspended);
 
   const toggleTheme = async (event: React.MouseEvent) => {
     const nextTheme = isDark ? 'light' : 'dark';
@@ -252,18 +253,25 @@ function Footer() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Item leftSection={<FontAwesomeIcon icon={faUserCog} />} onClick={() => navigate('/account')}>
-              {t('pages.account.account.title', {})}
-            </Menu.Item>
-            {isAdmin(user) && (
+            {!suspended && (
               <>
-                <Menu.Divider />
-                <Menu.Item leftSection={<FontAwesomeIcon icon={faGraduationCap} />} onClick={() => navigate('/admin')}>
-                  {t('pages.account.admin.title', {})}
+                <Menu.Item leftSection={<FontAwesomeIcon icon={faUserCog} />} onClick={() => navigate('/account')}>
+                  {t('pages.account.account.title', {})}
                 </Menu.Item>
+                {isAdmin(user) && (
+                  <>
+                    <Menu.Divider />
+                    <Menu.Item
+                      leftSection={<FontAwesomeIcon icon={faGraduationCap} />}
+                      onClick={() => navigate('/admin')}
+                    >
+                      {t('pages.account.admin.title', {})}
+                    </Menu.Item>
+                  </>
+                )}
+                <Menu.Divider />
               </>
             )}
-            <Menu.Divider />
             <Menu.Item leftSection={<FontAwesomeIcon icon={isDark ? faSun : faMoon} />} onClick={toggleTheme}>
               {isDark ? t('elements.sidebar.button.switchToLight', {}) : t('elements.sidebar.button.switchToDark', {})}
             </Menu.Item>

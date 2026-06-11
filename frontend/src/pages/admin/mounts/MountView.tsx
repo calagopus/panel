@@ -6,11 +6,13 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import MountCreateOrUpdate from '@/pages/admin/mounts/MountCreateOrUpdate.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminMountEggs from './eggs/AdminMountEggs.tsx';
 import AdminMountNodes from './nodes/AdminMountNodes.tsx';
 import AdminMountServers from './servers/AdminMountServers.tsx';
 
 export default function MountView() {
+  const { t } = useTranslations();
   const params = useParams<'id'>();
 
   const { data: mount, isLoading } = useQuery({
@@ -26,27 +28,27 @@ export default function MountView() {
         baseUrl={`/admin/mounts/${params.id}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: `/`,
             element: <MountCreateOrUpdate contextMount={mount} />,
           },
           {
-            name: 'Eggs',
+            name: t('pages.admin.mounts.tabs.eggs.title', {}),
             icon: faEgg,
             path: `/eggs`,
             element: <AdminMountEggs mount={mount} />,
             permission: 'eggs.read',
           },
           {
-            name: 'Nodes',
+            name: t('pages.admin.mounts.tabs.nodes.title', {}),
             icon: faServer,
             path: `/nodes`,
             element: <AdminMountNodes mount={mount} />,
             permission: 'nodes.read',
           },
           {
-            name: 'Servers',
+            name: t('pages.admin.mounts.tabs.servers.title', {}),
             icon: faComputer,
             path: `/servers`,
             element: <AdminMountServers mount={mount} />,

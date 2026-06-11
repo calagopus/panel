@@ -46,6 +46,14 @@
 
 :root[data-mantine-color-scheme="light"] {
   --mantine-color-body: #f0eff0;
+
+  /* Chart colors */
+  --chart-grid-color: #e5e7eb;
+  --chart-tick-color: #374151;
+  --chart-series-1-border: #0891b2;
+  --chart-series-1-fill: rgba(8, 145, 178, 0.15);
+  --chart-series-2-border: #d97706;
+  --chart-series-2-fill: rgba(217, 119, 6, 0.15);
 }
 
 :root[data-mantine-color-scheme="dark"] {
@@ -177,6 +185,18 @@
   --mantine-color-yellow-outline-hover: rgba(255, 212, 59, 0.05);
   --mantine-color-yellow-text: var(--mantine-color-yellow-4);
   --mantine-primary-color-contrast: var(--mantine-color-white);
+
+  /* Chart colors */
+  --chart-grid-color: #424242;
+  --chart-tick-color: #f3f4f6;
+  --chart-series-1-border: #22d3ee;
+  --chart-series-1-fill: rgba(14, 116, 144, 0.5);
+  --chart-series-2-border: #facc15;
+  --chart-series-2-fill: rgba(161, 98, 7, 0.5);
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 body {

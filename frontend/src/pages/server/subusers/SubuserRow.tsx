@@ -43,7 +43,9 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.server.subusers.modal.removeSubuser.content', { username: subuser.user.username }).md()}
+        {t('pages.server.subusers.modal.removeSubuser.content', {
+          username: subuser.user.username,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
@@ -70,7 +72,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>

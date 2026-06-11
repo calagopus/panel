@@ -114,7 +114,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
         items={[
           {
             icon: faStar,
-            label: t('pages.server.network.button.setPrimary', {}),
+            label: t('common.button.setPrimary', {}),
             hidden: allocation.isPrimary,
             onClick: doSetPrimary,
             color: 'gray',
@@ -122,7 +122,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
           },
           {
             icon: faStar,
-            label: t('pages.server.network.button.unsetPrimary', {}),
+            label: t('common.button.unsetPrimary', {}),
             hidden: !allocation.isPrimary,
             onClick: doUnsetPrimary,
             color: 'red',
@@ -143,12 +143,12 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <td className='relative w-10 text-center'>
               {allocation.isPrimary && (
-                <Tooltip label={t('pages.server.network.tooltip.primary', {})}>
+                <Tooltip label={t('common.tooltip.primary', {})}>
                   <FontAwesomeIcon icon={faStar} className='text-yellow-500 ml-3' />
                 </Tooltip>
               )}
@@ -167,7 +167,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
                 rows={Math.min(3, notes.split('\n').length)}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder={t('pages.server.network.table.columns.notes', {})}
+                placeholder={t('common.table.columns.notes', {})}
                 disabled={!canUpdate}
               />
             </TableData>

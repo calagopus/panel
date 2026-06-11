@@ -5,10 +5,12 @@ import getEggRepository from '@/api/admin/egg-repositories/getEggRepository.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggRepositoryCreateOrUpdate from './EggRepositoryCreateOrUpdate.tsx';
 import EggRepositoryEggs from './eggs/EggRepositoryEggs.tsx';
 
 export default function EggRepositoryView() {
+  const { t } = useTranslations();
   const params = useParams<'eggRepositoryId'>();
 
   const { data: eggRepository, isLoading } = useQuery({
@@ -24,13 +26,13 @@ export default function EggRepositoryView() {
         baseUrl={`/admin/egg-repositories/${params.eggRepositoryId}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: '/',
             element: <EggRepositoryCreateOrUpdate contextEggRepository={eggRepository} />,
           },
           {
-            name: 'Eggs',
+            name: t('pages.admin.eggRepositories.tabs.eggs.title', {}),
             icon: faEgg,
             path: `/eggs`,
             element: <EggRepositoryEggs contextEggRepository={eggRepository} />,

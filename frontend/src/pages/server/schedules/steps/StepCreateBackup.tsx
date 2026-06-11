@@ -34,8 +34,8 @@ export default function StepCreateBackup({
         />
       </Group>
       <TagsInput
-        label={t('pages.server.schedules.steps.createBackup.form.ignoredFiles', {})}
-        placeholder={t('pages.server.schedules.steps.createBackup.form.ignoredFiles', {})}
+        label={t('common.form.ignoredFiles', {})}
+        placeholder={t('common.form.ignoredFiles', {})}
         {...form.getInputProps('action.ignoredFiles')}
       />
     </Stack>

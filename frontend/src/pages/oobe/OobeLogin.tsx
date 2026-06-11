@@ -81,14 +81,14 @@ export default function OobeLogin({ onNext }: OobeComponentProps) {
         <div className='flex flex-col gap-6'>
           <Stack gap='sm'>
             <TextInput
-              label={t('pages.oobe.login.form.username', {})}
+              label={t('common.form.username', {})}
               placeholder={t('pages.oobe.login.form.usernamePlaceholder', {})}
               leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
               required
               {...form.getInputProps('username')}
             />
             <PasswordInput
-              label={t('pages.oobe.login.form.password', {})}
+              label={t('common.form.password', {})}
               placeholder={t('pages.oobe.login.form.passwordPlaceholder', {})}
               leftSection={<FontAwesomeIcon icon={faLock} size='sm' />}
               required

@@ -21,8 +21,10 @@ import AdminServerManagement from '@/pages/admin/servers/management/AdminServerM
 import AdminServerMounts from '@/pages/admin/servers/mounts/AdminServerMounts.tsx';
 import ServerUpdate from '@/pages/admin/servers/ServerUpdate.tsx';
 import AdminServerVariables from '@/pages/admin/servers/variables/AdminServerVariables.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServerView() {
+  const { t } = useTranslations();
   const params = useParams<'id'>();
 
   const { data: server, isLoading } = useQuery({
@@ -41,54 +43,54 @@ export default function ServerView() {
         baseUrl={`/admin/servers/${params.id}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: '/',
             element: <ServerUpdate contextServer={server} />,
           },
           {
-            name: 'Allocations',
+            name: t('pages.admin.servers.tabs.allocations.title', {}),
             icon: faNetworkWired,
             path: `/allocations`,
             element: <AdminServerAllocations server={server} />,
             permission: 'servers.allocations',
           },
           {
-            name: 'Variables',
+            name: t('pages.admin.servers.tabs.variables.title', {}),
             icon: faCodeCommit,
             path: `/variables`,
             element: <AdminServerVariables server={server} />,
             permission: 'servers.variables',
           },
           {
-            name: 'Mounts',
+            name: t('pages.admin.servers.tabs.mounts.title', {}),
             icon: faFolderTree,
             path: `/mounts`,
             element: <AdminServerMounts server={server} />,
             permission: 'servers.mounts',
           },
           {
-            name: 'Backups',
+            name: t('pages.admin.servers.tabs.backups.title', {}),
             icon: faArchive,
             path: `/backups`,
             element: <AdminServerBackups server={server} />,
             permission: 'nodes.backups',
           },
           {
-            name: 'Logs',
+            name: t('pages.admin.servers.tabs.logs.title', {}),
             icon: faFileText,
             path: `/logs`,
             element: <AdminServerLogs server={server} />,
             permission: 'servers.read',
           },
           {
-            name: 'Management',
+            name: t('pages.admin.servers.tabs.management.title', {}),
             icon: faWrench,
             path: `/management`,
             element: <AdminServerManagement server={server} />,
           },
           {
-            name: 'View',
+            name: t('pages.admin.servers.tabs.viewClient.title', {}),
             icon: faExternalLink,
             link: `/server/${server.uuidShort}`,
             permission: 'servers.read',

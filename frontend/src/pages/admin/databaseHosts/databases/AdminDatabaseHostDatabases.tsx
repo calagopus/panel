@@ -6,6 +6,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 import { databaseHostDatabaseTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DatabaseRow from './DatabaseRow.tsx';
 
 export default function AdminDatabaseHostDatabases({
@@ -13,6 +14,7 @@ export default function AdminDatabaseHostDatabases({
 }: {
   databaseHost: z.infer<typeof adminDatabaseHostSchema>;
 }) {
+  const { t } = useTranslations();
   const {
     data: databaseHostDatabases,
     loading,
@@ -25,9 +27,14 @@ export default function AdminDatabaseHostDatabases({
   });
 
   return (
-    <AdminSubContentContainer title={`Database Host Databases`} titleOrder={2} search={search} setSearch={setSearch}>
+    <AdminSubContentContainer
+      title={t('pages.admin.databaseHosts.tabs.databases.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
       <Table
-        columns={databaseHostDatabaseTableColumns}
+        columns={databaseHostDatabaseTableColumns()}
         loading={loading}
         pagination={databaseHostDatabases}
         onPageSelect={setPage}

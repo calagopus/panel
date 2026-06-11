@@ -61,7 +61,6 @@ export default function FileFingerprintsModal({ file, opened, onClose }: Props) 
           <Select
             withAsterisk
             label={t('pages.server.files.modal.fileFingerprints.form.algorithm', {})}
-            placeholder={t('pages.server.files.modal.fileFingerprints.form.algorithm', {})}
             data={Object.entries(fingerprintAlgorithmLabelMapping).map(([value, label]) => ({
               label,
               value,

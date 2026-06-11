@@ -13,6 +13,7 @@ import {
 } from '@mantine/core';
 import { forwardRef, ReactNode, startTransition, useEffect } from 'react';
 import Spinner from '@/elements/Spinner.tsx';
+import { matchesShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface TableHeaderProps {
@@ -88,18 +89,20 @@ export function Pagination<T>({ data, onPageSelect, ...props }: PaginationProps<
       const target = event.target as HTMLElement;
       const isInputFocused = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
 
-      if (event.key === 'ArrowLeft' && !isInputFocused) {
+      if (isInputFocused) return;
+
+      if (matchesShortcut(event, 'table.firstPage')) {
         event.preventDefault();
-
-        const page = event.shiftKey ? 1 : data.page - 1;
-        setPage(page);
-      }
-
-      if (event.key === 'ArrowRight' && !isInputFocused) {
+        setPage(1);
+      } else if (matchesShortcut(event, 'table.previousPage')) {
         event.preventDefault();
-
-        const page = event.shiftKey ? totalPages : data.page + 1;
-        setPage(page);
+        setPage(data.page - 1);
+      } else if (matchesShortcut(event, 'table.lastPage')) {
+        event.preventDefault();
+        setPage(totalPages);
+      } else if (matchesShortcut(event, 'table.nextPage')) {
+        event.preventDefault();
+        setPage(data.page + 1);
       }
     };
 

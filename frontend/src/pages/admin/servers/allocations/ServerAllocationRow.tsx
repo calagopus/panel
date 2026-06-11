@@ -1,5 +1,6 @@
 import { faStar, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -13,10 +14,12 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { formatAllocation } from '@/lib/server.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerAllocationRow({
@@ -26,7 +29,9 @@ export default function ServerAllocationRow({
   server: z.infer<typeof adminServerSchema>;
   allocation: z.infer<typeof serverAllocationSchema>;
 }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
   const { serverAllocations, setServerAllocations, removeServerAllocation } = useAdminStore();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
@@ -40,9 +45,11 @@ export default function ServerAllocationRow({
 
   const setDebouncedNotes = useCallback(
     debounce((notes: string) => {
-      updateServerAllocation(server.uuid, allocation.uuid, { notes: notes || null })
+      updateServerAllocation(server.uuid, allocation.uuid, {
+        notes: notes || null,
+      })
         .then(() => {
-          addToast('Allocation updated.', 'success');
+          addToast(t('pages.admin.servers.tabs.allocations.page.toast.updated', {}), 'success');
           allocation.notes = notes;
         })
         .catch((msg) => {
@@ -62,7 +69,7 @@ export default function ServerAllocationRow({
             isPrimary: a.uuid === allocation.uuid,
           })),
         });
-        addToast('Allocation set as primary.', 'success');
+        addToast(t('pages.admin.servers.tabs.allocations.page.toast.setPrimary', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -79,7 +86,7 @@ export default function ServerAllocationRow({
             isPrimary: false,
           })),
         });
-        addToast('Allocation unset as primary.', 'success');
+        addToast(t('pages.admin.servers.tabs.allocations.page.toast.unsetPrimary', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -88,9 +95,13 @@ export default function ServerAllocationRow({
 
   const doRemove = async () => {
     await deleteServerAllocation(server.uuid, allocation.uuid)
-      .then(() => {
+      .then(async () => {
         removeServerAllocation(allocation);
-        addToast('Allocation removed.', 'success');
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.servers.allocations(server.uuid),
+        });
+        setOpenModal(null);
+        addToast(t('pages.admin.servers.tabs.allocations.page.toast.removed', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -102,25 +113,37 @@ export default function ServerAllocationRow({
       <ConfirmationModal
         opened={openModal === 'remove'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Allocation Removal'
-        confirm='Remove'
+        title={t('pages.admin.servers.tabs.allocations.page.modal.remove.title', {})}
+        confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        Are you sure you want to remove
-        <Code>{formatAllocation(allocation)}</Code>?
+        {t('pages.admin.servers.tabs.allocations.page.modal.remove.content', {
+          allocation: formatAllocation(allocation),
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
-          { icon: faStar, label: 'Set Primary', hidden: allocation.isPrimary, onClick: doSetPrimary, color: 'gray' },
           {
             icon: faStar,
-            label: 'Unset Primary',
+            label: t('common.button.setPrimary', {}),
+            hidden: allocation.isPrimary,
+            onClick: doSetPrimary,
+            color: 'gray',
+          },
+          {
+            icon: faStar,
+            label: t('common.button.unsetPrimary', {}),
             hidden: !allocation.isPrimary,
             onClick: doUnsetPrimary,
             color: 'red',
           },
-          { icon: faTrash, label: 'Remove', onClick: () => setOpenModal('remove'), color: 'red' },
+          {
+            icon: faTrash,
+            label: t('common.button.remove', {}),
+            onClick: () => setOpenModal('remove'),
+            color: 'red',
+          },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.allocations.contextMenu}
         registryProps={{ server, allocation }}
@@ -129,12 +152,12 @@ export default function ServerAllocationRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData className='relative w-10 text-center'>
               {allocation.isPrimary && (
-                <Tooltip label='Primary'>
+                <Tooltip label={t('common.tooltip.primary', {})}>
                   <FontAwesomeIcon icon={faStar} className='text-yellow-500' />
                 </Tooltip>
               )}
@@ -145,7 +168,7 @@ export default function ServerAllocationRow({
             </TableData>
 
             <TableData>
-              <Code>{allocation.ipAlias ?? 'N/A'}</Code>
+              <Code>{allocation.ipAlias ?? t('common.na', {})}</Code>
             </TableData>
 
             <TableData>
@@ -157,7 +180,7 @@ export default function ServerAllocationRow({
                 rows={Math.min(3, notes.split('\n').length)}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder='Notes'
+                placeholder={t('pages.admin.servers.tabs.allocations.page.form.notesPlaceholder', {})}
               />
             </TableData>
 

@@ -29,6 +29,7 @@ import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Popover from '@/elements/Popover.tsx';
@@ -43,6 +44,7 @@ import { useExtendibleForm } from '@/plugins/useExtendibleForm.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const timezones = Object.keys(zones)
   .sort()
@@ -52,6 +54,7 @@ const timezones = Object.keys(zones)
   }));
 
 export default function ServerUpdate({ contextServer }: { contextServer: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const canReadUsers = useAdminCan('users.read');
   const canReadNests = useAdminCan('nests.read');
   const canReadEggs = useAdminCan('eggs.read');
@@ -115,7 +118,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
     updateFn: () => updateServer(contextServer.uuid, formSchema.parse(form.getValues())),
     doUpdate: true,
     basePath: '/admin/servers',
-    resourceName: 'Server',
+    resourceName: t('pages.admin.servers.resourceName', {}),
   });
 
   useEffect(() => {
@@ -184,7 +187,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
   return (
     <AdminSubContentContainer
-      title='Update Server'
+      title={t('pages.admin.servers.tabs.general.page.titleUpdate', {})}
       titleOrder={2}
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.update.subContainer}
       registryProps={{ server: contextServer }}
@@ -192,8 +195,12 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.servers.all()))}>
         <Stack>
           {contextServer.isSuspended && (
-            <Alert title='Server Suspended' color='orange' icon={<FontAwesomeIcon icon={faCircleInfo} />}>
-              This server is suspended.
+            <Alert
+              title={t('pages.admin.servers.tabs.general.page.badge.serverSuspended', {})}
+              color='orange'
+              icon={<FontAwesomeIcon icon={faCircleInfo} />}
+            >
+              {t('pages.admin.servers.tabs.general.page.alert.suspended', {})}
             </Alert>
           )}
 
@@ -204,7 +211,10 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
               ),
             )}
 
-            <TitleCard title='Basic Information' icon={<FontAwesomeIcon icon={faInfoCircle} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
+              icon={<FontAwesomeIcon icon={faInfoCircle} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.view.update.basicInformationFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -218,21 +228,21 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
                 <TextInput
                   withAsterisk
-                  label='Server Name'
-                  placeholder='My Game Server'
+                  label={t('common.form.serverName', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.serverNamePlaceholder', {})}
                   key={form.key('name')}
                   {...form.getInputProps('name')}
                 />
                 <TextInput
-                  label='External ID'
-                  placeholder='Optional external identifier'
+                  label={t('common.form.externalId', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.externalIdPlaceholder', {})}
                   key={form.key('externalId')}
                   {...form.getInputProps('externalId')}
                 />
 
                 <TextArea
-                  label='Description'
-                  placeholder='Server description'
+                  label={t('common.form.description', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.descriptionPlaceholder', {})}
                   className='col-span-full'
                   rows={3}
                   key={form.key('description')}
@@ -251,7 +261,10 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
               </div>
             </TitleCard>
 
-            <TitleCard title='Server Assignment' icon={<FontAwesomeIcon icon={faAddressCard} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.serverAssignment', {})}
+              icon={<FontAwesomeIcon icon={faAddressCard} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.view.update.serverAssignmentFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -265,8 +278,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
                 <Select
                   withAsterisk
-                  label='Owner'
-                  placeholder='Owner'
+                  label={t('pages.admin.servers.tabs.general.page.form.owner', {})}
                   data={users.items.map((user) => ({
                     label: user.username,
                     value: user.uuid,
@@ -280,8 +292,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                   {...form.getInputProps('ownerUuid')}
                 />
                 <Select
-                  label='Backup Configuration'
-                  placeholder='Inherit from Node/Location'
+                  label={t('common.form.backupConfiguration', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.backupConfigurationPlaceholder', {})}
                   data={backupConfigurations.items.map((backupConfiguration) => ({
                     label: backupConfiguration.name,
                     value: backupConfiguration.uuid,
@@ -299,8 +311,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
                 <Select
                   withAsterisk
-                  label='Nest'
-                  placeholder='Nest'
+                  label={t('common.form.nest', {})}
                   value={selectedNestUuid}
                   onChange={(value) => setSelectedNestUuid(value)}
                   data={nests.items.map((nest) => ({
@@ -315,8 +326,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
                 <Select
                   withAsterisk
-                  label='Egg'
-                  placeholder='Egg'
+                  label={t('pages.admin.servers.tabs.general.page.form.egg', {})}
                   disabled={!canReadEggs || !selectedNestUuid}
                   data={eggs.items.map((egg) => ({
                     label: egg.name,
@@ -342,7 +352,10 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
               </div>
             </TitleCard>
 
-            <TitleCard title='Resource Limits' icon={<FontAwesomeIcon icon={faStopwatch} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})}
+              icon={<FontAwesomeIcon icon={faStopwatch} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.view.update.resourceLimitsFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -356,8 +369,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
                 <NumberInput
                   withAsterisk
-                  label='CPU Limit (%)'
-                  description='The CPU Limit in % that the server can use, 1 thread = 100%'
+                  label={t('pages.admin.servers.tabs.general.page.form.cpuLimit', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.cpuLimitDescription', {})}
                   placeholder='100'
                   min={0}
                   key={form.key('limits.cpu')}
@@ -365,8 +378,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
                 <SizeInput
                   withAsterisk
-                  label='Swap'
-                  description='The amount of swap to give this server, -1 will not set a limit'
+                  label={t('pages.admin.servers.tabs.general.page.form.swap', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.swapDescription', {})}
                   mode='mb'
                   min={-1}
                   value={form.getValues().limits.swap}
@@ -375,8 +388,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
                 <SizeInput
                   withAsterisk
-                  label='Memory'
-                  description='The Memory limit of the server container, 0 will not set a limit'
+                  label={t('common.form.memory', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.memoryDescription', {})}
                   mode='mb'
                   min={0}
                   value={form.getValues().limits.memory}
@@ -384,8 +397,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
                 <SizeInput
                   withAsterisk
-                  label='Memory Overhead'
-                  description='Hidden Memory that will be added to the container'
+                  label={t('pages.admin.servers.tabs.general.page.form.memoryOverhead', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.memoryOverheadDescription', {})}
                   mode='mb'
                   min={0}
                   value={form.getValues().limits.memoryOverhead}
@@ -394,18 +407,31 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
                 <SizeInput
                   withAsterisk
-                  label='Disk Space'
-                  description='The disk limit of the server, this is a soft-limit unless disk limiter configured on wings'
+                  label={t('pages.admin.servers.tabs.general.page.form.diskSpace', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.diskSpaceDescription', {})}
                   mode='mb'
                   min={0}
                   value={form.getValues().limits.disk}
                   onChange={(value) => form.setFieldValue('limits.disk', value)}
                 />
                 <NumberInput
-                  label='IO Weight'
-                  description='The relative IO Weight of the server container compared to other containers, 0-1000, may not work on all systems'
+                  label={t('pages.admin.servers.tabs.general.page.form.ioWeight', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.ioWeightDescription', {})}
                   key={form.key('limits.ioWeight')}
                   {...form.getInputProps('limits.ioWeight')}
+                />
+                <TagsInput
+                  label={t('pages.admin.servers.tabs.general.page.form.pinnedCpus', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.pinnedCpusDescription', {})}
+                  placeholder='0'
+                  allowReordering={false}
+                  value={form.getValues().pinnedCpus.map(String)}
+                  onChange={(tags) =>
+                    form.setFieldValue(
+                      'pinnedCpus',
+                      tags.map((tag) => Number.parseInt(tag, 10)).filter((n) => Number.isInteger(n) && n >= 0),
+                    )
+                  }
                 />
 
                 {window.extensionContext.extensionRegistry.pages.admin.servers.view.update.resourceLimitsFormContainer.appendedComponents.map(
@@ -420,7 +446,10 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
               </div>
             </TitleCard>
 
-            <TitleCard title='Server Configuration' icon={<FontAwesomeIcon icon={faWrench} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})}
+              icon={<FontAwesomeIcon icon={faWrench} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.view.update.serverConfigurationFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -433,8 +462,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 )}
 
                 <Select
-                  label='Predefined Docker Images'
-                  placeholder='No predefined image selected'
+                  label={t('pages.admin.servers.tabs.general.page.form.predefinedDockerImages', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.predefinedDockerImagesPlaceholder', {})}
                   data={Object.entries(eggImages).map(([label, value]) => ({
                     label,
                     value,
@@ -451,15 +480,15 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
                 <TextInput
                   withAsterisk
-                  label='Docker Image'
-                  placeholder='ghcr.io/...'
+                  label={t('common.form.dockerImage', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.dockerImagePlaceholder', {})}
                   key={form.key('image')}
                   {...form.getInputProps('image')}
                 />
 
                 <Select
-                  label='Timezone'
-                  placeholder='System'
+                  label={t('common.form.timezone', {})}
+                  placeholder={t('common.form.timezoneSystem', {})}
                   data={timezones}
                   allowDeselect
                   clearable
@@ -469,8 +498,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
 
                 <TextArea
-                  label='Startup Command'
-                  placeholder='npm start'
+                  label={t('common.form.startupCommand', {})}
+                  placeholder={t('pages.admin.servers.tabs.general.page.form.startupCommandPlaceholder', {})}
                   className='col-span-full'
                   required
                   rows={2}
@@ -485,7 +514,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                         <Select
                           data={[
                             {
-                              label: 'Custom',
+                              label: t('pages.admin.servers.tabs.general.page.form.startupCommandCustom', {}),
                               value: '',
                             },
                             ...Object.entries(
@@ -510,8 +539,11 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
 
                 <Switch
-                  label='Enable Hugepages Passthrough'
-                  description='Enable hugepages passthrough for the server (mounts /dev/hugepages into the container)'
+                  label={t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {})}
+                  description={t(
+                    'pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription',
+                    {},
+                  )}
                   key={form.key('hugepagesPassthroughEnabled')}
                   {...form.getInputProps('hugepagesPassthroughEnabled', {
                     type: 'checkbox',
@@ -519,8 +551,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
 
                 <Switch
-                  label='Enable KVM Passthrough'
-                  description='Enable KVM passthrough for the server (allows access to /dev/kvm inside the container)'
+                  label={t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {})}
+                  description={t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {})}
                   key={form.key('kvmPassthroughEnabled')}
                   {...form.getInputProps('kvmPassthroughEnabled', {
                     type: 'checkbox',
@@ -539,7 +571,10 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
               </div>
             </TitleCard>
 
-            <TitleCard title='Feature Limits' icon={<FontAwesomeIcon icon={faIcons} />}>
+            <TitleCard
+              title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})}
+              icon={<FontAwesomeIcon icon={faIcons} />}
+            >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {window.extensionContext.extensionRegistry.pages.admin.servers.view.update.featureLimitsFormContainer.prependedComponents.map(
                   (Component, i) => (
@@ -553,7 +588,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
                 <NumberInput
                   withAsterisk
-                  label='Allocations'
+                  label={t('pages.admin.servers.tabs.general.page.form.allocationsLimit', {})}
                   placeholder='0'
                   min={0}
                   key={form.key('featureLimits.allocations')}
@@ -561,7 +596,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
                 <NumberInput
                   withAsterisk
-                  label='Databases'
+                  label={t('pages.admin.servers.tabs.general.page.form.databasesLimit', {})}
                   placeholder='0'
                   min={0}
                   key={form.key('featureLimits.databases')}
@@ -569,7 +604,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
                 <NumberInput
                   withAsterisk
-                  label='Backups'
+                  label={t('pages.admin.servers.tabs.general.page.form.backupsLimit', {})}
                   placeholder='0'
                   min={0}
                   key={form.key('featureLimits.backups')}
@@ -577,7 +612,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                 />
                 <NumberInput
                   withAsterisk
-                  label='Schedules'
+                  label={t('pages.admin.servers.tabs.general.page.form.schedulesLimit', {})}
                   placeholder='0'
                   min={0}
                   key={form.key('featureLimits.schedules')}
@@ -606,7 +641,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
           <Group>
             <AdminCan action='servers.update' cantSave>
               <Button type='submit' disabled={!isValid} loading={loading}>
-                Save
+                {t('common.button.save', {})}
               </Button>
             </AdminCan>
           </Group>

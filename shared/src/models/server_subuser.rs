@@ -258,67 +258,19 @@ impl CreatableModel for ServerSubuser {
                     name_last: "Subuser".into(),
                     password: None,
                     admin: false,
+                    frozen: false,
+                    suspended: false,
+                    send_email: true,
                     language: app_settings.app.language.clone(),
                 };
                 drop(app_settings);
-                let user = match super::user::User::create(state, create_options).await {
+                match super::user::User::create(state, create_options).await {
                     Ok(user) => user,
                     Err(err) => {
                         tracing::error!(username = %username, email = %options.email, "failed to create subuser user: {:?}", err);
                         return Err(err);
                     }
-                };
-
-                match super::user_password_reset::UserPasswordReset::create(
-                    &state.database,
-                    user.uuid,
-                )
-                .await
-                {
-                    Ok(token) => {
-                        let settings = state.settings.get().await?;
-
-                        super::user_activity::UserActivity::create(
-                            state,
-                            super::user_activity::CreateUserActivityOptions {
-                                user_uuid: user.uuid,
-                                impersonator_uuid: None,
-                                api_key_uuid: None,
-                                event: "email:account-created".into(),
-                                ip: None,
-                                data: serde_json::json!({}),
-                                created: None,
-                            },
-                        )
-                        .await?;
-
-                        state
-                            .mail
-                            .send_template(
-                                state,
-                                "account_created",
-                                user.email.clone(),
-                                minijinja::context! {
-                                    user => user,
-                                    reset_link => format!(
-                                        "{}/auth/reset-password?token={}",
-                                        settings.app.url,
-                                        urlencoding::encode(&token),
-                                    )
-                                },
-                            )
-                            .await;
-                    }
-                    Err(err) => {
-                        tracing::warn!(
-                            user = %user.uuid,
-                            "failed to create subuser password reset token: {:#?}",
-                            err
-                        );
-                    }
                 }
-
-                user
             }
         };
 

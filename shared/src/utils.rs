@@ -80,3 +80,40 @@ pub fn flatten_validation_errors(errors: &garde::Report) -> Vec<String> {
 
     messages
 }
+
+pub fn axum_to_tungstenite(
+    msg: axum::extract::ws::Message,
+) -> tokio_tungstenite::tungstenite::Message {
+    use axum::extract::ws::Message;
+    use tokio_tungstenite::tungstenite::{Message as Tung, protocol::CloseFrame as TungClose};
+
+    match msg {
+        Message::Text(text) => Tung::Text(text.as_str().into()),
+        Message::Binary(data) => Tung::Binary(data),
+        Message::Ping(data) => Tung::Ping(data),
+        Message::Pong(data) => Tung::Pong(data),
+        Message::Close(frame) => Tung::Close(frame.map(|f| TungClose {
+            code: f.code.into(),
+            reason: f.reason.as_str().into(),
+        })),
+    }
+}
+
+pub fn tungstenite_to_axum(
+    msg: tokio_tungstenite::tungstenite::Message,
+) -> Option<axum::extract::ws::Message> {
+    use axum::extract::ws::{CloseFrame, Message};
+    use tokio_tungstenite::tungstenite::Message as Tung;
+
+    Some(match msg {
+        Tung::Text(text) => Message::Text(text.as_str().into()),
+        Tung::Binary(data) => Message::Binary(data),
+        Tung::Ping(data) => Message::Ping(data),
+        Tung::Pong(data) => Message::Pong(data),
+        Tung::Close(frame) => Message::Close(frame.map(|f| CloseFrame {
+            code: f.code.into(),
+            reason: f.reason.as_str().into(),
+        })),
+        Tung::Frame(_) => return None,
+    })
+}

@@ -81,7 +81,6 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
         <Stack className='h-full grow'>
           <FileInput
             label={t('pages.account.account.containers.avatar.form.avatar', {})}
-            placeholder={t('pages.account.account.containers.avatar.form.avatar', {})}
             value={file}
             onChange={(file) => setFile(file)}
             accept='image/*'

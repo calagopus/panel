@@ -1,12 +1,14 @@
 import { z } from 'zod';
 import { oobeStepKey } from '@/lib/schemas/oobe.ts';
 import { nullableNumber, nullableString } from '@/lib/transformers.ts';
-import { hostnameSchema } from '../generic.ts';
+import { eggConfigurationRouteItemSchema, hostnameSchema } from '../generic.ts';
 
 export const adminSettingsApplicationSchema = z.object({
   name: z.string().min(1).max(64),
   icon: z.string().min(1).max(255),
+  iconLight: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   banner: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+  bannerLight: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   url: z.url({ protocol: /^https?$/ }).max(255),
   language: z.string(),
   twoFactorRequirement: z.enum(['admins', 'all_users', 'none']),
@@ -63,7 +65,7 @@ export const adminSettingsEmailSmtpSchema = z.object({
   port: z.number().min(1),
   username: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   password: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
-  useTls: z.boolean(),
+  tlsMode: z.enum(['none', 'start_tls', 'implicit_tls']),
   skipCertValidation: z.boolean(),
   fromAddress: z.email().max(255),
   fromName: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
@@ -128,6 +130,7 @@ export const adminSettingsServerSchema = z.object({
   allowViewingInstallationLogs: z.boolean(),
   allowAcknowledgingInstallationFailure: z.boolean(),
   allowViewingTransferProgress: z.boolean(),
+  containerPrelude: z.string().min(1).max(255),
 });
 
 export const adminSettingsUserSchema = z.object({
@@ -137,6 +140,7 @@ export const adminSettingsUserSchema = z.object({
   maxSecurityKeyCount: z.number().min(0),
   maxSshKeyCount: z.number().min(0),
   allowChangingLanguage: z.boolean(),
+  routeOrder: z.array(eggConfigurationRouteItemSchema).max(100).nullable(),
 });
 
 export const adminSettingsActivitySchema = z.object({

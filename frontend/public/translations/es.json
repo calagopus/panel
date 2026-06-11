@@ -69,7 +69,12 @@
         "downloadAs": "Descargar como {format}",
         "export": "Exportar",
         "exportAs": "Exportar como {format}",
-        "recreate": "Volver a crear"
+        "recreate": "Volver a crear",
+        "import": "Importar",
+        "details": "Detalles",
+        "setPrimary": "Establecer como principal",
+        "unsetPrimary": "Quitar principal",
+        "leavePage": "Salir de la página"
       },
       "alert": {
         "error": "Error",
@@ -86,7 +91,8 @@
       "tooltip": {
         "resetToDefault": "Restablecer al valor predeterminado",
         "edit": "Editar",
-        "delete": "Eliminar"
+        "delete": "Eliminar",
+        "primary": "Principal"
       },
       "form": {
         "name": "Nombre",
@@ -95,6 +101,40 @@
         "host": "Host",
         "username": "Usuario",
         "server": "Servidor",
+        "url": "URL",
+        "email": "Correo",
+        "port": "Puerto",
+        "command": "Comando",
+        "firstName": "Nombre",
+        "lastName": "Apellidos",
+        "language": "Idioma",
+        "enabled": "Activado",
+        "fileName": "Nombre del archivo",
+        "sftpPort": "Puerto SFTP",
+        "sftpHost": "Host SFTP",
+        "dockerImage": "Imagen de Docker",
+        "memory": "Memoria",
+        "disk": "Disco",
+        "serverName": "Nombre del servidor",
+        "startupCommand": "Comando de arranque",
+        "archiveName": "Nombre del archivo",
+        "archiveFormat": "Formato del archivo",
+        "databaseHost": "Host de la base de datos",
+        "timezone": "Zona horaria",
+        "protocol": "Protocolo",
+        "powerAction": "Acción de energía",
+        "destination": "Destino",
+        "directoryName": "Nombre del directorio",
+        "locked": "Bloqueada",
+        "portRanges": "Rangos de puertos",
+        "portRangesPlaceholder": "Rangos de puertos (p. ej. 3000-4000)",
+        "currentPassword": "Contraseña actual",
+        "confirmPassword": "Confirmar contraseña",
+        "authenticationCode": "Código de autenticación",
+        "lineContains": "La línea contiene",
+        "eggs": "Eggs",
+        "ignoredFiles": "Archivos ignorados",
+        "yourControlPanelPassword": "Tu contraseña del panel de control",
         "truncateDirectory": "¿Quieres eliminar todos los archivos de este servidor antes de realizar esta acción? Esto no se puede deshacer."
       },
       "table": {
@@ -113,7 +153,8 @@
           "event": "Evento",
           "ip": "IP",
           "when": "Cuándo",
-          "command": "Comando"
+          "command": "Comando",
+          "notes": "Notas"
         }
       },
       "badge": {
@@ -380,17 +421,12 @@
             "description": "Elige una contraseña segura. Esta cuenta tendrá acceso administrativo completo a todos los servidores y ajustes."
           },
           "form": {
-            "username": "Usuario",
             "usernamePlaceholder": "admin",
             "email": "Dirección de correo",
             "emailPlaceholder": "admin@example.com",
-            "firstName": "Nombre",
             "firstNamePlaceholder": "Alan",
-            "lastName": "Apellidos",
             "lastNamePlaceholder": "Turing",
-            "password": "Contraseña",
             "passwordPlaceholder": "Introduce una contraseña segura",
-            "confirmPassword": "Confirmar contraseña",
             "confirmPasswordPlaceholder": "Vuelve a introducir tu contraseña"
           },
           "button": {
@@ -401,9 +437,7 @@
           "title": "Volver a iniciar sesión",
           "alert": "Se cerró tu sesión durante el proceso de configuración. Vuelve a iniciar sesión para continuar donde lo dejaste.",
           "form": {
-            "username": "Usuario",
             "usernamePlaceholder": "admin",
-            "password": "Contraseña",
             "passwordPlaceholder": "Introduce una contraseña segura"
           },
           "button": {
@@ -430,21 +464,14 @@
           "form": {
             "name": "Nombre",
             "namePlaceholder": "Mi servidor",
-            "url": "URL",
             "urlPlaceholder": "URL",
             "urlDescription": "se usa para la comunicación interna con el nodo",
             "publicUrl": "URL pública",
             "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "se usa para websockets/descargas",
-            "sftpHost": "Host SFTP",
             "sftpHostPlaceholder": "Host SFTP",
-            "sftpPort": "Puerto SFTP",
             "sftpPortPlaceholder": "Puerto SFTP",
-            "memory": "Memoria",
-            "disk": "Disco",
-            "ip": "IP",
-            "portRanges": "Rangos de puertos",
-            "portRangesPlaceholder": "Rangos de puertos (p. ej. 3000-4000)"
+            "ip": "IP"
           },
           "error": {
             "noLocations": "Algo salió mal. No se encontraron ubicaciones."
@@ -470,7 +497,6 @@
           "form": {
             "applicationName": "Nombre de la aplicación",
             "applicationNamePlaceholder": "Calagopus",
-            "language": "Idioma",
             "languagePlaceholder": "Idioma",
             "applicationUrl": "URL de la aplicación",
             "applicationUrlPlaceholder": "https://calagop.us",
@@ -497,9 +523,6 @@
               "title": "Pterodactyl Generic Eggs",
               "description": "Eggs para entornos genéricos como Node JS, Java y Rust."
             }
-          },
-          "button": {
-            "submit": "Importar"
           }
         },
         "server": {
@@ -517,7 +540,6 @@
             "noNodes": "Algo salió mal. No se encontraron nodos."
           },
           "button": {
-            "submit": "Importar",
             "create": "Crear y continuar"
           }
         },
@@ -624,11 +646,6 @@
         "register": {
           "title": "Registrarse",
           "subtitle": "Introduce tus datos para registrarte",
-          "form": {
-            "email": "Correo",
-            "firstName": "Nombre",
-            "lastName": "Apellidos"
-          },
           "button": {
             "register": "Registrarse"
           }
@@ -636,9 +653,6 @@
         "forgotPassword": {
           "title": "Olvidé mi contraseña",
           "subtitle": "Introduce tu correo para recibir instrucciones sobre cómo restablecer tu contraseña",
-          "form": {
-            "email": "Correo"
-          },
           "button": {
             "request": "Solicitar restablecimiento de contraseña"
           },
@@ -647,9 +661,6 @@
         "resetPassword": {
           "title": "Restablecer contraseña",
           "subtitle": "Introduce tu nueva contraseña",
-          "form": {
-            "confirmPassword": "Confirmar contraseña"
-          },
           "button": {
             "reset": "Restablecer contraseña"
           },
@@ -756,7 +767,6 @@
                 "updated": "Contraseña actualizada correctamente."
               },
               "form": {
-                "currentPassword": "Contraseña actual",
                 "newPassword": "Nueva contraseña",
                 "confirmNewPassword": "Confirmar nueva contraseña"
               }
@@ -767,8 +777,7 @@
                 "updated": "Correo actualizado correctamente."
               },
               "form": {
-                "newEmail": "Nuevo correo",
-                "currentPassword": "Contraseña actual"
+                "newEmail": "Nuevo correo"
               }
             },
             "twoFactor": {
@@ -780,18 +789,12 @@
               "modal": {
                 "disableTwoFactor": {
                   "title": "Desactivar autenticación de dos factores",
-                  "description": "Desactivar la autenticación de dos factores hará que tu cuenta sea menos segura.",
-                  "form": {
-                    "code": "Código de autenticación"
-                  }
+                  "description": "Desactivar la autenticación de dos factores hará que tu cuenta sea menos segura."
                 },
                 "setupTwoFactor": {
                   "title": "Configurar autenticación de dos factores",
                   "description": "Ayuda a proteger tu cuenta de accesos no autorizados. Se te pedirá un código de verificación cada vez que inicies sesión.",
-                  "descriptionQR": "Escanea el código QR de arriba con la app de autenticación en dos factores que prefieras. Después, introduce el código de 6 dígitos generado en el campo de abajo.",
-                  "form": {
-                    "code": "Código de autenticación"
-                  }
+                  "descriptionQR": "Escanea el código QR de arriba con la app de autenticación en dos factores que prefieras. Después, introduce el código de 6 dígitos generado en el campo de abajo."
                 },
                 "recoveryCodes": {
                   "title": "Códigos de recuperación",
@@ -812,10 +815,6 @@
                 "updated": "Los detalles de la cuenta se actualizaron correctamente."
               },
               "form": {
-                "nameFirst": "Nombre",
-                "nameLast": "Apellidos",
-                "username": "Usuario",
-                "language": "Idioma",
                 "toastPosition": "Posición de los avisos",
                 "startOnGroupedServers": "Iniciar en la página de servidores agrupados"
               }
@@ -924,9 +923,6 @@
         },
         "sshKeys": {
           "title": "Claves SSH",
-          "button": {
-            "import": "Importar"
-          },
           "table": {
             "columns": {
               "fingerprint": "Huella"
@@ -957,8 +953,7 @@
                 "created": "{sshKeys} creadas."
               },
               "form": {
-                "provider": "Proveedor",
-                "username": "Usuario"
+                "provider": "Proveedor"
               }
             },
             "deleteSshKey": {
@@ -972,15 +967,6 @@
         },
         "commandSnippets": {
           "title": "Fragmentos de comandos",
-          "table": {
-            "columns": {
-              "eggs": "Eggs"
-            }
-          },
-          "form": {
-            "eggs": "Eggs",
-            "command": "Comando"
-          },
           "modal": {
             "createCommandSnippet": {
               "title": "Crear fragmento de comando",
@@ -1076,7 +1062,6 @@
           "title": "Actividad"
         }
       },
-      "admin": {},
       "server": {
         "viewAdmin": {
           "title": "Ver como administrador"
@@ -1094,12 +1079,6 @@
             "sshDetails": {
               "title": "Detalles SSH",
               "form": {
-                "protocol": "Protocolo",
-                "port": "Puerto",
-                "host": "Host",
-                "username": "Usuario",
-                "password": "Contraseña",
-                "yourPassword": "Tu contraseña del panel de control",
                 "command": "Comando SSH"
               },
               "launch": "Abrir"
@@ -1196,10 +1175,8 @@
             "new": "Nuevo",
             "sftpDetails": "Detalles SFTP",
             "openInNewWindow": "Abrir en una nueva ventana",
-            "details": "Detalles",
             "rename": "Renombrar",
             "copy": "Copiar",
-            "move": "Mover",
             "fingerprint": "Huella",
             "permissions": "Permisos",
             "unarchive": "Extraer",
@@ -1269,45 +1246,31 @@
           "modal": {
             "activeUploads": {
               "title": "Subidas activas",
-              "content": "¿Seguro que quieres salir de esta página? Tienes {files} subidas de archivos activas. Si sales, las subidas se cancelarán.",
-              "button": {
-                "leave": "Salir de la página"
-              }
+              "content": "¿Seguro que quieres salir de esta página? Tienes {files} subidas de archivos activas. Si sales, las subidas se cancelarán."
             },
             "unsavedChanges": {
               "title": "Cambios sin guardar",
-              "content": "Tienes cambios sin guardar en el editor de archivos. ¿Seguro que quieres salir de esta página? Si sales, se perderán tus cambios.",
-              "button": {
-                "leave": "Salir de la página"
-              }
+              "content": "Tienes cambios sin guardar en el editor de archivos. ¿Seguro que quieres salir de esta página? Si sales, se perderán tus cambios."
             },
             "createArchive": {
               "title": "Crear archivo",
               "form": {
-                "archiveName": "Nombre del archivo",
                 "format": "Formato"
               },
               "createdAs": "Este archivo se creará como "
             },
             "createDirectory": {
               "title": "Crear directorio",
-              "form": {
-                "directoryName": "Nombre del directorio"
-              },
               "createdAs": "Este directorio se creará como "
             },
             "copyFile": {
               "title": "Copiar archivo",
-              "form": {
-                "fileName": "Nombre del archivo"
-              },
               "createdAs": "Este archivo se creará como "
             },
             "copyRemote": {
               "title": "Copiar archivos de forma remota",
               "form": {
-                "server": "Servidor",
-                "destination": "Destino"
+                "server": "Servidor"
               },
               "createdAs": "Estos archivos se crearán en el servidor remoto bajo "
             },
@@ -1327,10 +1290,7 @@
               "multipleFilesWarning": "No podrás recuperar el contenido de los siguientes archivos una vez eliminados."
             },
             "createFile": {
-              "title": "Crear archivo",
-              "form": {
-                "fileName": "Nombre del archivo"
-              }
+              "title": "Crear archivo"
             },
             "details": {
               "title": "Detalles del archivo",
@@ -1355,10 +1315,7 @@
               "executePermission": "Permiso de ejecución (1)"
             },
             "renameFile": {
-              "title": "Renombrar archivo",
-              "form": {
-                "fileName": "Nombre del archivo"
-              }
+              "title": "Renombrar archivo"
             },
             "searchFiles": {
               "title": "Buscar archivos",
@@ -1372,7 +1329,7 @@
               "searchText": "Texto de búsqueda",
               "maxFileSize": "Tamaño máximo de archivo",
               "includeOversized": "Incluir archivos demasiado grandes",
-              "includeOversizedDescription": "Incluye archivos que coinciden con otros filtros pero son demasiado grandes para buscar en su contenido",
+              "includeOversizedDescription": "Incluye archivos que coinciden con otros filtros pero son demasiado grandes para buscar.",
               "fileSize": "Tamaño del archivo",
               "minimum": "Mínimo",
               "maximum": "Máximo"
@@ -1381,22 +1338,13 @@
               "title": "Traer archivo",
               "form": {
                 "fileUrl": "URL del archivo",
-                "query": "Consulta",
-                "fileName": "Nombre del archivo"
+                "query": "Consulta"
               },
               "createdAs": "Este archivo se creará como ",
               "pull": "Traer"
             },
             "sftpDetails": {
               "title": "Detalles SFTP",
-              "form": {
-                "protocol": "Protocolo",
-                "port": "Puerto",
-                "host": "Host",
-                "username": "Usuario",
-                "password": "Contraseña",
-                "yourPassword": "Tu contraseña del panel de control"
-              },
               "launch": "Abrir"
             }
           }
@@ -1409,13 +1357,10 @@
           },
           "table": {
             "columns": {
-              "type": "Tipo",
-              "address": "Dirección",
               "locked": "¿Bloqueada?"
             }
           },
           "button": {
-            "details": "Detalles",
             "rotatePassword": "Rotar contraseña"
           },
           "form": {
@@ -1428,7 +1373,6 @@
                 "created": "Base de datos creada."
               },
               "form": {
-                "databaseHost": "Host de la base de datos",
                 "noHostsFound": "No se encontraron hosts"
               }
             },
@@ -1436,9 +1380,6 @@
               "title": "Editar base de datos",
               "toast": {
                 "updated": "Base de datos actualizada."
-              },
-              "form": {
-                "locked": "Bloqueada"
               }
             },
             "databaseDetails": {
@@ -1484,7 +1425,6 @@
             }
           },
           "button": {
-            "import": "Importar",
             "trigger": "Ejecutar",
             "triggerWithCondition": "Ejecutar (no omitir condición)",
             "triggerSkipCondition": "Ejecutar (omitir condición)",
@@ -1588,7 +1528,6 @@
           },
           "form": {
             "scheduleName": "Nombre de la tarea programada",
-            "enabled": "Activado",
             "triggersList": "Disparadores",
             "triggerNumber": "Disparador {number}",
             "actionType": "Tipo de acción",
@@ -1614,8 +1553,7 @@
           "preCondition": {
             "valueSeconds": "Valor (segundos)",
             "valuePercent": "Valor (%)",
-            "value": "Valor",
-            "filePath": "Ruta del archivo"
+            "value": "Valor"
           },
           "triggers": {
             "cron": {
@@ -1629,9 +1567,6 @@
             },
             "powerAction": {
               "title": "Acción de energía",
-              "form": {
-                "powerAction": "Acción de energía"
-              },
               "card": {
                 "content": "Cuando se solicita la acción de energía `{action}`."
               }
@@ -1653,9 +1588,6 @@
             },
             "consoleLine": {
               "title": "Línea de consola",
-              "form": {
-                "lineContains": "La línea contiene"
-              },
               "card": {
                 "content": "Cuando la salida de la consola alcanza una línea que contiene `{contains}`"
               }
@@ -1697,7 +1629,7 @@
               "title": "Formatear",
               "form": {
                 "formatString": "Cadena de formato",
-                "formatStringDescription": "La cadena de formato puede incluir variables envolviéndolas en {wrapper}"
+                "formatStringDescription": "La cadena de formato. Se pueden incluir variables envolviéndolas dentro de {wrapper}."
               },
               "renderer": {
                 "compact": "Formatear una cadena en {outputInto}"
@@ -1718,7 +1650,6 @@
             "waitForConsoleLine": {
               "title": "Esperar línea de consola",
               "form": {
-                "lineContains": "La línea contiene",
                 "timeout": "Tiempo de espera (milisegundos)"
               },
               "renderer": {
@@ -1732,9 +1663,6 @@
             },
             "sendCommand": {
               "title": "Enviar comando",
-              "form": {
-                "command": "Comando"
-              },
               "renderer": {
                 "compact": "Ejecutar {command}",
                 "detail": {
@@ -1744,9 +1672,6 @@
             },
             "sendPower": {
               "title": "Enviar señal de energía",
-              "form": {
-                "powerAction": "Acción de energía"
-              },
               "renderer": {
                 "compact": "Hacer {action}",
                 "detail": {
@@ -1757,8 +1682,7 @@
             "createBackup": {
               "title": "Crear copia de seguridad",
               "form": {
-                "backupName": "Nombre de la copia de seguridad",
-                "ignoredFiles": "Archivos ignorados"
+                "backupName": "Nombre de la copia de seguridad"
               },
               "renderer": {
                 "compact": "Crear {name}",
@@ -1770,9 +1694,6 @@
             },
             "createDirectory": {
               "title": "Crear directorio",
-              "form": {
-                "directoryName": "Nombre del directorio"
-              },
               "renderer": {
                 "compact": "Crear {name} en {root}",
                 "detail": {
@@ -1784,7 +1705,6 @@
             "writeFile": {
               "title": "Escribir archivo",
               "form": {
-                "filePath": "Ruta del archivo",
                 "content": "Contenido",
                 "appendToFile": "Añadir al archivo"
               },
@@ -1799,8 +1719,7 @@
             "copyFile": {
               "title": "Copiar archivo",
               "form": {
-                "sourceFile": "Archivo origen",
-                "destination": "Destino"
+                "sourceFile": "Archivo origen"
               },
               "renderer": {
                 "compact": "Copiar {file} a {destination}",
@@ -1841,9 +1760,7 @@
             "compressFiles": {
               "title": "Comprimir archivos",
               "form": {
-                "filesToCompress": "Archivos a comprimir",
-                "archiveFormat": "Formato del archivo",
-                "archiveName": "Nombre del archivo"
+                "filesToCompress": "Archivos a comprimir"
               },
               "renderer": {
                 "compact": "Comprimir {files} en {root} como {name}",
@@ -1870,10 +1787,6 @@
             },
             "updateStartupVariable": {
               "title": "Actualizar variable de arranque",
-              "form": {
-                "envVariable": "Variable de entorno",
-                "value": "Valor"
-              },
               "renderer": {
                 "compact": "Establecer {variable} en {value}",
                 "detail": {
@@ -1884,9 +1797,6 @@
             },
             "updateStartupCommand": {
               "title": "Actualizar comando de arranque",
-              "form": {
-                "startupCommand": "Comando de arranque"
-              },
               "renderer": {
                 "compact": "Establecer en {command}",
                 "detail": {
@@ -1896,9 +1806,6 @@
             },
             "updateStartupDockerImage": {
               "title": "Actualizar imagen de Docker",
-              "form": {
-                "dockerImage": "Imagen de Docker"
-              },
               "renderer": {
                 "compact": "Establecer en {image}",
                 "detail": {
@@ -1924,10 +1831,8 @@
                 "created": "Subusuario creado."
               },
               "form": {
-                "email": "Correo",
                 "emailPlaceholder": "Introduce el correo con el que se guardará este subusuario.",
-                "permissions": "Permisos",
-                "ignoredFiles": "Archivos ignorados"
+                "permissions": "Permisos"
               }
             },
             "updateSubuser": {
@@ -1970,18 +1875,12 @@
               "title": "Crear copia de seguridad",
               "toast": {
                 "created": "Copia de seguridad creada."
-              },
-              "form": {
-                "ignoredFiles": "Archivos ignorados"
               }
             },
             "editBackup": {
               "title": "Editar copia de seguridad",
               "toast": {
                 "updated": "Copia de seguridad actualizada."
-              },
-              "form": {
-                "locked": "Bloqueada"
               }
             },
             "restoreBackup": {
@@ -2000,19 +1899,13 @@
           "title": "Red",
           "subtitle": "{current} de {max} asignaciones máximas asignadas.",
           "tooltip": {
-            "limitReached": "Este servidor está limitado a {max} asignaciones.",
-            "primary": "Principal"
+            "limitReached": "Este servidor está limitado a {max} asignaciones."
           },
           "table": {
             "columns": {
               "hostname": "Nombre de host",
-              "port": "Puerto",
-              "notes": "Notas"
+              "port": "Puerto"
             }
-          },
-          "button": {
-            "setPrimary": "Establecer como principal",
-            "unsetPrimary": "Quitar principal"
           },
           "toast": {
             "created": "Asignación creada.",
@@ -2023,10 +1916,7 @@
           },
           "modal": {
             "editAllocation": {
-              "title": "Editar asignación",
-              "form": {
-                "notes": "Notas"
-              }
+              "title": "Editar asignación"
             },
             "removeAllocation": {
               "title": "Confirmar eliminación de la asignación",
@@ -2036,10 +1926,6 @@
         },
         "startup": {
           "title": "Arranque",
-          "form": {
-            "startupCommand": "Comando de arranque",
-            "dockerImage": "Imagen de Docker"
-          },
           "variables": "Variables",
           "dockerImageDescription": "La imagen de Docker usada para ejecutar este servidor. Se puede cambiar para usar una imagen diferente.",
           "dockerImageDescriptionCustom": "La imagen de Docker usada para ejecutar este servidor. Ha sido configurada por un administrador y no se puede cambiar.",
@@ -2051,10 +1937,7 @@
           "modal": {
             "unsavedChanges": {
               "title": "Cambios sin guardar",
-              "content": "Tienes cambios sin guardar en tus variables de arranque. ¿Seguro que quieres salir de esta página? Si sales, se perderán tus cambios.",
-              "button": {
-                "leave": "Salir de la página"
-              }
+              "content": "Tienes cambios sin guardar en tus variables de arranque. ¿Seguro que quieres salir de esta página? Si sales, se perderán tus cambios."
             }
           },
           "noVariables": "No se encontraron variables de arranque para este servidor."
@@ -2101,19 +1984,12 @@
           },
           "rename": {
             "title": "Renombrar servidor",
-            "form": {
-              "serverName": "Nombre del servidor"
-            },
             "toast": {
               "renamed": "Servidor renombrado."
             }
           },
           "timezone": {
             "title": "Zona horaria",
-            "form": {
-              "timezone": "Zona horaria",
-              "system": "Sistema"
-            },
             "toast": {
               "updated": "Zona horaria del servidor actualizada."
             }
@@ -2121,7 +1997,6 @@
           "autokill": {
             "title": "Detención automática",
             "form": {
-              "enabled": "Activado",
               "secondsUntilAutoKill": "Segundos hasta la detención automática"
             },
             "toast": {

@@ -2,7 +2,7 @@ import { faArrowUpRightFromSquare, faGripVertical, faMinus, faPlus, faTrash } fr
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Group, Paper, Stack, Text, useComputedColorScheme } from '@mantine/core';
 import { ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
-import { ServerRouteDefinition } from 'shared';
+import { RouteDefinition } from 'shared';
 import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Badge from '@/elements/Badge.tsx';
@@ -14,6 +14,7 @@ import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { eggConfigurationRouteItemSchema } from '@/lib/schemas/generic.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type RouteItem = z.infer<typeof eggConfigurationRouteItemSchema>;
 
@@ -26,7 +27,7 @@ interface DndRouteEntry extends DndItem {
 interface RouteOrderEditorProps {
   value: RouteItem[];
   onChange: (value: RouteItem[]) => void;
-  serverRoutes: ServerRouteDefinition[];
+  routes: RouteDefinition[];
   languages: string[];
   readOnly?: boolean;
 }
@@ -45,10 +46,11 @@ function itemContentKey(item: RouteItem, index: number): string {
 export default function RouteOrderEditor({
   value,
   onChange,
-  serverRoutes,
+  routes,
   languages,
   readOnly = false,
 }: RouteOrderEditorProps) {
+  const { t } = useTranslations();
   const isDark = useComputedColorScheme('dark') === 'dark';
 
   const [addType, setAddType] = useState<'route' | 'divider' | 'redirect'>('route');
@@ -79,8 +81,8 @@ export default function RouteOrderEditor({
   const usedPaths = useMemo(() => new Set(value.filter((i) => i.type === 'route').map((i) => i.path)), [value]);
 
   const availableRoutes = useMemo(
-    () => serverRoutes.filter((r) => r.name !== undefined && !usedPaths.has(r.path)),
-    [serverRoutes, usedPaths],
+    () => routes.filter((r) => r.name !== undefined && !usedPaths.has(r.path)),
+    [routes, usedPaths],
   );
 
   const emit = useCallback(
@@ -114,9 +116,9 @@ export default function RouteOrderEditor({
     emit([...value, { type: 'redirect', name: '', nameTranslations: {}, destination: '' }]);
   };
 
-  const getRouteInfo = (path: string) => serverRoutes.find((r) => r.path === path);
+  const getRouteInfo = (path: string) => routes.find((r) => r.path === path);
 
-  const handleDragEnd = (items: DndRouteEntry[], oldIndex: number, newIndex: number) => {
+  const handleDragEnd = (items: DndRouteEntry[]) => {
     emit(items.map((i) => i.item));
   };
 
@@ -143,7 +145,7 @@ export default function RouteOrderEditor({
             )}
 
             <Badge variant={isDark ? 'light' : 'filled'} color='blue' size='sm' style={{ flexShrink: 0 }}>
-              Route
+              {t('elements.routeOrderEditor.label.route', {})}
             </Badge>
 
             {info?.icon && <FontAwesomeIcon icon={info.icon} style={{ fontSize: 14, opacity: 0.7, flexShrink: 0 }} />}
@@ -155,7 +157,7 @@ export default function RouteOrderEditor({
             </Text>
 
             {!readOnly && (
-              <Tooltip label='Remove' withArrow>
+              <Tooltip label={t('common.tooltip.remove', {})} withArrow>
                 <ActionIcon
                   variant='subtle'
                   color='red'
@@ -191,13 +193,13 @@ export default function RouteOrderEditor({
             <Badge variant={isDark ? 'light' : 'filled'} color='gray' size='sm' style={{ flexShrink: 0 }}>
               <Group gap={4}>
                 <FontAwesomeIcon icon={faMinus} style={{ fontSize: 10 }} />
-                Divider
+                {t('elements.routeOrderEditor.label.divider', {})}
               </Group>
             </Badge>
 
             {readOnly ? (
               <Text size='sm' c='dimmed' style={{ flex: 1 }}>
-                {item.name || '(unnamed)'}
+                {item.name || t('elements.routeOrderEditor.unnamed', {})}
               </Text>
             ) : (
               <Box style={{ flex: 1 }}>
@@ -207,14 +209,14 @@ export default function RouteOrderEditor({
                   setValue={(v) => handleUpdate(index, { ...item, name: v })}
                   valueTranslations={item.nameTranslations}
                   setValueTranslations={(t) => handleUpdate(index, { ...item, nameTranslations: t })}
-                  placeholder='Divider label (optional)'
+                  placeholder={t('elements.routeOrderEditor.dividerPlaceholder', {})}
                   size='sm'
                 />
               </Box>
             )}
 
             {!readOnly && (
-              <Tooltip label='Remove' withArrow>
+              <Tooltip label={t('common.tooltip.remove', {})} withArrow>
                 <ActionIcon
                   variant='subtle'
                   color='red'
@@ -251,13 +253,13 @@ export default function RouteOrderEditor({
               <Badge variant={isDark ? 'light' : 'filled'} color='orange' size='sm' style={{ flexShrink: 0 }}>
                 <Group gap={4}>
                   <FontAwesomeIcon icon={faArrowUpRightFromSquare} style={{ fontSize: 10 }} />
-                  Redirect
+                  {t('elements.routeOrderEditor.label.redirect', {})}
                 </Group>
               </Badge>
 
               {readOnly ? (
                 <Text size='sm' fw={500} style={{ flex: 1 }}>
-                  {item.name || '(unnamed)'}
+                  {item.name || t('elements.routeOrderEditor.unnamed', {})}
                 </Text>
               ) : (
                 <Box style={{ flex: 1 }}>
@@ -267,14 +269,14 @@ export default function RouteOrderEditor({
                     setValue={(v) => handleUpdate(index, { ...item, name: v ?? '' })}
                     valueTranslations={item.nameTranslations}
                     setValueTranslations={(t) => handleUpdate(index, { ...item, nameTranslations: t })}
-                    placeholder='Redirect name'
+                    placeholder={t('elements.routeOrderEditor.redirectNamePlaceholder', {})}
                     size='sm'
                   />
                 </Box>
               )}
 
               {!readOnly && (
-                <Tooltip label='Remove' withArrow>
+                <Tooltip label={t('common.tooltip.remove', {})} withArrow>
                   <ActionIcon
                     variant='subtle'
                     color='red'
@@ -292,7 +294,7 @@ export default function RouteOrderEditor({
               {!readOnly ? (
                 <TextInput
                   size='sm'
-                  placeholder='Destination URL (e.g. https://...)'
+                  placeholder={t('elements.routeOrderEditor.destinationPlaceholder', {})}
                   value={item.destination}
                   onChange={(e) => handleUpdate(index, { ...item, destination: e.currentTarget.value })}
                 />
@@ -338,7 +340,7 @@ export default function RouteOrderEditor({
         </DndContainer>
       ) : (
         <Text size='sm' c='dimmed' ta='center' py='md'>
-          No routes configured. Add routes, dividers, or redirects below.
+          {t('elements.routeOrderEditor.empty', {})}
         </Text>
       )}
 
@@ -351,9 +353,9 @@ export default function RouteOrderEditor({
               value={addType}
               onChange={(v) => setAddType((v as 'route' | 'divider' | 'redirect') ?? 'route')}
               data={[
-                { value: 'route', label: 'Route' },
-                { value: 'divider', label: 'Divider' },
-                { value: 'redirect', label: 'Redirect' },
+                { value: 'route', label: t('elements.routeOrderEditor.label.route', {}) },
+                { value: 'divider', label: t('elements.routeOrderEditor.label.divider', {}) },
+                { value: 'redirect', label: t('elements.routeOrderEditor.label.redirect', {}) },
               ]}
               allowDeselect={false}
               w={120}
@@ -362,7 +364,7 @@ export default function RouteOrderEditor({
             {addType === 'route' && (
               <Select
                 size='sm'
-                placeholder='Select a route…'
+                placeholder={t('elements.routeOrderEditor.selectRoutePlaceholder', {})}
                 data={availableRoutes.map((r) => ({
                   value: r.path,
                   label: typeof r.name === 'string' ? r.name : r.name!(),
@@ -385,7 +387,9 @@ export default function RouteOrderEditor({
                 leftSection={<FontAwesomeIcon icon={faPlus} style={{ fontSize: 12 }} />}
                 onClick={addType === 'divider' ? handleAddDivider : handleAddRedirect}
               >
-                Add {addType === 'divider' ? 'Divider' : 'Redirect'}
+                {addType === 'divider'
+                  ? t('elements.routeOrderEditor.button.addDivider', {})
+                  : t('elements.routeOrderEditor.button.addRedirect', {})}
               </Button>
             )}
           </Group>

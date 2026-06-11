@@ -68,7 +68,7 @@ export default function StepCreateOrUpdateModal({
       order: nextStepOrder ?? 1,
       action: scheduleStepDefaultMapping.sleep,
     },
-    validate: zod4Resolver(serverScheduleStepSchema),
+    validate: zod4Resolver(serverScheduleStepUpdateSchema),
     onClose,
     onSubmit: async (values) => {
       if (propStep) {

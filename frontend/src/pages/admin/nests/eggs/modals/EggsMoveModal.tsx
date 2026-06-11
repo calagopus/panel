@@ -13,6 +13,7 @@ import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggsMoveModal({
   nest,
@@ -26,6 +27,7 @@ export default function EggsMoveModal({
   invalidateEggs: () => void;
 }) {
   const { addToast } = useToast();
+  const { t, tItem } = useTranslations();
 
   const [loading, setLoading] = useState(false);
   const [selectedNest, setSelectedNest] = useState<z.infer<typeof adminNestSchema> | null>(null);
@@ -44,7 +46,7 @@ export default function EggsMoveModal({
 
     moveEggs(nest.uuid, selectedEggs.keys(), selectedNest.uuid)
       .then(({ moved }) => {
-        addToast(`${moved} Egg${moved == 1 ? '' : 's'} moved.`, 'success');
+        addToast(t('pages.admin.nests.tabs.eggs.page.toast.movedBulk', { eggs: tItem('egg', moved) }), 'success');
         invalidateEggs();
         onClose();
       })
@@ -55,12 +57,11 @@ export default function EggsMoveModal({
   };
 
   return (
-    <Modal title='Move Eggs' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.nests.tabs.eggs.page.modal.moveBulk.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label='Nest'
-          placeholder='Nest'
+          label={t('common.form.nest', {})}
           value={selectedNest?.uuid}
           onChange={(value) => setSelectedNest(nests.items.find((m) => m.uuid === value) ?? null)}
           data={nests.items.map((nest) => ({
@@ -75,10 +76,12 @@ export default function EggsMoveModal({
 
         <ModalFooter>
           <Button onClick={doMove} loading={loading} disabled={!selectedNest}>
-            Move {selectedEggs.size} Egg{selectedEggs.size == 1 ? '' : 's'}
+            {t('pages.admin.nests.tabs.eggs.page.modal.moveBulk.confirm', {
+              eggs: tItem('egg', selectedEggs.size),
+            })}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

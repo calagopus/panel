@@ -140,7 +140,7 @@ mod post {
             Some(
                 credential_ids
                     .into_iter()
-                    .map(|id| id.credential_id)
+                    .map(|id| id.credential_id.into())
                     .collect(),
             ),
         )?;

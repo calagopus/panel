@@ -7,9 +7,11 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ServerRow from './ServerRow.tsx';
 
 export default function AdminNodeTransfers({ node }: { node: z.infer<typeof adminNodeSchema> }) {
+  const { t } = useTranslations();
   const {
     data: nodeTransferringServers,
     loading,
@@ -33,9 +35,23 @@ export default function AdminNodeTransfers({ node }: { node: z.infer<typeof admi
 
   return (
     <>
-      <AdminSubContentContainer title='Node Transfers' titleOrder={2} search={search} setSearch={setSearch}>
+      <AdminSubContentContainer
+        title={t('pages.admin.nodes.tabs.transfers.page.title', {})}
+        titleOrder={2}
+        search={search}
+        setSearch={setSearch}
+      >
         <Table
-          columns={['ID', 'Progress', 'Archive Rate', 'Network Rate', 'Name', 'Node', 'Owner', 'Created']}
+          columns={[
+            t('common.table.columns.id', {}),
+            t('pages.admin.nodes.tabs.transfers.page.table.columns.progress', {}),
+            t('pages.admin.nodes.tabs.transfers.page.table.columns.archiveRate', {}),
+            t('pages.admin.nodes.tabs.transfers.page.table.columns.networkRate', {}),
+            t('common.table.columns.name', {}),
+            t('common.table.columns.node', {}),
+            t('common.table.columns.owner', {}),
+            t('common.table.columns.created', {}),
+          ]}
           loading={loading}
           pagination={nodeTransferringServers?.servers}
           onPageSelect={setPage}

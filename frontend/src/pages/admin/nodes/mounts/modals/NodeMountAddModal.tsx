@@ -12,6 +12,7 @@ import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function NodeMountAddModal({
@@ -19,6 +20,7 @@ export default function NodeMountAddModal({
   opened,
   onClose,
 }: ModalProps & { node: z.infer<typeof adminNodeSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { addNodeMount } = useAdminStore();
 
@@ -46,7 +48,7 @@ export default function NodeMountAddModal({
 
     createNodeMount(node.uuid, selectedMount.uuid)
       .then(() => {
-        addToast('Node Mount added.', 'success');
+        addToast(t('pages.admin.nodes.tabs.mounts.page.toast.added', {}), 'success');
 
         onClose();
         addNodeMount({ mount: selectedMount, created: new Date() });
@@ -58,12 +60,11 @@ export default function NodeMountAddModal({
   };
 
   return (
-    <Modal title='Add Node Mount' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.nodes.tabs.mounts.page.modal.add.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label='Mount'
-          placeholder='Mount'
+          label={t('common.form.mount', {})}
           value={selectedMount?.uuid}
           onChange={(value) => setSelectedMount(mounts.items.find((m) => m.uuid === value) ?? null)}
           data={mounts.items.map((mount) => ({
@@ -78,10 +79,10 @@ export default function NodeMountAddModal({
 
         <ModalFooter>
           <Button onClick={doAdd} loading={loading} disabled={!selectedMount}>
-            Add
+            {t('common.button.add', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

@@ -34,6 +34,12 @@ mod get {
                 .ok();
         }
 
+        if user.frozen {
+            return ApiResponse::error("account is frozen")
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+        }
+
         let secret = match totp_rs::Secret::generate_secret().to_encoded() {
             totp_rs::Secret::Encoded(secret) => secret,
             _ => unreachable!(),
@@ -111,6 +117,12 @@ mod post {
 
         if user.totp_enabled {
             return ApiResponse::error("two-factor authentication is already enabled")
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+        }
+
+        if user.frozen {
+            return ApiResponse::error("account is frozen")
                 .with_status(StatusCode::CONFLICT)
                 .ok();
         }

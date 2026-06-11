@@ -10,7 +10,6 @@ import updateEggRepository from '@/api/admin/egg-repositories/updateEggRepositor
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -19,12 +18,14 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositorySchema, adminEggRepositoryUpdateSchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggRepositoryCreateOrUpdate({
   contextEggRepository,
 }: {
   contextEggRepository?: z.infer<typeof adminEggRepositorySchema>;
 }) {
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
@@ -51,7 +52,7 @@ export default function EggRepositoryCreateOrUpdate({
     deleteFn: contextEggRepository ? () => deleteEggRepository(contextEggRepository.uuid) : undefined,
     doUpdate: !!contextEggRepository,
     basePath: '/admin/egg-repositories',
-    resourceName: 'Egg Repository',
+    resourceName: t('pages.admin.eggRepositories.resourceName', {}),
   });
 
   useEffect(() => {
@@ -73,7 +74,10 @@ export default function EggRepositoryCreateOrUpdate({
 
     syncEggRepository(contextEggRepository.uuid)
       .then((found) => {
-        addToast(`Egg Repository synchronised, found ${found} Egg${found === 1 ? '' : 's'}.`, 'success');
+        addToast(
+          t('pages.admin.eggRepositories.tabs.general.page.toast.synced', { eggs: tItem('egg', found) }),
+          'success',
+        );
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -83,39 +87,42 @@ export default function EggRepositoryCreateOrUpdate({
 
   return (
     <AdminContentContainer
-      title={`${contextEggRepository ? 'Update' : 'Create'} Egg Repository`}
+      title={
+        contextEggRepository
+          ? t('pages.admin.eggRepositories.tabs.general.page.titleUpdate', {})
+          : t('pages.admin.eggRepositories.tabs.general.page.titleCreate', {})
+      }
       fullscreen={!!contextEggRepository}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Egg Repository Deletion'
-        confirm='Delete'
+        title={t('pages.admin.eggRepositories.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.eggRepositories.tabs.general.page.modal.delete.content', {
+          name: form.getValues().name,
+        }).md()}
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.eggRepositories.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
           <TextInput
             withAsterisk
-            label='Git Repository'
-            placeholder='Git Repository'
+            label={t('pages.admin.eggRepositories.tabs.general.page.form.gitRepository', {})}
             key={form.key('gitRepository')}
             {...form.getInputProps('gitRepository')}
           />
 
           <TextArea
-            label='Description'
-            placeholder='Description'
+            label={t('common.form.description', {})}
             className='col-span-full'
             rows={3}
             key={form.key('description')}
@@ -126,25 +133,25 @@ export default function EggRepositoryCreateOrUpdate({
         <Group mt='md'>
           <AdminCan action={contextEggRepository ? 'egg-repositories.update' : 'egg-repositories.create'} cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
             {!contextEggRepository && (
               <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             )}
           </AdminCan>
           {contextEggRepository && (
             <AdminCan action='egg-repositories.sync'>
               <Button variant='outline' onClick={doSync} loading={loading}>
-                Sync
+                {t('pages.admin.eggRepositories.tabs.general.page.button.sync', {})}
               </Button>
             </AdminCan>
           )}
           {contextEggRepository && (
             <AdminCan action='egg-repositories.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                Delete
+                {t('common.button.delete', {})}
               </Button>
             </AdminCan>
           )}

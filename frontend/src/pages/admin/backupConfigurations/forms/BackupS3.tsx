@@ -6,16 +6,19 @@ import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { adminBackupConfigurationS3Schema } from '@/lib/schemas/admin/backupConfigurations.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function BackupS3({
   form,
 }: {
   form: UseFormReturnType<z.infer<typeof adminBackupConfigurationS3Schema>>;
 }) {
+  const { t } = useTranslations();
+
   return (
     <Stack gap='xs' mt='md'>
       <Stack gap={0}>
-        <Title order={2}>S3 Settings</Title>
+        <Title order={2}>{t('pages.admin.backupConfigurations.tabs.general.page.s3.title', {})}</Title>
         <Divider />
       </Stack>
 
@@ -23,15 +26,13 @@ export default function BackupS3({
         <Group grow>
           <TextInput
             withAsterisk
-            label='Access Key'
-            placeholder='Access Key'
+            label={t('common.form.accessKey', {})}
             key={form.key('accessKey')}
             {...form.getInputProps('accessKey')}
           />
           <PasswordInput
             withAsterisk
-            label='Secret Key'
-            placeholder='Secret Key'
+            label={t('common.form.secretKey', {})}
             key={form.key('secretKey')}
             {...form.getInputProps('secretKey')}
           />
@@ -40,15 +41,13 @@ export default function BackupS3({
         <Group grow>
           <TextInput
             withAsterisk
-            label='Bucket'
-            placeholder='Bucket'
+            label={t('common.form.bucket', {})}
             key={form.key('bucket')}
             {...form.getInputProps('bucket')}
           />
           <TextInput
             withAsterisk
-            label='Region'
-            placeholder='Region'
+            label={t('common.form.region', {})}
             key={form.key('region')}
             {...form.getInputProps('region')}
           />
@@ -57,14 +56,13 @@ export default function BackupS3({
         <Group grow>
           <TextInput
             withAsterisk
-            label='Endpoint'
-            placeholder='Endpoint'
+            label={t('common.form.endpoint', {})}
             key={form.key('endpoint')}
             {...form.getInputProps('endpoint')}
           />
           <SizeInput
             withAsterisk
-            label='Part Size'
+            label={t('pages.admin.backupConfigurations.tabs.general.page.s3.form.partSize', {})}
             mode='b'
             min={0}
             value={form.values.partSize}
@@ -72,7 +70,10 @@ export default function BackupS3({
           />
         </Group>
 
-        <Switch label='Using path-style URLs' {...form.getInputProps('pathStyle', { type: 'checkbox' })} />
+        <Switch
+          label={t('pages.admin.backupConfigurations.tabs.general.page.s3.form.pathStyle', {})}
+          {...form.getInputProps('pathStyle', { type: 'checkbox' })}
+        />
       </Stack>
     </Stack>
   );

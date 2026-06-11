@@ -34,6 +34,12 @@ mod put {
     ) -> ApiResponseResult {
         permissions.has_user_permission("account.avatar")?;
 
+        if user.frozen {
+            return ApiResponse::error("account is frozen")
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+        }
+
         let image = match ImageReader::new(std::io::Cursor::new(image)).with_guessed_format() {
             Ok(reader) => reader,
             Err(_) => {

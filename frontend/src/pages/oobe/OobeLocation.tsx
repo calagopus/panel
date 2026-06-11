@@ -67,6 +67,7 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
       repository: '',
       retryLockSeconds: 0,
       environment: {},
+      pruneJobs: [],
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(adminBackupConfigurationResticSchema),

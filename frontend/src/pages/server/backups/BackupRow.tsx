@@ -102,7 +102,9 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.server.backups.modal.deleteBackup.content', { name: backup.name }).md()}
+        {t('pages.server.backups.modal.deleteBackup.content', {
+          name: backup.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
@@ -175,7 +177,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>{backup.name}</TableData>

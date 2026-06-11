@@ -119,7 +119,7 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
               onContextMenu={(e) => {
                 e.preventDefault();
                 if (isSelected) {
-                  openMassMenu(e.pageX, e.pageY);
+                  openMassMenu(e.clientX, e.clientY);
                 } else {
                   openMenu(e.clientX, e.clientY);
                 }

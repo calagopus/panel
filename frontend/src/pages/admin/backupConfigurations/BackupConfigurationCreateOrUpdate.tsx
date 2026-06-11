@@ -9,10 +9,8 @@ import createBackupConfiguration from '@/api/admin/backup-configurations/createB
 import deleteBackupConfiguration from '@/api/admin/backup-configurations/deleteBackupConfiguration.ts';
 import updateBackupConfiguration from '@/api/admin/backup-configurations/updateBackupConfiguration.ts';
 import Alert from '@/elements/Alert.tsx';
-import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -30,12 +28,14 @@ import {
 import BackupRestic from '@/pages/admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '@/pages/admin/backupConfigurations/forms/BackupS3.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function BackupConfigurationCreateOrUpdate({
   contextBackupConfiguration,
 }: {
   contextBackupConfiguration?: z.infer<typeof adminBackupConfigurationSchema>;
 }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const form = useForm<Partial<z.infer<typeof adminBackupConfigurationUpdateSchema>>>({
@@ -69,6 +69,7 @@ export default function BackupConfigurationCreateOrUpdate({
       repository: '',
       retryLockSeconds: 0,
       environment: {},
+      pruneJobs: [],
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(adminBackupConfigurationResticSchema),
@@ -108,7 +109,7 @@ export default function BackupConfigurationCreateOrUpdate({
     deleteFn: contextBackupConfiguration ? () => deleteBackupConfiguration(contextBackupConfiguration.uuid) : undefined,
     doUpdate: !!contextBackupConfiguration,
     basePath: '/admin/backup-configurations',
-    resourceName: 'Backup configuration',
+    resourceName: t('pages.admin.backupConfigurations.resourceName', {}),
   });
 
   useEffect(() => {
@@ -124,57 +125,54 @@ export default function BackupConfigurationCreateOrUpdate({
         backupConfigS3Form.setValues(contextBackupConfiguration.backupConfigs.s3);
       }
       if (contextBackupConfiguration.backupConfigs?.restic) {
-        backupConfigResticForm.setValues(contextBackupConfiguration.backupConfigs.restic);
+        backupConfigResticForm.setValues({
+          ...contextBackupConfiguration.backupConfigs.restic,
+          pruneJobs: contextBackupConfiguration.backupConfigs.restic.pruneJobs ?? [],
+        });
       }
     }
   }, [contextBackupConfiguration]);
 
   return (
     <AdminContentContainer
-      title={`${contextBackupConfiguration ? 'Update' : 'Create'} Backup Config`}
+      title={t(
+        contextBackupConfiguration
+          ? 'pages.admin.backupConfigurations.tabs.general.page.titleUpdate'
+          : 'pages.admin.backupConfigurations.tabs.general.page.titleCreate',
+        {},
+      )}
       fullscreen={!!contextBackupConfiguration}
       titleOrder={2}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Backup Configuration Deletion'
-        confirm='Delete'
+        title={t('pages.admin.backupConfigurations.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.backupConfigurations.tabs.general.page.modal.delete.content', {
+          name: form.getValues().name ?? '',
+        }).md()}
       </ConfirmationModal>
 
       {form.values.backupDisk === 'ddup-bak' && (
         <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
-          Ddup-Bak is Technology Preview software, it is technically not recommended for production use. If you
-          acknowledge, sail ahead as you wish.
+          {t('pages.admin.backupConfigurations.tabs.general.page.alert.ddupBak', {})}
         </Alert>
       )}
       {form.values.backupDisk === 'btrfs' && (
         <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
-          Btrfs requires additional setup on the node to work, please{' '}
-          <Anchor
-            href='https://calagopus.com/docs/wings/disk-limiters/btrfs-subvolume'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            see the documentation
-          </Anchor>{' '}
-          for more details.
+          {t('pages.admin.backupConfigurations.tabs.general.page.alert.btrfs', {
+            docsUrl: 'https://calagopus.com/docs/wings/disk-limiters/btrfs-subvolume',
+          }).md()}
         </Alert>
       )}
       {form.values.backupDisk === 'zfs' && (
         <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
-          ZFS requires additional setup on the node to work, please{' '}
-          <Anchor
-            href='https://calagopus.com/docs/wings/disk-limiters/zfs-dataset'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            see the documentation
-          </Anchor>{' '}
-          for more details.
+          {t('pages.admin.backupConfigurations.tabs.general.page.alert.zfs', {
+            docsUrl: 'https://calagopus.com/docs/wings/disk-limiters/zfs-dataset',
+          }).md()}
         </Alert>
       )}
 
@@ -182,15 +180,13 @@ export default function BackupConfigurationCreateOrUpdate({
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
           <Select
             withAsterisk
-            label='Backup Disk'
-            placeholder='Backup Disk'
+            label={t('pages.admin.backupConfigurations.tabs.general.page.form.backupDisk', {})}
             data={Object.entries(backupDiskLabelMapping).map(([value, label]) => ({
               value,
               label,
@@ -200,8 +196,7 @@ export default function BackupConfigurationCreateOrUpdate({
           />
 
           <TextArea
-            label='Description'
-            placeholder='Description'
+            label={t('common.form.description', {})}
             className='col-span-full'
             rows={3}
             key={form.key('description')}
@@ -209,15 +204,15 @@ export default function BackupConfigurationCreateOrUpdate({
           />
 
           <Switch
-            label='Maintenance Enabled'
-            description='If enabled, any server using this backup configuration will not be able to create new backups, or manage existing ones.'
+            label={t('common.form.maintenanceEnabled', {})}
+            description={t('pages.admin.backupConfigurations.tabs.general.page.form.maintenanceEnabledDescription', {})}
             key={form.key('maintenanceEnabled')}
             {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Shared'
-            description='If enabled, backups on this backup configuration will not be transferred between nodes, they will be assumed to be accessible by all nodes.'
+            label={t('pages.admin.backupConfigurations.tabs.general.page.form.shared', {})}
+            description={t('pages.admin.backupConfigurations.tabs.general.page.form.sharedDescription', {})}
             key={form.key('shared')}
             {...form.getInputProps('shared', { type: 'checkbox' })}
           />
@@ -239,7 +234,7 @@ export default function BackupConfigurationCreateOrUpdate({
               }
               loading={loading}
             >
-              Save
+              {t('common.button.save', {})}
             </Button>
             {!contextBackupConfiguration && (
               <Button
@@ -253,14 +248,14 @@ export default function BackupConfigurationCreateOrUpdate({
                 }
                 loading={loading}
               >
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             )}
           </AdminCan>
           {contextBackupConfiguration && (
             <AdminCan action='backup-configurations.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                Delete
+                {t('common.button.delete', {})}
               </Button>
             </AdminCan>
           )}
@@ -270,7 +265,7 @@ export default function BackupConfigurationCreateOrUpdate({
             rel='noopener noreferrer'
           >
             <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
-              View Documentation
+              {t('common.button.viewDocumentation', {})}
             </Button>
           </a>
         </Group>

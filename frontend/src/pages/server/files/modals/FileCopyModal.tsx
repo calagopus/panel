@@ -90,12 +90,7 @@ export default function FileCopyModal({ file, opened, onClose }: Props) {
       loading={loading}
       opened={opened}
     >
-      <TextInput
-        label={t('pages.server.files.modal.copyFile.form.fileName', {})}
-        placeholder={t('pages.server.files.modal.copyFile.form.fileName', {})}
-        data-autofocus
-        {...form.getInputProps('name')}
-      />
+      <TextInput label={t('common.form.fileName', {})} data-autofocus {...form.getInputProps('name')} />
 
       <p className='mt-2 text-sm md:text-base break-all'>
         <span>{t('pages.server.files.modal.copyFile.createdAs', {})}</span>

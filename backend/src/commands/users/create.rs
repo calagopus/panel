@@ -143,6 +143,9 @@ impl shared::extensions::commands::CliCommand<CreateArgs> for CreateCommand {
                     name_last: name_last.into(),
                     password: Some(password),
                     admin,
+                    frozen: false,
+                    suspended: false,
+                    send_email: false,
                     language: settings.app.language.clone(),
                 };
                 drop(settings);

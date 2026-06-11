@@ -112,6 +112,7 @@ impl NodeAllocation {
         start_port: u16,
         end_port: u16,
         amount: i64,
+        exclude: &[uuid::Uuid],
     ) -> Result<Vec<uuid::Uuid>, crate::database::DatabaseError> {
         let rows = sqlx::query(
             r#"
@@ -123,6 +124,7 @@ impl NodeAllocation {
                     node_allocations.node_uuid = $1
                     AND node_allocations.port BETWEEN $2 AND $3
                     AND server_allocations.uuid IS NULL
+                    AND NOT (node_allocations.uuid = ANY($5))
                 GROUP BY node_allocations.ip
                 HAVING COUNT(*) >= $4
             ),
@@ -136,6 +138,7 @@ impl NodeAllocation {
                 node_allocations.node_uuid = $1
                 AND node_allocations.port BETWEEN $2 AND $3
                 AND server_allocations.uuid IS NULL
+                AND NOT (node_allocations.uuid = ANY($5))
                 AND node_allocations.ip = (SELECT ip FROM random_ip)
             ORDER BY RANDOM()
             LIMIT $4
@@ -145,6 +148,7 @@ impl NodeAllocation {
         .bind(start_port as i32)
         .bind(end_port as i32)
         .bind(amount)
+        .bind(exclude)
         .fetch_all(database.write())
         .await?;
 
@@ -165,6 +169,7 @@ impl NodeAllocation {
         start_port: u16,
         end_port: u16,
         amount: i64,
+        exclude: &[uuid::Uuid],
     ) -> Result<Vec<uuid::Uuid>, crate::database::DatabaseError> {
         let rows = sqlx::query(
             r#"
@@ -176,6 +181,7 @@ impl NodeAllocation {
                 AND node_allocations.ip = $2
                 AND node_allocations.port BETWEEN $3 AND $4
                 AND server_allocations.uuid IS NULL
+                AND NOT (node_allocations.uuid = ANY($6))
             ORDER BY RANDOM()
             LIMIT $5
             "#,
@@ -185,6 +191,7 @@ impl NodeAllocation {
         .bind(start_port as i32)
         .bind(end_port as i32)
         .bind(amount)
+        .bind(exclude)
         .fetch_all(database.write())
         .await?;
 
@@ -297,15 +304,28 @@ impl NodeAllocation {
         }
 
         macro_rules! get_random {
-            ($start_port:expr, $end_port:expr) => {
+            ($start_port:expr, $end_port:expr) => {{
+                let mut exclude = additional.clone();
                 if let Some(primary) = &primary {
-                    Self::get_random_ip(database, node_uuid, &primary.ip, $start_port, $end_port, 1)
-                        .await?
+                    exclude.push(primary.uuid);
+                    Self::get_random_ip(
+                        database,
+                        node_uuid,
+                        &primary.ip,
+                        $start_port,
+                        $end_port,
+                        1,
+                        &exclude,
+                    )
+                    .await?
                 } else {
-                    Self::get_random(database, node_uuid, $start_port, $end_port, 1).await?
+                    Self::get_random(database, node_uuid, $start_port, $end_port, 1, &exclude)
+                        .await?
                 }
-            };
+            }};
         }
+
+        let mut success = false;
 
         'primary: for i in 0..MAX_ITER {
             if i != 0 && deployment.primary.is_none() {
@@ -332,6 +352,7 @@ impl NodeAllocation {
                         primary_allocation.start_port,
                         primary_allocation.end_port,
                         1,
+                        &[],
                     )
                     .await?
                 };
@@ -359,24 +380,9 @@ impl NodeAllocation {
             for additional_allocation in &deployment.additional {
                 match additional_allocation.mode {
                     super::egg_configuration::EggConfigAllocationDeploymentAdditionalAllocationMode::Random => {
-                        let mut found_allocation = None;
-                        for _ in 0..MAX_ITER {
-                            let random = get_random!(
-                                1,
-                                u16::MAX
-                            );
+                        let random = get_random!(1, u16::MAX);
 
-                            if let Some(allocation) = random.into_iter().next() {
-                                if is_unused!(allocation) {
-                                    found_allocation = Some(allocation);
-                                    break;
-                                }
-                            } else {
-                                return Err(anyhow::anyhow!("no available additional allocation found").into());
-                            }
-                        }
-
-                        let Some(allocation) = found_allocation else {
+                        let Some(allocation) = random.into_iter().next() else {
                             return Err(anyhow::anyhow!("no available additional allocation found").into());
                         };
                         additional.push(allocation);
@@ -398,24 +404,9 @@ impl NodeAllocation {
                         start_port,
                         end_port,
                     } => {
-                        let mut found_allocation = None;
-                        for _ in 0..MAX_ITER {
-                            let random = get_random!(
-                                start_port,
-                                end_port
-                            );
+                        let random = get_random!(start_port, end_port);
 
-                            if let Some(allocation) = random.into_iter().next() {
-                                if is_unused!(allocation) {
-                                    found_allocation = Some(allocation);
-                                    break;
-                                }
-                            } else {
-                                return Err(anyhow::anyhow!("no available additional allocation found").into());
-                            }
-                        }
-
-                        let Some(allocation) = found_allocation else {
+                        let Some(allocation) = random.into_iter().next() else {
                             return Err(anyhow::anyhow!("no available additional allocation found").into());
                         };
                         additional.push(allocation);
@@ -528,7 +519,15 @@ impl NodeAllocation {
                 }
             }
 
+            success = true;
             break;
+        }
+
+        if !success {
+            return Err(anyhow::anyhow!(
+                "could not satisfy all additional allocation rules after {MAX_ITER} attempts"
+            )
+            .into());
         }
 
         Ok((primary.map(|p| p.uuid), additional))

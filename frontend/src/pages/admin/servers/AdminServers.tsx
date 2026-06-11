@@ -9,12 +9,14 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import ServerCreate from './ServerCreate.tsx';
 import ServerRow from './ServerRow.tsx';
 import ServerView from './ServerView.tsx';
 
 function ServersContainer() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const {
@@ -30,7 +32,7 @@ function ServersContainer() {
 
   return (
     <AdminContentContainer
-      title='Servers'
+      title={t('pages.admin.servers.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -40,13 +42,13 @@ function ServersContainer() {
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </AdminCan>
       }
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.container}
     >
-      <Table columns={serverTableColumns} loading={loading} pagination={servers} onPageSelect={setPage}>
+      <Table columns={serverTableColumns()} loading={loading} pagination={servers} onPageSelect={setPage}>
         {servers?.data.map((server) => (
           <ServerRow key={server.uuid} server={server} />
         ))}

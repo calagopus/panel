@@ -6,11 +6,11 @@ import deleteNodeAllocations from '@/api/admin/nodes/allocations/deleteNodeAlloc
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import NodeAllocationsUpdateModal from './modals/NodeAllocationsUpdateModal.tsx';
 
@@ -21,6 +21,7 @@ export default function AllocationActionBar({
   node: z.infer<typeof adminNodeSchema>;
   loadAllocations: () => void;
 }) {
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const { removeNodeAllocations, selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
 
@@ -31,7 +32,12 @@ export default function AllocationActionBar({
       .then(({ deleted }) => {
         removeNodeAllocations(selectedNodeAllocations.values());
 
-        addToast(`${deleted} Node Allocation${deleted === 1 ? '' : 's'} deleted.`, 'success');
+        addToast(
+          t('pages.admin.nodes.tabs.allocations.page.modal.delete.toast.deleted', {
+            allocations: tItem('allocation', deleted),
+          }),
+          'success',
+        );
         setSelectedNodeAllocations([]);
         setOpenModal(null);
       })
@@ -61,21 +67,22 @@ export default function AllocationActionBar({
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Node Allocations Deletion'
-        confirm='Delete'
+        title={t('pages.admin.nodes.tabs.allocations.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete
-        <Code>{selectedNodeAllocations.size}</Code>
-        allocations from <Code>{node.name}</Code>?
+        {t('pages.admin.nodes.tabs.allocations.page.modal.delete.content', {
+          count: selectedNodeAllocations.size,
+          name: node.name,
+        }).md()}
       </ConfirmationModal>
 
       <ActionBar opened={selectedNodeAllocations.size > 0}>
         <Button onClick={() => setOpenModal('update')}>
-          <FontAwesomeIcon icon={faPen} className='mr-2' /> Update
+          <FontAwesomeIcon icon={faPen} className='mr-2' /> {t('common.button.update', {})}
         </Button>
         <Button color='red' onClick={() => setOpenModal('delete')}>
-          <FontAwesomeIcon icon={faTrash} className='mr-2' /> Delete
+          <FontAwesomeIcon icon={faTrash} className='mr-2' /> {t('common.button.delete', {})}
         </Button>
       </ActionBar>
     </>

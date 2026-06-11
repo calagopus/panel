@@ -51,14 +51,12 @@ export default function StorageS3({ form }: { form: UseFormReturnType<z.infer<ty
         <TextInput
           withAsterisk
           label={t('common.form.accessKey', {})}
-          placeholder={t('common.form.accessKey', {})}
           key={form.key('accessKey')}
           {...form.getInputProps('accessKey')}
         />
         <PasswordInput
           withAsterisk
           label={t('common.form.secretKey', {})}
-          placeholder={t('common.form.secretKey', {})}
           key={form.key('secretKey')}
           {...form.getInputProps('secretKey')}
         />
@@ -68,14 +66,12 @@ export default function StorageS3({ form }: { form: UseFormReturnType<z.infer<ty
         <TextInput
           withAsterisk
           label={t('common.form.bucket', {})}
-          placeholder={t('common.form.bucket', {})}
           key={form.key('bucket')}
           {...form.getInputProps('bucket')}
         />
         <TextInput
           withAsterisk
           label={t('common.form.region', {})}
-          placeholder={t('common.form.region', {})}
           key={form.key('region')}
           {...form.getInputProps('region')}
         />
@@ -85,14 +81,12 @@ export default function StorageS3({ form }: { form: UseFormReturnType<z.infer<ty
         <TextInput
           withAsterisk
           label={t('common.form.publicUrl', {})}
-          placeholder={t('common.form.publicUrl', {})}
           key={form.key('publicUrl')}
           {...form.getInputProps('publicUrl')}
         />
         <TextInput
           withAsterisk
           label={t('common.form.endpoint', {})}
-          placeholder={t('common.form.endpoint', {})}
           key={form.key('endpoint')}
           {...form.getInputProps('endpoint')}
         />

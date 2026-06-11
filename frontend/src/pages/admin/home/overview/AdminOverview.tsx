@@ -67,7 +67,7 @@ export default function AdminOverview() {
   const containerTypeLabel = (type: AdminSystemOverview['containerType']) => {
     switch (type) {
       case 'unknown':
-        return t('pages.admin.home.tabs.overview.page.containerType.unknown', {});
+        return t('common.unknown', {});
       case 'none':
         return t('pages.admin.home.tabs.overview.page.containerType.none', {});
       case 'official':

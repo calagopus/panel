@@ -10,11 +10,13 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import EggCreateOrUpdate from '@/pages/admin/nests/eggs/EggCreateOrUpdate.tsx';
 import AdminEggMounts from '@/pages/admin/nests/eggs/mounts/AdminEggMounts.tsx';
 import AdminEggVariables from '@/pages/admin/nests/eggs/variables/AdminEggVariables.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggInstallationScriptContainer from './installationScript/EggInstallationScriptContainer.tsx';
 import AdminEggServers from './servers/AdminEggServers.tsx';
 
 export default function EggView({ contextNest }: { contextNest: z.infer<typeof adminNestSchema> }) {
   const params = useParams<'eggId'>();
+  const { t } = useTranslations();
 
   const { data: egg, isLoading } = useQuery({
     queryKey: ['admin', 'eggs', { uuid: params.eggId }],
@@ -31,32 +33,32 @@ export default function EggView({ contextNest }: { contextNest: z.infer<typeof a
         baseUrl={`/admin/nests/${contextNest.uuid}/eggs/${params.eggId}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: '/',
             element: <EggCreateOrUpdate contextNest={contextNest} contextEgg={egg} />,
           },
           {
-            name: 'Installation Script',
+            name: t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.title', {}),
             icon: faTerminal,
             path: '/installation-script',
             element: <EggInstallationScriptContainer contextNest={contextNest} contextEgg={egg} />,
           },
           {
-            name: 'Variables',
+            name: t('pages.admin.nests.tabs.eggs.page.tabs.variables.title', {}),
             icon: faCodeCommit,
             path: `/variables`,
             element: <AdminEggVariables contextNest={contextNest} contextEgg={egg} />,
           },
           {
-            name: 'Mounts',
+            name: t('pages.admin.nests.tabs.eggs.page.tabs.mounts.title', {}),
             icon: faFolderTree,
             path: `/mounts`,
             element: <AdminEggMounts contextNest={contextNest} contextEgg={egg} />,
             permission: 'eggs.mounts',
           },
           {
-            name: 'Servers',
+            name: t('pages.admin.nests.tabs.eggs.page.tabs.servers.title', {}),
             icon: faComputer,
             path: `/servers`,
             element: <AdminEggServers contextNest={contextNest} contextEgg={egg} />,

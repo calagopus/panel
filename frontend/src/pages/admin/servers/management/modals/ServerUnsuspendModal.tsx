@@ -2,10 +2,10 @@ import { ModalProps } from '@mantine/core';
 import { z } from 'zod';
 import updateServer from '@/api/admin/servers/updateServer.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Code from '@/elements/Code.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerUnsuspendModal({
@@ -13,6 +13,7 @@ export default function ServerUnsuspendModal({
   opened,
   onClose,
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { updateServer: updateStoreServer } = useAdminStore();
 
@@ -21,7 +22,7 @@ export default function ServerUnsuspendModal({
       suspended: false,
     })
       .then(() => {
-        addToast('Server unsuspended.', 'success');
+        addToast(t('pages.admin.servers.tabs.management.page.unsuspend.toast.unsuspended', {}), 'success');
         onClose();
         updateStoreServer({ ...server, isSuspended: false });
         server.isSuspended = false;
@@ -36,13 +37,12 @@ export default function ServerUnsuspendModal({
       <ConfirmationModal
         opened={opened}
         onClose={() => onClose()}
-        title='Confirm Server Unsuspension'
-        confirm='Unsuspend'
+        title={t('pages.admin.servers.tabs.management.page.unsuspend.modal.title', {})}
+        confirm={t('pages.admin.servers.tabs.management.page.unsuspend.button', {})}
         confirmColor='green'
         onConfirmed={doSuspend}
       >
-        Are you sure you want to unsuspend <Code>{server.name}</Code>? This will allow the server to start again. The
-        user will be able to access their files and otherwise manage the server through the panel or API.
+        {t('pages.admin.servers.tabs.management.page.unsuspend.modal.content', { name: server.name }).md()}
       </ConfirmationModal>
     </>
   );

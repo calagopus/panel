@@ -1,4 +1,4 @@
-import { faShieldAlt } from '@fortawesome/free-solid-svg-icons';
+import { faLock, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Alert from '@/elements/Alert.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
@@ -19,13 +19,25 @@ export default function DashboardAccount() {
   const { user } = useAuth();
 
   const requireTwoFactorActivation = Boolean(!user?.totpEnabled && user?.requireTwoFactor);
+  const frozen = Boolean(user?.frozen);
 
   return (
     <AccountContentContainer
       title={t('pages.account.account.title', {})}
       registry={window.extensionContext.extensionRegistry.pages.dashboard.account.container}
     >
-      {requireTwoFactorActivation && (
+      {frozen && (
+        <Alert
+          icon={<FontAwesomeIcon icon={faLock} />}
+          title={t('pages.account.account.alert.frozen.title', {})}
+          color='red'
+          mb='md'
+        >
+          {t('pages.account.account.alert.frozen.description', {})}
+        </Alert>
+      )}
+
+      {requireTwoFactorActivation && !frozen && (
         <Alert
           icon={<FontAwesomeIcon icon={faShieldAlt} />}
           title={t('pages.account.account.alert.requireTwoFactor.title', {})}
@@ -36,7 +48,12 @@ export default function DashboardAccount() {
         </Alert>
       )}
 
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+      <div
+        className={`grid grid-cols-1 md:grid-cols-3 gap-4${
+          frozen ? ' pointer-events-none select-none blur-sm opacity-60' : ''
+        }`}
+        aria-disabled={frozen}
+      >
         {window.extensionContext.extensionRegistry.pages.dashboard.account.accountContainers.prependedComponents.map(
           (Component, i) => (
             <Component

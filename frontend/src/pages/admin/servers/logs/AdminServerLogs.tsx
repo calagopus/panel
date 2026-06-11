@@ -11,8 +11,10 @@ import Select from '@/elements/input/Select.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminServerLogs({ server }: { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const [logType, setLogType] = useState<'console' | 'install'>('install');
@@ -35,7 +37,7 @@ export default function AdminServerLogs({ server }: { server: z.infer<typeof adm
 
   return (
     <AdminSubContentContainer
-      title='Server Logs'
+      title={t('pages.admin.servers.tabs.logs.page.title', {})}
       titleOrder={2}
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.logs.subContainer}
       registryProps={{ server }}
@@ -45,20 +47,18 @@ export default function AdminServerLogs({ server }: { server: z.infer<typeof adm
           <div className='flex flex-row space-x-2 col-span-2'>
             <Select
               withAsterisk
-              label='Log Type'
-              placeholder='Log Type'
+              label={t('pages.admin.servers.tabs.logs.page.form.logType', {})}
               value={logType}
               className='w-full'
               onChange={(value) => setLogType(value as 'console' | 'install')}
               data={[
-                { label: 'Console', value: 'console' },
-                { label: 'Install', value: 'install' },
+                { label: t('pages.admin.servers.tabs.logs.page.enum.logType.console', {}), value: 'console' },
+                { label: t('pages.admin.servers.tabs.logs.page.enum.logType.install', {}), value: 'install' },
               ]}
             />
             <NumberInput
               withAsterisk
-              label='Lines'
-              placeholder='Lines'
+              label={t('common.form.lines', {})}
               value={lines}
               className='w-full'
               onChange={(value) => setLines(Number(value))}
@@ -67,7 +67,7 @@ export default function AdminServerLogs({ server }: { server: z.infer<typeof adm
 
           <div className='flex flex-row items-end'>
             <Button className='ml-2' onClick={doView} variant='outline' loading={loading}>
-              View
+              {t('common.button.loadLogs', {})}
             </Button>
           </div>
         </div>

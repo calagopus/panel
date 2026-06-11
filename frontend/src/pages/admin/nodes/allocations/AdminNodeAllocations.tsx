@@ -16,12 +16,14 @@ import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/
 import { nodeAllocationTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import AllocationActionBar from './AllocationActionBar.tsx';
 import NodeAllocationsCreateModal from './modals/NodeAllocationsCreateModal.tsx';
 import NodeAllocationRow from './NodeAllocationRow.tsx';
 
 export default function AdminNodeAllocations({ node }: { node: z.infer<typeof adminNodeSchema> }) {
+  const { t } = useTranslations();
   const { selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
@@ -114,14 +116,14 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
 
   return (
     <AdminSubContentContainer
-      title='Node Allocations'
+      title={t('pages.admin.nodes.tabs.allocations.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Group gap='xs'>
           <Select
-            placeholder='IP'
+            placeholder={t('common.table.columns.ip', {})}
             value={ipFilter || null}
             onChange={(value) => setIpFilter(value || '')}
             data={uniqueIps}
@@ -131,7 +133,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
             w={120}
           />
           <Select
-            placeholder='Port'
+            placeholder={t('common.form.port', {})}
             value={portFilter || null}
             onChange={(value) => setPortFilter(value || '')}
             data={uniquePorts}
@@ -140,12 +142,12 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
             allowDeselect
             w={100}
           />
-          <Tooltip label='Select All'>
+          <Tooltip label={t('common.button.selectAll', {})}>
             <ActionIcon variant='subtle' onClick={handleSelectAll} color='gray'>
               <FontAwesomeIcon icon={faCheckDouble} />
             </ActionIcon>
           </Tooltip>
-          <Tooltip label='Clear Selection'>
+          <Tooltip label={t('pages.admin.nodes.tabs.allocations.page.tooltip.clearSelection', {})}>
             <ActionIcon
               variant='subtle'
               onClick={handleClearSelection}
@@ -161,7 +163,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
             size='sm'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </Group>
       }
@@ -177,7 +179,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
 
       <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected} disabled={!!openModal}>
         <Table
-          columns={nodeAllocationTableColumns}
+          columns={nodeAllocationTableColumns()}
           loading={loading}
           pagination={nodeAllocations}
           onPageSelect={setPage}

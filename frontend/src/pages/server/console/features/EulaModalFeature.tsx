@@ -35,7 +35,10 @@ export default function EulaModal() {
         content = 'eula=false';
       }
 
-      const updatedContent = content.replace(/eula\s*=\s*false/gi, 'eula=true');
+      let updatedContent = content.replace(/eula\s*=\s*false/gi, 'eula=true');
+      if (!updatedContent.includes('eula=true')) {
+        updatedContent += 'eula=true\n';
+      }
       await saveFileContent(server.uuid, '/eula.txt', updatedContent);
 
       addToast(t('pages.server.console.feature.eula.toast.accepted', {}), 'success');

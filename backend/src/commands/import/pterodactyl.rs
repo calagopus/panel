@@ -179,9 +179,14 @@ impl shared::extensions::commands::CliCommand<PterodactylArgs> for PterodactylCo
                                 password: source_settings
                                     .remove("settings::mail:mailers:smtp:password")
                                     .and_then(|p| decrypt_laravel_value(&p, &source_app_key).ok()),
-                                use_tls: source_settings
+                                tls_mode: if source_settings
                                     .remove("settings::mail:mailers:smtp:encryption")
-                                    .is_some_and(|e| e == "tls"),
+                                    .is_some_and(|e| e == "tls")
+                                {
+                                    shared::settings::TlsMode::StartTls
+                                } else {
+                                    shared::settings::TlsMode::None
+                                },
                                 skip_cert_validation: false,
                                 from_address,
                                 from_name: source_settings.remove("settings::mail:from:name"),
@@ -490,15 +495,8 @@ impl shared::extensions::commands::CliCommand<PterodactylArgs> for PterodactylCo
                                     None => return Ok(()),
                                 };
 
-                                let token = match decrypt_laravel_value(&token, &source_app_key) {
-                                    Ok(token) => token,
-                                    Err(_) => return Ok(()),
-                                };
-
-                                let url: reqwest::Url = match format!("{}://{}:{}", scheme, fqdn, daemon_listen).parse() {
-                                    Ok(url) => url,
-                                    Err(_) => return Ok(()),
-                                };
+                                let token = decrypt_laravel_value(&token, &source_app_key)?;
+                                let url: reqwest::Url = format!("{}://{}:{}", scheme, fqdn, daemon_listen).parse()?;
 
                                 sqlx::query(
                                     r#"

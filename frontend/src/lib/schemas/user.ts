@@ -42,6 +42,8 @@ export const fullUserSchema = z.lazy(() =>
     startOnGroupedServers: z.boolean(),
     hasPassword: z.boolean(),
     admin: z.boolean(),
+    frozen: z.boolean(),
+    suspended: z.boolean(),
     language: z.string(),
   }),
 );

@@ -52,7 +52,7 @@ export function isListenableAudio(file: z.infer<typeof serverDirectoryEntrySchem
 
   return [
     'audio/mpeg', // .mp3
-    'audio/wav', // .wav
+    'audio/x-wav', // .wav
     'audio/ogg', // .ogg
     'audio/flac', // .flac
     'audio/aac', // .aac

@@ -11,6 +11,7 @@ import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerMountRow({
@@ -20,6 +21,7 @@ export default function ServerMountRow({
   server: z.infer<typeof adminServerSchema>;
   mount: z.infer<typeof adminServerMountSchema>;
 }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { removeServerMount } = useAdminStore();
 
@@ -29,7 +31,7 @@ export default function ServerMountRow({
     await deleteServerMount(server.uuid, mount.mount.uuid)
       .then(() => {
         removeServerMount(mount);
-        addToast('Server Mount deleted.', 'success');
+        addToast(t('pages.admin.servers.tabs.mounts.page.toast.deleted', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -41,20 +43,21 @@ export default function ServerMountRow({
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Server Mount Removal'
-        confirm='Delete'
+        title={t('pages.admin.servers.tabs.mounts.page.modal.remove.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to remove the mount
-        <Code>{mount.mount.name}</Code>
-        from <Code>{server.name}</Code>?
+        {t('pages.admin.servers.tabs.mounts.page.modal.remove.content', {
+          mount: mount.mount.name,
+          name: server.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
           {
             icon: faTrash,
-            label: 'Remove',
+            label: t('common.button.remove', {}),
             onClick: () => setOpenModal('delete'),
             color: 'red',
           },
@@ -66,7 +69,7 @@ export default function ServerMountRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>

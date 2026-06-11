@@ -9,6 +9,7 @@ import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function MountAddEggModal({
   mount,
@@ -17,6 +18,7 @@ export default function MountAddEggModal({
   onClose,
 }: ModalProps & { mount: z.infer<typeof adminMountSchema>; refetch: () => void }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const [loading, setLoading] = useState(false);
   const [selectedEgg, setSelectedEgg] = useState<[string, string] | null>(null);
@@ -42,7 +44,7 @@ export default function MountAddEggModal({
 
     createEggMount(nestUuid, eggUuid, mount.uuid)
       .then(() => {
-        addToast('Mount Egg added.', 'success');
+        addToast(t('pages.admin.mounts.tabs.eggs.page.toast.added', {}), 'success');
 
         onClose();
         refetch();
@@ -54,12 +56,11 @@ export default function MountAddEggModal({
   };
 
   return (
-    <Modal title='Add Mount Egg' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.mounts.tabs.eggs.page.modal.add.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label='Egg'
-          placeholder='Egg'
+          label={t('pages.admin.mounts.tabs.eggs.page.modal.add.form.egg', {})}
           value={selectedEgg?.[1]}
           onChange={(value) =>
             setSelectedEgg(
@@ -80,10 +81,10 @@ export default function MountAddEggModal({
 
         <ModalFooter>
           <Button onClick={doAdd} loading={loading} disabled={!selectedEgg}>
-            Add
+            {t('common.button.add', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

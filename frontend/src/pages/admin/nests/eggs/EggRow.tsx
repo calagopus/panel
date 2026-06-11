@@ -37,7 +37,7 @@ const EggRow = forwardRef<HTMLTableRowElement, EggRowProps>(function EggRow(
         if (!contextMenuProps) return;
 
         e.preventDefault();
-        contextMenuProps.openMenu(e.pageX, e.pageY);
+        contextMenuProps.openMenu(e.clientX, e.clientY);
       }}
       ref={ref}
     >

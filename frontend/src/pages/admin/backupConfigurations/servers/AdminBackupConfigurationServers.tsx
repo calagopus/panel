@@ -7,12 +7,14 @@ import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfig
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminBackupConfigurationServers({
   backupConfiguration,
 }: {
   backupConfiguration: z.infer<typeof adminBackupConfigurationSchema>;
 }) {
+  const { t } = useTranslations();
   const {
     data: backupConfigurationServers,
     loading,
@@ -25,9 +27,14 @@ export default function AdminBackupConfigurationServers({
   });
 
   return (
-    <AdminSubContentContainer title={`Backup Config Servers`} titleOrder={2} search={search} setSearch={setSearch}>
+    <AdminSubContentContainer
+      title={t('pages.admin.backupConfigurations.tabs.servers.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
       <Table
-        columns={serverTableColumns}
+        columns={serverTableColumns()}
         loading={loading}
         pagination={backupConfigurationServers}
         onPageSelect={setPage}

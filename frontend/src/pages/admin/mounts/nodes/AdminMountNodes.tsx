@@ -6,7 +6,6 @@ import getMountNodes from '@/api/admin/mounts/nodes/getMountNodes.ts';
 import deleteNodeMount from '@/api/admin/nodes/mounts/deleteNodeMount.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -17,6 +16,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
 import MountAddNodeModal from './modals/MountAddNodeModal.tsx';
 
@@ -30,13 +30,14 @@ function MountNodeRow({
   refetch: () => void;
 }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
 
   const doRemove = async () => {
     await deleteNodeMount(node.uuid, mount.uuid)
       .then(() => {
-        addToast('Mount Node deleted.', 'success');
+        addToast(t('pages.admin.mounts.tabs.nodes.page.toast.removed', {}), 'success');
         refetch();
       })
       .catch((msg) => {
@@ -49,20 +50,18 @@ function MountNodeRow({
       <ConfirmationModal
         opened={openModal === 'remove'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Mount Node Removal'
-        confirm='Remove'
+        title={t('pages.admin.mounts.tabs.nodes.page.modal.remove.title', {})}
+        confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        Are you sure you want to remove the mount
-        <Code>{mount.name}</Code>
-        from <Code>{node.name}</Code>?
+        {t('pages.admin.mounts.tabs.nodes.page.modal.remove.content', { mount: mount.name, name: node.name }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
           {
             icon: faTrash,
-            label: 'Remove',
+            label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),
             color: 'red',
           },
@@ -75,6 +74,7 @@ function MountNodeRow({
 }
 
 export default function AdminMountNodes({ mount }: { mount: z.infer<typeof adminMountSchema> }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -91,13 +91,13 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
 
   return (
     <AdminSubContentContainer
-      title='Mount Nodes'
+      title={t('pages.admin.mounts.tabs.nodes.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-          Add
+          {t('common.button.add', {})}
         </Button>
       }
     >

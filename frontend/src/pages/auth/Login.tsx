@@ -1,6 +1,6 @@
 import { faExclamationTriangle, faFingerprint, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Alert, Divider, Stack, Text, Title } from '@mantine/core';
+import { Divider, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { startTransition, useEffect, useRef, useState } from 'react';
@@ -11,6 +11,7 @@ import getSecurityKeys from '@/api/auth/getSecurityKeys.ts';
 import login from '@/api/auth/login.ts';
 import postSecurityKeyChallenge from '@/api/auth/postSecurityKeyChallenge.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
 import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
@@ -266,11 +267,13 @@ export default function Login() {
                 >
                   {t('common.button.continue', {})}
                 </Button>
+
                 <Divider
                   label={t('common.divider.or', {})}
                   labelPosition='center'
                   hidden={oAuthProviders.length === 0 && !settings.app.registrationEnabled}
                 />
+
                 {oAuthProviders.length > 3 ? (
                   <Button
                     variant='light'
@@ -326,9 +329,14 @@ export default function Login() {
                 >
                   {t('pages.auth.login.step.passkey.button.usePasskey', {})}
                 </Button>
+
                 <Divider label={t('common.divider.or', {})} labelPosition='center' />
+
                 <Button variant='light' onClick={() => setStep('password')} size='md' fullWidth>
                   {t('pages.auth.login.step.passkey.button.usePassword', {})}
+                </Button>
+                <Button variant='light' onClick={() => setStep('username')} size='md' fullWidth>
+                  {t('common.button.back', {})}
                 </Button>
               </Stack>
             </Card>
@@ -364,9 +372,14 @@ export default function Login() {
                 >
                   {t('pages.auth.login.step.password.button.signIn', {})}
                 </Button>
+
                 <Divider label={t('common.divider.or', {})} labelPosition='center' />
+
                 <Button variant='light' onClick={() => navigate('/auth/forgot-password')} size='md' fullWidth>
                   {t('pages.auth.login.step.password.button.forgotPassword', {})}
+                </Button>
+                <Button variant='light' onClick={() => setStep('username')} size='md' fullWidth>
+                  {t('common.button.back', {})}
                 </Button>
               </Stack>
             </Card>

@@ -24,8 +24,8 @@ export default function StepCopyFile({
       />
       <ScheduleDynamicParameterInput
         withAsterisk
-        label={t('pages.server.schedules.steps.copyFile.form.destination', {})}
-        placeholder={t('pages.server.schedules.steps.copyFile.form.destination', {})}
+        label={t('common.form.destination', {})}
+        placeholder={t('common.form.destination', {})}
         value={form.getInputProps('action.destination').value}
         onChange={(v) => form.setFieldValue('action.destination', v)}
       />

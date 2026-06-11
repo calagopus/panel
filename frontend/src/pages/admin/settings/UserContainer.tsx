@@ -1,16 +1,22 @@
+import { faList } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
+import type { RouteDefinition } from 'shared';
 import { z } from 'zod';
 import updateUserSettings from '@/api/admin/settings/updateUserSettings.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import RouteOrderEditor from '@/elements/RouteOrderEditor.tsx';
 import { adminSettingsUserSchema } from '@/lib/schemas/admin/settings.ts';
+import { eggConfigurationRouteItemSchema } from '@/lib/schemas/generic.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
@@ -20,9 +26,13 @@ export default function UserContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
   const { user, updateSettings: updateAdminSettings } = useAdminStore();
-  const { updateSettings } = useGlobalStore();
+  const { updateSettings, languages } = useGlobalStore();
 
   const [loading, setLoading] = useState(false);
+  const [defaultRoutes, setDefaultRoutes] = useState<{
+    order: z.infer<typeof eggConfigurationRouteItemSchema>[];
+    entries: RouteDefinition[];
+  }>({ order: [], entries: [] });
 
   const form = useForm<z.infer<typeof adminSettingsUserSchema>>({
     initialValues: {
@@ -32,6 +42,7 @@ export default function UserContainer() {
       maxSecurityKeyCount: 0,
       maxSshKeyCount: 0,
       allowChangingLanguage: true,
+      routeOrder: null,
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(adminSettingsUserSchema),
@@ -42,6 +53,22 @@ export default function UserContainer() {
       ...user,
     });
   }, [user]);
+
+  useEffect(() => {
+    import('@/routers/routes/accountRoutes.ts')
+      .then((module) => {
+        const entries = [...module.default, ...window.extensionContext.extensionRegistry.routes.accountRoutes];
+        const order: z.infer<typeof eggConfigurationRouteItemSchema>[] = [];
+
+        for (const route of entries) {
+          if (route.name === undefined) continue;
+          order.push({ type: 'route', path: route.path });
+        }
+
+        setDefaultRoutes({ order, entries });
+      })
+      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'));
+  }, []);
 
   const doUpdate = () => {
     setLoading(true);
@@ -65,35 +92,30 @@ export default function UserContainer() {
           <NumberInput
             withAsterisk
             label={t('pages.admin.settings.tabs.user.page.form.maxServerGroupCount', {})}
-            placeholder={t('pages.admin.settings.tabs.user.page.form.maxServerGroupCount', {})}
             key={form.key('maxServerGroupCount')}
             {...form.getInputProps('maxServerGroupCount')}
           />
           <NumberInput
             withAsterisk
             label={t('pages.admin.settings.tabs.user.page.form.maxApiKeyCount', {})}
-            placeholder={t('pages.admin.settings.tabs.user.page.form.maxApiKeyCount', {})}
             key={form.key('maxApiKeyCount')}
             {...form.getInputProps('maxApiKeyCount')}
           />
           <NumberInput
             withAsterisk
             label={t('pages.admin.settings.tabs.user.page.form.maxCommandSnippetCount', {})}
-            placeholder={t('pages.admin.settings.tabs.user.page.form.maxCommandSnippetCount', {})}
             key={form.key('maxCommandSnippetCount')}
             {...form.getInputProps('maxCommandSnippetCount')}
           />
           <NumberInput
             withAsterisk
             label={t('pages.admin.settings.tabs.user.page.form.maxSecurityKeyCount', {})}
-            placeholder={t('pages.admin.settings.tabs.user.page.form.maxSecurityKeyCount', {})}
             key={form.key('maxSecurityKeyCount')}
             {...form.getInputProps('maxSecurityKeyCount')}
           />
           <NumberInput
             withAsterisk
             label={t('pages.admin.settings.tabs.user.page.form.maxSshKeyCount', {})}
-            placeholder={t('pages.admin.settings.tabs.user.page.form.maxSshKeyCount', {})}
             key={form.key('maxSshKeyCount')}
             {...form.getInputProps('maxSshKeyCount')}
           />
@@ -105,6 +127,23 @@ export default function UserContainer() {
             {...form.getInputProps('allowChangingLanguage', { type: 'checkbox' })}
           />
         </div>
+
+        <CollapsibleSection
+          className='mt-4'
+          icon={<FontAwesomeIcon icon={faList} />}
+          title={t('pages.admin.settings.tabs.user.page.routeOrder.title', {})}
+          enabled={form.values.routeOrder !== null}
+          onToggle={(enabled) => form.setFieldValue('routeOrder', enabled ? defaultRoutes.order : null)}
+        >
+          {form.values.routeOrder && (
+            <RouteOrderEditor
+              value={form.values.routeOrder}
+              onChange={(order) => form.setFieldValue('routeOrder', order)}
+              routes={defaultRoutes.entries}
+              languages={languages}
+            />
+          )}
+        </CollapsibleSection>
 
         <Group mt='md'>
           <AdminCan action='settings.update' cantSave>

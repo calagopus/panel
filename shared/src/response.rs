@@ -39,6 +39,17 @@ impl ApiResponse {
     }
 
     #[inline]
+    pub fn new_response(response: impl IntoResponse) -> Self {
+        let (parts, body) = response.into_response().into_parts();
+
+        Self {
+            body,
+            status: parts.status,
+            headers: parts.headers,
+        }
+    }
+
+    #[inline]
     pub fn new_stream(stream: impl tokio::io::AsyncRead + Send + 'static) -> Self {
         Self {
             body: axum::body::Body::from_stream(tokio_util::io::ReaderStream::with_capacity(

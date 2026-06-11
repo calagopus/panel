@@ -13,6 +13,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type Props = ModalProps & {
   node: z.infer<typeof adminNodeSchema>;
@@ -20,6 +21,7 @@ type Props = ModalProps & {
 };
 
 export default function NodeBackupsReattachModal({ node, backup, opened, onClose }: Props) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const [selectedServer, setSelectedServer] = useState<z.infer<typeof adminServerSchema> | null>(backup.server ?? null);
@@ -48,7 +50,7 @@ export default function NodeBackupsReattachModal({ node, backup, opened, onClose
       .then(() => {
         backup.server = selectedServer;
         onClose();
-        addToast(`Reattached backup to ${selectedServer.name} successfully.`, 'success');
+        addToast(t('pages.admin.nodes.tabs.backups.page.toast.reattached', { name: selectedServer.name }), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -57,18 +59,14 @@ export default function NodeBackupsReattachModal({ node, backup, opened, onClose
   };
 
   return (
-    <Modal title='Reattach Node Backup' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.nodes.tabs.backups.page.modal.reattach.title', {})} onClose={onClose} opened={opened}>
       <Stack>
-        <p>
-          Reattaching a node backup will link it to a server. This is useful if the backup is detached or you want to
-          link it to a different server. Do note that this is not a transfer tool, unless the backup is considered
-          remote (can be accessed by multiple nodes), the server must belong to the same node as the backup.
-        </p>
+        <p>{t('pages.admin.nodes.tabs.backups.page.modal.reattach.description', {})}</p>
 
         <Select
           withAsterisk
-          label='Server'
-          placeholder='Server'
+          label={t('common.table.columns.server', {})}
+          placeholder={t('common.table.columns.server', {})}
           value={selectedServer?.uuid}
           onChange={(value) => setSelectedServer(servers.items.find((m) => m.uuid === value) ?? null)}
           data={servers.items.map((server) => ({
@@ -84,10 +82,10 @@ export default function NodeBackupsReattachModal({ node, backup, opened, onClose
 
       <ModalFooter>
         <Button color='red' onClick={doReattach} loading={loading} disabled={!selectedServer}>
-          Reattach
+          {t('common.button.reattach', {})}
         </Button>
         <Button variant='default' onClick={onClose}>
-          Close
+          {t('common.button.close', {})}
         </Button>
       </ModalFooter>
     </Modal>

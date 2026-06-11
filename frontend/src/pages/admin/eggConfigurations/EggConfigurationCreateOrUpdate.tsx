@@ -14,7 +14,6 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Divider from '@/elements/Divider.tsx';
@@ -25,6 +24,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import RouteOrderEditor from '@/elements/RouteOrderEditor.tsx';
 import { eggConfigurationDeploymentDefaultMapping, eggConfigurationDeploymentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
@@ -37,8 +37,8 @@ import {
 import { eggConfigurationRouteItemSchema } from '@/lib/schemas/generic.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import RouteOrderEditor from './RouteOrderEditor.tsx';
 
 type DeploymentModeType = EggConfigurationDeployment['mode']['type'];
 
@@ -50,6 +50,8 @@ interface DeploymentItemEditorProps {
 }
 
 function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentItemEditorProps) {
+  const { t } = useTranslations();
+
   const handleTypeChange = (type: DeploymentModeType | null) => {
     if (!type) return;
     onChange({ mode: eggConfigurationDeploymentDefaultMapping[type], assignToVariable: value.assignToVariable });
@@ -64,16 +66,22 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
 
         <Select
           style={{ flex: 1 }}
-          label='Type'
+          label={t('common.form.type', {})}
           data={Object.entries(eggConfigurationDeploymentTypeLabelMapping).map(([value, label]) => ({
-            label,
+            label: label(),
             value,
           }))}
           value={value.mode.type}
           onChange={(v) => handleTypeChange(v as DeploymentModeType | null)}
         />
 
-        <ActionIcon color='red' variant='subtle' mt='lg' onClick={onRemove} aria-label='Remove deployment rule'>
+        <ActionIcon
+          color='red'
+          variant='subtle'
+          mt='lg'
+          onClick={onRemove}
+          aria-label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.deployment.removeRule', {})}
+        >
           <FontAwesomeIcon icon={faTrash} />
         </ActionIcon>
       </Group>
@@ -81,7 +89,7 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
       {value.mode.type === 'random' ? null : value.mode.type === 'range' ? (
         <Group grow>
           <NumberInput
-            label='Start Port'
+            label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.deployment.form.startPort', {})}
             placeholder='1024'
             min={0}
             max={65535}
@@ -96,7 +104,7 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
             }
           />
           <NumberInput
-            label='End Port'
+            label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.deployment.form.endPort', {})}
             placeholder='65535'
             min={0}
             max={65535}
@@ -117,7 +125,7 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
           value.mode.type === 'multiply_primary' ||
           value.mode.type === 'divide_primary') && (
           <NumberInput
-            label='Value'
+            label={t('common.form.value', {})}
             placeholder='0'
             value={value.mode.value}
             onChange={(v) =>
@@ -133,9 +141,15 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
       )}
 
       <TextInput
-        label='Assign to Variable'
-        description='Optional environment variable to receive the assigned port from this rule.'
-        placeholder='e.g. SERVER_PORT'
+        label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.deployment.form.assignToVariable', {})}
+        description={t(
+          'pages.admin.eggConfigurations.tabs.general.page.allocation.deployment.form.assignToVariableDescription',
+          {},
+        )}
+        placeholder={t(
+          'pages.admin.eggConfigurations.tabs.general.page.allocation.deployment.form.assignToVariablePlaceholder',
+          {},
+        )}
         value={value.assignToVariable ?? ''}
         onChange={(e) =>
           onChange({
@@ -154,6 +168,7 @@ export default function EggConfigurationCreateOrUpdate({
   contextEggConfiguration?: z.infer<typeof adminEggConfigurationSchema>;
 }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
   const { languages } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
@@ -193,7 +208,7 @@ export default function EggConfigurationCreateOrUpdate({
     deleteFn: contextEggConfiguration ? () => deleteEggConfiguration(contextEggConfiguration.uuid) : undefined,
     doUpdate: !!contextEggConfiguration,
     basePath: '/admin/egg-configurations',
-    resourceName: 'Egg Configuration',
+    resourceName: t('pages.admin.eggConfigurations.resourceName', {}),
   });
 
   useEffect(() => {
@@ -280,48 +295,51 @@ export default function EggConfigurationCreateOrUpdate({
 
   return (
     <AdminContentContainer
-      title={`${contextEggConfiguration ? 'Update' : 'Create'} Egg Configuration`}
+      title={
+        contextEggConfiguration
+          ? t('pages.admin.eggConfigurations.tabs.general.page.titleUpdate', {})
+          : t('pages.admin.eggConfigurations.tabs.general.page.titleCreate', {})
+      }
       fullscreen={!!contextEggConfiguration}
       titleOrder={2}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Egg Configuration Deletion'
-        confirm='Delete'
+        title={t('pages.admin.eggConfigurations.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.eggConfigurations.tabs.general.page.modal.delete.content', {
+          name: form.getValues().name,
+        }).md()}
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.eggConfigurations.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
           <NumberInput
             withAsterisk
-            label='Order'
-            placeholder='Order'
+            label={t('pages.admin.eggConfigurations.tabs.general.page.form.order', {})}
             key={form.key('order')}
             {...form.getInputProps('order')}
           />
 
           <MultiSelectGroup
-            label='Eggs'
-            placeholder='Select Eggs'
+            label={t('pages.admin.eggConfigurations.tabs.general.page.form.eggs', {})}
+            placeholder={t('pages.admin.eggConfigurations.tabs.general.page.form.eggsPlaceholder', {})}
             data={eggs}
             searchable
             loading={!eggs.length}
             {...form.getInputProps('eggs')}
           />
           <TextArea
-            label='Description'
-            placeholder='Description'
+            label={t('common.form.description', {})}
             rows={3}
             key={form.key('description')}
             {...form.getInputProps('description')}
@@ -329,7 +347,7 @@ export default function EggConfigurationCreateOrUpdate({
 
           <CollapsibleSection
             icon={<FontAwesomeIcon icon={faNetworkWired} />}
-            title='Allocation Configuration'
+            title={t('pages.admin.eggConfigurations.tabs.general.page.allocation.title', {})}
             enabled={form.values.configAllocations !== null}
             className='col-span-full'
             onToggle={(enabled) =>
@@ -360,16 +378,25 @@ export default function EggConfigurationCreateOrUpdate({
             <Stack>
               <Group grow>
                 <Switch
-                  label='User Self Assign'
-                  description='Allow users to create their own allocations from a specified port range.'
+                  label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.userSelfAssign', {})}
+                  description={t(
+                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.userSelfAssignDescription',
+                    {},
+                  )}
                   key={form.key('configAllocations.userSelfAssign.enabled')}
                   {...form.getInputProps('configAllocations.userSelfAssign.enabled', {
                     type: 'checkbox',
                   })}
                 />
                 <Switch
-                  label='Require Primary Allocation'
-                  description='Whether users must always have a primary allocation.'
+                  label={t(
+                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.requirePrimaryAllocation',
+                    {},
+                  )}
+                  description={t(
+                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.requirePrimaryAllocationDescription',
+                    {},
+                  )}
                   key={form.key('configAllocations.userSelfAssign.requirePrimaryAllocation')}
                   {...form.getInputProps('configAllocations.userSelfAssign.requirePrimaryAllocation', {
                     type: 'checkbox',
@@ -379,24 +406,34 @@ export default function EggConfigurationCreateOrUpdate({
 
               <Group grow>
                 <NumberInput
-                  label='Automatic Allocation Start'
-                  placeholder='Automatic Allocation Start'
+                  label={t(
+                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.automaticAllocationStart',
+                    {},
+                  )}
                   key={form.key('configAllocations.userSelfAssign.startPort')}
                   {...form.getInputProps('configAllocations.userSelfAssign.startPort')}
                 />
                 <NumberInput
-                  label='Automatic Allocation End'
-                  placeholder='Automatic Allocation End'
+                  label={t(
+                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.automaticAllocationEnd',
+                    {},
+                  )}
                   key={form.key('configAllocations.userSelfAssign.endPort')}
                   {...form.getInputProps('configAllocations.userSelfAssign.endPort')}
                 />
               </Group>
 
-              <Divider label='Deployment' labelPosition='left' />
+              <Divider
+                label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.divider.deployment', {})}
+                labelPosition='left'
+              />
 
               <Switch
-                label='Dedicated IP'
-                description='Assign a dedicated ip address for servers using this egg configuration.'
+                label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.dedicatedIp', {})}
+                description={t(
+                  'pages.admin.eggConfigurations.tabs.general.page.allocation.form.dedicatedIpDescription',
+                  {},
+                )}
                 key={form.key('configAllocations.deployment.dedicated')}
                 {...form.getInputProps('configAllocations.deployment.dedicated', {
                   type: 'checkbox',
@@ -405,8 +442,11 @@ export default function EggConfigurationCreateOrUpdate({
 
               <Stack gap='xs'>
                 <Switch
-                  label='Primary Allocation'
-                  description='Configure a primary port assignment for deployment.'
+                  label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryAllocation', {})}
+                  description={t(
+                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryAllocationDescription',
+                    {},
+                  )}
                   checked={primaryEnabled}
                   onChange={(e) => handlePrimaryToggle(e.currentTarget.checked)}
                 />
@@ -415,7 +455,10 @@ export default function EggConfigurationCreateOrUpdate({
                   <Stack gap='xs' pl='sm'>
                     <Group grow>
                       <NumberInput
-                        label='Primary Start Port'
+                        label={t(
+                          'pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryStartPort',
+                          {},
+                        )}
                         placeholder='1024'
                         min={0}
                         max={65535}
@@ -423,7 +466,7 @@ export default function EggConfigurationCreateOrUpdate({
                         {...form.getInputProps('configAllocations.deployment.primary.startPort')}
                       />
                       <NumberInput
-                        label='Primary End Port'
+                        label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryEndPort', {})}
                         placeholder='65535'
                         min={0}
                         max={65535}
@@ -432,9 +475,15 @@ export default function EggConfigurationCreateOrUpdate({
                       />
                     </Group>
                     <TextInput
-                      label='Assign to Variable'
-                      description='Optional environment variable to receive the assigned primary port.'
-                      placeholder='e.g. SERVER_PORT'
+                      label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariable', {})}
+                      description={t(
+                        'pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariableDescription',
+                        {},
+                      )}
+                      placeholder={t(
+                        'pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariablePlaceholder',
+                        {},
+                      )}
                       key={form.key('configAllocations.deployment.primary.assignToVariable')}
                       {...form.getInputProps('configAllocations.deployment.primary.assignToVariable')}
                       onChange={(e) =>
@@ -451,7 +500,7 @@ export default function EggConfigurationCreateOrUpdate({
               <Stack gap='xs'>
                 <Group justify='space-between'>
                   <Text size='sm' fw={500}>
-                    Additional Ports
+                    {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.title', {})}
                   </Text>
                   <Button
                     size='xs'
@@ -459,13 +508,13 @@ export default function EggConfigurationCreateOrUpdate({
                     leftSection={<FontAwesomeIcon icon={faPlus} />}
                     onClick={handleAddDeployment}
                   >
-                    Add Rule
+                    {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.button', {})}
                   </Button>
                 </Group>
 
                 {additionalDeployments.length === 0 && (
                   <Text size='sm' c='dimmed'>
-                    No additional port rules configured.
+                    {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.empty', {})}
                   </Text>
                 )}
 
@@ -486,7 +535,7 @@ export default function EggConfigurationCreateOrUpdate({
 
           <CollapsibleSection
             icon={<FontAwesomeIcon icon={faPlay} />}
-            title='Startup Configuration'
+            title={t('pages.admin.eggConfigurations.tabs.general.page.startup.title', {})}
             enabled={form.values.configStartup !== null}
             className='col-span-full'
             onToggle={(enabled) =>
@@ -501,8 +550,11 @@ export default function EggConfigurationCreateOrUpdate({
             }
           >
             <Switch
-              label='Allow Custom Startup Command'
-              description='Allow users to set their own, non-predefined startup commands.'
+              label={t('pages.admin.eggConfigurations.tabs.general.page.startup.form.allowCustomStartupCommand', {})}
+              description={t(
+                'pages.admin.eggConfigurations.tabs.general.page.startup.form.allowCustomStartupCommandDescription',
+                {},
+              )}
               key={form.key('configStartup.allowCustomStartupCommand')}
               {...form.getInputProps('configStartup.allowCustomStartupCommand', {
                 type: 'checkbox',
@@ -512,7 +564,7 @@ export default function EggConfigurationCreateOrUpdate({
 
           <CollapsibleSection
             icon={<FontAwesomeIcon icon={faList} />}
-            title='Route Configuration'
+            title={t('elements.routeOrderEditor.title', {})}
             className='col-span-full'
             enabled={form.values.configRoutes !== null}
             onToggle={(enabled) => form.setFieldValue('configRoutes', enabled ? { order: defaultRoutes.order } : null)}
@@ -521,7 +573,7 @@ export default function EggConfigurationCreateOrUpdate({
               <RouteOrderEditor
                 value={form.values.configRoutes.order}
                 onChange={(order) => form.setFieldValue('configRoutes.order', order)}
-                serverRoutes={defaultRoutes.entries}
+                routes={defaultRoutes.entries}
                 languages={languages}
               />
             )}
@@ -533,18 +585,18 @@ export default function EggConfigurationCreateOrUpdate({
               cantSave
             >
               <Button type='submit' disabled={!form.isValid()} loading={loading}>
-                Save
+                {t('common.button.save', {})}
               </Button>
               {!contextEggConfiguration && (
                 <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                  Save & Stay
+                  {t('common.button.saveAndStay', {})}
                 </Button>
               )}
             </AdminCan>
             {contextEggConfiguration && (
               <AdminCan action='egg-configurations.delete' cantDelete>
                 <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  Delete
+                  {t('common.button.delete', {})}
                 </Button>
               </AdminCan>
             )}

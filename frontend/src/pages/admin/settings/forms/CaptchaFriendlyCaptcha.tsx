@@ -27,14 +27,12 @@ export default function CaptchaFriendlyCaptcha({
         <TextInput
           withAsterisk
           label={t('common.form.siteKey', {})}
-          placeholder={t('common.form.siteKey', {})}
           key={form.key('siteKey')}
           {...form.getInputProps('siteKey')}
         />
         <PasswordInput
           withAsterisk
           label={t('common.form.apiKey', {})}
-          placeholder={t('common.form.apiKey', {})}
           key={form.key('apiKey')}
           {...form.getInputProps('apiKey')}
         />

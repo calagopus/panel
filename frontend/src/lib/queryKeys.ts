@@ -16,6 +16,7 @@ const admin = {
   nodes: {
     all: () => ['admin', 'nodes'] as const,
     detail: (uuid: string) => ['admin', 'nodes', { uuid }] as const,
+    token: (uuid: string) => ['admin', 'nodes', uuid, 'token'] as const,
     allocations: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'allocations'] as const,
     backups: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'backups'] as const,
     mounts: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'mounts'] as const,
@@ -80,6 +81,7 @@ const admin = {
     all: () => ['admin', 'oauth-providers'] as const,
     detail: (uuid: string) => ['admin', 'oauth-providers', { uuid }] as const,
     users: (providerUuid: string) => ['admin', 'oauth-providers', providerUuid, 'users'] as const,
+    mappings: (providerUuid: string) => ['admin', 'oauth-providers', providerUuid, 'mappings'] as const,
   },
 
   eggRepositories: {

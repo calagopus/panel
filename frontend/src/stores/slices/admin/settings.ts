@@ -27,9 +27,11 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
   app: {
     name: '',
     icon: '',
+    iconLight: null,
     language: '',
     url: '',
     banner: null,
+    bannerLight: null,
     twoFactorRequirement: 'none',
     sessionCookie: '',
     sessionDurationSeconds: 3600,
@@ -47,6 +49,7 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     allowViewingInstallationLogs: true,
     allowAcknowledgingInstallationFailure: true,
     allowViewingTransferProgress: true,
+    containerPrelude: '\x1b[1m\x1b[33mcontainer@calagopus~ \x1b[0m',
   },
   user: {
     maxServerGroupCount: 25,
@@ -55,6 +58,7 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     maxSecurityKeyCount: 50,
     maxSshKeyCount: 50,
     allowChangingLanguage: true,
+    routeOrder: null,
   },
   webauthn: {
     rpId: '',
@@ -118,6 +122,7 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
       state.captchaProvider = value.captchaProvider;
       state.app = value.app;
       state.server = value.server;
+      state.user = value.user;
       state.webauthn = value.webauthn;
       state.activity = value.activity;
       state.ratelimits = value.ratelimits;
@@ -130,6 +135,7 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
       if (value.captchaProvider) state.captchaProvider = value.captchaProvider;
       if (value.app) state.app = { ...state.app, ...value.app };
       if (value.server) state.server = { ...state.server, ...value.server };
+      if (value.user) state.user = { ...state.user, ...value.user };
       if (value.webauthn) state.webauthn = { ...state.webauthn, ...value.webauthn };
       if (value.activity) state.activity = { ...state.activity, ...value.activity };
       if (value.ratelimits) state.ratelimits = { ...state.ratelimits, ...value.ratelimits };

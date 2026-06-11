@@ -6,6 +6,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminOAuthProviderUsersTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import UserOAuthLinkRow from './UserOAuthLinkRow.tsx';
 
 export default function AdminOAuthProviderUsers({
@@ -13,6 +14,8 @@ export default function AdminOAuthProviderUsers({
 }: {
   oauthProvider: z.infer<typeof adminOAuthProviderSchema>;
 }) {
+  const { t } = useTranslations();
+
   const {
     data: oauthProviderUsers,
     loading,
@@ -25,9 +28,14 @@ export default function AdminOAuthProviderUsers({
   });
 
   return (
-    <AdminSubContentContainer title='OAuth Provider Users' titleOrder={2} search={search} setSearch={setSearch}>
+    <AdminSubContentContainer
+      title={t('pages.admin.oAuthProviders.tabs.users.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
       <Table
-        columns={adminOAuthProviderUsersTableColumns}
+        columns={adminOAuthProviderUsersTableColumns()}
         loading={loading}
         pagination={oauthProviderUsers}
         onPageSelect={setPage}

@@ -41,7 +41,7 @@ export default function CaptchaContainer() {
   });
 
   useEffect(() => {
-    form.setValues({
+    form.setValues<z.infer<typeof adminSettingsCaptchaProviderSchema>>({
       ...captchaProvider,
     });
   }, [captchaProvider]);

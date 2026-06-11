@@ -12,7 +12,6 @@ import updateDatabaseHost from '@/api/admin/database-hosts/updateDatabaseHost.ts
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
@@ -31,6 +30,7 @@ import {
 } from '@/lib/schemas/admin/databaseHosts.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import CredentialConnectionString from './forms/CredentialConnectionString.tsx';
 import CredentialDetails from './forms/CredentialDetails.tsx';
 
@@ -39,6 +39,7 @@ export default function DatabaseHostCreateOrUpdate({
 }: {
   contextDatabaseHost?: z.infer<typeof adminDatabaseHostSchema>;
 }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
@@ -69,7 +70,7 @@ export default function DatabaseHostCreateOrUpdate({
     deleteFn: contextDatabaseHost ? () => deleteDatabaseHost(contextDatabaseHost.uuid) : undefined,
     doUpdate: !!contextDatabaseHost,
     basePath: '/admin/database-hosts',
-    resourceName: 'Database host',
+    resourceName: t('pages.admin.databaseHosts.resourceName', {}),
   });
 
   useEffect(() => {
@@ -102,7 +103,7 @@ export default function DatabaseHostCreateOrUpdate({
 
     testDatabaseHost(contextDatabaseHost.uuid)
       .then(() => {
-        addToast('Test successfully completed', 'success');
+        addToast(t('pages.admin.databaseHosts.tabs.general.page.toast.tested', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -112,32 +113,37 @@ export default function DatabaseHostCreateOrUpdate({
 
   return (
     <AdminContentContainer
-      title={`${contextDatabaseHost ? 'Update' : 'Create'} Database Host`}
+      title={
+        contextDatabaseHost
+          ? t('pages.admin.databaseHosts.tabs.general.page.titleUpdate', {})
+          : t('pages.admin.databaseHosts.tabs.general.page.titleCreate', {})
+      }
       fullscreen={!!contextDatabaseHost}
       titleOrder={2}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Database Host Deletion'
-        confirm='Delete'
+        title={t('pages.admin.databaseHosts.tabs.general.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete <Code>{form.getValues().name}</Code>?
+        {t('pages.admin.databaseHosts.tabs.general.page.modal.delete.content', {
+          name: form.getValues().name ?? '',
+        }).md()}
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.databaseHosts.all()))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <TextInput
             withAsterisk
-            label='Name'
-            placeholder='Name'
+            label={t('common.form.name', {})}
             key={form.key('name')}
             {...form.getInputProps('name')}
           />
           <Select
             withAsterisk
-            label='Type'
+            label={t('common.form.type', {})}
             data={Object.entries(databaseTypeLabelMapping).map(([value, label]) => ({
               value,
               label,
@@ -148,14 +154,12 @@ export default function DatabaseHostCreateOrUpdate({
           />
 
           <TextInput
-            label='Public Host'
-            placeholder='Public Host'
+            label={t('pages.admin.databaseHosts.tabs.general.page.form.publicHost', {})}
             key={form.key('publicHost')}
             {...form.getInputProps('publicHost')}
           />
           <NumberInput
-            label='Public Port'
-            placeholder='Public Port'
+            label={t('pages.admin.databaseHosts.tabs.general.page.form.publicPort', {})}
             key={form.key('publicPort')}
             {...form.getInputProps('publicPort')}
           />
@@ -173,14 +177,14 @@ export default function DatabaseHostCreateOrUpdate({
                   })
                 : form.setValues({ credentials: undefined })
             }
-            title='Connection Credentials'
+            title={t('pages.admin.databaseHosts.tabs.general.page.form.connectionCredentials', {})}
           >
             <Select
               withAsterisk
-              label='Credential Type'
+              label={t('pages.admin.databaseHosts.tabs.general.page.form.credentialType', {})}
               data={Object.entries(databaseCredentialTypeLabelMapping).map(([value, label]) => ({
                 value,
-                label,
+                label: label(),
               }))}
               key={form.key('credentials.type')}
               {...form.getInputProps('credentials.type')}
@@ -206,12 +210,12 @@ export default function DatabaseHostCreateOrUpdate({
           </CollapsibleSection>
 
           <Switch
-            label='Deployment Enabled'
+            label={t('common.form.deploymentEnabled', {})}
             key={form.key('deploymentEnabled')}
             {...form.getInputProps('deploymentEnabled', { type: 'checkbox' })}
           />
           <Switch
-            label='Maintenance Enabled'
+            label={t('common.form.maintenanceEnabled', {})}
             key={form.key('maintenanceEnabled')}
             {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
           />
@@ -220,11 +224,11 @@ export default function DatabaseHostCreateOrUpdate({
         <Group mt='md'>
           <AdminCan action={contextDatabaseHost ? 'database-hosts.update' : 'database-hosts.create'} cantSave>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              Save
+              {t('common.button.save', {})}
             </Button>
             {!contextDatabaseHost && (
               <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
-                Save & Stay
+                {t('common.button.saveAndStay', {})}
               </Button>
             )}
           </AdminCan>
@@ -232,12 +236,12 @@ export default function DatabaseHostCreateOrUpdate({
             <>
               <AdminCan action='database-hosts.read'>
                 <Button variant='outline' onClick={doTest} loading={loading}>
-                  Test Connection
+                  {t('pages.admin.databaseHosts.tabs.general.page.button.testConnection', {})}
                 </Button>
               </AdminCan>
               <AdminCan action='database-hosts.delete' cantDelete>
                 <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  Delete
+                  {t('common.button.delete', {})}
                 </Button>
               </AdminCan>
             </>
@@ -248,7 +252,7 @@ export default function DatabaseHostCreateOrUpdate({
             rel='noopener noreferrer'
           >
             <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
-              View Documentation
+              {t('common.button.viewDocumentation', {})}
             </Button>
           </a>
         </Group>

@@ -27,14 +27,12 @@ export default function CaptchaHcaptcha({
         <TextInput
           withAsterisk
           label={t('common.form.siteKey', {})}
-          placeholder={t('common.form.siteKey', {})}
           key={form.key('siteKey')}
           {...form.getInputProps('siteKey')}
         />
         <PasswordInput
           withAsterisk
           label={t('common.form.secretKey', {})}
-          placeholder={t('common.form.secretKey', {})}
           key={form.key('secretKey')}
           {...form.getInputProps('secretKey')}
         />

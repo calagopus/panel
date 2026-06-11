@@ -12,6 +12,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { adminLocationDatabaseHostSchema, adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function LocationDatabaseHostRow({
@@ -21,6 +22,7 @@ export default function LocationDatabaseHostRow({
   location: z.infer<typeof adminLocationSchema>;
   databaseHost: z.infer<typeof adminLocationDatabaseHostSchema>;
 }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { removeLocationDatabaseHost } = useAdminStore();
 
@@ -30,7 +32,7 @@ export default function LocationDatabaseHostRow({
     await deleteLocationDatabaseHost(location.uuid, databaseHost.databaseHost.uuid)
       .then(() => {
         removeLocationDatabaseHost(databaseHost);
-        addToast('Location Database Host deleted.', 'success');
+        addToast(t('pages.admin.locations.tabs.databaseHosts.page.toast.deleted', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -42,20 +44,21 @@ export default function LocationDatabaseHostRow({
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Location Database Host Deletion'
-        confirm='Delete'
+        title={t('pages.admin.locations.tabs.databaseHosts.page.modal.delete.title', {})}
+        confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        Are you sure you want to delete the database host
-        <Code>{databaseHost.databaseHost.name}</Code>
-        from <Code>{location.name}</Code>?
+        {t('pages.admin.locations.tabs.databaseHosts.page.modal.delete.content', {
+          name: databaseHost.databaseHost.name,
+          location: location.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
           {
             icon: faTrash,
-            label: 'Remove',
+            label: t('common.button.remove', {}),
             onClick: () => setOpenModal('delete'),
             color: 'red',
           },
@@ -65,7 +68,7 @@ export default function LocationDatabaseHostRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>

@@ -77,7 +77,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
           <div className='flex flex-col gap-4'>
             <div className='flex flex-col md:flex-row gap-2 '>
               <TextInput
-                label={t('pages.oobe.register.form.firstName', {})}
+                label={t('common.form.firstName', {})}
                 placeholder={t('pages.oobe.register.form.firstNamePlaceholder', {})}
                 leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
                 required
@@ -85,7 +85,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
                 {...form.getInputProps('nameFirst')}
               />
               <TextInput
-                label={t('pages.oobe.register.form.lastName', {})}
+                label={t('common.form.lastName', {})}
                 placeholder={t('pages.oobe.register.form.lastNamePlaceholder', {})}
                 leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
                 required
@@ -96,7 +96,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
 
             <div className='flex flex-col md:flex-row gap-2 '>
               <TextInput
-                label={t('pages.oobe.register.form.username', {})}
+                label={t('common.form.username', {})}
                 placeholder={t('pages.oobe.register.form.usernamePlaceholder', {})}
                 leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
                 required
@@ -116,7 +116,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
 
             <div className='flex flex-col md:flex-row gap-2'>
               <PasswordInput
-                label={t('pages.oobe.register.form.password', {})}
+                label={t('common.form.password', {})}
                 placeholder={t('pages.oobe.register.form.passwordPlaceholder', {})}
                 leftSection={<FontAwesomeIcon icon={faLock} size='sm' />}
                 required
@@ -124,7 +124,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
                 {...form.getInputProps('password')}
               />
               <PasswordInput
-                label={t('pages.oobe.register.form.confirmPassword', {})}
+                label={t('common.form.confirmPassword', {})}
                 placeholder={t('pages.oobe.register.form.confirmPasswordPlaceholder', {})}
                 leftSection={<FontAwesomeIcon icon={faLock} size='sm' />}
                 required

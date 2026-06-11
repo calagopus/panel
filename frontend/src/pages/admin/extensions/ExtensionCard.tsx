@@ -79,7 +79,7 @@ export default function ExtensionCard({
           <div className='flex items-center justify-between'>
             <span className='text-xs text-zinc-500'>{t('pages.admin.extensions.card.authors', {})}</span>
             <span className='truncate text-xs text-zinc-300'>
-              {backendExtension.authors.join(', ') || t('pages.admin.extensions.unknown', {})}
+              {backendExtension.authors.join(', ') || t('common.unknown', {})}
             </span>
           </div>
         </div>

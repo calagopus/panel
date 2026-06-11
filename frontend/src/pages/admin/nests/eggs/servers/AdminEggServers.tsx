@@ -8,6 +8,7 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminEggServers({
   contextNest,
@@ -16,6 +17,8 @@ export default function AdminEggServers({
   contextNest: z.infer<typeof adminNestSchema>;
   contextEgg: z.infer<typeof adminEggSchema>;
 }) {
+  const { t } = useTranslations();
+
   const {
     data: eggServers,
     loading,
@@ -28,8 +31,13 @@ export default function AdminEggServers({
   });
 
   return (
-    <AdminSubContentContainer title='Egg Servers' titleOrder={2} search={search} setSearch={setSearch}>
-      <Table columns={serverTableColumns} loading={loading} pagination={eggServers} onPageSelect={setPage}>
+    <AdminSubContentContainer
+      title={t('pages.admin.nests.tabs.eggs.page.tabs.servers.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
+      <Table columns={serverTableColumns()} loading={loading} pagination={eggServers} onPageSelect={setPage}>
         {eggServers?.data.map((server) => (
           <ServerRow key={server.uuid} server={server} />
         ))}

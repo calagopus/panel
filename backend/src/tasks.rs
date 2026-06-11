@@ -1,7 +1,9 @@
 use rand::RngExt;
 use shared::models::{
-    admin_activity::AdminActivity, announcement::Announcement, egg_configuration::EggConfiguration,
-    server_activity::ServerActivity, user_activity::UserActivity, user_api_key::UserApiKey,
+    ByUuid, admin_activity::AdminActivity, announcement::Announcement,
+    backup_configuration::BackupConfiguration, egg_configuration::EggConfiguration, node::Node,
+    oauth_provider_mapping::OAuthProviderMapping, server_activity::ServerActivity,
+    user_activity::UserActivity, user_api_key::UserApiKey,
     user_command_snippet::UserCommandSnippet, user_security_key::UserSecurityKey,
     user_server_group::UserServerGroup, user_session::UserSession,
 };
@@ -173,9 +175,159 @@ pub async fn define_background_tasks(
                     );
                 }
 
+                let cleaned_prune_jobs =
+                    BackupConfiguration::cleanup_uuid_arrays(&state.database).await?;
+                if cleaned_prune_jobs > 0 {
+                    tracing::info!(
+                        "cleaned up stale node uuids in {} backup configuration prune jobs",
+                        cleaned_prune_jobs
+                    );
+                }
+
+                let cleaned_oauth_provider_mappings =
+                    OAuthProviderMapping::cleanup_uuid_arrays(&state.database).await?;
+                if cleaned_oauth_provider_mappings > 0 {
+                    tracing::info!(
+                        "cleaned up {} oauth provider mappings with stale references",
+                        cleaned_oauth_provider_mappings
+                    );
+                }
+
                 Ok(())
             },
         )
+        .await;
+    background_task_builder
+        .add_task("run_restic_prune_jobs", async |state| {
+            const CHECK_INTERVAL: std::time::Duration = std::time::Duration::from_secs(60);
+            const NODE_REQUEST_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
+
+            let mut interval = tokio::time::interval(CHECK_INTERVAL);
+            interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+            let mut last_check = chrono::Utc::now();
+
+            loop {
+                interval.tick().await;
+                let now = chrono::Utc::now();
+
+                let mut page = 1;
+                let mut completed = true;
+
+                loop {
+                    let backup_configurations = match BackupConfiguration::all_with_pagination(
+                        &state.database,
+                        page,
+                        50,
+                        None,
+                    )
+                    .await
+                    {
+                        Ok(configs) => configs,
+                        Err(err) => {
+                            tracing::error!(
+                                page,
+                                "failed to load backup configurations for prune sweep: {err:#?}"
+                            );
+                            completed = false;
+                            break;
+                        }
+                    };
+
+                    if backup_configurations.data.is_empty() {
+                        break;
+                    }
+
+                    for backup_configuration in &backup_configurations.data {
+                        let config_uuid = backup_configuration.uuid;
+                        let Some(restic) = &backup_configuration.backup_configs.restic else {
+                            continue;
+                        };
+                        if restic.prune_jobs.is_empty() {
+                            continue;
+                        }
+
+                        let mut due_nodes: std::collections::HashSet<uuid::Uuid> = Default::default();
+                        for prune_job in &restic.prune_jobs {
+                            let due = prune_job
+                                .cron
+                                .after(&last_check)
+                                .next()
+                                .is_some_and(|next| next <= now);
+                            if due {
+                                due_nodes.extend(prune_job.nodes.iter().copied());
+                            }
+                        }
+
+                        if due_nodes.is_empty() {
+                            continue;
+                        }
+
+                        let mut restic = restic.clone();
+                        if let Err(err) = restic.decrypt(&state.database).await {
+                            tracing::error!(
+                                backup_configuration = %config_uuid,
+                                "failed to decrypt restic configuration for prune job: {err:#?}"
+                            );
+                            continue;
+                        }
+                        let configuration = restic.into_wings_configuration();
+
+                        for node_uuid in due_nodes {
+                            let node = match Node::by_uuid_optional_cached(&state.database, node_uuid).await {
+                                Ok(Some(node)) => node,
+                                Ok(None) => continue,
+                                Err(err) => {
+                                    tracing::warn!(node = %node_uuid, "failed to load node for restic prune job: {err:#?}");
+                                    continue;
+                                }
+                            };
+
+                            let client = match node.api_client(&state.database).await {
+                                Ok(client) => client,
+                                Err(err) => {
+                                    tracing::warn!(node = %node_uuid, "failed to create wings client for restic prune job: {err:#?}");
+                                    continue;
+                                }
+                            };
+
+                            let request_data = wings_api::system_restic_prune::post::RequestBody {
+                                configuration: Some(configuration.clone()),
+                                dry_run: true,
+                                foreground: false,
+                            };
+                            let request = client.post_system_restic_prune(
+                                &request_data
+                            );
+
+                            match tokio::time::timeout(NODE_REQUEST_TIMEOUT, request).await {
+                                Ok(Ok(_)) => tracing::info!(
+                                    node = %node_uuid,
+                                    backup_configuration = %config_uuid,
+                                    "started restic prune job"
+                                ),
+                                Ok(Err(err)) => tracing::error!(
+                                    node = %node_uuid,
+                                    backup_configuration = %config_uuid,
+                                    "failed to start restic prune job: {err:#?}"
+                                ),
+                                Err(_) => tracing::error!(
+                                    node = %node_uuid,
+                                    backup_configuration = %config_uuid,
+                                    "restic prune request timed out"
+                                ),
+                            }
+                        }
+                    }
+
+                    page += 1;
+                }
+
+                if completed {
+                    last_check = now;
+                }
+            }
+        })
         .await;
     background_task_builder
         .add_cron_task("delete_old_activity", cron::Schedule::from_str("0 */30 * * * *").unwrap(), async |state| {

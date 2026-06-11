@@ -65,7 +65,6 @@ export default function ActivityContainer() {
             <NumberInput
               withAsterisk
               label={t('pages.admin.settings.tabs.activity.page.form.adminLogRetentionDays', {})}
-              placeholder={t('pages.admin.settings.tabs.activity.page.form.adminLogRetentionDays', {})}
               key={form.key('adminLogRetentionDays')}
               {...form.getInputProps('adminLogRetentionDays')}
             />
@@ -73,7 +72,6 @@ export default function ActivityContainer() {
             <NumberInput
               withAsterisk
               label={t('pages.admin.settings.tabs.activity.page.form.userLogRetentionDays', {})}
-              placeholder={t('pages.admin.settings.tabs.activity.page.form.userLogRetentionDays', {})}
               key={form.key('userLogRetentionDays')}
               {...form.getInputProps('userLogRetentionDays')}
             />
@@ -81,7 +79,6 @@ export default function ActivityContainer() {
             <NumberInput
               withAsterisk
               label={t('pages.admin.settings.tabs.activity.page.form.serverLogRetentionDays', {})}
-              placeholder={t('pages.admin.settings.tabs.activity.page.form.serverLogRetentionDays', {})}
               key={form.key('serverLogRetentionDays')}
               {...form.getInputProps('serverLogRetentionDays')}
             />
@@ -90,21 +87,18 @@ export default function ActivityContainer() {
           <Group grow>
             <NumberInput
               label={t('pages.admin.settings.tabs.activity.page.form.adminLogRetentionCount', {})}
-              placeholder={t('pages.admin.settings.tabs.activity.page.form.adminLogRetentionCount', {})}
               key={form.key('adminLogRetentionCount')}
               {...form.getInputProps('adminLogRetentionCount')}
             />
 
             <NumberInput
               label={t('pages.admin.settings.tabs.activity.page.form.userLogRetentionCount', {})}
-              placeholder={t('pages.admin.settings.tabs.activity.page.form.userLogRetentionCount', {})}
               key={form.key('userLogRetentionCount')}
               {...form.getInputProps('userLogRetentionCount')}
             />
 
             <NumberInput
               label={t('pages.admin.settings.tabs.activity.page.form.serverLogRetentionCount', {})}
-              placeholder={t('pages.admin.settings.tabs.activity.page.form.serverLogRetentionCount', {})}
               key={form.key('serverLogRetentionCount')}
               {...form.getInputProps('serverLogRetentionCount')}
             />

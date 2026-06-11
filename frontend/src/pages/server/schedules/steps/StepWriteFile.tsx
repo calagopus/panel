@@ -17,8 +17,8 @@ export default function StepWriteFile({
     <Stack>
       <ScheduleDynamicParameterInput
         withAsterisk
-        label={t('pages.server.schedules.steps.writeFile.form.filePath', {})}
-        placeholder={t('pages.server.schedules.steps.writeFile.form.filePath', {})}
+        label={t('common.form.filePath', {})}
+        placeholder={t('common.form.filePath', {})}
         value={form.getInputProps('action.file').value}
         onChange={(v) => form.setFieldValue('action.file', v)}
       />

@@ -13,9 +13,11 @@ import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { serverAllocationTableColumns } from '@/lib/tableColumns.ts';
 import ServerAllocationAddModal from '@/pages/admin/servers/allocations/modals/ServerAllocationAddModal.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ServerAllocationRow from './ServerAllocationRow.tsx';
 
 export default function AdminServerAllocations({ server }: { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -31,14 +33,14 @@ export default function AdminServerAllocations({ server }: { server: z.infer<typ
 
   return (
     <AdminSubContentContainer
-      title='Server Allocations'
+      title={t('pages.admin.servers.tabs.allocations.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <AdminCan action='nodes.read'>
           <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            Add
+            {t('common.button.add', {})}
           </Button>
         </AdminCan>
       }
@@ -51,7 +53,7 @@ export default function AdminServerAllocations({ server }: { server: z.infer<typ
 
       <ContextMenuProvider>
         <Table
-          columns={serverAllocationTableColumns}
+          columns={serverAllocationTableColumns()}
           loading={loading}
           pagination={serverAllocations}
           onPageSelect={setPage}

@@ -146,7 +146,9 @@ export default function AnnouncementCreateOrUpdate({
   return (
     <AdminContentContainer
       title={t(
-        contextAnnouncement ? 'pages.admin.announcements.update.title' : 'pages.admin.announcements.create.title',
+        contextAnnouncement
+          ? 'pages.admin.announcements.tabs.general.page.titleUpdate'
+          : 'pages.admin.announcements.tabs.general.page.titleCreate',
         {},
       )}
       fullscreen={!!contextAnnouncement}
@@ -155,18 +157,18 @@ export default function AnnouncementCreateOrUpdate({
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title={t('pages.admin.announcements.modal.delete.title', {})}
+        title={t('pages.admin.announcements.tabs.general.page.modal.delete.title', {})}
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {tReact('pages.admin.announcements.modal.delete.content', { title: form.getValues().title })}
+        {tReact('pages.admin.announcements.tabs.general.page.modal.delete.content', { title: form.getValues().title })}
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, [queryKeys.admin.announcements.all()]))}>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <Select
             withAsterisk
-            label={t('pages.admin.announcements.form.type', {})}
+            label={t('common.form.type', {})}
             data={Object.entries(announcementTypeLabelMapping).map(([value, label]) => ({ value, label: label() }))}
             key={form.key('type')}
             {...form.getInputProps('type')}
@@ -174,8 +176,7 @@ export default function AnnouncementCreateOrUpdate({
 
           <LocalizedTextInput
             withAsterisk
-            label={t('pages.admin.announcements.form.title', {})}
-            placeholder={t('pages.admin.announcements.form.title', {})}
+            label={t('common.form.title', {})}
             value={form.values.title}
             setValue={(value) => form.setFieldValue('title', value ?? '')}
             valueTranslations={form.values.titleTranslations}
@@ -186,8 +187,7 @@ export default function AnnouncementCreateOrUpdate({
 
           <LocalizedTextArea
             withAsterisk
-            label={t('pages.admin.announcements.form.content', {})}
-            placeholder={t('pages.admin.announcements.form.content', {})}
+            label={t('common.form.content', {})}
             value={form.values.content}
             setValue={(value) => form.setFieldValue('content', value ?? '')}
             valueTranslations={form.values.contentTranslations}
@@ -198,29 +198,29 @@ export default function AnnouncementCreateOrUpdate({
           />
 
           <DateTimePicker
-            label={t('pages.admin.announcements.form.dismissibleEnd', {})}
+            label={t('pages.admin.announcements.tabs.general.page.form.dismissibleEnd', {})}
             clearable
             value={form.values.dismissibleEnd}
             onChange={(value) => form.setFieldValue('dismissibleEnd', value ? new Date(value) : null)}
           />
 
           <DateTimePicker
-            label={t('pages.admin.announcements.form.enabledStart', {})}
+            label={t('pages.admin.announcements.tabs.general.page.form.enabledStart', {})}
             clearable
             value={form.values.enabledStart}
             onChange={(value) => form.setFieldValue('enabledStart', value ? new Date(value) : null)}
           />
 
           <DateTimePicker
-            label={t('pages.admin.announcements.form.enabledEnd', {})}
+            label={t('pages.admin.announcements.tabs.general.page.form.enabledEnd', {})}
             clearable
             value={form.values.enabledEnd}
             onChange={(value) => form.setFieldValue('enabledEnd', value ? new Date(value) : null)}
           />
 
           <MultiSelect
-            label={t('pages.admin.announcements.form.locations', {})}
-            description={t('pages.admin.announcements.form.locationsDescription', {})}
+            label={t('pages.admin.announcements.tabs.general.page.form.locations', {})}
+            description={t('pages.admin.announcements.tabs.general.page.form.locationsDescription', {})}
             data={locations.items.map((l) => ({ label: l.name, value: l.uuid }))}
             searchable
             searchValue={locations.search}
@@ -232,8 +232,8 @@ export default function AnnouncementCreateOrUpdate({
           />
 
           <MultiSelect
-            label={t('pages.admin.announcements.form.nodes', {})}
-            description={t('pages.admin.announcements.form.nodesDescription', {})}
+            label={t('pages.admin.announcements.tabs.general.page.form.nodes', {})}
+            description={t('pages.admin.announcements.tabs.general.page.form.nodesDescription', {})}
             data={nodes.items.map((n) => ({ label: n.name, value: n.uuid }))}
             searchable
             searchValue={nodes.search}
@@ -245,8 +245,8 @@ export default function AnnouncementCreateOrUpdate({
           />
 
           <MultiSelect
-            label={t('pages.admin.announcements.form.backupConfigurations', {})}
-            description={t('pages.admin.announcements.form.backupConfigurationsDescription', {})}
+            label={t('pages.admin.announcements.tabs.general.page.form.backupConfigurations', {})}
+            description={t('pages.admin.announcements.tabs.general.page.form.backupConfigurationsDescription', {})}
             data={backupConfigurations.items.map((b) => ({ label: b.name, value: b.uuid }))}
             searchable
             searchValue={backupConfigurations.search}
@@ -258,8 +258,8 @@ export default function AnnouncementCreateOrUpdate({
           />
 
           <MultiSelectGroup
-            label={t('pages.admin.announcements.form.eggs', {})}
-            placeholder={t('pages.admin.announcements.form.eggsPlaceholder', {})}
+            label={t('common.form.eggs', {})}
+            placeholder={t('pages.admin.announcements.tabs.general.page.form.eggsPlaceholder', {})}
             data={eggs}
             searchable
             loading={!eggs.length}
@@ -273,7 +273,7 @@ export default function AnnouncementCreateOrUpdate({
           />
 
           <Switch
-            label={t('pages.admin.announcements.form.dismissible', {})}
+            label={t('pages.admin.announcements.tabs.general.page.form.dismissible', {})}
             key={form.key('dismissible')}
             {...form.getInputProps('dismissible', { type: 'checkbox' })}
           />

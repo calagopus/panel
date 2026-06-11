@@ -16,11 +16,17 @@ use shared::{
     models::{ByUuid, node::Node},
     response::ApiResponse,
 };
-use std::{net::SocketAddr, sync::Arc};
+use std::{
+    net::SocketAddr,
+    sync::{Arc, OnceLock},
+};
 use tokio::sync::RwLock;
 use tower_cookies::CookieManagerLayer;
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
 use utoipa_axum::router::OpenApiRouter;
+
+pub static EXTENSIONS: OnceLock<Arc<shared::extensions::manager::ExtensionManager>> =
+    OnceLock::new();
 
 pub mod commands;
 pub mod routes;
@@ -161,9 +167,7 @@ pub async fn handle_startup() -> (
     shared::State,
 ) {
     let env = shared::env::Env::parse();
-    let extensions = Arc::new(shared::extensions::manager::ExtensionManager::new(
-        extension_internal_list::list(),
-    ));
+    let extensions = Arc::clone(EXTENSIONS.get().expect("Extensions not initialized"));
 
     let cli = CliCommandGroupBuilder::new(
         "panel-rs",

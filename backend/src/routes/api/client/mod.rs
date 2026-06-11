@@ -85,6 +85,8 @@ pub async fn auth(
         Err(err) => return Ok(ApiResponse::from(err).into_response()),
     };
 
+    const IGNORED_SUSPENDED_PATHS: &[&str] = &["/api/client/account", "/api/client/account/logout"];
+
     const IGNORED_TWO_FACTOR_PATHS: &[&str] = &[
         "/api/client/account",
         "/api/client/account/two-factor",
@@ -94,6 +96,12 @@ pub async fn auth(
     if let Some((auth_user, auth_method)) = req.extensions_mut().remove::<(User, AuthMethod)>() {
         let require_two_factor = auth_user.require_two_factor(&settings);
         drop(settings);
+
+        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
+            return Ok(ApiResponse::error("account is suspended")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response());
+        }
 
         if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
             && !auth_user.totp_enabled
@@ -223,6 +231,12 @@ pub async fn auth(
             },
         );
 
+        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
+            return Ok(ApiResponse::error("account is suspended")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response());
+        }
+
         if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
             && !auth_user.totp_enabled
             && require_two_factor
@@ -332,6 +346,12 @@ pub async fn auth(
         };
         let require_two_factor = auth_user.require_two_factor(&settings);
         drop(settings);
+
+        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
+            return Ok(ApiResponse::error("account is suspended")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response());
+        }
 
         if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
             && !auth_user.totp_enabled

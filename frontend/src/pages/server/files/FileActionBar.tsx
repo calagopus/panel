@@ -116,15 +116,14 @@ function FileActionBar() {
   useKeyboardShortcuts({
     shortcuts: [
       {
-        key: 'Escape',
+        id: 'files.deselectAll',
         callback: () => {
           clearActingFiles();
           doSelectFiles([]);
         },
       },
       {
-        key: 'x',
-        modifiers: ['ctrlOrMeta'],
+        id: 'files.cut',
         callback: () => {
           if (actingFiles.size === 0 && selectedFiles.size > 0 && browsingWritableDirectory) {
             doActFiles('move', selectedFiles.values());
@@ -133,8 +132,7 @@ function FileActionBar() {
         },
       },
       {
-        key: 'c',
-        modifiers: ['ctrlOrMeta'],
+        id: 'files.copy',
         callback: () => {
           if (actingFiles.size === 0 && selectedFiles.size > 0) {
             doActFiles('copy', selectedFiles.values());
@@ -143,8 +141,7 @@ function FileActionBar() {
         },
       },
       {
-        key: 'v',
-        modifiers: ['ctrlOrMeta'],
+        id: 'files.paste',
         callback: () => {
           if (
             actingFiles.size > 0 &&
@@ -161,7 +158,7 @@ function FileActionBar() {
         },
       },
       {
-        key: 'Delete',
+        id: 'files.delete',
         callback: () => {
           if (actingFiles.size === 0 && selectedFiles.size > 0 && browsingWritableDirectory) {
             doOpenModal('delete', selectedFiles.values());
@@ -255,7 +252,7 @@ function FileActionBar() {
                 </Tooltip>
               </ServerCan>
               <ServerCan action='files.update'>
-                <Tooltip label={t('pages.server.files.button.move', {})}>
+                <Tooltip label={t('common.button.move', {})}>
                   <Button
                     onClick={() => {
                       doActFiles('move', selectedFiles.values());

@@ -186,7 +186,7 @@ export default function EmailTemplatesContainer() {
         opened={confirmReset}
         onClose={() => setConfirmReset(false)}
         onConfirmed={doReset}
-        confirm={t('pages.admin.settings.tabs.mailTemplates.page.modal.reset.button.confirm', {})}
+        confirm={t('common.button.reset', {})}
       >
         {tReact('pages.admin.settings.tabs.mailTemplates.page.modal.reset.content', {
           identifier: selectedIdentifier ?? '',
@@ -244,7 +244,7 @@ export default function EmailTemplatesContainer() {
                   </Group>
                   <Group gap='xs'>
                     <Button size='xs' variant='subtle' onClick={() => setConfirmReset(true)} disabled={saving}>
-                      {t('pages.admin.settings.tabs.mailTemplates.page.button.resetToDefault', {})}
+                      {t('common.tooltip.resetToDefault', {})}
                     </Button>
                     <AdminCan action='settings.update' cantSave>
                       <Button size='xs' loading={saving} disabled={!isContentDirty && !form.isDirty()} onClick={doSave}>

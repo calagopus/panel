@@ -71,8 +71,9 @@ export function prepareCredentialForTransport(credential: PublicKeyCredential): 
   return serializedCredential;
 }
 
-export default async (securityKeyUuid: string, challenge: PublicKeyCredential): Promise<void> => {
-  await axiosInstance.post(`/api/client/account/security-keys/${securityKeyUuid}/challenge`, {
+export default async (securityKeyUuid: string, challenge: PublicKeyCredential): Promise<string> => {
+  const { data } = await axiosInstance.post(`/api/client/account/security-keys/${securityKeyUuid}/challenge`, {
     public_key_credential: prepareCredentialForTransport(challenge),
   });
+  return data.credentialId;
 };

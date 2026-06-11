@@ -61,8 +61,8 @@ export default function ServerDatabases() {
         <Table
           columns={[
             t('common.table.columns.name', {}),
-            t('pages.server.databases.table.columns.type', {}),
-            t('pages.server.databases.table.columns.address', {}),
+            t('common.table.columns.type', {}),
+            t('common.table.columns.address', {}),
             t('common.table.columns.username', {}),
             t('common.table.columns.size', {}),
             t('pages.server.databases.table.columns.locked', {}),

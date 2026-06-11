@@ -17,7 +17,7 @@ export const serverFilesCopySchema = z.object({
 });
 
 export const serverFilesCopyRemoteSchema = z.object({
-  destination: z.string().min(1).max(255),
+  destination: z.string().max(255),
   destinationServer: z.uuid(),
 });
 

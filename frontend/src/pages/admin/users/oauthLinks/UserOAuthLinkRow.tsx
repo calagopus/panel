@@ -32,7 +32,7 @@ export default function UserOAuthLinkRow({
     await deleteUserOAuthLink(user.uuid, userOAuthLink.uuid)
       .then(() => {
         removeUserOAuthLink(userOAuthLink);
-        addToast(t('pages.admin.users.oauthLinks.toast.removed', {}), 'success');
+        addToast(t('pages.admin.users.tabs.oauthLinks.page.toast.removed', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -44,11 +44,11 @@ export default function UserOAuthLinkRow({
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title={t('pages.admin.users.oauthLinks.modal.delete.title', {})}
+        title={t('pages.admin.users.tabs.oauthLinks.page.modal.delete.title', {})}
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.users.oauthLinks.modal.delete.content', {
+        {t('pages.admin.users.tabs.oauthLinks.page.modal.delete.content', {
           provider: userOAuthLink.oauthProvider.name,
           username: user.username,
         }).md()}
@@ -68,7 +68,7 @@ export default function UserOAuthLinkRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>

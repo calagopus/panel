@@ -28,6 +28,7 @@ export default function TimezoneContainer() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
+  const updateServer = useServerStore((state) => state.updateServer);
 
   const [loading, setLoading] = useState(false);
   const [time, setTime] = useState<string | null>(null);
@@ -45,6 +46,7 @@ export default function TimezoneContainer() {
     updateTimezone(server.uuid, form.values)
       .then(() => {
         addToast(t('pages.server.settings.timezone.toast.updated', {}), 'success');
+        updateServer({ timezone: form.values.timezone });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -77,8 +79,8 @@ export default function TimezoneContainer() {
           <Stack gap='xs'>
             <Select
               withAsterisk
-              label={t('pages.server.settings.timezone.form.timezone', {})}
-              placeholder={t('pages.server.settings.timezone.form.system', {})}
+              label={t('common.form.timezone', {})}
+              placeholder={t('common.form.timezoneSystem', {})}
               data={timezones}
               allowDeselect
               clearable

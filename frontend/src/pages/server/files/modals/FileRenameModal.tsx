@@ -77,13 +77,7 @@ export default function FileRenameModal({ file, opened, onClose }: Props) {
       loading={loading}
       opened={opened}
     >
-      <TextInput
-        withAsterisk
-        label={t('pages.server.files.modal.renameFile.form.fileName', {})}
-        placeholder={t('pages.server.files.modal.renameFile.form.fileName', {})}
-        data-autofocus
-        {...form.getInputProps('name')}
-      />
+      <TextInput withAsterisk label={t('common.form.fileName', {})} data-autofocus {...form.getInputProps('name')} />
 
       <ModalFooter>
         <Button type='submit' loading={loading}>

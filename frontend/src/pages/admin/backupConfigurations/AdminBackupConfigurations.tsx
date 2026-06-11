@@ -12,9 +12,11 @@ import BackupConfigurationCreateOrUpdate from '@/pages/admin/backupConfiguration
 import BackupConfigurationRow from '@/pages/admin/backupConfigurations/BackupConfigurationRow.tsx';
 import BackupConfigurationView from '@/pages/admin/backupConfigurations/BackupConfigurationView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 
 function BackupConfigurationsContainer() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const {
@@ -30,7 +32,7 @@ function BackupConfigurationsContainer() {
 
   return (
     <AdminContentContainer
-      title='Backup Configurations'
+      title={t('pages.admin.backupConfigurations.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -40,13 +42,13 @@ function BackupConfigurationsContainer() {
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </AdminCan>
       }
     >
       <Table
-        columns={backupConfigurationTableColumns}
+        columns={backupConfigurationTableColumns()}
         loading={loading}
         pagination={backupConfigurations}
         onPageSelect={setPage}

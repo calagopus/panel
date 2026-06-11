@@ -33,7 +33,7 @@ export default function StepCompressFiles({
       />
       <Select
         withAsterisk
-        label={t('pages.server.schedules.steps.compressFiles.form.archiveFormat', {})}
+        label={t('common.form.archiveFormat', {})}
         data={Object.entries(archiveFormatLabelMapping).map(([value, label]) => ({
           value,
           label,
@@ -42,8 +42,8 @@ export default function StepCompressFiles({
       />
       <ScheduleDynamicParameterInput
         withAsterisk
-        label={t('pages.server.schedules.steps.compressFiles.form.archiveName', {})}
-        placeholder={t('pages.server.schedules.steps.compressFiles.form.archiveName', {})}
+        label={t('common.form.archiveName', {})}
+        placeholder={t('common.form.archiveName', {})}
         value={form.getInputProps('action.name').value}
         onChange={(v) => form.setFieldValue('action.name', v)}
       />

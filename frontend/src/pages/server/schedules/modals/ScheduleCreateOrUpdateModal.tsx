@@ -91,14 +91,10 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
       size='lg'
     >
       <Stack>
-        <TextInput
-          label={t('pages.server.schedules.form.scheduleName', {})}
-          placeholder={t('pages.server.schedules.form.scheduleName', {})}
-          {...form.getInputProps('name')}
-        />
+        <TextInput label={t('pages.server.schedules.form.scheduleName', {})} {...form.getInputProps('name')} />
 
         <Switch
-          label={t('pages.server.schedules.form.enabled', {})}
+          label={t('common.form.enabled', {})}
           name='enabled'
           {...form.getInputProps('enabled', { type: 'checkbox' })}
         />
@@ -114,7 +110,6 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
               <div className='flex flex-row items-end space-x-2 mb-2'>
                 <Select
                   label={t('pages.server.schedules.form.triggerNumber', { number: index + 1 })}
-                  placeholder={t('pages.server.schedules.form.triggerNumber', { number: index + 1 })}
                   className='flex-1'
                   data={Object.entries(scheduleTriggerLabelMapping).map(([value, label]) => ({
                     value,

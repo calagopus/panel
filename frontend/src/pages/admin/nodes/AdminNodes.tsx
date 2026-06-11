@@ -16,6 +16,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import LocationCreateOrUpdateModal from './LocationCreateOrUpdateModal.tsx';
 import NodeActionBar from './NodeActionBar.tsx';
@@ -24,6 +25,7 @@ import NodeRow from './NodeRow.tsx';
 import NodeView from './NodeView.tsx';
 
 function NodesContainer() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [checkingLocations, setCheckingLocations] = useState(true);
@@ -104,7 +106,7 @@ function NodesContainer() {
   return (
     <>
       <AdminContentContainer
-        title='Nodes'
+        title={t('pages.admin.nodes.title', {})}
         search={search}
         setSearch={setSearch}
         contentRight={
@@ -114,7 +116,7 @@ function NodesContainer() {
               color='blue'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
             >
-              Create
+              {t('common.button.create', {})}
             </Button>
           </AdminCan>
         }

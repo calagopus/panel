@@ -18,6 +18,8 @@ pub struct AppSettingsServer {
     pub allow_viewing_installation_logs: bool,
     pub allow_acknowledging_installation_failure: bool,
     pub allow_viewing_transfer_progress: bool,
+
+    pub container_prelude: compact_str::CompactString,
 }
 
 #[async_trait::async_trait]
@@ -65,7 +67,8 @@ impl SettingsSerializeExt for AppSettingsServer {
             .write_raw_setting(
                 "allow_viewing_transfer_progress",
                 self.allow_viewing_transfer_progress.to_compact_string(),
-            ))
+            )
+            .write_raw_setting("container_prelude", &*self.container_prelude))
     }
 }
 
@@ -114,6 +117,9 @@ impl SettingsDeserializeExt for AppSettingsServerDeserializer {
                 .take_raw_setting("allow_viewing_transfer_progress")
                 .map(|s| s == "true")
                 .unwrap_or(true),
+            container_prelude: deserializer
+                .take_raw_setting("container_prelude")
+                .unwrap_or_else(|| "container@calagopus~".into()),
         }))
     }
 }

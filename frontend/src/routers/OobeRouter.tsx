@@ -39,7 +39,7 @@ export interface OobeData {
 }
 
 export interface OobeComponentProps {
-  onNext: () => void;
+  onNext: (stepsToSkip?: number) => void;
   onBack: () => void;
   canGoBack: boolean;
   skipFrom: (step: z.infer<typeof oobeStepKey>) => void;
@@ -132,8 +132,8 @@ export default function OobeRouter() {
     }
   }, [user, activeStep, currentAllowedStep, location.pathname]);
 
-  const onNext = () => {
-    const nextStep = filteredSteps[currentStepIndex + 1];
+  const onNext = (stepsToSkip = 0) => {
+    const nextStep = filteredSteps[currentStepIndex + 1 + stepsToSkip];
     if (!nextStep) return;
 
     const nextIndex = filteredSteps.findIndex((s) => s.path === nextStep.path);

@@ -24,7 +24,6 @@ export default function StorageFilesystem({
       <TextInput
         withAsterisk
         label={t('common.form.path', {})}
-        placeholder={t('common.form.path', {})}
         key={form.key('path')}
         {...form.getInputProps('path')}
       />

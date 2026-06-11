@@ -1,4 +1,4 @@
-import { Group, ModalProps, Stack, Title } from '@mantine/core';
+import { ModalProps, Stack, Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -179,7 +179,7 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
         </div>
       </Card>
 
-      <Group mt='md' grow>
+      <div className='mt-4 grid grid-cols-3 gap-4'>
         <PermissionGroup
           title={t('pages.server.files.modal.filePermissions.owner', {})}
           category='owner'
@@ -195,7 +195,7 @@ export default function FilePermissionsModal({ file, opened, onClose }: Props) {
           category='other'
           perms={permissions.other}
         />
-      </Group>
+      </div>
 
       <Card mt='md'>
         <Title order={3}>{t('pages.server.files.modal.filePermissions.breakdown', {})}</Title>

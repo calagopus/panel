@@ -46,7 +46,7 @@ export default function NodeBackupRow({
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadNodeBackup(node.uuid, backup.uuid, archiveFormat)
       .then(({ url }) => {
-        addToast('Download started.', 'success');
+        addToast(t('pages.admin.nodes.tabs.backups.page.toast.downloadStarted', {}), 'success');
         window.open(url, '_blank');
       })
       .catch((msg) => {
@@ -59,7 +59,7 @@ export default function NodeBackupRow({
       .then(() => {
         backup.server = null;
         setOpenModal(null);
-        addToast('Backup detached successfully.', 'success');
+        addToast(t('pages.admin.nodes.tabs.backups.page.toast.detached', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -85,11 +85,11 @@ export default function NodeBackupRow({
       <ConfirmationModal
         opened={openModal === 'detach'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Backup Detachment'
+        title={t('pages.admin.nodes.tabs.backups.page.modal.detach.title', {})}
         confirm={t('common.button.continue', {})}
         onConfirmed={doDetach}
       >
-        Are you sure you want to detach this backup from its server? It will not be deleted and can be reattached later.
+        {t('pages.admin.nodes.tabs.backups.page.modal.detach.content', {})}
       </ConfirmationModal>
       <NodeBackupsDeleteModal
         node={node}
@@ -142,7 +142,7 @@ export default function NodeBackupRow({
           },
           {
             icon: faLink,
-            label: 'Reattach',
+            label: t('common.button.reattach', {}),
             hidden: !backup.completed || isFailed,
             onClick: () => setOpenModal('reattach'),
             color: 'gray',
@@ -150,7 +150,7 @@ export default function NodeBackupRow({
           },
           {
             icon: faLink,
-            label: 'Detach',
+            label: t('common.button.detach', {}),
             hidden: !backup.completed || isFailed || !backup.server,
             onClick: () => setOpenModal('detach'),
             color: 'gray',
@@ -177,7 +177,7 @@ export default function NodeBackupRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>{backup.name}</TableData>
@@ -191,7 +191,7 @@ export default function NodeBackupRow({
                 )}
               </Code>
               {backup.server && backup.server.node.uuid !== node.uuid && (
-                <Tooltip label='This backup is not on the same node as the server. It is not viewable from the Client API.'>
+                <Tooltip label={t('pages.admin.nodes.tabs.backups.page.tooltip.backupNotOnSameNode', {})}>
                   <FontAwesomeIcon icon={faWarning} className='ml-1 text-yellow-400' />
                 </Tooltip>
               )}

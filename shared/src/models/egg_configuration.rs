@@ -126,28 +126,11 @@ pub struct EggConfigStartup {
     pub allow_custom_startup_command: bool,
 }
 
-#[derive(ToSchema, Serialize, Deserialize, Clone)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum EggConfigRoutesRouteItem {
-    Route {
-        path: compact_str::CompactString,
-    },
-    Divider {
-        name: Option<compact_str::CompactString>,
-        name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
-    },
-    Redirect {
-        name: compact_str::CompactString,
-        name_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
-        destination: compact_str::CompactString,
-    },
-}
-
 #[derive(ToSchema, Validate, Serialize, Deserialize, Default, Clone)]
 pub struct EggConfigRoutes {
     #[garde(length(max = 100))]
     #[schema(max_length = 100)]
-    pub order: Vec<EggConfigRoutesRouteItem>,
+    pub order: Vec<crate::settings::RouteOrderItem>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -762,5 +745,5 @@ pub struct ApiEggConfiguration {
     pub allocation_self_assign_enabled: bool,
     pub allocation_self_assign_require_primary: bool,
     pub startup_allow_custom_command: bool,
-    pub route_order: Option<Vec<EggConfigRoutesRouteItem>>,
+    pub route_order: Option<Vec<crate::settings::RouteOrderItem>>,
 }

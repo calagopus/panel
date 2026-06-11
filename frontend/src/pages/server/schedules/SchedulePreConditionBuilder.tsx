@@ -162,7 +162,7 @@ export default function SchedulePreConditionBuilder({ condition, onChange, depth
 
         {condition.type === 'file_exists' && (
           <TextInput
-            label={t('pages.server.schedules.preCondition.filePath', {})}
+            label={t('common.form.filePath', {})}
             value={condition.file}
             onChange={(e) => onChange({ ...condition, file: e.target.value })}
           />

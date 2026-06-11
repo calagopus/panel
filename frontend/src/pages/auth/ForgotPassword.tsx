@@ -1,6 +1,6 @@
 import { faExclamationTriangle, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Alert, Card, Divider, Stack, Text, Title } from '@mantine/core';
+import { Card, Divider, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useRef, useState } from 'react';
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import forgotPassword from '@/api/auth/forgotPassword.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -98,7 +99,7 @@ export default function ForgotPassword() {
 
         <Card>
           <Stack>
-            <TextInput placeholder={t('pages.auth.forgotPassword.form.email', {})} {...form.getInputProps('email')} />
+            <TextInput placeholder={t('common.form.email', {})} {...form.getInputProps('email')} />
             <Captcha ref={captchaRef} />
 
             <Button onClick={submit} loading={loading} disabled={requested || !form.isValid()} size='md' fullWidth>

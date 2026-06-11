@@ -91,7 +91,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         },
         {
           icon: faAnglesUp,
-          label: t('pages.server.files.button.move', {}),
+          label: t('common.button.move', {}),
           hidden: !!actingMode || !browsingWritableDirectory,
           onClick: () => {
             doActFiles('move', selectedFiles.values());

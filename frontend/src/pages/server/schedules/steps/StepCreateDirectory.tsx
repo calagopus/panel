@@ -24,8 +24,8 @@ export default function StepCreateDirectory({
       />
       <ScheduleDynamicParameterInput
         withAsterisk
-        label={t('pages.server.schedules.steps.createDirectory.form.directoryName', {})}
-        placeholder={t('pages.server.schedules.steps.createDirectory.form.directoryName', {})}
+        label={t('common.form.directoryName', {})}
+        placeholder={t('common.form.directoryName', {})}
         value={form.getInputProps('action.nane').value}
         onChange={(v) => form.setFieldValue('action.name', v)}
       />

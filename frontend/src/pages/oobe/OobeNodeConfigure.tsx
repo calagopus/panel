@@ -2,7 +2,8 @@ import { faCheck, faChevronLeft, faCopy } from '@fortawesome/free-solid-svg-icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack, Title } from '@mantine/core';
 import jsYaml from 'js-yaml';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
 import { axiosInstance } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Alert from '@/elements/Alert.tsx';
@@ -12,6 +13,8 @@ import Code from '@/elements/Code.tsx';
 import HljsCode from '@/elements/HljsCode.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { getNodeConfiguration, getNodeConfigurationCommand, getNodeUrl } from '@/lib/node.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
@@ -23,27 +26,45 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isVerified, setIsVerified] = useState(false);
-  const [nodeConfiguration, setNodeConfiguration] = useState({});
-  const [command, setCommand] = useState('');
 
   const node = data.nodes[0] ?? null;
+  const { data: nodeToken } = useResource({
+    queryKey: queryKeys.admin.nodes.token(node?.uuid ?? ''),
+    queryFn: useCallback(() => getNodeToken(node!.uuid), [node]),
+    enabled: !!node,
+  });
 
   useEffect(() => {
     if (!node) {
       setError(t('pages.oobe.nodeConfiguration.error.noNodes', {}));
-      return;
+    }
+  }, [node, t]);
+
+  const configurationParams = useMemo(() => {
+    if (!node || !nodeToken) {
+      return null;
     }
 
-    const remote = window.location.origin;
-    const apiPort = parseInt(new URL(node.url).port || '8080');
-    const sftpPort = node.sftpPort;
+    return {
+      node,
+      token: nodeToken,
+      remote: window.location.origin,
+      apiPort: parseInt(new URL(node.url).port || '8080'),
+      sftpPort: node.sftpPort,
+    };
+  }, [node, nodeToken]);
 
-    setNodeConfiguration(getNodeConfiguration({ node, remote, apiPort, sftpPort }));
-    setCommand(getNodeConfigurationCommand({ node, remote, apiPort, sftpPort }));
-  }, [node]);
+  const nodeConfiguration = useMemo(
+    () => (configurationParams ? getNodeConfiguration(configurationParams) : null),
+    [configurationParams],
+  );
+  const command = useMemo(
+    () => (configurationParams ? getNodeConfigurationCommand(configurationParams) : null),
+    [configurationParams],
+  );
 
   const verifyNode = async () => {
-    if (!node) return;
+    if (!node || !nodeToken) return;
 
     setLoading(true);
     setIsVerified(false);
@@ -51,7 +72,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
     axiosInstance
       .get(getNodeUrl(node, '/api/system'), {
         headers: {
-          Authorization: `Bearer ${node.token}`,
+          Authorization: `Bearer ${nodeToken.token}`,
           'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
       })
@@ -80,7 +101,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
           </Alert>
         )}
 
-        {node && (
+        {node && nodeConfiguration && command && (
           <div className='flex flex-col min-w-0'>
             <HljsCode
               languageName='yaml'

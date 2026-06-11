@@ -56,12 +56,7 @@ export default function ServerGroupCreateModal({ opened, onClose }: ModalProps) 
       onClose={onClose}
       opened={opened}
     >
-      <TextInput
-        withAsterisk
-        label={t('common.form.name', {})}
-        placeholder={t('common.form.name', {})}
-        {...form.getInputProps('name')}
-      />
+      <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
       <ModalFooter>
         <Button onClick={doCreate} loading={loading} disabled={!form.isValid()}>

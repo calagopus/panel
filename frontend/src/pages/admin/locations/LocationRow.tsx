@@ -14,7 +14,16 @@ export default ({ location }: { location: z.infer<typeof adminLocationSchema> })
         </TableLink>
       </TableData>
 
-      <TableData>{location.name}</TableData>
+      <TableData className='flex flex-row items-center'>
+        {location.flag && (
+          <img
+            src={`/flags/${location.flag}.svg`}
+            alt={location.name}
+            className='w-5 h-5 mr-1 rounded-md shrink-0 my-auto'
+          />
+        )}{' '}
+        {location.name}
+      </TableData>
 
       <TableData>
         <Code>

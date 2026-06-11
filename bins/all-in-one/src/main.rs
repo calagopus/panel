@@ -12,6 +12,7 @@ use shared::models::{
 use std::{
     net::{IpAddr, SocketAddr},
     path::PathBuf,
+    sync::Arc,
 };
 use tokio::io::AsyncBufReadExt;
 use tower::Layer;
@@ -19,11 +20,13 @@ use tower_http::normalize_path::NormalizePathLayer;
 
 mod bins;
 
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+#[cfg(target_arch = "x86_64")]
 #[global_allocator]
-static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+static ALLOC: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
-async fn handle_aio_wings(state: &shared::State) -> Result<(), anyhow::Error> {
+async fn handle_aio_wings(
+    state: &shared::State,
+) -> Result<Arc<tokio::sync::Notify>, anyhow::Error> {
     let node = match Node::by_uuid_optional(&state.database, Node::AIO_NODE_UUID).await? {
         Some(mut node) => {
             node.update(
@@ -101,7 +104,7 @@ async fn handle_aio_wings(state: &shared::State) -> Result<(), anyhow::Error> {
             }
 
             tracing::info!("creating aio wings node...");
-            let node = Node::create(
+            let mut node = Node::create(
                 state,
                 shared::models::node::CreateNodeOptions {
                     location_uuid: location.uuid,
@@ -127,6 +130,7 @@ async fn handle_aio_wings(state: &shared::State) -> Result<(), anyhow::Error> {
             )
             .execute(state.database.write())
             .await?;
+            node.uuid = Node::AIO_NODE_UUID;
 
             node
         }
@@ -218,43 +222,77 @@ async fn handle_aio_wings(state: &shared::State) -> Result<(), anyhow::Error> {
 
     let wings_bin = bins::get_wings_bin_path().await?;
 
-    tokio::spawn(async move {
-        let mut cmd = tokio::process::Command::new(wings_bin);
-        cmd.arg("--config").arg(&path);
-        cmd.stdout(std::process::Stdio::piped());
-        cmd.stderr(std::process::Stdio::piped());
+    let notify = Arc::new(tokio::sync::Notify::new());
+    tokio::spawn({
+        let notify = notify.clone();
 
-        let mut child = cmd.spawn().expect("failed to spawn aio wings process");
+        async move {
+            let mut cmd = tokio::process::Command::new(wings_bin);
+            cmd.arg("--config").arg(&path);
+            cmd.stdout(std::process::Stdio::piped());
+            cmd.stderr(std::process::Stdio::piped());
 
-        let stdout = child.stdout.take().unwrap();
-        let stderr = child.stderr.take().unwrap();
+            let mut child = cmd.spawn().expect("failed to spawn aio wings process");
 
-        let stdout_task = async {
-            let reader = tokio::io::BufReader::new(stdout);
-            let mut lines = reader.lines();
+            let stdout = child.stdout.take().unwrap();
+            let stderr = child.stderr.take().unwrap();
 
-            while let Ok(Some(line)) = lines.next_line().await {
-                println!("[wings] {}", line);
+            let stdout_task = async {
+                let reader = tokio::io::BufReader::new(stdout);
+                let mut lines = reader.lines();
+
+                while let Ok(Some(line)) = lines.next_line().await {
+                    println!("[wings] {}", line);
+                }
+            };
+
+            let stderr_task = async {
+                let reader = tokio::io::BufReader::new(stderr);
+                let mut lines = reader.lines();
+
+                while let Ok(Some(line)) = lines.next_line().await {
+                    eprintln!("[wings] {}", line);
+                }
+            };
+
+            let io_fut = futures_util::future::join(stdout_task, stderr_task);
+
+            tokio::select! {
+                _ = io_fut => {},
+                _ = notify.notified() => {
+                    let _ = child.kill().await;
+                },
+                status = child.wait() => {
+                    match status {
+                        Ok(status) => {
+                            if !status.success() {
+                                eprintln!("wings process exited with status: {}", status);
+                            } else {
+                                println!("wings process exited successfully");
+                            }
+                        }
+                        Err(err) => {
+                            eprintln!("failed to wait for wings process: {}", err);
+                        }
+                    }
+
+                    notify.notify_one();
+                }
             }
-        };
-
-        let stderr_task = async {
-            let reader = tokio::io::BufReader::new(stderr);
-            let mut lines = reader.lines();
-
-            while let Ok(Some(line)) = lines.next_line().await {
-                eprintln!("[wings] {}", line);
-            }
-        };
-
-        tokio::join!(stdout_task, stderr_task);
+        }
     });
 
-    Ok(())
+    Ok(notify)
 }
 
 #[tokio::main]
 async fn main() {
+    backend::EXTENSIONS
+        .set(Arc::new(
+            shared::extensions::manager::ExtensionManager::new(extension_internal_list::list()),
+        ))
+        .ok();
+
     let (_guard, _env_guard, state) = backend::handle_startup().await;
 
     let router = state
@@ -264,10 +302,13 @@ async fn main() {
         .clone()
         .expect("router not initialized");
 
-    if let Err(err) = handle_aio_wings(&state).await {
-        eprintln!("{} {}", "error handling aio wings:".red(), err);
-        std::process::exit(1);
-    }
+    let kill_notifier = match handle_aio_wings(&state).await {
+        Ok(notifier) => notifier,
+        Err(err) => {
+            eprintln!("{} {}", "error starting aio wings:".red(), err);
+            std::process::exit(1);
+        }
+    };
 
     let router = if state.env.bind.parse::<IpAddr>().is_ok() {
         router
@@ -342,10 +383,14 @@ async fn main() {
         _ = http_server => {},
         _ = tokio::signal::ctrl_c() => {
             tracing::info!("CTRL-C received, shutting down...");
+            kill_notifier.notify_one();
+            tokio::time::sleep(std::time::Duration::from_millis(200)).await;
             state.shutdown_handlers.handle_shutdown().await;
         },
         _ = sigterm_fut => {
             tracing::info!("SIGTERM received, shutting down...");
+            kill_notifier.notify_one();
+            tokio::time::sleep(std::time::Duration::from_millis(200)).await;
             state.shutdown_handlers.handle_shutdown().await;
         }
     }

@@ -9,7 +9,6 @@ import postTransfer from '@/api/admin/servers/postTransfer.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
@@ -27,12 +26,14 @@ import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/f
 import { formatAllocation } from '@/lib/server.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServerTransferModal({
   server,
   opened,
   onClose,
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -93,7 +94,7 @@ export default function ServerTransferModal({
       multiplexChannels,
     })
       .then(() => {
-        addToast('Server transfer started.', 'success');
+        addToast(t('pages.admin.servers.tabs.management.page.transfer.toast.started', {}), 'success');
         closeAll();
         navigate(`/server/${server.uuidShort}`);
       })
@@ -107,26 +108,32 @@ export default function ServerTransferModal({
       <ConfirmationModal
         opened={openModal === 'confirm'}
         onClose={closeAll}
-        title='Confirm Server Transfer'
-        confirm='Transfer'
+        title={t('pages.admin.servers.tabs.management.page.transfer.modal.confirm.title', {})}
+        confirm={t('common.button.transfer', {})}
         onConfirmed={doTransfer}
       >
         {selectedBackupUuids.length < backups.items.length && (
           <Alert color='yellow' mb='md'>
-            You have not selected all backups to transfer, the remaining backups will become partially detached if the
-            transfer completes successfully.
+            {t('pages.admin.servers.tabs.management.page.transfer.modal.confirm.alert.notAllBackupsSelected', {})}
           </Alert>
         )}
-        Are you sure you want to transfer <Code>{server.name}</Code> from <Code>{server.node.name}</Code> to{' '}
-        <Code>{nodes.items.find((node) => node.uuid === selectedNodeUuid)?.name}</Code>?
+        {t('pages.admin.servers.tabs.management.page.transfer.modal.confirm.content', {
+          name: server.name,
+          from: server.node.name,
+          to: nodes.items.find((node) => node.uuid === selectedNodeUuid)?.name ?? '',
+        }).md()}
       </ConfirmationModal>
 
-      <Modal title='Server Transfer' onClose={onClose} opened={opened && !openModal}>
+      <Modal
+        title={t('pages.admin.servers.tabs.management.page.transfer.modal.title', {})}
+        onClose={onClose}
+        opened={opened && !openModal}
+      >
         <Stack>
           <Select
             withAsterisk
-            label='Node'
-            placeholder='Node'
+            label={t('common.table.columns.node', {})}
+            placeholder={t('common.table.columns.node', {})}
             value={selectedNodeUuid || ''}
             onChange={(value) => setSelectedNodeUuid(value)}
             data={nodes.items
@@ -142,8 +149,8 @@ export default function ServerTransferModal({
           />
 
           <Select
-            label='Primary Allocation'
-            placeholder='Primary Allocation'
+            label={t('common.form.primaryAllocation', {})}
+            placeholder={t('common.form.primaryAllocation', {})}
             value={selectedPrimaryAllocationUuid}
             disabled={!selectedNodeUuid}
             onChange={(value) => setSelectedPrimaryAllocationUuid(value)}
@@ -161,8 +168,8 @@ export default function ServerTransferModal({
           />
 
           <MultiSelect
-            label='Additional Allocations'
-            placeholder='Additional Allocations'
+            label={t('common.form.additionalAllocations', {})}
+            placeholder={t('common.form.additionalAllocations', {})}
             value={selectedAllocationUuids}
             disabled={!selectedNodeUuid}
             onChange={(value) => setSelectedAllocationUuids(value)}
@@ -179,8 +186,8 @@ export default function ServerTransferModal({
           />
 
           <MultiSelect
-            label='Backups to transfer'
-            placeholder='Backups to transfer'
+            label={t('pages.admin.servers.tabs.management.page.transfer.modal.form.backupsToTransfer', {})}
+            placeholder={t('pages.admin.servers.tabs.management.page.transfer.modal.form.backupsToTransfer', {})}
             value={selectedBackupUuids}
             onChange={(value) => setSelectedBackupsUuids(value)}
             data={backups.items
@@ -196,15 +203,15 @@ export default function ServerTransferModal({
           />
 
           <Switch
-            label='Delete source backups'
-            description='Deletes the transferred backups on the source node once transfer finishes'
+            label={t('common.form.deleteSourceBackups', {})}
+            description={t('common.form.deleteSourceBackupsDescription', {})}
             checked={deleteSourceBackups}
             onChange={(e) => setDeleteSourceBackups(e.target.checked)}
           />
 
           <Select
             withAsterisk
-            label='Archive Format'
+            label={t('common.form.archiveFormat', {})}
             value={archiveFormat}
             onChange={(value) => setArchiveFormat(value as z.infer<typeof transferArchiveFormat>)}
             data={Object.entries(transferArchiveFormatLabelMapping).map(([value, label]) => ({
@@ -215,7 +222,7 @@ export default function ServerTransferModal({
 
           <Select
             withAsterisk
-            label='Compression Level'
+            label={t('common.form.compressionLevel', {})}
             value={compressionLevel}
             onChange={(value) => setCompressionLevel(value as z.infer<typeof compressionLevelEnum>)}
             disabled={archiveFormat === 'tar' || archiveFormat === 'itaf'}
@@ -227,9 +234,9 @@ export default function ServerTransferModal({
 
           <NumberInput
             withAsterisk
-            label='Multiplex Channels'
-            placeholder='Multiplex Channels'
-            description='Add additional HTTP connections (and therefore also threads) for transfering split archives, total streams is 1 + multiplex channels'
+            label={t('common.form.multiplexChannels', {})}
+            placeholder={t('common.form.multiplexChannels', {})}
+            description={t('common.form.multiplexChannelsDescription', {})}
             min={0}
             value={multiplexChannels}
             onChange={(value) => setMultiplexChannels(Number(value) || 0)}
@@ -239,14 +246,14 @@ export default function ServerTransferModal({
         <ModalFooter>
           <ConditionalTooltip
             enabled={selectedNodeUuid === NODE_AIO_UUID}
-            label='Transfers to the All-In-One node are not supported'
+            label={t('pages.admin.servers.tabs.management.page.transfer.modal.tooltip.aioNotSupported', {})}
           >
             <Button
               color='blue'
               onClick={() => setOpenModal('confirm')}
               disabled={!selectedNodeUuid || selectedNodeUuid === NODE_AIO_UUID}
             >
-              Transfer
+              {t('common.button.transfer', {})}
             </Button>
           </ConditionalTooltip>
         </ModalFooter>

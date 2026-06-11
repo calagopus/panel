@@ -60,7 +60,7 @@ export default function DashboardCommandSnippets() {
         <Table
           columns={[
             t('common.table.columns.name', {}),
-            t('pages.account.commandSnippets.table.columns.eggs', {}),
+            t('common.table.columns.eggs', {}),
             t('common.table.columns.created', {}),
             '',
           ]}

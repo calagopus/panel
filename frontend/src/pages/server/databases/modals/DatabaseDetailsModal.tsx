@@ -46,28 +46,12 @@ export default function DatabaseDetailsModal({ database, opened, onClose }: Prop
   return (
     <Modal title={t('pages.server.databases.modal.databaseDetails.title', {})} onClose={onClose} opened={opened}>
       <Stack>
-        <TextInput
-          label={t('pages.server.databases.form.databaseName', {})}
-          placeholder={t('pages.server.databases.form.databaseName', {})}
-          value={database.name}
-          readOnly
-        />
+        <TextInput label={t('pages.server.databases.form.databaseName', {})} value={database.name} readOnly />
         <TextInput label={t('common.form.host', {})} placeholder={t('common.form.host', {})} value={host} readOnly />
-        <TextInput
-          label={t('common.form.username', {})}
-          placeholder={t('common.form.username', {})}
-          value={database.username}
-          readOnly
-        />
-        <TextInput
-          label={t('common.form.password', {})}
-          placeholder={t('common.form.password', {})}
-          value={database.password ?? ''}
-          readOnly
-        />
+        <TextInput label={t('common.form.username', {})} value={database.username} readOnly />
+        <TextInput label={t('common.form.password', {})} value={database.password ?? ''} readOnly />
         <TextInput
           label={t('pages.server.databases.modal.databaseDetails.form.jdbcConnectionString', {})}
-          placeholder={t('pages.server.databases.modal.databaseDetails.form.jdbcConnectionString', {})}
           value={jdbcConnectionString}
           readOnly
         />

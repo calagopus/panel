@@ -12,10 +12,12 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { locationDatabaseHostTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import LocationDatabaseHostRow from './LocationDatabaseHostRow.tsx';
 import LocationDatabaseHostCreateModal from './modals/LocationDatabaseHostCreateModal.tsx';
 
 export default function AdminLocationDatabaseHosts({ location }: { location: z.infer<typeof adminLocationSchema> }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
   const {
@@ -31,14 +33,14 @@ export default function AdminLocationDatabaseHosts({ location }: { location: z.i
 
   return (
     <AdminSubContentContainer
-      title='Location Database Hosts'
+      title={t('pages.admin.locations.tabs.databaseHosts.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <AdminCan action='database-hosts.read'>
           <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            Add
+            {t('common.button.add', {})}
           </Button>
         </AdminCan>
       }
@@ -53,7 +55,7 @@ export default function AdminLocationDatabaseHosts({ location }: { location: z.i
 
       <ContextMenuProvider>
         <Table
-          columns={locationDatabaseHostTableColumns}
+          columns={locationDatabaseHostTableColumns()}
           loading={loading}
           pagination={locationDatabaseHosts}
           onPageSelect={setPage}

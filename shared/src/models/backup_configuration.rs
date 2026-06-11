@@ -98,6 +98,13 @@ impl BackupConfigsS3 {
     }
 }
 
+#[derive(ToSchema, Serialize, Deserialize, Clone)]
+pub struct BackupConfigsResticPruneJob {
+    #[schema(value_type = String, example = "0 0 0 * * *")]
+    pub cron: cron::Schedule,
+    pub nodes: Vec<uuid::Uuid>,
+}
+
 #[derive(ToSchema, Serialize, Deserialize, Validate, Clone)]
 pub struct BackupConfigsRestic {
     #[garde(length(chars, min = 3, max = 255))]
@@ -108,6 +115,10 @@ pub struct BackupConfigsRestic {
 
     #[garde(skip)]
     pub environment: IndexMap<compact_str::CompactString, compact_str::CompactString>,
+    #[garde(length(max = 50))]
+    #[schema(inline, max_items = 50)]
+    #[serde(default)]
+    pub prune_jobs: Vec<BackupConfigsResticPruneJob>,
 }
 
 impl BackupConfigsRestic {
@@ -141,6 +152,15 @@ impl BackupConfigsRestic {
             if key == "RESTIC_PASSWORD" || key == "AWS_SECRET_ACCESS_KEY" {
                 *value = "".into();
             }
+        }
+    }
+
+    pub fn into_wings_configuration(self) -> wings_api::ResticBackupConfiguration {
+        wings_api::ResticBackupConfiguration {
+            repository: self.repository,
+            password_file: None,
+            retry_lock_seconds: self.retry_lock_seconds,
+            environment: self.environment,
         }
     }
 }
@@ -324,6 +344,46 @@ impl BackupConfiguration {
                 .map(|row| Self::map(None, &row))
                 .try_collect_vec()?,
         })
+    }
+
+    pub async fn cleanup_uuid_arrays(
+        database: &crate::database::Database,
+    ) -> Result<u64, crate::database::DatabaseError> {
+        let result = sqlx::query(
+            "UPDATE backup_configurations
+            SET backup_configs = jsonb_set(
+                backup_configs,
+                '{restic,prune_jobs}',
+                (
+                    SELECT COALESCE(jsonb_agg(
+                        jsonb_set(
+                            job,
+                            '{nodes}',
+                            COALESCE(
+                                (
+                                    SELECT jsonb_agg(node)
+                                    FROM jsonb_array_elements_text(job->'nodes') AS node
+                                    WHERE EXISTS (SELECT 1 FROM nodes WHERE uuid = node::uuid)
+                                ),
+                                '[]'::jsonb
+                            )
+                        )
+                    ), '[]'::jsonb)
+                    FROM jsonb_array_elements(backup_configs->'restic'->'prune_jobs') AS job
+                )
+            )
+            WHERE jsonb_typeof(backup_configs->'restic'->'prune_jobs') = 'array'
+            AND EXISTS (
+                SELECT 1
+                FROM jsonb_array_elements(backup_configs->'restic'->'prune_jobs') AS job,
+                     jsonb_array_elements_text(job->'nodes') AS node
+                WHERE NOT EXISTS (SELECT 1 FROM nodes WHERE uuid = node::uuid)
+            )",
+        )
+        .execute(database.write())
+        .await?;
+
+        Ok(result.rows_affected())
     }
 }
 

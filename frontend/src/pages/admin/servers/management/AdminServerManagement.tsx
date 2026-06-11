@@ -13,9 +13,11 @@ import ServerSuspendModal from '@/pages/admin/servers/management/modals/ServerSu
 import ServerTransferModal from '@/pages/admin/servers/management/modals/ServerTransferModal.tsx';
 import ServerUnsuspendModal from '@/pages/admin/servers/management/modals/ServerUnsuspendModal.tsx';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ServerClearStateModal from './modals/ServerClearStateModal.tsx';
 
 export default function AdminServerManagement({ server }: { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const canTransfer = useAdminCan(['server.transfer', 'nodes.read'], false);
 
   const [openModal, setOpenModal] = useState<'transfer' | 'suspend' | 'unsuspend' | 'clear-state' | 'delete' | null>(
@@ -24,7 +26,7 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
 
   return (
     <AdminSubContentContainer
-      title='Server Management'
+      title={t('pages.admin.servers.tabs.management.page.title', {})}
       hideTitleComponent
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.management.subContainer}
       registryProps={{ server }}
@@ -45,39 +47,45 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
         )}
 
         {canTransfer && (
-          <TitleCard title='Transfer' icon={<FontAwesomeIcon icon={faReply} />} className='order-10'>
+          <TitleCard
+            title={t('pages.admin.servers.tabs.management.page.transfer.title', {})}
+            icon={<FontAwesomeIcon icon={faReply} />}
+            className='order-10'
+          >
             <Stack h='100%'>
-              Transfer this server and it's data to another node within this system.
+              {t('pages.admin.servers.tabs.management.page.transfer.content', {})}
               <Group mt='auto'>
-                <Button onClick={() => setOpenModal('transfer')}>Transfer</Button>
+                <Button onClick={() => setOpenModal('transfer')}>{t('common.button.transfer', {})}</Button>
               </Group>
             </Stack>
           </TitleCard>
         )}
         <AdminCan action='servers.update'>
           <TitleCard
-            title={server.isSuspended ? 'Unsuspend' : 'Suspend'}
+            title={
+              server.isSuspended
+                ? t('pages.admin.servers.tabs.management.page.unsuspend.title', {})
+                : t('pages.admin.servers.tabs.management.page.suspend.title', {})
+            }
             icon={<FontAwesomeIcon icon={server.isSuspended ? faPlay : faPause} />}
             className='order-20'
           >
             <Stack h='100%'>
               {server.isSuspended ? (
                 <>
-                  This will unsuspend the server, allowing it to start again. The user will be able to access their
-                  files and otherwise manage the server through the panel or API.
+                  {t('pages.admin.servers.tabs.management.page.unsuspend.content', {})}
                   <Group mt='auto'>
                     <Button onClick={() => setOpenModal('unsuspend')} color='green'>
-                      Unsuspend
+                      {t('pages.admin.servers.tabs.management.page.unsuspend.button', {})}
                     </Button>
                   </Group>
                 </>
               ) : (
                 <>
-                  This will suspend the server, stop any running processes, and immediately block the user from being
-                  able to access their files or otherwise manage the server through the panel or API.
+                  {t('pages.admin.servers.tabs.management.page.suspend.content', {})}
                   <Group mt='auto'>
                     <Button onClick={() => setOpenModal('suspend')} color='red'>
-                      Suspend
+                      {t('pages.admin.servers.tabs.management.page.suspend.button', {})}
                     </Button>
                   </Group>
                 </>
@@ -86,24 +94,32 @@ export default function AdminServerManagement({ server }: { server: z.infer<type
           </TitleCard>
         </AdminCan>
         <AdminCan action='servers.update'>
-          <TitleCard title='Clear State' icon={<FontAwesomeIcon icon={faSatellite} />} className='order-30'>
+          <TitleCard
+            title={t('pages.admin.servers.tabs.management.page.clearState.title', {})}
+            icon={<FontAwesomeIcon icon={faSatellite} />}
+            className='order-30'
+          >
             <Stack h='100%'>
-              This will clear the server state known by the panel.
+              {t('pages.admin.servers.tabs.management.page.clearState.content', {})}
               <Group mt='auto'>
                 <Button onClick={() => setOpenModal('clear-state')} color='red'>
-                  Clear State
+                  {t('pages.admin.servers.tabs.management.page.clearState.button', {})}
                 </Button>
               </Group>
             </Stack>
           </TitleCard>
         </AdminCan>
         <AdminCan action='servers.delete'>
-          <TitleCard title='Delete' icon={<FontAwesomeIcon icon={faTrash} />} className='order-40'>
+          <TitleCard
+            title={t('pages.admin.servers.tabs.management.page.delete.title', {})}
+            icon={<FontAwesomeIcon icon={faTrash} />}
+            className='order-40'
+          >
             <Stack h='100%'>
-              This will delete the server and all of its data. This action cannot be undone.
+              {t('pages.admin.servers.tabs.management.page.delete.content', {})}
               <Group mt='auto'>
                 <Button onClick={() => setOpenModal('delete')} color='red'>
-                  Delete
+                  {t('common.button.delete', {})}
                 </Button>
               </Group>
             </Stack>

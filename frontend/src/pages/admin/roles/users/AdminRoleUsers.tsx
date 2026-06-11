@@ -7,8 +7,10 @@ import { roleSchema } from '@/lib/schemas/user.ts';
 import { userTableColumns } from '@/lib/tableColumns.ts';
 import UserRow from '@/pages/admin/users/UserRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminRoleUsers({ role }: { role: z.infer<typeof roleSchema> }) {
+  const { t } = useTranslations();
   const {
     data: roleUsers,
     loading,
@@ -21,7 +23,12 @@ export default function AdminRoleUsers({ role }: { role: z.infer<typeof roleSche
   });
 
   return (
-    <AdminSubContentContainer title='Role Users' titleOrder={2} search={search} setSearch={setSearch}>
+    <AdminSubContentContainer
+      title={t('pages.admin.roles.tabs.users.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
       <Table columns={userTableColumns()} loading={loading} pagination={roleUsers} onPageSelect={setPage}>
         {roleUsers?.data.map((user) => (
           <UserRow key={user.uuid} user={user} />

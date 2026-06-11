@@ -6,6 +6,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
 
 export default function AdminBackupConfigurationNodes({
@@ -13,6 +14,7 @@ export default function AdminBackupConfigurationNodes({
 }: {
   backupConfiguration: z.infer<typeof adminBackupConfigurationSchema>;
 }) {
+  const { t } = useTranslations();
   const {
     data: backupConfigurationNodes,
     loading,
@@ -25,7 +27,12 @@ export default function AdminBackupConfigurationNodes({
   });
 
   return (
-    <AdminSubContentContainer title={`Backup Config Nodes`} titleOrder={2} search={search} setSearch={setSearch}>
+    <AdminSubContentContainer
+      title={t('pages.admin.backupConfigurations.tabs.nodes.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
       <Table
         columns={nodeTableColumns()}
         loading={loading}

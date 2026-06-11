@@ -11,6 +11,7 @@ import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminNodeMountSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function NodeMountRow({
@@ -20,6 +21,7 @@ export default function NodeMountRow({
   node: z.infer<typeof adminNodeSchema>;
   mount: z.infer<typeof adminNodeMountSchema>;
 }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { removeNodeMount } = useAdminStore();
 
@@ -29,7 +31,7 @@ export default function NodeMountRow({
     await deleteNodeMount(node.uuid, mount.mount.uuid)
       .then(() => {
         removeNodeMount(mount);
-        addToast('Node Mount removed.', 'success');
+        addToast(t('pages.admin.nodes.tabs.mounts.page.toast.removed', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -41,20 +43,21 @@ export default function NodeMountRow({
       <ConfirmationModal
         opened={openModal === 'remove'}
         onClose={() => setOpenModal(null)}
-        title='Confirm Node Mount Removal'
-        confirm='Remove'
+        title={t('pages.admin.nodes.tabs.mounts.page.modal.remove.title', {})}
+        confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        Are you sure you want to remove the mount
-        <Code>{mount.mount.name}</Code>
-        from <Code>{node.name}</Code>?
+        {t('pages.admin.nodes.tabs.mounts.page.modal.remove.content', {
+          mount: mount.mount.name,
+          name: node.name,
+        }).md()}
       </ConfirmationModal>
 
       <ContextMenu
         items={[
           {
             icon: faTrash,
-            label: 'Remove',
+            label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),
             color: 'red',
           },
@@ -64,7 +67,7 @@ export default function NodeMountRow({
           <TableRow
             onContextMenu={(e) => {
               e.preventDefault();
-              openMenu(e.pageX, e.pageY);
+              openMenu(e.clientX, e.clientY);
             }}
           >
             <TableData>

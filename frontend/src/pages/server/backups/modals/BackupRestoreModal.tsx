@@ -53,7 +53,7 @@ export default function BackupRestoreModal({ backup, opened, onClose }: Props) {
         />
 
         <Switch
-          label={t('pages.server.backups.modal.restoreBackup.form.restoreStartup', {})}
+          label={t('common.form.restoreStartup', {})}
           name='restoreStartup'
           checked={restoreStartup}
           disabled={Object.keys(backup.metadata).length === 0}

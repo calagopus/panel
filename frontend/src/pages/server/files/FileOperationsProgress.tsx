@@ -85,7 +85,7 @@ function FileOperationsProgress() {
         opened={blocker.state === 'blocked'}
         onClose={() => blocker.reset()}
         onConfirmed={() => blocker.proceed()}
-        confirm={t('pages.server.files.modal.activeUploads.button.leave', {})}
+        confirm={t('common.button.leavePage', {})}
       >
         {t('pages.server.files.modal.activeUploads.content', { files: tItem('file', uploadingFiles.size) }).md()}
       </ConfirmationModal>

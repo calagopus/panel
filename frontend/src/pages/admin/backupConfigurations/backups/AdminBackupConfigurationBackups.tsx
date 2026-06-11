@@ -6,6 +6,7 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminBackupConfigurationBackupRow from './AdminBackupConfigurationBackupRow.tsx';
 
 export default function AdminBackupConfigurationBackups({
@@ -13,6 +14,7 @@ export default function AdminBackupConfigurationBackups({
 }: {
   backupConfiguration: z.infer<typeof adminBackupConfigurationSchema>;
 }) {
+  const { t } = useTranslations();
   const {
     data: backupConfigurationBackups,
     loading,
@@ -25,10 +27,24 @@ export default function AdminBackupConfigurationBackups({
   });
 
   return (
-    <AdminSubContentContainer title={`Backup Config Backups`} titleOrder={2} search={search} setSearch={setSearch}>
+    <AdminSubContentContainer
+      title={t('pages.admin.backupConfigurations.tabs.backups.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
       <ContextMenuProvider>
         <Table
-          columns={['Name', 'Server', 'Node', 'Checksum', 'Size', 'Files', 'Created', '']}
+          columns={[
+            t('common.table.columns.name', {}),
+            t('common.table.columns.server', {}),
+            t('common.table.columns.node', {}),
+            t('common.table.columns.checksum', {}),
+            t('common.table.columns.size', {}),
+            t('common.table.columns.files', {}),
+            t('common.table.columns.created', {}),
+            '',
+          ]}
           loading={loading}
           pagination={backupConfigurationBackups}
           onPageSelect={setPage}

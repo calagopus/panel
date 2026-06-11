@@ -10,11 +10,13 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { mountTableColumns } from '@/lib/tableColumns.ts';
 import MountView from '@/pages/admin/mounts/MountView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import MountCreateOrUpdate from './MountCreateOrUpdate.tsx';
 import MountRow from './MountRow.tsx';
 
 function MountsContainer() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const {
@@ -30,7 +32,7 @@ function MountsContainer() {
 
   return (
     <AdminContentContainer
-      title='Mounts'
+      title={t('pages.admin.mounts.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -40,12 +42,12 @@ function MountsContainer() {
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </AdminCan>
       }
     >
-      <Table columns={mountTableColumns} loading={loading} pagination={mounts} onPageSelect={setPage}>
+      <Table columns={mountTableColumns()} loading={loading} pagination={mounts} onPageSelect={setPage}>
         {mounts?.data.map((m) => (
           <MountRow key={m.uuid} mount={m} />
         ))}

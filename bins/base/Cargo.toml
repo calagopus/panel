@@ -7,6 +7,7 @@ edition = { workspace = true }
 default-run = "panel-rs"
 
 [dependencies]
+extension-internal-list = { path = "../../backend-extensions/internal-list" }
 backend = { workspace = true }
 shared = { workspace = true }
 tokio = { workspace = true }
@@ -17,5 +18,5 @@ tower-http = { workspace = true }
 colored = { workspace = true }
 futures-util = { workspace = true }
 
-[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dependencies]
-tikv-jemallocator = "0.6.0"
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+mimalloc = "0.1.52"

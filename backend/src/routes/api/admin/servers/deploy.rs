@@ -209,6 +209,13 @@ mod post {
                         Err(_) => continue,
                     };
 
+                // Defense in depth: never deploy a server with fewer additional
+                // allocations than the rule configured. `get_from_deployment` already
+                // guarantees this, but a partial set must never silently slip through.
+                if deployment_allocation_uuids.len() != allocations.additional.len() {
+                    continue;
+                }
+
                 if allocation_uuid.is_none() {
                     allocation_uuid = deployment_allocation_uuid;
                 }

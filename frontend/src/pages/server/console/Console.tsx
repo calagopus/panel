@@ -26,7 +26,7 @@ import Popover from '@/elements/Popover.tsx';
 import Progress from '@/elements/Progress.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
+import { matchesShortcut, useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -36,8 +36,7 @@ import SshDetailsModal from './modals/SshDetailsModal.tsx';
 
 import '@xterm/xterm/css/xterm.css';
 import './xterm.css';
-
-const RAW_PRELUDE = '\u001b[1m\u001b[33mcontainer@calagopus~ \u001b[0m';
+import { useGlobalStore } from '@/stores/global.ts';
 
 const commandSnippetFilter: OptionsFilter = ({ options, search }) => {
   if (!search.startsWith('!')) {
@@ -83,6 +82,7 @@ export default function Terminal() {
   const { t } = useTranslations();
   const { server, updateServer, commandSnippets, imagePulls, socketConnected, socketInstance, state } =
     useServerStore();
+  const { settings } = useGlobalStore();
   const computedColorScheme = useComputedColorScheme('dark');
 
   const [history, setHistory] = useState<string[]>([]);
@@ -199,8 +199,16 @@ export default function Terminal() {
     fitAddonRef.current = fitAddon;
     searchAddonRef.current = searchAddon;
 
+    let fitFrame: number | null = null;
     const resizeObserver = new ResizeObserver(() => {
-      fitAddon.fit();
+      if (fitFrame !== null) return;
+      fitFrame = requestAnimationFrame(() => {
+        fitFrame = null;
+        const dims = fitAddon.proposeDimensions();
+        if (dims && (dims.cols !== term.cols || dims.rows !== term.rows)) {
+          fitAddon.fit();
+        }
+      });
     });
     resizeObserver.observe(terminalRef.current);
 
@@ -227,6 +235,7 @@ export default function Terminal() {
 
     return () => {
       resizeObserver.disconnect();
+      if (fitFrame !== null) cancelAnimationFrame(fitFrame);
       term.dispose();
       xtermInstance.current = null;
       fitAddonRef.current = null;
@@ -324,11 +333,11 @@ export default function Terminal() {
     let processed = text.replaceAll('\x1b[?25h', '').replaceAll('\x1b[?25l', '');
 
     if (processed.includes('container@pterodactyl~')) {
-      processed = processed.replace('container@pterodactyl~', 'container@calagopus~');
+      processed = processed.replace('container@pterodactyl~', settings.server.containerPrelude);
     }
 
-    if (prelude && !processed.includes('\u001b[1m\u001b[41m')) {
-      processed = RAW_PRELUDE.concat(processed);
+    if (prelude && !processed.includes('\x1b[1m\x1b[41m')) {
+      processed = `\x1b[1m\x1b[33m${settings.server.containerPrelude} \x1b[0m${processed}`;
     }
 
     if (isFirstLine.current) {
@@ -400,7 +409,7 @@ export default function Terminal() {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowUp' && !inputValueRef.current.startsWith('!')) {
+      if (matchesShortcut(e.nativeEvent, 'console.previousCommand') && !inputValueRef.current.startsWith('!')) {
         const newIndex = Math.min(historyIndex + 1, history.length - 1);
         setHistoryIndex(newIndex);
         setInputValue(history[newIndex] || '');
@@ -408,7 +417,7 @@ export default function Terminal() {
         e.preventDefault();
       }
 
-      if (e.key === 'ArrowDown' && !inputValueRef.current.startsWith('!')) {
+      if (matchesShortcut(e.nativeEvent, 'console.nextCommand') && !inputValueRef.current.startsWith('!')) {
         const newIndex = Math.max(historyIndex - 1, -1);
         setHistoryIndex(newIndex);
         setInputValue(history[newIndex] || '');
@@ -447,7 +456,7 @@ export default function Terminal() {
       setOpenModal(openModal ? null : 'search');
     },
     {
-      modifiers: ['ctrlOrMeta'],
+      id: 'console.search',
       allowWhenInputFocused: true,
       deps: [openModal],
     },
@@ -459,7 +468,7 @@ export default function Terminal() {
       <CommandHistoryDrawer opened={openModal === 'commandHistory'} onClose={() => setOpenModal(null)} />
       <SshDetailsModal opened={openModal === 'sshDetails'} onClose={() => setOpenModal(null)} />
 
-      <Card className='h-full flex flex-col font-mono text-sm relative p-2!'>
+      <Card className='h-full flex flex-col font-mono text-sm relative isolate p-2!'>
         <div className='flex flex-row justify-between items-center mb-2 text-xs'>
           <div className='flex flex-row items-center'>
             {window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderLeftComponents.prependedComponents.map(

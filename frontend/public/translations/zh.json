@@ -69,7 +69,12 @@
         "downloadAs": "下載為 {format}",
         "export": "匯出",
         "exportAs": "匯出為 {format}",
-        "recreate": "重新建立"
+        "recreate": "重新建立",
+        "import": "匯入",
+        "details": "詳細資訊",
+        "setPrimary": "設為主要",
+        "unsetPrimary": "取消主要",
+        "leavePage": "離開頁面"
       },
       "alert": {
         "error": "錯誤",
@@ -86,7 +91,8 @@
       "tooltip": {
         "resetToDefault": "重設為預設值",
         "edit": "編輯",
-        "delete": "刪除"
+        "delete": "刪除",
+        "primary": "主要"
       },
       "form": {
         "name": "名稱",
@@ -95,6 +101,40 @@
         "host": "主機",
         "username": "使用者名稱",
         "server": "伺服器",
+        "url": "URL",
+        "email": "電子郵件",
+        "port": "連接埠",
+        "command": "指令",
+        "firstName": "名字",
+        "lastName": "姓氏",
+        "language": "語言",
+        "enabled": "已啟用",
+        "fileName": "檔案名稱",
+        "sftpPort": "SFTP 連接埠",
+        "sftpHost": "SFTP 主機",
+        "dockerImage": "Docker 映像檔",
+        "memory": "記憶體",
+        "disk": "磁碟",
+        "serverName": "伺服器名稱",
+        "startupCommand": "啟動指令",
+        "archiveName": "壓縮檔名稱",
+        "archiveFormat": "壓縮格式",
+        "databaseHost": "資料庫主機",
+        "timezone": "時區",
+        "protocol": "通訊協定",
+        "powerAction": "電源動作",
+        "destination": "目的地",
+        "directoryName": "目錄名稱",
+        "locked": "已鎖定",
+        "portRanges": "連接埠範圍",
+        "portRangesPlaceholder": "連接埠範圍（例如 3000-4000）",
+        "currentPassword": "目前密碼",
+        "confirmPassword": "確認密碼",
+        "authenticationCode": "驗證代碼",
+        "lineContains": "行包含",
+        "eggs": "Egg",
+        "ignoredFiles": "忽略的檔案",
+        "yourControlPanelPassword": "你的控制面板密碼",
         "truncateDirectory": "你要在執行此動作前刪除此伺服器的所有檔案嗎？此操作無法復原。"
       },
       "table": {
@@ -113,7 +153,8 @@
           "event": "事件",
           "ip": "IP",
           "when": "時間",
-          "command": "指令"
+          "command": "指令",
+          "notes": "備註"
         }
       },
       "badge": {
@@ -384,17 +425,12 @@
             "description": "請選擇強密碼。此帳戶將擁有所有伺服器與設定的完整管理權限。"
           },
           "form": {
-            "username": "使用者名稱",
             "usernamePlaceholder": "admin",
             "email": "電子郵件地址",
             "emailPlaceholder": "admin@example.com",
-            "firstName": "名字",
             "firstNamePlaceholder": "Alan",
-            "lastName": "姓氏",
             "lastNamePlaceholder": "Turing",
-            "password": "密碼",
             "passwordPlaceholder": "輸入強密碼",
-            "confirmPassword": "確認密碼",
             "confirmPasswordPlaceholder": "重新輸入你的密碼"
           },
           "button": {
@@ -405,9 +441,7 @@
           "title": "重新登入",
           "alert": "你在設定過程中被登出。請重新登入以從離開的地方繼續。",
           "form": {
-            "username": "使用者名稱",
             "usernamePlaceholder": "admin",
-            "password": "密碼",
             "passwordPlaceholder": "輸入強密碼"
           },
           "button": {
@@ -434,21 +468,14 @@
           "form": {
             "name": "名稱",
             "namePlaceholder": "我的伺服器",
-            "url": "URL",
             "urlPlaceholder": "URL",
             "urlDescription": "用於與節點進行內部通訊",
             "publicUrl": "公開 URL",
             "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "用於 websocket/下載",
-            "sftpHost": "SFTP 主機",
             "sftpHostPlaceholder": "SFTP 主機",
-            "sftpPort": "SFTP 連接埠",
             "sftpPortPlaceholder": "SFTP 連接埠",
-            "memory": "記憶體",
-            "disk": "磁碟",
-            "ip": "IP",
-            "portRanges": "連接埠範圍",
-            "portRangesPlaceholder": "連接埠範圍（例如 3000-4000）"
+            "ip": "IP"
           },
           "error": {
             "noLocations": "發生錯誤。找不到任何位置。"
@@ -474,7 +501,6 @@
           "form": {
             "applicationName": "應用程式名稱",
             "applicationNamePlaceholder": "Calagopus",
-            "language": "語言",
             "languagePlaceholder": "語言",
             "applicationUrl": "應用程式 URL",
             "applicationUrlPlaceholder": "https://calagop.us",
@@ -501,9 +527,6 @@
               "title": "Pterodactyl 通用 Egg",
               "description": "Node JS、Java、Rust 等通用應用程式執行環境的 Egg。"
             }
-          },
-          "button": {
-            "submit": "匯入"
           }
         },
         "server": {
@@ -522,7 +545,6 @@
             "noNodes": "發生錯誤。找不到任何節點。"
           },
           "button": {
-            "submit": "匯入",
             "create": "建立並繼續"
           }
         },
@@ -634,11 +656,6 @@
         "register": {
           "title": "註冊",
           "subtitle": "請輸入你的詳細資料以註冊",
-          "form": {
-            "email": "電子郵件",
-            "firstName": "名字",
-            "lastName": "姓氏"
-          },
           "button": {
             "register": "註冊"
           }
@@ -646,9 +663,6 @@
         "forgotPassword": {
           "title": "忘記密碼",
           "subtitle": "輸入你的電子郵件以接收重設密碼的指示",
-          "form": {
-            "email": "電子郵件"
-          },
           "button": {
             "request": "要求重設密碼"
           },
@@ -657,9 +671,6 @@
         "resetPassword": {
           "title": "重設密碼",
           "subtitle": "請輸入你的新密碼",
-          "form": {
-            "confirmPassword": "確認密碼"
-          },
           "button": {
             "reset": "重設密碼"
           },
@@ -766,7 +777,6 @@
                 "updated": "密碼已成功更新。"
               },
               "form": {
-                "currentPassword": "目前密碼",
                 "newPassword": "新密碼",
                 "confirmNewPassword": "確認新密碼"
               }
@@ -777,8 +787,7 @@
                 "updated": "電子郵件已成功更新。"
               },
               "form": {
-                "newEmail": "新電子郵件",
-                "currentPassword": "目前密碼"
+                "newEmail": "新電子郵件"
               }
             },
             "twoFactor": {
@@ -790,18 +799,12 @@
               "modal": {
                 "disableTwoFactor": {
                   "title": "停用雙因素驗證",
-                  "description": "停用雙因素驗證會降低帳戶安全性。",
-                  "form": {
-                    "code": "驗證代碼"
-                  }
+                  "description": "停用雙因素驗證會降低帳戶安全性。"
                 },
                 "setupTwoFactor": {
                   "title": "設定雙因素驗證",
                   "description": "協助保護你的帳戶免於未授權存取。你每次登入時都會被要求輸入驗證碼。",
-                  "descriptionQR": "使用你選擇的雙因素驗證 App 掃描上方 QR code。然後將產生的 6 位數代碼輸入下方欄位。",
-                  "form": {
-                    "code": "驗證代碼"
-                  }
+                  "descriptionQR": "使用你選擇的雙因素驗證 App 掃描上方 QR code。然後將產生的 6 位數代碼輸入下方欄位。"
                 },
                 "recoveryCodes": {
                   "title": "復原代碼",
@@ -822,10 +825,6 @@
                 "updated": "帳戶詳細資料已成功更新。"
               },
               "form": {
-                "nameFirst": "名字",
-                "nameLast": "姓氏",
-                "username": "使用者名稱",
-                "language": "語言",
                 "toastPosition": "通知位置",
                 "startOnGroupedServers": "從已分組伺服器頁面開始"
               }
@@ -937,9 +936,6 @@
         "sshKeys": {
           "title": "SSH 金鑰",
           "subtitle": "已建立 {current} / {max} 個 SSH 金鑰。",
-          "button": {
-            "import": "匯入"
-          },
           "tooltip": {
             "limitReached": "你最多只能使用 {max} 個 SSH 金鑰。"
           },
@@ -973,8 +969,7 @@
                 "created": "已建立 {sshKeys}。"
               },
               "form": {
-                "provider": "提供者",
-                "username": "使用者名稱"
+                "provider": "提供者"
               }
             },
             "deleteSshKey": {
@@ -991,15 +986,6 @@
           "subtitle": "已建立 {current} / {max} 個指令片段。",
           "tooltip": {
             "limitReached": "你最多只能使用 {max} 個指令片段。"
-          },
-          "table": {
-            "columns": {
-              "eggs": "Egg"
-            }
-          },
-          "form": {
-            "eggs": "Egg",
-            "command": "指令"
           },
           "modal": {
             "createCommandSnippet": {
@@ -1100,7 +1086,6 @@
           "title": "活動"
         }
       },
-      "admin": {},
       "server": {
         "viewAdmin": {
           "title": "查看管理"
@@ -1119,12 +1104,6 @@
             "sshDetails": {
               "title": "SSH 詳細資訊",
               "form": {
-                "protocol": "通訊協定",
-                "port": "連接埠",
-                "host": "主機",
-                "username": "使用者名稱",
-                "password": "密碼",
-                "yourPassword": "你的控制面板密碼",
                 "command": "SSH 指令"
               },
               "launch": "啟動"
@@ -1221,10 +1200,8 @@
             "new": "新增",
             "sftpDetails": "SFTP 詳細資訊",
             "openInNewWindow": "在新視窗中開啟",
-            "details": "詳細資訊",
             "rename": "重新命名",
             "copy": "複製",
-            "move": "移動",
             "fingerprint": "指紋",
             "permissions": "權限",
             "unarchive": "解壓縮",
@@ -1298,45 +1275,31 @@
           "modal": {
             "activeUploads": {
               "title": "進行中的上傳",
-              "content": "你確定要離開此頁面嗎？你有 {files} 個進行中的檔案上傳。若離開此頁面，檔案上傳將會中止。",
-              "button": {
-                "leave": "離開頁面"
-              }
+              "content": "你確定要離開此頁面嗎？你有 {files} 個進行中的檔案上傳。若離開此頁面，檔案上傳將會中止。"
             },
             "unsavedChanges": {
               "title": "未儲存的變更",
-              "content": "檔案編輯器中有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。",
-              "button": {
-                "leave": "離開頁面"
-              }
+              "content": "檔案編輯器中有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。"
             },
             "createArchive": {
               "title": "建立壓縮檔",
               "form": {
-                "archiveName": "壓縮檔名稱",
                 "format": "格式"
               },
               "createdAs": "此壓縮檔將建立為 "
             },
             "createDirectory": {
               "title": "建立目錄",
-              "form": {
-                "directoryName": "目錄名稱"
-              },
               "createdAs": "此目錄將建立為 "
             },
             "copyFile": {
               "title": "複製檔案",
-              "form": {
-                "fileName": "檔案名稱"
-              },
               "createdAs": "此檔案將建立為 "
             },
             "copyRemote": {
               "title": "遠端複製檔案",
               "form": {
-                "server": "伺服器",
-                "destination": "目的地"
+                "server": "伺服器"
               },
               "createdAs": "這些檔案將建立在遠端伺服器的 "
             },
@@ -1356,10 +1319,7 @@
               "multipleFilesWarning": "刪除後將無法復原以下檔案的內容。"
             },
             "createFile": {
-              "title": "建立檔案",
-              "form": {
-                "fileName": "檔案名稱"
-              }
+              "title": "建立檔案"
             },
             "details": {
               "title": "檔案詳細資訊",
@@ -1384,10 +1344,7 @@
               "executePermission": "執行權限（1）"
             },
             "renameFile": {
-              "title": "重新命名檔案",
-              "form": {
-                "fileName": "檔案名稱"
-              }
+              "title": "重新命名檔案"
             },
             "searchFiles": {
               "title": "搜尋檔案",
@@ -1401,7 +1358,7 @@
               "searchText": "搜尋文字",
               "maxFileSize": "最大檔案大小",
               "includeOversized": "包含超大檔案",
-              "includeOversizedDescription": "包含符合其他篩選條件但太大而無法搜尋的檔案",
+              "includeOversizedDescription": "包含匹配其他筛选条件但过大而无法搜索的文件。",
               "fileSize": "檔案大小",
               "minimum": "最小值",
               "maximum": "最大值"
@@ -1410,22 +1367,13 @@
               "title": "拉取檔案",
               "form": {
                 "fileUrl": "檔案 URL",
-                "query": "查詢",
-                "fileName": "檔案名稱"
+                "query": "查詢"
               },
               "createdAs": "此檔案將建立為 ",
               "pull": "拉取"
             },
             "sftpDetails": {
               "title": "SFTP 詳細資訊",
-              "form": {
-                "protocol": "通訊協定",
-                "port": "連接埠",
-                "host": "主機",
-                "username": "使用者名稱",
-                "password": "密碼",
-                "yourPassword": "你的控制面板密碼"
-              },
               "launch": "啟動"
             }
           }
@@ -1438,13 +1386,10 @@
           },
           "table": {
             "columns": {
-              "type": "類型",
-              "address": "位址",
               "locked": "已鎖定？"
             }
           },
           "button": {
-            "details": "詳細資訊",
             "rotatePassword": "輪換密碼"
           },
           "form": {
@@ -1457,7 +1402,6 @@
                 "created": "資料庫已建立。"
               },
               "form": {
-                "databaseHost": "資料庫主機",
                 "noHostsFound": "找不到主機"
               }
             },
@@ -1465,9 +1409,6 @@
               "title": "編輯資料庫",
               "toast": {
                 "updated": "資料庫已更新。"
-              },
-              "form": {
-                "locked": "已鎖定"
               }
             },
             "databaseDetails": {
@@ -1513,7 +1454,6 @@
             }
           },
           "button": {
-            "import": "匯入",
             "trigger": "觸發",
             "triggerWithCondition": "觸發（不要略過條件）",
             "triggerSkipCondition": "觸發（略過條件）",
@@ -1617,7 +1557,6 @@
           },
           "form": {
             "scheduleName": "排程名稱",
-            "enabled": "已啟用",
             "triggersList": "觸發器",
             "triggerNumber": "觸發器 {number}",
             "actionType": "動作類型",
@@ -1643,8 +1582,7 @@
           "preCondition": {
             "valueSeconds": "值（秒）",
             "valuePercent": "值（%）",
-            "value": "值",
-            "filePath": "檔案路徑"
+            "value": "值"
           },
           "triggers": {
             "cron": {
@@ -1659,9 +1597,6 @@
             },
             "powerAction": {
               "title": "電源動作",
-              "form": {
-                "powerAction": "電源動作"
-              },
               "card": {
                 "content": "當要求電源動作 `{action}` 時。"
               }
@@ -1683,9 +1618,6 @@
             },
             "consoleLine": {
               "title": "主控台行",
-              "form": {
-                "lineContains": "行包含"
-              },
               "card": {
                 "content": "當主控台輸出到達包含 `{contains}` 的行時"
               }
@@ -1727,7 +1659,7 @@
               "title": "格式化",
               "form": {
                 "formatString": "格式字串",
-                "formatStringDescription": "格式字串，可以將變數包在 {wrapper} 中使用"
+                "formatStringDescription": "格式字符串。可以通过将变量包装在 {wrapper} 中来包含它们。"
               },
               "renderer": {
                 "compact": "將字串格式化到 {outputInto}"
@@ -1748,7 +1680,6 @@
             "waitForConsoleLine": {
               "title": "等待主控台行",
               "form": {
-                "lineContains": "行包含",
                 "timeout": "逾時（毫秒）"
               },
               "renderer": {
@@ -1762,9 +1693,6 @@
             },
             "sendCommand": {
               "title": "傳送指令",
-              "form": {
-                "command": "指令"
-              },
               "renderer": {
                 "compact": "執行 {command}",
                 "detail": {
@@ -1774,9 +1702,6 @@
             },
             "sendPower": {
               "title": "傳送電源訊號",
-              "form": {
-                "powerAction": "電源動作"
-              },
               "renderer": {
                 "compact": "執行 {action}",
                 "detail": {
@@ -1787,8 +1712,7 @@
             "createBackup": {
               "title": "建立備份",
               "form": {
-                "backupName": "備份名稱",
-                "ignoredFiles": "忽略的檔案"
+                "backupName": "備份名稱"
               },
               "renderer": {
                 "compact": "建立 {name}",
@@ -1800,9 +1724,6 @@
             },
             "createDirectory": {
               "title": "建立目錄",
-              "form": {
-                "directoryName": "目錄名稱"
-              },
               "renderer": {
                 "compact": "在 {root} 建立 {name}",
                 "detail": {
@@ -1814,7 +1735,6 @@
             "writeFile": {
               "title": "寫入檔案",
               "form": {
-                "filePath": "檔案路徑",
                 "content": "內容",
                 "appendToFile": "附加到檔案"
               },
@@ -1829,8 +1749,7 @@
             "copyFile": {
               "title": "複製檔案",
               "form": {
-                "sourceFile": "來源檔案",
-                "destination": "目的地"
+                "sourceFile": "來源檔案"
               },
               "renderer": {
                 "compact": "將 {file} 複製到 {destination}",
@@ -1871,9 +1790,7 @@
             "compressFiles": {
               "title": "壓縮檔案",
               "form": {
-                "filesToCompress": "要壓縮的檔案",
-                "archiveFormat": "壓縮格式",
-                "archiveName": "壓縮檔名稱"
+                "filesToCompress": "要壓縮的檔案"
               },
               "renderer": {
                 "compact": "將 {root} 中的 {files} 壓縮為 {name}",
@@ -1900,10 +1817,6 @@
             },
             "updateStartupVariable": {
               "title": "更新啟動變數",
-              "form": {
-                "envVariable": "環境變數",
-                "value": "值"
-              },
               "renderer": {
                 "compact": "將 {variable} 設為 {value}",
                 "detail": {
@@ -1914,9 +1827,6 @@
             },
             "updateStartupCommand": {
               "title": "更新啟動指令",
-              "form": {
-                "startupCommand": "啟動指令"
-              },
               "renderer": {
                 "compact": "設為 {command}",
                 "detail": {
@@ -1926,9 +1836,6 @@
             },
             "updateStartupDockerImage": {
               "title": "更新 Docker 映像檔",
-              "form": {
-                "dockerImage": "Docker 映像檔"
-              },
               "renderer": {
                 "compact": "設為 {image}",
                 "detail": {
@@ -1958,10 +1865,8 @@
                 "created": "子使用者已建立。"
               },
               "form": {
-                "email": "電子郵件",
                 "emailPlaceholder": "輸入此子使用者應儲存使用的電子郵件。",
-                "permissions": "權限",
-                "ignoredFiles": "忽略的檔案"
+                "permissions": "權限"
               }
             },
             "updateSubuser": {
@@ -2004,18 +1909,12 @@
               "title": "建立備份",
               "toast": {
                 "created": "備份已建立。"
-              },
-              "form": {
-                "ignoredFiles": "忽略的檔案"
               }
             },
             "editBackup": {
               "title": "編輯備份",
               "toast": {
                 "updated": "備份已更新。"
-              },
-              "form": {
-                "locked": "已鎖定"
               }
             },
             "restoreBackup": {
@@ -2034,19 +1933,13 @@
           "title": "網路",
           "subtitle": "已指派 {current} / {max} 個分配。",
           "tooltip": {
-            "limitReached": "此伺服器最多只能使用 {max} 個分配。",
-            "primary": "主要"
+            "limitReached": "此伺服器最多只能使用 {max} 個分配。"
           },
           "table": {
             "columns": {
               "hostname": "主機名稱",
-              "port": "連接埠",
-              "notes": "備註"
+              "port": "連接埠"
             }
-          },
-          "button": {
-            "setPrimary": "設為主要",
-            "unsetPrimary": "取消主要"
           },
           "toast": {
             "created": "分配已建立。",
@@ -2057,10 +1950,7 @@
           },
           "modal": {
             "editAllocation": {
-              "title": "編輯分配",
-              "form": {
-                "notes": "備註"
-              }
+              "title": "編輯分配"
             },
             "removeAllocation": {
               "title": "確認移除分配",
@@ -2070,10 +1960,6 @@
         },
         "startup": {
           "title": "啟動",
-          "form": {
-            "startupCommand": "啟動指令",
-            "dockerImage": "Docker 映像檔"
-          },
           "variables": "變數",
           "dockerImageDescription": "用來執行此伺服器的 Docker 映像檔。可以改用不同的映像檔。",
           "dockerImageDescriptionCustom": "用來執行此伺服器的 Docker 映像檔。此值由管理員設定，無法變更。",
@@ -2085,10 +1971,7 @@
           "modal": {
             "unsavedChanges": {
               "title": "未儲存的變更",
-              "content": "你的啟動變數有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。",
-              "button": {
-                "leave": "離開頁面"
-              }
+              "content": "你的啟動變數有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。"
             }
           },
           "noVariables": "找不到此伺服器的啟動變數。"
@@ -2135,19 +2018,12 @@
           },
           "rename": {
             "title": "重新命名伺服器",
-            "form": {
-              "serverName": "伺服器名稱"
-            },
             "toast": {
               "renamed": "伺服器已重新命名。"
             }
           },
           "timezone": {
             "title": "時區",
-            "form": {
-              "timezone": "時區",
-              "system": "系統"
-            },
             "toast": {
               "updated": "伺服器時區已更新。"
             }
@@ -2155,7 +2031,6 @@
           "autokill": {
             "title": "自動強制終止",
             "form": {
-              "enabled": "已啟用",
               "secondsUntilAutoKill": "自動強制終止前秒數"
             },
             "toast": {

@@ -40,7 +40,7 @@ export default function StorageContainer() {
   });
 
   useEffect(() => {
-    form.setValues({
+    form.setValues<z.infer<typeof adminSettingsStorageSchema>>({
       ...storageDriver,
     });
   }, [storageDriver]);
@@ -64,7 +64,7 @@ export default function StorageContainer() {
         opened={openModal === 'changeStorageType'}
         onClose={() => setOpenModal(null)}
         title={t('pages.admin.settings.tabs.storage.page.modal.changeStorageType.title', {})}
-        confirm={t('pages.admin.settings.tabs.storage.page.modal.changeStorageType.button.confirm', {})}
+        confirm={t('common.button.update', {})}
         onConfirmed={() => {
           doUpdate();
           setOpenModal(null);

@@ -61,7 +61,7 @@ export default function SubuserCreateModal({ opened, onClose }: ModalProps) {
       <Stack>
         <TextInput
           withAsterisk
-          label={t('pages.server.subusers.modal.createSubuser.form.email', {})}
+          label={t('common.form.email', {})}
           placeholder={t('pages.server.subusers.modal.createSubuser.form.emailPlaceholder', {})}
           {...form.getInputProps('email')}
         />
@@ -75,8 +75,7 @@ export default function SubuserCreateModal({ opened, onClose }: ModalProps) {
         />
 
         <TagsInput
-          label={t('pages.server.subusers.modal.createSubuser.form.ignoredFiles', {})}
-          placeholder={t('pages.server.subusers.modal.createSubuser.form.ignoredFiles', {})}
+          label={t('common.form.ignoredFiles', {})}
           description={t('pages.server.subusers.modal.createSubuser.form.ignoredFilesDescription', {})}
           {...form.getInputProps('ignoredFiles')}
         />

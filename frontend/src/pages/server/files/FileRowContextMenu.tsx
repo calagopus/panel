@@ -132,7 +132,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
         },
         {
           icon: faAnglesUp,
-          label: t('pages.server.files.button.move', {}),
+          label: t('common.button.move', {}),
           hidden: !browsingWritableDirectory,
           onClick: () => doActFiles('move', [file]),
           color: 'gray',
@@ -145,7 +145,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
               hidden: !browsingWritableDirectory,
               onClick: doUnarchive,
               color: 'gray',
-              canAccess: canCreate,
+              canAccess: canArchive,
             }
           : {
               icon: faFileZipper,
@@ -177,7 +177,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
           items: [
             {
               icon: faInfoCircle,
-              label: t('pages.server.files.button.details', {}),
+              label: t('common.button.details', {}),
               onClick: () => doOpenModal('details', [file]),
               color: 'gray',
             },

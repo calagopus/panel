@@ -43,7 +43,11 @@ impl shared::extensions::commands::CliCommand<ListArgs> for ListCommand {
                     SlimExtensionDistrFile::parse_from_directory(".")
                 })
                 .await??;
-                let applied_extensions = extension_internal_list::list();
+                let applied_extensions = crate::EXTENSIONS
+                    .get()
+                    .expect("Extensions not initialized")
+                    .extensions()
+                    .await;
 
                 if args.json {
                     let mut extensions_json = Vec::new();

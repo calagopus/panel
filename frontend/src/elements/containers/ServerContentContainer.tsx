@@ -213,7 +213,7 @@ function ServerContentContainer(props: Props) {
         </div>
       ) : null}
 
-      <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6'}`}>
+      <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6 mt-2'}`}>
         {registry?.prependedComponents.map((Component, index) => (
           <Component key={`prepended-${index}`} {...props} />
         ))}

@@ -9,6 +9,7 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { nestTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import NestCreateOrUpdate from './NestCreateOrUpdate.tsx';
 import NestRow from './NestRow.tsx';
@@ -16,6 +17,7 @@ import NestView from './NestView.tsx';
 
 function NestsContainer() {
   const navigate = useNavigate();
+  const { t } = useTranslations();
 
   const {
     data: nests,
@@ -30,7 +32,7 @@ function NestsContainer() {
 
   return (
     <AdminContentContainer
-      title='Nests'
+      title={t('pages.admin.nests.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -40,12 +42,12 @@ function NestsContainer() {
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </AdminCan>
       }
     >
-      <Table columns={nestTableColumns} loading={loading} pagination={nests} onPageSelect={setPage}>
+      <Table columns={nestTableColumns()} loading={loading} pagination={nests} onPageSelect={setPage}>
         {nests?.data.map((nest) => (
           <NestRow key={nest.uuid} nest={nest} />
         ))}

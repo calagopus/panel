@@ -9,6 +9,7 @@ import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 type Props = ModalProps & {
@@ -17,6 +18,7 @@ type Props = ModalProps & {
 };
 
 export default function NodeBackupsDeleteModal({ node, backup, opened, onClose }: Props) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { removeNodeBackup } = useAdminStore();
 
@@ -29,7 +31,7 @@ export default function NodeBackupsDeleteModal({ node, backup, opened, onClose }
       force: deleteDoForce,
     })
       .then(() => {
-        addToast('Node backup deleted.', 'success');
+        addToast(t('pages.admin.nodes.tabs.backups.page.toast.deleted', {}), 'success');
         onClose();
         removeNodeBackup(backup);
       })
@@ -41,10 +43,10 @@ export default function NodeBackupsDeleteModal({ node, backup, opened, onClose }
 
   return (
     <>
-      <Modal title='Confirm Node Backup Deletion' onClose={onClose} opened={opened}>
+      <Modal title={t('pages.admin.nodes.tabs.backups.page.modal.delete.title', {})} onClose={onClose} opened={opened}>
         <Stack>
           <Switch
-            label='Do you want to forcefully delete this node backup?'
+            label={t('pages.admin.nodes.tabs.backups.page.modal.delete.form.force', {})}
             name='force'
             defaultChecked={deleteDoForce}
             onChange={(e) => setDeleteDoForce(e.target.checked)}
@@ -53,10 +55,10 @@ export default function NodeBackupsDeleteModal({ node, backup, opened, onClose }
 
         <ModalFooter>
           <Button color='red' loading={loading} onClick={doDelete}>
-            Okay
+            {t('common.button.okay', {})}
           </Button>
           <Button variant='default' onClick={() => onClose()}>
-            Cancel
+            {t('common.button.cancel', {})}
           </Button>
         </ModalFooter>
       </Modal>

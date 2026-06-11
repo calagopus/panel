@@ -6,9 +6,11 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
 
 export default function AdminLocationNodes({ location }: { location: z.infer<typeof adminLocationSchema> }) {
+  const { t } = useTranslations();
   const {
     data: locationNodes,
     loading,
@@ -21,7 +23,12 @@ export default function AdminLocationNodes({ location }: { location: z.infer<typ
   });
 
   return (
-    <AdminSubContentContainer title='Location Nodes' titleOrder={2} search={search} setSearch={setSearch}>
+    <AdminSubContentContainer
+      title={t('pages.admin.locations.tabs.nodes.page.title', {})}
+      titleOrder={2}
+      search={search}
+      setSearch={setSearch}
+    >
       <Table columns={nodeTableColumns()} loading={loading} pagination={locationNodes} onPageSelect={setPage}>
         {locationNodes?.data.map((node) => (
           <NodeRow key={node.uuid} node={node} />

@@ -5,10 +5,12 @@ import getEggConfiguration from '@/api/admin/egg-configurations/getEggConfigurat
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggConfigurationCreateOrUpdate from './EggConfigurationCreateOrUpdate.tsx';
 
 export default function EggConfigurationView() {
   const params = useParams<'id'>();
+  const { t } = useTranslations();
 
   const { data: eggConfiguration, isLoading } = useQuery({
     queryKey: ['admin', 'eggConfigurations', { uuid: params.id }],
@@ -23,7 +25,7 @@ export default function EggConfigurationView() {
         baseUrl={`/admin/egg-configurations/${params.id}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: `/`,
             element: <EggConfigurationCreateOrUpdate contextEggConfiguration={eggConfiguration} />,

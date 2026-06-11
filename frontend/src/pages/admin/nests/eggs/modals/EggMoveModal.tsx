@@ -13,6 +13,7 @@ import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggMoveModal({
   nest,
@@ -21,6 +22,7 @@ export default function EggMoveModal({
   onClose,
 }: ModalProps & { nest: z.infer<typeof adminNestSchema>; egg: z.infer<typeof adminEggSchema> }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,7 @@ export default function EggMoveModal({
 
     moveEgg(nest.uuid, egg.uuid, selectedNest.uuid)
       .then(() => {
-        addToast('Egg moved.', 'success');
+        addToast(t('pages.admin.nests.tabs.eggs.page.toast.moved', {}), 'success');
         navigate(`/admin/nests/${selectedNest.uuid}/eggs/${egg.uuid}`);
 
         onClose();
@@ -52,12 +54,11 @@ export default function EggMoveModal({
   };
 
   return (
-    <Modal title='Move Egg' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.nests.tabs.eggs.page.modal.move.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label='Nest'
-          placeholder='Nest'
+          label={t('common.form.nest', {})}
           value={selectedNest?.uuid}
           onChange={(value) => setSelectedNest(nests.items.find((m) => m.uuid === value) ?? null)}
           data={nests.items.map((nest) => ({
@@ -72,10 +73,10 @@ export default function EggMoveModal({
 
         <ModalFooter>
           <Button onClick={doMove} loading={loading} disabled={!selectedNest}>
-            Move
+            {t('common.button.move', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>

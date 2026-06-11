@@ -12,9 +12,11 @@ import RoleCreateOrUpdate from '@/pages/admin/roles/RoleCreateOrUpdate.tsx';
 import RoleRow from '@/pages/admin/roles/RoleRow.tsx';
 import RoleView from '@/pages/admin/roles/RoleView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 
 function RolesContainer() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const {
@@ -30,7 +32,7 @@ function RolesContainer() {
 
   return (
     <AdminContentContainer
-      title='Roles'
+      title={t('pages.admin.roles.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -40,12 +42,12 @@ function RolesContainer() {
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </AdminCan>
       }
     >
-      <Table columns={roleTableColumns} loading={loading} pagination={roles} onPageSelect={setPage}>
+      <Table columns={roleTableColumns()} loading={loading} pagination={roles} onPageSelect={setPage}>
         {roles?.data.map((role) => (
           <RoleRow key={role.uuid} role={role} />
         ))}

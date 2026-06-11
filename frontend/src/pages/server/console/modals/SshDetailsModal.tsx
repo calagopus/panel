@@ -19,16 +19,11 @@ export default function SshDetailsModal({ opened, onClose }: ModalProps) {
     <Modal title={t('pages.server.console.modal.sshDetails.title', {})} onClose={onClose} opened={opened}>
       <div className='grid grid-cols-4 gap-2'>
         <CopyOnClick content='SSH' className='text-left'>
-          <TextInput
-            label={t('pages.server.console.modal.sshDetails.form.protocol', {})}
-            value='SSH'
-            className='pointer-events-none'
-            readOnly
-          />
+          <TextInput label={t('common.form.protocol', {})} value='SSH' className='pointer-events-none' readOnly />
         </CopyOnClick>
         <CopyOnClick content={server.sftpPort.toString()} className='text-left'>
           <TextInput
-            label={t('pages.server.console.modal.sshDetails.form.port', {})}
+            label={t('common.form.port', {})}
             value={server.sftpPort}
             className='pointer-events-none'
             readOnly
@@ -36,7 +31,7 @@ export default function SshDetailsModal({ opened, onClose }: ModalProps) {
         </CopyOnClick>
         <CopyOnClick content={server.sftpHost} className='col-span-2 text-left'>
           <TextInput
-            label={t('pages.server.console.modal.sshDetails.form.host', {})}
+            label={t('common.form.host', {})}
             value={server.sftpHost}
             className='pointer-events-none'
             readOnly
@@ -45,7 +40,7 @@ export default function SshDetailsModal({ opened, onClose }: ModalProps) {
 
         <CopyOnClick content={`${user!.username}.${server.uuidShort}`} className='col-span-4 text-left'>
           <TextInput
-            label={t('pages.server.console.modal.sshDetails.form.username', {})}
+            label={t('common.form.username', {})}
             value={`${user!.username}.${server.uuidShort}`}
             className='pointer-events-none'
             readOnly
@@ -53,8 +48,8 @@ export default function SshDetailsModal({ opened, onClose }: ModalProps) {
         </CopyOnClick>
 
         <TextInput
-          label={t('pages.server.console.modal.sshDetails.form.password', {})}
-          value={t('pages.server.console.modal.sshDetails.form.yourPassword', {})}
+          label={t('common.form.password', {})}
+          value={t('common.form.yourControlPanelPassword', {})}
           className='col-span-4 pointer-events-none'
           readOnly
         />

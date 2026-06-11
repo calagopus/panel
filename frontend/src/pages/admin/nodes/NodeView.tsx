@@ -16,6 +16,8 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import { isNodeAIO } from '@/lib/node.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminNodeAllocations from './allocations/AdminNodeAllocations.tsx';
 import AdminNodeBackups from './backups/AdminNodeBackups.tsx';
 import AdminNodeConfiguration from './configuration/AdminNodeConfiguration.tsx';
@@ -27,10 +29,11 @@ import AdminNodeStatistics from './statistics/AdminNodeStatistics.tsx';
 import AdminNodeTransfers from './transfers/AdminNodeTransfers.tsx';
 
 export default function NodeView() {
+  const { t } = useTranslations();
   const params = useParams<'id'>();
 
   const { data: node, isLoading } = useQuery({
-    queryKey: ['admin', 'nodes', { uuid: params.id }],
+    queryKey: queryKeys.admin.nodes.detail(params.id!),
     queryFn: () => getNode(params.id!),
   });
 
@@ -42,60 +45,60 @@ export default function NodeView() {
         baseUrl={`/admin/nodes/${params.id}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: '/',
             element: <NodeCreateOrUpdate contextNode={node} />,
           },
           {
-            name: 'Configuration',
+            name: t('pages.admin.nodes.tabs.configuration.title', {}),
             icon: faPenRuler,
             path: `/configuration`,
             hidden: isNodeAIO(node),
             element: <AdminNodeConfiguration node={node} />,
           },
           {
-            name: 'Statistics',
+            name: t('pages.admin.nodes.tabs.statistics.title', {}),
             icon: faInfoCircle,
             path: `/statistics`,
             element: <AdminNodeStatistics node={node} />,
           },
           {
-            name: 'Logs',
+            name: t('pages.admin.nodes.tabs.logs.title', {}),
             icon: faFileLines,
             path: `/logs`,
             element: <AdminNodeLogs node={node} />,
           },
           {
-            name: 'Allocations',
+            name: t('pages.admin.nodes.tabs.allocations.title', {}),
             icon: faNetworkWired,
             path: `/allocations`,
             element: <AdminNodeAllocations node={node} />,
             permission: 'nodes.allocations',
           },
           {
-            name: 'Mounts',
+            name: t('pages.admin.nodes.tabs.mounts.title', {}),
             icon: faFolderTree,
             path: `/mounts`,
             element: <AdminNodeMounts node={node} />,
             permission: 'nodes.mounts',
           },
           {
-            name: 'Backups',
+            name: t('pages.admin.nodes.tabs.backups.title', {}),
             icon: faArchive,
             path: `/backups`,
             element: <AdminNodeBackups node={node} />,
             permission: 'nodes.backups',
           },
           {
-            name: 'Servers',
+            name: t('pages.admin.nodes.tabs.servers.title', {}),
             icon: faComputer,
             path: `/servers`,
             element: <AdminNodeServers node={node} />,
             permission: 'servers.read',
           },
           {
-            name: 'Outgoing Transfers',
+            name: t('pages.admin.nodes.tabs.transfers.title', {}),
             icon: faArrowUpLong,
             path: `/transfers`,
             element: <AdminNodeTransfers node={node} />,

@@ -9,12 +9,14 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { databaseHostTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import DatabaseHostCreateOrUpdate from './DatabaseHostCreateOrUpdate.tsx';
 import DatabaseHostRow from './DatabaseHostRow.tsx';
 import DatabaseHostView from './DatabaseHostView.tsx';
 
 function DatabaseHostsContainer() {
+  const { t } = useTranslations();
   const navigate = useNavigate();
 
   const {
@@ -30,7 +32,7 @@ function DatabaseHostsContainer() {
 
   return (
     <AdminContentContainer
-      title='Database Hosts'
+      title={t('pages.admin.databaseHosts.title', {})}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -40,12 +42,12 @@ function DatabaseHostsContainer() {
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
-            Create
+            {t('common.button.create', {})}
           </Button>
         </AdminCan>
       }
     >
-      <Table columns={databaseHostTableColumns} loading={loading} pagination={databaseHosts} onPageSelect={setPage}>
+      <Table columns={databaseHostTableColumns()} loading={loading} pagination={databaseHosts} onPageSelect={setPage}>
         {databaseHosts?.data.map((dh) => (
           <DatabaseHostRow key={dh.uuid} databaseHost={dh} />
         ))}

@@ -6,9 +6,11 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import AdminDatabaseHostDatabases from '@/pages/admin/databaseHosts/databases/AdminDatabaseHostDatabases.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DatabaseHostCreateOrUpdate from './DatabaseHostCreateOrUpdate.tsx';
 
 export default function DatabaseHostView() {
+  const { t } = useTranslations();
   const params = useParams<'id'>();
 
   const { data: databaseHost, isLoading } = useQuery({
@@ -24,13 +26,13 @@ export default function DatabaseHostView() {
         baseUrl={`/admin/database-hosts/${params.id}`}
         items={[
           {
-            name: 'General',
+            name: t('common.tabs.general', {}),
             icon: faCog,
             path: `/`,
             element: <DatabaseHostCreateOrUpdate contextDatabaseHost={databaseHost} />,
           },
           {
-            name: 'Databases',
+            name: t('pages.admin.databaseHosts.tabs.databases.title', {}),
             icon: faDatabase,
             path: `/databases`,
             element: <AdminDatabaseHostDatabases databaseHost={databaseHost} />,

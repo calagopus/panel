@@ -13,8 +13,10 @@ import { serverMountTableColumns } from '@/lib/tableColumns.ts';
 import ServerMountAddModal from '@/pages/admin/servers/mounts/modals/ServerMountAddModal.tsx';
 import ServerMountRow from '@/pages/admin/servers/mounts/ServerMountRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminServerMounts({ server }: { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -30,13 +32,13 @@ export default function AdminServerMounts({ server }: { server: z.infer<typeof a
 
   return (
     <AdminSubContentContainer
-      title='Server Mounts'
+      title={t('pages.admin.servers.tabs.mounts.page.title', {})}
       titleOrder={2}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-          Add
+          {t('common.button.add', {})}
         </Button>
       }
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.mounts.subContainer}
@@ -45,7 +47,7 @@ export default function AdminServerMounts({ server }: { server: z.infer<typeof a
       <ServerMountAddModal server={server} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
 
       <ContextMenuProvider>
-        <Table columns={serverMountTableColumns} loading={loading} pagination={serverMounts} onPageSelect={setPage}>
+        <Table columns={serverMountTableColumns()} loading={loading} pagination={serverMounts} onPageSelect={setPage}>
           {serverMounts?.data.map((mount) => (
             <ServerMountRow key={mount.mount.uuid} server={server} mount={mount} />
           ))}

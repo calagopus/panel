@@ -10,12 +10,14 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServerDeleteModal({
   server,
   opened,
   onClose,
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ export default function ServerDeleteModal({
       deleteBackups: deleteDoDeleteBackups,
     })
       .then(() => {
-        addToast('Server deleted.', 'success');
+        addToast(t('pages.admin.servers.tabs.management.page.delete.toast.deleted', {}), 'success');
         onClose();
         navigate('/admin/servers');
       })
@@ -43,21 +45,25 @@ export default function ServerDeleteModal({
 
   return (
     <>
-      <Modal title='Confirm Server Deletion' onClose={onClose} opened={opened}>
+      <Modal
+        title={t('pages.admin.servers.tabs.management.page.delete.modal.title', {})}
+        onClose={onClose}
+        opened={opened}
+      >
         <Stack>
           <Text size='sm'>
-            You are about to delete <span className='font-bold'>{server.name}</span>. Are you sure?
+            {t('pages.admin.servers.tabs.management.page.delete.modal.description', { name: server.name }).md()}
           </Text>
 
           <Switch
-            label='Do you want to forcefully delete this server?'
+            label={t('pages.admin.servers.tabs.management.page.delete.modal.form.force', {})}
             name='force'
             defaultChecked={deleteDoForce}
             onChange={(e) => setDeleteDoForce(e.target.checked)}
           />
 
           <Switch
-            label='Do you want to delete backups of this server?'
+            label={t('pages.admin.servers.tabs.management.page.delete.modal.form.deleteBackups', {})}
             name='deleteBackups'
             defaultChecked={deleteDoDeleteBackups}
             onChange={(e) => setDeleteDoDeleteBackups(e.target.checked)}
@@ -65,8 +71,11 @@ export default function ServerDeleteModal({
 
           <TextInput
             withAsterisk
-            label='Confirm Server Name'
-            placeholder='Server Name'
+            label={t('pages.admin.servers.tabs.management.page.delete.modal.form.confirmServerName', {})}
+            placeholder={t(
+              'pages.admin.servers.tabs.management.page.delete.modal.form.confirmServerNamePlaceholder',
+              {},
+            )}
             value={deleteServerName}
             onChange={(e) => setDeleteServerName(e.target.value)}
           />
@@ -74,10 +83,10 @@ export default function ServerDeleteModal({
 
         <ModalFooter>
           <Button color='red' disabled={server.name != deleteServerName} loading={loading} onClick={doDelete}>
-            Delete
+            {t('common.button.delete', {})}
           </Button>
           <Button variant='default' onClick={() => onClose()}>
-            Cancel
+            {t('common.button.cancel', {})}
           </Button>
         </ModalFooter>
       </Modal>

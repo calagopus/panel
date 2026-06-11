@@ -68,17 +68,11 @@ export default function SshKeyCreateModal({ opened, onClose }: ModalProps) {
       opened={opened}
     >
       <Stack>
-        <TextInput
-          withAsterisk
-          label={t('common.form.name', {})}
-          placeholder={t('common.form.name', {})}
-          {...form.getInputProps('name')}
-        />
+        <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
         <TextArea
           withAsterisk
           label={t('pages.account.sshKeys.modal.createSshKey.form.publicKey', {})}
-          placeholder={t('pages.account.sshKeys.modal.createSshKey.form.publicKey', {})}
           rows={3}
           resize='none'
           {...form.getInputProps('publicKey')}

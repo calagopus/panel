@@ -23,23 +23,12 @@ export default function EmailSendmail({
 
   return (
     <Stack mt='md'>
-      <TextInput
-        label={t('common.form.command', {})}
-        placeholder={t('common.form.command', {})}
-        key={form.key('command')}
-        {...form.getInputProps('command')}
-      />
+      <TextInput label={t('common.form.command', {})} key={form.key('command')} {...form.getInputProps('command')} />
 
       <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.fromAddress', {})}
-          placeholder={t('common.form.fromAddress', {})}
-          {...form.getInputProps('fromAddress')}
-        />
+        <TextInput withAsterisk label={t('common.form.fromAddress', {})} {...form.getInputProps('fromAddress')} />
         <TextInput
           label={t('common.form.fromName', {})}
-          placeholder={t('common.form.fromName', {})}
           key={form.key('fromName')}
           {...form.getInputProps('fromName')}
         />

@@ -207,9 +207,14 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 password: source_settings
                                     .remove("settings::mail:mailers:smtp:password")
                                     .and_then(|p| decrypt_laravel_value(&p, &source_app_key).ok()),
-                                use_tls: source_settings
+                                tls_mode: if source_settings
                                     .remove("settings::mail:mailers:smtp:encryption")
-                                    .is_some_and(|e| e == "tls"),
+                                    .is_some_and(|e| e == "tls")
+                                {
+                                    shared::settings::TlsMode::StartTls
+                                } else {
+                                    shared::settings::TlsMode::None
+                                },
                                 skip_cert_validation: false,
                                 from_address,
                                 from_name: source_settings.remove("settings::mail:from:name"),

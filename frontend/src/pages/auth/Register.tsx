@@ -1,6 +1,6 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Alert, Divider, Stack, Text, Title } from '@mantine/core';
+import { Divider, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useRef, useState } from 'react';
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import register from '@/api/auth/register.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
 import Card from '@/elements/Card.tsx';
@@ -93,9 +94,9 @@ export default function Register() {
         <Card>
           <Stack>
             <TextInput placeholder={t('common.form.username', {})} {...form.getInputProps('username')} />
-            <TextInput placeholder={t('pages.auth.register.form.email', {})} {...form.getInputProps('email')} />
-            <TextInput placeholder={t('pages.auth.register.form.firstName', {})} {...form.getInputProps('nameFirst')} />
-            <TextInput placeholder={t('pages.auth.register.form.lastName', {})} {...form.getInputProps('nameLast')} />
+            <TextInput placeholder={t('common.form.email', {})} {...form.getInputProps('email')} />
+            <TextInput placeholder={t('common.form.firstName', {})} {...form.getInputProps('nameFirst')} />
+            <TextInput placeholder={t('common.form.lastName', {})} {...form.getInputProps('nameLast')} />
             <PasswordInput placeholder={t('common.form.password', {})} {...form.getInputProps('password')} />
             <Captcha ref={captchaRef} />
 

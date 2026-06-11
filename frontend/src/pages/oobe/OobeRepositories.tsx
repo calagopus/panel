@@ -141,7 +141,7 @@ export default function OobeRepositories({ onNext, onBack, canGoBack, skipFrom, 
             {t('common.button.skip', {})}
           </Button>
           <Button type='submit' disabled={!hasSelection} loading={loading} onClick={() => onSubmit()}>
-            {t('pages.oobe.eggRepositories.button.submit', {})}
+            {t('common.button.import', {})}
           </Button>
         </Group>
       </Stack>

@@ -10,6 +10,7 @@ import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function NodesBulkConfigModal({
   selectedNodes,
@@ -20,6 +21,7 @@ export default function NodesBulkConfigModal({
   selectedNodes: ObjectSet<z.infer<typeof adminNodeSchema>, 'uuid'>;
   setSelectedNodes: (nodes: ObjectSet<z.infer<typeof adminNodeSchema>, 'uuid'>) => void;
 }) {
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const [yaml, setYaml] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,7 +32,7 @@ export default function NodesBulkConfigModal({
     try {
       parsed = jsYaml.load(yaml) as object;
     } catch (err) {
-      addToast(`Invalid YAML: ${(err as Error).message}`, 'error');
+      addToast(t('pages.admin.nodes.modal.bulkConfig.error.invalidYaml', { error: (err as Error).message }), 'error');
       return;
     }
 
@@ -38,7 +40,12 @@ export default function NodesBulkConfigModal({
 
     updateNodesConfig(selectedNodes.keys(), parsed)
       .then((applied) => {
-        addToast(`Configuration applied to ${applied} Node${applied !== 1 ? 's' : ''}.`, 'success');
+        addToast(
+          t('pages.admin.nodes.modal.bulkConfig.toast.applied', {
+            nodes: tItem('node', applied),
+          }),
+          'success',
+        );
         setSelectedNodes(new ObjectSet('uuid'));
         onClose();
       })
@@ -52,7 +59,9 @@ export default function NodesBulkConfigModal({
 
   return (
     <Modal
-      title={`Update Configuration - ${selectedNodes.size} Node${selectedNodes.size !== 1 ? 's' : ''}`}
+      title={t('pages.admin.nodes.modal.bulkConfig.title', {
+        nodes: tItem('node', selectedNodes.size),
+      })}
       onClose={onClose}
       opened={opened}
       size='xl'
@@ -85,10 +94,12 @@ export default function NodesBulkConfigModal({
 
         <ModalFooter>
           <Button onClick={doApply} loading={loading} disabled={!yaml.trim()}>
-            Apply to {selectedNodes.size} Node{selectedNodes.size !== 1 ? 's' : ''}
+            {t('pages.admin.nodes.modal.bulkConfig.button.apply', {
+              nodes: tItem('node', selectedNodes.size),
+            })}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Cancel
+            {t('common.button.cancel', {})}
           </Button>
         </ModalFooter>
       </Stack>

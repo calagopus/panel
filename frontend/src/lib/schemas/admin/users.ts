@@ -12,6 +12,8 @@ export const adminUserSchema = z.object({
   nameLast: z.string(),
   password: z.preprocess(nullableString, z.string().nullable()),
   admin: z.boolean(),
+  frozen: z.boolean(),
+  suspended: z.boolean(),
   language: z.string(),
   role: z.lazy(() => roleSchema),
   created: z.date(),

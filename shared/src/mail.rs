@@ -47,7 +47,7 @@ impl Mail {
                 port,
                 username,
                 password,
-                use_tls,
+                tls_mode,
                 skip_cert_validation,
                 from_address,
                 from_name,
@@ -57,16 +57,28 @@ impl Mail {
                         host.as_str(),
                     )
                     .port(*port)
-                    .tls(if *use_tls {
-                        lettre::transport::smtp::client::Tls::Required(
-                            lettre::transport::smtp::client::TlsParametersBuilder::new(
-                                host.to_string(),
+                    .tls(match tls_mode {
+                        super::settings::TlsMode::None => {
+                            lettre::transport::smtp::client::Tls::None
+                        }
+                        super::settings::TlsMode::StartTls => {
+                            lettre::transport::smtp::client::Tls::Required(
+                                lettre::transport::smtp::client::TlsParametersBuilder::new(
+                                    host.to_string(),
+                                )
+                                .dangerous_accept_invalid_certs(*skip_cert_validation)
+                                .build_rustls()?,
                             )
-                            .dangerous_accept_invalid_certs(*skip_cert_validation)
-                            .build_rustls()?,
-                        )
-                    } else {
-                        lettre::transport::smtp::client::Tls::None
+                        }
+                        super::settings::TlsMode::ImplicitTls => {
+                            lettre::transport::smtp::client::Tls::Wrapper(
+                                lettre::transport::smtp::client::TlsParametersBuilder::new(
+                                    host.to_string(),
+                                )
+                                .dangerous_accept_invalid_certs(*skip_cert_validation)
+                                .build_rustls()?,
+                            )
+                        }
                     });
 
                 if let Some(username) = username {

@@ -78,7 +78,6 @@ export default function PullFileModal({ opened, onClose }: ModalProps) {
           withAsterisk
           className='col-span-3'
           label={t('pages.server.files.modal.pullFile.form.fileUrl', {})}
-          placeholder={t('pages.server.files.modal.pullFile.form.fileUrl', {})}
           {...form.getInputProps('url')}
         />
         <Button
@@ -93,8 +92,8 @@ export default function PullFileModal({ opened, onClose }: ModalProps) {
 
       <TextInput
         withAsterisk
-        label={t('pages.server.files.modal.pullFile.form.fileName', {})}
-        placeholder={queryResult?.fileName ?? t('pages.server.files.modal.pullFile.form.fileName', {})}
+        label={t('common.form.fileName', {})}
+        placeholder={queryResult?.fileName ?? t('common.form.fileName', {})}
         className='mt-2'
         {...form.getInputProps('name')}
       />

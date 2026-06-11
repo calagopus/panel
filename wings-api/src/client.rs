@@ -9,6 +9,7 @@ use std::{
     task::{Context, Poll},
 };
 use tokio::io::AsyncRead;
+use tokio_tungstenite::tungstenite::{Error, client::IntoClientRequest, http::HeaderValue};
 
 static CLIENT: LazyLock<Client> = LazyLock::new(|| {
     Client::builder()
@@ -21,6 +22,7 @@ static CLIENT: LazyLock<Client> = LazyLock::new(|| {
 pub enum ApiHttpError {
     Http(StatusCode, super::ApiError),
     Reqwest(reqwest::Error),
+    WebSocket(tokio_tungstenite::tungstenite::Error),
     MsgpackEncode(rmp_serde::encode::Error),
     MsgpackDecode(rmp_serde::decode::Error),
 }
@@ -32,6 +34,7 @@ impl From<ApiHttpError> for anyhow::Error {
                 anyhow::anyhow!("wings api status code {status}: {}", err.error)
             }
             ApiHttpError::Reqwest(err) => anyhow::anyhow!(err),
+            ApiHttpError::WebSocket(err) => anyhow::anyhow!(err),
             ApiHttpError::MsgpackEncode(err) => anyhow::anyhow!(err),
             ApiHttpError::MsgpackDecode(err) => anyhow::anyhow!(err),
         }
@@ -172,6 +175,51 @@ impl WingsClient {
         }
 
         request
+    }
+
+    pub async fn open_websocket(
+        &self,
+        endpoint: impl AsRef<str>,
+        headers: reqwest::header::HeaderMap,
+    ) -> Result<
+        tokio_tungstenite::WebSocketStream<
+            tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>,
+        >,
+        ApiHttpError,
+    > {
+        let url = format!(
+            "{}{}",
+            self.base_url.trim_end_matches('/'),
+            endpoint.as_ref()
+        );
+        let url = if let Some(rest) = url.strip_prefix("https://") {
+            format!("wss://{rest}")
+        } else if let Some(rest) = url.strip_prefix("http://") {
+            format!("ws://{rest}")
+        } else {
+            url
+        };
+
+        let mut request = url.into_client_request().map_err(ApiHttpError::WebSocket)?;
+
+        if !self.token.is_empty() {
+            let value = HeaderValue::from_str(&format!("Bearer {}", self.token))
+                .map_err(|err| ApiHttpError::WebSocket(Error::HttpFormat(err.into())))?;
+            request.headers_mut().insert("Authorization", value);
+        }
+
+        for (header, value) in headers {
+            let Some(header) = header else {
+                continue;
+            };
+            request.headers_mut().insert(header, value);
+        }
+
+        let (stream, _) = tokio_tungstenite::connect_async(request)
+            .await
+            .map_err(ApiHttpError::WebSocket)?;
+
+        Ok(stream)
     }
 
     pub async fn delete_backups_backup(
@@ -980,6 +1028,87 @@ impl WingsClient {
         &self,
     ) -> Result<super::system_overview::get::Response, ApiHttpError> {
         request_impl(self, Method::GET, "/api/system/overview", None::<&()>, None).await
+    }
+
+    pub async fn get_system_restic_prune(
+        &self,
+    ) -> Result<super::system_restic_prune::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            "/api/system/restic/prune",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_system_restic_prune(
+        &self,
+        data: &super::system_restic_prune::post::RequestBody,
+    ) -> Result<super::system_restic_prune::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            "/api/system/restic/prune",
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_system_restic_stats(
+        &self,
+    ) -> Result<super::system_restic_stats::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            "/api/system/restic/stats",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_system_restic_stats(
+        &self,
+        data: &super::system_restic_stats::post::RequestBody,
+    ) -> Result<super::system_restic_stats::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            "/api/system/restic/stats",
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_system_restic_unlock(
+        &self,
+    ) -> Result<super::system_restic_unlock::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            "/api/system/restic/unlock",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_system_restic_unlock(
+        &self,
+        data: &super::system_restic_unlock::post::RequestBody,
+    ) -> Result<super::system_restic_unlock::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            "/api/system/restic/unlock",
+            Some(data),
+            None,
+        )
+        .await
     }
 
     pub async fn get_system_stats(

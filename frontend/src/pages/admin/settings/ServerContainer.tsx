@@ -11,6 +11,7 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import TextInput from '@/elements/input/TextInput.tsx';
 import { adminSettingsServerSchema } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -37,6 +38,7 @@ export default function ServerContainer() {
       allowViewingInstallationLogs: false,
       allowAcknowledgingInstallationFailure: true,
       allowViewingTransferProgress: false,
+      containerPrelude: '',
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(adminSettingsServerSchema),
@@ -79,7 +81,6 @@ export default function ServerContainer() {
           <NumberInput
             withAsterisk
             label={t('pages.admin.settings.tabs.server.page.form.maxScheduleStepCount', {})}
-            placeholder={t('pages.admin.settings.tabs.server.page.form.maxScheduleStepCount', {})}
             key={form.key('maxScheduleStepCount')}
             {...form.getInputProps('maxScheduleStepCount')}
           />
@@ -96,7 +97,6 @@ export default function ServerContainer() {
           <NumberInput
             withAsterisk
             label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerSearchResults', {})}
-            placeholder={t('pages.admin.settings.tabs.server.page.form.maxFileManagerSearchResults', {})}
             key={form.key('maxFileManagerSearchResults')}
             {...form.getInputProps('maxFileManagerSearchResults')}
           />
@@ -104,7 +104,6 @@ export default function ServerContainer() {
           <NumberInput
             withAsterisk
             label={t('pages.admin.settings.tabs.server.page.form.maxSubuserCount', {})}
-            placeholder={t('pages.admin.settings.tabs.server.page.form.maxSubuserCount', {})}
             key={form.key('maxSubuserCount')}
             {...form.getInputProps('maxSubuserCount')}
           />
@@ -141,6 +140,14 @@ export default function ServerContainer() {
             description={t('pages.admin.settings.tabs.server.page.form.allowViewingTransferProgressDescription', {})}
             key={form.key('allowViewingTransferProgress')}
             {...form.getInputProps('allowViewingTransferProgress', { type: 'checkbox' })}
+          />
+
+          <TextInput
+            withAsterisk
+            label={t('pages.admin.settings.tabs.server.page.form.containerPrelude', {})}
+            description={t('pages.admin.settings.tabs.server.page.form.containerPreludeDescription', {})}
+            key={form.key('containerPrelude')}
+            {...form.getInputProps('containerPrelude')}
           />
         </div>
 

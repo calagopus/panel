@@ -53,7 +53,7 @@ mod post {
         activity_logger: GetServerActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
-        permissions.has_server_permission("files.create")?;
+        permissions.has_server_permission("files.archive")?;
 
         if server.is_ignored(&data.file, false) {
             return ApiResponse::error("file not found")

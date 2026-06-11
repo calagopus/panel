@@ -68,7 +68,12 @@
         "download": "Скачать",
         "downloadAs": "Скачать как {format}",
         "export": "Экспорт",
-        "exportAs": "Экспорт как {format}"
+        "exportAs": "Экспорт как {format}",
+        "import": "Импорт",
+        "details": "Подробности",
+        "setPrimary": "Сделать основным",
+        "unsetPrimary": "Убрать основной",
+        "leavePage": "Покинуть страницу"
       },
       "alert": {
         "error": "Ошибка",
@@ -85,7 +90,8 @@
       "tooltip": {
         "resetToDefault": "Сбросить по умолчанию",
         "edit": "Редактировать",
-        "delete": "Удалить"
+        "delete": "Удалить",
+        "primary": "Основной"
       },
       "form": {
         "name": "Имя",
@@ -94,6 +100,40 @@
         "host": "Хост",
         "username": "Имя пользователя",
         "server": "Сервер",
+        "url": "URL",
+        "email": "Электронная почта",
+        "port": "Порт",
+        "command": "Команда",
+        "firstName": "Имя",
+        "lastName": "Фамилия",
+        "language": "Язык",
+        "enabled": "Включено",
+        "fileName": "Имя файла",
+        "sftpPort": "SFTP-порт",
+        "sftpHost": "SFTP-хост",
+        "dockerImage": "Docker-образ",
+        "memory": "Память",
+        "disk": "Диск",
+        "serverName": "Имя сервера",
+        "startupCommand": "Команда запуска",
+        "archiveName": "Имя архива",
+        "archiveFormat": "Формат архива",
+        "databaseHost": "Хост базы данных",
+        "timezone": "Часовой пояс",
+        "protocol": "Протокол",
+        "powerAction": "Действие питания",
+        "destination": "Назначение",
+        "directoryName": "Имя директории",
+        "locked": "Заблокировано",
+        "portRanges": "Диапазоны портов",
+        "portRangesPlaceholder": "Диапазоны портов (напр. 3000-4000)",
+        "currentPassword": "Текущий пароль",
+        "confirmPassword": "Подтверждение пароля",
+        "authenticationCode": "Код аутентификации",
+        "lineContains": "Строка содержит",
+        "eggs": "Яйца",
+        "ignoredFiles": "Игнорируемые файлы",
+        "yourControlPanelPassword": "Ваш пароль от панели управления",
         "truncateDirectory": "Вы хотите удалить все файлы этого сервера перед выполнением этого действия? Это действие необратимо."
       },
       "table": {
@@ -112,7 +152,8 @@
           "event": "Событие",
           "ip": "IP",
           "when": "Когда",
-          "command": "Команда"
+          "command": "Команда",
+          "notes": "Заметки"
         }
       },
       "badge": {
@@ -150,6 +191,17 @@
           "starting": "Запускается",
           "stopping": "Останавливается"
         },
+        "serverPowerAction": {
+          "start": "Запуск",
+          "stop": "Остановка",
+          "restart": "Перезапуск",
+          "kill": "Принудительная остановка"
+        },
+        "serverBackupStatus": {
+          "starting": "Запускается",
+          "finished": "Завершено",
+          "failed": "Ошибка"
+        },
         "connectionStatus": {
           "connected": "Подключён",
           "offline": "Не в сети"
@@ -164,17 +216,6 @@
           "stopped": "Остановлен",
           "restarted": "Перезапущен",
           "killed": "Принудительно остановлен"
-        },
-        "serverPowerAction": {
-          "start": "Запуск",
-          "stop": "Остановка",
-          "restart": "Перезапуск",
-          "kill": "Принудительная остановка"
-        },
-        "serverBackupStatus": {
-          "starting": "Запускается",
-          "finished": "Завершено",
-          "failed": "Ошибка"
         }
       },
       "unit": {
@@ -208,19 +249,6 @@
         "stackTrace": "Стек вызовов:",
         "componentStack": "Стек компонентов:"
       },
-      "selectInput": {
-        "noResults": "Результаты не найдены."
-      },
-      "scheduleDynamicInput": {
-        "enterVariable": "Пожалуйста, введите имя переменной для вычисления.",
-        "enterData": "Пожалуйста, введите данные для отправки.",
-        "inputType": "Тип ввода",
-        "dataType": "Тип данных для отправки",
-        "selectType": "Выбрать тип",
-        "none": "Нет",
-        "rawString": "Строка",
-        "variable": "Переменная"
-      },
       "copyOnClick": {
         "toast": {
           "copied": "Скопировано в буфер обмена.",
@@ -253,6 +281,9 @@
       "permissionSelector": {
         "selectedPermissions": "Выбранные разрешения ({count})",
         "noPermissions": "Разрешения не выбраны."
+      },
+      "selectInput": {
+        "noResults": "Результаты не найдены."
       },
       "can": {
         "tooltip": {
@@ -295,6 +326,16 @@
             }
           }
         }
+      },
+      "scheduleDynamicInput": {
+        "enterVariable": "Пожалуйста, введите имя переменной для вычисления.",
+        "enterData": "Пожалуйста, введите данные для отправки.",
+        "inputType": "Тип ввода",
+        "dataType": "Тип данных для отправки",
+        "selectType": "Выбрать тип",
+        "none": "Нет",
+        "rawString": "Строка",
+        "variable": "Переменная"
       },
       "serverWebsocket": {
         "error": {
@@ -379,17 +420,12 @@
             "description": "Выберите надёжный пароль. Эта учётная запись будет иметь полный административный доступ ко всем серверам и настройкам."
           },
           "form": {
-            "username": "Имя пользователя",
             "usernamePlaceholder": "admin",
             "email": "Адрес электронной почты",
             "emailPlaceholder": "admin@example.com",
-            "firstName": "Имя",
             "firstNamePlaceholder": "Иван",
-            "lastName": "Фамилия",
             "lastNamePlaceholder": "Иванов",
-            "password": "Пароль",
             "passwordPlaceholder": "Введите надёжный пароль",
-            "confirmPassword": "Подтверждение пароля",
             "confirmPasswordPlaceholder": "Введите пароль повторно"
           },
           "button": {
@@ -400,9 +436,7 @@
           "title": "Войти снова",
           "alert": "Вы были разлогинены во время настройки. Пожалуйста, войдите снова, чтобы продолжить с того места, где остановились.",
           "form": {
-            "username": "Имя пользователя",
             "usernamePlaceholder": "admin",
-            "password": "Пароль",
             "passwordPlaceholder": "Введите надёжный пароль"
           },
           "button": {
@@ -429,21 +463,14 @@
           "form": {
             "name": "Имя",
             "namePlaceholder": "Мой сервер",
-            "url": "URL",
             "urlPlaceholder": "URL",
             "urlDescription": "используется для внутренней связи с узлом",
             "publicUrl": "Публичный URL",
             "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "используется для websocket/скачивания",
-            "sftpHost": "SFTP-хост",
             "sftpHostPlaceholder": "SFTP-хост",
-            "sftpPort": "SFTP-порт",
             "sftpPortPlaceholder": "SFTP-порт",
-            "memory": "Память",
-            "disk": "Диск",
-            "ip": "IP",
-            "portRanges": "Диапазоны портов",
-            "portRangesPlaceholder": "Диапазоны портов (напр. 3000-4000)"
+            "ip": "IP"
           },
           "error": {
             "noLocations": "Что-то пошло не так. Локации не найдены."
@@ -465,7 +492,6 @@
           "form": {
             "applicationName": "Название приложения",
             "applicationNamePlaceholder": "Calagopus",
-            "language": "Язык",
             "languagePlaceholder": "Язык",
             "applicationUrl": "URL приложения",
             "applicationUrlPlaceholder": "https://calagop.us",
@@ -474,6 +500,42 @@
           },
           "button": {
             "submit": "Обновить настройки и продолжить"
+          }
+        },
+        "eggRepositories": {
+          "title": "Репозитории яиц",
+          "description": "Это исходные репозитории ваших яиц. Вы можете изменить эти репозитории в любое время.",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "Игровые яйца Pterodactyl",
+              "description": "Яйца для игр, таких как Minecraft, Terraria и многих других."
+            },
+            "pterodactylApplication": {
+              "title": "Яйца приложений Pterodactyl",
+              "description": "Яйца для приложений, таких как Grafana, Meilisearch и различных баз данных."
+            },
+            "pterodactylGeneral": {
+              "title": "Общие яйца Pterodactyl",
+              "description": "Яйца для универсальных сред выполнения, таких как Node JS, Java и Rust."
+            }
+          }
+        },
+        "server": {
+          "title": "Сервер",
+          "egg": {
+            "title": "Яйцо",
+            "description": "Давайте запустим ваш первый сервер. Какое яйцо вы хотите использовать?",
+            "nestDescription": "Чтобы использовать это яйцо, вам нужно создать гнездо — коллекцию яиц. Дайте ему имя:"
+          },
+          "server": {
+            "title": "Сервер",
+            "nestDescription": "Чтобы использовать это яйцо, вам нужно создать гнездо — коллекцию яиц. Дайте ему имя:"
+          },
+          "error": {
+            "noNodes": "Что-то пошло не так. Узлы не найдены."
+          },
+          "button": {
+            "create": "Создать и продолжить"
           }
         },
         "finished": {
@@ -498,46 +560,6 @@
             "skipped": "Пропущено"
           },
           "button": "Перейти к панели управления"
-        },
-        "eggRepositories": {
-          "title": "Репозитории яиц",
-          "description": "Это исходные репозитории ваших яиц. Вы можете изменить эти репозитории в любое время.",
-          "repositories": {
-            "pterodactylGame": {
-              "title": "Игровые яйца Pterodactyl",
-              "description": "Яйца для игр, таких как Minecraft, Terraria и многих других."
-            },
-            "pterodactylApplication": {
-              "title": "Яйца приложений Pterodactyl",
-              "description": "Яйца для приложений, таких как Grafana, Meilisearch и различных баз данных."
-            },
-            "pterodactylGeneral": {
-              "title": "Общие яйца Pterodactyl",
-              "description": "Яйца для универсальных сред выполнения, таких как Node JS, Java и Rust."
-            }
-          },
-          "button": {
-            "submit": "Импортировать"
-          }
-        },
-        "server": {
-          "title": "Сервер",
-          "egg": {
-            "title": "Яйцо",
-            "description": "Давайте запустим ваш первый сервер. Какое яйцо вы хотите использовать?",
-            "nestDescription": "Чтобы использовать это яйцо, вам нужно создать гнездо — коллекцию яиц. Дайте ему имя:"
-          },
-          "server": {
-            "title": "Сервер",
-            "nestDescription": "Чтобы использовать это яйцо, вам нужно создать гнездо — коллекцию яиц. Дайте ему имя:"
-          },
-          "error": {
-            "noNodes": "Что-то пошло не так. Узлы не найдены."
-          },
-          "button": {
-            "submit": "Импортировать",
-            "create": "Создать и продолжить"
-          }
         }
       },
       "auth": {
@@ -619,11 +641,6 @@
         "register": {
           "title": "Регистрация",
           "subtitle": "Пожалуйста, введите свои данные для регистрации",
-          "form": {
-            "email": "Электронная почта",
-            "firstName": "Имя",
-            "lastName": "Фамилия"
-          },
           "button": {
             "register": "Зарегистрироваться"
           }
@@ -631,9 +648,6 @@
         "forgotPassword": {
           "title": "Забыли пароль",
           "subtitle": "Введите ваш email для получения инструкций по сбросу пароля",
-          "form": {
-            "email": "Электронная почта"
-          },
           "button": {
             "request": "Запросить сброс пароля"
           },
@@ -642,9 +656,6 @@
         "resetPassword": {
           "title": "Сброс пароля",
           "subtitle": "Пожалуйста, введите новый пароль",
-          "form": {
-            "confirmPassword": "Подтверждение пароля"
-          },
           "button": {
             "reset": "Сбросить пароль"
           },
@@ -751,7 +762,6 @@
                 "updated": "Пароль успешно обновлён."
               },
               "form": {
-                "currentPassword": "Текущий пароль",
                 "newPassword": "Новый пароль",
                 "confirmNewPassword": "Подтверждение нового пароля"
               }
@@ -762,8 +772,7 @@
                 "updated": "Электронная почта успешно обновлена."
               },
               "form": {
-                "newEmail": "Новый email",
-                "currentPassword": "Текущий пароль"
+                "newEmail": "Новый email"
               }
             },
             "twoFactor": {
@@ -775,18 +784,12 @@
               "modal": {
                 "disableTwoFactor": {
                   "title": "Отключить двухфакторную аутентификацию",
-                  "description": "Отключение двухфакторной аутентификации сделает ваш аккаунт менее защищённым.",
-                  "form": {
-                    "code": "Код аутентификации"
-                  }
+                  "description": "Отключение двухфакторной аутентификации сделает ваш аккаунт менее защищённым."
                 },
                 "setupTwoFactor": {
                   "title": "Настройка двухфакторной аутентификации",
                   "description": "Помогите защитить вашу учётную запись от несанкционированного доступа. При каждом входе вам будет предложено ввести код подтверждения.",
-                  "descriptionQR": "Отсканируйте QR-код выше с помощью вашего приложения для двухфакторной аутентификации. Затем введите сгенерированный 6-значный код в поле ниже.",
-                  "form": {
-                    "code": "Код аутентификации"
-                  }
+                  "descriptionQR": "Отсканируйте QR-код выше с помощью вашего приложения для двухфакторной аутентификации. Затем введите сгенерированный 6-значный код в поле ниже."
                 },
                 "recoveryCodes": {
                   "title": "Коды восстановления",
@@ -807,10 +810,6 @@
                 "updated": "Данные аккаунта успешно обновлены."
               },
               "form": {
-                "nameFirst": "Имя",
-                "nameLast": "Фамилия",
-                "username": "Имя пользователя",
-                "language": "Язык",
                 "toastPosition": "Позиция уведомлений",
                 "startOnGroupedServers": "Начинать на странице сгруппированных серверов"
               }
@@ -919,9 +918,6 @@
         },
         "sshKeys": {
           "title": "SSH-ключи",
-          "button": {
-            "import": "Импорт"
-          },
           "table": {
             "columns": {
               "fingerprint": "Отпечаток"
@@ -952,8 +948,7 @@
                 "created": "{sshKeys} создано."
               },
               "form": {
-                "provider": "Провайдер",
-                "username": "Имя пользователя"
+                "provider": "Провайдер"
               }
             },
             "deleteSshKey": {
@@ -967,15 +962,6 @@
         },
         "commandSnippets": {
           "title": "Шаблоны команд",
-          "table": {
-            "columns": {
-              "eggs": "Яйца"
-            }
-          },
-          "form": {
-            "eggs": "Яйца",
-            "command": "Команда"
-          },
           "modal": {
             "createCommandSnippet": {
               "title": "Создать шаблон команды",
@@ -1064,7 +1050,6 @@
           "title": "Активность"
         }
       },
-      "admin": {},
       "server": {
         "viewAdmin": {
           "title": "Вид администратора"
@@ -1082,12 +1067,6 @@
             "sshDetails": {
               "title": "Данные SSH",
               "form": {
-                "protocol": "Протокол",
-                "port": "Порт",
-                "host": "Хост",
-                "username": "Имя пользователя",
-                "password": "Пароль",
-                "yourPassword": "Ваш пароль от панели управления",
                 "command": "Команда SSH"
               },
               "launch": "Запустить"
@@ -1182,10 +1161,8 @@
             "new": "Создать",
             "sftpDetails": "Данные SFTP",
             "openInNewWindow": "Открыть в новом окне",
-            "details": "Подробности",
             "rename": "Переименовать",
             "copy": "Копировать",
-            "move": "Переместить",
             "fingerprint": "Отпечаток",
             "permissions": "Права доступа",
             "unarchive": "Распаковать",
@@ -1255,45 +1232,31 @@
           "modal": {
             "activeUploads": {
               "title": "Активные загрузки",
-              "content": "Вы уверены, что хотите покинуть эту страницу? У вас {files} активных загрузок файлов. Если вы покинете страницу, загрузки будут прерваны.",
-              "button": {
-                "leave": "Покинуть страницу"
-              }
+              "content": "Вы уверены, что хотите покинуть эту страницу? У вас {files} активных загрузок файлов. Если вы покинете страницу, загрузки будут прерваны."
             },
             "unsavedChanges": {
               "title": "Несохранённые изменения",
-              "content": "У вас есть несохранённые изменения в редакторе файлов. Вы уверены, что хотите покинуть эту страницу? При выходе ваши изменения будут потеряны.",
-              "button": {
-                "leave": "Покинуть страницу"
-              }
+              "content": "У вас есть несохранённые изменения в редакторе файлов. Вы уверены, что хотите покинуть эту страницу? При выходе ваши изменения будут потеряны."
             },
             "createArchive": {
               "title": "Создать архив",
               "form": {
-                "archiveName": "Имя архива",
                 "format": "Формат"
               },
               "createdAs": "Этот архив будет создан как "
             },
             "createDirectory": {
               "title": "Создать директорию",
-              "form": {
-                "directoryName": "Имя директории"
-              },
               "createdAs": "Эта директория будет создана как "
             },
             "copyFile": {
               "title": "Копировать файл",
-              "form": {
-                "fileName": "Имя файла"
-              },
               "createdAs": "Этот файл будет создан как "
             },
             "copyRemote": {
               "title": "Удалённое копирование файлов",
               "form": {
-                "server": "Сервер",
-                "destination": "Назначение"
+                "server": "Сервер"
               },
               "createdAs": "Эти файлы будут созданы на удалённом сервере в "
             },
@@ -1313,10 +1276,7 @@
               "multipleFilesWarning": "Вы не сможете восстановить содержимое следующих файлов после удаления."
             },
             "createFile": {
-              "title": "Создать файл",
-              "form": {
-                "fileName": "Имя файла"
-              }
+              "title": "Создать файл"
             },
             "details": {
               "title": "Детали файла",
@@ -1341,10 +1301,7 @@
               "executePermission": "Право на выполнение (1)"
             },
             "renameFile": {
-              "title": "Переименовать файл",
-              "form": {
-                "fileName": "Имя файла"
-              }
+              "title": "Переименовать файл"
             },
             "searchFiles": {
               "title": "Поиск файлов",
@@ -1358,7 +1315,7 @@
               "searchText": "Текст поиска",
               "maxFileSize": "Макс. размер файла",
               "includeOversized": "Включить слишком большие файлы",
-              "includeOversizedDescription": "Включить файлы, соответствующие другим фильтрам, но слишком большие для поиска",
+              "includeOversizedDescription": "Включает файлы, которые соответствуют другим фильтрам, но слишком велики для поиска.",
               "fileSize": "Размер файла",
               "minimum": "Минимум",
               "maximum": "Максимум"
@@ -1367,22 +1324,13 @@
               "title": "Загрузить файл",
               "form": {
                 "fileUrl": "URL файла",
-                "query": "Запрос",
-                "fileName": "Имя файла"
+                "query": "Запрос"
               },
               "createdAs": "Этот файл будет создан как ",
               "pull": "Загрузить"
             },
             "sftpDetails": {
               "title": "Данные SFTP",
-              "form": {
-                "protocol": "Протокол",
-                "port": "Порт",
-                "host": "Хост",
-                "username": "Имя пользователя",
-                "password": "Пароль",
-                "yourPassword": "Ваш пароль от панели управления"
-              },
               "launch": "Запустить"
             }
           }
@@ -1395,13 +1343,10 @@
           },
           "table": {
             "columns": {
-              "type": "Тип",
-              "address": "Адрес",
               "locked": "Заблокировано?"
             }
           },
           "button": {
-            "details": "Подробности",
             "rotatePassword": "Сменить пароль"
           },
           "form": {
@@ -1414,7 +1359,6 @@
                 "created": "База данных создана."
               },
               "form": {
-                "databaseHost": "Хост базы данных",
                 "noHostsFound": "Хосты не найдены"
               }
             },
@@ -1422,9 +1366,6 @@
               "title": "Редактировать базу данных",
               "toast": {
                 "updated": "База данных обновлена."
-              },
-              "form": {
-                "locked": "Заблокировано"
               }
             },
             "databaseDetails": {
@@ -1463,7 +1404,6 @@
             }
           },
           "button": {
-            "import": "Импорт",
             "trigger": "Запустить",
             "triggerWithCondition": "Запустить (не пропускать условие)",
             "triggerSkipCondition": "Запустить (пропустить условие)",
@@ -1567,7 +1507,6 @@
           },
           "form": {
             "scheduleName": "Название расписания",
-            "enabled": "Включено",
             "triggersList": "Триггеры",
             "triggerNumber": "Триггер {number}",
             "actionType": "Тип действия",
@@ -1593,8 +1532,7 @@
           "preCondition": {
             "valueSeconds": "Значение (секунды)",
             "valuePercent": "Значение (%)",
-            "value": "Значение",
-            "filePath": "Путь к файлу"
+            "value": "Значение"
           },
           "triggers": {
             "cron": {
@@ -1608,9 +1546,6 @@
             },
             "powerAction": {
               "title": "Действие питания",
-              "form": {
-                "powerAction": "Действие питания"
-              },
               "card": {
                 "content": "При запросе действия питания `{action}`."
               }
@@ -1632,9 +1567,6 @@
             },
             "consoleLine": {
               "title": "Строка консоли",
-              "form": {
-                "lineContains": "Строка содержит"
-              },
               "card": {
                 "content": "Когда вывод консоли содержит строку `{contains}`"
               }
@@ -1676,7 +1608,7 @@
               "title": "Форматирование",
               "form": {
                 "formatString": "Строка формата",
-                "formatStringDescription": "Строка формата, может включать переменные, обёрнутые в {wrapper}"
+                "formatStringDescription": "Строка формата. Переменные можно включить, обернув их в {wrapper}."
               },
               "renderer": {
                 "compact": "Форматировать строку в {outputInto}"
@@ -1697,7 +1629,6 @@
             "waitForConsoleLine": {
               "title": "Ожидание строки консоли",
               "form": {
-                "lineContains": "Строка содержит",
                 "timeout": "Тайм-аут (миллисекунды)"
               },
               "renderer": {
@@ -1711,9 +1642,6 @@
             },
             "sendCommand": {
               "title": "Отправить команду",
-              "form": {
-                "command": "Команда"
-              },
               "renderer": {
                 "compact": "Выполнить {command}",
                 "detail": {
@@ -1723,9 +1651,6 @@
             },
             "sendPower": {
               "title": "Отправить сигнал питания",
-              "form": {
-                "powerAction": "Действие питания"
-              },
               "renderer": {
                 "compact": "Выполнить {action}",
                 "detail": {
@@ -1736,8 +1661,7 @@
             "createBackup": {
               "title": "Создать резервную копию",
               "form": {
-                "backupName": "Имя резервной копии",
-                "ignoredFiles": "Игнорируемые файлы"
+                "backupName": "Имя резервной копии"
               },
               "renderer": {
                 "compact": "Создать {name}",
@@ -1749,9 +1673,6 @@
             },
             "createDirectory": {
               "title": "Создать директорию",
-              "form": {
-                "directoryName": "Имя директории"
-              },
               "renderer": {
                 "compact": "Создать {name} в {root}",
                 "detail": {
@@ -1763,7 +1684,6 @@
             "writeFile": {
               "title": "Записать файл",
               "form": {
-                "filePath": "Путь к файлу",
                 "content": "Содержимое",
                 "appendToFile": "Дописать в файл"
               },
@@ -1778,8 +1698,7 @@
             "copyFile": {
               "title": "Копировать файл",
               "form": {
-                "sourceFile": "Исходный файл",
-                "destination": "Назначение"
+                "sourceFile": "Исходный файл"
               },
               "renderer": {
                 "compact": "Копировать {file} в {destination}",
@@ -1820,9 +1739,7 @@
             "compressFiles": {
               "title": "Сжать файлы",
               "form": {
-                "filesToCompress": "Файлы для сжатия",
-                "archiveFormat": "Формат архива",
-                "archiveName": "Имя архива"
+                "filesToCompress": "Файлы для сжатия"
               },
               "renderer": {
                 "compact": "Сжать {files} из {root} в {name}",
@@ -1849,10 +1766,6 @@
             },
             "updateStartupVariable": {
               "title": "Обновить переменную запуска",
-              "form": {
-                "envVariable": "Переменная окружения",
-                "value": "Значение"
-              },
               "renderer": {
                 "compact": "Установить {variable} в {value}",
                 "detail": {
@@ -1863,9 +1776,6 @@
             },
             "updateStartupCommand": {
               "title": "Обновить команду запуска",
-              "form": {
-                "startupCommand": "Команда запуска"
-              },
               "renderer": {
                 "compact": "Установить {command}",
                 "detail": {
@@ -1875,9 +1785,6 @@
             },
             "updateStartupDockerImage": {
               "title": "Обновить Docker-образ",
-              "form": {
-                "dockerImage": "Docker-образ"
-              },
               "renderer": {
                 "compact": "Установить {image}",
                 "detail": {
@@ -1903,10 +1810,8 @@
                 "created": "Субпользователь создан."
               },
               "form": {
-                "email": "Email",
                 "emailPlaceholder": "Введите email для сохранения субпользователя.",
-                "permissions": "Разрешения",
-                "ignoredFiles": "Игнорируемые файлы"
+                "permissions": "Разрешения"
               }
             },
             "updateSubuser": {
@@ -1949,18 +1854,12 @@
               "title": "Создать резервную копию",
               "toast": {
                 "created": "Резервная копия создана."
-              },
-              "form": {
-                "ignoredFiles": "Игнорируемые файлы"
               }
             },
             "editBackup": {
               "title": "Редактировать резервную копию",
               "toast": {
                 "updated": "Резервная копия обновлена."
-              },
-              "form": {
-                "locked": "Заблокировано"
               }
             },
             "restoreBackup": {
@@ -1979,19 +1878,13 @@
           "title": "Сеть",
           "subtitle": "Назначено {current} из {max} максимальных портов.",
           "tooltip": {
-            "limitReached": "Этот сервер ограничен {max} портами.",
-            "primary": "Основной"
+            "limitReached": "Этот сервер ограничен {max} портами."
           },
           "table": {
             "columns": {
               "hostname": "Имя хоста",
-              "port": "Порт",
-              "notes": "Заметки"
+              "port": "Порт"
             }
-          },
-          "button": {
-            "setPrimary": "Сделать основным",
-            "unsetPrimary": "Убрать основной"
           },
           "toast": {
             "created": "Порт создан.",
@@ -2002,10 +1895,7 @@
           },
           "modal": {
             "editAllocation": {
-              "title": "Редактировать порт",
-              "form": {
-                "notes": "Заметки"
-              }
+              "title": "Редактировать порт"
             },
             "removeAllocation": {
               "title": "Подтверждение удаления порта",
@@ -2015,10 +1905,6 @@
         },
         "startup": {
           "title": "Запуск",
-          "form": {
-            "startupCommand": "Команда запуска",
-            "dockerImage": "Docker-образ"
-          },
           "variables": "Переменные",
           "dockerImageDescription": "Docker-образ, используемый для запуска этого сервера. Его можно изменить для использования другого образа.",
           "dockerImageDescriptionCustom": "Docker-образ, используемый для запуска этого сервера. Он был установлен администратором и не может быть изменён.",
@@ -2070,19 +1956,12 @@
           },
           "rename": {
             "title": "Переименовать сервер",
-            "form": {
-              "serverName": "Имя сервера"
-            },
             "toast": {
               "renamed": "Сервер переименован."
             }
           },
           "timezone": {
             "title": "Часовой пояс",
-            "form": {
-              "timezone": "Часовой пояс",
-              "system": "Системный"
-            },
             "toast": {
               "updated": "Часовой пояс сервера обновлён."
             }
@@ -2090,7 +1969,6 @@
           "autokill": {
             "title": "Авто-остановка",
             "form": {
-              "enabled": "Включено",
               "secondsUntilAutoKill": "Секунд до авто-остановки"
             },
             "toast": {

@@ -92,7 +92,7 @@ export default function ServerSchedules() {
                 disabled={schedules.total >= server.featureLimits.schedules}
               >
                 <FontAwesomeIcon icon={faUpload} className='mr-2' />
-                {t('pages.server.schedules.button.import', {})}
+                {t('common.button.import', {})}
               </Button>
             </ConditionalTooltip>
             <ConditionalTooltip

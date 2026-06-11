@@ -4,12 +4,15 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import { adminDatabaseCredentialsConnectionStringSchema } from '@/lib/schemas/admin/databaseHosts.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function CredentialConnectionString({
   form,
 }: {
   form: UseFormReturnType<{ credentials: z.infer<typeof adminDatabaseCredentialsConnectionStringSchema> }>;
 }) {
+  const { t } = useTranslations();
+
   useEffect(() => {
     form.setValues({
       credentials: {
@@ -23,8 +26,8 @@ export default function CredentialConnectionString({
     <Stack mt='md'>
       <PasswordInput
         withAsterisk
-        label='Connection String'
-        placeholder='mysql://username:password@host:port'
+        label={t('pages.admin.databaseHosts.tabs.general.page.form.connectionString', {})}
+        placeholder={t('pages.admin.databaseHosts.tabs.general.page.form.connectionStringPlaceholder', {})}
         key={form.key('credentials.connectionString')}
         {...form.getInputProps('credentials.connectionString')}
       />

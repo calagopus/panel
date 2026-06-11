@@ -77,7 +77,7 @@ mod get {
 
         let servers = Server::by_user_uuid_server_order_with_pagination(
             &state.database,
-            user.uuid,
+            &user,
             &server_group.server_order,
             params.page,
             params.per_page,

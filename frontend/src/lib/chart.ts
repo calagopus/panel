@@ -13,7 +13,6 @@ import 'chartjs-adapter-moment';
 import { useComputedColorScheme } from '@mantine/core';
 import { deepmerge, deepmergeCustom } from 'deepmerge-ts';
 import { useEffect, useRef, useState } from 'react';
-import { hexToRgba } from '@/lib/color.ts';
 
 ChartJS.register(LineElement, PointElement, Filler, LinearScale, StreamingPlugin);
 
@@ -53,24 +52,29 @@ function getOptions(opts?: Partial<ChartOptions<'line'>>): ChartOptions<'line'> 
   return deepmerge(defaultOptions, opts ?? {});
 }
 
-function getDatasetColors(isDark: boolean, index: number) {
+function cssVar(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function getDatasetColors(index: number) {
   const colors = [
     {
-      borderColor: isDark ? '#22d3ee' : '#0891b2',
-      backgroundColor: hexToRgba(isDark ? '#0e7490' : '#0891b2', isDark ? 0.5 : 0.15),
+      borderColor: cssVar('--chart-series-1-border'),
+      backgroundColor: cssVar('--chart-series-1-fill'),
     },
     {
-      borderColor: isDark ? '#facc15' : '#d97706',
-      backgroundColor: hexToRgba(isDark ? '#a16207' : '#d97706', isDark ? 0.5 : 0.15),
+      borderColor: cssVar('--chart-series-2-border'),
+      backgroundColor: cssVar('--chart-series-2-fill'),
     },
   ];
 
   return colors[index];
 }
 
-function getThemeOverrides(isDark: boolean): Partial<ChartOptions<'line'>> {
-  const gridColor = isDark ? '#424242' : '#e5e7eb';
-  const tickColor = isDark ? '#f3f4f6' : '#374151';
+function getThemeOverrides(): Partial<ChartOptions<'line'>> {
+  const gridColor = cssVar('--chart-grid-color');
+  const tickColor = cssVar('--chart-tick-color');
+
   return {
     scales: {
       y: {
@@ -96,7 +100,7 @@ function getEmptyData(label: string, sets = 1, callback?: ChartDatasetCallback, 
             fill: true,
             label,
             data: [],
-            ...getDatasetColors(isDark, index),
+            ...getDatasetColors(index),
           },
           index,
           isDark,
@@ -119,7 +123,7 @@ function useChart(label: string, opts?: UseChartOptions) {
     typeof opts?.options === 'number'
       ? getOptions({ scales: { y: { min: 0, suggestedMax: opts.options } } })
       : getOptions(opts?.options);
-  const options = deepmerge(baseOptions, getThemeOverrides(isDark)) as ChartOptions<'line'>;
+  const options = deepmerge(baseOptions, getThemeOverrides()) as ChartOptions<'line'>;
 
   const [data, setData] = useState(() => getEmptyData(label, opts?.sets || 1, opts?.callback, isDark));
 
@@ -132,7 +136,7 @@ function useChart(label: string, opts?: UseChartOptions) {
     setData((state) => ({
       ...state,
       datasets: state.datasets.map((ds, index) => {
-        const colors = getDatasetColors(isDark, index);
+        const colors = getDatasetColors(index);
         if (callbackRef.current) {
           const result = callbackRef.current({ ...ds, ...colors, data: [] }, index, isDark);
           return { ...ds, ...colors, ...result, data: ds.data };

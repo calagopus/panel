@@ -33,17 +33,44 @@
         "close": "Închide",
         "cancel": "Anulează",
         "continue": "Continuă",
-        "skip": "Sari peste"
+        "skip": "Sari peste",
+        "import": "Importă",
+        "details": "Detalii",
+        "setPrimary": "Setează ca primar",
+        "unsetPrimary": "Elimină ca primar"
       },
       "input": {
         "search": "Caută..."
+      },
+      "tooltip": {
+        "primary": "Primar"
       },
       "form": {
         "name": "Nume",
         "description": "Descriere",
         "password": "Parolă",
         "host": "Gazdă",
-        "username": "Nume utilizator"
+        "username": "Nume utilizator",
+        "url": "URL",
+        "email": "Email",
+        "firstName": "Prenume",
+        "lastName": "Nume de familie",
+        "language": "Limbă",
+        "enabled": "Activat",
+        "sftpPort": "Port SFTP",
+        "sftpHost": "Gazdă SFTP",
+        "dockerImage": "Imagine Docker",
+        "memory": "Memorie",
+        "disk": "Disc",
+        "serverName": "Nume server",
+        "startupCommand": "Comandă de pornire",
+        "databaseHost": "Gazdă bază de date",
+        "timezone": "Fus orar",
+        "locked": "Blocat",
+        "currentPassword": "Parolă actuală",
+        "confirmPassword": "Confirmă parola",
+        "authenticationCode": "Cod de autentificare",
+        "ignoredFiles": "Fișiere ignorate"
       },
       "table": {
         "pagination": {
@@ -60,7 +87,8 @@
           "actor": "Actor",
           "event": "Eveniment",
           "ip": "IP",
-          "when": "Când"
+          "when": "Când",
+          "notes": "Note"
         }
       },
       "server": {
@@ -117,17 +145,12 @@
             "description": "Alege o parolă puternică. Acest cont va avea acces administrativ complet la toate serverele și setările."
           },
           "form": {
-            "username": "Nume utilizator",
             "usernamePlaceholder": "admin",
             "email": "Adresă de email",
             "emailPlaceholder": "admin@example.com",
-            "firstName": "Prenume",
             "firstNamePlaceholder": "Alan",
-            "lastName": "Nume de familie",
             "lastNamePlaceholder": "Turing",
-            "password": "Parolă",
             "passwordPlaceholder": "Introdu o parolă puternică",
-            "confirmPassword": "Confirmă parola",
             "confirmPasswordPlaceholder": "Reintroду parola"
           },
           "button": {
@@ -138,9 +161,7 @@
           "title": "Autentifică-te din nou",
           "alert": "Ai fost deconectat în timpul procesului de configurare. Te rugăm să te autentifici din nou pentru a continua de unde ai rămas.",
           "form": {
-            "username": "Nume utilizator",
             "usernamePlaceholder": "admin",
-            "password": "Parolă",
             "passwordPlaceholder": "Introdu o parolă puternică"
           },
           "button": {
@@ -166,18 +187,13 @@
           "form": {
             "name": "Nume",
             "namePlaceholder": "Serverul meu",
-            "url": "URL",
             "urlPlaceholder": "URL",
             "urlDescription": "folosit pentru comunicarea internă cu nodul",
             "publicUrl": "URL public",
             "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "folosit pentru websocket/descărcări",
-            "sftpHost": "Gazdă SFTP",
             "sftpHostPlaceholder": "Gazdă SFTP",
-            "sftpPort": "Port SFTP",
-            "sftpPortPlaceholder": "Port SFTP",
-            "memory": "Memorie",
-            "disk": "Disc"
+            "sftpPortPlaceholder": "Port SFTP"
           },
           "error": {
             "noLocations": "Ceva nu a mers bine. Nu s-au găsit locații."
@@ -191,7 +207,6 @@
           "form": {
             "applicationName": "Nume aplicație",
             "applicationNamePlaceholder": "Calagopus",
-            "language": "Limbă",
             "languagePlaceholder": "Limbă",
             "applicationUrl": "URL aplicație",
             "applicationUrlPlaceholder": "https://calagop.us",
@@ -295,7 +310,6 @@
                 "updated": "Parolă actualizată cu succes."
               },
               "form": {
-                "currentPassword": "Parolă actuală",
                 "newPassword": "Parolă nouă",
                 "confirmNewPassword": "Confirmă parola nouă"
               }
@@ -306,8 +320,7 @@
                 "updated": "Email actualizat cu succes."
               },
               "form": {
-                "newEmail": "Email nou",
-                "currentPassword": "Parolă actuală"
+                "newEmail": "Email nou"
               }
             },
             "twoFactor": {
@@ -318,18 +331,12 @@
               "modal": {
                 "disableTwoFactor": {
                   "title": "Dezactivează autentificarea cu doi factori",
-                  "description": "Dezactivarea autentificării cu doi factori va face contul tău mai puțin sigur.",
-                  "form": {
-                    "code": "Cod de autentificare"
-                  }
+                  "description": "Dezactivarea autentificării cu doi factori va face contul tău mai puțin sigur."
                 },
                 "setupTwoFactor": {
                   "title": "Configurează autentificarea cu doi factori",
                   "description": "Ajută la protejarea contului tău împotriva accesului neautorizat. Ți se va solicita un cod de verificare de fiecare dată când te autentifici.",
-                  "descriptionQR": "Scanează codul QR de mai sus folosind aplicația de autentificare în doi pași la alegere. Apoi, introdu codul de 6 cifre generat în câmpul de mai jos.",
-                  "form": {
-                    "code": "Cod de autentificare"
-                  }
+                  "descriptionQR": "Scanează codul QR de mai sus folosind aplicația de autentificare în doi pași la alegere. Apoi, introdu codul de 6 cifre generat în câmpul de mai jos."
                 },
                 "recoveryCodes": {
                   "title": "Coduri de recuperare",
@@ -349,10 +356,6 @@
                 "updated": "Detalii cont actualizate cu succes."
               },
               "form": {
-                "nameFirst": "Prenume",
-                "nameLast": "Nume de familie",
-                "username": "Nume utilizator",
-                "language": "Limbă",
                 "toastPosition": "Poziție notificări",
                 "startOnGroupedServers": "Începe pe pagina Servere grupate"
               }
@@ -415,9 +418,6 @@
         },
         "sshKeys": {
           "title": "Chei SSH",
-          "button": {
-            "import": "Importă"
-          },
           "table": {
             "columns": {
               "fingerprint": "Amprentă"
@@ -445,8 +445,7 @@
                 "created": "{sshKeys} create."
               },
               "form": {
-                "provider": "Furnizor",
-                "username": "Nume utilizator"
+                "provider": "Furnizor"
               }
             },
             "deleteSshKey": {
@@ -570,13 +569,10 @@
           },
           "table": {
             "columns": {
-              "type": "Tip",
-              "address": "Adresă",
               "locked": "Blocat?"
             }
           },
           "button": {
-            "details": "Detalii",
             "rotatePassword": "Rotește parola"
           },
           "form": {
@@ -589,7 +585,6 @@
                 "created": "Bază de date creată."
               },
               "form": {
-                "databaseHost": "Gazdă bază de date",
                 "noHostsFound": "Nicio gazdă găsită"
               }
             },
@@ -597,9 +592,6 @@
               "title": "Editează bază de date",
               "toast": {
                 "updated": "Bază de date actualizată."
-              },
-              "form": {
-                "locked": "Blocat"
               }
             },
             "databaseDetails": {
@@ -636,10 +628,8 @@
                 "created": "Subutilizator creat."
               },
               "form": {
-                "email": "Email",
                 "emailPlaceholder": "Introdu emailul cu care ar trebui salvat acest subutilizator.",
-                "permissions": "Permisiuni",
-                "ignoredFiles": "Fișiere ignorate"
+                "permissions": "Permisiuni"
               }
             },
             "updateSubuser": {
@@ -682,18 +672,12 @@
               "title": "Creează backup",
               "toast": {
                 "created": "Backup creat."
-              },
-              "form": {
-                "ignoredFiles": "Fișiere ignorate"
               }
             },
             "editBackup": {
               "title": "Editează backup",
               "toast": {
                 "updated": "Backup actualizat."
-              },
-              "form": {
-                "locked": "Blocat"
               }
             },
             "restoreBackup": {
@@ -712,19 +696,13 @@
           "title": "Rețea",
           "subtitle": "{current} din {max} alocări maxime atribuite.",
           "tooltip": {
-            "limitReached": "Acest server este limitat la {max} alocări.",
-            "primary": "Primar"
+            "limitReached": "Acest server este limitat la {max} alocări."
           },
           "table": {
             "columns": {
               "hostname": "Nume gazdă",
-              "port": "Port",
-              "notes": "Note"
+              "port": "Port"
             }
-          },
-          "button": {
-            "setPrimary": "Setează ca primar",
-            "unsetPrimary": "Elimină ca primar"
           },
           "toast": {
             "created": "Alocare creată.",
@@ -735,10 +713,7 @@
           },
           "modal": {
             "editAllocation": {
-              "title": "Editează alocare",
-              "form": {
-                "notes": "Note"
-              }
+              "title": "Editează alocare"
             },
             "removeAllocation": {
               "title": "Confirmă eliminarea alocării",
@@ -748,10 +723,6 @@
         },
         "startup": {
           "title": "Pornire",
-          "form": {
-            "startupCommand": "Comandă de pornire",
-            "dockerImage": "Imagine Docker"
-          },
           "variables": "Variabile",
           "dockerImageDescription": "Imaginea Docker folosită pentru a rula acest server. Aceasta poate fi schimbată pentru a folosi o imagine diferită.",
           "dockerImageDescriptionCustom": "Imaginea Docker folosită pentru a rula acest server. Aceasta a fost setată de un administrator și nu poate fi schimbată.",
@@ -765,19 +736,12 @@
           "title": "Setări",
           "rename": {
             "title": "Redenumește server",
-            "form": {
-              "serverName": "Nume server"
-            },
             "toast": {
               "renamed": "Server redenumit."
             }
           },
           "timezone": {
             "title": "Fus orar",
-            "form": {
-              "timezone": "Fus orar",
-              "system": "Sistem"
-            },
             "toast": {
               "updated": "Fus orar server actualizat."
             }
@@ -785,7 +749,6 @@
           "autokill": {
             "title": "Auto-Kill",
             "form": {
-              "enabled": "Activat",
               "secondsUntilAutoKill": "Secunde până la auto-kill"
             },
             "toast": {

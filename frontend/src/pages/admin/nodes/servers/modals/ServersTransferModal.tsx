@@ -6,7 +6,6 @@ import getNodes from '@/api/admin/nodes/getNodes.ts';
 import postTransfers from '@/api/admin/nodes/servers/postTransfers.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -21,6 +20,7 @@ import { transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/files.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServersTransferModal({
   contextNode,
@@ -33,6 +33,7 @@ export default function ServersTransferModal({
   servers: ObjectSet<z.infer<typeof adminServerSchema>, 'uuid'>;
   clearSelected: () => void;
 }) {
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -69,7 +70,12 @@ export default function ServersTransferModal({
       multiplexChannels,
     })
       .then(({ affected }) => {
-        addToast(`${affected} Server transfer${affected === 1 ? '' : 's'} started.`, 'success');
+        addToast(
+          t('pages.admin.nodes.tabs.servers.page.modal.transfer.toast.started', {
+            servers: tItem('server', affected),
+          }),
+          'success',
+        );
         clearSelected();
         closeAll();
         navigate(`/admin/nodes/${contextNode.uuid}/transfers`);
@@ -84,20 +90,26 @@ export default function ServersTransferModal({
       <ConfirmationModal
         opened={openModal === 'confirm'}
         onClose={closeAll}
-        title='Confirm Server Transfers'
-        confirm='Transfer'
+        title={t('pages.admin.nodes.tabs.servers.page.modal.transfer.confirm.title', {})}
+        confirm={t('common.button.transfer', {})}
         onConfirmed={doTransfer}
       >
-        Are you sure you want to transfer <Code>{servers.size}</Code> servers from <Code>{contextNode.name}</Code> to{' '}
-        <Code>{nodes.items.find((n) => n.uuid === selectedNodeUuid)?.name}</Code>? This action cannot be undone.
+        {t('pages.admin.nodes.tabs.servers.page.modal.transfer.confirm.content', {
+          count: servers.size,
+          from: contextNode.name,
+          to: nodes.items.find((n) => n.uuid === selectedNodeUuid)?.name ?? '',
+        }).md()}
       </ConfirmationModal>
 
-      <Modal title='Transfer Servers' onClose={onClose} opened={opened && !openModal}>
+      <Modal
+        title={t('pages.admin.nodes.tabs.servers.page.modal.transfer.title', {})}
+        onClose={onClose}
+        opened={opened && !openModal}
+      >
         <Stack>
           <Select
             withAsterisk
-            label='Node'
-            placeholder='Node'
+            label={t('common.form.node', {})}
             value={selectedNodeUuid || ''}
             onChange={(value) => setSelectedNodeUuid(value)}
             data={nodes.items
@@ -114,7 +126,7 @@ export default function ServersTransferModal({
 
           <Select
             withAsterisk
-            label='Allocation Mode'
+            label={t('pages.admin.nodes.tabs.servers.page.modal.transfer.form.allocationMode', {})}
             value={allocationMode}
             onChange={(value) =>
               setAllocationMode(
@@ -129,44 +141,50 @@ export default function ServersTransferModal({
             data={[
               {
                 value: 'none',
-                label:
-                  'None (scrap all allocations, server will not be automatically assigned new allocations on the destination node)',
+                label: t('pages.admin.nodes.tabs.servers.page.modal.transfer.enum.allocationMode.none', {}),
               },
-              { value: 'random_primary', label: 'Randomize primary allocation (removes additional allocations)' },
+              {
+                value: 'random_primary',
+                label: t('pages.admin.nodes.tabs.servers.page.modal.transfer.enum.allocationMode.randomPrimary', {}),
+              },
               {
                 value: 'random_all',
-                label: 'Randomize all allocations (recommended to avoid incompatibility issues with destination node)',
+                label: t('pages.admin.nodes.tabs.servers.page.modal.transfer.enum.allocationMode.randomAll', {}),
               },
               {
                 value: 'egg_config_deployment',
-                label:
-                  'Assign allocations based on Egg deployment configuration (only works if the Egg has a deployment configuration and the destination node has compatible allocations)',
+                label: t(
+                  'pages.admin.nodes.tabs.servers.page.modal.transfer.enum.allocationMode.eggConfigDeployment',
+                  {},
+                ),
               },
               {
                 value: 'egg_config_self_assign_range',
-                label:
-                  'Self-assign new allocations based on Egg port range (only works if the Egg has a port range and the destination node has compatible allocations)',
+                label: t(
+                  'pages.admin.nodes.tabs.servers.page.modal.transfer.enum.allocationMode.eggConfigSelfAssignRange',
+                  {},
+                ),
               },
             ]}
           />
 
           <Switch
-            label='Transfer backups'
-            description='Whether to transfer backups along with the servers'
+            label={t('pages.admin.nodes.tabs.servers.page.modal.transfer.form.transferBackups', {})}
+            description={t('pages.admin.nodes.tabs.servers.page.modal.transfer.form.transferBackupsDescription', {})}
             checked={transferBackups}
             onChange={(e) => setTransferBackups(e.target.checked)}
           />
 
           <Switch
-            label='Delete source backups'
-            description='Deletes the transferred backups on the source node once transfer finishes'
+            label={t('common.form.deleteSourceBackups', {})}
+            description={t('common.form.deleteSourceBackupsDescription', {})}
             checked={deleteSourceBackups}
             onChange={(e) => setDeleteSourceBackups(e.target.checked)}
           />
 
           <Select
             withAsterisk
-            label='Archive Format'
+            label={t('common.form.archiveFormat', {})}
             value={archiveFormat}
             onChange={(value) => setArchiveFormat(value as z.infer<typeof transferArchiveFormat>)}
             data={Object.entries(transferArchiveFormatLabelMapping).map(([value, label]) => ({
@@ -177,7 +195,7 @@ export default function ServersTransferModal({
 
           <Select
             withAsterisk
-            label='Compression Level'
+            label={t('common.form.compressionLevel', {})}
             value={compressionLevel}
             onChange={(value) => setCompressionLevel(value as z.infer<typeof compressionLevelEnum>)}
             disabled={archiveFormat === 'tar' || archiveFormat === 'itaf'}
@@ -189,16 +207,15 @@ export default function ServersTransferModal({
 
           <NumberInput
             withAsterisk
-            label='Multiplex Channels'
-            placeholder='Multiplex Channels'
-            description='Add additional HTTP connections (and therefore also threads) for transfering split archives, total streams is 1 + multiplex channels'
+            label={t('common.form.multiplexChannels', {})}
+            description={t('common.form.multiplexChannelsDescription', {})}
             min={0}
             value={multiplexChannels}
             onChange={(value) => setMultiplexChannels(Number(value) || 0)}
           />
 
           <Button color='blue' onClick={() => setOpenModal('confirm')} disabled={!selectedNodeUuid}>
-            Transfer
+            {t('common.button.transfer', {})}
           </Button>
         </Stack>
       </Modal>

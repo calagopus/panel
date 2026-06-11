@@ -6,6 +6,7 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 interface NodeAllocationRowProps {
@@ -14,6 +15,7 @@ interface NodeAllocationRowProps {
 
 const NodeAllocationRow = memo(
   forwardRef<HTMLTableRowElement, NodeAllocationRowProps>(function FileRow({ allocation }, ref) {
+    const { t } = useTranslations();
     const { selectedNodeAllocations, addSelectedNodeAllocation, removeSelectedNodeAllocation } = useAdminStore();
 
     const isNodeAllocationSelected = selectedNodeAllocations.has(allocation);
@@ -65,7 +67,7 @@ const NodeAllocationRow = memo(
         </TableData>
 
         <TableData>
-          <Code>{allocation.ipAlias ?? 'N/A'}</Code>
+          <Code>{allocation.ipAlias ?? t('common.na', {})}</Code>
         </TableData>
 
         <TableData>

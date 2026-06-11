@@ -53,19 +53,9 @@ export default function RenameContainer() {
     >
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
         <Stack h='100%'>
-          <TextInput
-            withAsterisk
-            label={t('pages.server.settings.rename.form.serverName', {})}
-            placeholder={t('pages.server.settings.rename.form.serverName', {})}
-            {...form.getInputProps('name')}
-          />
+          <TextInput withAsterisk label={t('common.form.serverName', {})} {...form.getInputProps('name')} />
 
-          <TextArea
-            label={t('common.form.description', {})}
-            placeholder={t('common.form.description', {})}
-            rows={3}
-            {...form.getInputProps('description')}
-          />
+          <TextArea label={t('common.form.description', {})} rows={3} {...form.getInputProps('description')} />
 
           <Group mt='auto'>
             <Button type='submit' loading={loading} disabled={!form.isValid()}>

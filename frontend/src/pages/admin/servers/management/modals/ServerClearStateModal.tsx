@@ -2,10 +2,10 @@ import { ModalProps } from '@mantine/core';
 import { z } from 'zod';
 import clearServerState from '@/api/admin/servers/clearServerState.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Code from '@/elements/Code.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerClearStateModal({
@@ -13,13 +13,14 @@ export default function ServerClearStateModal({
   opened,
   onClose,
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { updateServer } = useAdminStore();
 
   const doClearState = async () => {
     await clearServerState(server.uuid)
       .then(() => {
-        addToast('Server state cleared.', 'success');
+        addToast(t('pages.admin.servers.tabs.management.page.clearState.toast.cleared', {}), 'success');
         onClose();
         updateServer({ ...server, status: null });
         server.status = null;
@@ -34,12 +35,11 @@ export default function ServerClearStateModal({
       <ConfirmationModal
         opened={opened}
         onClose={() => onClose()}
-        title='Confirm Server State Clear'
-        confirm='Clear State'
+        title={t('pages.admin.servers.tabs.management.page.clearState.modal.title', {})}
+        confirm={t('pages.admin.servers.tabs.management.page.clearState.button', {})}
         onConfirmed={doClearState}
       >
-        Are you sure you want to clear the state of <Code>{server.name}</Code>? This will clear any known pending
-        transfers and status failures, please make sure it is safe to do this before clicking without reason.
+        {t('pages.admin.servers.tabs.management.page.clearState.modal.content', { name: server.name }).md()}
       </ConfirmationModal>
     </>
   );

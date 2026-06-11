@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { eggConfigurationRouteItemSchema } from '@/lib/schemas/generic.ts';
 import { oobeStepKey } from '@/lib/schemas/oobe.ts';
 
 export const publicSettingsCaptchaProviderNoneSchema = z.object({
@@ -41,7 +42,9 @@ export const publicSettingsSchema = z.object({
   app: z.object({
     url: z.string(),
     icon: z.string(),
+    iconLight: z.string().nullable(),
     banner: z.string().nullable(),
+    bannerLight: z.string().nullable(),
     name: z.string(),
     language: z.string(),
     registrationEnabled: z.boolean(),
@@ -55,6 +58,7 @@ export const publicSettingsSchema = z.object({
     maxScheduleStepCount: z.number(),
     allowOverwritingCustomDockerImage: z.boolean(),
     allowAcknowledgingInstallationFailure: z.boolean(),
+    containerPrelude: z.string(),
   }),
   user: z.object({
     maxServerGroupCount: z.number(),
@@ -64,5 +68,7 @@ export const publicSettingsSchema = z.object({
     maxSshKeyCount: z.number(),
 
     allowChangingLanguage: z.boolean(),
+
+    routeOrder: z.array(eggConfigurationRouteItemSchema).nullable(),
   }),
 });

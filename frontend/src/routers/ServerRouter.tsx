@@ -130,89 +130,104 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
               <NavLink to='/' className='w-full'>
                 <AppIcon />
               </NavLink>
-              <div className='flex flex-col gap-2 mt-2 mb-1'>
-                <ServerStatusIndicator />
-              </div>
-              <Sidebar.Divider />
+              {!user?.suspended && (
+                <>
+                  <div className='flex flex-col gap-2 mt-2 mb-1'>
+                    <ServerStatusIndicator />
+                  </div>
+                  <Sidebar.Divider />
+                </>
+              )}
             </>
           }
           footer={
             <>
-              <ServerSwitcher isServer className='mb-2' />
+              {!user?.suspended && <ServerSwitcher isServer className='mb-2' />}
               <Sidebar.Footer />
             </>
           }
         >
-          <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
-          {isAdmin(user) && (
-            <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
-          )}
-          {isAdmin(user, 'servers.read') && (
-            <Sidebar.Link
-              to={`/admin/servers/${params.id}`}
-              end
-              icon={faArrowUpRightFromSquare}
-              name={t('pages.server.viewAdmin.title', {})}
-            />
-          )}
-
-          <Sidebar.Divider />
-
-          {sidebarItems.map((item, index) => {
-            if (!item) return null;
-
-            if (item.type === 'divider') {
-              return <Sidebar.Divider key={`divider-${index}`} label={item.label} />;
-            }
-
-            if (item.type === 'redirect') {
-              return (
+          {!user?.suspended && (
+            <>
+              <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
+              {isAdmin(user) && (
+                <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
+              )}
+              {isAdmin(user, 'servers.read') && (
                 <Sidebar.Link
-                  key={`redirect-${index}`}
-                  to={item.destination}
+                  to={`/admin/servers/${params.id}`}
+                  end
                   icon={faArrowUpRightFromSquare}
-                  name={item.name}
+                  name={t('pages.server.viewAdmin.title', {})}
                 />
-              );
-            }
+              )}
 
-            if (item.type === 'route') {
-              const { route } = item;
-              const name = typeof route.name === 'function' ? route.name() : route.name!;
+              <Sidebar.Divider />
 
-              return route.permission ? (
-                <ServerCan key={route.path} action={route.permission} matchAny>
-                  <Sidebar.Link
-                    to={to(route.path, `/server/${params.id}`)}
-                    end={route.exact}
-                    icon={route.icon}
-                    name={name}
-                    activeMatches={route.activeMatches}
-                  />
-                </ServerCan>
-              ) : (
-                <Sidebar.Link
-                  key={route.path}
-                  to={to(route.path, `/server/${params.id}`)}
-                  end={route.exact}
-                  icon={route.icon}
-                  name={name}
-                  activeMatches={route.activeMatches}
-                />
-              );
-            }
+              {sidebarItems.map((item, index) => {
+                if (!item) return null;
 
-            return null;
-          })}
+                if (item.type === 'divider') {
+                  return <Sidebar.Divider key={`divider-${index}`} label={item.label} />;
+                }
+
+                if (item.type === 'redirect') {
+                  return (
+                    <Sidebar.Link
+                      key={`redirect-${index}`}
+                      to={item.destination}
+                      icon={faArrowUpRightFromSquare}
+                      name={item.name}
+                    />
+                  );
+                }
+
+                if (item.type === 'route') {
+                  const { route } = item;
+                  const name = typeof route.name === 'function' ? route.name() : route.name!;
+
+                  return route.permission ? (
+                    <ServerCan key={route.path} action={route.permission} matchAny>
+                      <Sidebar.Link
+                        to={to(route.path, `/server/${params.id}`)}
+                        end={route.exact}
+                        icon={route.icon}
+                        name={name}
+                        activeMatches={route.activeMatches}
+                      />
+                    </ServerCan>
+                  ) : (
+                    <Sidebar.Link
+                      key={route.path}
+                      to={to(route.path, `/server/${params.id}`)}
+                      end={route.exact}
+                      icon={route.icon}
+                      name={name}
+                      activeMatches={route.activeMatches}
+                    />
+                  );
+                }
+
+                return null;
+              })}
+            </>
+          )}
         </Sidebar>
       )}
 
       <div
         id='server-root'
-        className={isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto h-full'}
+        className={
+          isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto h-full [scrollbar-gutter:stable]'
+        }
       >
         <Container isNormal={isNormal}>
-          {loading ? (
+          {user?.suspended ? (
+            <ScreenBlock
+              title={t('elements.screenBlock.suspended.title', {})}
+              content={t('elements.screenBlock.suspended.content', {})}
+            />
+          ) : loading ? (
             <Spinner.Centered />
           ) : server.uuid ? (
             <>

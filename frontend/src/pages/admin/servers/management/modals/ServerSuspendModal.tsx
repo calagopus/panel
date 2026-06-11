@@ -2,10 +2,10 @@ import { ModalProps } from '@mantine/core';
 import { z } from 'zod';
 import updateServer from '@/api/admin/servers/updateServer.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Code from '@/elements/Code.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerSuspendModal({
@@ -13,6 +13,7 @@ export default function ServerSuspendModal({
   opened,
   onClose,
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+  const { t } = useTranslations();
   const { addToast } = useToast();
   const { updateServer: updateStoreServer } = useAdminStore();
 
@@ -21,7 +22,7 @@ export default function ServerSuspendModal({
       suspended: true,
     })
       .then(() => {
-        addToast('Server suspended.', 'success');
+        addToast(t('pages.admin.servers.tabs.management.page.suspend.toast.suspended', {}), 'success');
         onClose();
         updateStoreServer({ ...server, isSuspended: true });
         server.isSuspended = true;
@@ -36,13 +37,11 @@ export default function ServerSuspendModal({
       <ConfirmationModal
         opened={opened}
         onClose={() => onClose()}
-        title='Confirm Server Suspension'
-        confirm='Suspend'
+        title={t('pages.admin.servers.tabs.management.page.suspend.modal.title', {})}
+        confirm={t('pages.admin.servers.tabs.management.page.suspend.button', {})}
         onConfirmed={doSuspend}
       >
-        Are you sure you want to suspend <Code>{server.name}</Code>? This will stop the server and prevent it from
-        starting. All running processes will be stopped and the user will not be able to access their files or otherwise
-        manage the server through the panel or API.
+        {t('pages.admin.servers.tabs.management.page.suspend.modal.content', { name: server.name }).md()}
       </ConfirmationModal>
     </>
   );

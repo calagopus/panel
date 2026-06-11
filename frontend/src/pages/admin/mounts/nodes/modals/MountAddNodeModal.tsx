@@ -12,6 +12,7 @@ import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function MountAddNodeModal({
   mount,
@@ -20,6 +21,7 @@ export default function MountAddNodeModal({
   onClose,
 }: ModalProps & { mount: z.infer<typeof adminMountSchema>; refetch: () => void }) {
   const { addToast } = useToast();
+  const { t } = useTranslations();
 
   const [loading, setLoading] = useState(false);
   const [selectedNode, setSelectedNode] = useState<z.infer<typeof adminNodeSchema> | null>(null);
@@ -45,7 +47,7 @@ export default function MountAddNodeModal({
 
     createNodeMount(selectedNode.uuid, mount.uuid)
       .then(() => {
-        addToast('Mount Node added.', 'success');
+        addToast(t('pages.admin.mounts.tabs.nodes.page.toast.added', {}), 'success');
 
         onClose();
         refetch();
@@ -57,12 +59,11 @@ export default function MountAddNodeModal({
   };
 
   return (
-    <Modal title='Add Mount Node' onClose={onClose} opened={opened}>
+    <Modal title={t('pages.admin.mounts.tabs.nodes.page.modal.add.title', {})} onClose={onClose} opened={opened}>
       <Stack>
         <Select
           withAsterisk
-          label='Node'
-          placeholder='Node'
+          label={t('common.form.node', {})}
           value={selectedNode?.uuid}
           onChange={(value) => setSelectedNode(nodes.items.find((n) => n.uuid === value) ?? null)}
           data={nodes.items.map((node) => ({
@@ -77,10 +78,10 @@ export default function MountAddNodeModal({
 
         <ModalFooter>
           <Button onClick={doAdd} loading={loading} disabled={!selectedNode}>
-            Add
+            {t('common.button.add', {})}
           </Button>
           <Button variant='default' onClick={onClose}>
-            Close
+            {t('common.button.close', {})}
           </Button>
         </ModalFooter>
       </Stack>
