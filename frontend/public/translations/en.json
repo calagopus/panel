@@ -2242,6 +2242,10 @@
                         "eggConfigSelfAssignRange": "Self-assign new allocations based on Egg port range (only works if the Egg has a port range and the destination node has compatible allocations)"
                       }
                     }
+                  },
+                  "powerAction": {
+                    "title": "Confirm Power Action",
+                    "content": "Are you sure you want to **{action}** {servers}?"
                   }
                 }
               }

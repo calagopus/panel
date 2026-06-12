@@ -2242,6 +2242,10 @@
                         "eggConfigSelfAssignRange": "Neue Allocations basierend auf dem Egg-Portbereich selbst zuweisen (funktioniert nur, wenn das Egg einen Portbereich hat und die Ziel-Node kompatible Allocations bereitstellt)"
                       }
                     }
+                  },
+                  "powerAction": {
+                    "title": "Energieaktion bestätigen",
+                    "content": "Bist du sicher, dass du **{action}** für {servers} ausführen möchtest?"
                   }
                 }
               }

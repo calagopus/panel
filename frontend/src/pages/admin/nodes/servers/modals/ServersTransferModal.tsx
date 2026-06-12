@@ -10,7 +10,7 @@ import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { Modal } from '@/elements/modals/Modal.tsx';
+import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { compressionLevelLabelMapping, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -213,11 +213,16 @@ export default function ServersTransferModal({
             value={multiplexChannels}
             onChange={(value) => setMultiplexChannels(Number(value) || 0)}
           />
+        </Stack>
 
+        <ModalFooter>
           <Button color='blue' onClick={() => setOpenModal('confirm')} disabled={!selectedNodeUuid}>
             {t('common.button.transfer', {})}
           </Button>
-        </Stack>
+          <Button variant='default' onClick={onClose}>
+            {t('common.button.cancel', {})}
+          </Button>
+        </ModalFooter>
       </Modal>
     </>
   );

@@ -2228,6 +2228,10 @@ const baseTranslations = defineTranslations({
                       },
                     },
                   },
+                  powerAction: {
+                    title: 'Confirm Power Action',
+                    content: 'Are you sure you want to **{action}** {servers}?',
+                  },
                 },
               },
             },

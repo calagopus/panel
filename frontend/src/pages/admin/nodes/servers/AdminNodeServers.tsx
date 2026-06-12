@@ -6,6 +6,7 @@ import sendNodeServersPowerAction from '@/api/admin/nodes/servers/sendNodeServer
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
@@ -33,6 +34,10 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
   const [bulkActionLoading, setBulkActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
   const [allActionLoading, setAllActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
   const [openModal, setOpenModal] = useState<'transfer' | null>(null);
+  const [confirmPowerAction, setConfirmPowerAction] = useState<{
+    action: z.infer<typeof serverPowerAction>;
+    scope: 'bulk' | 'all';
+  } | null>(null);
 
   const {
     data: nodeServers,
@@ -192,6 +197,23 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
       });
   };
 
+  const confirmCount = confirmPowerAction?.scope === 'all' ? (nodeServers?.total ?? 0) : selectedServers.size;
+
+  const onConfirmPowerAction = async () => {
+    if (!confirmPowerAction) {
+      return;
+    }
+
+    const { action, scope } = confirmPowerAction;
+    setConfirmPowerAction(null);
+
+    if (scope === 'all') {
+      await handleAllPowerAction(action);
+    } else {
+      await handleBulkPowerAction(action);
+    }
+  };
+
   useKeyboardShortcuts({
     shortcuts: [
       {
@@ -219,6 +241,21 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
         onClose={() => setOpenModal(null)}
       />
 
+      <ConfirmationModal
+        opened={confirmPowerAction !== null}
+        onClose={() => setConfirmPowerAction(null)}
+        title={t('pages.admin.nodes.tabs.servers.page.modal.powerAction.title', {})}
+        confirm={t('common.button.continue', {})}
+        onConfirmed={onConfirmPowerAction}
+      >
+        {confirmPowerAction
+          ? t('pages.admin.nodes.tabs.servers.page.modal.powerAction.content', {
+              action: t(`common.enum.serverPowerAction.${confirmPowerAction.action}`, {}),
+              servers: tItem('server', confirmCount),
+            }).md()
+          : null}
+      </ConfirmationModal>
+
       <AdminSubContentContainer
         title={t('pages.admin.nodes.tabs.servers.page.title', {})}
         titleOrder={2}
@@ -228,7 +265,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
           <Group gap='sm'>
             <Button
               color='green'
-              onClick={() => handleAllPowerAction('start')}
+              onClick={() => setConfirmPowerAction({ action: 'start', scope: 'all' })}
               loading={allActionLoading === 'start'}
               disabled={(allActionLoading !== null && allActionLoading !== 'start') || nodeServers?.total === 0}
             >
@@ -236,7 +273,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
             </Button>
             <Button
               color='gray'
-              onClick={() => handleAllPowerAction('restart')}
+              onClick={() => setConfirmPowerAction({ action: 'restart', scope: 'all' })}
               loading={allActionLoading === 'restart'}
               disabled={(allActionLoading !== null && allActionLoading !== 'restart') || nodeServers?.total === 0}
             >
@@ -244,7 +281,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
             </Button>
             <Button
               color='red'
-              onClick={() => handleAllPowerAction('stop')}
+              onClick={() => setConfirmPowerAction({ action: 'stop', scope: 'all' })}
               loading={allActionLoading === 'stop'}
               disabled={(allActionLoading !== null && allActionLoading !== 'stop') || nodeServers?.total === 0}
             >
@@ -290,7 +327,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
       <BulkActionBar
         selectedCount={selectedServers.size}
         onClear={() => setSelectedServers(new ObjectSet('uuid'))}
-        onPowerAction={handleBulkPowerAction}
+        onPowerAction={(action) => setConfirmPowerAction({ action, scope: 'bulk' })}
         onTransfer={() => setOpenModal('transfer')}
         loading={bulkActionLoading}
       />

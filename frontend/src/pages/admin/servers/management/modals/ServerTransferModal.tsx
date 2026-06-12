@@ -256,6 +256,9 @@ export default function ServerTransferModal({
               {t('common.button.transfer', {})}
             </Button>
           </ConditionalTooltip>
+          <Button variant='default' onClick={onClose}>
+            {t('common.button.cancel', {})}
+          </Button>
         </ModalFooter>
       </Modal>
     </>
