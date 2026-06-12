@@ -5,7 +5,7 @@ import { z } from 'zod';
 import getLocationDatabaseHosts from '@/api/admin/locations/database-hosts/getLocationDatabaseHosts.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -53,22 +53,20 @@ export default function AdminLocationDatabaseHosts({ location }: { location: z.i
         />
       </AdminCan>
 
-      <ContextMenuProvider>
-        <Table
-          columns={locationDatabaseHostTableColumns()}
-          loading={loading}
-          pagination={locationDatabaseHosts}
-          onPageSelect={setPage}
-        >
-          {locationDatabaseHosts?.data.map((databaseHost) => (
-            <LocationDatabaseHostRow
-              key={databaseHost.databaseHost.uuid}
-              location={location}
-              databaseHost={databaseHost}
-            />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={locationDatabaseHostTableColumns()}
+        loading={loading}
+        pagination={locationDatabaseHosts}
+        onPageSelect={setPage}
+      >
+        {locationDatabaseHosts?.data.map((databaseHost) => (
+          <LocationDatabaseHostRow
+            key={databaseHost.databaseHost.uuid}
+            location={location}
+            databaseHost={databaseHost}
+          />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

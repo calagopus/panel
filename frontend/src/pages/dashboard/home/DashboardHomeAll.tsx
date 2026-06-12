@@ -5,7 +5,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
 import getServers from '@/api/server/getServers.ts';
 import { AdminCan } from '@/elements/Can.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Divider from '@/elements/Divider.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -134,29 +134,27 @@ export default function DashboardHomeAll() {
           <Divider my='md' />
         </>
       )}
-      <ContextMenuProvider>
-        {loading ? (
-          <Spinner.Centered />
-        ) : servers.total === 0 ? (
-          <p className='text-(--mantine-color-dimmed)'>{t('pages.account.home.noServers', {})}</p>
-        ) : (
-          <div className='gap-4 grid md:grid-cols-2'>
-            {servers.data.map((server) => (
-              <ServerItem
-                key={server.uuid}
-                server={server}
-                showContextMenu
-                showGroupAddButton
-                showForeignServerBadge
-                isSelected={selectedServers.has(server.uuid)}
-                onSelectionChange={(selected) => handleServerSelectionChange(server, selected)}
-                onClick={(e) => handleServerClick(server, e)}
-                sKeyPressedRef={sKeyPressedRef}
-              />
-            ))}
-          </div>
-        )}
-      </ContextMenuProvider>
+      {loading ? (
+        <Spinner.Centered />
+      ) : servers.total === 0 ? (
+        <p className='text-(--mantine-color-dimmed)'>{t('pages.account.home.noServers', {})}</p>
+      ) : (
+        <div className='gap-4 grid md:grid-cols-2'>
+          {servers.data.map((server) => (
+            <ServerItem
+              key={server.uuid}
+              server={server}
+              showContextMenu
+              showGroupAddButton
+              showForeignServerBadge
+              isSelected={selectedServers.has(server.uuid)}
+              onSelectionChange={(selected) => handleServerSelectionChange(server, selected)}
+              onClick={(e) => handleServerClick(server, e)}
+              sKeyPressedRef={sKeyPressedRef}
+            />
+          ))}
+        </div>
+      )}
       <BulkActionBar
         selectedCount={selectedServers.size}
         onClear={() => setSelectedServers(new ObjectSet('uuid'))}

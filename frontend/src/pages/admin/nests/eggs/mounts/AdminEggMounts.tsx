@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getEggMounts from '@/api/admin/nests/eggs/mounts/getEggMounts.ts';
 import Button from '@/elements/Button.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -56,13 +56,11 @@ export default function AdminEggMounts({
         onClose={() => setOpenModal(null)}
       />
 
-      <ContextMenuProvider>
-        <Table columns={eggMountTableColumns()} loading={loading} pagination={eggMounts} onPageSelect={setPage}>
-          {eggMounts?.data.map((mount) => (
-            <EggMountRow key={mount.mount.uuid} nest={contextNest} egg={contextEgg} mount={mount} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table columns={eggMountTableColumns()} loading={loading} pagination={eggMounts} onPageSelect={setPage}>
+        {eggMounts?.data.map((mount) => (
+          <EggMountRow key={mount.mount.uuid} nest={contextNest} egg={contextEgg} mount={mount} />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

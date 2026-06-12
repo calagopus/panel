@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getUserOAuthLinks from '@/api/admin/users/oauthLinks/getUserOAuthLinks.ts';
 import Button from '@/elements/Button.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -44,18 +44,16 @@ export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof ful
     >
       <UserOAuthLinkAddModal user={user} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={adminUserOAuthLinkTableColumns()}
-          loading={loading}
-          pagination={userOAuthLinks}
-          onPageSelect={setPage}
-        >
-          {userOAuthLinks?.data.map((userOAuthLink) => (
-            <UserOAuthLinkRow key={userOAuthLink.uuid} user={user} userOAuthLink={userOAuthLink} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={adminUserOAuthLinkTableColumns()}
+        loading={loading}
+        pagination={userOAuthLinks}
+        onPageSelect={setPage}
+      >
+        {userOAuthLinks?.data.map((userOAuthLink) => (
+          <UserOAuthLinkRow key={userOAuthLink.uuid} user={user} userOAuthLink={userOAuthLink} />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

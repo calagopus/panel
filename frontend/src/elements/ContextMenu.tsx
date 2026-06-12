@@ -20,17 +20,18 @@ interface ContextMenuState {
   x: number;
   y: number;
   items: ContextMenuItem[];
+  menuProps?: MenuProps;
 }
 
 interface ContextMenuContextType {
   state: ContextMenuState;
-  showMenu: (x: number, y: number, items: ContextMenuItem[]) => void;
+  showMenu: (x: number, y: number, items: ContextMenuItem[], menuProps?: MenuProps) => void;
   hideMenu: () => void;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | undefined>(undefined);
 
-export const ContextMenuProvider = ({ children, menuProps }: { children: ReactNode; menuProps?: MenuProps }) => {
+export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<ContextMenuState>({
     visible: false,
     x: 0,
@@ -38,8 +39,8 @@ export const ContextMenuProvider = ({ children, menuProps }: { children: ReactNo
     items: [],
   });
 
-  const showMenu = (x: number, y: number, items: ContextMenuItem[]) => {
-    setState({ visible: true, x, y, items });
+  const showMenu = (x: number, y: number, items: ContextMenuItem[], menuProps?: MenuProps) => {
+    setState({ visible: true, x, y, items, menuProps });
   };
 
   const hideMenu = () => {
@@ -68,7 +69,7 @@ export const ContextMenuProvider = ({ children, menuProps }: { children: ReactNo
         withinPortal
         closeOnClickOutside
         transitionProps={{ transition: 'scale-y', duration: 200 }}
-        {...menuProps}
+        {...state.menuProps}
       >
         <Menu.Target>
           <div
@@ -167,6 +168,7 @@ export type ContextMenuChildrenProps = {
 type ContextMenuProps<P = unknown> = {
   items: ContextMenuItem[];
   enabled?: boolean;
+  menuProps?: MenuProps;
   children: (ctx: ContextMenuChildrenProps) => ReactNode;
 } & ({ registry: ContextMenuRegistry<P>; registryProps: P } | { registry?: never; registryProps?: never });
 
@@ -175,6 +177,7 @@ function ContextMenuBase<P>({
   registry,
   registryProps,
   enabled = true,
+  menuProps,
   children,
 }: ContextMenuProps<P>) {
   const context = useContext(ContextMenuContext);
@@ -201,9 +204,9 @@ function ContextMenuBase<P>({
   const openMenu = useCallback(
     (x: number, y: number) => {
       if (!enabled) return;
-      showMenu?.(x, y, items);
+      showMenu?.(x, y, items, menuProps);
     },
-    [items, showMenu, enabled],
+    [items, showMenu, enabled, menuProps],
   );
 
   const hideMenu = useCallback(() => {

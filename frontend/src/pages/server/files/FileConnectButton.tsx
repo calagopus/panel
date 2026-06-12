@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
-import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+import ContextMenu from '@/elements/ContextMenu.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -22,39 +22,38 @@ export default function FileConnectButton({ file }: { file?: string }) {
   return (
     <ServerCan action='files.sftp'>
       <SftpDetailsModal opened={sftpDetailsOpen} onClose={() => setSftpDetailsOpen(false)} />
-      <ContextMenuProvider menuProps={{ position: 'bottom-start' }}>
-        <ContextMenu
-          items={[
-            {
-              icon: faServer,
-              label: t('pages.server.files.button.connectSftp', {}),
-              onClick: () => setSftpDetailsOpen(true),
-              color: 'gray',
-            },
-            {
-              icon: faCode,
-              label: t('pages.server.files.button.connectVscode', {}),
-              onClick: () => window.open(vscodeUrl),
-              color: 'gray',
-            },
-          ]}
-        >
-          {({ openMenu }) => (
-            <Button
-              variant='outline'
-              leftSection={<FontAwesomeIcon icon={faServer} />}
-              rightSection={<FontAwesomeIcon icon={faChevronDown} />}
-              onClick={(e) => {
-                e.stopPropagation();
-                const rect = e.currentTarget.getBoundingClientRect();
-                openMenu(rect.left, rect.bottom);
-              }}
-            >
-              {t('pages.server.files.button.connect', {})}
-            </Button>
-          )}
-        </ContextMenu>
-      </ContextMenuProvider>
+      <ContextMenu
+        menuProps={{ position: 'bottom-start' }}
+        items={[
+          {
+            icon: faServer,
+            label: t('pages.server.files.button.connectSftp', {}),
+            onClick: () => setSftpDetailsOpen(true),
+            color: 'gray',
+          },
+          {
+            icon: faCode,
+            label: t('pages.server.files.button.connectVscode', {}),
+            onClick: () => window.open(vscodeUrl),
+            color: 'gray',
+          },
+        ]}
+      >
+        {({ openMenu }) => (
+          <Button
+            variant='outline'
+            leftSection={<FontAwesomeIcon icon={faServer} />}
+            rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+            onClick={(e) => {
+              e.stopPropagation();
+              const rect = e.currentTarget.getBoundingClientRect();
+              openMenu(rect.left, rect.bottom);
+            }}
+          >
+            {t('pages.server.files.button.connect', {})}
+          </Button>
+        )}
+      </ContextMenu>
     </ServerCan>
   );
 }

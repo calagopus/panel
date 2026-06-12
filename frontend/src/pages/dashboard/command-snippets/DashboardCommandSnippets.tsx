@@ -4,7 +4,7 @@ import { useState } from 'react';
 import getCommandSnippets from '@/api/me/command-snippets/getCommandSnippets.ts';
 import Button from '@/elements/Button.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -56,23 +56,21 @@ export default function DashboardCommandSnippets() {
     >
       <CommandSnippetCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('common.table.columns.eggs', {}),
-            t('common.table.columns.created', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={commandSnippets}
-          onPageSelect={setPage}
-        >
-          {commandSnippets.data.map((snippet) => (
-            <CommandSnippetRow key={snippet.uuid} commandSnippet={snippet} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('common.table.columns.eggs', {}),
+          t('common.table.columns.created', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={commandSnippets}
+        onPageSelect={setPage}
+      >
+        {commandSnippets.data.map((snippet) => (
+          <CommandSnippetRow key={snippet.uuid} commandSnippet={snippet} />
+        ))}
+      </Table>
     </AccountContentContainer>
   );
 }

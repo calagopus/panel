@@ -6,7 +6,7 @@ import getApiKeys from '@/api/me/api-keys/getApiKeys.ts';
 import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -62,26 +62,24 @@ export default function DashboardApiKeys() {
     >
       <ApiKeyCreateOrUpdateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('pages.account.apiKeys.table.columns.key', {}),
-            t('pages.account.apiKeys.table.columns.permissions', {}),
-            t('common.table.columns.lastUsed', {}),
-            t('pages.account.apiKeys.table.columns.expires', {}),
-            t('common.table.columns.created', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={apiKeys}
-          onPageSelect={setPage}
-        >
-          {apiKeys.data.map((key) => (
-            <ApiKeyRow key={key.uuid} apiKey={key} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('pages.account.apiKeys.table.columns.key', {}),
+          t('pages.account.apiKeys.table.columns.permissions', {}),
+          t('common.table.columns.lastUsed', {}),
+          t('pages.account.apiKeys.table.columns.expires', {}),
+          t('common.table.columns.created', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={apiKeys}
+        onPageSelect={setPage}
+      >
+        {apiKeys.data.map((key) => (
+          <ApiKeyRow key={key.uuid} apiKey={key} />
+        ))}
+      </Table>
     </AccountContentContainer>
   );
 }

@@ -27,7 +27,7 @@ import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useWindows } from '@/providers/WindowProvider.tsx';
 import RouterRoutes from '@/RouterRoutes.tsx';
-import ContextMenu, { ContextMenuProvider } from './ContextMenu.tsx';
+import ContextMenu from './ContextMenu.tsx';
 
 type SidebarProps = {
   children: ReactNode;
@@ -50,35 +50,33 @@ function Sidebar({ children, header, footer }: SidebarProps) {
         </ActionIcon>
       </Card>
 
-      <ContextMenuProvider menuProps={{ width: 250 }}>
-        <Drawer
-          opened={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
-          withCloseButton={false}
-          maw='16rem'
-          styles={{ body: { height: '100%' } }}
-        >
-          <CloseButton size='xl' className='absolute! right-4 z-10' onClick={() => setIsMobileMenuOpen(false)} />
+      <Drawer
+        opened={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        withCloseButton={false}
+        maw='16rem'
+        styles={{ body: { height: '100%' } }}
+      >
+        <CloseButton size='xl' className='absolute! right-4 z-10' onClick={() => setIsMobileMenuOpen(false)} />
 
-          <div id='sidebar-content' className='h-full flex flex-col'>
-            {header && <div className='shrink-0'>{header}</div>}
-            <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
-            {footer && <div className='shrink-0 pt-2'>{footer}</div>}
-          </div>
-        </Drawer>
+        <div id='sidebar-content' className='h-full flex flex-col'>
+          {header && <div className='shrink-0'>{header}</div>}
+          <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+          {footer && <div className='shrink-0 pt-2'>{footer}</div>}
+        </div>
+      </Drawer>
 
-        <Card
-          className='my-2 ml-2 top-2 sticky! hidden! lg:block! h-[calc(100vh-16px)] w-64! overflow-hidden transition-[width] duration-200 ease-in-out'
-          p='sm'
-          id='sidebar-desktop'
-        >
-          <div id='sidebar-content' className='h-full flex flex-col'>
-            {header && <div className='shrink-0'>{header}</div>}
-            <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
-            {footer && <div className='shrink-0 pt-2'>{footer}</div>}
-          </div>
-        </Card>
-      </ContextMenuProvider>
+      <Card
+        className='my-2 ml-2 top-2 sticky! hidden! lg:block! h-[calc(100vh-16px)] w-64! overflow-hidden transition-[width] duration-200 ease-in-out'
+        p='sm'
+        id='sidebar-desktop'
+      >
+        <div id='sidebar-content' className='h-full flex flex-col'>
+          {header && <div className='shrink-0'>{header}</div>}
+          <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+          {footer && <div className='shrink-0 pt-2'>{footer}</div>}
+        </div>
+      </Card>
     </>
   );
 }
@@ -104,6 +102,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
 
   return (
     <ContextMenu
+      menuProps={{ width: 250 }}
       items={[
         {
           icon: faWindowRestore,

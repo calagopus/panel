@@ -5,7 +5,7 @@ import { z } from 'zod';
 import getServerAllocations from '@/api/admin/servers/allocations/getServerAllocations.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -51,18 +51,16 @@ export default function AdminServerAllocations({ server }: { server: z.infer<typ
         <ServerAllocationAddModal server={server} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
       </AdminCan>
 
-      <ContextMenuProvider>
-        <Table
-          columns={serverAllocationTableColumns()}
-          loading={loading}
-          pagination={serverAllocations}
-          onPageSelect={setPage}
-        >
-          {serverAllocations?.data.map((allocation) => (
-            <ServerAllocationRow key={allocation.uuid} server={server} allocation={allocation} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={serverAllocationTableColumns()}
+        loading={loading}
+        pagination={serverAllocations}
+        onPageSelect={setPage}
+      >
+        {serverAllocations?.data.map((allocation) => (
+          <ServerAllocationRow key={allocation.uuid} server={server} allocation={allocation} />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

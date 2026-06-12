@@ -5,7 +5,7 @@ import getDatabases from '@/api/server/databases/getDatabases.ts';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -57,26 +57,24 @@ export default function ServerDatabases() {
     >
       <DatabaseCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('common.table.columns.type', {}),
-            t('common.table.columns.address', {}),
-            t('common.table.columns.username', {}),
-            t('common.table.columns.size', {}),
-            t('pages.server.databases.table.columns.locked', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={databases}
-          onPageSelect={setPage}
-        >
-          {databases.data.map((database) => (
-            <DatabaseRow database={database} key={database.uuid} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('common.table.columns.type', {}),
+          t('common.table.columns.address', {}),
+          t('common.table.columns.username', {}),
+          t('common.table.columns.size', {}),
+          t('pages.server.databases.table.columns.locked', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={databases}
+        onPageSelect={setPage}
+      >
+        {databases.data.map((database) => (
+          <DatabaseRow database={database} key={database.uuid} />
+        ))}
+      </Table>
     </ServerContentContainer>
   );
 }

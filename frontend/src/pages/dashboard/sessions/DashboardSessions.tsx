@@ -1,5 +1,5 @@
 import getSessions from '@/api/me/sessions/getSessions.ts';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -25,24 +25,22 @@ export default function DashboardSessions() {
       setSearch={setSearch}
       registry={window.extensionContext.extensionRegistry.pages.dashboard.sessions.container}
     >
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('pages.account.sessions.table.columns.ip', {}),
-            t('pages.account.sessions.table.columns.thisDevice', {}),
-            t('pages.account.sessions.table.columns.userAgent', {}),
-            t('common.table.columns.lastUsed', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={sessions}
-          onPageSelect={setPage}
-        >
-          {sessions.data.map((session) => (
-            <SessionRow key={session.uuid} session={session} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('pages.account.sessions.table.columns.ip', {}),
+          t('pages.account.sessions.table.columns.thisDevice', {}),
+          t('pages.account.sessions.table.columns.userAgent', {}),
+          t('common.table.columns.lastUsed', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={sessions}
+        onPageSelect={setPage}
+      >
+        {sessions.data.map((session) => (
+          <SessionRow key={session.uuid} session={session} />
+        ))}
+      </Table>
     </AccountContentContainer>
   );
 }

@@ -8,7 +8,7 @@ import importSchedule from '@/api/server/schedules/importSchedule.ts';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -123,25 +123,23 @@ export default function ServerSchedules() {
       <ScheduleCreateOrUpdateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
       <ScheduleImportOverlay visible={isDragging} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('pages.server.schedules.table.columns.lastRun', {}),
-            t('pages.server.schedules.table.columns.lastFailure', {}),
-            t('pages.server.schedules.table.columns.status', {}),
-            t('common.table.columns.created', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={schedules}
-          onPageSelect={setPage}
-        >
-          {schedules.data.map((schedule) => (
-            <ScheduleRow key={schedule.uuid} schedule={schedule} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('pages.server.schedules.table.columns.lastRun', {}),
+          t('pages.server.schedules.table.columns.lastFailure', {}),
+          t('pages.server.schedules.table.columns.status', {}),
+          t('common.table.columns.created', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={schedules}
+        onPageSelect={setPage}
+      >
+        {schedules.data.map((schedule) => (
+          <ScheduleRow key={schedule.uuid} schedule={schedule} />
+        ))}
+      </Table>
     </ServerContentContainer>
   );
 }

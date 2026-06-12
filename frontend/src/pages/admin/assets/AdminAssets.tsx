@@ -8,7 +8,7 @@ import getAssets from '@/api/admin/assets/getAssets.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Card from '@/elements/Card.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -152,32 +152,30 @@ export default function AdminAssets() {
         <Spinner.Centered />
       ) : (
         <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
-          <ContextMenuProvider>
-            <Table
-              columns={assetTableColumns()}
-              loading={isLoading}
-              pagination={data}
-              onPageSelect={onPageSelect}
-              allowSelect={false}
-            >
-              {data.data.map((asset) => (
-                <SelectionArea.Selectable key={asset.name} item={asset}>
-                  {(innerRef: Ref<HTMLElement>) => (
-                    <AssetRow
-                      key={asset.name}
-                      asset={asset}
-                      isSelected={selectedAssets.has(asset.name)}
-                      addSelectedAsset={addSelectedAsset}
-                      removeSelectedAsset={removeSelectedAsset}
-                      invalidateAssets={invalidateAssets}
-                      onDirectoryClick={navigateToDirectory}
-                      ref={innerRef as Ref<HTMLTableRowElement>}
-                    />
-                  )}
-                </SelectionArea.Selectable>
-              ))}
-            </Table>
-          </ContextMenuProvider>
+          <Table
+            columns={assetTableColumns()}
+            loading={isLoading}
+            pagination={data}
+            onPageSelect={onPageSelect}
+            allowSelect={false}
+          >
+            {data.data.map((asset) => (
+              <SelectionArea.Selectable key={asset.name} item={asset}>
+                {(innerRef: Ref<HTMLElement>) => (
+                  <AssetRow
+                    key={asset.name}
+                    asset={asset}
+                    isSelected={selectedAssets.has(asset.name)}
+                    addSelectedAsset={addSelectedAsset}
+                    removeSelectedAsset={removeSelectedAsset}
+                    invalidateAssets={invalidateAssets}
+                    onDirectoryClick={navigateToDirectory}
+                    ref={innerRef as Ref<HTMLTableRowElement>}
+                  />
+                )}
+              </SelectionArea.Selectable>
+            ))}
+          </Table>
         </SelectionArea>
       )}
     </AdminContentContainer>

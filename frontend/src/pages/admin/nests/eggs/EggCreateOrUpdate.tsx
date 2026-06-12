@@ -30,7 +30,7 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Card from '@/elements/Card.tsx';
-import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Select from '@/elements/input/Select.tsx';
@@ -660,73 +660,71 @@ export default function EggCreateOrUpdate({
             </Button>
             {contextEgg && (
               <>
-                <ContextMenuProvider menuProps={{ position: 'top', offset: 40 }}>
-                  <ContextMenu
-                    items={[
-                      {
-                        icon: faUpload,
-                        label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.fromFile', {}),
-                        onClick: () => fileInputRef.current?.click(),
-                        color: 'gray',
-                      },
-                      {
-                        icon: faRefresh,
-                        label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.fromRepository', {}),
-                        disabled: !contextEgg.eggRepositoryEgg,
-                        onClick: doRepositoryUpdate,
-                        color: 'gray',
-                      },
-                    ]}
-                  >
-                    {({ openMenu }) => (
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          openMenu(rect.left, rect.bottom);
-                        }}
-                        loading={loading}
-                        variant='outline'
-                        rightSection={<FontAwesomeIcon icon={faChevronDown} />}
-                      >
-                        {t('common.button.update', {})}
-                      </Button>
-                    )}
-                  </ContextMenu>
-                </ContextMenuProvider>
-                <ContextMenuProvider menuProps={{ position: 'top', offset: 40 }}>
-                  <ContextMenu
-                    items={[
-                      {
-                        icon: faFileDownload,
-                        label: t('common.button.exportAs', { format: 'JSON' }),
-                        onClick: () => doExport('json'),
-                        color: 'gray',
-                      },
-                      {
-                        icon: faFileDownload,
-                        label: t('common.button.exportAs', { format: 'YAML' }),
-                        onClick: () => doExport('yaml'),
-                        color: 'gray',
-                      },
-                    ]}
-                  >
-                    {({ openMenu }) => (
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          openMenu(rect.left, rect.bottom);
-                        }}
-                        loading={loading}
-                        variant='outline'
-                        rightSection={<FontAwesomeIcon icon={faChevronDown} />}
-                      >
-                        {t('common.button.export', {})}
-                      </Button>
-                    )}
-                  </ContextMenu>
-                </ContextMenuProvider>
+                <ContextMenu
+                  menuProps={{ position: 'top', offset: 40 }}
+                  items={[
+                    {
+                      icon: faUpload,
+                      label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.fromFile', {}),
+                      onClick: () => fileInputRef.current?.click(),
+                      color: 'gray',
+                    },
+                    {
+                      icon: faRefresh,
+                      label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.fromRepository', {}),
+                      disabled: !contextEgg.eggRepositoryEgg,
+                      onClick: doRepositoryUpdate,
+                      color: 'gray',
+                    },
+                  ]}
+                >
+                  {({ openMenu }) => (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        openMenu(rect.left, rect.bottom);
+                      }}
+                      loading={loading}
+                      variant='outline'
+                      rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+                    >
+                      {t('common.button.update', {})}
+                    </Button>
+                  )}
+                </ContextMenu>
+                <ContextMenu
+                  menuProps={{ position: 'top', offset: 40 }}
+                  items={[
+                    {
+                      icon: faFileDownload,
+                      label: t('common.button.exportAs', { format: 'JSON' }),
+                      onClick: () => doExport('json'),
+                      color: 'gray',
+                    },
+                    {
+                      icon: faFileDownload,
+                      label: t('common.button.exportAs', { format: 'YAML' }),
+                      onClick: () => doExport('yaml'),
+                      color: 'gray',
+                    },
+                  ]}
+                >
+                  {({ openMenu }) => (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        openMenu(rect.left, rect.bottom);
+                      }}
+                      loading={loading}
+                      variant='outline'
+                      rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+                    >
+                      {t('common.button.export', {})}
+                    </Button>
+                  )}
+                </ContextMenu>
 
                 <input
                   type='file'

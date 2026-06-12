@@ -19,7 +19,7 @@ import Alert from '@/elements/Alert.tsx';
 import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
-import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+import ContextMenu from '@/elements/ContextMenu.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
@@ -109,27 +109,40 @@ export default function ScheduleView() {
           <ServerCan action='schedules.update'>
             <Group>
               {scheduleSteps.length > 0 && (
-                <ContextMenuProvider>
-                  <ContextMenu
-                    items={[
-                      {
-                        icon: faPlayCircle,
-                        label: t('pages.server.schedules.button.triggerWithCondition', {}),
-                        onClick: () => doTriggerSchedule(false),
-                        color: 'gray',
-                      },
-                      {
-                        icon: faPlay,
-                        label: t('pages.server.schedules.button.triggerSkipCondition', {}),
-                        onClick: () => doTriggerSchedule(true),
-                        color: 'gray',
-                      },
-                    ]}
-                  >
-                    {({ openMenu }) =>
-                      schedule.enabled ? (
+                <ContextMenu
+                  items={[
+                    {
+                      icon: faPlayCircle,
+                      label: t('pages.server.schedules.button.triggerWithCondition', {}),
+                      onClick: () => doTriggerSchedule(false),
+                      color: 'gray',
+                    },
+                    {
+                      icon: faPlay,
+                      label: t('pages.server.schedules.button.triggerSkipCondition', {}),
+                      onClick: () => doTriggerSchedule(true),
+                      color: 'gray',
+                    },
+                  ]}
+                >
+                  {({ openMenu }) =>
+                    schedule.enabled ? (
+                      <Button
+                        loading={loading}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          openMenu(rect.left, rect.bottom);
+                        }}
+                        color='green'
+                        rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+                      >
+                        {t('pages.server.schedules.button.trigger', {})}
+                      </Button>
+                    ) : (
+                      <Tooltip label={t('pages.server.schedules.view.tooltip.cannotTrigger', {})}>
                         <Button
-                          loading={loading}
+                          disabled
                           onClick={(e) => {
                             e.stopPropagation();
                             const rect = e.currentTarget.getBoundingClientRect();
@@ -140,25 +153,10 @@ export default function ScheduleView() {
                         >
                           {t('pages.server.schedules.button.trigger', {})}
                         </Button>
-                      ) : (
-                        <Tooltip label={t('pages.server.schedules.view.tooltip.cannotTrigger', {})}>
-                          <Button
-                            disabled
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const rect = e.currentTarget.getBoundingClientRect();
-                              openMenu(rect.left, rect.bottom);
-                            }}
-                            color='green'
-                            rightSection={<FontAwesomeIcon icon={faChevronDown} />}
-                          >
-                            {t('pages.server.schedules.button.trigger', {})}
-                          </Button>
-                        </Tooltip>
-                      )
-                    }
-                  </ContextMenu>
-                </ContextMenuProvider>
+                      </Tooltip>
+                    )
+                  }
+                </ContextMenu>
               )}
               <Button
                 onClick={() => setOpenModal('update')}

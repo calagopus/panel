@@ -8,6 +8,7 @@ import UnauthenticatedGuard from './routers/guards/UnauthenticatedGuard.tsx';
 import '@mantine/core/styles.css';
 import { lazy } from 'react';
 import OobeGuard from '@/routers/guards/OobeGuard.tsx';
+import { ContextMenuProvider } from './elements/ContextMenu.tsx';
 import ContentContainer from './elements/containers/ContentContainer.tsx';
 import ScreenBlock from './elements/ScreenBlock.tsx';
 import { useCurrentWindow } from './providers/CurrentWindowProvider.tsx';
@@ -58,60 +59,62 @@ export default function RouterRoutes({ isNormal }: { isNormal: boolean }) {
   }, []);
 
   return (
-    <RelativePageStoreContextProvider createStore={createRelativePageStore}>
-      <AdminStoreContextProvider createStore={createAdminStore}>
-        <ServerStoreContextProvider createStore={createServerStore}>
-          <AuthProvider>
-            {window.extensionContext.extensionRegistry.pages.global.prependedComponents.map((Component, index) => (
-              <Component key={`pagesGlobal-prepended-${index}`} />
-            ))}
+    <ContextMenuProvider>
+      <RelativePageStoreContextProvider createStore={createRelativePageStore}>
+        <AdminStoreContextProvider createStore={createAdminStore}>
+          <ServerStoreContextProvider createStore={createServerStore}>
+            <AuthProvider>
+              {window.extensionContext.extensionRegistry.pages.global.prependedComponents.map((Component, index) => (
+                <Component key={`pagesGlobal-prepended-${index}`} />
+              ))}
 
-            <Suspense fallback={<Spinner.Centered />}>
-              <Routes>
-                {allGlobalRoutes
-                  .filter((route) => !route.filter || route.filter())
-                  .map(({ path, element: Element }) => (
-                    <Route key={path} path={path} element={<Element />} />
-                  ))}
+              <Suspense fallback={<Spinner.Centered />}>
+                <Routes>
+                  {allGlobalRoutes
+                    .filter((route) => !route.filter || route.filter())
+                    .map(({ path, element: Element }) => (
+                      <Route key={path} path={path} element={<Element />} />
+                    ))}
 
-                <Route element={<OobeGuard />}>
-                  <Route path='/oobe/*' element={<OobeRouter />} />
+                  <Route element={<OobeGuard />}>
+                    <Route path='/oobe/*' element={<OobeRouter />} />
 
-                  <Route element={<UnauthenticatedGuard />}>
-                    <Route path='/auth/*' element={<AuthenticationRouter />} />
-                  </Route>
-
-                  <Route element={<AuthenticatedGuard />}>
-                    <Route path='/server/:id/*' element={<ServerRouter isNormal={isNormal} />} />
-                    <Route path='/*' element={<DashboardRouter isNormal={isNormal} />} />
-
-                    <Route element={<AdminGuard />}>
-                      <Route path='/admin/*' element={<AdminRouter isNormal={isNormal} />} />
+                    <Route element={<UnauthenticatedGuard />}>
+                      <Route path='/auth/*' element={<AuthenticationRouter />} />
                     </Route>
+
+                    <Route element={<AuthenticatedGuard />}>
+                      <Route path='/server/:id/*' element={<ServerRouter isNormal={isNormal} />} />
+                      <Route path='/*' element={<DashboardRouter isNormal={isNormal} />} />
+
+                      <Route element={<AdminGuard />}>
+                        <Route path='/admin/*' element={<AdminRouter isNormal={isNormal} />} />
+                      </Route>
+                    </Route>
+
+                    <Route
+                      path='*'
+                      element={
+                        <ContentContainer title={t('elements.screenBlock.notFound.title', {})}>
+                          <ScreenBlock
+                            title={t('elements.screenBlock.notFound.title', {})}
+                            content={t('elements.screenBlock.notFound.content', {})}
+                          />
+                        </ContentContainer>
+                      }
+                    />
                   </Route>
+                </Routes>
+              </Suspense>
 
-                  <Route
-                    path='*'
-                    element={
-                      <ContentContainer title={t('elements.screenBlock.notFound.title', {})}>
-                        <ScreenBlock
-                          title={t('elements.screenBlock.notFound.title', {})}
-                          content={t('elements.screenBlock.notFound.content', {})}
-                        />
-                      </ContentContainer>
-                    }
-                  />
-                </Route>
-              </Routes>
-            </Suspense>
-
-            {window.extensionContext.extensionRegistry.pages.global.appendedComponents.map((Component, index) => (
-              <Component key={`pagesGlobal-appended-${index}`} />
-            ))}
-            <RelativePageListener />
-          </AuthProvider>
-        </ServerStoreContextProvider>
-      </AdminStoreContextProvider>
-    </RelativePageStoreContextProvider>
+              {window.extensionContext.extensionRegistry.pages.global.appendedComponents.map((Component, index) => (
+                <Component key={`pagesGlobal-appended-${index}`} />
+              ))}
+              <RelativePageListener />
+            </AuthProvider>
+          </ServerStoreContextProvider>
+        </AdminStoreContextProvider>
+      </RelativePageStoreContextProvider>
+    </ContextMenuProvider>
   );
 }

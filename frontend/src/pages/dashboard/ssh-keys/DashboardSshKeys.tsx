@@ -5,7 +5,7 @@ import { useState } from 'react';
 import getSshKeys from '@/api/me/ssh-keys/getSshKeys.ts';
 import Button from '@/elements/Button.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -71,23 +71,21 @@ export default function DashboardSshKeys() {
       <SshKeyCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
       <SshKeyImportModal opened={openModal === 'import'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('pages.account.sshKeys.table.columns.fingerprint', {}),
-            t('common.table.columns.created', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={sshKeys}
-          onPageSelect={setPage}
-        >
-          {sshKeys.data.map((key) => (
-            <SshKeyRow key={key.uuid} sshKey={key} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('pages.account.sshKeys.table.columns.fingerprint', {}),
+          t('common.table.columns.created', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={sshKeys}
+        onPageSelect={setPage}
+      >
+        {sshKeys.data.map((key) => (
+          <SshKeyRow key={key.uuid} sshKey={key} />
+        ))}
+      </Table>
     </AccountContentContainer>
   );
 }

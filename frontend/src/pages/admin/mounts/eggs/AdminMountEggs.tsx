@@ -6,7 +6,7 @@ import getMountNestEggs from '@/api/admin/mounts/nest-eggs/getMountNestEggs.ts';
 import deleteEggMount from '@/api/admin/nests/eggs/mounts/deleteEggMount.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
-import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Table from '@/elements/Table.tsx';
@@ -111,19 +111,17 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
         onClose={() => setOpenModal(null)}
       />
 
-      <ContextMenuProvider>
-        <Table columns={[...eggTableColumns(), '']} loading={loading} pagination={mountNestEggs} onPageSelect={setPage}>
-          {mountNestEggs?.data.map((nestEggMount) => (
-            <MountEggRow
-              key={nestEggMount.nestEgg.uuid}
-              nest={nestEggMount.nest}
-              egg={nestEggMount.nestEgg}
-              mount={mount}
-              refetch={refetch}
-            />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table columns={[...eggTableColumns(), '']} loading={loading} pagination={mountNestEggs} onPageSelect={setPage}>
+        {mountNestEggs?.data.map((nestEggMount) => (
+          <MountEggRow
+            key={nestEggMount.nestEgg.uuid}
+            nest={nestEggMount.nest}
+            egg={nestEggMount.nestEgg}
+            mount={mount}
+            refetch={refetch}
+          />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

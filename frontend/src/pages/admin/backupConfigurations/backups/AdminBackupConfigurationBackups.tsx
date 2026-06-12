@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import getBackupConfigurationBackups from '@/api/admin/backup-configurations/backups/getBackupConfigurationBackups.ts';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -33,27 +33,25 @@ export default function AdminBackupConfigurationBackups({
       search={search}
       setSearch={setSearch}
     >
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('common.table.columns.server', {}),
-            t('common.table.columns.node', {}),
-            t('common.table.columns.checksum', {}),
-            t('common.table.columns.size', {}),
-            t('common.table.columns.files', {}),
-            t('common.table.columns.created', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={backupConfigurationBackups}
-          onPageSelect={setPage}
-        >
-          {backupConfigurationBackups?.data.map((backup) => (
-            <AdminBackupConfigurationBackupRow key={backup.uuid} backup={backup} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('common.table.columns.server', {}),
+          t('common.table.columns.node', {}),
+          t('common.table.columns.checksum', {}),
+          t('common.table.columns.size', {}),
+          t('common.table.columns.files', {}),
+          t('common.table.columns.created', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={backupConfigurationBackups}
+        onPageSelect={setPage}
+      >
+        {backupConfigurationBackups?.data.map((backup) => (
+          <AdminBackupConfigurationBackupRow key={backup.uuid} backup={backup} />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

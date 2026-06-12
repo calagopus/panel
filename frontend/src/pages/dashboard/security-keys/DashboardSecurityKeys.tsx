@@ -4,7 +4,7 @@ import { useState } from 'react';
 import getSecurityKeys from '@/api/me/security-keys/getSecurityKeys.ts';
 import Button from '@/elements/Button.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -60,24 +60,22 @@ export default function DashboardSecurityKeys() {
     >
       <SecurityKeyCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('pages.account.securityKeys.table.columns.credentialId', {}),
-            t('common.table.columns.lastUsed', {}),
-            t('common.table.columns.created', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={securityKeys}
-          onPageSelect={setPage}
-        >
-          {securityKeys.data.map((key) => (
-            <SecurityKeyRow key={key.uuid} securityKey={key} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('pages.account.securityKeys.table.columns.credentialId', {}),
+          t('common.table.columns.lastUsed', {}),
+          t('common.table.columns.created', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={securityKeys}
+        onPageSelect={setPage}
+      >
+        {securityKeys.data.map((key) => (
+          <SecurityKeyRow key={key.uuid} securityKey={key} />
+        ))}
+      </Table>
     </AccountContentContainer>
   );
 }

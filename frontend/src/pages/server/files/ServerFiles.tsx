@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
 import Card from '@/elements/Card.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -323,69 +323,67 @@ function ServerFilesComponent() {
           className='h-full'
           disabled={actingFiles.size > 0}
         >
-          <ContextMenuProvider>
-            <Table
-              columns={
-                window.innerWidth < 768
-                  ? [
-                      { name: '' },
-                      {
-                        name: t('common.table.columns.name', {}),
-                        rightSection: <ServerFilesColumnRightSection name='name' />,
-                        onClick: columnOnClick('name', sortMode, setSortMode),
-                      },
-                      {
-                        name: t('common.table.columns.size', {}),
-                        rightSection: (
-                          <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
-                        ),
-                        onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
-                      },
-                    ]
-                  : [
-                      { name: '' },
-                      {
-                        name: t('common.table.columns.name', {}),
-                        rightSection: <ServerFilesColumnRightSection name='name' />,
-                        onClick: columnOnClick('name', sortMode, setSortMode),
-                      },
-                      {
-                        name: t('common.table.columns.size', {}),
-                        rightSection: (
-                          <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
-                        ),
-                        onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
-                      },
-                      {
-                        name: t('pages.server.files.table.columns.modified', {}),
-                        rightSection: <ServerFilesColumnRightSection name='modified' />,
-                      },
-                      { name: '' },
-                    ]
-              }
-              pagination={browsingEntries}
-              onPageSelect={onPageSelect}
-              allowSelect={false}
-            >
-              {browsingEntries.data.map((entry) => (
-                <SelectionArea.Selectable key={entry.name} item={entry}>
-                  {(innerRef: Ref<HTMLElement>) => (
-                    <FileRow
-                      ref={innerRef as Ref<HTMLTableRowElement>}
-                      file={entry}
-                      handleOpen={handleOpen}
-                      isSelected={selectedFiles.has(entry)}
-                      isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
-                      multipleSelectedRef={multipleSelectedRef}
-                      actingFilesRef={actingFilesRef}
-                      clickOnce={fileManagerContext.clickOnce}
-                      preferPhysicalSize={fileManagerContext.preferPhysicalSize}
-                    />
-                  )}
-                </SelectionArea.Selectable>
-              ))}
-            </Table>
-          </ContextMenuProvider>
+          <Table
+            columns={
+              window.innerWidth < 768
+                ? [
+                    { name: '' },
+                    {
+                      name: t('common.table.columns.name', {}),
+                      rightSection: <ServerFilesColumnRightSection name='name' />,
+                      onClick: columnOnClick('name', sortMode, setSortMode),
+                    },
+                    {
+                      name: t('common.table.columns.size', {}),
+                      rightSection: (
+                        <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
+                      ),
+                      onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
+                    },
+                  ]
+                : [
+                    { name: '' },
+                    {
+                      name: t('common.table.columns.name', {}),
+                      rightSection: <ServerFilesColumnRightSection name='name' />,
+                      onClick: columnOnClick('name', sortMode, setSortMode),
+                    },
+                    {
+                      name: t('common.table.columns.size', {}),
+                      rightSection: (
+                        <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
+                      ),
+                      onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
+                    },
+                    {
+                      name: t('pages.server.files.table.columns.modified', {}),
+                      rightSection: <ServerFilesColumnRightSection name='modified' />,
+                    },
+                    { name: '' },
+                  ]
+            }
+            pagination={browsingEntries}
+            onPageSelect={onPageSelect}
+            allowSelect={false}
+          >
+            {browsingEntries.data.map((entry) => (
+              <SelectionArea.Selectable key={entry.name} item={entry}>
+                {(innerRef: Ref<HTMLElement>) => (
+                  <FileRow
+                    ref={innerRef as Ref<HTMLTableRowElement>}
+                    file={entry}
+                    handleOpen={handleOpen}
+                    isSelected={selectedFiles.has(entry)}
+                    isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
+                    multipleSelectedRef={multipleSelectedRef}
+                    actingFilesRef={actingFilesRef}
+                    clickOnce={fileManagerContext.clickOnce}
+                    preferPhysicalSize={fileManagerContext.preferPhysicalSize}
+                  />
+                )}
+              </SelectionArea.Selectable>
+            ))}
+          </Table>
         </SelectionArea>
       )}
     </div>

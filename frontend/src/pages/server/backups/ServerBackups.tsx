@@ -5,7 +5,7 @@ import getBackups from '@/api/server/backups/getBackups.ts';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -57,26 +57,24 @@ export default function ServerBackups() {
     >
       <BackupCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('pages.server.backups.table.columns.checksum', {}),
-            t('common.table.columns.size', {}),
-            t('pages.server.backups.table.columns.files', {}),
-            t('common.table.columns.created', {}),
-            t('pages.server.backups.table.columns.locked', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={backups}
-          onPageSelect={setPage}
-        >
-          {backups.data.map((backup) => (
-            <BackupRow backup={backup} key={backup.uuid} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('pages.server.backups.table.columns.checksum', {}),
+          t('common.table.columns.size', {}),
+          t('pages.server.backups.table.columns.files', {}),
+          t('common.table.columns.created', {}),
+          t('pages.server.backups.table.columns.locked', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={backups}
+        onPageSelect={setPage}
+      >
+        {backups.data.map((backup) => (
+          <BackupRow backup={backup} key={backup.uuid} />
+        ))}
+      </Table>
     </ServerContentContainer>
   );
 }

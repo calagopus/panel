@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { z } from 'zod';
 import getNodeBackups from '@/api/admin/nodes/backups/getNodeBackups.ts';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Table from '@/elements/Table.tsx';
@@ -41,26 +41,24 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
         />
       }
     >
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            t('common.table.columns.name', {}),
-            t('common.table.columns.server', {}),
-            t('common.table.columns.checksum', {}),
-            t('common.table.columns.size', {}),
-            t('common.table.columns.files', {}),
-            t('common.table.columns.created', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={nodeBackups}
-          onPageSelect={setPage}
-        >
-          {nodeBackups?.data.map((backup) => (
-            <NodeBackupRow key={backup.uuid} node={node} backup={backup} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          t('common.table.columns.name', {}),
+          t('common.table.columns.server', {}),
+          t('common.table.columns.checksum', {}),
+          t('common.table.columns.size', {}),
+          t('common.table.columns.files', {}),
+          t('common.table.columns.created', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={nodeBackups}
+        onPageSelect={setPage}
+      >
+        {nodeBackups?.data.map((backup) => (
+          <NodeBackupRow key={backup.uuid} node={node} backup={backup} />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

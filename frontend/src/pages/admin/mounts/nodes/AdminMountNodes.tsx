@@ -6,7 +6,7 @@ import getMountNodes from '@/api/admin/mounts/nodes/getMountNodes.ts';
 import deleteNodeMount from '@/api/admin/nodes/mounts/deleteNodeMount.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
-import ContextMenu, { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Table from '@/elements/Table.tsx';
@@ -108,13 +108,11 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
         onClose={() => setOpenModal(null)}
       />
 
-      <ContextMenuProvider>
-        <Table columns={[...nodeTableColumns(), '']} loading={loading} pagination={mountNodes} onPageSelect={setPage}>
-          {mountNodes?.data.map((nodeMount) => (
-            <MountNodeRow key={nodeMount.node.uuid} node={nodeMount.node} mount={mount} refetch={refetch} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table columns={[...nodeTableColumns(), '']} loading={loading} pagination={mountNodes} onPageSelect={setPage}>
+        {mountNodes?.data.map((nodeMount) => (
+          <MountNodeRow key={nodeMount.node.uuid} node={nodeMount.node} mount={mount} refetch={refetch} />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

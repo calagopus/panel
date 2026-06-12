@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getServerMounts from '@/api/admin/servers/mounts/getServerMounts.ts';
 import Button from '@/elements/Button.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -46,13 +46,11 @@ export default function AdminServerMounts({ server }: { server: z.infer<typeof a
     >
       <ServerMountAddModal server={server} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table columns={serverMountTableColumns()} loading={loading} pagination={serverMounts} onPageSelect={setPage}>
-          {serverMounts?.data.map((mount) => (
-            <ServerMountRow key={mount.mount.uuid} server={server} mount={mount} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table columns={serverMountTableColumns()} loading={loading} pagination={serverMounts} onPageSelect={setPage}>
+        {serverMounts?.data.map((mount) => (
+          <ServerMountRow key={mount.mount.uuid} server={server} mount={mount} />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

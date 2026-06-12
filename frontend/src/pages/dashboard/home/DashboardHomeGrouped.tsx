@@ -6,7 +6,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
 import updateServerGroupsOrder from '@/api/me/servers/groups/updateServerGroupsOrder.ts';
 import Button from '@/elements/Button.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -123,67 +123,65 @@ export default function DashboardHomeGrouped() {
         loading={bulkActionLoading}
       />
 
-      <ContextMenuProvider>
-        {loading ? (
-          <Spinner.Centered />
-        ) : serverGroups.length === 0 ? (
-          <p className='text-gray-400 light:text-gray-600!'>
-            {t('pages.account.home.tabs.groupedServers.page.noGroups', {})}
-          </p>
-        ) : (
-          <DndContainer
-            items={dndServerGroups}
-            callbacks={{
-              onDragEnd: async (items) => {
-                const reorderedGroups = items.map((g, i) => ({ ...g, order: i }));
+      {loading ? (
+        <Spinner.Centered />
+      ) : serverGroups.length === 0 ? (
+        <p className='text-gray-400 light:text-gray-600!'>
+          {t('pages.account.home.tabs.groupedServers.page.noGroups', {})}
+        </p>
+      ) : (
+        <DndContainer
+          items={dndServerGroups}
+          callbacks={{
+            onDragEnd: async (items) => {
+              const reorderedGroups = items.map((g, i) => ({ ...g, order: i }));
 
-                startTransition(() => {
-                  setServerGroups(reorderedGroups);
-                });
+              startTransition(() => {
+                setServerGroups(reorderedGroups);
+              });
 
-                await updateServerGroupsOrder(items.map((g) => g.uuid)).catch((err) => {
-                  addToast(httpErrorToHuman(err), 'error');
-                  setServerGroups(serverGroups);
-                });
-              },
-            }}
-            renderOverlay={(activeItem) =>
-              activeItem ? (
-                <div style={{ cursor: 'grabbing', opacity: 0.95 }} className='shadow-xl rounded-lg'>
-                  <MemoizedServerGroupItem
-                    serverGroup={activeItem}
-                    dragHandleProps={{
-                      style: { cursor: 'grabbing' },
-                    }}
-                    sKeyPressedRef={sKeyPressedRef}
-                  />
-                </div>
-              ) : null
-            }
-          >
-            {(items) => (
-              <div className='flex flex-col gap-3'>
-                {items.map((serverGroup) => (
-                  <SortableItem
-                    key={serverGroup.id}
-                    id={serverGroup.id}
-                    renderItem={({ dragHandleProps }) => (
-                      <MemoizedServerGroupItem
-                        serverGroup={serverGroup}
-                        dragHandleProps={dragHandleProps as unknown as ComponentProps<'button'>}
-                        selectedServers={selectedServers}
-                        onServerSelectionChange={handleServerSelectionChange}
-                        onServerClick={handleServerClick}
-                        sKeyPressedRef={sKeyPressedRef}
-                      />
-                    )}
-                  />
-                ))}
+              await updateServerGroupsOrder(items.map((g) => g.uuid)).catch((err) => {
+                addToast(httpErrorToHuman(err), 'error');
+                setServerGroups(serverGroups);
+              });
+            },
+          }}
+          renderOverlay={(activeItem) =>
+            activeItem ? (
+              <div style={{ cursor: 'grabbing', opacity: 0.95 }} className='shadow-xl rounded-lg'>
+                <MemoizedServerGroupItem
+                  serverGroup={activeItem}
+                  dragHandleProps={{
+                    style: { cursor: 'grabbing' },
+                  }}
+                  sKeyPressedRef={sKeyPressedRef}
+                />
               </div>
-            )}
-          </DndContainer>
-        )}
-      </ContextMenuProvider>
+            ) : null
+          }
+        >
+          {(items) => (
+            <div className='flex flex-col gap-3'>
+              {items.map((serverGroup) => (
+                <SortableItem
+                  key={serverGroup.id}
+                  id={serverGroup.id}
+                  renderItem={({ dragHandleProps }) => (
+                    <MemoizedServerGroupItem
+                      serverGroup={serverGroup}
+                      dragHandleProps={dragHandleProps as unknown as ComponentProps<'button'>}
+                      selectedServers={selectedServers}
+                      onServerSelectionChange={handleServerSelectionChange}
+                      onServerClick={handleServerClick}
+                      sKeyPressedRef={sKeyPressedRef}
+                    />
+                  )}
+                />
+              ))}
+            </div>
+          )}
+        </DndContainer>
+      )}
 
       <div className='flex justify-center mt-4'>
         <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>

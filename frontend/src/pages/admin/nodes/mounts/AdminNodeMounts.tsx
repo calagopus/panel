@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getNodeMounts from '@/api/admin/nodes/mounts/getNodeMounts.ts';
 import Button from '@/elements/Button.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -44,13 +44,11 @@ export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNo
     >
       <NodeMountAddModal node={node} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table columns={nodeMountTableColumns()} loading={loading} pagination={nodeMounts} onPageSelect={setPage}>
-          {nodeMounts?.data.map((mount) => (
-            <NodeMountRow key={mount.mount.uuid} node={node} mount={mount} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table columns={nodeMountTableColumns()} loading={loading} pagination={nodeMounts} onPageSelect={setPage}>
+        {nodeMounts?.data.map((mount) => (
+          <NodeMountRow key={mount.mount.uuid} node={node} mount={mount} />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

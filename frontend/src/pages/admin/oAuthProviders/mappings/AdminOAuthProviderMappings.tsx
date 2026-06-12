@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getOAuthProviderMappings from '@/api/admin/oauth-providers/mappings/getOAuthProviderMappings.ts';
 import Button from '@/elements/Button.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -51,23 +51,21 @@ export default function AdminOAuthProviderMappings({
         onSaved={() => refetch()}
       />
 
-      <ContextMenuProvider>
-        <Table
-          columns={adminOAuthProviderMappingsTableColumns()}
-          loading={loading}
-          pagination={mappings}
-          onPageSelect={setPage}
-        >
-          {mappings?.data.map((mapping) => (
-            <OAuthProviderMappingRow
-              key={mapping.uuid}
-              oauthProvider={oauthProvider}
-              mapping={mapping}
-              onChanged={() => refetch()}
-            />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={adminOAuthProviderMappingsTableColumns()}
+        loading={loading}
+        pagination={mappings}
+        onPageSelect={setPage}
+      >
+        {mappings?.data.map((mapping) => (
+          <OAuthProviderMappingRow
+            key={mapping.uuid}
+            oauthProvider={oauthProvider}
+            mapping={mapping}
+            onChanged={() => refetch()}
+          />
+        ))}
+      </Table>
     </AdminSubContentContainer>
   );
 }

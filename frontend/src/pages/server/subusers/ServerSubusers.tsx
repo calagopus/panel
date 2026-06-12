@@ -6,7 +6,7 @@ import getSubusers from '@/api/server/subusers/getSubusers.ts';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import { ContextMenuProvider } from '@/elements/ContextMenu.tsx';
+
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -63,25 +63,23 @@ export default function ServerSubusers() {
     >
       <SubuserCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
 
-      <ContextMenuProvider>
-        <Table
-          columns={[
-            '',
-            t('common.table.columns.username', {}),
-            t('pages.server.subusers.table.columns.twoFactorEnabled', {}),
-            t('pages.server.subusers.table.columns.permissions', {}),
-            t('pages.server.subusers.table.columns.ignoredFiles', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={subusers}
-          onPageSelect={setPage}
-        >
-          {subusers.data.map((su) => (
-            <SubuserRow subuser={su} key={su.user.uuid} />
-          ))}
-        </Table>
-      </ContextMenuProvider>
+      <Table
+        columns={[
+          '',
+          t('common.table.columns.username', {}),
+          t('pages.server.subusers.table.columns.twoFactorEnabled', {}),
+          t('pages.server.subusers.table.columns.permissions', {}),
+          t('pages.server.subusers.table.columns.ignoredFiles', {}),
+          '',
+        ]}
+        loading={loading}
+        pagination={subusers}
+        onPageSelect={setPage}
+      >
+        {subusers.data.map((su) => (
+          <SubuserRow subuser={su} key={su.user.uuid} />
+        ))}
+      </Table>
     </ServerContentContainer>
   );
 }
