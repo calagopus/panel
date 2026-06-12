@@ -1178,7 +1178,6 @@
           },
           "button": {
             "new": "Ny",
-            "sftpDetails": "SFTP-detaljer",
             "openInNewWindow": "Öppna i nytt fönster",
             "rename": "Döp om",
             "copy": "Kopiera",

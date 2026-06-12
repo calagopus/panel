@@ -1164,7 +1164,6 @@
           },
           "button": {
             "new": "Yeni",
-            "sftpDetails": "SFTP Detayları",
             "openInNewWindow": "Yeni Pencerede Aç",
             "rename": "Yeniden Adlandır",
             "copy": "Kopyala",

@@ -1160,7 +1160,6 @@
           },
           "button": {
             "new": "Mới",
-            "sftpDetails": "Chi Tiết SFTP",
             "openInNewWindow": "Mở Trong Cửa Sổ Mới",
             "rename": "Đổi Tên",
             "copy": "Sao Chép",

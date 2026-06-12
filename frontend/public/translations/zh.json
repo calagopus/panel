@@ -1198,7 +1198,6 @@
           },
           "button": {
             "new": "新增",
-            "sftpDetails": "SFTP 詳細資訊",
             "openInNewWindow": "在新視窗中開啟",
             "rename": "重新命名",
             "copy": "複製",

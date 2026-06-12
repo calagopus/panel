@@ -1173,7 +1173,6 @@
           },
           "button": {
             "new": "Nuevo",
-            "sftpDetails": "Detalles SFTP",
             "openInNewWindow": "Abrir en una nueva ventana",
             "rename": "Renombrar",
             "copy": "Copiar",

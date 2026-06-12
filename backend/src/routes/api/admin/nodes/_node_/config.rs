@@ -28,7 +28,10 @@ mod get {
 
         let mut config = node.fetch_configuration(&state.database).await?;
 
-        if permissions.has_admin_permission("nodes.read-token").is_err() {
+        if permissions
+            .has_admin_permission("nodes.read-token")
+            .is_err()
+        {
             config.token_id = "redacted".into();
             config.token = "redacted".into();
         }

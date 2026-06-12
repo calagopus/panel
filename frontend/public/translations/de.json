@@ -3363,6 +3363,9 @@
           },
           "button": {
             "new": "Neu",
+            "connect": "Verbinden",
+            "connectSftp": "über SFTP",
+            "connectVscode": "über VS Code",
             "openInNewWindow": "In neuem Fenster öffnen",
             "rename": "Umbenennen",
             "copy": "Kopieren",
@@ -3378,10 +3381,7 @@
             "directory": "Verzeichnis",
             "fileFromPull": "Datei aus Pull",
             "fileFromUpload": "Datei aus Upload",
-            "directoryFromUpload": "Verzeichnis aus Upload",
-            "connect": "Verbinden",
-            "connectSftp": "über SFTP",
-            "connectVscode": "über VS Code"
+            "directoryFromUpload": "Verzeichnis aus Upload"
           },
           "actionBar": {
             "copyHere": "Kopiere {files} hierhin",
@@ -3420,8 +3420,8 @@
             "preferPhysicalSize": "Physische Größe statt logischer Größe anzeigen",
             "editorMinimap": "Datei Minimap",
             "editorLineOverflow": "Zeilenumbruch für lange Zeilen im Editor",
-            "imageViewerSmoothing": "Bildglättung (Anti-Aliasing)",
-            "vscodeUriScheme": "VS Code URI-Schema"
+            "vscodeUriScheme": "VS Code URI-Schema",
+            "imageViewerSmoothing": "Bildglättung (Anti-Aliasing)"
           },
           "toast": {
             "operationCancelled": "Vorgang abgebrochen",

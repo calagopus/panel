@@ -784,7 +784,6 @@
           },
           "button": {
             "new": "Nouveau",
-            "sftpDetails": "Détails SFTP",
             "openInNewWindow": "Ouvrir dans une nouvelle fenêtre",
             "rename": "Renommer",
             "copy": "Copier",

@@ -1159,7 +1159,6 @@
           },
           "button": {
             "new": "Создать",
-            "sftpDetails": "Данные SFTP",
             "openInNewWindow": "Открыть в новом окне",
             "rename": "Переименовать",
             "copy": "Копировать",
