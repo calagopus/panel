@@ -9,6 +9,7 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
+import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -19,6 +20,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.infer<typeof adminNestSchema> }) {
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [deleteEggs, setDeleteEggs] = useState(false);
   const { t } = useTranslations();
 
   const form = useForm<z.infer<typeof adminNestUpdateSchema>>({
@@ -40,7 +42,7 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
     updateFn: contextNest
       ? () => updateNest(contextNest.uuid, adminNestUpdateSchema.parse(form.getValues()))
       : undefined,
-    deleteFn: contextNest ? () => deleteNest(contextNest.uuid) : undefined,
+    deleteFn: contextNest ? () => deleteNest(contextNest.uuid, { deleteEggs }) : undefined,
     doUpdate: !!contextNest,
     basePath: '/admin/nests',
     resourceName: t('pages.admin.nests.resourceName', {}),
@@ -74,6 +76,14 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
         onConfirmed={doDelete}
       >
         {t('pages.admin.nests.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
+
+        <Switch
+          className='mt-4'
+          label={t('pages.admin.nests.tabs.general.page.modal.delete.form.deleteEggs', {})}
+          name='deleteEggs'
+          defaultChecked={deleteEggs}
+          onChange={(e) => setDeleteEggs(e.target.checked)}
+        />
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nests.all()))}>

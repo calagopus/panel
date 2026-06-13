@@ -2548,6 +2548,9 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Nest Deletion',
                     content: 'Are you sure you want to delete **{name}**?',
+                    form: {
+                      deleteEggs: 'Do you want to delete all eggs in this nest?',
+                    },
                   },
                 },
               },

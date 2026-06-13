@@ -757,6 +757,27 @@ impl NestEgg {
         row.try_map(|row| Self::map(None, &row))
     }
 
+    pub async fn all_by_nest_uuid(
+        database: &crate::database::Database,
+        nest_uuid: uuid::Uuid,
+    ) -> Result<Vec<Self>, crate::database::DatabaseError> {
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM nest_eggs
+            WHERE nest_eggs.nest_uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(nest_uuid)
+        .fetch_all(database.read())
+        .await?;
+
+        rows.into_iter()
+            .map(|row| Self::map(None, &row))
+            .try_collect_vec()
+    }
+
     pub async fn count_by_nest_uuid(
         database: &crate::database::Database,
         nest_uuid: uuid::Uuid,

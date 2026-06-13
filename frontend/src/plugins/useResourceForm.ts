@@ -81,7 +81,7 @@ export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = u
       return;
     }
 
-    deleteFn(args as DArgs)
+    return deleteFn(args as DArgs)
       .then(() => {
         addToast(t('elements.resource.tooltip.deleted', { resource: resourceName }), 'success');
         navigate(basePath);

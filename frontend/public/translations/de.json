@@ -2550,7 +2550,10 @@
                 "modal": {
                   "delete": {
                     "title": "Löschen des Nests bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
+                    "form": {
+                      "deleteEggs": "Möchtest du alle Eggs in diesem Nest löschen?"
+                    }
                   }
                 }
               }

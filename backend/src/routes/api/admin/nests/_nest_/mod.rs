@@ -94,16 +94,24 @@ mod get {
 mod delete {
     use crate::routes::api::admin::nests::_nest_::GetNest;
     use axum::http::StatusCode;
-    use serde::Serialize;
+    use futures_util::StreamExt;
+    use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
             DeletableModel, admin_activity::GetAdminActivityLogger, nest_egg::NestEgg,
             user::GetPermissionManager,
         },
+        prelude::SqlxErrorExt,
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
+
+    #[derive(ToSchema, Deserialize)]
+    pub struct Payload {
+        #[serde(default)]
+        delete_eggs: bool,
+    }
 
     #[derive(ToSchema, Serialize)]
     struct Response {}
@@ -118,20 +126,67 @@ mod delete {
             description = "The nest ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
-    ))]
+    ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
         nest: GetNest,
         activity_logger: GetAdminActivityLogger,
+        shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("nests.delete")?;
 
-        let nest_eggs = NestEgg::count_by_nest_uuid(&state.database, nest.uuid).await?;
-        if nest_eggs > 0 {
-            return ApiResponse::error("nest has eggs, cannot delete")
-                .with_status(StatusCode::CONFLICT)
-                .ok();
+        if data.delete_eggs {
+            let delete_egg = async |egg: NestEgg| {
+                egg.delete(&state, ()).await?;
+
+                activity_logger
+                    .log(
+                        "nest:egg.delete",
+                        serde_json::json!({
+                            "uuid": egg.uuid,
+                            "nest_uuid": nest.uuid,
+
+                            "author": egg.author,
+                            "name": egg.name,
+                        }),
+                    )
+                    .await;
+
+                Ok::<(), anyhow::Error>(())
+            };
+
+            let mut futures = Vec::new();
+
+            for egg in NestEgg::all_by_nest_uuid(&state.database, nest.uuid).await? {
+                futures.push(delete_egg(egg));
+            }
+
+            let mut results_stream = futures_util::stream::iter(futures).buffer_unordered(5);
+
+            while let Some(result) = results_stream.next().await {
+                if let Err(err) = result {
+                    if err
+                        .downcast_ref::<sqlx::Error>()
+                        .is_some_and(|e| e.is_foreign_key_violation())
+                    {
+                        return ApiResponse::error(
+                            "nest has eggs that are still in use, cannot delete",
+                        )
+                        .with_status(StatusCode::CONFLICT)
+                        .ok();
+                    }
+
+                    return Err(err.into());
+                }
+            }
+        } else {
+            let nest_eggs = NestEgg::count_by_nest_uuid(&state.database, nest.uuid).await?;
+            if nest_eggs > 0 {
+                return ApiResponse::error("nest has eggs, cannot delete")
+                    .with_status(StatusCode::CONFLICT)
+                    .ok();
+            }
         }
 
         nest.delete(&state, ()).await?;
