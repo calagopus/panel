@@ -9,6 +9,7 @@ import {
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import classNames from 'classnames';
 import { memo } from 'react';
 import { z } from 'zod';
 import { isListenableAudio, isOpenableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
@@ -53,7 +54,12 @@ function FileRowIcon({
   file?: z.infer<typeof serverDirectoryEntrySchema> | null;
   className?: string;
 }) {
-  return <FontAwesomeIcon className={className} icon={file ? getFileIcon(file) : faFile} />;
+  return (
+    <FontAwesomeIcon
+      className={classNames(file?.directory ? 'text-yellow-400' : 'text-(--mantine-color-dimmed)', className)}
+      icon={file ? getFileIcon(file) : faFile}
+    />
+  );
 }
 
 export default memo(FileRowIcon);
