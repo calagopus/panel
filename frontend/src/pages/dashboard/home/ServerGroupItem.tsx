@@ -66,6 +66,7 @@ export default function ServerGroupItem({
   onServerSelectionChange,
   onServerClick,
   sKeyPressedRef,
+  getServerTo,
 }: {
   serverGroup: z.infer<typeof userServerGroupSchema>;
   dragHandleProps: ComponentProps<'button'>;
@@ -73,6 +74,7 @@ export default function ServerGroupItem({
   onServerSelectionChange?: (server: z.infer<typeof serverSchema>, selected: boolean) => void;
   onServerClick?: (server: z.infer<typeof serverSchema>, event: React.MouseEvent) => void;
   sKeyPressedRef: React.MutableRefObject<boolean>;
+  getServerTo?: (server: z.infer<typeof serverSchema>) => string;
 }) {
   const { t, tItem } = useTranslations();
   const { updateServerGroup: updateStateServerGroup, removeServerGroup } = useUserStore();
@@ -343,7 +345,12 @@ export default function ServerGroupItem({
                 renderOverlay={(activeServer) =>
                   activeServer ? (
                     <div style={{ cursor: 'grabbing' }}>
-                      <MemoizedServerItem server={activeServer} showForeignServerBadge onGroupRemove={() => null} />
+                      <MemoizedServerItem
+                        server={activeServer}
+                        to={getServerTo?.(activeServer)}
+                        showForeignServerBadge
+                        onGroupRemove={() => null}
+                      />
                     </div>
                   ) : null
                 }
@@ -354,6 +361,7 @@ export default function ServerGroupItem({
                       <SortableItem key={server.id} id={server.id}>
                         <MemoizedServerItem
                           server={server}
+                          to={getServerTo?.(server)}
                           showContextMenu
                           isSelected={selectedServers?.has(server)}
                           onSelectionChange={
