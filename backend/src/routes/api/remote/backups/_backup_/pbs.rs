@@ -22,12 +22,9 @@ mod get {
         token_secret: compact_str::CompactString,
         fingerprint: compact_str::CompactString,
         backup_id_prefix: Option<compact_str::CompactString>,
-        /// The owning server's UUID (used by the node to derive the PBS group).
+
         server_uuid: Option<uuid::Uuid>,
-        /// The PBS snapshot backup-time: the backup's creation time. The node
-        /// uses this identical value at create and at restore/delete to address
-        /// the exact snapshot, so the panel is its single source of truth.
-        backup_time: i64,
+        backup_created: chrono::DateTime<chrono::Utc>,
     }
 
     #[utoipa::path(get, path = "/", responses(
@@ -46,9 +43,6 @@ mod get {
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
         }
-
-        let server_uuid = backup.server.as_ref().map(|server| server.uuid);
-        let backup_time = backup.created.and_utc().timestamp();
 
         let backup_configuration = match backup.0.backup_configuration {
             Some(backup_configuration) => {
@@ -80,8 +74,8 @@ mod get {
             token_secret: pbs_configuration.token_secret,
             fingerprint: pbs_configuration.fingerprint,
             backup_id_prefix: pbs_configuration.backup_id_prefix,
-            server_uuid,
-            backup_time,
+            server_uuid: backup.0.server.map(|server| server.uuid),
+            backup_created: backup.0.created.and_utc(),
         })
         .ok()
     }
