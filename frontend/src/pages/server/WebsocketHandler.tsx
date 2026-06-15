@@ -99,7 +99,7 @@ export default function WebsocketHandler() {
         socket.on('SOCKET_ERROR_STATE', (error: SocketError) => {
           setSocketError(error);
 
-          if (error.type === SocketErrorType.PERMISSION_DENIED) {
+          if (error.type === SocketErrorType.PERMISSION_DENIED && !isTransferring) {
             navigate('/');
             addToast(error.message, 'error');
           }
