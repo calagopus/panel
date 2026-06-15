@@ -22,6 +22,9 @@ export default async (
                 environment: backupConfigurationData.backupConfigs.restic.environment,
               }
             : null,
+          pbs: backupConfigurationData.backupConfigs.pbs
+            ? transformKeysToSnakeCase(backupConfigurationData.backupConfigs.pbs)
+            : null,
         }
       : null,
   });

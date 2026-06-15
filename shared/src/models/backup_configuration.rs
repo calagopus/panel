@@ -165,12 +165,100 @@ impl BackupConfigsRestic {
     }
 }
 
+/// Validates a Proxmox Backup Server TLS certificate fingerprint.
+///
+/// Accepts a SHA-256 fingerprint (64 hex characters = 32 bytes) with or without
+/// colon separators and in any case, e.g. `AB:CD:...` or `abcd...`.
+fn validate_pbs_fingerprint(
+    fingerprint: &compact_str::CompactString,
+    _context: &(),
+) -> Result<(), garde::Error> {
+    let normalized = normalize_pbs_fingerprint(fingerprint);
+
+    if normalized.len() != 64 || !normalized.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return Err(garde::Error::new(
+            "fingerprint must be a SHA-256 hash (64 hex characters, colons optional)",
+        ));
+    }
+
+    Ok(())
+}
+
+/// Normalizes a PBS fingerprint to lowercase hex without separators.
+pub fn normalize_pbs_fingerprint(fingerprint: &str) -> compact_str::CompactString {
+    fingerprint
+        .chars()
+        .filter(|c| !c.is_whitespace() && *c != ':')
+        .map(|c| c.to_ascii_lowercase())
+        .collect()
+}
+
+#[derive(ToSchema, Serialize, Deserialize, Validate, Clone)]
+pub struct BackupConfigsPbs {
+    #[garde(length(chars, min = 1, max = 255), url)]
+    #[schema(min_length = 1, max_length = 255, format = "uri")]
+    pub url: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub datastore: compact_str::CompactString,
+    #[garde(inner(length(chars, min = 1, max = 255)))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub namespace: Option<compact_str::CompactString>,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub username: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub token_name: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub token_secret: compact_str::CompactString,
+    #[garde(custom(validate_pbs_fingerprint))]
+    #[schema(min_length = 64, max_length = 95)]
+    pub fingerprint: compact_str::CompactString,
+    #[garde(inner(length(chars, min = 1, max = 255)))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub backup_id_prefix: Option<compact_str::CompactString>,
+}
+
+impl BackupConfigsPbs {
+    pub async fn encrypt(
+        &mut self,
+        database: &crate::database::Database,
+    ) -> Result<(), anyhow::Error> {
+        self.token_secret = base32::encode(
+            base32::Alphabet::Z,
+            &database.encrypt(self.token_secret.clone()).await?,
+        )
+        .into();
+
+        Ok(())
+    }
+
+    pub async fn decrypt(
+        &mut self,
+        database: &crate::database::Database,
+    ) -> Result<(), anyhow::Error> {
+        if let Some(decoded) = base32::decode(base32::Alphabet::Z, &self.token_secret) {
+            self.token_secret = database.decrypt(decoded).await?;
+        }
+
+        Ok(())
+    }
+
+    pub fn censor(&mut self) {
+        self.token_secret = "".into();
+    }
+}
+
 #[derive(ToSchema, Serialize, Deserialize, Default, Validate, Clone)]
 pub struct BackupConfigs {
     #[garde(dive)]
     pub s3: Option<BackupConfigsS3>,
     #[garde(dive)]
     pub restic: Option<BackupConfigsRestic>,
+    #[garde(dive)]
+    pub pbs: Option<BackupConfigsPbs>,
 }
 
 impl BackupConfigs {
@@ -183,6 +271,9 @@ impl BackupConfigs {
         }
         if let Some(restic) = &mut self.restic {
             restic.encrypt(database).await?;
+        }
+        if let Some(pbs) = &mut self.pbs {
+            pbs.encrypt(database).await?;
         }
 
         Ok(())
@@ -198,6 +289,9 @@ impl BackupConfigs {
         if let Some(restic) = &mut self.restic {
             restic.decrypt(database).await?;
         }
+        if let Some(pbs) = &mut self.pbs {
+            pbs.decrypt(database).await?;
+        }
 
         Ok(())
     }
@@ -208,6 +302,9 @@ impl BackupConfigs {
         }
         if let Some(restic) = &mut self.restic {
             restic.censor();
+        }
+        if let Some(pbs) = &mut self.pbs {
+            pbs.censor();
         }
     }
 }
@@ -678,4 +775,88 @@ pub struct AdminApiBackupConfiguration {
     pub backup_configs: BackupConfigs,
 
     pub created: chrono::DateTime<chrono::Utc>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::server_backup::BackupDisk;
+
+    fn valid_pbs() -> BackupConfigsPbs {
+        BackupConfigsPbs {
+            url: "https://pbs.example.com:8007".into(),
+            datastore: "store".into(),
+            namespace: None,
+            username: "root@pam".into(),
+            token_name: "calagopus".into(),
+            token_secret: "super-secret".into(),
+            fingerprint: "ab".repeat(32).into(),
+            backup_id_prefix: None,
+        }
+    }
+
+    #[test]
+    fn backup_disk_serializes_pbs_as_kebab_case() {
+        assert_eq!(
+            serde_json::to_string(&BackupDisk::ProxmoxBackupServer).unwrap(),
+            "\"proxmox-backup-server\""
+        );
+        assert_eq!(
+            serde_json::from_str::<BackupDisk>("\"proxmox-backup-server\"").unwrap(),
+            BackupDisk::ProxmoxBackupServer
+        );
+    }
+
+    #[test]
+    fn pbs_disk_maps_to_wings_adapter() {
+        assert!(matches!(
+            BackupDisk::ProxmoxBackupServer.to_wings_adapter(),
+            wings_api::BackupAdapter::ProxmoxBackupServer
+        ));
+    }
+
+    #[test]
+    fn fingerprint_normalization_strips_colons_and_lowercases() {
+        assert_eq!(normalize_pbs_fingerprint("AB:CD:ef"), "abcdef");
+        assert_eq!(normalize_pbs_fingerprint("ab cd"), "abcd");
+    }
+
+    #[test]
+    fn valid_config_passes_validation() {
+        assert!(valid_pbs().validate().is_ok());
+
+        // Colon-separated, upper-case fingerprint is also accepted.
+        let mut colons = valid_pbs();
+        colons.fingerprint = std::iter::repeat_n("AB", 32)
+            .collect::<Vec<_>>()
+            .join(":")
+            .into();
+        assert!(colons.validate().is_ok());
+    }
+
+    #[test]
+    fn invalid_fields_fail_validation() {
+        let mut bad_url = valid_pbs();
+        bad_url.url = "not-a-url".into();
+        assert!(bad_url.validate().is_err());
+
+        let mut short_fp = valid_pbs();
+        short_fp.fingerprint = "abcd".into();
+        assert!(short_fp.validate().is_err());
+
+        let mut non_hex_fp = valid_pbs();
+        non_hex_fp.fingerprint = "zz".repeat(32).into();
+        assert!(non_hex_fp.validate().is_err());
+
+        let mut empty_secret = valid_pbs();
+        empty_secret.token_secret = "".into();
+        assert!(empty_secret.validate().is_err());
+    }
+
+    #[test]
+    fn censor_blanks_token_secret() {
+        let mut config = valid_pbs();
+        config.censor();
+        assert_eq!(config.token_secret, "");
+    }
 }

@@ -68,6 +68,8 @@ pub enum BackupAdapter {
     Zfs,
     #[serde(rename = "restic")]
     Restic,
+    #[serde(rename = "proxmox-backup-server")]
+    ProxmoxBackupServer,
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]

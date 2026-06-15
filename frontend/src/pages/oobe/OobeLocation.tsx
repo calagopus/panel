@@ -19,12 +19,14 @@ import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
 import { backupDiskLabelMapping } from '@/lib/enums.ts';
 import {
+  adminBackupConfigurationPbsSchema,
   adminBackupConfigurationResticSchema,
   adminBackupConfigurationS3Schema,
 } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { oobeLocationSchema } from '@/lib/schemas/oobe.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
+import BackupPBS from '../admin/backupConfigurations/forms/BackupPBS.tsx';
 import BackupRestic from '../admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '../admin/backupConfigurations/forms/BackupS3.tsx';
 
@@ -75,15 +77,40 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
     validate: zod4Resolver(adminBackupConfigurationResticSchema),
   });
 
+  const backupConfigPbsForm = useForm<z.infer<typeof adminBackupConfigurationPbsSchema>>({
+    initialValues: existingBackupConfig?.backupConfigs?.pbs
+      ? {
+          ...existingBackupConfig.backupConfigs.pbs,
+          namespace: existingBackupConfig.backupConfigs.pbs.namespace ?? '',
+          backupIdPrefix: existingBackupConfig.backupConfigs.pbs.backupIdPrefix ?? '',
+        }
+      : {
+          url: '',
+          datastore: '',
+          namespace: '',
+          username: '',
+          tokenName: '',
+          tokenSecret: '',
+          fingerprint: '',
+          backupIdPrefix: '',
+        },
+    validateInputOnBlur: true,
+    validate: zod4Resolver(adminBackupConfigurationPbsSchema),
+  });
+
   const onSubmit = async () => {
     setLoading(true);
 
-    const backupConfigs = {
-      s3: form.values.backupDisk === 's3' ? backupConfigS3Form.values : null,
-      restic: form.values.backupDisk === 'restic' ? backupConfigResticForm.values : null,
-    };
-
     try {
+      const backupConfigs = {
+        s3: form.values.backupDisk === 's3' ? backupConfigS3Form.values : null,
+        restic: form.values.backupDisk === 'restic' ? backupConfigResticForm.values : null,
+        pbs:
+          form.values.backupDisk === 'proxmox-backup-server'
+            ? adminBackupConfigurationPbsSchema.parse(backupConfigPbsForm.values)
+            : null,
+      };
+
       if (isEdit) {
         await updateBackupConfiguration(existingBackupConfig!.uuid, {
           name: form.values.backupName,
@@ -104,7 +131,10 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
           name: form.values.backupName,
           description: null,
           maintenanceEnabled: false,
-          shared: form.values.backupDisk === 's3' || form.values.backupDisk === 'restic',
+          shared:
+            form.values.backupDisk === 's3' ||
+            form.values.backupDisk === 'restic' ||
+            form.values.backupDisk === 'proxmox-backup-server',
           backupDisk: form.values.backupDisk,
           backupConfigs,
         });
@@ -195,6 +225,7 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
             </div>
             {form.values.backupDisk === 's3' ? <BackupS3 form={backupConfigS3Form} /> : null}
             {form.values.backupDisk === 'restic' ? <BackupRestic form={backupConfigResticForm} /> : null}
+            {form.values.backupDisk === 'proxmox-backup-server' ? <BackupPBS form={backupConfigPbsForm} /> : null}
           </div>
 
           <Group justify='flex-end'>

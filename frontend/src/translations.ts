@@ -3095,6 +3095,7 @@ const baseTranslations = defineTranslations({
                   btrfs:
                     'Btrfs requires additional setup on the node to work, please [see the documentation]({docsUrl}) for more details.',
                   zfs: 'ZFS requires additional setup on the node to work, please [see the documentation]({docsUrl}) for more details.',
+                  pbs: 'The provided API token needs the following datastore ACLs: **DatastoreAudit** for usage and listing, **DatastoreBackup** for writing backups, and **DatastoreAdmin** (or equivalent prune/delete permissions) if backup deletion or pruning is enabled.',
                 },
                 form: {
                   backupDisk: 'Backup Disk',
@@ -3135,6 +3136,18 @@ const baseTranslations = defineTranslations({
                     button: {
                       add: 'Add Prune Job',
                     },
+                  },
+                },
+                pbs: {
+                  title: 'Proxmox Backup Server Settings',
+                  form: {
+                    url: 'Server URL',
+                    datastore: 'Datastore',
+                    namespace: 'Namespace',
+                    tokenName: 'Token Name',
+                    tokenSecret: 'Token Secret',
+                    fingerprint: 'TLS Certificate Fingerprint',
+                    backupIdPrefix: 'Backup ID Prefix',
                   },
                 },
               },

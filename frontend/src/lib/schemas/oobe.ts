@@ -18,7 +18,7 @@ export const oobeLocationSchema = z.object({
   locationName: z.string().min(3).max(255),
   locationFlag: z.preprocess(nullableString, z.string().lowercase().length(2).nullable()),
   backupName: z.string().min(3).max(255),
-  backupDisk: z.enum(['local', 's3', 'ddup-bak', 'btrfs', 'zfs', 'restic']),
+  backupDisk: z.enum(['local', 's3', 'ddup-bak', 'btrfs', 'zfs', 'restic', 'proxmox-backup-server']),
 });
 
 export const oobeLoginSchema = z.object({

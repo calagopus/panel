@@ -49,7 +49,15 @@ export const bytea = customType<{
 export const databaseTypeEnum = pgEnum('database_type', ['MYSQL', 'POSTGRES', 'MONGODB']);
 export const serverStatusEnum = pgEnum('server_status', ['INSTALLING', 'INSTALL_FAILED', 'RESTORING_BACKUP']);
 export const serverAutoStartBehaviorEnum = pgEnum('server_auto_start_behavior', ['ALWAYS', 'UNLESS_STOPPED', 'NEVER']);
-export const backupDiskEnum = pgEnum('backup_disk', ['LOCAL', 'S3', 'DDUP_BAK', 'BTRFS', 'ZFS', 'RESTIC']);
+export const backupDiskEnum = pgEnum('backup_disk', [
+  'LOCAL',
+  'S3',
+  'DDUP_BAK',
+  'BTRFS',
+  'ZFS',
+  'RESTIC',
+  'PROXMOX_BACKUP_SERVER',
+]);
 export const userToastPositionEnum = pgEnum('user_toast_position', [
   'TOP_LEFT',
   'TOP_CENTER',

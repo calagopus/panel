@@ -23,17 +23,34 @@ export const adminBackupConfigurationS3Schema = z.object({
   partSize: z.number().min(0),
 });
 
+export const adminBackupConfigurationPbsSchema = z.object({
+  url: z.url({ protocol: /^https?$/ }),
+  datastore: z.string().min(1).max(255),
+  namespace: z.preprocess(nullableString, z.string().max(255).nullable()),
+  username: z.string().min(1).max(255),
+  tokenName: z.string().min(1).max(255),
+  tokenSecret: z.string(),
+  fingerprint: z
+    .string()
+    .regex(
+      /^(?:[0-9a-fA-F]{2}:){31}[0-9a-fA-F]{2}$|^[0-9a-fA-F]{64}$/,
+      'Must be a SHA-256 fingerprint (64 hex characters, colons optional)',
+    ),
+  backupIdPrefix: z.preprocess(nullableString, z.string().max(255).nullable()),
+});
+
 export const adminBackupConfigurationSchema = z.object({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),
   maintenanceEnabled: z.boolean(),
   shared: z.boolean(),
-  backupDisk: z.enum(['local', 's3', 'ddup-bak', 'btrfs', 'zfs', 'restic']),
+  backupDisk: z.enum(['local', 's3', 'ddup-bak', 'btrfs', 'zfs', 'restic', 'proxmox-backup-server']),
   backupConfigs: z
     .object({
       s3: adminBackupConfigurationS3Schema.nullable(),
       restic: adminBackupConfigurationResticSchema.nullable(),
+      pbs: adminBackupConfigurationPbsSchema.nullable(),
     })
     .optional(),
   created: z.date(),

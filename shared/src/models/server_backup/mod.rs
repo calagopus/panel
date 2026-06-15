@@ -28,6 +28,7 @@ pub enum BackupDisk {
     Btrfs,
     Zfs,
     Restic,
+    ProxmoxBackupServer,
 }
 
 impl BackupDisk {
@@ -40,6 +41,7 @@ impl BackupDisk {
             BackupDisk::Btrfs => wings_api::BackupAdapter::Btrfs,
             BackupDisk::Zfs => wings_api::BackupAdapter::Zfs,
             BackupDisk::Restic => wings_api::BackupAdapter::Restic,
+            BackupDisk::ProxmoxBackupServer => wings_api::BackupAdapter::ProxmoxBackupServer,
         }
     }
 }

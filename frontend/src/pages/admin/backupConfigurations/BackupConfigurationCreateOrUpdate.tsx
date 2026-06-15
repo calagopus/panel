@@ -20,11 +20,13 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { backupDiskLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
+  adminBackupConfigurationPbsSchema,
   adminBackupConfigurationResticSchema,
   adminBackupConfigurationS3Schema,
   adminBackupConfigurationSchema,
   adminBackupConfigurationUpdateSchema,
 } from '@/lib/schemas/admin/backupConfigurations.ts';
+import BackupPBS from '@/pages/admin/backupConfigurations/forms/BackupPBS.tsx';
 import BackupRestic from '@/pages/admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '@/pages/admin/backupConfigurations/forms/BackupS3.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
@@ -75,6 +77,21 @@ export default function BackupConfigurationCreateOrUpdate({
     validate: zod4Resolver(adminBackupConfigurationResticSchema),
   });
 
+  const backupConfigPbsForm = useForm<z.infer<typeof adminBackupConfigurationPbsSchema>>({
+    initialValues: {
+      url: '',
+      datastore: '',
+      namespace: '',
+      username: '',
+      tokenName: '',
+      tokenSecret: '',
+      fingerprint: '',
+      backupIdPrefix: '',
+    },
+    validateInputOnBlur: true,
+    validate: zod4Resolver(adminBackupConfigurationPbsSchema),
+  });
+
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
     Partial<z.infer<typeof adminBackupConfigurationUpdateSchema>>,
     z.infer<typeof adminBackupConfigurationSchema>
@@ -90,6 +107,9 @@ export default function BackupConfigurationCreateOrUpdate({
           restic: backupConfigResticForm.isDirty()
             ? adminBackupConfigurationResticSchema.parse(backupConfigResticForm.getValues())
             : null,
+          pbs: backupConfigPbsForm.isDirty()
+            ? adminBackupConfigurationPbsSchema.parse(backupConfigPbsForm.getValues())
+            : null,
         },
       }),
     updateFn: contextBackupConfiguration
@@ -102,6 +122,9 @@ export default function BackupConfigurationCreateOrUpdate({
                 : null,
               restic: backupConfigResticForm.isDirty()
                 ? adminBackupConfigurationResticSchema.parse(backupConfigResticForm.getValues())
+                : null,
+              pbs: backupConfigPbsForm.isDirty()
+                ? adminBackupConfigurationPbsSchema.parse(backupConfigPbsForm.getValues())
                 : null,
             },
           })
@@ -128,6 +151,13 @@ export default function BackupConfigurationCreateOrUpdate({
         backupConfigResticForm.setValues({
           ...contextBackupConfiguration.backupConfigs.restic,
           pruneJobs: contextBackupConfiguration.backupConfigs.restic.pruneJobs ?? [],
+        });
+      }
+      if (contextBackupConfiguration.backupConfigs?.pbs) {
+        backupConfigPbsForm.setValues({
+          ...contextBackupConfiguration.backupConfigs.pbs,
+          namespace: contextBackupConfiguration.backupConfigs.pbs.namespace ?? '',
+          backupIdPrefix: contextBackupConfiguration.backupConfigs.pbs.backupIdPrefix ?? '',
         });
       }
     }
@@ -173,6 +203,11 @@ export default function BackupConfigurationCreateOrUpdate({
           {t('pages.admin.backupConfigurations.tabs.general.page.alert.zfs', {
             docsUrl: 'https://calagopus.com/docs/wings/disk-limiters/zfs-dataset',
           }).md()}
+        </Alert>
+      )}
+      {form.values.backupDisk === 'proxmox-backup-server' && (
+        <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+          {t('pages.admin.backupConfigurations.tabs.general.page.alert.pbs', {}).md()}
         </Alert>
       )}
 
@@ -230,7 +265,9 @@ export default function BackupConfigurationCreateOrUpdate({
                 ((form.getValues().backupDisk === 's3' || backupConfigS3Form.isDirty()) &&
                   !backupConfigS3Form.isValid()) ||
                 ((form.getValues().backupDisk === 'restic' || backupConfigResticForm.isDirty()) &&
-                  !backupConfigResticForm.isValid())
+                  !backupConfigResticForm.isValid()) ||
+                ((form.getValues().backupDisk === 'proxmox-backup-server' || backupConfigPbsForm.isDirty()) &&
+                  !backupConfigPbsForm.isValid())
               }
               loading={loading}
             >
@@ -276,6 +313,9 @@ export default function BackupConfigurationCreateOrUpdate({
         {(form.getValues().backupDisk === 'restic' ||
           backupConfigResticForm.isDirty() ||
           backupConfigResticForm.isTouched()) && <BackupRestic form={backupConfigResticForm} />}
+        {(form.getValues().backupDisk === 'proxmox-backup-server' ||
+          backupConfigPbsForm.isDirty() ||
+          backupConfigPbsForm.isTouched()) && <BackupPBS form={backupConfigPbsForm} />}
       </form>
     </AdminContentContainer>
   );
