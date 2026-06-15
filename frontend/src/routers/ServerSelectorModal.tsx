@@ -1,15 +1,13 @@
 import { faServer } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ScrollArea, Stack, Tabs, Text } from '@mantine/core';
-import { ComponentProps, memo, startTransition, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
-import updateServerGroupsOrder from '@/api/me/servers/groups/updateServerGroupsOrder.ts';
 import getServers from '@/api/server/getServers.ts';
 import Divider from '@/elements/Divider.tsx';
-import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -25,12 +23,7 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import serverRoutes from '@/routers/routes/serverRoutes.ts';
 
-interface DndServerGroup extends z.infer<typeof userServerGroupSchema>, DndItem {
-  id: string;
-}
-
-const MemoizedServerGroupItem = memo(ServerGroupItem);
-const DUMMY_S_KEY_REF = { current: false } as React.MutableRefObject<boolean>;
+const DUMMY_S_KEY_REF = { current: false } as React.RefObject<boolean>;
 
 function AllServersView({ getServerTo }: { getServerTo: (server: z.infer<typeof serverSchema>) => string }) {
   const { t } = useTranslations();
@@ -94,7 +87,6 @@ function GroupedServersView({ getServerTo }: { getServerTo: (server: z.infer<typ
   }, []);
 
   const sortedServerGroups = useMemo(() => [...serverGroups].sort((a, b) => a.order - b.order), [serverGroups]);
-  const dndServerGroups: DndServerGroup[] = sortedServerGroups.map((g) => ({ ...g, id: g.uuid }));
 
   if (loading) return <Spinner.Centered />;
 
@@ -107,50 +99,16 @@ function GroupedServersView({ getServerTo }: { getServerTo: (server: z.infer<typ
   }
 
   return (
-    <DndContainer
-      items={dndServerGroups}
-      callbacks={{
-        onDragEnd: async (items) => {
-          const reorderedGroups = items.map((g, i) => ({ ...g, order: i }));
-          startTransition(() => setServerGroups(reorderedGroups));
-          await updateServerGroupsOrder(items.map((g) => g.uuid)).catch((err) => {
-            addToast(httpErrorToHuman(err), 'error');
-            setServerGroups(serverGroups);
-          });
-        },
-      }}
-      renderOverlay={(activeItem) =>
-        activeItem ? (
-          <div style={{ cursor: 'grabbing', opacity: 0.95 }} className='shadow-xl rounded-lg'>
-            <MemoizedServerGroupItem
-              serverGroup={activeItem}
-              dragHandleProps={{ style: { cursor: 'grabbing' } }}
-              sKeyPressedRef={DUMMY_S_KEY_REF}
-              getServerTo={getServerTo}
-            />
-          </div>
-        ) : null
-      }
-    >
-      {(items) => (
-        <div className='flex flex-col gap-3'>
-          {items.map((serverGroup) => (
-            <SortableItem
-              key={serverGroup.id}
-              id={serverGroup.id}
-              renderItem={({ dragHandleProps }) => (
-                <MemoizedServerGroupItem
-                  serverGroup={serverGroup}
-                  dragHandleProps={dragHandleProps as unknown as ComponentProps<'button'>}
-                  sKeyPressedRef={DUMMY_S_KEY_REF}
-                  getServerTo={getServerTo}
-                />
-              )}
-            />
-          ))}
-        </div>
-      )}
-    </DndContainer>
+    <div className='flex flex-col gap-3'>
+      {sortedServerGroups.map((serverGroup) => (
+        <ServerGroupItem
+          key={serverGroup.uuid}
+          serverGroup={serverGroup}
+          sKeyPressedRef={DUMMY_S_KEY_REF}
+          getServerTo={getServerTo}
+        />
+      ))}
+    </div>
   );
 }
 

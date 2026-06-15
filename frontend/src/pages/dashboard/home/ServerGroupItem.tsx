@@ -69,11 +69,11 @@ export default function ServerGroupItem({
   getServerTo,
 }: {
   serverGroup: z.infer<typeof userServerGroupSchema>;
-  dragHandleProps: ComponentProps<'button'>;
+  dragHandleProps?: ComponentProps<'button'>;
   selectedServers?: ObjectSet<z.infer<typeof serverSchema>, 'uuid'>;
   onServerSelectionChange?: (server: z.infer<typeof serverSchema>, selected: boolean) => void;
   onServerClick?: (server: z.infer<typeof serverSchema>, event: React.MouseEvent) => void;
-  sKeyPressedRef: React.MutableRefObject<boolean>;
+  sKeyPressedRef: React.RefObject<boolean>;
   getServerTo?: (server: z.infer<typeof serverSchema>) => string;
 }) {
   const { t, tItem } = useTranslations();
@@ -197,16 +197,18 @@ export default function ServerGroupItem({
         >
           <div className='flex flex-col my-3 sm:my-0'>
             <div className='flex flex-row'>
-              <ActionIcon
-                size='md'
-                variant='subtle'
-                color='gray'
-                style={{ cursor: 'grab', flexShrink: 0 }}
-                className='text-gray-400! light:text-gray-500!'
-                {...dragHandleProps}
-              >
-                <FontAwesomeIcon icon={faGripVertical} style={{ fontSize: 16 }} />
-              </ActionIcon>
+              {dragHandleProps && (
+                <ActionIcon
+                  size='md'
+                  variant='subtle'
+                  color='gray'
+                  style={{ cursor: 'grab', flexShrink: 0 }}
+                  className='text-gray-400! light:text-gray-500!'
+                  {...dragHandleProps}
+                >
+                  <FontAwesomeIcon icon={faGripVertical} style={{ fontSize: 16 }} />
+                </ActionIcon>
+              )}
 
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
