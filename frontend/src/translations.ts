@@ -3144,7 +3144,7 @@ const baseTranslations = defineTranslations({
                     url: 'Server URL',
                     datastore: 'Datastore',
                     namespace: 'Namespace',
-                    tokenName: 'Token Name',
+                    tokenId: 'Token ID',
                     tokenSecret: 'Token Secret',
                     fingerprint: 'TLS Certificate Fingerprint',
                     backupIdPrefix: 'Backup ID Prefix',

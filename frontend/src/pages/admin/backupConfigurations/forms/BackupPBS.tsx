@@ -16,12 +16,10 @@ export default function BackupPBS({
 }) {
   const { t } = useTranslations();
 
-  const prefix = 'pages.admin.backupConfigurations.tabs.general.page.pbs';
-
   return (
     <Stack gap='xs' mt='md'>
       <Stack gap={0}>
-        <Title order={2}>{t(`${prefix}.title`, {})}</Title>
+        <Title order={2}>{t('pages.admin.backupConfigurations.tabs.general.page.pbs.title', {})}</Title>
         <Divider />
       </Stack>
 
@@ -29,14 +27,14 @@ export default function BackupPBS({
         <Group grow>
           <TextInput
             withAsterisk
-            label={t(`${prefix}.form.url`, {})}
+            label={t('pages.admin.backupConfigurations.tabs.general.page.pbs.form.url', {})}
             placeholder='https://pbs.example.com:8007'
             key={form.key('url')}
             {...form.getInputProps('url')}
           />
           <TextInput
             withAsterisk
-            label={t(`${prefix}.form.datastore`, {})}
+            label={t('pages.admin.backupConfigurations.tabs.general.page.pbs.form.datastore', {})}
             key={form.key('datastore')}
             {...form.getInputProps('datastore')}
           />
@@ -45,42 +43,36 @@ export default function BackupPBS({
         <Group grow>
           <TextInput
             withAsterisk
-            label={t('common.form.username', {})}
-            placeholder='root@pam'
-            key={form.key('username')}
-            {...form.getInputProps('username')}
+            label={t('pages.admin.backupConfigurations.tabs.general.page.pbs.form.tokenId', {})}
+            placeholder='root@pam!mytoken'
+            key={form.key('tokenId')}
+            {...form.getInputProps('tokenId')}
           />
-          <TextInput
-            withAsterisk
-            label={t(`${prefix}.form.tokenName`, {})}
-            key={form.key('tokenName')}
-            {...form.getInputProps('tokenName')}
-          />
-        </Group>
-
-        <Group grow>
           <PasswordInput
             withAsterisk
-            label={t(`${prefix}.form.tokenSecret`, {})}
+            label={t('pages.admin.backupConfigurations.tabs.general.page.pbs.form.tokenSecret', {})}
             key={form.key('tokenSecret')}
             {...form.getInputProps('tokenSecret')}
           />
+        </Group>
+
+        <Group grow>
           <TextInput
             withAsterisk
-            label={t(`${prefix}.form.fingerprint`, {})}
+            label={t('pages.admin.backupConfigurations.tabs.general.page.pbs.form.fingerprint', {})}
             key={form.key('fingerprint')}
             {...form.getInputProps('fingerprint')}
+          />
+          <TextInput
+            label={t('pages.admin.backupConfigurations.tabs.general.page.pbs.form.namespace', {})}
+            key={form.key('namespace')}
+            {...form.getInputProps('namespace')}
           />
         </Group>
 
         <Group grow>
           <TextInput
-            label={t(`${prefix}.form.namespace`, {})}
-            key={form.key('namespace')}
-            {...form.getInputProps('namespace')}
-          />
-          <TextInput
-            label={t(`${prefix}.form.backupIdPrefix`, {})}
+            label={t('pages.admin.backupConfigurations.tabs.general.page.pbs.form.backupIdPrefix', {})}
             placeholder='calagopus'
             key={form.key('backupIdPrefix')}
             {...form.getInputProps('backupIdPrefix')}

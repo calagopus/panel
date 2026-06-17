@@ -27,8 +27,14 @@ export const adminBackupConfigurationPbsSchema = z.object({
   url: z.url({ protocol: /^https?$/ }),
   datastore: z.string().min(1).max(255),
   namespace: z.preprocess(nullableString, z.string().max(255).nullable()),
-  username: z.string().min(1).max(255),
-  tokenName: z.string().min(1).max(255),
+  tokenId: z
+    .string()
+    .min(1)
+    .max(255)
+    .regex(
+      /^[^\s:/!@]+@[A-Za-z][A-Za-z0-9._-]*![A-Za-z0-9._-]+$/,
+      'Must be a Proxmox API token ID in the form user@realm!token-name',
+    ),
   tokenSecret: z.string(),
   fingerprint: z
     .string()

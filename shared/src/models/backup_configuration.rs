@@ -188,6 +188,23 @@ pub fn normalize_pbs_fingerprint(fingerprint: &str) -> compact_str::CompactStrin
         .collect()
 }
 
+fn validate_pbs_token_id(
+    token_id: &compact_str::CompactString,
+    _context: &(),
+) -> Result<(), garde::Error> {
+    static TOKEN_ID_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+        regex::Regex::new(r"^[^\s:/!@]+@[A-Za-z][A-Za-z0-9._-]*![A-Za-z0-9._-]+$").unwrap()
+    });
+
+    if !TOKEN_ID_REGEX.is_match(token_id) {
+        return Err(garde::Error::new(
+            "token id must be in the form user@realm!token-name",
+        ));
+    }
+
+    Ok(())
+}
+
 #[derive(ToSchema, Serialize, Deserialize, Validate, Clone)]
 pub struct BackupConfigsPbs {
     #[garde(length(chars, min = 1, max = 255), url)]
@@ -199,12 +216,9 @@ pub struct BackupConfigsPbs {
     #[garde(inner(length(chars, min = 1, max = 255)))]
     #[schema(min_length = 1, max_length = 255)]
     pub namespace: Option<compact_str::CompactString>,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(length(chars, min = 1, max = 255), custom(validate_pbs_token_id))]
     #[schema(min_length = 1, max_length = 255)]
-    pub username: compact_str::CompactString,
-    #[garde(length(chars, min = 1, max = 255))]
-    #[schema(min_length = 1, max_length = 255)]
-    pub token_name: compact_str::CompactString,
+    pub token_id: compact_str::CompactString,
     #[garde(length(chars, min = 1, max = 255))]
     #[schema(min_length = 1, max_length = 255)]
     pub token_secret: compact_str::CompactString,
