@@ -3501,6 +3501,7 @@
           "tooltip": {
             "fileHistory": "Dateiverlauf",
             "largestDirectories": "Verzeichnisgrößen analysieren",
+            "dragToMove": "Zum Verschieben ziehen",
             "back": "{seconds} Sekunden zurück",
             "forward": "{seconds} Sekunden vor",
             "play": "Abspielen",

@@ -22,6 +22,7 @@ import FileActionBar from '@/pages/server/files/FileActionBar.tsx';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
 import FileModals from '@/pages/server/files/FileModals.tsx';
 import FileOperationsProgress from '@/pages/server/files/FileOperationsProgress.tsx';
+import FileParentDirectoryRow from '@/pages/server/files/FileParentDirectoryRow.tsx';
 import FileRow from '@/pages/server/files/FileRow.tsx';
 import FileSearchBanner from '@/pages/server/files/FileSearchBanner.tsx';
 import FileSettings from '@/pages/server/files/FileSettings.tsx';
@@ -289,6 +290,15 @@ function ServerFilesComponent() {
     deps: [browsingEntries.data, selectedFiles, handleOpen, browsingWritableDirectory],
   });
 
+  const normalizedBrowsingDirectory = join('/', browsingDirectory);
+  const backupRootDirectory = fileManagerContext.browsingBackup
+    ? `/.backups/${fileManagerContext.browsingBackup.uuid}`
+    : null;
+  const showParentDirectoryRow =
+    normalizedBrowsingDirectory !== '/' &&
+    normalizedBrowsingDirectory !== backupRootDirectory &&
+    !fileManagerContext.searchInfo;
+
   return (
     <div className='h-fit relative'>
       <FileModals />
@@ -366,6 +376,8 @@ function ServerFilesComponent() {
             onPageSelect={onPageSelect}
             allowSelect={false}
           >
+            {showParentDirectoryRow && <FileParentDirectoryRow />}
+
             {browsingEntries.data.map((entry) => (
               <SelectionArea.Selectable key={entry.name} item={entry}>
                 {(innerRef: Ref<HTMLElement>) => (

@@ -3389,6 +3389,7 @@
           "tooltip": {
             "fileHistory": "História súborov",
             "largestDirectories": "Analyzovať veľkosti adresárov",
+            "dragToMove": "Potiahnutím presunúť",
             "back": "Späť {seconds} sekúnd",
             "forward": "Vpred {seconds} sekúnd",
             "play": "Prehrať",

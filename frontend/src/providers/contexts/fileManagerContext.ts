@@ -40,6 +40,9 @@ export interface FileManagerContextType {
   actingMode: ActingFileMode | null;
   actingFiles: ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>;
   actingFilesSource: string | null;
+  draggingFiles: ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>;
+  draggingFilesSource: string | null;
+  draggingTarget: string | null;
   selectedFiles: ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>;
   browsingBackup: z.infer<typeof serverBackupSchema> | null;
   setBrowsingBackup: (backup: z.infer<typeof serverBackupSchema> | null) => void;
@@ -86,6 +89,9 @@ export interface FileManagerContextType {
   fileUploader: FileUploader;
   doActFiles: (mode: ActingFileMode | null, files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
   clearActingFiles: () => void;
+  doDragFiles: (files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
+  clearDraggingFiles: () => void;
+  setDraggingTarget: (directory: string | null) => void;
   doSelectFiles: (files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
   addSelectedFile: (file: z.infer<typeof serverDirectoryEntrySchema>) => void;
   removeSelectedFile: (file: z.infer<typeof serverDirectoryEntrySchema>) => void;

@@ -3549,6 +3549,7 @@ const baseTranslations = defineTranslations({
           tooltip: {
             fileHistory: 'File History',
             largestDirectories: 'Analyze directory sizes',
+            dragToMove: 'Drag to move',
             back: 'Back {seconds} seconds',
             forward: 'Forward {seconds} seconds',
             play: 'Play',

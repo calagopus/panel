@@ -50,14 +50,18 @@ function getFileIcon(file: z.infer<typeof serverDirectoryEntrySchema>): IconDefi
 function FileRowIcon({
   file,
   className,
+  directory,
 }: {
   file?: z.infer<typeof serverDirectoryEntrySchema> | null;
   className?: string;
+  directory?: boolean;
 }) {
+  const isDirectory = directory || file?.directory;
+
   return (
     <FontAwesomeIcon
-      className={classNames(file?.directory ? 'text-yellow-400' : 'text-(--mantine-color-dimmed)', className)}
-      icon={file ? getFileIcon(file) : faFile}
+      className={classNames(isDirectory ? 'text-yellow-400' : 'text-(--mantine-color-dimmed)', className)}
+      icon={file ? getFileIcon(file) : directory ? faFolder : faFile}
     />
   );
 }

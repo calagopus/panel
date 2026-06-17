@@ -1,5 +1,6 @@
 import { faDoorOpen, faMagnifyingGlassChart, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import classNames from 'classnames';
 import { join } from 'pathe';
 import { ReactNode, useEffect } from 'react';
 import { createSearchParams, NavLink } from 'react-router';
@@ -10,6 +11,7 @@ import Breadcrumbs from '@/elements/Breadcrumbs.tsx';
 import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { useDraggedFileMove } from '@/pages/server/files/hooks/useDraggedFileMove.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -19,6 +21,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { server } = useServerStore();
+  const { isDropTarget, getDropHandlers } = useDraggedFileMove({ disabled: !!inFileEditor });
   const {
     selectedFiles,
     browsingBackup,
@@ -58,6 +61,12 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
     }
   }, [path, browsingBackup]);
 
+  const breadcrumbClassName = (targetDirectory: string) =>
+    classNames(
+      'text-(--mantine-color-anchor) hover:underline rounded-sm',
+      isDropTarget(targetDirectory) && 'bg-(--mantine-color-green-light)',
+    );
+
   const items: ReactNode[] = [
     browsingBackup ? 'backups' : 'home',
     <NavLink
@@ -69,7 +78,8 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
             })}`
           : `/server/${server?.uuidShort}/files`
       }
-      className='text-(--mantine-color-anchor) hover:underline'
+      className={breadcrumbClassName(browsingBackup ? `/.backups/${browsingBackup.uuid}` : '/')}
+      {...getDropHandlers(browsingBackup ? `/.backups/${browsingBackup.uuid}` : '/')}
     >
       {browsingBackup ? browsingBackup.name : 'container'}
     </NavLink>,
@@ -80,8 +90,9 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
         <NavLink
           key={item.path}
           to={`/server/${server?.uuidShort}/files?${createSearchParams({ directory: join('/', item.path) })}`}
-          className='text-(--mantine-color-anchor) hover:underline'
+          className={breadcrumbClassName(join('/', item.path))}
           onClick={() => setBrowsingDirectory(item.path)}
+          {...getDropHandlers(join('/', item.path))}
         >
           {item.name}
         </NavLink>

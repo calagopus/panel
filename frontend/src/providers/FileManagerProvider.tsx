@@ -27,6 +27,11 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
   );
   const [actingFilesSource, setActingFilesSource] = useState<string | null>(null);
+  const [draggingFiles, setDraggingFiles] = useState(
+    new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
+  );
+  const [draggingFilesSource, setDraggingFilesSource] = useState<string | null>(null);
+  const [draggingTarget, setDraggingTarget] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState(
     new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
   );
@@ -138,6 +143,18 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     setActingFilesSource(null);
   };
 
+  const doDragFiles = (files: z.infer<typeof serverDirectoryEntrySchema>[]) => {
+    setDraggingFiles(new ObjectSet('name', files));
+    setDraggingFilesSource(browsingDirectory);
+    setDraggingTarget(null);
+  };
+
+  const clearDraggingFiles = () => {
+    setDraggingFiles(new ObjectSet('name'));
+    setDraggingFilesSource(null);
+    setDraggingTarget(null);
+  };
+
   const doSelectFiles = (files: z.infer<typeof serverDirectoryEntrySchema>[]) =>
     setSelectedFiles(new ObjectSet('name', files));
 
@@ -224,6 +241,9 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         actingMode,
         actingFiles,
         actingFilesSource,
+        draggingFiles,
+        draggingFilesSource,
+        draggingTarget,
         selectedFiles,
         browsingBackup,
         setBrowsingBackup,
@@ -270,6 +290,9 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         fileUploader,
         doActFiles,
         clearActingFiles,
+        doDragFiles,
+        clearDraggingFiles,
+        setDraggingTarget,
         doSelectFiles,
         addSelectedFile,
         removeSelectedFile,

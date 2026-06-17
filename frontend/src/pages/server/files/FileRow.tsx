@@ -1,17 +1,22 @@
+import classNames from 'classnames';
+import { join } from 'pathe';
 import { forwardRef, memo, RefObject, useMemo, useRef } from 'react';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files.ts';
 import { z } from 'zod';
 import { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { isOpenableFile } from '@/lib/files.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { bytesToString } from '@/lib/size.ts';
 import FileRowContextMenu from '@/pages/server/files/FileRowContextMenu.tsx';
+import { useDraggedFileMove } from '@/pages/server/files/hooks/useDraggedFileMove.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { getFileManager, useFileManager } from '@/providers/contexts/fileManagerContext.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import FileMassContextMenu from './FileMassContextMenu.tsx';
 import FileRowIcon from './FileRowIcon.tsx';
 
@@ -55,15 +60,48 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
   { file, handleOpen, isSelected, isActing, multipleSelectedRef, actingFilesRef, clickOnce, preferPhysicalSize },
   ref,
 ) {
+  const { t } = useTranslations();
   const canOpenActionBar = useServerCan(['files.read-content', 'files.archive', 'files.update', 'files.delete'], true);
   const canOpenFile = useServerCan('files.read-content');
+  const canUpdateFiles = useServerCan('files.update');
+  const { moving, isDropTarget, getDropHandlers } = useDraggedFileMove();
   const openMode = useMemo(() => isOpenableFile(file, getFileManager()), [file]);
-  const { doSelectFiles, addSelectedFile, removeSelectedFile } = getFileManager();
+  const {
+    actingFiles,
+    selectedFiles,
+    browsingDirectory,
+    browsingWritableDirectory,
+    draggingFiles,
+    draggingFilesSource,
+    doDragFiles,
+    clearDraggingFiles,
+    doSelectFiles,
+    addSelectedFile,
+    removeSelectedFile,
+  } = useFileManager();
 
   const toggleSelected = () => (isSelected ? removeSelectedFile(file) : addSelectedFile(file));
 
   const clickCount = useRef(0);
   const clickTimer = useRef<NodeJS.Timeout | null>(null);
+  const targetDirectory = file.directory ? join(browsingDirectory, file.name) : null;
+  const canDragFile = canUpdateFiles && browsingWritableDirectory && actingFiles.size === 0 && !moving;
+  const fileIsDropTarget = !!targetDirectory && isDropTarget(targetDirectory);
+  const isDraggingSource = draggingFiles.has(file) && draggingFilesSource === browsingDirectory;
+
+  const handleDragStart = (e: React.DragEvent<HTMLElement>) => {
+    if (!canDragFile) {
+      e.preventDefault();
+      return;
+    }
+
+    const files = selectedFiles.has(file) ? selectedFiles.values() : [file];
+
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('application/x-calagopus-file-manager', 'move');
+    e.dataTransfer.setData('text/plain', files.map((file) => file.name).join('\n'));
+    doDragFiles(files);
+  };
 
   const handleClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
     clickCount.current += 1;
@@ -95,9 +133,12 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
   };
 
   const getBgColor = () => {
-    // if (isOver && isValidDropTarget) {
-    //   return 'var(--mantine-color-green-light)';
-    // }
+    if (fileIsDropTarget) {
+      return 'var(--mantine-color-green-light)';
+    }
+    if (isDraggingSource) {
+      return 'var(--mantine-color-blue-light)';
+    }
     if (isActing) {
       return 'var(--mantine-color-orange-light)';
     }
@@ -114,8 +155,13 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
           {({ items, openMenu }) => (
             <TableRow
               ref={ref}
-              className={clickOnce && canOpenFile && openMode.openable ? 'cursor-pointer select-none' : 'select-none'}
+              className={classNames(
+                'group',
+                isDraggingSource && 'opacity-60',
+                clickOnce && canOpenFile && openMode.openable ? 'cursor-pointer select-none' : 'select-none',
+              )}
               bg={getBgColor()}
+              {...(targetDirectory ? getDropHandlers(targetDirectory) : {})}
               onContextMenu={(e) => {
                 e.preventDefault();
                 if (isSelected) {
@@ -140,10 +186,24 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
               )}
 
               <TableData className='w-full max-w-0'>
-                <span className='flex items-center gap-4 min-w-0' title={file.name}>
-                  <FileRowIcon className='shrink-0' file={file} />
-                  <span className='truncate'>{file.name}</span>
-                </span>
+                <Tooltip label={t('pages.server.files.tooltip.dragToMove', {})} disabled={!canDragFile}>
+                  <span
+                    draggable={canDragFile}
+                    className={classNames(
+                      'flex w-fit max-w-full min-w-0 items-center gap-4 rounded-sm py-0.5 leading-5',
+                      canDragFile && 'cursor-grab active:cursor-grabbing',
+                    )}
+                    title={file.name}
+                    onMouseDown={(e) => {
+                      if (canDragFile) e.stopPropagation();
+                    }}
+                    onDragStart={handleDragStart}
+                    onDragEnd={clearDraggingFiles}
+                  >
+                    <FileRowIcon className='shrink-0 text-(--mantine-color-dimmed)' file={file} />
+                    <span className='truncate'>{file.name}</span>
+                  </span>
+                </Tooltip>
               </TableData>
 
               <TableData>
