@@ -61,7 +61,27 @@ mod post {
 
         let request_body = wings_api::servers_server_files_search::post::RequestBody {
             root: data.root,
-            path_filter: data.path_filter,
+            path_filter: if let Some(ignored_files) = server.0.subuser_ignored_files {
+                Some(
+                    wings_api::servers_server_files_search::post::RequestBodyPathFilter {
+                        case_insensitive: data
+                            .path_filter
+                            .as_ref()
+                            .is_some_and(|f| f.case_insensitive),
+                        include: data
+                            .path_filter
+                            .as_ref()
+                            .map_or(Vec::new(), |f| f.include.to_vec()),
+                        exclude: if let Some(filter) = data.path_filter {
+                            filter.exclude.into_iter().chain(ignored_files).collect()
+                        } else {
+                            ignored_files.into_iter().collect()
+                        },
+                    },
+                )
+            } else {
+                data.path_filter
+            },
             size_filter: data.size_filter,
             content_filter: data.content_filter.map(|cf| {
                 wings_api::servers_server_files_search::post::RequestBodyContentFilter {
@@ -77,12 +97,13 @@ mod post {
         drop(settings);
 
         let entries = match server
+            .0
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
             .await?
-            .post_servers_server_files_search(server.uuid, &request_body)
+            .post_servers_server_files_search(server.0.uuid, &request_body)
             .await
         {
             Ok(data) => data.results,

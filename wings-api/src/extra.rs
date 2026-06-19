@@ -6,6 +6,7 @@ pub type Config = super::system_config::get::Response200;
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Default, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum StreamableArchiveFormat {
     Tar,
     TarGz,
@@ -39,6 +40,7 @@ impl std::fmt::Display for StreamableArchiveFormat {
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
+#[non_exhaustive]
 pub enum Algorithm {
     Md5,
     Crc32,
@@ -71,6 +73,7 @@ impl std::fmt::Display for Algorithm {
 
 #[derive(Debug, Default, ToSchema, Deserialize, Serialize, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum DirectorySortingMode {
     #[default]
     NameAsc,
@@ -116,6 +119,7 @@ pub enum ServerBackupStatus {
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum Game {
     MinecraftJava,
 }
@@ -156,6 +160,7 @@ pub struct ScheduleAction {
 
 #[derive(ToSchema, Validate, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case", tag = "type")]
+#[non_exhaustive]
 pub enum ScheduleActionInner {
     Sleep {
         #[garde(range(min = 1, max = 24 * 60 * 60))]
@@ -353,6 +358,7 @@ impl ScheduleActionInner {
 
 #[derive(ToSchema, Validate, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case", tag = "type")]
+#[non_exhaustive]
 pub enum ScheduleTrigger {
     Cron {
         #[garde(skip)]
@@ -397,6 +403,7 @@ pub enum SchedulePreConditionComparator {
 #[derive(ToSchema, Validate, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case", tag = "type")]
 #[schema(no_recursion)]
+#[non_exhaustive]
 pub enum SchedulePreCondition {
     None,
     And {
@@ -449,6 +456,7 @@ pub enum SchedulePreCondition {
 #[derive(ToSchema, Deserialize, Serialize, Clone, Validate)]
 #[serde(rename_all = "snake_case", tag = "type")]
 #[schema(no_recursion)]
+#[non_exhaustive]
 pub enum ScheduleCondition {
     None,
     And {

@@ -12,7 +12,7 @@ use utoipa::ToSchema;
 pub mod client;
 mod extra;
 
-use client::AsyncResponseReader;
+use client::{AsyncRequestReader, AsyncResponseReader};
 pub use extra::*;
 
 nestify::nest! {
@@ -994,6 +994,16 @@ pub mod servers_server_files_contents {
         pub type Response417 = ApiError;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub file: Option<compact_str::CompactString>,
+            pub download: Option<bool>,
+            pub max_size: Option<u64>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_files_copy {
@@ -1246,6 +1256,15 @@ pub mod servers_server_files_fingerprints {
         }
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub algorithm: Option<Algorithm>,
+            pub files: Option<Vec<compact_str::CompactString>>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_files_largest_directories {
@@ -1261,6 +1280,15 @@ pub mod servers_server_files_largest_directories {
         pub type Response417 = ApiError;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub directory: Option<compact_str::CompactString>,
+            pub ignored: Option<Vec<compact_str::CompactString>>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_files_list {
@@ -1289,6 +1317,18 @@ pub mod servers_server_files_list {
         pub type Response417 = ApiError;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub directory: Option<compact_str::CompactString>,
+            pub ignored: Option<Vec<compact_str::CompactString>>,
+            pub per_page: Option<u64>,
+            pub page: Option<u64>,
+            pub sort: Option<DirectorySortingMode>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_files_list_directory {
@@ -1304,6 +1344,14 @@ pub mod servers_server_files_list_directory {
         pub type Response417 = ApiError;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub directory: Option<compact_str::CompactString>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_files_operations {
@@ -1487,6 +1535,14 @@ pub mod servers_server_files_revisions {
         }
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub file: Option<compact_str::CompactString>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_files_revisions_revision {
@@ -1562,7 +1618,7 @@ pub mod servers_server_files_write {
     pub mod post {
         use super::*;
 
-        pub type RequestBody = compact_str::CompactString;
+        pub type RequestBody = AsyncRequestReader;
 
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
@@ -1576,6 +1632,15 @@ pub mod servers_server_files_write {
         pub type Response417 = ApiError;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub file: Option<compact_str::CompactString>,
+            pub user: Option<uuid::Uuid>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_install_abort {
@@ -1603,6 +1668,14 @@ pub mod servers_server_logs {
         pub type Response200 = AsyncResponseReader;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub lines: Option<u64>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_logs_install {
@@ -1616,6 +1689,14 @@ pub mod servers_server_logs_install {
         pub type Response404 = ApiError;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub lines: Option<u64>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_power {
@@ -1839,6 +1920,14 @@ pub mod servers_server_version {
         pub type Response404 = ApiError;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub game: Option<Game>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers_server_ws_broadcast {
@@ -2413,6 +2502,14 @@ pub mod system_logs_file {
         pub type Response404 = ApiError;
 
         pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub lines: Option<u64>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod system_overview {
