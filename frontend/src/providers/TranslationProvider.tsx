@@ -95,6 +95,9 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     startTransition(() => {
       if (language === 'en') {
+        document.documentElement.lang = 'en';
+        document.documentElement.dir = 'ltr';
+
         setLanguageData(null);
       } else {
         axiosInstance
@@ -120,6 +123,14 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
 
             if (import.meta.env.DEV) {
               console.debug('Loaded language data', language, result);
+            }
+
+            try {
+              const lang = new Intl.Locale(language);
+              document.documentElement.lang = lang.language;
+              document.documentElement.dir = lang.getTextInfo().direction ?? 'ltr';
+            } catch {
+              // ignore
             }
 
             setLanguageData(result);
