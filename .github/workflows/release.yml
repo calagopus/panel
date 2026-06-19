@@ -238,6 +238,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Prepare binaries
         run: |
           mkdir -p .docker/amd64 .docker/arm64 .docker/riscv64 .docker/ppc64le
@@ -259,20 +265,20 @@ jobs:
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
-          DOCKER_TAGS="ghcr.io/${{ github.repository }}:${VERSION}"
-          AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-aio"
+          DOCKER_TAGS="ghcr.io/${{ github.repository }}:${VERSION},${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:${VERSION}"
+          AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-aio,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:${VERSION}-aio"
 
           if [[ "$VERSION" == *-* ]]; then
-            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest-pre"
-            AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio-pre"
+            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest-pre,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:latest-pre"
+            AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio-pre,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:aio-pre"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
-              AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio"
+              DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:latest"
+              AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:aio"
             fi
           else
-            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
-            AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio"
+            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:latest"
+            AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:aio"
           fi
 
           echo "DOCKER_TAGS=$DOCKER_TAGS" >> $GITHUB_ENV
@@ -430,22 +436,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Extract version and determine tags
         id: prep_tags
         run: |
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
-          HEAVY_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy"
+          HEAVY_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:${VERSION}-heavy"
 
           if [[ "$VERSION" == *-* ]]; then
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy-pre"
+            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy-pre,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:heavy-pre"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
+              HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:heavy"
             fi
           else
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
+            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:heavy"
           fi
 
           echo "HEAVY_TAGS=$HEAVY_TAGS" >> $GITHUB_ENV
@@ -476,22 +488,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Extract version and determine tags
         id: prep_tags
         run: |
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
-          HEAVY_AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy-aio"
+          HEAVY_AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy-aio,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:${VERSION}-heavy-aio"
 
           if [[ "$VERSION" == *-* ]]; then
-            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio-pre"
+            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio-pre,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:heavy-aio-pre"
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
+              HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:heavy-aio"
             fi
           else
-            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
+            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio,${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:heavy-aio"
           fi
 
           echo "HEAVY_AIO_TAGS=$HEAVY_AIO_TAGS" >> $GITHUB_ENV
