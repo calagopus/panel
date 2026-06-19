@@ -9,6 +9,8 @@ env:
   BIN_NAME: panel-rs
   AIO_BIN_NAME: panel-rs-aio
   PROJECT_NAME: panel-rs
+  GHCR_IMAGE: ghcr.io/${{ github.repository }}
+  DOCKERHUB_IMAGE: docker.io/${{ github.repository }}
 
 jobs:
   generate-sbom:
@@ -238,6 +240,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Prepare binaries
         run: |
           mkdir -p .docker/amd64 .docker/arm64 .docker/riscv64 .docker/ppc64le
@@ -259,21 +267,33 @@ jobs:
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
-          DOCKER_TAGS="ghcr.io/${{ github.repository }}:${VERSION}"
-          AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-aio"
+          # Tag suffixes for the main image and the AIO image variant.
+          MAIN_SUFFIXES=("${VERSION}")
+          AIO_SUFFIXES=("${VERSION}-aio")
 
           if [[ "$VERSION" == *-* ]]; then
-            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest-pre"
-            AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio-pre"
+            MAIN_SUFFIXES+=("latest-pre")
+            AIO_SUFFIXES+=("aio-pre")
 
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
-              AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio"
+              MAIN_SUFFIXES+=("latest")
+              AIO_SUFFIXES+=("aio")
             fi
           else
-            DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
-            AIO_TAGS="$AIO_TAGS,ghcr.io/${{ github.repository }}:aio"
+            MAIN_SUFFIXES+=("latest")
+            AIO_SUFFIXES+=("aio")
           fi
+
+          # Emit each suffix for both registries.
+          DOCKER_TAGS=""
+          for t in "${MAIN_SUFFIXES[@]}"; do
+            DOCKER_TAGS="${DOCKER_TAGS}${DOCKER_TAGS:+,}${GHCR_IMAGE}:${t},${DOCKERHUB_IMAGE}:${t}"
+          done
+
+          AIO_TAGS=""
+          for t in "${AIO_SUFFIXES[@]}"; do
+            AIO_TAGS="${AIO_TAGS}${AIO_TAGS:+,}${GHCR_IMAGE}:${t},${DOCKERHUB_IMAGE}:${t}"
+          done
 
           echo "DOCKER_TAGS=$DOCKER_TAGS" >> $GITHUB_ENV
           echo "AIO_TAGS=$AIO_TAGS" >> $GITHUB_ENV
@@ -292,10 +312,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Attach source SBOM attestation to image
+      - name: Attach source SBOM attestation to image (GHCR)
         uses: actions/attest-sbom@v4
         with:
-          subject-name: ghcr.io/${{ github.repository }}
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: sbom/sbom-source.cyclonedx.json
+          push-to-registry: true
+
+      - name: Attach source SBOM attestation to image (Docker Hub)
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ${{ env.DOCKERHUB_IMAGE }}
           subject-digest: ${{ steps.build.outputs.digest }}
           sbom-path: sbom/sbom-source.cyclonedx.json
           push-to-registry: true
@@ -314,10 +342,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Attach source SBOM attestation to AIO image
+      - name: Attach source SBOM attestation to AIO image (GHCR)
         uses: actions/attest-sbom@v4
         with:
-          subject-name: ghcr.io/${{ github.repository }}
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.build-aio.outputs.digest }}
+          sbom-path: sbom/sbom-source.cyclonedx.json
+          push-to-registry: true
+
+      - name: Attach source SBOM attestation to AIO image (Docker Hub)
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ${{ env.DOCKERHUB_IMAGE }}
           subject-digest: ${{ steps.build-aio.outputs.digest }}
           sbom-path: sbom/sbom-source.cyclonedx.json
           push-to-registry: true
@@ -355,6 +391,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build & push heavy platform image
         uses: docker/build-push-action@v7
         with:
@@ -362,7 +404,9 @@ jobs:
           file: ./docker/Dockerfile.heavy
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ghcr.io/${{ github.repository }}:heavy-build-${{ matrix.tag_suffix }}
+          tags: |
+            ${{ env.GHCR_IMAGE }}:heavy-build-${{ matrix.tag_suffix }}
+            ${{ env.DOCKERHUB_IMAGE }}:heavy-build-${{ matrix.tag_suffix }}
           sbom: scan-stages=true
           provenance: true
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
@@ -401,6 +445,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build & push heavy AIO platform image
         uses: docker/build-push-action@v7
         with:
@@ -408,7 +458,9 @@ jobs:
           file: ./docker/Dockerfile.heavy.aio
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ghcr.io/${{ github.repository }}:heavy-aio-build-${{ matrix.tag_suffix }}
+          tags: |
+            ${{ env.GHCR_IMAGE }}:heavy-aio-build-${{ matrix.tag_suffix }}
+            ${{ env.DOCKERHUB_IMAGE }}:heavy-aio-build-${{ matrix.tag_suffix }}
           sbom: scan-stages=true
           provenance: true
           cache-from: type=gha,scope=heavy-aio-${{ matrix.tag_suffix }}
@@ -430,34 +482,54 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Extract version and determine tags
         id: prep_tags
         run: |
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
-          HEAVY_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy"
-
+          SUFFIXES=("${VERSION}-heavy")
           if [[ "$VERSION" == *-* ]]; then
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy-pre"
-
+            SUFFIXES+=("heavy-pre")
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
+              SUFFIXES+=("heavy")
             fi
           else
-            HEAVY_TAGS="$HEAVY_TAGS,ghcr.io/${{ github.repository }}:heavy"
+            SUFFIXES+=("heavy")
           fi
 
-          echo "HEAVY_TAGS=$HEAVY_TAGS" >> $GITHUB_ENV
+          GHCR_HEAVY_TAGS=""
+          DOCKERHUB_HEAVY_TAGS=""
+          for t in "${SUFFIXES[@]}"; do
+            GHCR_HEAVY_TAGS="${GHCR_HEAVY_TAGS}${GHCR_HEAVY_TAGS:+,}${GHCR_IMAGE}:${t}"
+            DOCKERHUB_HEAVY_TAGS="${DOCKERHUB_HEAVY_TAGS}${DOCKERHUB_HEAVY_TAGS:+,}${DOCKERHUB_IMAGE}:${t}"
+          done
+
+          echo "GHCR_HEAVY_TAGS=$GHCR_HEAVY_TAGS" >> $GITHUB_ENV
+          echo "DOCKERHUB_HEAVY_TAGS=$DOCKERHUB_HEAVY_TAGS" >> $GITHUB_ENV
 
       - name: Create and push multi-arch manifest
         run: |
-          SOURCE_AMD64="ghcr.io/${{ github.repository }}:heavy-build-amd64"
-          SOURCE_ARM64="ghcr.io/${{ github.repository }}:heavy-build-arm64"
-
-          IFS=',' read -ra TAGS <<< "$HEAVY_TAGS"
+          # GHCR: assemble from the per-arch images pushed to GHCR.
+          GHCR_SRC_AMD64="${GHCR_IMAGE}:heavy-build-amd64"
+          GHCR_SRC_ARM64="${GHCR_IMAGE}:heavy-build-arm64"
+          IFS=',' read -ra TAGS <<< "$GHCR_HEAVY_TAGS"
           for TAG in "${TAGS[@]}"; do
-            docker buildx imagetools create -t "$TAG" "$SOURCE_AMD64" "$SOURCE_ARM64"
+            docker buildx imagetools create -t "$TAG" "$GHCR_SRC_AMD64" "$GHCR_SRC_ARM64"
+          done
+
+          # Docker Hub: assemble from the per-arch images pushed to Docker Hub.
+          DOCKERHUB_SRC_AMD64="${DOCKERHUB_IMAGE}:heavy-build-amd64"
+          DOCKERHUB_SRC_ARM64="${DOCKERHUB_IMAGE}:heavy-build-arm64"
+          IFS=',' read -ra TAGS <<< "$DOCKERHUB_HEAVY_TAGS"
+          for TAG in "${TAGS[@]}"; do
+            docker buildx imagetools create -t "$TAG" "$DOCKERHUB_SRC_AMD64" "$DOCKERHUB_SRC_ARM64"
           done
 
   merge-heavy-aio-image:
@@ -476,32 +548,52 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Extract version and determine tags
         id: prep_tags
         run: |
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
-          HEAVY_AIO_TAGS="ghcr.io/${{ github.repository }}:${VERSION}-heavy-aio"
-
+          SUFFIXES=("${VERSION}-heavy-aio")
           if [[ "$VERSION" == *-* ]]; then
-            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio-pre"
-
+            SUFFIXES+=("heavy-aio-pre")
             if [[ "$VERSION" == 1.0.0-* ]]; then
-              HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
+              SUFFIXES+=("heavy-aio")
             fi
           else
-            HEAVY_AIO_TAGS="$HEAVY_AIO_TAGS,ghcr.io/${{ github.repository }}:heavy-aio"
+            SUFFIXES+=("heavy-aio")
           fi
 
-          echo "HEAVY_AIO_TAGS=$HEAVY_AIO_TAGS" >> $GITHUB_ENV
+          GHCR_HEAVY_AIO_TAGS=""
+          DOCKERHUB_HEAVY_AIO_TAGS=""
+          for t in "${SUFFIXES[@]}"; do
+            GHCR_HEAVY_AIO_TAGS="${GHCR_HEAVY_AIO_TAGS}${GHCR_HEAVY_AIO_TAGS:+,}${GHCR_IMAGE}:${t}"
+            DOCKERHUB_HEAVY_AIO_TAGS="${DOCKERHUB_HEAVY_AIO_TAGS}${DOCKERHUB_HEAVY_AIO_TAGS:+,}${DOCKERHUB_IMAGE}:${t}"
+          done
+
+          echo "GHCR_HEAVY_AIO_TAGS=$GHCR_HEAVY_AIO_TAGS" >> $GITHUB_ENV
+          echo "DOCKERHUB_HEAVY_AIO_TAGS=$DOCKERHUB_HEAVY_AIO_TAGS" >> $GITHUB_ENV
 
       - name: Create and push multi-arch manifest
         run: |
-          AIO_SOURCE_AMD64="ghcr.io/${{ github.repository }}:heavy-aio-build-amd64"
-          AIO_SOURCE_ARM64="ghcr.io/${{ github.repository }}:heavy-aio-build-arm64"
-
-          IFS=',' read -ra TAGS <<< "$HEAVY_AIO_TAGS"
+          # GHCR: assemble from the per-arch images pushed to GHCR.
+          GHCR_SRC_AMD64="${GHCR_IMAGE}:heavy-aio-build-amd64"
+          GHCR_SRC_ARM64="${GHCR_IMAGE}:heavy-aio-build-arm64"
+          IFS=',' read -ra TAGS <<< "$GHCR_HEAVY_AIO_TAGS"
           for TAG in "${TAGS[@]}"; do
-            docker buildx imagetools create -t "$TAG" "$AIO_SOURCE_AMD64" "$AIO_SOURCE_ARM64"
+            docker buildx imagetools create -t "$TAG" "$GHCR_SRC_AMD64" "$GHCR_SRC_ARM64"
+          done
+
+          # Docker Hub: assemble from the per-arch images pushed to Docker Hub.
+          DOCKERHUB_SRC_AMD64="${DOCKERHUB_IMAGE}:heavy-aio-build-amd64"
+          DOCKERHUB_SRC_ARM64="${DOCKERHUB_IMAGE}:heavy-aio-build-arm64"
+          IFS=',' read -ra TAGS <<< "$DOCKERHUB_HEAVY_AIO_TAGS"
+          for TAG in "${TAGS[@]}"; do
+            docker buildx imagetools create -t "$TAG" "$DOCKERHUB_SRC_AMD64" "$DOCKERHUB_SRC_ARM64"
           done

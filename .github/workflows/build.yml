@@ -9,6 +9,8 @@ env:
   BIN_NAME: panel-rs
   AIO_BIN_NAME: panel-rs-aio
   PROJECT_NAME: panel-rs
+  GHCR_IMAGE: ghcr.io/${{ github.repository }}
+  DOCKERHUB_IMAGE: docker.io/${{ github.repository }}
 
 jobs:
   build-frontend:
@@ -188,6 +190,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Prepare binaries
         run: |
           mkdir -p .docker/amd64 .docker/arm64 .docker/riscv64 .docker/ppc64le
@@ -211,16 +219,26 @@ jobs:
           file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
-          tags: ghcr.io/${{ github.repository }}:nightly
+          tags: |
+            ${{ env.GHCR_IMAGE }}:nightly
+            ${{ env.DOCKERHUB_IMAGE }}:nightly
           sbom: true
           provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Attach source SBOM attestation to image
+      - name: Attach source SBOM attestation to image (GHCR)
         uses: actions/attest-sbom@v4
         with:
-          subject-name: ghcr.io/${{ github.repository }}
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: sbom-source.cyclonedx.json
+          push-to-registry: true
+
+      - name: Attach source SBOM attestation to image (Docker Hub)
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ${{ env.DOCKERHUB_IMAGE }}
           subject-digest: ${{ steps.build.outputs.digest }}
           sbom-path: sbom-source.cyclonedx.json
           push-to-registry: true
@@ -233,16 +251,26 @@ jobs:
           file: ./docker/Dockerfile.aio
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
-          tags: ghcr.io/${{ github.repository }}:nightly-aio
+          tags: |
+            ${{ env.GHCR_IMAGE }}:nightly-aio
+            ${{ env.DOCKERHUB_IMAGE }}:nightly-aio
           sbom: true
           provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Attach source SBOM attestation to AIO image
+      - name: Attach source SBOM attestation to AIO image (GHCR)
         uses: actions/attest-sbom@v4
         with:
-          subject-name: ghcr.io/${{ github.repository }}
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.build-aio.outputs.digest }}
+          sbom-path: sbom-source.cyclonedx.json
+          push-to-registry: true
+
+      - name: Attach source SBOM attestation to AIO image (Docker Hub)
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ${{ env.DOCKERHUB_IMAGE }}
           subject-digest: ${{ steps.build-aio.outputs.digest }}
           sbom-path: sbom-source.cyclonedx.json
           push-to-registry: true
@@ -280,6 +308,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build & push heavy platform image
         uses: docker/build-push-action@v7
         with:
@@ -287,7 +321,9 @@ jobs:
           file: ./docker/Dockerfile.heavy
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ghcr.io/${{ github.repository }}:nightly-heavy-${{ matrix.tag_suffix }}
+          tags: |
+            ${{ env.GHCR_IMAGE }}:nightly-heavy-${{ matrix.tag_suffix }}
+            ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-${{ matrix.tag_suffix }}
           sbom: scan-stages=true
           provenance: true
           cache-from: type=gha,scope=heavy-${{ matrix.tag_suffix }}
@@ -326,6 +362,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build & push heavy AIO platform image
         uses: docker/build-push-action@v7
         with:
@@ -333,7 +375,9 @@ jobs:
           file: ./docker/Dockerfile.heavy.aio
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ghcr.io/${{ github.repository }}:nightly-heavy-aio-${{ matrix.tag_suffix }}
+          tags: |
+            ${{ env.GHCR_IMAGE }}:nightly-heavy-aio-${{ matrix.tag_suffix }}
+            ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-aio-${{ matrix.tag_suffix }}
           sbom: scan-stages=true
           provenance: true
           cache-from: type=gha,scope=heavy-aio-${{ matrix.tag_suffix }}
@@ -355,11 +399,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create and push multi-arch manifest
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest (GHCR)
         run: |
-          docker buildx imagetools create -t ghcr.io/${{ github.repository }}:nightly-heavy \
-            ghcr.io/${{ github.repository }}:nightly-heavy-amd64 \
-            ghcr.io/${{ github.repository }}:nightly-heavy-arm64
+          docker buildx imagetools create -t ${{ env.GHCR_IMAGE }}:nightly-heavy \
+            ${{ env.GHCR_IMAGE }}:nightly-heavy-amd64 \
+            ${{ env.GHCR_IMAGE }}:nightly-heavy-arm64
+
+      - name: Create and push multi-arch manifest (Docker Hub)
+        run: |
+          docker buildx imagetools create -t ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy \
+            ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-amd64 \
+            ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-arm64
 
   merge-heavy-aio-image:
     name: Merge Heavy AIO Docker manifest
@@ -377,8 +433,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create and push multi-arch manifest
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest (GHCR)
         run: |
-          docker buildx imagetools create -t ghcr.io/${{ github.repository }}:nightly-heavy-aio \
-            ghcr.io/${{ github.repository }}:nightly-heavy-aio-amd64 \
-            ghcr.io/${{ github.repository }}:nightly-heavy-aio-arm64
+          docker buildx imagetools create -t ${{ env.GHCR_IMAGE }}:nightly-heavy-aio \
+            ${{ env.GHCR_IMAGE }}:nightly-heavy-aio-amd64 \
+            ${{ env.GHCR_IMAGE }}:nightly-heavy-aio-arm64
+
+      - name: Create and push multi-arch manifest (Docker Hub)
+        run: |
+          docker buildx imagetools create -t ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-aio \
+            ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-aio-amd64 \
+            ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-aio-arm64
