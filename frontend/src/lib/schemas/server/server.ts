@@ -83,5 +83,6 @@ export const serverResourceUsageSchema = z.object({
     txPackets: z.number(),
   }),
   cpuAbsolute: z.number(),
+  cpuLimitAbsolute: z.number(),
   uptime: z.number(),
 });

@@ -209,6 +209,8 @@ nestify::nest! {
         #[schema(inline)]
         pub cpu_absolute: f64,
         #[schema(inline)]
+        pub cpu_limit_absolute: u32,
+        #[schema(inline)]
         pub uptime: u64,
     }
 }
@@ -2301,6 +2303,14 @@ pub mod system_config {
                     pub domainname: compact_str::CompactString,
                     #[schema(inline)]
                     pub registries: IndexMap<compact_str::CompactString, serde_json::Value>,
+                    #[schema(inline)]
+                    pub registry_image_fetch_cache: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerRegistryImageFetchCache {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                        #[schema(inline)]
+                        pub duration: u64,
+                    },
+
                     #[schema(inline)]
                     pub tmpfs_size: u64,
                     #[schema(inline)]

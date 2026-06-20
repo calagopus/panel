@@ -107,7 +107,7 @@ export default function ServerDetails() {
           state === 'offline' && server.status !== 'installing'
             ? t('common.enum.serverState.offline', {})
             : doNormalizeCpuLoad
-              ? `${(((stats?.cpuAbsolute || 0) / (server.limits.cpu || 100)) * 100).toFixed(2)}%`
+              ? `${(((stats?.cpuAbsolute || 0) / (stats?.cpuLimitAbsolute || 100)) * 100).toFixed(2)}%`
               : `${(stats?.cpuAbsolute || 0).toFixed(2)}%`
         }
         limit={
