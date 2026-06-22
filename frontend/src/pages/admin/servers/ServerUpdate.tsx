@@ -37,7 +37,6 @@ import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminServerSchema, adminServerUpdateSchema } from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
-import { useExtendibleForm } from '@/plugins/useExtendibleForm.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -62,9 +61,9 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
   const [isValid, setIsValid] = useState(false);
   const [selectedNestUuid, setSelectedNestUuid] = useState<string | null>(contextServer?.nest.uuid ?? '');
 
-  const { formSchema, formInitialValues } = useExtendibleForm({
-    baseSchema: adminServerUpdateSchema,
-    defaultValues: {
+  const form = useForm<ServerUpdateFormValues>({
+    mode: 'uncontrolled',
+    initialValues: {
       ownerUuid: '',
       eggUuid: '',
       backupConfigurationUuid: null,
@@ -92,26 +91,14 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
         schedules: 5,
       },
     },
-    registry: [
-      window.extensionContext.extensionRegistry.pages.admin.servers.view.update.basicInformationFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.view.update.serverAssignmentFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.view.update.resourceLimitsFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.view.update.serverConfigurationFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.view.update.featureLimitsFormContainer,
-    ],
-  });
-
-  const form = useForm<ServerUpdateFormValues>({
-    mode: 'uncontrolled',
-    initialValues: formInitialValues,
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(formSchema),
+    validate: zod4Resolver(adminServerUpdateSchema),
   });
 
   const { loading, doCreateOrUpdate } = useResourceForm<ServerUpdateFormValues, z.infer<typeof adminServerSchema>>({
     form,
-    updateFn: () => updateServer(contextServer.uuid, formSchema.parse(form.getValues())),
+    updateFn: () => updateServer(contextServer.uuid, form.getValues()),
     doUpdate: true,
     basePath: '/admin/servers',
     resourceName: t('pages.admin.servers.resourceName', {}),
@@ -182,13 +169,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
   }, [form.getValues().eggUuid, eggs.items, contextServer]);
 
   const basicInfoFields: FieldDef<ServerUpdateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.basicInformationFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_basic_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
     {
       type: 'text',
       name: 'name',
@@ -210,23 +190,9 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       rows: 3,
       props: { placeholder: t('pages.admin.servers.tabs.general.page.form.descriptionPlaceholder', {}) },
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.basicInformationFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_basic_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
   ];
 
   const serverAssignmentFields: FieldDef<ServerUpdateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.serverAssignmentFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_assignment_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
     {
       type: 'select',
       name: 'ownerUuid',
@@ -289,23 +255,9 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
         disabled: !canReadEggs || !selectedNestUuid,
       },
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.serverAssignmentFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_assignment_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
   ];
 
   const resourceLimitsFields: FieldDef<ServerUpdateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.resourceLimitsFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_limits_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
     {
       type: 'number',
       name: 'limits.cpu',
@@ -364,23 +316,9 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       placeholder: '0',
       allowReordering: false,
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.resourceLimitsFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_limits_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
   ];
 
   const serverConfigFields: FieldDef<ServerUpdateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.serverConfigurationFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_config_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
     {
       type: 'custom',
       name: '_predefinedImage',
@@ -475,23 +413,9 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       label: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {}),
       description: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {}),
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.serverConfigurationFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_config_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
   ];
 
   const featureLimitsFields: FieldDef<ServerUpdateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.featureLimitsFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_feature_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
     {
       type: 'number',
       name: 'featureLimits.allocations',
@@ -520,13 +444,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       required: true,
       props: { placeholder: '0', min: 0 },
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.view.update.featureLimitsFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_feature_${i}`,
-        render: (f: typeof form) => <Component form={f as never} server={contextServer} />,
-      }),
-    ),
   ];
 
   return (
@@ -549,12 +466,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
           )}
 
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            {window.extensionContext.extensionRegistry.pages.admin.servers.view.update.formContainers.prependedComponents.map(
-              (Component, i) => (
-                <Component key={`form-container-prepended-${i}`} form={form as never} server={contextServer} />
-              ),
-            )}
-
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
               icon={<FontAwesomeIcon icon={faInfoCircle} />}
@@ -589,12 +500,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
             >
               <FormEngine form={form} fields={featureLimitsFields} />
             </TitleCard>
-
-            {window.extensionContext.extensionRegistry.pages.admin.servers.view.update.formContainers.appendedComponents.map(
-              (Component, i) => (
-                <Component key={`form-container-appended-${i}`} form={form as never} server={contextServer} />
-              ),
-            )}
           </div>
 
           <Group>

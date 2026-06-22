@@ -47,7 +47,6 @@ import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/
 import { adminServerCreateSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { formatAllocation } from '@/lib/server.ts';
-import { useExtendibleForm } from '@/plugins/useExtendibleForm.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -75,9 +74,9 @@ export default function ServerCreate() {
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'confirm-no-allocation' | null>(null);
 
-  const { formSchema, formInitialValues } = useExtendibleForm({
-    baseSchema: adminServerCreateSchema,
-    defaultValues: {
+  const form = useForm<ServerCreateFormValues>({
+    mode: 'uncontrolled',
+    initialValues: {
       externalId: null,
       name: '',
       description: null,
@@ -111,27 +110,14 @@ export default function ServerCreate() {
       allocationUuids: [],
       variables: [],
     },
-    registry: [
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.basicInformationFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.serverAssignmentFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.serverConfigurationFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.featureLimitsFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.allocationsFormContainer,
-    ],
-  });
-
-  const form = useForm<ServerCreateFormValues>({
-    mode: 'uncontrolled',
-    initialValues: formInitialValues,
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(formSchema),
+    validate: zod4Resolver(adminServerCreateSchema),
   });
 
   const { loading, doCreateOrUpdate } = useResourceForm<ServerCreateFormValues, z.infer<typeof adminServerSchema>>({
     form,
-    createFn: () => createServer(formSchema.parse(form.getValues())),
+    createFn: () => createServer(form.getValues()),
     doUpdate: false,
     basePath: '/admin/servers',
     resourceName: t('pages.admin.servers.resourceName', {}),
@@ -217,13 +203,6 @@ export default function ServerCreate() {
   }, [selectedNestUuid, form.getValues().eggUuid]);
 
   const basicInfoFields: FieldDef<ServerCreateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.basicInformationFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_basic_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
     {
       type: 'text',
       name: 'name',
@@ -245,23 +224,9 @@ export default function ServerCreate() {
       rows: 3,
       props: { placeholder: t('pages.admin.servers.tabs.general.page.form.descriptionPlaceholder', {}) },
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.basicInformationFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_basic_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
   ];
 
   const serverAssignmentFields: FieldDef<ServerCreateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.serverAssignmentFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_assignment_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
     {
       type: 'select',
       name: 'nodeUuid',
@@ -338,23 +303,9 @@ export default function ServerCreate() {
         loading: backupConfigurations.loading,
       },
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_assignment_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
   ];
 
   const resourceLimitsFields: FieldDef<ServerCreateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_limits_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
     {
       type: 'number',
       name: 'limits.cpu',
@@ -413,23 +364,9 @@ export default function ServerCreate() {
       placeholder: '0',
       allowReordering: false,
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_limits_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
   ];
 
   const serverConfigFields: FieldDef<ServerCreateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.serverConfigurationFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_config_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
     {
       type: 'select',
       name: 'image',
@@ -520,23 +457,9 @@ export default function ServerCreate() {
       label: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {}),
       description: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {}),
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.serverConfigurationFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_config_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
   ];
 
   const featureLimitsFields: FieldDef<ServerCreateFormValues>[] = [
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.featureLimitsFormContainer.prependedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_prepend_feature_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
     {
       type: 'number',
       name: 'featureLimits.allocations',
@@ -565,13 +488,6 @@ export default function ServerCreate() {
       required: true,
       props: { placeholder: '0', min: 0 },
     },
-    ...window.extensionContext.extensionRegistry.pages.admin.servers.create.featureLimitsFormContainer.appendedComponents.map(
-      (Component, i) => ({
-        type: 'custom' as const,
-        name: `_append_feature_${i}`,
-        render: (f: typeof form) => <Component form={f as never} />,
-      }),
-    ),
   ];
 
   return (
@@ -597,12 +513,6 @@ export default function ServerCreate() {
       >
         <Stack mt='16'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            {window.extensionContext.extensionRegistry.pages.admin.servers.create.formContainers.prependedComponents.map(
-              (Component, i) => (
-                <Component key={`form-container-prepended-${i}`} form={form as never} />
-              ),
-            )}
-
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
               icon={<FontAwesomeIcon icon={faInfoCircle} />}
@@ -643,12 +553,6 @@ export default function ServerCreate() {
               icon={<FontAwesomeIcon icon={faNetworkWired} />}
             >
               <Stack>
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.allocationsFormContainer.prependedComponents.map(
-                  (Component, i) => (
-                    <Component key={`allocations-form-container-prepended-${i}`} form={form as never} />
-                  ),
-                )}
-
                 <Group grow>
                   <Select
                     label={t('common.form.primaryAllocation', {})}
@@ -682,12 +586,6 @@ export default function ServerCreate() {
                     {...form.getInputProps('allocationUuids')}
                   />
                 </Group>
-
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.allocationsFormContainer.appendedComponents.map(
-                  (Component, i) => (
-                    <Component key={`allocations-form-container-appended-${i}`} form={form as never} />
-                  ),
-                )}
               </Stack>
             </TitleCard>
 
@@ -730,12 +628,6 @@ export default function ServerCreate() {
                 )}
               </Stack>
             </TitleCard>
-
-            {window.extensionContext.extensionRegistry.pages.admin.servers.create.formContainers.appendedComponents.map(
-              (Component, i) => (
-                <Component key={`form-container-appended-${i}`} form={form as never} />
-              ),
-            )}
           </div>
 
           <Group>
