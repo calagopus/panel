@@ -1,18 +1,14 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import Group from '@/elements/Group.tsx';
-import PasswordInput from '@/elements/input/PasswordInput.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsCaptchaProviderTurnstileSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function CaptchaTurnstile({
-  form,
-}: {
-  form: UseFormReturnType<z.infer<typeof adminSettingsCaptchaProviderTurnstileSchema>>;
-}) {
+type TurnstileValues = z.infer<typeof adminSettingsCaptchaProviderTurnstileSchema>;
+
+export default function CaptchaTurnstile({ form }: { form: UseFormReturnType<TurnstileValues> }) {
   const { t } = useTranslations();
 
   useEffect(() => {
@@ -22,22 +18,24 @@ export default function CaptchaTurnstile({
     });
   }, []);
 
+  const fields: FieldDef<TurnstileValues>[] = [
+    {
+      type: 'text',
+      name: 'siteKey',
+      label: t('common.form.siteKey', {}),
+      required: true,
+    },
+    {
+      type: 'password',
+      name: 'secretKey',
+      label: t('common.form.secretKey', {}),
+      required: true,
+    },
+  ];
+
   return (
     <Stack mt='md'>
-      <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.siteKey', {})}
-          key={form.key('siteKey')}
-          {...form.getInputProps('siteKey')}
-        />
-        <PasswordInput
-          withAsterisk
-          label={t('common.form.secretKey', {})}
-          key={form.key('secretKey')}
-          {...form.getInputProps('secretKey')}
-        />
-      </Group>
+      <FormEngine form={form} fields={fields} />
     </Stack>
   );
 }

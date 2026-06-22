@@ -5,15 +5,15 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import Alert from '@/elements/Alert.tsx';
 import Code from '@/elements/Code.tsx';
-import Group from '@/elements/Group.tsx';
-import PasswordInput from '@/elements/input/PasswordInput.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Switch from '@/elements/input/Switch.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsStorageS3Schema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function StorageS3({ form }: { form: UseFormReturnType<z.infer<typeof adminSettingsStorageS3Schema>> }) {
+type S3Values = z.infer<typeof adminSettingsStorageS3Schema>;
+
+export default function StorageS3({ form }: { form: UseFormReturnType<S3Values> }) {
   const { t } = useTranslations();
 
   useEffect(() => {
@@ -26,6 +26,61 @@ export default function StorageS3({ form }: { form: UseFormReturnType<z.infer<ty
       pathStyle: form.values.pathStyle ?? false,
     });
   }, []);
+
+  const fields: FieldDef<S3Values>[] = [
+    {
+      type: 'text',
+      name: 'accessKey',
+      label: t('common.form.accessKey', {}),
+      required: true,
+    },
+    {
+      type: 'password',
+      name: 'secretKey',
+      label: t('common.form.secretKey', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'bucket',
+      label: t('common.form.bucket', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'region',
+      label: t('common.form.region', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'publicUrl',
+      label: t('common.form.publicUrl', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'endpoint',
+      label: t('common.form.endpoint', {}),
+      required: true,
+    },
+    {
+      type: 'custom',
+      name: 'pathStyle',
+      colSpan: 'full',
+      render: (f) => (
+        <Switch
+          label={
+            f.values.pathStyle
+              ? t('pages.admin.settings.tabs.storage.page.s3.form.pathStyleOn', {})
+              : t('pages.admin.settings.tabs.storage.page.s3.form.pathStyleOff', {})
+          }
+          key={f.key('pathStyle')}
+          {...f.getInputProps('pathStyle', { type: 'checkbox' })}
+        />
+      ),
+    },
+  ];
 
   return (
     <Stack mt='md'>
@@ -47,61 +102,7 @@ export default function StorageS3({ form }: { form: UseFormReturnType<z.infer<ty
           </li>
         </ul>
       </Alert>
-
-      <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.accessKey', {})}
-          key={form.key('accessKey')}
-          {...form.getInputProps('accessKey')}
-        />
-        <PasswordInput
-          withAsterisk
-          label={t('common.form.secretKey', {})}
-          key={form.key('secretKey')}
-          {...form.getInputProps('secretKey')}
-        />
-      </Group>
-
-      <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.bucket', {})}
-          key={form.key('bucket')}
-          {...form.getInputProps('bucket')}
-        />
-        <TextInput
-          withAsterisk
-          label={t('common.form.region', {})}
-          key={form.key('region')}
-          {...form.getInputProps('region')}
-        />
-      </Group>
-
-      <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.publicUrl', {})}
-          key={form.key('publicUrl')}
-          {...form.getInputProps('publicUrl')}
-        />
-        <TextInput
-          withAsterisk
-          label={t('common.form.endpoint', {})}
-          key={form.key('endpoint')}
-          {...form.getInputProps('endpoint')}
-        />
-      </Group>
-
-      <Switch
-        label={
-          form.values.pathStyle
-            ? t('pages.admin.settings.tabs.storage.page.s3.form.pathStyleOn', {})
-            : t('pages.admin.settings.tabs.storage.page.s3.form.pathStyleOff', {})
-        }
-        key={form.key('pathStyle')}
-        {...form.getInputProps('pathStyle', { type: 'checkbox' })}
-      />
+      <FormEngine form={form} fields={fields} />
     </Stack>
   );
 }
