@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import type { ZodFieldShape } from 'shared/src/registries/forms/index.ts';
-import type { FormExtension } from './types.ts';
+import type { FormExtension, FormId } from './types.ts';
 
 export function useFormExtensions<T extends Record<string, unknown>>(
-  formId: string,
+  formId: FormId,
 ): {
   formExtension: FormExtension<T>;
   zodShape: ZodFieldShape;

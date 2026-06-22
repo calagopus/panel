@@ -156,3 +156,43 @@ export interface FormExtension<T extends Record<string, unknown>> {
     [fieldName: string]: Partial<Omit<BaseFieldDef<T>, 'name'>>;
   };
 }
+
+export interface RegisteredFormIds {
+  'admin.roles.createOrUpdate': true;
+  'admin.nests.createOrUpdate': true;
+  'admin.nests.eggs.installationScript': true;
+  'admin.nests.eggs.variables': true;
+  'admin.oAuthProviders.createOrUpdate': true;
+  'admin.databaseHosts.createOrUpdate': true;
+  'admin.databaseHosts.credentialDetails': true;
+  'admin.nodes.createOrUpdate': true;
+  'admin.nodes.locationModal': true;
+  'admin.mounts.createOrUpdate': true;
+  'admin.backupConfigurations.createOrUpdate': true;
+  'admin.backupConfigurations.pbs': true;
+  'admin.backupConfigurations.s3': true;
+  'admin.backupConfigurations.restic': true;
+  'admin.backupConfigurations.kopia': true;
+  'admin.servers.create': true;
+  'admin.servers.update': true;
+  'admin.locations.createOrUpdate': true;
+  'admin.eggRepositories.createOrUpdate': true;
+  'admin.eggConfigurations.createOrUpdate': true;
+  'admin.users.createOrUpdate': true;
+  'admin.announcements.createOrUpdate': true;
+  'admin.settings.server': true;
+  'admin.settings.webauthn': true;
+  'admin.settings.application': true;
+  'admin.settings.user': true;
+  'admin.settings.captcha.hcaptcha': true;
+  'admin.settings.captcha.recaptcha': true;
+  'admin.settings.captcha.turnstile': true;
+  'admin.settings.captcha.friendlyCaptcha': true;
+  'admin.settings.email.sendmail': true;
+  'admin.settings.email.smtp': true;
+  'admin.settings.email.file': true;
+  'admin.settings.storage.filesystem': true;
+  'admin.settings.storage.s3': true;
+}
+
+export type FormId = keyof RegisteredFormIds;
