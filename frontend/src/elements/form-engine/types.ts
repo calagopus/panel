@@ -111,10 +111,6 @@ export interface LocalizedTextAreaFieldDef<T extends Record<string, unknown>> ex
   rows?: number;
 }
 
-/**
- * Fully custom field. `render` receives the form instance and returns any ReactNode.
- * `name` is used as a React key only; it does not need to match a form field.
- */
 export interface CustomFieldDef<T extends Record<string, unknown>> {
   type: 'custom';
   name: string;
@@ -143,10 +139,6 @@ export type FieldDef<T extends Record<string, unknown>> =
   | MultiSelectGroupFieldDef<T>
   | CustomFieldDef<T>;
 
-// ---------------------------------------------------------------------------
-// Extension API
-// ---------------------------------------------------------------------------
-
 export type InsertPosition =
   | { at: 'prepend' }
   | { at: 'append' }
@@ -158,13 +150,8 @@ export interface ExtensionField<T extends Record<string, unknown>> {
   position: InsertPosition;
 }
 
-/**
- * A FormExtension can inject additional fields at any position and/or override
- * properties on existing fields (by name).
- */
 export interface FormExtension<T extends Record<string, unknown>> {
   fields?: ExtensionField<T>[];
-  /** Override label/description/required/advanced/colSpan/when on any existing field. */
   overrides?: {
     [fieldName: string]: Partial<Omit<BaseFieldDef<T>, 'name'>>;
   };

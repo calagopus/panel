@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import Alert from '@/elements/Alert.tsx';
 import Code from '@/elements/Code.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Switch from '@/elements/input/Switch.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsStorageS3Schema } from '@/lib/schemas/admin/settings.ts';
@@ -15,6 +15,7 @@ type S3Values = z.infer<typeof adminSettingsStorageS3Schema>;
 
 export default function StorageS3({ form }: { form: UseFormReturnType<S3Values> }) {
   const { t } = useTranslations();
+  const { formExtension } = useFormExtensions('admin.settings.storage.s3');
 
   useEffect(() => {
     form.setValues({
@@ -102,7 +103,7 @@ export default function StorageS3({ form }: { form: UseFormReturnType<S3Values> 
           </li>
         </ul>
       </Alert>
-      <FormEngine form={form} fields={fields} />
+      <FormEngine form={form} fields={fields} extensions={[formExtension]} />
     </Stack>
   );
 }

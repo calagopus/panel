@@ -13,7 +13,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { announcementTypeLabelMapping } from '@/lib/enums.ts';
@@ -48,6 +48,13 @@ export default function AnnouncementCreateOrUpdate({
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
   const [eggs, setEggs] = useState<{ group: string; items: { label: string; value: string }[] }[]>([]);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<AnnouncementFormValues>('admin.announcements.createOrUpdate');
+  const mergedSchema = adminAnnouncementUpdateSchema.extend(zodShape);
+
   const form = useForm<AnnouncementFormValues>({
     initialValues: {
       type: 'info',
@@ -64,9 +71,10 @@ export default function AnnouncementCreateOrUpdate({
       nodes: [],
       backupConfigurations: [],
       eggs: [],
+      ...(extInitialValues as Partial<AnnouncementFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminAnnouncementUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -265,7 +273,7 @@ export default function AnnouncementCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, [queryKeys.admin.announcements.all()]))}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextAnnouncement ? 'announcements.update' : 'announcements.create'} cantSave>

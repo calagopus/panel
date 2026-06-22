@@ -15,7 +15,7 @@ import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Title from '@/elements/Title.tsx';
@@ -41,6 +41,13 @@ export default function OAuthProviderCreateOrUpdate({
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<OAuthFormValues>('admin.oAuthProviders.createOrUpdate');
+  const mergedSchema = adminOAuthProviderUpdateSchema.unwrap().extend(zodShape);
+
   const form = useForm<OAuthFormValues>({
     mode: 'uncontrolled',
     initialValues: {
@@ -63,10 +70,11 @@ export default function OAuthProviderCreateOrUpdate({
       linkViewable: true,
       userManageable: true,
       basicAuth: false,
+      ...(extInitialValues as Partial<OAuthFormValues>),
     },
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminOAuthProviderUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -288,7 +296,7 @@ export default function OAuthProviderCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.oAuthProviders.all()))}>
-        <FormEngine form={form} fields={fieldsTop} />
+        <FormEngine form={form} fields={fieldsTop} extensions={[formExtension]} />
 
         <Card className='flex flex-row! items-center justify-between mt-4'>
           <Title order={4}>{t('pages.admin.oAuthProviders.tabs.general.page.card.redirectUrl.title', {})}</Title>
@@ -299,7 +307,7 @@ export default function OAuthProviderCreateOrUpdate({
           </Code>
         </Card>
 
-        <FormEngine form={form} fields={fieldsMain} className='mt-4' />
+        <FormEngine form={form} fields={fieldsMain} className='mt-4' extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextOAuthProvider ? 'oauth-providers.update' : 'oauth-providers.create'} cantSave>

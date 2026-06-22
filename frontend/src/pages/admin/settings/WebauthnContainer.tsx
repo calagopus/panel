@@ -7,7 +7,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { isIP } from '@/lib/ip.ts';
@@ -26,13 +26,21 @@ export default function WebauthnContainer() {
   const [openModal, setOpenModal] = useState<'changeRpId' | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<WebauthnFormValues>('admin.settings.webauthn');
+  const mergedSchema = adminSettingsWebauthnSchema.extend(zodShape);
+
   const form = useForm<WebauthnFormValues>({
     initialValues: {
       rpId: '',
       rpOrigin: '',
+      ...(extInitialValues as Partial<WebauthnFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminSettingsWebauthnSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   useEffect(() => {
@@ -94,7 +102,7 @@ export default function WebauthnContainer() {
       <form
         onSubmit={form.onSubmit(() => (form.values.rpId !== webauthn.rpId ? setOpenModal('changeRpId') : doUpdate()))}
       >
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action='settings.update' cantSave>

@@ -10,7 +10,7 @@ import updateLocation from '@/api/admin/locations/updateLocation.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -32,15 +32,23 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<LocationFormValues>('admin.locations.createOrUpdate');
+  const mergedSchema = adminLocationUpdateSchema.unwrap().extend(zodShape);
+
   const form = useForm<LocationFormValues>({
     initialValues: {
       name: '',
       description: null,
       flag: null,
       backupConfigurationUuid: null,
+      ...(extInitialValues as Partial<LocationFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminLocationUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -149,7 +157,7 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.locations.all()))}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextLocation ? 'locations.update' : 'locations.create'} cantSave>

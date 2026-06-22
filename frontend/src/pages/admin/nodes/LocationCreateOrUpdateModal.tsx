@@ -5,7 +5,7 @@ import getBackupConfigurations from '@/api/admin/backup-configurations/getBackup
 import createLocation from '@/api/admin/locations/createLocation.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Select from '@/elements/input/Select.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -40,14 +40,22 @@ export default function LocationCreateOrUpdateModal({
 
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<LocationFormValues>('admin.nodes.locationModal');
+  const mergedSchema = adminLocationUpdateSchema.unwrap().extend(zodShape);
+
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<LocationFormValues>({
     initialValues: {
       name: '',
       description: null,
       flag: null,
       backupConfigurationUuid: null,
+      ...(extInitialValues as Partial<LocationFormValues>),
     },
-    validate: zod4Resolver(adminLocationUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
     onClose,
     onSubmit: async (values) => {
       await createLocation(adminLocationUpdateSchema.parse(values));
@@ -132,7 +140,7 @@ export default function LocationCreateOrUpdateModal({
           {t('pages.admin.nodes.tabs.general.page.alert.noLocations', {})}
         </Text>
 
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <ModalFooter>
           <AdminCan action='locations.create' cantSave>

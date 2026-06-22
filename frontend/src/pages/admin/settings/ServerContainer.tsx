@@ -7,7 +7,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import { adminSettingsServerSchema } from '@/lib/schemas/admin/settings.ts';
@@ -26,6 +26,13 @@ export default function ServerContainer() {
 
   const [loading, setLoading] = useState(false);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<ServerFormValues>('admin.settings.server');
+  const mergedSchema = adminSettingsServerSchema.extend(zodShape);
+
   const form = useForm<ServerFormValues>({
     initialValues: {
       maxFileManagerViewSize: 0,
@@ -39,9 +46,10 @@ export default function ServerContainer() {
       allowAcknowledgingInstallationFailure: true,
       allowViewingTransferProgress: false,
       containerPrelude: '',
+      ...(extInitialValues as Partial<ServerFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminSettingsServerSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   useEffect(() => {
@@ -143,7 +151,7 @@ export default function ServerContainer() {
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.server.page.title', {})} titleOrder={2}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action='settings.update' cantSave>

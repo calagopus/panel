@@ -1,7 +1,7 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsCaptchaProviderHcaptchaSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -10,6 +10,7 @@ type HcaptchaValues = z.infer<typeof adminSettingsCaptchaProviderHcaptchaSchema>
 
 export default function CaptchaHcaptcha({ form }: { form: UseFormReturnType<HcaptchaValues> }) {
   const { t } = useTranslations();
+  const { formExtension } = useFormExtensions('admin.settings.captcha.hcaptcha');
 
   useEffect(() => {
     form.setValues({
@@ -35,7 +36,7 @@ export default function CaptchaHcaptcha({ form }: { form: UseFormReturnType<Hcap
 
   return (
     <Stack mt='md'>
-      <FormEngine form={form} fields={fields} />
+      <FormEngine form={form} fields={fields} extensions={[formExtension]} />
     </Stack>
   );
 }

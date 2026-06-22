@@ -24,6 +24,7 @@ export interface ServerRouteDefinition extends RouteDefinition {
 }
 
 export * from './extension.ts';
+export * from './registries/forms/index.ts';
 export * from './registries/index.ts';
 export * from './translation.ts';
 export * from './utils.ts';

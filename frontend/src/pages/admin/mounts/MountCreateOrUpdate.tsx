@@ -11,7 +11,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -25,6 +25,13 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<MountFormValues>('admin.mounts.createOrUpdate');
+  const mergedSchema = adminMountUpdateSchema.unwrap().extend(zodShape);
+
   const form = useForm<MountFormValues>({
     initialValues: {
       name: '',
@@ -33,9 +40,10 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
       target: '',
       readOnly: false,
       userMountable: false,
+      ...(extInitialValues as Partial<MountFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminMountUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<MountFormValues, z.infer<typeof adminMountSchema>>({
@@ -98,7 +106,7 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
       </Alert>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.mounts.all()))}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextMount ? 'mounts.update' : 'mounts.create'} cantSave>

@@ -11,7 +11,7 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import RouteOrderEditor from '@/elements/RouteOrderEditor.tsx';
 import { adminSettingsUserSchema } from '@/lib/schemas/admin/settings.ts';
@@ -35,6 +35,13 @@ export default function UserContainer() {
     entries: RouteDefinition[];
   }>({ order: [], entries: [] });
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<UserFormValues>('admin.settings.user');
+  const mergedSchema = adminSettingsUserSchema.extend(zodShape);
+
   const form = useForm<UserFormValues>({
     initialValues: {
       maxServerGroupCount: 0,
@@ -44,9 +51,10 @@ export default function UserContainer() {
       maxSshKeyCount: 0,
       allowChangingLanguage: true,
       routeOrder: null,
+      ...(extInitialValues as Partial<UserFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminSettingsUserSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   useEffect(() => {
@@ -121,7 +129,7 @@ export default function UserContainer() {
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.user.page.title', {})} titleOrder={2}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <CollapsibleSection
           className='mt-4'

@@ -12,7 +12,7 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -39,6 +39,9 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
     null,
   );
 
+  const { formExtension, initialValues: extInitialValues } =
+    useFormExtensions<UserFormValues>('admin.users.createOrUpdate');
+
   const form = useForm<UserFormValues>({
     initialValues: {
       externalId: null,
@@ -52,6 +55,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
       suspended: false,
       language: settings.app.language,
       roleUuid: null,
+      ...(extInitialValues as Partial<UserFormValues>),
     },
   });
 
@@ -228,7 +232,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.users.all()))}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextUser ? 'users.update' : 'users.create'} cantSave>

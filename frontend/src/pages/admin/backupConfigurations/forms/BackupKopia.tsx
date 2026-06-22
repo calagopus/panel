@@ -1,7 +1,7 @@
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import Divider from '@/elements/Divider.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
@@ -12,6 +12,7 @@ type KopiaFormValues = z.infer<typeof adminBackupConfigurationKopiaSchema>;
 
 export default function BackupKopia({ form }: { form: UseFormReturnType<KopiaFormValues> }) {
   const { t } = useTranslations();
+  const { formExtension } = useFormExtensions('admin.backupConfigurations.kopia');
 
   const fields: FieldDef<KopiaFormValues>[] = [
     {
@@ -39,7 +40,7 @@ export default function BackupKopia({ form }: { form: UseFormReturnType<KopiaFor
         <Divider />
       </Stack>
 
-      <FormEngine form={form} fields={fields} />
+      <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
       <MultiKeyValueInput
         label={t('pages.admin.backupConfigurations.tabs.general.page.kopia.form.tags', {})}

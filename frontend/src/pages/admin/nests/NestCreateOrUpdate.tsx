@@ -8,7 +8,7 @@ import updateNest from '@/api/admin/nests/updateNest.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -24,14 +24,22 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
   const [deleteEggs, setDeleteEggs] = useState(false);
   const { t } = useTranslations();
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<NestFormValues>('admin.nests.createOrUpdate');
+  const mergedSchema = adminNestUpdateSchema.unwrap().extend(zodShape);
+
   const form = useForm<NestFormValues>({
     initialValues: {
       author: '',
       name: '',
       description: null,
+      ...(extInitialValues as Partial<NestFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminNestUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<NestFormValues, z.infer<typeof adminNestSchema>>({
@@ -91,7 +99,7 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nests.all()))}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextNest ? 'nests.update' : 'nests.create'} cantSave>

@@ -16,7 +16,7 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -41,6 +41,13 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<NodeFormValues>('admin.nodes.createOrUpdate');
+  const mergedSchema = adminNodeUpdateSchema.unwrap().extend(zodShape);
+
   const form = useForm<NodeFormValues>({
     mode: 'uncontrolled',
     initialValues: {
@@ -56,10 +63,11 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       sftpPort: 2022,
       memory: 8192,
       disk: 10240,
+      ...(extInitialValues as Partial<NodeFormValues>),
     },
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminNodeUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -224,7 +232,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nodes.all()))}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextNode ? 'nodes.update' : 'nodes.create'} cantSave>

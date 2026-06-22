@@ -1,7 +1,7 @@
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import Divider from '@/elements/Divider.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
 import { adminBackupConfigurationPbsSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
@@ -11,6 +11,7 @@ type PbsFormValues = z.infer<typeof adminBackupConfigurationPbsSchema>;
 
 export default function BackupPBS({ form }: { form: UseFormReturnType<PbsFormValues> }) {
   const { t } = useTranslations();
+  const { formExtension } = useFormExtensions('admin.backupConfigurations.pbs');
 
   const fields: FieldDef<PbsFormValues>[] = [
     {
@@ -65,7 +66,7 @@ export default function BackupPBS({ form }: { form: UseFormReturnType<PbsFormVal
         <Divider />
       </Stack>
 
-      <FormEngine form={form} fields={fields} />
+      <FormEngine form={form} fields={fields} extensions={[formExtension]} />
     </Stack>
   );
 }

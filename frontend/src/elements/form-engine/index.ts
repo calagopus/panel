@@ -10,11 +10,17 @@ export type {
   FieldDef,
   FormExtension,
   InsertPosition,
+  LocalizedTextAreaFieldDef,
+  LocalizedTextFieldDef,
   MultiSelectFieldDef,
+  MultiSelectGroupFieldDef,
   NumberFieldDef,
   PasswordFieldDef,
   SelectFieldDef,
+  SizeFieldDef,
   SwitchFieldDef,
+  TagsFieldDef,
   TextAreaFieldDef,
   TextFieldDef,
 } from './types.ts';
+export { useFormExtensions } from './useFormExtensions.ts';

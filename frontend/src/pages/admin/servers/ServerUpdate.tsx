@@ -24,7 +24,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
@@ -61,6 +61,13 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
   const [isValid, setIsValid] = useState(false);
   const [selectedNestUuid, setSelectedNestUuid] = useState<string | null>(contextServer?.nest.uuid ?? '');
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<ServerUpdateFormValues>('admin.servers.update');
+  const mergedSchema = adminServerUpdateSchema.unwrap().extend(zodShape);
+
   const form = useForm<ServerUpdateFormValues>({
     mode: 'uncontrolled',
     initialValues: {
@@ -90,10 +97,11 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
         backups: 5,
         schedules: 5,
       },
+      ...(extInitialValues as Partial<ServerUpdateFormValues>),
     },
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminServerUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate } = useResourceForm<ServerUpdateFormValues, z.infer<typeof adminServerSchema>>({
@@ -470,35 +478,35 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
               title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
               icon={<FontAwesomeIcon icon={faInfoCircle} />}
             >
-              <FormEngine form={form} fields={basicInfoFields} />
+              <FormEngine form={form} fields={basicInfoFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.serverAssignment', {})}
               icon={<FontAwesomeIcon icon={faAddressCard} />}
             >
-              <FormEngine form={form} fields={serverAssignmentFields} />
+              <FormEngine form={form} fields={serverAssignmentFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})}
               icon={<FontAwesomeIcon icon={faStopwatch} />}
             >
-              <FormEngine form={form} fields={resourceLimitsFields} />
+              <FormEngine form={form} fields={resourceLimitsFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})}
               icon={<FontAwesomeIcon icon={faWrench} />}
             >
-              <FormEngine form={form} fields={serverConfigFields} />
+              <FormEngine form={form} fields={serverConfigFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})}
               icon={<FontAwesomeIcon icon={faIcons} />}
             >
-              <FormEngine form={form} fields={featureLimitsFields} />
+              <FormEngine form={form} fields={featureLimitsFields} extensions={[formExtension]} />
             </TitleCard>
           </div>
 

@@ -13,7 +13,7 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -44,6 +44,15 @@ export default function DatabaseHostCreateOrUpdate({
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<DatabaseHostFormValues>('admin.databaseHosts.createOrUpdate');
+  const mergedSchema = (contextDatabaseHost ? adminDatabaseHostUpdateSchema : adminDatabaseHostCreateSchema)
+    .unwrap()
+    .extend(zodShape);
+
   const form = useForm<DatabaseHostFormValues>({
     initialValues: {
       name: '',
@@ -53,9 +62,10 @@ export default function DatabaseHostCreateOrUpdate({
       publicHost: null,
       publicPort: null,
       credentials: undefined,
+      ...(extInitialValues as Partial<DatabaseHostFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(contextDatabaseHost ? adminDatabaseHostUpdateSchema : adminDatabaseHostCreateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -204,7 +214,7 @@ export default function DatabaseHostCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.databaseHosts.all()))}>
-        <FormEngine form={form} fields={fields} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextDatabaseHost ? 'database-hosts.update' : 'database-hosts.create'} cantSave>

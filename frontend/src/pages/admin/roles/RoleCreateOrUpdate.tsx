@@ -12,7 +12,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
@@ -31,6 +31,13 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<RoleFormValues>('admin.roles.createOrUpdate');
+  const mergedSchema = adminRoleUpdateSchema.unwrap().extend(zodShape);
+
   const form = useForm<RoleFormValues>({
     initialValues: {
       name: '',
@@ -38,9 +45,10 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       requireTwoFactor: false,
       adminPermissions: [],
       serverPermissions: [],
+      ...(extInitialValues as Partial<RoleFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminRoleUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -156,7 +164,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.roles.all()))}>
-        <FormEngine form={form} fields={fields} showAdvancedToggle />
+        <FormEngine form={form} fields={fields} showAdvancedToggle extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextRole ? 'roles.update' : 'roles.create'} cantSave>
