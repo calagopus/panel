@@ -164,7 +164,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.roles.all()))}>
-        <FormEngine form={form} fields={fields} showAdvancedToggle extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextRole ? 'roles.update' : 'roles.create'} cantSave>

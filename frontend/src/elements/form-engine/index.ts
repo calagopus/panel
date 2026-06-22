@@ -1,3 +1,4 @@
+export { AdvancedModeToggle } from './AdvancedModeToggle.tsx';
 export type { FormEngineProps } from './FormEngine.tsx';
 export { FormEngine } from './FormEngine.tsx';
 export type {
@@ -23,4 +24,5 @@ export type {
   TextAreaFieldDef,
   TextFieldDef,
 } from './types.ts';
+export { useAdvancedMode } from './useAdvancedMode.ts';
 export { useFormExtensions } from './useFormExtensions.ts';

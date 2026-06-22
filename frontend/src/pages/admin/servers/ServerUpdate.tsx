@@ -24,7 +24,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
@@ -300,6 +300,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       description: t('pages.admin.servers.tabs.general.page.form.memoryOverheadDescription', {}),
       mode: 'mb',
       min: 0,
+      advanced: true,
     },
     {
       type: 'size',
@@ -315,6 +316,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       name: 'limits.ioWeight',
       label: t('pages.admin.servers.tabs.general.page.form.ioWeight', {}),
       description: t('pages.admin.servers.tabs.general.page.form.ioWeightDescription', {}),
+      advanced: true,
     },
     {
       type: 'tags',
@@ -323,6 +325,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       description: t('pages.admin.servers.tabs.general.page.form.pinnedCpusDescription', {}),
       placeholder: '0',
       allowReordering: false,
+      advanced: true,
     },
   ];
 
@@ -414,12 +417,14 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       name: 'hugepagesPassthroughEnabled',
       label: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {}),
       description: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription', {}),
+      advanced: true,
     },
     {
       type: 'switch',
       name: 'kvmPassthroughEnabled',
       label: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {}),
       description: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {}),
+      advanced: true,
     },
   ];
 
@@ -460,6 +465,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       titleOrder={2}
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.update.subContainer}
       registryProps={{ server: contextServer }}
+      contentRight={<AdvancedModeToggle />}
     >
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.servers.all()))}>
         <Stack>

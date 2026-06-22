@@ -9,7 +9,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -125,6 +125,7 @@ export default function ApplicationContainer() {
       name: 'iconLight',
       label: t('pages.admin.settings.tabs.application.page.form.iconLight', {}),
       options: assetUrls,
+      advanced: true,
     },
     {
       type: 'autocomplete',
@@ -137,6 +138,7 @@ export default function ApplicationContainer() {
       name: 'bannerLight',
       label: t('pages.admin.settings.tabs.application.page.form.bannerLight', {}),
       options: assetUrls,
+      advanced: true,
     },
     {
       type: 'text',
@@ -149,12 +151,14 @@ export default function ApplicationContainer() {
       name: 'sessionCookie',
       label: t('pages.admin.settings.tabs.application.page.form.sessionCookie', {}),
       required: true,
+      advanced: true,
     },
     {
       type: 'text',
       name: 'sessionDurationSeconds',
       label: t('pages.admin.settings.tabs.application.page.form.sessionDurationSeconds', {}),
       required: true,
+      advanced: true,
     },
     {
       type: 'select',
@@ -209,7 +213,11 @@ export default function ApplicationContainer() {
   ];
 
   return (
-    <AdminSubContentContainer title={t('pages.admin.settings.tabs.application.page.title', {})} titleOrder={2}>
+    <AdminSubContentContainer
+      title={t('pages.admin.settings.tabs.application.page.title', {})}
+      titleOrder={2}
+      contentRight={<AdvancedModeToggle />}
+    >
       <TelemetryPreviewModal
         telemetry={telemetryData}
         opened={telemetryData !== null}

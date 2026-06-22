@@ -28,7 +28,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import Select from '@/elements/input/Select.tsx';
@@ -330,6 +330,7 @@ export default function ServerCreate() {
       description: t('pages.admin.servers.tabs.general.page.form.swapDescription', {}),
       mode: 'mb',
       min: -1,
+      advanced: true,
     },
     {
       type: 'size',
@@ -348,6 +349,7 @@ export default function ServerCreate() {
       description: t('pages.admin.servers.tabs.general.page.form.memoryOverheadDescription', {}),
       mode: 'mb',
       min: 0,
+      advanced: true,
     },
     {
       type: 'size',
@@ -363,6 +365,7 @@ export default function ServerCreate() {
       name: 'limits.ioWeight',
       label: t('pages.admin.servers.tabs.general.page.form.ioWeight', {}),
       description: t('pages.admin.servers.tabs.general.page.form.ioWeightDescription', {}),
+      advanced: true,
     },
     {
       type: 'tags',
@@ -371,6 +374,7 @@ export default function ServerCreate() {
       description: t('pages.admin.servers.tabs.general.page.form.pinnedCpusDescription', {}),
       placeholder: '0',
       allowReordering: false,
+      advanced: true,
     },
   ];
 
@@ -458,12 +462,14 @@ export default function ServerCreate() {
       name: 'hugepagesPassthroughEnabled',
       label: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {}),
       description: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription', {}),
+      advanced: true,
     },
     {
       type: 'switch',
       name: 'kvmPassthroughEnabled',
       label: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {}),
       description: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {}),
+      advanced: true,
     },
   ];
 
@@ -503,6 +509,7 @@ export default function ServerCreate() {
       title={t('pages.admin.servers.tabs.general.page.titleCreate', {})}
       titleOrder={2}
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.create.container}
+      contentRight={<AdvancedModeToggle />}
     >
       <ConfirmationModal
         opened={openModal === 'confirm-no-allocation'}

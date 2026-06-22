@@ -1,17 +1,12 @@
 import { UseFormReturnType } from '@mantine/form';
-import { useMemo, useState } from 'react';
-import Switch from '@/elements/input/Switch.tsx';
-import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useMemo } from 'react';
 import { FormField } from './FormField.tsx';
 import { FieldDef, FormExtension, InsertPosition } from './types.ts';
+import { useAdvancedMode } from './useAdvancedMode.ts';
 
 export interface FormEngineProps<T extends Record<string, unknown>> {
   form: UseFormReturnType<T>;
   fields: FieldDef<T>[];
-  showAdvancedToggle?: boolean;
-  defaultAdvanced?: boolean;
-  advanced?: boolean;
-  onAdvancedChange?: (value: boolean) => void;
   extensions?: FormExtension<T>[];
   className?: string;
 }
@@ -64,45 +59,19 @@ function insertField<T extends Record<string, unknown>>(
 export function FormEngine<T extends Record<string, unknown>>({
   form,
   fields,
-  showAdvancedToggle = false,
-  defaultAdvanced = false,
-  advanced: controlledAdvanced,
-  onAdvancedChange,
   extensions = [],
   className,
 }: FormEngineProps<T>) {
-  const { t } = useTranslations();
-  const [internalAdvanced, setInternalAdvanced] = useState(defaultAdvanced);
-
-  const isAdvanced = controlledAdvanced !== undefined ? controlledAdvanced : internalAdvanced;
-
-  const handleAdvancedChange = (value: boolean) => {
-    if (controlledAdvanced === undefined) setInternalAdvanced(value);
-    onAdvancedChange?.(value);
-  };
-
+  const [advanced] = useAdvancedMode();
   const resolvedFields = useMemo(() => applyExtensions(fields, extensions), [fields, extensions]);
 
-  const hasAdvancedFields = resolvedFields.some((f) => f.advanced);
-
-  const visibleFields = resolvedFields.filter((f) => !f.advanced || isAdvanced);
+  const visibleFields = resolvedFields.filter((f) => !f.advanced || advanced);
 
   return (
-    <div>
-      {showAdvancedToggle && hasAdvancedFields && (
-        <div className='flex justify-end mb-3'>
-          <Switch
-            label={t('elements.formEngine.advancedMode', {})}
-            checked={isAdvanced}
-            onChange={(e) => handleAdvancedChange(e.currentTarget.checked)}
-          />
-        </div>
-      )}
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-4${className ? ` ${className}` : ''}`}>
-        {visibleFields.map((field) => (
-          <FormField key={field.name} form={form} field={field} />
-        ))}
-      </div>
+    <div className={`grid grid-cols-1 md:grid-cols-2 gap-4${className ? ` ${className}` : ''}`}>
+      {visibleFields.map((field) => (
+        <FormField key={field.name} form={form} field={field} />
+      ))}
     </div>
   );
 }
