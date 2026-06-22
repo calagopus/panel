@@ -12,10 +12,8 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import Select from '@/elements/input/Select.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/users.ts';
@@ -28,6 +26,8 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
+type UserFormValues = z.infer<typeof adminUserUpdateSchema>;
+
 export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.infer<typeof adminFullUserSchema> }) {
   const { user, doImpersonate } = useAuth();
   const { settings, languages } = useGlobalStore();
@@ -39,7 +39,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
     null,
   );
 
-  const form = useForm<z.infer<typeof adminUserUpdateSchema>>({
+  const form = useForm<UserFormValues>({
     initialValues: {
       externalId: null,
       username: '',
@@ -55,10 +55,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
     },
   });
 
-  const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminUserUpdateSchema>,
-    z.infer<typeof adminFullUserSchema>
-  >({
+  const { loading, doCreateOrUpdate, doDelete } = useResourceForm<UserFormValues, z.infer<typeof adminFullUserSchema>>({
     form,
     createFn: () => createUser(adminUserUpdateSchema.parse(form.getValues())),
     updateFn: contextUser
@@ -128,6 +125,65 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
       });
   };
 
+  const fields: FieldDef<UserFormValues>[] = [
+    { type: 'text', name: 'username', label: t('common.table.columns.username', {}), required: true },
+    { type: 'text', name: 'email', label: t('common.form.email', {}), required: true, props: { type: 'email' } },
+    { type: 'text', name: 'nameFirst', label: t('common.form.firstName', {}), required: true },
+    { type: 'text', name: 'nameLast', label: t('common.form.lastName', {}), required: true },
+    {
+      type: 'select',
+      name: 'language',
+      label: t('common.form.language', {}),
+      required: true,
+      options: languages.map((language) => ({
+        label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
+        value: language,
+      })),
+      props: { searchable: true },
+    },
+    {
+      type: 'select',
+      name: 'roleUuid',
+      label: t('pages.admin.users.tabs.general.page.form.role', {}),
+      options: roles.items.map((role) => ({ label: role.name, value: role.uuid })),
+      props: {
+        placeholder: t('common.none', {}),
+        searchable: true,
+        searchValue: roles.search,
+        onSearchChange: roles.setSearch,
+        allowDeselect: true,
+        clearable: true,
+        disabled: !canReadRoles,
+        loading: roles.loading,
+      },
+    },
+    { type: 'text', name: 'externalId', label: t('common.form.externalId', {}) },
+    {
+      type: 'password',
+      name: 'password',
+      label: t('common.form.password', {}),
+      props: { withAsterisk: !contextUser },
+    },
+    {
+      type: 'switch',
+      name: 'admin',
+      label: t('pages.admin.users.tabs.general.page.form.admin', {}),
+      description: t('pages.admin.users.tabs.general.page.form.adminDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'frozen',
+      label: t('pages.admin.users.tabs.general.page.form.frozen', {}),
+      description: t('pages.admin.users.tabs.general.page.form.frozenDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'suspended',
+      label: t('pages.admin.users.tabs.general.page.form.suspended', {}),
+      description: t('pages.admin.users.tabs.general.page.form.suspendedDescription', {}),
+    },
+  ];
+
   return (
     <AdminContentContainer
       title={t(
@@ -172,97 +228,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.users.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.table.columns.username', {})}
-            key={form.key('username')}
-            {...form.getInputProps('username')}
-          />
-          <TextInput
-            withAsterisk
-            label={t('common.form.email', {})}
-            type='email'
-            key={form.key('email')}
-            {...form.getInputProps('email')}
-          />
-
-          <TextInput
-            withAsterisk
-            label={t('common.form.firstName', {})}
-            key={form.key('nameFirst')}
-            {...form.getInputProps('nameFirst')}
-          />
-          <TextInput
-            withAsterisk
-            label={t('common.form.lastName', {})}
-            key={form.key('nameLast')}
-            {...form.getInputProps('nameLast')}
-          />
-
-          <Select
-            withAsterisk
-            label={t('common.form.language', {})}
-            data={languages.map((language) => ({
-              label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
-              value: language,
-            }))}
-            searchable
-            key={form.key('language')}
-            {...form.getInputProps('language')}
-          />
-
-          <Select
-            label={t('pages.admin.users.tabs.general.page.form.role', {})}
-            data={roles.items.map((role) => ({
-              label: role.name,
-              value: role.uuid,
-            }))}
-            searchable
-            searchValue={roles.search}
-            onSearchChange={roles.setSearch}
-            allowDeselect
-            clearable
-            disabled={!canReadRoles}
-            loading={roles.loading}
-            key={form.key('roleUuid')}
-            {...form.getInputProps('roleUuid')}
-          />
-
-          <TextInput
-            label={t('common.form.externalId', {})}
-            key={form.key('externalId')}
-            {...form.getInputProps('externalId')}
-          />
-          <TextInput
-            withAsterisk={!contextUser}
-            label={t('common.form.password', {})}
-            type='password'
-            key={form.key('password')}
-            {...form.getInputProps('password')}
-          />
-
-          <Switch
-            label={t('pages.admin.users.tabs.general.page.form.admin', {})}
-            description={t('pages.admin.users.tabs.general.page.form.adminDescription', {})}
-            key={form.key('admin')}
-            {...form.getInputProps('admin', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('pages.admin.users.tabs.general.page.form.frozen', {})}
-            description={t('pages.admin.users.tabs.general.page.form.frozenDescription', {})}
-            key={form.key('frozen')}
-            {...form.getInputProps('frozen', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('pages.admin.users.tabs.general.page.form.suspended', {})}
-            description={t('pages.admin.users.tabs.general.page.form.suspendedDescription', {})}
-            key={form.key('suspended')}
-            {...form.getInputProps('suspended', { type: 'checkbox' })}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextUser ? 'users.update' : 'users.create'} cantSave>

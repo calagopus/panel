@@ -8,20 +8,18 @@ import updateEggVariable from '@/api/admin/nests/eggs/variables/updateEggVariabl
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import LocalizedTextArea from '@/elements/input/LocalizedTextArea.tsx';
-import LocalizedTextInput from '@/elements/input/LocalizedTextInput.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { adminEggSchema, adminEggVariableSchema, adminEggVariableUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+
+type VariableFormValues = z.infer<typeof adminEggVariableUpdateSchema>;
 
 export default function EggVariableContainer({
   contextNest,
@@ -40,7 +38,7 @@ export default function EggVariableContainer({
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof adminEggVariableUpdateSchema>>({
+  const form = useForm<VariableFormValues>({
     initialValues: {
       name: '',
       nameTranslations: {},
@@ -127,6 +125,69 @@ export default function EggVariableContainer({
     }
   };
 
+  const fields: FieldDef<VariableFormValues>[] = [
+    {
+      type: 'localizedtext',
+      name: 'name',
+      label: t('common.form.name', {}),
+      required: true,
+      colSpan: 'full',
+      translationsName: 'nameTranslations',
+      languages,
+    },
+    {
+      type: 'localizedtextarea',
+      name: 'description',
+      label: t('common.form.description', {}),
+      description: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.supportsMarkdown', {}),
+      colSpan: 'full',
+      translationsName: 'descriptionTranslations',
+      languages,
+    },
+    {
+      type: 'custom',
+      name: 'envVariable',
+      render: (f) => (
+        <TextInput
+          withAsterisk
+          label={t('common.form.envVariable', {})}
+          {...f.getInputProps('envVariable')}
+          onChange={(e) => f.setFieldValue('envVariable', e.target.value.toUpperCase().replace(/-| /g, '_'))}
+        />
+      ),
+    },
+    {
+      type: 'text',
+      name: 'defaultValue',
+      label: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.defaultValue', {}),
+      props: {
+        placeholder: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.defaultValuePlaceholder', {}),
+      },
+    },
+    {
+      type: 'switch',
+      name: 'userViewable',
+      label: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.userViewable', {}),
+    },
+    {
+      type: 'switch',
+      name: 'userEditable',
+      label: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.userEditable', {}),
+    },
+    {
+      type: 'switch',
+      name: 'secret',
+      label: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.secret', {}),
+    },
+    {
+      type: 'tags',
+      name: 'rules',
+      label: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.rules', {}),
+      description: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.rulesDescription', {}),
+      colSpan: 'full',
+    },
+  ];
+
   return (
     <>
       <ConfirmationModal
@@ -146,70 +207,7 @@ export default function EggVariableContainer({
 
       <Card className='flex flex-col justify-between h-full'>
         <form onSubmit={form.onSubmit(doCreateOrUpdate)}>
-          <Stack>
-            <LocalizedTextInput
-              withAsterisk
-              label={t('common.form.name', {})}
-              value={form.values.name}
-              setValue={(value) => form.setFieldValue('name', value ?? '')}
-              valueTranslations={form.values.nameTranslations}
-              setValueTranslations={(translations) => form.setFieldValue('nameTranslations', translations)}
-              languages={languages}
-              error={form.errors.name}
-            />
-
-            <LocalizedTextArea
-              label={t('common.form.description', {})}
-              description={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.supportsMarkdown', {})}
-              value={form.values.description}
-              setValue={(value) => form.setFieldValue('description', value)}
-              valueTranslations={form.values.descriptionTranslations}
-              setValueTranslations={(translations) => form.setFieldValue('descriptionTranslations', translations)}
-              languages={languages}
-              error={form.errors.description}
-            />
-
-            <Group grow>
-              <TextInput
-                withAsterisk
-                label={t('common.form.envVariable', {})}
-                {...form.getInputProps('envVariable')}
-                onChange={(e) => form.setFieldValue('envVariable', e.target.value.toUpperCase().replace(/-| /g, '_'))}
-              />
-
-              <TextInput
-                label={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.defaultValue', {})}
-                placeholder={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.defaultValuePlaceholder', {})}
-                {...form.getInputProps('defaultValue')}
-              />
-            </Group>
-
-            <Group grow>
-              <Switch
-                label={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.userViewable', {})}
-                name='user_viewable'
-                {...form.getInputProps('userViewable', { type: 'checkbox' })}
-              />
-
-              <Switch
-                label={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.userEditable', {})}
-                name='user_editable'
-                {...form.getInputProps('userEditable', { type: 'checkbox' })}
-              />
-            </Group>
-
-            <Switch
-              label={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.secret', {})}
-              name='secret'
-              {...form.getInputProps('secret', { type: 'checkbox' })}
-            />
-
-            <TagsInput
-              label={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.rules', {})}
-              description={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.rulesDescription', {})}
-              {...form.getInputProps('rules')}
-            />
-          </Stack>
+          <FormEngine form={form} fields={fields} />
 
           <Group pt='md' mt='auto'>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>

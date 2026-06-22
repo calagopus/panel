@@ -16,7 +16,7 @@ import { ReactNode } from 'react';
 export type ColSpan = 'full' | 1;
 
 interface BaseFieldDef<T extends Record<string, unknown>> {
-  name: keyof T & string;
+  name: string;
   label: string;
   description?: string;
   required?: boolean;
@@ -68,6 +68,12 @@ export interface MultiSelectFieldDef<T extends Record<string, unknown>> extends 
   props?: Partial<MultiSelectProps>;
 }
 
+export interface MultiSelectGroupFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
+  type: 'multiselectgroup';
+  data: { group: string; items: { value: string; label: string }[] }[];
+  props?: Partial<Omit<MultiSelectProps, 'data' | 'value' | 'onChange'>>;
+}
+
 export interface DateFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'date';
   props?: Partial<DateTimePickerProps>;
@@ -77,6 +83,32 @@ export interface AutocompleteFieldDef<T extends Record<string, unknown>> extends
   type: 'autocomplete';
   options?: string[];
   props?: Partial<AutocompleteProps>;
+}
+
+export interface TagsFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
+  type: 'tags';
+  allowReordering?: boolean;
+  placeholder?: string;
+  allowDuplicates?: boolean;
+}
+
+export interface SizeFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
+  type: 'size';
+  mode: 'b' | 'mb';
+  min: number;
+}
+
+export interface LocalizedTextFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
+  type: 'localizedtext';
+  translationsName: keyof T & string;
+  languages: string[];
+}
+
+export interface LocalizedTextAreaFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
+  type: 'localizedtextarea';
+  translationsName: keyof T & string;
+  languages: string[];
+  rows?: number;
 }
 
 /**
@@ -104,6 +136,11 @@ export type FieldDef<T extends Record<string, unknown>> =
   | MultiSelectFieldDef<T>
   | DateFieldDef<T>
   | AutocompleteFieldDef<T>
+  | TagsFieldDef<T>
+  | SizeFieldDef<T>
+  | LocalizedTextFieldDef<T>
+  | LocalizedTextAreaFieldDef<T>
+  | MultiSelectGroupFieldDef<T>
   | CustomFieldDef<T>;
 
 // ---------------------------------------------------------------------------

@@ -6,14 +6,16 @@ import updateEggScript from '@/api/admin/nests/eggs/updateEggScript.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { adminEggConfigScriptSchema, adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+
+type ScriptFormValues = z.infer<typeof adminEggConfigScriptSchema>;
 
 export default function EggInstallationScriptContainer({
   contextNest,
@@ -27,7 +29,7 @@ export default function EggInstallationScriptContainer({
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof adminEggConfigScriptSchema>>({
+  const form = useForm<ScriptFormValues>({
     initialValues: {
       container: '',
       entrypoint: '',
@@ -63,6 +65,21 @@ export default function EggInstallationScriptContainer({
       });
   };
 
+  const fields: FieldDef<ScriptFormValues>[] = [
+    {
+      type: 'text',
+      name: 'container',
+      label: t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.form.container', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'entrypoint',
+      label: t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.form.entrypoint', {}),
+      required: true,
+    },
+  ];
+
   return (
     <>
       <AdminSubContentContainer
@@ -71,18 +88,7 @@ export default function EggInstallationScriptContainer({
       >
         <form onSubmit={form.onSubmit(doUpdate)}>
           <Stack>
-            <Group grow>
-              <TextInput
-                withAsterisk
-                label={t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.form.container', {})}
-                {...form.getInputProps('container')}
-              />
-              <TextInput
-                withAsterisk
-                label={t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.form.entrypoint', {})}
-                {...form.getInputProps('entrypoint')}
-              />
-            </Group>
+            <FormEngine form={form} fields={fields} />
 
             <div className='rounded-md overflow-hidden'>
               <MonacoEditor

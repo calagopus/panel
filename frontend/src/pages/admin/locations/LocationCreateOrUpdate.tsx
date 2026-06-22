@@ -10,10 +10,9 @@ import updateLocation from '@/api/admin/locations/updateLocation.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
@@ -25,13 +24,15 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const flags = import.meta.glob('/node_modules/svg-country-flags/svg/*.svg', { import: 'metadata' });
 
+type LocationFormValues = z.infer<typeof adminLocationUpdateSchema>;
+
 export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLocationSchema> }) => {
   const { t, language } = useTranslations();
 
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
-  const form = useForm<z.infer<typeof adminLocationUpdateSchema>>({
+  const form = useForm<LocationFormValues>({
     initialValues: {
       name: '',
       description: null,
@@ -43,7 +44,7 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminLocationUpdateSchema>,
+    LocationFormValues,
     z.infer<typeof adminLocationSchema>
   >({
     form,
@@ -75,6 +76,57 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
     canRequest: canReadBackupConfigurations,
   });
 
+  const fields: FieldDef<LocationFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    {
+      type: 'select',
+      name: 'backupConfigurationUuid',
+      label: t('common.form.backupConfiguration', {}),
+      options: backupConfigurations.items.map((b) => ({ label: b.name, value: b.uuid })),
+      props: {
+        placeholder: t('common.none', {}),
+        searchable: true,
+        searchValue: backupConfigurations.search,
+        onSearchChange: backupConfigurations.setSearch,
+        allowDeselect: true,
+        clearable: true,
+        disabled: !canReadBackupConfigurations,
+        loading: backupConfigurations.loading,
+      },
+    },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
+    {
+      type: 'custom',
+      name: 'flag',
+      render: (f) => (
+        <Select
+          label={t('pages.admin.locations.tabs.general.page.form.flag', {})}
+          placeholder={t('common.none', {})}
+          renderOption={({ option }) => (
+            <div className='flex items-center gap-2'>
+              <img src={`/flags/${option.value}.svg`} alt={option.label} className='w-4 h-4 rounded-md shrink-0' />
+              <span className='truncate'>{option.label}</span>
+            </div>
+          )}
+          data={Object.keys(flags)
+            .filter((flag) => basename(flag, '.svg').length === 2)
+            .map((flag) => {
+              const countryCode = basename(flag, '.svg');
+              const regionNames = new Intl.DisplayNames([language], { type: 'region' });
+              return {
+                label: regionNames.of(countryCode.toUpperCase()) || countryCode,
+                value: countryCode,
+              };
+            })}
+          clearable
+          searchable
+          key={f.key('flag')}
+          {...f.getInputProps('flag')}
+        />
+      ),
+    },
+  ];
+
   return (
     <AdminContentContainer
       title={t(
@@ -97,64 +149,7 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.locations.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <Select
-            label={t('common.form.backupConfiguration', {})}
-            placeholder={t('common.none', {})}
-            data={backupConfigurations.items.map((backupConfiguration) => ({
-              label: backupConfiguration.name,
-              value: backupConfiguration.uuid,
-            }))}
-            searchable
-            searchValue={backupConfigurations.search}
-            onSearchChange={backupConfigurations.setSearch}
-            allowDeselect
-            clearable
-            disabled={!canReadBackupConfigurations}
-            loading={backupConfigurations.loading}
-            key={form.key('backupConfigurationUuid')}
-            {...form.getInputProps('backupConfigurationUuid')}
-          />
-
-          <TextArea
-            label={t('common.form.description', {})}
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
-
-          <Select
-            label={t('pages.admin.locations.tabs.general.page.form.flag', {})}
-            placeholder={t('common.none', {})}
-            renderOption={({ option }) => (
-              <div className='flex items-center gap-2'>
-                <img src={`/flags/${option.value}.svg`} alt={option.label} className='w-4 h-4 rounded-md shrink-0' />
-                <span className='truncate'>{option.label}</span>
-              </div>
-            )}
-            data={Object.keys(flags)
-              .filter((flag) => basename(flag, '.svg').length === 2)
-              .map((flag) => {
-                const countryCode = basename(flag, '.svg');
-                const regionNames = new Intl.DisplayNames([language], { type: 'region' });
-
-                return {
-                  label: regionNames.of(countryCode.toUpperCase()) || countryCode,
-                  value: countryCode,
-                };
-              })}
-            clearable
-            searchable
-            key={form.key('flag')}
-            {...form.getInputProps('flag')}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextLocation ? 'locations.update' : 'locations.create'} cantSave>

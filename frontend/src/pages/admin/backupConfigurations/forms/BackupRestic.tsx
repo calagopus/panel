@@ -8,10 +8,10 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import Divider from '@/elements/Divider.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
-import NumberInput from '@/elements/input/NumberInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/Stack.tsx';
@@ -81,9 +81,26 @@ function PruneJobRow({ form, index }: { form: ResticForm; index: number }) {
   );
 }
 
+type ResticFormValues = z.infer<typeof adminBackupConfigurationResticSchema>;
+
 export default function BackupRestic({ form }: { form: ResticForm }) {
   const { t } = useTranslations();
   const pruneJobs = form.values.pruneJobs ?? [];
+
+  const fields: FieldDef<ResticFormValues>[] = [
+    {
+      type: 'text',
+      name: 'repository',
+      label: t('pages.admin.backupConfigurations.tabs.general.page.restic.form.repository', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'retryLockSeconds',
+      label: t('pages.admin.backupConfigurations.tabs.general.page.restic.form.retryLockSeconds', {}),
+      required: true,
+    },
+  ];
 
   return (
     <Stack gap='xs' mt='md'>
@@ -93,20 +110,7 @@ export default function BackupRestic({ form }: { form: ResticForm }) {
       </Stack>
 
       <Stack>
-        <Group grow>
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.backupConfigurations.tabs.general.page.restic.form.repository', {})}
-            key={form.key('repository')}
-            {...form.getInputProps('repository')}
-          />
-          <NumberInput
-            withAsterisk
-            label={t('pages.admin.backupConfigurations.tabs.general.page.restic.form.retryLockSeconds', {})}
-            key={form.key('retryLockSeconds')}
-            {...form.getInputProps('retryLockSeconds')}
-          />
-        </Group>
+        <FormEngine form={form} fields={fields} />
 
         <PasswordInput
           withAsterisk
