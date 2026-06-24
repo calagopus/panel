@@ -1,9 +1,19 @@
-import { faChartPie, faHardDrive, faMemory, faMicrochip, faServer } from '@fortawesome/free-solid-svg-icons';
+import {
+  faChartPie,
+  faCircleInfo,
+  faHardDrive,
+  faMemory,
+  faMicrochip,
+  faServer,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SimpleGrid, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
 import getNodeCapacity from '@/api/admin/nodes/getNodeCapacity.ts';
+import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
+import { axiosInstance } from '@/api/axios.ts';
 import Badge from '@/elements/Badge.tsx';
 import Card from '@/elements/Card.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -14,13 +24,25 @@ import Stack from '@/elements/Stack.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import Title from '@/elements/Title.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
+import { getNodeUrl } from '@/lib/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { formatDateTime } from '@/lib/time.ts';
+import { parseVersion } from '@/lib/version.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useAdminStore } from '@/stores/admin.tsx';
 
 type Node = z.infer<typeof adminNodeSchema>;
+
+interface SystemInfo {
+  architecture: string;
+  cpuCount: number;
+  kernelVersion: string;
+  os: string;
+  version: string;
+}
 
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -100,11 +122,37 @@ function CapacityResource({
 
 export default function NodeOverview({ node }: { node: Node }) {
   const { t } = useTranslations();
+  const { updateInformation } = useAdminStore();
+
+  const [systemInfo, setSystemInfo] = useState<SystemInfo | 'unavailable' | null>(null);
 
   const { data: capacity } = useQuery({
     queryKey: queryKeys.admin.nodes.capacity(node.uuid),
     queryFn: () => getNodeCapacity(node.uuid),
   });
+
+  const { data: nodeToken } = useResource({
+    queryKey: queryKeys.admin.nodes.token(node.uuid),
+    queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
+    silent: true,
+  });
+
+  useEffect(() => {
+    if (!nodeToken?.token) return;
+
+    axiosInstance
+      .get<SystemInfo>(getNodeUrl(node, '/api/system'), {
+        headers: { Authorization: `Bearer ${nodeToken.token}` },
+      })
+      .then(({ data }) => setSystemInfo(data))
+      .catch(() => setSystemInfo('unavailable'));
+  }, [node, nodeToken?.token]);
+
+  const versionString = systemInfo && systemInfo !== 'unavailable' ? systemInfo.version : null;
+  const hasUpdate =
+    versionString && updateInformation
+      ? parseVersion(updateInformation.latestWingsVersion).isNewerThan(versionString)
+      : false;
 
   return (
     <AdminSubContentContainer title={t('pages.admin.nodes.tabs.overview.page.title', {})} titleOrder={2}>
@@ -122,12 +170,12 @@ export default function NodeOverview({ node }: { node: Node }) {
       </Group>
 
       <Stack gap='md'>
-        <TitleCard
-          title={t('pages.admin.nodes.tabs.overview.page.card.nodeDetails', {})}
-          icon={<FontAwesomeIcon icon={faServer} />}
-        >
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing={0}>
-            <Stack gap={0} className='md:pr-4 md:border-r md:border-(--mantine-color-default-border)'>
+        <SimpleGrid cols={{ base: 1, md: 2 }} spacing='md'>
+          <TitleCard
+            title={t('pages.admin.nodes.tabs.overview.page.card.nodeDetails', {})}
+            icon={<FontAwesomeIcon icon={faServer} />}
+          >
+            <Stack gap={0}>
               <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.location', {})}>
                 <TableLink to={`/admin/locations/${node.location.uuid}`}>
                   {locationFlag(node.location.flag)}
@@ -153,8 +201,6 @@ export default function NodeOverview({ node }: { node: Node }) {
                   {node.sftpHost ?? new URL(node.url).hostname}:{node.sftpPort}
                 </Text>
               </InfoRow>
-            </Stack>
-            <Stack gap={0} className='md:pl-4'>
               <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.backupConfiguration', {})}>
                 {node.backupConfiguration ? (
                   <TableLink to={`/admin/backup-configurations/${node.backupConfiguration.uuid}`}>
@@ -175,8 +221,58 @@ export default function NodeOverview({ node }: { node: Node }) {
                 <Text size='sm'>{formatDateTime(node.created)}</Text>
               </InfoRow>
             </Stack>
-          </SimpleGrid>
-        </TitleCard>
+          </TitleCard>
+
+          <TitleCard
+            title={t('pages.admin.nodes.tabs.overview.page.card.systemInfo', {})}
+            icon={<FontAwesomeIcon icon={faCircleInfo} />}
+          >
+            {systemInfo === null ? (
+              <Spinner.Centered />
+            ) : systemInfo === 'unavailable' ? (
+              <Stack gap={0}>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.wingsVersion', {})}>
+                  <Text size='sm' c='dimmed'>
+                    {t('pages.admin.nodes.tabs.overview.page.label.unavailable', {})}
+                  </Text>
+                </InfoRow>
+              </Stack>
+            ) : (
+              <Stack gap={0}>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.wingsVersion', {})}>
+                  <Group gap='xs' justify='flex-end'>
+                    <Text size='sm' ff='monospace'>
+                      {systemInfo.version}
+                    </Text>
+                    {hasUpdate && (
+                      <Badge color='yellow' variant='light' size='sm'>
+                        {t('pages.admin.nodes.tabs.overview.page.badge.updateAvailable', {})}
+                      </Badge>
+                    )}
+                  </Group>
+                </InfoRow>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.os', {})}>
+                  <Text size='sm' tt='capitalize'>
+                    {systemInfo.os}
+                  </Text>
+                </InfoRow>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.kernelVersion', {})}>
+                  <Text size='sm' ff='monospace'>
+                    {systemInfo.kernelVersion}
+                  </Text>
+                </InfoRow>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.architecture', {})}>
+                  <Text size='sm' ff='monospace'>
+                    {systemInfo.architecture}
+                  </Text>
+                </InfoRow>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.cpuCount', {})}>
+                  <Text size='sm'>{systemInfo.cpuCount}</Text>
+                </InfoRow>
+              </Stack>
+            )}
+          </TitleCard>
+        </SimpleGrid>
 
         <TitleCard
           title={t('pages.admin.nodes.tabs.capacity.page.card.resources', {})}

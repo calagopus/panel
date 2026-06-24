@@ -1998,6 +1998,7 @@ const baseTranslations = defineTranslations({
                 title: 'Node Overview',
                 card: {
                   nodeDetails: 'Node Details',
+                  systemInfo: 'System Information',
                 },
                 label: {
                   location: 'Location',
@@ -2009,6 +2010,15 @@ const baseTranslations = defineTranslations({
                   createdAt: 'Created',
                   inheritedFromLocation: 'Inherited from Location',
                   none: 'None',
+                  wingsVersion: 'Wings Version',
+                  os: 'Operating System',
+                  architecture: 'Architecture',
+                  cpuCount: 'CPU Threads',
+                  kernelVersion: 'Kernel Version',
+                  unavailable: 'Unavailable',
+                },
+                badge: {
+                  updateAvailable: 'Update Available',
                 },
               },
             },

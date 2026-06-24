@@ -2021,7 +2021,8 @@
               "page": {
                 "title": "Node Overview",
                 "card": {
-                  "nodeDetails": "Node Details"
+                  "nodeDetails": "Node Details",
+                  "systemInfo": "System Information"
                 },
                 "label": {
                   "location": "Location",
@@ -2032,7 +2033,16 @@
                   "description": "Description",
                   "createdAt": "Created",
                   "inheritedFromLocation": "Inherited from Location",
-                  "none": "None"
+                  "none": "None",
+                  "wingsVersion": "Wings Version",
+                  "os": "Operating System",
+                  "architecture": "Architecture",
+                  "cpuCount": "CPU Threads",
+                  "kernelVersion": "Kernel Version",
+                  "unavailable": "Unavailable"
+                },
+                "badge": {
+                  "updateAvailable": "Update Available"
                 }
               }
             },
