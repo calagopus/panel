@@ -195,11 +195,6 @@
   --chart-series-2-fill: rgba(161, 98, 7, 0.5);
 }
 
-html {
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
-}
-
 body {
   @apply font-sans;
   background-color: var(--mantine-color-body);
