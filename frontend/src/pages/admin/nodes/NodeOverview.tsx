@@ -30,6 +30,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { formatDateTime } from '@/lib/time.ts';
 import { parseVersion } from '@/lib/version.ts';
+import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
@@ -123,6 +124,7 @@ function CapacityResource({
 export default function NodeOverview({ node }: { node: Node }) {
   const { t } = useTranslations();
   const { updateInformation } = useAdminStore();
+  const canReadToken = useAdminCan('nodes.read-token');
 
   const [systemInfo, setSystemInfo] = useState<SystemInfo | 'unavailable' | null>(null);
 
@@ -135,6 +137,7 @@ export default function NodeOverview({ node }: { node: Node }) {
     queryKey: queryKeys.admin.nodes.token(node.uuid),
     queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
     silent: true,
+    enabled: canReadToken,
   });
 
   useEffect(() => {
@@ -227,7 +230,15 @@ export default function NodeOverview({ node }: { node: Node }) {
             title={t('pages.admin.nodes.tabs.overview.page.card.systemInfo', {})}
             icon={<FontAwesomeIcon icon={faCircleInfo} />}
           >
-            {systemInfo === null ? (
+            {!canReadToken ? (
+              <Stack gap={0}>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.wingsVersion', {})}>
+                  <Text size='sm' c='dimmed'>
+                    {t('elements.screenBlock.permissionDenied.title', {})}
+                  </Text>
+                </InfoRow>
+              </Stack>
+            ) : systemInfo === null ? (
               <Spinner.Centered />
             ) : systemInfo === 'unavailable' ? (
               <Stack gap={0}>
