@@ -1992,6 +1992,26 @@ const baseTranslations = defineTranslations({
           title: 'Nodes',
           resourceName: 'Node',
           tabs: {
+            overview: {
+              title: 'Overview',
+              page: {
+                title: 'Node Overview',
+                card: {
+                  nodeDetails: 'Node Details',
+                },
+                label: {
+                  location: 'Location',
+                  url: 'Internal URL',
+                  publicUrl: 'Public URL',
+                  sftpAddress: 'SFTP Address',
+                  backupConfiguration: 'Backup Configuration',
+                  description: 'Description',
+                  createdAt: 'Created',
+                  inheritedFromLocation: 'Inherited from Location',
+                  none: 'None',
+                },
+              },
+            },
             general: {
               page: {
                 tooltip: {
