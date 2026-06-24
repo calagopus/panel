@@ -1522,8 +1522,7 @@
                     "permissionsPublicData": "Toto je miesto, kde môžu rozšírenia ukladať verejné údaje (napr. obrázky)."
                   },
                   "form": {
-                    "pathStyleOn": "Používanie adries URL v štýle cesty",
-                    "pathStyleOff": "Používanie adries URL v štýle virtuálneho hosťovania"
+                    "pathStyle": "Používať URL vo formáte path-style"
                   }
                 }
               }

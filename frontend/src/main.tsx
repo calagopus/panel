@@ -47,4 +47,9 @@ if (!root) {
   throw new Error('Root element not found');
 }
 
-createRoot(root).render(<App theme={window.extensionContext.getMantineTheme()} />);
+createRoot(root).render(
+  <App
+    theme={window.extensionContext.getMantineTheme()}
+    cssVariablesResolver={window.extensionContext.getMantineCssResolver()}
+  />,
+);

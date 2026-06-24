@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { nullableString } from '@/lib/transformers.ts';
+import { compressionType } from '../generic.ts';
 
 export const adminBackupConfigurationResticPruneJobSchema = z.object({
   cron: z.string().min(1),
@@ -20,6 +21,7 @@ export const adminBackupConfigurationS3Schema = z.object({
   region: z.string(),
   endpoint: z.url({ protocol: /^https?$/ }),
   pathStyle: z.boolean(),
+  compressionType: z.lazy(() => compressionType),
   partSize: z.number().min(0),
 });
 

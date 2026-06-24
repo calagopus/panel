@@ -358,6 +358,16 @@ jobs:
           sbom-path: sbom/sbom-source.cyclonedx.json
           push-to-registry: true
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Sign images with cosign
+        run: |
+          cosign sign --yes ${{ env.GHCR_IMAGE }}@${{ steps.build.outputs.digest }}
+          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}@${{ steps.build.outputs.digest }}
+          cosign sign --yes ${{ env.GHCR_IMAGE }}@${{ steps.build-aio.outputs.digest }}
+          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}@${{ steps.build-aio.outputs.digest }}
+
   build-heavy-image:
     name: Build Heavy Docker image (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
@@ -473,6 +483,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Login to GitHub Container Registry
@@ -532,6 +543,16 @@ jobs:
             docker buildx imagetools create -t "$TAG" "$DOCKERHUB_SRC_AMD64" "$DOCKERHUB_SRC_ARM64"
           done
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Sign heavy images with cosign
+        run: |
+          FIRST_GHCR_TAG=$(echo "$GHCR_HEAVY_TAGS" | cut -d',' -f1)
+          cosign sign --yes "$FIRST_GHCR_TAG"
+          FIRST_DOCKERHUB_TAG=$(echo "$DOCKERHUB_HEAVY_TAGS" | cut -d',' -f1)
+          cosign sign --yes "$FIRST_DOCKERHUB_TAG"
+
   merge-heavy-aio-image:
     name: Merge Heavy AIO Docker manifest
     needs: [build-heavy-aio-image]
@@ -539,6 +560,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Login to GitHub Container Registry
@@ -597,3 +619,13 @@ jobs:
           for TAG in "${TAGS[@]}"; do
             docker buildx imagetools create -t "$TAG" "$DOCKERHUB_SRC_AMD64" "$DOCKERHUB_SRC_ARM64"
           done
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Sign heavy AIO images with cosign
+        run: |
+          FIRST_GHCR_TAG=$(echo "$GHCR_HEAVY_AIO_TAGS" | cut -d',' -f1)
+          cosign sign --yes "$FIRST_GHCR_TAG"
+          FIRST_DOCKERHUB_TAG=$(echo "$DOCKERHUB_HEAVY_AIO_TAGS" | cut -d',' -f1)
+          cosign sign --yes "$FIRST_DOCKERHUB_TAG"

@@ -189,6 +189,7 @@ const baseTranslations = defineTranslations({
           size: 'Size',
           lastUsed: 'Last Used',
           created: 'Created',
+          updated: 'Updated',
           actor: 'Actor',
           event: 'Event',
           ip: 'IP',
@@ -275,6 +276,12 @@ const baseTranslations = defineTranslations({
           stopped: 'Stopped',
           restarted: 'Restarted',
           killed: 'Killed',
+        },
+        compressionLevel: {
+          bestSpeed: 'Best Speed',
+          goodSpeed: 'Good Speed',
+          goodCompression: 'Good Compression',
+          bestCompression: 'Best Compression',
         },
       },
       unit: {
@@ -1489,8 +1496,7 @@ const baseTranslations = defineTranslations({
                     permissionsPublicData: 'This is where extensions can store public data (e.g., images).',
                   },
                   form: {
-                    pathStyleOn: 'Using path-style URLs',
-                    pathStyleOff: 'Using virtual-hosted-style URLs',
+                    pathStyle: 'Using path-style URLs',
                   },
                 },
               },
@@ -2901,6 +2907,9 @@ const baseTranslations = defineTranslations({
                     button: 'Install {eggs}',
                   },
                 },
+                drawer: {
+                  noReadme: 'This egg does not have a README.',
+                },
               },
             },
           },
@@ -3118,6 +3127,7 @@ const baseTranslations = defineTranslations({
                   title: 'S3 Settings',
                   form: {
                     partSize: 'Part Size',
+                    compressionType: 'Compression Type',
                     pathStyle: 'Using path-style URLs',
                   },
                 },

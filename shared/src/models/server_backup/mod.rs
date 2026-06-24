@@ -973,11 +973,14 @@ impl ServerBackup {
                             {
                                 s3_configuration.decrypt(&state.database).await?;
 
+                                let compression_type = s3_configuration.compression_type;
                                 let (client, bucket) = s3_configuration.into_client();
 
                                 let file_path = match &self.upload_path {
                                     Some(path) => path.as_str(),
-                                    None => &Self::s3_path(server.uuid, self.uuid),
+                                    None => {
+                                        &Self::s3_path(server.uuid, self.uuid, compression_type)
+                                    }
                                 };
 
                                 let presigning_config =
@@ -1052,14 +1055,41 @@ impl ServerBackup {
     }
 
     #[inline]
-    pub fn s3_path(server_uuid: uuid::Uuid, backup_uuid: uuid::Uuid) -> compact_str::CompactString {
-        compact_str::format_compact!("{server_uuid}/{backup_uuid}.tar.gz")
+    pub fn s3_path(
+        server_uuid: uuid::Uuid,
+        backup_uuid: uuid::Uuid,
+        compression_type: wings_api::CompressionType,
+    ) -> compact_str::CompactString {
+        compact_str::format_compact!(
+            "{server_uuid}/{backup_uuid}.tar{}",
+            match compression_type {
+                wings_api::CompressionType::None => "",
+                wings_api::CompressionType::Gz => ".gz",
+                wings_api::CompressionType::Xz => ".xz",
+                wings_api::CompressionType::Lzip => ".lz",
+                wings_api::CompressionType::Bz2 => ".bz2",
+                wings_api::CompressionType::Lz4 => ".lz4",
+                wings_api::CompressionType::Zstd => ".zst",
+            }
+        )
     }
 
     #[inline]
     pub fn s3_content_type(name: &str) -> &'static str {
-        if name.ends_with(".tar.gz") {
+        if name.ends_with("tar") {
+            "application/x-tar"
+        } else if name.ends_with(".tar.gz") {
             "application/x-gzip"
+        } else if name.ends_with(".tar.xz") {
+            "application/x-xz"
+        } else if name.ends_with(".tar.lz") {
+            "application/x-lzip"
+        } else if name.ends_with(".tar.bz2") {
+            "application/x-bzip2"
+        } else if name.ends_with(".tar.lz4") {
+            "application/x-lz4"
+        } else if name.ends_with(".tar.zst") {
+            "application/zstd"
         } else {
             "application/octet-stream"
         }
@@ -1569,12 +1599,13 @@ impl DeletableModel for ServerBackup {
                     if let Some(mut s3_configuration) = backup_configuration.backup_configs.s3 {
                         s3_configuration.decrypt(&state.database).await?;
 
+                        let compression_type = s3_configuration.compression_type;
                         let (client, bucket) = s3_configuration.into_client();
 
                         let file_path = match &backup.upload_path {
                             Some(path) => path,
                             None => if let Some(server) = &backup.server {
-                                &Self::s3_path(server.uuid, backup.uuid)
+                                &Self::s3_path(server.uuid, backup.uuid, compression_type)
                             } else {
                                 return Err(anyhow::anyhow!("backup upload path not found"))
                             }

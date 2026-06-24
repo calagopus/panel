@@ -149,7 +149,7 @@ export default function Terminal() {
       lineHeight: 1.2,
       disableStdin: true,
       convertEol: true,
-      smoothScrollDuration: 250,
+      smoothScrollDuration: 0,
       allowProposedApi: true,
       fontWeightBold: '500',
       rescaleOverlappingGlyphs: true,

@@ -1,41 +1,31 @@
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { forwardRef, memo, useState } from 'react';
+import { forwardRef, memo } from 'react';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import { AdminCan } from '@/elements/Can.tsx';
 import Code from '@/elements/Code.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
-import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
-import EggRepositoryEggInstallModal from './modals/EggRepositoryEggInstallModal.tsx';
+import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { adminEggRepositoryEggSchema } from '@/lib/schemas/admin/eggRepositories.ts';
 
 interface EggRepositoryEggRowProps {
-  eggRepository: z.infer<typeof adminEggRepositorySchema>;
   egg: z.infer<typeof adminEggRepositoryEggSchema>;
   isSelected: boolean;
   onSelectionChange: (selected: boolean) => void;
+  onOpen: () => void;
 }
 
 const EggRepositoryEggRow = memo(
   forwardRef<HTMLTableRowElement, EggRepositoryEggRowProps>(function EggRepositoryEggRow(
-    { eggRepository, egg, isSelected, onSelectionChange },
+    { egg, isSelected, onSelectionChange, onOpen },
     ref,
   ) {
-    const [openModal, setOpenModal] = useState<'install' | null>(null);
-
     return (
       <>
-        <AdminCan action='nests.read'>
-          <EggRepositoryEggInstallModal
-            eggRepository={eggRepository}
-            egg={egg}
-            opened={openModal === 'install'}
-            onClose={() => setOpenModal(null)}
-          />
-        </AdminCan>
-
-        <TableRow bg={isSelected ? 'var(--mantine-color-blue-light)' : undefined} ref={ref}>
+        <TableRow
+          bg={isSelected ? 'var(--mantine-color-blue-light)' : undefined}
+          ref={ref}
+          className='cursor-pointer'
+          onClick={onOpen}
+        >
           <TableData className='pl-4 relative cursor-pointer w-10 text-center'>
             <Checkbox
               id={egg.uuid}
@@ -52,18 +42,14 @@ const EggRepositoryEggRow = memo(
             <Code>{egg.path}</Code>
           </TableData>
 
-          <TableData>{egg.name}</TableData>
+          <TableData>{egg.exportedEgg.name}</TableData>
 
-          <TableData>{egg.author}</TableData>
+          <TableData>{egg.exportedEgg.author}</TableData>
 
-          <TableData>{egg.description}</TableData>
+          <TableData>{egg.exportedEgg.description}</TableData>
 
           <TableData>
-            <AdminCan action='nests.read'>
-              <ActionIcon onClick={() => setOpenModal('install')}>
-                <FontAwesomeIcon icon={faDownload} />
-              </ActionIcon>
-            </AdminCan>
+            <FormattedTimestamp timestamp={egg.updated} />
           </TableData>
         </TableRow>
       </>

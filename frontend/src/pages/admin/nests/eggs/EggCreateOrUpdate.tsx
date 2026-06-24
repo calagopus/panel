@@ -154,7 +154,7 @@ export default function EggCreateOrUpdate({
       selectedEggRepositoryUuid
         ? getEggRepositoryEggs(selectedEggRepositoryUuid, 1, search)
         : Promise.resolve(getEmptyPaginationSet()),
-    defaultSearchValue: contextEgg?.eggRepositoryEgg?.name,
+    defaultSearchValue: contextEgg?.eggRepositoryEgg?.exportedEgg.name,
     deps: [selectedEggRepositoryUuid],
   });
 
@@ -327,7 +327,7 @@ export default function EggCreateOrUpdate({
               placeholder={t('common.none', {})}
               disabled={!selectedEggRepositoryUuid}
               data={eggRepositoryEggs.items.map((eggRepositoryEgg) => ({
-                label: eggRepositoryEgg.name,
+                label: eggRepositoryEgg.exportedEgg.name,
                 value: eggRepositoryEgg.uuid,
               }))}
               searchable

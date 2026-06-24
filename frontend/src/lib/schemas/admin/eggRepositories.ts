@@ -19,13 +19,15 @@ export const adminEggRepositoryUpdateSchema = z.lazy(() =>
 export const adminEggRepositoryEggSchema = z.object({
   uuid: z.string(),
   path: z.string(),
-  author: z.string(),
-  name: z.string(),
-  description: z.string().nullable(),
+  readme: z.string().nullable(),
   exportedEgg: z.object({
+    name: z.string(),
+    description: z.string().nullable(),
+    author: z.string(),
     startupCommands: z.record(z.string(), z.string()),
     dockerImages: z.record(z.string(), z.string()),
   }),
+  updated: z.date(),
 });
 
 export const adminEggEggRepositoryEggSchema = z.lazy(() =>

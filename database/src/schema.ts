@@ -582,10 +582,9 @@ export const eggRepositoriesEggsTable = pgTable(
       .references(() => eggRepositoriesTable.uuid, { onDelete: 'cascade' })
       .notNull(),
     path: text().notNull(),
-    name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
-    description: text(),
-    author: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    readme: text(),
     exported_egg: json().notNull(),
+    updated: timestamp().defaultNow().notNull(),
   },
   (cols) => [
     index('egg_repository_eggs_egg_repository_uuid_idx').on(cols.egg_repository_uuid),

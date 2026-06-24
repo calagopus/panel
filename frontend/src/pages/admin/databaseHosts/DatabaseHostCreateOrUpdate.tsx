@@ -241,11 +241,7 @@ export default function DatabaseHostCreateOrUpdate({
               </AdminCan>
             </>
           )}
-          <a
-            href='https://calagopus.com/docs/advanced/setting-up-database-hosts'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
+          <a href='https://calagopus.com/docs/additional/database-hosts/' target='_blank' rel='noopener noreferrer'>
             <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
               {t('common.button.viewDocumentation', {})}
             </Button>

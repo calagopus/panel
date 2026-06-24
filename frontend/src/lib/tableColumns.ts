@@ -260,7 +260,7 @@ export const eggRepositoryEggTableColumns = (): string[] => {
     t('common.table.columns.name', {}),
     t('common.table.columns.author', {}),
     t('common.table.columns.description', {}),
-    '',
+    t('common.table.columns.updated', {}),
   ];
 };
 

@@ -49,7 +49,13 @@ mod get {
             .ok();
         }
 
-        let size = match database.get_size(&state.database).await {
+        let size = match state
+            .cache
+            .cached(&format!("database_size::{}", database.uuid), 15, || async {
+                database.get_size(&state.database).await
+            })
+            .await
+        {
             Ok(size) => size,
             Err(err) => {
                 tracing::error!(server = %server.uuid, "failed to get database size: {:?}", err);

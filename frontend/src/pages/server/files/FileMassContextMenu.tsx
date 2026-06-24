@@ -81,7 +81,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         {
           icon: faCopy,
           label: t('pages.server.files.button.copy', {}),
-          hidden: !!actingMode || !browsingWritableDirectory,
+          hidden: !!actingMode,
           onClick: () => {
             doActFiles('copy', selectedFiles.values());
             doSelectFiles([]);

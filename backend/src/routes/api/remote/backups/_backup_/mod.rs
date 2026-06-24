@@ -154,9 +154,10 @@ mod post {
                 }
             };
 
+            let compression_type = s3_configuration.compression_type;
             let (client, bucket) = s3_configuration.into_client();
 
-            let file_path = ServerBackup::s3_path(server.uuid, backup.uuid);
+            let file_path = ServerBackup::s3_path(server.uuid, backup.uuid, compression_type);
 
             if data.successful {
                 let completed_parts: Vec<CompletedPart> = data

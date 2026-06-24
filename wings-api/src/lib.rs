@@ -86,6 +86,24 @@ pub enum CompressionLevel {
     BestCompression,
 }
 
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum CompressionType {
+    #[serde(rename = "none")]
+    None,
+    #[serde(rename = "gz")]
+    Gz,
+    #[serde(rename = "xz")]
+    Xz,
+    #[serde(rename = "lzip")]
+    Lzip,
+    #[serde(rename = "bz2")]
+    Bz2,
+    #[serde(rename = "lz4")]
+    Lz4,
+    #[serde(rename = "zstd")]
+    Zstd,
+}
+
 nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct CopyFile {
         #[schema(inline)]
@@ -2401,6 +2419,8 @@ pub mod system_logs {
                 pub log_files: Vec<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200LogFiles {
                     #[schema(inline)]
                     pub name: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub compression_type: CompressionType,
                     #[schema(inline)]
                     pub size: u64,
                     #[schema(inline)]

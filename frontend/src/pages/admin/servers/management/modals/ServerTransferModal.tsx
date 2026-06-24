@@ -43,8 +43,8 @@ export default function ServerTransferModal({
   const [selectedAllocationUuids, setSelectedAllocationUuids] = useState<string[]>([]);
   const [selectedBackupUuids, setSelectedBackupsUuids] = useState<string[]>([]);
   const [deleteSourceBackups, setDeleteSourceBackups] = useState(false);
-  const [archiveFormat, setArchiveFormat] = useState<z.infer<typeof transferArchiveFormat>>('tar_lz4');
-  const [compressionLevel, setCompressionLevel] = useState<z.infer<typeof compressionLevelEnum>>('good_compression');
+  const [archiveFormat, setArchiveFormat] = useState<z.infer<typeof transferArchiveFormat>>('tar_zstd');
+  const [compressionLevel, setCompressionLevel] = useState<z.infer<typeof compressionLevelEnum>>('good_speed');
   const [multiplexChannels, setMultiplexChannels] = useState(0);
 
   const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
@@ -228,7 +228,7 @@ export default function ServerTransferModal({
             disabled={archiveFormat === 'tar' || archiveFormat === 'itaf'}
             data={Object.entries(compressionLevelLabelMapping).map(([value, label]) => ({
               value,
-              label,
+              label: label(),
             }))}
           />
 

@@ -1522,8 +1522,7 @@
                     "permissionsPublicData": "Đây là nơi các tiện ích mở rộng có thể lưu trữ dữ liệu công khai (vd: hình ảnh)."
                   },
                   "form": {
-                    "pathStyleOn": "Sử dụng URL kiểu đường dẫn",
-                    "pathStyleOff": "Sử dụng URL kiểu virtual-hosted"
+                    "pathStyle": "Sử dụng URL kiểu đường dẫn"
                   }
                 }
               }

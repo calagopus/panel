@@ -200,7 +200,7 @@ function FileRevisionDiffComponent() {
                   wordWrap: editorLineOverflow ? 'on' : 'off',
                   codeLens: false,
                   scrollBeyondLastLine: false,
-                  smoothScrolling: true,
+                  smoothScrolling: false,
                   // @ts-expect-error this is valid
                   touchScrollEnabled: true,
                   fixedOverflowWidgets: true,

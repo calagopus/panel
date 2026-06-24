@@ -64,10 +64,12 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
             controlsPosition={navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? 'left' : 'right'}
             draggable='header'
             opened
+            shadow='xl'
             onClose={() => closeWindow(w.id)}
             defaultWidth='50%'
             defaultHeight='50%'
             withScrollArea={false}
+            styles={{ content: { overscrollBehavior: 'contain' } }}
           >
             <CurrentWindowProvider id={w.id}>{w.component}</CurrentWindowProvider>
           </Window>

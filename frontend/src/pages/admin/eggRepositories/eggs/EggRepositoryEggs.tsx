@@ -11,6 +11,7 @@ import { eggRepositoryEggTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import EggRepositoryEggDrawer from './drawers/EggRepositoryEggDrawer.tsx';
 import EggActionBar from './EggActionBar.tsx';
 import EggRepositoryEggRow from './EggRepositoryEggRow.tsx';
 
@@ -24,6 +25,7 @@ export default function EggRepositoryEggs({
     new ObjectSet<z.infer<typeof adminEggRepositoryEggSchema>, 'uuid'>('uuid'),
   );
   const selectedEggsPreviousRef = useRef<z.infer<typeof adminEggRepositoryEggSchema>[]>([]);
+  const [drawerEgg, setDrawerEgg] = useState<z.infer<typeof adminEggRepositoryEggSchema> | null>(null);
 
   useEffect(() => {
     setSelectedEggs(new ObjectSet('uuid'));
@@ -94,7 +96,14 @@ export default function EggRepositoryEggs({
         setSelectedEggs={setSelectedEggs}
       />
 
-      <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
+      <EggRepositoryEggDrawer
+        eggRepository={contextEggRepository}
+        egg={drawerEgg}
+        opened={drawerEgg !== null}
+        onClose={() => setDrawerEgg(null)}
+      />
+
+      <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected} disabled={drawerEgg !== null}>
         <Table
           columns={eggRepositoryEggTableColumns()}
           loading={loading}
@@ -107,11 +116,11 @@ export default function EggRepositoryEggs({
               {(innerRef: Ref<HTMLElement>) => (
                 <EggRepositoryEggRow
                   key={eggRepositoryEgg.uuid}
-                  eggRepository={contextEggRepository}
                   egg={eggRepositoryEgg}
                   ref={innerRef as Ref<HTMLTableRowElement>}
                   isSelected={selectedEggs.has(eggRepositoryEgg.uuid)}
                   onSelectionChange={(selected) => handleEggSelectionChange(eggRepositoryEgg, selected)}
+                  onOpen={() => setDrawerEgg(eggRepositoryEgg)}
                 />
               )}
             </SelectionArea.Selectable>

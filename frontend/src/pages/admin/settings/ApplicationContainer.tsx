@@ -154,7 +154,7 @@ export default function ApplicationContainer() {
       advanced: true,
     },
     {
-      type: 'text',
+      type: 'number',
       name: 'sessionDurationSeconds',
       label: t('pages.admin.settings.tabs.application.page.form.sessionDurationSeconds', {}),
       required: true,

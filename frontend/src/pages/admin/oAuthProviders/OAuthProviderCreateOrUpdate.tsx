@@ -361,7 +361,11 @@ export default function OAuthProviderCreateOrUpdate({
               </Button>
             </AdminCan>
           )}
-          <Anchor href='https://calagopus.com/docs/advanced/oauth' target='_blank' rel='noopener noreferrer'>
+          <Anchor
+            href='https://calagopus.com/docs/additional/setting-up-oauth/'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
             <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
               {t('common.button.viewDocumentation', {})}
             </Button>

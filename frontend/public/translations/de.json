@@ -253,6 +253,7 @@
           "size": "Größe",
           "lastUsed": "Zuletzt verwendet",
           "created": "Erstellt",
+          "updated": "Aktualisiert",
           "actor": "Akteur",
           "event": "Ereignis",
           "ip": "IP",
@@ -339,6 +340,12 @@
           "stopped": "Gestoppt",
           "restarted": "Neu gestartet",
           "killed": "Gekillt"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Beste Geschwindigkeit",
+          "goodSpeed": "Gute Geschwindigkeit",
+          "goodCompression": "Gute Komprimierung",
+          "bestCompression": "Beste Komprimierung"
         }
       },
       "unit": {
@@ -1522,8 +1529,7 @@
                     "permissionsPublicData": "Hier können Erweiterungen öffentliche Daten (z. B. Bilder) speichern."
                   },
                   "form": {
-                    "pathStyleOn": "Pfad-Stil-URLs verwenden",
-                    "pathStyleOff": "Virtual-Hosted-Stil-URLs verwenden"
+                    "pathStyle": "Pfad-Stil-URLs verwenden"
                   }
                 }
               }
@@ -2890,6 +2896,9 @@
                     "title": "Egg Repository Eggs installieren",
                     "button": "{eggs} installieren"
                   }
+                },
+                "drawer": {
+                  "noReadme": "Dieses Egg hat keine README."
                 }
               }
             }
@@ -3078,7 +3087,8 @@
                 "alert": {
                   "ddupBak": "Ddup-Bak ist Technology-Preview-Software, sie wird technisch nicht für den Produktiveinsatz empfohlen. Wenn du dies zur Kenntnis nimmst, kannst du gerne fortfahren.",
                   "btrfs": "Btrfs erfordert zusätzliche Einrichtung auf der Node, um zu funktionieren, bitte [siehe die Dokumentation]({docsUrl}) für weitere Details.",
-                  "zfs": "ZFS erfordert zusätzliche Einrichtung auf der Node, um zu funktionieren, bitte [siehe die Dokumentation]({docsUrl}) für weitere Details."
+                  "zfs": "ZFS erfordert zusätzliche Einrichtung auf der Node, um zu funktionieren, bitte [siehe die Dokumentation]({docsUrl}) für weitere Details.",
+                  "pbs": "Das angegebene API-Token benötigt die folgenden Datastore-ACLs: **DatastoreAudit** für Nutzung und Auflistung, **DatastoreBackup** zum Schreiben von Backups und **DatastoreAdmin** (oder entsprechende Prune-/Löschberechtigungen), falls Backup-Löschung oder -Pruning aktiviert ist."
                 },
                 "form": {
                   "backupDisk": "Backup-Datenträger",
@@ -3096,6 +3106,7 @@
                   "title": "S3-Einstellungen",
                   "form": {
                     "partSize": "Teilgröße",
+                    "compressionType": "Komprimierungstyp",
                     "pathStyle": "Pfad-Stil-URLs verwenden"
                   }
                 },
@@ -3116,6 +3127,26 @@
                     "button": {
                       "add": "Prune-Job hinzufügen"
                     }
+                  }
+                },
+                "pbs": {
+                  "title": "Proxmox Backup Server-Einstellungen",
+                  "form": {
+                    "url": "Server-URL",
+                    "datastore": "Datastore",
+                    "namespace": "Namespace",
+                    "tokenId": "Token-ID",
+                    "tokenSecret": "Token-Geheimnis",
+                    "fingerprint": "TLS-Zertifikat-Fingerabdruck",
+                    "backupIdPrefix": "Backup-ID-Präfix"
+                  }
+                },
+                "kopia": {
+                  "title": "Kopia-Einstellungen",
+                  "form": {
+                    "url": "Kopia-Server-URL",
+                    "fingerprint": "TLS-Zertifikat-Fingerabdruck",
+                    "tags": "Backup-Tags"
                   }
                 }
               }

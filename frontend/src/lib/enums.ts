@@ -53,7 +53,7 @@ import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfig
 import { adminEggConfigurationDeploymentSchema } from '@/lib/schemas/admin/eggConfigurations.ts';
 import { processConfigurationConfigParser } from '@/lib/schemas/admin/eggs.ts';
 import { adminSettingsEmailSchema, adminSettingsStorageSchema } from '@/lib/schemas/admin/settings.ts';
-import { databaseType, streamingArchiveFormat, transferArchiveFormat } from '@/lib/schemas/generic.ts';
+import { compressionType, databaseType, streamingArchiveFormat, transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
 import {
   serverScheduleComparator,
@@ -80,11 +80,11 @@ export const captchaProviderTypeLabelMapping: Record<
   friendly_captcha: 'Friendly Captcha',
 };
 
-export const compressionLevelLabelMapping: Record<z.infer<typeof compressionLevel>, string> = {
-  best_speed: 'Best Speed',
-  good_speed: 'Good Speed',
-  good_compression: 'Good Compression',
-  best_compression: 'Best Compression',
+export const compressionLevelLabelMapping: Record<z.infer<typeof compressionLevel>, () => string> = {
+  best_speed: () => getTranslations().t('common.enum.compressionLevel.bestSpeed', {}),
+  good_speed: () => getTranslations().t('common.enum.compressionLevel.goodSpeed', {}),
+  good_compression: () => getTranslations().t('common.enum.compressionLevel.goodCompression', {}),
+  best_compression: () => getTranslations().t('common.enum.compressionLevel.bestCompression', {}),
 };
 
 export const processConfigurationParserLabelMapping: Record<
@@ -197,6 +197,16 @@ export const streamingArchiveFormatLabelMapping: Record<z.infer<typeof streaming
   tar_lz4: '.tar.lz4',
   tar_zstd: '.tar.zst',
   zip: '.zip',
+};
+
+export const compressionTypeLabelMapping: Record<z.infer<typeof compressionType>, string> = {
+  none: 'None',
+  gz: 'Gzip',
+  xz: 'XZ',
+  lzip: 'Lzip',
+  bz2: 'Bzip2',
+  lz4: 'LZ4',
+  zstd: 'Zstandard',
 };
 
 export const fingerprintAlgorithmLabelMapping: Record<z.infer<typeof fingerprintAlgorithm>, string> = {

@@ -1,6 +1,9 @@
-import { Text, Title, TitleOrder } from '@mantine/core';
+import { Table, Text, Title, TitleOrder } from '@mantine/core';
 import { Fragment, ReactNode, startTransition, useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
+import remarkGfm from 'remark-gfm';
 import { getTranslationMapping, setGlobalTranslationHandle, TranslationContext, TranslationItemRecord } from 'shared';
 import { z } from 'zod';
 import { $ZodConfig } from 'zod/v4/core';
@@ -17,9 +20,13 @@ type LanguageData = {
   translations: Record<string, string>;
 };
 
+interface MarkdownOptions {
+  html?: boolean;
+}
+
 declare global {
   interface String {
-    md(): ReactNode;
+    md(options?: MarkdownOptions): ReactNode;
   }
 }
 
@@ -27,16 +34,22 @@ const SafeMarkdownLink = ({ href, children }: { href?: string; children?: ReactN
   if (href && /^(javascript|data|vbscript):/i.test(href)) {
     return <span>{children}</span>;
   }
-  return <Anchor href={href}>{children}</Anchor>;
+  return (
+    <Anchor href={href} inherit>
+      {children}
+    </Anchor>
+  );
 };
 
 const Header =
   ({ order }: { order: TitleOrder }) =>
   (props: React.ComponentProps<typeof Title>) => <Title order={order} {...props} />;
 
-String.prototype.md = function (): ReactNode {
+String.prototype.md = function (options?: MarkdownOptions): ReactNode {
   return (
     <Markdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={options?.html ? [rehypeRaw, rehypeSanitize] : undefined}
       components={{
         a: SafeMarkdownLink,
         p: ({ children }) => <Text component='span'>{children}</Text>,
@@ -46,7 +59,20 @@ String.prototype.md = function (): ReactNode {
         h4: Header({ order: 4 }),
         h5: Header({ order: 5 }),
         h6: Header({ order: 6 }),
-        code: ({ children }) => <Code>{children}</Code>,
+        pre: ({ children }) => <Fragment>{children}</Fragment>,
+        code: ({ className, children }) => (
+          <Code block={/language-/.test(className ?? '') || String(children).includes('\n')}>{children}</Code>
+        ),
+        table: ({ children }) => (
+          <Table withTableBorder withColumnBorders>
+            {children}
+          </Table>
+        ),
+        thead: ({ children }) => <Table.Thead>{children}</Table.Thead>,
+        tbody: ({ children }) => <Table.Tbody>{children}</Table.Tbody>,
+        tr: ({ children }) => <Table.Tr>{children}</Table.Tr>,
+        th: ({ children }) => <Table.Th>{children}</Table.Th>,
+        td: ({ children }) => <Table.Td>{children}</Table.Td>,
         strong: ({ children }) => (
           <Text component='span' fw={700}>
             {children}

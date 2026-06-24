@@ -134,8 +134,15 @@ impl EggRepository {
     pub async fn sync(&self, database: &crate::database::Database) -> Result<usize, anyhow::Error> {
         let git_repository = self.git_repository.clone();
 
-        let exported_eggs = tokio::task::spawn_blocking(
-            move || -> Result<Vec<(PathBuf, super::nest_egg::ExportedNestEgg)>, anyhow::Error> {
+        struct FoundEgg {
+            path: PathBuf,
+            readme: Option<String>,
+            exported_egg: super::nest_egg::ExportedNestEgg,
+            updated: chrono::DateTime<chrono::Utc>,
+        }
+
+        let exported_eggs =
+            tokio::task::spawn_blocking(move || -> Result<Vec<FoundEgg>, anyhow::Error> {
                 let mut exported_eggs = Vec::new();
                 let temp_dir = tempfile::tempdir()?;
                 let filesystem = crate::cap::CapFilesystem::new(temp_dir.path().to_path_buf())?;
@@ -174,7 +181,7 @@ impl EggRepository {
                         Err(_) => continue,
                     };
 
-                    // if any egg is larger than 1 MB, something went horribly wrong in development
+                    // if any egg is larger than 1 MiB, something went horribly wrong in development
                     if !metadata.is_file() || metadata.len() > 1024 * 1024 {
                         continue;
                     }
@@ -196,22 +203,61 @@ impl EggRepository {
                             }
                         };
 
-                    exported_eggs.push((entry, exported_egg));
+                    let mut readme = None;
+                    let mut current_path = entry.parent();
+                    'readme: while let Some(path) = current_path {
+                        let mut dir = filesystem.read_dir(path)?;
+
+                        while let Some(Ok((is_dir, entry))) = dir.next_entry() {
+                            if is_dir {
+                                continue;
+                            }
+
+                            let path = path.join(&entry);
+
+                            if entry.to_lowercase().contains("readme")
+                                && filesystem
+                                    .metadata(&path)
+                                    .is_ok_and(|m| m.is_file() && m.len() <= 1024 * 1024)
+                                && let Ok(content) = filesystem.read_to_string(&path)
+                            {
+                                readme = Some(content);
+                                break 'readme;
+                            }
+                        }
+
+                        current_path = path.parent();
+                    }
+
+                    exported_eggs.push(FoundEgg {
+                        path: entry,
+                        readme,
+                        exported_egg,
+                        updated: chrono::DateTime::from_timestamp(
+                            metadata
+                                .modified()
+                                .map_or_else(|_| std::time::SystemTime::now(), |t| t.into_std())
+                                .duration_since(std::time::UNIX_EPOCH)
+                                .unwrap_or_default()
+                                .as_secs() as i64,
+                            0,
+                        )
+                        .unwrap_or_else(chrono::Utc::now),
+                    });
                 }
 
                 drop(prepare_fetch);
 
                 Ok(exported_eggs)
-            },
-        )
-        .await??;
+            })
+            .await??;
 
         super::egg_repository_egg::EggRepositoryEgg::delete_unused(
             database,
             self.uuid,
             &exported_eggs
                 .iter()
-                .map(|(path, _)| path.to_string_lossy().to_compact_string())
+                .map(|egg| egg.path.to_string_lossy().to_compact_string())
                 .collect::<Vec<_>>(),
         )
         .await?;
@@ -219,15 +265,14 @@ impl EggRepository {
         let mut futures = Vec::new();
         futures.reserve_exact(exported_eggs.len());
 
-        for (path, exported_egg) in exported_eggs.iter() {
+        for egg in exported_eggs.iter() {
             futures.push(super::egg_repository_egg::EggRepositoryEgg::create(
                 database,
                 self.uuid,
-                path.to_string_lossy(),
-                &exported_egg.name,
-                exported_egg.description.as_deref(),
-                &exported_egg.author,
-                exported_egg,
+                egg.path.to_string_lossy(),
+                egg.readme.as_deref(),
+                &egg.exported_egg,
+                egg.updated.naive_utc(),
             ));
         }
 

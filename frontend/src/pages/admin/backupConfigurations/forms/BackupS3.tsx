@@ -4,6 +4,7 @@ import Divider from '@/elements/Divider.tsx';
 import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
+import { compressionTypeLabelMapping } from '@/lib/enums.ts';
 import { adminBackupConfigurationS3Schema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -36,6 +37,13 @@ export default function BackupS3({ form }: { form: UseFormReturnType<S3FormValue
       type: 'switch',
       name: 'pathStyle',
       label: t('pages.admin.backupConfigurations.tabs.general.page.s3.form.pathStyle', {}),
+    },
+    {
+      type: 'select',
+      name: 'compressionType',
+      label: t('pages.admin.backupConfigurations.tabs.general.page.s3.form.compressionType', {}),
+      required: true,
+      options: Object.entries(compressionTypeLabelMapping).map(([value, label]) => ({ value, label })),
     },
   ];
 

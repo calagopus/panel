@@ -211,7 +211,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                     className='flex-1'
                     label='Egg'
                     data={eggs.items.map((egg) => ({
-                      label: egg.name,
+                      label: egg.exportedEgg.name,
                       value: egg.uuid,
                     }))}
                     searchable

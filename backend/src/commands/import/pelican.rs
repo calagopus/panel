@@ -436,6 +436,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 path_style: std::env::var("AWS_USE_PATH_STYLE_ENDPOINT")
                                     .map(|v| v == "true")
                                     .unwrap_or_default(),
+                                compression_type: wings_api::CompressionType::Gz,
                                 part_size: std::env::var("BACKUP_MAX_PART_SIZE")
                                     .ok()
                                     .and_then(|v| v.parse::<u64>().ok())

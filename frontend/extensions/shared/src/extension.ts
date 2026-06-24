@@ -1,4 +1,4 @@
-import { createTheme, type MantineThemeOverride } from '@mantine/core';
+import { CSSVariablesResolver, createTheme, type MantineThemeOverride } from '@mantine/core';
 import { merge } from 'object-deep-merge';
 import { ExtensionRegistry } from 'shared';
 
@@ -40,6 +40,17 @@ export class ExtensionContext {
     return createTheme(mantineTheme);
   }
 
+  public getMantineCssResolver(): CSSVariablesResolver | null {
+    for (const extension of this.extensions) {
+      const resolver = extension.initializeMantineCssResolver(this);
+      if (resolver) {
+        return resolver;
+      }
+    }
+
+    return null;
+  }
+
   public call(name: string, args: object): unknown {
     for (const extension of this.extensions) {
       const result = extension.processCall(this, name, args);
@@ -73,6 +84,11 @@ export class Extension {
   // Your extension mantine theme entrypoint, this runs when the page is loaded
   public initializeMantineTheme(ctx: ExtensionContext): MantineThemeOverride {
     return {};
+  }
+
+  // Your extension can also provide a resolver for css variables, this runs when the page is loaded
+  public initializeMantineCssResolver(ctx: ExtensionContext): CSSVariablesResolver | null {
+    return null;
   }
 
   /**

@@ -84,7 +84,7 @@ export default function NodesBulkConfigModal({
               minimap: { enabled: false },
               codeLens: false,
               scrollBeyondLastLine: false,
-              smoothScrolling: true,
+              smoothScrolling: false,
               // @ts-expect-error this is valid
               touchScrollEnabled: true,
             }}

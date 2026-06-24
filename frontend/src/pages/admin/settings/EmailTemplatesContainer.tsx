@@ -290,7 +290,7 @@ export default function EmailTemplatesContainer() {
                   minimap: { enabled: false },
                   codeLens: false,
                   scrollBeyondLastLine: false,
-                  smoothScrolling: true,
+                  smoothScrolling: false,
                   wordWrap: 'on',
                 }}
                 onChange={(value) => setEditorContent(value ?? '')}

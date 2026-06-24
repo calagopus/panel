@@ -1522,8 +1522,7 @@
                     "permissionsPublicData": "擴充功能可將公開資料（例如圖片）儲存於此處。"
                   },
                   "form": {
-                    "pathStyleOn": "使用路徑樣式 URL",
-                    "pathStyleOff": "使用虛擬主機樣式 URL"
+                    "pathStyle": "使用路徑樣式 URL"
                   }
                 }
               }

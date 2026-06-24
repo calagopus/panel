@@ -275,6 +275,16 @@ jobs:
           sbom-path: sbom-source.cyclonedx.json
           push-to-registry: true
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Sign images with cosign
+        run: |
+          cosign sign --yes ${{ env.GHCR_IMAGE }}@${{ steps.build.outputs.digest }}
+          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}@${{ steps.build.outputs.digest }}
+          cosign sign --yes ${{ env.GHCR_IMAGE }}@${{ steps.build-aio.outputs.digest }}
+          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}@${{ steps.build-aio.outputs.digest }}
+
   build-heavy-image:
     name: Build Heavy Docker image (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
@@ -390,6 +400,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Login to GitHub Container Registry
@@ -417,6 +428,14 @@ jobs:
             ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-amd64 \
             ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-arm64
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Sign heavy image with cosign
+        run: |
+          cosign sign --yes ${{ env.GHCR_IMAGE }}:nightly-heavy
+          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy
+
   merge-heavy-aio-image:
     name: Merge Heavy AIO Docker manifest
     needs: [build-heavy-aio-image]
@@ -424,6 +443,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Login to GitHub Container Registry
@@ -450,3 +470,11 @@ jobs:
           docker buildx imagetools create -t ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-aio \
             ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-aio-amd64 \
             ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-aio-arm64
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Sign heavy AIO image with cosign
+        run: |
+          cosign sign --yes ${{ env.GHCR_IMAGE }}:nightly-heavy-aio
+          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}:nightly-heavy-aio

@@ -68,8 +68,9 @@ export default function BackupConfigurationCreateOrUpdate({
       bucket: '',
       region: '',
       endpoint: '',
-      pathStyle: true,
+      compressionType: 'zstd',
       partSize: 1024 * 1024 * 1024,
+      pathStyle: true,
     },
     validateInputOnBlur: true,
     validate: zod4Resolver(adminBackupConfigurationS3Schema),
@@ -320,7 +321,7 @@ export default function BackupConfigurationCreateOrUpdate({
             </AdminCan>
           )}
           <a
-            href='https://calagopus.com/docs/advanced/setting-up-backup-configurations'
+            href='https://calagopus.com/docs/wings/advanced/backup-configurations'
             target='_blank'
             rel='noopener noreferrer'
           >

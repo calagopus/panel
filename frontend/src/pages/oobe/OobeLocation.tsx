@@ -62,6 +62,7 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
       region: '',
       endpoint: '',
       pathStyle: true,
+      compressionType: 'zstd',
       partSize: 0,
     },
     validateInputOnBlur: true,

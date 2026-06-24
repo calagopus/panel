@@ -235,7 +235,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
                 minimap: { enabled: false },
                 codeLens: false,
                 scrollBeyondLastLine: false,
-                smoothScrolling: true,
+                smoothScrolling: false,
                 // @ts-expect-error this is valid
                 touchScrollEnabled: true,
               }}

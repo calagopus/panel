@@ -40,7 +40,7 @@ export default function BackupCreateModal({ ...props }: ModalProps) {
       name: generateBackupName(),
       ignoredFiles: [],
     });
-  }, []);
+  }, [props.opened]);
 
   return (
     <FormModal

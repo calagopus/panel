@@ -13,11 +13,10 @@ pub struct EggRepositoryEgg {
     pub path: String,
     pub egg_repository: Fetchable<super::egg_repository::EggRepository>,
 
-    pub name: compact_str::CompactString,
-    pub description: Option<compact_str::CompactString>,
-    pub author: compact_str::CompactString,
-
+    pub readme: Option<compact_str::CompactString>,
     pub exported_egg: super::nest_egg::ExportedNestEgg,
+
+    pub updated: chrono::NaiveDateTime,
 
     extension_data: super::ModelExtensionData,
 }
@@ -54,20 +53,16 @@ impl BaseModel for EggRepositoryEgg {
                 compact_str::format_compact!("{prefix}egg_repository_uuid"),
             ),
             (
-                "egg_repository_eggs.name",
-                compact_str::format_compact!("{prefix}name"),
-            ),
-            (
-                "egg_repository_eggs.description",
-                compact_str::format_compact!("{prefix}description"),
-            ),
-            (
-                "egg_repository_eggs.author",
-                compact_str::format_compact!("{prefix}author"),
+                "egg_repository_eggs.readme",
+                compact_str::format_compact!("{prefix}readme"),
             ),
             (
                 "egg_repository_eggs.exported_egg",
                 compact_str::format_compact!("{prefix}exported_egg"),
+            ),
+            (
+                "egg_repository_eggs.updated",
+                compact_str::format_compact!("{prefix}updated"),
             ),
         ])
     }
@@ -82,13 +77,11 @@ impl BaseModel for EggRepositoryEgg {
             egg_repository: super::egg_repository::EggRepository::get_fetchable(
                 row.try_get(compact_str::format_compact!("{prefix}egg_repository_uuid").as_str())?,
             ),
-            name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
-            description: row
-                .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
-            author: row.try_get(compact_str::format_compact!("{prefix}author").as_str())?,
+            readme: row.try_get(compact_str::format_compact!("{prefix}readme").as_str())?,
             exported_egg: serde_json::from_value(
                 row.try_get(compact_str::format_compact!("{prefix}exported_egg").as_str())?,
             )?,
+            updated: row.try_get(compact_str::format_compact!("{prefix}updated").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
         })
     }
@@ -99,30 +92,27 @@ impl EggRepositoryEgg {
         database: &crate::database::Database,
         egg_repository_uuid: uuid::Uuid,
         path: impl AsRef<str>,
-        name: &str,
-        description: Option<&str>,
-        author: &str,
+        readme: Option<&str>,
         exported_egg: &super::nest_egg::ExportedNestEgg,
+        updated: chrono::NaiveDateTime,
     ) -> Result<Self, crate::database::DatabaseError> {
         let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
-            INSERT INTO egg_repository_eggs (egg_repository_uuid, path, author, name, description, exported_egg)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO egg_repository_eggs (egg_repository_uuid, path, readme, exported_egg, updated)
+            VALUES ($1, $2, $3, $4, $5)
             ON CONFLICT (egg_repository_uuid, path) DO UPDATE SET
-                name = EXCLUDED.name,
-                description = EXCLUDED.description,
-                author = EXCLUDED.author,
-                exported_egg = EXCLUDED.exported_egg
+                readme = EXCLUDED.readme,
+                exported_egg = EXCLUDED.exported_egg,
+                updated = EXCLUDED.updated
             RETURNING {}
             "#,
             Self::columns_sql(None)
         )))
         .bind(egg_repository_uuid)
         .bind(path.as_ref())
-        .bind(author)
-        .bind(name)
-        .bind(description)
+        .bind(readme)
         .bind(OrderedJson(exported_egg))
+        .bind(updated)
         .fetch_one(database.write())
         .await?;
 
@@ -166,8 +156,8 @@ impl EggRepositoryEgg {
             r#"
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM egg_repository_eggs
-            WHERE egg_repository_eggs.egg_repository_uuid = $1 AND ($2 IS NULL OR egg_repository_eggs.path ILIKE '%' || $2 || '%' OR egg_repository_eggs.name ILIKE '%' || $2 || '%')
-            ORDER BY egg_repository_eggs.name
+            WHERE egg_repository_eggs.egg_repository_uuid = $1 AND ($2 IS NULL OR egg_repository_eggs.path ILIKE '%' || $2 || '%' OR egg_repository_eggs.exported_egg->>'name' ILIKE '%' || $2 || '%')
+            ORDER BY egg_repository_eggs.exported_egg->>'name'
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
@@ -225,10 +215,9 @@ impl EggRepositoryEgg {
                 .await?
                 .into_admin_api_object(state, ())
                 .await?,
-            name: self.name,
-            description: self.description,
-            author: self.author,
+            readme: self.readme,
             exported_egg: self.exported_egg,
+            updated: self.updated.and_utc(),
         })
     }
 }
@@ -249,10 +238,9 @@ impl IntoAdminApiObject for EggRepositoryEgg {
             AdminApiEggRepositoryEgg {
                 uuid: self.uuid,
                 path: self.path,
-                name: self.name,
-                description: self.description,
-                author: self.author,
+                readme: self.readme,
                 exported_egg: self.exported_egg,
+                updated: self.updated.and_utc(),
             },
             api_object,
             state
@@ -349,11 +337,10 @@ pub struct AdminApiEggRepositoryEgg {
     pub uuid: uuid::Uuid,
     pub path: String,
 
-    pub name: compact_str::CompactString,
-    pub description: Option<compact_str::CompactString>,
-    pub author: compact_str::CompactString,
-
+    pub readme: Option<compact_str::CompactString>,
     pub exported_egg: super::nest_egg::ExportedNestEgg,
+
+    pub updated: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(ToSchema, Serialize)]
@@ -363,9 +350,8 @@ pub struct AdminApiEggEggRepositoryEgg {
     pub path: String,
     pub egg_repository: super::egg_repository::AdminApiEggRepository,
 
-    pub name: compact_str::CompactString,
-    pub description: Option<compact_str::CompactString>,
-    pub author: compact_str::CompactString,
-
+    pub readme: Option<compact_str::CompactString>,
     pub exported_egg: super::nest_egg::ExportedNestEgg,
+
+    pub updated: chrono::DateTime<chrono::Utc>,
 }

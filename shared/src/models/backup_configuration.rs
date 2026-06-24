@@ -19,6 +19,10 @@ use std::{
 };
 use utoipa::ToSchema;
 
+fn default_compression_type() -> wings_api::CompressionType {
+    wings_api::CompressionType::Gz
+}
+
 #[derive(ToSchema, Serialize, Deserialize, Validate, Clone)]
 pub struct BackupConfigsS3 {
     #[garde(length(chars, min = 1, max = 255))]
@@ -38,6 +42,9 @@ pub struct BackupConfigsS3 {
     pub endpoint: compact_str::CompactString,
     #[garde(skip)]
     pub path_style: bool,
+    #[garde(skip)]
+    #[serde(default = "default_compression_type")]
+    pub compression_type: wings_api::CompressionType,
     #[garde(skip)]
     pub part_size: u64,
 }
