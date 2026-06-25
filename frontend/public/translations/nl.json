@@ -9,20 +9,20 @@
       "other": "{count} Bytes"
     },
     "user": {
-      "zero": "{count} Users",
-      "one": "{count} User",
-      "two": "{count} Users",
-      "few": "{count} Users",
-      "many": "{count} Users",
-      "other": "{count} Users"
+      "zero": "{count} Gebruikers",
+      "one": "{count} Gebruiker",
+      "two": "{count} Gebruikers",
+      "few": "{count} Gebruikers",
+      "many": "{count} Gebruikers",
+      "other": "{count} Gebruikers"
     },
     "file": {
-      "zero": "{count} Files",
-      "one": "{count} File",
-      "two": "{count} Files",
-      "few": "{count} Files",
-      "many": "{count} Files",
-      "other": "{count} Files"
+      "zero": "{count} Bestanden",
+      "one": "{count} Bestand",
+      "two": "{count} Bestanden",
+      "few": "{count} Bestanden",
+      "many": "{count} Bestanden",
+      "other": "{count} Bestanden"
     },
     "server": {
       "zero": "{count} Servers",
@@ -33,12 +33,12 @@
       "other": "{count} Servers"
     },
     "sshKey": {
-      "zero": "{count} SSH Keys",
-      "one": "{count} SSH Key",
-      "two": "{count} SSH Keys",
-      "few": "{count} SSH Keys",
-      "many": "{count} SSH Keys",
-      "other": "{count} SSH Keys"
+      "zero": "{count} SSH-sleutels",
+      "one": "{count} SSH-sleutel",
+      "two": "{count} SSH-sleutels",
+      "few": "{count} SSH-sleutels",
+      "many": "{count} SSH-sleutels",
+      "other": "{count} SSH-sleutels"
     },
     "asset": {
       "zero": "{count} Assets",
@@ -92,33 +92,33 @@
   "translations": {
     "common": {
       "button": {
-        "create": "Create",
-        "add": "Add",
-        "save": "Save",
-        "saveAndStay": "Save & Stay",
-        "edit": "Edit",
-        "delete": "Delete",
-        "remove": "Remove",
-        "enable": "Enable",
-        "disable": "Disable",
-        "update": "Update",
-        "close": "Close",
-        "cancel": "Cancel",
-        "continue": "Continue",
-        "skip": "Skip",
-        "okay": "Okay",
-        "back": "Back",
-        "next": "Next",
-        "install": "Install",
-        "selectAll": "Select All",
-        "deselectAll": "Deselect All",
-        "restore": "Restore",
+        "create": "Aanmaken",
+        "add": "Toevoegen",
+        "save": "Opslaan",
+        "saveAndStay": "Opslaan & Blijven",
+        "edit": "Bewerken",
+        "delete": "Verwijderen",
+        "remove": "Verwijderen",
+        "enable": "Inschakelen",
+        "disable": "Uitschakelen",
+        "update": "Bijwerken",
+        "close": "Sluiten",
+        "cancel": "Annuleren",
+        "continue": "Doorgaan",
+        "skip": "Overslaan",
+        "okay": "Oké",
+        "back": "Terug",
+        "next": "Volgende",
+        "install": "Installeren",
+        "selectAll": "Alles selecteren",
+        "deselectAll": "Alles deselecteren",
+        "restore": "Herstellen",
         "discard": "Discard",
-        "download": "Download",
-        "downloadAs": "Download as {format}",
-        "export": "Export",
-        "exportAs": "Export as {format}",
-        "recreate": "Recreate",
+        "download": "Downloaden",
+        "downloadAs": "Downloaden als {format}",
+        "export": "Exporteren",
+        "exportAs": "Exporteren als {format}",
+        "recreate": "Opnieuw aanmaken",
         "move": "Move",
         "transfer": "Transfer",
         "reattach": "Reattach",
@@ -126,51 +126,51 @@
         "send": "Send",
         "reset": "Reset",
         "view": "View",
-        "import": "Import",
+        "import": "Importeren",
         "details": "Details",
         "loadLogs": "Load Logs",
         "sendTestEmail": "Send Test Email",
-        "setPrimary": "Set Primary",
-        "unsetPrimary": "Unset Primary",
-        "leavePage": "Leave Page",
+        "setPrimary": "Instellen als primair",
+        "unsetPrimary": "Primair verwijderen",
+        "leavePage": "Pagina verlaten",
         "viewDocumentation": "View Documentation"
       },
       "alert": {
-        "error": "Error",
-        "warning": "Warning",
-        "success": "Success",
-        "clockOffset": "Your system clock is out of sync with the server by more than 5 seconds. This may cause issues with passkey authentication and two-factor authentication. Please sync your clock if issues arise. Current offset: {offset} second(s)."
+        "error": "Fout",
+        "warning": "Waarschuwing",
+        "success": "Geslaagd",
+        "clockOffset": "Uw systeemklok wijkt meer dan 5 seconden af van de server. Dit kan problemen veroorzaken met wachtwoordsleutel- en tweestapsverificatie. Synchroniseer uw klok als er problemen optreden. Huidige afwijking: {offset} seconde(n)."
       },
       "divider": {
-        "or": "OR"
+        "or": "OF"
       },
       "input": {
-        "search": "Search..."
+        "search": "Zoeken..."
       },
       "tooltip": {
-        "resetToDefault": "Reset to default",
-        "edit": "Edit",
-        "delete": "Delete",
+        "resetToDefault": "Herstellen naar standaard",
+        "edit": "Bewerken",
+        "delete": "Verwijderen",
         "remove": "Remove",
-        "primary": "Primary",
+        "primary": "Primair",
         "backupOnDifferentNode": "This backup is on a different node than the server. It is not viewable from the Client API."
       },
       "form": {
-        "name": "Name",
-        "description": "Description",
+        "name": "Naam",
+        "description": "Beschrijving",
         "author": "Author",
         "type": "Type",
-        "password": "Password",
+        "password": "Wachtwoord",
         "host": "Host",
-        "username": "Username",
+        "username": "Gebruikersnaam",
         "usernameOrEmail": "Username/Email",
         "server": "Server",
         "url": "URL",
-        "email": "Email",
+        "email": "E-mail",
         "path": "Path",
-        "port": "Port",
+        "port": "Poort",
         "provider": "Provider",
-        "command": "Command",
+        "command": "Opdracht",
         "fromAddress": "From Address",
         "fromName": "From Name",
         "siteKey": "Site Key",
@@ -181,24 +181,24 @@
         "region": "Region",
         "endpoint": "Endpoint",
         "publicUrl": "Public URL",
-        "firstName": "First Name",
-        "lastName": "Last Name",
-        "language": "Language",
+        "firstName": "Voornaam",
+        "lastName": "Achternaam",
+        "language": "Taal",
         "identifier": "Identifier",
-        "enabled": "Enabled",
+        "enabled": "Ingeschakeld",
         "title": "Title",
         "content": "Content",
         "backupConfiguration": "Backup Configuration",
-        "fileName": "File Name",
-        "sftpPort": "SFTP Port",
-        "sftpHost": "SFTP Host",
-        "dockerImage": "Docker Image",
-        "memory": "Memory",
-        "disk": "Disk",
-        "serverName": "Server Name",
-        "startupCommand": "Startup Command",
-        "archiveName": "Archive Name",
-        "archiveFormat": "Archive Format",
+        "fileName": "Bestandsnaam",
+        "sftpPort": "SFTP-poort",
+        "sftpHost": "SFTP-host",
+        "dockerImage": "Docker-image",
+        "memory": "Geheugen",
+        "disk": "Schijf",
+        "serverName": "Servernaam",
+        "startupCommand": "Opstartcommando",
+        "archiveName": "Archiefnaam",
+        "archiveFormat": "Archiefformaat",
         "compressionLevel": "Compression Level",
         "multiplexChannels": "Multiplex Channels",
         "multiplexChannelsDescription": "Add additional HTTP connections (and therefore also threads) for transferring split archives, total streams is 1 + multiplex channels.",
@@ -211,54 +211,54 @@
         "mount": "Mount",
         "nest": "Nest",
         "lines": "Lines",
-        "databaseHost": "Database Host",
-        "timezone": "Timezone",
+        "databaseHost": "Databasehost",
+        "timezone": "Tijdzone",
         "timezoneSystem": "System",
         "protocol": "Protocol",
-        "powerAction": "Power Action",
-        "destination": "Destination",
-        "directoryName": "Directory Name",
-        "locked": "Locked",
-        "portRanges": "Port Ranges",
-        "portRangesPlaceholder": "Port Ranges (eg. 3000-4000)",
-        "currentPassword": "Current Password",
-        "confirmPassword": "Confirm Password",
-        "authenticationCode": "Authentication Code",
+        "powerAction": "Stroomactie",
+        "destination": "Bestemming",
+        "directoryName": "Mapnaam",
+        "locked": "Vergrendeld",
+        "portRanges": "Poortbereiken",
+        "portRangesPlaceholder": "Poortbereiken (bijv. 3000-4000)",
+        "currentPassword": "Huidig wachtwoord",
+        "confirmPassword": "Wachtwoord bevestigen",
+        "authenticationCode": "Authenticatiecode",
         "restoreStartup": "Restore the startup command, image, and variables from this backup.",
-        "lineContains": "Line Contains",
+        "lineContains": "Regel bevat",
         "filePath": "File Path",
         "envVariable": "Environment Variable",
         "value": "Value",
         "eggs": "Eggs",
-        "ignoredFiles": "Ignored Files",
-        "yourControlPanelPassword": "Your Control Panel Password",
+        "ignoredFiles": "Genegeerde bestanden",
+        "yourControlPanelPassword": "Uw configuratiepanelwachtwoord",
         "deploymentEnabled": "Deployment Enabled",
         "maintenanceEnabled": "Maintenance Enabled",
-        "truncateDirectory": "Do you want to delete all files of this server before performing this action? This cannot be undone."
+        "truncateDirectory": "Wilt u alle bestanden van deze server verwijderen voordat u deze actie uitvoert? Dit kan niet ongedaan worden gemaakt."
       },
       "table": {
         "pagination": {
-          "results": "Showing {start} to {end} of {total} results.",
-          "empty": "No items could be found, it's almost like they are hiding."
+          "results": "{start} tot {end} van {total} resultaten weergegeven.",
+          "empty": "Er zijn geen items gevonden, ze lijken zich te verstoppen."
         },
         "columns": {
           "id": "ID",
-          "name": "Name",
+          "name": "Naam",
           "author": "Author",
           "type": "Type",
           "title": "Title",
           "enabled": "Enabled",
-          "description": "Description",
-          "username": "Username",
-          "size": "Size",
-          "lastUsed": "Last Used",
-          "created": "Created",
+          "description": "Beschrijving",
+          "username": "Gebruikersnaam",
+          "size": "Grootte",
+          "lastUsed": "Laatst gebruikt",
+          "created": "Aangemaakt",
           "updated": "Updated",
-          "actor": "Actor",
-          "event": "Event",
+          "actor": "Uitvoerder",
+          "event": "Gebeurtenis",
           "ip": "IP",
-          "when": "When",
-          "command": "Command",
+          "when": "Wanneer",
+          "command": "Opdracht",
           "location": "Location",
           "node": "Node",
           "owner": "Owner",
@@ -266,7 +266,7 @@
           "backupConfiguration": "Backup Configuration",
           "status": "Status",
           "allocation": "Allocation",
-          "notes": "Notes",
+          "notes": "Notities",
           "source": "Source",
           "target": "Target",
           "checksum": "Checksum",
@@ -280,66 +280,66 @@
         "general": "General"
       },
       "badge": {
-        "active": "Active",
-        "inactive": "Inactive",
-        "enabled": "Enabled",
-        "disabled": "Disabled",
-        "successful": "Successful",
-        "failed": "Failed",
+        "active": "Actief",
+        "inactive": "Inactief",
+        "enabled": "Ingeschakeld",
+        "disabled": "Uitgeschakeld",
+        "successful": "Geslaagd",
+        "failed": "Mislukt",
         "installed": "Installed"
       },
       "server": {
-        "noAllocation": "No Allocation",
+        "noAllocation": "Geen allocatie",
         "state": {
-          "suspended": "Suspended",
-          "transferring": "Server is being transferred",
-          "nodeMaintenance": "Node is under Maintenance",
-          "restoringBackup": "Restoring Backup",
-          "installing": "Installing",
-          "installFailed": "Install Failed"
+          "suspended": "Opgeschort",
+          "transferring": "Server wordt overgedragen",
+          "nodeMaintenance": "Node is in onderhoud",
+          "restoringBackup": "Back-up herstellen",
+          "installing": "Installeren",
+          "installFailed": "Installatie mislukt"
         }
       },
       "enum": {
         "userToastPosition": {
-          "topLeft": "Top Left",
-          "topCenter": "Top Center",
-          "topRight": "Top Right",
-          "bottomLeft": "Bottom Left",
-          "bottomCenter": "Bottom Center",
-          "bottomRight": "Bottom Right"
+          "topLeft": "Linksboven",
+          "topCenter": "Midden boven",
+          "topRight": "Rechtsboven",
+          "bottomLeft": "Linksonder",
+          "bottomCenter": "Midden onder",
+          "bottomRight": "Rechtsonder"
         },
         "serverState": {
-          "unknown": "Unknown",
+          "unknown": "Onbekend",
           "offline": "Offline",
-          "running": "Running",
-          "starting": "Starting",
-          "stopping": "Stopping"
+          "running": "Actief",
+          "starting": "Starten",
+          "stopping": "Stoppen"
         },
         "serverPowerAction": {
-          "start": "Start",
-          "stop": "Stop",
-          "restart": "Restart",
-          "kill": "Kill"
+          "start": "Starten",
+          "stop": "Stoppen",
+          "restart": "Herstarten",
+          "kill": "Forceer stop"
         },
         "serverBackupStatus": {
-          "starting": "Starting",
-          "finished": "Finished",
-          "failed": "Failed"
+          "starting": "Bezig",
+          "finished": "Voltooid",
+          "failed": "Mislukt"
         },
         "connectionStatus": {
-          "connected": "Connected",
+          "connected": "Verbonden",
           "offline": "Offline"
         },
         "serverAutoStartBehavior": {
-          "always": "Always",
-          "unlessStopped": "Unless Stopped",
-          "never": "Never"
+          "always": "Altijd",
+          "unlessStopped": "Tenzij gestopt",
+          "never": "Nooit"
         },
         "bulkActionServerAction": {
-          "started": "Started",
-          "stopped": "Stopped",
-          "restarted": "Restarted",
-          "killed": "Killed"
+          "started": "Gestart",
+          "stopped": "Gestopt",
+          "restarted": "Herstart",
+          "killed": "Geforceerd gestopt"
         },
         "compressionLevel": {
           "bestSpeed": "Best Speed",
@@ -358,21 +358,21 @@
           "pebibytes": "PiB"
         }
       },
-      "unlimited": "Unlimited",
-      "readOnly": "Read-Only",
-      "na": "N/A",
-      "never": "Never",
+      "unlimited": "Onbeperkt",
+      "readOnly": "Alleen-lezen",
+      "na": "N.v.t.",
+      "never": "Nooit",
       "none": "None",
       "unknown": "Unknown",
-      "yes": "Yes",
-      "no": "No",
+      "yes": "Ja",
+      "no": "Nee",
       "web": "Web",
       "api": "API",
       "default": "Default",
       "custom": "Custom",
-      "system": "System",
-      "schedule": "Schedule",
-      "impersonatedBy": "Impersonated by {username}"
+      "system": "Systeem",
+      "schedule": "Planning",
+      "impersonatedBy": "Nagebootst door {username}"
     },
     "elements": {
       "routeOrderEditor": {
@@ -394,18 +394,18 @@
         }
       },
       "errorBoundary": {
-        "message": "An unexpected error occurred while rendering this page. Try refreshing. If the problem persists, contact your system administrator.",
-        "hideDetails": "Hide Details",
-        "showDetails": "Show Details",
-        "errorMessage": "Error Message:",
-        "stackTrace": "Stack Trace:",
-        "componentStack": "Component Stack:"
+        "message": "Er is een fout opgetreden bij het weergeven van deze pagina. Probeer de pagina te vernieuwen.",
+        "hideDetails": "Details verbergen",
+        "showDetails": "Details weergeven",
+        "errorMessage": "Foutmelding:",
+        "stackTrace": "Stack-tracering:",
+        "componentStack": "Componentstack:"
       },
       "copyOnClick": {
         "toast": {
-          "copied": "Copied to clipboard.",
-          "failed": "Failed to copy to clipboard.",
-          "copyManual": "Copy to clipboard: Ctrl+C or Command+C, Enter"
+          "copied": "Gekopieerd naar klembord.",
+          "failed": "Kopiëren naar klembord mislukt.",
+          "copyManual": "Kopiëren naar klembord: Ctrl+C of Command+C, Enter"
         }
       },
       "pasteOnClick": {
@@ -417,24 +417,24 @@
       },
       "estimatedTimeArrival": {
         "tooltip": {
-          "estimating": "Estimating completion time...",
-          "estimated": "Estimated completion time: {time}"
+          "estimating": "Voltooiingstijd berekenen...",
+          "estimated": "Geschatte voltooiingstijd: {time}"
         },
-        "calculating": "ETA: Calculating...",
+        "calculating": "ETA: Berekenen...",
         "calculated": "ETA: {time}"
       },
       "container": {
         "alert": {
-          "impersonating": "You are currently impersonating a user. Please be aware that your actions may affect the impersonated user's account. To exit impersonation mode, click the \"Stop Impersonating\" button in the bottom left corner."
+          "impersonating": "U bootst momenteel een gebruiker na. Houd er rekening mee dat uw acties gevolgen kunnen hebben voor het account van de nagebootste gebruiker. Klik op de knop \"Stop met nabootsen\" linksonder om de nagebootsmodus te verlaten."
         }
       },
       "sidebar": {
         "button": {
-          "logout": "Logout",
-          "stopImpersonating": "Stop Impersonating",
-          "openInVirtualWindow": "Open in Virtual Window",
-          "openInPopup": "Open in Popup",
-          "openInNewTab": "Open in New Tab",
+          "logout": "Uitloggen",
+          "stopImpersonating": "Stop met nabootsen",
+          "openInVirtualWindow": "Openen in virtueel venster",
+          "openInPopup": "Openen in pop-up",
+          "openInNewTab": "Openen in nieuw tabblad",
           "switchToDark": "Switch to Dark Mode",
           "switchToLight": "Switch to Light Mode"
         }
@@ -444,16 +444,16 @@
           "copyPermissions": "Copy Permissions",
           "pastePermissions": "Paste Permissions"
         },
-        "selectedPermissions": "Selected Permissions ({count})",
-        "noPermissions": "No permissions selected."
+        "selectedPermissions": "Geselecteerde rechten ({count})",
+        "noPermissions": "Geen rechten geselecteerd."
       },
       "selectInput": {
-        "noResults": "No Results found."
+        "noResults": "Geen resultaten gevonden."
       },
       "can": {
         "tooltip": {
-          "cantSave": "You do not have permission to save.",
-          "cantDelete": "You do not have permission to delete."
+          "cantSave": "U heeft geen toestemming om op te slaan.",
+          "cantDelete": "U heeft geen toestemming om te verwijderen."
         }
       },
       "resource": {
@@ -466,100 +466,100 @@
       "activityInfoButton": {
         "modal": {
           "info": {
-            "title": "Activity Details"
+            "title": "Activiteitsdetails"
           }
         }
       },
       "screenBlock": {
         "permissionDenied": {
-          "title": "Permission Denied",
-          "content": "You do not have permission to access this page."
+          "title": "Toegang geweigerd",
+          "content": "U heeft geen toestemming om deze pagina te bekijken."
         },
         "notFound": {
-          "title": "Not Found",
-          "content": "The page you are looking for could not be found."
+          "title": "Niet gevonden",
+          "content": "De pagina die u zoekt kon niet worden gevonden."
         },
         "suspended": {
           "title": "Account Suspended",
           "content": "Your account has been suspended. You cannot make changes to your account. Please contact an administrator for more information."
         },
         "serverConflict": {
-          "title": "Conflicting Server State",
-          "contentSuspended": "This server is suspended and cannot be accessed.",
-          "contentNodeMaintenance": "This server is on a node that is currently under maintenance and cannot be accessed.",
-          "contentTransferring": "This server is currently being transferred and cannot be accessed until the transfer is complete.",
-          "contentInstallFailed": "This server failed to install and cannot be accessed until acknowledged.",
-          "contentInstalling": "This server is currently installing and cannot be accessed until completed.",
-          "contentRestoringBackup": "This server is currently restoring from a backup and cannot be accessed until completed.",
+          "title": "Conflicterende serverstatus",
+          "contentSuspended": "Deze server is opgeschort en kan niet worden geopend.",
+          "contentNodeMaintenance": "De node van deze server is momenteel in onderhoud en kan niet worden geopend.",
+          "contentTransferring": "Deze server wordt momenteel overgedragen en kan pas worden geopend na voltooiing.",
+          "contentInstallFailed": "De installatie van deze server is mislukt en kan pas worden geopend na bevestiging.",
+          "contentInstalling": "Deze server wordt momenteel geïnstalleerd en kan pas worden geopend na voltooiing.",
+          "contentRestoringBackup": "Deze server herstelt momenteel een back-up en kan pas worden geopend na voltooiing.",
           "button": {
-            "viewInstallLogs": "View Installation Logs",
-            "acknowledgeFailure": "Acknowledge Failure"
+            "viewInstallLogs": "Installatielogboeken bekijken",
+            "acknowledgeFailure": "Mislukking bevestigen"
           },
           "modal": {
             "acknowledgeFailure": {
-              "title": "Acknowledge Installation Failure",
-              "content": "By acknowledging this installation failure, you are confirming that you are aware of the failed installation and have taken any necessary steps to resolve the issue. This will allow you to regain control over the server."
+              "title": "Installatiefout bevestigen",
+              "content": "Door deze installatiefout te bevestigen, geeft u aan dat u op de hoogte bent van de mislukte installatie en de nodige stappen heeft ondernomen om het probleem op te lossen. Hiermee herkrijgt u de controle over de server."
             }
           }
         }
       },
       "scheduleDynamicInput": {
-        "enterVariable": "Please enter the variable name to evaluate.",
-        "enterData": "Please enter the data to send.",
-        "inputType": "Input Type",
-        "dataType": "Data type to send",
-        "selectType": "Select Type",
-        "none": "None",
-        "rawString": "Raw String",
-        "variable": "Variable"
+        "enterVariable": "Voer de naam in van de variabele die geëvalueerd moet worden.",
+        "enterData": "Voer de te verzenden gegevens in.",
+        "inputType": "Invoertype",
+        "dataType": "Te verzenden gegevenstype",
+        "selectType": "Selecteer type",
+        "none": "Geen",
+        "rawString": "Onbewerkte tekst",
+        "variable": "Variabele"
       },
       "serverWebsocket": {
         "error": {
-          "connectionFailed": "Unable to connect after multiple attempts. Please refresh the page.",
-          "connectionClosed": "Connection to server was closed. Attempting to reconnect...",
-          "connectionRetry": "Connection lost. Retrying (attempt {attempt})...",
-          "authFailed": "Authentication failed. Attempting to refresh credentials... ({error})",
-          "authRefreshFailed": "Failed to refresh credentials. Please refresh the page to try again.",
-          "permissionRevoked": "Connection closed: your access to this server has been revoked.",
-          "tokenRefreshLoop": "Authentication loop detected. Please refresh the page to try again."
+          "connectionFailed": "Verbinden na meerdere pogingen mislukt. Vernieuw de pagina.",
+          "connectionClosed": "Verbinding met server verbroken. Opnieuw verbinden...",
+          "connectionRetry": "Verbinding verbroken. Opnieuw proberen (poging {attempt})...",
+          "authFailed": "Authenticatie mislukt. Bezig met vernieuwen van gegevens... ({error})",
+          "authRefreshFailed": "Vernieuwen van gegevens mislukt. Vernieuw de pagina en probeer opnieuw.",
+          "permissionRevoked": "Verbinding verbroken: uw toegang tot deze server is ingetrokken.",
+          "tokenRefreshLoop": "Authenticatielus gedetecteerd. Vernieuw de pagina en probeer opnieuw."
         },
         "banner": {
-          "retrying": "Retrying in {countdown}..."
+          "retrying": "Opnieuw proberen over {countdown}..."
         },
         "listener": {
           "toast": {
-            "backupCompleted": "Backup completed successfully.",
-            "backupFailed": "Backup failed.",
-            "backupRestoreCompleted": "Backup restore completed successfully.",
-            "installCompleted": "Server Installation completed successfully.",
-            "installFailed": "Server Installation failed.",
+            "backupCompleted": "Back-up succesvol voltooid.",
+            "backupFailed": "Back-up mislukt.",
+            "backupRestoreCompleted": "Back-up herstel succesvol voltooid.",
+            "installCompleted": "Serverinstallatie succesvol voltooid.",
+            "installFailed": "Serverinstallatie mislukt.",
             "operations": {
               "compressing": {
-                "completed": "Compressed {files} to `{path}` in {time}.",
-                "failed": "Failed to compress {files} to `{path}`:\n{error}"
+                "completed": "{files} gecomprimeerd naar `{path}` in {time}.",
+                "failed": "Comprimeren van {files} naar `{path}` mislukt:\n{error}"
               },
               "decompressing": {
-                "completed": "Decompressed `{path}` to `{destination}` in {time}.",
-                "failed": "Failed to decompress `{path}` to `{destination}`:\n{error}"
+                "completed": "`{path}` gedecomprimeerd naar `{destination}` in {time}.",
+                "failed": "Decomprimeren van `{path}` naar `{destination}` mislukt:\n{error}"
               },
               "pulling": {
-                "completed": "Pulled `{destination}` in {time}.",
-                "failed": "Failed to pull `{destination}`:\n{error}"
+                "completed": "`{destination}` opgehaald in {time}.",
+                "failed": "Ophalen van `{destination}` mislukt:\n{error}"
               },
               "copying": {
-                "completed": "Copied `{path}` to `{destination}` in {time}.",
+                "completed": "`{path}` gekopieerd naar `{destination}` in {time}.",
                 "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
-                "failed": "Failed to copy `{path}` to `{destination}`:\n{error}"
+                "failed": "Kopiëren van `{path}` naar `{destination}` mislukt:\n{error}"
               },
               "copyingMany": {
-                "completed": "Copied {files} in {time}.",
-                "failed": "Failed to copy {files}:\n{error}"
+                "completed": "{files} gekopieerd in {time}.",
+                "failed": "Kopiëren van {files} mislukt:\n{error}"
               },
               "copyingRemote": {
-                "completedFrom": "Copied {files} from remote server in {time}.",
-                "completedTo": "Copied {files} to remote server in {time}.",
-                "failedFrom": "Failed to copy {files} from remote server:\n{error}",
-                "failedTo": "Failed to copy {files} to remote server:\n{error}"
+                "completedFrom": "{files} van externe server gekopieerd in {time}.",
+                "completedTo": "{files} naar externe server gekopieerd in {time}.",
+                "failedFrom": "Kopiëren van {files} van externe server mislukt:\n{error}",
+                "failedTo": "Kopiëren van {files} naar externe server mislukt:\n{error}"
               }
             }
           }
@@ -567,9 +567,9 @@
       },
       "fileUpload": {
         "toast": {
-          "uploading": "Started uploading {files}...",
-          "cancelledFile": "Successfully cancelled upload of `{file}`.",
-          "cancelledFolder": "Successfully cancelled upload of `{folder}` ({files}).",
+          "uploading": "Uploaden van {files} gestart...",
+          "cancelledFile": "Uploaden van `{file}` succesvol geannuleerd.",
+          "cancelledFolder": "Uploaden van map `{folder}` ({files}) succesvol geannuleerd.",
           "cancelledAll": "All uploads have been cancelled."
         }
       }
@@ -577,130 +577,130 @@
     "pages": {
       "oobe": {
         "welcome": {
-          "title": "Welcome to Calagopus",
-          "subtitle": "Let's get your game server management system up and running!",
-          "wizardIntro": "This setup wizard will guide you through:",
+          "title": "Welkom bij Calagopus",
+          "subtitle": "Laten we uw gameservermanagementsysteem instellen!",
+          "wizardIntro": "Deze installatiewizard begeleidt u door:",
           "steps": {
-            "account": "Creating your administrator account",
-            "settings": "Configuring essential system settings",
-            "location": "Setting up your server location",
-            "node": "Adding your first node",
-            "server": "Deploying your first game server"
+            "account": "Uw beheerdersaccount aanmaken",
+            "settings": "Essentiële systeeminstellingen configureren",
+            "location": "Uw serverlocatie instellen",
+            "node": "Uw eerste node toevoegen",
+            "server": "Uw eerste gameserver deployen"
           },
           "button": {
-            "start": "Get Started"
+            "start": "Aan de slag"
           }
         },
         "register": {
-          "title": "Create Administrator Account",
+          "title": "Beheerdersaccount aanmaken",
           "alert": {
-            "title": "Security Notice",
-            "description": "Choose a strong password. This account will have complete administrative access to all servers and settings."
+            "title": "Beveiligingsmelding",
+            "description": "Kies een sterk wachtwoord. Dit account heeft volledige beheerderstoegang tot alle servers en instellingen."
           },
           "form": {
-            "usernamePlaceholder": "admin",
-            "email": "Email Address",
-            "emailPlaceholder": "admin@example.com",
+            "usernamePlaceholder": "beheerder",
+            "email": "E-mailadres",
+            "emailPlaceholder": "beheerder@voorbeeld.nl",
             "firstNamePlaceholder": "Alan",
             "lastNamePlaceholder": "Turing",
-            "passwordPlaceholder": "Enter a strong password",
-            "confirmPasswordPlaceholder": "Re-enter your password"
+            "passwordPlaceholder": "Voer een sterk wachtwoord in",
+            "confirmPasswordPlaceholder": "Voer uw wachtwoord opnieuw in"
           },
           "button": {
-            "create": "Create Account & Continue"
+            "create": "Account aanmaken & doorgaan"
           }
         },
         "login": {
-          "title": "Log back in",
-          "alert": "You got logged out during the setup process. Please log back in to continue where you left off.",
+          "title": "Opnieuw inloggen",
+          "alert": "U bent uitgelogd tijdens het installatieproces. Log opnieuw in om verder te gaan waar u gebleven was.",
           "form": {
-            "usernamePlaceholder": "admin",
-            "passwordPlaceholder": "Enter a strong password"
+            "usernamePlaceholder": "beheerder",
+            "passwordPlaceholder": "Voer een sterk wachtwoord in"
           },
           "button": {
-            "login": "Log in & Continue"
+            "login": "Inloggen & doorgaan"
           }
         },
         "location": {
-          "title": "Location Configuration",
+          "title": "Locatieconfiguratie",
           "form": {
-            "locationName": "Location Name",
-            "locationNamePlaceholder": "My home",
+            "locationName": "Locatienaam",
+            "locationNamePlaceholder": "Mijn thuis",
             "locationFlag": "Location Flag",
             "locationFlagPlaceholder": "The best country",
-            "backupName": "Backup Configuration Name",
+            "backupName": "Naam back-upconfiguratie",
             "backupNamePlaceholder": "Unicorn Cloud",
-            "backupDisk": "Backup Disk",
-            "backupDiskPlaceholder": "Backup Disk"
+            "backupDisk": "Back-upschijf",
+            "backupDiskPlaceholder": "Back-upschijf"
           },
           "button": {
-            "create": "Create & Continue"
+            "create": "Aanmaken & doorgaan"
           }
         },
         "node": {
-          "title": "Node Configuration",
-          "allocationsTitle": "Allocations Configuration",
+          "title": "Nodeconfiguratie",
+          "allocationsTitle": "Allocatiesconfiguratie",
           "form": {
-            "name": "Name",
-            "namePlaceholder": "My Server",
+            "name": "Naam",
+            "namePlaceholder": "Mijn server",
             "urlPlaceholder": "URL",
-            "urlDescription": "used for internal communication with the node",
-            "publicUrl": "Public URL",
+            "urlDescription": "gebruikt voor interne communicatie met de node",
+            "publicUrl": "Openbare URL",
             "publicUrlPlaceholder": "URL",
-            "publicUrlDescription": "used for websocket/downloads",
-            "sftpHostPlaceholder": "SFTP Host",
-            "sftpPortPlaceholder": "SFTP Port",
+            "publicUrlDescription": "gebruikt voor websocket/downloads",
+            "sftpHostPlaceholder": "SFTP-host",
+            "sftpPortPlaceholder": "SFTP-poort",
             "ip": "IP"
           },
           "error": {
-            "noLocations": "Something went wrong. No locations were found."
+            "noLocations": "Er is iets misgegaan. Geen locaties gevonden."
           },
           "button": {
-            "create": "Create & Continue"
+            "create": "Aanmaken & doorgaan"
           }
         },
         "nodeConfiguration": {
-          "title": "Node Configuration",
+          "title": "Nodeconfiguratie",
           "error": {
-            "noNodes": "Something went wrong. No nodes were found.",
-            "connectionError": "Something went wrong. Connection Error."
+            "noNodes": "Er is iets misgegaan. Geen nodes gevonden.",
+            "connectionError": "Er is iets misgegaan. Verbindingsfout."
           },
-          "successMessage": "The connection to your node was successfully verified. You may now continue.",
-          "configurationDescription": "Place this into the configuration file at `{file}` or run:",
+          "successMessage": "De verbinding met uw node is succesvol geverifieerd. U kunt nu doorgaan.",
+          "configurationDescription": "Plaats dit in het configuratiebestand op `{file}` of voer het volgende uit:",
           "button": {
-            "verify": "Verify Connection"
+            "verify": "Verbinding verifiëren"
           }
         },
         "configuration": {
-          "title": "Application Settings",
+          "title": "Applicatie-instellingen",
           "form": {
-            "applicationName": "Application Name",
+            "applicationName": "Applicatienaam",
             "applicationNamePlaceholder": "Calagopus",
-            "languagePlaceholder": "Language",
-            "applicationUrl": "Application URL",
+            "languagePlaceholder": "Taal",
+            "applicationUrl": "Applicatie-URL",
             "applicationUrlPlaceholder": "https://calagop.us",
-            "registration": "Enable Registration",
-            "registrationDescription": "Allow new users to register their own account."
+            "registration": "Registratie inschakelen",
+            "registrationDescription": "Sta nieuwe gebruikers toe een eigen account te registreren."
           },
           "button": {
-            "submit": "Update Settings & Continue"
+            "submit": "Instellingen opslaan & doorgaan"
           }
         },
         "eggRepositories": {
-          "title": "Egg Repositories",
-          "description": "These are the source repositories of your eggs. You may change these repositories at any time.",
+          "title": "Egg-opslagplaatsen",
+          "description": "Dit zijn de bronopslagplaatsen van uw eggs. U kunt deze opslagplaatsen op elk moment wijzigen.",
           "repositories": {
             "pterodactylGame": {
               "title": "Pterodactyl Game Eggs",
-              "description": "Eggs for games like Minecraft, Terraria, and a lot more."
+              "description": "Eggs voor games zoals Minecraft, Terraria en nog veel meer."
             },
             "pterodactylApplication": {
-              "title": "Pterodactyl Application Eggs",
-              "description": "Eggs for applications like Grafana, Meilisearch, and various databases."
+              "title": "Pterodactyl Applicatie-Eggs",
+              "description": "Eggs voor applicaties zoals Grafana, Meilisearch en diverse databases."
             },
             "pterodactylGeneral": {
-              "title": "Pterodactyl Generic Eggs",
-              "description": "Eggs for generic application runtimes like Node JS, Java, and Rust."
+              "title": "Pterodactyl Generieke Eggs",
+              "description": "Eggs voor generieke applicatie-runtimes zoals Node JS, Java en Rust."
             }
           }
         },
@@ -709,201 +709,201 @@
           "existingServer": "A server has already been created. You can change the settings later in the admin menu.",
           "egg": {
             "title": "Egg",
-            "description": "Let's get your first server up and running. What egg would you like to use?",
-            "nestDescription": "To start using this egg, you will need to create a nest, nests are collections of eggs. Give it a name:"
+            "description": "Laten we uw eerste server instellen. Welke egg wilt u gebruiken?",
+            "nestDescription": "Om deze egg te gebruiken, moet u een nest aanmaken. Nests zijn verzamelingen van eggs. Geef het een naam:"
           },
           "server": {
             "title": "Server",
-            "nestDescription": "To start using this egg, you will need to create a nest, nests are collections of eggs. Give it a name:"
+            "nestDescription": "Om deze egg te gebruiken, moet u een nest aanmaken. Nests zijn verzamelingen van eggs. Geef het een naam:"
           },
           "error": {
-            "noNodes": "Something went wrong. No nodes were found."
+            "noNodes": "Er is iets misgegaan. Geen nodes gevonden."
           },
           "button": {
-            "create": "Create & Continue"
+            "create": "Aanmaken & doorgaan"
           }
         },
         "finished": {
-          "title": "Setup Complete!",
-          "subtitle": "Your Calagopus panel is ready to use",
-          "setupTitle": "What We've Set Up",
+          "title": "Installatie voltooid!",
+          "subtitle": "Uw Calagopus-panel is klaar voor gebruik",
+          "setupTitle": "Wat we hebben ingesteld",
           "items": {
-            "account": "Administrator Account",
+            "account": "Beheerdersaccount",
             "configuration": {
-              "title": "System Configuration",
-              "subtitle": "Panel settings and preferences configured"
+              "title": "Systeemconfiguratie",
+              "subtitle": "Panelinstellingen en voorkeuren geconfigureerd"
             },
             "eggRepositories": {
-              "title": "Egg Repositories",
-              "subtitle": "{count} repositories"
+              "title": "Egg-opslagplaatsen",
+              "subtitle": "{count} opslagplaatsen"
             },
-            "location": "Location",
+            "location": "Locatie",
             "node": "Node",
             "server": "Server"
           },
           "badge": {
-            "skipped": "Skipped"
+            "skipped": "Overgeslagen"
           },
-          "button": "Go to Dashboard"
+          "button": "Naar dashboard"
         }
       },
       "auth": {
         "button": {
-          "login": "Login",
-          "loginWith": "Login with {name}"
+          "login": "Inloggen",
+          "loginWith": "Inloggen met {name}"
         },
         "alert": {
           "urlMismatch": "The application URL does not match the current URL. Expected: `{appUrl}`, Current: `{currentUrl}`."
         },
         "login": {
           "error": {
-            "usernameRequired": "Please enter a username",
+            "usernameRequired": "Voer een gebruikersnaam in",
             "registrationDisabled": "No matching Account could be found and registration is currently disabled.",
             "userAlreadyExists": "An account with this username or email already exists."
           },
           "passkey": {
             "error": {
-              "notSupported": "Your browser does not support passkeys.",
-              "unexpected": "An unexpected error occurred while using your passkey.",
-              "cancelled": "Passkey request was cancelled.",
-              "dismissed": "You dismissed or did not interact with the passkey prompt. The used key could also be not registered.",
-              "invalidState": "This passkey is not available or already registered.",
-              "notSupportedType": "Your browser or device does not support this type of passkey.",
-              "securityError": "Passkeys can only be used over HTTPS and with a valid domain.",
-              "authenticatorError": "Something went wrong with the authenticator.",
-              "constraintError": "The authenticator could not meet the required constraints."
+              "notSupported": "Uw browser ondersteunt geen wachtwoordsleutels.",
+              "unexpected": "Er is een onverwachte fout opgetreden bij het gebruik van uw wachtwoordsleutel.",
+              "cancelled": "Wachtwoordsleutelaanvraag geannuleerd.",
+              "dismissed": "U heeft het wachtwoordsleutelprompt gesloten of niet beantwoord. De gebruikte sleutel is mogelijk ook niet geregistreerd.",
+              "invalidState": "Deze wachtwoordsleutel is niet beschikbaar of al geregistreerd.",
+              "notSupportedType": "Uw browser of apparaat ondersteunt dit type wachtwoordsleutel niet.",
+              "securityError": "Wachtwoordsleutels kunnen alleen worden gebruikt via HTTPS en met een geldig domein.",
+              "authenticatorError": "Er is iets misgegaan met de authenticator.",
+              "constraintError": "De authenticator kon niet voldoen aan de vereiste beperkingen."
             }
           },
           "step": {
             "username": {
-              "title": "Login",
+              "title": "Inloggen",
               "subtitle": "Enter your username or email address to continue",
               "form": {
                 "usernameOrEmailPlaceholder": "Your username or email address"
               },
               "link": {
-                "forgotPassword": "Forgot Password",
-                "notRegistered": "Not registered?",
-                "createAccount": "Create account"
+                "forgotPassword": "Wachtwoord vergeten",
+                "notRegistered": "Nog niet geregistreerd?",
+                "createAccount": "Account aanmaken"
               },
               "button": {
-                "oauthLogin": "OAuth Login"
+                "oauthLogin": "OAuth-inloggen"
               }
             },
             "passkey": {
-              "title": "Authenticate with Passkey",
-              "subtitle": "We found a passkey associated with {username}",
+              "title": "Authenticeren met wachtwoordsleutel",
+              "subtitle": "Er is een wachtwoordsleutel gevonden voor {username}",
               "button": {
-                "usePasskey": "Use Passkey",
-                "usePassword": "Use Password"
+                "usePasskey": "Wachtwoordsleutel gebruiken",
+                "usePassword": "Wachtwoord gebruiken"
               }
             },
             "password": {
-              "title": "Enter Password",
-              "subtitle": "Please enter your password for {username}",
+              "title": "Wachtwoord invoeren",
+              "subtitle": "Voer uw wachtwoord in voor {username}",
               "form": {
-                "passwordPlaceholder": "Enter your password"
+                "passwordPlaceholder": "Voer uw wachtwoord in"
               },
               "button": {
-                "signIn": "Sign In",
-                "forgotPassword": "Forgot Password"
+                "signIn": "Inloggen",
+                "forgotPassword": "Wachtwoord vergeten"
               }
             },
             "totp": {
-              "title": "Two-Factor Authentication",
-              "welcomeBack": "Welcome back {username}!",
-              "enterCode": "Enter the 6-digit code from your authenticator app",
+              "title": "Tweestapsverificatie",
+              "welcomeBack": "Welkom terug {username}!",
+              "enterCode": "Voer de 6-cijferige code in van uw authenticator-app",
               "button": {
-                "verify": "Verify Code",
-                "useRecoveryCode": "Use Recovery Code",
-                "useTotp": "Use TOTP"
+                "verify": "Code verifiëren",
+                "useRecoveryCode": "Herstelcode gebruiken",
+                "useTotp": "TOTP gebruiken"
               }
             },
             "totpRecovery": {
-              "subtitle": "Enter a recovery code",
+              "subtitle": "Voer een herstelcode in",
               "form": {
-                "label": "Recovery Code",
-                "placeholder": "Enter a recovery code"
+                "label": "Herstelcode",
+                "placeholder": "Voer een herstelcode in"
               }
             }
           }
         },
         "register": {
-          "title": "Register",
-          "subtitle": "Please enter your details to register",
+          "title": "Registreren",
+          "subtitle": "Voer uw gegevens in om te registreren",
           "button": {
-            "register": "Register"
+            "register": "Registreren"
           }
         },
         "forgotPassword": {
-          "title": "Forgot Password",
-          "subtitle": "Enter your email to receive instructions on how to reset your password",
+          "title": "Wachtwoord vergeten",
+          "subtitle": "Voer uw e-mailadres in om instructies te ontvangen voor het opnieuw instellen van uw wachtwoord",
           "button": {
-            "request": "Request Password Reset"
+            "request": "Wachtwoordreset aanvragen"
           },
-          "success": "An email has been sent to you with instructions on how to reset your password."
+          "success": "Er is een e-mail naar u verzonden met instructies voor het opnieuw instellen van uw wachtwoord."
         },
         "resetPassword": {
-          "title": "Reset Password",
-          "subtitle": "Please enter your new password",
+          "title": "Wachtwoord opnieuw instellen",
+          "subtitle": "Voer uw nieuwe wachtwoord in",
           "button": {
-            "reset": "Reset Password"
+            "reset": "Wachtwoord opnieuw instellen"
           },
           "toast": {
-            "success": "Password has been reset."
+            "success": "Wachtwoord opnieuw ingesteld."
           }
         },
         "oauth": {
-          "title": "Authenticate with OAuth",
-          "subtitle": "Choose any of the providers below to login"
+          "title": "Authenticeren met OAuth",
+          "subtitle": "Kies een van de onderstaande aanbieders om in te loggen"
         }
       },
       "account": {
         "home": {
           "title": "Servers",
           "tooltip": {
-            "removeFromGroup": "Remove from Group",
-            "addToGroup": "Add to Group",
-            "addServerToGroup": "Add Server to Group",
-            "groupActions": "Group Actions",
-            "noGroups": "No groups available to add server to",
-            "noGroup": "This server is not in any group"
+            "removeFromGroup": "Uit groep verwijderen",
+            "addToGroup": "Aan groep toevoegen",
+            "addServerToGroup": "Server aan groep toevoegen",
+            "groupActions": "Groepsacties",
+            "noGroups": "Geen groepen beschikbaar om server aan toe te voegen",
+            "noGroup": "Deze server behoort niet tot een groep"
           },
           "badge": {
             "foreign": "Foreign"
           },
           "tabs": {
             "groupedServers": {
-              "title": "Grouped Servers",
+              "title": "Gegroepeerde servers",
               "page": {
                 "button": {
-                  "createGroup": "Create Group"
+                  "createGroup": "Groep aanmaken"
                 },
                 "modal": {
                   "createServerGroup": {
-                    "title": "Create Server Group",
+                    "title": "Servergroep aanmaken",
                     "toast": {
-                      "created": "Server group created."
+                      "created": "Servergroep aangemaakt."
                     }
                   },
                   "editServerGroup": {
-                    "title": "Edit Server Group",
+                    "title": "Servergroep bewerken",
                     "toast": {
-                      "updated": "Server group updated."
+                      "updated": "Servergroep bijgewerkt."
                     }
                   },
                   "deleteServerGroup": {
-                    "title": "Confirm Server Group Deletion",
-                    "content": "Are you sure you want to delete **{group}** from your account?",
+                    "title": "Verwijderen van servergroep bevestigen",
+                    "content": "Weet u zeker dat u **{group}** wilt verwijderen van uw account?",
                     "toast": {
-                      "deleted": "Server group deleted."
+                      "deleted": "Servergroep verwijderd."
                     }
                   },
                   "addServerToGroup": {
-                    "title": "Add Server to {group}",
-                    "noServers": "All servers are already in this group.",
+                    "title": "Server toevoegen aan {group}",
+                    "noServers": "Alle servers zijn al in deze groep.",
                     "toast": {
-                      "added": "Server added to group."
+                      "added": "Server toegevoegd aan groep."
                     }
                   },
                   "removeServerFromGroup": {
@@ -914,20 +914,20 @@
                     }
                   }
                 },
-                "noGroups": "No Groups could be found, time to create one?"
+                "noGroups": "Geen groepen gevonden. Tijd om er een aan te maken?"
               }
             },
             "allServers": {
-              "title": "All Servers",
+              "title": "Alle servers",
               "page": {
                 "input": {
-                  "showOtherUsersServers": "Show other user's servers"
+                  "showOtherUsersServers": "Servers van andere gebruikers weergeven"
                 },
                 "modal": {
                   "addToServerGroup": {
-                    "title": "Add {server} to Server Group",
+                    "title": "{server} toevoegen aan servergroep",
                     "form": {
-                      "serverGroup": "Server Group"
+                      "serverGroup": "Servergroep"
                     }
                   }
                 }
@@ -935,24 +935,24 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Selection Mode",
-            "select": "Select server",
-            "deselect": "Deselect server",
-            "success": "Successfully {action} {servers}.",
-            "partial": "Successfully {action} {successfulServers}. {failedServers} failed.",
-            "groupActions": "Group Actions"
+            "selectionMode": "Selectiemodus",
+            "select": "Server selecteren",
+            "deselect": "Server deselecteren",
+            "success": "{servers} succesvol {action}.",
+            "partial": "{successfulServers} succesvol {action}. {failedServers} mislukt.",
+            "groupActions": "Groepsacties"
           },
-          "noServers": "No Servers could be found, time to add one?"
+          "noServers": "Geen servers gevonden. Tijd om er een toe te voegen?"
         },
         "admin": {
-          "title": "Admin"
+          "title": "Beheerder"
         },
         "account": {
           "title": "Account",
           "alert": {
             "requireTwoFactor": {
-              "title": "Two-Factor Authentication Required",
-              "description": "Two-Factor Authentication is required on your account. Please set it up below to continue using the panel."
+              "title": "Tweestapsverificatie vereist",
+              "description": "Tweestapsverificatie is vereist voor uw account. Stel het hieronder in om het panel te blijven gebruiken."
             },
             "frozen": {
               "title": "Account Frozen",
@@ -961,68 +961,68 @@
           },
           "containers": {
             "password": {
-              "title": "Password",
+              "title": "Wachtwoord",
               "toast": {
-                "updated": "Password updated successfully."
+                "updated": "Wachtwoord succesvol bijgewerkt."
               },
               "form": {
-                "newPassword": "New Password",
-                "confirmNewPassword": "Confirm New Password"
+                "newPassword": "Nieuw wachtwoord",
+                "confirmNewPassword": "Nieuw wachtwoord bevestigen"
               }
             },
             "email": {
-              "title": "Email",
+              "title": "E-mail",
               "toast": {
-                "updated": "Email updated successfully."
+                "updated": "E-mailadres succesvol bijgewerkt."
               },
               "form": {
-                "newEmail": "New Email"
+                "newEmail": "Nieuw e-mailadres"
               }
             },
             "twoFactor": {
-              "title": "Two-Factor Authentication",
+              "title": "Tweestapsverificatie",
               "toast": {
-                "disabled": "Two-factor authentication disabled successfully.",
-                "enabled": "Two-factor authentication enabled successfully. Please copy your recovery codes."
+                "disabled": "Tweestapsverificatie succesvol uitgeschakeld.",
+                "enabled": "Tweestapsverificatie succesvol ingeschakeld. Kopieer uw herstelcodes."
               },
               "modal": {
                 "disableTwoFactor": {
-                  "title": "Disable Two-Factor Authentication",
-                  "description": "Disabling two-factor authentication will make your account less secure."
+                  "title": "Tweestapsverificatie uitschakelen",
+                  "description": "Het uitschakelen van tweestapsverificatie maakt uw account minder veilig."
                 },
                 "setupTwoFactor": {
-                  "title": "Setup Two-Factor Authentication",
-                  "description": "Help protect your account from unauthorized access. You'll be prompted for a verification code each time you sign in.",
-                  "descriptionQR": "Scan the QR code above using the two-factor authentication app of your choice. Then, enter the 6-digit code generated into the field below."
+                  "title": "Tweestapsverificatie instellen",
+                  "description": "Bescherm uw account tegen ongeautoriseerde toegang. U wordt gevraagd om een verificatiecode bij elke aanmelding.",
+                  "descriptionQR": "Scan de bovenstaande QR-code met uw tweestapsverificatie-app naar keuze. Voer vervolgens de gegenereerde 6-cijferige code in het onderstaande veld in."
                 },
                 "recoveryCodes": {
-                  "title": "Recovery Codes",
-                  "description": "Below are your recovery codes. Store these in a safe place. If you lose access to your authentication device, you can use these codes to regain access to your account."
+                  "title": "Herstelcodes",
+                  "description": "Hieronder staan uw herstelcodes. Bewaar deze op een veilige plek. Als u geen toegang meer heeft tot uw authenticatieapparaat, kunt u deze codes gebruiken om toegang tot uw account te herkrijgen."
                 }
               },
               "button": {
-                "disableTwoFactor": "Disable Two-Factor",
-                "setupTwoFactor": "Setup Two-Factor"
+                "disableTwoFactor": "Tweestapsverificatie uitschakelen",
+                "setupTwoFactor": "Tweestapsverificatie instellen"
               },
-              "twoFactorEnabled": "Two-Factor Verification is currently enabled.",
-              "twoFactorDisabled": "You do not currently have two-factor verification enabled on your account. Click the button below to begin configuring it.",
-              "twoFactorLastUsed": "Last used: {timestamp}"
+              "twoFactorEnabled": "Tweestapsverificatie is momenteel ingeschakeld.",
+              "twoFactorDisabled": "Tweestapsverificatie is momenteel niet ingeschakeld op uw account. Klik op de onderstaande knop om het in te stellen.",
+              "twoFactorLastUsed": "Laatst gebruikt: {timestamp}"
             },
             "account": {
-              "title": "Account Details",
+              "title": "Accountgegevens",
               "toast": {
-                "updated": "Account details updated successfully."
+                "updated": "Accountgegevens succesvol bijgewerkt."
               },
               "form": {
-                "toastPosition": "Toast Position",
-                "startOnGroupedServers": "Start on the Grouped Servers page"
+                "toastPosition": "Meldingspositie",
+                "startOnGroupedServers": "Starten op de pagina Gegroepeerde servers"
               }
             },
             "avatar": {
               "title": "Avatar",
               "toast": {
-                "updated": "Avatar updated successfully.",
-                "removed": "Avatar removed successfully."
+                "updated": "Avatar succesvol bijgewerkt.",
+                "removed": "Avatar succesvol verwijderd."
               },
               "form": {
                 "avatar": "Avatar"
@@ -1031,64 +1031,64 @@
           }
         },
         "securityKeys": {
-          "title": "Security Keys",
+          "title": "Beveiligingssleutels",
           "subtitle": "{current} of {max} maximum security keys created.",
           "table": {
             "columns": {
-              "credentialId": "Credential ID"
+              "credentialId": "Referentie-ID"
             }
           },
           "tooltip": {
-            "secureContextRequired": "A secure context (HTTPS) is required to use security keys.",
+            "secureContextRequired": "Een beveiligde context (HTTPS) is vereist om beveiligingssleutels te gebruiken.",
             "limitReached": "You are limited to {max} security keys."
           },
           "modal": {
             "createSecurityKey": {
-              "title": "Create Security Key",
+              "title": "Beveiligingssleutel aanmaken",
               "toast": {
-                "created": "Security key created successfully.",
-                "aborted": "Security key creation aborted."
+                "created": "Beveiligingssleutel succesvol aangemaakt.",
+                "aborted": "Aanmaken van beveiligingssleutel afgebroken."
               }
             },
             "editSecurityKey": {
-              "title": "Edit Security Key",
+              "title": "Beveiligingssleutel bewerken",
               "toast": {
-                "updated": "Security key updated successfully."
+                "updated": "Beveiligingssleutel succesvol bijgewerkt."
               }
             },
             "deleteSecurityKey": {
-              "title": "Confirm Security Key Deletion",
-              "content": "Are you sure you want to delete **{key}** from your account?",
+              "title": "Verwijderen van beveiligingssleutel bevestigen",
+              "content": "Weet u zeker dat u **{key}** wilt verwijderen van uw account?",
               "toast": {
-                "deleted": "Security key deleted successfully."
+                "deleted": "Beveiligingssleutel succesvol verwijderd."
               }
             }
           }
         },
         "sessions": {
-          "title": "Sessions",
+          "title": "Sessies",
           "table": {
             "columns": {
               "ip": "IP",
-              "thisDevice": "This Device?",
-              "userAgent": "User Agent"
+              "thisDevice": "Dit apparaat?",
+              "userAgent": "Gebruikersagent"
             }
           },
           "modal": {
             "deleteSession": {
-              "title": "Confirm Session Deletion",
-              "content": "Are you sure you want to delete the session **{ip}** from your account?",
+              "title": "Verwijderen van sessie bevestigen",
+              "content": "Weet u zeker dat u de sessie **{ip}** wilt verwijderen van uw account?",
               "toast": {
-                "deleted": "Session deleted."
+                "deleted": "Sessie verwijderd."
               }
             }
           }
         },
         "shortcuts": {
-          "title": "Keyboard Shortcuts",
-          "subtitle": "Use these keyboard shortcuts to navigate and interact with the panel more efficiently.",
-          "detectedMac": "macOS detected",
-          "detectedWindows": "Windows/Linux detected",
+          "title": "Sneltoetsen",
+          "subtitle": "Gebruik deze sneltoetsen om efficiënter door het panel te navigeren.",
+          "detectedMac": "macOS gedetecteerd",
+          "detectedWindows": "Windows/Linux gedetecteerd",
           "label": {
             "disabled": "Disabled",
             "modified": "Modified",
@@ -1107,162 +1107,162 @@
             "resetAll": "All shortcuts reset to defaults."
           },
           "fileManager": {
-            "title": "File Manager",
-            "selectAll": "Select all files",
-            "cutFiles": "Cut selected files",
-            "copyFiles": "Copy selected files",
-            "duplicateFile": "Duplicate selected file",
-            "pasteFiles": "Paste files",
-            "searchFiles": "Search files",
-            "moveUpDirectory": "Move Up a directory",
-            "moveUpSelection": "Move Up the selection",
-            "moveDownSelection": "Move Down the selection",
-            "renameFile": "Rename file",
-            "deselectAll": "Deselect all files",
-            "deleteFiles": "Delete selected files"
+            "title": "Bestandsbeheer",
+            "selectAll": "Alle bestanden selecteren",
+            "cutFiles": "Geselecteerde bestanden knippen",
+            "copyFiles": "Geselecteerde bestanden kopiëren",
+            "duplicateFile": "Geselecteerd bestand dupliceren",
+            "pasteFiles": "Bestanden plakken",
+            "searchFiles": "Bestanden zoeken",
+            "moveUpDirectory": "Een map omhoog",
+            "moveUpSelection": "Selectie omhoog verplaatsen",
+            "moveDownSelection": "Selectie omlaag verplaatsen",
+            "renameFile": "Bestand hernoemen",
+            "deselectAll": "Alle bestanden deselecteren",
+            "deleteFiles": "Geselecteerde bestanden verwijderen"
           },
           "table": {
-            "title": "Table Navigation",
-            "previousPage": "Previous page",
-            "nextPage": "Next page",
-            "firstPage": "First page",
-            "lastPage": "Last page"
+            "title": "Tabelnavigatie",
+            "previousPage": "Vorige pagina",
+            "nextPage": "Volgende pagina",
+            "firstPage": "Eerste pagina",
+            "lastPage": "Laatste pagina"
           },
           "console": {
-            "title": "Server Console",
-            "searchContent": "Search in console output",
-            "previousCommand": "Previous command in history",
-            "nextCommand": "Next command in history"
+            "title": "Serverconsole",
+            "searchContent": "Zoeken in console-uitvoer",
+            "previousCommand": "Vorige opdracht in geschiedenis",
+            "nextCommand": "Volgende opdracht in geschiedenis"
           },
           "serverList": {
-            "title": "Server List",
-            "selectServer": "Hold S and click to select/deselect server"
+            "title": "Serverlijst",
+            "selectServer": "Houd S ingedrukt en klik om server te selecteren/deselecteren"
           }
         },
         "sshKeys": {
-          "title": "SSH Keys",
+          "title": "SSH-sleutels",
           "subtitle": "{current} of {max} maximum ssh keys created.",
           "tooltip": {
             "limitReached": "You are limited to {max} ssh keys."
           },
           "table": {
             "columns": {
-              "fingerprint": "Fingerprint"
+              "fingerprint": "Vingerafdruk"
             }
           },
           "modal": {
             "createSshKey": {
-              "title": "Create SSH Key",
+              "title": "SSH-sleutel aanmaken",
               "toast": {
-                "created": "SSH key created."
+                "created": "SSH-sleutel aangemaakt."
               },
               "button": {
-                "uploadKeyFile": "Upload Key File"
+                "uploadKeyFile": "Sleutelbestand uploaden"
               },
               "form": {
-                "publicKey": "Public Key"
+                "publicKey": "Publieke sleutel"
               }
             },
             "editSshKey": {
-              "title": "Edit SSH Key",
+              "title": "SSH-sleutel bewerken",
               "toast": {
-                "updated": "SSH Key updated."
+                "updated": "SSH-sleutel bijgewerkt."
               }
             },
             "importSshKeys": {
-              "title": "Import SSH Keys",
+              "title": "SSH-sleutels importeren",
               "toast": {
-                "created": "{sshKeys} created."
+                "created": "{sshKeys} aangemaakt."
               },
               "form": {
-                "provider": "Provider"
+                "provider": "Aanbieder"
               }
             },
             "deleteSshKey": {
-              "title": "Confirm SSH Key Deletion",
-              "content": "Are you sure you want to delete **{name}** from your account?",
+              "title": "Verwijderen van SSH-sleutel bevestigen",
+              "content": "Weet u zeker dat u **{name}** wilt verwijderen van uw account?",
               "toast": {
-                "removed": "SSH key removed."
+                "removed": "SSH-sleutel verwijderd."
               }
             }
           }
         },
         "commandSnippets": {
-          "title": "Command Snippets",
+          "title": "Opdrachtfragmenten",
           "subtitle": "{current} of {max} maximum command snippets created.",
           "tooltip": {
             "limitReached": "You are limited to {max} command snippets."
           },
           "modal": {
             "createCommandSnippet": {
-              "title": "Create Command Snippet",
+              "title": "Opdrachtfragment aanmaken",
               "toast": {
-                "created": "Command snippet created."
+                "created": "Opdrachtfragment aangemaakt."
               }
             },
             "editCommandSnippet": {
-              "title": "Edit Command Snippet",
+              "title": "Opdrachtfragment bewerken",
               "toast": {
-                "updated": "Command snippet updated."
+                "updated": "Opdrachtfragment bijgewerkt."
               }
             },
             "deleteCommandSnippet": {
-              "title": "Confirm Command Snippet Deletion",
-              "content": "Are you sure you want to delete **{name}** from your account?",
+              "title": "Verwijderen van opdrachtfragment bevestigen",
+              "content": "Weet u zeker dat u **{name}** wilt verwijderen van uw account?",
               "toast": {
-                "removed": "Command snippet removed."
+                "removed": "Opdrachtfragment verwijderd."
               }
             }
           }
         },
         "oauthLinks": {
-          "title": "OAuth Links",
+          "title": "OAuth-koppelingen",
           "button": {
-            "connect": "Connect",
-            "connectTo": "Connect to {provider}"
+            "connect": "Verbinden",
+            "connectTo": "Verbinden met {provider}"
           },
           "table": {
             "columns": {
-              "providerName": "Provider Name"
+              "providerName": "Aanbiedernaam"
             }
           },
           "modal": {
             "deleteOAuthLink": {
-              "title": "Confirm OAuth Link Deletion",
-              "content": "Are you sure you want to delete the **{provider}** connection from your account?",
+              "title": "Verwijderen van OAuth-koppeling bevestigen",
+              "content": "Weet u zeker dat u de **{provider}**-verbinding wilt verwijderen van uw account?",
               "toast": {
-                "removed": "OAuth Link removed."
+                "removed": "OAuth-koppeling verwijderd."
               }
             }
           }
         },
         "apiKeys": {
-          "title": "API Keys",
+          "title": "API-sleutels",
           "subtitle": "{current} of {max} maximum api keys created.",
           "button": {
-            "apiDocumentation": "API Documentation"
+            "apiDocumentation": "API-documentatie"
           },
           "tooltip": {
             "limitReached": "You are limited to {max} api keys."
           },
           "table": {
             "columns": {
-              "key": "Key",
-              "permissions": "User / Server / Admin Permissions",
-              "expires": "Expires"
+              "key": "Sleutel",
+              "permissions": "Gebruiker / Server / Beheerdersrechten",
+              "expires": "Verloopt"
             }
           },
           "modal": {
             "createApiKey": {
-              "title": "Create API Key",
+              "title": "API-sleutel aanmaken",
               "toast": {
-                "created": "API key created."
+                "created": "API-sleutel aangemaakt."
               }
             },
             "updateApiKey": {
-              "title": "Update API Key",
+              "title": "API-sleutel bijwerken",
               "toast": {
-                "updated": "API key updated."
+                "updated": "API-sleutel bijgewerkt."
               }
             },
             "recreateApiKey": {
@@ -1273,19 +1273,19 @@
               }
             },
             "deleteApiKey": {
-              "title": "Confirm API Key Deletion",
-              "content": "Are you sure you want to delete **{name}** from your account?",
+              "title": "Verwijderen van API-sleutel bevestigen",
+              "content": "Weet u zeker dat u **{name}** wilt verwijderen van uw account?",
               "toast": {
-                "removed": "API key removed."
+                "removed": "API-sleutel verwijderd."
               }
             }
           },
           "form": {
-            "allowedIps": "Allowed IPs",
-            "allowedIpsPlaceholder": "e.g. 192.168.1.1, 2001:db8::1",
-            "userPermissions": "User Permissions",
-            "serverPermissions": "Server Permissions",
-            "adminPermissions": "Admin Permissions"
+            "allowedIps": "Toegestane IP-adressen",
+            "allowedIpsPlaceholder": "bijv. 192.168.1.1, 2001:db8::1",
+            "userPermissions": "Gebruikersrechten",
+            "serverPermissions": "Serverrechten",
+            "adminPermissions": "Beheerdersrechten"
           },
           "create": {
             "title": "Create API Key",
@@ -1302,7 +1302,7 @@
           }
         },
         "activity": {
-          "title": "Activity"
+          "title": "Activiteit"
         }
       },
       "admin": {
@@ -3325,73 +3325,73 @@
       },
       "server": {
         "viewAdmin": {
-          "title": "View in Admin Area"
+          "title": "Bekijk als beheerder"
         },
         "console": {
           "title": "Console",
           "input": {
-            "placeholder": "Type a command...",
-            "ariaLabel": "Console command input."
+            "placeholder": "Typ een opdracht...",
+            "ariaLabel": "Console-opdrachtinvoer."
           },
           "toast": {
-            "installCancelled": "Server install cancelled.",
+            "installCancelled": "Serverinstallatie geannuleerd.",
             "transferCancelled": "Server transfer cancelled."
           },
           "modal": {
             "sshDetails": {
-              "title": "SSH Details",
+              "title": "SSH-gegevens",
               "form": {
-                "command": "SSH Command"
+                "command": "SSH-opdracht"
               },
-              "launch": "Launch"
+              "launch": "Starten"
             }
           },
           "notification": {
             "suspended": "Your Server is currently suspended. No actions can be performed until the suspension is lifted.",
             "suspendedAdmin": "This server is currently suspended. Since you are an administrator, you can still access the server, but actions are limited.",
-            "nodeMaintenance": "Your Server is on a node that is currently under maintenance.",
-            "transferring": "Your Server is currently being transferred to another node.",
-            "restoringBackup": "Your Server is currently restoring from a backup. Please wait...",
-            "installing": "Your Server is currently being installed. Please wait...",
+            "nodeMaintenance": "Uw server bevindt zich op een node die momenteel in onderhoud is.",
+            "transferring": "Uw server wordt momenteel overgedragen naar een andere node.",
+            "restoringBackup": "Uw server herstelt momenteel een back-up. Een moment geduld...",
+            "installing": "Uw server wordt momenteel geïnstalleerd. Een moment geduld...",
             "pendingRestart": "Your Server has pending changes that require a restart. Please restart your server to apply these changes."
           },
           "message": {
-            "serverMarkedAs": "Server marked as {state}...",
-            "installFailed": "Installation has failed.",
-            "installCompleted": "Installation has completed successfully.",
-            "transferFailed": "Transfer has failed.",
-            "transferCompleted": "Transfer has completed successfully. Reconnecting to server...",
-            "pullingImage": "Your Server is currently pulling it's docker image. Please wait...",
-            "pulling": "Pulling",
-            "extracting": "Extracting"
+            "serverMarkedAs": "Server gemarkeerd als {state}...",
+            "installFailed": "Installatie mislukt.",
+            "installCompleted": "Installatie succesvol voltooid.",
+            "transferFailed": "Overdracht mislukt.",
+            "transferCompleted": "Overdracht succesvol voltooid. Opnieuw verbinden met server...",
+            "pullingImage": "Uw server haalt momenteel zijn Docker-image op. Een moment geduld...",
+            "pulling": "Ophalen",
+            "extracting": "Uitpakken"
           },
           "tooltip": {
-            "search": "Search",
-            "sshDetails": "SSH Details",
-            "commandHistory": "Command History",
-            "decreaseFontSize": "Decrease Font Size",
-            "increaseFontSize": "Increase Font Size"
+            "search": "Zoeken",
+            "sshDetails": "SSH-gegevens",
+            "commandHistory": "Opdrachtgeschiedenis",
+            "decreaseFontSize": "Lettergrootte verkleinen",
+            "increaseFontSize": "Lettergrootte vergroten"
           },
           "drawer": {
             "commandHistory": {
-              "title": "Command History",
-              "detailTitle": "Command Details",
-              "noCommands": "No commands found.",
-              "copyButton": "Copy Command",
-              "sendButton": "Send Command",
-              "commandSent": "Command sent successfully."
+              "title": "Opdrachtgeschiedenis",
+              "detailTitle": "Opdrachtdetails",
+              "noCommands": "Geen opdrachten gevonden.",
+              "copyButton": "Opdracht kopiëren",
+              "sendButton": "Opdracht verzenden",
+              "commandSent": "Opdracht succesvol verzonden."
             }
           },
           "feature": {
             "eula": {
-              "title": "Minecraft EULA Agreement",
-              "content": "The Minecraft server requires you to accept the [Minecraft End User License Agreement](https://minecraft.net/eula) before it can start.",
-              "contentDetails": "By clicking \"Accept EULA\", you agree to the terms of the Minecraft EULA and the **eula.txt** file will be updated to **eula=true**.",
+              "title": "Akkoord met Minecraft EULA",
+              "content": "De Minecraft-server vereist dat u akkoord gaat met de [Minecraft Eindgebruikerslicentieovereenkomst](https://minecraft.net/eula) voordat deze kan starten.",
+              "contentDetails": "Door op \"EULA accepteren\" te klikken, gaat u akkoord met de Minecraft EULA en wordt het bestand **eula.txt** bijgewerkt naar **eula=true**.",
               "toast": {
-                "accepted": "EULA accepted successfully."
+                "accepted": "EULA succesvol geaccepteerd."
               },
               "button": {
-                "accept": "Accept EULA"
+                "accept": "EULA accepteren"
               }
             },
             "javaVersion": {
@@ -3407,128 +3407,128 @@
             }
           },
           "details": {
-            "address": "Address",
-            "port": "Port",
+            "address": "Adres",
+            "port": "Poort",
             "uptime": "Uptime",
-            "cpuLoad": "CPU Load",
-            "memoryLoad": "Memory Load",
-            "diskUsage": "Disk Usage",
-            "networkIn": "Network (In)",
-            "networkOut": "Network (Out)",
-            "normalizeCpuLoad": "Normalize CPU Load (shifted to max 100%)"
+            "cpuLoad": "CPU-belasting",
+            "memoryLoad": "Geheugenbelasting",
+            "diskUsage": "Schijfgebruik",
+            "networkIn": "Netwerk (in)",
+            "networkOut": "Netwerk (uit)",
+            "normalizeCpuLoad": "CPU-belasting normaliseren (verschoven naar max. 100%)"
           },
           "power": {
             "modal": {
               "forceStop": {
-                "title": "Forcibly Stop Process",
-                "content": "Forcibly stopping a server can lead to data corruption."
+                "title": "Proces geforceerd stoppen",
+                "content": "Het geforceerd stoppen van een server kan leiden tot gegevensbeschadiging."
               }
             }
           },
           "stats": {
-            "cpuLoad": "CPU Load",
-            "memoryLoad": "Memory Load",
-            "network": "Network",
-            "inbound": "Inbound",
-            "outbound": "Outbound"
+            "cpuLoad": "CPU-belasting",
+            "memoryLoad": "Geheugenbelasting",
+            "network": "Netwerk",
+            "inbound": "Inkomend",
+            "outbound": "Uitgaand"
           },
-          "socketConnected": "Connected ({ping}ms ping)",
-          "socketDisconnected": "Disconnected"
+          "socketConnected": "Verbonden ({ping}ms ping)",
+          "socketDisconnected": "Verbinding verbroken"
         },
         "files": {
-          "title": "Files",
-          "titleEditorViewing": "Viewing {file}",
+          "title": "Bestanden",
+          "titleEditorViewing": "{file} bekijken",
           "titleEditorPlaying": "Playing {file}",
-          "titleEditorEditing": "Editing {file}",
-          "titleEditorNew": "New File",
+          "titleEditorEditing": "{file} bewerken",
+          "titleEditorNew": "Nieuw bestand",
           "titleDiffRevisionVsCurrent": "{file} - Revision #{revision} vs Current",
           "titleDiffRevisionVsRevision": "{file} - Revision #{previousRevision} vs #{revision}",
           "table": {
             "columns": {
-              "modified": "Modified"
+              "modified": "Gewijzigd"
             }
           },
           "button": {
-            "new": "New",
+            "new": "Nieuw",
             "connect": "Connect",
             "connectSftp": "via SFTP",
             "connectVscode": "via VS Code",
-            "openInNewWindow": "Open in new Window",
-            "rename": "Rename",
-            "copy": "Copy",
-            "fingerprint": "Fingerprint",
-            "permissions": "Permissions",
-            "unarchive": "Unarchive",
-            "archive": "Archive",
-            "more": "More",
-            "remoteCopy": "Remote Copy",
-            "search": "Search",
-            "exitBackup": "Exit Backup",
-            "fileFromEditor": "File from Editor",
-            "directory": "Directory",
-            "fileFromPull": "File from Pull",
-            "fileFromUpload": "File from Upload",
-            "directoryFromUpload": "Directory from Upload"
+            "openInNewWindow": "Openen in nieuw venster",
+            "rename": "Hernoemen",
+            "copy": "Kopiëren",
+            "fingerprint": "Vingerafdruk",
+            "permissions": "Rechten",
+            "unarchive": "Uitpakken",
+            "archive": "Archiveren",
+            "more": "Meer",
+            "remoteCopy": "Op afstand kopiëren",
+            "search": "Zoeken",
+            "exitBackup": "Back-up verlaten",
+            "fileFromEditor": "Bestand vanuit editor",
+            "directory": "Map",
+            "fileFromPull": "Bestand ophalen",
+            "fileFromUpload": "Bestand uploaden",
+            "directoryFromUpload": "Map uploaden"
           },
           "actionBar": {
-            "copyHere": "Copy {files} here",
-            "moveHere": "Move {files} here"
+            "copyHere": "{files} hier kopiëren",
+            "moveHere": "{files} hier verplaatsen"
           },
           "searchBanner": {
-            "resultsTitle": "Search Results ({files} found)",
-            "query": "Query:",
-            "excluded": "Excluded:",
-            "content": "Content:",
-            "size": "Size:",
+            "resultsTitle": "Zoekresultaten ({files} gevonden)",
+            "query": "Zoekopdracht:",
+            "excluded": "Uitgesloten:",
+            "content": "Inhoud:",
+            "size": "Grootte:",
             "min": "Min:",
             "max": "Max:"
           },
           "operations": {
-            "uploadingFolder": "Uploading folder: {folder} ({files})",
-            "waiting": "Waiting: ",
-            "uploading": "Uploading: ",
-            "compressing": "Compressing {files} from {path}",
-            "decompressing": "Decompressing {path}",
-            "pulling": "Pulling {destination}",
-            "copying": "Copying {path} to {destination}",
-            "copyingMany": "Copying {files}",
-            "receivingRemote": "Receiving {files} from remote server",
-            "sendingRemote": "Sending {files} to remote server",
+            "uploadingFolder": "Map uploaden: {folder} ({files})",
+            "waiting": "Wachten: ",
+            "uploading": "Uploaden: ",
+            "compressing": "{files} comprimeren vanuit {path}",
+            "decompressing": "{path} decomprimeren",
+            "pulling": "{destination} ophalen",
+            "copying": "{path} kopiëren naar {destination}",
+            "copyingMany": "{files} kopiëren",
+            "receivingRemote": "{files} ontvangen van externe server",
+            "sendingRemote": "{files} verzenden naar externe server",
             "rateLimited": "Your upload has been rate limited. Waiting...",
             "cancelAllUploads": "Cancel all uploads",
             "cancelAllOperations": "Cancel all operations"
           },
           "dropzone": {
-            "title": "Drop files here to upload",
-            "subtitle": "Release to start uploading"
+            "title": "Bestanden hier neerzetten om te uploaden",
+            "subtitle": "Loslaten om te beginnen met uploaden"
           },
           "settings": {
-            "clickOnce": "Click once to open file or folder",
-            "preferPhysicalSize": "Show physical size instead of logical size",
-            "editorMinimap": "Show File Minimap",
-            "editorLineOverflow": "Wrap Line Overflow",
+            "clickOnce": "Eén keer klikken om bestand of map te openen",
+            "preferPhysicalSize": "Fysieke grootte weergeven in plaats van logische grootte",
+            "editorMinimap": "Bestandsminimap weergeven",
+            "editorLineOverflow": "Regeloverloop inpakken",
             "vscodeUriScheme": "VS Code URI Scheme",
-            "imageViewerSmoothing": "Smoothen Image (Anti-Aliasing)"
+            "imageViewerSmoothing": "Afbeelding vloeiend maken (anti-aliasing)"
           },
           "toast": {
-            "operationCancelled": "Operation cancelled",
+            "operationCancelled": "Bewerking geannuleerd",
             "allOperationsCancelled": "All operations have been cancelled.",
-            "copyingStarted": "{files} started copying.",
-            "filesCouldNotBeMoved": "Files could not be moved.",
-            "filesMoved": "{files} moved.",
-            "downloadStarted": "Download started.",
-            "filesDeleted": "Files have been deleted.",
-            "archiveCreationStarted": "Archive creation has begun.",
-            "fileCopyingStarted": "File copying has started.",
-            "fileInfoRetrieved": "File information retrieved successfully.",
-            "filePullingStarted": "File pulling has started.",
-            "fileRenamed": "File has been renamed.",
-            "fileCouldNotBeRenamed": "File could not be renamed.",
+            "copyingStarted": "{files} begint met kopiëren.",
+            "filesCouldNotBeMoved": "Bestanden konden niet worden verplaatst.",
+            "filesMoved": "{files} verplaatst.",
+            "downloadStarted": "Download gestart.",
+            "filesDeleted": "Bestanden zijn verwijderd.",
+            "archiveCreationStarted": "Aanmaken van archief gestart.",
+            "fileCopyingStarted": "Kopiëren van bestand gestart.",
+            "fileInfoRetrieved": "Bestandsinformatie succesvol opgehaald.",
+            "filePullingStarted": "Ophalen van bestand gestart.",
+            "fileRenamed": "Bestand is hernoemd.",
+            "fileCouldNotBeRenamed": "Bestand kon niet worden hernoemd.",
             "filesRenamed": "{files} renamed.",
-            "permissionsUpdated": "Permissions have been updated.",
+            "permissionsUpdated": "Rechten zijn bijgewerkt.",
             "permissionsUpdatedMany": "Permissions have been updated for {files}.",
             "permissionsCouldNotBeUpdated": "Permissions could not be updated.",
-            "fileSaved": "File has been saved."
+            "fileSaved": "Bestand is opgeslagen."
           },
           "tooltip": {
             "fileHistory": "File History",
@@ -3562,12 +3562,12 @@
           },
           "modal": {
             "activeUploads": {
-              "title": "Active Uploads",
-              "content": "Are you sure you want to leave this page? You have {files} active file uploads. If you leave this page, the file uploads will abort."
+              "title": "Actieve uploads",
+              "content": "Weet u zeker dat u deze pagina wilt verlaten? U heeft {files} actieve bestandsuploads. Als u de pagina verlaat, worden de uploads afgebroken."
             },
             "unsavedChanges": {
-              "title": "Unsaved Changes",
-              "content": "You have unsaved changes in the file editor. Are you sure you want to leave this page? If you leave, your changes will be lost."
+              "title": "Niet-opgeslagen wijzigingen",
+              "content": "U heeft niet-opgeslagen wijzigingen in de bestandseditor. Weet u zeker dat u deze pagina wilt verlaten? Als u de pagina verlaat, gaan uw wijzigingen verloren."
             },
             "draftRestore": {
               "title": "Restore Draft",
@@ -3575,72 +3575,72 @@
               "contentHashMismatch": "The file has been modified on the server since this draft was saved. Restoring the draft may overwrite those changes."
             },
             "createArchive": {
-              "title": "Create Archive",
+              "title": "Archief aanmaken",
               "form": {
-                "format": "Format"
+                "format": "Formaat"
               },
-              "createdAs": "This archive will be created as "
+              "createdAs": "Dit archief wordt aangemaakt als "
             },
             "createDirectory": {
-              "title": "Create Directory",
-              "createdAs": "This directory will be created as "
+              "title": "Map aanmaken",
+              "createdAs": "Deze map wordt aangemaakt als "
             },
             "copyFile": {
-              "title": "Copy File",
-              "createdAs": "This file will be created as "
+              "title": "Bestand kopiëren",
+              "createdAs": "Dit bestand wordt aangemaakt als "
             },
             "copyRemote": {
-              "title": "Remote Copy Files",
+              "title": "Bestanden op afstand kopiëren",
               "form": {
                 "server": "Server"
               },
-              "createdAs": "These files will be created on the remote server under "
+              "createdAs": "Deze bestanden worden aangemaakt op de externe server onder "
             },
             "fileFingerprints": {
-              "title": "File Fingerprint",
+              "title": "Bestandsvingerafdruk",
               "form": {
-                "algorithm": "Algorithm",
-                "fingerprint": "Fingerprint"
+                "algorithm": "Algoritme",
+                "fingerprint": "Vingerafdruk"
               },
               "button": {
-                "calculate": "Calculate Fingerprint"
+                "calculate": "Vingerafdruk berekenen"
               }
             },
             "deleteFile": {
-              "title": "Delete File",
-              "singleFileWarning": "You will not be able to recover the contents of {file} once deleted.",
-              "multipleFilesWarning": "You will not be able to recover the contents of the following files once deleted."
+              "title": "Bestand verwijderen",
+              "singleFileWarning": "U kunt de inhoud van {file} niet herstellen nadat het is verwijderd.",
+              "multipleFilesWarning": "U kunt de inhoud van de volgende bestanden niet herstellen nadat ze zijn verwijderd."
             },
             "createFile": {
-              "title": "Create File"
+              "title": "Bestand aanmaken"
             },
             "details": {
-              "title": "File Details",
-              "path": "Path",
-              "mode": "Mode",
-              "logicalSize": "Logical Size",
-              "physicalSize": "Physical Size",
-              "mimeType": "MIME Type",
-              "lastModifiedAt": "Last Modified At",
-              "createdAt": "Created At"
+              "title": "Bestandsdetails",
+              "path": "Pad",
+              "mode": "Modus",
+              "logicalSize": "Logische grootte",
+              "physicalSize": "Fysieke grootte",
+              "mimeType": "MIME-type",
+              "lastModifiedAt": "Laatst gewijzigd op",
+              "createdAt": "Aangemaakt op"
             },
             "filePermissions": {
-              "title": "File Permissions",
+              "title": "Bestandsrechten",
               "form": {
                 "recursive": "Apply changes recursively to all files and subdirectories within this directory"
               },
-              "symbolic": "Symbolic:",
-              "octal": "Octal:",
-              "owner": "Owner",
-              "group": "Group",
-              "other": "Other",
-              "breakdown": "Permission Breakdown",
-              "readPermission": "Read permission (4)",
-              "writePermission": "Write permission (2)",
-              "executePermission": "Execute permission (1)"
+              "symbolic": "Symbolisch:",
+              "octal": "Octaal:",
+              "owner": "Eigenaar",
+              "group": "Groep",
+              "other": "Overig",
+              "breakdown": "Rechtenopbouw",
+              "readPermission": "Leesrecht (4)",
+              "writePermission": "Schrijfrecht (2)",
+              "executePermission": "Uitvoerrecht (1)"
             },
             "renameFile": {
-              "title": "Rename File"
+              "title": "Bestand hernoemen"
             },
             "massRename": {
               "title": "Rename Files",
@@ -3703,497 +3703,497 @@
               "empty": "No directories found."
             },
             "searchFiles": {
-              "title": "Search Files",
-              "placeholder": "Search for files...",
-              "advancedFilters": "Advanced Filters",
-              "pathPatterns": "Path Patterns",
-              "include": "Include",
-              "exclude": "Exclude",
-              "caseInsensitive": "Case insensitive",
-              "fileContent": "File Content",
-              "searchText": "Search text",
-              "maxFileSize": "Max file size",
-              "includeOversized": "Include oversized files",
-              "includeOversizedDescription": "Includes files that match other filters but are too large to search.",
-              "fileSize": "File Size",
+              "title": "Bestanden zoeken",
+              "placeholder": "Zoek naar bestanden...",
+              "advancedFilters": "Geavanceerde filters",
+              "pathPatterns": "Padpatronen",
+              "include": "Opnemen",
+              "exclude": "Uitsluiten",
+              "caseInsensitive": "Hoofdletterongevoelig",
+              "fileContent": "Bestandsinhoud",
+              "searchText": "Zoektekst",
+              "maxFileSize": "Maximale bestandsgrootte",
+              "includeOversized": "Te grote bestanden opnemen",
+              "includeOversizedDescription": "Bevat bestanden die overeenkomen met andere filters maar te groot zijn om te doorzoeken.",
+              "fileSize": "Bestandsgrootte",
               "minimum": "Minimum",
               "maximum": "Maximum"
             },
             "pullFile": {
-              "title": "Pull File",
+              "title": "Bestand ophalen",
               "form": {
-                "fileUrl": "File URL",
-                "query": "Query"
+                "fileUrl": "Bestands-URL",
+                "query": "Zoekopdracht"
               },
-              "createdAs": "This file will be created as ",
-              "pull": "Pull"
+              "createdAs": "Dit bestand wordt aangemaakt als ",
+              "pull": "Ophalen"
             },
             "sftpDetails": {
-              "title": "SFTP Details",
-              "launch": "Launch"
+              "title": "SFTP-gegevens",
+              "launch": "Starten"
             }
           }
         },
         "databases": {
           "title": "Databases",
-          "subtitle": "{current} of {max} maximum databases created.",
+          "subtitle": "{current} van {max} maximale databases aangemaakt.",
           "tooltip": {
-            "limitReached": "This server is limited to {max} databases."
+            "limitReached": "Deze server is beperkt tot {max} databases."
           },
           "table": {
             "columns": {
-              "locked": "Locked?"
+              "locked": "Vergrendeld?"
             }
           },
           "button": {
-            "rotatePassword": "Rotate Password"
+            "rotatePassword": "Wachtwoord roteren"
           },
           "form": {
-            "databaseName": "Database Name"
+            "databaseName": "Databasenaam"
           },
           "modal": {
             "createDatabase": {
-              "title": "Create Database",
+              "title": "Database aanmaken",
               "toast": {
-                "created": "Database created."
+                "created": "Database aangemaakt."
               },
               "form": {
-                "noHostsFound": "No hosts found"
+                "noHostsFound": "Geen hosts gevonden"
               }
             },
             "editDatabase": {
-              "title": "Edit Database",
+              "title": "Database bewerken",
               "toast": {
-                "updated": "Database updated."
+                "updated": "Database bijgewerkt."
               }
             },
             "databaseDetails": {
-              "title": "Database connection details",
+              "title": "Databaseverbindingsgegevens",
               "toast": {
-                "passwordRotated": "Password has been rotated."
+                "passwordRotated": "Wachtwoord is geroteerd."
               },
               "form": {
-                "jdbcConnectionString": "JDBC Connection String"
+                "jdbcConnectionString": "JDBC-verbindingsreeks"
               }
             },
             "recreateDatabase": {
-              "title": "Confirm Database Recreation",
-              "content": "Recreating a database will permanently delete all data in the **{name}** database and create a new one with the same connection details.",
+              "title": "Opnieuw aanmaken van database bevestigen",
+              "content": "Het opnieuw aanmaken van een database verwijdert alle gegevens in de **{name}** database permanent en maakt een nieuwe aan met dezelfde verbindingsgegevens.",
               "toast": {
-                "recreated": "Database recreated."
+                "recreated": "Database opnieuw aangemaakt."
               }
             },
             "deleteDatabase": {
-              "title": "Confirm Database Deletion",
-              "content": "Deleting a database is a permanent action, it cannot be undone. This will permanently delete the **{name}** database and remove all associated data.",
+              "title": "Verwijderen van database bevestigen",
+              "content": "Het verwijderen van een database is permanent en kan niet ongedaan worden gemaakt. Dit verwijdert de **{name}** database en alle bijbehorende gegevens permanent.",
               "toast": {
-                "deleted": "Database deleted."
+                "deleted": "Database verwijderd."
               }
             }
           }
         },
         "schedules": {
-          "title": "Schedules",
-          "subtitle": "{current} of {max} maximum schedules created.",
+          "title": "Planningen",
+          "subtitle": "{current} van {max} maximale planningen aangemaakt.",
           "dropzone": {
-            "title": "Drop some files here to import them as Schedules",
-            "subtitle": "Release to start importing"
+            "title": "Bestanden hier neerzetten om te importeren als planningen",
+            "subtitle": "Loslaten om te beginnen met importeren"
           },
           "tooltip": {
-            "limitReached": "This server is limited to {max} schedules."
+            "limitReached": "Deze server is beperkt tot {max} planningen."
           },
           "table": {
             "columns": {
-              "lastRun": "Last Run",
-              "lastFailure": "Last Failure",
+              "lastRun": "Laatste uitvoering",
+              "lastFailure": "Laatste mislukking",
               "status": "Status"
             }
           },
           "button": {
-            "trigger": "Trigger",
-            "triggerWithCondition": "Trigger (do not skip condition)",
-            "triggerSkipCondition": "Trigger (skip condition)",
-            "addTrigger": "Add Trigger",
-            "addCondition": "Add Condition",
-            "addStep": "Add Step",
-            "createFirstStep": "Create First Step",
-            "addOutput": "Add Output",
-            "addFile": "Add File",
-            "exitEditor": "Exit Editor"
+            "trigger": "Activeren",
+            "triggerWithCondition": "Activeren (conditie niet overslaan)",
+            "triggerSkipCondition": "Activeren (conditie overslaan)",
+            "addTrigger": "Trigger toevoegen",
+            "addCondition": "Conditie toevoegen",
+            "addStep": "Stap toevoegen",
+            "createFirstStep": "Eerste stap aanmaken",
+            "addOutput": "Uitvoer toevoegen",
+            "addFile": "Bestand toevoegen",
+            "exitEditor": "Editor verlaten"
           },
           "toast": {
-            "imported": "Schedule imported.",
-            "created": "Schedule created.",
-            "updated": "Schedule updated.",
-            "deleted": "Schedule deleted.",
-            "triggered": "Schedule triggered.",
-            "exported": "Schedule exported.",
-            "parseError": "Failed to parse schedule: {error}",
+            "imported": "Planning geïmporteerd.",
+            "created": "Planning aangemaakt.",
+            "updated": "Planning bijgewerkt.",
+            "deleted": "Planning verwijderd.",
+            "triggered": "Planning geactiveerd.",
+            "exported": "Planning geëxporteerd.",
+            "parseError": "Verwerken van planning mislukt: {error}",
             "step": {
-              "created": "Schedule step created.",
-              "updated": "Schedule step updated.",
-              "deleted": "Schedule step deleted."
+              "created": "Planningsstap aangemaakt.",
+              "updated": "Planningsstap bijgewerkt.",
+              "deleted": "Planningsstap verwijderd."
             }
           },
           "enum": {
             "schedulePreConditionType": {
-              "none": "None",
-              "and": "AND (All must be true)",
-              "or": "OR (Any must be true)",
-              "not": "NOT (Must not be true)",
-              "serverState": "Server State",
+              "none": "Geen",
+              "and": "EN (Alle moeten waar zijn)",
+              "or": "OF (Minstens één moet waar zijn)",
+              "not": "NIET (Mag niet waar zijn)",
+              "serverState": "Serverstatus",
               "uptime": "Uptime",
-              "cpuUsage": "CPU Usage",
-              "memoryUsage": "Memory Usage",
-              "diskUsage": "Disk Usage",
-              "fileExists": "File Exists"
+              "cpuUsage": "CPU-gebruik",
+              "memoryUsage": "Geheugengebruik",
+              "diskUsage": "Schijfgebruik",
+              "fileExists": "Bestand bestaat"
             },
             "scheduleConditionType": {
-              "none": "None",
-              "and": "AND (All must be true)",
-              "or": "OR (Any must be true)",
-              "not": "NOT (Must not be true)",
-              "variableExists": "Variable Exists",
-              "variableContains": "Variable Contains",
-              "variableEquals": "Variable Equals",
-              "variableStartsWith": "Variable Starts With",
-              "variableEndsWith": "Variable Ends With"
+              "none": "Geen",
+              "and": "EN (Alle moeten waar zijn)",
+              "or": "OF (Minstens één moet waar zijn)",
+              "not": "NIET (Mag niet waar zijn)",
+              "variableExists": "Variabele bestaat",
+              "variableContains": "Variabele bevat",
+              "variableEquals": "Variabele is gelijk aan",
+              "variableStartsWith": "Variabele begint met",
+              "variableEndsWith": "Variabele eindigt met"
             },
             "scheduleComparator": {
-              "smallerThan": "Smaller than",
-              "smallerThanOrEqual": "Smaller than or equal to",
-              "equal": "Equal to",
-              "greaterThanOrEqual": "Greater than or equal to",
-              "greaterThan": "Greater than"
+              "smallerThan": "Kleiner dan",
+              "smallerThanOrEqual": "Kleiner dan of gelijk aan",
+              "equal": "Gelijk aan",
+              "greaterThanOrEqual": "Groter dan of gelijk aan",
+              "greaterThan": "Groter dan"
             }
           },
           "modal": {
             "createSchedule": {
-              "title": "Create Schedule"
+              "title": "Planning aanmaken"
             },
             "updateSchedule": {
-              "title": "Update Schedule"
+              "title": "Planning bijwerken"
             },
             "deleteSchedule": {
-              "title": "Confirm Schedule Deletion",
-              "content": "Are you sure you want to delete {name} from this server?"
+              "title": "Verwijderen van planning bevestigen",
+              "content": "Weet u zeker dat u {name} wilt verwijderen van deze server?"
             },
             "createStep": {
-              "title": "Create Schedule Step"
+              "title": "Planningsstap aanmaken"
             },
             "editStep": {
-              "title": "Edit Schedule Step"
+              "title": "Planningsstap bewerken"
             },
             "deleteStep": {
-              "title": "Confirm Schedule Step Deletion",
-              "content": "Are you sure you want to delete this schedule step?"
+              "title": "Verwijderen van planningsstap bevestigen",
+              "content": "Weet u zeker dat u deze planningsstap wilt verwijderen?"
             }
           },
           "view": {
             "badge": {
-              "running": "Running"
+              "running": "Actief"
             },
             "tooltip": {
-              "cannotTrigger": "Cannot trigger a disabled schedule"
+              "cannotTrigger": "Kan een uitgeschakelde planning niet activeren"
             },
             "tabs": {
-              "actions": "Actions",
-              "conditions": "Conditions",
+              "actions": "Acties",
+              "conditions": "Condities",
               "triggers": "Triggers"
             },
             "sections": {
-              "actions": "Schedule Actions",
-              "preConditions": "Schedule Pre-Conditions",
-              "triggers": "Schedule Triggers"
+              "actions": "Planningsacties",
+              "preConditions": "Planningsvoorwaarden",
+              "triggers": "Planningstriggers"
             },
             "alert": {
-              "noActions": "No actions configured for this schedule",
-              "noTriggers": "No triggers configured for this schedule"
+              "noActions": "Geen acties geconfigureerd voor deze planning",
+              "noTriggers": "Geen triggers geconfigureerd voor deze planning"
             }
           },
           "form": {
-            "scheduleName": "Schedule Name",
+            "scheduleName": "Planningsnaam",
             "triggersList": "Triggers",
             "triggerNumber": "Trigger {number}",
-            "actionType": "Action Type",
-            "conditionType": "Condition Type",
-            "serverState": "Server State",
-            "comparator": "Comparator",
-            "rootPath": "Root Path",
-            "outputInto": "Output into",
-            "caseInsensitive": "Case Insensitive",
-            "ignoreFailure": "Ignore Failure",
-            "runInForeground": "Run in Foreground"
+            "actionType": "Actietype",
+            "conditionType": "Conditietype",
+            "serverState": "Serverstatus",
+            "comparator": "Vergelijker",
+            "rootPath": "Hoofdpad",
+            "outputInto": "Uitvoer naar",
+            "caseInsensitive": "Hoofdletterongevoelig",
+            "ignoreFailure": "Mislukking negeren",
+            "runInForeground": "Op voorgrond uitvoeren"
           },
           "condition": {
-            "variable": "Variable",
-            "equals": "Equals",
-            "contains": "Contains",
-            "startsWith": "Starts With",
-            "endsWith": "Ends With",
-            "allMustBeTrue": "All conditions must be true:",
-            "anyMustBeTrue": "Any condition must be true:",
-            "mustNotBeTrue": "Condition must not be true:"
+            "variable": "Variabele",
+            "equals": "Is gelijk aan",
+            "contains": "Bevat",
+            "startsWith": "Begint met",
+            "endsWith": "Eindigt met",
+            "allMustBeTrue": "Alle condities moeten waar zijn:",
+            "anyMustBeTrue": "Minstens één conditie moet waar zijn:",
+            "mustNotBeTrue": "Conditie mag niet waar zijn:"
           },
           "preCondition": {
-            "valueSeconds": "Value (seconds)",
-            "valuePercent": "Value (%)",
-            "value": "Value"
+            "valueSeconds": "Waarde (seconden)",
+            "valuePercent": "Waarde (%)",
+            "value": "Waarde"
           },
           "triggers": {
             "cron": {
               "title": "Cron",
               "form": {
-                "cronSchedule": "Cron Schedule"
+                "cronSchedule": "Cron-planning"
               },
               "card": {
-                "content": "On Cron Interval {schedule}, Next run is {timestamp} - Last run was {lastTimestamp}."
+                "content": "Op cron-interval {schedule}, volgende uitvoering is {timestamp} - laatste uitvoering was {lastTimestamp}."
               },
               "invalidCron": "Invalid cron expression"
             },
             "powerAction": {
-              "title": "Power Action",
+              "title": "Stroomactie",
               "card": {
-                "content": "When Power Action `{action}` is requested."
+                "content": "Wanneer stroomactie `{action}` wordt gevraagd."
               }
             },
             "serverState": {
-              "title": "Server State",
+              "title": "Serverstatus",
               "card": {
-                "content": "When Server State `{state}` is reached."
+                "content": "Wanneer serverstatus `{state}` wordt bereikt."
               }
             },
             "backupStatus": {
-              "title": "Backup Status",
+              "title": "Back-upstatus",
               "form": {
-                "backupStatus": "Backup Status"
+                "backupStatus": "Back-upstatus"
               },
               "card": {
-                "content": "When Backup reaches Status `{status}`."
+                "content": "Wanneer back-up status `{status}` bereikt."
               }
             },
             "consoleLine": {
-              "title": "Console Line",
+              "title": "Consoleregel",
               "card": {
-                "content": "When Console Output reaches line that contains `{contains}`"
+                "content": "Wanneer console-uitvoer een regel bereikt die `{contains}` bevat"
               }
             },
             "crash": {
               "title": "Crash",
               "card": {
-                "content": "When Server crashes."
+                "content": "Wanneer de server crasht."
               }
             }
           },
           "renderer": {
-            "noActionSelected": "Select an action type to configure",
-            "noActionDetails": "Action details not available",
-            "ignoreFailure": "Ignore Failure: {value}",
-            "foreground": "Foreground: {value}"
+            "noActionSelected": "Selecteer een actietype om te configureren",
+            "noActionDetails": "Actiedetails niet beschikbaar",
+            "ignoreFailure": "Mislukking negeren: {value}",
+            "foreground": "Voorgrond: {value}"
           },
           "steps": {
             "empty": {
-              "title": "No Steps Configured",
-              "description": "This schedule doesn't have any steps yet. Add some actions to get started."
+              "title": "Geen stappen geconfigureerd",
+              "description": "Deze planning heeft nog geen stappen. Voeg acties toe om aan de slag te gaan."
             },
             "sleep": {
-              "title": "Sleep",
+              "title": "Wachten",
               "form": {
-                "duration": "Duration (milliseconds)"
+                "duration": "Duur (milliseconden)"
               },
               "renderer": {
-                "compact": "Sleep for {duration}ms"
+                "compact": "Wacht {duration}ms"
               }
             },
             "ensure": {
-              "title": "Ensure",
+              "title": "Verzekeren",
               "renderer": {
-                "compact": "Ensure a condition matches"
+                "compact": "Verzeker dat een conditie overeenkomt"
               }
             },
             "format": {
-              "title": "Format",
+              "title": "Opmaken",
               "form": {
-                "formatString": "Format String",
-                "formatStringDescription": "The format string. Variables can be included by wrapping them inside {wrapper}."
+                "formatString": "Opmaaktekenreeks",
+                "formatStringDescription": "De opmaakreeks. Variabelen kunnen worden opgenomen door ze in {wrapper} te plaatsen."
               },
               "renderer": {
-                "compact": "Format a string into {outputInto}"
+                "compact": "Maak een tekenreeks op in {outputInto}"
               }
             },
             "matchRegex": {
-              "title": "Match Regex",
+              "title": "Regex vergelijken",
               "form": {
-                "input": "Input",
+                "input": "Invoer",
                 "regex": "Regex",
-                "outputs": "Outputs",
-                "outputNumber": "Output {number}"
+                "outputs": "Uitvoeren",
+                "outputNumber": "Uitvoer {number}"
               },
               "renderer": {
-                "compact": "Match {input} with regex {regex}"
+                "compact": "Vergelijk {input} met regex {regex}"
               }
             },
             "waitForConsoleLine": {
-              "title": "Wait for Console Line",
+              "title": "Wachten op consoleregel",
               "form": {
-                "timeout": "Timeout (milliseconds)"
+                "timeout": "Time-out (milliseconden)"
               },
               "renderer": {
-                "compact": "Wait {timeout} for console line containing {contains}",
+                "compact": "Wacht {timeout} op consoleregel met {contains}",
                 "detail": {
-                  "lineContains": "Line must contain: {contains}",
-                  "caseInsensitive": "Case insensitive: {value}",
-                  "timeout": "Timeout: {timeout}"
+                  "lineContains": "Regel moet bevatten: {contains}",
+                  "caseInsensitive": "Hoofdletterongevoelig: {value}",
+                  "timeout": "Time-out: {timeout}"
                 }
               }
             },
             "sendCommand": {
-              "title": "Send Command",
+              "title": "Opdracht verzenden",
               "renderer": {
-                "compact": "Run {command}",
+                "compact": "Voer {command} uit",
                 "detail": {
-                  "command": "Command: {command}"
+                  "command": "Opdracht: {command}"
                 }
               }
             },
             "sendPower": {
-              "title": "Send Power Signal",
+              "title": "Stroomsignaal verzenden",
               "renderer": {
-                "compact": "Do {action}",
+                "compact": "Voer {action} uit",
                 "detail": {
-                  "powerAction": "Power Action: {action}"
+                  "powerAction": "Stroomactie: {action}"
                 }
               }
             },
             "createBackup": {
-              "title": "Create Backup",
+              "title": "Back-up aanmaken",
               "form": {
-                "backupName": "Backup Name"
+                "backupName": "Back-upnaam"
               },
               "renderer": {
-                "compact": "Create {name}",
+                "compact": "Maak {name} aan",
                 "detail": {
-                  "backupName": "Backup Name: {name}",
-                  "ignoredFiles": "Ignored Files: {files}"
+                  "backupName": "Back-upnaam: {name}",
+                  "ignoredFiles": "Genegeerde bestanden: {files}"
                 }
               }
             },
             "createDirectory": {
-              "title": "Create Directory",
+              "title": "Map aanmaken",
               "renderer": {
-                "compact": "Create {name} in {root}",
+                "compact": "Maak {name} aan in {root}",
                 "detail": {
-                  "directory": "Directory: {name}",
-                  "root": "Root: {root}"
+                  "directory": "Map: {name}",
+                  "root": "Hoofdmap: {root}"
                 }
               }
             },
             "writeFile": {
-              "title": "Write File",
+              "title": "Bestand schrijven",
               "form": {
-                "content": "Content",
-                "appendToFile": "Append to File"
+                "content": "Inhoud",
+                "appendToFile": "Toevoegen aan bestand"
               },
               "renderer": {
-                "compact": "Write to {file}",
+                "compact": "Schrijf naar {file}",
                 "detail": {
-                  "file": "File: {file}",
-                  "append": "Append: {value}"
+                  "file": "Bestand: {file}",
+                  "append": "Toevoegen: {value}"
                 }
               }
             },
             "copyFile": {
-              "title": "Copy File",
+              "title": "Bestand kopiëren",
               "form": {
-                "sourceFile": "Source File"
+                "sourceFile": "Bronbestand"
               },
               "renderer": {
-                "compact": "Copy {file} to {destination}",
+                "compact": "Kopieer {file} naar {destination}",
                 "detail": {
-                  "from": "From: {file}",
-                  "to": "To: {destination}"
+                  "from": "Van: {file}",
+                  "to": "Naar: {destination}"
                 }
               }
             },
             "deleteFiles": {
-              "title": "Delete Files",
+              "title": "Bestanden verwijderen",
               "form": {
-                "filesToDelete": "Files to Delete"
+                "filesToDelete": "Te verwijderen bestanden"
               },
               "renderer": {
-                "compact": "Delete {files}",
+                "compact": "Verwijder {files}",
                 "detail": {
-                  "root": "Root: {root}",
-                  "files": "Files: {files}"
+                  "root": "Hoofdmap: {root}",
+                  "files": "Bestanden: {files}"
                 }
               }
             },
             "renameFiles": {
-              "title": "Rename Files",
+              "title": "Bestanden hernoemen",
               "form": {
-                "files": "Files",
-                "from": "from",
-                "to": "to"
+                "files": "Bestanden",
+                "from": "van",
+                "to": "naar"
               },
               "renderer": {
-                "compact": "Rename {files}",
+                "compact": "Hernoem {files}",
                 "detail": {
-                  "root": "Root: {root}",
-                  "files": "Files: {files}"
+                  "root": "Hoofdmap: {root}",
+                  "files": "Bestanden: {files}"
                 }
               }
             },
             "compressFiles": {
-              "title": "Compress Files",
+              "title": "Bestanden comprimeren",
               "form": {
-                "filesToCompress": "Files to Compress"
+                "filesToCompress": "Te comprimeren bestanden"
               },
               "renderer": {
-                "compact": "Compress {files} in {root} to {name}",
+                "compact": "Comprimeer {files} in {root} naar {name}",
                 "detail": {
-                  "output": "Output: {name}",
-                  "root": "Root: {root}",
-                  "format": "Format: {format}",
-                  "files": "Files: {files}"
+                  "output": "Uitvoer: {name}",
+                  "root": "Hoofdmap: {root}",
+                  "format": "Formaat: {format}",
+                  "files": "Bestanden: {files}"
                 }
               }
             },
             "decompressFile": {
-              "title": "Decompress File",
+              "title": "Bestand decomprimeren",
               "form": {
-                "file": "File"
+                "file": "Bestand"
               },
               "renderer": {
-                "compact": "Decompress {file} to {root}",
+                "compact": "Decomprimeer {file} naar {root}",
                 "detail": {
-                  "file": "File: {file}",
-                  "root": "Root: {root}"
+                  "file": "Bestand: {file}",
+                  "root": "Hoofdmap: {root}"
                 }
               }
             },
             "updateStartupVariable": {
-              "title": "Update Startup Variable",
+              "title": "Opstartvariabele bijwerken",
               "renderer": {
-                "compact": "Set {variable} to {value}",
+                "compact": "Stel {variable} in op {value}",
                 "detail": {
-                  "variable": "Variable: {variable}",
-                  "value": "Value: {value}"
+                  "variable": "Variabele: {variable}",
+                  "value": "Waarde: {value}"
                 }
               }
             },
             "updateStartupCommand": {
-              "title": "Update Startup Command",
+              "title": "Opstartcommando bijwerken",
               "renderer": {
-                "compact": "Set to {command}",
+                "compact": "Stel in op {command}",
                 "detail": {
-                  "command": "Command: {command}"
+                  "command": "Opdracht: {command}"
                 }
               }
             },
             "updateStartupDockerImage": {
-              "title": "Update Docker Image",
+              "title": "Docker-image bijwerken",
               "renderer": {
-                "compact": "Set to {image}",
+                "compact": "Stel in op {image}",
                 "detail": {
                   "image": "Image: {image}"
                 }
@@ -4202,86 +4202,86 @@
           }
         },
         "subusers": {
-          "title": "Subusers",
+          "title": "Subgebruikers",
           "subtitle": "{current} of {max} maximum subusers created.",
           "tooltip": {
             "limitReached": "This server is limited to {max} subusers."
           },
           "table": {
             "columns": {
-              "twoFactorEnabled": "2FA Enabled",
-              "permissions": "Permissions",
-              "ignoredFiles": "Ignored Files"
+              "twoFactorEnabled": "2FA ingeschakeld",
+              "permissions": "Rechten",
+              "ignoredFiles": "Genegeerde bestanden"
             }
           },
           "modal": {
             "createSubuser": {
-              "title": "Create Subuser",
+              "title": "Subgebruiker aanmaken",
               "toast": {
-                "created": "Subuser created."
+                "created": "Subgebruiker aangemaakt."
               },
               "form": {
-                "emailPlaceholder": "Enter the email that this subuser should be saved as.",
-                "permissions": "Permissions",
+                "emailPlaceholder": "Voer het e-mailadres in waaronder deze subgebruiker moet worden opgeslagen.",
+                "permissions": "Rechten",
                 "ignoredFilesDescription": "Files and directories matching these patterns will be hidden from this subuser. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`). Prefix a pattern with `!` to un-hide a path that a broader pattern would otherwise exclude."
               }
             },
             "updateSubuser": {
-              "title": "Update Subuser",
+              "title": "Subgebruiker bijwerken",
               "toast": {
-                "updated": "Subuser updated."
+                "updated": "Subgebruiker bijgewerkt."
               }
             },
             "removeSubuser": {
-              "title": "Confirm Subuser Removal",
-              "content": "Are you sure you want to remove **{username}** from this server?",
+              "title": "Verwijderen van subgebruiker bevestigen",
+              "content": "Weet u zeker dat u **{username}** wilt verwijderen van deze server?",
               "toast": {
-                "removed": "Subuser removed."
+                "removed": "Subgebruiker verwijderd."
               }
             }
           }
         },
         "backups": {
-          "title": "Backups",
-          "subtitle": "{current} of {max} maximum backups created.",
+          "title": "Back-ups",
+          "subtitle": "{current} van {max} maximale back-ups aangemaakt.",
           "tooltip": {
-            "limitReached": "This server is limited to {max} backups."
+            "limitReached": "Deze server is beperkt tot {max} back-ups."
           },
           "table": {
             "columns": {
-              "checksum": "Checksum",
-              "files": "Files",
-              "locked": "Locked?"
+              "checksum": "Controlesom",
+              "files": "Bestanden",
+              "locked": "Vergrendeld?"
             }
           },
           "button": {
-            "browse": "Browse"
+            "browse": "Bladeren"
           },
           "toast": {
-            "downloadStarted": "Download started.",
-            "restoringBackup": "Restoring backup..."
+            "downloadStarted": "Download gestart.",
+            "restoringBackup": "Back-up herstellen..."
           },
           "modal": {
             "createBackup": {
-              "title": "Create Backup",
+              "title": "Back-up aanmaken",
               "toast": {
-                "created": "Backup created."
+                "created": "Back-up aangemaakt."
               }
             },
             "editBackup": {
-              "title": "Edit Backup",
+              "title": "Back-up bewerken",
               "toast": {
-                "updated": "Backup updated."
+                "updated": "Back-up bijgewerkt."
               }
             },
             "restoreBackup": {
-              "title": "Restore Backup"
+              "title": "Back-up herstellen"
             },
             "deleteBackup": {
-              "title": "Confirm Backup Deletion",
-              "content": "Are you sure you want to delete **{name}** from this server?",
+              "title": "Verwijderen van back-up bevestigen",
+              "content": "Weet u zeker dat u **{name}** wilt verwijderen van deze server?",
               "toast": {
-                "deleted": "Backup deleted."
+                "deleted": "Back-up verwijderd."
               }
             },
             "viewMetadata": {
@@ -4290,43 +4290,43 @@
           }
         },
         "network": {
-          "title": "Network",
-          "subtitle": "{current} of {max} maximum allocations assigned.",
+          "title": "Netwerk",
+          "subtitle": "{current} van {max} maximale allocaties toegewezen.",
           "tooltip": {
-            "limitReached": "This server is limited to {max} allocations."
+            "limitReached": "Deze server is beperkt tot {max} allocaties."
           },
           "table": {
             "columns": {
-              "hostname": "Hostname",
-              "port": "Port"
+              "hostname": "Hostnaam",
+              "port": "Poort"
             }
           },
           "toast": {
-            "created": "Allocation created.",
-            "updated": "Allocation updated.",
-            "removed": "Allocation removed.",
-            "setPrimary": "Allocation set as primary.",
-            "unsetPrimary": "Allocation unset as primary."
+            "created": "Allocatie aangemaakt.",
+            "updated": "Allocatie bijgewerkt.",
+            "removed": "Allocatie verwijderd.",
+            "setPrimary": "Allocatie ingesteld als primair.",
+            "unsetPrimary": "Primaire instelling van allocatie verwijderd."
           },
           "modal": {
             "editAllocation": {
-              "title": "Edit Allocation"
+              "title": "Allocatie bewerken"
             },
             "removeAllocation": {
-              "title": "Confirm Allocation Removal",
-              "content": "Are you sure you want to remove **{allocation}** from this server?"
+              "title": "Verwijderen van allocatie bevestigen",
+              "content": "Weet u zeker dat u **{allocation}** wilt verwijderen van deze server?"
             }
           }
         },
         "startup": {
-          "title": "Startup",
-          "variables": "Variables",
-          "dockerImageDescription": "The Docker image used to run this server. This can be changed to use a different image.",
-          "dockerImageDescriptionCustom": "The Docker image used to run this server. This has been set by an administrator and cannot be changed.",
+          "title": "Opstarten",
+          "variables": "Variabelen",
+          "dockerImageDescription": "De Docker-image die wordt gebruikt om deze server te draaien. Dit kan worden gewijzigd om een andere image te gebruiken.",
+          "dockerImageDescriptionCustom": "De Docker-image die wordt gebruikt om deze server te draaien. Dit is ingesteld door een beheerder en kan niet worden gewijzigd.",
           "toast": {
-            "startupCommandUpdated": "Startup command updated.",
-            "dockerImageUpdated": "Docker image updated.",
-            "variablesUpdated": "Variables updated."
+            "startupCommandUpdated": "Opstartcommando bijgewerkt.",
+            "dockerImageUpdated": "Docker-image bijgewerkt.",
+            "variablesUpdated": "Variabelen bijgewerkt."
           },
           "modal": {
             "unsavedChanges": {
@@ -4334,93 +4334,93 @@
               "content": "You have unsaved changes to your startup variables. Are you sure you want to leave this page? If you leave, your changes will be lost."
             }
           },
-          "noVariables": "No startup variables found for this server."
+          "noVariables": "Geen opstartvarabelen gevonden voor deze server."
         },
         "mounts": {
-          "title": "Mounts",
+          "title": "Koppelingen",
           "table": {
             "columns": {
-              "target": "Target",
-              "mounted": "Mounted",
-              "readOnly": "Read Only"
+              "target": "Doel",
+              "mounted": "Gekoppeld",
+              "readOnly": "Alleen-lezen"
             }
           },
           "button": {
-            "attach": "Attach",
-            "detach": "Detach"
+            "attach": "Koppelen",
+            "detach": "Loskoppelen"
           },
           "modal": {
             "attachMount": {
-              "title": "Attach Mount",
-              "content": "Do you want to attach **{name}** to `{target}`?",
+              "title": "Koppeling toevoegen",
+              "content": "Wilt u **{name}** koppelen aan `{target}`?",
               "toast": {
-                "attached": "{name} has been mounted to your server."
+                "attached": "{name} is gekoppeld aan uw server."
               }
             },
             "detachMount": {
-              "title": "Detach Mount",
-              "content": "Do you want to detach **{name}** from `{target}`?",
+              "title": "Koppeling verwijderen",
+              "content": "Wilt u **{name}** loskoppelen van `{target}`?",
               "toast": {
-                "detached": "{name} has been removed from your server."
+                "detached": "{name} is verwijderd van uw server."
               }
             }
           }
         },
         "settings": {
-          "title": "Settings",
+          "title": "Instellingen",
           "debugInformation": {
-            "title": "Debug Information",
+            "title": "Foutopsporingsinformatie",
             "form": {
               "nodeName": "Node (UUID)",
-              "locationName": "Location (UUID)",
-              "serverUuid": "Server UUID"
+              "locationName": "Locatie (UUID)",
+              "serverUuid": "Server-UUID"
             }
           },
           "rename": {
-            "title": "Rename Server",
+            "title": "Server hernoemen",
             "toast": {
-              "renamed": "Server renamed."
+              "renamed": "Server hernoemd."
             }
           },
           "timezone": {
-            "title": "Timezone",
+            "title": "Tijdzone",
             "toast": {
-              "updated": "Server timezone updated."
+              "updated": "Servertijdzone bijgewerkt."
             }
           },
           "autokill": {
-            "title": "Auto-Kill",
+            "title": "Automatisch beëindigen",
             "form": {
-              "secondsUntilAutoKill": "Seconds until auto-kill"
+              "secondsUntilAutoKill": "Seconden tot automatisch beëindigen"
             },
             "toast": {
-              "updated": "Server auto-kill updated."
+              "updated": "Automatisch beëindigen van server bijgewerkt."
             }
           },
           "autostart": {
-            "title": "Auto-Start",
+            "title": "Automatisch starten",
             "form": {
-              "behavior": "Behavior"
+              "behavior": "Gedrag"
             },
             "toast": {
-              "updated": "Server auto-start behavior updated."
+              "updated": "Gedrag voor automatisch starten van server bijgewerkt."
             }
           },
           "reinstall": {
-            "title": "Reinstall Server",
-            "button": "Reinstall Server",
-            "content": "Reinstalling your server will stop it, and then re-run the installation script that initially set it up. **Some files may be deleted or modified during this process, please back up your data before continuing.**",
+            "title": "Server opnieuw installeren",
+            "button": "Server opnieuw installeren",
+            "content": "Het opnieuw installeren van uw server stopt de server en voert het installatiescript opnieuw uit. **Sommige bestanden kunnen tijdens dit proces worden verwijderd of gewijzigd. Maak een back-up van uw gegevens voordat u doorgaat.**",
             "modal": {
-              "title": "Reinstall Server",
-              "button": "Reinstall",
+              "title": "Server opnieuw installeren",
+              "button": "Opnieuw installeren",
               "toast": {
-                "reinstalling": "Reinstalling server..."
+                "reinstalling": "Server wordt opnieuw geïnstalleerd..."
               }
             }
           }
         },
         "activity": {
-          "title": "Activity",
+          "title": "Activiteit",
           "button": {
             "clearUserFilter": "Clear User Filter"
           }
