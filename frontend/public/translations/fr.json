@@ -1,5 +1,13 @@
 {
   "items": {
+    "byte": {
+      "zero": "{count} Octets",
+      "one": "{count} Octet",
+      "two": "{count} Octets",
+      "few": "{count} Octets",
+      "many": "{count} Octets",
+      "other": "{count} Octets"
+    },
     "user": {
       "zero": "{count} Utilisateurs",
       "one": "{count} Utilisateur",
@@ -32,13 +40,13 @@
       "many": "{count} Clés SSH",
       "other": "{count} Clés SSH"
     },
-    "byte": {
-      "zero": "{count} Octets",
-      "one": "{count} Octet",
-      "two": "{count} Octets",
-      "few": "{count} Octets",
-      "many": "{count} Octets",
-      "other": "{count} Octets"
+    "asset": {
+      "zero": "{count} Assets",
+      "one": "{count} Asset",
+      "two": "{count} Assets",
+      "few": "{count} Assets",
+      "many": "{count} Assets",
+      "other": "{count} Assets"
     },
     "node": {
       "zero": "{count} Nœuds",
@@ -56,6 +64,14 @@
       "many": "{count} Allocations de nœud",
       "other": "{count} Allocations de nœud"
     },
+    "egg": {
+      "zero": "{count} Eggs",
+      "one": "{count} Egg",
+      "two": "{count} Eggs",
+      "few": "{count} Eggs",
+      "many": "{count} Eggs",
+      "other": "{count} Eggs"
+    },
     "shortcut": {
       "zero": "{count} Raccourcis",
       "one": "{count} Raccourci",
@@ -71,22 +87,6 @@
       "few": "{count} Lignes",
       "many": "{count} Lignes",
       "other": "{count} Lignes"
-    },
-    "asset": {
-      "zero": "{count} Assets",
-      "one": "{count} Asset",
-      "two": "{count} Assets",
-      "few": "{count} Assets",
-      "many": "{count} Assets",
-      "other": "{count} Assets"
-    },
-    "egg": {
-      "zero": "{count} Eggs",
-      "one": "{count} Egg",
-      "two": "{count} Eggs",
-      "few": "{count} Eggs",
-      "many": "{count} Eggs",
-      "other": "{count} Eggs"
     }
   },
   "translations": {
@@ -106,21 +106,16 @@
         "cancel": "Annuler",
         "continue": "Continuer",
         "skip": "Passer",
+        "okay": "D'accord",
         "back": "Retour",
         "next": "Suivant",
         "install": "Installer",
         "selectAll": "Sélectionner tout",
         "deselectAll": "Désélectionner tout",
-        "download": "Télécharger",
-        "downloadAs": "Télécharger en {format}",
-        "import": "Importer",
-        "details": "Détails",
-        "setPrimary": "Définir comme primaire",
-        "unsetPrimary": "Retirer le statut primaire",
-        "leavePage": "Quitter la page",
-        "okay": "D'accord",
         "restore": "Restaurer",
         "discard": "Abandonner",
+        "download": "Télécharger",
+        "downloadAs": "Télécharger en {format}",
         "export": "Exporter",
         "exportAs": "Exporter en {format}",
         "recreate": "Recréer",
@@ -131,60 +126,49 @@
         "send": "Envoyer",
         "reset": "Réinitialiser",
         "view": "Voir",
+        "import": "Importer",
+        "details": "Détails",
         "loadLogs": "Charger les journaux",
         "sendTestEmail": "Envoyer un e-mail de test",
+        "setPrimary": "Définir comme primaire",
+        "unsetPrimary": "Retirer le statut primaire",
+        "leavePage": "Quitter la page",
         "viewDocumentation": "Voir la documentation"
+      },
+      "alert": {
+        "error": "Erreur",
+        "warning": "Avertissement",
+        "success": "Succès",
+        "clockOffset": "L'horloge de votre système est désynchronisée de plus de 5 secondes par rapport au serveur. Cela peut causer des problèmes avec l'authentification par clé d'accès et l'authentification à deux facteurs. Veuillez synchroniser votre horloge si des problèmes surviennent. Décalage actuel : {offset} seconde(s)."
+      },
+      "divider": {
+        "or": "OU"
       },
       "input": {
         "search": "Chercher..."
       },
       "tooltip": {
-        "primary": "Primaire",
         "resetToDefault": "Réinitialiser à la valeur par défaut",
         "edit": "Modifier",
         "delete": "Supprimer",
         "remove": "Retirer",
+        "primary": "Primaire",
         "backupOnDifferentNode": "Cette sauvegarde se trouve sur un nœud différent de celui du serveur. Elle n'est pas consultable depuis l'API client."
       },
       "form": {
         "name": "Nom",
         "description": "Description",
+        "author": "Auteur",
+        "type": "Type",
         "password": "Mot de passe",
         "host": "Hôte",
         "username": "Nom d'utilisateur",
+        "usernameOrEmail": "Nom d'utilisateur/Adresse e-mail",
         "server": "Serveur",
         "url": "URL",
         "email": "E-mail",
-        "port": "Port",
-        "firstName": "Prénom",
-        "lastName": "Nom de famille",
-        "language": "Langue",
-        "enabled": "Activé",
-        "fileName": "Nom du fichier",
-        "sftpPort": "Port SFTP",
-        "sftpHost": "Hôte SFTP",
-        "dockerImage": "Image Docker",
-        "memory": "Mémoire",
-        "disk": "Disque",
-        "serverName": "Nom du serveur",
-        "startupCommand": "Commande de démarrage",
-        "archiveName": "Nom de l'archive",
-        "databaseHost": "Hôte de base de données",
-        "timezone": "Fuseau horaire",
-        "protocol": "Protocole",
-        "destination": "Destination",
-        "directoryName": "Nom du répertoire",
-        "locked": "Verrouillé",
-        "currentPassword": "Mot de passe actuel",
-        "confirmPassword": "Confirmer le mot de passe",
-        "authenticationCode": "Code d'authentification",
-        "ignoredFiles": "Fichiers ignorés",
-        "yourControlPanelPassword": "Votre mot de passe de panel de contrôle",
-        "truncateDirectory": "Souhaitez-vous supprimer tous les fichiers de ce serveur avant d'effectuer cette action ? Ceci n'est pas réversible.",
-        "author": "Auteur",
-        "type": "Type",
-        "usernameOrEmail": "Nom d'utilisateur/Adresse e-mail",
         "path": "Chemin",
+        "port": "Port",
         "provider": "Fournisseur",
         "command": "Commande",
         "fromAddress": "Adresse d'expéditeur",
@@ -197,10 +181,23 @@
         "region": "Région",
         "endpoint": "Point de terminaison",
         "publicUrl": "URL publique",
+        "firstName": "Prénom",
+        "lastName": "Nom de famille",
+        "language": "Langue",
         "identifier": "Identifiant",
+        "enabled": "Activé",
         "title": "Titre",
         "content": "Contenu",
         "backupConfiguration": "Configuration de sauvegarde",
+        "fileName": "Nom du fichier",
+        "sftpPort": "Port SFTP",
+        "sftpHost": "Hôte SFTP",
+        "dockerImage": "Image Docker",
+        "memory": "Mémoire",
+        "disk": "Disque",
+        "serverName": "Nom du serveur",
+        "startupCommand": "Commande de démarrage",
+        "archiveName": "Nom de l'archive",
         "archiveFormat": "Format d'archive",
         "compressionLevel": "Niveau de compression",
         "multiplexChannels": "Canaux de multiplexage",
@@ -214,18 +211,30 @@
         "mount": "Montage",
         "nest": "Nest",
         "lines": "Lignes",
+        "databaseHost": "Hôte de base de données",
+        "timezone": "Fuseau horaire",
         "timezoneSystem": "Système",
+        "protocol": "Protocole",
         "powerAction": "Action d'alimentation",
+        "destination": "Destination",
+        "directoryName": "Nom du répertoire",
+        "locked": "Verrouillé",
         "portRanges": "Plages de ports",
         "portRangesPlaceholder": "Plages de ports (ex. 3000-4000)",
+        "currentPassword": "Mot de passe actuel",
+        "confirmPassword": "Confirmer le mot de passe",
+        "authenticationCode": "Code d'authentification",
         "restoreStartup": "Restaurer la commande de démarrage, l'image et les variables depuis cette sauvegarde.",
         "lineContains": "La ligne contient",
         "filePath": "Chemin du fichier",
         "envVariable": "Variable d'environnement",
         "value": "Valeur",
         "eggs": "Eggs",
+        "ignoredFiles": "Fichiers ignorés",
+        "yourControlPanelPassword": "Votre mot de passe de panel de contrôle",
         "deploymentEnabled": "Déploiement activé",
-        "maintenanceEnabled": "Maintenance activée"
+        "maintenanceEnabled": "Maintenance activée",
+        "truncateDirectory": "Souhaitez-vous supprimer tous les fichiers de ce serveur avant d'effectuer cette action ? Ceci n'est pas réversible."
       },
       "table": {
         "pagination": {
@@ -233,24 +242,23 @@
           "empty": "Pas d'éléments trouvés, c'est comme s'ils se cachaient."
         },
         "columns": {
+          "id": "ID",
           "name": "Nom",
+          "author": "Auteur",
+          "type": "Type",
+          "title": "Titre",
+          "enabled": "Activé",
           "description": "Description",
           "username": "Nom d'utilisateur",
           "size": "Taille",
           "lastUsed": "Dernière utilisation",
           "created": "Créé",
+          "updated": "Mis à jour",
           "actor": "Acteur",
           "event": "Événement",
           "ip": "IP",
           "when": "Quand",
           "command": "Commande",
-          "notes": "Notes",
-          "id": "ID",
-          "author": "Auteur",
-          "type": "Type",
-          "title": "Titre",
-          "enabled": "Activé",
-          "updated": "Mis à jour",
           "location": "Emplacement",
           "node": "Nœud",
           "owner": "Propriétaire",
@@ -258,6 +266,7 @@
           "backupConfiguration": "Configuration de sauvegarde",
           "status": "Statut",
           "allocation": "Allocation",
+          "notes": "Notes",
           "source": "Source",
           "target": "Cible",
           "checksum": "Somme de contrôle",
@@ -267,14 +276,26 @@
           "eggs": "Eggs"
         }
       },
+      "tabs": {
+        "general": "Général"
+      },
+      "badge": {
+        "active": "Actif",
+        "inactive": "Inactif",
+        "enabled": "Activé",
+        "disabled": "Désactivé",
+        "successful": "Réussi",
+        "failed": "Échoué",
+        "installed": "Installé"
+      },
       "server": {
         "noAllocation": "Pas d'allocation",
         "state": {
           "suspended": "Suspendu",
-          "restoringBackup": "Restauration de la sauvegarde",
-          "installing": "Installation",
           "transferring": "Le serveur est en cours de transfert",
           "nodeMaintenance": "Le nœud est en maintenance",
+          "restoringBackup": "Restauration de la sauvegarde",
+          "installing": "Installation",
           "installFailed": "Échec de l'installation"
         }
       },
@@ -300,6 +321,11 @@
           "restart": "Redémarrer",
           "kill": "Tuer"
         },
+        "serverBackupStatus": {
+          "starting": "Démarrage",
+          "finished": "Terminé",
+          "failed": "Échoué"
+        },
         "connectionStatus": {
           "connected": "Connecté",
           "offline": "Déconnecté"
@@ -315,52 +341,12 @@
           "restarted": "Redémarré",
           "killed": "Tué"
         },
-        "serverBackupStatus": {
-          "starting": "Démarrage",
-          "finished": "Terminé",
-          "failed": "Échoué"
-        },
         "compressionLevel": {
           "bestSpeed": "Vitesse maximale",
           "goodSpeed": "Bonne vitesse",
           "goodCompression": "Bonne compression",
           "bestCompression": "Compression maximale"
         }
-      },
-      "unlimited": "Illimité",
-      "readOnly": "Lecture-seule",
-      "na": "N/A",
-      "yes": "Oui",
-      "no": "Non",
-      "web": "Web",
-      "api": "API",
-      "system": "Système",
-      "schedule": "Planification",
-      "custom": "Personnalisé",
-      "default": "Par défaut",
-      "never": "Jamais",
-      "none": "Aucun",
-      "unknown": "Inconnu",
-      "alert": {
-        "error": "Erreur",
-        "warning": "Avertissement",
-        "success": "Succès",
-        "clockOffset": "L'horloge de votre système est désynchronisée de plus de 5 secondes par rapport au serveur. Cela peut causer des problèmes avec l'authentification par clé d'accès et l'authentification à deux facteurs. Veuillez synchroniser votre horloge si des problèmes surviennent. Décalage actuel : {offset} seconde(s)."
-      },
-      "badge": {
-        "active": "Actif",
-        "inactive": "Inactif",
-        "enabled": "Activé",
-        "disabled": "Désactivé",
-        "successful": "Réussi",
-        "failed": "Échoué",
-        "installed": "Installé"
-      },
-      "divider": {
-        "or": "OU"
-      },
-      "tabs": {
-        "general": "Général"
       },
       "unit": {
         "bytes": {
@@ -372,9 +358,41 @@
           "pebibytes": "Pio"
         }
       },
+      "unlimited": "Illimité",
+      "readOnly": "Lecture-seule",
+      "na": "N/A",
+      "never": "Jamais",
+      "none": "Aucun",
+      "unknown": "Inconnu",
+      "yes": "Oui",
+      "no": "Non",
+      "web": "Web",
+      "api": "API",
+      "default": "Par défaut",
+      "custom": "Personnalisé",
+      "system": "Système",
+      "schedule": "Planification",
       "impersonatedBy": "Usurpé par {username}"
     },
     "elements": {
+      "routeOrderEditor": {
+        "title": "Configuration des routes",
+        "label": {
+          "route": "Route",
+          "divider": "Séparateur",
+          "redirect": "Redirection"
+        },
+        "empty": "Aucune route configurée. Ajoutez des routes, des séparateurs ou des redirections ci-dessous.",
+        "unnamed": "(sans nom)",
+        "dividerPlaceholder": "Libellé du séparateur (optionnel)",
+        "redirectNamePlaceholder": "Nom de la redirection",
+        "destinationPlaceholder": "URL de destination (ex. https://...)",
+        "selectRoutePlaceholder": "Sélectionner une route…",
+        "button": {
+          "addDivider": "Ajouter un séparateur",
+          "addRedirect": "Ajouter une redirection"
+        }
+      },
       "errorBoundary": {
         "message": "Une erreur a été rencontrée par l'application lors du rendu de cette page. Essayez de recharger la page.",
         "hideDetails": "Cacher détails",
@@ -389,6 +407,21 @@
           "failed": "Copie vers le presse-papier échouée.",
           "copyManual": "Copier vers le presse-papier : Ctrl+C ou Command+C, Entrée"
         }
+      },
+      "pasteOnClick": {
+        "toast": {
+          "pasted": "Collé depuis le presse-papier.",
+          "failed": "Échec du collage depuis le presse-papier.",
+          "pasteManual": "Coller depuis le presse-papier : Ctrl+V ou Command+V, Entrée"
+        }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "Estimation du temps de fin...",
+          "estimated": "Temps de fin estimé : {time}"
+        },
+        "calculating": "ETA : Calcul en cours...",
+        "calculated": "ETA : {time}"
       },
       "container": {
         "alert": {
@@ -414,27 +447,13 @@
         "selectedPermissions": "Permissions sélectionnées ({count})",
         "noPermissions": "Pas de permissions sélectionnées."
       },
+      "selectInput": {
+        "noResults": "Aucun résultat trouvé."
+      },
       "can": {
         "tooltip": {
           "cantSave": "Vous n'avez pas la permission d'enregistrer.",
           "cantDelete": "Vous n'avez pas la permission de supprimer."
-        }
-      },
-      "activityInfoButton": {
-        "modal": {
-          "info": {
-            "title": "Détails de l'activité"
-          }
-        }
-      },
-      "selectInput": {
-        "noResults": "Aucun résultat trouvé."
-      },
-      "pasteOnClick": {
-        "toast": {
-          "pasted": "Collé depuis le presse-papier.",
-          "failed": "Échec du collage depuis le presse-papier.",
-          "pasteManual": "Coller depuis le presse-papier : Ctrl+V ou Command+V, Entrée"
         }
       },
       "resource": {
@@ -444,49 +463,12 @@
           "deleted": "{resource} supprimé."
         }
       },
-      "estimatedTimeArrival": {
-        "tooltip": {
-          "estimating": "Estimation du temps de fin...",
-          "estimated": "Temps de fin estimé : {time}"
-        },
-        "calculating": "ETA : Calcul en cours...",
-        "calculated": "ETA : {time}"
-      },
-      "fileUpload": {
-        "toast": {
-          "uploading": "Téléversement de {files} démarré...",
-          "cancelledFile": "Téléversement de `{file}` annulé avec succès.",
-          "cancelledFolder": "Téléversement de `{folder}` ({files}) annulé avec succès.",
-          "cancelledAll": "Tous les téléversements ont été annulés."
+      "activityInfoButton": {
+        "modal": {
+          "info": {
+            "title": "Détails de l'activité"
+          }
         }
-      },
-      "routeOrderEditor": {
-        "title": "Configuration des routes",
-        "label": {
-          "route": "Route",
-          "divider": "Séparateur",
-          "redirect": "Redirection"
-        },
-        "empty": "Aucune route configurée. Ajoutez des routes, des séparateurs ou des redirections ci-dessous.",
-        "unnamed": "(sans nom)",
-        "dividerPlaceholder": "Libellé du séparateur (optionnel)",
-        "redirectNamePlaceholder": "Nom de la redirection",
-        "destinationPlaceholder": "URL de destination (ex. https://...)",
-        "selectRoutePlaceholder": "Sélectionner une route…",
-        "button": {
-          "addDivider": "Ajouter un séparateur",
-          "addRedirect": "Ajouter une redirection"
-        }
-      },
-      "scheduleDynamicInput": {
-        "enterVariable": "Veuillez entrer le nom de la variable à évaluer.",
-        "enterData": "Veuillez entrer les données à envoyer.",
-        "inputType": "Type d'entrée",
-        "dataType": "Type de données à envoyer",
-        "selectType": "Sélectionner le type",
-        "none": "Aucun",
-        "rawString": "Chaîne brute",
-        "variable": "Variable"
       },
       "screenBlock": {
         "permissionDenied": {
@@ -520,6 +502,16 @@
             }
           }
         }
+      },
+      "scheduleDynamicInput": {
+        "enterVariable": "Veuillez entrer le nom de la variable à évaluer.",
+        "enterData": "Veuillez entrer les données à envoyer.",
+        "inputType": "Type d'entrée",
+        "dataType": "Type de données à envoyer",
+        "selectType": "Sélectionner le type",
+        "none": "Aucun",
+        "rawString": "Chaîne brute",
+        "variable": "Variable"
       },
       "serverWebsocket": {
         "error": {
@@ -556,6 +548,7 @@
               },
               "copying": {
                 "completed": "`{path}` copié vers `{destination}` en {time}.",
+                "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
                 "failed": "Échec de la copie de `{path}` vers `{destination}` :\n{error}"
               },
               "copyingMany": {
@@ -571,9 +564,747 @@
             }
           }
         }
+      },
+      "fileUpload": {
+        "toast": {
+          "uploading": "Téléversement de {files} démarré...",
+          "cancelledFile": "Téléversement de `{file}` annulé avec succès.",
+          "cancelledFolder": "Téléversement de `{folder}` ({files}) annulé avec succès.",
+          "cancelledAll": "Tous les téléversements ont été annulés."
+        }
       }
     },
     "pages": {
+      "oobe": {
+        "welcome": {
+          "title": "Bienvenue sur Calagopus",
+          "subtitle": "Mettons en marche votre système de gestion de serveurs de jeux !",
+          "wizardIntro": "Cet assistant de configuration va vous guider pour :",
+          "steps": {
+            "account": "Créer votre compte administrateur",
+            "settings": "Configurer les paramètres système essentiels",
+            "location": "Configurer votre emplacement/groupe de serveurs",
+            "node": "Ajouter votre premier nœud",
+            "server": "Déployer votre premier serveur de jeu"
+          },
+          "button": {
+            "start": "Commencer"
+          }
+        },
+        "register": {
+          "title": "Créer le compte administrateur",
+          "alert": {
+            "title": "Notice de sécurité",
+            "description": "Choisissez un mot de passe fort. Ce compte aura un accès administratif complet à tous les serveurs et paramètres."
+          },
+          "form": {
+            "usernamePlaceholder": "admin",
+            "email": "Adresse e-mail",
+            "emailPlaceholder": "admin@exemple.com",
+            "firstNamePlaceholder": "Alan",
+            "lastNamePlaceholder": "Turing",
+            "passwordPlaceholder": "Entrez un mot de passe fort",
+            "confirmPasswordPlaceholder": "Entrez à nouveau votre mot de passe"
+          },
+          "button": {
+            "create": "Créer compte & continuer"
+          }
+        },
+        "login": {
+          "title": "Se reconnecter",
+          "alert": "Vous vous êtes fait déconnecter durant le processus de configuration. Veuillez vous reconnecter pour continuer de là où vous vous êtes arrêté.",
+          "form": {
+            "usernamePlaceholder": "admin",
+            "passwordPlaceholder": "Entrez un mot de passe fort"
+          },
+          "button": {
+            "login": "Se connecter & continuer"
+          }
+        },
+        "location": {
+          "title": "Configuration de l'emplacement",
+          "form": {
+            "locationName": "Nom de l'emplacement",
+            "locationNamePlaceholder": "Ma maison",
+            "locationFlag": "Drapeau de l'emplacement",
+            "locationFlagPlaceholder": "Le meilleur pays",
+            "backupName": "Nom de la configuration de sauvegarde",
+            "backupNamePlaceholder": "Baguette Cloud",
+            "backupDisk": "Disque de sauvegarde",
+            "backupDiskPlaceholder": "Disque de sauvegarde"
+          },
+          "button": {
+            "create": "Créer & continuer"
+          }
+        },
+        "node": {
+          "title": "Configuration du nœud",
+          "allocationsTitle": "Configuration des allocations",
+          "form": {
+            "name": "Nom",
+            "namePlaceholder": "Mon serveur",
+            "urlPlaceholder": "URL",
+            "urlDescription": "utilisé pour la communication interne avec le nœud",
+            "publicUrl": "URL publique",
+            "publicUrlPlaceholder": "URL",
+            "publicUrlDescription": "utilisé pour websocket/téléchargements",
+            "sftpHostPlaceholder": "Hôte SFTP",
+            "sftpPortPlaceholder": "Port SFTP",
+            "ip": "IP"
+          },
+          "error": {
+            "noLocations": "Quelque chose s'est mal passé. Pas d'emplacements trouvés."
+          },
+          "button": {
+            "create": "Créer & continuer"
+          }
+        },
+        "nodeConfiguration": {
+          "title": "Configuration du nœud",
+          "error": {
+            "noNodes": "Quelque chose s'est mal passé. Aucun nœud trouvé.",
+            "connectionError": "Quelque chose s'est mal passé. Erreur de connexion."
+          },
+          "successMessage": "La connexion à votre nœud a été vérifiée avec succès. Vous pouvez maintenant continuer.",
+          "configurationDescription": "Placez ceci dans le fichier de configuration à `{file}` ou exécutez :",
+          "button": {
+            "verify": "Vérifier la connexion"
+          }
+        },
+        "configuration": {
+          "title": "Paramètres d'application",
+          "form": {
+            "applicationName": "Nom d'application",
+            "applicationNamePlaceholder": "Calagopus",
+            "languagePlaceholder": "Langue",
+            "applicationUrl": "URL d'application",
+            "applicationUrlPlaceholder": "https://calagop.us",
+            "registration": "Activer l'inscription",
+            "registrationDescription": "Autoriser de nouveaux utilisateurs à créer leur propre compte."
+          },
+          "button": {
+            "submit": "Mettre à jour les paramètres & continuer"
+          }
+        },
+        "eggRepositories": {
+          "title": "Dépôts d'Eggs",
+          "description": "Ce sont les dépôts source de vos Eggs. Vous pouvez changer ces dépôts à tout moment.",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "Eggs de jeux Pterodactyl",
+              "description": "Eggs pour des jeux comme Minecraft, Terraria, et bien d'autres."
+            },
+            "pterodactylApplication": {
+              "title": "Eggs d'applications Pterodactyl",
+              "description": "Eggs pour des applications comme Grafana, Meilisearch, et diverses bases de données."
+            },
+            "pterodactylGeneral": {
+              "title": "Eggs génériques Pterodactyl",
+              "description": "Eggs pour des environnements d'exécution génériques comme Node JS, Java, et Rust."
+            }
+          }
+        },
+        "server": {
+          "title": "Serveur",
+          "existingServer": "Un serveur a déjà été créé. Vous pourrez modifier les paramètres plus tard dans le menu d'administration.",
+          "egg": {
+            "title": "Egg",
+            "description": "Mettons en marche votre premier serveur. Quel Egg souhaitez-vous utiliser ?",
+            "nestDescription": "Pour commencer à utiliser cet Egg, vous devrez créer un Nest ; les Nests sont des collections d'Eggs. Donnez-lui un nom :"
+          },
+          "server": {
+            "title": "Serveur",
+            "nestDescription": "Pour commencer à utiliser cet Egg, vous devrez créer un Nest ; les Nests sont des collections d'Eggs. Donnez-lui un nom :"
+          },
+          "error": {
+            "noNodes": "Quelque chose s'est mal passé. Aucun nœud trouvé."
+          },
+          "button": {
+            "create": "Créer & continuer"
+          }
+        },
+        "finished": {
+          "title": "Configuration terminée !",
+          "subtitle": "Votre panel Calagopus est prêt à l'emploi",
+          "setupTitle": "Ce que nous avons configuré",
+          "items": {
+            "account": "Compte administrateur",
+            "configuration": {
+              "title": "Configuration système",
+              "subtitle": "Paramètres et préférences du panel configurés"
+            },
+            "eggRepositories": {
+              "title": "Dépôts d'Eggs",
+              "subtitle": "{count} dépôts"
+            },
+            "location": "Emplacement",
+            "node": "Nœud",
+            "server": "Serveur"
+          },
+          "badge": {
+            "skipped": "Passé"
+          },
+          "button": "Aller au tableau de bord"
+        }
+      },
+      "auth": {
+        "button": {
+          "login": "Connexion",
+          "loginWith": "Se connecter avec {name}"
+        },
+        "alert": {
+          "urlMismatch": "L'URL de l'application ne correspond pas à l'URL actuelle. Attendu : `{appUrl}`, Actuel : `{currentUrl}`."
+        },
+        "login": {
+          "error": {
+            "usernameRequired": "Veuillez entrer un nom d'utilisateur",
+            "registrationDisabled": "Aucun compte correspondant n'a été trouvé et l'inscription est actuellement désactivée.",
+            "userAlreadyExists": "Un compte avec ce nom d'utilisateur ou cette adresse e-mail existe déjà."
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "Votre navigateur ne prend pas en charge les clés d'accès.",
+              "unexpected": "Une erreur inattendue s'est produite lors de l'utilisation de votre clé d'accès.",
+              "cancelled": "La demande de clé d'accès a été annulée.",
+              "dismissed": "Vous avez ignoré la demande de clé d'accès ou n'avez pas interagi avec elle. La clé utilisée peut aussi ne pas être enregistrée.",
+              "invalidState": "Cette clé d'accès n'est pas disponible ou est déjà enregistrée.",
+              "notSupportedType": "Votre navigateur ou appareil ne prend pas en charge ce type de clé d'accès.",
+              "securityError": "Les clés d'accès ne peuvent être utilisées qu'en HTTPS et avec un domaine valide.",
+              "authenticatorError": "Une erreur s'est produite avec l'authentificateur.",
+              "constraintError": "L'authentificateur n'a pas pu satisfaire les contraintes requises."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "Connexion",
+              "subtitle": "Entrez votre nom d'utilisateur ou votre adresse e-mail pour continuer",
+              "form": {
+                "usernameOrEmailPlaceholder": "Votre nom d'utilisateur ou adresse e-mail"
+              },
+              "link": {
+                "forgotPassword": "Mot de passe oublié",
+                "notRegistered": "Pas encore inscrit ?",
+                "createAccount": "Créer un compte"
+              },
+              "button": {
+                "oauthLogin": "Connexion OAuth"
+              }
+            },
+            "passkey": {
+              "title": "S'authentifier avec une clé d'accès",
+              "subtitle": "Nous avons trouvé une clé d'accès associée à {username}",
+              "button": {
+                "usePasskey": "Utiliser la clé d'accès",
+                "usePassword": "Utiliser le mot de passe"
+              }
+            },
+            "password": {
+              "title": "Entrez votre mot de passe",
+              "subtitle": "Veuillez entrer votre mot de passe pour {username}",
+              "form": {
+                "passwordPlaceholder": "Entrez votre mot de passe"
+              },
+              "button": {
+                "signIn": "Se connecter",
+                "forgotPassword": "Mot de passe oublié"
+              }
+            },
+            "totp": {
+              "title": "Authentification à deux facteurs",
+              "welcomeBack": "Bon retour {username} !",
+              "enterCode": "Entrez le code à 6 chiffres de votre application d'authentification",
+              "button": {
+                "verify": "Vérifier le code",
+                "useRecoveryCode": "Utiliser un code de récupération",
+                "useTotp": "Utiliser le TOTP"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "Entrez un code de récupération",
+              "form": {
+                "label": "Code de récupération",
+                "placeholder": "Entrez un code de récupération"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "Inscription",
+          "subtitle": "Veuillez entrer vos informations pour vous inscrire",
+          "button": {
+            "register": "S'inscrire"
+          }
+        },
+        "forgotPassword": {
+          "title": "Mot de passe oublié",
+          "subtitle": "Entrez votre adresse e-mail pour recevoir les instructions de réinitialisation de votre mot de passe",
+          "button": {
+            "request": "Demander la réinitialisation du mot de passe"
+          },
+          "success": "Un e-mail vous a été envoyé avec les instructions pour réinitialiser votre mot de passe."
+        },
+        "resetPassword": {
+          "title": "Réinitialiser le mot de passe",
+          "subtitle": "Veuillez entrer votre nouveau mot de passe",
+          "button": {
+            "reset": "Réinitialiser le mot de passe"
+          },
+          "toast": {
+            "success": "Le mot de passe a été réinitialisé."
+          }
+        },
+        "oauth": {
+          "title": "S'authentifier avec OAuth",
+          "subtitle": "Choisissez l'un des fournisseurs ci-dessous pour vous connecter"
+        }
+      },
+      "account": {
+        "home": {
+          "title": "Serveurs",
+          "tooltip": {
+            "removeFromGroup": "Retirer du groupe",
+            "addToGroup": "Ajouter au groupe",
+            "addServerToGroup": "Ajouter le serveur au groupe",
+            "groupActions": "Actions de groupe",
+            "noGroups": "Pas de groupes disponibles auxquels ajouter le serveur",
+            "noGroup": "Ce serveur n'est dans aucun groupe"
+          },
+          "badge": {
+            "foreign": "Externe"
+          },
+          "tabs": {
+            "groupedServers": {
+              "title": "Serveurs groupés",
+              "page": {
+                "button": {
+                  "createGroup": "Créer groupe"
+                },
+                "modal": {
+                  "createServerGroup": {
+                    "title": "Créer groupe de serveur",
+                    "toast": {
+                      "created": "Groupe de serveur créé."
+                    }
+                  },
+                  "editServerGroup": {
+                    "title": "Modifier le groupe de serveur",
+                    "toast": {
+                      "updated": "Groupe de serveur mis à jour."
+                    }
+                  },
+                  "deleteServerGroup": {
+                    "title": "Confirmer la suppression du groupe de serveur",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{group}** de votre compte ?",
+                    "toast": {
+                      "deleted": "Groupe de serveur supprimé."
+                    }
+                  },
+                  "addServerToGroup": {
+                    "title": "Ajouter un serveur à {group}",
+                    "noServers": "Tous les serveurs sont déjà dans ce groupe.",
+                    "toast": {
+                      "added": "Serveur ajouté au groupe."
+                    }
+                  },
+                  "removeServerFromGroup": {
+                    "title": "Confirmer le retrait du serveur",
+                    "content": "Êtes-vous sûr de vouloir retirer **{server}** de **{group}** ?",
+                    "toast": {
+                      "removed": "Serveur retiré du groupe."
+                    }
+                  }
+                },
+                "noGroups": "Pas de groupes trouvés, créez-en un."
+              }
+            },
+            "allServers": {
+              "title": "Tous les serveurs",
+              "page": {
+                "input": {
+                  "showOtherUsersServers": "Afficher les serveurs d'autres utilisateurs"
+                },
+                "modal": {
+                  "addToServerGroup": {
+                    "title": "Ajouter {server} au groupe de serveur",
+                    "form": {
+                      "serverGroup": "Groupe de serveur"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "bulkActions": {
+            "selectionMode": "Mode de sélection",
+            "select": "Sélectionner serveur",
+            "deselect": "Désélectionner serveur",
+            "success": "{action} {servers} avec succès.",
+            "partial": "{action} {successfulServers} avec succès. {failedServers} ont échoué.",
+            "groupActions": "Actions de groupe"
+          },
+          "noServers": "Pas de serveurs trouvés, est-il temps d'en ajouter un ?"
+        },
+        "admin": {
+          "title": "Admin"
+        },
+        "account": {
+          "title": "Compte",
+          "alert": {
+            "requireTwoFactor": {
+              "title": "Authentification à deux facteurs requise",
+              "description": "L'authentification à deux facteurs est requise pour votre compte. Veuillez la mettre en place ci-dessus pour continuer à utiliser le panel."
+            },
+            "frozen": {
+              "title": "Compte gelé",
+              "description": "Votre compte a été gelé. Vous ne pouvez pas apporter de modifications à votre compte tant qu'il n'est pas dégelé. Veuillez contacter un administrateur pour plus d'informations."
+            }
+          },
+          "containers": {
+            "password": {
+              "title": "Mot de passe",
+              "toast": {
+                "updated": "Mot de passe mis à jour avec succès."
+              },
+              "form": {
+                "newPassword": "Nouveau mot de passe",
+                "confirmNewPassword": "Confirmer le nouveau mot de passe"
+              }
+            },
+            "email": {
+              "title": "Adresse e-mail",
+              "toast": {
+                "updated": "Adresse e-mail mise à jour avec succès."
+              },
+              "form": {
+                "newEmail": "Nouvelle adresse e-mail"
+              }
+            },
+            "twoFactor": {
+              "title": "Authentification à deux facteurs",
+              "toast": {
+                "disabled": "Authentification à deux facteurs désactivée avec succès.",
+                "enabled": "Authentification à deux facteurs activée avec succès. Veuillez copier vos codes de récupération."
+              },
+              "modal": {
+                "disableTwoFactor": {
+                  "title": "Désactiver l'authentification à deux facteurs",
+                  "description": "Désactiver l'authentification à deux facteurs rendra votre compte moins sécurisé."
+                },
+                "setupTwoFactor": {
+                  "title": "Configurer l'authentification à deux facteurs",
+                  "description": "Protégez votre compte des accès non-autorisés. Un code de vérification vous sera demandé à chaque connexion.",
+                  "descriptionQR": "Scannez le QR code ci-dessus en utilisant l'application d'authentification à deux facteurs de votre choix. Ensuite, entrez le code à 6 chiffres généré dans le champ ci-dessous."
+                },
+                "recoveryCodes": {
+                  "title": "Codes de récupération",
+                  "description": "Ci-dessous sont vos codes de récupération. Gardez-les dans un endroit sûr. Si vous perdez accès à votre dispositif d'authentification, vous pourrez utiliser ces codes pour regagner accès à votre compte."
+                }
+              },
+              "button": {
+                "disableTwoFactor": "Désactiver l'authentification à deux facteurs",
+                "setupTwoFactor": "Configurer l'authentification à deux facteurs"
+              },
+              "twoFactorEnabled": "La vérification à deux facteurs est actuellement activée.",
+              "twoFactorDisabled": "La vérification à deux facteurs n'est pas activée pour votre compte. Cliquez sur le bouton ci-dessous pour commencer à la configurer.",
+              "twoFactorLastUsed": "Dernière utilisation : {timestamp}"
+            },
+            "account": {
+              "title": "Détails du compte",
+              "toast": {
+                "updated": "Détails du compte mis à jour avec succès."
+              },
+              "form": {
+                "toastPosition": "Position du toast",
+                "startOnGroupedServers": "Commencer sur la page des serveurs groupés"
+              }
+            },
+            "avatar": {
+              "title": "Avatar",
+              "toast": {
+                "updated": "Avatar mis à jour avec succès.",
+                "removed": "Avatar supprimé avec succès."
+              },
+              "form": {
+                "avatar": "Avatar"
+              }
+            }
+          }
+        },
+        "securityKeys": {
+          "title": "Clés de sécurité",
+          "subtitle": "{current} sur {max} clés de sécurité maximum créées.",
+          "table": {
+            "columns": {
+              "credentialId": "ID d'identifiant"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "Un contexte sécurisé (HTTPS) est requis pour utiliser les clés de sécurité.",
+            "limitReached": "Vous êtes limité à {max} clés de sécurité."
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "Créer une clé de sécurité",
+              "toast": {
+                "created": "Clé de sécurité créée avec succès.",
+                "aborted": "Création de la clé de sécurité annulée."
+              }
+            },
+            "editSecurityKey": {
+              "title": "Modifier la clé de sécurité",
+              "toast": {
+                "updated": "Clé de sécurité mise à jour avec succès."
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "Confirmer la suppression de la clé de sécurité",
+              "content": "Êtes-vous sûr de vouloir supprimer **{key}** de votre compte ?",
+              "toast": {
+                "deleted": "Clé de sécurité supprimée avec succès."
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "Sessions",
+          "table": {
+            "columns": {
+              "ip": "IP",
+              "thisDevice": "Cet appareil ?",
+              "userAgent": "Agent utilisateur"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "Confirmer la suppression de la session",
+              "content": "Êtes-vous sûr de vouloir supprimer la session **{ip}** de votre compte ?",
+              "toast": {
+                "deleted": "Session supprimée."
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "Raccourcis clavier",
+          "subtitle": "Utilisez ces raccourcis clavier pour naviguer et interagir avec le panel plus efficacement.",
+          "detectedMac": "macOS détecté",
+          "detectedWindows": "Windows/Linux détecté",
+          "label": {
+            "disabled": "Désactivé",
+            "modified": "Modifié",
+            "recording": "Appuyez sur des touches..."
+          },
+          "button": {
+            "rebind": "Réassigner",
+            "resetAll": "Tout réinitialiser",
+            "copy": "Tout copier",
+            "paste": "Coller"
+          },
+          "toast": {
+            "imported": "{shortcuts} mis à jour.",
+            "importedNone": "Aucun raccourci n'a été modifié.",
+            "importErrors": "{unknown} et {invalid} ignorés.",
+            "resetAll": "Tous les raccourcis réinitialisés par défaut."
+          },
+          "fileManager": {
+            "title": "Gestionnaire de fichiers",
+            "selectAll": "Sélectionner tous les fichiers",
+            "cutFiles": "Couper les fichiers sélectionnés",
+            "copyFiles": "Copier les fichiers sélectionnés",
+            "duplicateFile": "Dupliquer le fichier sélectionné",
+            "pasteFiles": "Coller fichiers",
+            "searchFiles": "Chercher fichiers",
+            "moveUpDirectory": "Déplacer vers répertoire parent",
+            "moveUpSelection": "Déplacer la sélection vers le haut",
+            "moveDownSelection": "Déplacer la sélection vers le bas",
+            "renameFile": "Renommer le fichier",
+            "deselectAll": "Désélectionner tous les fichiers",
+            "deleteFiles": "Supprimer les fichiers sélectionnés"
+          },
+          "table": {
+            "title": "Navigation des tables",
+            "previousPage": "Page précédente",
+            "nextPage": "Page suivante",
+            "firstPage": "Première page",
+            "lastPage": "Dernière page"
+          },
+          "console": {
+            "title": "Console du serveur",
+            "searchContent": "Rechercher dans la sortie console",
+            "previousCommand": "Commande précédente dans l'historique",
+            "nextCommand": "Commande suivante dans l'historique"
+          },
+          "serverList": {
+            "title": "Liste des serveurs",
+            "selectServer": "Gardez appuyé S et cliquez pour (dé)sélectionner serveur"
+          }
+        },
+        "sshKeys": {
+          "title": "Clés SSH",
+          "subtitle": "{current} sur {max} clés SSH maximum créées.",
+          "tooltip": {
+            "limitReached": "Vous êtes limité à {max} clés SSH."
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "Empreinte"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "Créer clé SSH",
+              "toast": {
+                "created": "Clé SSH créée."
+              },
+              "button": {
+                "uploadKeyFile": "Téléverser le fichier de clé"
+              },
+              "form": {
+                "publicKey": "Clé publique"
+              }
+            },
+            "editSshKey": {
+              "title": "Modifier la clé SSH",
+              "toast": {
+                "updated": "Clé SSH modifiée."
+              }
+            },
+            "importSshKeys": {
+              "title": "Importer des clés SSH",
+              "toast": {
+                "created": "{sshKeys} créées."
+              },
+              "form": {
+                "provider": "Fournisseur"
+              }
+            },
+            "deleteSshKey": {
+              "title": "Confirmer la suppression de la clé SSH",
+              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
+              "toast": {
+                "removed": "Clé SSH supprimée."
+              }
+            }
+          }
+        },
+        "commandSnippets": {
+          "title": "Extraits de commande",
+          "subtitle": "{current} sur {max} extraits de commande maximum créés.",
+          "tooltip": {
+            "limitReached": "Vous êtes limité à {max} extraits de commande."
+          },
+          "modal": {
+            "createCommandSnippet": {
+              "title": "Créer un extrait de commande",
+              "toast": {
+                "created": "Extrait de commande créé."
+              }
+            },
+            "editCommandSnippet": {
+              "title": "Modifier l'extrait de commande",
+              "toast": {
+                "updated": "Extrait de commande mis à jour."
+              }
+            },
+            "deleteCommandSnippet": {
+              "title": "Confirmer la suppression de l'extrait de commande",
+              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
+              "toast": {
+                "removed": "Extrait de commande supprimé."
+              }
+            }
+          }
+        },
+        "oauthLinks": {
+          "title": "Liens OAuth",
+          "button": {
+            "connect": "Connecter",
+            "connectTo": "Connecter {provider}"
+          },
+          "table": {
+            "columns": {
+              "providerName": "Nom du fournisseur"
+            }
+          },
+          "modal": {
+            "deleteOAuthLink": {
+              "title": "Confirmer la suppression du lien OAuth",
+              "content": "Êtes-vous sûr de vouloir supprimer la connexion **{provider}** de votre compte ?",
+              "toast": {
+                "removed": "Lien OAuth supprimé."
+              }
+            }
+          }
+        },
+        "apiKeys": {
+          "title": "Clés API",
+          "subtitle": "{current} sur {max} clés API maximum créées.",
+          "button": {
+            "apiDocumentation": "Documentation API"
+          },
+          "tooltip": {
+            "limitReached": "Vous êtes limité à {max} clés API."
+          },
+          "table": {
+            "columns": {
+              "key": "Clé",
+              "permissions": "Permissions Utilisateur / Serveur / Admin",
+              "expires": "Expiration"
+            }
+          },
+          "modal": {
+            "createApiKey": {
+              "title": "Créer une clé API",
+              "toast": {
+                "created": "Clé API créée."
+              }
+            },
+            "updateApiKey": {
+              "title": "Mettre à jour clé API",
+              "toast": {
+                "updated": "Clé API mise à jour."
+              }
+            },
+            "recreateApiKey": {
+              "title": "Recréer la clé API",
+              "content": "Recréer une clé API générera une nouvelle clé et invalidera l'ancienne. Êtes-vous sûr de vouloir recréer la clé API **{name}** ?",
+              "toast": {
+                "recreated": "Clé API recréée."
+              }
+            },
+            "deleteApiKey": {
+              "title": "Confirmer la suppression de la clé API",
+              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
+              "toast": {
+                "removed": "Clé API supprimée."
+              }
+            }
+          },
+          "form": {
+            "allowedIps": "IPs autorisées",
+            "allowedIpsPlaceholder": "ex. 192.168.1.1, 2001:db8::1",
+            "userPermissions": "Permissions utilisateur",
+            "serverPermissions": "Permissions serveur",
+            "adminPermissions": "Permissions admin"
+          },
+          "create": {
+            "title": "Créer une clé API",
+            "subtitle": "Une application demande la création d'une clé API pour votre compte.",
+            "alert": {
+              "adminPermissions": "Cette clé API demande des **permissions admin**. Toute personne en possession de cette clé pourra effectuer des actions administratives sur ce panel en votre nom. Ne continuez que si vous faites entièrement confiance à l'application demandeuse.",
+              "callbackUrl": "Après la création, la nouvelle clé API sera envoyée à **{url}**."
+            },
+            "noPermissions": "Cette clé API n'aura aucune permission.",
+            "keyCreated": "Votre nouvelle clé API a été créée. Veillez à la copier maintenant, car elle ne sera plus affichée.",
+            "button": {
+              "goToApiKeys": "Aller aux clés API"
+            }
+          }
+        },
+        "activity": {
+          "title": "Activité"
+        }
+      },
       "admin": {
         "home": {
           "title": "Accueil",
@@ -1069,92 +1800,75 @@
             }
           }
         },
-        "locations": {
-          "title": "Emplacements",
-          "resourceName": "Emplacement",
-          "tabs": {
-            "general": {
-              "page": {
-                "form": {
-                  "flag": "Drapeau"
-                },
-                "modal": {
-                  "delete": {
-                    "title": "Confirmer la suppression de l'emplacement",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
-                  }
-                },
-                "titleCreate": "Créer un emplacement",
-                "titleUpdate": "Modifier l'emplacement"
-              }
+        "extensions": {
+          "title": "Extensions",
+          "unknownExtension": "Extension inconnue",
+          "alert": {
+            "noExtensions": "Aucune extension installée.",
+            "heavyImageMissing": "Il semble que vous n'utilisiez pas l'image heavy requise pour installer des extensions, consultez [ici]({docsUrl}) comment basculer dessus."
+          },
+          "button": {
+            "viewBuildLogs": "Voir les journaux de compilation",
+            "install": "Installer une extension",
+            "rebuild": "Recompiler les extensions",
+            "configure": "Configurer",
+            "back": "Retour aux extensions",
+            "accept": "Accepter",
+            "decline": "Refuser"
+          },
+          "tooltip": {
+            "building": "Le panel est en train de compiler le code des extensions. Veuillez patienter.",
+            "noPendingBuild": "Aucune extension en attente de compilation.",
+            "noBackend": "Une extension backend est requise pour configurer cette extension.",
+            "noConfigurationPage": "Cette extension n'a pas de page de configuration définie.",
+            "removeExtension": "Retirer l'extension"
+          },
+          "badge": {
+            "frontendMissing": "Frontend manquant",
+            "backendMissing": "Backend manquant",
+            "pendingBuild": "Compilation en attente",
+            "pendingRemoval": "Retrait en attente"
+          },
+          "card": {
+            "version": "Version",
+            "authors": "Auteurs"
+          },
+          "section": {
+            "pendingExtensions": "Extensions en attente",
+            "noPendingExtensions": "Aucune extension en attente."
+          },
+          "dropzone": {
+            "title": "Déposez des fichiers ici pour les installer en tant qu'extensions",
+            "subtitle": "Relâchez pour démarrer l'installation"
+          },
+          "toast": {
+            "buildStarted": "Recompilation des extensions démarrée avec succès.",
+            "buildCompleted": "Compilation des extensions terminée. Vous devrez peut-être actualiser la page.",
+            "added": "Extension `{packageName}` ajoutée avec succès.",
+            "removed": "Extension `{packageName}` supprimée avec succès."
+          },
+          "notFound": {
+            "title": "Extension introuvable",
+            "content": "Extension avec le nom de paquet « {packageName} » introuvable."
+          },
+          "configure": {
+            "title": "Configurer {packageName}",
+            "noConfigurationPage": "Cette extension n'a pas de page de configuration."
+          },
+          "modal": {
+            "buildLogs": {
+              "title": "Journaux de compilation",
+              "empty": "Aucun journal trouvé."
             },
-            "databaseHosts": {
-              "title": "Hôtes de base de données",
-              "page": {
-                "title": "Hôtes de base de données de l'emplacement",
-                "toast": {
-                  "created": "Hôte de base de données de l'emplacement créé.",
-                  "deleted": "Hôte de base de données de l'emplacement supprimé."
-                },
-                "modal": {
-                  "create": {
-                    "title": "Créer un hôte de base de données d'emplacement"
-                  },
-                  "delete": {
-                    "title": "Confirmer la suppression de l'hôte de base de données de l'emplacement",
-                    "content": "Êtes-vous sûr de vouloir supprimer l'hôte de base de données **{name}** de **{location}** ?"
-                  }
-                }
-              }
+            "license": {
+              "title": "Accord de licence",
+              "description": "L'extension `{packageName}` requiert que vous acceptiez la licence suivante avant de pouvoir être installée."
             },
-            "nodes": {
-              "title": "Nœuds",
-              "page": {
-                "title": "Nœuds de l'emplacement"
-              }
-            }
-          }
-        },
-        "databaseHosts": {
-          "title": "Hôtes de base de données",
-          "resourceName": "Hôte de base de données",
-          "tabs": {
-            "general": {
-              "page": {
-                "titleCreate": "Créer un hôte de base de données",
-                "titleUpdate": "Modifier l'hôte de base de données",
-                "form": {
-                  "publicHost": "Hôte public",
-                  "publicPort": "Port public",
-                  "connectionCredentials": "Identifiants de connexion",
-                  "credentialType": "Type d'identifiant",
-                  "connectionString": "Chaîne de connexion",
-                  "connectionStringPlaceholder": "mysql://username:password@host:port"
-                },
-                "enum": {
-                  "credentialType": {
-                    "connectionString": "Chaîne de connexion",
-                    "details": "Détails"
-                  }
-                },
-                "button": {
-                  "testConnection": "Tester la connexion"
-                },
-                "toast": {
-                  "tested": "Test effectué avec succès."
-                },
-                "modal": {
-                  "delete": {
-                    "title": "Confirmer la suppression de l'hôte de base de données",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
-                  }
-                }
-              }
-            },
-            "databases": {
-              "title": "Bases de données",
-              "page": {
-                "title": "Bases de données de l'hôte"
+            "remove": {
+              "title": "Retirer l'extension",
+              "content": "Êtes-vous sûr de vouloir retirer l'extension `{packageName}` ? Cette action est irréversible.",
+              "form": {
+                "removeMigrations": "Voulez-vous supprimer et annuler les migrations de base de données de cette extension ?"
               }
             }
           }
@@ -1253,47 +1967,40 @@
             }
           }
         },
-        "mounts": {
-          "title": "Montages",
-          "resourceName": "Montage",
+        "locations": {
+          "title": "Emplacements",
+          "resourceName": "Emplacement",
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Créer un montage",
-                "titleUpdate": "Modifier le montage",
-                "alert": "Les montages sont une fonctionnalité puissante et potentiellement dangereuse. Une mauvaise utilisation peut entraîner une perte de données ou des failles de sécurité (y compris des évasions de conteneur). Assurez-vous de comprendre les implications de l'utilisation des montages avant d'en créer ou d'en modifier.",
                 "form": {
-                  "source": "Source",
-                  "target": "Cible",
-                  "readOnly": "Lecture seule",
-                  "userMountable": "Montable par l'utilisateur"
+                  "flag": "Drapeau"
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirmer la suppression du montage",
+                    "title": "Confirmer la suppression de l'emplacement",
                     "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
                   }
-                }
+                },
+                "titleCreate": "Créer un emplacement",
+                "titleUpdate": "Modifier l'emplacement"
               }
             },
-            "eggs": {
-              "title": "Eggs",
+            "databaseHosts": {
+              "title": "Hôtes de base de données",
               "page": {
-                "title": "Eggs du montage",
+                "title": "Hôtes de base de données de l'emplacement",
                 "toast": {
-                  "added": "Egg du montage ajouté.",
-                  "removed": "Egg du montage supprimé."
+                  "created": "Hôte de base de données de l'emplacement créé.",
+                  "deleted": "Hôte de base de données de l'emplacement supprimé."
                 },
                 "modal": {
-                  "add": {
-                    "title": "Ajouter un Egg au montage",
-                    "form": {
-                      "egg": "Egg"
-                    }
+                  "create": {
+                    "title": "Créer un hôte de base de données d'emplacement"
                   },
-                  "remove": {
-                    "title": "Confirmer le retrait de l'Egg du montage",
-                    "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{name}** ?"
+                  "delete": {
+                    "title": "Confirmer la suppression de l'hôte de base de données de l'emplacement",
+                    "content": "Êtes-vous sûr de vouloir supprimer l'hôte de base de données **{name}** de **{location}** ?"
                   }
                 }
               }
@@ -1301,689 +2008,7 @@
             "nodes": {
               "title": "Nœuds",
               "page": {
-                "title": "Nœuds du montage",
-                "toast": {
-                  "added": "Nœud du montage ajouté.",
-                  "removed": "Nœud du montage supprimé."
-                },
-                "modal": {
-                  "add": {
-                    "title": "Ajouter un nœud au montage"
-                  },
-                  "remove": {
-                    "title": "Confirmer le retrait du nœud du montage",
-                    "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{name}** ?"
-                  }
-                }
-              }
-            },
-            "servers": {
-              "title": "Serveurs",
-              "page": {
-                "title": "Serveurs du montage"
-              }
-            }
-          }
-        },
-        "eggRepositories": {
-          "title": "Dépôts d'Eggs",
-          "resourceName": "Dépôt d'Eggs",
-          "table": {
-            "columns": {
-              "gitRepository": "Dépôt Git"
-            }
-          },
-          "tabs": {
-            "general": {
-              "page": {
-                "titleCreate": "Créer un dépôt d'Eggs",
-                "titleUpdate": "Modifier le dépôt d'Eggs",
-                "form": {
-                  "gitRepository": "Dépôt Git"
-                },
-                "button": {
-                  "sync": "Synchroniser"
-                },
-                "toast": {
-                  "synced": "Dépôt d'Eggs synchronisé, {eggs} trouvés."
-                },
-                "modal": {
-                  "delete": {
-                    "title": "Confirmer la suppression du dépôt d'Eggs",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
-                  }
-                }
-              }
-            },
-            "eggs": {
-              "title": "Eggs",
-              "page": {
-                "title": "Eggs du dépôt",
-                "table": {
-                  "columns": {
-                    "path": "Chemin"
-                  }
-                },
-                "toast": {
-                  "installed": "Egg installé.",
-                  "installedBulk": "{eggs} installés."
-                },
-                "modal": {
-                  "install": {
-                    "title": "Installer l'Egg du dépôt"
-                  },
-                  "installBulk": {
-                    "title": "Installer les Eggs du dépôt",
-                    "button": "Installer {eggs}"
-                  }
-                },
-                "drawer": {
-                  "noReadme": "Cet Egg n'a pas de README."
-                }
-              }
-            }
-          }
-        },
-        "extensions": {
-          "title": "Extensions",
-          "unknownExtension": "Extension inconnue",
-          "alert": {
-            "noExtensions": "Aucune extension installée.",
-            "heavyImageMissing": "Il semble que vous n'utilisiez pas l'image heavy requise pour installer des extensions, consultez [ici]({docsUrl}) comment basculer dessus."
-          },
-          "button": {
-            "viewBuildLogs": "Voir les journaux de compilation",
-            "install": "Installer une extension",
-            "rebuild": "Recompiler les extensions",
-            "configure": "Configurer",
-            "back": "Retour aux extensions",
-            "accept": "Accepter",
-            "decline": "Refuser"
-          },
-          "tooltip": {
-            "building": "Le panel est en train de compiler le code des extensions. Veuillez patienter.",
-            "noPendingBuild": "Aucune extension en attente de compilation.",
-            "noBackend": "Une extension backend est requise pour configurer cette extension.",
-            "noConfigurationPage": "Cette extension n'a pas de page de configuration définie.",
-            "removeExtension": "Retirer l'extension"
-          },
-          "badge": {
-            "frontendMissing": "Frontend manquant",
-            "backendMissing": "Backend manquant",
-            "pendingBuild": "Compilation en attente",
-            "pendingRemoval": "Retrait en attente"
-          },
-          "card": {
-            "version": "Version",
-            "authors": "Auteurs"
-          },
-          "section": {
-            "pendingExtensions": "Extensions en attente",
-            "noPendingExtensions": "Aucune extension en attente."
-          },
-          "dropzone": {
-            "title": "Déposez des fichiers ici pour les installer en tant qu'extensions",
-            "subtitle": "Relâchez pour démarrer l'installation"
-          },
-          "toast": {
-            "buildStarted": "Recompilation des extensions démarrée avec succès.",
-            "buildCompleted": "Compilation des extensions terminée. Vous devrez peut-être actualiser la page.",
-            "added": "Extension `{packageName}` ajoutée avec succès.",
-            "removed": "Extension `{packageName}` supprimée avec succès."
-          },
-          "notFound": {
-            "title": "Extension introuvable",
-            "content": "Extension avec le nom de paquet « {packageName} » introuvable."
-          },
-          "configure": {
-            "title": "Configurer {packageName}",
-            "noConfigurationPage": "Cette extension n'a pas de page de configuration."
-          },
-          "modal": {
-            "buildLogs": {
-              "title": "Journaux de compilation",
-              "empty": "Aucun journal trouvé."
-            },
-            "license": {
-              "title": "Accord de licence",
-              "description": "L'extension `{packageName}` requiert que vous acceptiez la licence suivante avant de pouvoir être installée."
-            },
-            "remove": {
-              "title": "Retirer l'extension",
-              "content": "Êtes-vous sûr de vouloir retirer l'extension `{packageName}` ? Cette action est irréversible.",
-              "form": {
-                "removeMigrations": "Voulez-vous supprimer et annuler les migrations de base de données de cette extension ?"
-              }
-            }
-          }
-        },
-        "eggConfigurations": {
-          "title": "Configurations d'Eggs",
-          "resourceName": "Configuration d'Egg",
-          "table": {
-            "columns": {
-              "order": "Ordre"
-            }
-          },
-          "tabs": {
-            "general": {
-              "page": {
-                "titleCreate": "Créer une configuration d'Egg",
-                "titleUpdate": "Modifier la configuration d'Egg",
-                "form": {
-                  "order": "Ordre",
-                  "eggs": "Eggs",
-                  "eggsPlaceholder": "Sélectionner des Eggs"
-                },
-                "enum": {
-                  "deploymentType": {
-                    "random": "Aléatoire",
-                    "range": "Plage de ports",
-                    "addPrimary": "Ajouter au primaire",
-                    "subtractPrimary": "Soustraire du primaire",
-                    "multiplyPrimary": "Multiplier le primaire",
-                    "dividePrimary": "Diviser le primaire"
-                  }
-                },
-                "allocation": {
-                  "title": "Configuration d'allocation",
-                  "form": {
-                    "userSelfAssign": "Auto-attribution par l'utilisateur",
-                    "userSelfAssignDescription": "Autoriser les utilisateurs à créer leurs propres allocations à partir d'une plage de ports spécifiée.",
-                    "requirePrimaryAllocation": "Exiger une allocation primaire",
-                    "requirePrimaryAllocationDescription": "Indique si les utilisateurs doivent toujours avoir une allocation primaire.",
-                    "automaticAllocationStart": "Début d'allocation automatique",
-                    "automaticAllocationEnd": "Fin d'allocation automatique",
-                    "dedicatedIp": "IP dédiée",
-                    "dedicatedIpDescription": "Attribuer une adresse IP dédiée aux serveurs utilisant cette configuration d'Egg.",
-                    "primaryAllocation": "Allocation primaire",
-                    "primaryAllocationDescription": "Configurer une attribution de port primaire pour le déploiement.",
-                    "primaryStartPort": "Port de début primaire",
-                    "primaryEndPort": "Port de fin primaire",
-                    "assignToVariable": "Attribuer à une variable",
-                    "assignToVariablePlaceholder": "ex. SERVER_PORT",
-                    "assignToVariableDescription": "Variable d'environnement optionnelle qui recevra le port primaire attribué."
-                  },
-                  "divider": {
-                    "deployment": "Déploiement"
-                  },
-                  "additionalPorts": {
-                    "title": "Ports supplémentaires",
-                    "button": "Ajouter une règle",
-                    "empty": "Aucune règle de port supplémentaire configurée."
-                  },
-                  "deployment": {
-                    "form": {
-                      "startPort": "Port de début",
-                      "endPort": "Port de fin",
-                      "assignToVariable": "Attribuer à une variable",
-                      "assignToVariableDescription": "Variable d'environnement optionnelle qui recevra le port attribué par cette règle.",
-                      "assignToVariablePlaceholder": "ex. SERVER_PORT"
-                    },
-                    "removeRule": "Retirer la règle de déploiement"
-                  }
-                },
-                "startup": {
-                  "title": "Configuration de démarrage",
-                  "form": {
-                    "allowCustomStartupCommand": "Autoriser une commande de démarrage personnalisée",
-                    "allowCustomStartupCommandDescription": "Autoriser les utilisateurs à définir leurs propres commandes de démarrage non prédéfinies."
-                  }
-                },
-                "modal": {
-                  "delete": {
-                    "title": "Confirmer la suppression de la configuration d'Egg",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "oAuthProviders": {
-          "title": "Fournisseurs OAuth",
-          "resourceName": "Fournisseur OAuth",
-          "dropzone": {
-            "title": "Déposez des fichiers ici pour les importer en tant que fournisseurs OAuth",
-            "subtitle": "Relâchez pour démarrer l'importation"
-          },
-          "table": {
-            "columns": {
-              "loginOnly": "Connexion uniquement",
-              "linkViewable": "Lien visible",
-              "userManageable": "Gérable par l'utilisateur"
-            }
-          },
-          "toast": {
-            "imported": "Fournisseur OAuth importé.",
-            "parseFailed": "Échec de l'analyse du fournisseur OAuth : {error}"
-          },
-          "tabs": {
-            "general": {
-              "page": {
-                "titleCreate": "Créer un fournisseur OAuth",
-                "titleUpdate": "Modifier le fournisseur OAuth",
-                "card": {
-                  "redirectUrl": {
-                    "title": "URL de redirection",
-                    "unavailable": "Disponible après la création"
-                  }
-                },
-                "form": {
-                  "clientId": "Client Id",
-                  "clientSecret": "Client Secret",
-                  "authUrl": "URL d'authentification",
-                  "tokenUrl": "URL de token",
-                  "infoUrl": "URL d'info",
-                  "basicAuth": "Authentification basique",
-                  "basicAuthDescription": "Utilise l'authentification HTTP Basic pour transmettre le client id et le secret, peu courant désormais.",
-                  "scopes": "Scopes",
-                  "scopesDescription": "Les scopes OAuth2 à demander, veillez à inclure les scopes pour l'e-mail et les informations de profil si nécessaire.",
-                  "identifierPath": "Chemin de l'identifiant",
-                  "identifierPathDescription": "Le chemin utilisé pour extraire l'identifiant unique de l'utilisateur depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
-                  "emailPath": "Chemin de l'e-mail",
-                  "emailPathDescription": "Le chemin utilisé pour extraire l'e-mail depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
-                  "usernamePath": "Chemin du nom d'utilisateur",
-                  "usernamePathDescription": "Le chemin utilisé pour extraire le nom d'utilisateur depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
-                  "nameFirstPath": "Chemin du prénom",
-                  "nameFirstPathPlaceholder": "URL du prénom",
-                  "nameFirstPathDescription": "Le chemin utilisé pour extraire le prénom depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
-                  "nameLastPath": "Chemin du nom de famille",
-                  "nameLastPathDescription": "Le chemin utilisé pour extraire le nom de famille depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
-                  "loginOnly": "Autoriser uniquement la connexion",
-                  "loginBypass2fa": "Contourner la 2FA à la connexion",
-                  "loginBypass2faDescription": "Permet aux utilisateurs se connectant avec ce fournisseur de contourner leur 2FA du panel.",
-                  "linkViewable": "Lien visible par l'utilisateur",
-                  "linkViewableDescription": "Permet à l'utilisateur de voir la connexion et son identifiant dans l'interface client.",
-                  "userManageable": "Lien gérable par l'utilisateur",
-                  "userManageableDescription": "Permet à l'utilisateur de se connecter et se déconnecter avec ce fournisseur."
-                },
-                "toast": {
-                  "exported": "Fournisseur OAuth exporté."
-                },
-                "modal": {
-                  "delete": {
-                    "title": "Confirmer la suppression du fournisseur OAuth",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
-                  }
-                }
-              }
-            },
-            "mappings": {
-              "title": "Mappages",
-              "page": {
-                "title": "Mappages du fournisseur OAuth",
-                "table": {
-                  "columns": {
-                    "scopes": "Scopes"
-                  }
-                },
-                "enum": {
-                  "mappingType": {
-                    "role": "Rôle",
-                    "serverSubuser": "Sous-utilisateur de serveur"
-                  }
-                },
-                "toast": {
-                  "created": "Mappage du fournisseur OAuth créé.",
-                  "updated": "Mappage du fournisseur OAuth mis à jour.",
-                  "deleted": "Mappage du fournisseur OAuth supprimé."
-                },
-                "form": {
-                  "scopes": "Scopes",
-                  "scopesDescription": "Scopes OAuth requis pour que ce mappage s'applique.",
-                  "mappingType": "Type de mappage",
-                  "role": "Rôle",
-                  "permissions": "Permissions"
-                },
-                "modal": {
-                  "add": {
-                    "title": "Ajouter un mappage de fournisseur OAuth"
-                  },
-                  "edit": {
-                    "title": "Modifier le mappage de fournisseur OAuth"
-                  },
-                  "delete": {
-                    "title": "Supprimer le mappage de fournisseur OAuth",
-                    "content": "Êtes-vous sûr de vouloir supprimer ce mappage ? Cette action est irréversible."
-                  }
-                }
-              }
-            },
-            "users": {
-              "title": "Utilisateurs",
-              "page": {
-                "title": "Utilisateurs du fournisseur OAuth",
-                "table": {
-                  "columns": {
-                    "user": "Utilisateur"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "backupConfigurations": {
-          "title": "Configurations de sauvegarde",
-          "resourceName": "Configuration de sauvegarde",
-          "table": {
-            "columns": {
-              "disk": "Disque"
-            }
-          },
-          "tabs": {
-            "general": {
-              "page": {
-                "titleCreate": "Créer une configuration de sauvegarde",
-                "titleUpdate": "Modifier la configuration de sauvegarde",
-                "alert": {
-                  "ddupBak": "Ddup-Bak est un logiciel en avant-première technologique, il n'est techniquement pas recommandé pour une utilisation en production. Si vous l'acceptez, allez-y comme bon vous semble.",
-                  "btrfs": "Btrfs nécessite une configuration supplémentaire sur le nœud pour fonctionner, veuillez [consulter la documentation]({docsUrl}) pour plus de détails.",
-                  "zfs": "ZFS nécessite une configuration supplémentaire sur le nœud pour fonctionner, veuillez [consulter la documentation]({docsUrl}) pour plus de détails.",
-                  "pbs": "Le token d'API fourni nécessite les ACL de datastore suivantes : **DatastoreAudit** pour l'utilisation et le listage, **DatastoreBackup** pour l'écriture des sauvegardes, et **DatastoreAdmin** (ou des permissions équivalentes d'élagage/suppression) si la suppression ou l'élagage des sauvegardes est activé."
-                },
-                "form": {
-                  "backupDisk": "Disque de sauvegarde",
-                  "maintenanceEnabledDescription": "Si activé, tout serveur utilisant cette configuration de sauvegarde ne pourra pas créer de nouvelles sauvegardes ni gérer les existantes.",
-                  "shared": "Partagé",
-                  "sharedDescription": "Si activé, les sauvegardes de cette configuration ne seront pas transférées entre les nœuds ; elles seront supposées accessibles par tous les nœuds."
-                },
-                "modal": {
-                  "delete": {
-                    "title": "Confirmer la suppression de la configuration de sauvegarde",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
-                  }
-                },
-                "s3": {
-                  "title": "Paramètres S3",
-                  "form": {
-                    "partSize": "Taille de partie",
-                    "compressionType": "Type de compression",
-                    "pathStyle": "Utiliser des URL de style chemin"
-                  }
-                },
-                "restic": {
-                  "title": "Paramètres Restic",
-                  "form": {
-                    "repository": "Dépôt",
-                    "retryLockSeconds": "Secondes de réessai du verrou",
-                    "environmentVariables": "Variables d'environnement",
-                    "cronSchedule": "Planification Cron",
-                    "cronScheduleDescription": "Format : seconde minute heure jour mois jour-de-semaine.",
-                    "nodes": "Nœuds",
-                    "nodesPlaceholder": "Sélectionner des nœuds"
-                  },
-                  "pruneJobs": {
-                    "title": "Tâches d'élagage",
-                    "description": "Exécutions d'élagage Restic planifiées. Chaque tâche s'exécute sur les nœuds configurés selon sa planification cron.",
-                    "button": {
-                      "add": "Ajouter une tâche d'élagage"
-                    }
-                  }
-                },
-                "pbs": {
-                  "title": "Paramètres Proxmox Backup Server",
-                  "form": {
-                    "url": "URL du serveur",
-                    "datastore": "Datastore",
-                    "namespace": "Namespace",
-                    "tokenId": "ID du token",
-                    "tokenSecret": "Secret du token",
-                    "fingerprint": "Empreinte du certificat TLS",
-                    "backupIdPrefix": "Préfixe d'ID de sauvegarde"
-                  }
-                },
-                "kopia": {
-                  "title": "Paramètres Kopia",
-                  "form": {
-                    "url": "URL du serveur Kopia",
-                    "fingerprint": "Empreinte du certificat TLS",
-                    "tags": "Tags de sauvegarde"
-                  }
-                }
-              }
-            },
-            "stats": {
-              "title": "Statistiques",
-              "page": {
-                "title": "Statistiques de la configuration de sauvegarde",
-                "card": {
-                  "title": "Statistiques des sauvegardes"
-                },
-                "period": {
-                  "allTime": "Depuis toujours",
-                  "today": "Aujourd'hui",
-                  "week": "Cette semaine",
-                  "month": "Ce mois-ci"
-                },
-                "periodLabel": {
-                  "allTime": "depuis toujours",
-                  "today": "aujourd'hui",
-                  "week": "cette semaine",
-                  "month": "ce mois-ci"
-                },
-                "stat": {
-                  "total": "Total des sauvegardes {period}",
-                  "successful": "Sauvegardes réussies {period}",
-                  "failed": "Sauvegardes échouées {period}",
-                  "deleted": "Sauvegardes supprimées {period}"
-                }
-              }
-            },
-            "backups": {
-              "title": "Sauvegardes",
-              "page": {
-                "title": "Sauvegardes de la configuration de sauvegarde",
-                "toast": {
-                  "downloadStarted": "Téléchargement commencé."
-                }
-              }
-            },
-            "locations": {
-              "title": "Emplacements",
-              "page": {
-                "title": "Emplacements de la configuration de sauvegarde"
-              }
-            },
-            "nodes": {
-              "title": "Nœuds",
-              "page": {
-                "title": "Nœuds de la configuration de sauvegarde"
-              }
-            },
-            "servers": {
-              "title": "Serveurs",
-              "page": {
-                "title": "Serveurs de la configuration de sauvegarde"
-              }
-            }
-          }
-        },
-        "nests": {
-          "title": "Nests",
-          "resourceName": "Nest",
-          "tabs": {
-            "general": {
-              "page": {
-                "titleCreate": "Créer un Nest",
-                "titleUpdate": "Modifier le Nest",
-                "modal": {
-                  "delete": {
-                    "title": "Confirmer la suppression du Nest",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?",
-                    "form": {
-                      "deleteEggs": "Voulez-vous supprimer tous les Eggs de ce Nest ?"
-                    }
-                  }
-                }
-              }
-            },
-            "eggs": {
-              "title": "Eggs",
-              "page": {
-                "title": "Eggs",
-                "resourceName": "Egg",
-                "dropzone": {
-                  "title": "Déposez des fichiers ici pour les importer en tant qu'Eggs",
-                  "subtitle": "Relâchez pour démarrer l'importation"
-                },
-                "button": {
-                  "updateFromRepository": "Mettre à jour depuis le dépôt"
-                },
-                "toast": {
-                  "imported": "Egg importé.",
-                  "moved": "Egg déplacé.",
-                  "movedBulk": "{eggs} déplacés.",
-                  "deletedBulk": "{eggs} supprimés.",
-                  "updatedFromRepository": "{eggs} mis à jour avec succès à partir de leur Egg de dépôt respectif.",
-                  "parseFailed": "Échec de l'analyse de l'Egg : {error}"
-                },
-                "modal": {
-                  "move": {
-                    "title": "Déplacer l'Egg"
-                  },
-                  "moveBulk": {
-                    "title": "Déplacer les Eggs",
-                    "confirm": "Déplacer {eggs}"
-                  },
-                  "deleteBulk": {
-                    "title": "Confirmer la suppression des Eggs",
-                    "content": "Êtes-vous sûr de vouloir supprimer `{count}` Eggs ?"
-                  }
-                },
-                "tabs": {
-                  "general": {
-                    "page": {
-                      "titleCreate": "Créer un Egg",
-                      "titleUpdate": "Modifier l'Egg",
-                      "card": {
-                        "startupConfiguration": "Configuration de démarrage",
-                        "stopConfiguration": "Configuration d'arrêt",
-                        "configFiles": "Configuration des fichiers de configuration"
-                      },
-                      "form": {
-                        "eggRepository": "Dépôt d'Eggs",
-                        "eggRepositoryEgg": "Egg du dépôt",
-                        "startupDone": "Démarrage terminé",
-                        "startupDoneDescription": "Message de console indiquant la fin du démarrage.",
-                        "stripAnsi": "Retirer l'ANSI des messages de démarrage",
-                        "stripAnsiDescription": "Supprime les caractères de contrôle ANSI de la sortie console avant de détecter la fin du démarrage.",
-                        "stopType": "Type d'arrêt",
-                        "stopCommand": "Commande d'arrêt",
-                        "stopSignal": "Signal d'arrêt",
-                        "parser": "Parseur",
-                        "createNewFile": "Créer un nouveau fichier",
-                        "createNewFileDescription": "Si activé, le fichier sera créé s'il n'existe pas. Si désactivé, le fichier doit déjà exister, sinon le remplacement échouera.",
-                        "match": "Correspondance",
-                        "ifValue": "Si valeur",
-                        "replaceWith": "Remplacer par",
-                        "insertNew": "Insérer nouveau",
-                        "insertNewDescription": "Si activé, lorsqu'aucune valeur existante ne correspond au champ « Correspondance », la valeur « Remplacer par » sera insérée dans le fichier. Si désactivé, en l'absence de correspondance, aucune modification ne sera apportée au fichier.",
-                        "updateExisting": "Mettre à jour l'existant",
-                        "updateExistingDescription": "Si activé, lorsqu'une correspondance est trouvée, elle sera remplacée par la valeur « Remplacer par ». Si désactivé, le remplacement n'insérera que de nouvelles valeurs et échouera si une correspondance est trouvée.",
-                        "startupCommands": "Commandes de démarrage",
-                        "forceOutgoingIp": "Forcer l'IP sortante",
-                        "separatePort": "Séparer l'IP et le port",
-                        "separatePortDescription": "Sépare l'IP et le port primaires sur la page Console au lieu de les joindre avec « : ».",
-                        "features": "Fonctionnalités",
-                        "featurePlaceholder": "Fonctionnalité",
-                        "fileDenylist": "Liste de fichiers interdits",
-                        "dockerImages": "Images Docker"
-                      },
-                      "enum": {
-                        "stopType": {
-                          "command": "Envoyer une commande",
-                          "signal": "Envoyer un signal",
-                          "docker": "Arrêt Docker"
-                        }
-                      },
-                      "emptyConfigFiles": "Aucun fichier de configuration défini.",
-                      "emptyReplacements": "Aucun remplacement défini.",
-                      "button": {
-                        "addReplacement": "Ajouter un remplacement",
-                        "addConfigFile": "Ajouter un fichier de configuration",
-                        "fromFile": "depuis un fichier",
-                        "fromRepository": "depuis le dépôt"
-                      },
-                      "toast": {
-                        "exported": "Egg exporté.",
-                        "updated": "Egg mis à jour."
-                      },
-                      "modal": {
-                        "delete": {
-                          "title": "Confirmer la suppression de l'Egg",
-                          "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
-                        }
-                      }
-                    }
-                  },
-                  "installationScript": {
-                    "title": "Script d'installation",
-                    "page": {
-                      "title": "Script d'installation de l'Egg",
-                      "form": {
-                        "container": "Conteneur d'installation",
-                        "entrypoint": "Point d'entrée du conteneur"
-                      },
-                      "toast": {
-                        "updated": "Script de l'Egg mis à jour."
-                      }
-                    }
-                  },
-                  "variables": {
-                    "title": "Variables",
-                    "page": {
-                      "title": "Variables de l'Egg",
-                      "form": {
-                        "supportsMarkdown": "Prend en charge le formatage Markdown.",
-                        "defaultValue": "Valeur par défaut",
-                        "defaultValuePlaceholder": "server.jar",
-                        "userViewable": "Visible par l'utilisateur",
-                        "userEditable": "Modifiable par l'utilisateur",
-                        "secret": "Secret",
-                        "rules": "Règles",
-                        "rulesDescription": "Voir https://laravel.com/docs/12.x/validation#available-validation-rules pour les règles de validation disponibles."
-                      },
-                      "toast": {
-                        "created": "Variable de l'Egg créée.",
-                        "updated": "Variable de l'Egg mise à jour.",
-                        "deleted": "Variable de l'Egg supprimée."
-                      },
-                      "modal": {
-                        "delete": {
-                          "title": "Confirmer le retrait de la variable de l'Egg",
-                          "content": "Êtes-vous sûr de vouloir retirer **{variable}** ?",
-                          "emptyVariable": "cette variable vide"
-                        }
-                      }
-                    }
-                  },
-                  "mounts": {
-                    "title": "Montages",
-                    "page": {
-                      "title": "Montages de l'Egg",
-                      "toast": {
-                        "added": "Montage de l'Egg ajouté.",
-                        "deleted": "Montage de l'Egg supprimé."
-                      },
-                      "modal": {
-                        "add": {
-                          "title": "Ajouter un montage à l'Egg"
-                        },
-                        "delete": {
-                          "title": "Confirmer le retrait du montage de l'Egg",
-                          "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{egg}** ?"
-                        }
-                      }
-                    }
-                  },
-                  "servers": {
-                    "title": "Serveurs",
-                    "page": {
-                      "title": "Serveurs de l'Egg"
-                    }
-                  }
-                }
+                "title": "Nœuds de l'emplacement"
               }
             }
           }
@@ -2040,10 +2065,12 @@
                   "apiPort": "Port de l'API"
                 },
                 "button": {
-                  "save": "Enregistrer la configuration"
+                  "save": "Enregistrer la configuration",
+                  "reveal": "Reveal Configuration"
                 },
                 "alert": {
-                  "couldNotReach": "Impossible de joindre le nœud : {error}"
+                  "couldNotReach": "Impossible de joindre le nœud : {error}",
+                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed."
                 },
                 "toast": {
                   "applied": "Configuration appliquée avec succès.",
@@ -2549,6 +2576,712 @@
             }
           }
         },
+        "nests": {
+          "title": "Nests",
+          "resourceName": "Nest",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Créer un Nest",
+                "titleUpdate": "Modifier le Nest",
+                "modal": {
+                  "delete": {
+                    "title": "Confirmer la suppression du Nest",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?",
+                    "form": {
+                      "deleteEggs": "Voulez-vous supprimer tous les Eggs de ce Nest ?"
+                    }
+                  }
+                }
+              }
+            },
+            "eggs": {
+              "title": "Eggs",
+              "page": {
+                "title": "Eggs",
+                "resourceName": "Egg",
+                "dropzone": {
+                  "title": "Déposez des fichiers ici pour les importer en tant qu'Eggs",
+                  "subtitle": "Relâchez pour démarrer l'importation"
+                },
+                "button": {
+                  "updateFromRepository": "Mettre à jour depuis le dépôt"
+                },
+                "toast": {
+                  "imported": "Egg importé.",
+                  "moved": "Egg déplacé.",
+                  "movedBulk": "{eggs} déplacés.",
+                  "deletedBulk": "{eggs} supprimés.",
+                  "updatedFromRepository": "{eggs} mis à jour avec succès à partir de leur Egg de dépôt respectif.",
+                  "parseFailed": "Échec de l'analyse de l'Egg : {error}"
+                },
+                "modal": {
+                  "move": {
+                    "title": "Déplacer l'Egg"
+                  },
+                  "moveBulk": {
+                    "title": "Déplacer les Eggs",
+                    "confirm": "Déplacer {eggs}"
+                  },
+                  "deleteBulk": {
+                    "title": "Confirmer la suppression des Eggs",
+                    "content": "Êtes-vous sûr de vouloir supprimer `{count}` Eggs ?"
+                  }
+                },
+                "tabs": {
+                  "general": {
+                    "page": {
+                      "titleCreate": "Créer un Egg",
+                      "titleUpdate": "Modifier l'Egg",
+                      "card": {
+                        "startupConfiguration": "Configuration de démarrage",
+                        "stopConfiguration": "Configuration d'arrêt",
+                        "configFiles": "Configuration des fichiers de configuration"
+                      },
+                      "form": {
+                        "eggRepository": "Dépôt d'Eggs",
+                        "eggRepositoryEgg": "Egg du dépôt",
+                        "startupDone": "Démarrage terminé",
+                        "startupDoneDescription": "Message de console indiquant la fin du démarrage.",
+                        "stripAnsi": "Retirer l'ANSI des messages de démarrage",
+                        "stripAnsiDescription": "Supprime les caractères de contrôle ANSI de la sortie console avant de détecter la fin du démarrage.",
+                        "stopType": "Type d'arrêt",
+                        "stopCommand": "Commande d'arrêt",
+                        "stopSignal": "Signal d'arrêt",
+                        "parser": "Parseur",
+                        "createNewFile": "Créer un nouveau fichier",
+                        "createNewFileDescription": "Si activé, le fichier sera créé s'il n'existe pas. Si désactivé, le fichier doit déjà exister, sinon le remplacement échouera.",
+                        "match": "Correspondance",
+                        "ifValue": "Si valeur",
+                        "replaceWith": "Remplacer par",
+                        "insertNew": "Insérer nouveau",
+                        "insertNewDescription": "Si activé, lorsqu'aucune valeur existante ne correspond au champ « Correspondance », la valeur « Remplacer par » sera insérée dans le fichier. Si désactivé, en l'absence de correspondance, aucune modification ne sera apportée au fichier.",
+                        "updateExisting": "Mettre à jour l'existant",
+                        "updateExistingDescription": "Si activé, lorsqu'une correspondance est trouvée, elle sera remplacée par la valeur « Remplacer par ». Si désactivé, le remplacement n'insérera que de nouvelles valeurs et échouera si une correspondance est trouvée.",
+                        "startupCommands": "Commandes de démarrage",
+                        "forceOutgoingIp": "Forcer l'IP sortante",
+                        "separatePort": "Séparer l'IP et le port",
+                        "separatePortDescription": "Sépare l'IP et le port primaires sur la page Console au lieu de les joindre avec « : ».",
+                        "features": "Fonctionnalités",
+                        "featurePlaceholder": "Fonctionnalité",
+                        "fileDenylist": "Liste de fichiers interdits",
+                        "dockerImages": "Images Docker"
+                      },
+                      "enum": {
+                        "stopType": {
+                          "command": "Envoyer une commande",
+                          "signal": "Envoyer un signal",
+                          "docker": "Arrêt Docker"
+                        }
+                      },
+                      "emptyConfigFiles": "Aucun fichier de configuration défini.",
+                      "emptyReplacements": "Aucun remplacement défini.",
+                      "button": {
+                        "addReplacement": "Ajouter un remplacement",
+                        "addConfigFile": "Ajouter un fichier de configuration",
+                        "fromFile": "depuis un fichier",
+                        "fromRepository": "depuis le dépôt"
+                      },
+                      "toast": {
+                        "exported": "Egg exporté.",
+                        "updated": "Egg mis à jour."
+                      },
+                      "modal": {
+                        "delete": {
+                          "title": "Confirmer la suppression de l'Egg",
+                          "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
+                        }
+                      }
+                    }
+                  },
+                  "installationScript": {
+                    "title": "Script d'installation",
+                    "page": {
+                      "title": "Script d'installation de l'Egg",
+                      "form": {
+                        "container": "Conteneur d'installation",
+                        "entrypoint": "Point d'entrée du conteneur"
+                      },
+                      "toast": {
+                        "updated": "Script de l'Egg mis à jour."
+                      }
+                    }
+                  },
+                  "variables": {
+                    "title": "Variables",
+                    "page": {
+                      "title": "Variables de l'Egg",
+                      "form": {
+                        "supportsMarkdown": "Prend en charge le formatage Markdown.",
+                        "defaultValue": "Valeur par défaut",
+                        "defaultValuePlaceholder": "server.jar",
+                        "userViewable": "Visible par l'utilisateur",
+                        "userEditable": "Modifiable par l'utilisateur",
+                        "secret": "Secret",
+                        "rules": "Règles",
+                        "rulesDescription": "Voir https://laravel.com/docs/12.x/validation#available-validation-rules pour les règles de validation disponibles."
+                      },
+                      "toast": {
+                        "created": "Variable de l'Egg créée.",
+                        "updated": "Variable de l'Egg mise à jour.",
+                        "deleted": "Variable de l'Egg supprimée."
+                      },
+                      "modal": {
+                        "delete": {
+                          "title": "Confirmer le retrait de la variable de l'Egg",
+                          "content": "Êtes-vous sûr de vouloir retirer **{variable}** ?",
+                          "emptyVariable": "cette variable vide"
+                        }
+                      }
+                    }
+                  },
+                  "mounts": {
+                    "title": "Montages",
+                    "page": {
+                      "title": "Montages de l'Egg",
+                      "toast": {
+                        "added": "Montage de l'Egg ajouté.",
+                        "deleted": "Montage de l'Egg supprimé."
+                      },
+                      "modal": {
+                        "add": {
+                          "title": "Ajouter un montage à l'Egg"
+                        },
+                        "delete": {
+                          "title": "Confirmer le retrait du montage de l'Egg",
+                          "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{egg}** ?"
+                        }
+                      }
+                    }
+                  },
+                  "servers": {
+                    "title": "Serveurs",
+                    "page": {
+                      "title": "Serveurs de l'Egg"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "eggConfigurations": {
+          "title": "Configurations d'Eggs",
+          "resourceName": "Configuration d'Egg",
+          "table": {
+            "columns": {
+              "order": "Ordre"
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Créer une configuration d'Egg",
+                "titleUpdate": "Modifier la configuration d'Egg",
+                "form": {
+                  "order": "Ordre",
+                  "eggs": "Eggs",
+                  "eggsPlaceholder": "Sélectionner des Eggs"
+                },
+                "enum": {
+                  "deploymentType": {
+                    "random": "Aléatoire",
+                    "range": "Plage de ports",
+                    "addPrimary": "Ajouter au primaire",
+                    "subtractPrimary": "Soustraire du primaire",
+                    "multiplyPrimary": "Multiplier le primaire",
+                    "dividePrimary": "Diviser le primaire"
+                  }
+                },
+                "allocation": {
+                  "title": "Configuration d'allocation",
+                  "form": {
+                    "userSelfAssign": "Auto-attribution par l'utilisateur",
+                    "userSelfAssignDescription": "Autoriser les utilisateurs à créer leurs propres allocations à partir d'une plage de ports spécifiée.",
+                    "requirePrimaryAllocation": "Exiger une allocation primaire",
+                    "requirePrimaryAllocationDescription": "Indique si les utilisateurs doivent toujours avoir une allocation primaire.",
+                    "automaticAllocationStart": "Début d'allocation automatique",
+                    "automaticAllocationEnd": "Fin d'allocation automatique",
+                    "dedicatedIp": "IP dédiée",
+                    "dedicatedIpDescription": "Attribuer une adresse IP dédiée aux serveurs utilisant cette configuration d'Egg.",
+                    "primaryAllocation": "Allocation primaire",
+                    "primaryAllocationDescription": "Configurer une attribution de port primaire pour le déploiement.",
+                    "primaryStartPort": "Port de début primaire",
+                    "primaryEndPort": "Port de fin primaire",
+                    "assignToVariable": "Attribuer à une variable",
+                    "assignToVariablePlaceholder": "ex. SERVER_PORT",
+                    "assignToVariableDescription": "Variable d'environnement optionnelle qui recevra le port primaire attribué."
+                  },
+                  "divider": {
+                    "deployment": "Déploiement"
+                  },
+                  "additionalPorts": {
+                    "title": "Ports supplémentaires",
+                    "button": "Ajouter une règle",
+                    "empty": "Aucune règle de port supplémentaire configurée."
+                  },
+                  "deployment": {
+                    "form": {
+                      "startPort": "Port de début",
+                      "endPort": "Port de fin",
+                      "assignToVariable": "Attribuer à une variable",
+                      "assignToVariableDescription": "Variable d'environnement optionnelle qui recevra le port attribué par cette règle.",
+                      "assignToVariablePlaceholder": "ex. SERVER_PORT"
+                    },
+                    "removeRule": "Retirer la règle de déploiement"
+                  }
+                },
+                "startup": {
+                  "title": "Configuration de démarrage",
+                  "form": {
+                    "allowCustomStartupCommand": "Autoriser une commande de démarrage personnalisée",
+                    "allowCustomStartupCommandDescription": "Autoriser les utilisateurs à définir leurs propres commandes de démarrage non prédéfinies."
+                  }
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirmer la suppression de la configuration d'Egg",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "eggRepositories": {
+          "title": "Dépôts d'Eggs",
+          "resourceName": "Dépôt d'Eggs",
+          "table": {
+            "columns": {
+              "gitRepository": "Dépôt Git"
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Créer un dépôt d'Eggs",
+                "titleUpdate": "Modifier le dépôt d'Eggs",
+                "form": {
+                  "gitRepository": "Dépôt Git"
+                },
+                "button": {
+                  "sync": "Synchroniser"
+                },
+                "toast": {
+                  "synced": "Dépôt d'Eggs synchronisé, {eggs} trouvés."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirmer la suppression du dépôt d'Eggs",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
+                  }
+                }
+              }
+            },
+            "eggs": {
+              "title": "Eggs",
+              "page": {
+                "title": "Eggs du dépôt",
+                "table": {
+                  "columns": {
+                    "path": "Chemin"
+                  }
+                },
+                "toast": {
+                  "installed": "Egg installé.",
+                  "installedBulk": "{eggs} installés."
+                },
+                "modal": {
+                  "install": {
+                    "title": "Installer l'Egg du dépôt"
+                  },
+                  "installBulk": {
+                    "title": "Installer les Eggs du dépôt",
+                    "button": "Installer {eggs}"
+                  }
+                },
+                "drawer": {
+                  "noReadme": "Cet Egg n'a pas de README."
+                }
+              }
+            }
+          }
+        },
+        "databaseHosts": {
+          "title": "Hôtes de base de données",
+          "resourceName": "Hôte de base de données",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Créer un hôte de base de données",
+                "titleUpdate": "Modifier l'hôte de base de données",
+                "form": {
+                  "publicHost": "Hôte public",
+                  "publicPort": "Port public",
+                  "connectionCredentials": "Identifiants de connexion",
+                  "credentialType": "Type d'identifiant",
+                  "connectionString": "Chaîne de connexion",
+                  "connectionStringPlaceholder": "mysql://username:password@host:port"
+                },
+                "enum": {
+                  "credentialType": {
+                    "connectionString": "Chaîne de connexion",
+                    "details": "Détails"
+                  }
+                },
+                "button": {
+                  "testConnection": "Tester la connexion"
+                },
+                "toast": {
+                  "tested": "Test effectué avec succès."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirmer la suppression de l'hôte de base de données",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
+                  }
+                }
+              }
+            },
+            "databases": {
+              "title": "Bases de données",
+              "page": {
+                "title": "Bases de données de l'hôte"
+              }
+            }
+          }
+        },
+        "oAuthProviders": {
+          "title": "Fournisseurs OAuth",
+          "resourceName": "Fournisseur OAuth",
+          "dropzone": {
+            "title": "Déposez des fichiers ici pour les importer en tant que fournisseurs OAuth",
+            "subtitle": "Relâchez pour démarrer l'importation"
+          },
+          "table": {
+            "columns": {
+              "loginOnly": "Connexion uniquement",
+              "linkViewable": "Lien visible",
+              "userManageable": "Gérable par l'utilisateur"
+            }
+          },
+          "toast": {
+            "imported": "Fournisseur OAuth importé.",
+            "parseFailed": "Échec de l'analyse du fournisseur OAuth : {error}"
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Créer un fournisseur OAuth",
+                "titleUpdate": "Modifier le fournisseur OAuth",
+                "card": {
+                  "redirectUrl": {
+                    "title": "URL de redirection",
+                    "unavailable": "Disponible après la création"
+                  }
+                },
+                "form": {
+                  "clientId": "Client Id",
+                  "clientSecret": "Client Secret",
+                  "authUrl": "URL d'authentification",
+                  "tokenUrl": "URL de token",
+                  "infoUrl": "URL d'info",
+                  "basicAuth": "Authentification basique",
+                  "basicAuthDescription": "Utilise l'authentification HTTP Basic pour transmettre le client id et le secret, peu courant désormais.",
+                  "scopes": "Scopes",
+                  "scopesDescription": "Les scopes OAuth2 à demander, veillez à inclure les scopes pour l'e-mail et les informations de profil si nécessaire.",
+                  "identifierPath": "Chemin de l'identifiant",
+                  "identifierPathDescription": "Le chemin utilisé pour extraire l'identifiant unique de l'utilisateur depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
+                  "emailPath": "Chemin de l'e-mail",
+                  "emailPathDescription": "Le chemin utilisé pour extraire l'e-mail depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
+                  "usernamePath": "Chemin du nom d'utilisateur",
+                  "usernamePathDescription": "Le chemin utilisé pour extraire le nom d'utilisateur depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
+                  "nameFirstPath": "Chemin du prénom",
+                  "nameFirstPathPlaceholder": "URL du prénom",
+                  "nameFirstPathDescription": "Le chemin utilisé pour extraire le prénom depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
+                  "nameLastPath": "Chemin du nom de famille",
+                  "nameLastPathDescription": "Le chemin utilisé pour extraire le nom de famille depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
+                  "loginOnly": "Autoriser uniquement la connexion",
+                  "loginBypass2fa": "Contourner la 2FA à la connexion",
+                  "loginBypass2faDescription": "Permet aux utilisateurs se connectant avec ce fournisseur de contourner leur 2FA du panel.",
+                  "linkViewable": "Lien visible par l'utilisateur",
+                  "linkViewableDescription": "Permet à l'utilisateur de voir la connexion et son identifiant dans l'interface client.",
+                  "userManageable": "Lien gérable par l'utilisateur",
+                  "userManageableDescription": "Permet à l'utilisateur de se connecter et se déconnecter avec ce fournisseur."
+                },
+                "toast": {
+                  "exported": "Fournisseur OAuth exporté."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirmer la suppression du fournisseur OAuth",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
+                  }
+                }
+              }
+            },
+            "mappings": {
+              "title": "Mappages",
+              "page": {
+                "title": "Mappages du fournisseur OAuth",
+                "table": {
+                  "columns": {
+                    "scopes": "Scopes"
+                  }
+                },
+                "enum": {
+                  "mappingType": {
+                    "role": "Rôle",
+                    "serverSubuser": "Sous-utilisateur de serveur"
+                  }
+                },
+                "toast": {
+                  "created": "Mappage du fournisseur OAuth créé.",
+                  "updated": "Mappage du fournisseur OAuth mis à jour.",
+                  "deleted": "Mappage du fournisseur OAuth supprimé."
+                },
+                "form": {
+                  "scopes": "Scopes",
+                  "scopesDescription": "Scopes OAuth requis pour que ce mappage s'applique.",
+                  "mappingType": "Type de mappage",
+                  "role": "Rôle",
+                  "permissions": "Permissions"
+                },
+                "modal": {
+                  "add": {
+                    "title": "Ajouter un mappage de fournisseur OAuth"
+                  },
+                  "edit": {
+                    "title": "Modifier le mappage de fournisseur OAuth"
+                  },
+                  "delete": {
+                    "title": "Supprimer le mappage de fournisseur OAuth",
+                    "content": "Êtes-vous sûr de vouloir supprimer ce mappage ? Cette action est irréversible."
+                  }
+                }
+              }
+            },
+            "users": {
+              "title": "Utilisateurs",
+              "page": {
+                "title": "Utilisateurs du fournisseur OAuth",
+                "table": {
+                  "columns": {
+                    "user": "Utilisateur"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "backupConfigurations": {
+          "title": "Configurations de sauvegarde",
+          "resourceName": "Configuration de sauvegarde",
+          "table": {
+            "columns": {
+              "disk": "Disque"
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Créer une configuration de sauvegarde",
+                "titleUpdate": "Modifier la configuration de sauvegarde",
+                "alert": {
+                  "ddupBak": "Ddup-Bak est un logiciel en avant-première technologique, il n'est techniquement pas recommandé pour une utilisation en production. Si vous l'acceptez, allez-y comme bon vous semble.",
+                  "btrfs": "Btrfs nécessite une configuration supplémentaire sur le nœud pour fonctionner, veuillez [consulter la documentation]({docsUrl}) pour plus de détails.",
+                  "zfs": "ZFS nécessite une configuration supplémentaire sur le nœud pour fonctionner, veuillez [consulter la documentation]({docsUrl}) pour plus de détails.",
+                  "pbs": "Le token d'API fourni nécessite les ACL de datastore suivantes : **DatastoreAudit** pour l'utilisation et le listage, **DatastoreBackup** pour l'écriture des sauvegardes, et **DatastoreAdmin** (ou des permissions équivalentes d'élagage/suppression) si la suppression ou l'élagage des sauvegardes est activé."
+                },
+                "form": {
+                  "backupDisk": "Disque de sauvegarde",
+                  "maintenanceEnabledDescription": "Si activé, tout serveur utilisant cette configuration de sauvegarde ne pourra pas créer de nouvelles sauvegardes ni gérer les existantes.",
+                  "shared": "Partagé",
+                  "sharedDescription": "Si activé, les sauvegardes de cette configuration ne seront pas transférées entre les nœuds ; elles seront supposées accessibles par tous les nœuds."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirmer la suppression de la configuration de sauvegarde",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
+                  }
+                },
+                "s3": {
+                  "title": "Paramètres S3",
+                  "form": {
+                    "partSize": "Taille de partie",
+                    "compressionType": "Type de compression",
+                    "pathStyle": "Utiliser des URL de style chemin"
+                  }
+                },
+                "restic": {
+                  "title": "Paramètres Restic",
+                  "form": {
+                    "repository": "Dépôt",
+                    "retryLockSeconds": "Secondes de réessai du verrou",
+                    "environmentVariables": "Variables d'environnement",
+                    "cronSchedule": "Planification Cron",
+                    "cronScheduleDescription": "Format : seconde minute heure jour mois jour-de-semaine.",
+                    "nodes": "Nœuds",
+                    "nodesPlaceholder": "Sélectionner des nœuds"
+                  },
+                  "pruneJobs": {
+                    "title": "Tâches d'élagage",
+                    "description": "Exécutions d'élagage Restic planifiées. Chaque tâche s'exécute sur les nœuds configurés selon sa planification cron.",
+                    "button": {
+                      "add": "Ajouter une tâche d'élagage"
+                    }
+                  }
+                },
+                "pbs": {
+                  "title": "Paramètres Proxmox Backup Server",
+                  "form": {
+                    "url": "URL du serveur",
+                    "datastore": "Datastore",
+                    "namespace": "Namespace",
+                    "tokenId": "ID du token",
+                    "tokenSecret": "Secret du token",
+                    "fingerprint": "Empreinte du certificat TLS",
+                    "backupIdPrefix": "Préfixe d'ID de sauvegarde"
+                  }
+                },
+                "kopia": {
+                  "title": "Paramètres Kopia",
+                  "form": {
+                    "url": "URL du serveur Kopia",
+                    "fingerprint": "Empreinte du certificat TLS",
+                    "tags": "Tags de sauvegarde"
+                  }
+                }
+              }
+            },
+            "stats": {
+              "title": "Statistiques",
+              "page": {
+                "title": "Statistiques de la configuration de sauvegarde",
+                "card": {
+                  "title": "Statistiques des sauvegardes"
+                },
+                "period": {
+                  "allTime": "Depuis toujours",
+                  "today": "Aujourd'hui",
+                  "week": "Cette semaine",
+                  "month": "Ce mois-ci"
+                },
+                "periodLabel": {
+                  "allTime": "depuis toujours",
+                  "today": "aujourd'hui",
+                  "week": "cette semaine",
+                  "month": "ce mois-ci"
+                },
+                "stat": {
+                  "total": "Total des sauvegardes {period}",
+                  "successful": "Sauvegardes réussies {period}",
+                  "failed": "Sauvegardes échouées {period}",
+                  "deleted": "Sauvegardes supprimées {period}"
+                }
+              }
+            },
+            "backups": {
+              "title": "Sauvegardes",
+              "page": {
+                "title": "Sauvegardes de la configuration de sauvegarde",
+                "toast": {
+                  "downloadStarted": "Téléchargement commencé."
+                }
+              }
+            },
+            "locations": {
+              "title": "Emplacements",
+              "page": {
+                "title": "Emplacements de la configuration de sauvegarde"
+              }
+            },
+            "nodes": {
+              "title": "Nœuds",
+              "page": {
+                "title": "Nœuds de la configuration de sauvegarde"
+              }
+            },
+            "servers": {
+              "title": "Serveurs",
+              "page": {
+                "title": "Serveurs de la configuration de sauvegarde"
+              }
+            }
+          }
+        },
+        "mounts": {
+          "title": "Montages",
+          "resourceName": "Montage",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Créer un montage",
+                "titleUpdate": "Modifier le montage",
+                "alert": "Les montages sont une fonctionnalité puissante et potentiellement dangereuse. Une mauvaise utilisation peut entraîner une perte de données ou des failles de sécurité (y compris des évasions de conteneur). Assurez-vous de comprendre les implications de l'utilisation des montages avant d'en créer ou d'en modifier.",
+                "form": {
+                  "source": "Source",
+                  "target": "Cible",
+                  "readOnly": "Lecture seule",
+                  "userMountable": "Montable par l'utilisateur"
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirmer la suppression du montage",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{name}** ?"
+                  }
+                }
+              }
+            },
+            "eggs": {
+              "title": "Eggs",
+              "page": {
+                "title": "Eggs du montage",
+                "toast": {
+                  "added": "Egg du montage ajouté.",
+                  "removed": "Egg du montage supprimé."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Ajouter un Egg au montage",
+                    "form": {
+                      "egg": "Egg"
+                    }
+                  },
+                  "remove": {
+                    "title": "Confirmer le retrait de l'Egg du montage",
+                    "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{name}** ?"
+                  }
+                }
+              }
+            },
+            "nodes": {
+              "title": "Nœuds",
+              "page": {
+                "title": "Nœuds du montage",
+                "toast": {
+                  "added": "Nœud du montage ajouté.",
+                  "removed": "Nœud du montage supprimé."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Ajouter un nœud au montage"
+                  },
+                  "remove": {
+                    "title": "Confirmer le retrait du nœud du montage",
+                    "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{name}** ?"
+                  }
+                }
+              }
+            },
+            "servers": {
+              "title": "Serveurs",
+              "page": {
+                "title": "Serveurs du montage"
+              }
+            }
+          }
+        },
         "roles": {
           "title": "Rôles",
           "resourceName": "Rôle",
@@ -2592,736 +3325,6 @@
           "title": "Activité"
         }
       },
-      "auth": {
-        "button": {
-          "login": "Connexion",
-          "loginWith": "Se connecter avec {name}"
-        },
-        "alert": {
-          "urlMismatch": "L'URL de l'application ne correspond pas à l'URL actuelle. Attendu : `{appUrl}`, Actuel : `{currentUrl}`."
-        },
-        "login": {
-          "error": {
-            "usernameRequired": "Veuillez entrer un nom d'utilisateur",
-            "registrationDisabled": "Aucun compte correspondant n'a été trouvé et l'inscription est actuellement désactivée.",
-            "userAlreadyExists": "Un compte avec ce nom d'utilisateur ou cette adresse e-mail existe déjà."
-          },
-          "passkey": {
-            "error": {
-              "notSupported": "Votre navigateur ne prend pas en charge les clés d'accès.",
-              "unexpected": "Une erreur inattendue s'est produite lors de l'utilisation de votre clé d'accès.",
-              "cancelled": "La demande de clé d'accès a été annulée.",
-              "dismissed": "Vous avez ignoré la demande de clé d'accès ou n'avez pas interagi avec elle. La clé utilisée peut aussi ne pas être enregistrée.",
-              "invalidState": "Cette clé d'accès n'est pas disponible ou est déjà enregistrée.",
-              "notSupportedType": "Votre navigateur ou appareil ne prend pas en charge ce type de clé d'accès.",
-              "securityError": "Les clés d'accès ne peuvent être utilisées qu'en HTTPS et avec un domaine valide.",
-              "authenticatorError": "Une erreur s'est produite avec l'authentificateur.",
-              "constraintError": "L'authentificateur n'a pas pu satisfaire les contraintes requises."
-            }
-          },
-          "step": {
-            "username": {
-              "title": "Connexion",
-              "subtitle": "Entrez votre nom d'utilisateur ou votre adresse e-mail pour continuer",
-              "form": {
-                "usernameOrEmailPlaceholder": "Votre nom d'utilisateur ou adresse e-mail"
-              },
-              "link": {
-                "forgotPassword": "Mot de passe oublié",
-                "notRegistered": "Pas encore inscrit ?",
-                "createAccount": "Créer un compte"
-              },
-              "button": {
-                "oauthLogin": "Connexion OAuth"
-              }
-            },
-            "passkey": {
-              "title": "S'authentifier avec une clé d'accès",
-              "subtitle": "Nous avons trouvé une clé d'accès associée à {username}",
-              "button": {
-                "usePasskey": "Utiliser la clé d'accès",
-                "usePassword": "Utiliser le mot de passe"
-              }
-            },
-            "password": {
-              "title": "Entrez votre mot de passe",
-              "subtitle": "Veuillez entrer votre mot de passe pour {username}",
-              "form": {
-                "passwordPlaceholder": "Entrez votre mot de passe"
-              },
-              "button": {
-                "signIn": "Se connecter",
-                "forgotPassword": "Mot de passe oublié"
-              }
-            },
-            "totp": {
-              "title": "Authentification à deux facteurs",
-              "welcomeBack": "Bon retour {username} !",
-              "enterCode": "Entrez le code à 6 chiffres de votre application d'authentification",
-              "button": {
-                "verify": "Vérifier le code",
-                "useRecoveryCode": "Utiliser un code de récupération",
-                "useTotp": "Utiliser le TOTP"
-              }
-            },
-            "totpRecovery": {
-              "subtitle": "Entrez un code de récupération",
-              "form": {
-                "label": "Code de récupération",
-                "placeholder": "Entrez un code de récupération"
-              }
-            }
-          }
-        },
-        "register": {
-          "title": "Inscription",
-          "subtitle": "Veuillez entrer vos informations pour vous inscrire",
-          "button": {
-            "register": "S'inscrire"
-          }
-        },
-        "forgotPassword": {
-          "title": "Mot de passe oublié",
-          "subtitle": "Entrez votre adresse e-mail pour recevoir les instructions de réinitialisation de votre mot de passe",
-          "button": {
-            "request": "Demander la réinitialisation du mot de passe"
-          },
-          "success": "Un e-mail vous a été envoyé avec les instructions pour réinitialiser votre mot de passe."
-        },
-        "resetPassword": {
-          "title": "Réinitialiser le mot de passe",
-          "subtitle": "Veuillez entrer votre nouveau mot de passe",
-          "button": {
-            "reset": "Réinitialiser le mot de passe"
-          },
-          "toast": {
-            "success": "Le mot de passe a été réinitialisé."
-          }
-        },
-        "oauth": {
-          "title": "S'authentifier avec OAuth",
-          "subtitle": "Choisissez l'un des fournisseurs ci-dessous pour vous connecter"
-        }
-      },
-      "oobe": {
-        "welcome": {
-          "title": "Bienvenue sur Calagopus",
-          "subtitle": "Mettons en marche votre système de gestion de serveurs de jeux !",
-          "wizardIntro": "Cet assistant de configuration va vous guider pour :",
-          "steps": {
-            "account": "Créer votre compte administrateur",
-            "settings": "Configurer les paramètres système essentiels",
-            "location": "Configurer votre emplacement/groupe de serveurs",
-            "node": "Ajouter votre premier nœud",
-            "server": "Déployer votre premier serveur de jeu"
-          },
-          "button": {
-            "start": "Commencer"
-          }
-        },
-        "register": {
-          "title": "Créer le compte administrateur",
-          "alert": {
-            "title": "Notice de sécurité",
-            "description": "Choisissez un mot de passe fort. Ce compte aura un accès administratif complet à tous les serveurs et paramètres."
-          },
-          "form": {
-            "usernamePlaceholder": "admin",
-            "email": "Adresse e-mail",
-            "emailPlaceholder": "admin@exemple.com",
-            "firstNamePlaceholder": "Alan",
-            "lastNamePlaceholder": "Turing",
-            "passwordPlaceholder": "Entrez un mot de passe fort",
-            "confirmPasswordPlaceholder": "Entrez à nouveau votre mot de passe"
-          },
-          "button": {
-            "create": "Créer compte & continuer"
-          }
-        },
-        "login": {
-          "title": "Se reconnecter",
-          "alert": "Vous vous êtes fait déconnecter durant le processus de configuration. Veuillez vous reconnecter pour continuer de là où vous vous êtes arrêté.",
-          "form": {
-            "usernamePlaceholder": "admin",
-            "passwordPlaceholder": "Entrez un mot de passe fort"
-          },
-          "button": {
-            "login": "Se connecter & continuer"
-          }
-        },
-        "location": {
-          "title": "Configuration de l'emplacement",
-          "form": {
-            "locationName": "Nom de l'emplacement",
-            "locationNamePlaceholder": "Ma maison",
-            "backupName": "Nom de la configuration de sauvegarde",
-            "backupNamePlaceholder": "Baguette Cloud",
-            "backupDisk": "Disque de sauvegarde",
-            "backupDiskPlaceholder": "Disque de sauvegarde",
-            "locationFlag": "Drapeau de l'emplacement",
-            "locationFlagPlaceholder": "Le meilleur pays"
-          },
-          "button": {
-            "create": "Créer & continuer"
-          }
-        },
-        "node": {
-          "title": "Configuration du nœud",
-          "allocationsTitle": "Configuration des allocations",
-          "form": {
-            "ip": "IP",
-            "name": "Nom",
-            "namePlaceholder": "Mon serveur",
-            "urlPlaceholder": "URL",
-            "urlDescription": "utilisé pour la communication interne avec le nœud",
-            "publicUrl": "URL publique",
-            "publicUrlPlaceholder": "URL",
-            "publicUrlDescription": "utilisé pour websocket/téléchargements",
-            "sftpHostPlaceholder": "Hôte SFTP",
-            "sftpPortPlaceholder": "Port SFTP"
-          },
-          "error": {
-            "noLocations": "Quelque chose s'est mal passé. Pas d'emplacements trouvés."
-          },
-          "button": {
-            "create": "Créer & continuer"
-          }
-        },
-        "nodeConfiguration": {
-          "title": "Configuration du nœud",
-          "error": {
-            "noNodes": "Quelque chose s'est mal passé. Aucun nœud trouvé.",
-            "connectionError": "Quelque chose s'est mal passé. Erreur de connexion."
-          },
-          "successMessage": "La connexion à votre nœud a été vérifiée avec succès. Vous pouvez maintenant continuer.",
-          "configurationDescription": "Placez ceci dans le fichier de configuration à `{file}` ou exécutez :",
-          "button": {
-            "verify": "Vérifier la connexion"
-          }
-        },
-        "eggRepositories": {
-          "title": "Dépôts d'Eggs",
-          "description": "Ce sont les dépôts source de vos Eggs. Vous pouvez changer ces dépôts à tout moment.",
-          "repositories": {
-            "pterodactylGame": {
-              "title": "Eggs de jeux Pterodactyl",
-              "description": "Eggs pour des jeux comme Minecraft, Terraria, et bien d'autres."
-            },
-            "pterodactylApplication": {
-              "title": "Eggs d'applications Pterodactyl",
-              "description": "Eggs pour des applications comme Grafana, Meilisearch, et diverses bases de données."
-            },
-            "pterodactylGeneral": {
-              "title": "Eggs génériques Pterodactyl",
-              "description": "Eggs pour des environnements d'exécution génériques comme Node JS, Java, et Rust."
-            }
-          }
-        },
-        "server": {
-          "title": "Serveur",
-          "existingServer": "Un serveur a déjà été créé. Vous pourrez modifier les paramètres plus tard dans le menu d'administration.",
-          "egg": {
-            "title": "Egg",
-            "description": "Mettons en marche votre premier serveur. Quel Egg souhaitez-vous utiliser ?",
-            "nestDescription": "Pour commencer à utiliser cet Egg, vous devrez créer un Nest ; les Nests sont des collections d'Eggs. Donnez-lui un nom :"
-          },
-          "server": {
-            "title": "Serveur",
-            "nestDescription": "Pour commencer à utiliser cet Egg, vous devrez créer un Nest ; les Nests sont des collections d'Eggs. Donnez-lui un nom :"
-          },
-          "error": {
-            "noNodes": "Quelque chose s'est mal passé. Aucun nœud trouvé."
-          },
-          "button": {
-            "create": "Créer & continuer"
-          }
-        },
-        "configuration": {
-          "title": "Paramètres d'application",
-          "form": {
-            "applicationName": "Nom d'application",
-            "applicationNamePlaceholder": "Calagopus",
-            "languagePlaceholder": "Langue",
-            "applicationUrl": "URL d'application",
-            "applicationUrlPlaceholder": "https://calagop.us",
-            "registration": "Activer l'inscription",
-            "registrationDescription": "Autoriser de nouveaux utilisateurs à créer leur propre compte."
-          },
-          "button": {
-            "submit": "Mettre à jour les paramètres & continuer"
-          }
-        },
-        "finished": {
-          "title": "Configuration terminée !",
-          "subtitle": "Votre panel Calagopus est prêt à l'emploi",
-          "setupTitle": "Ce que nous avons configuré",
-          "items": {
-            "account": "Compte administrateur",
-            "configuration": {
-              "title": "Configuration système",
-              "subtitle": "Paramètres et préférences du panel configurés"
-            },
-            "location": "Emplacement",
-            "node": "Nœud",
-            "eggRepositories": {
-              "title": "Dépôts d'Eggs",
-              "subtitle": "{count} dépôts"
-            },
-            "server": "Serveur"
-          },
-          "badge": {
-            "skipped": "Passé"
-          },
-          "button": "Aller au tableau de bord"
-        }
-      },
-      "account": {
-        "home": {
-          "title": "Serveurs",
-          "tooltip": {
-            "removeFromGroup": "Retirer du groupe",
-            "addToGroup": "Ajouter au groupe",
-            "noGroups": "Pas de groupes disponibles auxquels ajouter le serveur",
-            "noGroup": "Ce serveur n'est dans aucun groupe",
-            "addServerToGroup": "Ajouter le serveur au groupe",
-            "groupActions": "Actions de groupe"
-          },
-          "badge": {
-            "foreign": "Externe"
-          },
-          "tabs": {
-            "groupedServers": {
-              "title": "Serveurs groupés",
-              "page": {
-                "button": {
-                  "createGroup": "Créer groupe"
-                },
-                "modal": {
-                  "createServerGroup": {
-                    "title": "Créer groupe de serveur",
-                    "toast": {
-                      "created": "Groupe de serveur créé."
-                    }
-                  },
-                  "editServerGroup": {
-                    "title": "Modifier le groupe de serveur",
-                    "toast": {
-                      "updated": "Groupe de serveur mis à jour."
-                    }
-                  },
-                  "deleteServerGroup": {
-                    "title": "Confirmer la suppression du groupe de serveur",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{group}** de votre compte ?",
-                    "toast": {
-                      "deleted": "Groupe de serveur supprimé."
-                    }
-                  },
-                  "addServerToGroup": {
-                    "title": "Ajouter un serveur à {group}",
-                    "noServers": "Tous les serveurs sont déjà dans ce groupe.",
-                    "toast": {
-                      "added": "Serveur ajouté au groupe."
-                    }
-                  },
-                  "removeServerFromGroup": {
-                    "title": "Confirmer le retrait du serveur",
-                    "content": "Êtes-vous sûr de vouloir retirer **{server}** de **{group}** ?",
-                    "toast": {
-                      "removed": "Serveur retiré du groupe."
-                    }
-                  }
-                },
-                "noGroups": "Pas de groupes trouvés, créez-en un."
-              }
-            },
-            "allServers": {
-              "title": "Tous les serveurs",
-              "page": {
-                "input": {
-                  "showOtherUsersServers": "Afficher les serveurs d'autres utilisateurs"
-                },
-                "modal": {
-                  "addToServerGroup": {
-                    "title": "Ajouter {server} au groupe de serveur",
-                    "form": {
-                      "serverGroup": "Groupe de serveur"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "bulkActions": {
-            "selectionMode": "Mode de sélection",
-            "select": "Sélectionner serveur",
-            "deselect": "Désélectionner serveur",
-            "success": "{action} {servers} avec succès.",
-            "partial": "{action} {successfulServers} avec succès. {failedServers} ont échoué.",
-            "groupActions": "Actions de groupe"
-          },
-          "noServers": "Pas de serveurs trouvés, est-il temps d'en ajouter un ?"
-        },
-        "admin": {
-          "title": "Admin"
-        },
-        "account": {
-          "title": "Compte",
-          "alert": {
-            "requireTwoFactor": {
-              "title": "Authentification à deux facteurs requise",
-              "description": "L'authentification à deux facteurs est requise pour votre compte. Veuillez la mettre en place ci-dessus pour continuer à utiliser le panel."
-            },
-            "frozen": {
-              "title": "Compte gelé",
-              "description": "Votre compte a été gelé. Vous ne pouvez pas apporter de modifications à votre compte tant qu'il n'est pas dégelé. Veuillez contacter un administrateur pour plus d'informations."
-            }
-          },
-          "containers": {
-            "password": {
-              "title": "Mot de passe",
-              "toast": {
-                "updated": "Mot de passe mis à jour avec succès."
-              },
-              "form": {
-                "newPassword": "Nouveau mot de passe",
-                "confirmNewPassword": "Confirmer le nouveau mot de passe"
-              }
-            },
-            "email": {
-              "title": "Adresse e-mail",
-              "toast": {
-                "updated": "Adresse e-mail mise à jour avec succès."
-              },
-              "form": {
-                "newEmail": "Nouvelle adresse e-mail"
-              }
-            },
-            "twoFactor": {
-              "title": "Authentification à deux facteurs",
-              "toast": {
-                "disabled": "Authentification à deux facteurs désactivée avec succès.",
-                "enabled": "Authentification à deux facteurs activée avec succès. Veuillez copier vos codes de récupération."
-              },
-              "modal": {
-                "disableTwoFactor": {
-                  "title": "Désactiver l'authentification à deux facteurs",
-                  "description": "Désactiver l'authentification à deux facteurs rendra votre compte moins sécurisé."
-                },
-                "setupTwoFactor": {
-                  "title": "Configurer l'authentification à deux facteurs",
-                  "description": "Protégez votre compte des accès non-autorisés. Un code de vérification vous sera demandé à chaque connexion.",
-                  "descriptionQR": "Scannez le QR code ci-dessus en utilisant l'application d'authentification à deux facteurs de votre choix. Ensuite, entrez le code à 6 chiffres généré dans le champ ci-dessous."
-                },
-                "recoveryCodes": {
-                  "title": "Codes de récupération",
-                  "description": "Ci-dessous sont vos codes de récupération. Gardez-les dans un endroit sûr. Si vous perdez accès à votre dispositif d'authentification, vous pourrez utiliser ces codes pour regagner accès à votre compte."
-                }
-              },
-              "button": {
-                "disableTwoFactor": "Désactiver l'authentification à deux facteurs",
-                "setupTwoFactor": "Configurer l'authentification à deux facteurs"
-              },
-              "twoFactorEnabled": "La vérification à deux facteurs est actuellement activée.",
-              "twoFactorDisabled": "La vérification à deux facteurs n'est pas activée pour votre compte. Cliquez sur le bouton ci-dessous pour commencer à la configurer.",
-              "twoFactorLastUsed": "Dernière utilisation : {timestamp}"
-            },
-            "account": {
-              "title": "Détails du compte",
-              "toast": {
-                "updated": "Détails du compte mis à jour avec succès."
-              },
-              "form": {
-                "toastPosition": "Position du toast",
-                "startOnGroupedServers": "Commencer sur la page des serveurs groupés"
-              }
-            },
-            "avatar": {
-              "title": "Avatar",
-              "toast": {
-                "updated": "Avatar mis à jour avec succès.",
-                "removed": "Avatar supprimé avec succès."
-              },
-              "form": {
-                "avatar": "Avatar"
-              }
-            }
-          }
-        },
-        "securityKeys": {
-          "title": "Clés de sécurité",
-          "subtitle": "{current} sur {max} clés de sécurité maximum créées.",
-          "table": {
-            "columns": {
-              "credentialId": "ID d'identifiant"
-            }
-          },
-          "tooltip": {
-            "secureContextRequired": "Un contexte sécurisé (HTTPS) est requis pour utiliser les clés de sécurité.",
-            "limitReached": "Vous êtes limité à {max} clés de sécurité."
-          },
-          "modal": {
-            "createSecurityKey": {
-              "title": "Créer une clé de sécurité",
-              "toast": {
-                "created": "Clé de sécurité créée avec succès.",
-                "aborted": "Création de la clé de sécurité annulée."
-              }
-            },
-            "editSecurityKey": {
-              "title": "Modifier la clé de sécurité",
-              "toast": {
-                "updated": "Clé de sécurité mise à jour avec succès."
-              }
-            },
-            "deleteSecurityKey": {
-              "title": "Confirmer la suppression de la clé de sécurité",
-              "content": "Êtes-vous sûr de vouloir supprimer **{key}** de votre compte ?",
-              "toast": {
-                "deleted": "Clé de sécurité supprimée avec succès."
-              }
-            }
-          }
-        },
-        "sessions": {
-          "title": "Sessions",
-          "table": {
-            "columns": {
-              "ip": "IP",
-              "thisDevice": "Cet appareil ?",
-              "userAgent": "Agent utilisateur"
-            }
-          },
-          "modal": {
-            "deleteSession": {
-              "title": "Confirmer la suppression de la session",
-              "content": "Êtes-vous sûr de vouloir supprimer la session **{ip}** de votre compte ?",
-              "toast": {
-                "deleted": "Session supprimée."
-              }
-            }
-          }
-        },
-        "shortcuts": {
-          "title": "Raccourcis clavier",
-          "subtitle": "Utilisez ces raccourcis clavier pour naviguer et interagir avec le panel plus efficacement.",
-          "label": {
-            "disabled": "Désactivé",
-            "modified": "Modifié",
-            "recording": "Appuyez sur des touches..."
-          },
-          "button": {
-            "rebind": "Réassigner",
-            "resetAll": "Tout réinitialiser",
-            "copy": "Tout copier",
-            "paste": "Coller"
-          },
-          "toast": {
-            "imported": "{shortcuts} mis à jour.",
-            "importedNone": "Aucun raccourci n'a été modifié.",
-            "importErrors": "{unknown} et {invalid} ignorés.",
-            "resetAll": "Tous les raccourcis réinitialisés par défaut."
-          },
-          "detectedMac": "macOS détecté",
-          "detectedWindows": "Windows/Linux détecté",
-          "fileManager": {
-            "title": "Gestionnaire de fichiers",
-            "selectAll": "Sélectionner tous les fichiers",
-            "cutFiles": "Couper les fichiers sélectionnés",
-            "copyFiles": "Copier les fichiers sélectionnés",
-            "duplicateFile": "Dupliquer le fichier sélectionné",
-            "pasteFiles": "Coller fichiers",
-            "searchFiles": "Chercher fichiers",
-            "moveUpDirectory": "Déplacer vers répertoire parent",
-            "moveUpSelection": "Déplacer la sélection vers le haut",
-            "moveDownSelection": "Déplacer la sélection vers le bas",
-            "renameFile": "Renommer le fichier",
-            "deselectAll": "Désélectionner tous les fichiers",
-            "deleteFiles": "Supprimer les fichiers sélectionnés"
-          },
-          "table": {
-            "title": "Navigation des tables",
-            "previousPage": "Page précédente",
-            "nextPage": "Page suivante",
-            "firstPage": "Première page",
-            "lastPage": "Dernière page"
-          },
-          "console": {
-            "title": "Console du serveur",
-            "searchContent": "Rechercher dans la sortie console",
-            "previousCommand": "Commande précédente dans l'historique",
-            "nextCommand": "Commande suivante dans l'historique"
-          },
-          "serverList": {
-            "title": "Liste des serveurs",
-            "selectServer": "Gardez appuyé S et cliquez pour (dé)sélectionner serveur"
-          }
-        },
-        "sshKeys": {
-          "title": "Clés SSH",
-          "subtitle": "{current} sur {max} clés SSH maximum créées.",
-          "tooltip": {
-            "limitReached": "Vous êtes limité à {max} clés SSH."
-          },
-          "table": {
-            "columns": {
-              "fingerprint": "Empreinte"
-            }
-          },
-          "modal": {
-            "createSshKey": {
-              "title": "Créer clé SSH",
-              "toast": {
-                "created": "Clé SSH créée."
-              },
-              "button": {
-                "uploadKeyFile": "Téléverser le fichier de clé"
-              },
-              "form": {
-                "publicKey": "Clé publique"
-              }
-            },
-            "editSshKey": {
-              "title": "Modifier la clé SSH",
-              "toast": {
-                "updated": "Clé SSH modifiée."
-              }
-            },
-            "importSshKeys": {
-              "title": "Importer des clés SSH",
-              "toast": {
-                "created": "{sshKeys} créées."
-              },
-              "form": {
-                "provider": "Fournisseur"
-              }
-            },
-            "deleteSshKey": {
-              "title": "Confirmer la suppression de la clé SSH",
-              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
-              "toast": {
-                "removed": "Clé SSH supprimée."
-              }
-            }
-          }
-        },
-        "commandSnippets": {
-          "title": "Extraits de commande",
-          "subtitle": "{current} sur {max} extraits de commande maximum créés.",
-          "tooltip": {
-            "limitReached": "Vous êtes limité à {max} extraits de commande."
-          },
-          "modal": {
-            "createCommandSnippet": {
-              "title": "Créer un extrait de commande",
-              "toast": {
-                "created": "Extrait de commande créé."
-              }
-            },
-            "editCommandSnippet": {
-              "title": "Modifier l'extrait de commande",
-              "toast": {
-                "updated": "Extrait de commande mis à jour."
-              }
-            },
-            "deleteCommandSnippet": {
-              "title": "Confirmer la suppression de l'extrait de commande",
-              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
-              "toast": {
-                "removed": "Extrait de commande supprimé."
-              }
-            }
-          }
-        },
-        "oauthLinks": {
-          "title": "Liens OAuth",
-          "button": {
-            "connect": "Connecter",
-            "connectTo": "Connecter {provider}"
-          },
-          "table": {
-            "columns": {
-              "providerName": "Nom du fournisseur"
-            }
-          },
-          "modal": {
-            "deleteOAuthLink": {
-              "title": "Confirmer la suppression du lien OAuth",
-              "content": "Êtes-vous sûr de vouloir supprimer la connexion **{provider}** de votre compte ?",
-              "toast": {
-                "removed": "Lien OAuth supprimé."
-              }
-            }
-          }
-        },
-        "apiKeys": {
-          "title": "Clés API",
-          "subtitle": "{current} sur {max} clés API maximum créées.",
-          "tooltip": {
-            "limitReached": "Vous êtes limité à {max} clés API."
-          },
-          "button": {
-            "apiDocumentation": "Documentation API"
-          },
-          "table": {
-            "columns": {
-              "key": "Clé",
-              "permissions": "Permissions Utilisateur / Serveur / Admin",
-              "expires": "Expiration"
-            }
-          },
-          "modal": {
-            "createApiKey": {
-              "title": "Créer une clé API",
-              "toast": {
-                "created": "Clé API créée."
-              }
-            },
-            "updateApiKey": {
-              "title": "Mettre à jour clé API",
-              "toast": {
-                "updated": "Clé API mise à jour."
-              }
-            },
-            "deleteApiKey": {
-              "title": "Confirmer la suppression de la clé API",
-              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
-              "toast": {
-                "removed": "Clé API supprimée."
-              }
-            },
-            "recreateApiKey": {
-              "title": "Recréer la clé API",
-              "content": "Recréer une clé API générera une nouvelle clé et invalidera l'ancienne. Êtes-vous sûr de vouloir recréer la clé API **{name}** ?",
-              "toast": {
-                "recreated": "Clé API recréée."
-              }
-            }
-          },
-          "form": {
-            "allowedIps": "IPs autorisées",
-            "allowedIpsPlaceholder": "ex. 192.168.1.1, 2001:db8::1",
-            "userPermissions": "Permissions utilisateur",
-            "serverPermissions": "Permissions serveur",
-            "adminPermissions": "Permissions admin"
-          },
-          "create": {
-            "title": "Créer une clé API",
-            "subtitle": "Une application demande la création d'une clé API pour votre compte.",
-            "alert": {
-              "adminPermissions": "Cette clé API demande des **permissions admin**. Toute personne en possession de cette clé pourra effectuer des actions administratives sur ce panel en votre nom. Ne continuez que si vous faites entièrement confiance à l'application demandeuse.",
-              "callbackUrl": "Après la création, la nouvelle clé API sera envoyée à **{url}**."
-            },
-            "noPermissions": "Cette clé API n'aura aucune permission.",
-            "keyCreated": "Votre nouvelle clé API a été créée. Veillez à la copier maintenant, car elle ne sera plus affichée.",
-            "button": {
-              "goToApiKeys": "Aller aux clés API"
-            }
-          }
-        },
-        "activity": {
-          "title": "Activité"
-        }
-      },
       "server": {
         "viewAdmin": {
           "title": "Voir dans l'espace admin"
@@ -3332,6 +3335,10 @@
             "placeholder": "Entrez une commande...",
             "ariaLabel": "Entrée commande console."
           },
+          "toast": {
+            "installCancelled": "Installation du serveur annulée.",
+            "transferCancelled": "Transfert du serveur annulé."
+          },
           "modal": {
             "sshDetails": {
               "title": "Détails SSH",
@@ -3341,35 +3348,31 @@
               "launch": "Lancer"
             }
           },
-          "toast": {
-            "installCancelled": "Installation du serveur annulée.",
-            "transferCancelled": "Transfert du serveur annulé."
-          },
           "notification": {
-            "restoringBackup": "Votre serveur est actuellement en train d'être restauré depuis une sauvegarde. Veuillez patienter...",
-            "installing": "Votre serveur est en train d'être installé. Veuillez patienter...",
             "suspended": "Votre serveur est actuellement suspendu. Aucune action ne peut être effectuée tant que la suspension n'est pas levée.",
             "suspendedAdmin": "Ce serveur est actuellement suspendu. Étant administrateur, vous pouvez toujours y accéder, mais les actions sont limitées.",
             "nodeMaintenance": "Votre serveur est sur un nœud actuellement en maintenance.",
             "transferring": "Votre serveur est en cours de transfert vers un autre nœud.",
+            "restoringBackup": "Votre serveur est actuellement en train d'être restauré depuis une sauvegarde. Veuillez patienter...",
+            "installing": "Votre serveur est en train d'être installé. Veuillez patienter...",
             "pendingRestart": "Votre serveur a des changements en attente nécessitant un redémarrage. Veuillez redémarrer votre serveur pour appliquer ces changements."
           },
           "message": {
             "serverMarkedAs": "Serveur marqué comme {state}...",
-            "transferFailed": "Le transfert a échoué.",
-            "pullingImage": "Votre serveur est en train de récupérer son image Docker. Veuillez patienter...",
-            "pulling": "Récupération",
-            "extracting": "Extraction",
             "installFailed": "L'installation a échoué.",
             "installCompleted": "L'installation s'est terminée avec succès.",
-            "transferCompleted": "Le transfert s'est terminé avec succès. Reconnexion au serveur..."
+            "transferFailed": "Le transfert a échoué.",
+            "transferCompleted": "Le transfert s'est terminé avec succès. Reconnexion au serveur...",
+            "pullingImage": "Votre serveur est en train de récupérer son image Docker. Veuillez patienter...",
+            "pulling": "Récupération",
+            "extracting": "Extraction"
           },
           "tooltip": {
             "search": "Rechercher",
+            "sshDetails": "Détails SSH",
             "commandHistory": "Historique de commande",
             "decreaseFontSize": "Réduire taille de texte",
-            "increaseFontSize": "Augmenter taille de texte",
-            "sshDetails": "Détails SSH"
+            "increaseFontSize": "Augmenter taille de texte"
           },
           "drawer": {
             "commandHistory": {
@@ -3437,9 +3440,9 @@
         "files": {
           "title": "Fichiers",
           "titleEditorViewing": "Affichage de {file}",
+          "titleEditorPlaying": "Lecture de {file}",
           "titleEditorEditing": "Modification de {file}",
           "titleEditorNew": "Nouveau fichier",
-          "titleEditorPlaying": "Lecture de {file}",
           "titleDiffRevisionVsCurrent": "{file} - Révision n°{revision} vs actuel",
           "titleDiffRevisionVsRevision": "{file} - Révision n°{previousRevision} vs n°{revision}",
           "table": {
@@ -3449,12 +3452,17 @@
           },
           "button": {
             "new": "Nouveau",
+            "connect": "Connecter",
+            "connectSftp": "via SFTP",
+            "connectVscode": "via VS Code",
             "openInNewWindow": "Ouvrir dans une nouvelle fenêtre",
             "rename": "Renommer",
             "copy": "Copier",
+            "fingerprint": "Empreinte",
             "permissions": "Permissions",
             "unarchive": "Désarchiver",
             "archive": "Archiver",
+            "more": "Plus",
             "remoteCopy": "Copie distante",
             "search": "Rechercher",
             "exitBackup": "Quitter la sauvegarde",
@@ -3462,27 +3470,11 @@
             "directory": "Répertoire",
             "fileFromPull": "Fichier depuis récupération",
             "fileFromUpload": "Fichier depuis téléversement",
-            "directoryFromUpload": "Répertoire depuis téléversement",
-            "connect": "Connecter",
-            "connectSftp": "via SFTP",
-            "connectVscode": "via VS Code",
-            "fingerprint": "Empreinte",
-            "more": "Plus"
+            "directoryFromUpload": "Répertoire depuis téléversement"
           },
           "actionBar": {
             "copyHere": "Copier {files} ici",
             "moveHere": "Déplacer {files} ici"
-          },
-          "tooltip": {
-            "fileHistory": "Historique du fichier",
-            "largestDirectories": "Analyser la taille des répertoires",
-            "dragToMove": "Glisser pour déplacer",
-            "back": "Reculer de {seconds} secondes",
-            "forward": "Avancer de {seconds} secondes",
-            "play": "Lecture",
-            "pause": "Pause",
-            "mute": "Couper le son",
-            "unmute": "Activer le son"
           },
           "searchBanner": {
             "resultsTitle": "Résultats de recherche ({files} trouvés)",
@@ -3514,14 +3506,15 @@
           },
           "settings": {
             "clickOnce": "Cliquez une fois pour ouvrir fichier ou dossier",
+            "preferPhysicalSize": "Afficher la taille physique au lieu de la taille logique",
             "editorMinimap": "Afficher la minicarte de fichier",
             "editorLineOverflow": "Saut de ligne en débordement",
-            "imageViewerSmoothing": "Adoucir l'image (anti-aliasing)",
-            "preferPhysicalSize": "Afficher la taille physique au lieu de la taille logique",
-            "vscodeUriScheme": "Schéma d'URI VS Code"
+            "vscodeUriScheme": "Schéma d'URI VS Code",
+            "imageViewerSmoothing": "Adoucir l'image (anti-aliasing)"
           },
           "toast": {
             "operationCancelled": "Opération annulée",
+            "allOperationsCancelled": "Toutes les opérations ont été annulées.",
             "copyingStarted": "Copie de {files} commencée.",
             "filesCouldNotBeMoved": "Les fichiers n'ont pas pu être déplacés.",
             "filesMoved": "{files} déplacés.",
@@ -3533,12 +3526,22 @@
             "filePullingStarted": "La récupération du fichier a commencé.",
             "fileRenamed": "Le fichier a été renommé.",
             "fileCouldNotBeRenamed": "Le fichier n'a pas pu être renommé.",
-            "permissionsUpdated": "Les permissions ont été mises à jour.",
-            "fileSaved": "Le fichier a été sauvegardé.",
-            "allOperationsCancelled": "Toutes les opérations ont été annulées.",
             "filesRenamed": "{files} renommés.",
+            "permissionsUpdated": "Les permissions ont été mises à jour.",
             "permissionsUpdatedMany": "Les permissions ont été mises à jour pour {files}.",
-            "permissionsCouldNotBeUpdated": "Les permissions n'ont pas pu être mises à jour."
+            "permissionsCouldNotBeUpdated": "Les permissions n'ont pas pu être mises à jour.",
+            "fileSaved": "Le fichier a été sauvegardé."
+          },
+          "tooltip": {
+            "fileHistory": "Historique du fichier",
+            "largestDirectories": "Analyser la taille des répertoires",
+            "dragToMove": "Glisser pour déplacer",
+            "back": "Reculer de {seconds} secondes",
+            "forward": "Avancer de {seconds} secondes",
+            "play": "Lecture",
+            "pause": "Pause",
+            "mute": "Couper le son",
+            "unmute": "Activer le son"
           },
           "drawer": {
             "revisions": {
@@ -3568,6 +3571,11 @@
               "title": "Changements non sauvegardés",
               "content": "Vous avez des changements non sauvegardés dans l'éditeur de fichiers. Êtes-vous sûr de vouloir quitter cette page ? Si vous quittez, vos changements seront perdus."
             },
+            "draftRestore": {
+              "title": "Restaurer le brouillon",
+              "content": "Un brouillon de ce fichier a été trouvé dans votre navigateur. Souhaitez-vous le restaurer ?",
+              "contentHashMismatch": "Le fichier a été modifié sur le serveur depuis l'enregistrement de ce brouillon. Restaurer le brouillon pourrait écraser ces changements."
+            },
             "createArchive": {
               "title": "Créer archive",
               "form": {
@@ -3590,67 +3598,6 @@
               },
               "createdAs": "Ces fichiers seront créés sur le serveur distant en tant que "
             },
-            "deleteFile": {
-              "title": "Supprimer fichier",
-              "singleFileWarning": "Vous ne pourrez plus récupérer le contenu de {file} une fois supprimé.",
-              "multipleFilesWarning": "Vous ne serez plus en mesure de récupérer le contenu des fichiers suivants une fois supprimés."
-            },
-            "createFile": {
-              "title": "Créer fichier"
-            },
-            "filePermissions": {
-              "title": "Permissions du fichier",
-              "symbolic": "Symbolique :",
-              "octal": "Octal :",
-              "owner": "Propriétaire",
-              "group": "Groupe",
-              "other": "Autre",
-              "breakdown": "Résumé de permission",
-              "readPermission": "Permission lecture (4)",
-              "writePermission": "Permission écriture (2)",
-              "executePermission": "Permission exécution (1)",
-              "form": {
-                "recursive": "Appliquer les changements de manière récursive à tous les fichiers et sous-répertoires de ce répertoire"
-              }
-            },
-            "renameFile": {
-              "title": "Renommer fichier"
-            },
-            "searchFiles": {
-              "title": "Rechercher fichiers",
-              "placeholder": "Chercher des fichiers...",
-              "advancedFilters": "Filtres avancés",
-              "pathPatterns": "Motifs de chemins",
-              "include": "Inclure",
-              "exclude": "Exclure",
-              "caseInsensitive": "Insensible à la casse",
-              "fileContent": "Contenu du fichier",
-              "searchText": "Chercher texte",
-              "maxFileSize": "Taille de fichier maximale",
-              "includeOversized": "Inclure fichiers surdimensionnés",
-              "includeOversizedDescription": "Inclut les fichiers qui correspondent à d'autres filtres mais sont trop volumineux pour être recherchés.",
-              "fileSize": "Taille de fichier",
-              "minimum": "Minimum",
-              "maximum": "Maximum"
-            },
-            "pullFile": {
-              "title": "Récupérer fichier",
-              "form": {
-                "fileUrl": "URL du fichier",
-                "query": "Requête"
-              },
-              "createdAs": "Ce fichier sera créé en tant que ",
-              "pull": "Récupérer"
-            },
-            "sftpDetails": {
-              "title": "Détails SFTP",
-              "launch": "Lancer"
-            },
-            "draftRestore": {
-              "title": "Restaurer le brouillon",
-              "content": "Un brouillon de ce fichier a été trouvé dans votre navigateur. Souhaitez-vous le restaurer ?",
-              "contentHashMismatch": "Le fichier a été modifié sur le serveur depuis l'enregistrement de ce brouillon. Restaurer le brouillon pourrait écraser ces changements."
-            },
             "fileFingerprints": {
               "title": "Empreinte du fichier",
               "form": {
@@ -3661,6 +3608,14 @@
                 "calculate": "Calculer l'empreinte"
               }
             },
+            "deleteFile": {
+              "title": "Supprimer fichier",
+              "singleFileWarning": "Vous ne pourrez plus récupérer le contenu de {file} une fois supprimé.",
+              "multipleFilesWarning": "Vous ne serez plus en mesure de récupérer le contenu des fichiers suivants une fois supprimés."
+            },
+            "createFile": {
+              "title": "Créer fichier"
+            },
             "details": {
               "title": "Détails du fichier",
               "path": "Chemin",
@@ -3670,6 +3625,24 @@
               "mimeType": "Type MIME",
               "lastModifiedAt": "Dernière modification le",
               "createdAt": "Créé le"
+            },
+            "filePermissions": {
+              "title": "Permissions du fichier",
+              "form": {
+                "recursive": "Appliquer les changements de manière récursive à tous les fichiers et sous-répertoires de ce répertoire"
+              },
+              "symbolic": "Symbolique :",
+              "octal": "Octal :",
+              "owner": "Propriétaire",
+              "group": "Groupe",
+              "other": "Autre",
+              "breakdown": "Résumé de permission",
+              "readPermission": "Permission lecture (4)",
+              "writePermission": "Permission écriture (2)",
+              "executePermission": "Permission exécution (1)"
+            },
+            "renameFile": {
+              "title": "Renommer fichier"
             },
             "massRename": {
               "title": "Renommer les fichiers",
@@ -3730,36 +3703,36 @@
             "largestDirectories": {
               "title": "Plus grands répertoires",
               "empty": "Aucun répertoire trouvé."
-            }
-          }
-        },
-        "mounts": {
-          "title": "Montages",
-          "table": {
-            "columns": {
-              "target": "Cible",
-              "mounted": "Monté",
-              "readOnly": "Lecture seule"
-            }
-          },
-          "button": {
-            "attach": "Attacher",
-            "detach": "Détacher"
-          },
-          "modal": {
-            "attachMount": {
-              "title": "Attacher le montage",
-              "content": "Voulez-vous attacher **{name}** à `{target}` ?",
-              "toast": {
-                "attached": "{name} a été monté sur votre serveur."
-              }
             },
-            "detachMount": {
-              "title": "Détacher le montage",
-              "content": "Voulez-vous détacher **{name}** de `{target}` ?",
-              "toast": {
-                "detached": "{name} a été retiré de votre serveur."
-              }
+            "searchFiles": {
+              "title": "Rechercher fichiers",
+              "placeholder": "Chercher des fichiers...",
+              "advancedFilters": "Filtres avancés",
+              "pathPatterns": "Motifs de chemins",
+              "include": "Inclure",
+              "exclude": "Exclure",
+              "caseInsensitive": "Insensible à la casse",
+              "fileContent": "Contenu du fichier",
+              "searchText": "Chercher texte",
+              "maxFileSize": "Taille de fichier maximale",
+              "includeOversized": "Inclure fichiers surdimensionnés",
+              "includeOversizedDescription": "Inclut les fichiers qui correspondent à d'autres filtres mais sont trop volumineux pour être recherchés.",
+              "fileSize": "Taille de fichier",
+              "minimum": "Minimum",
+              "maximum": "Maximum"
+            },
+            "pullFile": {
+              "title": "Récupérer fichier",
+              "form": {
+                "fileUrl": "URL du fichier",
+                "query": "Requête"
+              },
+              "createdAs": "Ce fichier sera créé en tant que ",
+              "pull": "Récupérer"
+            },
+            "sftpDetails": {
+              "title": "Détails SFTP",
+              "launch": "Lancer"
             }
           }
         },
@@ -3805,18 +3778,18 @@
                 "jdbcConnectionString": "Chaîne de connexion JDBC"
               }
             },
-            "deleteDatabase": {
-              "title": "Confirmer la suppression de base de données",
-              "content": "Supprimer une base de données est une action permanente, elle ne peut pas être défaite. Ceci supprimera la base de données **{name}** et toutes données associées de manière permanente.",
-              "toast": {
-                "deleted": "Base de données supprimée."
-              }
-            },
             "recreateDatabase": {
               "title": "Confirmer la recréation de la base de données",
               "content": "Recréer une base de données supprimera définitivement toutes les données de la base **{name}** et en créera une nouvelle avec les mêmes détails de connexion.",
               "toast": {
                 "recreated": "Base de données recréée."
+              }
+            },
+            "deleteDatabase": {
+              "title": "Confirmer la suppression de base de données",
+              "content": "Supprimer une base de données est une action permanente, elle ne peut pas être défaite. Ceci supprimera la base de données **{name}** et toutes données associées de manière permanente.",
+              "toast": {
+                "deleted": "Base de données supprimée."
               }
             }
           }
@@ -4350,19 +4323,49 @@
         "startup": {
           "title": "Démarrage",
           "variables": "Variables",
-          "noVariables": "Aucune variable de démarrage trouvée pour ce serveur.",
-          "modal": {
-            "unsavedChanges": {
-              "title": "Changements non sauvegardés",
-              "content": "Vous avez des changements non sauvegardés dans vos variables de démarrage. Êtes-vous sûr de vouloir quitter cette page ? Si vous quittez, vos changements seront perdus."
-            }
-          },
           "dockerImageDescription": "L'image Docker utilisée pour lancer ce serveur. Elle peut être changée pour utiliser une autre image.",
           "dockerImageDescriptionCustom": "L'image Docker utilisée pour lancer ce serveur. Elle a été définie par un administrateur et ne peut pas être changée.",
           "toast": {
             "startupCommandUpdated": "Commande de démarrage mise à jour.",
             "dockerImageUpdated": "Image Docker mise à jour.",
             "variablesUpdated": "Variables mises à jour."
+          },
+          "modal": {
+            "unsavedChanges": {
+              "title": "Changements non sauvegardés",
+              "content": "Vous avez des changements non sauvegardés dans vos variables de démarrage. Êtes-vous sûr de vouloir quitter cette page ? Si vous quittez, vos changements seront perdus."
+            }
+          },
+          "noVariables": "Aucune variable de démarrage trouvée pour ce serveur."
+        },
+        "mounts": {
+          "title": "Montages",
+          "table": {
+            "columns": {
+              "target": "Cible",
+              "mounted": "Monté",
+              "readOnly": "Lecture seule"
+            }
+          },
+          "button": {
+            "attach": "Attacher",
+            "detach": "Détacher"
+          },
+          "modal": {
+            "attachMount": {
+              "title": "Attacher le montage",
+              "content": "Voulez-vous attacher **{name}** à `{target}` ?",
+              "toast": {
+                "attached": "{name} a été monté sur votre serveur."
+              }
+            },
+            "detachMount": {
+              "title": "Détacher le montage",
+              "content": "Voulez-vous détacher **{name}** de `{target}` ?",
+              "toast": {
+                "detached": "{name} a été retiré de votre serveur."
+              }
+            }
           }
         },
         "settings": {
