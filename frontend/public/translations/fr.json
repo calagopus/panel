@@ -9,36 +9,36 @@
       "other": "{count} Bytes"
     },
     "user": {
-      "zero": "{count} Users",
-      "one": "{count} User",
-      "two": "{count} Users",
-      "few": "{count} Users",
-      "many": "{count} Users",
-      "other": "{count} Users"
+      "zero": "{count} Utilisateurs",
+      "one": "{count} Utilisateur",
+      "two": "{count} Utilisateurs",
+      "few": "{count} Utilisateurs",
+      "many": "{count} Utilisateurs",
+      "other": "{count} Utilisateurs"
     },
     "file": {
-      "zero": "{count} Files",
-      "one": "{count} File",
-      "two": "{count} Files",
-      "few": "{count} Files",
-      "many": "{count} Files",
-      "other": "{count} Files"
+      "zero": "{count} Fichiers",
+      "one": "{count} Fichier",
+      "two": "{count} Fichiers",
+      "few": "{count} Fichiers",
+      "many": "{count} Fichiers",
+      "other": "{count} Fichiers"
     },
     "server": {
-      "zero": "{count} Servers",
-      "one": "{count} Server",
-      "two": "{count} Servers",
-      "few": "{count} Servers",
-      "many": "{count} Servers",
-      "other": "{count} Servers"
+      "zero": "{count} Serveurs",
+      "one": "{count} Serveur",
+      "two": "{count} Serveurs",
+      "few": "{count} Serveurs",
+      "many": "{count} Serveurs",
+      "other": "{count} Serveurs"
     },
     "sshKey": {
-      "zero": "{count} SSH Keys",
-      "one": "{count} SSH Key",
-      "two": "{count} SSH Keys",
-      "few": "{count} SSH Keys",
-      "many": "{count} SSH Keys",
-      "other": "{count} SSH Keys"
+      "zero": "{count} Clés SSH",
+      "one": "{count} Clé SSH",
+      "two": "{count} Clés SSH",
+      "few": "{count} Clés SSH",
+      "many": "{count} Clés SSH",
+      "other": "{count} Clés SSH"
     },
     "asset": {
       "zero": "{count} Assets",
@@ -92,30 +92,30 @@
   "translations": {
     "common": {
       "button": {
-        "create": "Create",
-        "add": "Add",
-        "save": "Save",
-        "saveAndStay": "Save & Stay",
-        "edit": "Edit",
-        "delete": "Delete",
-        "remove": "Remove",
-        "enable": "Enable",
-        "disable": "Disable",
-        "update": "Update",
-        "close": "Close",
-        "cancel": "Cancel",
-        "continue": "Continue",
-        "skip": "Skip",
+        "create": "Créer",
+        "add": "Ajouter",
+        "save": "Sauvegarder",
+        "saveAndStay": "Sauvegarder & Rester",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "remove": "Retirer",
+        "enable": "Activer",
+        "disable": "Désactiver",
+        "update": "Mettre à jour",
+        "close": "Fermer",
+        "cancel": "Annuler",
+        "continue": "Continuer",
+        "skip": "Passer",
         "okay": "Okay",
-        "back": "Back",
-        "next": "Next",
-        "install": "Install",
-        "selectAll": "Select All",
-        "deselectAll": "Deselect All",
+        "back": "Retour",
+        "next": "Suivant",
+        "install": "Installer",
+        "selectAll": "Sélectionner Tout",
+        "deselectAll": "Désélectionner Tout",
         "restore": "Restore",
         "discard": "Discard",
-        "download": "Download",
-        "downloadAs": "Download as {format}",
+        "download": "Télécharger",
+        "downloadAs": "Télécharger en {format}",
         "export": "Export",
         "exportAs": "Export as {format}",
         "recreate": "Recreate",
@@ -126,13 +126,13 @@
         "send": "Send",
         "reset": "Reset",
         "view": "View",
-        "import": "Import",
-        "details": "Details",
+        "import": "Importer",
+        "details": "Détails",
         "loadLogs": "Load Logs",
         "sendTestEmail": "Send Test Email",
-        "setPrimary": "Set Primary",
-        "unsetPrimary": "Unset Primary",
-        "leavePage": "Leave Page",
+        "setPrimary": "Définir primaire",
+        "unsetPrimary": "Retirer primarité",
+        "leavePage": "Quitter la page",
         "viewDocumentation": "View Documentation"
       },
       "alert": {
@@ -145,28 +145,28 @@
         "or": "OR"
       },
       "input": {
-        "search": "Search..."
+        "search": "Chercher..."
       },
       "tooltip": {
         "resetToDefault": "Reset to default",
         "edit": "Edit",
         "delete": "Delete",
         "remove": "Remove",
-        "primary": "Primary",
+        "primary": "Primaire",
         "backupOnDifferentNode": "This backup is on a different node than the server. It is not viewable from the Client API."
       },
       "form": {
-        "name": "Name",
+        "name": "Nom",
         "description": "Description",
         "author": "Author",
         "type": "Type",
-        "password": "Password",
-        "host": "Host",
-        "username": "Username",
+        "password": "Mot de passe",
+        "host": "Hôte",
+        "username": "Nom d'utilisateur",
         "usernameOrEmail": "Username/Email",
-        "server": "Server",
+        "server": "Serveur",
         "url": "URL",
-        "email": "Email",
+        "email": "E-mail",
         "path": "Path",
         "port": "Port",
         "provider": "Provider",
@@ -181,23 +181,23 @@
         "region": "Region",
         "endpoint": "Endpoint",
         "publicUrl": "Public URL",
-        "firstName": "First Name",
-        "lastName": "Last Name",
-        "language": "Language",
+        "firstName": "Prénom",
+        "lastName": "Nom de famille",
+        "language": "Langue",
         "identifier": "Identifier",
-        "enabled": "Enabled",
+        "enabled": "Activé",
         "title": "Title",
         "content": "Content",
         "backupConfiguration": "Backup Configuration",
-        "fileName": "File Name",
-        "sftpPort": "SFTP Port",
-        "sftpHost": "SFTP Host",
-        "dockerImage": "Docker Image",
-        "memory": "Memory",
-        "disk": "Disk",
-        "serverName": "Server Name",
-        "startupCommand": "Startup Command",
-        "archiveName": "Archive Name",
+        "fileName": "Nom du fichier",
+        "sftpPort": "Port SFTP",
+        "sftpHost": "Hôte SFTP",
+        "dockerImage": "Image Docker",
+        "memory": "Mémoire",
+        "disk": "Disque",
+        "serverName": "Nom du serveur",
+        "startupCommand": "Commande de démarrage",
+        "archiveName": "Nom de l'archive",
         "archiveFormat": "Archive Format",
         "compressionLevel": "Compression Level",
         "multiplexChannels": "Multiplex Channels",
@@ -211,54 +211,54 @@
         "mount": "Mount",
         "nest": "Nest",
         "lines": "Lines",
-        "databaseHost": "Database Host",
-        "timezone": "Timezone",
+        "databaseHost": "Hôte de base de données",
+        "timezone": "Fuseau horaire",
         "timezoneSystem": "System",
-        "protocol": "Protocol",
+        "protocol": "Protocole",
         "powerAction": "Power Action",
         "destination": "Destination",
-        "directoryName": "Directory Name",
-        "locked": "Locked",
+        "directoryName": "Nom du répertoire",
+        "locked": "Verrouillé",
         "portRanges": "Port Ranges",
         "portRangesPlaceholder": "Port Ranges (eg. 3000-4000)",
-        "currentPassword": "Current Password",
-        "confirmPassword": "Confirm Password",
-        "authenticationCode": "Authentication Code",
+        "currentPassword": "Mot de passe actuel",
+        "confirmPassword": "Confirmer le mot de passe",
+        "authenticationCode": "Code d'authentification",
         "restoreStartup": "Restore the startup command, image, and variables from this backup.",
         "lineContains": "Line Contains",
         "filePath": "File Path",
         "envVariable": "Environment Variable",
         "value": "Value",
         "eggs": "Eggs",
-        "ignoredFiles": "Ignored Files",
-        "yourControlPanelPassword": "Your Control Panel Password",
+        "ignoredFiles": "Fichiers ignorés",
+        "yourControlPanelPassword": "Votre mot de passe de panel de contrôle",
         "deploymentEnabled": "Deployment Enabled",
         "maintenanceEnabled": "Maintenance Enabled",
-        "truncateDirectory": "Do you want to delete all files of this server before performing this action? This cannot be undone."
+        "truncateDirectory": "Souhaitez-vous supprimer tous les fichiers de ce serveur avant d'effectuer cette action ? Ceci n'est pas réversible."
       },
       "table": {
         "pagination": {
-          "results": "Showing {start} to {end} of {total} results.",
-          "empty": "No items could be found, it's almost like they are hiding."
+          "results": "Affiche {start} à {end} de {total} résultats.",
+          "empty": "Pas d'éléments trouvés, c'est comme s'ils se cachaient."
         },
         "columns": {
           "id": "ID",
-          "name": "Name",
+          "name": "Nom",
           "author": "Author",
           "type": "Type",
           "title": "Title",
           "enabled": "Enabled",
           "description": "Description",
-          "username": "Username",
-          "size": "Size",
-          "lastUsed": "Last Used",
-          "created": "Created",
+          "username": "Nom d'utilisateur",
+          "size": "Taille",
+          "lastUsed": "Dernière utilisation",
+          "created": "Créé",
           "updated": "Updated",
-          "actor": "Actor",
-          "event": "Event",
+          "actor": "Acteur",
+          "event": "Événement",
           "ip": "IP",
-          "when": "When",
-          "command": "Command",
+          "when": "Quand",
+          "command": "Commande",
           "location": "Location",
           "node": "Node",
           "owner": "Owner",
@@ -289,37 +289,37 @@
         "installed": "Installed"
       },
       "server": {
-        "noAllocation": "No Allocation",
+        "noAllocation": "Pas d'allocation",
         "state": {
-          "suspended": "Suspended",
+          "suspended": "Suspendu",
           "transferring": "Server is being transferred",
           "nodeMaintenance": "Node is under Maintenance",
-          "restoringBackup": "Restoring Backup",
-          "installing": "Installing",
+          "restoringBackup": "Restauration de la sauvegarde",
+          "installing": "Installation",
           "installFailed": "Install Failed"
         }
       },
       "enum": {
         "userToastPosition": {
-          "topLeft": "Top Left",
-          "topCenter": "Top Center",
-          "topRight": "Top Right",
-          "bottomLeft": "Bottom Left",
-          "bottomCenter": "Bottom Center",
-          "bottomRight": "Bottom Right"
+          "topLeft": "Haut Gauche",
+          "topCenter": "Haut Centre",
+          "topRight": "Haut Droite",
+          "bottomLeft": "Bas Gauche",
+          "bottomCenter": "Bas Centre",
+          "bottomRight": "Bas Droite"
         },
         "serverState": {
-          "unknown": "Unknown",
-          "offline": "Offline",
-          "running": "Running",
-          "starting": "Starting",
-          "stopping": "Stopping"
+          "unknown": "Inconnu",
+          "offline": "Hors-ligne",
+          "running": "Allumé",
+          "starting": "Démarrage",
+          "stopping": "Arrêt"
         },
         "serverPowerAction": {
-          "start": "Start",
-          "stop": "Stop",
-          "restart": "Restart",
-          "kill": "Kill"
+          "start": "Démarrer",
+          "stop": "Arrêter",
+          "restart": "Redémarrer",
+          "kill": "Tuer"
         },
         "serverBackupStatus": {
           "starting": "Starting",
@@ -327,19 +327,19 @@
           "failed": "Failed"
         },
         "connectionStatus": {
-          "connected": "Connected",
-          "offline": "Offline"
+          "connected": "Connecté",
+          "offline": "Déconnecté"
         },
         "serverAutoStartBehavior": {
-          "always": "Always",
-          "unlessStopped": "Unless Stopped",
-          "never": "Never"
+          "always": "Toujours",
+          "unlessStopped": "Sauf si arrêté",
+          "never": "Jamais"
         },
         "bulkActionServerAction": {
-          "started": "Started",
-          "stopped": "Stopped",
-          "restarted": "Restarted",
-          "killed": "Killed"
+          "started": "Démarré",
+          "stopped": "Arrêté",
+          "restarted": "Redémarré",
+          "killed": "Tué"
         },
         "compressionLevel": {
           "bestSpeed": "Best Speed",
@@ -358,21 +358,21 @@
           "pebibytes": "PiB"
         }
       },
-      "unlimited": "Unlimited",
-      "readOnly": "Read-Only",
+      "unlimited": "Illimité",
+      "readOnly": "Lecture-seule",
       "na": "N/A",
       "never": "Never",
       "none": "None",
       "unknown": "Unknown",
-      "yes": "Yes",
-      "no": "No",
+      "yes": "Oui",
+      "no": "Non",
       "web": "Web",
       "api": "API",
       "default": "Default",
       "custom": "Custom",
-      "system": "System",
-      "schedule": "Schedule",
-      "impersonatedBy": "Impersonated by {username}"
+      "system": "Système",
+      "schedule": "Planification",
+      "impersonatedBy": "Usurpé par {username}"
     },
     "elements": {
       "routeOrderEditor": {
@@ -394,18 +394,18 @@
         }
       },
       "errorBoundary": {
-        "message": "An unexpected error occurred while rendering this page. Try refreshing. If the problem persists, contact your system administrator.",
-        "hideDetails": "Hide Details",
-        "showDetails": "Show Details",
-        "errorMessage": "Error Message:",
-        "stackTrace": "Stack Trace:",
-        "componentStack": "Component Stack:"
+        "message": "Une erreur a été rencontrée par l'application lors du rendu de cette page. Essayez de recharger la page.",
+        "hideDetails": "Cacher détails",
+        "showDetails": "Afficher détails",
+        "errorMessage": "Message d'erreur :",
+        "stackTrace": "Trace de pile :",
+        "componentStack": "Pile de composants :"
       },
       "copyOnClick": {
         "toast": {
-          "copied": "Copied to clipboard.",
-          "failed": "Failed to copy to clipboard.",
-          "copyManual": "Copy to clipboard: Ctrl+C or Command+C, Enter"
+          "copied": "Copié vers le presse-papier.",
+          "failed": "Copie vers le presse-papier échouée.",
+          "copyManual": "Copier vers le presse-papier : Ctrl+C ou Command+C, Entrée"
         }
       },
       "pasteOnClick": {
@@ -425,13 +425,13 @@
       },
       "container": {
         "alert": {
-          "impersonating": "You are currently impersonating a user. Please be aware that your actions may affect the impersonated user's account. To exit impersonation mode, click the \"Stop Impersonating\" button in the bottom left corner."
+          "impersonating": "Vous usurpez un utilisateur. Vos actions peuvent affecter le compte de la personne usurpée. Pour quitter le mode usurpation, cliquez le bouton \"Arrêter l'usurpation\" dans le coin bas gauche."
         }
       },
       "sidebar": {
         "button": {
-          "logout": "Logout",
-          "stopImpersonating": "Stop Impersonating",
+          "logout": "Se déconnecter",
+          "stopImpersonating": "Arrêter l'usurpation",
           "openInVirtualWindow": "Open in Virtual Window",
           "openInPopup": "Open in Popup",
           "openInNewTab": "Open in New Tab",
@@ -444,16 +444,16 @@
           "copyPermissions": "Copy Permissions",
           "pastePermissions": "Paste Permissions"
         },
-        "selectedPermissions": "Selected Permissions ({count})",
-        "noPermissions": "No permissions selected."
+        "selectedPermissions": "Permissions sélectionnées ({count})",
+        "noPermissions": "Pas de permissions sélectionnées."
       },
       "selectInput": {
         "noResults": "No Results found."
       },
       "can": {
         "tooltip": {
-          "cantSave": "You do not have permission to save.",
-          "cantDelete": "You do not have permission to delete."
+          "cantSave": "Vous n'avez pas la permission d'enregistrer.",
+          "cantDelete": "Vous n'avez pas la permission de supprimer."
         }
       },
       "resource": {
@@ -466,7 +466,7 @@
       "activityInfoButton": {
         "modal": {
           "info": {
-            "title": "Activity Details"
+            "title": "Détails de l'activité"
           }
         }
       },
@@ -577,86 +577,86 @@
     "pages": {
       "oobe": {
         "welcome": {
-          "title": "Welcome to Calagopus",
-          "subtitle": "Let's get your game server management system up and running!",
-          "wizardIntro": "This setup wizard will guide you through:",
+          "title": "Bienvenue sur Calagopus",
+          "subtitle": "Mettons en marche votre système de gestion de serveurs de jeux !",
+          "wizardIntro": "Cet assistant de configuration va vous guider pour :",
           "steps": {
-            "account": "Creating your administrator account",
-            "settings": "Configuring essential system settings",
-            "location": "Setting up your server location",
-            "node": "Adding your first node",
-            "server": "Deploying your first game server"
+            "account": "Créer votre compte administrateur",
+            "settings": "Configurer les paramètres système essentiels",
+            "location": "Configurer votre emplacement/groupe de serveurs",
+            "node": "Ajouter votre premier nœud",
+            "server": "Déployer votre premier serveur de jeu"
           },
           "button": {
-            "start": "Get Started"
+            "start": "Commencer"
           }
         },
         "register": {
-          "title": "Create Administrator Account",
+          "title": "Créer le compte administrateur",
           "alert": {
-            "title": "Security Notice",
-            "description": "Choose a strong password. This account will have complete administrative access to all servers and settings."
+            "title": "Notice de sécurité",
+            "description": "Choisissez un mot de passe fort. Ce compte aura un accès administratif complet à tous les serveurs et paramètres."
           },
           "form": {
             "usernamePlaceholder": "admin",
-            "email": "Email Address",
-            "emailPlaceholder": "admin@example.com",
+            "email": "Adresse e-mail",
+            "emailPlaceholder": "admin@exemple.com",
             "firstNamePlaceholder": "Alan",
             "lastNamePlaceholder": "Turing",
-            "passwordPlaceholder": "Enter a strong password",
-            "confirmPasswordPlaceholder": "Re-enter your password"
+            "passwordPlaceholder": "Entrez un mot de passe fort",
+            "confirmPasswordPlaceholder": "Entrez à nouveau votre mot de passe"
           },
           "button": {
-            "create": "Create Account & Continue"
+            "create": "Créer compte & continuer"
           }
         },
         "login": {
-          "title": "Log back in",
-          "alert": "You got logged out during the setup process. Please log back in to continue where you left off.",
+          "title": "Se reconnecter",
+          "alert": "Vous vous êtes fait déconnecté durant le processus de configuration. Veuillez vous reconnecter pour continuer de là où vous vous êtes arrêté.",
           "form": {
             "usernamePlaceholder": "admin",
-            "passwordPlaceholder": "Enter a strong password"
+            "passwordPlaceholder": "Entrez un mot de passe fort"
           },
           "button": {
-            "login": "Log in & Continue"
+            "login": "Se connecter & continuer"
           }
         },
         "location": {
-          "title": "Location Configuration",
+          "title": "Configuration de l'emplacement",
           "form": {
-            "locationName": "Location Name",
-            "locationNamePlaceholder": "My home",
+            "locationName": "Nom de l'emplacement",
+            "locationNamePlaceholder": "Ma maison",
             "locationFlag": "Location Flag",
             "locationFlagPlaceholder": "The best country",
-            "backupName": "Backup Configuration Name",
-            "backupNamePlaceholder": "Unicorn Cloud",
-            "backupDisk": "Backup Disk",
-            "backupDiskPlaceholder": "Backup Disk"
+            "backupName": "Nom de la configuration de sauvegarde",
+            "backupNamePlaceholder": "Baguette Cloud",
+            "backupDisk": "Disque de sauvegarde",
+            "backupDiskPlaceholder": "Disque de sauvegarde"
           },
           "button": {
-            "create": "Create & Continue"
+            "create": "Créer & continuer"
           }
         },
         "node": {
-          "title": "Node Configuration",
+          "title": "Configuration du nœud",
           "allocationsTitle": "Allocations Configuration",
           "form": {
-            "name": "Name",
-            "namePlaceholder": "My Server",
+            "name": "Nom",
+            "namePlaceholder": "Mon serveur",
             "urlPlaceholder": "URL",
-            "urlDescription": "used for internal communication with the node",
-            "publicUrl": "Public URL",
+            "urlDescription": "utilisé pour la communication interne avec le nœud",
+            "publicUrl": "URL publique",
             "publicUrlPlaceholder": "URL",
-            "publicUrlDescription": "used for websocket/downloads",
-            "sftpHostPlaceholder": "SFTP Host",
-            "sftpPortPlaceholder": "SFTP Port",
+            "publicUrlDescription": "utilisé pour websocket/téléchargements",
+            "sftpHostPlaceholder": "Hôte SFTP",
+            "sftpPortPlaceholder": "Port SFTP",
             "ip": "IP"
           },
           "error": {
-            "noLocations": "Something went wrong. No locations were found."
+            "noLocations": "Quelque chose s'est mal placé. Pas d'emplacements trouvés."
           },
           "button": {
-            "create": "Create & Continue"
+            "create": "Créer & continuer"
           }
         },
         "nodeConfiguration": {
@@ -672,18 +672,18 @@
           }
         },
         "configuration": {
-          "title": "Application Settings",
+          "title": "Paramètres d'application",
           "form": {
-            "applicationName": "Application Name",
+            "applicationName": "Nom d'application",
             "applicationNamePlaceholder": "Calagopus",
-            "languagePlaceholder": "Language",
-            "applicationUrl": "Application URL",
+            "languagePlaceholder": "Langue",
+            "applicationUrl": "URL d'application",
             "applicationUrlPlaceholder": "https://calagop.us",
-            "registration": "Enable Registration",
-            "registrationDescription": "Allow new users to register their own account."
+            "registration": "Activer l'inscription",
+            "registrationDescription": "Autoriser de nouveaux utilisateurs à créer leur propre compte."
           },
           "button": {
-            "submit": "Update Settings & Continue"
+            "submit": "Mettre à jour les paramètres & continuer"
           }
         },
         "eggRepositories": {
@@ -724,27 +724,27 @@
           }
         },
         "finished": {
-          "title": "Setup Complete!",
-          "subtitle": "Your Calagopus panel is ready to use",
-          "setupTitle": "What We've Set Up",
+          "title": "Configuration terminée !",
+          "subtitle": "Votre panel Calagopus est prêt à l'emploi",
+          "setupTitle": "Ce que nous avons configuré",
           "items": {
-            "account": "Administrator Account",
+            "account": "Compte administrateur",
             "configuration": {
-              "title": "System Configuration",
-              "subtitle": "Panel settings and preferences configured"
+              "title": "Configuration système",
+              "subtitle": "Paramètres et préférences du panel configurés"
             },
             "eggRepositories": {
               "title": "Egg Repositories",
               "subtitle": "{count} repositories"
             },
-            "location": "Location",
-            "node": "Node",
+            "location": "Emplacement",
+            "node": "Nœud",
             "server": "Server"
           },
           "badge": {
-            "skipped": "Skipped"
+            "skipped": "Passé"
           },
-          "button": "Go to Dashboard"
+          "button": "Aller au tableau de bord"
         }
       },
       "auth": {
@@ -860,50 +860,50 @@
       },
       "account": {
         "home": {
-          "title": "Servers",
+          "title": "Serveurs",
           "tooltip": {
-            "removeFromGroup": "Remove from Group",
-            "addToGroup": "Add to Group",
+            "removeFromGroup": "Retirer du groupe",
+            "addToGroup": "Ajouter au groupe",
             "addServerToGroup": "Add Server to Group",
             "groupActions": "Group Actions",
-            "noGroups": "No groups available to add server to",
-            "noGroup": "This server is not in any group"
+            "noGroups": "Pas de groupes disponibles auxquels ajouter le serveur",
+            "noGroup": "Ce serveur n'est dans aucun groupe"
           },
           "badge": {
             "foreign": "Foreign"
           },
           "tabs": {
             "groupedServers": {
-              "title": "Grouped Servers",
+              "title": "Serveurs groupés",
               "page": {
                 "button": {
-                  "createGroup": "Create Group"
+                  "createGroup": "Créer groupe"
                 },
                 "modal": {
                   "createServerGroup": {
-                    "title": "Create Server Group",
+                    "title": "Créer groupe de serveur",
                     "toast": {
-                      "created": "Server group created."
+                      "created": "Groupe de serveur créé."
                     }
                   },
                   "editServerGroup": {
-                    "title": "Edit Server Group",
+                    "title": "Modifier le groupe de serveur",
                     "toast": {
-                      "updated": "Server group updated."
+                      "updated": "Groupe de serveur mis à jour."
                     }
                   },
                   "deleteServerGroup": {
-                    "title": "Confirm Server Group Deletion",
-                    "content": "Are you sure you want to delete **{group}** from your account?",
+                    "title": "Confirmer la suppression du groupe de serveur",
+                    "content": "Êtes-vous sûr de vouloir supprimer **{group}** de votre compte ?",
                     "toast": {
-                      "deleted": "Server group deleted."
+                      "deleted": "Groupe de serveur supprimé."
                     }
                   },
                   "addServerToGroup": {
-                    "title": "Add Server to {group}",
-                    "noServers": "All servers are already in this group.",
+                    "title": "Ajouter un serveur à {group}",
+                    "noServers": "Tous les serveurs sont déjà dans ce groupe.",
                     "toast": {
-                      "added": "Server added to group."
+                      "added": "Serveur ajouté au groupe."
                     }
                   },
                   "removeServerFromGroup": {
@@ -914,20 +914,20 @@
                     }
                   }
                 },
-                "noGroups": "No Groups could be found, time to create one?"
+                "noGroups": "Pas de groupes trouvés, créez-en un."
               }
             },
             "allServers": {
-              "title": "All Servers",
+              "title": "Tous les serveurs",
               "page": {
                 "input": {
-                  "showOtherUsersServers": "Show other user's servers"
+                  "showOtherUsersServers": "Afficher les serveurs d'autres utilisateurs"
                 },
                 "modal": {
                   "addToServerGroup": {
-                    "title": "Add {server} to Server Group",
+                    "title": "Ajouter {server} au groupe de serveur",
                     "form": {
-                      "serverGroup": "Server Group"
+                      "serverGroup": "Groupe de serveur"
                     }
                   }
                 }
@@ -935,24 +935,24 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Selection Mode",
-            "select": "Select server",
-            "deselect": "Deselect server",
-            "success": "Successfully {action} {servers}.",
-            "partial": "Successfully {action} {successfulServers}. {failedServers} failed.",
-            "groupActions": "Group Actions"
+            "selectionMode": "Mode de sélection",
+            "select": "Sélectionner serveur",
+            "deselect": "Désélectionner serveur",
+            "success": "{action} {servers} avec succès.",
+            "partial": "{action} {successfulServers} avec succès. {failedServers} ont échoué.",
+            "groupActions": "Actions de groupe"
           },
-          "noServers": "No Servers could be found, time to add one?"
+          "noServers": "Pas de serveurs trouvés, est-il temps d'en ajouter un ?"
         },
         "admin": {
           "title": "Admin"
         },
         "account": {
-          "title": "Account",
+          "title": "Compte",
           "alert": {
             "requireTwoFactor": {
-              "title": "Two-Factor Authentication Required",
-              "description": "Two-Factor Authentication is required on your account. Please set it up below to continue using the panel."
+              "title": "Authentification à deux facteurs requise",
+              "description": "L'authentification à deux facteurs est requise pour votre compte. Veuillez la mettre en place ci-dessus pour continuer à utiliser le panel."
             },
             "frozen": {
               "title": "Account Frozen",
@@ -961,68 +961,68 @@
           },
           "containers": {
             "password": {
-              "title": "Password",
+              "title": "Mot de passe",
               "toast": {
-                "updated": "Password updated successfully."
+                "updated": "Mot de passe mis à jour avec succès."
               },
               "form": {
-                "newPassword": "New Password",
-                "confirmNewPassword": "Confirm New Password"
+                "newPassword": "Nouveau mot de passe",
+                "confirmNewPassword": "Confirmer le nouveau mot de passe"
               }
             },
             "email": {
-              "title": "Email",
+              "title": "E-mail",
               "toast": {
-                "updated": "Email updated successfully."
+                "updated": "E-mail mise à jour avec succès."
               },
               "form": {
-                "newEmail": "New Email"
+                "newEmail": "Nouvelle e-mail"
               }
             },
             "twoFactor": {
-              "title": "Two-Factor Authentication",
+              "title": "Authentification à double facteurs",
               "toast": {
-                "disabled": "Two-factor authentication disabled successfully.",
-                "enabled": "Two-factor authentication enabled successfully. Please copy your recovery codes."
+                "disabled": "Authentification à double facteurs désactivée avec succès.",
+                "enabled": "Authentification à double facteurs activée avec succès. Veuillez copier vos codes de récupération."
               },
               "modal": {
                 "disableTwoFactor": {
-                  "title": "Disable Two-Factor Authentication",
-                  "description": "Disabling two-factor authentication will make your account less secure."
+                  "title": "Désactiver l'authentification à double facteurs",
+                  "description": "Désactiver l'authentification à double facteurs rendra votre compte moins sécurisé."
                 },
                 "setupTwoFactor": {
-                  "title": "Setup Two-Factor Authentication",
-                  "description": "Help protect your account from unauthorized access. You'll be prompted for a verification code each time you sign in.",
-                  "descriptionQR": "Scan the QR code above using the two-factor authentication app of your choice. Then, enter the 6-digit code generated into the field below."
+                  "title": "Configurer l'authentification à double facteurs",
+                  "description": "Protégez votre compte des accès non-autorisés. Un code de vérification vous sera demandé à chaque connexion.",
+                  "descriptionQR": "Scannez le QR code ci-dessus en utilisant l'application à double facteurs de votre choix. Ensuite, entrez le code à 6 chiffres généré dans le champ ci-dessous."
                 },
                 "recoveryCodes": {
-                  "title": "Recovery Codes",
-                  "description": "Below are your recovery codes. Store these in a safe place. If you lose access to your authentication device, you can use these codes to regain access to your account."
+                  "title": "Codes de récupération",
+                  "description": "Ci-dessous sont vos codes de récupération. Gardez-les dans un endroit sûr. Si vous perdez accès à votre dispositif d'authentification, vous pourrez utiliser ces codes pour regagner accès à votre compte."
                 }
               },
               "button": {
-                "disableTwoFactor": "Disable Two-Factor",
-                "setupTwoFactor": "Setup Two-Factor"
+                "disableTwoFactor": "Désactiver le deuxième facteur",
+                "setupTwoFactor": "Configurer le deuxième facteur"
               },
-              "twoFactorEnabled": "Two-Factor Verification is currently enabled.",
-              "twoFactorDisabled": "You do not currently have two-factor verification enabled on your account. Click the button below to begin configuring it.",
-              "twoFactorLastUsed": "Last used: {timestamp}"
+              "twoFactorEnabled": "La vérification du double facteur est actuellement activée.",
+              "twoFactorDisabled": "La vérification double facteur n'est pas activée pour votre compte. Cliquez le bouton ci-dessous pour commencer à la configurer.",
+              "twoFactorLastUsed": "Dernière utilisation : {timestamp}"
             },
             "account": {
-              "title": "Account Details",
+              "title": "Détails du compte",
               "toast": {
-                "updated": "Account details updated successfully."
+                "updated": "Détails du compte mis à jour avec succès."
               },
               "form": {
-                "toastPosition": "Toast Position",
-                "startOnGroupedServers": "Start on the Grouped Servers page"
+                "toastPosition": "Position du toast",
+                "startOnGroupedServers": "Commencer sur la page des serveurs groupés"
               }
             },
             "avatar": {
               "title": "Avatar",
               "toast": {
-                "updated": "Avatar updated successfully.",
-                "removed": "Avatar removed successfully."
+                "updated": "Avatar mis à jour avec succès.",
+                "removed": "Avatar supprimé avec succès."
               },
               "form": {
                 "avatar": "Avatar"
@@ -1031,7 +1031,7 @@
           }
         },
         "securityKeys": {
-          "title": "Security Keys",
+          "title": "Clés de sécurité",
           "subtitle": "{current} of {max} maximum security keys created.",
           "table": {
             "columns": {
@@ -1044,23 +1044,23 @@
           },
           "modal": {
             "createSecurityKey": {
-              "title": "Create Security Key",
+              "title": "Créer une clé de sécurité",
               "toast": {
-                "created": "Security key created successfully.",
-                "aborted": "Security key creation aborted."
+                "created": "Clé de sécurité créée avec succès.",
+                "aborted": "Création de la clé de sécurité annulée."
               }
             },
             "editSecurityKey": {
-              "title": "Edit Security Key",
+              "title": "Modifier la clé de sécurité",
               "toast": {
-                "updated": "Security key updated successfully."
+                "updated": "Clé de sécurité mise à jour avec succès."
               }
             },
             "deleteSecurityKey": {
-              "title": "Confirm Security Key Deletion",
-              "content": "Are you sure you want to delete **{key}** from your account?",
+              "title": "Confirmer la suppression de la clé de sécurité",
+              "content": "Êtes-vous sur de vouloir supprimer **{key}** de votre compte ?",
               "toast": {
-                "deleted": "Security key deleted successfully."
+                "deleted": "Clé de sécurité supprimée avec succès."
               }
             }
           }
@@ -1070,25 +1070,25 @@
           "table": {
             "columns": {
               "ip": "IP",
-              "thisDevice": "This Device?",
-              "userAgent": "User Agent"
+              "thisDevice": "Cet appareil ?",
+              "userAgent": "Agent utilisateur"
             }
           },
           "modal": {
             "deleteSession": {
-              "title": "Confirm Session Deletion",
-              "content": "Are you sure you want to delete the session **{ip}** from your account?",
+              "title": "Confirmer la suppression de la session",
+              "content": "Êtes-vous sûr de vouloir supprimer la session **{ip}** de votre compte ?",
               "toast": {
-                "deleted": "Session deleted."
+                "deleted": "Session supprimée."
               }
             }
           }
         },
         "shortcuts": {
-          "title": "Keyboard Shortcuts",
-          "subtitle": "Use these keyboard shortcuts to navigate and interact with the panel more efficiently.",
-          "detectedMac": "macOS detected",
-          "detectedWindows": "Windows/Linux detected",
+          "title": "Raccourcis clavier",
+          "subtitle": "Utilisez ces raccourcis clavier pour naviguer et interagir avec le panel plus efficacement.",
+          "detectedMac": "macOS détecté",
+          "detectedWindows": "Windows/Linux détecté",
           "label": {
             "disabled": "Disabled",
             "modified": "Modified",
@@ -1107,82 +1107,82 @@
             "resetAll": "All shortcuts reset to defaults."
           },
           "fileManager": {
-            "title": "File Manager",
-            "selectAll": "Select all files",
-            "cutFiles": "Cut selected files",
-            "copyFiles": "Copy selected files",
-            "duplicateFile": "Duplicate selected file",
-            "pasteFiles": "Paste files",
-            "searchFiles": "Search files",
-            "moveUpDirectory": "Move Up a directory",
-            "moveUpSelection": "Move Up the selection",
-            "moveDownSelection": "Move Down the selection",
-            "renameFile": "Rename file",
-            "deselectAll": "Deselect all files",
-            "deleteFiles": "Delete selected files"
+            "title": "Gestionnaire de fichiers",
+            "selectAll": "Sélectionner tous les fichiers",
+            "cutFiles": "Couper les fichiers sélectionnées",
+            "copyFiles": "Copier les fichiers sélectionnés",
+            "duplicateFile": "Dupliquer le fichier sélectionné",
+            "pasteFiles": "Coller fichiers",
+            "searchFiles": "Chercher fichiers",
+            "moveUpDirectory": "Déplacer vers répertoire parent",
+            "moveUpSelection": "Déplacer la sélection vers le haut",
+            "moveDownSelection": "Déplacer la sélection vers le bas",
+            "renameFile": "Renommer le fichier",
+            "deselectAll": "Désélectionner tous les fichiers",
+            "deleteFiles": "Supprimer les fichiers sélectionner"
           },
           "table": {
-            "title": "Table Navigation",
-            "previousPage": "Previous page",
-            "nextPage": "Next page",
-            "firstPage": "First page",
-            "lastPage": "Last page"
+            "title": "Navigation des tables",
+            "previousPage": "Page précédente",
+            "nextPage": "Page suivante",
+            "firstPage": "Première page",
+            "lastPage": "Dernière page"
           },
           "console": {
-            "title": "Server Console",
-            "searchContent": "Search in console output",
-            "previousCommand": "Previous command in history",
-            "nextCommand": "Next command in history"
+            "title": "Console du serveur",
+            "searchContent": "Rechercher dans la sortie console",
+            "previousCommand": "Commande précédente dans l'historique",
+            "nextCommand": "Commande suivante dans l'historique"
           },
           "serverList": {
-            "title": "Server List",
-            "selectServer": "Hold S and click to select/deselect server"
+            "title": "Liste des serveurs",
+            "selectServer": "Gardez appuyé S et cliquez pour (dé)sélectionner serveur"
           }
         },
         "sshKeys": {
-          "title": "SSH Keys",
+          "title": "Clés SSH",
           "subtitle": "{current} of {max} maximum ssh keys created.",
           "tooltip": {
             "limitReached": "You are limited to {max} ssh keys."
           },
           "table": {
             "columns": {
-              "fingerprint": "Fingerprint"
+              "fingerprint": "Empreinte"
             }
           },
           "modal": {
             "createSshKey": {
-              "title": "Create SSH Key",
+              "title": "Créer clé SSH",
               "toast": {
-                "created": "SSH key created."
+                "created": "Clé SSH créée."
               },
               "button": {
-                "uploadKeyFile": "Upload Key File"
+                "uploadKeyFile": "Téléverser le fichier de clé"
               },
               "form": {
-                "publicKey": "Public Key"
+                "publicKey": "Clé publique"
               }
             },
             "editSshKey": {
-              "title": "Edit SSH Key",
+              "title": "Modifier la clé SSH",
               "toast": {
-                "updated": "SSH Key updated."
+                "updated": "Clé SSH modifiée."
               }
             },
             "importSshKeys": {
-              "title": "Import SSH Keys",
+              "title": "Importer des clés SSH",
               "toast": {
-                "created": "{sshKeys} created."
+                "created": "{sshKeys} créées."
               },
               "form": {
-                "provider": "Provider"
+                "provider": "Fournisseur"
               }
             },
             "deleteSshKey": {
-              "title": "Confirm SSH Key Deletion",
-              "content": "Are you sure you want to delete **{name}** from your account?",
+              "title": "Confirmer la suppression de la clé SSH",
+              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
               "toast": {
-                "removed": "SSH key removed."
+                "removed": "Clé SSH supprimée."
               }
             }
           }
@@ -1216,53 +1216,53 @@
           }
         },
         "oauthLinks": {
-          "title": "OAuth Links",
+          "title": "Liens OAuth",
           "button": {
-            "connect": "Connect",
-            "connectTo": "Connect to {provider}"
+            "connect": "Connecter",
+            "connectTo": "Connecter {provider}"
           },
           "table": {
             "columns": {
-              "providerName": "Provider Name"
+              "providerName": "Nom du fournisseur"
             }
           },
           "modal": {
             "deleteOAuthLink": {
-              "title": "Confirm OAuth Link Deletion",
-              "content": "Are you sure you want to delete the **{provider}** connection from your account?",
+              "title": "Confirmer la suppression du lien OAuth",
+              "content": "Êtes-vous sûr de vouloir supprimer la connexion **{provider}** de votre compte ?",
               "toast": {
-                "removed": "OAuth Link removed."
+                "removed": "Lien OAuth supprimé."
               }
             }
           }
         },
         "apiKeys": {
-          "title": "API Keys",
+          "title": "Clés API",
           "subtitle": "{current} of {max} maximum api keys created.",
           "button": {
-            "apiDocumentation": "API Documentation"
+            "apiDocumentation": "Documentation API"
           },
           "tooltip": {
             "limitReached": "You are limited to {max} api keys."
           },
           "table": {
             "columns": {
-              "key": "Key",
-              "permissions": "User / Server / Admin Permissions",
-              "expires": "Expires"
+              "key": "Clé",
+              "permissions": "Permissions Utilisateur / Serveur / Admin",
+              "expires": "Expiration"
             }
           },
           "modal": {
             "createApiKey": {
-              "title": "Create API Key",
+              "title": "Créer une clé API",
               "toast": {
-                "created": "API key created."
+                "created": "Clé API créée."
               }
             },
             "updateApiKey": {
-              "title": "Update API Key",
+              "title": "Mettre à jour clé API",
               "toast": {
-                "updated": "API key updated."
+                "updated": "Clé API mise à jour."
               }
             },
             "recreateApiKey": {
@@ -1273,19 +1273,19 @@
               }
             },
             "deleteApiKey": {
-              "title": "Confirm API Key Deletion",
-              "content": "Are you sure you want to delete **{name}** from your account?",
+              "title": "Confirmer la suppression de la clé API",
+              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
               "toast": {
-                "removed": "API key removed."
+                "removed": "Clé API supprimée."
               }
             }
           },
           "form": {
-            "allowedIps": "Allowed IPs",
-            "allowedIpsPlaceholder": "e.g. 192.168.1.1, 2001:db8::1",
-            "userPermissions": "User Permissions",
-            "serverPermissions": "Server Permissions",
-            "adminPermissions": "Admin Permissions"
+            "allowedIps": "IPs autorisées",
+            "allowedIpsPlaceholder": "ex. 192.168.1.1, 2001:db8::1",
+            "userPermissions": "Permissions utilisateur",
+            "serverPermissions": "Permissions serveur",
+            "adminPermissions": "Permissions admin"
           },
           "create": {
             "title": "Create API Key",
@@ -1302,7 +1302,7 @@
           }
         },
         "activity": {
-          "title": "Activity"
+          "title": "Activité"
         }
       },
       "admin": {
@@ -3325,16 +3325,16 @@
       },
       "server": {
         "viewAdmin": {
-          "title": "View in Admin Area"
+          "title": "Voir admin"
         },
         "console": {
           "title": "Console",
           "input": {
-            "placeholder": "Type a command...",
-            "ariaLabel": "Console command input."
+            "placeholder": "Entrez une commande...",
+            "ariaLabel": "Entrée commande console."
           },
           "toast": {
-            "installCancelled": "Server install cancelled.",
+            "installCancelled": "Installation du serveur annulée.",
             "transferCancelled": "Server transfer cancelled."
           },
           "modal": {
@@ -3351,47 +3351,47 @@
             "suspendedAdmin": "This server is currently suspended. Since you are an administrator, you can still access the server, but actions are limited.",
             "nodeMaintenance": "Your Server is on a node that is currently under maintenance.",
             "transferring": "Your Server is currently being transferred to another node.",
-            "restoringBackup": "Your Server is currently restoring from a backup. Please wait...",
-            "installing": "Your Server is currently being installed. Please wait...",
+            "restoringBackup": "Votre serveur est actuellement en train d'être restauré depuis une sauvegarde. Veuillez patienter...",
+            "installing": "Votre serveur est en train d'être installé. Veuillez patienter...",
             "pendingRestart": "Your Server has pending changes that require a restart. Please restart your server to apply these changes."
           },
           "message": {
-            "serverMarkedAs": "Server marked as {state}...",
+            "serverMarkedAs": "Serveur marqué comme {state}...",
             "installFailed": "Installation has failed.",
             "installCompleted": "Installation has completed successfully.",
-            "transferFailed": "Transfer has failed.",
+            "transferFailed": "Le transfert a échoué.",
             "transferCompleted": "Transfer has completed successfully. Reconnecting to server...",
-            "pullingImage": "Your Server is currently pulling it's docker image. Please wait...",
-            "pulling": "Pulling",
-            "extracting": "Extracting"
+            "pullingImage": "Votre serveur est entrain de récupérer son image Docker. Veuillez patienter...",
+            "pulling": "Récupération",
+            "extracting": "Extraction"
           },
           "tooltip": {
-            "search": "Search",
+            "search": "Rechercher",
             "sshDetails": "SSH Details",
-            "commandHistory": "Command History",
-            "decreaseFontSize": "Decrease Font Size",
-            "increaseFontSize": "Increase Font Size"
+            "commandHistory": "Historique de commande",
+            "decreaseFontSize": "Réduire taille de texte",
+            "increaseFontSize": "Augmenter taille de texte"
           },
           "drawer": {
             "commandHistory": {
-              "title": "Command History",
-              "detailTitle": "Command Details",
-              "noCommands": "No commands found.",
-              "copyButton": "Copy Command",
-              "sendButton": "Send Command",
-              "commandSent": "Command sent successfully."
+              "title": "Historique de commande",
+              "detailTitle": "Détails de la commande",
+              "noCommands": "Pas de commandes trouvées.",
+              "copyButton": "Copier la commande",
+              "sendButton": "Envoyer commande",
+              "commandSent": "Commande envoyée avec succès."
             }
           },
           "feature": {
             "eula": {
-              "title": "Minecraft EULA Agreement",
-              "content": "The Minecraft server requires you to accept the [Minecraft End User License Agreement](https://minecraft.net/eula) before it can start.",
-              "contentDetails": "By clicking \"Accept EULA\", you agree to the terms of the Minecraft EULA and the **eula.txt** file will be updated to **eula=true**.",
+              "title": "Accord Minecraft EULA",
+              "content": "Le serveur Minecraft vous requiert d'accepter [l'Accord de Licence d'Utilisateur Final de Minecraft](https://minecraft.net/eula) avant qu'il ne puisse démarrer.",
+              "contentDetails": "En cliquant \"Accepter EULA\", vous êtes en accord avec les termes de l'EULA Minecraft et le fichier **eula.txt** sera mis à jour pour **eula=true**.",
               "toast": {
-                "accepted": "EULA accepted successfully."
+                "accepted": "EULA acceptée avec succès."
               },
               "button": {
-                "accept": "Accept EULA"
+                "accept": "Accepter EULA"
               }
             },
             "javaVersion": {
@@ -3407,93 +3407,93 @@
             }
           },
           "details": {
-            "address": "Address",
+            "address": "Adresse",
             "port": "Port",
-            "uptime": "Uptime",
-            "cpuLoad": "CPU Load",
-            "memoryLoad": "Memory Load",
-            "diskUsage": "Disk Usage",
-            "networkIn": "Network (In)",
-            "networkOut": "Network (Out)",
-            "normalizeCpuLoad": "Normalize CPU Load (shifted to max 100%)"
+            "uptime": "Temps de fonctionnement",
+            "cpuLoad": "Charge CPU",
+            "memoryLoad": "Charge mémoire",
+            "diskUsage": "Utilisation du disque",
+            "networkIn": "Réseau (entrant)",
+            "networkOut": "Réseau (sortant)",
+            "normalizeCpuLoad": "Normaliser la charge CPU (max 100%)"
           },
           "power": {
             "modal": {
               "forceStop": {
-                "title": "Forcibly Stop Process",
-                "content": "Forcibly stopping a server can lead to data corruption."
+                "title": "Stopper le processus de force",
+                "content": "Arrêter de force un serveur peut mener à de la corruption de données."
               }
             }
           },
           "stats": {
-            "cpuLoad": "CPU Load",
-            "memoryLoad": "Memory Load",
-            "network": "Network",
-            "inbound": "Inbound",
-            "outbound": "Outbound"
+            "cpuLoad": "Charge CPU",
+            "memoryLoad": "Charge mémoire",
+            "network": "Réseau",
+            "inbound": "Entrant",
+            "outbound": "Sortant"
           },
-          "socketConnected": "Connected ({ping}ms ping)",
-          "socketDisconnected": "Disconnected"
+          "socketConnected": "Connecté (ping {ping}ms)",
+          "socketDisconnected": "Déconnecté"
         },
         "files": {
-          "title": "Files",
-          "titleEditorViewing": "Viewing {file}",
+          "title": "Fichiers",
+          "titleEditorViewing": "Affichage de {file}",
           "titleEditorPlaying": "Playing {file}",
-          "titleEditorEditing": "Editing {file}",
-          "titleEditorNew": "New File",
+          "titleEditorEditing": "Modification de {file}",
+          "titleEditorNew": "Nouveau fichier",
           "titleDiffRevisionVsCurrent": "{file} - Revision #{revision} vs Current",
           "titleDiffRevisionVsRevision": "{file} - Revision #{previousRevision} vs #{revision}",
           "table": {
             "columns": {
-              "modified": "Modified"
+              "modified": "Modifié"
             }
           },
           "button": {
-            "new": "New",
+            "new": "Nouveau",
             "connect": "Connect",
             "connectSftp": "via SFTP",
             "connectVscode": "via VS Code",
-            "openInNewWindow": "Open in new Window",
-            "rename": "Rename",
-            "copy": "Copy",
+            "openInNewWindow": "Ouvrir dans une nouvelle fenêtre",
+            "rename": "Renommer",
+            "copy": "Copier",
             "fingerprint": "Fingerprint",
             "permissions": "Permissions",
-            "unarchive": "Unarchive",
-            "archive": "Archive",
+            "unarchive": "Désarchiver",
+            "archive": "Archiver",
             "more": "More",
-            "remoteCopy": "Remote Copy",
-            "search": "Search",
-            "exitBackup": "Exit Backup",
-            "fileFromEditor": "File from Editor",
-            "directory": "Directory",
-            "fileFromPull": "File from Pull",
-            "fileFromUpload": "File from Upload",
-            "directoryFromUpload": "Directory from Upload"
+            "remoteCopy": "Copie distante",
+            "search": "Rechercher",
+            "exitBackup": "Quitter la sauvegarde",
+            "fileFromEditor": "Fichier de l'éditeur",
+            "directory": "Répertoire",
+            "fileFromPull": "Fichier depuis récupération",
+            "fileFromUpload": "Fichier depuis téléversement",
+            "directoryFromUpload": "Répertoire depuis téléversement"
           },
           "actionBar": {
-            "copyHere": "Copy {files} here",
-            "moveHere": "Move {files} here"
+            "copyHere": "Copier {files} ici",
+            "moveHere": "Déplacer {files} ici"
           },
           "searchBanner": {
-            "resultsTitle": "Search Results ({files} found)",
-            "query": "Query:",
-            "excluded": "Excluded:",
-            "content": "Content:",
-            "size": "Size:",
-            "min": "Min:",
-            "max": "Max:"
+            "resultsTitle": "Résultats de recherche ({files} trouvés)",
+            "query": "Requête :",
+            "excluded": "Exclu :",
+            "content": "Contenu :",
+            "size": "Taille :",
+            "min": "Min :",
+            "max": "Max :"
           },
           "operations": {
-            "uploadingFolder": "Uploading folder: {folder} ({files})",
-            "waiting": "Waiting: ",
-            "uploading": "Uploading: ",
-            "compressing": "Compressing {files} from {path}",
-            "decompressing": "Decompressing {path}",
-            "pulling": "Pulling {destination}",
-            "copying": "Copying {path} to {destination}",
-            "copyingMany": "Copying {files}",
-            "receivingRemote": "Receiving {files} from remote server",
-            "sendingRemote": "Sending {files} to remote server",
+            "uploadingFolder": "Téléversement du dossier : {folder} ({files} fichiers)",
+            "waiting": "En attente : ",
+            "uploading": "Téléversement : ",
+            "compressing": "Compression de {files} de {path}",
+            "decompressing": "Décompression de {path}",
+            "pulling": "Récupération de {destination}",
+            "copying": "Copie de {path} vers {destination}",
+            "copyingMany": "Copie de {files}",
+            "receivingRemote": "Réception de {files} depuis serveur distant",
+            "sendingRemote": "Envoi de {files} vers serveur distant",
             "rateLimited": "Your upload has been rate limited. Waiting...",
             "cancelAllUploads": "Cancel all uploads",
             "cancelAllOperations": "Cancel all operations"
@@ -3503,32 +3503,32 @@
             "subtitle": "Release to start uploading"
           },
           "settings": {
-            "clickOnce": "Click once to open file or folder",
+            "clickOnce": "Cliquez une fois pour ouvrir fichier ou dossier",
             "preferPhysicalSize": "Show physical size instead of logical size",
-            "editorMinimap": "Show File Minimap",
-            "editorLineOverflow": "Wrap Line Overflow",
+            "editorMinimap": "Afficher la minicarte de fichier",
+            "editorLineOverflow": "Saut de ligne en débordement",
             "vscodeUriScheme": "VS Code URI Scheme",
-            "imageViewerSmoothing": "Smoothen Image (Anti-Aliasing)"
+            "imageViewerSmoothing": "Adoucir l'image (anti-aliasing)"
           },
           "toast": {
-            "operationCancelled": "Operation cancelled",
+            "operationCancelled": "Opération annulée",
             "allOperationsCancelled": "All operations have been cancelled.",
-            "copyingStarted": "{files} started copying.",
-            "filesCouldNotBeMoved": "Files could not be moved.",
-            "filesMoved": "{files} moved.",
-            "downloadStarted": "Download started.",
-            "filesDeleted": "Files have been deleted.",
-            "archiveCreationStarted": "Archive creation has begun.",
-            "fileCopyingStarted": "File copying has started.",
-            "fileInfoRetrieved": "File information retrieved successfully.",
-            "filePullingStarted": "File pulling has started.",
-            "fileRenamed": "File has been renamed.",
-            "fileCouldNotBeRenamed": "File could not be renamed.",
+            "copyingStarted": "Copie de {files} commencée.",
+            "filesCouldNotBeMoved": "Les fichiers n'ont pas pu être déplacées.",
+            "filesMoved": "{files} déplacés.",
+            "downloadStarted": "Téléchargement démarré.",
+            "filesDeleted": "Les fichiers ont été supprimés.",
+            "archiveCreationStarted": "La création de l'archive a commencé.",
+            "fileCopyingStarted": "La copie de fichier a commencée.",
+            "fileInfoRetrieved": "Informations du fichier récupérées avec succès.",
+            "filePullingStarted": "La récupération du fichier a commencée.",
+            "fileRenamed": "Le fichier a été renommé.",
+            "fileCouldNotBeRenamed": "Le fichier n'a pas pu être renommé.",
             "filesRenamed": "{files} renamed.",
-            "permissionsUpdated": "Permissions have been updated.",
+            "permissionsUpdated": "Les permissions ont été mises à jour.",
             "permissionsUpdatedMany": "Permissions have been updated for {files}.",
             "permissionsCouldNotBeUpdated": "Permissions could not be updated.",
-            "fileSaved": "File has been saved."
+            "fileSaved": "Le fichier a été sauvegardé."
           },
           "tooltip": {
             "fileHistory": "File History",
@@ -3562,12 +3562,12 @@
           },
           "modal": {
             "activeUploads": {
-              "title": "Active Uploads",
-              "content": "Are you sure you want to leave this page? You have {files} active file uploads. If you leave this page, the file uploads will abort."
+              "title": "Téléversements actifs",
+              "content": "Êtes-vous sûr de vouloir quitter la page ? Vous avez {files} téléversements de fichier actifs. Si vous quittez la page, les téléversements seront annulés."
             },
             "unsavedChanges": {
-              "title": "Unsaved Changes",
-              "content": "You have unsaved changes in the file editor. Are you sure you want to leave this page? If you leave, your changes will be lost."
+              "title": "Changements non sauvegardées",
+              "content": "Vous avez des changements non sauvegardés dans l'éditeur de fichiers. Êtes-vous sûr de vouloir quitter cette page ? Si vous quittez, vos changements seront perdus."
             },
             "draftRestore": {
               "title": "Restore Draft",
@@ -3575,26 +3575,26 @@
               "contentHashMismatch": "The file has been modified on the server since this draft was saved. Restoring the draft may overwrite those changes."
             },
             "createArchive": {
-              "title": "Create Archive",
+              "title": "Créer archive",
               "form": {
                 "format": "Format"
               },
-              "createdAs": "This archive will be created as "
+              "createdAs": "Cette archive sera créée en tant que "
             },
             "createDirectory": {
-              "title": "Create Directory",
-              "createdAs": "This directory will be created as "
+              "title": "Créer répertoire",
+              "createdAs": "Ce répertoire sera créé en tant que "
             },
             "copyFile": {
-              "title": "Copy File",
-              "createdAs": "This file will be created as "
+              "title": "Copier fichier",
+              "createdAs": "Ce fichier sera créé en tant que "
             },
             "copyRemote": {
-              "title": "Remote Copy Files",
+              "title": "Copier des fichiers à distance",
               "form": {
-                "server": "Server"
+                "server": "Serveur"
               },
-              "createdAs": "These files will be created on the remote server under "
+              "createdAs": "Ces fichiers seront créés sur le serveur distant en tant que "
             },
             "fileFingerprints": {
               "title": "File Fingerprint",
@@ -3607,12 +3607,12 @@
               }
             },
             "deleteFile": {
-              "title": "Delete File",
-              "singleFileWarning": "You will not be able to recover the contents of {file} once deleted.",
-              "multipleFilesWarning": "You will not be able to recover the contents of the following files once deleted."
+              "title": "Supprimer fichier",
+              "singleFileWarning": "Vous ne pourrez plus récupérer le contenu de {file} une fois supprimé.",
+              "multipleFilesWarning": "Vous ne serez plus en mesure de récupérer le contenu des fichiers suivants une fois supprimés."
             },
             "createFile": {
-              "title": "Create File"
+              "title": "Créer fichier"
             },
             "details": {
               "title": "File Details",
@@ -3625,22 +3625,22 @@
               "createdAt": "Created At"
             },
             "filePermissions": {
-              "title": "File Permissions",
+              "title": "Permissions du fichier",
               "form": {
                 "recursive": "Apply changes recursively to all files and subdirectories within this directory"
               },
-              "symbolic": "Symbolic:",
-              "octal": "Octal:",
-              "owner": "Owner",
-              "group": "Group",
-              "other": "Other",
-              "breakdown": "Permission Breakdown",
-              "readPermission": "Read permission (4)",
-              "writePermission": "Write permission (2)",
-              "executePermission": "Execute permission (1)"
+              "symbolic": "Symbolique :",
+              "octal": "Octal :",
+              "owner": "Propriétaire",
+              "group": "Groupe",
+              "other": "Autre",
+              "breakdown": "Résumé de permission",
+              "readPermission": "Permission lecture (4)",
+              "writePermission": "Permission écriture (2)",
+              "executePermission": "Permission exécution (1)"
             },
             "renameFile": {
-              "title": "Rename File"
+              "title": "Renommer fichier"
             },
             "massRename": {
               "title": "Rename Files",
@@ -3703,77 +3703,77 @@
               "empty": "No directories found."
             },
             "searchFiles": {
-              "title": "Search Files",
-              "placeholder": "Search for files...",
-              "advancedFilters": "Advanced Filters",
-              "pathPatterns": "Path Patterns",
-              "include": "Include",
-              "exclude": "Exclude",
-              "caseInsensitive": "Case insensitive",
-              "fileContent": "File Content",
-              "searchText": "Search text",
-              "maxFileSize": "Max file size",
-              "includeOversized": "Include oversized files",
-              "includeOversizedDescription": "Includes files that match other filters but are too large to search.",
-              "fileSize": "File Size",
+              "title": "Rechercher fichiers",
+              "placeholder": "Chercher des fichiers...",
+              "advancedFilters": "Filtres avancés",
+              "pathPatterns": "Patternes de chemins",
+              "include": "Inclure",
+              "exclude": "Exclure",
+              "caseInsensitive": "Insensible à la casse",
+              "fileContent": "Contenu du fichier",
+              "searchText": "Chercher texte",
+              "maxFileSize": "Taille de fichier maximale",
+              "includeOversized": "Inclure fichiers surdimensionnés",
+              "includeOversizedDescription": "Inclut les fichiers qui correspondent à d'autres filtres mais sont trop volumineux pour être recherchés.",
+              "fileSize": "Taille de fichier",
               "minimum": "Minimum",
               "maximum": "Maximum"
             },
             "pullFile": {
-              "title": "Pull File",
+              "title": "Récupérer fichier",
               "form": {
-                "fileUrl": "File URL",
-                "query": "Query"
+                "fileUrl": "URL du fichier",
+                "query": "Tester"
               },
-              "createdAs": "This file will be created as ",
-              "pull": "Pull"
+              "createdAs": "Ce fichier sera créé en tant que ",
+              "pull": "Récupérer"
             },
             "sftpDetails": {
-              "title": "SFTP Details",
-              "launch": "Launch"
+              "title": "Détails SFTP",
+              "launch": "Lancer"
             }
           }
         },
         "databases": {
-          "title": "Databases",
-          "subtitle": "{current} of {max} maximum databases created.",
+          "title": "Bases de données",
+          "subtitle": "{current} de {max} base de données maximum créées.",
           "tooltip": {
-            "limitReached": "This server is limited to {max} databases."
+            "limitReached": "Ce serveur est limité à {max} base de données."
           },
           "table": {
             "columns": {
-              "locked": "Locked?"
+              "locked": "Verrouillé ?"
             }
           },
           "button": {
-            "rotatePassword": "Rotate Password"
+            "rotatePassword": "Régénérer mot de passe"
           },
           "form": {
-            "databaseName": "Database Name"
+            "databaseName": "Nom de base de données"
           },
           "modal": {
             "createDatabase": {
-              "title": "Create Database",
+              "title": "Créer base de données",
               "toast": {
-                "created": "Database created."
+                "created": "Base de données créée."
               },
               "form": {
-                "noHostsFound": "No hosts found"
+                "noHostsFound": "Pas d'hôtes trouvés"
               }
             },
             "editDatabase": {
-              "title": "Edit Database",
+              "title": "Modifier la base de données",
               "toast": {
-                "updated": "Database updated."
+                "updated": "Base de données modifiée."
               }
             },
             "databaseDetails": {
-              "title": "Database connection details",
+              "title": "Détails de connexion à la base de données",
               "toast": {
-                "passwordRotated": "Password has been rotated."
+                "passwordRotated": "Le mot de passe a été régénéré."
               },
               "form": {
-                "jdbcConnectionString": "JDBC Connection String"
+                "jdbcConnectionString": "Chaîne de connexion JDBC"
               }
             },
             "recreateDatabase": {
@@ -3784,16 +3784,16 @@
               }
             },
             "deleteDatabase": {
-              "title": "Confirm Database Deletion",
-              "content": "Deleting a database is a permanent action, it cannot be undone. This will permanently delete the **{name}** database and remove all associated data.",
+              "title": "Confirmer la suppression de base de données",
+              "content": "Supprimer une base de données est une action permanente, elle ne peut pas être défaite. Ceci supprimera la base de données **{name}** et toutes données associées de manière permanente.",
               "toast": {
-                "deleted": "Database deleted."
+                "deleted": "Base de données supprimée."
               }
             }
           }
         },
         "schedules": {
-          "title": "Schedules",
+          "title": "Planifications",
           "subtitle": "{current} of {max} maximum schedules created.",
           "dropzone": {
             "title": "Drop some files here to import them as Schedules",
@@ -4202,86 +4202,86 @@
           }
         },
         "subusers": {
-          "title": "Subusers",
+          "title": "Sous-utilisateurs",
           "subtitle": "{current} of {max} maximum subusers created.",
           "tooltip": {
             "limitReached": "This server is limited to {max} subusers."
           },
           "table": {
             "columns": {
-              "twoFactorEnabled": "2FA Enabled",
+              "twoFactorEnabled": "2FA activé",
               "permissions": "Permissions",
-              "ignoredFiles": "Ignored Files"
+              "ignoredFiles": "Fichiers ignorés"
             }
           },
           "modal": {
             "createSubuser": {
-              "title": "Create Subuser",
+              "title": "Créer sous-utilisateur",
               "toast": {
-                "created": "Subuser created."
+                "created": "Sous-utilisateur créé."
               },
               "form": {
-                "emailPlaceholder": "Enter the email that this subuser should be saved as.",
+                "emailPlaceholder": "Entrez l'adresse e-mail du sous-utilisateur.",
                 "permissions": "Permissions",
                 "ignoredFilesDescription": "Files and directories matching these patterns will be hidden from this subuser. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`). Prefix a pattern with `!` to un-hide a path that a broader pattern would otherwise exclude."
               }
             },
             "updateSubuser": {
-              "title": "Update Subuser",
+              "title": "Mettre à jour sous-utilisateur",
               "toast": {
-                "updated": "Subuser updated."
+                "updated": "Sous-utilisateur mis à jour."
               }
             },
             "removeSubuser": {
-              "title": "Confirm Subuser Removal",
-              "content": "Are you sure you want to remove **{username}** from this server?",
+              "title": "Confirmer la suppression du sous-utilisateur",
+              "content": "Êtes-vous sûr de vouloir supprimer **{username}** de ce serveur ?",
               "toast": {
-                "removed": "Subuser removed."
+                "removed": "Sous-utilisateur supprimé."
               }
             }
           }
         },
         "backups": {
-          "title": "Backups",
-          "subtitle": "{current} of {max} maximum backups created.",
+          "title": "Sauvegardes",
+          "subtitle": "{current} de {max} sauvegardes maximum créées.",
           "tooltip": {
-            "limitReached": "This server is limited to {max} backups."
+            "limitReached": "Ce serveur est limité à {max} sauvegardes."
           },
           "table": {
             "columns": {
-              "checksum": "Checksum",
-              "files": "Files",
-              "locked": "Locked?"
+              "checksum": "Somme de contrôle",
+              "files": "Fichiers",
+              "locked": "Verrouillé ?"
             }
           },
           "button": {
-            "browse": "Browse"
+            "browse": "Parcourir"
           },
           "toast": {
-            "downloadStarted": "Download started.",
-            "restoringBackup": "Restoring backup..."
+            "downloadStarted": "Téléchargement commencé.",
+            "restoringBackup": "Restauration de la sauvegarde..."
           },
           "modal": {
             "createBackup": {
-              "title": "Create Backup",
+              "title": "Créer sauvegarde",
               "toast": {
-                "created": "Backup created."
+                "created": "Sauvegarde créée."
               }
             },
             "editBackup": {
-              "title": "Edit Backup",
+              "title": "Modifier la sauvegarde",
               "toast": {
-                "updated": "Backup updated."
+                "updated": "Sauvegarde mise à jour."
               }
             },
             "restoreBackup": {
-              "title": "Restore Backup"
+              "title": "Restaurer la sauvegarde"
             },
             "deleteBackup": {
-              "title": "Confirm Backup Deletion",
-              "content": "Are you sure you want to delete **{name}** from this server?",
+              "title": "Confirmer la suppression de la sauvegarde",
+              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de ce serveur ?",
               "toast": {
-                "deleted": "Backup deleted."
+                "deleted": "Sauvegarde supprimée."
               }
             },
             "viewMetadata": {
@@ -4290,43 +4290,43 @@
           }
         },
         "network": {
-          "title": "Network",
-          "subtitle": "{current} of {max} maximum allocations assigned.",
+          "title": "Réseau",
+          "subtitle": "{current} de {max} allocations maximum assignées.",
           "tooltip": {
-            "limitReached": "This server is limited to {max} allocations."
+            "limitReached": "Ce serveur est limité à {max} allocations."
           },
           "table": {
             "columns": {
-              "hostname": "Hostname",
+              "hostname": "Nom d'hôte",
               "port": "Port"
             }
           },
           "toast": {
-            "created": "Allocation created.",
-            "updated": "Allocation updated.",
-            "removed": "Allocation removed.",
-            "setPrimary": "Allocation set as primary.",
-            "unsetPrimary": "Allocation unset as primary."
+            "created": "Allocation créée.",
+            "updated": "Allocation mise à jour.",
+            "removed": "Allocation supprimée.",
+            "setPrimary": "Allocation définie comme primaire.",
+            "unsetPrimary": "Primarité de l'allocation retirée."
           },
           "modal": {
             "editAllocation": {
-              "title": "Edit Allocation"
+              "title": "Modifier l'allocation"
             },
             "removeAllocation": {
-              "title": "Confirm Allocation Removal",
-              "content": "Are you sure you want to remove **{allocation}** from this server?"
+              "title": "Confirmer la suppression de l'allocation",
+              "content": "Êtes-vous sûr de vouloir supprimer **{allocation}** de ce serveur ?"
             }
           }
         },
         "startup": {
-          "title": "Startup",
+          "title": "Démarrage",
           "variables": "Variables",
-          "dockerImageDescription": "The Docker image used to run this server. This can be changed to use a different image.",
-          "dockerImageDescriptionCustom": "The Docker image used to run this server. This has been set by an administrator and cannot be changed.",
+          "dockerImageDescription": "L'image Docker utilisée pour lancer ce serveur. Elle peut être changée pour utiliser une autre image.",
+          "dockerImageDescriptionCustom": "L'image Docker utilisée pour lancer ce serveur. Elle a été définie par un administrateur et ne peut pas être changée.",
           "toast": {
-            "startupCommandUpdated": "Startup command updated.",
-            "dockerImageUpdated": "Docker image updated.",
-            "variablesUpdated": "Variables updated."
+            "startupCommandUpdated": "Commande de démarrage mise à jour.",
+            "dockerImageUpdated": "Image Docker mise à jour.",
+            "variablesUpdated": "Variables mises à jour."
           },
           "modal": {
             "unsavedChanges": {
@@ -4367,7 +4367,7 @@
           }
         },
         "settings": {
-          "title": "Settings",
+          "title": "Paramètres",
           "debugInformation": {
             "title": "Debug Information",
             "form": {
@@ -4377,50 +4377,50 @@
             }
           },
           "rename": {
-            "title": "Rename Server",
+            "title": "Renommer serveur",
             "toast": {
-              "renamed": "Server renamed."
+              "renamed": "Serveur renommé."
             }
           },
           "timezone": {
-            "title": "Timezone",
+            "title": "Fuseau horaire",
             "toast": {
-              "updated": "Server timezone updated."
+              "updated": "Fuseau horaire du serveur mis à jour."
             }
           },
           "autokill": {
-            "title": "Auto-Kill",
+            "title": "Auto-tuage",
             "form": {
-              "secondsUntilAutoKill": "Seconds until auto-kill"
+              "secondsUntilAutoKill": "Secondes avant auto-tuage"
             },
             "toast": {
-              "updated": "Server auto-kill updated."
+              "updated": "Auto-tuage du serveur mis à jour."
             }
           },
           "autostart": {
-            "title": "Auto-Start",
+            "title": "Auto-démarrage",
             "form": {
-              "behavior": "Behavior"
+              "behavior": "Comportement"
             },
             "toast": {
-              "updated": "Server auto-start behavior updated."
+              "updated": "Comportement d'auto-démarrage du serveur mis à jour."
             }
           },
           "reinstall": {
-            "title": "Reinstall Server",
-            "button": "Reinstall Server",
-            "content": "Reinstalling your server will stop it, and then re-run the installation script that initially set it up. **Some files may be deleted or modified during this process, please back up your data before continuing.**",
+            "title": "Réinstaller serveur",
+            "button": "Réinstaller serveur",
+            "content": "Réinstaller votre serveur l'éteindra, puis exécutera le script d'installation qui l'a initialement configuré. **Des fichiers peuvent être supprimés ou modifiés durant ce processus, veuillez sauvegarder vos données avant de continuer.**",
             "modal": {
-              "title": "Reinstall Server",
-              "button": "Reinstall",
+              "title": "Réinstaller serveur",
+              "button": "Réinstaller",
               "toast": {
-                "reinstalling": "Reinstalling server..."
+                "reinstalling": "Réinstallation du serveur..."
               }
             }
           }
         },
         "activity": {
-          "title": "Activity",
+          "title": "Activité",
           "button": {
             "clearUserFilter": "Clear User Filter"
           }
