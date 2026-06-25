@@ -24,7 +24,7 @@ jobs:
           cache: false
 
       - name: Dummy Frontend Files
-        run: mkdir -p frontend/dist && echo "Dummy file" > frontend/dist/dummy.txt
+        run: mkdir -p frontend/dist && echo "Dummy file" > frontend/dist/index.html
 
       - name: Build Crate Docs
         run: cargo doc --no-deps -p shared -p wings-api
