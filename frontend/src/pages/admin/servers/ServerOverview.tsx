@@ -152,6 +152,11 @@ export default function ServerOverview({ server }: { server: Server }) {
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.createdAt', {})}>
                 <Text size='sm'>{formatDateTime(server.owner.created)}</Text>
               </InfoRow>
+              {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.owner.appendedComponents.map(
+                (Component, index) => (
+                  <Component key={`owner-ext-${index}`} server={server} />
+                ),
+              )}
             </Stack>
           </TitleCard>
 
@@ -180,6 +185,11 @@ export default function ServerOverview({ server }: { server: Server }) {
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.diskLimit', {})}>
                 <Text size='sm'>{bytesToString(mbToBytes(server.node.disk))}</Text>
               </InfoRow>
+              {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.nodeAndLocation.appendedComponents.map(
+                (Component, index) => (
+                  <Component key={`node-location-ext-${index}`} server={server} />
+                ),
+              )}
             </Stack>
           </TitleCard>
         </SimpleGrid>
@@ -245,6 +255,11 @@ export default function ServerOverview({ server }: { server: Server }) {
               </InfoRow>
             </Stack>
           </SimpleGrid>
+          {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.serverDetails.appendedComponents.map(
+            (Component, index) => (
+              <Component key={`server-details-ext-${index}`} server={server} />
+            ),
+          )}
         </TitleCard>
 
         <TitleCard
@@ -308,6 +323,11 @@ export default function ServerOverview({ server }: { server: Server }) {
                 )
               }
             />
+            {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.resourceLimits.appendedComponents.map(
+              (Component, index) => (
+                <Component key={`resource-limits-ext-${index}`} server={server} />
+              ),
+            )}
           </SimpleGrid>
         </TitleCard>
 
@@ -343,6 +363,11 @@ export default function ServerOverview({ server }: { server: Server }) {
             )}
           </SimpleGrid>
         </TitleCard>
+        {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.appendedCards.appendedComponents.map(
+          (Component, index) => (
+            <Component key={`overview-card-ext-${index}`} server={server} />
+          ),
+        )}
       </Stack>
     </AdminSubContentContainer>
   );

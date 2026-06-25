@@ -223,6 +223,11 @@ export default function NodeOverview({ node }: { node: Node }) {
               <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.createdAt', {})}>
                 <Text size='sm'>{formatDateTime(node.created)}</Text>
               </InfoRow>
+              {window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.nodeDetails.appendedComponents.map(
+                (Component, index) => (
+                  <Component key={`node-details-ext-${index}`} node={node} />
+                ),
+              )}
             </Stack>
           </TitleCard>
 
@@ -282,6 +287,11 @@ export default function NodeOverview({ node }: { node: Node }) {
                 </InfoRow>
               </Stack>
             )}
+            {window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.systemInfo.appendedComponents.map(
+              (Component, index) => (
+                <Component key={`system-info-ext-${index}`} node={node} />
+              ),
+            )}
           </TitleCard>
         </SimpleGrid>
 
@@ -340,9 +350,19 @@ export default function NodeOverview({ node }: { node: Node }) {
                   cores: (capacity.allocated.cpu / 100).toFixed(2),
                 })}
               />
+              {window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.resources.appendedComponents.map(
+                (Component, index) => (
+                  <Component key={`resources-ext-${index}`} node={node} />
+                ),
+              )}
             </div>
           )}
         </TitleCard>
+        {window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.appendedCards.appendedComponents.map(
+          (Component, index) => (
+            <Component key={`overview-card-ext-${index}`} node={node} />
+          ),
+        )}
       </Stack>
     </AdminSubContentContainer>
   );
