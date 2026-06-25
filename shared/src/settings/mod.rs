@@ -768,6 +768,41 @@ impl Deref for SettingsReadGuard<'_> {
     }
 }
 
+const INDEX_HTML: &str = include_str!("../../../frontend/dist/index.html");
+
+#[derive(Clone)]
+pub struct ArcedIndexHtml(Arc<String>);
+
+// SAFETY: Just wrapping Arc
+unsafe impl arc_swap::RefCnt for ArcedIndexHtml {
+    type Base = String;
+
+    fn into_ptr(me: Self) -> *mut Self::Base {
+        arc_swap::RefCnt::into_ptr(me.0)
+    }
+
+    fn as_ptr(me: &Self) -> *mut Self::Base {
+        arc_swap::RefCnt::as_ptr(&me.0)
+    }
+
+    unsafe fn from_ptr(ptr: *const Self::Base) -> Self {
+        // SAFETY: Just wrapping Arc
+        Self(unsafe { arc_swap::RefCnt::from_ptr(ptr) })
+    }
+}
+
+impl AsRef<str> for ArcedIndexHtml {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl AsRef<[u8]> for ArcedIndexHtml {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_bytes()
+    }
+}
+
 pub struct SettingsWriteGuard<'a> {
     parent: &'a Settings,
     settings: Option<RwLockWriteGuard<'a, SettingsBuffer>>,
@@ -805,6 +840,20 @@ impl<'a> SettingsWriteGuard<'a> {
             .parent
             .cached_index
             .fetch_update(Ordering::Release, Ordering::Relaxed, |i| Some((i + 1) % 2));
+
+        let mut environment = minijinja::Environment::new();
+        environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
+        environment.add_global(
+            "settings",
+            minijinja::Value::from_serialize(&settings_guard.settings),
+        );
+
+        let rendered_index_html = environment
+            .render_str(INDEX_HTML, minijinja::context! {})
+            .map_err(anyhow::Error::new)?;
+        self.parent
+            .rendered_index_html
+            .store(ArcedIndexHtml(Arc::new(rendered_index_html)));
 
         Ok(())
     }
@@ -865,6 +914,8 @@ pub struct Settings {
     cached_index: AtomicUsize,
     write_serializing: Semaphore,
 
+    rendered_index_html: arc_swap::ArcSwapAny<ArcedIndexHtml>,
+
     database: Arc<crate::database::Database>,
 }
 
@@ -898,6 +949,14 @@ impl Settings {
             Self::fetch_settings(&database)
         )?;
 
+        let mut environment = minijinja::Environment::new();
+        environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
+        environment.add_global("settings", minijinja::Value::from_serialize(&s1));
+
+        let rendered_index_html = environment.render_str(INDEX_HTML, minijinja::context! {})?;
+        let rendered_index_html =
+            arc_swap::ArcSwapAny::new(ArcedIndexHtml(Arc::new(rendered_index_html)));
+
         Ok(Self {
             cached: [
                 RwLock::new(SettingsBuffer {
@@ -911,8 +970,14 @@ impl Settings {
             ],
             cached_index: AtomicUsize::new(0),
             write_serializing: Semaphore::new(1),
+            rendered_index_html,
             database,
         })
+    }
+
+    #[inline]
+    pub fn get_rendered_index_html(&self) -> ArcedIndexHtml {
+        self.rendered_index_html.load_full()
     }
 
     pub async fn get(&self) -> Result<SettingsReadGuard<'_>, anyhow::Error> {

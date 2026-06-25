@@ -768,34 +768,40 @@ pub async fn handle_startup() -> Result<
                         },
                     };
 
-                    return ApiResponse::new(Body::from(file.contents()))
-                        .with_header(
-                            "Content-Type",
-                            match infer::get(file.contents()) {
-                                Some(kind) => kind.mime_type(),
-                                _ => match file.path().extension() {
-                                    Some(ext) => match ext.to_str() {
-                                        Some("html") => "text/html",
-                                        Some("js") => "application/javascript",
-                                        Some("css") => "text/css",
-                                        Some("json") => "application/json",
-                                        Some("svg") => "image/svg+xml",
-                                        _ => "application/octet-stream",
-                                    },
-                                    None => "application/octet-stream",
+                    return ApiResponse::new(if is_index {
+                        Body::from(axum::body::Bytes::from_owner(
+                            state.settings.get_rendered_index_html(),
+                        ))
+                    } else {
+                        Body::from(file.contents())
+                    })
+                    .with_header(
+                        "Content-Type",
+                        match infer::get(file.contents()) {
+                            Some(kind) => kind.mime_type(),
+                            _ => match file.path().extension() {
+                                Some(ext) => match ext.to_str() {
+                                    Some("html") => "text/html",
+                                    Some("js") => "application/javascript",
+                                    Some("css") => "text/css",
+                                    Some("json") => "application/json",
+                                    Some("svg") => "image/svg+xml",
+                                    _ => "application/octet-stream",
                                 },
+                                None => "application/octet-stream",
                             },
-                        )
-                        .with_optional_header(
-                            "Content-Security-Policy",
-                            if is_index {
-                                let settings = state.settings.get().await?;
-                                let script_csp = settings.captcha_provider.to_csp_script_src();
-                                let style_csp = settings.captcha_provider.to_csp_style_src();
-                                drop(settings);
+                        },
+                    )
+                    .with_optional_header(
+                        "Content-Security-Policy",
+                        if is_index {
+                            let settings = state.settings.get().await?;
+                            let script_csp = settings.captcha_provider.to_csp_script_src();
+                            let style_csp = settings.captcha_provider.to_csp_style_src();
+                            drop(settings);
 
-                                Some(format!(
-                                    "default-src 'self'; \
+                            Some(format!(
+                                "default-src 'self'; \
                                     script-src 'self' blob: {script_csp}; \
                                     frame-src *; \
                                     style-src 'self' 'unsafe-inline' {style_csp}; \
@@ -807,14 +813,14 @@ pub async fn handle_startup() -> Result<
                                     base-uri 'self'; \
                                     form-action 'self'; \
                                     frame-ancestors 'self';"
-                                ))
-                            } else {
-                                None
-                            },
-                        )
-                        .with_header("X-Content-Type-Options", "nosniff")
-                        .with_header("X-Frame-Options", "SAMEORIGIN")
-                        .ok();
+                            ))
+                        } else {
+                            None
+                        },
+                    )
+                    .with_header("X-Content-Type-Options", "nosniff")
+                    .with_header("X-Frame-Options", "SAMEORIGIN")
+                    .ok();
                 }
 
                 ApiResponse::error("route not found")

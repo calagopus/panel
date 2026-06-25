@@ -78,16 +78,12 @@ export default function NodeAllocationsUpdateModal({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!ip) {
-      setIp(mostCommonIp);
-    }
-  }, [mostCommonIp, ip]);
+    setIp(mostCommonIp);
+  }, [mostCommonIp, props.opened]);
 
   useEffect(() => {
-    if (!ipAlias) {
-      setIpAlias(mostCommonIpAlias);
-    }
-  }, [mostCommonIpAlias, ipAlias]);
+    setIpAlias(mostCommonIpAlias);
+  }, [mostCommonIpAlias, props.opened]);
 
   const doUpdate = () => {
     setLoading(true);

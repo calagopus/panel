@@ -2065,10 +2065,12 @@
                   "apiPort": "API Port"
                 },
                 "button": {
-                  "save": "Konfiguration speichern"
+                  "save": "Konfiguration speichern",
+                  "reveal": "Konfiguration anzeigen"
                 },
                 "alert": {
-                  "couldNotReach": "Node konnte nicht erreicht werden: {error}"
+                  "couldNotReach": "Node konnte nicht erreicht werden: {error}",
+                  "tokenWarning": "Die folgende Konfiguration enthält den Node-Token. Zeige sie nur an, wenn nötig."
                 },
                 "toast": {
                   "applied": "Konfiguration erfolgreich angewendet.",

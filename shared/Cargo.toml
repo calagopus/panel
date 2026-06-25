@@ -63,7 +63,7 @@ ignore = "0.4.23"
 futures-util = { workspace = true }
 cap-std = "4.0.0"
 semver = { workspace = true }
-gix = { version = "0.84.0", features = ["blocking-http-transport-reqwest-rust-tls"] }
+gix = { version = "0.85.0", features = ["blocking-http-transport-reqwest-rust-tls"] }
 tempfile = { workspace = true }
 compact_str = { workspace = true }
 nestify = { workspace = true }
@@ -82,3 +82,4 @@ parking_lot = { workspace = true }
 ipnetwork = { version = "0.21.1", features = ["serde"] }
 openssl = { version = "0.10.80", features = ["vendored"] } # temporary for webauthn-rs
 tokio-tungstenite = { workspace = true }
+arc-swap = "1.9.1"

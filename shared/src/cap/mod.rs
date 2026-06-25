@@ -4,7 +4,6 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
-use tokio::sync::RwLock;
 pub use utils::{AsyncReadDir, AsyncWalkDir, ReadDir, WalkDir};
 
 mod utils;
@@ -12,7 +11,7 @@ mod utils;
 #[derive(Debug, Clone)]
 pub struct CapFilesystem {
     pub base_path: Arc<PathBuf>,
-    pub(super) inner: Arc<RwLock<Option<Arc<cap_std::fs::Dir>>>>,
+    pub(super) inner: Arc<arc_swap::ArcSwapOption<cap_std::fs::Dir>>,
 }
 
 impl CapFilesystem {
@@ -28,7 +27,7 @@ impl CapFilesystem {
 
         Ok(Self {
             base_path,
-            inner: Arc::new(RwLock::new(Some(Arc::new(inner)))),
+            inner: Arc::new(arc_swap::ArcSwapOption::from(Some(Arc::new(inner)))),
         })
     }
 
@@ -39,37 +38,26 @@ impl CapFilesystem {
 
         Ok(Self {
             base_path,
-            inner: Arc::new(RwLock::new(Some(Arc::new(inner)))),
+            inner: Arc::new(arc_swap::ArcSwapOption::from(Some(Arc::new(inner)))),
         })
     }
 
     pub fn new_uninitialized(base_path: PathBuf) -> Self {
         Self {
             base_path: Arc::new(base_path),
-            inner: Arc::new(RwLock::new(None)),
+            inner: Arc::new(arc_swap::ArcSwapOption::from(None)),
         }
     }
 
     #[inline]
-    pub async fn is_uninitialized(&self) -> bool {
-        self.inner.read().await.is_none()
-    }
-
-    #[inline]
-    pub async fn async_get_inner(&self) -> Result<Arc<cap_std::fs::Dir>, anyhow::Error> {
-        let inner = self.inner.read().await;
-
-        inner
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("filesystem not initialized"))
+    pub fn is_uninitialized(&self) -> bool {
+        self.inner.load().is_none()
     }
 
     #[inline]
     pub fn get_inner(&self) -> Result<Arc<cap_std::fs::Dir>, anyhow::Error> {
-        let inner = self.inner.blocking_read();
-
-        inner
-            .clone()
+        self.inner
+            .load_full()
             .ok_or_else(|| anyhow::anyhow!("filesystem not initialized"))
     }
 
@@ -109,7 +97,7 @@ impl CapFilesystem {
     pub async fn async_create_dir_all(&self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         tokio::task::spawn_blocking(move || inner.create_dir_all(path)).await??;
 
         Ok(())
@@ -127,7 +115,7 @@ impl CapFilesystem {
     pub async fn async_create_dir(&self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         tokio::task::spawn_blocking(move || inner.create_dir(path)).await??;
 
         Ok(())
@@ -145,7 +133,7 @@ impl CapFilesystem {
     pub async fn async_remove_dir(&self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         tokio::task::spawn_blocking(move || inner.remove_dir(path)).await??;
 
         Ok(())
@@ -163,7 +151,7 @@ impl CapFilesystem {
     pub async fn async_remove_dir_all(&self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         tokio::task::spawn_blocking(move || inner.remove_dir_all(path)).await??;
 
         Ok(())
@@ -181,7 +169,7 @@ impl CapFilesystem {
     pub async fn async_remove_file(&self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         tokio::task::spawn_blocking(move || inner.remove_file(path)).await??;
 
         Ok(())
@@ -205,8 +193,8 @@ impl CapFilesystem {
         let from = self.relative_path(from.as_ref());
         let to = self.relative_path(to.as_ref());
 
-        let inner = self.async_get_inner().await?;
-        let to_inner = to_dir.async_get_inner().await?;
+        let inner = self.get_inner()?;
+        let to_inner = to_dir.get_inner()?;
         tokio::task::spawn_blocking(move || inner.rename(from, &to_inner, to)).await??;
 
         Ok(())
@@ -234,7 +222,7 @@ impl CapFilesystem {
         let metadata = if path.components().next().is_none() {
             cap_std::fs::Metadata::from_just_metadata(tokio::fs::metadata(&*self.base_path).await?)
         } else {
-            let inner = self.async_get_inner().await?;
+            let inner = self.get_inner()?;
 
             tokio::task::spawn_blocking(move || inner.metadata(path)).await??
         };
@@ -267,7 +255,7 @@ impl CapFilesystem {
                 tokio::fs::symlink_metadata(&*self.base_path).await?,
             )
         } else {
-            let inner = self.async_get_inner().await?;
+            let inner = self.get_inner()?;
 
             tokio::task::spawn_blocking(move || inner.symlink_metadata(path)).await??
         };
@@ -298,7 +286,7 @@ impl CapFilesystem {
             return Ok(path);
         }
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         let canonicalized = tokio::task::spawn_blocking(move || inner.canonicalize(path)).await??;
 
         Ok(canonicalized)
@@ -319,7 +307,7 @@ impl CapFilesystem {
     pub async fn async_read_link(&self, path: impl AsRef<Path>) -> Result<PathBuf, anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         let link = tokio::task::spawn_blocking(move || inner.read_link(path)).await??;
 
         Ok(link)
@@ -340,7 +328,7 @@ impl CapFilesystem {
     ) -> Result<PathBuf, anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         let link_contents =
             tokio::task::spawn_blocking(move || inner.read_link_contents(path)).await??;
 
@@ -362,7 +350,7 @@ impl CapFilesystem {
     ) -> Result<String, anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         let content = tokio::task::spawn_blocking(move || inner.read_to_string(path)).await??;
 
         Ok(content)
@@ -383,7 +371,7 @@ impl CapFilesystem {
     ) -> Result<tokio::fs::File, anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         let file = tokio::task::spawn_blocking(move || inner.open(path)).await??;
 
         Ok(tokio::fs::File::from_std(file.into_std()))
@@ -405,7 +393,7 @@ impl CapFilesystem {
     ) -> Result<tokio::fs::File, anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         let file = tokio::task::spawn_blocking(move || inner.open_with(path, &options)).await??;
 
         Ok(tokio::fs::File::from_std(file.into_std()))
@@ -431,7 +419,7 @@ impl CapFilesystem {
     ) -> Result<(), anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         tokio::task::spawn_blocking(move || inner.write(path, data)).await??;
 
         Ok(())
@@ -452,7 +440,7 @@ impl CapFilesystem {
     ) -> Result<tokio::fs::File, anyhow::Error> {
         let path = self.relative_path(path.as_ref());
 
-        let inner = self.async_get_inner().await?;
+        let inner = self.get_inner()?;
         let file = tokio::task::spawn_blocking(move || inner.create(path)).await??;
 
         Ok(tokio::fs::File::from_std(file.into_std()))
@@ -476,8 +464,8 @@ impl CapFilesystem {
         let from = self.relative_path(from.as_ref());
         let to = self.relative_path(to.as_ref());
 
-        let inner = self.async_get_inner().await?;
-        let to_inner = to_dir.async_get_inner().await?;
+        let inner = self.get_inner()?;
+        let to_inner = to_dir.get_inner()?;
         let bytes_copied =
             tokio::task::spawn_blocking(move || inner.copy(from, &to_inner, to)).await??;
 
@@ -536,7 +524,7 @@ impl CapFilesystem {
                 tokio::fs::read_dir(&*self.base_path).await?,
             ))
         } else {
-            let inner = self.async_get_inner().await?;
+            let inner = self.get_inner()?;
 
             AsyncReadDir::Cap(utils::AsyncCapReadDir(
                 Some(tokio::task::spawn_blocking(move || inner.read_dir(path)).await??),

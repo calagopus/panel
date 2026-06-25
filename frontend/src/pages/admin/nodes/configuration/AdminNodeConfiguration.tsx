@@ -1,4 +1,4 @@
-import { faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faExclamationTriangle, faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import jsYaml from 'js-yaml';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -60,6 +60,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
     [configurationParams],
   );
 
+  const [revealed, setRevealed] = useState(false);
   const [yaml, setYaml] = useState<string | null>(null);
   const [liveConfigError, setLiveConfigError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -111,115 +112,133 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
       title={t('pages.admin.nodes.tabs.configuration.page.title', {})}
       titleOrder={2}
       contentRight={
-        <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>
-          {t('pages.admin.nodes.tabs.configuration.page.button.save', {})}
-        </Button>
+        revealed ? (
+          <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>
+            {t('pages.admin.nodes.tabs.configuration.page.button.save', {})}
+          </Button>
+        ) : undefined
       }
     >
-      <Stack gap='xl'>
-        <div>
-          <Title order={4} mb='md'>
-            {t('pages.admin.nodes.tabs.configuration.page.section.initialSetup', {})}
-          </Title>
-          <div className='grid md:grid-cols-4 grid-cols-1 gap-4'>
-            <div className='flex flex-col md:col-span-3'>
-              {nodeConfiguration && command ? (
-                <>
-                  <HljsCode
-                    languageName='yaml'
-                    language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
-                  >
-                    {jsYaml.dump(nodeConfiguration)}
-                  </HljsCode>
-
-                  <div className='mt-2'>
-                    <p>{t('pages.admin.nodes.tabs.configuration.page.description.placeFile', {}).md()}</p>
-                    <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
-                      <Code block className='flex-1'>
-                        {command}
-                      </Code>
-                      <Tooltip label={t('pages.admin.nodes.tabs.configuration.page.tooltip.copyCommand', {})}>
-                        <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
-                          <FontAwesomeIcon icon={faCopy} />
-                        </ActionIcon>
-                      </Tooltip>
-                    </Group>
-                  </div>
-                </>
-              ) : (
-                <Spinner.Centered />
-              )}
-            </div>
-            <Card>
-              <Title className='text-right'>{t('pages.admin.nodes.tabs.configuration.page.title', {})}</Title>
-
-              <Stack>
-                <TextInput
-                  name='remote'
-                  label={t('pages.admin.nodes.tabs.configuration.page.form.panelUrl', {})}
-                  value={remote}
-                  onChange={(e) => setRemote(e.target.value)}
-                />
-                <NumberInput
-                  name='api_port'
-                  label={t('pages.admin.nodes.tabs.configuration.page.form.apiPort', {})}
-                  value={apiPort}
-                  min={1}
-                  max={65535}
-                  onChange={(value) => setApiPort(Number(value))}
-                />
-                <NumberInput
-                  name='sftp_port'
-                  label={t('common.form.sftpPort', {})}
-                  value={sftpPort}
-                  min={1}
-                  max={65535}
-                  onChange={(value) => setSftpPort(Number(value))}
-                />
-              </Stack>
-            </Card>
+      {!revealed ? (
+        <Stack>
+          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+            {t('pages.admin.nodes.tabs.configuration.page.alert.tokenWarning', {})}
+          </Alert>
+          <div>
+            <Button onClick={() => setRevealed(true)}>
+              <Group gap='xs'>
+                <FontAwesomeIcon icon={faEye} />
+                {t('pages.admin.nodes.tabs.configuration.page.button.reveal', {})}
+              </Group>
+            </Button>
           </div>
-        </div>
+        </Stack>
+      ) : (
+        <Stack gap='xl'>
+          <div>
+            <Title order={4} mb='md'>
+              {t('pages.admin.nodes.tabs.configuration.page.section.initialSetup', {})}
+            </Title>
+            <div className='grid md:grid-cols-4 grid-cols-1 gap-4'>
+              <div className='flex flex-col md:col-span-3'>
+                {nodeConfiguration && command ? (
+                  <>
+                    <HljsCode
+                      languageName='yaml'
+                      language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
+                    >
+                      {jsYaml.dump(nodeConfiguration)}
+                    </HljsCode>
 
-        <Divider />
+                    <div className='mt-2'>
+                      <p>{t('pages.admin.nodes.tabs.configuration.page.description.placeFile', {}).md()}</p>
+                      <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
+                        <Code block className='flex-1'>
+                          {command}
+                        </Code>
+                        <Tooltip label={t('pages.admin.nodes.tabs.configuration.page.tooltip.copyCommand', {})}>
+                          <ActionIcon variant='subtle' onClick={handleCopyToClipboard(command, addToast)} size='lg'>
+                            <FontAwesomeIcon icon={faCopy} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
+                    </div>
+                  </>
+                ) : (
+                  <Spinner.Centered />
+                )}
+              </div>
+              <Card>
+                <Title className='text-right'>{t('pages.admin.nodes.tabs.configuration.page.title', {})}</Title>
 
-        <div>
-          <Title order={4} mb='md'>
-            {t('pages.admin.nodes.tabs.configuration.page.section.liveConfiguration', {})}
-          </Title>
-          {liveConfigError ? (
-            <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
-              {t('pages.admin.nodes.tabs.configuration.page.alert.couldNotReach', { error: liveConfigError })}
-            </Alert>
-          ) : yaml === null ? (
-            <Spinner.Centered />
-          ) : (
-            <div className='rounded-md overflow-hidden'>
-              <MonacoEditor
-                height='65vh'
-                theme='vs-dark'
-                language='yaml'
-                value={yaml}
-                onChange={(value) => setYaml(value ?? '')}
-                onMount={(editor, monaco) => {
-                  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-                    doSaveRef.current();
-                  });
-                }}
-                options={{
-                  stickyScroll: { enabled: false },
-                  minimap: { enabled: false },
-                  codeLens: false,
-                  scrollBeyondLastLine: false,
-                  smoothScrolling: false,
-                  // @ts-expect-error this is valid
-                  touchScrollEnabled: true,
-                }}
-              />
+                <Stack>
+                  <TextInput
+                    name='remote'
+                    label={t('pages.admin.nodes.tabs.configuration.page.form.panelUrl', {})}
+                    value={remote}
+                    onChange={(e) => setRemote(e.target.value)}
+                  />
+                  <NumberInput
+                    name='api_port'
+                    label={t('pages.admin.nodes.tabs.configuration.page.form.apiPort', {})}
+                    value={apiPort}
+                    min={1}
+                    max={65535}
+                    onChange={(value) => setApiPort(Number(value))}
+                  />
+                  <NumberInput
+                    name='sftp_port'
+                    label={t('common.form.sftpPort', {})}
+                    value={sftpPort}
+                    min={1}
+                    max={65535}
+                    onChange={(value) => setSftpPort(Number(value))}
+                  />
+                </Stack>
+              </Card>
             </div>
-          )}
-        </div>
-      </Stack>
+          </div>
+
+          <Divider />
+
+          <div>
+            <Title order={4} mb='md'>
+              {t('pages.admin.nodes.tabs.configuration.page.section.liveConfiguration', {})}
+            </Title>
+            {liveConfigError ? (
+              <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                {t('pages.admin.nodes.tabs.configuration.page.alert.couldNotReach', { error: liveConfigError })}
+              </Alert>
+            ) : yaml === null ? (
+              <Spinner.Centered />
+            ) : (
+              <div className='rounded-md overflow-hidden'>
+                <MonacoEditor
+                  height='65vh'
+                  theme='vs-dark'
+                  language='yaml'
+                  value={yaml}
+                  onChange={(value) => setYaml(value ?? '')}
+                  onMount={(editor, monaco) => {
+                    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+                      doSaveRef.current();
+                    });
+                  }}
+                  options={{
+                    stickyScroll: { enabled: false },
+                    minimap: { enabled: false },
+                    codeLens: false,
+                    scrollBeyondLastLine: false,
+                    smoothScrolling: false,
+                    // @ts-expect-error this is valid
+                    touchScrollEnabled: true,
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </Stack>
+      )}
     </AdminSubContentContainer>
   );
 }

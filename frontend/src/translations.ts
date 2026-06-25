@@ -2043,9 +2043,11 @@ const baseTranslations = defineTranslations({
                 },
                 button: {
                   save: 'Save Configuration',
+                  reveal: 'Reveal Configuration',
                 },
                 alert: {
                   couldNotReach: 'Could not reach the node: {error}',
+                  tokenWarning: 'The configuration below contains the node token. Reveal it only when needed.',
                 },
                 toast: {
                   applied: 'Configuration applied successfully.',
