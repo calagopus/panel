@@ -21,6 +21,7 @@ export default function EmailSmtp({ form }: { form: UseFormReturnType<z.infer<ty
       username: form.values.username ?? null,
       password: form.values.password ?? null,
       tlsMode: form.values.tlsMode ?? 'start_tls',
+      skipCertValidation: form.values.skipCertValidation ?? false,
       fromAddress: form.values.fromAddress ?? '',
       fromName: form.values.fromName ?? null,
     });
