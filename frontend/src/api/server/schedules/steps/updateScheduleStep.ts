@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   serverUuid: string,
@@ -11,6 +11,6 @@ export default async (
 ): Promise<void> => {
   await axiosInstance.patch(
     `/api/client/servers/${serverUuid}/schedules/${scheduleUuid}/steps/${stepUuid}`,
-    transformKeysToSnakeCase(data),
+    serializeForApi(serverScheduleStepUpdateSchema, data),
   );
 };

@@ -1,13 +1,10 @@
+import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 
-interface Data {
-  serverUuid: string;
-}
-
-export default async (nodeUuid: string, backupUuid: string, data: Data): Promise<void> => {
+export default async (nodeUuid: string, backupUuid: string, data: { serverUuid: string }): Promise<void> => {
   await axiosInstance.post(
     `/api/admin/nodes/${nodeUuid}/backups/${backupUuid}/reattach`,
-    transformKeysToSnakeCase(data),
+    serializeForApi(z.object({ serverUuid: z.string() }), data),
   );
 };
