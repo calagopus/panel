@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 1.1.x
 
 env:
   BIN_NAME: panel-rs
@@ -11,6 +12,7 @@ env:
   PROJECT_NAME: panel-rs
   GHCR_IMAGE: ghcr.io/${{ github.repository }}
   DOCKERHUB_IMAGE: docker.io/${{ github.repository }}
+  IMAGE_PREFIX: ${{ github.ref_name == 'main' && 'nightly' || 'next' }}
 
 jobs:
   build-frontend:
@@ -161,10 +163,10 @@ jobs:
         include:
           - variant: main
             dockerfile: Dockerfile
-            tag: nightly
+            tag_suffix: ""
           - variant: aio
             dockerfile: Dockerfile.aio
-            tag: nightly-aio
+            tag_suffix: -aio
 
     steps:
       - name: Checkout code
@@ -224,8 +226,8 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
           push: true
           tags: |
-            ${{ env.GHCR_IMAGE }}:${{ matrix.tag }}
-            ${{ env.DOCKERHUB_IMAGE }}:${{ matrix.tag }}
+            ${{ env.GHCR_IMAGE }}:${{ env.IMAGE_PREFIX }}${{ matrix.tag_suffix }}
+            ${{ env.DOCKERHUB_IMAGE }}:${{ env.IMAGE_PREFIX }}${{ matrix.tag_suffix }}
           sbom: true
           provenance: true
           cache-from: type=gha,scope=${{ matrix.variant }}
@@ -256,7 +258,7 @@ jobs:
           cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}@${{ steps.build.outputs.digest }}
 
   build-heavy-images:
-    name: Build Heavy ${{ matrix.variant }} Docker image (${{ matrix.platform }})
+    name: Build ${{ matrix.variant }} Docker image (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -316,8 +318,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: |
-            ${{ env.GHCR_IMAGE }}:nightly-${{ matrix.variant }}-${{ matrix.tag_suffix }}
-            ${{ env.DOCKERHUB_IMAGE }}:nightly-${{ matrix.variant }}-${{ matrix.tag_suffix }}
+            ${{ env.GHCR_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}-${{ matrix.tag_suffix }}
+            ${{ env.DOCKERHUB_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}-${{ matrix.tag_suffix }}
           sbom: scan-stages=true
           provenance: true
           cache-from: type=gha,scope=${{ matrix.variant }}-${{ matrix.tag_suffix }}
@@ -352,20 +354,20 @@ jobs:
 
       - name: Create and push multi-arch manifest (GHCR)
         run: |
-          docker buildx imagetools create -t ${{ env.GHCR_IMAGE }}:nightly-${{ matrix.variant }} \
-            ${{ env.GHCR_IMAGE }}:nightly-${{ matrix.variant }}-amd64 \
-            ${{ env.GHCR_IMAGE }}:nightly-${{ matrix.variant }}-arm64
+          docker buildx imagetools create -t ${{ env.GHCR_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }} \
+            ${{ env.GHCR_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}-amd64 \
+            ${{ env.GHCR_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}-arm64
 
       - name: Create and push multi-arch manifest (Docker Hub)
         run: |
-          docker buildx imagetools create -t ${{ env.DOCKERHUB_IMAGE }}:nightly-${{ matrix.variant }} \
-            ${{ env.DOCKERHUB_IMAGE }}:nightly-${{ matrix.variant }}-amd64 \
-            ${{ env.DOCKERHUB_IMAGE }}:nightly-${{ matrix.variant }}-arm64
+          docker buildx imagetools create -t ${{ env.DOCKERHUB_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }} \
+            ${{ env.DOCKERHUB_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}-amd64 \
+            ${{ env.DOCKERHUB_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}-arm64
 
       - name: Install cosign
         uses: sigstore/cosign-installer@v4.1.2
 
       - name: Sign image with cosign
         run: |
-          cosign sign --yes ${{ env.GHCR_IMAGE }}:nightly-${{ matrix.variant }}
-          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}:nightly-${{ matrix.variant }}
+          cosign sign --yes ${{ env.GHCR_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}
+          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}

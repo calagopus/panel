@@ -334,7 +334,7 @@ jobs:
           cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}@${{ steps.build.outputs.digest }}
 
   build-heavy-images:
-    name: Build Heavy ${{ matrix.variant }} Docker image (${{ matrix.platform }})
+    name: Build ${{ matrix.variant }} Docker image (${{ matrix.platform }})
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
