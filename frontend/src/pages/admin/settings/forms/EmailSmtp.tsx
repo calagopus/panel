@@ -1,18 +1,16 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import Group from '@/elements/Group.tsx';
-import NumberInput from '@/elements/input/NumberInput.tsx';
-import PasswordInput from '@/elements/input/PasswordInput.tsx';
-import Select from '@/elements/input/Select.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsEmailSmtpSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function EmailSmtp({ form }: { form: UseFormReturnType<z.infer<typeof adminSettingsEmailSmtpSchema>> }) {
+type SmtpValues = z.infer<typeof adminSettingsEmailSmtpSchema>;
+
+export default function EmailSmtp({ form }: { form: UseFormReturnType<SmtpValues> }) {
   const { t } = useTranslations();
+  const { formExtension } = useFormExtensions('admin.settings.email.smtp');
 
   useEffect(() => {
     form.setValues({
@@ -27,69 +25,62 @@ export default function EmailSmtp({ form }: { form: UseFormReturnType<z.infer<ty
     });
   }, []);
 
+  const fields: FieldDef<SmtpValues>[] = [
+    {
+      type: 'text',
+      name: 'host',
+      label: t('common.form.host', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'port',
+      label: t('common.form.port', {}),
+      required: true,
+      props: { min: 0 },
+    },
+    {
+      type: 'select',
+      name: 'tlsMode',
+      label: t('pages.admin.settings.tabs.mail.page.smtp.form.tlsMode', {}),
+      required: true,
+      options: [
+        { value: 'none', label: t('pages.admin.settings.tabs.mail.page.enum.tlsMode.none', {}) },
+        { value: 'start_tls', label: t('pages.admin.settings.tabs.mail.page.enum.tlsMode.startTls', {}) },
+        { value: 'implicit_tls', label: t('pages.admin.settings.tabs.mail.page.enum.tlsMode.implicitTls', {}) },
+      ],
+    },
+    {
+      type: 'switch',
+      name: 'skipCertValidation',
+      label: t('pages.admin.settings.tabs.mail.page.smtp.form.skipCertValidation', {}),
+    },
+    {
+      type: 'text',
+      name: 'username',
+      label: t('common.form.username', {}),
+    },
+    {
+      type: 'password',
+      name: 'password',
+      label: t('common.form.password', {}),
+    },
+    {
+      type: 'text',
+      name: 'fromAddress',
+      label: t('common.form.fromAddress', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'fromName',
+      label: t('common.form.fromName', {}),
+    },
+  ];
+
   return (
     <Stack mt='md'>
-      <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.host', {})}
-          key={form.key('host')}
-          {...form.getInputProps('host')}
-        />
-        <NumberInput
-          withAsterisk
-          label={t('common.form.port', {})}
-          min={0}
-          key={form.key('port')}
-          {...form.getInputProps('port')}
-        />
-      </Group>
-
-      <Group grow>
-        <Select
-          withAsterisk
-          label={t('pages.admin.settings.tabs.mail.page.smtp.form.tlsMode', {})}
-          data={[
-            { value: 'none', label: t('pages.admin.settings.tabs.mail.page.enum.tlsMode.none', {}) },
-            { value: 'start_tls', label: t('pages.admin.settings.tabs.mail.page.enum.tlsMode.startTls', {}) },
-            { value: 'implicit_tls', label: t('pages.admin.settings.tabs.mail.page.enum.tlsMode.implicitTls', {}) },
-          ]}
-          key={form.key('tlsMode')}
-          {...form.getInputProps('tlsMode')}
-        />
-        <Switch
-          label={t('pages.admin.settings.tabs.mail.page.smtp.form.skipCertValidation', {})}
-          key={form.key('skipCertValidation')}
-          {...form.getInputProps('skipCertValidation', { type: 'checkbox' })}
-        />
-      </Group>
-
-      <Group grow>
-        <TextInput
-          label={t('common.form.username', {})}
-          key={form.key('username')}
-          {...form.getInputProps('username')}
-        />
-        <PasswordInput
-          label={t('common.form.password', {})}
-          key={form.key('password')}
-          {...form.getInputProps('password')}
-        />
-      </Group>
-
-      <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.fromAddress', {})}
-          key={form.key('fromAddress')}
-          {...form.getInputProps('fromAddress')}
-        />
-        <TextInput
-          label={t('common.form.fromName', {})}
-          key={form.key('fromName')}
-          {...form.getInputProps('fromName')}
-        />
-      </Group>
+      <FormEngine form={form} fields={fields} extensions={[formExtension]} />
     </Stack>
   );
 }

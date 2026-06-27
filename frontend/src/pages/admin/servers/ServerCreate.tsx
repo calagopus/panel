@@ -28,15 +28,11 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
-import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
-import SizeInput from '@/elements/input/SizeInput.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Popover from '@/elements/Popover.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -51,7 +47,6 @@ import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/
 import { adminServerCreateSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { formatAllocation } from '@/lib/server.ts';
-import { useExtendibleForm } from '@/plugins/useExtendibleForm.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -65,6 +60,8 @@ const timezones = Object.keys(zones)
     label: zone,
   }));
 
+type ServerCreateFormValues = z.infer<typeof adminServerCreateSchema>;
+
 export default function ServerCreate() {
   const { t } = useTranslations();
   const { addToast } = useToast();
@@ -77,9 +74,16 @@ export default function ServerCreate() {
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'confirm-no-allocation' | null>(null);
 
-  const { formSchema, formInitialValues } = useExtendibleForm({
-    baseSchema: adminServerCreateSchema,
-    defaultValues: {
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<ServerCreateFormValues>('admin.servers.create');
+  const mergedSchema = adminServerCreateSchema.unwrap().extend(zodShape);
+
+  const form = useForm<ServerCreateFormValues>({
+    mode: 'uncontrolled',
+    initialValues: {
       externalId: null,
       name: '',
       description: null,
@@ -112,31 +116,16 @@ export default function ServerCreate() {
       allocationUuid: null,
       allocationUuids: [],
       variables: [],
+      ...(extInitialValues as Partial<ServerCreateFormValues>),
     },
-    registry: [
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.basicInformationFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.serverAssignmentFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.serverConfigurationFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.featureLimitsFormContainer,
-      window.extensionContext.extensionRegistry.pages.admin.servers.create.allocationsFormContainer,
-    ],
-  });
-
-  const form = useForm<z.infer<typeof adminServerCreateSchema>>({
-    mode: 'uncontrolled',
-    initialValues: formInitialValues,
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(formSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
-  const { loading, doCreateOrUpdate } = useResourceForm<
-    z.infer<typeof adminServerCreateSchema>,
-    z.infer<typeof adminServerSchema>
-  >({
+  const { loading, doCreateOrUpdate } = useResourceForm<ServerCreateFormValues, z.infer<typeof adminServerSchema>>({
     form,
-    createFn: () => createServer(formSchema.parse(form.getValues())),
+    createFn: () => createServer(form.getValues()),
     doUpdate: false,
     basePath: '/admin/servers',
     resourceName: t('pages.admin.servers.resourceName', {}),
@@ -221,11 +210,306 @@ export default function ServerCreate() {
       .finally(() => setEggVariablesLoading(false));
   }, [selectedNestUuid, form.getValues().eggUuid]);
 
+  const basicInfoFields: FieldDef<ServerCreateFormValues>[] = [
+    {
+      type: 'text',
+      name: 'name',
+      label: t('common.form.serverName', {}),
+      required: true,
+      props: { placeholder: t('pages.admin.servers.tabs.general.page.form.serverNamePlaceholder', {}) },
+    },
+    {
+      type: 'text',
+      name: 'externalId',
+      label: t('common.form.externalId', {}),
+      props: { placeholder: t('pages.admin.servers.tabs.general.page.form.externalIdPlaceholder', {}) },
+    },
+    {
+      type: 'textarea',
+      name: 'description',
+      label: t('common.form.description', {}),
+      colSpan: 'full',
+      rows: 3,
+      props: { placeholder: t('pages.admin.servers.tabs.general.page.form.descriptionPlaceholder', {}) },
+    },
+  ];
+
+  const serverAssignmentFields: FieldDef<ServerCreateFormValues>[] = [
+    {
+      type: 'select',
+      name: 'nodeUuid',
+      label: t('common.form.node', {}),
+      required: true,
+      options: nodes.items.map((node) => ({ label: node.name, value: node.uuid })),
+      props: {
+        searchable: true,
+        searchValue: nodes.search,
+        onSearchChange: nodes.setSearch,
+        disabled: !canReadNodes,
+        loading: nodes.loading,
+      },
+    },
+    {
+      type: 'select',
+      name: 'ownerUuid',
+      label: t('pages.admin.servers.tabs.general.page.form.owner', {}),
+      required: true,
+      options: users.items.map((user) => ({ label: user.username, value: user.uuid })),
+      props: {
+        searchable: true,
+        searchValue: users.search,
+        onSearchChange: users.setSearch,
+        loading: users.loading,
+        disabled: !canReadUsers,
+      },
+    },
+    {
+      type: 'custom',
+      name: '_nestSelect',
+      render: () => (
+        <Select
+          withAsterisk
+          label={t('common.form.nest', {})}
+          value={selectedNestUuid}
+          onChange={(value) => setSelectedNestUuid(value)}
+          data={nests.items.map((nest) => ({ label: nest.name, value: nest.uuid }))}
+          searchable
+          searchValue={nests.search}
+          onSearchChange={nests.setSearch}
+          disabled={!canReadNests}
+          loading={nests.loading}
+        />
+      ),
+    },
+    {
+      type: 'select',
+      name: 'eggUuid',
+      label: t('pages.admin.servers.tabs.general.page.form.egg', {}),
+      required: true,
+      options: eggs.items.map((egg) => ({ label: egg.name, value: egg.uuid })),
+      props: {
+        searchable: true,
+        searchValue: eggs.search,
+        onSearchChange: eggs.setSearch,
+        loading: eggs.loading,
+        disabled: !canReadEggs || !selectedNestUuid,
+      },
+    },
+    {
+      type: 'select',
+      name: 'backupConfigurationUuid',
+      label: t('common.form.backupConfiguration', {}),
+      options: backupConfigurations.items.map((bc) => ({ label: bc.name, value: bc.uuid })),
+      props: {
+        placeholder: t('pages.admin.servers.tabs.general.page.form.backupConfigurationPlaceholder', {}),
+        searchable: true,
+        searchValue: backupConfigurations.search,
+        onSearchChange: backupConfigurations.setSearch,
+        allowDeselect: true,
+        clearable: true,
+        disabled: !canReadBackupConfigurations,
+        loading: backupConfigurations.loading,
+      },
+    },
+  ];
+
+  const resourceLimitsFields: FieldDef<ServerCreateFormValues>[] = [
+    {
+      type: 'number',
+      name: 'limits.cpu',
+      label: t('pages.admin.servers.tabs.general.page.form.cpuLimit', {}),
+      required: true,
+      description: t('pages.admin.servers.tabs.general.page.form.cpuLimitDescription', {}),
+      props: { placeholder: '100', min: 0 },
+    },
+    {
+      type: 'size',
+      name: 'limits.swap',
+      label: t('pages.admin.servers.tabs.general.page.form.swap', {}),
+      required: true,
+      description: t('pages.admin.servers.tabs.general.page.form.swapDescription', {}),
+      mode: 'mb',
+      min: -1,
+      advanced: true,
+    },
+    {
+      type: 'size',
+      name: 'limits.memory',
+      label: t('common.form.memory', {}),
+      required: true,
+      description: t('pages.admin.servers.tabs.general.page.form.memoryDescription', {}),
+      mode: 'mb',
+      min: 0,
+    },
+    {
+      type: 'size',
+      name: 'limits.memoryOverhead',
+      label: t('pages.admin.servers.tabs.general.page.form.memoryOverhead', {}),
+      required: true,
+      description: t('pages.admin.servers.tabs.general.page.form.memoryOverheadDescription', {}),
+      mode: 'mb',
+      min: 0,
+      advanced: true,
+    },
+    {
+      type: 'size',
+      name: 'limits.disk',
+      label: t('pages.admin.servers.tabs.general.page.form.diskSpace', {}),
+      required: true,
+      description: t('pages.admin.servers.tabs.general.page.form.diskSpaceDescription', {}),
+      mode: 'mb',
+      min: 0,
+    },
+    {
+      type: 'number',
+      name: 'limits.ioWeight',
+      label: t('pages.admin.servers.tabs.general.page.form.ioWeight', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.ioWeightDescription', {}),
+      advanced: true,
+    },
+    {
+      type: 'tags',
+      name: 'pinnedCpus',
+      label: t('pages.admin.servers.tabs.general.page.form.pinnedCpus', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.pinnedCpusDescription', {}),
+      placeholder: '0',
+      allowReordering: false,
+      advanced: true,
+    },
+  ];
+
+  const serverConfigFields: FieldDef<ServerCreateFormValues>[] = [
+    {
+      type: 'select',
+      name: 'image',
+      label: t('common.form.dockerImage', {}),
+      required: true,
+      options: Object.entries(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.dockerImages || {}).map(
+        ([label, value]) => ({ label, value }),
+      ),
+      props: {
+        placeholder: t('pages.admin.servers.tabs.general.page.form.dockerImagePlaceholder', {}),
+        searchable: true,
+      },
+    },
+    {
+      type: 'select',
+      name: 'timezone',
+      label: t('common.form.timezone', {}),
+      options: [{ label: t('common.form.timezoneSystem', {}), value: '' }, ...timezones],
+      props: {
+        placeholder: t('pages.admin.servers.tabs.general.page.form.timezonePlaceholder', {}),
+        searchable: true,
+      },
+    },
+    {
+      type: 'custom',
+      name: 'startup',
+      colSpan: 'full',
+      render: (f) => (
+        <TextArea
+          label={t('common.form.startupCommand', {})}
+          placeholder={t('pages.admin.servers.tabs.general.page.form.startupCommandPlaceholder', {})}
+          required
+          rows={2}
+          rightSection={
+            <Popover>
+              <Popover.Target>
+                <ActionIcon variant='subtle'>
+                  <FontAwesomeIcon icon={faCog} />
+                </ActionIcon>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Select
+                  data={[
+                    {
+                      label: t('pages.admin.servers.tabs.general.page.form.startupCommandCustom', {}),
+                      value: '',
+                    },
+                    ...Object.entries(
+                      eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
+                    ).map(([key, value]) => ({ value, label: key })),
+                  ]}
+                  value={
+                    Object.values(
+                      eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
+                    ).find((value) => value === form.getValues().startup) || ''
+                  }
+                  onChange={(value) => f.setFieldValue('startup', value ?? '')}
+                />
+              </Popover.Dropdown>
+            </Popover>
+          }
+          key={f.key('startup')}
+          {...f.getInputProps('startup')}
+        />
+      ),
+    },
+    {
+      type: 'switch',
+      name: 'startOnCompletion',
+      label: t('pages.admin.servers.tabs.general.page.form.startOnCompletion', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.startOnCompletionDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'skipInstaller',
+      label: t('pages.admin.servers.tabs.general.page.form.skipInstaller', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.skipInstallerDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'hugepagesPassthroughEnabled',
+      label: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription', {}),
+      advanced: true,
+    },
+    {
+      type: 'switch',
+      name: 'kvmPassthroughEnabled',
+      label: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {}),
+      advanced: true,
+    },
+  ];
+
+  const featureLimitsFields: FieldDef<ServerCreateFormValues>[] = [
+    {
+      type: 'number',
+      name: 'featureLimits.allocations',
+      label: t('pages.admin.servers.tabs.general.page.form.allocationsLimit', {}),
+      required: true,
+      props: { placeholder: '0', min: 0 },
+    },
+    {
+      type: 'number',
+      name: 'featureLimits.databases',
+      label: t('pages.admin.servers.tabs.general.page.form.databasesLimit', {}),
+      required: true,
+      props: { placeholder: '0', min: 0 },
+    },
+    {
+      type: 'number',
+      name: 'featureLimits.backups',
+      label: t('pages.admin.servers.tabs.general.page.form.backupsLimit', {}),
+      required: true,
+      props: { placeholder: '0', min: 0 },
+    },
+    {
+      type: 'number',
+      name: 'featureLimits.schedules',
+      label: t('pages.admin.servers.tabs.general.page.form.schedulesLimit', {}),
+      required: true,
+      props: { placeholder: '0', min: 0 },
+    },
+  ];
+
   return (
     <AdminContentContainer
       title={t('pages.admin.servers.tabs.general.page.titleCreate', {})}
       titleOrder={2}
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.create.container}
+      contentRight={<AdvancedModeToggle />}
     >
       <ConfirmationModal
         opened={openModal === 'confirm-no-allocation'}
@@ -244,416 +528,39 @@ export default function ServerCreate() {
       >
         <Stack mt='16'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            {window.extensionContext.extensionRegistry.pages.admin.servers.create.formContainers.prependedComponents.map(
-              (Component, i) => (
-                <Component key={`form-container-prepended-${i}`} form={form as never} />
-              ),
-            )}
-
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
               icon={<FontAwesomeIcon icon={faInfoCircle} />}
             >
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.basicInformationFormContainer.prependedComponents.map(
-                  (Component, i) => (
-                    <Component key={`basic-information-form-container-prepended-${i}`} form={form as never} />
-                  ),
-                )}
-
-                <TextInput
-                  withAsterisk
-                  label={t('common.form.serverName', {})}
-                  placeholder={t('pages.admin.servers.tabs.general.page.form.serverNamePlaceholder', {})}
-                  key={form.key('name')}
-                  {...form.getInputProps('name')}
-                />
-                <TextInput
-                  label={t('common.form.externalId', {})}
-                  placeholder={t('pages.admin.servers.tabs.general.page.form.externalIdPlaceholder', {})}
-                  key={form.key('externalId')}
-                  {...form.getInputProps('externalId')}
-                />
-
-                <TextArea
-                  label={t('common.form.description', {})}
-                  placeholder={t('pages.admin.servers.tabs.general.page.form.descriptionPlaceholder', {})}
-                  className='col-span-full'
-                  rows={3}
-                  key={form.key('description')}
-                  {...form.getInputProps('description')}
-                />
-
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.basicInformationFormContainer.appendedComponents.map(
-                  (Component, i) => (
-                    <Component key={`basic-information-form-container-appended-${i}`} form={form as never} />
-                  ),
-                )}
-              </div>
+              <FormEngine form={form} fields={basicInfoFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.serverAssignment', {})}
               icon={<FontAwesomeIcon icon={faAddressCard} />}
             >
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.serverAssignmentFormContainer.prependedComponents.map(
-                  (Component, i) => (
-                    <Component key={`server-assignment-form-container-prepended-${i}`} form={form as never} />
-                  ),
-                )}
-
-                <Select
-                  withAsterisk
-                  label={t('common.form.node', {})}
-                  data={nodes.items.map((node) => ({
-                    label: node.name,
-                    value: node.uuid,
-                  }))}
-                  searchable
-                  searchValue={nodes.search}
-                  onSearchChange={nodes.setSearch}
-                  disabled={!canReadNodes}
-                  loading={nodes.loading}
-                  key={form.key('nodeUuid')}
-                  {...form.getInputProps('nodeUuid')}
-                />
-                <Select
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.owner', {})}
-                  data={users.items.map((user) => ({
-                    label: user.username,
-                    value: user.uuid,
-                  }))}
-                  searchable
-                  searchValue={users.search}
-                  onSearchChange={users.setSearch}
-                  loading={users.loading}
-                  disabled={!canReadUsers}
-                  key={form.key('ownerUuid')}
-                  {...form.getInputProps('ownerUuid')}
-                />
-
-                <Select
-                  withAsterisk
-                  label={t('common.form.nest', {})}
-                  value={selectedNestUuid}
-                  onChange={(value) => setSelectedNestUuid(value)}
-                  data={nests.items.map((nest) => ({
-                    label: nest.name,
-                    value: nest.uuid,
-                  }))}
-                  searchable
-                  searchValue={nests.search}
-                  onSearchChange={nests.setSearch}
-                  disabled={!canReadNests}
-                  loading={nests.loading}
-                />
-                <Select
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.egg', {})}
-                  disabled={!canReadEggs || !selectedNestUuid}
-                  data={eggs.items.map((egg) => ({
-                    label: egg.name,
-                    value: egg.uuid,
-                  }))}
-                  searchable
-                  searchValue={eggs.search}
-                  onSearchChange={eggs.setSearch}
-                  loading={eggs.loading}
-                  key={form.key('eggUuid')}
-                  {...form.getInputProps('eggUuid')}
-                />
-
-                <Select
-                  label={t('common.form.backupConfiguration', {})}
-                  placeholder={t('pages.admin.servers.tabs.general.page.form.backupConfigurationPlaceholder', {})}
-                  data={backupConfigurations.items.map((backupConfiguration) => ({
-                    label: backupConfiguration.name,
-                    value: backupConfiguration.uuid,
-                  }))}
-                  searchable
-                  searchValue={backupConfigurations.search}
-                  onSearchChange={backupConfigurations.setSearch}
-                  allowDeselect
-                  clearable
-                  disabled={!canReadBackupConfigurations}
-                  loading={backupConfigurations.loading}
-                  key={form.key('backupConfigurationUuid')}
-                  {...form.getInputProps('backupConfigurationUuid')}
-                />
-
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.appendedComponents.map(
-                  (Component, i) => (
-                    <Component key={`resource-limits-form-container-appended-${i}`} form={form as never} />
-                  ),
-                )}
-              </div>
+              <FormEngine form={form} fields={serverAssignmentFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})}
               icon={<FontAwesomeIcon icon={faStopwatch} />}
             >
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.prependedComponents.map(
-                  (Component, i) => (
-                    <Component key={`resource-limits-form-container-prepended-${i}`} form={form as never} />
-                  ),
-                )}
-
-                <NumberInput
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.cpuLimit', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.cpuLimitDescription', {})}
-                  placeholder='100'
-                  min={0}
-                  key={form.key('limits.cpu')}
-                  {...form.getInputProps('limits.cpu')}
-                />
-                <SizeInput
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.swap', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.swapDescription', {})}
-                  mode='mb'
-                  min={-1}
-                  value={form.getValues().limits.swap}
-                  onChange={(value) => form.setFieldValue('limits.swap', value)}
-                />
-
-                <SizeInput
-                  withAsterisk
-                  label={t('common.form.memory', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.memoryDescription', {})}
-                  mode='mb'
-                  min={0}
-                  value={form.getValues().limits.memory}
-                  onChange={(value) => form.setFieldValue('limits.memory', value)}
-                />
-                <SizeInput
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.memoryOverhead', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.memoryOverheadDescription', {})}
-                  mode='mb'
-                  min={0}
-                  value={form.getValues().limits.memoryOverhead}
-                  onChange={(value) => form.setFieldValue('limits.memoryOverhead', value)}
-                />
-
-                <SizeInput
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.diskSpace', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.diskSpaceDescription', {})}
-                  mode='mb'
-                  min={0}
-                  value={form.getValues().limits.disk}
-                  onChange={(value) => form.setFieldValue('limits.disk', value)}
-                />
-                <NumberInput
-                  label={t('pages.admin.servers.tabs.general.page.form.ioWeight', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.ioWeightDescription', {})}
-                  key={form.key('limits.ioWeight')}
-                  {...form.getInputProps('limits.ioWeight')}
-                />
-                <TagsInput
-                  label={t('pages.admin.servers.tabs.general.page.form.pinnedCpus', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.pinnedCpusDescription', {})}
-                  placeholder='0'
-                  allowReordering={false}
-                  value={form.getValues().pinnedCpus.map(String)}
-                  onChange={(tags) =>
-                    form.setFieldValue(
-                      'pinnedCpus',
-                      tags.map((tag) => Number.parseInt(tag, 10)).filter((n) => Number.isInteger(n) && n >= 0),
-                    )
-                  }
-                />
-
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.resourceLimitsFormContainer.appendedComponents.map(
-                  (Component, i) => (
-                    <Component key={`resource-limits-form-container-appended-${i}`} form={form as never} />
-                  ),
-                )}
-              </div>
+              <FormEngine form={form} fields={resourceLimitsFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})}
               icon={<FontAwesomeIcon icon={faWrench} />}
             >
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.serverConfigurationFormContainer.prependedComponents.map(
-                  (Component, i) => (
-                    <Component key={`server-configuration-form-container-prepended-${i}`} form={form as never} />
-                  ),
-                )}
-
-                <Select
-                  withAsterisk
-                  label={t('common.form.dockerImage', {})}
-                  placeholder={t('pages.admin.servers.tabs.general.page.form.dockerImagePlaceholder', {})}
-                  data={Object.entries(
-                    eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.dockerImages || {},
-                  ).map(([label, value]) => ({
-                    label,
-                    value,
-                  }))}
-                  searchable
-                  key={form.key('image')}
-                  {...form.getInputProps('image')}
-                />
-                <Select
-                  label={t('common.form.timezone', {})}
-                  placeholder={t('pages.admin.servers.tabs.general.page.form.timezonePlaceholder', {})}
-                  data={[
-                    {
-                      label: t('common.form.timezoneSystem', {}),
-                      value: '',
-                    },
-                    ...timezones,
-                  ]}
-                  searchable
-                  key={form.key('timezone')}
-                  {...form.getInputProps('timezone')}
-                />
-
-                <TextArea
-                  label={t('common.form.startupCommand', {})}
-                  placeholder={t('pages.admin.servers.tabs.general.page.form.startupCommandPlaceholder', {})}
-                  className='col-span-full'
-                  required
-                  rows={2}
-                  rightSection={
-                    <Popover>
-                      <Popover.Target>
-                        <ActionIcon variant='subtle'>
-                          <FontAwesomeIcon icon={faCog} />
-                        </ActionIcon>
-                      </Popover.Target>
-                      <Popover.Dropdown>
-                        <Select
-                          data={[
-                            {
-                              label: t('pages.admin.servers.tabs.general.page.form.startupCommandCustom', {}),
-                              value: '',
-                            },
-                            ...Object.entries(
-                              eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
-                            ).map(([key, value]) => ({
-                              value,
-                              label: key,
-                            })),
-                          ]}
-                          value={
-                            Object.values(
-                              eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
-                            ).find((value) => value === form.getValues().startup) || ''
-                          }
-                          onChange={(value) => form.setFieldValue('startup', value ?? '')}
-                        />
-                      </Popover.Dropdown>
-                    </Popover>
-                  }
-                  key={form.key('startup')}
-                  {...form.getInputProps('startup')}
-                />
-
-                <Switch
-                  label={t('pages.admin.servers.tabs.general.page.form.startOnCompletion', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.startOnCompletionDescription', {})}
-                  key={form.key('startOnCompletion')}
-                  {...form.getInputProps('startOnCompletion', {
-                    type: 'checkbox',
-                  })}
-                />
-                <Switch
-                  label={t('pages.admin.servers.tabs.general.page.form.skipInstaller', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.skipInstallerDescription', {})}
-                  key={form.key('skipInstaller')}
-                  {...form.getInputProps('skipInstaller', {
-                    type: 'checkbox',
-                  })}
-                />
-
-                <Switch
-                  label={t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {})}
-                  description={t(
-                    'pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription',
-                    {},
-                  )}
-                  key={form.key('hugepagesPassthroughEnabled')}
-                  {...form.getInputProps('hugepagesPassthroughEnabled', {
-                    type: 'checkbox',
-                  })}
-                />
-
-                <Switch
-                  label={t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {})}
-                  description={t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {})}
-                  key={form.key('kvmPassthroughEnabled')}
-                  {...form.getInputProps('kvmPassthroughEnabled', {
-                    type: 'checkbox',
-                  })}
-                />
-
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.serverConfigurationFormContainer.appendedComponents.map(
-                  (Component, i) => (
-                    <Component key={`server-configuration-form-container-appended-${i}`} form={form as never} />
-                  ),
-                )}
-              </div>
+              <FormEngine form={form} fields={serverConfigFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})}
               icon={<FontAwesomeIcon icon={faIcons} />}
             >
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.featureLimitsFormContainer.prependedComponents.map(
-                  (Component, i) => (
-                    <Component key={`feature-limits-form-container-prepended-${i}`} form={form as never} />
-                  ),
-                )}
-
-                <NumberInput
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.allocationsLimit', {})}
-                  placeholder='0'
-                  min={0}
-                  key={form.key('featureLimits.allocations')}
-                  {...form.getInputProps('featureLimits.allocations')}
-                />
-                <NumberInput
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.databasesLimit', {})}
-                  placeholder='0'
-                  min={0}
-                  key={form.key('featureLimits.databases')}
-                  {...form.getInputProps('featureLimits.databases')}
-                />
-                <NumberInput
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.backupsLimit', {})}
-                  placeholder='0'
-                  min={0}
-                  key={form.key('featureLimits.backups')}
-                  {...form.getInputProps('featureLimits.backups')}
-                />
-                <NumberInput
-                  withAsterisk
-                  label={t('pages.admin.servers.tabs.general.page.form.schedulesLimit', {})}
-                  placeholder='0'
-                  min={0}
-                  key={form.key('featureLimits.schedules')}
-                  {...form.getInputProps('featureLimits.schedules')}
-                />
-
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.featureLimitsFormContainer.appendedComponents.map(
-                  (Component, i) => (
-                    <Component key={`feature-limits-form-container-appended-${i}`} form={form as never} />
-                  ),
-                )}
-              </div>
+              <FormEngine form={form} fields={featureLimitsFields} extensions={[formExtension]} />
             </TitleCard>
 
             <TitleCard
@@ -661,12 +568,6 @@ export default function ServerCreate() {
               icon={<FontAwesomeIcon icon={faNetworkWired} />}
             >
               <Stack>
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.allocationsFormContainer.prependedComponents.map(
-                  (Component, i) => (
-                    <Component key={`allocations-form-container-prepended-${i}`} form={form as never} />
-                  ),
-                )}
-
                 <Group grow>
                   <Select
                     label={t('common.form.primaryAllocation', {})}
@@ -700,12 +601,6 @@ export default function ServerCreate() {
                     {...form.getInputProps('allocationUuids')}
                   />
                 </Group>
-
-                {window.extensionContext.extensionRegistry.pages.admin.servers.create.allocationsFormContainer.appendedComponents.map(
-                  (Component, i) => (
-                    <Component key={`allocations-form-container-appended-${i}`} form={form as never} />
-                  ),
-                )}
               </Stack>
             </TitleCard>
 
@@ -748,12 +643,6 @@ export default function ServerCreate() {
                 )}
               </Stack>
             </TitleCard>
-
-            {window.extensionContext.extensionRegistry.pages.admin.servers.create.formContainers.appendedComponents.map(
-              (Component, i) => (
-                <Component key={`form-container-appended-${i}`} form={form as never} />
-              ),
-            )}
           </div>
 
           <Group>

@@ -5,9 +5,8 @@ import getBackupConfigurations from '@/api/admin/backup-configurations/getBackup
 import createLocation from '@/api/admin/locations/createLocation.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Select from '@/elements/input/Select.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
@@ -29,6 +28,8 @@ interface LocationCreateOrUpdateModalProps {
   onLocationCreated: () => void;
 }
 
+type LocationFormValues = z.infer<typeof adminLocationUpdateSchema>;
+
 export default function LocationCreateOrUpdateModal({
   opened,
   onClose,
@@ -39,26 +40,32 @@ export default function LocationCreateOrUpdateModal({
 
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
 
-  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof adminLocationUpdateSchema>>(
-    {
-      initialValues: {
-        name: '',
-        description: null,
-        flag: null,
-        backupConfigurationUuid: null,
-      },
-      validate: zod4Resolver(adminLocationUpdateSchema),
-      onClose,
-      onSubmit: async (values) => {
-        await createLocation(adminLocationUpdateSchema.parse(values));
-        addToast(
-          t('elements.resource.tooltip.created', { resource: t('pages.admin.locations.resourceName', {}) }),
-          'success',
-        );
-        onLocationCreated();
-      },
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<LocationFormValues>('admin.nodes.locationModal');
+  const mergedSchema = adminLocationUpdateSchema.unwrap().extend(zodShape);
+
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<LocationFormValues>({
+    initialValues: {
+      name: '',
+      description: null,
+      flag: null,
+      backupConfigurationUuid: null,
+      ...(extInitialValues as Partial<LocationFormValues>),
     },
-  );
+    validate: zod4Resolver(mergedSchema),
+    onClose,
+    onSubmit: async (values) => {
+      await createLocation(adminLocationUpdateSchema.parse(values));
+      addToast(
+        t('elements.resource.tooltip.created', { resource: t('pages.admin.locations.resourceName', {}) }),
+        'success',
+      );
+      onLocationCreated();
+    },
+  });
 
   const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
@@ -66,6 +73,57 @@ export default function LocationCreateOrUpdateModal({
     defaultSearchValue: '',
     canRequest: canReadBackupConfigurations,
   });
+
+  const fields: FieldDef<LocationFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    {
+      type: 'select',
+      name: 'backupConfigurationUuid',
+      label: t('common.form.backupConfiguration', {}),
+      options: backupConfigurations.items.map((bc) => ({ label: bc.name, value: bc.uuid })),
+      props: {
+        placeholder: t('common.none', {}),
+        searchable: true,
+        searchValue: backupConfigurations.search,
+        onSearchChange: backupConfigurations.setSearch,
+        allowDeselect: true,
+        clearable: true,
+        disabled: !canReadBackupConfigurations,
+        loading: backupConfigurations.loading,
+      },
+    },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
+    {
+      type: 'custom',
+      name: 'flag',
+      render: (f) => (
+        <Select
+          label={t('pages.admin.locations.tabs.general.page.form.flag', {})}
+          placeholder={t('common.none', {})}
+          renderOption={({ option }) => (
+            <div className='flex items-center gap-2'>
+              <img src={`/flags/${option.value}.svg`} alt={option.label} className='w-4 h-4 rounded-md shrink-0' />
+              <span className='truncate'>{option.label}</span>
+            </div>
+          )}
+          data={Object.keys(flags)
+            .filter((flag) => basename(flag, '.svg').length === 2)
+            .map((flag) => {
+              const countryCode = basename(flag, '.svg');
+              const regionNames = new Intl.DisplayNames([language], { type: 'region' });
+              return {
+                label: regionNames.of(countryCode.toUpperCase()) || countryCode,
+                value: countryCode,
+              };
+            })}
+          clearable
+          searchable
+          key={f.key('flag')}
+          {...f.getInputProps('flag')}
+        />
+      ),
+    },
+  ];
 
   return (
     <FormModal
@@ -82,59 +140,7 @@ export default function LocationCreateOrUpdateModal({
           {t('pages.admin.nodes.tabs.general.page.alert.noLocations', {})}
         </Text>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <Select
-            label={t('common.form.backupConfiguration', {})}
-            placeholder={t('common.none', {})}
-            data={backupConfigurations.items.map((backupConfiguration) => ({
-              label: backupConfiguration.name,
-              value: backupConfiguration.uuid,
-            }))}
-            searchable
-            searchValue={backupConfigurations.search}
-            onSearchChange={backupConfigurations.setSearch}
-            allowDeselect
-            clearable
-            disabled={!canReadBackupConfigurations}
-            loading={backupConfigurations.loading}
-            key={form.key('backupConfigurationUuid')}
-            {...form.getInputProps('backupConfigurationUuid')}
-          />
-
-          <TextArea label={t('common.form.description', {})} rows={3} {...form.getInputProps('description')} />
-
-          <Select
-            label={t('pages.admin.locations.tabs.general.page.form.flag', {})}
-            placeholder={t('common.none', {})}
-            renderOption={({ option }) => (
-              <div className='flex items-center gap-2'>
-                <img src={`/flags/${option.value}.svg`} alt={option.label} className='w-4 h-4 rounded-md shrink-0' />
-                <span className='truncate'>{option.label}</span>
-              </div>
-            )}
-            data={Object.keys(flags)
-              .filter((flag) => basename(flag, '.svg').length === 2)
-              .map((flag) => {
-                const countryCode = basename(flag, '.svg');
-                const regionNames = new Intl.DisplayNames([language], { type: 'region' });
-
-                return {
-                  label: regionNames.of(countryCode.toUpperCase()) || countryCode,
-                  value: countryCode,
-                };
-              })}
-            clearable
-            searchable
-            key={form.key('flag')}
-            {...form.getInputProps('flag')}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <ModalFooter>
           <AdminCan action='locations.create' cantSave>

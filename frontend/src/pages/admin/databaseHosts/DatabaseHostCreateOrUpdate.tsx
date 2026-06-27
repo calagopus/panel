@@ -13,11 +13,9 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { databaseCredentialTypeLabelMapping, databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -34,6 +32,8 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import CredentialConnectionString from './forms/CredentialConnectionString.tsx';
 import CredentialDetails from './forms/CredentialDetails.tsx';
 
+type DatabaseHostFormValues = z.infer<typeof adminDatabaseHostUpdateSchema>;
+
 export default function DatabaseHostCreateOrUpdate({
   contextDatabaseHost,
 }: {
@@ -44,7 +44,16 @@ export default function DatabaseHostCreateOrUpdate({
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
-  const form = useForm<z.infer<typeof adminDatabaseHostUpdateSchema>>({
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<DatabaseHostFormValues>('admin.databaseHosts.createOrUpdate');
+  const mergedSchema = (contextDatabaseHost ? adminDatabaseHostUpdateSchema : adminDatabaseHostCreateSchema)
+    .unwrap()
+    .extend(zodShape);
+
+  const form = useForm<DatabaseHostFormValues>({
     initialValues: {
       name: '',
       type: 'mysql',
@@ -53,13 +62,14 @@ export default function DatabaseHostCreateOrUpdate({
       publicHost: null,
       publicPort: null,
       credentials: undefined,
+      ...(extInitialValues as Partial<DatabaseHostFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(contextDatabaseHost ? adminDatabaseHostUpdateSchema : adminDatabaseHostCreateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminDatabaseHostUpdateSchema>,
+    DatabaseHostFormValues,
     z.infer<typeof adminDatabaseHostSchema>
   >({
     form,
@@ -111,6 +121,76 @@ export default function DatabaseHostCreateOrUpdate({
       .finally(() => setLoading(false));
   };
 
+  const fields: FieldDef<DatabaseHostFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    {
+      type: 'select',
+      name: 'type',
+      label: t('common.form.type', {}),
+      required: true,
+      options: Object.entries(databaseTypeLabelMapping).map(([value, label]) => ({ value, label })),
+      props: { disabled: !!contextDatabaseHost },
+    },
+    { type: 'text', name: 'publicHost', label: t('pages.admin.databaseHosts.tabs.general.page.form.publicHost', {}) },
+    {
+      type: 'number',
+      name: 'publicPort',
+      label: t('pages.admin.databaseHosts.tabs.general.page.form.publicPort', {}),
+    },
+    {
+      type: 'custom',
+      name: 'credentials',
+      colSpan: 'full',
+      render: (f) => (
+        <CollapsibleSection
+          icon={<FontAwesomeIcon icon={faUnlockKeyhole} />}
+          enabled={!!f.values.credentials}
+          onToggle={(enabled) =>
+            enabled
+              ? f.setValues({
+                  credentials: contextDatabaseHost
+                    ? contextDatabaseHost.credentials
+                    : { type: 'connection_string', connectionString: '' },
+                })
+              : f.setValues({ credentials: undefined })
+          }
+          title={t('pages.admin.databaseHosts.tabs.general.page.form.connectionCredentials', {})}
+        >
+          <Select
+            withAsterisk
+            label={t('pages.admin.databaseHosts.tabs.general.page.form.credentialType', {})}
+            data={Object.entries(databaseCredentialTypeLabelMapping).map(([value, label]) => ({
+              value,
+              label: label(),
+            }))}
+            key={f.key('credentials.type')}
+            {...f.getInputProps('credentials.type')}
+          />
+
+          {f.values.credentials?.type === 'connection_string' ? (
+            <CredentialConnectionString
+              form={
+                f as UseFormReturnType<{
+                  credentials: z.infer<typeof adminDatabaseCredentialsConnectionStringSchema>;
+                }>
+              }
+            />
+          ) : f.values.credentials?.type === 'details' ? (
+            <CredentialDetails
+              form={
+                f as UseFormReturnType<{
+                  credentials: z.infer<typeof adminDatabaseCredentialsDetailsSchema>;
+                }>
+              }
+            />
+          ) : null}
+        </CollapsibleSection>
+      ),
+    },
+    { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
+    { type: 'switch', name: 'maintenanceEnabled', label: t('common.form.maintenanceEnabled', {}) },
+  ];
+
   return (
     <AdminContentContainer
       title={
@@ -134,92 +214,7 @@ export default function DatabaseHostCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.databaseHosts.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <Select
-            withAsterisk
-            label={t('common.form.type', {})}
-            data={Object.entries(databaseTypeLabelMapping).map(([value, label]) => ({
-              value,
-              label,
-            }))}
-            disabled={!!contextDatabaseHost}
-            key={form.key('type')}
-            {...form.getInputProps('type')}
-          />
-
-          <TextInput
-            label={t('pages.admin.databaseHosts.tabs.general.page.form.publicHost', {})}
-            key={form.key('publicHost')}
-            {...form.getInputProps('publicHost')}
-          />
-          <NumberInput
-            label={t('pages.admin.databaseHosts.tabs.general.page.form.publicPort', {})}
-            key={form.key('publicPort')}
-            {...form.getInputProps('publicPort')}
-          />
-
-          <CollapsibleSection
-            icon={<FontAwesomeIcon icon={faUnlockKeyhole} />}
-            enabled={!!form.values.credentials}
-            className='col-span-full'
-            onToggle={(enabled) =>
-              enabled
-                ? form.setValues({
-                    credentials: contextDatabaseHost
-                      ? contextDatabaseHost.credentials
-                      : { type: 'connection_string', connectionString: '' },
-                  })
-                : form.setValues({ credentials: undefined })
-            }
-            title={t('pages.admin.databaseHosts.tabs.general.page.form.connectionCredentials', {})}
-          >
-            <Select
-              withAsterisk
-              label={t('pages.admin.databaseHosts.tabs.general.page.form.credentialType', {})}
-              data={Object.entries(databaseCredentialTypeLabelMapping).map(([value, label]) => ({
-                value,
-                label: label(),
-              }))}
-              key={form.key('credentials.type')}
-              {...form.getInputProps('credentials.type')}
-            />
-
-            {form.values.credentials?.type === 'connection_string' ? (
-              <CredentialConnectionString
-                form={
-                  form as UseFormReturnType<{
-                    credentials: z.infer<typeof adminDatabaseCredentialsConnectionStringSchema>;
-                  }>
-                }
-              />
-            ) : form.values.credentials?.type === 'details' ? (
-              <CredentialDetails
-                form={
-                  form as UseFormReturnType<{
-                    credentials: z.infer<typeof adminDatabaseCredentialsDetailsSchema>;
-                  }>
-                }
-              />
-            ) : null}
-          </CollapsibleSection>
-
-          <Switch
-            label={t('common.form.deploymentEnabled', {})}
-            key={form.key('deploymentEnabled')}
-            {...form.getInputProps('deploymentEnabled', { type: 'checkbox' })}
-          />
-          <Switch
-            label={t('common.form.maintenanceEnabled', {})}
-            key={form.key('maintenanceEnabled')}
-            {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextDatabaseHost ? 'database-hosts.update' : 'database-hosts.create'} cantSave>

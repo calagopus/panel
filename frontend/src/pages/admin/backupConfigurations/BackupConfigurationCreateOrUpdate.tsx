@@ -11,11 +11,8 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import Select from '@/elements/input/Select.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { backupDiskLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -34,6 +31,8 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BackupKopia from './forms/BackupKopia.tsx';
 
+type BackupConfigFormValues = Partial<z.infer<typeof adminBackupConfigurationUpdateSchema>>;
+
 export default function BackupConfigurationCreateOrUpdate({
   contextBackupConfiguration,
 }: {
@@ -42,16 +41,24 @@ export default function BackupConfigurationCreateOrUpdate({
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
-  const form = useForm<Partial<z.infer<typeof adminBackupConfigurationUpdateSchema>>>({
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<BackupConfigFormValues>('admin.backupConfigurations.createOrUpdate');
+  const mergedSchema = adminBackupConfigurationUpdateSchema.unwrap().extend(zodShape);
+
+  const form = useForm<BackupConfigFormValues>({
     initialValues: {
       name: '',
       description: null,
       maintenanceEnabled: false,
       shared: false,
       backupDisk: 'local',
+      ...(extInitialValues as Partial<BackupConfigFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminBackupConfigurationUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
   const backupConfigS3Form = useForm<z.infer<typeof adminBackupConfigurationS3Schema>>({
@@ -107,7 +114,7 @@ export default function BackupConfigurationCreateOrUpdate({
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
-    Partial<z.infer<typeof adminBackupConfigurationUpdateSchema>>,
+    BackupConfigFormValues,
     z.infer<typeof adminBackupConfigurationSchema>
   >({
     form,
@@ -189,6 +196,30 @@ export default function BackupConfigurationCreateOrUpdate({
     }
   }, [contextBackupConfiguration]);
 
+  const fields: FieldDef<BackupConfigFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    {
+      type: 'select',
+      name: 'backupDisk',
+      label: t('pages.admin.backupConfigurations.tabs.general.page.form.backupDisk', {}),
+      required: true,
+      options: Object.entries(backupDiskLabelMapping).map(([value, label]) => ({ value, label })),
+    },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
+    {
+      type: 'switch',
+      name: 'maintenanceEnabled',
+      label: t('common.form.maintenanceEnabled', {}),
+      description: t('pages.admin.backupConfigurations.tabs.general.page.form.maintenanceEnabledDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'shared',
+      label: t('pages.admin.backupConfigurations.tabs.general.page.form.shared', {}),
+      description: t('pages.admin.backupConfigurations.tabs.general.page.form.sharedDescription', {}),
+    },
+  ];
+
   return (
     <AdminContentContainer
       title={t(
@@ -238,46 +269,7 @@ export default function BackupConfigurationCreateOrUpdate({
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.backupConfigurations.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <Select
-            withAsterisk
-            label={t('pages.admin.backupConfigurations.tabs.general.page.form.backupDisk', {})}
-            data={Object.entries(backupDiskLabelMapping).map(([value, label]) => ({
-              value,
-              label,
-            }))}
-            key={form.key('backupDisk')}
-            {...form.getInputProps('backupDisk')}
-          />
-
-          <TextArea
-            label={t('common.form.description', {})}
-            className='col-span-full'
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
-
-          <Switch
-            label={t('common.form.maintenanceEnabled', {})}
-            description={t('pages.admin.backupConfigurations.tabs.general.page.form.maintenanceEnabledDescription', {})}
-            key={form.key('maintenanceEnabled')}
-            {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('pages.admin.backupConfigurations.tabs.general.page.form.shared', {})}
-            description={t('pages.admin.backupConfigurations.tabs.general.page.form.sharedDescription', {})}
-            key={form.key('shared')}
-            {...form.getInputProps('shared', { type: 'checkbox' })}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan

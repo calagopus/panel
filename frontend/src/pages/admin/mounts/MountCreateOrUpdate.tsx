@@ -11,21 +11,28 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema, adminMountUpdateSchema } from '@/lib/schemas/admin/mounts.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
+type MountFormValues = z.infer<typeof adminMountUpdateSchema>;
+
 export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z.infer<typeof adminMountSchema> }) {
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
-  const form = useForm<z.infer<typeof adminMountUpdateSchema>>({
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<MountFormValues>('admin.mounts.createOrUpdate');
+  const mergedSchema = adminMountUpdateSchema.unwrap().extend(zodShape);
+
+  const form = useForm<MountFormValues>({
     initialValues: {
       name: '',
       description: null,
@@ -33,15 +40,13 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
       target: '',
       readOnly: false,
       userMountable: false,
+      ...(extInitialValues as Partial<MountFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminMountUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
-  const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminMountUpdateSchema>,
-    z.infer<typeof adminMountSchema>
-  >({
+  const { loading, doCreateOrUpdate, doDelete } = useResourceForm<MountFormValues, z.infer<typeof adminMountSchema>>({
     form,
     createFn: () => createMount(adminMountUpdateSchema.parse(form.getValues())),
     updateFn: contextMount
@@ -65,6 +70,15 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
       });
     }
   }, [contextMount]);
+
+  const fields: FieldDef<MountFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
+    { type: 'text', name: 'source', label: t('pages.admin.mounts.tabs.general.page.form.source', {}), required: true },
+    { type: 'text', name: 'target', label: t('pages.admin.mounts.tabs.general.page.form.target', {}), required: true },
+    { type: 'switch', name: 'readOnly', label: t('pages.admin.mounts.tabs.general.page.form.readOnly', {}) },
+    { type: 'switch', name: 'userMountable', label: t('pages.admin.mounts.tabs.general.page.form.userMountable', {}) },
+  ];
 
   return (
     <AdminContentContainer
@@ -92,44 +106,7 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
       </Alert>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.mounts.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <TextArea
-            label={t('common.form.description', {})}
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
-
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.mounts.tabs.general.page.form.source', {})}
-            key={form.key('source')}
-            {...form.getInputProps('source')}
-          />
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.mounts.tabs.general.page.form.target', {})}
-            key={form.key('target')}
-            {...form.getInputProps('target')}
-          />
-
-          <Switch
-            label={t('pages.admin.mounts.tabs.general.page.form.readOnly', {})}
-            key={form.key('readOnly')}
-            {...form.getInputProps('readOnly', { type: 'checkbox' })}
-          />
-          <Switch
-            label={t('pages.admin.mounts.tabs.general.page.form.userMountable', {})}
-            key={form.key('userMountable')}
-            {...form.getInputProps('userMountable', { type: 'checkbox' })}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextMount ? 'mounts.update' : 'mounts.create'} cantSave>

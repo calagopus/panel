@@ -8,35 +8,41 @@ import updateNest from '@/api/admin/nests/updateNest.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNestSchema, adminNestUpdateSchema } from '@/lib/schemas/admin/nests.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
+type NestFormValues = z.infer<typeof adminNestUpdateSchema>;
+
 export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.infer<typeof adminNestSchema> }) {
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
   const [deleteEggs, setDeleteEggs] = useState(false);
   const { t } = useTranslations();
 
-  const form = useForm<z.infer<typeof adminNestUpdateSchema>>({
+  const {
+    formExtension,
+    zodShape,
+    initialValues: extInitialValues,
+  } = useFormExtensions<NestFormValues>('admin.nests.createOrUpdate');
+  const mergedSchema = adminNestUpdateSchema.unwrap().extend(zodShape);
+
+  const form = useForm<NestFormValues>({
     initialValues: {
       author: '',
       name: '',
       description: null,
+      ...(extInitialValues as Partial<NestFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminNestUpdateSchema),
+    validate: zod4Resolver(mergedSchema),
   });
 
-  const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminNestUpdateSchema>,
-    z.infer<typeof adminNestSchema>
-  >({
+  const { loading, doCreateOrUpdate, doDelete } = useResourceForm<NestFormValues, z.infer<typeof adminNestSchema>>({
     form,
     createFn: () => createNest(adminNestUpdateSchema.parse(form.getValues())),
     updateFn: contextNest
@@ -57,6 +63,12 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
       });
     }
   }, [contextNest]);
+
+  const fields: FieldDef<NestFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    { type: 'text', name: 'author', label: t('common.form.author', {}), required: true },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
+  ];
 
   return (
     <AdminContentContainer
@@ -87,28 +99,7 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nests.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <TextInput
-            withAsterisk
-            label={t('common.form.author', {})}
-            key={form.key('author')}
-            {...form.getInputProps('author')}
-          />
-
-          <TextArea
-            label={t('common.form.description', {})}
-            className='col-span-full'
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
 
         <Group mt='md'>
           <AdminCan action={contextNest ? 'nests.update' : 'nests.create'} cantSave>

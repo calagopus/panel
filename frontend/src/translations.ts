@@ -401,6 +401,9 @@ const baseTranslations = defineTranslations({
           deleted: '{resource} deleted.',
         },
       },
+      formEngine: {
+        advancedMode: 'Advanced mode',
+      },
       activityInfoButton: {
         modal: {
           info: {
