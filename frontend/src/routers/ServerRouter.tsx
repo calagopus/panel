@@ -26,6 +26,7 @@ import ServerPermissionGuard from '@/routers/guards/ServerPermissionGuard.tsx';
 import serverRoutes from '@/routers/routes/serverRoutes.ts';
 import { useServerStore } from '@/stores/server.ts';
 import ServerStateGuard from './guards/ServerStateGuard.tsx';
+import ServerSelectorModal from './ServerSelectorModal.tsx';
 
 export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   const { t, language } = useTranslations();
@@ -93,7 +94,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   }, []);
 
   useEffect(() => {
-    if (params.id) {
+    if (params.id && params.id !== ':id') {
       setLoading(true);
       getServer(params.id)
         .then((data) => {
@@ -120,6 +121,10 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
         .finally(() => setLoading(false));
     }
   }, [params.id]);
+
+  if (params.id === ':id') {
+    return <ServerSelectorModal />;
+  }
 
   return (
     <div className='lg:flex h-full'>

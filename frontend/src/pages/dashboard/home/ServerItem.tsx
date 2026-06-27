@@ -41,6 +41,7 @@ import ServerAddGroupModal from './modals/ServerAddGroupModal.tsx';
 
 export default function ServerItem({
   server,
+  to,
   showGroupAddButton = false,
   showForeignServerBadge = false,
   showContextMenu = false,
@@ -52,6 +53,7 @@ export default function ServerItem({
   sKeyPressedRef,
 }: {
   server: z.infer<typeof serverSchema>;
+  to?: string;
   showGroupAddButton?: boolean;
   showForeignServerBadge?: boolean;
   showContextMenu?: boolean;
@@ -146,7 +148,7 @@ export default function ServerItem({
               }}
             >
               <NavLink
-                to={`/server/${server.uuidShort}`}
+                to={to ?? `/server/${server.uuidShort}`}
                 onClick={(e) => {
                   if (sKeyPressedRef?.current) {
                     e.preventDefault();

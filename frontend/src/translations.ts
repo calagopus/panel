@@ -3350,6 +3350,11 @@ const baseTranslations = defineTranslations({
         viewAdmin: {
           title: 'View in Admin Area',
         },
+        selector: {
+          title: 'Select a Server',
+          description: 'Choose which server you want to navigate to.',
+          descriptionWithPage: 'Select a server to go to **{page}**.',
+        },
         console: {
           title: 'Console',
           input: {
