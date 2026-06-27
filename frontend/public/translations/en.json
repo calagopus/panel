@@ -2020,6 +2020,36 @@
           "title": "Nodes",
           "resourceName": "Node",
           "tabs": {
+            "overview": {
+              "title": "Overview",
+              "page": {
+                "title": "Node Overview",
+                "card": {
+                  "nodeDetails": "Node Details",
+                  "systemInfo": "System Information"
+                },
+                "label": {
+                  "location": "Location",
+                  "url": "Internal URL",
+                  "publicUrl": "Public URL",
+                  "sftpAddress": "SFTP Address",
+                  "backupConfiguration": "Backup Configuration",
+                  "description": "Description",
+                  "createdAt": "Created",
+                  "inheritedFromLocation": "Inherited from Location",
+                  "none": "None",
+                  "wingsVersion": "Wings Version",
+                  "os": "Operating System",
+                  "architecture": "Architecture",
+                  "cpuCount": "CPU Threads",
+                  "kernelVersion": "Kernel Version",
+                  "unavailable": "Unavailable"
+                },
+                "badge": {
+                  "updateAvailable": "Update Available"
+                }
+              }
+            },
             "general": {
               "page": {
                 "tooltip": {
@@ -2334,6 +2364,57 @@
           "title": "Servers",
           "resourceName": "Server",
           "tabs": {
+            "overview": {
+              "title": "Overview",
+              "page": {
+                "title": "Server Overview",
+                "card": {
+                  "owner": "Owner",
+                  "nodeAndLocation": "Node & Location",
+                  "serverDetails": "Server Details",
+                  "resourceLimits": "Resource Limits",
+                  "featureLimits": "Feature Limits"
+                },
+                "label": {
+                  "email": "Email",
+                  "language": "Language",
+                  "createdAt": "Created",
+                  "node": "Node",
+                  "location": "Location",
+                  "memoryLimit": "Memory Limit",
+                  "diskLimit": "Disk Limit",
+                  "sftpAddress": "SFTP Address",
+                  "primaryAllocation": "Primary Allocation",
+                  "none": "None",
+                  "dockerImage": "Docker Image",
+                  "nest": "Nest",
+                  "egg": "Egg",
+                  "timezone": "Timezone",
+                  "autoKill": "Auto-Kill",
+                  "cpu": "CPU",
+                  "memory": "Memory",
+                  "disk": "Disk",
+                  "swap": "Swap",
+                  "allocations": "Allocations",
+                  "databases": "Databases",
+                  "backups": "Backups",
+                  "schedules": "Schedules",
+                  "unlimited": "Unlimited",
+                  "autoKillSeconds": "{seconds}s",
+                  "autoKillDisabled": "Disabled",
+                  "externalId": "External ID",
+                  "uuid": "UUID"
+                },
+                "badge": {
+                  "suspended": "Suspended",
+                  "transferring": "Transferring",
+                  "installing": "Installing",
+                  "installFailed": "Install Failed",
+                  "restoringBackup": "Restoring Backup",
+                  "admin": "Admin"
+                }
+              }
+            },
             "general": {
               "page": {
                 "titleCreate": "Create Server",

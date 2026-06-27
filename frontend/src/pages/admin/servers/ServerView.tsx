@@ -5,6 +5,7 @@ import {
   faExternalLink,
   faFileText,
   faFolderTree,
+  faHouse,
   faNetworkWired,
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
@@ -19,6 +20,7 @@ import AdminServerBackups from '@/pages/admin/servers/backups/AdminServerBackups
 import AdminServerLogs from '@/pages/admin/servers/logs/AdminServerLogs.tsx';
 import AdminServerManagement from '@/pages/admin/servers/management/AdminServerManagement.tsx';
 import AdminServerMounts from '@/pages/admin/servers/mounts/AdminServerMounts.tsx';
+import ServerOverview from '@/pages/admin/servers/ServerOverview.tsx';
 import ServerUpdate from '@/pages/admin/servers/ServerUpdate.tsx';
 import AdminServerVariables from '@/pages/admin/servers/variables/AdminServerVariables.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -43,9 +45,15 @@ export default function ServerView() {
         baseUrl={`/admin/servers/${params.id}`}
         items={[
           {
+            name: t('pages.admin.servers.tabs.overview.title', {}),
+            icon: faHouse,
+            path: '/',
+            element: <ServerOverview server={server} />,
+          },
+          {
             name: t('common.tabs.general', {}),
             icon: faCog,
-            path: '/',
+            path: `/settings`,
             element: <ServerUpdate contextServer={server} />,
           },
           {

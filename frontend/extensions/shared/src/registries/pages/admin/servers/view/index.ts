@@ -7,6 +7,7 @@ import { AllocationsRegistry } from './allocations.ts';
 import { LogsRegistry } from './logs.ts';
 import { ManagementRegistry } from './management.ts';
 import { MountsRegistry } from './mounts.ts';
+import { OverviewRegistry } from './overview.ts';
 import { UpdateRegistry } from './update.ts';
 import { VariablesRegistry } from './variables.ts';
 
@@ -14,6 +15,7 @@ export class ViewRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.subContainer.mergeFrom(other.subContainer);
     this.subNavigation.mergeFrom(other.subNavigation);
+    this.overview.mergeFrom(other.overview);
     this.update.mergeFrom(other.update);
     this.allocations.mergeFrom(other.allocations);
     this.variables.mergeFrom(other.variables);
@@ -26,6 +28,7 @@ export class ViewRegistry implements Registry {
 
   public subContainer: ContainerRegistry<SubContainerProps> = new ContainerRegistry();
   public subNavigation = new SubNavigationRegistry<{ server: z.infer<typeof adminServerSchema> }>();
+  public overview: OverviewRegistry = new OverviewRegistry();
   public update: UpdateRegistry = new UpdateRegistry();
   public allocations: AllocationsRegistry = new AllocationsRegistry();
   public variables: VariablesRegistry = new VariablesRegistry();
@@ -42,6 +45,11 @@ export class ViewRegistry implements Registry {
     callback: (registry: SubNavigationRegistry<{ server: z.infer<typeof adminServerSchema> }>) => unknown,
   ): this {
     callback(this.subNavigation);
+    return this;
+  }
+
+  public enterOverview(callback: (registry: OverviewRegistry) => unknown): this {
+    callback(this.overview);
     return this;
   }
 
