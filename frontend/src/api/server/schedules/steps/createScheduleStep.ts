@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
 import { serverScheduleStepSchema, serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
+import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   serverUuid: string,
@@ -10,7 +10,7 @@ export default async (
 ): Promise<z.infer<typeof serverScheduleStepSchema>> => {
   const { data } = await axiosInstance.post(
     `/api/client/servers/${serverUuid}/schedules/${scheduleUuid}/steps`,
-    serializeForApi(serverScheduleStepUpdateSchema, scheduleStepData),
+    transformKeysToSnakeCase(scheduleStepData),
   );
   return data.scheduleStep;
 };

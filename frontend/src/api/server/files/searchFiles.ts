@@ -1,17 +1,31 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
-import { serverDirectoryEntrySchema, serverFilesSearchSchema } from '@/lib/schemas/server/files.ts';
+import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
-const searchFilesSchema = serverFilesSearchSchema.extend({ root: z.string() });
+interface Data {
+  root: string;
+  pathFilter: {
+    include: string[];
+    exclude: string[];
+    caseInsensitive: boolean;
+  } | null;
+  sizeFilter: {
+    min: number;
+    max: number;
+  } | null;
+  contentFilter: {
+    query: string;
+    maxSearchSize: number;
+    includeUnmatched: boolean;
+    caseInsensitive: boolean;
+  } | null;
+}
 
-export default async (
-  uuid: string,
-  searchData: z.infer<typeof searchFilesSchema>,
-): Promise<z.infer<typeof serverDirectoryEntrySchema>[]> => {
+export default async (uuid: string, searchData: Data): Promise<z.infer<typeof serverDirectoryEntrySchema>[]> => {
   const { data } = await axiosInstance.post(
     `/api/client/servers/${uuid}/files/search`,
-    serializeForApi(searchFilesSchema, searchData),
+    transformKeysToSnakeCase(searchData),
   );
   return data.entries;
 };
