@@ -1,15 +1,17 @@
+import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 
-interface Data {
-  serverUuid: string;
-  truncateDirectory: boolean;
-  restoreStartup: boolean;
-}
-
-export default async (nodeUuid: string, backupUuid: string, data: Data): Promise<void> => {
+export default async (
+  nodeUuid: string,
+  backupUuid: string,
+  data: { serverUuid: string; truncateDirectory: boolean; restoreStartup: boolean },
+): Promise<void> => {
   await axiosInstance.post(
     `/api/admin/nodes/${nodeUuid}/backups/${backupUuid}/restore`,
-    transformKeysToSnakeCase(data),
+    serializeForApi(
+      z.object({ serverUuid: z.string(), truncateDirectory: z.boolean(), restoreStartup: z.boolean() }),
+      data,
+    ),
   );
 };

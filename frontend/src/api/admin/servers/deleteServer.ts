@@ -1,13 +1,9 @@
+import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 
-interface Data {
-  force: boolean;
-  deleteBackups: boolean;
-}
-
-export default async (serverUuid: string, data: Data): Promise<void> => {
+export default async (serverUuid: string, data: { force: boolean; deleteBackups: boolean }): Promise<void> => {
   await axiosInstance.delete(`/api/admin/servers/${serverUuid}`, {
-    data: transformKeysToSnakeCase(data),
+    data: serializeForApi(z.object({ force: z.boolean(), deleteBackups: z.boolean() }), data),
   });
 };

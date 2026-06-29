@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminOAuthProviderMappingCreateSchema,
   adminOAuthProviderMappingSchema,
 } from '@/lib/schemas/admin/oauthProviders.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   oauthProviderUuid: string,
@@ -12,7 +12,7 @@ export default async (
 ): Promise<z.infer<typeof adminOAuthProviderMappingSchema>> => {
   const { data: response } = await axiosInstance.post(
     `/api/admin/oauth-providers/${oauthProviderUuid}/mappings`,
-    transformKeysToSnakeCase(data),
+    serializeForApi(adminOAuthProviderMappingCreateSchema, data),
   );
   return response.oauthMapping;
 };
