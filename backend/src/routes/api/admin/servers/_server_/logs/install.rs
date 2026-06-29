@@ -58,13 +58,7 @@ mod get {
             .await?
             .api_client(&state.database)
             .await?
-            .get_servers_server_logs_install(
-                server.uuid,
-                &wings_api::servers_server_logs_install::get::Query {
-                    lines: Some(params.lines),
-                    ..Default::default()
-                },
-            )
+            .get_servers_server_logs_install(server.uuid, params.lines)
             .await
         {
             Ok(logs) => logs,

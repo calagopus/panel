@@ -75,13 +75,7 @@ mod get {
             .await?
             .api_client(&state.database)
             .await?
-            .get_servers_server_files_revisions(
-                server.uuid,
-                &wings_api::servers_server_files_revisions::get::Query {
-                    file: Some(params.file.clone()),
-                    ..Default::default()
-                },
-            )
+            .get_servers_server_files_revisions(server.uuid, &params.file)
             .await?;
 
         let mut revisions = Vec::new();
