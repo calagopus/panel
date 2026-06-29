@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 import { adminEggVariableSchema, adminEggVariableUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   nestUuid: string,
@@ -10,7 +10,7 @@ export default async (
 ): Promise<z.infer<typeof adminEggVariableSchema>> => {
   const { data } = await axiosInstance.post(
     `/api/admin/nests/${nestUuid}/eggs/${eggUuid}/variables`,
-    transformKeysToSnakeCase(eggVariableData),
+    serializeForApi(adminEggVariableUpdateSchema, eggVariableData),
   );
   return data.variable;
 };
