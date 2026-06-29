@@ -145,7 +145,7 @@ export default function ServerStartup() {
             placeholder={t('common.form.startupCommand', {})}
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            readOnly={!useServerCan('startup.command') || !server.eggConfiguration?.startupAllowCustomStartupCommand}
+            readOnly={!useServerCan('startup.command') || !server.eggConfiguration?.startupAllowCustomCommand}
             autosize
             rightSection={
               <Popover>
@@ -157,9 +157,9 @@ export default function ServerStartup() {
                 <Popover.Dropdown>
                   <Select
                     data={[
-                      ...((!server.eggConfiguration?.startupAllowCustomStartupCommand &&
+                      ...((!server.eggConfiguration?.startupAllowCustomCommand &&
                         Object.values(server.egg.startupCommands).every((value) => value !== command)) ||
-                      server.eggConfiguration?.startupAllowCustomStartupCommand
+                      server.eggConfiguration?.startupAllowCustomCommand
                         ? [
                             {
                               label: t('common.custom', {}),
@@ -174,7 +174,7 @@ export default function ServerStartup() {
                     ]}
                     disabled={
                       !useServerCan('startup.command') ||
-                      (!server.eggConfiguration?.startupAllowCustomStartupCommand &&
+                      (!server.eggConfiguration?.startupAllowCustomCommand &&
                         Object.values(server.egg.startupCommands).every((value) => value !== command))
                     }
                     value={Object.values(server.egg.startupCommands).find((value) => value === command) || ''}

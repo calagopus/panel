@@ -594,6 +594,14 @@ impl UpdatableModel for EggConfiguration {
                     .transpose()?,
             )
             .set(
+                "config_startup",
+                options
+                    .config_startup
+                    .as_ref()
+                    .map(|c| c.as_ref().map(serde_json::to_value).transpose())
+                    .transpose()?,
+            )
+            .set(
                 "config_routes",
                 options
                     .config_routes
@@ -619,6 +627,9 @@ impl UpdatableModel for EggConfiguration {
         }
         if let Some(config_allocations) = options.config_allocations {
             self.config_allocations = config_allocations;
+        }
+        if let Some(config_startup) = options.config_startup {
+            self.config_startup = config_startup;
         }
         if let Some(config_routes) = options.config_routes {
             self.config_routes = config_routes;

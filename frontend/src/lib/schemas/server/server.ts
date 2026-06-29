@@ -27,7 +27,7 @@ export const serverEggSchema = z.object({
 export const serverEggConfigurationSchema = z.object({
   allocationSelfAssignEnabled: z.boolean(),
   allocationSelfAssignRequirePrimary: z.boolean(),
-  startupAllowCustomStartupCommand: z.boolean(),
+  startupAllowCustomCommand: z.boolean(),
   routeOrder: z.array(eggConfigurationRouteItemSchema).nullable(),
 });
 
