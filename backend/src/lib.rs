@@ -1,7 +1,7 @@
 use anyhow::Context;
 use axum::{
     body::Body,
-    extract::{ConnectInfo, Request},
+    extract::{ConnectInfo, FromRequestParts, Request, ws::WebSocketUpgrade},
     http::{HeaderValue, StatusCode},
     middleware::Next,
     response::{IntoResponse, Response},
@@ -21,6 +21,7 @@ use std::{
     sync::{Arc, OnceLock},
 };
 use tokio::sync::RwLock;
+use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tower_cookies::CookieManagerLayer;
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
 use utoipa_axum::router::OpenApiRouter;
@@ -406,6 +407,7 @@ pub async fn handle_startup() -> Result<
 
         client: reqwest::ClientBuilder::new()
             .user_agent(format!("github.com/calagopus/panel {}", shared::VERSION))
+            .connect_timeout(std::time::Duration::from_secs(10))
             .build()
             .context("failed to build http client")?,
         app_router: RwLock::new(None),
@@ -519,20 +521,14 @@ pub async fn handle_startup() -> Result<
         .merge(routes::router(&state))
         .merge(extension_router)
         .fallback(
-            |state: GetState, ip: GetIp, mut req: Request<Body>| async move {
+            |state: GetState, ip: GetIp, req: Request<Body>| async move {
                 let is_upgrade = req
                     .headers()
                     .get(axum::http::header::UPGRADE)
                     .is_some_and(|v| v.as_bytes().eq_ignore_ascii_case(b"websocket"));
 
-                let on_upgrade = if is_upgrade {
-                    Some(hyper::upgrade::on(&mut req))
-                } else {
-                    None
-                };
-
-                let (parts, body) = req.into_parts();
-                let path = parts.uri.path();
+                let (mut parts, body) = req.into_parts();
+                let path = parts.uri.path().to_string();
 
                 'proxy: {
                     if path.starts_with("/wings-proxy") {
@@ -565,6 +561,115 @@ pub async fn handle_startup() -> Result<
                         let mut url = node.url(path);
                         url.set_query(parts.uri.query());
 
+                        let node_token = state.database.decrypt(node.token.clone()).await?;
+
+                        if is_upgrade {
+                            let ws = match WebSocketUpgrade::from_request_parts(
+                                &mut parts, &state,
+                            )
+                            .await
+                            {
+                                Ok(ws) => ws,
+                                Err(_) => break 'proxy,
+                            };
+
+                            let url = match url.scheme() {
+                                "https" => format!("wss://{}", &url.as_str()["https://".len()..]),
+                                "http" => format!("ws://{}", &url.as_str()["http://".len()..]),
+                                _ => url.to_string(),
+                            };
+
+                            let mut upstream_request = match url.into_client_request() {
+                                Ok(request) => request,
+                                Err(_) => break 'proxy,
+                            };
+
+                            for (name, value) in parts.headers.iter() {
+                                if matches!(
+                                    name.as_str(),
+                                    "host"
+                                        | "connection"
+                                        | "upgrade"
+                                        | "content-length"
+                                        | "transfer-encoding"
+                                        | "x-forwarded-for"
+                                        | "sec-websocket-key"
+                                        | "sec-websocket-version"
+                                        | "sec-websocket-extensions"
+                                        | "sec-websocket-accept"
+                                ) {
+                                    continue;
+                                }
+
+                                upstream_request
+                                    .headers_mut()
+                                    .append(name.clone(), value.clone());
+                            }
+
+                            upstream_request
+                                .headers_mut()
+                                .insert("X-Real-Ip", ip.to_string().parse()?);
+                            upstream_request
+                                .headers_mut()
+                                .insert("X-Real-Ip-Token", node_token.parse()?);
+
+                            tracing::debug!(
+                                "proxying websocket to wings-proxy upstream: {}",
+                                upstream_request.uri()
+                            );
+
+                            let upstream =
+                                match tokio_tungstenite::connect_async(upstream_request).await {
+                                    Ok((upstream, _)) => upstream,
+                                    Err(err) => {
+                                        tracing::warn!(
+                                            "failed to connect to wings-proxy websocket upstream: {:#?}",
+                                            err
+                                        );
+
+                                        return ApiResponse::error("failed to connect to upstream")
+                                            .with_status(StatusCode::BAD_GATEWAY)
+                                            .ok();
+                                    }
+                                };
+
+                            return ApiResponse::new_response(ws.on_upgrade(
+                                move |client_ws| async move {
+                                    use futures_util::{SinkExt, StreamExt};
+
+                                    let (mut client_tx, mut client_rx) = client_ws.split();
+                                    let (mut up_tx, mut up_rx) = upstream.split();
+
+                                    let to_upstream = async {
+                                        while let Some(Ok(msg)) = client_rx.next().await {
+                                            let msg = shared::utils::axum_to_tungstenite(msg);
+                                            if up_tx.send(msg).await.is_err() {
+                                                break;
+                                            }
+                                        }
+                                    };
+
+                                    let to_client = async {
+                                        while let Some(Ok(msg)) = up_rx.next().await {
+                                            let Some(msg) = shared::utils::tungstenite_to_axum(msg)
+                                            else {
+                                                continue;
+                                            };
+                                            if client_tx.send(msg).await.is_err() {
+                                                break;
+                                            }
+                                        }
+                                    };
+
+                                    tokio::select! {
+                                        _ = to_upstream => {},
+                                        _ = to_client => {},
+                                    }
+                                },
+                            ))
+                            .ok();
+                        }
+
                         let mut request = reqwest::Request::new(parts.method, url);
                         *request.headers_mut() = parts.headers;
                         *request.body_mut() =
@@ -580,72 +685,42 @@ pub async fn handle_startup() -> Result<
                             .headers_mut()
                             .remove(axum::http::header::CONTENT_LENGTH);
 
-                        if !is_upgrade {
-                            request.headers_mut().remove(axum::http::header::CONNECTION);
-                        }
+                        request.headers_mut().remove(axum::http::header::CONNECTION);
 
                         request
                             .headers_mut()
                             .insert("X-Real-Ip", ip.to_string().parse()?);
+                        request
+                            .headers_mut()
+                            .insert("X-Real-Ip-Token", node_token.parse()?);
 
                         tracing::debug!(
                             "proxying request to wings-proxy upstream: {}",
                             request.url()
                         );
 
-                        let response = match tokio::time::timeout(
-                            std::time::Duration::from_secs(30),
-                            state.client.execute(request),
-                        )
-                        .await
-                        {
-                            Ok(Ok(response)) => response,
-                            Ok(Err(err)) => {
+                        let response = match state.client.execute(request).await {
+                            Ok(response) => response,
+                            Err(err) => {
                                 tracing::warn!(
                                     "failed to connect to wings-proxy upstream: {:#?}",
                                     err
                                 );
 
+                                let status = if err.is_connect() || err.is_timeout() {
+                                    StatusCode::GATEWAY_TIMEOUT
+                                } else {
+                                    StatusCode::BAD_GATEWAY
+                                };
+
                                 return ApiResponse::error("failed to connect to upstream")
-                                    .with_status(StatusCode::BAD_GATEWAY)
-                                    .ok();
-                            }
-                            Err(_) => {
-                                return ApiResponse::error("upstream request timed out")
-                                    .with_status(StatusCode::GATEWAY_TIMEOUT)
+                                    .with_status(status)
                                     .ok();
                             }
                         };
 
                         let status = response.status();
                         let headers = response.headers().clone();
-
-                        if status == axum::http::StatusCode::SWITCHING_PROTOCOLS
-                            && is_upgrade
-                            && let Some(on_upgrade) = on_upgrade
-                        {
-                            tokio::spawn(async move {
-                                let (client_stream_raw, mut upstream_stream) =
-                                    match tokio::join!(on_upgrade, response.upgrade()) {
-                                        (Ok(c), Ok(u)) => (c, u),
-                                        _ => return,
-                                    };
-
-                                let mut client_stream =
-                                    hyper_util::rt::TokioIo::new(client_stream_raw);
-
-                                let _ = tokio::io::copy_bidirectional(
-                                    &mut client_stream,
-                                    &mut upstream_stream,
-                                )
-                                .await;
-                            });
-
-                            return ApiResponse::new(Body::empty())
-                                .with_status(status)
-                                .with_headers(&headers)
-                                .ok();
-                        }
 
                         let mut headers = headers;
                         for header in [
