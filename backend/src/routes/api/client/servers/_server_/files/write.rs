@@ -3,7 +3,6 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod post {
     use axum::{extract::Query, http::StatusCode};
-    use futures_util::TryStreamExt;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
@@ -47,7 +46,7 @@ mod post {
         mut server: GetServer,
         activity_logger: GetServerActivityLogger,
         Query(params): Query<Params>,
-        body: axum::body::Body,
+        body: String,
     ) -> ApiResponseResult {
         permissions.has_server_permission("files.create")?;
 
@@ -57,32 +56,13 @@ mod post {
                 .ok();
         }
 
-        let body_reader = tokio_util::io::StreamReader::new(
-            http_body_util::BodyDataStream::new(http_body_util::Limited::new(
-                body,
-                state
-                    .settings
-                    .get_as(|s| s.server.max_file_manager_view_size as usize)
-                    .await?,
-            ))
-            .map_err(std::io::Error::other),
-        );
-
         let revision_id = match server
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
             .await?
-            .post_servers_server_files_write(
-                server.uuid,
-                wings_api::client::AsyncRequestReader::new(body_reader),
-                &wings_api::servers_server_files_write::post::Query {
-                    file: Some(params.file.clone()),
-                    user: Some(user.uuid),
-                    ..Default::default()
-                },
-            )
+            .post_servers_server_files_write(server.uuid, &params.file, user.uuid, body.into())
             .await
         {
             Ok(data) => data.revision_id,

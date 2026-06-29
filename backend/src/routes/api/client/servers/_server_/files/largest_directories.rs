@@ -15,7 +15,7 @@ mod get {
     #[derive(ToSchema, Deserialize)]
     pub struct Params {
         #[serde(default)]
-        directory: compact_str::CompactString,
+        directory: String,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -58,14 +58,7 @@ mod get {
             .await?
             .api_client(&state.database)
             .await?
-            .get_servers_server_files_largest_directories(
-                server.uuid,
-                &wings_api::servers_server_files_largest_directories::get::Query {
-                    directory: Some(params.directory.clone()),
-                    ignored: server.0.subuser_ignored_files,
-                    ..Default::default()
-                },
-            )
+            .get_servers_server_files_largest_directories(server.uuid, &params.directory)
             .await
         {
             Ok(directories) => directories,

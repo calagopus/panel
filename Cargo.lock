@@ -1012,7 +1012,6 @@ dependencies = [
  "futures-util",
  "garde",
  "hex",
- "http-body-util",
  "human_bytes",
  "hyper 1.10.1",
  "hyper-util",
