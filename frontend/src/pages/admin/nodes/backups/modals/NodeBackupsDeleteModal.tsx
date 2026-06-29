@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteNodeBackup from '@/api/admin/nodes/backups/deleteNodeBackup.ts';
@@ -7,11 +8,11 @@ import Button from '@/elements/Button.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 type Props = ModalProps & {
   node: z.infer<typeof adminNodeSchema>;
@@ -21,7 +22,7 @@ type Props = ModalProps & {
 export default function NodeBackupsDeleteModal({ node, backup, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeNodeBackup } = useAdminStore();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [deleteDoForce, setDeleteDoForce] = useState(false);
@@ -34,7 +35,7 @@ export default function NodeBackupsDeleteModal({ node, backup, ...props }: Props
       .then(() => {
         addToast(t('pages.admin.nodes.tabs.backups.page.toast.deleted', {}), 'success');
         props.onClose();
-        removeNodeBackup(backup);
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.backups(node.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getMounts from '@/api/admin/mounts/getMounts.ts';
@@ -14,12 +15,11 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function NodeMountAddModal({ node, ...props }: ModalProps & { node: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addNodeMount } = useAdminStore();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [selectedMount, setSelectedMount] = useState<z.infer<typeof adminMountSchema> | null>(null);
@@ -48,7 +48,7 @@ export default function NodeMountAddModal({ node, ...props }: ModalProps & { nod
         addToast(t('pages.admin.nodes.tabs.mounts.page.toast.added', {}), 'success');
 
         props.onClose();
-        addNodeMount({ mount: selectedMount, created: new Date() });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.mounts(node.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

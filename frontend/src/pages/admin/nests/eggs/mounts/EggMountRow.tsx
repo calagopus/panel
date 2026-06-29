@@ -1,4 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteEggMount from '@/api/admin/nests/eggs/mounts/deleteEggMount.ts';
@@ -9,12 +10,12 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeMountSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function EggMountRow({
   nest,
@@ -26,7 +27,7 @@ export default function EggMountRow({
   mount: z.infer<typeof adminNodeMountSchema>;
 }) {
   const { addToast } = useToast();
-  const { removeEggMount } = useAdminStore();
+  const queryClient = useQueryClient();
   const { t } = useTranslations();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
@@ -34,7 +35,7 @@ export default function EggMountRow({
   const doRemove = async () => {
     await deleteEggMount(nest.uuid, egg.uuid, mount.mount.uuid)
       .then(() => {
-        removeEggMount(mount);
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.eggs.mounts(egg.uuid) });
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.toast.deleted', {}), 'success');
       })
       .catch((msg) => {

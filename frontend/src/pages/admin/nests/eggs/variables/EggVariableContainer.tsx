@@ -16,7 +16,6 @@ import { adminEggSchema, adminEggVariableSchema, adminEggVariableUpdateSchema } 
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 type VariableFormValues = z.infer<typeof adminEggVariableUpdateSchema>;
@@ -25,12 +24,17 @@ export default function EggVariableContainer({
   contextNest,
   contextEgg,
   contextVariable,
+  eggVariables,
+  setEggVariables,
+  removeEggVariable,
 }: {
   contextNest: z.infer<typeof adminNestSchema>;
   contextEgg: z.infer<typeof adminEggSchema>;
   contextVariable?: z.infer<typeof adminEggVariableSchema>;
+  eggVariables: z.infer<typeof adminEggVariableSchema>[];
+  setEggVariables: (variables: z.infer<typeof adminEggVariableSchema>[]) => void;
+  removeEggVariable: (variable: z.infer<typeof adminEggVariableSchema>) => void;
 }) {
-  const { eggVariables, setEggVariables, removeEggVariable } = useAdminStore();
   const { addToast } = useToast();
   const { languages } = useGlobalStore();
   const { t } = useTranslations();

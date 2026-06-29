@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getOAuthProviders from '@/api/admin/oauth-providers/getOAuthProviders.ts';
@@ -15,7 +16,6 @@ import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function UserOAuthLinkAddModal({
   user,
@@ -23,7 +23,7 @@ export default function UserOAuthLinkAddModal({
 }: ModalProps & { user: z.infer<typeof fullUserSchema> }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { addUserOAuthLink } = useAdminStore();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [identifier, setIdentifier] = useState('');
@@ -55,7 +55,7 @@ export default function UserOAuthLinkAddModal({
         addToast(t('pages.admin.users.tabs.oauthLinks.page.toast.added', {}), 'success');
 
         props.onClose();
-        addUserOAuthLink(oauthLink);
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.oauthLinks(user.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

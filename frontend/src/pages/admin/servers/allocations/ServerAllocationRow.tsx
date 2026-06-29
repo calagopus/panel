@@ -20,7 +20,6 @@ import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { formatAllocation } from '@/lib/server.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerAllocationRow({
   server,
@@ -32,7 +31,6 @@ export default function ServerAllocationRow({
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
-  const { serverAllocations, setServerAllocations, removeServerAllocation } = useAdminStore();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
   const [notes, setNotes] = useState(allocation.notes ?? '');
@@ -62,13 +60,7 @@ export default function ServerAllocationRow({
   const doSetPrimary = () => {
     updateServerAllocation(server.uuid, allocation.uuid, { primary: true })
       .then(() => {
-        setServerAllocations({
-          ...serverAllocations,
-          data: serverAllocations.data.map((a) => ({
-            ...a,
-            isPrimary: a.uuid === allocation.uuid,
-          })),
-        });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
         addToast(t('pages.admin.servers.tabs.allocations.page.toast.setPrimary', {}), 'success');
       })
       .catch((msg) => {
@@ -79,13 +71,7 @@ export default function ServerAllocationRow({
   const doUnsetPrimary = () => {
     updateServerAllocation(server.uuid, allocation.uuid, { primary: false })
       .then(() => {
-        setServerAllocations({
-          ...serverAllocations,
-          data: serverAllocations.data.map((a) => ({
-            ...a,
-            isPrimary: false,
-          })),
-        });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
         addToast(t('pages.admin.servers.tabs.allocations.page.toast.unsetPrimary', {}), 'success');
       })
       .catch((msg) => {
@@ -96,10 +82,7 @@ export default function ServerAllocationRow({
   const doRemove = async () => {
     await deleteServerAllocation(server.uuid, allocation.uuid)
       .then(async () => {
-        removeServerAllocation(allocation);
-        await queryClient.invalidateQueries({
-          queryKey: queryKeys.admin.servers.allocations(server.uuid),
-        });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
         setOpenModal(null);
         addToast(t('pages.admin.servers.tabs.allocations.page.toast.removed', {}), 'success');
       })

@@ -7,19 +7,25 @@ import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
-import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { ObjectSet } from '@/lib/objectSet.ts';
+import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function NodeAllocationsUpdateModal({
   node,
   loadAllocations,
+  selectedNodeAllocations,
+  setSelectedNodeAllocations,
   ...props
-}: ModalProps & { node: z.infer<typeof adminNodeSchema>; loadAllocations: () => void }) {
+}: ModalProps & {
+  node: z.infer<typeof adminNodeSchema>;
+  loadAllocations: () => void;
+  selectedNodeAllocations: ObjectSet<z.infer<typeof adminNodeAllocationSchema>, 'uuid'>;
+  setSelectedNodeAllocations: (allocations: z.infer<typeof adminNodeAllocationSchema>[]) => void;
+}) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
 
   const mostCommonIp = useMemo(() => {
     const ipCounts = new Map<string, number>();

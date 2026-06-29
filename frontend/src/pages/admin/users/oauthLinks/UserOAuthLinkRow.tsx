@@ -1,4 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteUserOAuthLink from '@/api/admin/users/oauthLinks/deleteUserOAuthLink.ts';
@@ -9,11 +10,11 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminUserOAuthLinkSchema } from '@/lib/schemas/admin/users.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function UserOAuthLinkRow({
   user,
@@ -24,14 +25,14 @@ export default function UserOAuthLinkRow({
 }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { removeUserOAuthLink } = useAdminStore();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
 
   const doDelete = async () => {
     await deleteUserOAuthLink(user.uuid, userOAuthLink.uuid)
       .then(() => {
-        removeUserOAuthLink(userOAuthLink);
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.oauthLinks(user.uuid) });
         addToast(t('pages.admin.users.tabs.oauthLinks.page.toast.removed', {}), 'success');
       })
       .catch((msg) => {

@@ -15,6 +15,7 @@ import getServer from '@/api/admin/servers/getServer.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminServerAllocations from '@/pages/admin/servers/allocations/AdminServerAllocations.tsx';
 import AdminServerBackups from '@/pages/admin/servers/backups/AdminServerBackups.tsx';
 import AdminServerLogs from '@/pages/admin/servers/logs/AdminServerLogs.tsx';
@@ -30,7 +31,7 @@ export default function ServerView() {
   const params = useParams<'id'>();
 
   const { data: server, isLoading } = useQuery({
-    queryKey: ['admin', 'servers', { uuid: params.id }],
+    queryKey: queryKeys.admin.servers.detail(params.id!),
     queryFn: () => getServer(params.id!),
   });
 

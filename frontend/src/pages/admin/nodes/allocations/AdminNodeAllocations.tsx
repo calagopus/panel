@@ -11,20 +11,43 @@ import Select from '@/elements/input/Select.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { nodeAllocationTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 import AllocationActionBar from './AllocationActionBar.tsx';
 import NodeAllocationsCreateModal from './modals/NodeAllocationsCreateModal.tsx';
 import NodeAllocationRow from './NodeAllocationRow.tsx';
 
 export default function AdminNodeAllocations({ node }: { node: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
-  const { selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
+
+  const [selectedNodeAllocations, setSelectedNodeAllocationsState] = useState(
+    () => new ObjectSet<z.infer<typeof adminNodeAllocationSchema>, 'uuid'>('uuid'),
+  );
+
+  const setSelectedNodeAllocations = useCallback((allocations: z.infer<typeof adminNodeAllocationSchema>[]) => {
+    setSelectedNodeAllocationsState(new ObjectSet('uuid', allocations));
+  }, []);
+
+  const addSelectedNodeAllocation = useCallback((allocation: z.infer<typeof adminNodeAllocationSchema>) => {
+    setSelectedNodeAllocationsState((prev) => {
+      const next = new ObjectSet('uuid', prev.values());
+      next.add(allocation);
+      return next;
+    });
+  }, []);
+
+  const removeSelectedNodeAllocation = useCallback((allocation: z.infer<typeof adminNodeAllocationSchema>) => {
+    setSelectedNodeAllocationsState((prev) => {
+      const next = new ObjectSet('uuid', prev.values());
+      next.delete(allocation);
+      return next;
+    });
+  }, []);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
   const [ipFilter, setIpFilter] = useState('');
@@ -82,9 +105,12 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
     [selectedNodeAllocations],
   );
 
-  const onSelected = useCallback((selected: z.infer<typeof adminNodeAllocationSchema>[]) => {
-    setSelectedNodeAllocations([...selectedNodeAllocationsPreviousRef.current, ...selected]);
-  }, []);
+  const onSelected = useCallback(
+    (selected: z.infer<typeof adminNodeAllocationSchema>[]) => {
+      setSelectedNodeAllocations([...selectedNodeAllocationsPreviousRef.current, ...selected]);
+    },
+    [setSelectedNodeAllocations],
+  );
 
   useEffect(() => {
     setSelectedNodeAllocations([]);
@@ -175,7 +201,12 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
         onClose={() => setOpenModal(null)}
       />
 
-      <AllocationActionBar node={node} loadAllocations={refetch} />
+      <AllocationActionBar
+        node={node}
+        loadAllocations={refetch}
+        selectedNodeAllocations={selectedNodeAllocations}
+        setSelectedNodeAllocations={setSelectedNodeAllocations}
+      />
 
       <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected} disabled={!!openModal}>
         <Table
@@ -192,6 +223,9 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
                   key={allocation.uuid}
                   allocation={allocation}
                   ref={innerRef as Ref<HTMLTableRowElement>}
+                  selectedNodeAllocations={selectedNodeAllocations}
+                  addSelectedNodeAllocation={addSelectedNodeAllocation}
+                  removeSelectedNodeAllocation={removeSelectedNodeAllocation}
                 />
               )}
             </SelectionArea.Selectable>

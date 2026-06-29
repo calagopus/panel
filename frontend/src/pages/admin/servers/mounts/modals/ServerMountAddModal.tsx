@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createServerMount from '@/api/admin/servers/mounts/createServerMount.ts';
@@ -14,7 +15,6 @@ import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/s
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerMountAddModal({
   server,
@@ -22,7 +22,7 @@ export default function ServerMountAddModal({
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addServerMount } = useAdminStore();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [selectedMount, setSelectedMount] = useState<z.infer<typeof adminNodeMountSchema> | null>(null);
@@ -49,7 +49,7 @@ export default function ServerMountAddModal({
         addToast(t('pages.admin.servers.tabs.mounts.page.toast.added', {}), 'success');
 
         props.onClose();
-        addServerMount({ mount: selectedMount.mount, created: new Date() });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.mounts(server.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

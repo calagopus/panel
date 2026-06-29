@@ -5,18 +5,23 @@ import Checkbox from '@/elements/input/Checkbox.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { ObjectSet } from '@/lib/objectSet.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 interface NodeAllocationRowProps {
   allocation: z.infer<typeof adminNodeAllocationSchema>;
+  selectedNodeAllocations: ObjectSet<z.infer<typeof adminNodeAllocationSchema>, 'uuid'>;
+  addSelectedNodeAllocation: (allocation: z.infer<typeof adminNodeAllocationSchema>) => void;
+  removeSelectedNodeAllocation: (allocation: z.infer<typeof adminNodeAllocationSchema>) => void;
 }
 
 const NodeAllocationRow = memo(
-  forwardRef<HTMLTableRowElement, NodeAllocationRowProps>(function FileRow({ allocation }, ref) {
+  forwardRef<HTMLTableRowElement, NodeAllocationRowProps>(function FileRow(
+    { allocation, selectedNodeAllocations, addSelectedNodeAllocation, removeSelectedNodeAllocation },
+    ref,
+  ) {
     const { t } = useTranslations();
-    const { selectedNodeAllocations, addSelectedNodeAllocation, removeSelectedNodeAllocation } = useAdminStore();
 
     const isNodeAllocationSelected = selectedNodeAllocations.has(allocation);
 
