@@ -60,7 +60,13 @@ mod get {
             .await?
             .api_client(&state.database)
             .await?
-            .get_servers_server_logs(server.uuid, params.lines)
+            .get_servers_server_logs(
+                server.uuid,
+                &wings_api::servers_server_logs::get::Query {
+                    lines: Some(params.lines),
+                    ..Default::default()
+                },
+            )
             .await?;
 
         ApiResponse::new_stream(logs)

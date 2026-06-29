@@ -23,7 +23,7 @@ mod get {
 
         #[garde(skip)]
         #[serde(default)]
-        directory: String,
+        directory: compact_str::CompactString,
 
         #[garde(skip)]
         #[serde(default)]
@@ -100,11 +100,14 @@ mod get {
             .await?
             .get_servers_server_files_list(
                 server.uuid,
-                &params.directory,
-                server.0.subuser_ignored_files.unwrap_or_default(),
-                params.per_page as u64,
-                params.page as u64,
-                params.sort,
+                &wings_api::servers_server_files_list::get::Query {
+                    directory: Some(params.directory),
+                    ignored: server.0.subuser_ignored_files,
+                    per_page: Some(params.per_page as u64),
+                    page: Some(params.page as u64),
+                    sort: Some(params.sort),
+                    ..Default::default()
+                },
             )
             .await
         {
