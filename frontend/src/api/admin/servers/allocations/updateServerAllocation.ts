@@ -1,21 +1,21 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
+import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
-const updateAllocationSchema = z.object({
-  notes: z.string().nullable().optional(),
-  primary: z.boolean().optional(),
-});
+interface Data {
+  notes?: string | null;
+  primary?: boolean;
+}
 
 export default async (
   serverUuid: string,
   allocationUuid: string,
-  allocationData: z.infer<typeof updateAllocationSchema>,
+  allocationData: Data,
 ): Promise<z.infer<typeof serverAllocationSchema>> => {
   const { data } = await axiosInstance.patch(
     `/api/admin/servers/${serverUuid}/allocations/${allocationUuid}`,
-    serializeForApi(updateAllocationSchema, allocationData),
+    transformKeysToSnakeCase(allocationData),
   );
   return data.allocation;
 };

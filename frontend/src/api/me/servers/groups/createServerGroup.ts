@@ -1,19 +1,14 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
+import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
-const createServerGroupSchema = z.object({
-  name: z.string(),
-  serverOrder: z.array(z.string()),
-});
+interface Data {
+  name: string;
+  serverOrder: string[];
+}
 
-export default async (
-  groupData: z.infer<typeof createServerGroupSchema>,
-): Promise<z.infer<typeof userServerGroupSchema>> => {
-  const { data } = await axiosInstance.post(
-    '/api/client/servers/groups',
-    serializeForApi(createServerGroupSchema, groupData),
-  );
+export default async (groupData: Data): Promise<z.infer<typeof userServerGroupSchema>> => {
+  const { data } = await axiosInstance.post('/api/client/servers/groups', transformKeysToSnakeCase(groupData));
   return data.serverGroup;
 };
