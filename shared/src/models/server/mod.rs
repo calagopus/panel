@@ -1235,16 +1235,6 @@ impl Server {
             .await?;
         }
 
-        sqlx::query!(
-            "UPDATE server_backups
-            SET node_uuid = $2
-            WHERE server_backups.server_uuid = $1 AND server_backups.shared = true",
-            self.uuid,
-            options.destination_node.uuid
-        )
-        .execute(&mut *transaction)
-        .await?;
-
         let token = options.destination_node.create_jwt(
             &state.database,
             &state.jwt,

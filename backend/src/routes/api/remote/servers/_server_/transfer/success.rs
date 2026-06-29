@@ -88,7 +88,8 @@ mod post {
         sqlx::query!(
             "UPDATE server_backups
             SET node_uuid = $3
-            WHERE server_backups.server_uuid = $1 AND server_backups.uuid = ANY($2)",
+            WHERE server_backups.server_uuid = $1
+                AND (server_backups.uuid = ANY($2) OR server_backups.shared = true)",
             server.uuid,
             &data.backups,
             destination_node.uuid

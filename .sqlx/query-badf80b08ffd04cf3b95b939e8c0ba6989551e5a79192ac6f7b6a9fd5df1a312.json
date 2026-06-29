@@ -16,7 +16,9 @@
                 "DDUP_BAK",
                 "BTRFS",
                 "ZFS",
-                "RESTIC"
+                "RESTIC",
+                "PROXMOX_BACKUP_SERVER",
+                "KOPIA"
               ]
             }
           }
