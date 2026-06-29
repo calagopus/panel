@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE server_backups\n            SET node_uuid = $3\n            WHERE server_backups.server_uuid = $1\n                AND (server_backups.uuid = ANY($2) OR server_backups.shared = true)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "UuidArray",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b2e304e72cb42a331e7733565544719d4d3780803885d6c4f80c6e706a051ac3"
+}
