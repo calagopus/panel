@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import getDatabaseHosts from '@/api/admin/database-hosts/getDatabaseHosts.ts';
@@ -15,7 +16,6 @@ import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function LocationDatabaseHostCreateModal({
   location,
@@ -23,7 +23,7 @@ export default function LocationDatabaseHostCreateModal({
 }: ModalProps & { location: z.infer<typeof adminLocationSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addLocationDatabaseHost } = useAdminStore();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [databaseHost, setDatabaseHost] = useState<z.infer<typeof adminDatabaseHostSchema> | null>(null);
@@ -45,7 +45,7 @@ export default function LocationDatabaseHostCreateModal({
         addToast(t('pages.admin.locations.tabs.databaseHosts.page.toast.created', {}), 'success');
 
         props.onClose();
-        addLocationDatabaseHost({ databaseHost, created: new Date() });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.locations.databaseHosts(location.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

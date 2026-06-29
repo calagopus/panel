@@ -1,4 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteLocationDatabaseHost from '@/api/admin/locations/database-hosts/deleteLocationDatabaseHost.ts';
@@ -10,10 +11,10 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminLocationDatabaseHostSchema, adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function LocationDatabaseHostRow({
   location,
@@ -24,14 +25,14 @@ export default function LocationDatabaseHostRow({
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeLocationDatabaseHost } = useAdminStore();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const doDelete = async () => {
     await deleteLocationDatabaseHost(location.uuid, databaseHost.databaseHost.uuid)
       .then(() => {
-        removeLocationDatabaseHost(databaseHost);
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.locations.databaseHosts(location.uuid) });
         addToast(t('pages.admin.locations.tabs.databaseHosts.page.toast.deleted', {}), 'success');
       })
       .catch((msg) => {
