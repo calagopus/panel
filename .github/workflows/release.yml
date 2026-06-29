@@ -284,6 +284,7 @@ jobs:
             SUFFIXES+=("${STABLE}-pre")
           else
             SUFFIXES+=("$STABLE")
+            SUFFIXES+=("${STABLE}-pre")
           fi
 
           IMAGE_TAGS=""
@@ -435,6 +436,7 @@ jobs:
             SUFFIXES+=("${{ matrix.variant }}-pre")
           else
             SUFFIXES+=("${{ matrix.variant }}")
+            SUFFIXES+=("${{ matrix.variant }}-pre")
           fi
 
           GHCR_TAGS=""
