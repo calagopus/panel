@@ -282,9 +282,6 @@ jobs:
           SUFFIXES=("${VERSION}${{ matrix.version_suffix }}")
           if [[ "$VERSION" == *-* ]]; then
             SUFFIXES+=("${STABLE}-pre")
-            if [[ "$VERSION" == 1.0.0-* ]]; then
-              SUFFIXES+=("$STABLE")
-            fi
           else
             SUFFIXES+=("$STABLE")
           fi
@@ -436,9 +433,6 @@ jobs:
           SUFFIXES=("${VERSION}-${{ matrix.variant }}")
           if [[ "$VERSION" == *-* ]]; then
             SUFFIXES+=("${{ matrix.variant }}-pre")
-            if [[ "$VERSION" == 1.0.0-* ]]; then
-              SUFFIXES+=("${{ matrix.variant }}")
-            fi
           else
             SUFFIXES+=("${{ matrix.variant }}")
           fi
