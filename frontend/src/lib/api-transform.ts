@@ -3,6 +3,7 @@ import { z } from 'zod';
 type AnySchema = z.ZodTypeAny;
 type Def = Record<string, AnySchema>;
 
+// Zod doesn't expose a public API for reading schema internals, so read _zod.def
 function def<T>(schema: AnySchema): T {
   return schema._zod.def as unknown as T;
 }
@@ -11,6 +12,7 @@ function toSnakeCase(key: string): string {
   return key.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
 
+// Remove optional/nullable/default/etc wrappers to get to the actual type
 function unwrap(schema: AnySchema): AnySchema {
   const { type } = def<{ type: string }>(schema);
 
@@ -28,6 +30,7 @@ function unwrap(schema: AnySchema): AnySchema {
   }
 }
 
+// snake_case to camelCase, walks nested objects/arrays using the schema shape
 function applyTransform(schema: AnySchema, data: unknown): unknown {
   const inner = unwrap(schema);
   const { type } = def<{ type: string }>(inner);
@@ -41,6 +44,7 @@ function applyTransform(schema: AnySchema, data: unknown): unknown {
 
     for (const [camelKey, fieldSchema] of Object.entries(shape)) {
       const snakeKey = toSnakeCase(camelKey);
+      // snake_case first, fall back to camelCase
       const value = Object.hasOwn(raw, snakeKey) ? raw[snakeKey] : raw[camelKey];
       result[camelKey] = applyTransform(fieldSchema, value);
     }
@@ -59,7 +63,7 @@ function applyTransform(schema: AnySchema, data: unknown): unknown {
     const { valueType } = def<{ valueType: AnySchema }>(inner);
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
-      result[key] = applyTransform(valueType, value);
+      result[key] = applyReverseTransform(valueType, value);
     }
     return result;
   }
@@ -67,10 +71,12 @@ function applyTransform(schema: AnySchema, data: unknown): unknown {
   return data;
 }
 
+// Remap keys then validate, main entry point for incoming API responses
 export function parseFromApi<T extends z.ZodTypeAny>(schema: T, data: unknown): z.infer<T> {
   return schema.parse(applyTransform(schema, data));
 }
 
+// camelCase to snake_case, skips undefined fields
 function applyReverseTransform(schema: AnySchema, data: unknown): unknown {
   const inner = unwrap(schema);
   const { type } = def<{ type: string }>(inner);
@@ -112,6 +118,7 @@ function applyReverseTransform(schema: AnySchema, data: unknown): unknown {
   return data;
 }
 
+// Main entry point for outgoing request bodies
 export function serializeForApi<T extends z.ZodTypeAny>(schema: T, data: z.infer<T>): unknown {
   return applyReverseTransform(schema, data);
 }
