@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO server_schedule_steps (schedule_uuid, action, order_)\n            SELECT $1, server_schedule_steps.action, server_schedule_steps.order_\n            FROM server_schedule_steps\n            WHERE server_schedule_steps.schedule_uuid = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1ac020f680f973dbdb71e45847c17c9b4d18cb8de5070838a2d503e708c2467e"
+}

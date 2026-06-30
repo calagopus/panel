@@ -12,6 +12,8 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod duplicate;
+
 pub type GetEggConfiguration = shared::extract::ConsumingExtension<EggConfiguration>;
 
 pub async fn auth(
@@ -208,6 +210,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
+        .nest("/duplicate", duplicate::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }

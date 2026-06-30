@@ -97,6 +97,7 @@
         "save": "Speichern",
         "saveAndStay": "Speichern & Bleiben",
         "edit": "Bearbeiten",
+        "duplicate": "Duplizieren",
         "delete": "Löschen",
         "remove": "Entfernen",
         "enable": "Aktivieren",
@@ -147,6 +148,14 @@
       "input": {
         "search": "Suchen..."
       },
+      "modal": {
+        "duplicate": {
+          "title": "{resource} duplizieren"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} dupliziert."
+      },
       "tooltip": {
         "resetToDefault": "Auf Standard zurücksetzen",
         "edit": "Bearbeiten",
@@ -157,6 +166,7 @@
       },
       "form": {
         "name": "Name",
+        "newName": "Neuer Name",
         "description": "Beschreibung",
         "author": "Autor",
         "type": "Typ",
@@ -1737,6 +1747,9 @@
                   "delete": {
                     "title": "Ankündigungslöschung bestätigen",
                     "content": "Möchtest du **{title}** wirklich löschen?"
+                  },
+                  "duplicate": {
+                    "content": "Möchtest du **{title}** wirklich duplizieren?"
                   }
                 },
                 "form": {
@@ -3827,6 +3840,7 @@
             "imported": "Zeitplan importiert.",
             "created": "Zeitplan erstellt.",
             "updated": "Zeitplan aktualisiert.",
+            "duplicated": "Zeitplan dupliziert.",
             "deleted": "Zeitplan gelöscht.",
             "triggered": "Zeitplan ausgelöst.",
             "exported": "Zeitplan exportiert.",
@@ -3834,6 +3848,7 @@
             "step": {
               "created": "Zeitplan-Schritt erstellt.",
               "updated": "Zeitplan-Schritt aktualisiert.",
+              "duplicated": "Zeitplan-Schritt dupliziert.",
               "deleted": "Zeitplan-Schritt gelöscht."
             }
           },
@@ -3875,6 +3890,9 @@
             },
             "updateSchedule": {
               "title": "Zeitplan aktualisieren"
+            },
+            "duplicateSchedule": {
+              "title": "Zeitplan duplizieren"
             },
             "deleteSchedule": {
               "title": "Löschen des Zeitplans bestätigen",

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO nest_egg_mounts (egg_uuid, mount_uuid)\n            SELECT $1, nest_egg_mounts.mount_uuid\n            FROM nest_egg_mounts\n            WHERE nest_egg_mounts.egg_uuid = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bbe864ab99f848638c226071949d019ff116984bb8c80e2bf22791e3a27da80f"
+}

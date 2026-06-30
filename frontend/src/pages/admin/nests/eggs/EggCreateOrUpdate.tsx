@@ -50,6 +50,7 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import EggDuplicateModal from './modals/EggDuplicateModal.tsx';
 import EggMoveModal from './modals/EggMoveModal.tsx';
 
 export default function EggCreateOrUpdate({
@@ -63,7 +64,7 @@ export default function EggCreateOrUpdate({
   const { t } = useTranslations();
 
   const [isValid, setIsValid] = useState(false);
-  const [openModal, setOpenModal] = useState<'move' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'move' | 'delete' | 'duplicate' | null>(null);
   const [selectedEggRepositoryUuid, setSelectedEggRepositoryUuid] = useState<string>(
     contextEgg?.eggRepositoryEgg?.eggRepository.uuid ?? '',
   );
@@ -267,6 +268,14 @@ export default function EggCreateOrUpdate({
       {contextEgg && (
         <EggMoveModal
           opened={openModal === 'move'}
+          onClose={() => setOpenModal(null)}
+          nest={contextNest}
+          egg={contextEgg}
+        />
+      )}
+      {contextEgg && (
+        <EggDuplicateModal
+          opened={openModal === 'duplicate'}
           onClose={() => setOpenModal(null)}
           nest={contextNest}
           egg={contextEgg}
@@ -741,6 +750,13 @@ export default function EggCreateOrUpdate({
             <Button variant='outline' onClick={() => setOpenModal('move')} loading={loading}>
               {t('common.button.move', {})}
             </Button>
+          )}
+          {contextEgg && (
+            <AdminCan action='eggs.create'>
+              <Button variant='default' onClick={() => setOpenModal('duplicate')} loading={loading}>
+                {t('common.button.duplicate', {})}
+              </Button>
+            </AdminCan>
           )}
           {contextEgg && (
             <AdminCan action='eggs.delete' cantDelete>

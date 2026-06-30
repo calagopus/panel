@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO nest_egg_variables (\n                egg_uuid, name, name_translations, description, description_translations,\n                order_, env_variable, default_value, user_viewable, user_editable, secret, rules\n            )\n            SELECT\n                $1, nest_egg_variables.name, nest_egg_variables.name_translations,\n                nest_egg_variables.description, nest_egg_variables.description_translations,\n                nest_egg_variables.order_, nest_egg_variables.env_variable,\n                nest_egg_variables.default_value, nest_egg_variables.user_viewable,\n                nest_egg_variables.user_editable, nest_egg_variables.secret, nest_egg_variables.rules\n            FROM nest_egg_variables\n            WHERE nest_egg_variables.egg_uuid = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a35a1e5035287961738ef2cfe53ce5be369644892e3c4d54e15eee0d2ceec6d7"
+}

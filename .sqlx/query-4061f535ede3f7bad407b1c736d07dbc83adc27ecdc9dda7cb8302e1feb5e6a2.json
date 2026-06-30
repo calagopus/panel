@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO location_database_hosts (location_uuid, database_host_uuid)\n            SELECT $1, location_database_hosts.database_host_uuid\n            FROM location_database_hosts\n            WHERE location_database_hosts.location_uuid = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4061f535ede3f7bad407b1c736d07dbc83adc27ecdc9dda7cb8302e1feb5e6a2"
+}

@@ -13,6 +13,7 @@ use shared::{
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod abort;
+mod duplicate;
 mod export;
 mod status;
 mod steps;
@@ -241,6 +242,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/status", status::router(state))
         .nest("/export", export::router(state))
         .nest("/abort", abort::router(state))
+        .nest("/duplicate", duplicate::router(state))
         .nest("/trigger", trigger::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())

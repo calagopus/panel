@@ -100,6 +100,21 @@ function eventKey(event: KeyboardEvent): string {
   return event.key;
 }
 
+// Map a physical `event.code` to its Latin character. `event.code` describes the
+// key's position on the keyboard and is independent of the active layout.
+function codeToKey(code: string): string | null {
+  if (/^Key[A-Z]$/.test(code)) return code.charAt(3).toLowerCase();
+  if (/^Digit[0-9]$/.test(code)) return code.charAt(5);
+  if (/^Numpad[0-9]$/.test(code)) return code.charAt(6);
+  return null;
+}
+
+function layoutSafeKey(event: KeyboardEvent): string {
+  const key = eventKey(event);
+  if (/^[a-zA-Z0-9]$/.test(key)) return key;
+  return codeToKey(event.code) ?? key;
+}
+
 export function bindingFromEvent(event: KeyboardEvent): ShortcutBinding | null {
   if (['Control', 'Meta', 'Shift', 'Alt', 'AltGraph'].includes(event.key)) return null;
 
@@ -109,7 +124,12 @@ export function bindingFromEvent(event: KeyboardEvent): ShortcutBinding | null {
   if (event.altKey) modifiers.push('alt');
   if (event.shiftKey) modifiers.push('shift');
 
-  return { key: eventKey(event), modifiers };
+  return { key: layoutSafeKey(event), modifiers };
+}
+
+export function eventKeyMatches(event: KeyboardEvent, key: string): boolean {
+  const target = key.toLowerCase();
+  return layoutSafeKey(event).toLowerCase() === target || eventKey(event).toLowerCase() === target;
 }
 
 function modifiersMatch(event: KeyboardEvent, modifiers: ModifierKey[]): boolean {
@@ -131,7 +151,7 @@ function modifiersMatch(event: KeyboardEvent, modifiers: ModifierKey[]): boolean
 }
 
 export function eventMatchesBinding(event: KeyboardEvent, binding: ShortcutBinding): boolean {
-  if (eventKey(event).toLowerCase() !== binding.key.toLowerCase()) return false;
+  if (!eventKeyMatches(event, binding.key)) return false;
   return modifiersMatch(event, binding.modifiers);
 }
 

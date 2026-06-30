@@ -12,6 +12,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
+import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -54,7 +55,7 @@ export default function DashboardHomeGrouped() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 's' || e.key === 'S') {
+      if (eventKeyMatches(e, 's')) {
         const target = e.target as HTMLElement;
         if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
           sKeyPressedRef.current = true;
@@ -63,7 +64,7 @@ export default function DashboardHomeGrouped() {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 's' || e.key === 'S') {
+      if (eventKeyMatches(e, 's')) {
         sKeyPressedRef.current = false;
       }
     };

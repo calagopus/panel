@@ -160,7 +160,7 @@ mod post {
             let file_path = ServerBackup::s3_path(server.uuid, backup.uuid, compression_type);
 
             if data.successful {
-                let completed_parts: Vec<CompletedPart> = data
+                let completed_parts: Vec<_> = data
                     .parts
                     .into_iter()
                     .map(|p| {

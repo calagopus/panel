@@ -97,6 +97,7 @@
         "save": "Save",
         "saveAndStay": "Save & Stay",
         "edit": "Edit",
+        "duplicate": "Duplicate",
         "delete": "Delete",
         "remove": "Remove",
         "enable": "Enable",
@@ -147,6 +148,14 @@
       "input": {
         "search": "Search..."
       },
+      "modal": {
+        "duplicate": {
+          "title": "Duplicate {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicated."
+      },
       "tooltip": {
         "resetToDefault": "Reset to default",
         "edit": "Edit",
@@ -157,6 +166,7 @@
       },
       "form": {
         "name": "Name",
+        "newName": "New Name",
         "description": "Description",
         "author": "Author",
         "type": "Type",
@@ -1740,6 +1750,9 @@
                   "delete": {
                     "title": "Confirm Announcement Deletion",
                     "content": "Are you sure you want to delete **{title}**?"
+                  },
+                  "duplicate": {
+                    "content": "Are you sure you want to duplicate **{title}**?"
                   }
                 },
                 "form": {
@@ -3916,6 +3929,7 @@
             "imported": "Schedule imported.",
             "created": "Schedule created.",
             "updated": "Schedule updated.",
+            "duplicated": "Schedule duplicated.",
             "deleted": "Schedule deleted.",
             "triggered": "Schedule triggered.",
             "exported": "Schedule exported.",
@@ -3923,6 +3937,7 @@
             "step": {
               "created": "Schedule step created.",
               "updated": "Schedule step updated.",
+              "duplicated": "Schedule step duplicated.",
               "deleted": "Schedule step deleted."
             }
           },
@@ -3964,6 +3979,9 @@
             },
             "updateSchedule": {
               "title": "Update Schedule"
+            },
+            "duplicateSchedule": {
+              "title": "Duplicate Schedule"
             },
             "deleteSchedule": {
               "title": "Confirm Schedule Deletion",

@@ -29,6 +29,7 @@ const baseTranslations = defineTranslations({
         save: 'Save',
         saveAndStay: 'Save & Stay',
         edit: 'Edit',
+        duplicate: 'Duplicate',
         delete: 'Delete',
         remove: 'Remove',
         enable: 'Enable',
@@ -80,6 +81,14 @@ const baseTranslations = defineTranslations({
       input: {
         search: 'Search...',
       },
+      modal: {
+        duplicate: {
+          title: 'Duplicate {resource}',
+        },
+      },
+      toast: {
+        duplicated: '{resource} duplicated.',
+      },
       tooltip: {
         resetToDefault: 'Reset to default',
         edit: 'Edit',
@@ -91,6 +100,7 @@ const baseTranslations = defineTranslations({
       },
       form: {
         name: 'Name',
+        newName: 'New Name',
         description: 'Description',
         author: 'Author',
         type: 'Type',
@@ -1714,6 +1724,9 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Announcement Deletion',
                     content: 'Are you sure you want to delete **{title}**?',
+                  },
+                  duplicate: {
+                    content: 'Are you sure you want to duplicate **{title}**?',
                   },
                 },
                 form: {
@@ -3948,6 +3961,7 @@ const baseTranslations = defineTranslations({
             imported: 'Schedule imported.',
             created: 'Schedule created.',
             updated: 'Schedule updated.',
+            duplicated: 'Schedule duplicated.',
             deleted: 'Schedule deleted.',
             triggered: 'Schedule triggered.',
             exported: 'Schedule exported.',
@@ -3955,6 +3969,7 @@ const baseTranslations = defineTranslations({
             step: {
               created: 'Schedule step created.',
               updated: 'Schedule step updated.',
+              duplicated: 'Schedule step duplicated.',
               deleted: 'Schedule step deleted.',
             },
           },
@@ -3996,6 +4011,9 @@ const baseTranslations = defineTranslations({
             },
             updateSchedule: {
               title: 'Update Schedule',
+            },
+            duplicateSchedule: {
+              title: 'Duplicate Schedule',
             },
             deleteSchedule: {
               title: 'Confirm Schedule Deletion',

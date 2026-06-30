@@ -334,6 +334,54 @@ impl DeletableModel for ServerScheduleStep {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateServerScheduleStepOptions {
+    #[garde(skip)]
+    pub schedule_uuid: uuid::Uuid,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for ServerScheduleStep {
+    type DuplicateOptions<'a> = DuplicateServerScheduleStepOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<ServerScheduleStep>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("server_schedule_steps");
+
+        query_builder
+            .set("schedule_uuid", options.schedule_uuid)
+            .set("action", serde_json::to_value(&self.action)?)
+            .set("order_", self.order);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut step = Self::map(None, &row)?;
+
+        self.run_after_duplicate_handlers(&mut step, &options, state, transaction)
+            .await?;
+
+        Ok(step)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(ServerScheduleStep, crate::State)]
 #[hook_args(crate::State)]

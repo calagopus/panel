@@ -14,6 +14,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
+import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
@@ -63,7 +64,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 's' || e.key === 'S') {
+      if (eventKeyMatches(e, 's')) {
         const target = e.target as HTMLElement;
         if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
           setSKeyPressed(true);
@@ -72,7 +73,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 's' || e.key === 'S') {
+      if (eventKeyMatches(e, 's')) {
         setSKeyPressed(false);
       }
     };

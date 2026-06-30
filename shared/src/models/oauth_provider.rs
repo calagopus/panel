@@ -856,6 +856,81 @@ impl DeletableModel for OAuthProvider {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateOAuthProviderOptions {
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for OAuthProvider {
+    type DuplicateOptions<'a> = DuplicateOAuthProviderOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<OAuthProvider>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("oauth_providers");
+
+        query_builder
+            .set("name", &options.name)
+            .set("description", &self.description)
+            .set("client_id", &self.client_id)
+            .set("client_secret", self.client_secret.clone())
+            .set("auth_url", &self.auth_url)
+            .set("token_url", &self.token_url)
+            .set("info_url", &self.info_url)
+            .set("scopes", &self.scopes)
+            .set("identifier_path", &self.identifier_path)
+            .set("email_path", &self.email_path)
+            .set("username_path", &self.username_path)
+            .set("name_first_path", &self.name_first_path)
+            .set("name_last_path", &self.name_last_path)
+            .set("enabled", self.enabled)
+            .set("login_only", self.login_only)
+            .set("login_bypass_2fa", self.login_bypass_2fa)
+            .set("link_viewable", self.link_viewable)
+            .set("user_manageable", self.user_manageable)
+            .set("basic_auth", self.basic_auth);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut oauth_provider = Self::map(None, &row)?;
+
+        sqlx::query!(
+            "INSERT INTO oauth_provider_mappings (oauth_provider_uuid, scopes, mapping)
+            SELECT $1, oauth_provider_mappings.scopes, oauth_provider_mappings.mapping
+            FROM oauth_provider_mappings
+            WHERE oauth_provider_mappings.oauth_provider_uuid = $2",
+            oauth_provider.uuid,
+            self.uuid,
+        )
+        .execute(&mut **transaction)
+        .await?;
+
+        self.run_after_duplicate_handlers(&mut oauth_provider, &options, state, transaction)
+            .await?;
+
+        Ok(oauth_provider)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(OAuthProvider, crate::State)]
 #[hook_args(crate::State)]

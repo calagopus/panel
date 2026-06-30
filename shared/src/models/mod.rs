@@ -813,6 +813,182 @@ pub trait DeletableModel: BaseModel + Send + Sync + 'static {
     }
 }
 
+type DuplicateHandlerResult<'a> =
+    Pin<Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>>;
+type DuplicateHandler<M> = dyn for<'a> Fn(
+        &'a M,
+        &'a <M as DuplicableModel>::DuplicateOptions<'_>,
+        &'a crate::State,
+        &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> DuplicateHandlerResult<'a>
+    + Send
+    + Sync;
+type DuplicateAfterHandler<M> = dyn for<'a> Fn(
+        &'a M,
+        &'a mut M,
+        &'a <M as DuplicableModel>::DuplicateOptions<'_>,
+        &'a crate::State,
+        &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> DuplicateHandlerResult<'a>
+    + Send
+    + Sync;
+pub type DuplicateHandlerList<M> =
+    Arc<ModelHandlerList<Box<DuplicateHandler<M>>, Box<DuplicateAfterHandler<M>>>>;
+
+#[async_trait::async_trait]
+pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
+    type DuplicateOptions<'a>: Send + Sync + Validate;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>>;
+
+    async fn register_duplicate_handler<
+        F: for<'a> Fn(
+                &'a Self,
+                &'a Self::DuplicateOptions<'_>,
+                &'a crate::State,
+                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
+            ) -> DuplicateHandlerResult<'a>
+            + Send
+            + Sync
+            + 'static,
+    >(
+        priority: ListenerPriority,
+        callback: F,
+    ) {
+        let erased = Box::new(callback) as Box<DuplicateHandler<Self>>;
+
+        Self::get_duplicate_handlers()
+            .register_handler(priority, erased)
+            .await;
+    }
+
+    async fn register_after_duplicate_handler<
+        F: for<'a> Fn(
+                &'a Self,
+                &'a mut Self,
+                &'a Self::DuplicateOptions<'_>,
+                &'a crate::State,
+                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
+            ) -> DuplicateHandlerResult<'a>
+            + Send
+            + Sync
+            + 'static,
+    >(
+        priority: ListenerPriority,
+        callback: F,
+    ) {
+        let erased = Box::new(callback) as Box<DuplicateAfterHandler<Self>>;
+
+        Self::get_duplicate_handlers()
+            .register_after_handler(priority, erased)
+            .await;
+    }
+
+    /// # Warning
+    /// This method will block the current thread if the lock is not available
+    fn blocking_register_duplicate_handler<
+        F: for<'a> Fn(
+                &'a Self,
+                &'a Self::DuplicateOptions<'_>,
+                &'a crate::State,
+                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
+            ) -> DuplicateHandlerResult<'a>
+            + Send
+            + Sync
+            + 'static,
+    >(
+        priority: ListenerPriority,
+        callback: F,
+    ) {
+        let erased = Box::new(callback) as Box<DuplicateHandler<Self>>;
+
+        Self::get_duplicate_handlers().blocking_register_handler(priority, erased);
+    }
+
+    /// # Warning
+    /// This method will block the current thread if the lock is not available
+    fn blocking_register_after_duplicate_handler<
+        F: for<'a> Fn(
+                &'a Self,
+                &'a mut Self,
+                &'a Self::DuplicateOptions<'_>,
+                &'a crate::State,
+                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
+            ) -> DuplicateHandlerResult<'a>
+            + Send
+            + Sync
+            + 'static,
+    >(
+        priority: ListenerPriority,
+        callback: F,
+    ) {
+        let erased = Box::new(callback) as Box<DuplicateAfterHandler<Self>>;
+
+        Self::get_duplicate_handlers().blocking_register_after_handler(priority, erased);
+    }
+
+    async fn run_duplicate_handlers(
+        &self,
+        options: &Self::DuplicateOptions<'_>,
+        state: &crate::State,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), crate::database::DatabaseError> {
+        let listeners = Self::get_duplicate_handlers().before_handlers.read().await;
+
+        for listener in listeners.iter() {
+            (*listener.callback)(self, options, state, transaction).await?;
+        }
+
+        Ok(())
+    }
+
+    async fn run_after_duplicate_handlers(
+        &self,
+        duplicated: &mut Self,
+        options: &Self::DuplicateOptions<'_>,
+        state: &crate::State,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), crate::database::DatabaseError> {
+        let listeners = Self::get_duplicate_handlers().after_handlers.read().await;
+
+        for listener in listeners.iter() {
+            (*listener.callback)(self, duplicated, options, state, transaction).await?;
+        }
+
+        Ok(())
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError>;
+
+    async fn duplicate(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let mut transaction = state.database.write().begin().await?;
+
+        let duplicated = match self
+            .duplicate_with_transaction(state, options, &mut transaction)
+            .await
+        {
+            Ok(duplicated) => duplicated,
+            Err(err) => {
+                transaction.rollback().await?;
+                return Err(err);
+            }
+        };
+
+        transaction.commit().await?;
+
+        Ok(duplicated)
+    }
+}
+
 #[async_trait::async_trait]
 pub trait ByUuid: BaseModel {
     async fn by_uuid(

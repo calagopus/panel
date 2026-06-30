@@ -23,6 +23,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
+  const selectionAnchor = useRef<z.infer<typeof serverDirectoryEntrySchema> | null>(null);
 
   const [actingMode, setActingMode] = useState<ActingFileMode | null>(null);
   const [actingFiles, setActingFiles] = useState(
@@ -181,6 +182,40 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const doSelectFiles = (files: z.infer<typeof serverDirectoryEntrySchema>[]) =>
     setSelectedFiles(new ObjectSet('name', files));
 
+  const selectFile = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
+    selectionAnchor.current = file;
+    setSelectedFiles(new ObjectSet('name', [file]));
+  };
+
+  const toggleSelectedFile = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
+    selectionAnchor.current = file;
+    setSelectedFiles((prev) => {
+      const next = new ObjectSet('name', prev.values());
+      if (next.has(file)) {
+        next.delete(file);
+      } else {
+        next.add(file);
+      }
+      return next;
+    });
+  };
+
+  const selectFileRange = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
+    const entries = browsingEntries.data;
+    const targetIndex = entries.findIndex((entry) => entry.name === file.name);
+    if (targetIndex === -1) return;
+
+    const anchor = selectionAnchor.current;
+    const anchorIndex = anchor ? entries.findIndex((entry) => entry.name === anchor.name) : -1;
+    if (anchorIndex === -1) {
+      selectFile(file);
+      return;
+    }
+
+    const [start, end] = anchorIndex < targetIndex ? [anchorIndex, targetIndex] : [targetIndex, anchorIndex];
+    setSelectedFiles(new ObjectSet('name', entries.slice(start, end + 1)));
+  };
+
   const addSelectedFile = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
     setSelectedFiles((prev) => {
       const next = new ObjectSet('name', prev.values());
@@ -215,6 +250,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   }, [searchParams]);
 
   useEffect(() => {
+    selectionAnchor.current = null;
     setSelectedFiles(new ObjectSet('name'));
   }, [browsingDirectory]);
 
@@ -316,6 +352,9 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         clearDraggingFiles,
         setDraggingTarget,
         doSelectFiles,
+        selectFile,
+        toggleSelectedFile,
+        selectFileRange,
         addSelectedFile,
         removeSelectedFile,
         doOpenModal,

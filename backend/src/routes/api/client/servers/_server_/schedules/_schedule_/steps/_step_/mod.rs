@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod duplicate;
+
 mod patch {
     use crate::routes::api::client::servers::_server_::schedules::_schedule_::GetServerSchedule;
     use axum::{extract::Path, http::StatusCode};
@@ -191,5 +193,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(patch::route))
         .routes(routes!(delete::route))
+        .nest("/duplicate", duplicate::router(state))
         .with_state(state.clone())
 }

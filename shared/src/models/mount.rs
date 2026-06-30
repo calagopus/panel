@@ -421,6 +421,61 @@ impl DeletableModel for Mount {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateMountOptions {
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 255))]
+    pub source: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 255))]
+    pub target: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for Mount {
+    type DuplicateOptions<'a> = DuplicateMountOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<Mount>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("mounts");
+
+        query_builder
+            .set("name", &options.name)
+            .set("description", &self.description)
+            .set("source", &options.source)
+            .set("target", &options.target)
+            .set("read_only", self.read_only)
+            .set("user_mountable", self.user_mountable);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut mount = Self::map(None, &row)?;
+
+        self.run_after_duplicate_handlers(&mut mount, &options, state, transaction)
+            .await?;
+
+        Ok(mount)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(Mount, crate::State)]
 #[hook_args(crate::State)]

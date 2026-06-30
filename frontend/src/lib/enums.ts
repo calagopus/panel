@@ -3,6 +3,7 @@ import { faDocker } from '@fortawesome/free-brands-svg-icons';
 import {
   faBoxArchive,
   faBriefcase,
+  faBullhorn,
   faChartPie,
   faCheckCircle,
   faCircleXmark,
@@ -509,6 +510,7 @@ export const permissionCategoryIconMapping: Record<string, IconDefinition> = {
   'backup-configurations': faFileZipper,
   backups: faBoxArchive,
   control: faTerminal,
+  announcements: faBullhorn,
   'database-hosts': faDatabase,
   databases: faDatabase,
   eggs: faEgg,

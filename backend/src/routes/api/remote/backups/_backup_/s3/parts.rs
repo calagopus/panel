@@ -170,7 +170,7 @@ mod get {
             }
         };
 
-        let presigning_config = PresigningConfig::expires_in(Duration::from_hours(24))?;
+        let presigning_config = PresigningConfig::expires_in(Duration::from_hours(2))?;
 
         for i in 0..part_count {
             let presigned = client

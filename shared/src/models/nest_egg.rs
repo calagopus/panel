@@ -1327,6 +1327,101 @@ impl DeletableModel for NestEgg {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateNestEggOptions {
+    #[garde(skip)]
+    pub nest_uuid: uuid::Uuid,
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for NestEgg {
+    type DuplicateOptions<'a> = DuplicateNestEggOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<NestEgg>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("nest_eggs");
+
+        query_builder
+            .set("nest_uuid", options.nest_uuid)
+            .set("egg_repository_egg_uuid", None::<uuid::Uuid>)
+            .set("author", &self.author)
+            .set("name", &options.name)
+            .set("description", &self.description)
+            .set("config_files", serde_json::to_value(&self.config_files)?)
+            .set(
+                "config_startup",
+                serde_json::to_value(&self.config_startup)?,
+            )
+            .set("config_stop", serde_json::to_value(&self.config_stop)?)
+            .set("config_script", serde_json::to_value(&self.config_script)?)
+            .set("startup_commands", OrderedJson(&self.startup_commands))
+            .set("force_outgoing_ip", self.force_outgoing_ip)
+            .set("separate_port", self.separate_port)
+            .set("features", &self.features)
+            .set("docker_images", OrderedJson(&self.docker_images))
+            .set("file_denylist", &self.file_denylist);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut nest_egg = Self::map(None, &row)?;
+
+        sqlx::query!(
+            "INSERT INTO nest_egg_variables (
+                egg_uuid, name, name_translations, description, description_translations,
+                order_, env_variable, default_value, user_viewable, user_editable, secret, rules
+            )
+            SELECT
+                $1, nest_egg_variables.name, nest_egg_variables.name_translations,
+                nest_egg_variables.description, nest_egg_variables.description_translations,
+                nest_egg_variables.order_, nest_egg_variables.env_variable,
+                nest_egg_variables.default_value, nest_egg_variables.user_viewable,
+                nest_egg_variables.user_editable, nest_egg_variables.secret, nest_egg_variables.rules
+            FROM nest_egg_variables
+            WHERE nest_egg_variables.egg_uuid = $2",
+            nest_egg.uuid,
+            self.uuid,
+        )
+        .execute(&mut **transaction)
+        .await?;
+
+        sqlx::query!(
+            "INSERT INTO nest_egg_mounts (egg_uuid, mount_uuid)
+            SELECT $1, nest_egg_mounts.mount_uuid
+            FROM nest_egg_mounts
+            WHERE nest_egg_mounts.egg_uuid = $2",
+            nest_egg.uuid,
+            self.uuid,
+        )
+        .execute(&mut **transaction)
+        .await?;
+
+        self.run_after_duplicate_handlers(&mut nest_egg, &options, state, transaction)
+            .await?;
+
+        Ok(nest_egg)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(NestEgg, crate::State)]
 #[hook_args(crate::State)]

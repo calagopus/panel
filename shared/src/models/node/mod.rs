@@ -595,12 +595,19 @@ impl Node {
             .await
     }
 
+    #[inline]
+    pub fn generate_token() -> (String, String) {
+        let token_id = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 16);
+        let token = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 64);
+
+        (token_id, token)
+    }
+
     pub async fn reset_token(
         &self,
         state: &crate::State,
     ) -> Result<(String, String), anyhow::Error> {
-        let token_id = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 16);
-        let token = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 64);
+        let (token_id, token) = Self::generate_token();
 
         sqlx::query(
             r#"
@@ -865,8 +872,7 @@ impl CreatableModel for Node {
 
         Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
-        let token_id = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 16);
-        let token = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 64);
+        let (token_id, token) = Self::generate_token();
 
         query_builder
             .set("location_uuid", options.location_uuid)
@@ -1126,6 +1132,83 @@ impl DeletableModel for Node {
             .await?;
 
         Ok(())
+    }
+}
+
+#[derive(Validate)]
+pub struct DuplicateNodeOptions {
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for Node {
+    type DuplicateOptions<'a> = DuplicateNodeOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<Node>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("nodes");
+
+        let (token_id, token) = Self::generate_token();
+
+        query_builder
+            .set("location_uuid", self.location.uuid)
+            .set(
+                "backup_configuration_uuid",
+                self.backup_configuration.as_ref().map(|c| c.uuid),
+            )
+            .set("name", &options.name)
+            .set("description", &self.description)
+            .set("deployment_enabled", self.deployment_enabled)
+            .set("maintenance_enabled", self.maintenance_enabled)
+            .set("public_url", self.public_url.as_ref().map(|u| u.as_str()))
+            .set("url", self.url.as_str())
+            .set("sftp_host", &self.sftp_host)
+            .set("sftp_port", self.sftp_port)
+            .set("memory", self.memory)
+            .set("disk", self.disk)
+            .set("token_id", token_id)
+            .set("token", state.database.encrypt(token).await?);
+
+        let row = query_builder
+            .returning("uuid")
+            .fetch_one(&mut **transaction)
+            .await?;
+        let uuid: uuid::Uuid = row.try_get("uuid")?;
+
+        let mut node = Self::by_uuid_with_transaction(transaction, uuid).await?;
+
+        sqlx::query!(
+            "INSERT INTO node_mounts (node_uuid, mount_uuid)
+            SELECT $1, node_mounts.mount_uuid
+            FROM node_mounts
+            WHERE node_mounts.node_uuid = $2",
+            node.uuid,
+            self.uuid,
+        )
+        .execute(&mut **transaction)
+        .await?;
+
+        self.run_after_duplicate_handlers(&mut node, &options, state, transaction)
+            .await?;
+
+        Ok(node)
     }
 }
 

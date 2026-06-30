@@ -820,6 +820,68 @@ impl DeletableModel for Announcement {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateAnnouncementOptions {}
+
+#[async_trait::async_trait]
+impl DuplicableModel for Announcement {
+    type DuplicateOptions<'a> = DuplicateAnnouncementOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<Announcement>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("announcements");
+
+        query_builder
+            .set("type", self.r#type)
+            .set("enabled", self.enabled)
+            .set("enabled_start", self.enabled_start)
+            .set("enabled_end", self.enabled_end)
+            .set("dismissible", self.dismissible)
+            .set("dismissible_end", self.dismissible_end)
+            .set("title", &self.title)
+            .set(
+                "title_translations",
+                serde_json::to_value(&self.title_translations)?,
+            )
+            .set("content", &self.content)
+            .set(
+                "content_translations",
+                serde_json::to_value(&self.content_translations)?,
+            )
+            .set("locations", &self.locations)
+            .set("nodes", &self.nodes)
+            .set("backup_configurations", &self.backup_configurations)
+            .set("eggs", &self.eggs);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut announcement = Self::map(None, &row)?;
+
+        self.run_after_duplicate_handlers(&mut announcement, &options, state, transaction)
+            .await?;
+
+        Ok(announcement)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(Announcement, crate::State)]
 #[hook_args(crate::State)]

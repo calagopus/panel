@@ -470,6 +470,69 @@ impl DeletableModel for Location {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateLocationOptions {
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for Location {
+    type DuplicateOptions<'a> = DuplicateLocationOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<Location>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("locations");
+
+        query_builder
+            .set(
+                "backup_configuration_uuid",
+                self.backup_configuration.as_ref().map(|c| c.uuid),
+            )
+            .set("name", &options.name)
+            .set("description", &self.description)
+            .set("flag", &self.flag);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut location = Self::map(None, &row)?;
+
+        sqlx::query!(
+            "INSERT INTO location_database_hosts (location_uuid, database_host_uuid)
+            SELECT $1, location_database_hosts.database_host_uuid
+            FROM location_database_hosts
+            WHERE location_database_hosts.location_uuid = $2",
+            location.uuid,
+            self.uuid,
+        )
+        .execute(&mut **transaction)
+        .await?;
+
+        self.run_after_duplicate_handlers(&mut location, &options, state, transaction)
+            .await?;
+
+        Ok(location)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(Location, crate::State)]
 #[hook_args(crate::State)]

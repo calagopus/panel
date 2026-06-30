@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO oauth_provider_mappings (oauth_provider_uuid, scopes, mapping)\n            SELECT $1, oauth_provider_mappings.scopes, oauth_provider_mappings.mapping\n            FROM oauth_provider_mappings\n            WHERE oauth_provider_mappings.oauth_provider_uuid = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a60cab7ee5b7babee97988c20c9f41b4f7006275d84fca28ddf7347af304e595"
+}

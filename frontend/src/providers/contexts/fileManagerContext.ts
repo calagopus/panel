@@ -92,6 +92,9 @@ export interface FileManagerContextType {
   clearDraggingFiles: () => void;
   setDraggingTarget: (directory: string | null) => void;
   doSelectFiles: (files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
+  selectFile: (file: z.infer<typeof serverDirectoryEntrySchema>) => void;
+  toggleSelectedFile: (file: z.infer<typeof serverDirectoryEntrySchema>) => void;
+  selectFileRange: (file: z.infer<typeof serverDirectoryEntrySchema>) => void;
   addSelectedFile: (file: z.infer<typeof serverDirectoryEntrySchema>) => void;
   removeSelectedFile: (file: z.infer<typeof serverDirectoryEntrySchema>) => void;
   doOpenModal: (modal: ModalType, entries?: z.infer<typeof serverDirectoryEntrySchema>[]) => void;

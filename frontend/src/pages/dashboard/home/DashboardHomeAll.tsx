@@ -14,6 +14,7 @@ import { Pagination } from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
+import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -47,7 +48,7 @@ export default function DashboardHomeAll() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 's' || e.key === 'S') {
+      if (eventKeyMatches(e, 's')) {
         const target = e.target as HTMLElement;
         if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
           sKeyPressedRef.current = true;
@@ -56,7 +57,7 @@ export default function DashboardHomeAll() {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 's' || e.key === 'S') {
+      if (eventKeyMatches(e, 's')) {
         sKeyPressedRef.current = false;
       }
     };

@@ -19,6 +19,7 @@ import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminRoleUpdateSchema } from '@/lib/schemas/admin/roles.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
+import RoleDuplicateModal from '@/pages/admin/roles/modals/RoleDuplicateModal.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -29,7 +30,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
   const { t } = useTranslations();
   const { availablePermissions, setAvailablePermissions } = useGlobalStore();
 
-  const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
   const {
     formExtension,
@@ -157,6 +158,10 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
         {t('pages.admin.roles.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
       </ConfirmationModal>
 
+      {contextRole && (
+        <RoleDuplicateModal role={contextRole} opened={openModal === 'duplicate'} onClose={() => setOpenModal(null)} />
+      )}
+
       {form.values.adminPermissions.includes('users.impersonate') && (
         <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
           {t('pages.admin.roles.tabs.general.page.alert.impersonate', {}).md()}
@@ -177,6 +182,13 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
               </Button>
             )}
           </AdminCan>
+          {contextRole && (
+            <AdminCan action='roles.create'>
+              <Button variant='default' onClick={() => setOpenModal('duplicate')} loading={loading}>
+                {t('common.button.duplicate', {})}
+              </Button>
+            </AdminCan>
+          )}
           {contextRole && (
             <AdminCan action='roles.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>

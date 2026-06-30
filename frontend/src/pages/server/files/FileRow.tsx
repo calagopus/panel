@@ -75,7 +75,9 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
     draggingFilesSource,
     doDragFiles,
     clearDraggingFiles,
-    doSelectFiles,
+    selectFile,
+    toggleSelectedFile,
+    selectFileRange,
     addSelectedFile,
     removeSelectedFile,
   } = useFileManager();
@@ -110,15 +112,17 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
 
     if (actingFilesRef.current.size === 0) {
       if (e.shiftKey) {
-        addSelectedFile(file);
+        selectFileRange(file);
+      } else if (e.ctrlKey || e.metaKey) {
+        toggleSelectedFile(file);
       } else if (isSelected) {
         if (multipleSelectedRef.current) {
-          doSelectFiles([file]);
+          selectFile(file);
         } else {
           removeSelectedFile(file);
         }
       } else {
-        doSelectFiles([file]);
+        selectFile(file);
       }
     }
 

@@ -22,6 +22,7 @@ import Title from '@/elements/Title.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
+import OAuthProviderDuplicateModal from '@/pages/admin/oAuthProviders/modals/OAuthProviderDuplicateModal.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -39,7 +40,7 @@ export default function OAuthProviderCreateOrUpdate({
   const { settings } = useGlobalStore();
 
   const [isValid, setIsValid] = useState(false);
-  const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
   const {
     formExtension,
@@ -295,6 +296,14 @@ export default function OAuthProviderCreateOrUpdate({
         }).md()}
       </ConfirmationModal>
 
+      {contextOAuthProvider && (
+        <OAuthProviderDuplicateModal
+          oauthProvider={contextOAuthProvider}
+          opened={openModal === 'duplicate'}
+          onClose={() => setOpenModal(null)}
+        />
+      )}
+
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.oAuthProviders.all()))}>
         <FormEngine form={form} fields={fieldsTop} extensions={[formExtension]} />
 
@@ -354,6 +363,13 @@ export default function OAuthProviderCreateOrUpdate({
               </ContextMenu>
             )}
           </AdminCan>
+          {contextOAuthProvider && (
+            <AdminCan action='oauth-providers.create'>
+              <Button variant='default' onClick={() => setOpenModal('duplicate')} loading={loading}>
+                {t('common.button.duplicate', {})}
+              </Button>
+            </AdminCan>
+          )}
           {contextOAuthProvider && (
             <AdminCan action='oauth-providers.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>

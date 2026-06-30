@@ -12,6 +12,7 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod duplicate;
 mod nest_eggs;
 mod nodes;
 mod servers;
@@ -211,6 +212,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/nest-eggs", nest_eggs::router(state))
         .nest("/nodes", nodes::router(state))
         .nest("/servers", servers::router(state))
+        .nest("/duplicate", duplicate::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }

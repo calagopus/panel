@@ -1,4 +1,4 @@
-import { faFileDownload, faPlay, faPlayCircle, faShareAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faClone, faFileDownload, faPlay, faPlayCircle, faShareAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import jsYaml from 'js-yaml';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -13,6 +13,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { serverScheduleSchema } from '@/lib/schemas/server/schedules.ts';
+import ScheduleDuplicateModal from '@/pages/server/schedules/modals/ScheduleDuplicateModal.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -25,7 +26,7 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
   const { server, removeSchedule } = useServerStore();
   const navigateUrl = `/server/${server.uuidShort}/schedules/${schedule.uuid}`;
 
-  const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
   const doDelete = async () => {
     await deleteSchedule(server.uuid, schedule.uuid)
@@ -91,6 +92,12 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
         {t('pages.server.schedules.modal.deleteSchedule.content', { name: schedule.name })}
       </ConfirmationModal>
 
+      <ScheduleDuplicateModal
+        schedule={schedule}
+        opened={openModal === 'duplicate'}
+        onClose={() => setOpenModal(null)}
+      />
+
       <ContextMenu
         items={[
           {
@@ -130,6 +137,13 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
               },
             ],
             canAccess: useServerCan('schedules.read'),
+          },
+          {
+            icon: faClone,
+            label: t('common.button.duplicate', {}),
+            onClick: () => setOpenModal('duplicate'),
+            color: 'gray',
+            canAccess: useServerCan('schedules.create'),
           },
           {
             icon: faTrash,

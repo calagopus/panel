@@ -468,6 +468,69 @@ impl DeletableModel for ServerSchedule {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateServerScheduleOptions {
+    #[garde(skip)]
+    pub server_uuid: uuid::Uuid,
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for ServerSchedule {
+    type DuplicateOptions<'a> = DuplicateServerScheduleOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<ServerSchedule>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("server_schedules");
+
+        query_builder
+            .set("server_uuid", options.server_uuid)
+            .set("name", &options.name)
+            .set("enabled", self.enabled)
+            .set("triggers", serde_json::to_value(&self.triggers)?)
+            .set("condition", serde_json::to_value(&self.condition)?);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut schedule = Self::map(None, &row)?;
+
+        sqlx::query!(
+            "INSERT INTO server_schedule_steps (schedule_uuid, action, order_)
+            SELECT $1, server_schedule_steps.action, server_schedule_steps.order_
+            FROM server_schedule_steps
+            WHERE server_schedule_steps.schedule_uuid = $2",
+            schedule.uuid,
+            self.uuid,
+        )
+        .execute(&mut **transaction)
+        .await?;
+
+        self.run_after_duplicate_handlers(&mut schedule, &options, state, transaction)
+            .await?;
+
+        Ok(schedule)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(ServerSchedule, crate::State)]
 #[hook_args(crate::State)]

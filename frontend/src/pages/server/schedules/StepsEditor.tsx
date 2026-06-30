@@ -163,6 +163,7 @@ export default function StepsEditor({ schedule }: { schedule: z.infer<typeof ser
                           step={step}
                           onStepUpdate={handleStepUpdate}
                           onStepDelete={handleStepDelete}
+                          onStepDuplicate={handleStepCreate}
                         />
                       </div>
                     )}

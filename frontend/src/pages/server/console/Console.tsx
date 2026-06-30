@@ -26,6 +26,7 @@ import Popover from '@/elements/Popover.tsx';
 import Progress from '@/elements/Progress.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { matchesShortcut, useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -217,7 +218,7 @@ export default function Terminal() {
     });
 
     term.attachCustomKeyEventHandler((e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+      if ((e.ctrlKey || e.metaKey) && eventKeyMatches(e, 'c')) {
         if (term.hasSelection()) {
           navigator.clipboard.writeText(term.getSelection());
           term.clearSelection();
@@ -226,7 +227,7 @@ export default function Terminal() {
         }
       }
 
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+      if ((e.ctrlKey || e.metaKey) && eventKeyMatches(e, 'f')) {
         return false;
       }
 
