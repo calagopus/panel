@@ -467,9 +467,9 @@ impl DuplicableModel for Mount {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let mount = Self::map(None, &row)?;
+        let mut mount = Self::map(None, &row)?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut mount, &options, state, transaction)
             .await?;
 
         Ok(mount)

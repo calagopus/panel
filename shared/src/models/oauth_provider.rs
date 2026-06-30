@@ -911,7 +911,7 @@ impl DuplicableModel for OAuthProvider {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let oauth_provider = Self::map(None, &row)?;
+        let mut oauth_provider = Self::map(None, &row)?;
 
         sqlx::query!(
             "INSERT INTO oauth_provider_mappings (oauth_provider_uuid, scopes, mapping)
@@ -924,7 +924,7 @@ impl DuplicableModel for OAuthProvider {
         .execute(&mut **transaction)
         .await?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut oauth_provider, &options, state, transaction)
             .await?;
 
         Ok(oauth_provider)

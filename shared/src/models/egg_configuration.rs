@@ -739,9 +739,9 @@ impl DuplicableModel for EggConfiguration {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let egg_configuration = Self::map(None, &row)?;
+        let mut egg_configuration = Self::map(None, &row)?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut egg_configuration, &options, state, transaction)
             .await?;
 
         Ok(egg_configuration)

@@ -1383,7 +1383,7 @@ impl DuplicableModel for NestEgg {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let nest_egg = Self::map(None, &row)?;
+        let mut nest_egg = Self::map(None, &row)?;
 
         sqlx::query!(
             "INSERT INTO nest_egg_variables (
@@ -1415,7 +1415,7 @@ impl DuplicableModel for NestEgg {
         .execute(&mut **transaction)
         .await?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut nest_egg, &options, state, transaction)
             .await?;
 
         Ok(nest_egg)
