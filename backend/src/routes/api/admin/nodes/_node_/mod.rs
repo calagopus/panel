@@ -12,11 +12,11 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-mod duplicate;
 mod allocations;
 mod backups;
 mod capacity;
 mod config;
+mod duplicate;
 mod mounts;
 mod reset_token;
 mod servers;
