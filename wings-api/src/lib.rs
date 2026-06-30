@@ -11,6 +11,7 @@ use utoipa::ToSchema;
 
 pub mod client;
 mod extra;
+pub mod tunnel;
 
 use client::AsyncResponseReader;
 pub use extra::*;
