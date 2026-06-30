@@ -1,7 +1,7 @@
 import { faCheck, faGripVertical, faPencil, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Input, Stack, StyleProp, Text } from '@mantine/core';
-import { ComponentProps, startTransition, useEffect, useRef, useState } from 'react';
+import { ComponentProps, ReactNode, startTransition, useEffect, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
@@ -11,7 +11,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface TagsInputProps {
-  label?: string;
+  label?: ReactNode;
   description?: string;
   withAsterisk?: boolean;
   allowReordering?: boolean;

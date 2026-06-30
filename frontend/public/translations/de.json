@@ -582,6 +582,9 @@
           "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen.",
           "cancelledAll": "Alle Uploads wurden abgebrochen."
         }
+      },
+      "formEngine": {
+        "advancedMode": "Erweiterter Modus"
       }
     },
     "pages": {
@@ -2319,6 +2322,36 @@
                   }
                 }
               }
+            },
+            "overview": {
+              "title": "Übersicht",
+              "page": {
+                "title": "Knoten-Übersicht",
+                "card": {
+                  "nodeDetails": "Knoten-Details",
+                  "systemInfo": "Systeminformationen"
+                },
+                "label": {
+                  "location": "Standort",
+                  "url": "Interne URL",
+                  "publicUrl": "Öffentliche URL",
+                  "sftpAddress": "SFTP-Adresse",
+                  "backupConfiguration": "Backup-Konfiguration",
+                  "description": "Beschreibung",
+                  "createdAt": "Erstellt",
+                  "inheritedFromLocation": "Vom Standort geerbt",
+                  "none": "Keine",
+                  "wingsVersion": "Wings-Version",
+                  "os": "Betriebssystem",
+                  "architecture": "Architektur",
+                  "cpuCount": "CPU-Threads",
+                  "kernelVersion": "Kernel-Version",
+                  "unavailable": "Nicht verfügbar"
+                },
+                "badge": {
+                  "updateAvailable": "Update verfügbar"
+                }
+              }
             }
           },
           "modal": {
@@ -2372,18 +2405,24 @@
                   "egg": "Egg",
                   "backupConfigurationPlaceholder": "Von Node/Standort erben",
                   "cpuLimit": "CPU-Limit (%)",
-                  "cpuLimitDescription": "Das CPU-Limit in %, das der Server nutzen darf, 1 Thread = 100%.",
+                  "cpuLimitDescription": "Das CPU-Limit in %, das der Server nutzen darf.",
+                  "cpuLimitTooltip": "1 Thread = 100 %. 0 setzt kein Limit.",
                   "swap": "Swap",
-                  "swapDescription": "Die Menge an Swap für diesen Server, -1 setzt kein Limit.",
-                  "memoryDescription": "Das Arbeitsspeicher-Limit des Server-Containers, 0 setzt kein Limit.",
+                  "swapDescription": "Die Menge an Swap für diesen Server.",
+                  "swapTooltip": "-1 setzt kein Limit.",
+                  "memoryDescription": "Das Arbeitsspeicher-Limit des Server-Containers.",
+                  "memoryTooltip": "0 setzt kein Limit.",
                   "memoryOverhead": "Speicher-Overhead",
                   "memoryOverheadDescription": "Versteckter Arbeitsspeicher, der dem Container hinzugefügt wird.",
                   "diskSpace": "Speicherplatz",
-                  "diskSpaceDescription": "Das Speicher-Limit des Servers. Dies ist ein Soft-Limit, sofern der Disk-Limiter nicht in Wings konfiguriert ist.",
+                  "diskSpaceDescription": "Das Speicher-Limit des Servers.",
+                  "diskSpaceTooltip": "0 setzt kein Limit. Dies ist ein Soft-Limit, sofern der Disk-Limiter nicht in Wings konfiguriert ist.",
                   "ioWeight": "IO-Gewichtung",
-                  "ioWeightDescription": "Die relative IO-Gewichtung des Server-Containers im Vergleich zu anderen Containern, 0-1000. Funktioniert möglicherweise nicht auf allen Systemen.",
+                  "ioWeightDescription": "Die relative IO-Gewichtung des Server-Containers im Vergleich zu anderen Containern.",
+                  "ioWeightTooltip": "0-1000. Funktioniert möglicherweise nicht auf allen Systemen.",
                   "pinnedCpus": "Angeheftete CPUs",
-                  "pinnedCpusDescription": "Die CPU-Kerne (nach Index, z. B. 0, 1, 2), an die dieser Server angeheftet ist. Leer lassen, um alle Kerne zuzulassen.",
+                  "pinnedCpusDescription": "Die CPU-Kerne, an die dieser Server angeheftet ist.",
+                  "pinnedCpusTooltip": "Nach Index, z. B. 0, 1, 2. Leer lassen, um alle Kerne zuzulassen.",
                   "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Vordefinierte Docker-Images",
                   "predefinedDockerImagesPlaceholder": "Kein vordefiniertes Image ausgewählt",
@@ -2586,6 +2625,57 @@
             },
             "viewClient": {
               "title": "Im Client-Bereich ansehen"
+            },
+            "overview": {
+              "title": "Übersicht",
+              "page": {
+                "title": "Server-Übersicht",
+                "card": {
+                  "owner": "Besitzer",
+                  "nodeAndLocation": "Knoten & Standort",
+                  "serverDetails": "Server-Details",
+                  "resourceLimits": "Ressourcenlimits",
+                  "featureLimits": "Funktionslimits"
+                },
+                "label": {
+                  "email": "E-Mail",
+                  "language": "Sprache",
+                  "createdAt": "Erstellt",
+                  "node": "Knoten",
+                  "location": "Standort",
+                  "memoryLimit": "Arbeitsspeicher-Limit",
+                  "diskLimit": "Speicherplatz-Limit",
+                  "sftpAddress": "SFTP-Adresse",
+                  "primaryAllocation": "Primäre Allocation",
+                  "none": "Keine",
+                  "dockerImage": "Docker-Image",
+                  "nest": "Nest",
+                  "egg": "Egg",
+                  "timezone": "Zeitzone",
+                  "autoKill": "Auto-Kill",
+                  "cpu": "CPU",
+                  "memory": "Arbeitsspeicher",
+                  "disk": "Speicherplatz",
+                  "swap": "Swap",
+                  "allocations": "Allocations",
+                  "databases": "Datenbanken",
+                  "backups": "Backups",
+                  "schedules": "Zeitpläne",
+                  "unlimited": "Unendlich",
+                  "autoKillSeconds": "{seconds}s",
+                  "autoKillDisabled": "Deaktiviert",
+                  "externalId": "Externe ID",
+                  "uuid": "UUID"
+                },
+                "badge": {
+                  "suspended": "Suspendiert",
+                  "transferring": "Server wird übertragen",
+                  "installing": "Wird installiert",
+                  "installFailed": "Installation fehlgeschlagen",
+                  "restoringBackup": "Backup wird wiederhergestellt",
+                  "admin": "Admin"
+                }
+              }
             }
           }
         },
@@ -4444,6 +4534,11 @@
           "button": {
             "clearUserFilter": "Benutzerfilter löschen"
           }
+        },
+        "selector": {
+          "title": "Server auswählen",
+          "description": "Wähle aus, zu welchem Server du navigieren möchtest.",
+          "descriptionWithPage": "Wähle einen Server, um zu **{page}** zu gelangen."
         }
       }
     }

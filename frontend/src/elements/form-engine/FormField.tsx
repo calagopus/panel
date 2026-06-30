@@ -1,4 +1,7 @@
+import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType } from '@mantine/form';
+import { ReactNode } from 'react';
 import Autocomplete from '@/elements/input/Autocomplete.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import DateTimePicker from '@/elements/input/DateTimePicker.tsx';
@@ -14,6 +17,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { FieldDef } from './types.ts';
 
 interface Props<T extends Record<string, unknown>> {
@@ -28,6 +32,20 @@ function getByPath(obj: Record<string, unknown>, path: string): unknown {
   }, obj);
 }
 
+function fieldLabel<T extends Record<string, unknown>>(field: FieldDef<T>): ReactNode {
+  const label = 'label' in field ? field.label : undefined;
+  if (field.type === 'custom' || !field.tooltip) return label;
+
+  return (
+    <span className='inline-flex items-center gap-1'>
+      {label}
+      <Tooltip label={field.tooltip} className='inline-block'>
+        <FontAwesomeIcon icon={faCircleQuestion} className='text-(--mantine-color-dimmed) cursor-help' size='xs' />
+      </Tooltip>
+    </span>
+  );
+}
+
 export function FormField<T extends Record<string, unknown>>({ form, field }: Props<T>) {
   if (field.when && !field.when(form.values)) return null;
 
@@ -39,7 +57,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <TextInput
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           key={f.key(field.name)}
@@ -52,7 +70,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <PasswordInput
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           key={f.key(field.name)}
@@ -65,7 +83,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <TextArea
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           rows={field.rows}
@@ -79,7 +97,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <NumberInput
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           key={f.key(field.name)}
@@ -92,7 +110,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <Switch
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           key={f.key(field.name)}
           {...f.getInputProps(field.name, { type: 'checkbox' })}
@@ -104,7 +122,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <Checkbox
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           key={f.key(field.name)}
           {...f.getInputProps(field.name, { type: 'checkbox' })}
@@ -116,7 +134,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <Select
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           data={field.options}
@@ -130,7 +148,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <MultiSelect
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           data={field.options}
@@ -144,7 +162,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <DateTimePicker
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           key={f.key(field.name)}
@@ -157,7 +175,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <Autocomplete
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           data={field.options ?? []}
@@ -172,7 +190,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <div className={colSpanClass}>
           <TagsInput
-            label={field.label}
+            label={fieldLabel(field)}
             description={field.description}
             withAsterisk={field.required}
             allowReordering={field.allowReordering}
@@ -191,7 +209,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <SizeInput
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           mode={field.mode}
@@ -206,7 +224,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <LocalizedTextInput
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           value={f.values[field.name] as string | null}
@@ -224,7 +242,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <LocalizedTextArea
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           value={f.values[field.name] as string | null}
@@ -243,7 +261,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <MultiSelectGroup
           className={colSpanClass}
-          label={field.label}
+          label={fieldLabel(field)}
           description={field.description}
           withAsterisk={field.required}
           data={field.data}

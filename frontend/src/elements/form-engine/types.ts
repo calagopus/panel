@@ -19,6 +19,7 @@ interface BaseFieldDef<T extends Record<string, unknown>> {
   name: string;
   label: string;
   description?: string;
+  tooltip?: ReactNode;
   required?: boolean;
   advanced?: boolean;
   colSpan?: ColSpan;

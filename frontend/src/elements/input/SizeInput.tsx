@@ -1,11 +1,11 @@
-import { startTransition, useEffect, useRef, useState } from 'react';
+import { ReactNode, startTransition, useEffect, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import { closestUnit, formatUnitBytes, mapUnitToLocale, mbToBytes, UNITS, unitToBytes } from '@/lib/size.ts';
 import NumberInput from './NumberInput.tsx';
 import Select from './Select.tsx';
 
 interface SizeInputProps {
-  label?: string;
+  label?: ReactNode;
   description?: string;
   withAsterisk?: boolean;
   mode: 'b' | 'mb';
