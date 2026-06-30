@@ -1,6 +1,6 @@
 use futures_util::StreamExt;
+use parking_lot::RwLock;
 use std::{collections::HashMap, pin::Pin, sync::Arc};
-use tokio::sync::RwLock;
 
 type Listener<Event> = dyn Fn(
         crate::State,
@@ -17,34 +17,19 @@ pub struct EventHandlerHandle {
 
 impl EventHandlerHandle {
     #[inline]
-    pub async fn disconnect(self) {
-        self.listeners_ref.disconnect(self.id).await;
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    #[inline]
-    pub fn blocking_disconnect(self) {
-        self.listeners_ref.blocking_disconnect(self.id);
+    pub fn disconnect(self) {
+        self.listeners_ref.disconnect(self.id);
     }
 }
 
-#[async_trait::async_trait]
 pub(crate) trait DisconnectEventHandler {
-    async fn disconnect(&self, id: uuid::Uuid);
-    fn blocking_disconnect(&self, id: uuid::Uuid);
+    fn disconnect(&self, id: uuid::Uuid);
 }
 
-#[async_trait::async_trait]
 impl<Event> DisconnectEventHandler for RwLock<HashMap<uuid::Uuid, Box<Listener<Event>>>> {
     #[inline]
-    async fn disconnect(&self, id: uuid::Uuid) {
-        self.write().await.remove(&id);
-    }
-
-    #[inline]
-    fn blocking_disconnect(&self, id: uuid::Uuid) {
-        self.blocking_write().remove(&id);
+    fn disconnect(&self, id: uuid::Uuid) {
+        self.write().remove(&id);
     }
 }
 
@@ -81,7 +66,6 @@ impl<Event: 'static + Send + Sync> Default for EventEmitter<Event> {
                         let event = Arc::new(event);
                         let listeners = listeners
                             .read()
-                            .await
                             .values()
                             .map(|listener| listener(state.clone(), event.clone()))
                             .collect::<Vec<_>>();
@@ -108,7 +92,7 @@ impl<Event: 'static + Send + Sync> Default for EventEmitter<Event> {
 }
 
 impl<Event: 'static + Send + Sync> EventEmitter<Event> {
-    pub async fn register_event_handler<
+    pub fn register_event_handler<
         F: Fn(crate::State, Arc<Event>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = Result<(), anyhow::Error>> + Send + 'static,
     >(
@@ -121,30 +105,7 @@ impl<Event: 'static + Send + Sync> EventEmitter<Event> {
                 as Pin<Box<dyn Future<Output = Result<(), anyhow::Error>> + Send + 'static>>
         }) as Box<Listener<Event>>;
 
-        self.listeners.write().await.insert(id, listener_box);
-
-        EventHandlerHandle {
-            listeners_ref: self.listeners.clone(),
-            id,
-        }
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    pub fn blocking_register_event_handler<
-        F: Fn(crate::State, Arc<Event>) -> Fut + Send + Sync + 'static,
-        Fut: Future<Output = Result<(), anyhow::Error>> + Send + 'static,
-    >(
-        &self,
-        listener: F,
-    ) -> EventHandlerHandle {
-        let id = uuid::Uuid::new_v4();
-        let listener_box = Box::new(move |state: crate::State, event: Arc<Event>| {
-            Box::pin(listener(state, event))
-                as Pin<Box<dyn Future<Output = Result<(), anyhow::Error>> + Send + 'static>>
-        }) as Box<Listener<Event>>;
-
-        self.listeners.blocking_write().insert(id, listener_box);
+        self.listeners.write().insert(id, listener_box);
 
         EventHandlerHandle {
             listeners_ref: self.listeners.clone(),
