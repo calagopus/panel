@@ -66,12 +66,6 @@ function countLabel(value: number, unlimited: string): React.ReactNode {
   );
 }
 
-function locationFlag(flag: string | null): string {
-  if (!flag || flag.length !== 2) return '';
-  const codePoints = [...flag.toUpperCase()].map((c) => 0x1f1e0 - 0x41 + c.charCodeAt(0));
-  return String.fromCodePoint(...codePoints) + ' ';
-}
-
 export default function ServerOverview({ server }: { server: Server }) {
   const { t } = useTranslations();
 
@@ -169,10 +163,16 @@ export default function ServerOverview({ server }: { server: Server }) {
                 <TableLink to={`/admin/nodes/${server.node.uuid}`}>{server.node.name}</TableLink>
               </InfoRow>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.location', {})}>
-                <Text size='sm'>
-                  {locationFlag(server.node.location.flag)}
+                <TableLink to={`/admin/locations/${server.node.location.uuid}`} className='inline-flex items-center'>
+                  {server.node.location.flag && (
+                    <img
+                      src={`/flags/${server.node.location.flag}.svg`}
+                      alt={server.node.location.name}
+                      className='w-5 h-5 mr-1 rounded-md shrink-0 my-auto'
+                    />
+                  )}
                   {server.node.location.name}
-                </Text>
+                </TableLink>
               </InfoRow>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.sftpAddress', {})}>
                 <Text size='sm' ff='monospace'>
@@ -209,7 +209,7 @@ export default function ServerOverview({ server }: { server: Server }) {
                 <Text size='sm' ff='monospace'>
                   {server.externalId ?? (
                     <Text span c='dimmed' size='sm'>
-                      —
+                      {t('common.na', {})}
                     </Text>
                   )}
                 </Text>
@@ -236,7 +236,7 @@ export default function ServerOverview({ server }: { server: Server }) {
                 <Text size='sm'>
                   {server.timezone ?? (
                     <Text span c='dimmed' size='sm'>
-                      —
+                      {t('common.na', {})}
                     </Text>
                   )}
                 </Text>

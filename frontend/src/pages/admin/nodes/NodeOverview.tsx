@@ -56,12 +56,6 @@ function InfoRow({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-function locationFlag(flag: string | null): string {
-  if (!flag || flag.length !== 2) return '';
-  const codePoints = [...flag.toUpperCase()].map((c) => 0x1f1e0 - 0x41 + c.charCodeAt(0));
-  return String.fromCodePoint(...codePoints) + ' ';
-}
-
 function CapacityResource({
   label,
   icon,
@@ -180,8 +174,14 @@ export default function NodeOverview({ node }: { node: Node }) {
           >
             <Stack gap={0}>
               <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.location', {})}>
-                <TableLink to={`/admin/locations/${node.location.uuid}`}>
-                  {locationFlag(node.location.flag)}
+                <TableLink to={`/admin/locations/${node.location.uuid}`} className='inline-flex items-center'>
+                  {node.location.flag && (
+                    <img
+                      src={`/flags/${node.location.flag}.svg`}
+                      alt={node.location.name}
+                      className='w-5 h-5 mr-1 rounded-md shrink-0 my-auto'
+                    />
+                  )}
                   {node.location.name}
                 </TableLink>
               </InfoRow>
@@ -194,7 +194,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                 <Text size='sm' ff='monospace' className='break-all'>
                   {node.publicUrl ?? (
                     <Text span c='dimmed' size='sm'>
-                      —
+                      {t('common.na', {})}
                     </Text>
                   )}
                 </Text>
