@@ -97,6 +97,7 @@
         "save": "Lưu",
         "saveAndStay": "Lưu &Ở lại",
         "edit": "Chỉnh sửa",
+        "duplicate": "Duplicate",
         "delete": "Xóa",
         "remove": "Gỡ bỏ",
         "enable": "Kích hoạt",
@@ -147,6 +148,14 @@
       "input": {
         "search": "Tìm kiếm..."
       },
+      "modal": {
+        "duplicate": {
+          "title": "Duplicate {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicated."
+      },
       "tooltip": {
         "resetToDefault": "Đặt lại về mặc định",
         "edit": "Chỉnh sửa",
@@ -157,6 +166,7 @@
       },
       "form": {
         "name": "Tên",
+        "newName": "New Name",
         "description": "Mô tả",
         "author": "Tác giả",
         "type": "Loại",
@@ -253,6 +263,7 @@
           "size": "Kích thước",
           "lastUsed": "Lần Sử Dụng Cuối",
           "created": "Đã Tạo",
+          "updated": "Updated",
           "actor": "Người Thực Hiện",
           "event": "Sự Kiện",
           "ip": "IP",
@@ -339,6 +350,12 @@
           "stopped": "Đã dừng",
           "restarted": "Đã khởi động lại",
           "killed": "Đã buộc dừng"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Best Speed",
+          "goodSpeed": "Good Speed",
+          "goodCompression": "Good Compression",
+          "bestCompression": "Best Compression"
         }
       },
       "unit": {
@@ -541,6 +558,7 @@
               },
               "copying": {
                 "completed": "Đã sao chép `{path}` tới `{destination}` trong {time}.",
+                "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
                 "failed": "Sao chép thất bại `{path}` tới `{destination}`:\n{error}"
               },
               "copyingMany": {
@@ -1729,6 +1747,9 @@
                   "delete": {
                     "title": "Xác Nhận Xóa Thông Báo",
                     "content": "Bạn có chắc muốn xóa **{title}** không?"
+                  },
+                  "duplicate": {
+                    "content": "Are you sure you want to duplicate **{title}**?"
                   }
                 },
                 "form": {
@@ -1868,6 +1889,25 @@
         "users": {
           "title": "Người Dùng",
           "resourceName": "Người Dùng",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-user-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "User Found",
+                "username": "Username",
+                "email": "Email",
+                "role": "Role",
+                "viewUser": "View User"
+              },
+              "notFound": "No user found with that external ID."
+            }
+          },
           "tooltip": {
             "admin": "Quản Trị Viên",
             "twoFactorEnabled": "2FA Đã Bật",
@@ -2057,10 +2097,12 @@
                   "apiPort": "Cổng API"
                 },
                 "button": {
-                  "save": "Lưu Cấu Hình"
+                  "save": "Lưu Cấu Hình",
+                  "reveal": "Reveal Configuration"
                 },
                 "alert": {
-                  "couldNotReach": "Không thể kết nối với node: {error}"
+                  "couldNotReach": "Không thể kết nối với node: {error}",
+                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed."
                 },
                 "toast": {
                   "applied": "Cấu hình đã được áp dụng thành công.",
@@ -2320,6 +2362,25 @@
         "servers": {
           "title": "Máy Chủ",
           "resourceName": "Máy Chủ",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-server-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "Server Found",
+                "name": "Name",
+                "owner": "Owner",
+                "node": "Node",
+                "viewServer": "View Server"
+              },
+              "notFound": "No server found with that external ID."
+            }
+          },
           "tabs": {
             "general": {
               "page": {
@@ -2367,6 +2428,7 @@
                   "timezonePlaceholder": "Europe/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Tùy Chỉnh",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Khởi Động Khi Hoàn Tất",
                   "startOnCompletionDescription": "Khởi động máy chủ sau khi cài đặt hoàn tất.",
                   "skipInstaller": "Bỏ Qua Cài Đặt",
@@ -2553,6 +2615,7 @@
                     "description": "Bạn sắp xóa **{name}**. Bạn có chắc không?",
                     "form": {
                       "force": "Bạn có muốn xóa cưỡng bức máy chủ này?",
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.",
                       "deleteBackups": "Bạn có muốn xóa sao lưu của máy chủ này?",
                       "confirmServerName": "Xác Nhận Tên Máy Chủ",
                       "confirmServerNamePlaceholder": "Tên Máy Chủ"
@@ -2771,7 +2834,8 @@
                 "form": {
                   "order": "Thứ Tự",
                   "eggs": "Eggs",
-                  "eggsPlaceholder": "Chọn Egg"
+                  "eggsPlaceholder": "Chọn Egg",
+                  "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
                 },
                 "enum": {
                   "deploymentType": {
@@ -2889,6 +2953,9 @@
                     "title": "Cài Đặt Egg Kho Lưu Trữ",
                     "button": "Cài đặt {eggs}"
                   }
+                },
+                "drawer": {
+                  "noReadme": "This egg does not have a README."
                 }
               }
             }
@@ -3096,6 +3163,7 @@
                   "title": "Cài Đặt S3",
                   "form": {
                     "partSize": "Kích Thước Phần",
+                    "compressionType": "Compression Type",
                     "pathStyle": "Sử dụng URL kiểu đường dẫn"
                   }
                 },
@@ -3813,6 +3881,7 @@
             "imported": "Lịch trình đã được nhập.",
             "created": "Lịch trình đã được tạo.",
             "updated": "Lịch trình đã được cập nhật.",
+            "duplicated": "Schedule duplicated.",
             "deleted": "Lịch trình đã được xóa.",
             "triggered": "Lịch trình đã được kích hoạt.",
             "exported": "Lịch trình đã được xuất.",
@@ -3820,6 +3889,7 @@
             "step": {
               "created": "Bước lịch trình đã được tạo.",
               "updated": "Bước lịch trình đã được cập nhật.",
+              "duplicated": "Schedule step duplicated.",
               "deleted": "Bước lịch trình đã được xóa."
             }
           },
@@ -3861,6 +3931,9 @@
             },
             "updateSchedule": {
               "title": "Cập Nhật Lịch Trình"
+            },
+            "duplicateSchedule": {
+              "title": "Duplicate Schedule"
             },
             "deleteSchedule": {
               "title": "Xác Nhận Xóa Lịch Trình",
@@ -4322,7 +4395,8 @@
               "content": "Bạn có thay đổi chưa lưu đối với các biến khởi động. Bạn có chắc muốn rời khỏi trang này không? Nếu bạn rời khỏi, các thay đổi sẽ bị mất."
             }
           },
-          "noVariables": "Không tìm thấy biến khởi động cho máy chủ này."
+          "noVariables": "Không tìm thấy biến khởi động cho máy chủ này.",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "Điểm Gắn",

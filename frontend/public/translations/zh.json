@@ -97,6 +97,7 @@
         "save": "儲存",
         "saveAndStay": "儲存並停留",
         "edit": "編輯",
+        "duplicate": "Duplicate",
         "delete": "刪除",
         "remove": "移除",
         "enable": "啟用",
@@ -147,6 +148,14 @@
       "input": {
         "search": "搜尋..."
       },
+      "modal": {
+        "duplicate": {
+          "title": "Duplicate {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicated."
+      },
       "tooltip": {
         "resetToDefault": "重設為預設值",
         "edit": "編輯",
@@ -157,6 +166,7 @@
       },
       "form": {
         "name": "名稱",
+        "newName": "New Name",
         "description": "描述",
         "author": "作者",
         "type": "類型",
@@ -253,6 +263,7 @@
           "size": "大小",
           "lastUsed": "上次使用",
           "created": "已建立",
+          "updated": "Updated",
           "actor": "操作者",
           "event": "事件",
           "ip": "IP",
@@ -339,6 +350,12 @@
           "stopped": "已停止",
           "restarted": "已重新啟動",
           "killed": "已強制終止"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Best Speed",
+          "goodSpeed": "Good Speed",
+          "goodCompression": "Good Compression",
+          "bestCompression": "Best Compression"
         }
       },
       "unit": {
@@ -541,6 +558,7 @@
               },
               "copying": {
                 "completed": "已在 {time} 內將 `{path}` 複製到 `{destination}`。",
+                "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
                 "failed": "無法將 `{path}` 複製到 `{destination}`：\n{error}"
               },
               "copyingMany": {
@@ -1729,6 +1747,9 @@
                   "delete": {
                     "title": "確認刪除公告",
                     "content": "你確定要刪除 **{title}** 嗎？"
+                  },
+                  "duplicate": {
+                    "content": "Are you sure you want to duplicate **{title}**?"
                   }
                 },
                 "form": {
@@ -1868,6 +1889,25 @@
         "users": {
           "title": "使用者",
           "resourceName": "使用者",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-user-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "User Found",
+                "username": "Username",
+                "email": "Email",
+                "role": "Role",
+                "viewUser": "View User"
+              },
+              "notFound": "No user found with that external ID."
+            }
+          },
           "tooltip": {
             "admin": "管理員",
             "twoFactorEnabled": "2FA 已啟用",
@@ -2057,10 +2097,12 @@
                   "apiPort": "API 連接埠"
                 },
                 "button": {
-                  "save": "儲存設定"
+                  "save": "儲存設定",
+                  "reveal": "Reveal Configuration"
                 },
                 "alert": {
-                  "couldNotReach": "無法連線到節點：{error}"
+                  "couldNotReach": "無法連線到節點：{error}",
+                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed."
                 },
                 "toast": {
                   "applied": "設定已成功套用。",
@@ -2320,6 +2362,25 @@
         "servers": {
           "title": "伺服器",
           "resourceName": "伺服器",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-server-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "Server Found",
+                "name": "Name",
+                "owner": "Owner",
+                "node": "Node",
+                "viewServer": "View Server"
+              },
+              "notFound": "No server found with that external ID."
+            }
+          },
           "tabs": {
             "general": {
               "page": {
@@ -2367,6 +2428,7 @@
                   "timezonePlaceholder": "Europe/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "自訂",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "完成後啟動",
                   "startOnCompletionDescription": "安裝完成後啟動伺服器。",
                   "skipInstaller": "略過安裝程式",
@@ -2553,6 +2615,7 @@
                     "description": "你即將刪除 **{name}**。你確定嗎？",
                     "form": {
                       "force": "你要強制刪除此伺服器嗎？",
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.",
                       "deleteBackups": "你要刪除此伺服器的備份嗎？",
                       "confirmServerName": "確認伺服器名稱",
                       "confirmServerNamePlaceholder": "伺服器名稱"
@@ -2771,7 +2834,8 @@
                 "form": {
                   "order": "順序",
                   "eggs": "Egg",
-                  "eggsPlaceholder": "選取 Egg"
+                  "eggsPlaceholder": "選取 Egg",
+                  "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
                 },
                 "enum": {
                   "deploymentType": {
@@ -2889,6 +2953,9 @@
                     "title": "安裝 Egg 儲存庫 Egg",
                     "button": "安裝 {eggs}"
                   }
+                },
+                "drawer": {
+                  "noReadme": "This egg does not have a README."
                 }
               }
             }
@@ -3096,6 +3163,7 @@
                   "title": "S3 設定",
                   "form": {
                     "partSize": "分段大小",
+                    "compressionType": "Compression Type",
                     "pathStyle": "使用路徑樣式 URL"
                   }
                 },
@@ -3813,6 +3881,7 @@
             "imported": "排程已匯入。",
             "created": "排程已建立。",
             "updated": "排程已更新。",
+            "duplicated": "Schedule duplicated.",
             "deleted": "排程已刪除。",
             "triggered": "排程已觸發。",
             "exported": "排程已匯出。",
@@ -3820,6 +3889,7 @@
             "step": {
               "created": "排程步驟已建立。",
               "updated": "排程步驟已更新。",
+              "duplicated": "Schedule step duplicated.",
               "deleted": "排程步驟已刪除。"
             }
           },
@@ -3861,6 +3931,9 @@
             },
             "updateSchedule": {
               "title": "更新排程"
+            },
+            "duplicateSchedule": {
+              "title": "Duplicate Schedule"
             },
             "deleteSchedule": {
               "title": "確認刪除排程",
@@ -4322,7 +4395,8 @@
               "content": "你的啟動變數有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。"
             }
           },
-          "noVariables": "找不到此伺服器的啟動變數。"
+          "noVariables": "找不到此伺服器的啟動變數。",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "掛載",

@@ -1889,6 +1889,25 @@
         "users": {
           "title": "Benutzer",
           "resourceName": "Benutzer",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-user-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "User Found",
+                "username": "Username",
+                "email": "Email",
+                "role": "Role",
+                "viewUser": "View User"
+              },
+              "notFound": "No user found with that external ID."
+            }
+          },
           "tooltip": {
             "admin": "Administrator",
             "twoFactorEnabled": "2FA aktiviert",
@@ -2343,6 +2362,25 @@
         "servers": {
           "title": "Server",
           "resourceName": "Server",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-server-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "Server Found",
+                "name": "Name",
+                "owner": "Owner",
+                "node": "Node",
+                "viewServer": "View Server"
+              },
+              "notFound": "No server found with that external ID."
+            }
+          },
           "tabs": {
             "general": {
               "page": {
@@ -2390,6 +2428,7 @@
                   "timezonePlaceholder": "Europe/Berlin",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Benutzerdefiniert",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Nach Abschluss starten",
                   "startOnCompletionDescription": "Server nach Abschluss der Installation starten.",
                   "skipInstaller": "Installer überspringen",
@@ -2576,6 +2615,7 @@
                     "description": "Du bist dabei, **{name}** zu löschen. Bist du sicher?",
                     "form": {
                       "force": "Möchtest du diesen Server zwangsweise löschen?",
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.",
                       "deleteBackups": "Möchtest du die Backups dieses Servers löschen?",
                       "confirmServerName": "Servername bestätigen",
                       "confirmServerNamePlaceholder": "Servername"
@@ -2794,7 +2834,8 @@
                 "form": {
                   "order": "Reihenfolge",
                   "eggs": "Eggs",
-                  "eggsPlaceholder": "Eggs auswählen"
+                  "eggsPlaceholder": "Eggs auswählen",
+                  "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
                 },
                 "enum": {
                   "deploymentType": {
@@ -4354,7 +4395,8 @@
               "content": "Du hast ungespeicherte Änderungen an deinen Startvariablen. Bist du sicher, dass du diese Seite verlassen möchtest? Wenn du die Seite verlässt, gehen deine Änderungen verloren."
             }
           },
-          "noVariables": "Keine Startvariablen für diesen Server gefunden."
+          "noVariables": "Keine Startvariablen für diesen Server gefunden.",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "Mounts",

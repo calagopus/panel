@@ -97,6 +97,7 @@
         "save": "Opslaan",
         "saveAndStay": "Opslaan & Blijven",
         "edit": "Bewerken",
+        "duplicate": "Duplicate",
         "delete": "Verwijderen",
         "remove": "Verwijderen",
         "enable": "Inschakelen",
@@ -147,6 +148,14 @@
       "input": {
         "search": "Zoeken..."
       },
+      "modal": {
+        "duplicate": {
+          "title": "Duplicate {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicated."
+      },
       "tooltip": {
         "resetToDefault": "Herstellen naar standaard",
         "edit": "Bewerken",
@@ -157,6 +166,7 @@
       },
       "form": {
         "name": "Naam",
+        "newName": "New Name",
         "description": "Beschrijving",
         "author": "Author",
         "type": "Type",
@@ -1737,6 +1747,9 @@
                   "delete": {
                     "title": "Confirm Announcement Deletion",
                     "content": "Are you sure you want to delete **{title}**?"
+                  },
+                  "duplicate": {
+                    "content": "Are you sure you want to duplicate **{title}**?"
                   }
                 },
                 "form": {
@@ -1876,6 +1889,25 @@
         "users": {
           "title": "Users",
           "resourceName": "User",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-user-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "User Found",
+                "username": "Username",
+                "email": "Email",
+                "role": "Role",
+                "viewUser": "View User"
+              },
+              "notFound": "No user found with that external ID."
+            }
+          },
           "tooltip": {
             "admin": "Admin",
             "twoFactorEnabled": "2FA Enabled",
@@ -2330,6 +2362,25 @@
         "servers": {
           "title": "Servers",
           "resourceName": "Server",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-server-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "Server Found",
+                "name": "Name",
+                "owner": "Owner",
+                "node": "Node",
+                "viewServer": "View Server"
+              },
+              "notFound": "No server found with that external ID."
+            }
+          },
           "tabs": {
             "general": {
               "page": {
@@ -2377,6 +2428,7 @@
                   "timezonePlaceholder": "Europe/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Custom",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Start on Completion",
                   "startOnCompletionDescription": "Start server after installation completes.",
                   "skipInstaller": "Skip Installer",
@@ -2563,6 +2615,7 @@
                     "description": "You are about to delete **{name}**. Are you sure?",
                     "form": {
                       "force": "Do you want to forcefully delete this server?",
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.",
                       "deleteBackups": "Do you want to delete backups of this server?",
                       "confirmServerName": "Confirm Server Name",
                       "confirmServerNamePlaceholder": "Server Name"
@@ -2781,7 +2834,8 @@
                 "form": {
                   "order": "Order",
                   "eggs": "Eggs",
-                  "eggsPlaceholder": "Select Eggs"
+                  "eggsPlaceholder": "Select Eggs",
+                  "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
                 },
                 "enum": {
                   "deploymentType": {
@@ -3827,6 +3881,7 @@
             "imported": "Planning geïmporteerd.",
             "created": "Planning aangemaakt.",
             "updated": "Planning bijgewerkt.",
+            "duplicated": "Schedule duplicated.",
             "deleted": "Planning verwijderd.",
             "triggered": "Planning geactiveerd.",
             "exported": "Planning geëxporteerd.",
@@ -3834,6 +3889,7 @@
             "step": {
               "created": "Planningsstap aangemaakt.",
               "updated": "Planningsstap bijgewerkt.",
+              "duplicated": "Schedule step duplicated.",
               "deleted": "Planningsstap verwijderd."
             }
           },
@@ -3875,6 +3931,9 @@
             },
             "updateSchedule": {
               "title": "Planning bijwerken"
+            },
+            "duplicateSchedule": {
+              "title": "Duplicate Schedule"
             },
             "deleteSchedule": {
               "title": "Verwijderen van planning bevestigen",
@@ -4336,7 +4395,8 @@
               "content": "You have unsaved changes to your startup variables. Are you sure you want to leave this page? If you leave, your changes will be lost."
             }
           },
-          "noVariables": "Geen opstartvarabelen gevonden voor deze server."
+          "noVariables": "Geen opstartvarabelen gevonden voor deze server.",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "Koppelingen",
