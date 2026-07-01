@@ -1,18 +1,15 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosRequestConfig } from 'axios';
-import { ReactNode, startTransition, useEffect, useMemo, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { z } from 'zod';
-import { axiosInstance, getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { useStore } from 'zustand';
+import { axiosInstance, httpErrorToHuman } from '@/api/axios.ts';
 import getBackup from '@/api/server/backups/getBackup.ts';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl.ts';
 import loadDirectory from '@/api/server/files/loadDirectory.ts';
-import searchFiles from '@/api/server/files/searchFiles.ts';
-import { ObjectSet } from '@/lib/objectSet.ts';
-import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
 import { UploadResult, useFileUpload } from '@/plugins/useFileUpload.ts';
-import { ActingFileMode, FileManagerContext, ModalType, SearchInfo } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { createFileManagerStore, FileManagerExternals, FileManagerStoreContextProvider } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 
 const FileManagerProvider = ({ children }: { children: ReactNode }) => {
@@ -21,61 +18,25 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const folderInputRef = useRef<HTMLInputElement>(null);
-  const selectionAnchor = useRef<z.infer<typeof serverDirectoryEntrySchema> | null>(null);
+  const externalsRef = useRef<FileManagerExternals>({ serverUuid: server.uuid, queryClient, directoryData: null });
+  const [store] = useState(() =>
+    createFileManagerStore(() => externalsRef.current, {
+      browsingDirectory: searchParams.get('directory') || '/',
+      page: Number(searchParams.get('page')) || 1,
+    }),
+  );
 
-  const [actingMode, setActingMode] = useState<ActingFileMode | null>(null);
-  const [actingFiles, setActingFiles] = useState(
-    new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
-  );
-  const [actingFilesSource, setActingFilesSource] = useState<string | null>(null);
-  const [draggingFiles, setDraggingFiles] = useState(
-    new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
-  );
-  const [draggingFilesSource, setDraggingFilesSource] = useState<string | null>(null);
-  const [draggingTarget, setDraggingTarget] = useState<string | null>(null);
-  const [selectedFiles, setSelectedFiles] = useState(
-    new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
-  );
-  const [browsingDirectory, setBrowsingDirectory] = useState(() => searchParams.get('directory') || '/');
-  const [browsingEntries, setBrowsingEntries] = useState<Pagination<z.infer<typeof serverDirectoryEntrySchema>>>(
-    getEmptyPaginationSet(),
-  );
-  const [page, setPage] = useState(() => Number(searchParams.get('page')) || 1);
-  const [browsingPrimaryFilesystem, setBrowsingPrimaryFilesystem] = useState(true);
-  const [browsingWritableDirectory, setBrowsingWritableDirectory] = useState(true);
-  const [browsingFastDirectory, setBrowsingFastDirectory] = useState(true);
-  const [openModal, setOpenModal] = useState<ModalType>(null);
-  const [modalDirectoryEntries, setModalDirectoryEntries] = useState<z.infer<typeof serverDirectoryEntrySchema>[]>([]);
-  const [searchInfo, setSearchInfo] = useState<SearchInfo | null>(null);
-  const [sortMode, setSortMode] = useState<z.infer<typeof serverDirectorySortingModeSchema>>(
-    serverDirectorySortingModeSchema.safeParse(localStorage.getItem('file_sorting_mode')).data ?? 'name_asc',
-  );
-  const [clickOnce, setClickOnce] = useState(localStorage.getItem('file_click_once') !== 'false');
-  const [preferPhysicalSize, setPreferPhysicalSize] = useState(
-    localStorage.getItem('file_prefer_physical_size') === 'true',
-  );
-  const [editorMinimap, setEditorMinimap] = useState(localStorage.getItem('file_editor_minimap') === 'true');
-  const [editorLineOverflow, setEditorLineOverflow] = useState(
-    localStorage.getItem('file_editor_lineoverflow') === 'true',
-  );
-  const [vscodeUriScheme, setVscodeUriScheme] = useState(localStorage.getItem('file_vscode_uri_scheme') || 'vscode');
-  const [imageViewerSmoothing, setImageViewerSmoothing] = useState(
-    localStorage.getItem('file_image_viewer_smoothing') !== 'false',
-  );
-  const [audioPlayerVolume, setAudioPlayerVolume] = useState(
-    Number(localStorage.getItem('file_audio_player_volume')) || 0.5,
-  );
-  const [audioPlayerPlaybackRate, setAudioPlayerPlaybackRate] = useState(
-    Number(localStorage.getItem('file_audio_player_playback_rate')) || 1,
-  );
+  const browsingDirectory = useStore(store, (state) => state.browsingDirectory);
+  const page = useStore(store, (state) => state.page);
+  const sortMode = useStore(store, (state) => state.sortMode);
 
   const { data, isLoading } = useQuery({
     queryKey: ['server', server.uuid, 'files', { browsingDirectory, page, sortMode }],
     queryFn: () => loadDirectory(server.uuid, browsingDirectory, page, sortMode),
     staleTime: 30_000,
   });
+
+  externalsRef.current = { serverUuid: server.uuid, queryClient, directoryData: data ?? null };
 
   const backupUuid = useMemo(() => {
     if (!browsingDirectory.startsWith('/.backups/')) return null;
@@ -98,273 +59,67 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [browsingBackupError]);
 
+  const doUpload = useCallback(
+    async (form: FormData, config: AxiosRequestConfig): Promise<UploadResult> => {
+      const { url } = await getFileUploadUrl(externalsRef.current.serverUuid, store.getState().browsingDirectory);
+      const { data } = await axiosInstance.post(url, form, config);
+
+      return { url, continuationToken: data.continuationToken ?? null };
+    },
+    [store],
+  );
+
+  const doSplitUpload = useCallback(
+    async (
+      form: FormData,
+      config: AxiosRequestConfig,
+      continuationToken: string,
+      prevUrl: string,
+    ): Promise<UploadResult> => {
+      const { data } = await axiosInstance.post(prevUrl, form, {
+        ...config,
+        params: { ...config.params, continuation_token: continuationToken },
+      });
+
+      return { url: prevUrl, continuationToken: data.continuationToken ?? null };
+    },
+    [],
+  );
+
+  const onUploadComplete = useCallback(() => store.getState().invalidateFilemanager(), [store]);
+  const fileUploader = useFileUpload(doUpload, onUploadComplete, doSplitUpload);
+
+  useEffect(() => {
+    store.setState({ isLoading });
+  }, [isLoading]);
+
+  useEffect(() => {
+    store.setState({ fileUploader });
+  }, [fileUploader]);
+
+  useEffect(() => {
+    store.setState({ browsingBackup });
+  }, [browsingBackup]);
+
   useEffect(() => {
     if (!data) return;
 
-    setBrowsingEntries(data.entries);
-    setBrowsingPrimaryFilesystem(data.isFilesystemPrimary);
-    setBrowsingWritableDirectory(data.isFilesystemWritable);
-    setBrowsingFastDirectory(data.isFilesystemFast);
+    store.setState({
+      browsingEntries: data.entries,
+      browsingPrimaryFilesystem: data.isFilesystemPrimary,
+      browsingWritableDirectory: data.isFilesystemWritable,
+      browsingFastDirectory: data.isFilesystemFast,
+    });
   }, [data]);
 
-  const resetEntries = () => {
-    if (!data) return;
-
-    setBrowsingEntries(data.entries);
-  };
-
-  const invalidateFilemanager = () => {
-    if (searchInfo) {
-      searchFiles(server.uuid, { root: browsingDirectory, ...searchInfo.filters }).then((entries) => {
-        startTransition(() => {
-          setBrowsingEntries({ total: entries.length, page: 1, perPage: entries.length, data: entries });
-          doSelectFiles([]);
-          clearActingFiles();
-        });
-      });
-      return;
-    }
-
-    queryClient
-      .invalidateQueries({
-        queryKey: ['server', server.uuid, 'files'],
-      })
-      .catch((e) => console.error(e));
-  };
-
-  const doUpload = async (form: FormData, config: AxiosRequestConfig): Promise<UploadResult> => {
-    const { url } = await getFileUploadUrl(server.uuid, browsingDirectory);
-    const { data } = await axiosInstance.post(url, form, config);
-
-    return { url, continuationToken: data.continuationToken ?? null };
-  };
-
-  const doSplitUpload = async (
-    form: FormData,
-    config: AxiosRequestConfig,
-    continuationToken: string,
-    prevUrl: string,
-  ): Promise<UploadResult> => {
-    const { data } = await axiosInstance.post(prevUrl, form, {
-      ...config,
-      params: { ...config.params, continuation_token: continuationToken },
-    });
-
-    return { url: prevUrl, continuationToken: data.continuationToken ?? null };
-  };
-
-  const fileUploader = useFileUpload(doUpload, invalidateFilemanager, doSplitUpload);
-
-  const doActFiles = (mode: ActingFileMode | null, files: z.infer<typeof serverDirectoryEntrySchema>[]) => {
-    setActingMode(mode);
-    setActingFiles(new ObjectSet('name', files));
-    setActingFilesSource(browsingDirectory);
-  };
-
-  const clearActingFiles = () => {
-    setActingMode(null);
-    setActingFiles(new ObjectSet('name'));
-    setActingFilesSource(null);
-  };
-
-  const doDragFiles = (files: z.infer<typeof serverDirectoryEntrySchema>[]) => {
-    setDraggingFiles(new ObjectSet('name', files));
-    setDraggingFilesSource(browsingDirectory);
-    setDraggingTarget(null);
-  };
-
-  const clearDraggingFiles = () => {
-    setDraggingFiles(new ObjectSet('name'));
-    setDraggingFilesSource(null);
-    setDraggingTarget(null);
-  };
-
-  const doSelectFiles = (files: z.infer<typeof serverDirectoryEntrySchema>[]) =>
-    setSelectedFiles(new ObjectSet('name', files));
-
-  const selectFile = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
-    selectionAnchor.current = file;
-    setSelectedFiles(new ObjectSet('name', [file]));
-  };
-
-  const toggleSelectedFile = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
-    selectionAnchor.current = file;
-    setSelectedFiles((prev) => {
-      const next = new ObjectSet('name', prev.values());
-      if (next.has(file)) {
-        next.delete(file);
-      } else {
-        next.add(file);
-      }
-      return next;
-    });
-  };
-
-  const selectFileRange = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
-    const entries = browsingEntries.data;
-    const targetIndex = entries.findIndex((entry) => entry.name === file.name);
-    if (targetIndex === -1) return;
-
-    const anchor = selectionAnchor.current;
-    const anchorIndex = anchor ? entries.findIndex((entry) => entry.name === anchor.name) : -1;
-    if (anchorIndex === -1) {
-      selectFile(file);
-      return;
-    }
-
-    const [start, end] = anchorIndex < targetIndex ? [anchorIndex, targetIndex] : [targetIndex, anchorIndex];
-    setSelectedFiles(new ObjectSet('name', entries.slice(start, end + 1)));
-  };
-
-  const addSelectedFile = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
-    setSelectedFiles((prev) => {
-      const next = new ObjectSet('name', prev.values());
-      next.add(file);
-      return next;
-    });
-  };
-
-  const removeSelectedFile = (file: z.infer<typeof serverDirectoryEntrySchema>) => {
-    setSelectedFiles((prev) => {
-      const next = new ObjectSet('name', prev.values());
-      next.delete(file);
-      return next;
-    });
-  };
-
-  const doOpenModal = (modal: ModalType, entries?: z.infer<typeof serverDirectoryEntrySchema>[]) => {
-    setOpenModal(modal);
-    if (entries) {
-      setModalDirectoryEntries(entries);
-    }
-  };
-
-  const doCloseModal = () => {
-    setOpenModal(null);
-    setModalDirectoryEntries([]);
-  };
-
   useEffect(() => {
-    setBrowsingDirectory(searchParams.get('directory') || '/');
-    setPage(Number(searchParams.get('page')) || 1);
+    const state = store.getState();
+    state.setBrowsingDirectory(searchParams.get('directory') || '/');
+    state.setPage(Number(searchParams.get('page')) || 1);
   }, [searchParams]);
 
-  useEffect(() => {
-    selectionAnchor.current = null;
-    setSelectedFiles(new ObjectSet('name'));
-  }, [browsingDirectory]);
-
-  useEffect(() => {
-    localStorage.setItem('file_sorting_mode', sortMode);
-  }, [sortMode]);
-
-  useEffect(() => {
-    localStorage.setItem('file_click_once', clickOnce.toString());
-  }, [clickOnce]);
-
-  useEffect(() => {
-    localStorage.setItem('file_prefer_physical_size', preferPhysicalSize.toString());
-  }, [preferPhysicalSize]);
-
-  useEffect(() => {
-    localStorage.setItem('file_editor_minimap', editorMinimap.toString());
-  }, [editorMinimap]);
-
-  useEffect(() => {
-    localStorage.setItem('file_editor_lineoverflow', editorLineOverflow.toString());
-  }, [editorLineOverflow]);
-
-  useEffect(() => {
-    localStorage.setItem('file_vscode_uri_scheme', vscodeUriScheme);
-  }, [vscodeUriScheme]);
-
-  useEffect(() => {
-    localStorage.setItem('file_image_viewer_smoothing', imageViewerSmoothing.toString());
-  }, [imageViewerSmoothing]);
-
-  useEffect(() => {
-    localStorage.setItem('file_audio_player_volume', audioPlayerVolume.toString());
-  }, [audioPlayerVolume]);
-
-  useEffect(() => {
-    localStorage.setItem('file_audio_player_playback_rate', audioPlayerPlaybackRate.toString());
-  }, [audioPlayerPlaybackRate]);
-
-  return (
-    <FileManagerContext.Provider
-      value={{
-        isLoading,
-        fileInputRef,
-        folderInputRef,
-
-        actingMode,
-        actingFiles,
-        actingFilesSource,
-        draggingFiles,
-        draggingFilesSource,
-        draggingTarget,
-        selectedFiles,
-        browsingBackup,
-        browsingDirectory,
-        setBrowsingDirectory,
-        browsingEntries,
-        setBrowsingEntries,
-        page,
-        setPage,
-        browsingPrimaryFilesystem,
-        setBrowsingPrimaryFilesystem,
-        browsingWritableDirectory,
-        setBrowsingWritableDirectory,
-        browsingFastDirectory,
-        setBrowsingFastDirectory,
-        openModal,
-        setOpenModal,
-        modalDirectoryEntries,
-        setModalDirectoryEntries,
-        searchInfo,
-        setSearchInfo,
-
-        sortMode,
-        setSortMode,
-        clickOnce,
-        setClickOnce,
-        preferPhysicalSize,
-        setPreferPhysicalSize,
-        editorMinimap,
-        setEditorMinimap,
-        editorLineOverflow,
-        setEditorLineOverflow,
-        vscodeUriScheme,
-        setVscodeUriScheme,
-        imageViewerSmoothing,
-        setImageViewerSmoothing,
-        audioPlayerVolume,
-        setAudioPlayerVolume,
-        audioPlayerPlaybackRate,
-        setAudioPlayerPlaybackRate,
-
-        resetEntries,
-        invalidateFilemanager,
-        fileUploader,
-        doActFiles,
-        clearActingFiles,
-        doDragFiles,
-        clearDraggingFiles,
-        setDraggingTarget,
-        doSelectFiles,
-        selectFile,
-        toggleSelectedFile,
-        selectFileRange,
-        addSelectedFile,
-        removeSelectedFile,
-        doOpenModal,
-        doCloseModal,
-      }}
-    >
-      {children}
-    </FileManagerContext.Provider>
-  );
+  return <FileManagerStoreContextProvider createStore={() => store}>{children}</FileManagerStoreContextProvider>;
 };
 
-export { useFileManager } from './contexts/fileManagerContext.ts';
+export { useFileManager } from '@/stores/fileManager.ts';
 export { FileManagerProvider };

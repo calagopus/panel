@@ -1,6 +1,6 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ComponentProps, memo, startTransition, useEffect, useMemo, useRef, useState } from 'react';
+import { ComponentProps, memo, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
@@ -78,9 +78,9 @@ export default function DashboardHomeGrouped() {
     };
   }, []);
 
-  const handleServerSelectionChange = (server: z.infer<typeof serverSchema>, selected: boolean) => {
+  const handleServerSelectionChange = useCallback((server: z.infer<typeof serverSchema>, selected: boolean) => {
     setSelectedServers((prev) => {
-      const newSet = new ObjectSet('uuid', prev.values());
+      const newSet = prev.clone();
       if (selected) {
         newSet.add(server);
       } else {
@@ -88,15 +88,21 @@ export default function DashboardHomeGrouped() {
       }
       return newSet;
     });
-  };
+  }, []);
 
-  const handleServerClick = (server: z.infer<typeof serverSchema>, event: React.MouseEvent) => {
+  const handleServerClick = useCallback((server: z.infer<typeof serverSchema>, event: React.MouseEvent) => {
     if (sKeyPressedRef.current) {
       event.preventDefault();
       event.stopPropagation();
-      handleServerSelectionChange(server, !selectedServers.has(server));
+      setSelectedServers((prev) => {
+        const newSet = prev.clone();
+        if (!newSet.delete(server)) {
+          newSet.add(server);
+        }
+        return newSet;
+      });
     }
-  };
+  }, []);
 
   const onBulkAction = async (action: z.infer<typeof serverPowerAction>) => {
     await handleBulkPowerAction(selectedServers.keys(), action);
@@ -105,7 +111,10 @@ export default function DashboardHomeGrouped() {
 
   const sortedServerGroups = useMemo(() => [...serverGroups].sort((a, b) => a.order - b.order), [serverGroups]);
 
-  const dndServerGroups: DndServerGroup[] = sortedServerGroups.map((g) => ({ ...g, id: g.uuid }));
+  const dndServerGroups: DndServerGroup[] = useMemo(
+    () => sortedServerGroups.map((g) => ({ ...g, id: g.uuid })),
+    [sortedServerGroups],
+  );
 
   return (
     <AccountContentContainer

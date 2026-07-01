@@ -119,7 +119,11 @@ function FileEditorComponent() {
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const contentRef = useRef(content);
+  const savedContentRef = useRef('');
   const originalHashRef = useRef('');
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const draftPathRef = useRef<string | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const blocker = useBlocker(dirty, false, (tx) => {
     if (!tx.location.pathname.includes('/files/diff')) return true;
     return new URLSearchParams(tx.location.search).has('previousRevision');
@@ -153,7 +157,9 @@ function FileEditorComponent() {
         }
 
         if (params.action === 'image' || params.action === 'audio') {
-          return URL.createObjectURL(content);
+          if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+          objectUrlRef.current = URL.createObjectURL(content);
+          return objectUrlRef.current;
         } else {
           return content.text();
         }
@@ -162,6 +168,7 @@ function FileEditorComponent() {
         startTransition(() => {
           if (typeof content === 'string') {
             setContent(content);
+            savedContentRef.current = content;
 
             if (params.action === 'edit') {
               const hash = hashContent(content);
@@ -195,14 +202,16 @@ function FileEditorComponent() {
   }, [content]);
 
   useEffect(() => {
-    if (!dirty || !fileName || !browsingDirectory || params.action !== 'edit') return;
-    const key = draftKey(server.uuid, join(browsingDirectory, fileName));
-    const timer = setTimeout(() => {
-      const draft: FileDraft = { content, originalHash: originalHashRef.current, savedAt: Date.now() };
-      localStorage.setItem(key, JSON.stringify(draft));
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [content, dirty]);
+    draftPathRef.current =
+      params.action === 'edit' && fileName && browsingDirectory ? join(browsingDirectory, fileName) : null;
+  }, [params.action, fileName, browsingDirectory]);
+
+  useEffect(() => {
+    return () => {
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+      if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const el = editorContainerRef.current;
@@ -256,6 +265,9 @@ function FileEditorComponent() {
           setNameModalOpen(false);
         });
 
+        savedContentRef.current = currentContent;
+        originalHashRef.current = hashContent(currentContent);
+        if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
         localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, name ?? fileName)));
         addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
 
@@ -520,12 +532,26 @@ function FileEditorComponent() {
                     touchScrollEnabled: true,
                     fixedOverflowWidgets: true,
                   }}
-                  onChange={(value) => setContent(value || '')}
                   onMount={(editor, monaco) => {
                     editorRef.current = editor;
                     editor.onDidChangeModelContent(() => {
-                      contentRef.current = editor.getValue();
-                      setDirty(contentRef.current !== content);
+                      const value = editor.getValue();
+                      contentRef.current = value;
+                      const isDirty = value !== savedContentRef.current;
+                      setDirty(isDirty);
+
+                      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+                      if (isDirty && draftPathRef.current) {
+                        const path = draftPathRef.current;
+                        draftTimerRef.current = setTimeout(() => {
+                          const draft: FileDraft = {
+                            content: value,
+                            originalHash: originalHashRef.current,
+                            savedAt: Date.now(),
+                          };
+                          localStorage.setItem(draftKey(server.uuid, path), JSON.stringify(draft));
+                        }, 1000);
+                      }
                     });
                     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
                       if (params.action === 'new') {

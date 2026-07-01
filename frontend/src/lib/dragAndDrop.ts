@@ -9,25 +9,31 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DndCallbacks, DndConfig, DndItem } from '@/elements/DragAndDrop.tsx';
 
 export function useDndSensors(config: DndConfig = {}) {
   const { pointerActivationDistance = 8, touchActivationDelay = 250, touchActivationTolerance = 8 } = config;
 
-  return useSensors(
-    useSensor(MouseSensor, {
+  const mouseOptions = useMemo(
+    () => ({
       activationConstraint: {
         distance: pointerActivationDistance,
       },
     }),
-    useSensor(TouchSensor, {
+    [pointerActivationDistance],
+  );
+  const touchOptions = useMemo(
+    () => ({
       activationConstraint: {
         delay: touchActivationDelay,
         tolerance: touchActivationTolerance,
       },
     }),
+    [touchActivationDelay, touchActivationTolerance],
   );
+
+  return useSensors(useSensor(MouseSensor, mouseOptions), useSensor(TouchSensor, touchOptions));
 }
 
 export function useDndState<T extends DndItem>(items: T[], callbacks: DndCallbacks<T>) {

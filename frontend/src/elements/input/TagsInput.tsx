@@ -1,7 +1,7 @@
 import { faCheck, faGripVertical, faPencil, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Input, Stack, StyleProp, Text } from '@mantine/core';
-import { ComponentProps, startTransition, useEffect, useRef, useState } from 'react';
+import { ComponentProps, startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
@@ -118,10 +118,14 @@ function TagsInput({
     }
   };
 
-  const dndItems: DndTag[] = selectedTags.map((value, index) => ({
-    id: `tag-${index}-${value}`,
-    value,
-  }));
+  const dndItems: DndTag[] = useMemo(
+    () =>
+      selectedTags.map((value, index) => ({
+        id: `tag-${index}-${value}`,
+        value,
+      })),
+    [selectedTags],
+  );
 
   const handleDragEnd = (items: DndTag[]) => {
     const next = items.map((item) => item.value);

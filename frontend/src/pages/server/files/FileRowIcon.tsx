@@ -14,11 +14,12 @@ import { memo } from 'react';
 import { z } from 'zod';
 import { isListenableAudio, isOpenableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
-import { getFileManager } from '@/providers/contexts/fileManagerContext.ts';
+import { FileManagerStore, useFileManagerApi } from '@/stores/fileManager.ts';
 
-function getFileIcon(file: z.infer<typeof serverDirectoryEntrySchema>): IconDefinition {
-  const fileManagerContext = getFileManager();
-
+function getFileIcon(
+  file: z.infer<typeof serverDirectoryEntrySchema>,
+  fileManagerContext: FileManagerStore,
+): IconDefinition {
   for (const handler of window.extensionContext.extensionRegistry.pages.server.files.fileIconHandlers) {
     const icon = handler(file, fileManagerContext);
     if (icon) {
@@ -56,12 +57,13 @@ function FileRowIcon({
   className?: string;
   directory?: boolean;
 }) {
+  const store = useFileManagerApi();
   const isDirectory = directory || file?.directory;
 
   return (
     <FontAwesomeIcon
       className={classNames(isDirectory ? 'text-yellow-400' : 'text-(--mantine-color-dimmed)', className)}
-      icon={file ? getFileIcon(file) : directory ? faFolder : faFile}
+      icon={file ? getFileIcon(file, store.getState()) : directory ? faFolder : faFile}
     />
   );
 }

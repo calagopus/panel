@@ -98,14 +98,10 @@ export const createNodesSlice: StateCreator<AdminStore, [], [], NodesSlice> = (s
   setSelectedNodeAllocations: (value) =>
     set((state) => ({ ...state, selectedNodeAllocations: new ObjectSet('uuid', value) })),
   addSelectedNodeAllocation: (value) =>
-    set((state) => {
-      const next = new ObjectSet('uuid', state.selectedNodeAllocations.values());
-      next.add(value);
-      return { ...state, selectedNodeAllocations: next };
-    }),
+    set((state) => ({ ...state, selectedNodeAllocations: state.selectedNodeAllocations.clone().add(value) })),
   removeSelectedNodeAllocation: (value) =>
     set((state) => {
-      const next = new ObjectSet('uuid', state.selectedNodeAllocations.values());
+      const next = state.selectedNodeAllocations.clone();
       next.delete(value);
       return { ...state, selectedNodeAllocations: next };
     }),

@@ -45,7 +45,7 @@ export default function EggRepositoryEggs({
   const handleEggSelectionChange = useCallback(
     (egg: z.infer<typeof adminEggRepositoryEggSchema>, selected: boolean) => {
       setSelectedEggs((prev) => {
-        const newSet = new ObjectSet('uuid', prev.values());
+        const newSet = prev.clone();
         if (selected) {
           newSet.add(egg);
         } else {

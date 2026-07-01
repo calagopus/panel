@@ -16,7 +16,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import { matchesShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-interface TableHeaderProps {
+export interface TableHeaderProps {
   name?: string | (() => string);
   rightSection?: ReactNode;
   onClick?: () => void;

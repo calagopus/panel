@@ -2,47 +2,61 @@ import { useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import { canMoveFilesToDirectory, moveFilesToDirectory } from '@/pages/server/files/fileMove.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { FileManagerStore, useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 
-export function useDraggedFileMove({ disabled = false } = {}) {
+interface UseDraggedFileMoveOptions {
+  disabled?: boolean;
+  targetDirectory?: string | null;
+}
+
+export function useDraggedFileMove({ disabled = false, targetDirectory }: UseDraggedFileMoveOptions = {}) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const { server } = useServerStore();
   const canUpdateFiles = useServerCan('files.update');
-  const {
-    browsingWritableDirectory,
-    draggingFiles,
-    draggingFilesSource,
-    draggingTarget,
-    setDraggingTarget,
-    clearDraggingFiles,
-    doSelectFiles,
-    invalidateFilemanager,
-  } = useFileManager();
+  const store = useFileManagerApi();
   const [moving, setMoving] = useState(false);
 
-  const draggedFiles = draggingFiles.values();
-
-  const canMoveToDirectory = (targetDirectory: string) =>
+  const canMoveToDirectory = (state: FileManagerStore, target: string) =>
     !disabled &&
     !moving &&
     canUpdateFiles &&
-    browsingWritableDirectory &&
-    canMoveFilesToDirectory(draggedFiles, draggingFilesSource, targetDirectory);
+    state.browsingWritableDirectory &&
+    canMoveFilesToDirectory(state.draggingFiles.values(), state.draggingFilesSource, target);
 
-  const isDropTarget = (targetDirectory: string) =>
-    canMoveToDirectory(targetDirectory) && draggingTarget === targetDirectory;
+  const isDropTargetFor = (state: FileManagerStore, target: string) =>
+    canMoveToDirectory(state, target) && state.draggingTarget === target;
 
-  const moveToDirectory = async (targetDirectory: string) => {
-    if (!draggingFilesSource || !canMoveToDirectory(targetDirectory)) return;
+  const scopedIsDropTarget = useFileManagerStore((state) =>
+    targetDirectory != null ? isDropTargetFor(state, targetDirectory) : false,
+  );
+  useFileManagerStore((state) =>
+    targetDirectory === undefined
+      ? [state.draggingTarget, state.draggingFiles, state.draggingFilesSource, state.browsingWritableDirectory]
+      : null,
+  );
+
+  const isDropTarget = (target: string) =>
+    targetDirectory !== undefined
+      ? target === targetDirectory && scopedIsDropTarget
+      : isDropTargetFor(store.getState(), target);
+
+  const moveToDirectory = async (target: string) => {
+    const state = store.getState();
+    if (!state.draggingFilesSource || !canMoveToDirectory(state, target)) return;
 
     setMoving(true);
 
     try {
-      const { renamed } = await moveFilesToDirectory(server.uuid, draggedFiles, draggingFilesSource, targetDirectory);
+      const { renamed } = await moveFilesToDirectory(
+        server.uuid,
+        state.draggingFiles.values(),
+        state.draggingFilesSource,
+        target,
+      );
 
       if (renamed < 1) {
         addToast(t('pages.server.files.toast.filesCouldNotBeMoved', {}), 'error');
@@ -50,34 +64,36 @@ export function useDraggedFileMove({ disabled = false } = {}) {
       }
 
       addToast(t('pages.server.files.toast.filesMoved', { files: tItem('file', renamed) }), 'success');
-      doSelectFiles([]);
-      invalidateFilemanager();
+      state.doSelectFiles([]);
+      state.invalidateFilemanager();
     } catch (msg) {
       addToast(httpErrorToHuman(msg), 'error');
     } finally {
       setMoving(false);
-      clearDraggingFiles();
+      store.getState().clearDraggingFiles();
     }
   };
 
-  const getDropHandlers = <T extends HTMLElement = HTMLElement>(targetDirectory: string) => ({
+  const getDropHandlers = <T extends HTMLElement = HTMLElement>(target: string) => ({
     onDragOver: (event: React.DragEvent<T>) => {
-      if (!canMoveToDirectory(targetDirectory)) return;
+      const state = store.getState();
+      if (!canMoveToDirectory(state, target)) return;
 
       event.preventDefault();
       event.stopPropagation();
       event.dataTransfer.dropEffect = 'move';
-      setDraggingTarget(targetDirectory);
+      state.setDraggingTarget(target);
     },
     onDragLeave: () => {
-      if (isDropTarget(targetDirectory)) setDraggingTarget(null);
+      const state = store.getState();
+      if (isDropTargetFor(state, target)) state.setDraggingTarget(null);
     },
     onDrop: (event: React.DragEvent<T>) => {
-      if (!canMoveToDirectory(targetDirectory)) return;
+      if (!canMoveToDirectory(store.getState(), target)) return;
 
       event.preventDefault();
       event.stopPropagation();
-      void moveToDirectory(targetDirectory);
+      void moveToDirectory(target);
     },
   });
 

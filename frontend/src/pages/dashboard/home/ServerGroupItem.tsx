@@ -12,7 +12,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme } from '@mantine/core';
 import classNames from 'classnames';
-import { ComponentProps, memo, startTransition, useEffect, useState } from 'react';
+import { ComponentProps, memo, startTransition, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import deleteServerGroup from '@/api/me/servers/groups/deleteServerGroup.ts';
@@ -141,10 +141,14 @@ export default function ServerGroupItem({
       });
   };
 
-  const dndServers: DndServer[] = servers.data.map((s) => ({
-    ...s,
-    id: `${serverGroup.uuid}-${s.uuid}`,
-  }));
+  const dndServers: DndServer[] = useMemo(
+    () =>
+      servers.data.map((s) => ({
+        ...s,
+        id: `${serverGroup.uuid}-${s.uuid}`,
+      })),
+    [servers.data, serverGroup.uuid],
+  );
 
   const serverCount = servers?.total ?? serverGroup.serverOrder.length;
 
