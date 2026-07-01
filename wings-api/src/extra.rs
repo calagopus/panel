@@ -4,35 +4,54 @@ use utoipa::ToSchema;
 
 pub type Config = super::system_config::get::Response200;
 
-#[derive(Debug, ToSchema, Deserialize, Serialize, Default, Clone, Copy)]
-#[serde(rename_all = "snake_case")]
-#[non_exhaustive]
-pub enum StreamableArchiveFormat {
-    Tar,
-    TarGz,
-    TarXz,
-    TarLzip,
-    TarBz2,
-    TarLz4,
-    TarZstd,
-    #[default]
-    Zip,
-}
-
-impl std::fmt::Display for StreamableArchiveFormat {
+impl std::fmt::Display for super::StreamableArchiveFormat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "{}",
             match self {
-                StreamableArchiveFormat::Tar => "tar",
-                StreamableArchiveFormat::TarGz => "tar_gz",
-                StreamableArchiveFormat::TarXz => "tar_xz",
-                StreamableArchiveFormat::TarLzip => "tar_lzip",
-                StreamableArchiveFormat::TarBz2 => "tar_bz2",
-                StreamableArchiveFormat::TarLz4 => "tar_lz4",
-                StreamableArchiveFormat::TarZstd => "tar_zstd",
-                StreamableArchiveFormat::Zip => "zip",
+                super::StreamableArchiveFormat::Tar => "tar",
+                super::StreamableArchiveFormat::TarGz => "tar_gz",
+                super::StreamableArchiveFormat::TarXz => "tar_xz",
+                super::StreamableArchiveFormat::TarLzip => "tar_lzip",
+                super::StreamableArchiveFormat::TarBz2 => "tar_bz2",
+                super::StreamableArchiveFormat::TarLz4 => "tar_lz4",
+                super::StreamableArchiveFormat::TarZstd => "tar_zstd",
+                super::StreamableArchiveFormat::Itaf => "itaf",
+                super::StreamableArchiveFormat::ItafGz => "itaf_gz",
+                super::StreamableArchiveFormat::ItafXz => "itaf_xz",
+                super::StreamableArchiveFormat::ItafLzip => "itaf_lzip",
+                super::StreamableArchiveFormat::ItafBz2 => "itaf_bz2",
+                super::StreamableArchiveFormat::ItafLz4 => "itaf_lz4",
+                super::StreamableArchiveFormat::ItafZstd => "itaf_zstd",
+                super::StreamableArchiveFormat::Zip => "zip",
+            }
+        )
+    }
+}
+
+#[allow(clippy::derivable_impls)]
+impl Default for super::StreamableArchiveFormat {
+    #[inline]
+    fn default() -> Self {
+        super::StreamableArchiveFormat::TarGz
+    }
+}
+
+impl std::fmt::Display for super::BackupAdapter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                super::BackupAdapter::Wings => "wings",
+                super::BackupAdapter::S3 => "s3",
+                super::BackupAdapter::DdupBak => "ddup-bak",
+                super::BackupAdapter::Btrfs => "btrfs",
+                super::BackupAdapter::Zfs => "zfs",
+                super::BackupAdapter::Restic => "restic",
+                super::BackupAdapter::ProxmoxBackupServer => "proxmox-backup-server",
+                super::BackupAdapter::Kopia => "kopia",
             }
         )
     }

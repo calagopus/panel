@@ -258,6 +258,45 @@ impl WingsClient {
         .await
     }
 
+    pub async fn post_backups_backup_export(
+        &self,
+        backup: uuid::Uuid,
+        data: &super::backups_backup_export::post::RequestBody,
+    ) -> Result<super::backups_backup_export::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/backups/{backup}/export"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_backups_backup_query(
+        &self,
+        backup: uuid::Uuid,
+        query: &super::backups_backup_query::get::Query,
+    ) -> Result<super::backups_backup_query::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.adapter {
+            query_parts.push(format!("adapter={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/backups/{backup}/query{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn post_deauthorize_user(
         &self,
         data: &super::deauthorize_user::post::RequestBody,

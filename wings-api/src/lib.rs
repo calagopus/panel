@@ -459,6 +459,40 @@ pub enum ServerState {
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum StreamableArchiveFormat {
+    #[serde(rename = "tar")]
+    Tar,
+    #[serde(rename = "tar_gz")]
+    TarGz,
+    #[serde(rename = "tar_xz")]
+    TarXz,
+    #[serde(rename = "tar_lzip")]
+    TarLzip,
+    #[serde(rename = "tar_bz2")]
+    TarBz2,
+    #[serde(rename = "tar_lz4")]
+    TarLz4,
+    #[serde(rename = "tar_zstd")]
+    TarZstd,
+    #[serde(rename = "itaf")]
+    Itaf,
+    #[serde(rename = "itaf_gz")]
+    ItafGz,
+    #[serde(rename = "itaf_xz")]
+    ItafXz,
+    #[serde(rename = "itaf_lzip")]
+    ItafLzip,
+    #[serde(rename = "itaf_bz2")]
+    ItafBz2,
+    #[serde(rename = "itaf_lz4")]
+    ItafLz4,
+    #[serde(rename = "itaf_zstd")]
+    ItafZstd,
+    #[serde(rename = "zip")]
+    Zip,
+}
+
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
 pub enum SystemBackupsDdupBakCompressionFormat {
     #[serde(rename = "none")]
     None,
@@ -582,6 +616,8 @@ nestify::nest! {
         pub network_bytes_processed: u64,
         #[schema(inline)]
         pub bytes_total: u64,
+        #[schema(inline)]
+        pub files_processed: u64,
     }
 }
 
@@ -701,6 +737,78 @@ pub mod backups_backup {
         pub type Response404 = ApiError;
 
         pub type Response = Response202;
+    }
+}
+pub mod backups_backup_export {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub adapter: BackupAdapter,
+                #[schema(inline)]
+                pub server: uuid::Uuid,
+                #[schema(inline)]
+                pub path: compact_str::CompactString,
+                #[schema(inline)]
+                pub archive_format: StreamableArchiveFormat,
+                #[schema(inline)]
+                pub foreground: bool,
+            }
+        }
+
+        pub type Response200 = DirectoryEntry;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response202 {
+                #[schema(inline)]
+                pub identifier: uuid::Uuid,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        pub enum Response {
+            Ok(Response200),
+            Accepted(Response202),
+        }
+    }
+}
+pub mod backups_backup_query {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub file_name: compact_str::CompactString,
+                #[schema(inline)]
+                pub archive_format: Option<ArchiveFormat>,
+                #[schema(inline)]
+                pub size: Option<u64>,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub adapter: Option<BackupAdapter>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod deauthorize_user {
