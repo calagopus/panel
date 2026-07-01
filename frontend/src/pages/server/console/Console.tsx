@@ -16,7 +16,6 @@ import { WebLinksAddon } from '@xterm/addon-web-links';
 import { ITerminalInitOnlyOptions, ITerminalOptions, Terminal as XTerm } from '@xterm/xterm';
 import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import getServer from '@/api/server/getServer.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
@@ -381,14 +380,7 @@ export default function Terminal() {
       [SocketEvent.TRANSFER_LOGS]: (l) => addLine(l),
       [SocketEvent.TRANSFER_STATUS]: (s) => {
         if (s === 'failure') addLine(t('pages.server.console.message.transferFailed', {}), true);
-        else if (s === 'completed') {
-          addLine(t('pages.server.console.message.transferCompleted', {}), true);
-          setTimeout(() => {
-            getServer(server.uuid).then(updateServer);
-          }, 5000);
-        } else {
-          updateServer({ isTransferring: true });
-        }
+        else if (s === 'completed') addLine(t('pages.server.console.message.transferCompleted', {}), true);
       },
       [SocketEvent.DAEMON_MESSAGE]: (l) => addLine(l, true),
       [SocketEvent.DAEMON_ERROR]: (l) => addLine(`\u001b[1m\u001b[41m${l}\u001b[0m`, true),
@@ -400,7 +392,7 @@ export default function Terminal() {
     return () => {
       Object.entries(listeners).forEach(([k, fn]) => socketInstance.removeListener(k, fn));
     };
-  }, [socketConnected, socketInstance]);
+  }, [socketConnected, socketInstance, xtermInstance]);
 
   useEffect(() => {
     if (!openModal) {
@@ -621,7 +613,7 @@ export default function Terminal() {
                   : t('pages.server.console.message.extracting', {})}{' '}
                 <Progress
                   hourglass={false}
-                  value={(progress.bytes_processed / progress.bytes_total) * 100}
+                  value={progress.bytes_total === 0 ? 100 : (progress.bytes_processed / progress.bytes_total) * 100}
                   className='flex-1 ml-2'
                 />
               </span>
