@@ -39,6 +39,54 @@
       "few": "{count} مفاتيح SSH",
       "many": "{count} مفتاح SSH",
       "other": "{count} مفتاح SSH"
+    },
+    "asset": {
+      "zero": "{count} Assets",
+      "one": "{count} Asset",
+      "two": "{count} Assets",
+      "few": "{count} Assets",
+      "many": "{count} Assets",
+      "other": "{count} Assets"
+    },
+    "node": {
+      "zero": "{count} Nodes",
+      "one": "{count} Node",
+      "two": "{count} Nodes",
+      "few": "{count} Nodes",
+      "many": "{count} Nodes",
+      "other": "{count} Nodes"
+    },
+    "allocation": {
+      "zero": "{count} Node Allocations",
+      "one": "{count} Node Allocation",
+      "two": "{count} Node Allocations",
+      "few": "{count} Node Allocations",
+      "many": "{count} Node Allocations",
+      "other": "{count} Node Allocations"
+    },
+    "egg": {
+      "zero": "{count} Eggs",
+      "one": "{count} Egg",
+      "two": "{count} Eggs",
+      "few": "{count} Eggs",
+      "many": "{count} Eggs",
+      "other": "{count} Eggs"
+    },
+    "shortcut": {
+      "zero": "{count} Shortcuts",
+      "one": "{count} Shortcut",
+      "two": "{count} Shortcuts",
+      "few": "{count} Shortcuts",
+      "many": "{count} Shortcuts",
+      "other": "{count} Shortcuts"
+    },
+    "line": {
+      "zero": "{count} Lines",
+      "one": "{count} Line",
+      "two": "{count} Lines",
+      "few": "{count} Lines",
+      "many": "{count} Lines",
+      "other": "{count} Lines"
     }
   },
   "translations": {
@@ -49,6 +97,7 @@
         "save": "حفظ",
         "saveAndStay": "حفظ والبقاء",
         "edit": "تعديل",
+        "duplicate": "Duplicate",
         "delete": "حذف",
         "remove": "إزالة",
         "enable": "تفعيل",
@@ -65,16 +114,27 @@
         "selectAll": "تحديد الكل",
         "deselectAll": "إلغاء تحديد الكل",
         "restore": "استعادة",
+        "discard": "Discard",
         "download": "تنزيل",
         "downloadAs": "تنزيل كـ {format}",
         "export": "تصدير",
         "exportAs": "تصدير كـ {format}",
         "recreate": "إعادة إنشاء",
+        "move": "Move",
+        "transfer": "Transfer",
+        "reattach": "Reattach",
+        "detach": "Detach",
+        "send": "Send",
+        "reset": "Reset",
+        "view": "View",
         "import": "استيراد",
         "details": "التفاصيل",
+        "loadLogs": "Load Logs",
+        "sendTestEmail": "Send Test Email",
         "setPrimary": "تعيين كأساسي",
         "unsetPrimary": "إلغاء التعيين كأساسي",
-        "leavePage": "مغادرة الصفحة"
+        "leavePage": "مغادرة الصفحة",
+        "viewDocumentation": "View Documentation"
       },
       "alert": {
         "error": "خطأ",
@@ -88,27 +148,57 @@
       "input": {
         "search": "بحث..."
       },
+      "modal": {
+        "duplicate": {
+          "title": "Duplicate {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicated."
+      },
       "tooltip": {
         "resetToDefault": "إعادة تعيين إلى الافتراضي",
         "edit": "تعديل",
         "delete": "حذف",
-        "primary": "أساسي"
+        "remove": "Remove",
+        "primary": "أساسي",
+        "backupOnDifferentNode": "This backup is on a different node than the server. It is not viewable from the Client API."
       },
       "form": {
         "name": "الاسم",
+        "newName": "New Name",
         "description": "الوصف",
+        "author": "Author",
+        "type": "Type",
         "password": "كلمة المرور",
         "host": "المضيف",
         "username": "اسم المستخدم",
+        "usernameOrEmail": "Username/Email",
         "server": "الخادم",
         "url": "URL",
         "email": "البريد الإلكتروني",
+        "path": "Path",
         "port": "المنفذ",
+        "provider": "Provider",
         "command": "الأمر",
+        "fromAddress": "From Address",
+        "fromName": "From Name",
+        "siteKey": "Site Key",
+        "secretKey": "Secret Key",
+        "apiKey": "API Key",
+        "accessKey": "Access Key",
+        "bucket": "Bucket",
+        "region": "Region",
+        "endpoint": "Endpoint",
+        "publicUrl": "Public URL",
         "firstName": "الاسم الأول",
         "lastName": "اسم العائلة",
         "language": "اللغة",
+        "identifier": "Identifier",
         "enabled": "مفعّل",
+        "title": "Title",
+        "content": "Content",
+        "backupConfiguration": "Backup Configuration",
         "fileName": "اسم الملف",
         "sftpPort": "منفذ SFTP",
         "sftpHost": "مضيف SFTP",
@@ -119,8 +209,21 @@
         "startupCommand": "أمر بدء التشغيل",
         "archiveName": "اسم الأرشيف",
         "archiveFormat": "تنسيق الأرشيف",
+        "compressionLevel": "Compression Level",
+        "multiplexChannels": "Multiplex Channels",
+        "multiplexChannelsDescription": "Add additional HTTP connections (and therefore also threads) for transferring split archives, total streams is 1 + multiplex channels.",
+        "deleteSourceBackups": "Delete source backups",
+        "deleteSourceBackupsDescription": "Deletes the transferred backups on the source node once transfer finishes.",
+        "node": "Node",
+        "primaryAllocation": "Primary Allocation",
+        "additionalAllocations": "Additional Allocations",
+        "externalId": "External ID",
+        "mount": "Mount",
+        "nest": "Nest",
+        "lines": "Lines",
         "databaseHost": "مضيف قاعدة البيانات",
         "timezone": "المنطقة الزمنية",
+        "timezoneSystem": "System",
         "protocol": "البروتوكول",
         "powerAction": "إجراء الطاقة",
         "destination": "الوجهة",
@@ -131,10 +234,16 @@
         "currentPassword": "كلمة المرور الحالية",
         "confirmPassword": "تأكيد كلمة المرور",
         "authenticationCode": "رمز المصادقة",
+        "restoreStartup": "Restore the startup command, image, and variables from this backup.",
         "lineContains": "السطر يحتوي",
+        "filePath": "File Path",
+        "envVariable": "Environment Variable",
+        "value": "Value",
         "eggs": "البيض",
         "ignoredFiles": "الملفات المتجاهلة",
         "yourControlPanelPassword": "كلمة مرور لوحة التحكم الخاصة بك",
+        "deploymentEnabled": "Deployment Enabled",
+        "maintenanceEnabled": "Maintenance Enabled",
         "truncateDirectory": "هل تريد حذف جميع ملفات هذا الخادم قبل تنفيذ هذا الإجراء؟ لا يمكن التراجع عن هذا."
       },
       "table": {
@@ -143,19 +252,42 @@
           "empty": "لم يتم العثور على عناصر، يبدو أنها مخفية."
         },
         "columns": {
+          "id": "ID",
           "name": "الاسم",
+          "author": "Author",
+          "type": "Type",
+          "title": "Title",
+          "enabled": "Enabled",
           "description": "الوصف",
           "username": "اسم المستخدم",
           "size": "الحجم",
           "lastUsed": "آخر استخدام",
           "created": "تم الإنشاء",
+          "updated": "Updated",
           "actor": "الممثل",
           "event": "الحدث",
           "ip": "IP",
           "when": "متى",
           "command": "الأمر",
-          "notes": "ملاحظات"
+          "location": "Location",
+          "node": "Node",
+          "owner": "Owner",
+          "added": "Added",
+          "backupConfiguration": "Backup Configuration",
+          "status": "Status",
+          "allocation": "Allocation",
+          "notes": "ملاحظات",
+          "source": "Source",
+          "target": "Target",
+          "checksum": "Checksum",
+          "files": "Files",
+          "server": "Server",
+          "address": "Address",
+          "eggs": "Eggs"
         }
+      },
+      "tabs": {
+        "general": "General"
       },
       "badge": {
         "active": "نشط",
@@ -163,7 +295,8 @@
         "enabled": "مفعّل",
         "disabled": "معطّل",
         "successful": "ناجح",
-        "failed": "فشل"
+        "failed": "فشل",
+        "installed": "Installed"
       },
       "server": {
         "noAllocation": "لا يوجد تخصيص",
@@ -217,6 +350,12 @@
           "stopped": "تم الإيقاف",
           "restarted": "تم إعادة التشغيل",
           "killed": "تم الإنهاء"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Best Speed",
+          "goodSpeed": "Good Speed",
+          "goodCompression": "Good Compression",
+          "bestCompression": "Best Compression"
         }
       },
       "unit": {
@@ -233,15 +372,37 @@
       "readOnly": "قراءة فقط",
       "na": "غير متوفر",
       "never": "أبداً",
+      "none": "None",
+      "unknown": "Unknown",
       "yes": "نعم",
       "no": "لا",
       "web": "الويب",
       "api": "API",
+      "default": "Default",
+      "custom": "Custom",
       "system": "النظام",
       "schedule": "الجدولة",
       "impersonatedBy": "تم انتحال صفته بواسطة {username}"
     },
     "elements": {
+      "routeOrderEditor": {
+        "title": "Route Configuration",
+        "label": {
+          "route": "Route",
+          "divider": "Divider",
+          "redirect": "Redirect"
+        },
+        "empty": "No routes configured. Add routes, dividers, or redirects below.",
+        "unnamed": "(unnamed)",
+        "dividerPlaceholder": "Divider label (optional)",
+        "redirectNamePlaceholder": "Redirect name",
+        "destinationPlaceholder": "Destination URL (e.g. https://...)",
+        "selectRoutePlaceholder": "Select a route…",
+        "button": {
+          "addDivider": "Add Divider",
+          "addRedirect": "Add Redirect"
+        }
+      },
       "errorBoundary": {
         "message": "حدث خطأ أثناء عرض هذا العرض. حاول تحديث الصفحة.",
         "hideDetails": "إخفاء التفاصيل",
@@ -255,6 +416,13 @@
           "copied": "تم النسخ إلى الحافظة.",
           "failed": "فشل النسخ إلى الحافظة.",
           "copyManual": "نسخ إلى الحافظة: Ctrl+C أو Command+C، Enter"
+        }
+      },
+      "pasteOnClick": {
+        "toast": {
+          "pasted": "Pasted from clipboard.",
+          "failed": "Failed to paste from clipboard.",
+          "pasteManual": "Paste from clipboard: Ctrl+V or Command+V, Enter"
         }
       },
       "estimatedTimeArrival": {
@@ -276,10 +444,16 @@
           "stopImpersonating": "إيقاف انتحال الشخصية",
           "openInVirtualWindow": "فتح في نافذة افتراضية",
           "openInPopup": "فتح في نافذة منبثقة",
-          "openInNewTab": "فتح في علامة تبويب جديدة"
+          "openInNewTab": "فتح في علامة تبويب جديدة",
+          "switchToDark": "Switch to Dark Mode",
+          "switchToLight": "Switch to Light Mode"
         }
       },
       "permissionSelector": {
+        "button": {
+          "copyPermissions": "Copy Permissions",
+          "pastePermissions": "Paste Permissions"
+        },
         "selectedPermissions": "الأذونات المحددة ({count})",
         "noPermissions": "لم يتم تحديد أي أذونات."
       },
@@ -290,6 +464,13 @@
         "tooltip": {
           "cantSave": "ليس لديك إذن للحفظ.",
           "cantDelete": "ليس لديك إذن للحذف."
+        }
+      },
+      "resource": {
+        "tooltip": {
+          "created": "{resource} created.",
+          "updated": "{resource} updated.",
+          "deleted": "{resource} deleted."
         }
       },
       "activityInfoButton": {
@@ -307,6 +488,10 @@
         "notFound": {
           "title": "غير موجود",
           "content": "لم يتم العثور على الصفحة التي تبحث عنها."
+        },
+        "suspended": {
+          "title": "Account Suspended",
+          "content": "Your account has been suspended. You cannot make changes to your account. Please contact an administrator for more information."
         },
         "serverConflict": {
           "title": "حالة خادم متضاربة",
@@ -373,6 +558,7 @@
               },
               "copying": {
                 "completed": "تم نسخ `{path}` إلى `{destination}` في {time}.",
+                "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
                 "failed": "فشل نسخ `{path}` إلى `{destination}`:\n{error}"
               },
               "copyingMany": {
@@ -393,7 +579,8 @@
         "toast": {
           "uploading": "بدأ رفع {files}...",
           "cancelledFile": "تم إلغاء رفع `{file}` بنجاح.",
-          "cancelledFolder": "تم إلغاء رفع `{folder}` ({files}) بنجاح."
+          "cancelledFolder": "تم إلغاء رفع `{folder}` ({files}) بنجاح.",
+          "cancelledAll": "All uploads have been cancelled."
         }
       }
     },
@@ -449,6 +636,8 @@
           "form": {
             "locationName": "اسم الموقع",
             "locationNamePlaceholder": "منزلي",
+            "locationFlag": "Location Flag",
+            "locationFlagPlaceholder": "The best country",
             "backupName": "اسم تكوين النسخ الاحتياطي",
             "backupNamePlaceholder": "Unicorn Cloud",
             "backupDisk": "قرص النسخ الاحتياطي",
@@ -527,6 +716,7 @@
         },
         "server": {
           "title": "الخادم",
+          "existingServer": "A server has already been created. You can change the settings later in the admin menu.",
           "egg": {
             "title": "البيضة",
             "description": "لنقم بإعداد خادمك الأول وتشغيله. ما هي البيضة التي ترغب في استخدامها؟",
@@ -572,9 +762,14 @@
           "login": "تسجيل الدخول",
           "loginWith": "تسجيل الدخول بـ {name}"
         },
+        "alert": {
+          "urlMismatch": "The application URL does not match the current URL. Expected: `{appUrl}`, Current: `{currentUrl}`."
+        },
         "login": {
           "error": {
-            "usernameRequired": "الرجاء إدخال اسم المستخدم"
+            "usernameRequired": "الرجاء إدخال اسم المستخدم",
+            "registrationDisabled": "No matching Account could be found and registration is currently disabled.",
+            "userAlreadyExists": "An account with this username or email already exists."
           },
           "passkey": {
             "error": {
@@ -592,6 +787,10 @@
           "step": {
             "username": {
               "title": "تسجيل الدخول",
+              "subtitle": "Enter your username or email address to continue",
+              "form": {
+                "usernameOrEmailPlaceholder": "Your username or email address"
+              },
               "link": {
                 "forgotPassword": "نسيت كلمة المرور",
                 "notRegistered": "غير مسجل؟",
@@ -680,6 +879,9 @@
             "noGroups": "لا توجد مجموعات متاحة لإضافة الخادم إليها",
             "noGroup": "هذا الخادم ليس في أي مجموعة"
           },
+          "badge": {
+            "foreign": "Foreign"
+          },
           "tabs": {
             "groupedServers": {
               "title": "الخوادم المجمعة",
@@ -712,6 +914,13 @@
                     "noServers": "جميع الخوادم موجودة بالفعل في هذه المجموعة.",
                     "toast": {
                       "added": "تمت إضافة الخادم إلى المجموعة."
+                    }
+                  },
+                  "removeServerFromGroup": {
+                    "title": "Confirm Server Removal",
+                    "content": "Are you sure you want to remove **{server}** from **{group}**?",
+                    "toast": {
+                      "removed": "Server removed from group."
                     }
                   }
                 },
@@ -754,6 +963,10 @@
             "requireTwoFactor": {
               "title": "مطلوب المصادقة الثنائية",
               "description": "المصادقة الثنائية مطلوبة على حسابك. يرجى إعدادها أدناه لمواصلة استخدام اللوحة."
+            },
+            "frozen": {
+              "title": "Account Frozen",
+              "description": "Your account has been frozen. You cannot make changes to your account until it is unfrozen. Please contact an administrator for more information."
             }
           },
           "containers": {
@@ -829,13 +1042,15 @@
         },
         "securityKeys": {
           "title": "مفاتيح الأمان",
+          "subtitle": "{current} of {max} maximum security keys created.",
           "table": {
             "columns": {
               "credentialId": "معرف الاعتماد"
             }
           },
           "tooltip": {
-            "secureContextRequired": "مطلوب سياق آمن (HTTPS) لاستخدام مفاتيح الأمان."
+            "secureContextRequired": "مطلوب سياق آمن (HTTPS) لاستخدام مفاتيح الأمان.",
+            "limitReached": "You are limited to {max} security keys."
           },
           "modal": {
             "createSecurityKey": {
@@ -884,6 +1099,23 @@
           "subtitle": "استخدم هذه الاختصارات للتنقل والتفاعل مع اللوحة بشكل أكثر كفاءة.",
           "detectedMac": "تم اكتشاف macOS",
           "detectedWindows": "تم اكتشاف Windows/Linux",
+          "label": {
+            "disabled": "Disabled",
+            "modified": "Modified",
+            "recording": "Press keys..."
+          },
+          "button": {
+            "rebind": "Rebind",
+            "resetAll": "Reset All",
+            "copy": "Copy All",
+            "paste": "Paste"
+          },
+          "toast": {
+            "imported": "Updated {shortcuts}.",
+            "importedNone": "No shortcuts were changed.",
+            "importErrors": "Ignored {unknown} and {invalid}.",
+            "resetAll": "All shortcuts reset to defaults."
+          },
           "fileManager": {
             "title": "مدير الملفات",
             "selectAll": "تحديد جميع الملفات",
@@ -919,6 +1151,10 @@
         },
         "sshKeys": {
           "title": "مفاتيح SSH",
+          "subtitle": "{current} of {max} maximum ssh keys created.",
+          "tooltip": {
+            "limitReached": "You are limited to {max} ssh keys."
+          },
           "table": {
             "columns": {
               "fingerprint": "البصمة"
@@ -963,6 +1199,10 @@
         },
         "commandSnippets": {
           "title": "قصاصات الأوامر",
+          "subtitle": "{current} of {max} maximum command snippets created.",
+          "tooltip": {
+            "limitReached": "You are limited to {max} command snippets."
+          },
           "modal": {
             "createCommandSnippet": {
               "title": "إنشاء قصاصة أمر",
@@ -1008,8 +1248,12 @@
         },
         "apiKeys": {
           "title": "مفاتيح API",
+          "subtitle": "{current} of {max} maximum api keys created.",
           "button": {
             "apiDocumentation": "وثائق API"
+          },
+          "tooltip": {
+            "limitReached": "You are limited to {max} api keys."
           },
           "table": {
             "columns": {
@@ -1052,10 +1296,2087 @@
             "userPermissions": "أذونات المستخدم",
             "serverPermissions": "أذونات الخادم",
             "adminPermissions": "أذونات المسؤول"
+          },
+          "create": {
+            "title": "Create API Key",
+            "subtitle": "An application is requesting an API key to be created for your account.",
+            "alert": {
+              "adminPermissions": "This API key requests **admin permissions**. Anyone in possession of this key will be able to perform administrative actions on this panel in your name. Only continue if you absolutely trust the requesting application.",
+              "callbackUrl": "After creation, the new API key will be sent to **{url}**."
+            },
+            "noPermissions": "This API key will not have any permissions.",
+            "keyCreated": "Your new API key has been created. Make sure to copy it now, as it will not be shown again.",
+            "button": {
+              "goToApiKeys": "Go to API Keys"
+            }
           }
         },
         "activity": {
           "title": "النشاط"
+        }
+      },
+      "admin": {
+        "home": {
+          "title": "Home",
+          "alert": {
+            "newPanelVersion": "A new version is available for the panel! You are currently on {current} and the latest version is {latest}. You may want to consider upgrading. [Click here]({upgradeUrl}) to view upgrade instructions."
+          },
+          "tabs": {
+            "overview": {
+              "title": "Overview",
+              "page": {
+                "permissionDenied": "You do not have permission to read the statistics that would have been here otherwise. For now, enjoy this bird.",
+                "card": {
+                  "systemOverview": "System Overview",
+                  "generalStatistics": "General Statistics",
+                  "backupStatistics": "Backup Statistics"
+                },
+                "system": {
+                  "cpu": "CPU",
+                  "memoryUsage": "Memory Usage ({process} used by Panel)",
+                  "memoryValue": "{used} / {total} ({percent}%)",
+                  "kernelVersion": "Kernel Version ({architecture})",
+                  "containerType": "Container Type",
+                  "databaseVersion": "Database Version ({size})",
+                  "cacheVersion": "Cache Version",
+                  "cacheCalls": "Cache Calls",
+                  "cacheHits": "Cache Hits ({percent}%)",
+                  "cacheMisses": "Cache Misses ({percent}%)",
+                  "avgCachedCallLatency": "Avg. Cached Call Latency"
+                },
+                "containerType": {
+                  "none": "None detected",
+                  "official": "Official",
+                  "officialAio": "Official AIO",
+                  "officialHeavy": "Official Heavy"
+                },
+                "stats": {
+                  "users": "Users",
+                  "servers": "Servers",
+                  "locations": "Locations",
+                  "nodes": "Nodes",
+                  "nestEggs": "Nest Eggs",
+                  "databaseHosts": "Database Hosts",
+                  "backupConfigurations": "Backup Configurations",
+                  "roles": "Roles"
+                },
+                "backup": {
+                  "allTime": "All Time",
+                  "today": "Today",
+                  "week": "This Week",
+                  "month": "This Month",
+                  "totalAllTime": "Total backups all time",
+                  "successfulAllTime": "Successful backups all time",
+                  "failedAllTime": "Failed backups all time",
+                  "deletedAllTime": "Deleted backups all time",
+                  "totalToday": "Total backups today",
+                  "successfulToday": "Successful backups today",
+                  "failedToday": "Failed backups today",
+                  "deletedToday": "Deleted backups today",
+                  "totalWeek": "Total backups this week",
+                  "successfulWeek": "Successful backups this week",
+                  "failedWeek": "Failed backups this week",
+                  "deletedWeek": "Deleted backups this week",
+                  "totalMonth": "Total backups this month",
+                  "successfulMonth": "Successful backups this month",
+                  "failedMonth": "Failed backups this month",
+                  "deletedMonth": "Deleted backups this month",
+                  "successfulValue": "{count} ({size})",
+                  "deletedValue": "{count} ({size})"
+                }
+              }
+            },
+            "updates": {
+              "title": "Updates",
+              "page": {
+                "alert": {
+                  "extensionUpdateErrors": "There were errors checking for updates for some extensions."
+                },
+                "card": {
+                  "panelVersion": "Panel Version",
+                  "versionHistory": "Version History",
+                  "outdatedExtensions": "Outdated Extensions",
+                  "outdatedNodes": "Outdated Nodes"
+                },
+                "panelVersion": "Your panel is currently running version `{current}`. The latest available version is `{latest}`.",
+                "unknown": "unknown",
+                "button": {
+                  "recheck": "Recheck for Updates"
+                },
+                "toast": {
+                  "recheckComplete": "Recheck complete."
+                },
+                "selectHistory": "Select an update history to view.",
+                "historyPanel": "Panel",
+                "historyExtension": "Extension: {name}",
+                "extensionsUpToDate": "All extensions are up to date.",
+                "extensionsOutdated": "Some extensions are outdated or had errors when checking for updates.",
+                "noChangelog": "No changelog",
+                "nodesUpToDate": "Seems like all nodes are up to date. ({failed} failed to check)",
+                "nodesOutdated": "Some nodes are outdated, the latest available version is `{latest}`. ({outdated} outdated, {failed} failed to check)",
+                "table": {
+                  "version": "Version",
+                  "installed": "Installed",
+                  "packageName": "Package Name",
+                  "latestVersion": "Latest Version",
+                  "changes": "Changes",
+                  "error": "Error"
+                }
+              }
+            },
+            "health": {
+              "title": "Health",
+              "page": {
+                "card": {
+                  "generalHealth": "General Health",
+                  "extensionMigrationHealth": "Extension Migration Health",
+                  "desyncNodes": "Desync Nodes",
+                  "debugMode": "Debug Mode"
+                },
+                "appliedMigrations": "Applied Migrations ({percent}%)",
+                "migrationsValue": "{applied} / {total}",
+                "avgNtpOffset": "Avg. NTP Offset",
+                "noExtensions": "No extensions found.",
+                "nodesSynced": "Seems like all nodes have a synced clock (within 5 seconds of panel clock). ({failed} failed to check)",
+                "nodesDesync": "Some nodes have desync clocks (over 5 seconds off of the panel's clock). This can cause file download/console issues. ({desync} desync, {failed} failed to check)",
+                "debugEnabled": "Debug mode is currently enabled.",
+                "debugDisabled": "Debug mode is currently disabled.",
+                "debugResetNote": "This setting will be reset to the default ({default}) when the application restarts.",
+                "table": {
+                  "packageName": "Package Name",
+                  "applied": "Applied",
+                  "total": "Total",
+                  "id": "ID",
+                  "desync": "Desync",
+                  "appliedValue": "{applied} ({percent}%)"
+                },
+                "button": {
+                  "enableDebug": "Enable Debug Mode",
+                  "disableDebug": "Disable Debug Mode"
+                },
+                "toast": {
+                  "debugEnabled": "Debug mode enabled.",
+                  "debugDisabled": "Debug mode disabled."
+                }
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Settings",
+          "tabs": {
+            "application": {
+              "title": "Application",
+              "page": {
+                "title": "Application Settings",
+                "form": {
+                  "icon": "Icon",
+                  "iconLight": "Icon (Light Mode)",
+                  "banner": "Banner",
+                  "bannerLight": "Banner (Light Mode)",
+                  "sessionCookie": "Session Cookie",
+                  "sessionDurationSeconds": "Session Duration (seconds)",
+                  "twoFactorRequirement": "Two-Factor Authentication Requirement",
+                  "telemetryEnabled": "Enable Telemetry",
+                  "telemetryEnabledDescription": "Allow Calagopus to collect limited and anonymous usage data to help improve the application.",
+                  "registrationEnabled": "Enable Registration"
+                },
+                "enum": {
+                  "twoFactorRequirement": {
+                    "admins": "Admins",
+                    "allUsers": "All Users",
+                    "none": "None"
+                  }
+                },
+                "button": {
+                  "previewTelemetry": "Preview Telemetry"
+                },
+                "toast": {
+                  "updated": "Application settings updated."
+                },
+                "modal": {
+                  "disableTelemetry": {
+                    "title": "Confirm Disabling Telemetry",
+                    "content": "Are you sure you want to disable telemetry? Telemetry helps us improve Calagopus by providing anonymous usage data. Disabling telemetry will prevent any data from being sent."
+                  },
+                  "enableRegistration": {
+                    "title": "Confirm Enabling Registration",
+                    "content": "Are you sure you want to enable registration? Enabling registration allows anyone to create an account on this panel. If you do not have a captcha configured, this may be a mistake."
+                  },
+                  "telemetryPreview": {
+                    "title": "Telemetry Preview"
+                  }
+                }
+              }
+            },
+            "storage": {
+              "title": "Storage",
+              "page": {
+                "title": "Storage Settings",
+                "form": {
+                  "driver": "Driver"
+                },
+                "enum": {
+                  "driver": {
+                    "filesystem": "Filesystem",
+                    "s3": "S3"
+                  }
+                },
+                "toast": {
+                  "updated": "Storage settings updated."
+                },
+                "modal": {
+                  "changeStorageType": {
+                    "title": "Confirm Changing Storage Type",
+                    "content": "Are you sure you want to change the storage type? Changing the storage type will cause the application to look for assets (e.g. profile pictures) in a different location, which may result in missing assets if they are not moved to the new location manually."
+                  }
+                },
+                "s3": {
+                  "alert": {
+                    "permissionsTitle": "Note on Permissions",
+                    "permissionsIntro": "To ensure that the storage backend works correctly, please make sure the following subdirectories are publicly accessible over the \"Public URL\" you provided:",
+                    "permissionsAssets": "This is where all admin assets (e.g., icons) will be stored.",
+                    "permissionsAvatars": "This is where all user avatars will be stored.",
+                    "permissionsPublicData": "This is where extensions can store public data (e.g., images)."
+                  },
+                  "form": {
+                    "pathStyle": "Using path-style URLs"
+                  }
+                }
+              }
+            },
+            "mail": {
+              "title": "Mail",
+              "page": {
+                "title": "Email Settings",
+                "enum": {
+                  "provider": {
+                    "none": "None",
+                    "smtp": "SMTP",
+                    "sendmail": "Sendmail Command",
+                    "filesystem": "Filesystem"
+                  },
+                  "tlsMode": {
+                    "none": "None",
+                    "startTls": "STARTTLS",
+                    "implicitTls": "Implicit TLS"
+                  }
+                },
+                "toast": {
+                  "updated": "Email settings updated."
+                },
+                "modal": {
+                  "sendTestEmail": {
+                    "title": "Send Test Email",
+                    "toast": {
+                      "sent": "Test email has been sent successfully."
+                    }
+                  }
+                },
+                "smtp": {
+                  "form": {
+                    "tlsMode": "TLS Mode",
+                    "skipCertValidation": "Skip Certificate Validation"
+                  }
+                }
+              }
+            },
+            "mailTemplates": {
+              "title": "Mail Templates",
+              "page": {
+                "title": "Email Template Settings",
+                "sidebar": {
+                  "templates": "Templates",
+                  "loading": "Loading...",
+                  "availableVariables": "Available Variables"
+                },
+                "alert": {
+                  "syntaxBefore": "Templates use the",
+                  "syntaxLink": "MiniJinja",
+                  "syntaxMiddle": "templating syntax. Variables are referenced with",
+                  "syntaxAnd": "and control structures like",
+                  "syntaxOr": "and",
+                  "syntaxAfter": "are supported."
+                },
+                "empty": "Select a template from the sidebar to edit it.",
+                "loadingTemplate": "Loading template...",
+                "form": {
+                  "subject": "Subject"
+                },
+                "toast": {
+                  "saved": "Email template saved.",
+                  "reset": "Email template reset to default."
+                },
+                "modal": {
+                  "reset": {
+                    "title": "Reset to default",
+                    "content": "This will discard your custom template for **{identifier}** and restore the built-in default. This cannot be undone."
+                  }
+                }
+              }
+            },
+            "captcha": {
+              "title": "Captcha",
+              "page": {
+                "title": "Captcha Settings",
+                "toast": {
+                  "updated": "Captcha settings updated."
+                },
+                "recaptcha": {
+                  "form": {
+                    "v3": "V3"
+                  }
+                }
+              }
+            },
+            "webauthn": {
+              "title": "Webauthn",
+              "page": {
+                "title": "Webauthn Settings",
+                "form": {
+                  "rpId": "RP Id",
+                  "rpOrigin": "RP Origin"
+                },
+                "button": {
+                  "autofill": "Autofill"
+                },
+                "toast": {
+                  "updated": "Webauthn settings updated.",
+                  "ipNotAllowed": "Cannot use WebAuthn on an IP address."
+                },
+                "modal": {
+                  "changeRpId": {
+                    "title": "Confirm Changing RP Id",
+                    "content": "Are you sure you want to change the RP Id? Changing the RP Id will break all existing Webauthn credentials and require users to re-register their devices. This can have significant consequences, so please make sure you understand the implications before proceeding."
+                  }
+                }
+              }
+            },
+            "server": {
+              "title": "Server",
+              "page": {
+                "title": "Server Settings",
+                "form": {
+                  "maxFileManagerViewSize": "Max File Manager View Size",
+                  "maxScheduleStepCount": "Max Schedule Steps",
+                  "maxFileManagerContentSearchSize": "Max File Manager Content Search Size",
+                  "maxFileManagerSearchResults": "Max File Manager Search Results",
+                  "maxSubuserCount": "Max Subuser Count",
+                  "allowOverwritingCustomDockerImage": "Allow Overwriting Custom Docker Image",
+                  "allowOverwritingCustomDockerImageDescription": "If enabled, users will be able to overwrite the Docker image specified in the server configuration using the Eggs list, even if an admin has set a custom Docker image.",
+                  "allowViewingInstallationLogs": "Allow Viewing Installation Logs",
+                  "allowViewingInstallationLogsDescription": "If enabled, users with console read permissions will also be able to view installation logs via the websocket connection. If disabled, installation logs will only be available for admins.",
+                  "allowAcknowledgingInstallationFailure": "Allow Acknowledging Installation Failure",
+                  "allowAcknowledgingInstallationFailureDescription": "If enabled, users will be able to acknowledge installation failures for servers that are in the \"Install Failed\" state, allowing them to attempt to start the server instead of having to wait for an admin. If disabled, only admins will be able to acknowledge installation failures.",
+                  "allowViewingTransferProgress": "Allow Viewing Transfer Progress",
+                  "allowViewingTransferProgressDescription": "If enabled, users with console read permissions will also be able to view transfer progress logs via the websocket connection. If disabled, transfer progress logs will only be available for admins.",
+                  "containerPrelude": "Container Prelude",
+                  "containerPreludeDescription": "The terminal prelude used for some status-related messages in the server console."
+                },
+                "toast": {
+                  "updated": "Server settings updated."
+                }
+              }
+            },
+            "user": {
+              "title": "User",
+              "page": {
+                "title": "User Settings",
+                "form": {
+                  "maxServerGroupCount": "Max Server Groups",
+                  "maxApiKeyCount": "Max API Keys",
+                  "maxCommandSnippetCount": "Max Command Snippets",
+                  "maxSecurityKeyCount": "Max Security Keys",
+                  "maxSshKeyCount": "Max SSH Keys",
+                  "allowChangingLanguage": "Allow Changing Language",
+                  "allowChangingLanguageDescription": "If enabled, users will be able to change their language preferences."
+                },
+                "routeOrder": {
+                  "title": "Client Route Order"
+                },
+                "toast": {
+                  "updated": "User settings updated."
+                }
+              }
+            },
+            "activity": {
+              "title": "Activity",
+              "page": {
+                "title": "Activity Settings",
+                "form": {
+                  "adminLogRetentionDays": "Admin Activity Retention Days",
+                  "userLogRetentionDays": "User Activity Retention Days",
+                  "serverLogRetentionDays": "Server Activity Retention Days",
+                  "adminLogRetentionCount": "Admin Activity Retention Count",
+                  "userLogRetentionCount": "User Activity Retention Count",
+                  "serverLogRetentionCount": "Server Activity Retention Count",
+                  "serverLogAdminActivity": "Log Server Admin Activity",
+                  "serverLogAdminActivityDescription": "Enable or disable logging of admin activity on servers where the admin isn't an owner or subuser.",
+                  "serverLogScheduleActivity": "Log Server Schedule Activity",
+                  "serverLogScheduleActivityDescription": "Enable or disable logging of activity done by server schedules."
+                },
+                "toast": {
+                  "updated": "Activity settings updated."
+                }
+              }
+            },
+            "ratelimits": {
+              "title": "Ratelimits",
+              "page": {
+                "title": "Ratelimit Settings",
+                "form": {
+                  "hits": "Hits",
+                  "hitsDescription": "Maximum number of requests allowed per window.",
+                  "windowSeconds": "Window",
+                  "windowSecondsDescription": "Window duration in seconds."
+                },
+                "toast": {
+                  "updated": "Rate limit settings updated."
+                }
+              }
+            }
+          }
+        },
+        "announcements": {
+          "title": "Announcements",
+          "resourceName": "Announcement",
+          "tabs": {
+            "general": {
+              "page": {
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Announcement Deletion",
+                    "content": "Are you sure you want to delete **{title}**?"
+                  },
+                  "duplicate": {
+                    "content": "Are you sure you want to duplicate **{title}**?"
+                  }
+                },
+                "form": {
+                  "dismissibleEnd": "Dismissible End",
+                  "enabledStart": "Enabled Start",
+                  "enabledEnd": "Enabled End",
+                  "locations": "Locations",
+                  "locationsDescription": "Leave empty to apply to all locations.",
+                  "nodes": "Nodes",
+                  "nodesDescription": "Leave empty to apply to all nodes.",
+                  "backupConfigurations": "Backup Configurations",
+                  "backupConfigurationsDescription": "Leave empty to apply to all backup configurations.",
+                  "eggsPlaceholder": "Select Eggs",
+                  "dismissible": "Dismissible"
+                },
+                "titleCreate": "Create Announcement",
+                "titleUpdate": "Update Announcement"
+              }
+            }
+          },
+          "enum": {
+            "announcementType": {
+              "info": "Info",
+              "success": "Success",
+              "warning": "Warning",
+              "error": "Error"
+            }
+          }
+        },
+        "assets": {
+          "title": "Assets",
+          "button": {
+            "newDirectory": "New Directory",
+            "upload": "Upload",
+            "copyLink": "Copy Link"
+          },
+          "dropzone": {
+            "title": "Drop files here to upload",
+            "subtitle": "Release to start uploading"
+          },
+          "operations": {
+            "waiting": "Waiting: ",
+            "uploading": "Uploading: "
+          },
+          "toast": {
+            "assetDeleted": "Asset deleted.",
+            "assetsDeleted": "{assets} deleted."
+          },
+          "modal": {
+            "createDirectory": {
+              "title": "New Directory",
+              "createdAs": "Will be created at "
+            },
+            "deleteAssets": {
+              "title": "Confirm Asset Deletion",
+              "content": "Are you sure you want to delete `{count}` assets?"
+            },
+            "deleteAsset": {
+              "title": "Delete Asset",
+              "content": "Are you sure you want to delete this asset? This action cannot be undone."
+            }
+          }
+        },
+        "extensions": {
+          "title": "Extensions",
+          "unknownExtension": "Unknown Extension",
+          "alert": {
+            "noExtensions": "No extensions installed.",
+            "heavyImageMissing": "You don't seem to be using the heavy image required to install extensions, see [here]({docsUrl}) on how to switch to it."
+          },
+          "button": {
+            "viewBuildLogs": "View build logs",
+            "install": "Install extension",
+            "rebuild": "Rebuild extensions",
+            "configure": "Configure",
+            "back": "Back to Extensions",
+            "accept": "Accept",
+            "decline": "Decline"
+          },
+          "tooltip": {
+            "building": "The panel is currently building extension code. Please wait.",
+            "noPendingBuild": "No pending extensions to build.",
+            "noBackend": "Backend extension is required to configure this extension.",
+            "noConfigurationPage": "This extension does not have a configuration page defined.",
+            "removeExtension": "Remove extension"
+          },
+          "badge": {
+            "frontendMissing": "Frontend missing",
+            "backendMissing": "Backend missing",
+            "pendingBuild": "Pending build",
+            "pendingRemoval": "Pending removal"
+          },
+          "card": {
+            "version": "Version",
+            "authors": "Authors"
+          },
+          "section": {
+            "pendingExtensions": "Pending extensions",
+            "noPendingExtensions": "No pending extensions."
+          },
+          "dropzone": {
+            "title": "Drop some files here to install as Extensions",
+            "subtitle": "Release to start installing"
+          },
+          "toast": {
+            "buildStarted": "Extension rebuild started successfully.",
+            "buildCompleted": "Extension build completed. You may need to refresh the page.",
+            "added": "Extension `{packageName}` added successfully.",
+            "removed": "Extension `{packageName}` removed successfully."
+          },
+          "notFound": {
+            "title": "Extension Not Found",
+            "content": "Extension with package name \"{packageName}\" not found."
+          },
+          "configure": {
+            "title": "Configure {packageName}",
+            "noConfigurationPage": "This extension does not have a configuration page."
+          },
+          "modal": {
+            "buildLogs": {
+              "title": "Build Logs",
+              "empty": "No logs found."
+            },
+            "license": {
+              "title": "License agreement",
+              "description": "The extension `{packageName}` requires you to accept the following license before it can be installed."
+            },
+            "remove": {
+              "title": "Remove extension",
+              "content": "Are you sure you want to remove the extension `{packageName}`? This action cannot be undone.",
+              "form": {
+                "removeMigrations": "Do you want to remove & rollback the database migrations of this extension?"
+              }
+            }
+          }
+        },
+        "users": {
+          "title": "Users",
+          "resourceName": "User",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-user-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "User Found",
+                "username": "Username",
+                "email": "Email",
+                "role": "Role",
+                "viewUser": "View User"
+              },
+              "notFound": "No user found with that external ID."
+            }
+          },
+          "tooltip": {
+            "admin": "Admin",
+            "twoFactorEnabled": "2FA Enabled",
+            "twoFactorDisabled": "2FA Disabled"
+          },
+          "table": {
+            "columns": {
+              "role": "Role"
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "tooltip": {
+                  "cannotImpersonateSelf": "You cannot impersonate yourself."
+                },
+                "button": {
+                  "disableTwoFactor": "Disable Two Factor",
+                  "sendPasswordResetEmail": "Send Password Reset Email",
+                  "impersonate": "Impersonate"
+                },
+                "form": {
+                  "admin": "Admin",
+                  "adminDescription": "Admin users have full, unrestricted access to everything on the panel.",
+                  "frozen": "Frozen",
+                  "frozenDescription": "Frozen users cannot make any changes to their account information.",
+                  "suspended": "Suspended",
+                  "suspendedDescription": "Suspended users cannot access the panel in any meaningful way.",
+                  "role": "Role"
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm User Deletion",
+                    "content": "Are you sure you want to delete **{username}**?"
+                  },
+                  "disableTwoFactor": {
+                    "title": "Disable User Two Factor",
+                    "content": "Are you sure you want to remove the two factor of **{username}**?",
+                    "toast": {
+                      "disabled": "User two factor disabled."
+                    }
+                  },
+                  "sendPasswordResetEmail": {
+                    "title": "Send Password Reset Email",
+                    "content": "Are you sure you want to send a password reset email to **{email}**?",
+                    "toast": {
+                      "sent": "Password reset email sent."
+                    }
+                  }
+                },
+                "titleCreate": "Create User",
+                "titleUpdate": "Update User"
+              }
+            },
+            "servers": {
+              "title": "Servers",
+              "page": {
+                "title": "User Servers",
+                "showOwnedOnly": "Only show users' owned servers"
+              }
+            },
+            "oauthLinks": {
+              "title": "OAuth Links",
+              "page": {
+                "title": "User OAuth Links",
+                "toast": {
+                  "added": "OAuth Link added.",
+                  "removed": "OAuth Link removed."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add OAuth Link",
+                    "form": {
+                      "oauthProvider": "OAuth Provider"
+                    }
+                  },
+                  "delete": {
+                    "title": "Confirm OAuth Link Deletion",
+                    "content": "Are you sure you want to delete the **{provider}** connection from **{username}**?"
+                  }
+                }
+              }
+            },
+            "activity": {
+              "title": "Activity",
+              "page": {
+                "title": "User Activity"
+              }
+            }
+          }
+        },
+        "locations": {
+          "title": "Locations",
+          "resourceName": "Location",
+          "tabs": {
+            "general": {
+              "page": {
+                "form": {
+                  "flag": "Flag"
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Location Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                },
+                "titleCreate": "Create Location",
+                "titleUpdate": "Update Location"
+              }
+            },
+            "databaseHosts": {
+              "title": "Database Hosts",
+              "page": {
+                "title": "Location Database Hosts",
+                "toast": {
+                  "created": "Location database host created.",
+                  "deleted": "Location database host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Location Database Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Location Database Host Deletion",
+                    "content": "Are you sure you want to delete the database host **{name}** from **{location}**?"
+                  }
+                }
+              }
+            },
+            "nodes": {
+              "title": "Nodes",
+              "page": {
+                "title": "Location Nodes"
+              }
+            }
+          }
+        },
+        "nodes": {
+          "title": "Nodes",
+          "resourceName": "Node",
+          "tabs": {
+            "general": {
+              "page": {
+                "tooltip": {
+                  "deploymentEnabled": "Deployment Enabled",
+                  "deploymentDisabled": "Deployment Disabled",
+                  "allInOneNode": "All-in-One Node",
+                  "errorWhileFetchingVersion": "Error while fetching version",
+                  "updateAvailable": "{version} (Update Available)",
+                  "useWingsProxyUrl": "Use Wings Proxy URL"
+                },
+                "form": {
+                  "urlDescription": "Used for internal communication with the node.",
+                  "publicUrlDescription": "Used for websocket connections and downloads.",
+                  "backupConfigurationPlaceholder": "Inherit from Location"
+                },
+                "button": {
+                  "resetToken": "Reset Token",
+                  "updateConfig": "Update Config"
+                },
+                "toast": {
+                  "tokenReset": "Node token reset."
+                },
+                "alert": {
+                  "noLocations": "You need to create at least one location before you can create nodes. Locations help organize your nodes geographically or logically."
+                },
+                "titleCreate": "Create Node",
+                "titleUpdate": "Update Node"
+              }
+            },
+            "configuration": {
+              "title": "Configuration",
+              "page": {
+                "title": "Configuration",
+                "section": {
+                  "initialSetup": "Initial Setup",
+                  "liveConfiguration": "Live Configuration"
+                },
+                "description": {
+                  "placeFile": "Place this into the configuration file at `/etc/pterodactyl/config.yml` or run"
+                },
+                "tooltip": {
+                  "copyCommand": "Copy command"
+                },
+                "form": {
+                  "panelUrl": "Panel URL",
+                  "apiPort": "API Port"
+                },
+                "button": {
+                  "save": "Save Configuration",
+                  "reveal": "Reveal Configuration"
+                },
+                "alert": {
+                  "couldNotReach": "Could not reach the node: {error}",
+                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed."
+                },
+                "toast": {
+                  "applied": "Configuration applied successfully.",
+                  "submittedNotApplied": "Configuration was submitted but not applied.",
+                  "invalidYaml": "Invalid YAML: {error}"
+                }
+              }
+            },
+            "statistics": {
+              "title": "Statistics",
+              "page": {
+                "title": "Node Statistics",
+                "card": {
+                  "resources": "Resources",
+                  "graphs": "Graphs"
+                },
+                "toast": {
+                  "connectionLost": "Lost connection to the node statistics stream."
+                },
+                "label": {
+                  "cpu": "CPU",
+                  "memory": "Memory",
+                  "disk": "Disk",
+                  "network": "Network",
+                  "cpuThreads": "{model} ({threads} threads)",
+                  "usedByWings": "{size} used by Wings",
+                  "networkIn": "In: {in}",
+                  "networkOut": "Out: {out}"
+                },
+                "chart": {
+                  "cpuLoad": "CPU Load",
+                  "memoryUsage": "Memory Usage",
+                  "diskIo": "Disk I/O",
+                  "networkTraffic": "Network Traffic",
+                  "diskRead": "Disk Read",
+                  "diskWrite": "Disk Write",
+                  "inbound": "Inbound",
+                  "outbound": "Outbound",
+                  "networkInLabel": "Network In",
+                  "networkOutLabel": "Network Out"
+                }
+              }
+            },
+            "capacity": {
+              "title": "Capacity",
+              "page": {
+                "title": "Deployment Capacity",
+                "subtitle": "Resources allocated to servers on this node, measured against the limits configured in node settings, not the physical machine capacity. Deployment only checks memory and disk.",
+                "card": {
+                  "resources": "Allocated Resources"
+                },
+                "status": {
+                  "deploymentEnabled": "Deployment Enabled",
+                  "deploymentDisabled": "Deployment Disabled",
+                  "maintenanceEnabled": "Under Maintenance",
+                  "maintenanceDisabled": "Not Under Maintenance"
+                },
+                "label": {
+                  "cpu": "CPU",
+                  "memory": "Memory",
+                  "disk": "Disk",
+                  "memoryOverhead": "Memory Overhead",
+                  "servers": "Servers",
+                  "noLimit": "No node limit",
+                  "free": "{size} free",
+                  "overhead": "+ {size} reserved overhead",
+                  "cores": "{cores} cores allocated"
+                }
+              }
+            },
+            "logs": {
+              "title": "Logs",
+              "page": {
+                "title": "Node Logs",
+                "form": {
+                  "logFile": "Log File",
+                  "follow": "Follow"
+                },
+                "button": {
+                  "download": "Download Full Log"
+                },
+                "toast": {
+                  "connectionLost": "Lost connection to the node log stream."
+                }
+              }
+            },
+            "allocations": {
+              "title": "Allocations",
+              "page": {
+                "title": "Node Allocations",
+                "tooltip": {
+                  "clearSelection": "Clear Selection"
+                },
+                "form": {
+                  "ipAlias": "IP Alias"
+                },
+                "table": {
+                  "columns": {
+                    "ipAlias": "IP Alias"
+                  }
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Allocations",
+                    "button": {
+                      "create": "Create {count}"
+                    },
+                    "toast": {
+                      "created": "{allocations} created."
+                    }
+                  },
+                  "update": {
+                    "title": "Update Node Allocations",
+                    "toast": {
+                      "updated": "{allocations} updated."
+                    }
+                  },
+                  "delete": {
+                    "title": "Confirm Node Allocations Deletion",
+                    "content": "Are you sure you want to delete `{count}` allocations from **{name}**?",
+                    "toast": {
+                      "deleted": "{allocations} deleted."
+                    }
+                  }
+                }
+              }
+            },
+            "mounts": {
+              "title": "Mounts",
+              "page": {
+                "title": "Node Mounts",
+                "toast": {
+                  "added": "Node Mount added.",
+                  "removed": "Node Mount removed."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add Node Mount"
+                  },
+                  "remove": {
+                    "title": "Confirm Node Mount Removal",
+                    "content": "Are you sure you want to remove the mount **{mount}** from **{name}**?"
+                  }
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "page": {
+                "title": "Node Backups",
+                "input": {
+                  "detachedOnly": "Only show detached backups"
+                },
+                "tooltip": {
+                  "backupNotOnSameNode": "This backup is not on the same node as the server. It is not viewable from the Client API."
+                },
+                "toast": {
+                  "downloadStarted": "Download started.",
+                  "detached": "Backup detached successfully.",
+                  "reattached": "Reattached backup to {name} successfully.",
+                  "restoring": "Restoring backup to {name}...",
+                  "deleted": "Node backup deleted."
+                },
+                "modal": {
+                  "detach": {
+                    "title": "Confirm Backup Detachment",
+                    "content": "Are you sure you want to detach this backup from its server? It will not be deleted and can be reattached later."
+                  },
+                  "reattach": {
+                    "title": "Reattach Node Backup",
+                    "description": "Reattaching a node backup will link it to a server. This is useful if the backup is detached or you want to link it to a different server. Do note that this is not a transfer tool, unless the backup is considered remote (can be accessed by multiple nodes), the server must belong to the same node as the backup."
+                  },
+                  "restore": {
+                    "title": "Restore Node Backup",
+                    "form": {
+                      "truncateDirectory": "Do you want to empty the filesystem of this server before restoring the backup?"
+                    }
+                  },
+                  "delete": {
+                    "title": "Confirm Node Backup Deletion",
+                    "form": {
+                      "force": "Do you want to forcefully delete this node backup?"
+                    }
+                  }
+                }
+              }
+            },
+            "servers": {
+              "title": "Servers",
+              "page": {
+                "title": "Node Servers",
+                "modal": {
+                  "transfer": {
+                    "title": "Transfer Servers",
+                    "form": {
+                      "allocationMode": "Allocation Mode",
+                      "transferBackups": "Transfer backups",
+                      "transferBackupsDescription": "Whether to transfer backups along with the servers."
+                    },
+                    "toast": {
+                      "started": "{servers} transfer started."
+                    },
+                    "confirm": {
+                      "title": "Confirm Server Transfers",
+                      "content": "Are you sure you want to transfer `{count}` servers from **{from}** to **{to}**? This action cannot be undone."
+                    },
+                    "enum": {
+                      "allocationMode": {
+                        "none": "None (scrap all allocations, server will not be automatically assigned new allocations on the destination node)",
+                        "randomPrimary": "Randomize primary allocation (removes additional allocations)",
+                        "randomAll": "Randomize all allocations (recommended to avoid incompatibility issues with destination node)",
+                        "eggConfigDeployment": "Assign allocations based on Egg deployment configuration (only works if the Egg has a deployment configuration and the destination node has compatible allocations)",
+                        "eggConfigSelfAssignRange": "Self-assign new allocations based on Egg port range (only works if the Egg has a port range and the destination node has compatible allocations)"
+                      }
+                    }
+                  },
+                  "powerAction": {
+                    "title": "Confirm Power Action",
+                    "content": "Are you sure you want to **{action}** {servers}?"
+                  }
+                }
+              }
+            },
+            "transfers": {
+              "title": "Outgoing Transfers",
+              "page": {
+                "title": "Node Transfers",
+                "table": {
+                  "columns": {
+                    "progress": "Progress",
+                    "archiveRate": "Archive Rate",
+                    "networkRate": "Network Rate"
+                  }
+                }
+              }
+            }
+          },
+          "modal": {
+            "delete": {
+              "title": "Confirm Node Deletion",
+              "content": "Are you sure you want to delete **{name}**?"
+            },
+            "bulkConfig": {
+              "title": "Update Configuration - {nodes}",
+              "button": {
+                "apply": "Apply to {nodes}"
+              },
+              "toast": {
+                "applied": "Configuration applied to {nodes}."
+              },
+              "error": {
+                "invalidYaml": "Invalid YAML: {error}"
+              }
+            }
+          }
+        },
+        "servers": {
+          "title": "Servers",
+          "resourceName": "Server",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-server-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "Server Found",
+                "name": "Name",
+                "owner": "Owner",
+                "node": "Node",
+                "viewServer": "View Server"
+              },
+              "notFound": "No server found with that external ID."
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Server",
+                "titleUpdate": "Update Server",
+                "card": {
+                  "basicInformation": "Basic Information",
+                  "serverAssignment": "Server Assignment",
+                  "resourceLimits": "Resource Limits",
+                  "serverConfiguration": "Server Configuration",
+                  "featureLimits": "Feature Limits",
+                  "allocations": "Allocations",
+                  "variables": "Variables"
+                },
+                "alert": {
+                  "suspended": "This server is suspended.",
+                  "selectEggForVariables": "Please select an egg before you can configure variables."
+                },
+                "badge": {
+                  "serverSuspended": "Server Suspended"
+                },
+                "form": {
+                  "serverNamePlaceholder": "My Game Server",
+                  "externalIdPlaceholder": "Optional external identifier",
+                  "descriptionPlaceholder": "Server description",
+                  "owner": "Owner",
+                  "egg": "Egg",
+                  "backupConfigurationPlaceholder": "Inherit from Node/Location",
+                  "cpuLimit": "CPU Limit (%)",
+                  "cpuLimitDescription": "The CPU limit in % that the server can use, 1 thread = 100%.",
+                  "swap": "Swap",
+                  "swapDescription": "The amount of swap to give this server, -1 will not set a limit.",
+                  "memoryDescription": "The Memory limit of the server container, 0 will not set a limit.",
+                  "memoryOverhead": "Memory Overhead",
+                  "memoryOverheadDescription": "Hidden Memory that will be added to the container.",
+                  "diskSpace": "Disk Space",
+                  "diskSpaceDescription": "The disk limit of the server. This is a soft-limit unless the disk limiter is configured on Wings.",
+                  "ioWeight": "IO Weight",
+                  "ioWeightDescription": "The relative IO Weight of the server container compared to other containers, 0-1000. May not work on all systems.",
+                  "pinnedCpus": "Pinned CPUs",
+                  "pinnedCpusDescription": "The CPU cores (by index, e.g. 0, 1, 2) this server is pinned to. Leave empty to allow all cores.",
+                  "dockerImagePlaceholder": "ghcr.io/...",
+                  "predefinedDockerImages": "Predefined Docker Images",
+                  "predefinedDockerImagesPlaceholder": "No predefined image selected",
+                  "timezonePlaceholder": "Europe/Amsterdam",
+                  "startupCommandPlaceholder": "npm start",
+                  "startupCommandCustom": "Custom",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
+                  "startOnCompletion": "Start on Completion",
+                  "startOnCompletionDescription": "Start server after installation completes.",
+                  "skipInstaller": "Skip Installer",
+                  "skipInstallerDescription": "Skip running the install script.",
+                  "hugepagesPassthroughEnabled": "Enable Hugepages Passthrough",
+                  "hugepagesPassthroughEnabledDescription": "Enable hugepages passthrough for the server (mounts /dev/hugepages into the container).",
+                  "kvmPassthroughEnabled": "Enable KVM Passthrough",
+                  "kvmPassthroughEnabledDescription": "Enable KVM passthrough for the server (allows access to /dev/kvm inside the container).",
+                  "allocationsLimit": "Allocations",
+                  "databasesLimit": "Databases",
+                  "backupsLimit": "Backups",
+                  "schedulesLimit": "Schedules"
+                },
+                "modal": {
+                  "confirmNoAllocation": {
+                    "title": "No Primary Allocation Assigned",
+                    "content": "You are creating a server without assigning any primary allocation. Are you sure you want to continue?",
+                    "button": {
+                      "confirm": "Create Anyway"
+                    }
+                  }
+                }
+              }
+            },
+            "allocations": {
+              "title": "Allocations",
+              "page": {
+                "title": "Server Allocations",
+                "table": {
+                  "columns": {
+                    "ipAlias": "IP Alias"
+                  }
+                },
+                "form": {
+                  "notesPlaceholder": "Notes"
+                },
+                "toast": {
+                  "updated": "Allocation updated.",
+                  "setPrimary": "Allocation set as primary.",
+                  "unsetPrimary": "Allocation unset as primary.",
+                  "removed": "Allocation removed.",
+                  "added": "{count} allocations added."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add Server Allocations",
+                    "form": {
+                      "allocations": "Allocations"
+                    },
+                    "button": {
+                      "add": "Add {count}"
+                    }
+                  },
+                  "remove": {
+                    "title": "Confirm Allocation Removal",
+                    "content": "Are you sure you want to remove **{allocation}**?"
+                  }
+                }
+              }
+            },
+            "variables": {
+              "title": "Variables",
+              "page": {
+                "title": "Server Variables",
+                "toast": {
+                  "updated": "Server variables updated."
+                }
+              }
+            },
+            "mounts": {
+              "title": "Mounts",
+              "page": {
+                "title": "Server Mounts",
+                "toast": {
+                  "added": "Server Mount added.",
+                  "deleted": "Server Mount deleted."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add Server Mount"
+                  },
+                  "remove": {
+                    "title": "Confirm Server Mount Removal",
+                    "content": "Are you sure you want to remove the mount **{mount}** from **{name}**?"
+                  }
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "page": {
+                "title": "Server Backups",
+                "input": {
+                  "partiallyDetachedOnly": "Only show partially detached backups"
+                }
+              }
+            },
+            "logs": {
+              "title": "Logs",
+              "page": {
+                "title": "Server Logs",
+                "form": {
+                  "logType": "Log Type"
+                },
+                "enum": {
+                  "logType": {
+                    "console": "Console",
+                    "install": "Install"
+                  }
+                }
+              }
+            },
+            "management": {
+              "title": "Management",
+              "page": {
+                "title": "Server Management",
+                "transfer": {
+                  "title": "Transfer",
+                  "content": "Transfer this server and it's data to another node within this system.",
+                  "toast": {
+                    "started": "Server transfer started."
+                  },
+                  "modal": {
+                    "title": "Server Transfer",
+                    "form": {
+                      "backupsToTransfer": "Backups to transfer"
+                    },
+                    "tooltip": {
+                      "aioNotSupported": "Transfers to the All-In-One node are not supported."
+                    },
+                    "confirm": {
+                      "title": "Confirm Server Transfer",
+                      "content": "Are you sure you want to transfer **{name}** from **{from}** to **{to}**?",
+                      "alert": {
+                        "notAllBackupsSelected": "You have not selected all backups to transfer, the remaining backups will become partially detached if the transfer completes successfully."
+                      }
+                    }
+                  }
+                },
+                "suspend": {
+                  "title": "Suspend",
+                  "content": "This will suspend the server, stop any running processes, and immediately block the user from being able to access their files or otherwise manage the server through the panel or API.",
+                  "button": "Suspend",
+                  "toast": {
+                    "suspended": "Server suspended."
+                  },
+                  "modal": {
+                    "title": "Confirm Server Suspension",
+                    "content": "Are you sure you want to suspend **{name}**? This will stop the server and prevent it from starting. All running processes will be stopped and the user will not be able to access their files or otherwise manage the server through the panel or API."
+                  }
+                },
+                "unsuspend": {
+                  "title": "Unsuspend",
+                  "content": "This will unsuspend the server, allowing it to start again. The user will be able to access their files and otherwise manage the server through the panel or API.",
+                  "button": "Unsuspend",
+                  "toast": {
+                    "unsuspended": "Server unsuspended."
+                  },
+                  "modal": {
+                    "title": "Confirm Server Unsuspension",
+                    "content": "Are you sure you want to unsuspend **{name}**? This will allow the server to start again. The user will be able to access their files and otherwise manage the server through the panel or API."
+                  }
+                },
+                "clearState": {
+                  "title": "Clear State",
+                  "content": "This will clear the server state known by the panel.",
+                  "button": "Clear State",
+                  "toast": {
+                    "cleared": "Server state cleared."
+                  },
+                  "modal": {
+                    "title": "Confirm Server State Clear",
+                    "content": "Are you sure you want to clear the state of **{name}**? This will clear any known pending transfers and status failures, please make sure it is safe to do this before clicking without reason."
+                  }
+                },
+                "delete": {
+                  "title": "Delete",
+                  "content": "This will delete the server and all of its data. This action cannot be undone.",
+                  "toast": {
+                    "deleted": "Server deleted."
+                  },
+                  "modal": {
+                    "title": "Confirm Server Deletion",
+                    "description": "You are about to delete **{name}**. Are you sure?",
+                    "form": {
+                      "force": "Force delete",
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.",
+                      "deleteBackups": "Do you want to delete backups of this server?",
+                      "confirmServerName": "Confirm Server Name",
+                      "confirmServerNamePlaceholder": "Server Name"
+                    }
+                  }
+                }
+              }
+            },
+            "viewClient": {
+              "title": "View in Client Area"
+            }
+          }
+        },
+        "nests": {
+          "title": "Nests",
+          "resourceName": "Nest",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Nest",
+                "titleUpdate": "Update Nest",
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Nest Deletion",
+                    "content": "Are you sure you want to delete **{name}**?",
+                    "form": {
+                      "deleteEggs": "Do you want to delete all eggs in this nest?"
+                    }
+                  }
+                }
+              }
+            },
+            "eggs": {
+              "title": "Eggs",
+              "page": {
+                "title": "Eggs",
+                "resourceName": "Egg",
+                "dropzone": {
+                  "title": "Drop some files here to import as Eggs",
+                  "subtitle": "Release to start importing"
+                },
+                "button": {
+                  "updateFromRepository": "Update from Repository"
+                },
+                "toast": {
+                  "imported": "Egg imported.",
+                  "moved": "Egg moved.",
+                  "movedBulk": "{eggs} moved.",
+                  "deletedBulk": "{eggs} deleted.",
+                  "updatedFromRepository": "{eggs} updated using their respective repository egg successfully.",
+                  "parseFailed": "Failed to parse egg: {error}"
+                },
+                "modal": {
+                  "move": {
+                    "title": "Move Egg"
+                  },
+                  "moveBulk": {
+                    "title": "Move Eggs",
+                    "confirm": "Move {eggs}"
+                  },
+                  "deleteBulk": {
+                    "title": "Confirm Egg Deletion",
+                    "content": "Are you sure you want to delete `{count}` eggs?"
+                  }
+                },
+                "tabs": {
+                  "general": {
+                    "page": {
+                      "titleCreate": "Create Egg",
+                      "titleUpdate": "Update Egg",
+                      "card": {
+                        "startupConfiguration": "Startup Configuration",
+                        "stopConfiguration": "Stop Configuration",
+                        "configFiles": "Config Files Configuration"
+                      },
+                      "form": {
+                        "eggRepository": "Egg Repository",
+                        "eggRepositoryEgg": "Egg Repository Egg",
+                        "startupDone": "Startup Done",
+                        "startupDoneDescription": "Console message indicating startup completion.",
+                        "stripAnsi": "Strip ANSI from startup messages",
+                        "stripAnsiDescription": "Removes ANSI control characters from the console output before matching startup completion.",
+                        "stopType": "Stop Type",
+                        "stopCommand": "Stop Command",
+                        "stopSignal": "Stop Signal",
+                        "parser": "Parser",
+                        "createNewFile": "Create New File",
+                        "createNewFileDescription": "If enabled, the file will be created if it does not exist. If disabled, the file must already exist or the replacement will fail.",
+                        "match": "Match",
+                        "ifValue": "If Value",
+                        "replaceWith": "Replace With",
+                        "insertNew": "Insert New",
+                        "insertNewDescription": "If enabled, if no existing value matches the \"Match\" field, the \"Replace With\" value will be inserted into the file. If disabled, if no match is found, no changes will be made to the file.",
+                        "updateExisting": "Update Existing",
+                        "updateExistingDescription": "If enabled, if a match is found, it will be replaced with the \"Replace With\" value. If disabled, the replacement will only insert new values and will fail if a match is found.",
+                        "startupCommands": "Startup Commands",
+                        "forceOutgoingIp": "Force Outgoing IP",
+                        "separatePort": "Separate IP and Port",
+                        "separatePortDescription": "Separates the primary IP and port on the Console page instead of joining them with \":\".",
+                        "features": "Features",
+                        "featurePlaceholder": "Feature",
+                        "fileDenylist": "File Deny List",
+                        "dockerImages": "Docker Images"
+                      },
+                      "enum": {
+                        "stopType": {
+                          "command": "Send Command",
+                          "signal": "Send Signal",
+                          "docker": "Docker Stop"
+                        }
+                      },
+                      "emptyConfigFiles": "No config files defined.",
+                      "emptyReplacements": "No replacements defined.",
+                      "button": {
+                        "addReplacement": "Add Replacement",
+                        "addConfigFile": "Add Config File",
+                        "fromFile": "from File",
+                        "fromRepository": "from Repository"
+                      },
+                      "toast": {
+                        "exported": "Egg exported.",
+                        "updated": "Egg updated."
+                      },
+                      "modal": {
+                        "delete": {
+                          "title": "Confirm Egg Deletion",
+                          "content": "Are you sure you want to delete **{name}**?"
+                        }
+                      }
+                    }
+                  },
+                  "installationScript": {
+                    "title": "Installation Script",
+                    "page": {
+                      "title": "Egg Installation Script",
+                      "form": {
+                        "container": "Installation Container",
+                        "entrypoint": "Container Entrypoint"
+                      },
+                      "toast": {
+                        "updated": "Egg script updated."
+                      }
+                    }
+                  },
+                  "variables": {
+                    "title": "Variables",
+                    "page": {
+                      "title": "Egg Variables",
+                      "form": {
+                        "supportsMarkdown": "Supports Markdown formatting.",
+                        "defaultValue": "Default Value",
+                        "defaultValuePlaceholder": "server.jar",
+                        "userViewable": "User Viewable",
+                        "userEditable": "User Editable",
+                        "secret": "Secret",
+                        "rules": "Rules",
+                        "rulesDescription": "See https://laravel.com/docs/12.x/validation#available-validation-rules for the available validation rules."
+                      },
+                      "toast": {
+                        "created": "Egg variable created.",
+                        "updated": "Egg variable updated.",
+                        "deleted": "Egg variable deleted."
+                      },
+                      "modal": {
+                        "delete": {
+                          "title": "Confirm Egg Variable Removal",
+                          "content": "Are you sure you want to remove **{variable}**?",
+                          "emptyVariable": "this empty variable"
+                        }
+                      }
+                    }
+                  },
+                  "mounts": {
+                    "title": "Mounts",
+                    "page": {
+                      "title": "Egg Mounts",
+                      "toast": {
+                        "added": "Egg Mount added.",
+                        "deleted": "Egg Mount deleted."
+                      },
+                      "modal": {
+                        "add": {
+                          "title": "Add Egg Mount"
+                        },
+                        "delete": {
+                          "title": "Confirm Egg Mount Removal",
+                          "content": "Are you sure you want to remove the mount **{mount}** from **{egg}**?"
+                        }
+                      }
+                    }
+                  },
+                  "servers": {
+                    "title": "Servers",
+                    "page": {
+                      "title": "Egg Servers"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "eggConfigurations": {
+          "title": "Egg Configurations",
+          "resourceName": "Egg Configuration",
+          "table": {
+            "columns": {
+              "order": "Order"
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Egg Configuration",
+                "titleUpdate": "Update Egg Configuration",
+                "form": {
+                  "order": "Order",
+                  "eggs": "Eggs",
+                  "eggsPlaceholder": "Select Eggs",
+                  "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
+                },
+                "enum": {
+                  "deploymentType": {
+                    "random": "Random",
+                    "range": "Port Range",
+                    "addPrimary": "Add to Primary",
+                    "subtractPrimary": "Subtract from Primary",
+                    "multiplyPrimary": "Multiply Primary",
+                    "dividePrimary": "Divide Primary"
+                  }
+                },
+                "allocation": {
+                  "title": "Allocation Configuration",
+                  "form": {
+                    "userSelfAssign": "User Self Assign",
+                    "userSelfAssignDescription": "Allow users to create their own allocations from a specified port range.",
+                    "requirePrimaryAllocation": "Require Primary Allocation",
+                    "requirePrimaryAllocationDescription": "Whether users must always have a primary allocation.",
+                    "automaticAllocationStart": "Automatic Allocation Start",
+                    "automaticAllocationEnd": "Automatic Allocation End",
+                    "dedicatedIp": "Dedicated IP",
+                    "dedicatedIpDescription": "Assign a dedicated ip address for servers using this egg configuration.",
+                    "primaryAllocation": "Primary Allocation",
+                    "primaryAllocationDescription": "Configure a primary port assignment for deployment.",
+                    "primaryStartPort": "Primary Start Port",
+                    "primaryEndPort": "Primary End Port",
+                    "assignToVariable": "Assign to Variable",
+                    "assignToVariablePlaceholder": "e.g. SERVER_PORT",
+                    "assignToVariableDescription": "Optional environment variable to receive the assigned primary port."
+                  },
+                  "divider": {
+                    "deployment": "Deployment"
+                  },
+                  "additionalPorts": {
+                    "title": "Additional Ports",
+                    "button": "Add Rule",
+                    "empty": "No additional port rules configured."
+                  },
+                  "deployment": {
+                    "form": {
+                      "startPort": "Start Port",
+                      "endPort": "End Port",
+                      "assignToVariable": "Assign to Variable",
+                      "assignToVariableDescription": "Optional environment variable to receive the assigned port from this rule.",
+                      "assignToVariablePlaceholder": "e.g. SERVER_PORT"
+                    },
+                    "removeRule": "Remove deployment rule"
+                  }
+                },
+                "startup": {
+                  "title": "Startup Configuration",
+                  "form": {
+                    "allowCustomStartupCommand": "Allow Custom Startup Command",
+                    "allowCustomStartupCommandDescription": "Allow users to set their own, non-predefined startup commands."
+                  }
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Egg Configuration Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "eggRepositories": {
+          "title": "Egg Repositories",
+          "resourceName": "Egg Repository",
+          "table": {
+            "columns": {
+              "gitRepository": "Git Repository"
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Egg Repository",
+                "titleUpdate": "Update Egg Repository",
+                "form": {
+                  "gitRepository": "Git Repository"
+                },
+                "button": {
+                  "sync": "Sync"
+                },
+                "toast": {
+                  "synced": "Egg repository synchronised, found {eggs}."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Egg Repository Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                }
+              }
+            },
+            "eggs": {
+              "title": "Eggs",
+              "page": {
+                "title": "Egg Repository Eggs",
+                "table": {
+                  "columns": {
+                    "path": "Path"
+                  }
+                },
+                "toast": {
+                  "installed": "Egg installed.",
+                  "installedBulk": "{eggs} installed."
+                },
+                "modal": {
+                  "install": {
+                    "title": "Install Egg Repository Egg"
+                  },
+                  "installBulk": {
+                    "title": "Install Egg Repository Eggs",
+                    "button": "Install {eggs}"
+                  }
+                },
+                "drawer": {
+                  "noReadme": "This egg does not have a README."
+                }
+              }
+            }
+          }
+        },
+        "databaseHosts": {
+          "title": "Database Hosts",
+          "resourceName": "Database host",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Database Host",
+                "titleUpdate": "Update Database Host",
+                "form": {
+                  "publicHost": "Public Host",
+                  "publicPort": "Public Port",
+                  "connectionCredentials": "Connection Credentials",
+                  "credentialType": "Credential Type",
+                  "connectionString": "Connection String",
+                  "connectionStringPlaceholder": "mysql://username:password@host:port"
+                },
+                "enum": {
+                  "credentialType": {
+                    "connectionString": "Connection String",
+                    "details": "Details"
+                  }
+                },
+                "button": {
+                  "testConnection": "Test Connection"
+                },
+                "toast": {
+                  "tested": "Test successfully completed."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Database Host Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                }
+              }
+            },
+            "databases": {
+              "title": "Databases",
+              "page": {
+                "title": "Database Host Databases"
+              }
+            }
+          }
+        },
+        "oAuthProviders": {
+          "title": "OAuth Providers",
+          "resourceName": "OAuth Provider",
+          "dropzone": {
+            "title": "Drop some files here to import as OAuth Providers",
+            "subtitle": "Release to start importing"
+          },
+          "table": {
+            "columns": {
+              "loginOnly": "Login Only",
+              "linkViewable": "Link Viewable",
+              "userManageable": "User Manageable"
+            }
+          },
+          "toast": {
+            "imported": "OAuth Provider imported.",
+            "parseFailed": "Failed to parse OAuth provider: {error}"
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create OAuth Provider",
+                "titleUpdate": "Update OAuth Provider",
+                "card": {
+                  "redirectUrl": {
+                    "title": "Redirect URL",
+                    "unavailable": "Available after creation"
+                  }
+                },
+                "form": {
+                  "clientId": "Client Id",
+                  "clientSecret": "Client Secret",
+                  "authUrl": "Auth URL",
+                  "tokenUrl": "Token URL",
+                  "infoUrl": "Info URL",
+                  "basicAuth": "Basic Auth",
+                  "basicAuthDescription": "Uses HTTP Basic Authentication to transmit the client id and secret, not common anymore.",
+                  "scopes": "Scopes",
+                  "scopesDescription": "The OAuth2 scopes to request, make sure to include scopes for email and profile info when needed.",
+                  "identifierPath": "Identifier Path",
+                  "identifierPathDescription": "The path used to extract the unique user identifier from the Info URL response (https://serdejsonpath.live).",
+                  "emailPath": "Email Path",
+                  "emailPathDescription": "The path used to extract the email from the Info URL response (https://serdejsonpath.live).",
+                  "usernamePath": "Username Path",
+                  "usernamePathDescription": "The path used to extract the username from the Info URL response (https://serdejsonpath.live).",
+                  "nameFirstPath": "First Name Path",
+                  "nameFirstPathPlaceholder": "First Name URL",
+                  "nameFirstPathDescription": "The path used to extract the first name from the Info URL response (https://serdejsonpath.live).",
+                  "nameLastPath": "Last Name Path",
+                  "nameLastPathDescription": "The path used to extract the last name from the Info URL response (https://serdejsonpath.live).",
+                  "loginOnly": "Only allow Login",
+                  "loginBypass2fa": "Bypass 2FA on Login",
+                  "loginBypass2faDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
+                  "linkViewable": "Link Viewable to User",
+                  "linkViewableDescription": "Allows the user to see the connection and its identifier in the client UI.",
+                  "userManageable": "Link Manageable by User",
+                  "userManageableDescription": "Allows the user to connect and disconnect with this provider."
+                },
+                "toast": {
+                  "exported": "OAuth Provider exported."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm OAuth Provider Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                }
+              }
+            },
+            "mappings": {
+              "title": "Mappings",
+              "page": {
+                "title": "OAuth Provider Mappings",
+                "table": {
+                  "columns": {
+                    "scopes": "Scopes"
+                  }
+                },
+                "enum": {
+                  "mappingType": {
+                    "role": "Role",
+                    "serverSubuser": "Server Subuser"
+                  }
+                },
+                "toast": {
+                  "created": "OAuth provider mapping created.",
+                  "updated": "OAuth provider mapping updated.",
+                  "deleted": "OAuth provider mapping deleted."
+                },
+                "form": {
+                  "scopes": "Scopes",
+                  "scopesDescription": "OAuth scopes required for this mapping to apply.",
+                  "mappingType": "Mapping Type",
+                  "role": "Role",
+                  "permissions": "Permissions"
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add OAuth Provider Mapping"
+                  },
+                  "edit": {
+                    "title": "Edit OAuth Provider Mapping"
+                  },
+                  "delete": {
+                    "title": "Delete OAuth Provider Mapping",
+                    "content": "Are you sure you want to delete this mapping? This action cannot be undone."
+                  }
+                }
+              }
+            },
+            "users": {
+              "title": "Users",
+              "page": {
+                "title": "OAuth Provider Users",
+                "table": {
+                  "columns": {
+                    "user": "User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "backupConfigurations": {
+          "title": "Backup Configurations",
+          "resourceName": "Backup configuration",
+          "table": {
+            "columns": {
+              "disk": "Disk"
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Backup Configuration",
+                "titleUpdate": "Update Backup Configuration",
+                "alert": {
+                  "ddupBak": "Ddup-Bak is Technology Preview software, it is technically not recommended for production use. If you acknowledge, sail ahead as you wish.",
+                  "btrfs": "Btrfs requires additional setup on the node to work, please [see the documentation]({docsUrl}) for more details.",
+                  "zfs": "ZFS requires additional setup on the node to work, please [see the documentation]({docsUrl}) for more details.",
+                  "pbs": "The provided API token needs the following datastore ACLs: **DatastoreAudit** for usage and listing, **DatastoreBackup** for writing backups, and **DatastoreAdmin** (or equivalent prune/delete permissions) if backup deletion or pruning is enabled."
+                },
+                "form": {
+                  "backupDisk": "Backup Disk",
+                  "maintenanceEnabledDescription": "If enabled, any server using this backup configuration will not be able to create new backups, or manage existing ones.",
+                  "shared": "Shared",
+                  "sharedDescription": "If enabled, backups on this backup configuration will not be transferred between nodes, they will be assumed to be accessible by all nodes."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Backup Configuration Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                },
+                "s3": {
+                  "title": "S3 Settings",
+                  "form": {
+                    "partSize": "Part Size",
+                    "compressionType": "Compression Type",
+                    "pathStyle": "Using path-style URLs"
+                  }
+                },
+                "restic": {
+                  "title": "Restic Settings",
+                  "form": {
+                    "repository": "Repository",
+                    "retryLockSeconds": "Retry Lock Seconds",
+                    "environmentVariables": "Environment Variables",
+                    "cronSchedule": "Cron Schedule",
+                    "cronScheduleDescription": "Format: second minute hour day month weekday.",
+                    "nodes": "Nodes",
+                    "nodesPlaceholder": "Select nodes"
+                  },
+                  "pruneJobs": {
+                    "title": "Prune Jobs",
+                    "description": "Scheduled restic prune runs. Each job runs on the configured nodes following its cron schedule.",
+                    "button": {
+                      "add": "Add Prune Job"
+                    }
+                  }
+                },
+                "pbs": {
+                  "title": "Proxmox Backup Server Settings",
+                  "form": {
+                    "url": "Server URL",
+                    "datastore": "Datastore",
+                    "namespace": "Namespace",
+                    "tokenId": "Token ID",
+                    "tokenSecret": "Token Secret",
+                    "fingerprint": "TLS Certificate Fingerprint",
+                    "backupIdPrefix": "Backup ID Prefix"
+                  }
+                },
+                "kopia": {
+                  "title": "Kopia Settings",
+                  "form": {
+                    "url": "Kopia Server URL",
+                    "fingerprint": "TLS Certificate Fingerprint",
+                    "tags": "Backup Tags"
+                  }
+                }
+              }
+            },
+            "stats": {
+              "title": "Stats",
+              "page": {
+                "title": "Backup Configuration Stats",
+                "card": {
+                  "title": "Backup Statistics"
+                },
+                "period": {
+                  "allTime": "All Time",
+                  "today": "Today",
+                  "week": "This Week",
+                  "month": "This Month"
+                },
+                "periodLabel": {
+                  "allTime": "all time",
+                  "today": "today",
+                  "week": "this week",
+                  "month": "this month"
+                },
+                "stat": {
+                  "total": "Total backups {period}",
+                  "successful": "Successful backups {period}",
+                  "failed": "Failed backups {period}",
+                  "deleted": "Deleted backups {period}"
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "page": {
+                "title": "Backup Configuration Backups",
+                "toast": {
+                  "downloadStarted": "Download started."
+                }
+              }
+            },
+            "locations": {
+              "title": "Locations",
+              "page": {
+                "title": "Backup Configuration Locations"
+              }
+            },
+            "nodes": {
+              "title": "Nodes",
+              "page": {
+                "title": "Backup Configuration Nodes"
+              }
+            },
+            "servers": {
+              "title": "Servers",
+              "page": {
+                "title": "Backup Configuration Servers"
+              }
+            }
+          }
+        },
+        "mounts": {
+          "title": "Mounts",
+          "resourceName": "Mount",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Mount",
+                "titleUpdate": "Update Mount",
+                "alert": "Mounts are a powerful and potentially dangerous feature. Improper use can lead to data loss or security vulnerabilities (including container escapes). Make sure you understand the implications of using mounts before creating or updating them.",
+                "form": {
+                  "source": "Source",
+                  "target": "Target",
+                  "readOnly": "Read Only",
+                  "userMountable": "User Mountable"
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Mount Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                }
+              }
+            },
+            "eggs": {
+              "title": "Eggs",
+              "page": {
+                "title": "Mount Eggs",
+                "toast": {
+                  "added": "Mount Egg added.",
+                  "removed": "Mount Egg deleted."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add Mount Egg",
+                    "form": {
+                      "egg": "Egg"
+                    }
+                  },
+                  "remove": {
+                    "title": "Confirm Mount Egg Removal",
+                    "content": "Are you sure you want to remove the mount **{mount}** from **{name}**?"
+                  }
+                }
+              }
+            },
+            "nodes": {
+              "title": "Nodes",
+              "page": {
+                "title": "Mount Nodes",
+                "toast": {
+                  "added": "Mount Node added.",
+                  "removed": "Mount Node deleted."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add Mount Node"
+                  },
+                  "remove": {
+                    "title": "Confirm Mount Node Removal",
+                    "content": "Are you sure you want to remove the mount **{mount}** from **{name}**?"
+                  }
+                }
+              }
+            },
+            "servers": {
+              "title": "Servers",
+              "page": {
+                "title": "Mount Servers"
+              }
+            }
+          }
+        },
+        "roles": {
+          "title": "Roles",
+          "resourceName": "Role",
+          "table": {
+            "columns": {
+              "serverPermissions": "Server Permissions",
+              "adminPermissions": "Admin Permissions"
+            }
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Role",
+                "titleUpdate": "Update Role",
+                "alert": {
+                  "impersonate": "This role has the `users.impersonate` permission, which allows users with this role to impersonate any other user, including administrators. Be cautious when assigning this permission to roles with less trusted users."
+                },
+                "form": {
+                  "requireTwoFactor": "Require Two Factor",
+                  "requireTwoFactorDescription": "Require users with this role to use two factor authentication.",
+                  "serverPermissions": "Server Permissions",
+                  "adminPermissions": "Admin Permissions"
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Role Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                }
+              }
+            },
+            "users": {
+              "title": "Users",
+              "page": {
+                "title": "Role Users"
+              }
+            }
+          }
+        },
+        "activity": {
+          "title": "Activity"
         }
       },
       "server": {
@@ -1069,7 +3390,8 @@
             "ariaLabel": "إدخال أمر وحدة التحكم."
           },
           "toast": {
-            "installCancelled": "تم إلغاء تثبيت الخادم."
+            "installCancelled": "تم إلغاء تثبيت الخادم.",
+            "transferCancelled": "Server transfer cancelled."
           },
           "modal": {
             "sshDetails": {
@@ -1086,7 +3408,8 @@
             "nodeMaintenance": "خادمك على عقدة قيد الصيانة حالياً.",
             "transferring": "خادمك قيد النقل حالياً إلى عقدة أخرى.",
             "restoringBackup": "خادمك يستعيد من نسخة احتياطية حالياً. يرجى الانتظار...",
-            "installing": "خادمك قيد التثبيت حالياً. يرجى الانتظار..."
+            "installing": "خادمك قيد التثبيت حالياً. يرجى الانتظار...",
+            "pendingRestart": "Your Server has pending changes that require a restart. Please restart your server to apply these changes."
           },
           "message": {
             "serverMarkedAs": "تم وضع علامة على الخادم كـ {state}...",
@@ -1126,6 +3449,17 @@
               "button": {
                 "accept": "قبول EULA"
               }
+            },
+            "javaVersion": {
+              "title": "Unsupported Java Version",
+              "content": "This server is currently running an unsupported version of Java and cannot be started.",
+              "contentDetails": "Please select a supported Docker image from the list below to continue starting the server.",
+              "toast": {
+                "updated": "Docker image updated successfully."
+              },
+              "button": {
+                "update": "Update Docker Image"
+              }
             }
           },
           "details": {
@@ -1160,8 +3494,11 @@
         "files": {
           "title": "الملفات",
           "titleEditorViewing": "عرض {file}",
+          "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "تعديل {file}",
           "titleEditorNew": "ملف جديد",
+          "titleDiffRevisionVsCurrent": "{file} - Revision #{revision} vs Current",
+          "titleDiffRevisionVsRevision": "{file} - Revision #{previousRevision} vs #{revision}",
           "table": {
             "columns": {
               "modified": "تم التعديل"
@@ -1169,6 +3506,9 @@
           },
           "button": {
             "new": "جديد",
+            "connect": "Connect",
+            "connectSftp": "via SFTP",
+            "connectVscode": "via VS Code",
             "openInNewWindow": "فتح في نافذة جديدة",
             "rename": "إعادة التسمية",
             "copy": "نسخ",
@@ -1209,7 +3549,10 @@
             "copying": "جاري نسخ {path} إلى {destination}",
             "copyingMany": "جاري نسخ {files}",
             "receivingRemote": "جاري استلام {files} من الخادم البعيد",
-            "sendingRemote": "جاري إرسال {files} إلى الخادم البعيد"
+            "sendingRemote": "جاري إرسال {files} إلى الخادم البعيد",
+            "rateLimited": "Your upload has been rate limited. Waiting...",
+            "cancelAllUploads": "Cancel all uploads",
+            "cancelAllOperations": "Cancel all operations"
           },
           "dropzone": {
             "title": "أفلت الملفات هنا للرفع",
@@ -1220,10 +3563,12 @@
             "preferPhysicalSize": "إظهار الحجم الفعلي بدلاً من الحجم المنطقي",
             "editorMinimap": "إظهار خريطة الملف المصغرة",
             "editorLineOverflow": "التفاف تجاوز السطر",
+            "vscodeUriScheme": "VS Code URI Scheme",
             "imageViewerSmoothing": "تنعيم الصورة (مضاد للتعرج)"
           },
           "toast": {
             "operationCancelled": "تم إلغاء العملية",
+            "allOperationsCancelled": "All operations have been cancelled.",
             "copyingStarted": "بدأ نسخ {files}.",
             "filesCouldNotBeMoved": "لم يمكن نقل الملفات.",
             "filesMoved": "تم نقل {files}.",
@@ -1235,8 +3580,41 @@
             "filePullingStarted": "بدأ سحب الملف.",
             "fileRenamed": "تم إعادة تسمية الملف.",
             "fileCouldNotBeRenamed": "لم يمكن إعادة تسمية الملف.",
+            "filesRenamed": "{files} renamed.",
             "permissionsUpdated": "تم تحديث الأذونات.",
+            "permissionsUpdatedMany": "Permissions have been updated for {files}.",
+            "permissionsCouldNotBeUpdated": "Permissions could not be updated.",
             "fileSaved": "تم حفظ الملف."
+          },
+          "tooltip": {
+            "fileHistory": "File History",
+            "largestDirectories": "Analyze directory sizes",
+            "dragToMove": "Drag to move",
+            "back": "Back {seconds} seconds",
+            "forward": "Forward {seconds} seconds",
+            "play": "Play",
+            "pause": "Pause",
+            "mute": "Mute",
+            "unmute": "Unmute"
+          },
+          "drawer": {
+            "revisions": {
+              "title": "File History",
+              "noRevisions": "No revisions found for this file.",
+              "restored": "Revision restored into editor.",
+              "badge": {
+                "fullSnapshot": "Full Snapshot"
+              },
+              "tooltip": {
+                "restore": "Restore this revision into the editor",
+                "viewDiff": "View diff against current file",
+                "compareToPrevious": "Compare to previous revision"
+              },
+              "diff": {
+                "original": "Revision",
+                "current": "Current"
+              }
+            }
           },
           "modal": {
             "activeUploads": {
@@ -1246,6 +3624,11 @@
             "unsavedChanges": {
               "title": "تغييرات غير محفوظة",
               "content": "لديك تغييرات غير محفوظة في محرر الملفات. هل أنت متأكد أنك تريد مغادرة هذه الصفحة؟ إذا غادرت، ستفقد تغييراتك."
+            },
+            "draftRestore": {
+              "title": "Restore Draft",
+              "content": "A draft of this file was found in your browser. Would you like to restore it?",
+              "contentHashMismatch": "The file has been modified on the server since this draft was saved. Restoring the draft may overwrite those changes."
             },
             "createArchive": {
               "title": "إنشاء أرشيف",
@@ -1299,6 +3682,9 @@
             },
             "filePermissions": {
               "title": "أذونات الملف",
+              "form": {
+                "recursive": "Apply changes recursively to all files and subdirectories within this directory"
+              },
               "symbolic": "رمزي:",
               "octal": "ثماني:",
               "owner": "المالك",
@@ -1311,6 +3697,66 @@
             },
             "renameFile": {
               "title": "إعادة تسمية الملف"
+            },
+            "massRename": {
+              "title": "Rename Files",
+              "find": "Find",
+              "findPlaceholder": "Text to find",
+              "replace": "Replace with",
+              "replacePlaceholder": "Replacement text",
+              "scope": "Apply to",
+              "scopeName": "Name",
+              "scopeExtension": "Extension",
+              "scopeFull": "Full name",
+              "section": {
+                "matchOptions": "Match options",
+                "affixes": "Prefix & suffix",
+                "caseConversion": "Case conversion",
+                "numbering": "Numbering"
+              },
+              "affix": {
+                "prefix": "Prefix",
+                "suffix": "Suffix",
+                "help": "Both may include {token} for the number; a suffix appends a count to every name."
+              },
+              "option": {
+                "regex": "Use regular expression",
+                "regexDescription": "Treat the find text as a regex; reference groups with $1, $2 in the replacement.",
+                "caseSensitive": "Case sensitive",
+                "allOccurrences": "Replace all occurrences"
+              },
+              "case": {
+                "label": "Convert case",
+                "none": "No change",
+                "lower": "lowercase",
+                "upper": "UPPERCASE",
+                "title": "Title Case",
+                "capitalize": "Capitalize"
+              },
+              "numbering": {
+                "enable": "Enable numbering",
+                "help": "Insert {token} in the find, replace, prefix, or suffix text where the number should appear.",
+                "start": "Start at",
+                "step": "Step",
+                "padding": "Minimum digits"
+              },
+              "preview": {
+                "title": "Preview",
+                "original": "Original",
+                "newName": "New name",
+                "unchanged": "Unchanged",
+                "conflict": "Name already in use",
+                "duplicate": "Duplicate target",
+                "invalid": "Invalid name",
+                "invalidRegex": "Invalid regular expression",
+                "empty": "No files selected."
+              },
+              "summary": "{changed} of {total} will be renamed",
+              "conflictWarning": "Resolve the highlighted name conflicts before renaming."
+            },
+            "largestDirectories": {
+              "title": "Largest Directories",
+              "empty": "No directories found."
             },
             "searchFiles": {
               "title": "بحث الملفات",
@@ -1435,6 +3881,7 @@
             "imported": "تم استيراد الجدول.",
             "created": "تم إنشاء الجدول.",
             "updated": "تم تحديث الجدول.",
+            "duplicated": "Schedule duplicated.",
             "deleted": "تم حذف الجدول.",
             "triggered": "تم تشغيل الجدول.",
             "exported": "تم تصدير الجدول.",
@@ -1442,6 +3889,7 @@
             "step": {
               "created": "تم إنشاء خطوة الجدول.",
               "updated": "تم تحديث خطوة الجدول.",
+              "duplicated": "Schedule step duplicated.",
               "deleted": "تم حذف خطوة الجدول."
             }
           },
@@ -1483,6 +3931,9 @@
             },
             "updateSchedule": {
               "title": "تحديث الجدول"
+            },
+            "duplicateSchedule": {
+              "title": "Duplicate Schedule"
             },
             "deleteSchedule": {
               "title": "تأكيد حذف الجدول",
@@ -1558,7 +4009,8 @@
               },
               "card": {
                 "content": "على فاصل Cron {schedule}، التشغيل التالي هو {timestamp} - التشغيل الأخير كان {lastTimestamp}."
-              }
+              },
+              "invalidCron": "Invalid cron expression"
             },
             "powerAction": {
               "title": "إجراء الطاقة",
@@ -1812,6 +4264,10 @@
         },
         "subusers": {
           "title": "المستخدمون الفرعيون",
+          "subtitle": "{current} of {max} maximum subusers created.",
+          "tooltip": {
+            "limitReached": "This server is limited to {max} subusers."
+          },
           "table": {
             "columns": {
               "twoFactorEnabled": "تم تفعيل 2FA",
@@ -1827,7 +4283,8 @@
               },
               "form": {
                 "emailPlaceholder": "أدخل البريد الإلكتروني الذي يجب حفظ هذا المستخدم الفرعي به.",
-                "permissions": "الأذونات"
+                "permissions": "الأذونات",
+                "ignoredFilesDescription": "Files and directories matching these patterns will be hidden from this subuser. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`). Prefix a pattern with `!` to un-hide a path that a broader pattern would otherwise exclude."
               }
             },
             "updateSubuser": {
@@ -1887,6 +4344,9 @@
               "toast": {
                 "deleted": "تم حذف النسخة الاحتياطية."
               }
+            },
+            "viewMetadata": {
+              "title": "Backup Metadata"
             }
           }
         },
@@ -1935,7 +4395,8 @@
               "content": "لديك تغييرات غير محفوظة في متغيرات بدء التشغيل. هل أنت متأكد أنك تريد مغادرة هذه الصفحة؟ إذا غادرت، ستفقد تغييراتك."
             }
           },
-          "noVariables": "لم يتم العثور على متغيرات بدء التشغيل لهذا الخادم."
+          "noVariables": "لم يتم العثور على متغيرات بدء التشغيل لهذا الخادم.",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "النقاط",
@@ -2021,7 +4482,10 @@
           }
         },
         "activity": {
-          "title": "النشاط"
+          "title": "النشاط",
+          "button": {
+            "clearUserFilter": "Clear User Filter"
+          }
         }
       }
     }

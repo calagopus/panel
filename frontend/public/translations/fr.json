@@ -97,6 +97,7 @@
         "save": "Sauvegarder",
         "saveAndStay": "Sauvegarder & Rester",
         "edit": "Modifier",
+        "duplicate": "Duplicate",
         "delete": "Supprimer",
         "remove": "Retirer",
         "enable": "Activer",
@@ -147,6 +148,14 @@
       "input": {
         "search": "Chercher..."
       },
+      "modal": {
+        "duplicate": {
+          "title": "Duplicate {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicated."
+      },
       "tooltip": {
         "resetToDefault": "Réinitialiser à la valeur par défaut",
         "edit": "Modifier",
@@ -157,6 +166,7 @@
       },
       "form": {
         "name": "Nom",
+        "newName": "New Name",
         "description": "Description",
         "author": "Auteur",
         "type": "Type",
@@ -1737,6 +1747,9 @@
                   "delete": {
                     "title": "Confirmer la suppression de l'annonce",
                     "content": "Êtes-vous sûr de vouloir supprimer **{title}** ?"
+                  },
+                  "duplicate": {
+                    "content": "Are you sure you want to duplicate **{title}**?"
                   }
                 },
                 "form": {
@@ -1876,6 +1889,25 @@
         "users": {
           "title": "Utilisateurs",
           "resourceName": "Utilisateur",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-user-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "User Found",
+                "username": "Username",
+                "email": "Email",
+                "role": "Role",
+                "viewUser": "View User"
+              },
+              "notFound": "No user found with that external ID."
+            }
+          },
           "tooltip": {
             "admin": "Admin",
             "twoFactorEnabled": "2FA activé",
@@ -2330,6 +2362,25 @@
         "servers": {
           "title": "Serveurs",
           "resourceName": "Serveur",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-server-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "Server Found",
+                "name": "Name",
+                "owner": "Owner",
+                "node": "Node",
+                "viewServer": "View Server"
+              },
+              "notFound": "No server found with that external ID."
+            }
+          },
           "tabs": {
             "general": {
               "page": {
@@ -2377,6 +2428,7 @@
                   "timezonePlaceholder": "Europe/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Personnalisé",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Démarrer à la fin",
                   "startOnCompletionDescription": "Démarrer le serveur une fois l'installation terminée.",
                   "skipInstaller": "Ignorer l'installateur",
@@ -2563,6 +2615,7 @@
                     "description": "Vous êtes sur le point de supprimer **{name}**. Êtes-vous sûr ?",
                     "form": {
                       "force": "Voulez-vous forcer la suppression de ce serveur ?",
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.",
                       "deleteBackups": "Voulez-vous supprimer les sauvegardes de ce serveur ?",
                       "confirmServerName": "Confirmer le nom du serveur",
                       "confirmServerNamePlaceholder": "Nom du serveur"
@@ -2781,7 +2834,8 @@
                 "form": {
                   "order": "Ordre",
                   "eggs": "Eggs",
-                  "eggsPlaceholder": "Sélectionner des Eggs"
+                  "eggsPlaceholder": "Sélectionner des Eggs",
+                  "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
                 },
                 "enum": {
                   "deploymentType": {
@@ -3827,6 +3881,7 @@
             "imported": "Planification importée.",
             "created": "Planification créée.",
             "updated": "Planification mise à jour.",
+            "duplicated": "Schedule duplicated.",
             "deleted": "Planification supprimée.",
             "triggered": "Planification déclenchée.",
             "exported": "Planification exportée.",
@@ -3834,6 +3889,7 @@
             "step": {
               "created": "Étape de planification créée.",
               "updated": "Étape de planification mise à jour.",
+              "duplicated": "Schedule step duplicated.",
               "deleted": "Étape de planification supprimée."
             }
           },
@@ -3875,6 +3931,9 @@
             },
             "updateSchedule": {
               "title": "Modifier la planification"
+            },
+            "duplicateSchedule": {
+              "title": "Duplicate Schedule"
             },
             "deleteSchedule": {
               "title": "Confirmer la suppression de la planification",
@@ -4336,7 +4395,8 @@
               "content": "Vous avez des changements non sauvegardés dans vos variables de démarrage. Êtes-vous sûr de vouloir quitter cette page ? Si vous quittez, vos changements seront perdus."
             }
           },
-          "noVariables": "Aucune variable de démarrage trouvée pour ce serveur."
+          "noVariables": "Aucune variable de démarrage trouvée pour ce serveur.",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "Montages",

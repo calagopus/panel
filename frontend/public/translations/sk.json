@@ -97,6 +97,7 @@
         "save": "Uložiť",
         "saveAndStay": "Uložiť a zostať",
         "edit": "Upraviť",
+        "duplicate": "Duplicate",
         "delete": "Odstrániť",
         "remove": "Odstrániť",
         "enable": "Povoliť",
@@ -147,6 +148,14 @@
       "input": {
         "search": "Hľadať..."
       },
+      "modal": {
+        "duplicate": {
+          "title": "Duplicate {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicated."
+      },
       "tooltip": {
         "resetToDefault": "Obnoviť predvolené nastavenie",
         "edit": "Upraviť",
@@ -157,6 +166,7 @@
       },
       "form": {
         "name": "Názov",
+        "newName": "New Name",
         "description": "Popis",
         "author": "Autor",
         "type": "Typ",
@@ -253,6 +263,7 @@
           "size": "Veľkosť",
           "lastUsed": "Naposledy použité",
           "created": "Vytvorené",
+          "updated": "Updated",
           "actor": "Aktér",
           "event": "Udalosť",
           "ip": "IP",
@@ -339,6 +350,12 @@
           "stopped": "Zastavené",
           "restarted": "Reštartované",
           "killed": "Ukončené"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Best Speed",
+          "goodSpeed": "Good Speed",
+          "goodCompression": "Good Compression",
+          "bestCompression": "Best Compression"
         }
       },
       "unit": {
@@ -541,6 +558,7 @@
               },
               "copying": {
                 "completed": "Skopírované `{path}` do `{destination}` v {time}.",
+                "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
                 "failed": "Nepodarilo sa skopírovať `{path}` do `{destination}`:\n{error}"
               },
               "copyingMany": {
@@ -1729,6 +1747,9 @@
                   "delete": {
                     "title": "Potvrdiť odstránenie oznámenia",
                     "content": "Naozaj chcete odstrániť **{title}**?"
+                  },
+                  "duplicate": {
+                    "content": "Are you sure you want to duplicate **{title}**?"
                   }
                 },
                 "form": {
@@ -1868,6 +1889,25 @@
         "users": {
           "title": "Používatelia",
           "resourceName": "Používateľ",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-user-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "User Found",
+                "username": "Username",
+                "email": "Email",
+                "role": "Role",
+                "viewUser": "View User"
+              },
+              "notFound": "No user found with that external ID."
+            }
+          },
           "tooltip": {
             "admin": "Admin",
             "twoFactorEnabled": "2FA povolené",
@@ -2057,10 +2097,12 @@
                   "apiPort": "API port"
                 },
                 "button": {
-                  "save": "Uložiť konfiguráciu"
+                  "save": "Uložiť konfiguráciu",
+                  "reveal": "Reveal Configuration"
                 },
                 "alert": {
-                  "couldNotReach": "Nepodarilo sa spojiť s uzlom: {error}"
+                  "couldNotReach": "Nepodarilo sa spojiť s uzlom: {error}",
+                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed."
                 },
                 "toast": {
                   "applied": "Konfigurácia bola úspešne použitá.",
@@ -2320,6 +2362,25 @@
         "servers": {
           "title": "Servery",
           "resourceName": "Server",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-server-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "Server Found",
+                "name": "Name",
+                "owner": "Owner",
+                "node": "Node",
+                "viewServer": "View Server"
+              },
+              "notFound": "No server found with that external ID."
+            }
+          },
           "tabs": {
             "general": {
               "page": {
@@ -2367,6 +2428,7 @@
                   "timezonePlaceholder": "Európa/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Vlastné",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Spustiť po dokončení",
                   "startOnCompletionDescription": "Spustí server po dokončení inštalácie.",
                   "skipInstaller": "Preskočiť inštalačný program",
@@ -2553,6 +2615,7 @@
                     "description": "Chystáte sa odstrániť **{name}**. Naozaj chcete pokračovať?",
                     "form": {
                       "force": "Chcete tento server odstrániť vynútene?",
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.",
                       "deleteBackups": "Chcete odstrániť zálohy tohto servera?",
                       "confirmServerName": "Potvrdiť názov servera",
                       "confirmServerNamePlaceholder": "Názov servera"
@@ -2771,7 +2834,8 @@
                 "form": {
                   "order": "Poradie",
                   "eggs": "Eggy",
-                  "eggsPlaceholder": "Vyberte eggy"
+                  "eggsPlaceholder": "Vyberte eggy",
+                  "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
                 },
                 "enum": {
                   "deploymentType": {
@@ -2889,6 +2953,9 @@
                     "title": "Nainštalovať eggy z repozitára eggov",
                     "button": "Nainštalovať {eggs}"
                   }
+                },
+                "drawer": {
+                  "noReadme": "This egg does not have a README."
                 }
               }
             }
@@ -3077,7 +3144,8 @@
                 "alert": {
                   "ddupBak": "Ddup-Bak je softvér vo fáze technologickej ukážky a neodporúča sa na produkčné použitie. Ak tomu rozumiete, môžete pokračovať.",
                   "btrfs": "Btrfs vyžaduje na uzle dodatočné nastavenie. Ďalšie podrobnosti nájdete v [dokumentácii]({docsUrl}).",
-                  "zfs": "ZFS vyžaduje na uzle dodatočné nastavenie. Ďalšie podrobnosti nájdete v [dokumentácii]({docsUrl})."
+                  "zfs": "ZFS vyžaduje na uzle dodatočné nastavenie. Ďalšie podrobnosti nájdete v [dokumentácii]({docsUrl}).",
+                  "pbs": "The provided API token needs the following datastore ACLs: **DatastoreAudit** for usage and listing, **DatastoreBackup** for writing backups, and **DatastoreAdmin** (or equivalent prune/delete permissions) if backup deletion or pruning is enabled."
                 },
                 "form": {
                   "backupDisk": "Disk pre zálohy",
@@ -3095,6 +3163,7 @@
                   "title": "Nastavenia S3",
                   "form": {
                     "partSize": "Veľkosť časti",
+                    "compressionType": "Compression Type",
                     "pathStyle": "Používať URL vo formáte path-style"
                   }
                 },
@@ -3115,6 +3184,26 @@
                     "button": {
                       "add": "Pridať úlohu prune"
                     }
+                  }
+                },
+                "pbs": {
+                  "title": "Proxmox Backup Server Settings",
+                  "form": {
+                    "url": "Server URL",
+                    "datastore": "Datastore",
+                    "namespace": "Namespace",
+                    "tokenId": "Token ID",
+                    "tokenSecret": "Token Secret",
+                    "fingerprint": "TLS Certificate Fingerprint",
+                    "backupIdPrefix": "Backup ID Prefix"
+                  }
+                },
+                "kopia": {
+                  "title": "Kopia Settings",
+                  "form": {
+                    "url": "Kopia Server URL",
+                    "fingerprint": "TLS Certificate Fingerprint",
+                    "tags": "Backup Tags"
                   }
                 }
               }
@@ -3792,6 +3881,7 @@
             "imported": "Plán bol importovaný.",
             "created": "Plán bol vytvorený.",
             "updated": "Plán bol aktualizovaný.",
+            "duplicated": "Schedule duplicated.",
             "deleted": "Plán bol odstránený.",
             "triggered": "Plán bol spustený.",
             "exported": "Plán bol exportovaný.",
@@ -3799,6 +3889,7 @@
             "step": {
               "created": "Krok plánu bol vytvorený.",
               "updated": "Krok plánu bol aktualizovaný.",
+              "duplicated": "Schedule step duplicated.",
               "deleted": "Krok plánu bol odstránený."
             }
           },
@@ -3840,6 +3931,9 @@
             },
             "updateSchedule": {
               "title": "Aktualizovať plán"
+            },
+            "duplicateSchedule": {
+              "title": "Duplicate Schedule"
             },
             "deleteSchedule": {
               "title": "Potvrdiť odstránenie plánu",
@@ -4301,7 +4395,8 @@
               "content": "Máte neuložené zmeny spúšťacích premenných. Naozaj chcete opustiť túto stránku? Ak odídete, vaše zmeny sa stratia."
             }
           },
-          "noVariables": "Pre tento server sa nenašli žiadne spúšťacie premenné."
+          "noVariables": "Pre tento server sa nenašli žiadne spúšťacie premenné.",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "Mounty",
