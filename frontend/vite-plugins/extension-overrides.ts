@@ -143,15 +143,6 @@ function buildOverrideMap(reportError: (message: string) => void): Map<string, O
   return map;
 }
 
-/**
- * Lets an extension replace a whole core component at build time (`defineOverride` in `shared`),
- * with the replacement type-checked against the core contract by the normal tsgo run - no codegen.
- *
- * Load-bearing assumption: this only wins because `enforce: 'pre'` runs its `resolveId` before Vite's
- * built-in tsconfig-paths resolver (`resolve.tsconfigPaths` in vite.config.ts), which otherwise owns
- * `@/*`. If that resolver is ever swapped for a plugin-based one (e.g. `vite-tsconfig-paths`), re-check
- * that it still runs after this plugin in the `pre` bucket.
- */
 export function extensionOverrides(): Plugin {
   let map = new Map<string, OverrideTarget>();
 
