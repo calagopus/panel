@@ -9,6 +9,7 @@ import type { Plugin } from 'vite';
 import { defineConfig, normalizePath } from 'vite';
 import dynamicPublicDirectory from 'vite-multiple-assets';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { extensionOverrides } from './vite-plugins/extension-overrides.ts';
 
 const useFastReactCompiler = process.env.FAST_REACT_COMPILER === 'true';
 
@@ -186,6 +187,7 @@ const svgCountryFlagsDir = normalizePath(
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    extensionOverrides(),
     react(),
     babel(
       useFastReactCompiler

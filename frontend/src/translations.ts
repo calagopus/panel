@@ -1872,6 +1872,25 @@ const baseTranslations = defineTranslations({
         users: {
           title: 'Users',
           resourceName: 'User',
+          externalIdLookup: {
+            button: 'Find by External ID',
+            modal: {
+              title: 'Look Up by External ID',
+              form: {
+                externalId: 'External ID',
+                externalIdPlaceholder: 'e.g. my-user-001',
+                search: 'Search',
+              },
+              result: {
+                title: 'User Found',
+                username: 'Username',
+                email: 'Email',
+                role: 'Role',
+                viewUser: 'View User',
+              },
+              notFound: 'No user found with that external ID.',
+            },
+          },
           tooltip: {
             admin: 'Admin',
             twoFactorEnabled: '2FA Enabled',
@@ -2370,6 +2389,25 @@ const baseTranslations = defineTranslations({
         servers: {
           title: 'Servers',
           resourceName: 'Server',
+          externalIdLookup: {
+            button: 'Find by External ID',
+            modal: {
+              title: 'Look Up by External ID',
+              form: {
+                externalId: 'External ID',
+                externalIdPlaceholder: 'e.g. my-server-001',
+                search: 'Search',
+              },
+              result: {
+                title: 'Server Found',
+                name: 'Name',
+                owner: 'Owner',
+                node: 'Node',
+                viewServer: 'View Server',
+              },
+              notFound: 'No server found with that external ID.',
+            },
+          },
           tabs: {
             overview: {
               title: 'Overview',
@@ -2475,6 +2513,7 @@ const baseTranslations = defineTranslations({
                   timezonePlaceholder: 'Europe/Amsterdam',
                   startupCommandPlaceholder: 'npm start',
                   startupCommandCustom: 'Custom',
+                  predefinedStartupCommands: 'Predefined Startup Commands',
                   startOnCompletion: 'Start on Completion',
                   startOnCompletionDescription: 'Start server after installation completes.',
                   skipInstaller: 'Skip Installer',
@@ -2669,7 +2708,9 @@ const baseTranslations = defineTranslations({
                     title: 'Confirm Server Deletion',
                     description: 'You are about to delete **{name}**. Are you sure?',
                     form: {
-                      force: 'Do you want to forcefully delete this server?',
+                      force: 'Force delete',
+                      forceWarning:
+                        'Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.',
                       deleteBackups: 'Do you want to delete backups of this server?',
                       confirmServerName: 'Confirm Server Name',
                       confirmServerNamePlaceholder: 'Server Name',
@@ -2895,6 +2936,7 @@ const baseTranslations = defineTranslations({
                   order: 'Order',
                   eggs: 'Eggs',
                   eggsPlaceholder: 'Select Eggs',
+                  eggsEmpty: 'No eggs are configured. Create a nest and egg before creating an egg configuration.',
                 },
                 enum: {
                   deploymentType: {
@@ -4499,6 +4541,7 @@ const baseTranslations = defineTranslations({
             },
           },
           noVariables: 'No startup variables found for this server.',
+          predefinedStartupCommands: 'Predefined Startup Commands',
         },
         mounts: {
           title: 'Mounts',

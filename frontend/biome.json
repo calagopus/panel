@@ -5,6 +5,7 @@
     "includes": [
       "src/**",
       "extensions/*/src/**",
+      "vite-plugins/**",
       "*.ts",
       "*.mts",
       "public/translations/**",
@@ -24,7 +25,15 @@
     "bracketSpacing": true,
     "expand": "auto",
     "useEditorconfig": true,
-    "includes": ["src/**", "extensions/*/src/**", "*.ts", "*.mts", "public/translations/*.json", "!**/node_modules"]
+    "includes": [
+      "src/**",
+      "extensions/*/src/**",
+      "vite-plugins/**",
+      "*.ts",
+      "*.mts",
+      "public/translations/*.json",
+      "!**/node_modules"
+    ]
   },
   "linter": {
     "enabled": true,

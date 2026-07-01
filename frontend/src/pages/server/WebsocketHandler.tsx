@@ -22,6 +22,7 @@ export default function WebsocketHandler() {
   const connectingRef = useRef(false);
   const updatingTokenRef = useRef(false);
   const tokenRefreshFailuresRef = useRef(0);
+  const prevIsTransferringRef = useRef(isTransferring);
 
   const uuidRef = useRef(uuid);
   uuidRef.current = uuid;
@@ -179,7 +180,7 @@ export default function WebsocketHandler() {
       updatingTokenRef.current = false;
       tokenRefreshFailuresRef.current = 0;
     };
-  }, [uuid, isTransferring, nodeMaintenanceEnabled]);
+  }, [uuid, nodeMaintenanceEnabled]);
 
   useEffect(() => {
     if (!uuid || socketRef.current || nodeMaintenanceEnabled) {
@@ -187,7 +188,27 @@ export default function WebsocketHandler() {
     }
 
     connect(uuid);
-  }, [uuid, isTransferring, nodeMaintenanceEnabled]);
+  }, [uuid, nodeMaintenanceEnabled]);
+
+  useEffect(() => {
+    const wasTransferring = prevIsTransferringRef.current;
+    prevIsTransferringRef.current = isTransferring;
+
+    if (!wasTransferring || isTransferring) return;
+
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+      setSocketInstance(null);
+      setSocketConnectionState(false);
+      setSocketError(null);
+    }
+    connectingRef.current = false;
+
+    if (uuid && !nodeMaintenanceEnabled) {
+      connect(uuid);
+    }
+  }, [isTransferring]);
 
   return null;
 }

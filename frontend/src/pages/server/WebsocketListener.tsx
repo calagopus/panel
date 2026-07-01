@@ -1,6 +1,7 @@
 import { QueryFilters, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { z } from 'zod';
+import getServer from '@/api/server/getServer.ts';
 import { serverFileOperationSchema } from '@/lib/schemas/server/files.ts';
 import { serverImagePullProgressSchema, serverResourceUsageSchema } from '@/lib/schemas/server/server.ts';
 import { formatMilliseconds } from '@/lib/time.ts';
@@ -23,6 +24,8 @@ export default function WebsocketListener() {
     schedule,
     scheduleSteps,
     updateServer,
+    setSocketConnectionState,
+    setSocketError,
     setImagePull,
     removeImagePull,
     clearImagePulls,
@@ -158,7 +161,25 @@ export default function WebsocketListener() {
     addToast(t('elements.serverWebsocket.listener.toast.backupRestoreCompleted', {}), 'success');
   });
 
+  useWebsocketEvent(SocketEvent.TRANSFER_STATUS, (s) => {
+    if (s === 'processing') {
+      updateServer({ isTransferring: true });
+    } else if (s === 'completed') {
+      if (socketInstance) {
+        socketInstance.close();
+        setSocketConnectionState(false);
+        setSocketError(null);
+      }
+      setTimeout(() => {
+        getServer(server.uuid).then(updateServer);
+        updateServer({ isTransferring: false });
+      }, 5000);
+    }
+  });
+
   useWebsocketEvent(SocketEvent.TRANSFER_PROGRESS, (data) => {
+    updateServer({ isTransferring: true });
+
     let wsData: {
       archive_bytes_processed: number;
       network_bytes_processed: number;

@@ -1,4 +1,11 @@
-import { faList, faNetworkWired, faPlay, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faList,
+  faNetworkWired,
+  faPlay,
+  faPlus,
+  faTrash,
+  faTriangleExclamation,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -11,6 +18,7 @@ import updateEggConfiguration from '@/api/admin/egg-configurations/updateEggConf
 import getAllEggs from '@/api/admin/nests/getAllEggs.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
@@ -177,6 +185,7 @@ export default function EggConfigurationCreateOrUpdate({
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
   const [eggs, setEggs] = useState<{ group: string; items: { label: string; value: string }[] }[]>([]);
+  const [eggsLoading, setEggsLoading] = useState(true);
   const [defaultRoutes, setDefaultRoutes] = useState<{
     order: z.infer<typeof eggConfigurationRouteItemSchema>[];
     entries: ServerRouteDefinition[];
@@ -250,7 +259,8 @@ export default function EggConfigurationCreateOrUpdate({
           })),
         );
       })
-      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'));
+      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
+      .finally(() => setEggsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -598,6 +608,12 @@ export default function EggConfigurationCreateOrUpdate({
           opened={openModal === 'duplicate'}
           onClose={() => setOpenModal(null)}
         />
+      )}
+
+      {!eggsLoading && eggs.length === 0 && (
+        <Alert color='yellow' mb='xs' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+          {t('pages.admin.eggConfigurations.tabs.general.page.form.eggsEmpty', {})}
+        </Alert>
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.eggConfigurations.all()))}>

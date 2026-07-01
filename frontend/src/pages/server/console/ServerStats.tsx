@@ -21,6 +21,7 @@ export default function ServerStats() {
   const stats = useServerStore((state) => state.stats);
 
   const networkPrevious = useRef<Record<'tx' | 'rx', number>>({ tx: -1, rx: -1 });
+  const wasOffline = useRef(false);
 
   const cpu = useChartTickLabel(t('pages.server.console.stats.cpuLoad', {}), server.limits.cpu, '%', 2);
   const memory = useChartTickLabel(t('pages.server.console.stats.memoryLoad', {}), server.limits.memory, 'MiB');
@@ -47,9 +48,17 @@ export default function ServerStats() {
 
   useEffect(() => {
     if (!stats?.state || (stats?.state === 'offline' && server.status !== 'installing')) {
+      if (!wasOffline.current) {
+        wasOffline.current = true;
+        cpu.push(0);
+        memory.push(0);
+        network.push([0, 0]);
+        networkPrevious.current = { tx: 0, rx: 0 };
+      }
       return;
     }
 
+    wasOffline.current = false;
     cpu.push(stats.cpuAbsolute);
     memory.push(Math.floor(stats.memoryBytes / 1024 / 1024));
     network.push([

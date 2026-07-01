@@ -1,6 +1,5 @@
 import {
   faAddressCard,
-  faCog,
   faIcons,
   faInfoCircle,
   faNetworkWired,
@@ -23,7 +22,6 @@ import getNodes from '@/api/admin/nodes/getNodes.ts';
 import createServer from '@/api/admin/servers/createServer.ts';
 import getUsers from '@/api/admin/users/getUsers.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -34,7 +32,6 @@ import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Popover from '@/elements/Popover.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
@@ -413,42 +410,42 @@ export default function ServerCreate() {
       name: 'startup',
       colSpan: 'full',
       render: (f) => (
-        <TextArea
-          label={t('common.form.startupCommand', {})}
-          placeholder={t('pages.admin.servers.tabs.general.page.form.startupCommandPlaceholder', {})}
-          required
-          rows={2}
-          rightSection={
-            <Popover>
-              <Popover.Target>
-                <ActionIcon variant='subtle'>
-                  <FontAwesomeIcon icon={faCog} />
-                </ActionIcon>
-              </Popover.Target>
-              <Popover.Dropdown>
-                <Select
-                  data={[
-                    {
-                      label: t('pages.admin.servers.tabs.general.page.form.startupCommandCustom', {}),
-                      value: '',
-                    },
-                    ...Object.entries(
-                      eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
-                    ).map(([key, value]) => ({ value, label: key })),
-                  ]}
-                  value={
-                    Object.values(
-                      eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
-                    ).find((value) => value === form.getValues().startup) || ''
-                  }
-                  onChange={(value) => f.setFieldValue('startup', value ?? '')}
-                />
-              </Popover.Dropdown>
-            </Popover>
-          }
-          key={f.key('startup')}
-          {...f.getInputProps('startup')}
-        />
+        <>
+          {Object.keys(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {})
+            .length > 0 && (
+            <Select
+              label={t('pages.admin.servers.tabs.general.page.form.predefinedStartupCommands', {})}
+              className='col-span-full'
+              data={[
+                {
+                  label: t('pages.admin.servers.tabs.general.page.form.startupCommandCustom', {}),
+                  value: '',
+                },
+                ...Object.entries(
+                  eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
+                ).map(([key, value]) => ({
+                  value,
+                  label: key,
+                })),
+              ]}
+              value={
+                Object.values(
+                  eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
+                ).find((value) => value === form.getValues().startup) || ''
+              }
+              onChange={(value) => form.setFieldValue('startup', value ?? '')}
+            />
+          )}
+          <TextArea
+            label={t('common.form.startupCommand', {})}
+            placeholder={t('pages.admin.servers.tabs.general.page.form.startupCommandPlaceholder', {})}
+            className='col-span-full'
+            required
+            rows={2}
+            key={form.key('startup')}
+            {...form.getInputProps('startup')}
+          />
+        </>
       ),
     },
     {
