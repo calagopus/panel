@@ -146,7 +146,7 @@ function useChart(label: string, opts?: UseChartOptions) {
     }));
   }, [isDark]);
 
-  const push = (items: number | (number | null)[]) => {
+  const push = (items: number | null | (number | null)[]) => {
     const time = Date.now();
     setData((state) =>
       merge(state, {
