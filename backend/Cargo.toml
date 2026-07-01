@@ -66,3 +66,4 @@ cbc = "0.2.1"
 spki = "0.8.0"
 rsa = "0.9.10"
 rustls = { version = "0.23.40", features = ["aws-lc-rs"] }
+http-body-util = "0.1.3"

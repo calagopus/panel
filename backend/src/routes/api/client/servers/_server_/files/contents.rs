@@ -63,9 +63,11 @@ mod get {
             .await?
             .get_servers_server_files_contents(
                 server.uuid,
-                &params.file,
-                false,
-                max_file_manager_view_size,
+                &wings_api::servers_server_files_contents::get::Query {
+                    file: Some(params.file.clone()),
+                    max_size: Some(max_file_manager_view_size),
+                    ..Default::default()
+                },
             )
             .await
         {

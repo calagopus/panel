@@ -63,7 +63,14 @@ mod get {
             .await?
             .api_client(&state.database)
             .await?
-            .get_servers_server_files_fingerprints(server.uuid, params.algorithm, vec![params.file])
+            .get_servers_server_files_fingerprints(
+                server.uuid,
+                &wings_api::servers_server_files_fingerprints::get::Query {
+                    algorithm: Some(params.algorithm),
+                    files: Some(vec![params.file]),
+                    ..Default::default()
+                },
+            )
             .await
         {
             Ok(data) => data,

@@ -5,7 +5,9 @@ import generateSchemaObject from "@/generate-schema-object"
 import { pascalCase, snakeCase } from "change-case"
 import { convertType } from "@/generate-schema-property"
 
-// TODO 1.1.x: Make query params use defaultable structs instead of function arguments
+function rustIdent(name: string): string {
+    return ['type', 'override', 'match', 'move', 'ref', 'self', 'use', 'mod'].includes(name) ? `r#${name}` : name
+}
 
 const openapi: oas31.OpenAPIObject = JSON.parse(fs.readFileSync('../openapi.json', 'utf-8'))
 const output = fs.createWriteStream('../src/lib.rs', { flags: 'w' })
@@ -25,7 +27,7 @@ pub mod client;
 mod extra;
 pub mod tunnel;
 
-use client::AsyncResponseReader;
+use client::{AsyncRequestReader, AsyncResponseReader};
 pub use extra::*;
 
 `)
@@ -96,12 +98,31 @@ impl<'de> Deserialize<'de> for AsyncResponseReader {
     }
 }
 
+pub struct AsyncRequestReader(Box<dyn AsyncRead + Send + Unpin>);
+
+impl AsyncRequestReader {
+    #[inline]
+    pub fn new(reader: impl AsyncRead + Send + Unpin + 'static) -> Self {
+        Self(Box::new(reader))
+    }
+}
+
+impl AsyncRead for AsyncRequestReader {
+    fn poll_read(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> Poll<std::io::Result<()>> {
+        Pin::new(&mut self.0).poll_read(cx, buf)
+    }
+}
+
 async fn request_impl<T: DeserializeOwned + 'static>(
     client: &WingsClient,
     method: Method,
     endpoint: impl AsRef<str>,
     body: Option<&impl Serialize>,
-    body_raw: Option<compact_str::CompactString>,
+    body_reader: Option<AsyncRequestReader>,
 ) -> Result<T, ApiHttpError> {
     let url = format!(
         "{}{}",
@@ -126,8 +147,10 @@ async fn request_impl<T: DeserializeOwned + 'static>(
             return Err(ApiHttpError::MsgpackEncode(err));
         }
         request = request.body(bytes);
-    } else if let Some(body_raw) = body_raw {
-        request = request.body(Vec::from(body_raw));
+    } else if let Some(body_reader) = body_reader {
+        request = request.body(reqwest::Body::wrap_stream(
+            tokio_util::io::ReaderStream::new(body_reader),
+        ));
     }
 
     match request.send().await {
@@ -290,7 +313,8 @@ for (const [path, route] of Object.entries(openapi.paths ?? {})) {
                 output.write(`        pub type RequestBody = ${schema.$ref.split('/').at(-1)};\n\n`)
             } else {
                 if ((schema as oas31.SchemaObject).type !== 'object') {
-                    output.write(`        pub type RequestBody = ${convertType(schema as any)};\n\n`)
+                    const type = (schema as oas31.SchemaObject).type === 'string' ? 'AsyncRequestReader' : convertType(schema as any)
+                    output.write(`        pub type RequestBody = ${type};\n\n`)
                 } else {
                     generateSchemaObject(output, 8, null, `RequestBody`, schema as any)
                 }
@@ -327,12 +351,30 @@ for (const [path, route] of Object.entries(openapi.paths ?? {})) {
             output.write(`        pub type Response = Response${Object.keys(data.responses ?? []).find((code) => code.startsWith('2'))};\n`)
         }
 
-        {
-            const params: string[] = []
+        const allParams = (data.parameters ?? []) as oas31.ParameterObject[]
+        const pathParams = allParams.filter((p) => p.in === 'path')
+        const queryParams = allParams.filter((p) => p.in === 'query')
 
-            for (const param of (data.parameters ?? []) as oas31.ParameterObject[]) {
-                const type = param.schema? convertType(param.schema) : 'compact_str::CompactString'
-                params.push(`${param.name}: ${type === 'compact_str::CompactString' ? '&str' : type}`)
+        if (queryParams.length) {
+            output.write('\n        #[derive(Debug, Clone, Default)]\n')
+            output.write('        #[allow(clippy::manual_non_exhaustive)]\n')
+            output.write('        pub struct Query {\n')
+            for (const param of queryParams) {
+                const inner = param.schema ? convertType(param.schema) : 'compact_str::CompactString'
+                output.write(`            pub ${rustIdent(param.name)}: Option<${inner}>,\n`)
+            }
+            output.write('            #[doc(hidden)]\n')
+            output.write('            pub __priv: (),\n')
+            output.write('        }\n')
+        }
+
+        {
+            const modName = snakeCase(path).slice(4)
+            const args: string[] = []
+
+            for (const param of pathParams) {
+                const type = param.schema ? convertType(param.schema) : 'compact_str::CompactString'
+                args.push(`${rustIdent(param.name)}: ${type === 'compact_str::CompactString' ? '&str' : type}`)
             }
 
             const body = data.requestBody
@@ -343,38 +385,60 @@ for (const [path, route] of Object.entries(openapi.paths ?? {})) {
 
             if (data.requestBody) {
                 if (body === 'None::<&()>, Some(data)') {
-                    params.push(`data: super::${snakeCase(path).slice(4)}::${method}::RequestBody`)
+                    args.push(`data: super::${modName}::${method}::RequestBody`)
                 } else {
-                    params.push(`data: &super::${snakeCase(path).slice(4)}::${method}::RequestBody`)
+                    args.push(`data: &super::${modName}::${method}::RequestBody`)
                 }
             }
 
-            clientOutput.write(`    pub async fn ${method}_${snakeCase(path).slice(4)}(&self${params.length ? `, ${params.join(', ')}` : ''})`)
-            clientOutput.write(` -> Result<super::${snakeCase(path).slice(4)}::${method}::Response, ApiHttpError> {\n`)
+            if (queryParams.length) {
+                args.push(`query: &super::${modName}::${method}::Query`)
+            }
 
-            let query = ""
-            for (const param of (data.parameters ?? []) as oas31.ParameterObject[]) {
-                if (param.in === 'query') {
-                    if (params.find((p) => p.startsWith(param.name))?.endsWith('&str')) {
-                        clientOutput.write(`        let ${param.name} = urlencoding::encode(${param.name});\n`)
-                    } else if (params.find((p) => p.startsWith(param.name))?.endsWith('Vec<compact_str::CompactString>')) {
-                        clientOutput.write(`        let ${param.name} = ${param.name}.into_iter().map(|s| urlencoding::encode(&s).into()).collect::<Vec<compact_str::CompactString>>().join("&${param.name}=");\n`)
+            clientOutput.write(`    pub async fn ${method}_${modName}(&self${args.length ? `, ${args.join(', ')}` : ''})`)
+            clientOutput.write(` -> Result<super::${modName}::${method}::Response, ApiHttpError> {\n`)
+
+            let endpoint: string
+            if (queryParams.length) {
+                clientOutput.write('        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();\n')
+
+                for (const param of queryParams) {
+                    const inner = param.schema ? convertType(param.schema) : 'compact_str::CompactString'
+                    const key = param.name
+                    const field = rustIdent(param.name)
+                    const isArray = inner.startsWith('Vec<')
+                    const isString = inner === 'compact_str::CompactString'
+                    const itemIsString = isArray && inner.slice(4, -1) === 'compact_str::CompactString'
+
+                    clientOutput.write(`        if let Some(value) = ${isArray || isString ? '&' : ''}query.${field} {\n`)
+                    if (isArray) {
+                        clientOutput.write('            for value in value {\n')
+                        if (itemIsString) {
+                            clientOutput.write(`                query_parts.push(format!("${key}={}", urlencoding::encode(value)).into());\n`)
+                        } else {
+                            clientOutput.write(`                query_parts.push(format!("${key}={value}").into());\n`)
+                        }
+                        clientOutput.write('            }\n')
+                    } else if (isString) {
+                        clientOutput.write(`            query_parts.push(format!("${key}={}", urlencoding::encode(value)).into());\n`)
+                    } else {
+                        clientOutput.write(`            query_parts.push(format!("${key}={}", value).into());\n`)
                     }
-
-                    query += `${param.name}={${param.name}}&`
+                    clientOutput.write('        }\n')
                 }
+
+                clientOutput.write('        let query = if query_parts.is_empty() {\n')
+                clientOutput.write('            String::new()\n')
+                clientOutput.write('        } else {\n')
+                clientOutput.write('            format!("?{}", query_parts.join("&"))\n')
+                clientOutput.write('        };\n')
+
+                endpoint = `format!("${path}{query}")`
+            } else {
+                endpoint = path.includes('{') ? `format!("${path}")` : `"${path}"`
             }
 
-            if (query) {
-                query = '?' + query.slice(0, -1)
-            }
-
-            let p = `format!("${path}${query}")`
-            if (!p.includes('{')) {
-                p = `"${path}${query}"`
-            }
-
-            clientOutput.write(`        request_impl(self, Method::${method.toUpperCase()}, ${p}, ${body}).await\n`)
+            clientOutput.write(`        request_impl(self, Method::${method.toUpperCase()}, ${endpoint}, ${body}).await\n`)
 
             clientOutput.write('    }\n\n')
         }

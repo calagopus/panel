@@ -62,12 +62,31 @@ impl<'de> Deserialize<'de> for AsyncResponseReader {
     }
 }
 
+pub struct AsyncRequestReader(Box<dyn AsyncRead + Send + Unpin>);
+
+impl AsyncRequestReader {
+    #[inline]
+    pub fn new(reader: impl AsyncRead + Send + Unpin + 'static) -> Self {
+        Self(Box::new(reader))
+    }
+}
+
+impl AsyncRead for AsyncRequestReader {
+    fn poll_read(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> Poll<std::io::Result<()>> {
+        Pin::new(&mut self.0).poll_read(cx, buf)
+    }
+}
+
 async fn request_impl<T: DeserializeOwned + 'static>(
     client: &WingsClient,
     method: Method,
     endpoint: impl AsRef<str>,
     body: Option<&impl Serialize>,
-    body_raw: Option<compact_str::CompactString>,
+    body_reader: Option<AsyncRequestReader>,
 ) -> Result<T, ApiHttpError> {
     let url = format!(
         "{}{}",
@@ -92,8 +111,10 @@ async fn request_impl<T: DeserializeOwned + 'static>(
             return Err(ApiHttpError::MsgpackEncode(err));
         }
         request = request.body(bytes);
-    } else if let Some(body_raw) = body_raw {
-        request = request.body(Vec::from(body_raw));
+    } else if let Some(body_reader) = body_reader {
+        request = request.body(reqwest::Body::wrap_stream(
+            tokio_util::io::ReaderStream::new(body_reader),
+        ));
     }
 
     match request.send().await {
@@ -404,12 +425,31 @@ impl WingsClient {
     pub async fn get_servers_server_files_contents(
         &self,
         server: uuid::Uuid,
-        file: &str,
-        download: bool,
-        max_size: u64,
+        query: &super::servers_server_files_contents::get::Query,
     ) -> Result<super::servers_server_files_contents::get::Response, ApiHttpError> {
-        let file = urlencoding::encode(file);
-        request_impl(self, Method::GET, format!("/api/servers/{server}/files/contents?file={file}&download={download}&max_size={max_size}"), None::<&()>, None).await
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.file {
+            query_parts.push(format!("file={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = query.download {
+            query_parts.push(format!("download={}", value).into());
+        }
+        if let Some(value) = query.max_size {
+            query_parts.push(format!("max_size={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/contents{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
     }
 
     pub async fn post_servers_server_files_copy(
@@ -505,18 +545,26 @@ impl WingsClient {
     pub async fn get_servers_server_files_fingerprints(
         &self,
         server: uuid::Uuid,
-        algorithm: Algorithm,
-        files: Vec<compact_str::CompactString>,
+        query: &super::servers_server_files_fingerprints::get::Query,
     ) -> Result<super::servers_server_files_fingerprints::get::Response, ApiHttpError> {
-        let files = files
-            .into_iter()
-            .map(|s| urlencoding::encode(&s).into())
-            .collect::<Vec<compact_str::CompactString>>()
-            .join("&files=");
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.algorithm {
+            query_parts.push(format!("algorithm={}", value).into());
+        }
+        if let Some(value) = &query.files {
+            for value in value {
+                query_parts.push(format!("files={}", urlencoding::encode(value)).into());
+            }
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::GET,
-            format!("/api/servers/{server}/files/fingerprints?algorithm={algorithm}&files={files}"),
+            format!("/api/servers/{server}/files/fingerprints{query}"),
             None::<&()>,
             None,
         )
@@ -526,13 +574,26 @@ impl WingsClient {
     pub async fn get_servers_server_files_largest_directories(
         &self,
         server: uuid::Uuid,
-        directory: &str,
+        query: &super::servers_server_files_largest_directories::get::Query,
     ) -> Result<super::servers_server_files_largest_directories::get::Response, ApiHttpError> {
-        let directory = urlencoding::encode(directory);
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.directory {
+            query_parts.push(format!("directory={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::GET,
-            format!("/api/servers/{server}/files/largest-directories?directory={directory}"),
+            format!("/api/servers/{server}/files/largest-directories{query}"),
             None::<&()>,
             None,
         )
@@ -542,31 +603,59 @@ impl WingsClient {
     pub async fn get_servers_server_files_list(
         &self,
         server: uuid::Uuid,
-        directory: &str,
-        ignored: Vec<compact_str::CompactString>,
-        per_page: u64,
-        page: u64,
-        sort: DirectorySortingMode,
+        query: &super::servers_server_files_list::get::Query,
     ) -> Result<super::servers_server_files_list::get::Response, ApiHttpError> {
-        let directory = urlencoding::encode(directory);
-        let ignored = ignored
-            .into_iter()
-            .map(|s| urlencoding::encode(&s).into())
-            .collect::<Vec<compact_str::CompactString>>()
-            .join("&ignored=");
-        request_impl(self, Method::GET, format!("/api/servers/{server}/files/list?directory={directory}&ignored={ignored}&per_page={per_page}&page={page}&sort={sort}"), None::<&()>, None).await
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.directory {
+            query_parts.push(format!("directory={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
+        }
+        if let Some(value) = query.per_page {
+            query_parts.push(format!("per_page={}", value).into());
+        }
+        if let Some(value) = query.page {
+            query_parts.push(format!("page={}", value).into());
+        }
+        if let Some(value) = query.sort {
+            query_parts.push(format!("sort={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/list{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
     }
 
     pub async fn get_servers_server_files_list_directory(
         &self,
         server: uuid::Uuid,
-        directory: &str,
+        query: &super::servers_server_files_list_directory::get::Query,
     ) -> Result<super::servers_server_files_list_directory::get::Response, ApiHttpError> {
-        let directory = urlencoding::encode(directory);
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.directory {
+            query_parts.push(format!("directory={}", urlencoding::encode(value)).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::GET,
-            format!("/api/servers/{server}/files/list-directory?directory={directory}"),
+            format!("/api/servers/{server}/files/list-directory{query}"),
             None::<&()>,
             None,
         )
@@ -680,13 +769,21 @@ impl WingsClient {
     pub async fn get_servers_server_files_revisions(
         &self,
         server: uuid::Uuid,
-        file: &str,
+        query: &super::servers_server_files_revisions::get::Query,
     ) -> Result<super::servers_server_files_revisions::get::Response, ApiHttpError> {
-        let file = urlencoding::encode(file);
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.file {
+            query_parts.push(format!("file={}", urlencoding::encode(value)).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::GET,
-            format!("/api/servers/{server}/files/revisions?file={file}"),
+            format!("/api/servers/{server}/files/revisions{query}"),
             None::<&()>,
             None,
         )
@@ -726,15 +823,25 @@ impl WingsClient {
     pub async fn post_servers_server_files_write(
         &self,
         server: uuid::Uuid,
-        file: &str,
-        user: uuid::Uuid,
         data: super::servers_server_files_write::post::RequestBody,
+        query: &super::servers_server_files_write::post::Query,
     ) -> Result<super::servers_server_files_write::post::Response, ApiHttpError> {
-        let file = urlencoding::encode(file);
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.file {
+            query_parts.push(format!("file={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = query.user {
+            query_parts.push(format!("user={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::POST,
-            format!("/api/servers/{server}/files/write?file={file}&user={user}"),
+            format!("/api/servers/{server}/files/write{query}"),
             None::<&()>,
             Some(data),
         )
@@ -758,12 +865,21 @@ impl WingsClient {
     pub async fn get_servers_server_logs(
         &self,
         server: uuid::Uuid,
-        lines: u64,
+        query: &super::servers_server_logs::get::Query,
     ) -> Result<super::servers_server_logs::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.lines {
+            query_parts.push(format!("lines={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::GET,
-            format!("/api/servers/{server}/logs?lines={lines}"),
+            format!("/api/servers/{server}/logs{query}"),
             None::<&()>,
             None,
         )
@@ -773,12 +889,21 @@ impl WingsClient {
     pub async fn get_servers_server_logs_install(
         &self,
         server: uuid::Uuid,
-        lines: u64,
+        query: &super::servers_server_logs_install::get::Query,
     ) -> Result<super::servers_server_logs_install::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.lines {
+            query_parts.push(format!("lines={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::GET,
-            format!("/api/servers/{server}/logs/install?lines={lines}"),
+            format!("/api/servers/{server}/logs/install{query}"),
             None::<&()>,
             None,
         )
@@ -938,12 +1063,21 @@ impl WingsClient {
     pub async fn get_servers_server_version(
         &self,
         server: uuid::Uuid,
-        game: Game,
+        query: &super::servers_server_version::get::Query,
     ) -> Result<super::servers_server_version::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.game {
+            query_parts.push(format!("game={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::GET,
-            format!("/api/servers/{server}/version?game={game}"),
+            format!("/api/servers/{server}/version{query}"),
             None::<&()>,
             None,
         )
@@ -1012,12 +1146,21 @@ impl WingsClient {
     pub async fn get_system_logs_file(
         &self,
         file: &str,
-        lines: u64,
+        query: &super::system_logs_file::get::Query,
     ) -> Result<super::system_logs_file::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.lines {
+            query_parts.push(format!("lines={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
         request_impl(
             self,
             Method::GET,
-            format!("/api/system/logs/{file}?lines={lines}"),
+            format!("/api/system/logs/{file}{query}"),
             None::<&()>,
             None,
         )

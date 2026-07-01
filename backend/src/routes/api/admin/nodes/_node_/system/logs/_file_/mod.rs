@@ -65,7 +65,13 @@ mod get {
         let logs = node
             .api_client(&state.database)
             .await?
-            .get_system_logs_file(&file, params.lines)
+            .get_system_logs_file(
+                &file,
+                &wings_api::system_logs_file::get::Query {
+                    lines: Some(params.lines),
+                    ..Default::default()
+                },
+            )
             .await?;
 
         ApiResponse::new_stream(logs)
