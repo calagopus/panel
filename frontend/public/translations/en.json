@@ -2576,7 +2576,8 @@
                     "title": "Confirm Server Deletion",
                     "description": "You are about to delete **{name}**. Are you sure?",
                     "form": {
-                      "force": "Do you want to forcefully delete this server?",
+                      "force": "Force delete",
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.",
                       "deleteBackups": "Do you want to delete backups of this server?",
                       "confirmServerName": "Confirm Server Name",
                       "confirmServerNamePlaceholder": "Server Name"
