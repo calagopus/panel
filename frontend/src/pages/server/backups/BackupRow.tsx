@@ -1,5 +1,6 @@
 import {
   faFileArrowDown,
+  faFileExport,
   faInfo,
   faLock,
   faLockOpen,
@@ -35,6 +36,7 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import BackupEditModal from './modals/BackupEditModal.tsx';
+import BackupExportModal from './modals/BackupExportModal.tsx';
 import BackupRestoreModal from './modals/BackupRestoreModal.tsx';
 
 export default function BackupRow({ backup }: { backup: z.infer<typeof serverBackupWithProgressSchema> }) {
@@ -43,7 +45,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
   const { server, removeBackup } = useServerStore();
   const navigate = useNavigate();
 
-  const [openModal, setOpenModal] = useState<'edit' | 'restore' | 'delete' | 'metadata' | null>(null);
+  const [openModal, setOpenModal] = useState<'edit' | 'restore' | 'export' | 'delete' | 'metadata' | null>(null);
   const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
 
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
@@ -77,6 +79,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
     <>
       <BackupEditModal backup={backup} opened={openModal === 'edit'} onClose={() => setOpenModal(null)} />
       <BackupRestoreModal backup={backup} opened={openModal === 'restore'} onClose={() => setOpenModal(null)} />
+      <BackupExportModal backup={backup} opened={openModal === 'export'} onClose={() => setOpenModal(null)} />
 
       <Modal
         title={t('pages.server.backups.modal.viewMetadata.title', {})}
@@ -152,6 +155,14 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             onClick: () => setOpenModal('restore'),
             color: 'gray',
             canAccess: useServerCan('backups.restore'),
+          },
+          {
+            icon: faFileExport,
+            label: t('pages.server.backups.button.exportToFiles', {}),
+            hidden: !backup.completed || isFailed,
+            onClick: () => setOpenModal('export'),
+            color: 'gray',
+            canAccess: useServerCan(['backups.download', 'files.create'], false),
           },
           {
             icon: faInfo,

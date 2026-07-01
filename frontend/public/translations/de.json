@@ -227,6 +227,7 @@
         "protocol": "Protokoll",
         "powerAction": "Power-Aktion",
         "destination": "Ziel",
+        "destinationDirectory": "Zielverzeichnis",
         "directoryName": "Verzeichnisname",
         "locked": "Gesperrt",
         "portRanges": "Port-Bereiche",
@@ -297,6 +298,9 @@
         "successful": "Erfolgreich",
         "failed": "Fehlgeschlagen",
         "installed": "Installiert"
+      },
+      "label": {
+        "noSubdirectories": "Keine Unterverzeichnisse"
       },
       "server": {
         "noAllocation": "Keine Allocation",
@@ -2248,9 +2252,13 @@
                   "detached": "Backup erfolgreich gelöst.",
                   "reattached": "Backup erfolgreich an {name} wieder angehängt.",
                   "restoring": "Backup wird auf {name} wiederhergestellt...",
+                  "exporting": "Backup wird in Dateien von {name} exportiert...",
                   "deleted": "Node-Backup gelöscht."
                 },
                 "modal": {
+                  "export": {
+                    "title": "Node-Backup in Dateien exportieren"
+                  },
                   "detach": {
                     "title": "Lösen des Backups bestätigen",
                     "content": "Bist du sicher, dass du dieses Backup von seinem Server lösen möchtest? Es wird nicht gelöscht und kann später wieder angehängt werden."
@@ -3599,6 +3607,7 @@
             "copyingMany": "Kopiere {files}",
             "receivingRemote": "Empfange {files} vom Remote-Server",
             "sendingRemote": "Sende {files} an Remote-Server",
+            "exportingBackup": "Exportiere Backup nach {destination}",
             "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
             "cancelAllUploads": "Alle Uploads abbrechen",
             "cancelAllOperations": "Alle Vorgänge abbrechen"
@@ -4365,11 +4374,13 @@
             }
           },
           "button": {
-            "browse": "Durchsuchen"
+            "browse": "Durchsuchen",
+            "exportToFiles": "In Dateien exportieren"
           },
           "toast": {
             "downloadStarted": "Download gestartet.",
-            "restoringBackup": "Backup wird wiederhergestellt..."
+            "restoringBackup": "Backup wird wiederhergestellt...",
+            "exportStarted": "Backup-Export gestartet."
           },
           "modal": {
             "createBackup": {
@@ -4386,6 +4397,9 @@
             },
             "restoreBackup": {
               "title": "Backup wiederherstellen"
+            },
+            "exportBackup": {
+              "title": "Backup in Dateien exportieren"
             },
             "deleteBackup": {
               "title": "Löschen des Backups bestätigen",

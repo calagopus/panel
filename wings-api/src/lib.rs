@@ -790,8 +790,6 @@ pub mod backups_backup_query {
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
-                pub file_name: compact_str::CompactString,
-                #[schema(inline)]
                 pub archive_format: Option<ArchiveFormat>,
                 #[schema(inline)]
                 pub size: Option<u64>,

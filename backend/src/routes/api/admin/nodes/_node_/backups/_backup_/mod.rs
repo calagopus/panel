@@ -14,6 +14,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod detach;
 mod download;
+mod export;
+mod query;
 mod reattach;
 mod restore;
 
@@ -185,6 +187,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(delete::route))
         .nest("/download", download::router(state))
+        .nest("/export", export::router(state))
+        .nest("/query", query::router(state))
         .nest("/restore", restore::router(state))
         .nest("/reattach", reattach::router(state))
         .nest("/detach", detach::router(state))

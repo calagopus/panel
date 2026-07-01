@@ -118,6 +118,14 @@ export const serverFileOperationCopyRemoteSchema = z.lazy(() =>
   }),
 );
 
+export const serverFileOperationExportBackupSchema = z.lazy(() =>
+  serverFileOperationBaseSchema.extend({
+    type: z.literal('export_backup'),
+    backup: z.string(),
+    destinationPath: z.string(),
+  }),
+);
+
 export const serverFileOperationSchema = z.discriminatedUnion('type', [
   serverFileOperationCompressSchema,
   serverFileOperationDecompressSchema,
@@ -125,6 +133,7 @@ export const serverFileOperationSchema = z.discriminatedUnion('type', [
   serverFileOperationCopySchema,
   serverFileOperationCopyManySchema,
   serverFileOperationCopyRemoteSchema,
+  serverFileOperationExportBackupSchema,
 ]);
 
 export const serverDirectorySortingModeSchema = z.enum([

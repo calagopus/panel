@@ -226,7 +226,11 @@ function FileOperationsProgress() {
                                   : t('pages.server.files.operations.sendingRemote', {
                                       files: tItem('file', operation.files.length),
                                     })
-                                : null}
+                                : operation.type === 'export_backup'
+                                  ? t('pages.server.files.operations.exportingBackup', {
+                                      destination: operation.destinationPath,
+                                    })
+                                  : null}
                   </p>
                   <Tooltip
                     label={`${bytesToString(operation.bytesProcessed)} / ${bytesToString(operation.bytesTotal)}${

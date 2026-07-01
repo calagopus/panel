@@ -162,6 +162,7 @@ const baseTranslations = defineTranslations({
         protocol: 'Protocol',
         powerAction: 'Power Action',
         destination: 'Destination',
+        destinationDirectory: 'Destination Directory',
         directoryName: 'Directory Name',
         locked: 'Locked',
         portRanges: 'Port Ranges',
@@ -233,6 +234,9 @@ const baseTranslations = defineTranslations({
         successful: 'Successful',
         failed: 'Failed',
         installed: 'Installed',
+      },
+      label: {
+        noSubdirectories: 'No subdirectories',
       },
       server: {
         noAllocation: 'No Allocation',
@@ -2257,9 +2261,13 @@ const baseTranslations = defineTranslations({
                   detached: 'Backup detached successfully.',
                   reattached: 'Reattached backup to {name} successfully.',
                   restoring: 'Restoring backup to {name}...',
+                  exporting: 'Exporting backup to files of {name}...',
                   deleted: 'Node backup deleted.',
                 },
                 modal: {
+                  export: {
+                    title: 'Export Node Backup to Files',
+                  },
                   detach: {
                     title: 'Confirm Backup Detachment',
                     content:
@@ -3629,6 +3637,7 @@ const baseTranslations = defineTranslations({
             copyingMany: 'Copying {files}',
             receivingRemote: 'Receiving {files} from remote server',
             sendingRemote: 'Sending {files} to remote server',
+            exportingBackup: 'Exporting backup to {destination}',
             rateLimited: 'Your upload has been rate limited. Waiting...',
             cancelAllUploads: 'Cancel all uploads',
             cancelAllOperations: 'Cancel all operations',
@@ -4403,10 +4412,12 @@ const baseTranslations = defineTranslations({
           },
           button: {
             browse: 'Browse',
+            exportToFiles: 'Export to Files',
           },
           toast: {
             downloadStarted: 'Download started.',
             restoringBackup: 'Restoring backup...',
+            exportStarted: 'Backup export started.',
           },
           modal: {
             createBackup: {
@@ -4423,6 +4434,9 @@ const baseTranslations = defineTranslations({
             },
             restoreBackup: {
               title: 'Restore Backup',
+            },
+            exportBackup: {
+              title: 'Export Backup to Files',
             },
             deleteBackup: {
               title: 'Confirm Backup Deletion',

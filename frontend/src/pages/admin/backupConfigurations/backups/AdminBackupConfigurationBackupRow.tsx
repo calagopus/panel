@@ -1,4 +1,4 @@
-import { faFileArrowDown, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faFileArrowDown, faFileExport, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -20,6 +20,7 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeBackupsDeleteModal from '../../nodes/backups/modals/NodeBackupsDeleteModal.tsx';
+import NodeBackupsExportModal from '../../nodes/backups/modals/NodeBackupsExportModal.tsx';
 import NodeBackupsRestoreModal from '../../nodes/backups/modals/NodeBackupsRestoreModal.tsx';
 
 export default function AdminBackupConfigurationBackupRow({
@@ -30,7 +31,7 @@ export default function AdminBackupConfigurationBackupRow({
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [openModal, setOpenModal] = useState<'restore' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'restore' | 'export' | 'delete' | null>(null);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadNodeBackup(backup.node.uuid, backup.uuid, archiveFormat)
@@ -51,6 +52,12 @@ export default function AdminBackupConfigurationBackupRow({
         node={backup.node}
         backup={backup}
         opened={openModal === 'restore'}
+        onClose={() => setOpenModal(null)}
+      />
+      <NodeBackupsExportModal
+        node={backup.node}
+        backup={backup}
+        opened={openModal === 'export'}
         onClose={() => setOpenModal(null)}
       />
       <NodeBackupsDeleteModal
@@ -83,6 +90,14 @@ export default function AdminBackupConfigurationBackupRow({
             label: t('common.button.restore', {}),
             hidden: !backup.completed || isFailed,
             onClick: () => setOpenModal('restore'),
+            color: 'gray',
+            canAccess: useAdminCan('nodes.backups'),
+          },
+          {
+            icon: faFileExport,
+            label: t('pages.server.backups.button.exportToFiles', {}),
+            hidden: !backup.completed || isFailed,
+            onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: useAdminCan('nodes.backups'),
           },

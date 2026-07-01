@@ -1017,6 +1017,96 @@ impl ServerBackup {
         Ok(())
     }
 
+    pub async fn export(
+        &self,
+        state: &crate::State,
+        server: &super::server::Server,
+        path: compact_str::CompactString,
+        archive_format: wings_api::StreamableArchiveFormat,
+        foreground: bool,
+    ) -> Result<wings_api::backups_backup_export::post::Response, anyhow::Error> {
+        let backup_configuration = self
+            .backup_configuration
+            .as_ref()
+            .ok_or_else(|| {
+                crate::response::DisplayError::new(
+                    "no backup configuration available, unable to export backup",
+                )
+                .with_status(StatusCode::EXPECTATION_FAILED)
+            })?
+            .fetch_cached(&state.database)
+            .await?;
+
+        if backup_configuration.maintenance_enabled {
+            return Err(crate::response::DisplayError::new(
+                "cannot export backup while backup configuration is in maintenance mode",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
+        let client = server
+            .node
+            .fetch_cached(&state.database)
+            .await?
+            .api_client(&state.database)
+            .await?;
+
+        match client
+            .post_backups_backup_export(
+                self.uuid,
+                &wings_api::backups_backup_export::post::RequestBody {
+                    adapter: self.disk.to_wings_adapter(),
+                    server: server.uuid,
+                    path,
+                    archive_format,
+                    foreground,
+                },
+            )
+            .await
+        {
+            Ok(response) => Ok(response),
+            Err(wings_api::client::ApiHttpError::Http(
+                status @ (StatusCode::NOT_FOUND | StatusCode::EXPECTATION_FAILED),
+                err,
+            )) => Err(crate::response::DisplayError::new(
+                crate::ApiError::new_wings_value(err).to_string(),
+            )
+            .with_status(status)
+            .into()),
+            Err(err) => Err(err.into()),
+        }
+    }
+
+    pub async fn query(
+        &self,
+        state: &crate::State,
+        node: &super::node::Node,
+    ) -> Result<wings_api::backups_backup_query::get::Response, anyhow::Error> {
+        let client = node.api_client(&state.database).await?;
+
+        match client
+            .get_backups_backup_query(
+                self.uuid,
+                &wings_api::backups_backup_query::get::Query {
+                    adapter: Some(self.disk.to_wings_adapter()),
+                    __priv: (),
+                },
+            )
+            .await
+        {
+            Ok(response) => Ok(response),
+            Err(wings_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, err)) => {
+                Err(crate::response::DisplayError::new(
+                    crate::ApiError::new_wings_value(err).to_string(),
+                )
+                .with_status(StatusCode::NOT_FOUND)
+                .into())
+            }
+            Err(err) => Err(err.into()),
+        }
+    }
+
     pub async fn delete_oldest_by_server_uuid(
         state: &crate::State,
         server: &super::server::Server,
