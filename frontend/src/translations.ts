@@ -2840,6 +2840,7 @@ const baseTranslations = defineTranslations({
                   order: 'Order',
                   eggs: 'Eggs',
                   eggsPlaceholder: 'Select Eggs',
+                  eggsEmpty: 'No eggs are configured. Create a nest and egg before creating an egg configuration.',
                 },
                 enum: {
                   deploymentType: {
