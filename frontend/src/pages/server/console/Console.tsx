@@ -80,8 +80,7 @@ const getXtermTheme = (isDark: boolean) => ({
 
 export default function Terminal() {
   const { t } = useTranslations();
-  const { server, updateServer, commandSnippets, imagePulls, socketConnected, socketInstance, state } =
-    useServerStore();
+  const { server, commandSnippets, imagePulls, socketConnected, socketInstance, state } = useServerStore();
   const { settings } = useGlobalStore();
   const computedColorScheme = useComputedColorScheme('dark');
 
