@@ -13,5 +13,5 @@
     "strict": true,
     "resolvePackageJsonExports": true
   },
-  "include": ["src", "extensions/*/src"]
+  "include": ["src", "extensions/*/src", "vite-plugins"]
 }
