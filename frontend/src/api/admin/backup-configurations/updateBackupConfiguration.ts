@@ -1,31 +1,14 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 import { adminBackupConfigurationUpdateSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   backupConfigUuid: string,
   data: z.infer<typeof adminBackupConfigurationUpdateSchema>,
 ): Promise<void> => {
-  await axiosInstance.patch(`/api/admin/backup-configurations/${backupConfigUuid}`, {
-    ...transformKeysToSnakeCase(data),
-    backup_configs: data.backupConfigs
-      ? {
-          s3: data.backupConfigs.s3 ? transformKeysToSnakeCase(data.backupConfigs.s3) : null,
-          restic: data.backupConfigs.restic
-            ? {
-                ...transformKeysToSnakeCase(data.backupConfigs.restic),
-                environment: data.backupConfigs.restic.environment,
-              }
-            : null,
-          pbs: data.backupConfigs.pbs ? transformKeysToSnakeCase(data.backupConfigs.pbs) : null,
-          kopia: data.backupConfigs.kopia
-            ? {
-                ...transformKeysToSnakeCase(data.backupConfigs.kopia),
-                tags: data.backupConfigs.kopia.tags,
-              }
-            : null,
-        }
-      : null,
-  });
+  await axiosInstance.patch(
+    `/api/admin/backup-configurations/${backupConfigUuid}`,
+    serializeForApi(adminBackupConfigurationUpdateSchema, data),
+  );
 };

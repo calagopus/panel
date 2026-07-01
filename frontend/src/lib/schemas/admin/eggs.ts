@@ -48,6 +48,18 @@ export const adminEggSchema = z.object({
   created: z.date(),
 });
 
+export const adminEggCreateSchema = z.lazy(() =>
+  adminEggSchema
+    .omit({
+      uuid: true,
+      eggRepositoryEgg: true,
+      created: true,
+    })
+    .extend({
+      eggRepositoryEggUuid: z.uuid().nullable(),
+    }),
+);
+
 export const adminEggUpdateSchema = z.lazy(() =>
   adminEggSchema
     .omit({

@@ -1,12 +1,9 @@
+import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 
-interface Data {
-  deleteEggs: boolean;
-}
-
-export default async (nestUuid: string, data: Data): Promise<void> => {
+export default async (nestUuid: string, data: { deleteEggs: boolean }): Promise<void> => {
   await axiosInstance.delete(`/api/admin/nests/${nestUuid}`, {
-    data: transformKeysToSnakeCase(data),
+    data: serializeForApi(z.object({ deleteEggs: z.boolean() }), data),
   });
 };
