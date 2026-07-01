@@ -2379,6 +2379,7 @@ const baseTranslations = defineTranslations({
                   timezonePlaceholder: 'Europe/Amsterdam',
                   startupCommandPlaceholder: 'npm start',
                   startupCommandCustom: 'Custom',
+                  predefinedStartupCommands: 'Predefined Startup Commands',
                   startOnCompletion: 'Start on Completion',
                   startOnCompletionDescription: 'Start server after installation completes.',
                   skipInstaller: 'Skip Installer',
@@ -4392,6 +4393,7 @@ const baseTranslations = defineTranslations({
             },
           },
           noVariables: 'No startup variables found for this server.',
+          predefinedStartupCommands: 'Predefined Startup Commands',
         },
         mounts: {
           title: 'Mounts',

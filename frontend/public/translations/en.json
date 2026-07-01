@@ -2390,6 +2390,7 @@
                   "timezonePlaceholder": "Europe/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Custom",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Start on Completion",
                   "startOnCompletionDescription": "Start server after installation completes.",
                   "skipInstaller": "Skip Installer",
@@ -4354,7 +4355,8 @@
               "content": "You have unsaved changes to your startup variables. Are you sure you want to leave this page? If you leave, your changes will be lost."
             }
           },
-          "noVariables": "No startup variables found for this server."
+          "noVariables": "No startup variables found for this server.",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "Mounts",

@@ -1,5 +1,5 @@
 import { faDocker } from '@fortawesome/free-brands-svg-icons';
-import { faCog, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import debounce from 'debounce';
 import { useCallback, useEffect, useState } from 'react';
@@ -8,14 +8,12 @@ import getVariables from '@/api/server/startup/getVariables.ts';
 import updateCommand from '@/api/server/startup/updateCommand.ts';
 import updateDockerImage from '@/api/server/startup/updateDockerImage.ts';
 import updateVariables from '@/api/server/startup/updateVariables.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Popover from '@/elements/Popover.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Title from '@/elements/Title.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
@@ -34,6 +32,7 @@ export default function ServerStartup() {
   const { settings } = useGlobalStore();
   const { server, updateServer, variables, setVariables, updateVariable } = useServerStore();
   const canModifyVariables = useServerCan('startup.update');
+  const canModifyStartupCommand = useServerCan('startup.command');
 
   const [command, setCommand] = useState(server.startup);
   const [dockerImage, setDockerImage] = useState(server.image);
@@ -140,49 +139,37 @@ export default function ServerStartup() {
           icon={<FontAwesomeIcon icon={faPlay} />}
           className='col-span-2'
         >
+          {Object.keys(server.egg.startupCommands).length > 0 && (
+            <Select
+              label={t('pages.server.startup.predefinedStartupCommands', {})}
+              data={[
+                ...((!server.eggConfiguration?.startupAllowCustomCommand &&
+                  Object.values(server.egg.startupCommands).every((value) => value !== command)) ||
+                server.eggConfiguration?.startupAllowCustomCommand
+                  ? [{ label: t('common.custom', {}), value: '' }]
+                  : []),
+                ...Object.entries(server.egg.startupCommands).map(([key, value]) => ({
+                  value,
+                  label: key,
+                })),
+              ]}
+              disabled={
+                !canModifyStartupCommand ||
+                (!server.eggConfiguration?.startupAllowCustomCommand &&
+                  Object.values(server.egg.startupCommands).every((value) => value !== command))
+              }
+              value={Object.values(server.egg.startupCommands).find((value) => value === command) || ''}
+              onChange={(value) => setCommand(value ?? '')}
+              mb='sm'
+            />
+          )}
           <TextArea
             withAsterisk
             placeholder={t('common.form.startupCommand', {})}
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            readOnly={!useServerCan('startup.command') || !server.eggConfiguration?.startupAllowCustomCommand}
+            readOnly={!canModifyStartupCommand || !server.eggConfiguration?.startupAllowCustomCommand}
             autosize
-            rightSection={
-              <Popover>
-                <Popover.Target>
-                  <ActionIcon variant='subtle'>
-                    <FontAwesomeIcon icon={faCog} />
-                  </ActionIcon>
-                </Popover.Target>
-                <Popover.Dropdown>
-                  <Select
-                    data={[
-                      ...((!server.eggConfiguration?.startupAllowCustomCommand &&
-                        Object.values(server.egg.startupCommands).every((value) => value !== command)) ||
-                      server.eggConfiguration?.startupAllowCustomCommand
-                        ? [
-                            {
-                              label: t('common.custom', {}),
-                              value: '',
-                            },
-                          ]
-                        : []),
-                      ...Object.entries(server.egg.startupCommands).map(([key, value]) => ({
-                        value,
-                        label: key,
-                      })),
-                    ]}
-                    disabled={
-                      !useServerCan('startup.command') ||
-                      (!server.eggConfiguration?.startupAllowCustomCommand &&
-                        Object.values(server.egg.startupCommands).every((value) => value !== command))
-                    }
-                    value={Object.values(server.egg.startupCommands).find((value) => value === command) || ''}
-                    onChange={(value) => setCommand(value ?? '')}
-                  />
-                </Popover.Dropdown>
-              </Popover>
-            }
           />
         </TitleCard>
         <TitleCard title={t('common.form.dockerImage', {})} icon={<FontAwesomeIcon icon={faDocker} />}>
