@@ -1192,7 +1192,7 @@ impl DuplicableModel for Node {
             .await?;
         let uuid: uuid::Uuid = row.try_get("uuid")?;
 
-        let node = Self::by_uuid_with_transaction(transaction, uuid).await?;
+        let mut node = Self::by_uuid_with_transaction(transaction, uuid).await?;
 
         sqlx::query!(
             "INSERT INTO node_mounts (node_uuid, mount_uuid)
@@ -1205,7 +1205,7 @@ impl DuplicableModel for Node {
         .execute(&mut **transaction)
         .await?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut node, &options, state, transaction)
             .await?;
 
         Ok(node)

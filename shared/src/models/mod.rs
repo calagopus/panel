@@ -825,6 +825,7 @@ type DuplicateHandler<M> = dyn for<'a> Fn(
     + Sync;
 type DuplicateAfterHandler<M> = dyn for<'a> Fn(
         &'a M,
+        &'a mut M,
         &'a <M as DuplicableModel>::DuplicateOptions<'_>,
         &'a crate::State,
         &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -864,6 +865,7 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
     async fn register_after_duplicate_handler<
         F: for<'a> Fn(
                 &'a Self,
+                &'a mut Self,
                 &'a Self::DuplicateOptions<'_>,
                 &'a crate::State,
                 &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -908,6 +910,7 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
     fn blocking_register_after_duplicate_handler<
         F: for<'a> Fn(
                 &'a Self,
+                &'a mut Self,
                 &'a Self::DuplicateOptions<'_>,
                 &'a crate::State,
                 &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -941,6 +944,7 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
 
     async fn run_after_duplicate_handlers(
         &self,
+        duplicated: &mut Self,
         options: &Self::DuplicateOptions<'_>,
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -948,7 +952,7 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
         let listeners = Self::get_duplicate_handlers().after_handlers.read().await;
 
         for listener in listeners.iter() {
-            (*listener.callback)(self, options, state, transaction).await?;
+            (*listener.callback)(self, duplicated, options, state, transaction).await?;
         }
 
         Ok(())

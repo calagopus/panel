@@ -420,9 +420,9 @@ impl DuplicableModel for Role {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let role = Self::map(None, &row)?;
+        let mut role = Self::map(None, &row)?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut role, &options, state, transaction)
             .await?;
 
         Ok(role)

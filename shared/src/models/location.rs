@@ -513,7 +513,7 @@ impl DuplicableModel for Location {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let location = Self::map(None, &row)?;
+        let mut location = Self::map(None, &row)?;
 
         sqlx::query!(
             "INSERT INTO location_database_hosts (location_uuid, database_host_uuid)
@@ -526,7 +526,7 @@ impl DuplicableModel for Location {
         .execute(&mut **transaction)
         .await?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut location, &options, state, transaction)
             .await?;
 
         Ok(location)

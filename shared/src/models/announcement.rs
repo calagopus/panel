@@ -873,9 +873,9 @@ impl DuplicableModel for Announcement {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let announcement = Self::map(None, &row)?;
+        let mut announcement = Self::map(None, &row)?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut announcement, &options, state, transaction)
             .await?;
 
         Ok(announcement)

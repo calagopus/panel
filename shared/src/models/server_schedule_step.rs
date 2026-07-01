@@ -373,9 +373,9 @@ impl DuplicableModel for ServerScheduleStep {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let step = Self::map(None, &row)?;
+        let mut step = Self::map(None, &row)?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut step, &options, state, transaction)
             .await?;
 
         Ok(step)

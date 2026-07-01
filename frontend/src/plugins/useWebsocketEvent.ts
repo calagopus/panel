@@ -43,7 +43,7 @@ export enum SocketRequest {
 }
 
 const useWebsocketEvent = (event: SocketEvent, callback: (...data: string[]) => void) => {
-  const { socketConnected, socketInstance } = useServerStore();
+  const { socketInstance } = useServerStore();
   const savedCallback = useRef<(...data: string[]) => void>(null);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const useWebsocketEvent = (event: SocketEvent, callback: (...data: string[]) => 
 
   return useEffect(() => {
     const eventListener = (...data: string[]) => savedCallback.current!(...data);
-    if (socketConnected && socketInstance) {
+    if (socketInstance) {
       socketInstance.addListener(event, eventListener);
     }
 
@@ -61,7 +61,7 @@ const useWebsocketEvent = (event: SocketEvent, callback: (...data: string[]) => 
         socketInstance.removeListener(event, eventListener);
       }
     };
-  }, [event, socketConnected, socketInstance]);
+  }, [event, socketInstance]);
 };
 
 export default useWebsocketEvent;

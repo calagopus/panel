@@ -511,7 +511,7 @@ impl DuplicableModel for ServerSchedule {
             .returning(&Self::columns_sql(None))
             .fetch_one(&mut **transaction)
             .await?;
-        let schedule = Self::map(None, &row)?;
+        let mut schedule = Self::map(None, &row)?;
 
         sqlx::query!(
             "INSERT INTO server_schedule_steps (schedule_uuid, action, order_)
@@ -524,7 +524,7 @@ impl DuplicableModel for ServerSchedule {
         .execute(&mut **transaction)
         .await?;
 
-        self.run_after_duplicate_handlers(&options, state, transaction)
+        self.run_after_duplicate_handlers(&mut schedule, &options, state, transaction)
             .await?;
 
         Ok(schedule)
