@@ -411,8 +411,8 @@ export default function ServerCreate() {
       colSpan: 'full',
       render: (f) => (
         <>
-          {Object.keys(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {})
-            .length > 0 && (
+          {Object.keys(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {}).length >
+            0 && (
             <Select
               label={t('pages.admin.servers.tabs.general.page.form.predefinedStartupCommands', {})}
               className='col-span-full'

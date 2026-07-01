@@ -11,7 +11,7 @@ import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { serverMountTableColumns } from '@/lib/tableColumns.ts';
 import ServerMountAddModal from '@/pages/admin/servers/mounts/modals/ServerMountAddModal.tsx';
 import ServerMountRow from '@/pages/admin/servers/mounts/ServerMountRow.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminServerMounts({ server }: { server: z.infer<typeof adminServerSchema> }) {

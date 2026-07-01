@@ -29,7 +29,7 @@ import {
 } from '@/lib/schemas/admin/system.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { parseVersion } from '@/lib/version.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';

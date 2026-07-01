@@ -16,7 +16,7 @@ import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts'
 import { oauthProviderTableColumns } from '@/lib/tableColumns.ts';
 import { transformKeysToCamelCase } from '@/lib/transformers.ts';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';

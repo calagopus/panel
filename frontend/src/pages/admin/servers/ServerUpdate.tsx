@@ -26,8 +26,6 @@ import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
-import Popover from '@/elements/Popover.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/Stack.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -380,8 +378,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       colSpan: 'full',
       render: (f) => (
         <>
-          {Object.keys(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {})
-            .length > 0 && (
+          {Object.keys(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {}).length >
+            0 && (
             <Select
               label={t('pages.admin.servers.tabs.general.page.form.predefinedStartupCommands', {})}
               className='col-span-full'

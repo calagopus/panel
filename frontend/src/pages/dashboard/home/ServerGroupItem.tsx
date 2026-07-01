@@ -36,7 +36,7 @@ import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts'
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
 import ServerItem from '@/pages/dashboard/home/ServerItem.tsx';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useUserStore } from '@/stores/user.ts';

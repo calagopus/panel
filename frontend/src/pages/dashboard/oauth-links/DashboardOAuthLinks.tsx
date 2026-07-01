@@ -10,7 +10,7 @@ import AccountContentContainer from '@/elements/containers/AccountContentContain
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useUserStore } from '@/stores/user.ts';
 import OAuthLinkRow from './OAuthLinkRow.tsx';

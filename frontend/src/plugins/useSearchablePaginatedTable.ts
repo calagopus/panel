@@ -25,7 +25,6 @@ function parseNumber(num: string | null): number | null {
   return Number.isFinite(parsed) && parsed >= 1 ? parsed : null;
 }
 
-// TODO 1.1.x: Rename this to match file name/rename file
 export function useSearchablePaginatedTable<T>({
   queryKey = [],
   fetcher,
