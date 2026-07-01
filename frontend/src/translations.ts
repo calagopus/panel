@@ -1865,6 +1865,25 @@ const baseTranslations = defineTranslations({
         users: {
           title: 'Users',
           resourceName: 'User',
+          externalIdLookup: {
+            button: 'Find by External ID',
+            modal: {
+              title: 'Look Up by External ID',
+              form: {
+                externalId: 'External ID',
+                externalIdPlaceholder: 'e.g. my-user-001',
+                search: 'Search',
+              },
+              result: {
+                title: 'User Found',
+                username: 'Username',
+                email: 'Email',
+                role: 'Role',
+                viewUser: 'View User',
+              },
+              notFound: 'No user found with that external ID.',
+            },
+          },
           tooltip: {
             admin: 'Admin',
             twoFactorEnabled: '2FA Enabled',
@@ -2329,6 +2348,25 @@ const baseTranslations = defineTranslations({
         servers: {
           title: 'Servers',
           resourceName: 'Server',
+          externalIdLookup: {
+            button: 'Find by External ID',
+            modal: {
+              title: 'Look Up by External ID',
+              form: {
+                externalId: 'External ID',
+                externalIdPlaceholder: 'e.g. my-server-001',
+                search: 'Search',
+              },
+              result: {
+                title: 'Server Found',
+                name: 'Name',
+                owner: 'Owner',
+                node: 'Node',
+                viewServer: 'View Server',
+              },
+              notFound: 'No server found with that external ID.',
+            },
+          },
           tabs: {
             general: {
               page: {

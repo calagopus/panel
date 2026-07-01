@@ -1,5 +1,6 @@
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFingerprint, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import getServers from '@/api/admin/servers/getServers.ts';
 import Button from '@/elements/Button.tsx';
@@ -11,6 +12,7 @@ import { serverTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
+import ExternalIdLookupModal from './modals/ExternalIdLookupModal.tsx';
 import ServerCreate from './ServerCreate.tsx';
 import ServerRow from './ServerRow.tsx';
 import ServerView from './ServerView.tsx';
@@ -18,6 +20,7 @@ import ServerView from './ServerView.tsx';
 function ServersContainer() {
   const { t } = useTranslations();
   const navigate = useNavigate();
+  const [lookupOpen, setLookupOpen] = useState(false);
 
   const {
     data: servers,
@@ -36,15 +39,27 @@ function ServersContainer() {
       search={search}
       setSearch={setSearch}
       contentRight={
-        <AdminCan action='servers.create'>
-          <Button
-            onClick={() => navigate('/admin/servers/new')}
-            color='blue'
-            leftSection={<FontAwesomeIcon icon={faPlus} />}
-          >
-            {t('common.button.create', {})}
-          </Button>
-        </AdminCan>
+        <>
+          <ExternalIdLookupModal opened={lookupOpen} onClose={() => setLookupOpen(false)} />
+          <AdminCan action='servers.read'>
+            <Button
+              onClick={() => setLookupOpen(true)}
+              variant='default'
+              leftSection={<FontAwesomeIcon icon={faFingerprint} />}
+            >
+              {t('pages.admin.servers.externalIdLookup.button', {})}
+            </Button>
+          </AdminCan>
+          <AdminCan action='servers.create'>
+            <Button
+              onClick={() => navigate('/admin/servers/new')}
+              color='blue'
+              leftSection={<FontAwesomeIcon icon={faPlus} />}
+            >
+              {t('common.button.create', {})}
+            </Button>
+          </AdminCan>
+        </>
       }
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.container}
     >
