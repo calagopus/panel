@@ -329,14 +329,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "لا شيء",
+        "variable": "متغير",
         "enterVariable": "الرجاء إدخال اسم المتغير للتقييم.",
         "enterData": "الرجاء إدخال البيانات للإرسال.",
         "inputType": "نوع الإدخال",
         "dataType": "نوع البيانات للإرسال",
         "selectType": "تحديد النوع",
-        "none": "لا شيء",
-        "rawString": "سلسلة نصية خام",
-        "variable": "متغير"
+        "rawString": "سلسلة نصية خام"
       },
       "serverWebsocket": {
         "error": {
@@ -1420,16 +1420,16 @@
             }
           },
           "button": {
-            "trigger": "تشغيل",
-            "triggerWithCondition": "تشغيل (عدم تخطي الشرط)",
-            "triggerSkipCondition": "تشغيل (تخطي الشرط)",
             "addTrigger": "إضافة مشغل",
             "addCondition": "إضافة شرط",
             "addStep": "إضافة خطوة",
             "createFirstStep": "إنشاء الخطوة الأولى",
             "addOutput": "إضافة مخرجات",
             "addFile": "إضافة ملف",
-            "exitEditor": "خروج من المحرر"
+            "exitEditor": "خروج من المحرر",
+            "trigger": "تشغيل",
+            "triggerWithCondition": "تشغيل (عدم تخطي الشرط)",
+            "triggerSkipCondition": "تشغيل (تخطي الشرط)"
           },
           "toast": {
             "imported": "تم استيراد الجدول.",

@@ -1,10 +1,13 @@
 import { UseFormReturnType } from '@mantine/form';
 import cronstrue from 'cronstrue/i18n';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
+import Group from '@/elements/Group.tsx';
+import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import TimeInput from '@/elements/input/TimeInput.tsx';
 import Popover from '@/elements/Popover.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
@@ -15,9 +18,81 @@ import {
 } from '@/lib/enums.ts';
 import { serverScheduleTriggerSchema, serverScheduleUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useServerStore } from '@/stores/server.ts';
 import ScheduleDynamicParameterInput from '../ScheduleDynamicParameterInput.tsx';
 
 const CRON_SEGMENTS = ['Second', 'Minute', 'Hour', 'Day', 'Month', 'Weekday'] as const;
+
+type SimpleSchedule =
+  | { frequency: 'everyMinutes'; interval: number }
+  | { frequency: 'everyHours'; interval: number }
+  | { frequency: 'daily'; hour: number; minute: number }
+  | { frequency: 'weekly'; weekday: number; hour: number; minute: number }
+  | { frequency: 'monthly'; day: number; hour: number; minute: number };
+
+function parseSimpleSchedule(schedule: string): SimpleSchedule | null {
+  const segments = schedule.trim().split(/\s+/);
+  if (segments.length !== 6) return null;
+
+  const [second, minute, hour, dayOfMonth, month, weekday] = segments;
+  if (second !== '0' || month !== '*') return null;
+
+  const asNumber = (segment: string) => (/^\d+$/.test(segment) ? Number(segment) : null);
+  const asInterval = (segment: string) => {
+    if (segment === '*') return 1;
+    const match = /^\*\/(\d+)$/.exec(segment);
+    return match ? Number(match[1]) : null;
+  };
+
+  if (dayOfMonth === '*' && weekday === '*') {
+    const minuteInterval = asInterval(minute);
+    if (hour === '*' && minuteInterval !== null) return { frequency: 'everyMinutes', interval: minuteInterval };
+
+    const hourInterval = asInterval(hour);
+    if (minute === '0' && hourInterval !== null) return { frequency: 'everyHours', interval: hourInterval };
+
+    const parsedHour = asNumber(hour);
+    const parsedMinute = asNumber(minute);
+    if (parsedHour !== null && parsedMinute !== null) {
+      return { frequency: 'daily', hour: parsedHour, minute: parsedMinute };
+    }
+
+    return null;
+  }
+
+  const parsedHour = asNumber(hour);
+  const parsedMinute = asNumber(minute);
+  if (parsedHour === null || parsedMinute === null) return null;
+
+  if (dayOfMonth === '*') {
+    const parsedWeekday = asNumber(weekday);
+    if (parsedWeekday !== null && parsedWeekday <= 6) {
+      return { frequency: 'weekly', weekday: parsedWeekday, hour: parsedHour, minute: parsedMinute };
+    }
+  } else if (weekday === '*') {
+    const parsedDay = asNumber(dayOfMonth);
+    if (parsedDay !== null && parsedDay >= 1 && parsedDay <= 31) {
+      return { frequency: 'monthly', day: parsedDay, hour: parsedHour, minute: parsedMinute };
+    }
+  }
+
+  return null;
+}
+
+function simpleScheduleToCron(schedule: SimpleSchedule): string {
+  switch (schedule.frequency) {
+    case 'everyMinutes':
+      return schedule.interval === 1 ? '0 * * * * *' : `0 */${schedule.interval} * * * *`;
+    case 'everyHours':
+      return schedule.interval === 1 ? '0 0 * * * *' : `0 0 */${schedule.interval} * * *`;
+    case 'daily':
+      return `0 ${schedule.minute} ${schedule.hour} * * *`;
+    case 'weekly':
+      return `0 ${schedule.minute} ${schedule.hour} * * ${schedule.weekday}`;
+    case 'monthly':
+      return `0 ${schedule.minute} ${schedule.hour} ${schedule.day} * *`;
+  }
+}
 
 interface CrontabEditorProps {
   value: string;
@@ -70,44 +145,179 @@ interface TriggerFormProps {
   index: number;
 }
 
-function CronTriggerForm({ form, index }: TriggerFormProps) {
-  const { t } = useTranslations();
-
-  if (form.values.triggers[index].type !== 'cron') return null;
-
-  return (
-    <Popover>
-      <Popover.Target>
-        <TextInput
-          withAsterisk
-          label={t('pages.server.schedules.triggers.cron.form.cronSchedule', {})}
-          className='flex-1'
-          {...form.getInputProps(`triggers.${index}.schedule`)}
-        />
-      </Popover.Target>
-      <Popover.Dropdown>
-        <CrontabEditor
-          value={form.values.triggers[index].schedule}
-          setValue={(value) => form.setFieldValue(`triggers.${index}.schedule`, value)}
-        />
-      </Popover.Dropdown>
-    </Popover>
-  );
-}
-
 function CronTriggerExtraForm({ form, index }: TriggerFormProps) {
   const { t, language } = useTranslations();
+  const server = useServerStore((state) => state.server);
+  const [advancedManual, setAdvancedManual] = useState(false);
 
-  if (form.values.triggers[index].type !== 'cron') return null;
+  const trigger = form.values.triggers[index];
+  const schedule = trigger.type === 'cron' ? trigger.schedule : '';
+  const simple = useMemo(() => parseSimpleSchedule(schedule), [schedule]);
+
+  const weekdayOptions = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(language, { weekday: 'long', timeZone: 'UTC' });
+    // 2021-08-01 was a Sunday, matching cron weekday 0
+    return Array.from({ length: 7 }, (_, day) => ({
+      value: String(day),
+      label: formatter.format(new Date(Date.UTC(2021, 7, 1 + day))),
+    }));
+  }, [language]);
+
+  if (trigger.type !== 'cron') return null;
+
+  const advanced = advancedManual || !simple;
+
+  const setSchedule = (value: string) => form.setFieldValue(`triggers.${index}.schedule`, value);
+  const setSimple = (value: SimpleSchedule) => setSchedule(simpleScheduleToCron(value));
+
+  const handleFrequencyChange = (frequency: string) => {
+    const hour = simple && 'hour' in simple ? simple.hour : 0;
+    const minute = simple && 'minute' in simple ? simple.minute : 0;
+
+    switch (frequency) {
+      case 'everyMinutes':
+        setSimple({ frequency, interval: 30 });
+        break;
+      case 'everyHours':
+        setSimple({ frequency, interval: 6 });
+        break;
+      case 'daily':
+        setSimple({ frequency, hour, minute });
+        break;
+      case 'weekly':
+        setSimple({ frequency, weekday: 0, hour, minute });
+        break;
+      case 'monthly':
+        setSimple({ frequency, day: 1, hour, minute });
+        break;
+    }
+  };
+
+  const handleTimeChange = (value: string) => {
+    if (!simple || !('hour' in simple)) return;
+
+    const [hour, minute] = value.split(':').map(Number);
+    if (Number.isNaN(hour) || Number.isNaN(minute)) return;
+
+    setSimple({ ...simple, hour, minute });
+  };
 
   let description: string;
   try {
-    description = cronstrue.toString(form.values.triggers[index].schedule, { locale: language });
+    description = cronstrue.toString(schedule, { locale: language });
   } catch {
     description = t('pages.server.schedules.triggers.cron.invalidCron', {});
   }
 
-  return <Text c='dimmed'>{description}</Text>;
+  const timeValue =
+    simple && 'hour' in simple
+      ? `${String(simple.hour).padStart(2, '0')}:${String(simple.minute).padStart(2, '0')}`
+      : '00:00';
+
+  return (
+    <Stack gap='xs'>
+      {advanced ? (
+        <Popover>
+          <Popover.Target>
+            <TextInput
+              withAsterisk
+              label={t('pages.server.schedules.triggers.cron.form.cronSchedule', {})}
+              {...form.getInputProps(`triggers.${index}.schedule`)}
+            />
+          </Popover.Target>
+          <Popover.Dropdown>
+            <CrontabEditor value={schedule} setValue={setSchedule} />
+          </Popover.Dropdown>
+        </Popover>
+      ) : (
+        <Group align='end' gap='sm'>
+          <Select
+            label={t('pages.server.schedules.triggers.cron.form.frequency', {})}
+            className='flex-1'
+            value={simple!.frequency}
+            onChange={(value) => value && handleFrequencyChange(value)}
+            data={[
+              { value: 'everyMinutes', label: t('pages.server.schedules.triggers.cron.frequency.everyMinutes', {}) },
+              { value: 'everyHours', label: t('pages.server.schedules.triggers.cron.frequency.everyHours', {}) },
+              { value: 'daily', label: t('pages.server.schedules.triggers.cron.frequency.daily', {}) },
+              { value: 'weekly', label: t('pages.server.schedules.triggers.cron.frequency.weekly', {}) },
+              { value: 'monthly', label: t('pages.server.schedules.triggers.cron.frequency.monthly', {}) },
+            ]}
+          />
+
+          {simple!.frequency === 'everyMinutes' && (
+            <NumberInput
+              label={t('pages.server.schedules.triggers.cron.form.intervalMinutes', {})}
+              className='w-40'
+              min={1}
+              max={59}
+              value={simple!.interval}
+              onChange={(value) => setSimple({ frequency: 'everyMinutes', interval: Number(value) || 1 })}
+            />
+          )}
+          {simple!.frequency === 'everyHours' && (
+            <NumberInput
+              label={t('pages.server.schedules.triggers.cron.form.intervalHours', {})}
+              className='w-40'
+              min={1}
+              max={23}
+              value={simple!.interval}
+              onChange={(value) => setSimple({ frequency: 'everyHours', interval: Number(value) || 1 })}
+            />
+          )}
+          {simple!.frequency === 'weekly' && (
+            <Select
+              label={t('pages.server.schedules.triggers.cron.form.weekday', {})}
+              className='w-40'
+              value={String(simple!.weekday)}
+              onChange={(value) =>
+                value && simple!.frequency === 'weekly' && setSimple({ ...simple!, weekday: Number(value) })
+              }
+              data={weekdayOptions}
+            />
+          )}
+          {simple!.frequency === 'monthly' && (
+            <NumberInput
+              label={t('pages.server.schedules.triggers.cron.form.dayOfMonth', {})}
+              className='w-40'
+              min={1}
+              max={31}
+              value={simple!.day}
+              onChange={(value) =>
+                simple!.frequency === 'monthly' &&
+                setSimple({ ...simple!, day: Math.min(Math.max(Number(value) || 1, 1), 31) })
+              }
+            />
+          )}
+          {(simple!.frequency === 'daily' || simple!.frequency === 'weekly' || simple!.frequency === 'monthly') && (
+            <TimeInput
+              label={t('pages.server.schedules.triggers.cron.form.time', {})}
+              className='w-40'
+              value={timeValue}
+              onChange={(e) => handleTimeChange(e.currentTarget.value)}
+            />
+          )}
+        </Group>
+      )}
+
+      <Text c='dimmed' size='sm'>
+        {description} &middot;{' '}
+        {t('pages.server.schedules.triggers.cron.timezoneHint', { timezone: server.timezone || 'UTC' })}
+      </Text>
+
+      <Switch
+        label={t('pages.server.schedules.triggers.cron.form.advanced', {})}
+        checked={advanced}
+        onChange={(e) => {
+          const enabled = e.currentTarget.checked;
+          setAdvancedManual(enabled);
+          if (!enabled && !simple) {
+            setSchedule('0 0 0 * * *');
+          }
+        }}
+      />
+    </Stack>
+  );
 }
 
 function PowerActionTriggerForm({ form, index }: TriggerFormProps) {
@@ -208,7 +418,7 @@ function ConsoleLineExtraForm({ form, index }: TriggerFormProps) {
 type ServerScheduleTriggerType = z.infer<typeof serverScheduleTriggerSchema>['type'];
 
 const TRIGGER_INLINE_FORMS: Record<ServerScheduleTriggerType, React.FC<TriggerFormProps> | null> = {
-  cron: CronTriggerForm,
+  cron: null,
   power_action: PowerActionTriggerForm,
   server_state: ServerStateTriggerForm,
   backup_status: BackupStatusTriggerForm,

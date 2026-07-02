@@ -504,14 +504,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "Aucun",
+        "variable": "Variable",
         "enterVariable": "Veuillez entrer le nom de la variable à évaluer.",
         "enterData": "Veuillez entrer les données à envoyer.",
         "inputType": "Type d'entrée",
         "dataType": "Type de données à envoyer",
         "selectType": "Sélectionner le type",
-        "none": "Aucun",
-        "rawString": "Chaîne brute",
-        "variable": "Variable"
+        "rawString": "Chaîne brute"
       },
       "serverWebsocket": {
         "error": {
@@ -3812,16 +3812,16 @@
             }
           },
           "button": {
-            "trigger": "Déclencher",
-            "triggerWithCondition": "Déclencher (ne pas ignorer la condition)",
-            "triggerSkipCondition": "Déclencher (ignorer la condition)",
             "addTrigger": "Ajouter un déclencheur",
             "addCondition": "Ajouter une condition",
             "addStep": "Ajouter une étape",
             "createFirstStep": "Créer la première étape",
             "addOutput": "Ajouter une sortie",
             "addFile": "Ajouter un fichier",
-            "exitEditor": "Quitter l'éditeur"
+            "exitEditor": "Quitter l'éditeur",
+            "trigger": "Déclencher",
+            "triggerWithCondition": "Déclencher (ne pas ignorer la condition)",
+            "triggerSkipCondition": "Déclencher (ignorer la condition)"
           },
           "toast": {
             "imported": "Planification importée.",

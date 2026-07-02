@@ -102,17 +102,17 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
         items={[
           {
             icon: faPlay,
-            label: t('pages.server.schedules.button.trigger', {}),
+            label: t('pages.server.schedules.button.runNow', {}),
             items: [
               {
                 icon: faPlayCircle,
-                label: t('pages.server.schedules.button.triggerWithCondition', {}),
+                label: t('pages.server.schedules.button.runNowWithConditions', {}),
                 onClick: () => doTriggerSchedule(false),
                 color: 'gray',
               },
               {
                 icon: faPlay,
-                label: t('pages.server.schedules.button.triggerSkipCondition', {}),
+                label: t('pages.server.schedules.button.runNowIgnoreConditions', {}),
                 onClick: () => doTriggerSchedule(true),
                 color: 'gray',
               },

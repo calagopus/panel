@@ -330,14 +330,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "Ingen",
+        "variable": "Variabel",
         "enterVariable": "Ange variabelnamnet för utvärdering.",
         "enterData": "Ange data som ska skickas.",
         "inputType": "Ingångstyp",
         "dataType": "Datatyp att skicka",
         "selectType": "Välj Typ",
-        "none": "Ingen",
-        "rawString": "Rå sträng",
-        "variable": "Variabel"
+        "rawString": "Rå sträng"
       },
       "serverWebsocket": {
         "error": {
@@ -1425,16 +1425,16 @@
             }
           },
           "button": {
-            "trigger": "Utlösare",
-            "triggerWithCondition": "Utlösare (do not skip condition)",
-            "triggerSkipCondition": "Utlösare (skip condition)",
             "addTrigger": "Lägg till utlösare",
             "addCondition": "Lägg till villkor",
             "addStep": "Lägg till steg",
             "createFirstStep": "Skapa första steget",
             "addOutput": "Lägg till utdata",
             "addFile": "Lägg till fil",
-            "exitEditor": "Avsluta editor"
+            "exitEditor": "Avsluta editor",
+            "trigger": "Utlösare",
+            "triggerWithCondition": "Utlösare (do not skip condition)",
+            "triggerSkipCondition": "Utlösare (skip condition)"
           },
           "toast": {
             "imported": "Schema importerat.",

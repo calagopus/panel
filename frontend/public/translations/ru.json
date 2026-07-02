@@ -328,14 +328,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "Нет",
+        "variable": "Переменная",
         "enterVariable": "Пожалуйста, введите имя переменной для вычисления.",
         "enterData": "Пожалуйста, введите данные для отправки.",
         "inputType": "Тип ввода",
         "dataType": "Тип данных для отправки",
         "selectType": "Выбрать тип",
-        "none": "Нет",
-        "rawString": "Строка",
-        "variable": "Переменная"
+        "rawString": "Строка"
       },
       "serverWebsocket": {
         "error": {
@@ -1399,16 +1399,16 @@
             }
           },
           "button": {
-            "trigger": "Запустить",
-            "triggerWithCondition": "Запустить (не пропускать условие)",
-            "triggerSkipCondition": "Запустить (пропустить условие)",
             "addTrigger": "Добавить триггер",
             "addCondition": "Добавить условие",
             "addStep": "Добавить шаг",
             "createFirstStep": "Создать первый шаг",
             "addOutput": "Добавить вывод",
             "addFile": "Добавить файл",
-            "exitEditor": "Выйти из редактора"
+            "exitEditor": "Выйти из редактора",
+            "trigger": "Запустить",
+            "triggerWithCondition": "Запустить (не пропускать условие)",
+            "triggerSkipCondition": "Запустить (пропустить условие)"
           },
           "toast": {
             "imported": "Расписание импортировано.",

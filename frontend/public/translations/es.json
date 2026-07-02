@@ -329,14 +329,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "Ninguno",
+        "variable": "Variable",
         "enterVariable": "Introduce el nombre de la variable a evaluar.",
         "enterData": "Introduce los datos a enviar.",
         "inputType": "Tipo de entrada",
         "dataType": "Tipo de dato a enviar",
         "selectType": "Seleccionar tipo",
-        "none": "Ninguno",
-        "rawString": "Cadena sin procesar",
-        "variable": "Variable"
+        "rawString": "Cadena sin procesar"
       },
       "serverWebsocket": {
         "error": {
@@ -1420,16 +1420,16 @@
             }
           },
           "button": {
-            "trigger": "Ejecutar",
-            "triggerWithCondition": "Ejecutar (no omitir condición)",
-            "triggerSkipCondition": "Ejecutar (omitir condición)",
             "addTrigger": "Añadir disparador",
             "addCondition": "Añadir condición",
             "addStep": "Añadir paso",
             "createFirstStep": "Crear primer paso",
             "addOutput": "Añadir salida",
             "addFile": "Añadir archivo",
-            "exitEditor": "Salir del editor"
+            "exitEditor": "Salir del editor",
+            "trigger": "Ejecutar",
+            "triggerWithCondition": "Ejecutar (no omitir condición)",
+            "triggerSkipCondition": "Ejecutar (omitir condición)"
           },
           "toast": {
             "imported": "Tarea programada importada.",

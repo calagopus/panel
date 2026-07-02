@@ -497,14 +497,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "Không có",
+        "variable": "Biến",
         "enterVariable": "Vui lòng nhập tên biến để đánh giá.",
         "enterData": "Vui lòng nhập dữ liệu để gửi.",
         "inputType": "Kiểu nhập",
         "dataType": "Loại dữ liệu để gửi",
         "selectType": "Chọn loại",
-        "none": "Không có",
-        "rawString": "Chuỗi thô",
-        "variable": "Biến"
+        "rawString": "Chuỗi thô"
       },
       "serverWebsocket": {
         "error": {
@@ -3798,16 +3798,16 @@
             }
           },
           "button": {
-            "trigger": "Kích Hoạt",
-            "triggerWithCondition": "Kích Hoạt (không bỏ qua điều kiện)",
-            "triggerSkipCondition": "Kích Hoạt (bỏ qua điều kiện)",
             "addTrigger": "Thêm Trình Kích Hoạt",
             "addCondition": "Thêm Điều Kiện",
             "addStep": "Thêm Bước",
             "createFirstStep": "Tạo Bước Đầu Tiên",
             "addOutput": "Thêm Đầu Ra",
             "addFile": "Thêm Tệp",
-            "exitEditor": "Thoát Trình Soạn Thảo"
+            "exitEditor": "Thoát Trình Soạn Thảo",
+            "trigger": "Kích Hoạt",
+            "triggerWithCondition": "Kích Hoạt (không bỏ qua điều kiện)",
+            "triggerSkipCondition": "Kích Hoạt (bỏ qua điều kiện)"
           },
           "toast": {
             "imported": "Lịch trình đã được nhập.",

@@ -457,14 +457,12 @@ const baseTranslations = defineTranslations({
         },
       },
       scheduleDynamicInput: {
-        enterVariable: 'Please enter the variable name to evaluate.',
-        enterData: 'Please enter the data to send.',
-        inputType: 'Input Type',
-        dataType: 'Data type to send',
-        selectType: 'Select Type',
         none: 'None',
-        rawString: 'Raw String',
         variable: 'Variable',
+        enterVariable: 'Reading from a variable.',
+        useVariable: 'Use a variable instead of plain text',
+        usePlainText: 'Use plain text instead of a variable',
+        optionalPlaceholder: 'None (optional)',
       },
       serverWebsocket: {
         error: {
@@ -3901,9 +3899,9 @@ const baseTranslations = defineTranslations({
             },
           },
           button: {
-            trigger: 'Trigger',
-            triggerWithCondition: 'Trigger (do not skip condition)',
-            triggerSkipCondition: 'Trigger (skip condition)',
+            runNow: 'Run Now',
+            runNowWithConditions: 'Run now (check conditions first)',
+            runNowIgnoreConditions: 'Run now (ignore conditions)',
             addTrigger: 'Add Trigger',
             addCondition: 'Add Condition',
             addStep: 'Add Step',
@@ -3984,13 +3982,18 @@ const baseTranslations = defineTranslations({
               title: 'Confirm Schedule Step Deletion',
               content: 'Are you sure you want to delete this schedule step?',
             },
+            unsavedChanges: {
+              title: 'Unsaved Changes',
+              content:
+                'You have unsaved changes to your schedule conditions. Are you sure you want to leave this page? If you leave, your changes will be lost.',
+            },
           },
           view: {
             badge: {
               running: 'Running',
             },
             tooltip: {
-              cannotTrigger: 'Cannot trigger a disabled schedule',
+              cannotRun: 'Cannot run a disabled schedule',
             },
             tabs: {
               actions: 'Actions',
@@ -4038,10 +4041,25 @@ const baseTranslations = defineTranslations({
           },
           triggers: {
             cron: {
-              title: 'Cron',
+              title: 'Time Interval (Cron)',
               form: {
                 cronSchedule: 'Cron Schedule',
+                frequency: 'Runs',
+                intervalMinutes: 'Every (minutes)',
+                intervalHours: 'Every (hours)',
+                time: 'At',
+                weekday: 'On',
+                dayOfMonth: 'On day',
+                advanced: 'Edit as cron expression',
               },
+              frequency: {
+                everyMinutes: 'Every few minutes',
+                everyHours: 'Every few hours',
+                daily: 'Daily',
+                weekly: 'Weekly',
+                monthly: 'Monthly',
+              },
+              timezoneHint: 'Times use the server timezone ({timezone}).',
               card: {
                 content: 'On Cron Interval {schedule}, Next run is {timestamp} - Last run was {lastTimestamp}.',
               },
@@ -4092,8 +4110,15 @@ const baseTranslations = defineTranslations({
               title: 'No Steps Configured',
               description: "This schedule doesn't have any steps yet. Add some actions to get started.",
             },
+            groups: {
+              server: 'Server',
+              files: 'Files & Backups',
+              startup: 'Startup Settings',
+              advanced: 'Advanced Logic',
+            },
             sleep: {
               title: 'Sleep',
+              description: 'Wait for a set amount of time before continuing with the next action.',
               form: {
                 duration: 'Duration (milliseconds)',
               },
@@ -4103,12 +4128,14 @@ const baseTranslations = defineTranslations({
             },
             ensure: {
               title: 'Ensure',
+              description: 'Stop the schedule here unless a condition is true.',
               renderer: {
                 compact: 'Ensure a condition matches',
               },
             },
             format: {
               title: 'Format',
+              description: 'Build a text value from variables and store it in a variable.',
               form: {
                 formatString: 'Format String',
                 formatStringDescription:
@@ -4120,6 +4147,7 @@ const baseTranslations = defineTranslations({
             },
             matchRegex: {
               title: 'Match Regex',
+              description: 'Extract parts of a text value using a regular expression.',
               form: {
                 input: 'Input',
                 regex: 'Regex',
@@ -4132,6 +4160,7 @@ const baseTranslations = defineTranslations({
             },
             waitForConsoleLine: {
               title: 'Wait for Console Line',
+              description: 'Wait until the server console outputs a matching line.',
               form: {
                 timeout: 'Timeout (milliseconds)',
               },
@@ -4146,6 +4175,7 @@ const baseTranslations = defineTranslations({
             },
             sendCommand: {
               title: 'Send Command',
+              description: 'Send a command to the server console.',
               renderer: {
                 compact: 'Run {command}',
                 detail: {
@@ -4155,6 +4185,7 @@ const baseTranslations = defineTranslations({
             },
             sendPower: {
               title: 'Send Power Signal',
+              description: 'Start, restart, stop or kill the server.',
               renderer: {
                 compact: 'Do {action}',
                 detail: {
@@ -4164,6 +4195,7 @@ const baseTranslations = defineTranslations({
             },
             createBackup: {
               title: 'Create Backup',
+              description: 'Create a backup of the server files.',
               form: {
                 backupName: 'Backup Name',
               },
@@ -4177,6 +4209,7 @@ const baseTranslations = defineTranslations({
             },
             createDirectory: {
               title: 'Create Directory',
+              description: 'Create a new folder in the server files.',
               renderer: {
                 compact: 'Create {name} in {root}',
                 detail: {
@@ -4187,6 +4220,7 @@ const baseTranslations = defineTranslations({
             },
             writeFile: {
               title: 'Write File',
+              description: 'Write or append text to a file.',
               form: {
                 content: 'Content',
                 appendToFile: 'Append to File',
@@ -4201,6 +4235,7 @@ const baseTranslations = defineTranslations({
             },
             copyFile: {
               title: 'Copy File',
+              description: 'Copy a file to a new location.',
               form: {
                 sourceFile: 'Source File',
               },
@@ -4214,6 +4249,7 @@ const baseTranslations = defineTranslations({
             },
             deleteFiles: {
               title: 'Delete Files',
+              description: 'Delete files or folders.',
               form: {
                 filesToDelete: 'Files to Delete',
               },
@@ -4227,6 +4263,7 @@ const baseTranslations = defineTranslations({
             },
             renameFiles: {
               title: 'Rename Files',
+              description: 'Rename or move files.',
               form: {
                 files: 'Files',
                 from: 'from',
@@ -4242,6 +4279,7 @@ const baseTranslations = defineTranslations({
             },
             compressFiles: {
               title: 'Compress Files',
+              description: 'Compress files into an archive.',
               form: {
                 filesToCompress: 'Files to Compress',
               },
@@ -4257,6 +4295,7 @@ const baseTranslations = defineTranslations({
             },
             decompressFile: {
               title: 'Decompress File',
+              description: 'Extract an archive into a folder.',
               form: {
                 file: 'File',
               },
@@ -4270,6 +4309,7 @@ const baseTranslations = defineTranslations({
             },
             updateStartupVariable: {
               title: 'Update Startup Variable',
+              description: 'Change the value of a startup variable.',
               renderer: {
                 compact: 'Set {variable} to {value}',
                 detail: {
@@ -4280,6 +4320,7 @@ const baseTranslations = defineTranslations({
             },
             updateStartupCommand: {
               title: 'Update Startup Command',
+              description: 'Change the command used to start the server.',
               renderer: {
                 compact: 'Set to {command}',
                 detail: {
@@ -4289,6 +4330,7 @@ const baseTranslations = defineTranslations({
             },
             updateStartupDockerImage: {
               title: 'Update Docker Image',
+              description: 'Change the Docker image the server runs in.',
               renderer: {
                 compact: 'Set to {image}',
                 detail: {

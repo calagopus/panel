@@ -1,10 +1,12 @@
-import classNames from 'classnames';
-import { useMemo } from 'react';
+import { faDollarSign, faFont } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useMemo, useState } from 'react';
 import { z } from 'zod';
+import ActionIcon from '@/elements/ActionIcon.tsx';
 import Autocomplete from '@/elements/input/Autocomplete.tsx';
-import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { serverScheduleStepDynamicSchema, serverScheduleStepVariableSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -40,6 +42,10 @@ export default function ScheduleDynamicParameterInput<N extends boolean = false,
   const schedule = useServerStore((server) => server.schedule);
   const scheduleSteps = useServerStore((server) => server.scheduleSteps);
 
+  const [nullModePreference, setNullModePreference] = useState<'text' | 'variable'>(
+    value && typeof value === 'object' ? 'variable' : allowString ? 'text' : 'variable',
+  );
+
   const outputVariables = useMemo(() => {
     if (!schedule) {
       return [];
@@ -70,81 +76,101 @@ export default function ScheduleDynamicParameterInput<N extends boolean = false,
     return [...outputVariables];
   }, [schedule, scheduleSteps]);
 
-  return (
-    <div className={classNames('grid grid-cols-6 gap-2', className)}>
-      {value && typeof value === 'object' ? (
-        <Autocomplete
-          description={t('elements.scheduleDynamicInput.enterVariable', {})}
-          className='col-span-4'
-          value={value.variable}
-          onChange={(v) => onChange({ variable: v })}
-          data={outputVariables}
-          {...rest}
-        />
-      ) : textArea ? (
-        <TextArea description={t('elements.scheduleDynamicInput.enterData', {})} className='col-span-4' {...rest} />
-      ) : (
-        <TextInput
-          description={
-            !allowString
-              ? t('elements.scheduleDynamicInput.enterVariable', {})
-              : t('elements.scheduleDynamicInput.enterData', {})
-          }
-          className='col-span-4'
-          disabled={allowNull && value === null}
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value as never)}
-          {...rest}
-        />
-      )}
-      <Select
-        label={t('elements.scheduleDynamicInput.inputType', {})}
-        description={t('elements.scheduleDynamicInput.dataType', {})}
-        placeholder={t('elements.scheduleDynamicInput.selectType', {})}
-        className='col-span-2'
-        value={value === undefined ? null : value === null ? 'null' : typeof value === 'string' ? 'raw' : 'variable'}
-        data={[
-          ...(allowNull
-            ? [
-                {
-                  label: t('elements.scheduleDynamicInput.none', {}),
-                  value: 'null',
-                },
-              ]
-            : []),
-          ...(allowString
-            ? [
-                {
-                  label: t('elements.scheduleDynamicInput.rawString', {}),
-                  value: 'raw',
-                },
-              ]
-            : []),
-          {
-            label: t('elements.scheduleDynamicInput.variable', {}),
-            value: 'variable',
-          },
-        ]}
-        onChange={(v) => {
-          switch (v) {
-            case 'null':
-              if (value !== null) {
-                onChange(null as never);
-              }
-              break;
-            case 'raw':
-              if (typeof value !== 'string') {
-                onChange('' as never);
-              }
-              break;
-            case 'variable':
-              if (value === null || typeof value !== 'object') {
-                onChange({ variable: '' });
-              }
-              break;
-          }
-        }}
+  const mode: 'text' | 'variable' = !allowString
+    ? 'variable'
+    : value && typeof value === 'object'
+      ? 'variable'
+      : typeof value === 'string'
+        ? 'text'
+        : nullModePreference;
+
+  const displayedValue: string =
+    mode === 'variable'
+      ? value && typeof value === 'object'
+        ? value.variable
+        : ''
+      : typeof value === 'string'
+        ? value
+        : '';
+
+  const handleChange = (input: string) => {
+    if (allowNull && input === '') {
+      onChange(null as never);
+    } else if (mode === 'variable') {
+      onChange({ variable: input } as never);
+    } else {
+      onChange(input as never);
+    }
+  };
+
+  const toggleMode = () => {
+    const newMode = mode === 'variable' ? 'text' : 'variable';
+    setNullModePreference(newMode);
+
+    if (allowNull && displayedValue === '') {
+      onChange(null as never);
+    } else if (newMode === 'variable') {
+      onChange({ variable: displayedValue } as never);
+    } else {
+      onChange(displayedValue as never);
+    }
+  };
+
+  const modeToggle = allowString ? (
+    <Tooltip
+      label={
+        mode === 'variable'
+          ? t('elements.scheduleDynamicInput.usePlainText', {})
+          : t('elements.scheduleDynamicInput.useVariable', {})
+      }
+    >
+      <ActionIcon variant='subtle' color='gray' onClick={toggleMode}>
+        <FontAwesomeIcon icon={mode === 'variable' ? faFont : faDollarSign} />
+      </ActionIcon>
+    </Tooltip>
+  ) : null;
+
+  const placeholder = allowNull ? t('elements.scheduleDynamicInput.optionalPlaceholder', {}) : rest.placeholder;
+
+  if (mode === 'variable') {
+    return (
+      <Autocomplete
+        className={className}
+        description={t('elements.scheduleDynamicInput.enterVariable', {})}
+        value={displayedValue}
+        onChange={handleChange}
+        data={outputVariables}
+        rightSection={modeToggle}
+        rightSectionPointerEvents='all'
+        {...rest}
+        placeholder={placeholder}
       />
-    </div>
+    );
+  }
+
+  if (textArea) {
+    return (
+      <TextArea
+        className={className}
+        value={displayedValue}
+        onChange={(e) => handleChange(e.target.value)}
+        rightSection={modeToggle}
+        rightSectionPointerEvents='all'
+        {...rest}
+        placeholder={placeholder}
+      />
+    );
+  }
+
+  return (
+    <TextInput
+      className={className}
+      value={displayedValue}
+      onChange={(e) => handleChange(e.target.value)}
+      rightSection={modeToggle}
+      rightSectionPointerEvents='all'
+      {...rest}
+      placeholder={placeholder}
+    />
   );
 }
