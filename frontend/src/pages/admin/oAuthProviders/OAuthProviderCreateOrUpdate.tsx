@@ -1,7 +1,7 @@
 import { faChevronDown, faExternalLink, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
-import jsYaml from 'js-yaml';
+import { dump } from 'js-yaml';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -154,7 +154,7 @@ export default function OAuthProviderCreateOrUpdate({
       URL.revokeObjectURL(fileURL);
       downloadLink.remove();
     } else {
-      const yamlData = jsYaml.dump(data, { flowLevel: -1, forceQuotes: true });
+      const yamlData = dump(data, { flowLevel: -1, forceQuotes: true });
       const fileURL = URL.createObjectURL(new Blob([yamlData], { type: 'text/plain' }));
       const downloadLink = document.createElement('a');
       downloadLink.href = fileURL;

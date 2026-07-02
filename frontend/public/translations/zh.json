@@ -497,14 +497,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "無",
+        "variable": "變數",
         "enterVariable": "請輸入要評估的變數名稱。",
         "enterData": "請輸入要傳送的資料。",
         "inputType": "輸入類型",
         "dataType": "要傳送的資料類型",
         "selectType": "選取類型",
-        "none": "無",
-        "rawString": "原始字串",
-        "variable": "變數"
+        "rawString": "原始字串"
       },
       "serverWebsocket": {
         "error": {
@@ -3798,16 +3798,16 @@
             }
           },
           "button": {
-            "trigger": "觸發",
-            "triggerWithCondition": "觸發（不要略過條件）",
-            "triggerSkipCondition": "觸發（略過條件）",
             "addTrigger": "新增觸發器",
             "addCondition": "新增條件",
             "addStep": "新增步驟",
             "createFirstStep": "建立第一個步驟",
             "addOutput": "新增輸出",
             "addFile": "新增檔案",
-            "exitEditor": "離開編輯器"
+            "exitEditor": "離開編輯器",
+            "trigger": "觸發",
+            "triggerWithCondition": "觸發（不要略過條件）",
+            "triggerSkipCondition": "觸發（略過條件）"
           },
           "toast": {
             "imported": "排程已匯入。",

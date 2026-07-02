@@ -518,14 +518,12 @@
         }
       },
       "scheduleDynamicInput": {
-        "enterVariable": "Bitte gib den Namen der auszuwertenden Variablen ein.",
-        "enterData": "Bitte gib die zu sendenden Daten ein.",
-        "inputType": "Eingabetyp",
-        "dataType": "Zu sendender Datentyp",
-        "selectType": "Typ auswählen",
         "none": "Keine",
-        "rawString": "Rohdaten-String",
-        "variable": "Variable"
+        "variable": "Variable",
+        "enterVariable": "Liest aus einer Variable.",
+        "useVariable": "Eine Variable anstelle von Text verwenden",
+        "usePlainText": "Text anstelle einer Variable verwenden",
+        "optionalPlaceholder": "Keine (optional)"
       },
       "serverWebsocket": {
         "error": {
@@ -2306,6 +2304,7 @@
                         "none": "Keine (alle Allocations verwerfen, dem Server werden auf der Ziel-Node keine neuen Allocations automatisch zugewiesen)",
                         "randomPrimary": "Primäre Allocation zufällig zuweisen (entfernt zusätzliche Allocations)",
                         "randomAll": "Alle Allocations zufällig zuweisen (empfohlen, um Inkompatibilitätsprobleme mit der Ziel-Node zu vermeiden)",
+                        "preservePorts": "Portnummern beibehalten (verwendet, sofern verfügbar, dieselben Portnummern auf der Ziel-Node und weist andernfalls zufällige Allocations zu)",
                         "eggConfigDeployment": "Allocations basierend auf der Egg-Deployment-Konfiguration zuweisen (funktioniert nur, wenn das Egg eine Deployment-Konfiguration hat und die Ziel-Node kompatible Allocations bereitstellt)",
                         "eggConfigSelfAssignRange": "Neue Allocations basierend auf dem Egg-Portbereich selbst zuweisen (funktioniert nur, wenn das Egg einen Portbereich hat und die Ziel-Node kompatible Allocations bereitstellt)"
                       }
@@ -3924,9 +3923,9 @@
             }
           },
           "button": {
-            "trigger": "Auslösen",
-            "triggerWithCondition": "Auslösen (Bedingung nicht überspringen)",
-            "triggerSkipCondition": "Auslösen (Bedingung überspringen)",
+            "runNow": "Jetzt ausführen",
+            "runNowWithConditions": "Jetzt ausführen (Bedingungen zuerst prüfen)",
+            "runNowIgnoreConditions": "Jetzt ausführen (Bedingungen ignorieren)",
             "addTrigger": "Auslöser hinzufügen",
             "addCondition": "Bedingung hinzufügen",
             "addStep": "Schritt hinzufügen",
@@ -4006,6 +4005,10 @@
             "deleteStep": {
               "title": "Löschen des Zeitplan-Schritts bestätigen",
               "content": "Bist du sicher, dass du diesen Zeitplan-Schritt löschen möchtest?"
+            },
+            "unsavedChanges": {
+              "title": "Ungespeicherte Änderungen",
+              "content": "Du hast ungespeicherte Änderungen an deinen Zeitplan-Bedingungen. Bist du sicher, dass du diese Seite verlassen möchtest? Wenn du die Seite verlässt, gehen deine Änderungen verloren."
             }
           },
           "view": {
@@ -4013,7 +4016,7 @@
               "running": "Läuft"
             },
             "tooltip": {
-              "cannotTrigger": "Ein deaktivierter Zeitplan kann nicht ausgelöst werden"
+              "cannotRun": "Ein deaktivierter Zeitplan kann nicht ausgeführt werden"
             },
             "tabs": {
               "actions": "Aktionen",
@@ -4061,10 +4064,25 @@
           },
           "triggers": {
             "cron": {
-              "title": "Cron",
+              "title": "Zeitintervall (Cron)",
               "form": {
-                "cronSchedule": "Cron-Zeitplan"
+                "cronSchedule": "Cron-Zeitplan",
+                "frequency": "Läuft",
+                "intervalMinutes": "Alle (Minuten)",
+                "intervalHours": "Alle (Stunden)",
+                "time": "Um",
+                "weekday": "Am",
+                "dayOfMonth": "Am Tag",
+                "advanced": "Als Cron-Ausdruck bearbeiten"
               },
+              "frequency": {
+                "everyMinutes": "Alle paar Minuten",
+                "everyHours": "Alle paar Stunden",
+                "daily": "Täglich",
+                "weekly": "Wöchentlich",
+                "monthly": "Monatlich"
+              },
+              "timezoneHint": "Zeiten verwenden die Server-Zeitzone ({timezone}).",
               "card": {
                 "content": "Im Cron-Intervall {schedule}, nächste Ausführung ist {timestamp} - letzte Ausführung war {lastTimestamp}."
               },
@@ -4115,8 +4133,15 @@
               "title": "Keine Schritte konfiguriert",
               "description": "Dieser Zeitplan hat noch keine Schritte. Füge einige Aktionen hinzu, um loszulegen."
             },
+            "groups": {
+              "server": "Server",
+              "files": "Dateien & Backups",
+              "startup": "Starteinstellungen",
+              "advanced": "Erweiterte Logik"
+            },
             "sleep": {
               "title": "Pausieren (Sleep)",
+              "description": "Wartet eine festgelegte Zeit, bevor die nächste Aktion ausgeführt wird.",
               "form": {
                 "duration": "Dauer (Millisekunden)"
               },
@@ -4126,12 +4151,14 @@
             },
             "ensure": {
               "title": "Sicherstellen",
+              "description": "Bricht den Zeitplan hier ab, wenn eine Bedingung nicht erfüllt ist.",
               "renderer": {
                 "compact": "Sicherstellen, dass eine Bedingung zutrifft"
               }
             },
             "format": {
               "title": "Formatieren",
+              "description": "Erstellt einen Textwert aus Variablen und speichert ihn in einer Variable.",
               "form": {
                 "formatString": "Format-String",
                 "formatStringDescription": "Der Format-String. Variablen können eingefügt werden, indem sie in {wrapper} eingeschlossen werden."
@@ -4142,6 +4169,7 @@
             },
             "matchRegex": {
               "title": "Regex abgleichen",
+              "description": "Extrahiert Teile eines Textwerts mit einem regulären Ausdruck.",
               "form": {
                 "input": "Eingabe",
                 "regex": "Regex",
@@ -4154,6 +4182,7 @@
             },
             "waitForConsoleLine": {
               "title": "Auf Konsolenzeile warten",
+              "description": "Wartet, bis die Server-Konsole eine passende Zeile ausgibt.",
               "form": {
                 "timeout": "Zeitüberschreitung (Millisekunden)"
               },
@@ -4168,6 +4197,7 @@
             },
             "sendCommand": {
               "title": "Befehl senden",
+              "description": "Sendet einen Befehl an die Server-Konsole.",
               "renderer": {
                 "compact": "Führe {command} aus",
                 "detail": {
@@ -4177,6 +4207,7 @@
             },
             "sendPower": {
               "title": "Power-Signal senden",
+              "description": "Startet, stoppt oder killt den Server oder startet ihn neu.",
               "renderer": {
                 "compact": "Führe {action} aus",
                 "detail": {
@@ -4186,6 +4217,7 @@
             },
             "createBackup": {
               "title": "Backup erstellen",
+              "description": "Erstellt ein Backup der Server-Dateien.",
               "form": {
                 "backupName": "Backup-Name"
               },
@@ -4199,6 +4231,7 @@
             },
             "createDirectory": {
               "title": "Verzeichnis erstellen",
+              "description": "Erstellt einen neuen Ordner in den Server-Dateien.",
               "renderer": {
                 "compact": "Erstelle {name} in {root}",
                 "detail": {
@@ -4209,6 +4242,7 @@
             },
             "writeFile": {
               "title": "Datei schreiben",
+              "description": "Schreibt Text in eine Datei oder hängt ihn an.",
               "form": {
                 "content": "Inhalt",
                 "appendToFile": "An Datei anhängen"
@@ -4223,6 +4257,7 @@
             },
             "copyFile": {
               "title": "Datei kopieren",
+              "description": "Kopiert eine Datei an einen neuen Ort.",
               "form": {
                 "sourceFile": "Quelldatei"
               },
@@ -4236,6 +4271,7 @@
             },
             "deleteFiles": {
               "title": "Dateien löschen",
+              "description": "Löscht Dateien oder Ordner.",
               "form": {
                 "filesToDelete": "Zu löschende Dateien"
               },
@@ -4249,6 +4285,7 @@
             },
             "renameFiles": {
               "title": "Dateien umbenennen",
+              "description": "Benennt Dateien um oder verschiebt sie.",
               "form": {
                 "files": "Dateien",
                 "from": "von",
@@ -4264,6 +4301,7 @@
             },
             "compressFiles": {
               "title": "Dateien komprimieren",
+              "description": "Komprimiert Dateien in ein Archiv.",
               "form": {
                 "filesToCompress": "Zu komprimierende Dateien"
               },
@@ -4279,6 +4317,7 @@
             },
             "decompressFile": {
               "title": "Datei entpacken",
+              "description": "Entpackt ein Archiv in einen Ordner.",
               "form": {
                 "file": "Datei"
               },
@@ -4292,6 +4331,7 @@
             },
             "updateStartupVariable": {
               "title": "Startvariable aktualisieren",
+              "description": "Ändert den Wert einer Startvariable.",
               "renderer": {
                 "compact": "Setze {variable} auf {value}",
                 "detail": {
@@ -4302,6 +4342,7 @@
             },
             "updateStartupCommand": {
               "title": "Startbefehl aktualisieren",
+              "description": "Ändert den Befehl, mit dem der Server gestartet wird.",
               "renderer": {
                 "compact": "Setze auf {command}",
                 "detail": {
@@ -4311,6 +4352,7 @@
             },
             "updateStartupDockerImage": {
               "title": "Docker Image aktualisieren",
+              "description": "Ändert das Docker-Image, in dem der Server läuft.",
               "renderer": {
                 "compact": "Setze auf {image}",
                 "detail": {

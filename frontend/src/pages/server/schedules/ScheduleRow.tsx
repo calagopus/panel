@@ -1,5 +1,5 @@
 import { faClone, faFileDownload, faPlay, faPlayCircle, faShareAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
-import jsYaml from 'js-yaml';
+import { dump } from 'js-yaml';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -57,7 +57,7 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
           URL.revokeObjectURL(fileURL);
           downloadLink.remove();
         } else {
-          const yamlData = jsYaml.dump(data, { flowLevel: -1, forceQuotes: true });
+          const yamlData = dump(data, { flowLevel: -1, forceQuotes: true });
           const fileURL = URL.createObjectURL(new Blob([yamlData], { type: 'text/plain' }));
           const downloadLink = document.createElement('a');
           downloadLink.href = fileURL;
@@ -102,17 +102,17 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
         items={[
           {
             icon: faPlay,
-            label: t('pages.server.schedules.button.trigger', {}),
+            label: t('pages.server.schedules.button.runNow', {}),
             items: [
               {
                 icon: faPlayCircle,
-                label: t('pages.server.schedules.button.triggerWithCondition', {}),
+                label: t('pages.server.schedules.button.runNowWithConditions', {}),
                 onClick: () => doTriggerSchedule(false),
                 color: 'gray',
               },
               {
                 icon: faPlay,
-                label: t('pages.server.schedules.button.triggerSkipCondition', {}),
+                label: t('pages.server.schedules.button.runNowIgnoreConditions', {}),
                 onClick: () => doTriggerSchedule(true),
                 color: 'gray',
               },

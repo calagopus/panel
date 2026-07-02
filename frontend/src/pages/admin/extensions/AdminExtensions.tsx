@@ -64,11 +64,6 @@ export default function AdminExtensions() {
           }
         })
         .catch((err) => {
-          // stop polling instead of toasting the same error every 5 seconds
-          if (statusIntervalRef.current) {
-            clearInterval(statusIntervalRef.current);
-            statusIntervalRef.current = null;
-          }
           addToast(httpErrorToHuman(err), 'error');
         });
     }, 5000);

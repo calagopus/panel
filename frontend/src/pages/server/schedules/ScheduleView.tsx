@@ -21,6 +21,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Tabs from '@/elements/Tabs.tsx';
@@ -28,6 +29,8 @@ import Timeline from '@/elements/Timeline.tsx';
 import Title from '@/elements/Title.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { useBlocker } from '@/plugins/useBlocker.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -47,6 +50,9 @@ export default function ScheduleView() {
   const [openModal, setOpenModal] = useState<'actions' | 'update' | null>(null);
   const [date, setDate] = useState(new Date());
   const [loading, setLoading] = useState(false);
+  const [conditionsDirty, setConditionsDirty] = useState(false);
+  const canUpdate = useServerCan('schedules.update');
+  const blocker = useBlocker(conditionsDirty);
 
   useEffect(() => {
     const interval = setInterval(() => setDate(new Date()), 1000);
@@ -56,7 +62,13 @@ export default function ScheduleView() {
   useEffect(() => {
     if (params.id) {
       getSchedule(server.uuid, params.id).then(setSchedule);
-      getScheduleSteps(server.uuid, params.id).then(setScheduleSteps);
+      getScheduleSteps(server.uuid, params.id).then((steps) => {
+        setScheduleSteps(steps);
+
+        if (steps.length === 0 && canUpdate) {
+          setOpenModal('actions');
+        }
+      });
     }
   }, [params.id]);
 
@@ -79,6 +91,7 @@ export default function ScheduleView() {
       updateSchedule(server.uuid, params.id, { condition: schedule!.condition })
         .then(() => {
           addToast(t('pages.server.schedules.toast.updated', {}), 'success');
+          setConditionsDirty(false);
         })
         .finally(() => setLoading(false));
     }
@@ -101,6 +114,16 @@ export default function ScheduleView() {
         onClose={() => setOpenModal(null)}
       />
 
+      <ConfirmationModal
+        title={t('pages.server.schedules.modal.unsavedChanges.title', {})}
+        opened={blocker.state === 'blocked'}
+        onClose={() => blocker.reset()}
+        onConfirmed={() => blocker.proceed()}
+        confirm={t('common.button.leavePage', {})}
+      >
+        {t('pages.server.schedules.modal.unsavedChanges.content', {}).md()}
+      </ConfirmationModal>
+
       <Stack gap='lg'>
         <Group justify='space-between'>
           <Group gap='md'>
@@ -117,13 +140,13 @@ export default function ScheduleView() {
                   items={[
                     {
                       icon: faPlayCircle,
-                      label: t('pages.server.schedules.button.triggerWithCondition', {}),
+                      label: t('pages.server.schedules.button.runNowWithConditions', {}),
                       onClick: () => doTriggerSchedule(false),
                       color: 'gray',
                     },
                     {
                       icon: faPlay,
-                      label: t('pages.server.schedules.button.triggerSkipCondition', {}),
+                      label: t('pages.server.schedules.button.runNowIgnoreConditions', {}),
                       onClick: () => doTriggerSchedule(true),
                       color: 'gray',
                     },
@@ -141,10 +164,10 @@ export default function ScheduleView() {
                         color='green'
                         rightSection={<FontAwesomeIcon icon={faChevronDown} />}
                       >
-                        {t('pages.server.schedules.button.trigger', {})}
+                        {t('pages.server.schedules.button.runNow', {})}
                       </Button>
                     ) : (
-                      <Tooltip label={t('pages.server.schedules.view.tooltip.cannotTrigger', {})}>
+                      <Tooltip label={t('pages.server.schedules.view.tooltip.cannotRun', {})}>
                         <Button
                           disabled
                           onClick={(e) => {
@@ -155,7 +178,7 @@ export default function ScheduleView() {
                           color='green'
                           rightSection={<FontAwesomeIcon icon={faChevronDown} />}
                         >
-                          {t('pages.server.schedules.button.trigger', {})}
+                          {t('pages.server.schedules.button.runNow', {})}
                         </Button>
                       </Tooltip>
                     )
@@ -219,7 +242,14 @@ export default function ScheduleView() {
               <StepsEditor schedule={schedule} />
             ) : scheduleSteps.length === 0 ? (
               <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
-                {t('pages.server.schedules.view.alert.noActions', {})}
+                <Group justify='space-between'>
+                  {t('pages.server.schedules.view.alert.noActions', {})}
+                  <ServerCan action='schedules.update'>
+                    <Button size='xs' variant='light' onClick={() => setOpenModal('actions')}>
+                      {t('pages.server.schedules.button.addStep', {})}
+                    </Button>
+                  </ServerCan>
+                </Group>
               </Alert>
             ) : (
               <Timeline
@@ -246,12 +276,15 @@ export default function ScheduleView() {
 
             <SchedulePreConditionBuilder
               condition={schedule.condition}
-              onChange={(condition) => setSchedule({ ...schedule, condition })}
+              onChange={(condition) => {
+                setSchedule({ ...schedule, condition });
+                setConditionsDirty(true);
+              }}
             />
 
             <ServerCan action='schedules.update'>
               <div className='flex flex-row mt-4'>
-                <Button loading={loading} onClick={doUpdate}>
+                <Button loading={loading} disabled={!conditionsDirty} onClick={doUpdate}>
                   {t('common.button.update', {})}
                 </Button>
               </div>

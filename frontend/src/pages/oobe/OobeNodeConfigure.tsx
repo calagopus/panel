@@ -1,6 +1,6 @@
 import { faCheck, faChevronLeft, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import jsYaml from 'js-yaml';
+import { dump } from 'js-yaml';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
 import { axiosInstance } from '@/api/axios.ts';
@@ -109,7 +109,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
               languageName='yaml'
               language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
             >
-              {jsYaml.dump(nodeConfiguration)}
+              {dump(nodeConfiguration)}
             </HljsCode>
 
             <div className='mt-2'>

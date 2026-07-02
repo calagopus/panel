@@ -1,5 +1,5 @@
 import { ModalProps } from '@mantine/core';
-import jsYaml from 'js-yaml';
+import { load } from 'js-yaml';
 import { useRef, useState } from 'react';
 import { z } from 'zod';
 import updateNodesConfig from '@/api/admin/nodes/updateNodesConfig.ts';
@@ -30,7 +30,7 @@ export default function NodesBulkConfigModal({
   const doApply = () => {
     let parsed: object;
     try {
-      parsed = jsYaml.load(yaml) as object;
+      parsed = load(yaml) as object;
     } catch (err) {
       addToast(t('pages.admin.nodes.modal.bulkConfig.error.invalidYaml', { error: (err as Error).message }), 'error');
       return;

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import createSchedule from '@/api/server/schedules/createSchedule.ts';
 import updateSchedule from '@/api/server/schedules/updateSchedule.ts';
@@ -33,6 +34,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { server, addSchedule } = useServerStore();
+  const navigate = useNavigate();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
     z.infer<typeof serverScheduleUpdateSchema>
@@ -56,6 +58,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
         const schedule = await createSchedule(server.uuid, values);
         addToast(t('pages.server.schedules.toast.created', {}), 'success');
         addSchedule(schedule);
+        navigate(`/server/${server.uuidShort}/schedules/${schedule.uuid}`);
       }
     },
   });

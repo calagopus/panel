@@ -133,8 +133,6 @@ export default function ServerCreate() {
   const [selectedNestUuid, setSelectedNestUuid] = useState<string | null>('');
   const [eggVariables, setEggVariables] = useState<z.infer<typeof adminEggVariableSchema>[]>([]);
 
-  // the form is uncontrolled, so render-time form.getValues() reads don't react to
-  // changes; mirror the fields that drive queries/effects into state via form.watch
   const [selectedEggUuid, setSelectedEggUuid] = useState('');
   const [selectedNodeUuid, setSelectedNodeUuid] = useState('');
   form.watch('eggUuid', ({ value }) => setSelectedEggUuid(value));
@@ -196,9 +194,6 @@ export default function ServerCreate() {
 
     form.setFieldValue('image', Object.values(egg.dockerImages)[0] ?? '');
     form.setFieldValue('startup', egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '');
-    // only react to the egg actually changing: `eggs.items` refetches (e.g. while
-    // typing in the egg search box) must not clobber user-edited image/startup
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEggUuid]);
 
   useEffect(() => {
@@ -280,7 +275,6 @@ export default function ServerCreate() {
           value={selectedNestUuid}
           onChange={(value) => {
             setSelectedNestUuid(value);
-            // a stale egg from the previous nest must not be submitted
             form.setFieldValue('eggUuid', '');
           }}
           data={nests.items.map((nest) => ({ label: nest.name, value: nest.uuid }))}

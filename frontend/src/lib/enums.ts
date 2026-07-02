@@ -361,6 +361,66 @@ export const scheduleStepLabelMapping: Record<z.infer<typeof serverScheduleStepA
     getTranslations().t('pages.server.schedules.steps.updateStartupDockerImage.title', {}),
 };
 
+export type ScheduleStepGroup = 'server' | 'files' | 'startup' | 'advanced';
+
+export const scheduleStepGroupLabelMapping: Record<ScheduleStepGroup, () => string> = {
+  server: () => getTranslations().t('pages.server.schedules.steps.groups.server', {}),
+  files: () => getTranslations().t('pages.server.schedules.steps.groups.files', {}),
+  startup: () => getTranslations().t('pages.server.schedules.steps.groups.startup', {}),
+  advanced: () => getTranslations().t('pages.server.schedules.steps.groups.advanced', {}),
+};
+
+export const scheduleStepGroupMapping: Record<
+  z.infer<typeof serverScheduleStepActionSchema>['type'],
+  ScheduleStepGroup
+> = {
+  sleep: 'advanced',
+  ensure: 'advanced',
+  format: 'advanced',
+  match_regex: 'advanced',
+  wait_for_console_line: 'advanced',
+  send_power: 'server',
+  send_command: 'server',
+  create_backup: 'server',
+  create_directory: 'files',
+  write_file: 'files',
+  copy_file: 'files',
+  delete_files: 'files',
+  rename_files: 'files',
+  compress_files: 'files',
+  decompress_file: 'files',
+  update_startup_variable: 'startup',
+  update_startup_command: 'startup',
+  update_startup_docker_image: 'startup',
+};
+
+export const scheduleStepDescriptionMapping: Record<
+  z.infer<typeof serverScheduleStepActionSchema>['type'],
+  () => string
+> = {
+  sleep: () => getTranslations().t('pages.server.schedules.steps.sleep.description', {}),
+  ensure: () => getTranslations().t('pages.server.schedules.steps.ensure.description', {}),
+  format: () => getTranslations().t('pages.server.schedules.steps.format.description', {}),
+  match_regex: () => getTranslations().t('pages.server.schedules.steps.matchRegex.description', {}),
+  wait_for_console_line: () => getTranslations().t('pages.server.schedules.steps.waitForConsoleLine.description', {}),
+  send_power: () => getTranslations().t('pages.server.schedules.steps.sendPower.description', {}),
+  send_command: () => getTranslations().t('pages.server.schedules.steps.sendCommand.description', {}),
+  create_backup: () => getTranslations().t('pages.server.schedules.steps.createBackup.description', {}),
+  create_directory: () => getTranslations().t('pages.server.schedules.steps.createDirectory.description', {}),
+  write_file: () => getTranslations().t('pages.server.schedules.steps.writeFile.description', {}),
+  copy_file: () => getTranslations().t('pages.server.schedules.steps.copyFile.description', {}),
+  delete_files: () => getTranslations().t('pages.server.schedules.steps.deleteFiles.description', {}),
+  rename_files: () => getTranslations().t('pages.server.schedules.steps.renameFiles.description', {}),
+  compress_files: () => getTranslations().t('pages.server.schedules.steps.compressFiles.description', {}),
+  decompress_file: () => getTranslations().t('pages.server.schedules.steps.decompressFile.description', {}),
+  update_startup_variable: () =>
+    getTranslations().t('pages.server.schedules.steps.updateStartupVariable.description', {}),
+  update_startup_command: () =>
+    getTranslations().t('pages.server.schedules.steps.updateStartupCommand.description', {}),
+  update_startup_docker_image: () =>
+    getTranslations().t('pages.server.schedules.steps.updateStartupDockerImage.description', {}),
+};
+
 export const scheduleStepDefaultMapping: Record<
   z.infer<typeof serverScheduleStepActionSchema>['type'],
   z.infer<typeof serverScheduleStepActionSchema>
@@ -568,7 +628,7 @@ export const scheduleTriggerDefaultMapping: Record<
   z.infer<typeof serverScheduleTriggerSchema>['type'],
   z.infer<typeof serverScheduleTriggerSchema>
 > = {
-  cron: { type: 'cron', schedule: '' },
+  cron: { type: 'cron', schedule: '0 0 0 * * *' },
   power_action: { type: 'power_action', action: 'start' },
   server_state: { type: 'server_state', state: 'running' },
   backup_status: { type: 'backup_status', status: 'starting' },

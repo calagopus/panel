@@ -114,8 +114,7 @@ export default function ServerGroupItem({
     }
 
     const { server } = serverToRemove;
-    // remove by uuid: the displayed page can be search-filtered, so index math
-    // against serverOrder would remove the wrong server
+
     const serverOrder = serverGroup.serverOrder.filter((uuid) => uuid !== server.uuid);
     updateStateServerGroup(serverGroup.uuid, { serverOrder });
     setServers((prev) => ({ ...prev, data: prev.data.filter((s) => s.uuid !== server.uuid) }));
@@ -315,9 +314,6 @@ export default function ServerGroupItem({
                 strategy={rectSortingStrategy}
                 callbacks={{
                   onDragEnd: async (items) => {
-                    // the displayed list can be a search-filtered subset, so reorder
-                    // the dragged uuids within the order positions they already occupy
-                    // instead of splicing over a contiguous region
                     const serverOrder = [...serverGroup.serverOrder];
                     const knownUuids = new Set(serverOrder);
                     const draggedUuids = items.map((s) => s.uuid).filter((uuid) => knownUuids.has(uuid));

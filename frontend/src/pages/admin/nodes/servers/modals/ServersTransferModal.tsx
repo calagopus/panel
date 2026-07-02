@@ -40,8 +40,13 @@ export default function ServersTransferModal({
   const [openModal, setOpenModal] = useState<'confirm' | null>(null);
   const [selectedNodeUuid, setSelectedNodeUuid] = useState<string | null>(null);
   const [allocationMode, setAllocationMode] = useState<
-    'none' | 'random_primary' | 'random_all' | 'egg_config_deployment' | 'egg_config_self_assign_range'
-  >('random_all');
+    | 'none'
+    | 'random_primary'
+    | 'random_all'
+    | 'preserve_ports'
+    | 'egg_config_deployment'
+    | 'egg_config_self_assign_range'
+  >('preserve_ports');
   const [transferBackups, setTransferBackups] = useState(false);
   const [deleteSourceBackups, setDeleteSourceBackups] = useState(false);
   const [archiveFormat, setArchiveFormat] = useState<z.infer<typeof transferArchiveFormat>>('tar_zstd');
@@ -134,6 +139,7 @@ export default function ServersTransferModal({
                   | 'none'
                   | 'random_primary'
                   | 'random_all'
+                  | 'preserve_ports'
                   | 'egg_config_deployment'
                   | 'egg_config_self_assign_range',
               )
@@ -150,6 +156,10 @@ export default function ServersTransferModal({
               {
                 value: 'random_all',
                 label: t('pages.admin.nodes.tabs.servers.page.modal.transfer.enum.allocationMode.randomAll', {}),
+              },
+              {
+                value: 'preserve_ports',
+                label: t('pages.admin.nodes.tabs.servers.page.modal.transfer.enum.allocationMode.preservePorts', {}),
               },
               {
                 value: 'egg_config_deployment',

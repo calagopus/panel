@@ -11,6 +11,7 @@ const postTransfersSchema = z.object({
     'none',
     'random_primary',
     'random_all',
+    'preserve_ports',
     'egg_config_deployment',
     'egg_config_self_assign_range',
   ]),

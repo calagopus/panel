@@ -504,14 +504,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "Geen",
+        "variable": "Variabele",
         "enterVariable": "Voer de naam in van de variabele die geëvalueerd moet worden.",
         "enterData": "Voer de te verzenden gegevens in.",
         "inputType": "Invoertype",
         "dataType": "Te verzenden gegevenstype",
         "selectType": "Selecteer type",
-        "none": "Geen",
-        "rawString": "Onbewerkte tekst",
-        "variable": "Variabele"
+        "rawString": "Onbewerkte tekst"
       },
       "serverWebsocket": {
         "error": {
@@ -3812,16 +3812,16 @@
             }
           },
           "button": {
-            "trigger": "Activeren",
-            "triggerWithCondition": "Activeren (conditie niet overslaan)",
-            "triggerSkipCondition": "Activeren (conditie overslaan)",
             "addTrigger": "Trigger toevoegen",
             "addCondition": "Conditie toevoegen",
             "addStep": "Stap toevoegen",
             "createFirstStep": "Eerste stap aanmaken",
             "addOutput": "Uitvoer toevoegen",
             "addFile": "Bestand toevoegen",
-            "exitEditor": "Editor verlaten"
+            "exitEditor": "Editor verlaten",
+            "trigger": "Activeren",
+            "triggerWithCondition": "Activeren (conditie niet overslaan)",
+            "triggerSkipCondition": "Activeren (conditie overslaan)"
           },
           "toast": {
             "imported": "Planning geïmporteerd.",

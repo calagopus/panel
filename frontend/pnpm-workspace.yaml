@@ -6,3 +6,5 @@ allowBuilds:
   esbuild: true
 minimumReleaseAge: 4320 # 3 days
 blockExoticSubdeps: true
+overrides:
+  dompurify: ^3.4.11

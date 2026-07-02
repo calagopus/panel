@@ -329,14 +329,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "Yok",
+        "variable": "Değişken",
         "enterVariable": "Lütfen değerlendirilecek değişken adını girin.",
         "enterData": "Lütfen gönderilecek veriyi girin.",
         "inputType": "Giriş Tipi",
         "dataType": "Gönderilecek veri tipi",
         "selectType": "Tip Seçin",
-        "none": "Yok",
-        "rawString": "Ham Metin (Raw String)",
-        "variable": "Değişken"
+        "rawString": "Ham Metin (Raw String)"
       },
       "serverWebsocket": {
         "error": {
@@ -1411,16 +1411,16 @@
             }
           },
           "button": {
-            "trigger": "Tetikle",
-            "triggerWithCondition": "Tetikle (koşulu atlama)",
-            "triggerSkipCondition": "Tetikle (koşulu atla)",
             "addTrigger": "Tetikleyici Ekle",
             "addCondition": "Koşul Ekle",
             "addStep": "Adım Ekle",
             "createFirstStep": "İlk Adımı Oluştur",
             "addOutput": "Çıktı Ekle",
             "addFile": "Dosya Ekle",
-            "exitEditor": "Editörden Çık"
+            "exitEditor": "Editörden Çık",
+            "trigger": "Tetikle",
+            "triggerWithCondition": "Tetikle (koşulu atlama)",
+            "triggerSkipCondition": "Tetikle (koşulu atla)"
           },
           "toast": {
             "imported": "Zamanlayıcı içe aktarıldı.",

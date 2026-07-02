@@ -13,7 +13,14 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
-import { scheduleStepDefaultMapping, scheduleStepLabelMapping } from '@/lib/enums.ts';
+import {
+  ScheduleStepGroup,
+  scheduleStepDefaultMapping,
+  scheduleStepDescriptionMapping,
+  scheduleStepGroupLabelMapping,
+  scheduleStepGroupMapping,
+  scheduleStepLabelMapping,
+} from '@/lib/enums.ts';
 import {
   serverScheduleSchema,
   serverScheduleStepActionSchema,
@@ -68,7 +75,7 @@ export default function StepCreateOrUpdateModal({
   >({
     initialValues: {
       order: nextStepOrder ?? 1,
-      action: scheduleStepDefaultMapping.sleep,
+      action: scheduleStepDefaultMapping.send_command,
     },
     validate: zod4Resolver(serverScheduleStepUpdateSchema),
     onClose: props.onClose,
@@ -110,10 +117,23 @@ export default function StepCreateOrUpdateModal({
       <Stack gap='md'>
         <Select
           label={t('pages.server.schedules.form.actionType', {})}
-          data={Object.entries(scheduleStepLabelMapping).map(([value, label]) => ({
-            value,
-            label: label(),
+          data={(['server', 'files', 'startup', 'advanced'] as ScheduleStepGroup[]).map((group) => ({
+            group: scheduleStepGroupLabelMapping[group](),
+            items: Object.entries(scheduleStepLabelMapping)
+              .filter(([value]) => scheduleStepGroupMapping[value as keyof typeof scheduleStepGroupMapping] === group)
+              .map(([value, label]) => ({
+                value,
+                label: label(),
+              })),
           }))}
+          renderOption={({ option }) => (
+            <Stack gap={0}>
+              <Text size='sm'>{option.label}</Text>
+              <Text size='xs' c='dimmed'>
+                {scheduleStepDescriptionMapping[option.value as keyof typeof scheduleStepDescriptionMapping]()}
+              </Text>
+            </Stack>
+          )}
           searchable
           value={form.getValues().action.type}
           onChange={(type) => {

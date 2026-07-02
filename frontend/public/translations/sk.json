@@ -497,14 +497,14 @@
         }
       },
       "scheduleDynamicInput": {
+        "none": "žiadne",
+        "variable": "Premenná",
         "enterVariable": "Zadajte názov premennej na vyhodnotenie.",
         "enterData": "Zadajte údaje na odoslanie.",
         "inputType": "Typ vstupu",
         "dataType": "Typ údajov na odoslanie",
         "selectType": "Vyberte typ",
-        "none": "žiadne",
-        "rawString": "Surový text",
-        "variable": "Premenná"
+        "rawString": "Surový text"
       },
       "serverWebsocket": {
         "error": {
@@ -3777,16 +3777,16 @@
             }
           },
           "button": {
-            "trigger": "Spustiť",
-            "triggerWithCondition": "Spustiť (nepreskočiť podmienku)",
-            "triggerSkipCondition": "Spustiť (preskočiť podmienku)",
             "addTrigger": "Pridať spúšťač",
             "addCondition": "Pridať podmienku",
             "addStep": "Pridať krok",
             "createFirstStep": "Vytvoriť prvý krok",
             "addOutput": "Pridať výstup",
             "addFile": "Pridať súbor",
-            "exitEditor": "Ukončiť editor"
+            "exitEditor": "Ukončiť editor",
+            "trigger": "Spustiť",
+            "triggerWithCondition": "Spustiť (nepreskočiť podmienku)",
+            "triggerSkipCondition": "Spustiť (preskočiť podmienku)"
           },
           "toast": {
             "imported": "Plán bol importovaný.",

@@ -159,7 +159,6 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
           return;
         }
 
-        // toast only once per outage instead of on every 5s reconnect attempt
         if (!lossNotified) {
           lossNotified = true;
           addToast(t('pages.admin.nodes.tabs.statistics.page.toast.connectionLost', {}), 'error');
