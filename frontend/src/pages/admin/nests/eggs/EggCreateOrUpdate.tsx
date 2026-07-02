@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
-import jsYaml from 'js-yaml';
+import { dump, load } from 'js-yaml';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
@@ -181,7 +181,7 @@ export default function EggCreateOrUpdate({
           URL.revokeObjectURL(fileURL);
           downloadLink.remove();
         } else {
-          const yamlData = jsYaml.dump(data, {
+          const yamlData = dump(data, {
             flowLevel: -1,
             forceQuotes: true,
           });
@@ -235,7 +235,7 @@ export default function EggCreateOrUpdate({
       if (text.startsWith('{')) {
         data = JSON.parse(text);
       } else {
-        data = jsYaml.load(text) as object;
+        data = load(text) as object;
       }
     } catch (err) {
       addToast(t('pages.admin.nests.tabs.eggs.page.toast.parseFailed', { error: String(err) }), 'error');

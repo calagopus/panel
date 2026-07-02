@@ -1,5 +1,5 @@
 import { faClone, faFileDownload, faPlay, faPlayCircle, faShareAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
-import jsYaml from 'js-yaml';
+import { dump } from 'js-yaml';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -57,7 +57,7 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
           URL.revokeObjectURL(fileURL);
           downloadLink.remove();
         } else {
-          const yamlData = jsYaml.dump(data, { flowLevel: -1, forceQuotes: true });
+          const yamlData = dump(data, { flowLevel: -1, forceQuotes: true });
           const fileURL = URL.createObjectURL(new Blob([yamlData], { type: 'text/plain' }));
           const downloadLink = document.createElement('a');
           downloadLink.href = fileURL;
