@@ -31,7 +31,7 @@ export interface ServerStore
   reset: () => void;
 }
 
-const { Provider, useStore } = createContext<StoreApi<ServerStore>>();
+const { Provider, useStore, useStoreApi } = createContext<StoreApi<ServerStore>>();
 
 export const createServerStore = () =>
   create<ServerStore>()((...a) => {
@@ -57,3 +57,4 @@ export const createServerStore = () =>
 
 export const ServerStoreContextProvider = Provider;
 export const useServerStore = useStore;
+export const useServerStoreApi = useStoreApi;

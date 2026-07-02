@@ -306,6 +306,9 @@ export default function EggConfigurationCreateOrUpdate({
     );
   };
 
+  // this form is controlled and the schema is recursive; validate once per render
+  const formIsValid = form.isValid();
+
   return (
     <AdminContentContainer
       title={
@@ -609,11 +612,11 @@ export default function EggConfigurationCreateOrUpdate({
               action={contextEggConfiguration ? 'egg-configurations.update' : 'egg-configurations.create'}
               cantSave
             >
-              <Button type='submit' disabled={!form.isValid()} loading={loading}>
+              <Button type='submit' disabled={!formIsValid} loading={loading}>
                 {t('common.button.save', {})}
               </Button>
               {!contextEggConfiguration && (
-                <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
+                <Button onClick={() => doCreateOrUpdate(true)} disabled={!formIsValid} loading={loading}>
                   {t('common.button.saveAndStay', {})}
                 </Button>
               )}

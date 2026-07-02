@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
 import saveFileContent from '@/api/server/files/saveFileContent.ts';
@@ -13,7 +14,9 @@ import { useServerStore } from '@/stores/server.ts';
 export default function EulaModal() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, state, socketInstance } = useServerStore();
+  const { server, state, socketInstance } = useServerStore(
+    useShallow((s) => ({ server: s.server, state: s.state, socketInstance: s.socketInstance })),
+  );
 
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);

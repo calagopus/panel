@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createBrowserHistory } from 'history';
 import { useEffect, useRef, useState } from 'react';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 import getAnnouncements from './api/getAnnouncements.ts';
 import getLanguages from './api/getLanguages.ts';
 import getSettings from './api/getSettings.ts';
@@ -43,7 +44,15 @@ export default function App({
   theme: MantineThemeOverride;
   cssVariablesResolver: CSSVariablesResolver | null;
 }) {
-  const { settings, setSettings, setLanguages, setTimeOffset, setAnnouncements } = useGlobalStore();
+  const { settings, setSettings, setLanguages, setTimeOffset, setAnnouncements } = useGlobalStore(
+    useShallow((state) => ({
+      settings: state.settings,
+      setSettings: state.setSettings,
+      setLanguages: state.setLanguages,
+      setTimeOffset: state.setTimeOffset,
+      setAnnouncements: state.setAnnouncements,
+    })),
+  );
   const [loadWarning, setLoadWarning] = useState(false);
   const retryCount = useRef(0);
 

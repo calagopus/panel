@@ -108,6 +108,11 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
     validate: zod4Resolver(formSchema),
   });
 
+  // the form is uncontrolled, so render-time form.getValues() reads don't react to
+  // changes; mirror the egg into state via form.watch
+  const [selectedEggUuid, setSelectedEggUuid] = useState(contextServer?.egg.uuid ?? '');
+  form.watch('eggUuid', ({ value }) => setSelectedEggUuid(value));
+
   const { loading, doCreateOrUpdate } = useResourceForm<
     z.infer<typeof adminServerUpdateSchema>,
     z.infer<typeof adminServerSchema>
@@ -167,21 +172,24 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
     canRequest: canReadBackupConfigurations,
   });
 
-  const eggImages = eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.dockerImages || {};
+  const eggImages = eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.dockerImages || {};
 
   useEffect(() => {
-    if (!form.getValues().eggUuid || contextServer) {
+    // populate egg defaults only when the admin picks a different egg; the
+    // server's saved image/startup must not be clobbered on load
+    if (!selectedEggUuid || selectedEggUuid === contextServer.egg.uuid) {
       return;
     }
 
-    const egg = eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid);
+    const egg = eggs.items.find((egg) => egg.uuid === selectedEggUuid);
     if (!egg) {
       return;
     }
 
     form.setFieldValue('image', Object.values(egg.dockerImages)[0] ?? '');
     form.setFieldValue('startup', egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '');
-  }, [form.getValues().eggUuid, eggs.items, contextServer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEggUuid]);
 
   return (
     <AdminSubContentContainer
@@ -311,7 +319,11 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                   withAsterisk
                   label={t('common.form.nest', {})}
                   value={selectedNestUuid}
-                  onChange={(value) => setSelectedNestUuid(value)}
+                  onChange={(value) => {
+                    setSelectedNestUuid(value);
+                    // a stale egg from the previous nest must not be submitted
+                    form.setFieldValue('eggUuid', '');
+                  }}
                   data={nests.items.map((nest) => ({
                     label: nest.name,
                     value: nest.uuid,
@@ -495,8 +507,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                   {...form.getInputProps('timezone')}
                 />
 
-                {Object.keys(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {})
-                  .length > 0 && (
+                {Object.keys(eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.startupCommands || {}).length >
+                  0 && (
                   <Select
                     label={t('pages.admin.servers.tabs.general.page.form.predefinedStartupCommands', {})}
                     className='col-span-full'
@@ -506,16 +518,16 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                         value: '',
                       },
                       ...Object.entries(
-                        eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
+                        eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.startupCommands || {},
                       ).map(([key, value]) => ({
                         value,
                         label: key,
                       })),
                     ]}
                     value={
-                      Object.values(
-                        eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
-                      ).find((value) => value === form.getValues().startup) || ''
+                      Object.values(eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.startupCommands || {}).find(
+                        (value) => value === form.getValues().startup,
+                      ) || ''
                     }
                     onChange={(value) => form.setFieldValue('startup', value ?? '')}
                   />

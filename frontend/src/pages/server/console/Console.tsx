@@ -16,6 +16,7 @@ import { WebLinksAddon } from '@xterm/addon-web-links';
 import { ITerminalInitOnlyOptions, ITerminalOptions, Terminal as XTerm } from '@xterm/xterm';
 import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
@@ -80,8 +81,17 @@ const getXtermTheme = (isDark: boolean) => ({
 
 export default function Terminal() {
   const { t } = useTranslations();
-  const { server, commandSnippets, imagePulls, socketConnected, socketInstance, state } = useServerStore();
-  const { settings } = useGlobalStore();
+  const { server, commandSnippets, imagePulls, socketConnected, socketInstance, state } = useServerStore(
+    useShallow((s) => ({
+      server: s.server,
+      commandSnippets: s.commandSnippets,
+      imagePulls: s.imagePulls,
+      socketConnected: s.socketConnected,
+      socketInstance: s.socketInstance,
+      state: s.state,
+    })),
+  );
+  const settings = useGlobalStore((s) => s.settings);
   const computedColorScheme = useComputedColorScheme('dark');
 
   const [history, setHistory] = useState<string[]>([]);
@@ -289,22 +299,29 @@ export default function Terminal() {
 
   useEffect(() => {
     let pingInterval: ReturnType<typeof setInterval>;
+    let pongTimeout: ReturnType<typeof setTimeout> | null = null;
+    let activePongHandler: (() => void) | null = null;
 
     if (socketConnected && socketInstance) {
       const pingFn = () => {
         const start = Date.now();
         socketInstance.send(SocketRequest.PING);
 
-        let timeout: ReturnType<typeof setTimeout> | null = null;
+        if (activePongHandler) socketInstance.removeListener(SocketEvent.PONG, activePongHandler);
+        if (pongTimeout) clearTimeout(pongTimeout);
+
         const handlePong = () => {
           const latency = Date.now() - start;
           setWebsocketPing(latency);
           socketInstance.removeListener(SocketEvent.PONG, handlePong);
-          if (timeout) clearTimeout(timeout);
+          if (pongTimeout) clearTimeout(pongTimeout);
+          if (activePongHandler === handlePong) activePongHandler = null;
         };
+        activePongHandler = handlePong;
 
-        timeout = setTimeout(() => {
+        pongTimeout = setTimeout(() => {
           socketInstance.removeListener(SocketEvent.PONG, handlePong);
+          if (activePongHandler === handlePong) activePongHandler = null;
         }, 10000);
 
         socketInstance.addListener(SocketEvent.PONG, handlePong);
@@ -316,6 +333,8 @@ export default function Terminal() {
 
     return () => {
       if (pingInterval) clearInterval(pingInterval);
+      if (pongTimeout) clearTimeout(pongTimeout);
+      if (activePongHandler && socketInstance) socketInstance.removeListener(SocketEvent.PONG, activePongHandler);
     };
   }, [socketConnected, socketInstance]);
 
@@ -326,17 +345,22 @@ export default function Terminal() {
     }
   }, []);
 
+  const containerPreludeRef = useRef(settings.server.containerPrelude);
+  useEffect(() => {
+    containerPreludeRef.current = settings.server.containerPrelude;
+  }, [settings.server.containerPrelude]);
+
   const addLine = useCallback((text: string, prelude = false) => {
     if (!xtermInstance.current) return;
 
     let processed = text.replaceAll('\x1b[?25h', '').replaceAll('\x1b[?25l', '');
 
     if (processed.includes('container@pterodactyl~')) {
-      processed = processed.replace('container@pterodactyl~', settings.server.containerPrelude);
+      processed = processed.replace('container@pterodactyl~', containerPreludeRef.current);
     }
 
     if (prelude && !processed.includes('\x1b[1m\x1b[41m')) {
-      processed = `\x1b[1m\x1b[33m${settings.server.containerPrelude} \x1b[0m${processed}`;
+      processed = `\x1b[1m\x1b[33m${containerPreludeRef.current} \x1b[0m${processed}`;
     }
 
     if (isFirstLine.current) {
@@ -605,7 +629,7 @@ export default function Terminal() {
         {imagePulls.size > 0 && (
           <span className='flex flex-col justify-end mt-4'>
             {t('pages.server.console.message.pullingImage', {})}
-            {imagePulls.entries().map(([id, progress]) => (
+            {[...imagePulls.entries()].map(([id, progress]) => (
               <span key={id} className='flex flex-row w-full items-center whitespace-pre-wrap break-all'>
                 {progress.status === 'pulling'
                   ? t('pages.server.console.message.pulling', {})

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import updateDockerImage from '@/api/server/startup/updateDockerImage.ts';
 import Button from '@/elements/Button.tsx';
@@ -31,7 +32,14 @@ const OFFLINE_GRACE_MS = 5000;
 export default function JavaVersionModal() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, state, socketInstance, updateServer } = useServerStore();
+  const { server, state, socketInstance, updateServer } = useServerStore(
+    useShallow((s) => ({
+      server: s.server,
+      state: s.state,
+      socketInstance: s.socketInstance,
+      updateServer: s.updateServer,
+    })),
+  );
 
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);

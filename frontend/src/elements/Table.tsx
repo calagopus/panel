@@ -69,7 +69,12 @@ interface PaginationProps<T> {
   onPageSelect: (page: number) => void;
 }
 
-export function Pagination<T>({ data, onPageSelect, ...props }: PaginationProps<T> & GroupProps) {
+export function Pagination<T>({
+  data,
+  onPageSelect,
+  withShortcuts = true,
+  ...props
+}: PaginationProps<T> & { withShortcuts?: boolean } & GroupProps) {
   const { t } = useTranslations();
 
   const totalPages = data.total === 0 ? 0 : Math.ceil(data.total / data.perPage);
@@ -85,9 +90,15 @@ export function Pagination<T>({ data, onPageSelect, ...props }: PaginationProps<
   };
 
   useEffect(() => {
+    if (!withShortcuts) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
-      const isInputFocused = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+      const isInputFocused =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable;
 
       if (isInputFocused) return;
 
@@ -110,7 +121,7 @@ export function Pagination<T>({ data, onPageSelect, ...props }: PaginationProps<
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [data.page, totalPages]);
+  }, [data.page, totalPages, withShortcuts]);
 
   const isFirstPage = data.page === 1;
   const isLastPage = data.page >= totalPages;
@@ -173,7 +184,7 @@ export default function Table({
       }}
     >
       {pagination && onPageSelect && pagination.total > pagination.perPage && (
-        <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} />
+        <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} withShortcuts={false} />
       )}
 
       <MantineTable

@@ -13,7 +13,7 @@ import { useServerStore } from '@/stores/server.ts';
 export default function SshDetailsModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { user } = useAuth();
-  const { server } = useServerStore();
+  const server = useServerStore((s) => s.server);
 
   return (
     <Modal title={t('pages.server.console.modal.sshDetails.title', {})} {...props}>

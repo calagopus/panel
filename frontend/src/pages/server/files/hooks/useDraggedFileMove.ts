@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import { canMoveFilesToDirectory, moveFilesToDirectory } from '@/pages/server/files/fileMove.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
@@ -33,10 +34,12 @@ export function useDraggedFileMove({ disabled = false, targetDirectory }: UseDra
   const scopedIsDropTarget = useFileManagerStore((state) =>
     targetDirectory != null ? isDropTargetFor(state, targetDirectory) : false,
   );
-  useFileManagerStore((state) =>
-    targetDirectory === undefined
-      ? [state.draggingTarget, state.draggingFiles, state.draggingFilesSource, state.browsingWritableDirectory]
-      : null,
+  useFileManagerStore(
+    useShallow((state) =>
+      targetDirectory === undefined
+        ? [state.draggingTarget, state.draggingFiles, state.draggingFilesSource, state.browsingWritableDirectory]
+        : null,
+    ),
   );
 
   const isDropTarget = (target: string) =>

@@ -14,7 +14,7 @@ import { useServerStore } from '@/stores/server.ts';
 
 const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const [searchParams, _] = useSearchParams();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -60,8 +60,11 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   }, [browsingBackupError]);
 
   const doUpload = useCallback(
-    async (form: FormData, config: AxiosRequestConfig): Promise<UploadResult> => {
-      const { url } = await getFileUploadUrl(externalsRef.current.serverUuid, store.getState().browsingDirectory);
+    async (form: FormData, config: AxiosRequestConfig, target?: string): Promise<UploadResult> => {
+      const { url } = await getFileUploadUrl(
+        externalsRef.current.serverUuid,
+        target ?? store.getState().browsingDirectory,
+      );
       const { data } = await axiosInstance.post(url, form, config);
 
       return { url, continuationToken: data.continuationToken ?? null };
@@ -87,7 +90,8 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const onUploadComplete = useCallback(() => store.getState().invalidateFilemanager(), [store]);
-  const fileUploader = useFileUpload(doUpload, onUploadComplete, doSplitUpload);
+  const getUploadTarget = useCallback(() => store.getState().browsingDirectory, [store]);
+  const fileUploader = useFileUpload(doUpload, onUploadComplete, doSplitUpload, getUploadTarget);
 
   useEffect(() => {
     store.setState({ isLoading });

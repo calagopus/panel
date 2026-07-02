@@ -1,6 +1,7 @@
 import { QueryFilters, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { z } from 'zod';
+import { useShallow } from 'zustand/react/shallow';
 import getServer from '@/api/server/getServer.ts';
 import { serverFileOperationSchema } from '@/lib/schemas/server/files.ts';
 import { serverImagePullProgressSchema, serverResourceUsageSchema } from '@/lib/schemas/server/server.ts';
@@ -9,20 +10,18 @@ import { transformKeysToCamelCase } from '@/lib/transformers.ts';
 import useWebsocketEvent, { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useServerStore } from '@/stores/server.ts';
+import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 export default function WebsocketListener() {
+  const serverStoreApi = useServerStoreApi();
   const queryClient = useQueryClient();
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { addServerResourceUsage } = useUserStore();
+  const addServerResourceUsage = useUserStore((state) => state.addServerResourceUsage);
+  const socketConnected = useServerStore((state) => state.socketConnected);
+  const socketInstance = useServerStore((state) => state.socketInstance);
   const {
-    server,
-    socketConnected,
-    socketInstance,
-    schedule,
-    scheduleSteps,
     updateServer,
     setSocketConnectionState,
     setSocketError,
@@ -37,10 +36,35 @@ export default function WebsocketListener() {
     updateBackup,
     setRunningScheduleStep,
     setScheduleSteps,
-    fileOperations,
     setFileOperation,
     removeFileOperation,
-  } = useServerStore();
+  } = useServerStore(
+    useShallow((state) => ({
+      updateServer: state.updateServer,
+      setSocketConnectionState: state.setSocketConnectionState,
+      setSocketError: state.setSocketError,
+      setImagePull: state.setImagePull,
+      removeImagePull: state.removeImagePull,
+      clearImagePulls: state.clearImagePulls,
+      setPendingRestart: state.setPendingRestart,
+      setStats: state.setStats,
+      setBackupProgress: state.setBackupProgress,
+      setBackupRestoreProgress: state.setBackupRestoreProgress,
+      setTransferProgress: state.setTransferProgress,
+      updateBackup: state.updateBackup,
+      setRunningScheduleStep: state.setRunningScheduleStep,
+      setScheduleSteps: state.setScheduleSteps,
+      setFileOperation: state.setFileOperation,
+      removeFileOperation: state.removeFileOperation,
+    })),
+  );
+
+  const transferTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (transferTimeoutRef.current !== null) clearTimeout(transferTimeoutRef.current);
+    };
+  }, []);
 
   const invalidateCacheKey = (queryKey: QueryFilters['queryKey']) => {
     queryClient
@@ -65,16 +89,15 @@ export default function WebsocketListener() {
   }, [socketInstance, socketConnected]);
 
   useWebsocketEvent(SocketEvent.STATS, (data) => {
-    let wsStats: object;
+    let resourceUsage: z.infer<typeof serverResourceUsageSchema>;
     try {
-      wsStats = transformKeysToCamelCase(JSON.parse(data));
+      resourceUsage = transformKeysToCamelCase(JSON.parse(data)) as z.infer<typeof serverResourceUsageSchema>;
     } catch {
       return;
     }
 
-    const resourceUsage = transformKeysToCamelCase(wsStats) as z.infer<typeof serverResourceUsageSchema>;
     setStats(resourceUsage);
-    addServerResourceUsage(server.uuid, resourceUsage);
+    addServerResourceUsage(serverStoreApi.getState().server.uuid, resourceUsage);
   });
 
   useWebsocketEvent(SocketEvent.PENDING_RESTART, (pending) => {
@@ -170,9 +193,15 @@ export default function WebsocketListener() {
         setSocketConnectionState(false);
         setSocketError(null);
       }
-      setTimeout(() => {
-        getServer(server.uuid).then(updateServer);
-        updateServer({ isTransferring: false });
+      if (transferTimeoutRef.current !== null) clearTimeout(transferTimeoutRef.current);
+      transferTimeoutRef.current = setTimeout(() => {
+        transferTimeoutRef.current = null;
+        getServer(serverStoreApi.getState().server.uuid)
+          .then((data) => {
+            updateServer(data);
+            updateServer({ isTransferring: false });
+          })
+          .catch((e) => console.error(e));
       }, 5000);
     }
   });
@@ -215,6 +244,7 @@ export default function WebsocketListener() {
   });
 
   useWebsocketEvent(SocketEvent.SCHEDULE_STARTED, (uuid) => {
+    const { schedule, scheduleSteps } = serverStoreApi.getState();
     if (schedule?.uuid === uuid) {
       setScheduleSteps(scheduleSteps.map((s) => ({ ...s, error: null })));
     }
@@ -224,9 +254,10 @@ export default function WebsocketListener() {
     setRunningScheduleStep(uuid, stepUuid);
   });
 
-  useWebsocketEvent(SocketEvent.SCHEDULE_STEP_ERROR, (uuid, error) => {
+  useWebsocketEvent(SocketEvent.SCHEDULE_STEP_ERROR, (uuid, stepUuid, error) => {
+    const { schedule, scheduleSteps } = serverStoreApi.getState();
     if (schedule?.uuid === uuid) {
-      setScheduleSteps(scheduleSteps.map((s) => (s.uuid === uuid ? { ...s, error } : s)));
+      setScheduleSteps(scheduleSteps.map((s) => (s.uuid === stepUuid ? { ...s, error } : s)));
     }
   });
 
@@ -246,6 +277,7 @@ export default function WebsocketListener() {
   });
 
   useWebsocketEvent(SocketEvent.OPERATION_COMPLETED, (uuid) => {
+    const { server, fileOperations } = serverStoreApi.getState();
     const fileOperation = fileOperations.get(uuid);
     if (!fileOperation) return;
 
@@ -342,6 +374,7 @@ export default function WebsocketListener() {
   });
 
   useWebsocketEvent(SocketEvent.OPERATION_ERROR, (uuid, error) => {
+    const { server, fileOperations } = serverStoreApi.getState();
     const fileOperation = fileOperations.get(uuid);
     if (!fileOperation) return;
 

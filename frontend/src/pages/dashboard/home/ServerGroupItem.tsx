@@ -43,16 +43,6 @@ import { useUserStore } from '@/stores/user.ts';
 import GroupAddServerModal from './modals/GroupAddServerModal.tsx';
 import ServerGroupEditModal from './modals/ServerGroupEditModal.tsx';
 
-function insertItems<T>(list: T[], items: T[], startIndex: number): T[] {
-  if (startIndex > list.length) {
-    throw new Error(`startIndex ${startIndex} is beyond array size ${list.length}`);
-  }
-
-  const result = Array.from(list);
-  result.splice(startIndex, items.length, ...items);
-  return result;
-}
-
 interface DndServer extends z.infer<typeof serverSchema>, DndItem {
   id: string;
 }
@@ -86,7 +76,6 @@ export default function ServerGroupItem({
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | 'add-server' | 'remove-server' | null>(null);
   const [serverToRemove, setServerToRemove] = useState<{
     server: z.infer<typeof serverSchema>;
-    index: number;
   } | null>(null);
 
   const { handleBulkPowerAction, bulkActionLoading: groupActionLoading } = useBulkPowerActions();
@@ -122,12 +111,12 @@ export default function ServerGroupItem({
       return;
     }
 
-    const { index } = serverToRemove;
-    const serverOrder = serverGroup.serverOrder.filter(
-      (_, orderI) => (servers.page - 1) * servers.perPage + index !== orderI,
-    );
+    const { server } = serverToRemove;
+    // remove by uuid: the displayed page can be search-filtered, so index math
+    // against serverOrder would remove the wrong server
+    const serverOrder = serverGroup.serverOrder.filter((uuid) => uuid !== server.uuid);
     updateStateServerGroup(serverGroup.uuid, { serverOrder });
-    setServers((prev) => ({ ...prev, data: prev.data.filter((_, dataI) => index !== dataI) }));
+    setServers((prev) => ({ ...prev, data: prev.data.filter((s) => s.uuid !== server.uuid) }));
 
     await updateServerGroup(serverGroup.uuid, { serverOrder })
       .then(() => {
@@ -322,12 +311,18 @@ export default function ServerGroupItem({
                 strategy={rectSortingStrategy}
                 callbacks={{
                   onDragEnd: async (items) => {
-                    const serverOrder = insertItems(
-                      serverGroup.serverOrder,
-                      items.map((s) => s.uuid),
-                      (servers.page - 1) * servers.perPage,
-                    );
+                    // the displayed list can be a search-filtered subset, so reorder
+                    // the dragged uuids within the order positions they already occupy
+                    // instead of splicing over a contiguous region
+                    const serverOrder = [...serverGroup.serverOrder];
+                    const knownUuids = new Set(serverOrder);
+                    const draggedUuids = items.map((s) => s.uuid).filter((uuid) => knownUuids.has(uuid));
+                    const positions = draggedUuids.map((uuid) => serverOrder.indexOf(uuid)).sort((a, b) => a - b);
+                    positions.forEach((position, i) => {
+                      serverOrder[position] = draggedUuids[i];
+                    });
 
+                    updateStateServerGroup(serverGroup.uuid, { serverOrder });
                     startTransition(() => {
                       setServers({ ...servers, data: items });
                     });
@@ -354,7 +349,7 @@ export default function ServerGroupItem({
               >
                 {(items) => (
                   <div className='gap-3 grid md:grid-cols-2'>
-                    {items.map((server, i) => (
+                    {items.map((server) => (
                       <SortableItem key={server.id} id={server.id}>
                         <MemoizedServerItem
                           server={server}
@@ -368,7 +363,7 @@ export default function ServerGroupItem({
                           showForeignServerBadge
                           onClick={onServerClick ? (event) => onServerClick(server, event) : undefined}
                           onGroupRemove={() => {
-                            setServerToRemove({ server, index: i });
+                            setServerToRemove({ server });
                             setOpenModal('remove-server');
                           }}
                           sKeyPressedRef={sKeyPressedRef}

@@ -290,8 +290,6 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
   }
 
   private readonly handleMouseUp = (e: MouseEvent): void => {
-    if (this.props.disabled) return;
-
     window.removeEventListener('mousemove', this.handleMouseMove);
     window.removeEventListener('mouseup', this.handleMouseUp);
     window.removeEventListener('scroll', this.handleScroll, { capture: true });
@@ -301,7 +299,7 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
       this.rAFId = null;
     }
 
-    if (!this.state.isSelecting && this.mouseDown && this.props.fireEvents) {
+    if (!this.props.disabled && !this.state.isSelecting && this.mouseDown && this.props.fireEvents) {
       const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
       if (target && !(target instanceof HTMLInputElement)) {
         const newEvent = new MouseEvent('click', {

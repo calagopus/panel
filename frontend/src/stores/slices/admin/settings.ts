@@ -128,30 +128,28 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
   updateInformation: null,
 
   setSettings: (value) =>
-    set((state) => {
-      state.storageDriver = value.storageDriver;
-      state.mailMode = value.mailMode;
-      state.captchaProvider = value.captchaProvider;
-      state.app = value.app;
-      state.server = value.server;
-      state.user = value.user;
-      state.webauthn = value.webauthn;
-      state.activity = value.activity;
-      state.ratelimits = value.ratelimits;
-      return state;
-    }),
+    set(() => ({
+      storageDriver: value.storageDriver,
+      mailMode: value.mailMode,
+      captchaProvider: value.captchaProvider,
+      app: value.app,
+      server: value.server,
+      user: value.user,
+      webauthn: value.webauthn,
+      activity: value.activity,
+      ratelimits: value.ratelimits,
+    })),
   updateSettings: (value) =>
-    set((state) => {
-      if (value.storageDriver) state.storageDriver = value.storageDriver;
-      if (value.mailMode) state.mailMode = value.mailMode;
-      if (value.captchaProvider) state.captchaProvider = value.captchaProvider;
-      if (value.app) state.app = { ...state.app, ...value.app };
-      if (value.server) state.server = { ...state.server, ...value.server };
-      if (value.user) state.user = { ...state.user, ...value.user };
-      if (value.webauthn) state.webauthn = { ...state.webauthn, ...value.webauthn };
-      if (value.activity) state.activity = { ...state.activity, ...value.activity };
-      if (value.ratelimits) state.ratelimits = { ...state.ratelimits, ...value.ratelimits };
-      return state;
-    }),
+    set((state) => ({
+      ...(value.storageDriver ? { storageDriver: value.storageDriver } : {}),
+      ...(value.mailMode ? { mailMode: value.mailMode } : {}),
+      ...(value.captchaProvider ? { captchaProvider: value.captchaProvider } : {}),
+      ...(value.app ? { app: { ...state.app, ...value.app } } : {}),
+      ...(value.server ? { server: { ...state.server, ...value.server } } : {}),
+      ...(value.user ? { user: { ...state.user, ...value.user } } : {}),
+      ...(value.webauthn ? { webauthn: { ...state.webauthn, ...value.webauthn } } : {}),
+      ...(value.activity ? { activity: { ...state.activity, ...value.activity } } : {}),
+      ...(value.ratelimits ? { ratelimits: { ...state.ratelimits, ...value.ratelimits } } : {}),
+    })),
   setUpdateInformation: (value) => set((state) => ({ ...state, updateInformation: value })),
 });

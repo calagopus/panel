@@ -319,7 +319,7 @@ function ServerFilesComponent() {
       </Group>
 
       <Card mb='sm'>
-        <FileBreadcrumbs path={decodeURIComponent(browsingDirectory)} />
+        <FileBreadcrumbs path={browsingDirectory} />
       </Card>
 
       <FileSearchBanner resetEntries={resetEntries} />

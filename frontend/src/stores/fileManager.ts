@@ -330,4 +330,8 @@ export const FileManagerStoreContextProvider = Provider;
 export const useFileManagerStore = useStore;
 export const useFileManagerApi = useStoreApi;
 
-export const useFileManager = () => useFileManagerStore();
+export function useFileManager(): FileManagerStore;
+export function useFileManager<T>(selector: (state: FileManagerStore) => T): T;
+export function useFileManager<T>(selector?: (state: FileManagerStore) => T) {
+  return useFileManagerStore(selector as (state: FileManagerStore) => T);
+}

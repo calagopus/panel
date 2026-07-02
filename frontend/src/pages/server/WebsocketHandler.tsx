@@ -1,20 +1,29 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 import getWebsocketToken from '@/api/server/getWebsocketToken.ts';
 import { SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { SocketError, SocketErrorType, Websocket } from '@/plugins/Websocket.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useServerStore } from '@/stores/server.ts';
+import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
 
 const MAX_TOKEN_REFRESH_FAILURES = 3;
 
 export default function WebsocketHandler() {
+  const serverStoreApi = useServerStoreApi();
   const uuid = useServerStore((state) => state.server.uuid);
   const isTransferring = useServerStore((state) => state.server.isTransferring);
   const nodeMaintenanceEnabled = useServerStore((state) => state.server.nodeMaintenanceEnabled);
   const { t } = useTranslations();
-  const { setSocketInstance, setSocketConnectionState, setSocketError, setState } = useServerStore();
+  const { setSocketInstance, setSocketConnectionState, setSocketError, setState } = useServerStore(
+    useShallow((state) => ({
+      setSocketInstance: state.setSocketInstance,
+      setSocketConnectionState: state.setSocketConnectionState,
+      setSocketError: state.setSocketError,
+      setState: state.setState,
+    })),
+  );
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -100,7 +109,7 @@ export default function WebsocketHandler() {
         socket.on('SOCKET_ERROR_STATE', (error: SocketError) => {
           setSocketError(error);
 
-          if (error.type === SocketErrorType.PERMISSION_DENIED && !isTransferring) {
+          if (error.type === SocketErrorType.PERMISSION_DENIED && !serverStoreApi.getState().server.isTransferring) {
             navigate('/');
             addToast(error.message, 'error');
           }

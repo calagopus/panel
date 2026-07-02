@@ -1,5 +1,5 @@
 import { Window } from '@gfazioli/mantine-window';
-import { FC, ReactNode, startTransition, useCallback, useMemo, useRef, useState } from 'react';
+import { FC, ReactNode, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CurrentWindowProvider } from '@/providers/CurrentWindowProvider.tsx';
 import { WindowContext } from '@/providers/contexts/windowContext.ts';
 
@@ -14,6 +14,10 @@ interface WindowType {
 const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [windows, setWindows] = useState<WindowType[]>([]);
   const windowId = useRef(1);
+  const windowCount = useRef(0);
+  useEffect(() => {
+    windowCount.current = windows.length;
+  }, [windows.length]);
 
   const closeWindow = useCallback((id: number) => {
     setWindows((prev) => prev.filter((t) => t.id !== id));
@@ -23,20 +27,18 @@ const WindowProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setWindows([]);
   }, []);
 
-  const addWindow = useCallback(
-    (title: string, component: ReactNode) => {
-      if (windows.length >= MAX_WINDOWS) return -1;
+  const addWindow = useCallback((title: string, component: ReactNode) => {
+    if (windowCount.current >= MAX_WINDOWS) return -1;
 
-      const id = windowId.current++;
+    const id = windowId.current++;
+    windowCount.current++;
 
-      startTransition(() => {
-        setWindows((prev) => [...prev, { id, title, component }]);
-      });
+    startTransition(() => {
+      setWindows((prev) => [...prev, { id, title, component }]);
+    });
 
-      return id;
-    },
-    [windows.length],
-  );
+    return id;
+  }, []);
 
   const updateWindow = useCallback((id: number, title: string) => {
     setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, title } : w)));

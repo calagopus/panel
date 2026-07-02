@@ -1,5 +1,5 @@
 import { Table, Text, Title, TitleOrder } from '@mantine/core';
-import { Fragment, ReactNode, startTransition, useEffect, useState } from 'react';
+import { Fragment, ReactNode, startTransition, useEffect, useMemo, useState } from 'react';
 import Markdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
@@ -119,6 +119,8 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    let cancelled = false;
+
     startTransition(() => {
       if (language === 'en') {
         document.documentElement.lang = 'en';
@@ -129,6 +131,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
         axiosInstance
           .get(`/translations/${language}.json`)
           .then(({ data }) => {
+            if (cancelled) return;
             const result: LanguageData = {
               items: data[''].items,
               translations: data[''].translations,
@@ -162,6 +165,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
             setLanguageData(result);
           })
           .catch((err) => {
+            if (cancelled) return;
             setLanguage('en');
             console.error(err);
           });
@@ -171,127 +175,131 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
     });
 
     localStorage.setItem('last_language', language);
+
+    return () => {
+      cancelled = true;
+    };
   }, [language]);
 
-  const t = (key: string, values: Record<string, string | number>): string => {
-    if (!languageData?.translations[key] && !baseTranslations.mapping[key as never]) {
-      throw new Error(`Language key ${key} not found.`);
-    }
+  const contextValue = useMemo(() => {
+    const t = (key: string, values: Record<string, string | number>): string => {
+      if (!languageData?.translations[key] && !baseTranslations.mapping[key as never]) {
+        throw new Error(`Language key ${key} not found.`);
+      }
 
-    let translation = languageData?.translations[key] || (baseTranslations.mapping[key as never] as string);
+      let translation = languageData?.translations[key] || (baseTranslations.mapping[key as never] as string);
 
-    if (values) {
-      Object.keys(values).forEach((placeholder) => {
-        translation = translation.replaceAll(`{${placeholder}}`, String(values[placeholder]));
-      });
-    }
+      if (values) {
+        Object.keys(values).forEach((placeholder) => {
+          translation = translation.replaceAll(`{${placeholder}}`, String(values[placeholder]));
+        });
+      }
 
-    return translation;
-  };
+      return translation;
+    };
 
-  const tReact = (key: string, values: Record<string, ReactNode>): ReactNode => {
-    if (!languageData?.translations[key] && !baseTranslations.mapping[key as never]) {
-      throw new Error(`Language key ${key} not found.`);
-    }
+    const tReact = (key: string, values: Record<string, ReactNode>): ReactNode => {
+      if (!languageData?.translations[key] && !baseTranslations.mapping[key as never]) {
+        throw new Error(`Language key ${key} not found.`);
+      }
 
-    let translation = languageData?.translations[key] || (baseTranslations.mapping[key as never] as string);
+      let translation = languageData?.translations[key] || (baseTranslations.mapping[key as never] as string);
 
-    if (values) {
-      const reactNodeKeys: string[] = [];
-      Object.keys(values).forEach((placeholder) => {
-        const value = values[placeholder];
-        if (typeof value === 'string' || typeof value === 'number') {
-          translation = translation.replaceAll(`{${placeholder}}`, String(value));
-        } else {
-          reactNodeKeys.push(placeholder);
-          translation = translation.replaceAll(`{${placeholder}}`, `%%${placeholder}%%`);
+      if (values) {
+        const reactNodeKeys: string[] = [];
+        Object.keys(values).forEach((placeholder) => {
+          const value = values[placeholder];
+          if (typeof value === 'string' || typeof value === 'number') {
+            translation = translation.replaceAll(`{${placeholder}}`, String(value));
+          } else {
+            reactNodeKeys.push(placeholder);
+            translation = translation.replaceAll(`{${placeholder}}`, `%%${placeholder}%%`);
+          }
+        });
+
+        if (reactNodeKeys.length === 0) {
+          return (
+            <Markdown
+              components={{
+                p: ({ children }) => <>{children}</>,
+                a: SafeMarkdownLink,
+              }}
+            >
+              {translation}
+            </Markdown>
+          );
         }
-      });
 
-      if (reactNodeKeys.length === 0) {
+        const parts = translation.split(/(%%\w+%%)/g);
         return (
-          <Markdown
-            components={{
-              p: ({ children }) => <>{children}</>,
-              a: SafeMarkdownLink,
-            }}
-          >
-            {translation}
-          </Markdown>
+          <span>
+            {parts.map((part, index) => {
+              const match = part.match(/%%(\w+)%%/);
+              if (match) {
+                const placeholder = match[1];
+                return <Fragment key={index}>{values[placeholder]}</Fragment>;
+              }
+
+              const leadingSpace = part.startsWith(' ') ? ' ' : '';
+              const trailingSpace = part.endsWith(' ') ? ' ' : '';
+              const trimmed = part.trim();
+              if (!trimmed) {
+                return <Fragment key={index}>{part}</Fragment>;
+              }
+
+              const hasMarkdown = /[*_`~[!#]/.test(trimmed);
+              if (!hasMarkdown) {
+                return <Fragment key={index}>{part}</Fragment>;
+              }
+
+              return (
+                <Fragment key={index}>
+                  {leadingSpace}
+                  <Markdown
+                    components={{
+                      p: ({ children }) => <>{children}</>,
+                      a: SafeMarkdownLink,
+                    }}
+                  >
+                    {trimmed}
+                  </Markdown>
+                  {trailingSpace}
+                </Fragment>
+              );
+            })}
+          </span>
         );
       }
 
-      const parts = translation.split(/(%%\w+%%)/g);
       return (
-        <span>
-          {parts.map((part, index) => {
-            const match = part.match(/%%(\w+)%%/);
-            if (match) {
-              const placeholder = match[1];
-              return <Fragment key={index}>{values[placeholder]}</Fragment>;
-            }
-
-            const leadingSpace = part.startsWith(' ') ? ' ' : '';
-            const trailingSpace = part.endsWith(' ') ? ' ' : '';
-            const trimmed = part.trim();
-            if (!trimmed) {
-              return <Fragment key={index}>{part}</Fragment>;
-            }
-
-            const hasMarkdown = /[*_`~[!#]/.test(trimmed);
-            if (!hasMarkdown) {
-              return <Fragment key={index}>{part}</Fragment>;
-            }
-
-            return (
-              <Fragment key={index}>
-                {leadingSpace}
-                <Markdown
-                  components={{
-                    p: ({ children }) => <>{children}</>,
-                    a: SafeMarkdownLink,
-                  }}
-                >
-                  {trimmed}
-                </Markdown>
-                {trailingSpace}
-              </Fragment>
-            );
-          })}
-        </span>
+        <Markdown
+          components={{
+            p: ({ children }) => <>{children}</>,
+            a: SafeMarkdownLink,
+          }}
+        >
+          {translation}
+        </Markdown>
       );
-    }
+    };
 
-    return (
-      <Markdown
-        components={{
-          p: ({ children }) => <>{children}</>,
-          a: SafeMarkdownLink,
-        }}
-      >
-        {translation}
-      </Markdown>
-    );
-  };
+    const tItem = (key: string, count: number): string => {
+      if (!languageData?.items[key] && !baseTranslations.items[key as never]) {
+        throw new Error(`Language item key ${key} not found.`);
+      }
 
-  const tItem = (key: string, count: number): string => {
-    if (!languageData?.items[key] && !baseTranslations.items[key as never]) {
-      throw new Error(`Language item key ${key} not found.`);
-    }
+      const translationItem = languageData?.items[key] || baseTranslations.items[key as never];
+      const rules = new Intl.PluralRules(language);
 
-    const translationItem = languageData?.items[key] || baseTranslations.items[key as never];
-    const rules = new Intl.PluralRules(language);
+      return translationItem[rules.select(count)].replaceAll('{count}', count.toString());
+    };
 
-    return translationItem[rules.select(count)].replaceAll('{count}', count.toString());
-  };
+    return { language, setLanguage, t, tReact, tItem };
+  }, [language, languageData]);
 
-  setGlobalTranslationHandle({ language, setLanguage, t, tReact, tItem });
+  setGlobalTranslationHandle(contextValue);
 
-  return (
-    <TranslationContext.Provider value={{ language, setLanguage, t, tReact, tItem }}>
-      {children}
-    </TranslationContext.Provider>
-  );
+  return <TranslationContext.Provider value={contextValue}>{children}</TranslationContext.Provider>;
 };
 
 export default TranslationProvider;

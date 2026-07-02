@@ -1,4 +1,5 @@
 import { memo, useCallback, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelOperation from '@/api/server/files/cancelOperation.ts';
 import Button from '@/elements/Button.tsx';
@@ -20,10 +21,23 @@ import { useServerStore } from '@/stores/server.ts';
 function FileOperationsProgress() {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { server, fileOperations, removeFileOperation } = useServerStore();
-  const { fileUploader } = useFileManager();
+  const { server, fileOperations, removeFileOperation } = useServerStore(
+    useShallow((state) => ({
+      server: state.server,
+      fileOperations: state.fileOperations,
+      removeFileOperation: state.removeFileOperation,
+    })),
+  );
   const { uploadingFiles, cancelFileUpload, cancelFolderUpload, cancelAllUploads, aggregatedUploadProgress } =
-    fileUploader;
+    useFileManager(
+      useShallow((state) => ({
+        uploadingFiles: state.fileUploader.uploadingFiles,
+        cancelFileUpload: state.fileUploader.cancelFileUpload,
+        cancelFolderUpload: state.fileUploader.cancelFolderUpload,
+        cancelAllUploads: state.fileUploader.cancelAllUploads,
+        aggregatedUploadProgress: state.fileUploader.aggregatedUploadProgress,
+      })),
+    );
 
   const blocker = useBlocker(uploadingFiles.size > 0, true);
 

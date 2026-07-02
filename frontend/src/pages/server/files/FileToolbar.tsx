@@ -8,6 +8,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { createSearchParams, useNavigate } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
@@ -20,8 +21,16 @@ import FileConnectButton from './FileConnectButton.tsx';
 export default function FileToolbar() {
   const { t } = useTranslations();
   const navigate = useNavigate();
-  const { server } = useServerStore();
-  const { fileInputRef, folderInputRef, browsingDirectory, browsingWritableDirectory, doOpenModal } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const { fileInputRef, folderInputRef, browsingDirectory, browsingWritableDirectory, doOpenModal } = useFileManager(
+    useShallow((state) => ({
+      fileInputRef: state.fileInputRef,
+      folderInputRef: state.folderInputRef,
+      browsingDirectory: state.browsingDirectory,
+      browsingWritableDirectory: state.browsingWritableDirectory,
+      doOpenModal: state.doOpenModal,
+    })),
+  );
 
   return (
     <Group>

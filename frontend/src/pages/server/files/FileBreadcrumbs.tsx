@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { join } from 'pathe';
 import { ReactNode } from 'react';
 import { createSearchParams, NavLink } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Breadcrumbs from '@/elements/Breadcrumbs.tsx';
 import Button from '@/elements/Button.tsx';
@@ -16,7 +17,7 @@ import { useServerStore } from '@/stores/server.ts';
 
 export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; inFileEditor?: boolean }) {
   const { t } = useTranslations();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
   const { isDropTarget, getDropHandlers } = useDraggedFileMove({ disabled: !!inFileEditor });
   const {
     selectedFiles,
@@ -27,7 +28,18 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
     actingFiles,
     doSelectFiles,
     doOpenModal,
-  } = useFileManager();
+  } = useFileManager(
+    useShallow((state) => ({
+      selectedFiles: state.selectedFiles,
+      browsingBackup: state.browsingBackup,
+      browsingEntries: state.browsingEntries,
+      browsingPrimaryFilesystem: state.browsingPrimaryFilesystem,
+      setBrowsingDirectory: state.setBrowsingDirectory,
+      actingFiles: state.actingFiles,
+      doSelectFiles: state.doSelectFiles,
+      doOpenModal: state.doOpenModal,
+    })),
+  );
 
   const splittedPath = path.split('/').filter(Boolean);
   const pathItems = splittedPath.map((item, index) => {
@@ -70,7 +82,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
           key={item.path}
           to={`/server/${server?.uuidShort}/files?${createSearchParams({ directory: join('/', item.path) })}`}
           className={breadcrumbClassName(join('/', item.path))}
-          onClick={() => setBrowsingDirectory(item.path)}
+          onClick={() => setBrowsingDirectory(join('/', item.path))}
           {...getDropHandlers(join('/', item.path))}
         >
           {item.name}

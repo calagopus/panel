@@ -6,6 +6,7 @@ import { join } from 'pathe';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { createSearchParams, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
 import saveFileContent from '@/api/server/files/saveFileContent.ts';
@@ -103,7 +104,21 @@ function FileEditorComponent() {
     browsingWritableDirectory,
     browsingDirectory,
     setBrowsingDirectory,
-  } = useFileManager();
+  } = useFileManager(
+    useShallow((state) => ({
+      editorMinimap: state.editorMinimap,
+      editorLineOverflow: state.editorLineOverflow,
+      imageViewerSmoothing: state.imageViewerSmoothing,
+      audioPlayerVolume: state.audioPlayerVolume,
+      audioPlayerPlaybackRate: state.audioPlayerPlaybackRate,
+      setAudioPlayerVolume: state.setAudioPlayerVolume,
+      setAudioPlayerPlaybackRate: state.setAudioPlayerPlaybackRate,
+      browsingPrimaryFilesystem: state.browsingPrimaryFilesystem,
+      browsingWritableDirectory: state.browsingWritableDirectory,
+      browsingDirectory: state.browsingDirectory,
+      setBrowsingDirectory: state.setBrowsingDirectory,
+    })),
+  );
 
   const { getParent } = useCurrentWindow();
 
@@ -195,7 +210,7 @@ function FileEditorComponent() {
         addToast(httpErrorToHuman(msg), 'error');
         setLoading(false);
       });
-  }, [fileName]);
+  }, [fileName, browsingDirectory]);
 
   useEffect(() => {
     contentRef.current = content;
@@ -249,6 +264,18 @@ function FileEditorComponent() {
 
     return () => observer.disconnect();
   }, [loading, getParent, params.action, fileName]);
+
+  const saveShortcutRef = useRef(() => void 0);
+
+  useEffect(() => {
+    saveShortcutRef.current = () => {
+      if (params.action === 'new') {
+        setNameModalOpen(true);
+      } else {
+        saveFile();
+      }
+    };
+  });
 
   const saveFile = (name?: string) => {
     setDirty(false);
@@ -440,7 +467,7 @@ function FileEditorComponent() {
           />
 
           <div className='flex justify-between w-full py-4'>
-            <FileBreadcrumbs inFileEditor path={join(decodeURIComponent(browsingDirectory), fileName)} />
+            <FileBreadcrumbs inFileEditor path={join(browsingDirectory, fileName)} />
           </div>
           <div className='relative'>
             <div ref={editorContainerRef} className='flex max-w-full w-full z-1 absolute'>
@@ -554,11 +581,7 @@ function FileEditorComponent() {
                       }
                     });
                     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-                      if (params.action === 'new') {
-                        setNameModalOpen(true);
-                      } else {
-                        saveFile();
-                      }
+                      saveShortcutRef.current();
                     });
                     registerTomlLanguage(monaco);
                     registerHoconLanguage(monaco);

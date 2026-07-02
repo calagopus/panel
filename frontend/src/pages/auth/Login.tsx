@@ -110,12 +110,12 @@ export default function Login() {
   };
 
   const doPasskeyAuth = () => {
-    setLoading(true);
-
     if (!window.navigator.credentials) {
       setError(t('pages.auth.login.passkey.error.notSupported', {}));
       return;
     }
+
+    setLoading(true);
 
     window.navigator.credentials
       .get(passkeyOptions)
@@ -166,36 +166,44 @@ export default function Login() {
   const doSubmitPassword = () => {
     setLoading(true);
 
-    captchaRef.current?.getToken().then((token) => {
-      login({
-        user: usernameForm.values.username,
-        password: passwordForm.values.password,
-        captcha: token,
+    const tokenPromise = captchaRef.current?.getToken() ?? Promise.resolve(null);
+    tokenPromise
+      .then((token) => {
+        login({
+          user: usernameForm.values.username,
+          password: passwordForm.values.password,
+          captcha: token,
+        })
+          .then((response) => {
+            if (response.type === 'two_factor_required') {
+              const authInfo = btoa(
+                JSON.stringify({
+                  user: response.user,
+                  token: response.token,
+                }),
+              )
+                .replaceAll('+', '-')
+                .replaceAll('/', '_');
+
+              navigate(`/auth/login/checkpoint?data=${authInfo}`);
+
+              return;
+            }
+
+            doLogin(response.user);
+          })
+          .catch((msg) => {
+            setError(httpErrorToHuman(msg));
+            captchaRef.current?.resetCaptcha();
+          })
+          .finally(() => setLoading(false));
       })
-        .then((response) => {
-          if (response.type === 'two_factor_required') {
-            const authInfo = btoa(
-              JSON.stringify({
-                user: response.user,
-                token: response.token,
-              }),
-            )
-              .replaceAll('+', '-')
-              .replaceAll('/', '_');
-
-            navigate(`/auth/login/checkpoint?data=${authInfo}`);
-
-            return;
-          }
-
-          doLogin(response.user);
-        })
-        .catch((msg) => {
-          setError(httpErrorToHuman(msg));
-          captchaRef.current?.resetCaptcha();
-        })
-        .finally(() => setLoading(false));
-    });
+      .catch((err) => {
+        // captcha token retrieval failed; without this the button spins forever
+        setError(httpErrorToHuman(err));
+        captchaRef.current?.resetCaptcha();
+        setLoading(false);
+      });
   };
 
   return (
