@@ -2298,6 +2298,8 @@ const baseTranslations = defineTranslations({
                         randomPrimary: 'Randomize primary allocation (removes additional allocations)',
                         randomAll:
                           'Randomize all allocations (recommended to avoid incompatibility issues with destination node)',
+                        preservePorts:
+                          'Preserve port numbers (reuses the same port numbers on the destination node where available, falls back to random allocations otherwise)',
                         eggConfigDeployment:
                           'Assign allocations based on Egg deployment configuration (only works if the Egg has a deployment configuration and the destination node has compatible allocations)',
                         eggConfigSelfAssignRange:

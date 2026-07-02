@@ -2295,6 +2295,7 @@
                         "none": "Keine (alle Allocations verwerfen, dem Server werden auf der Ziel-Node keine neuen Allocations automatisch zugewiesen)",
                         "randomPrimary": "Primäre Allocation zufällig zuweisen (entfernt zusätzliche Allocations)",
                         "randomAll": "Alle Allocations zufällig zuweisen (empfohlen, um Inkompatibilitätsprobleme mit der Ziel-Node zu vermeiden)",
+                        "preservePorts": "Portnummern beibehalten (verwendet, sofern verfügbar, dieselben Portnummern auf der Ziel-Node und weist andernfalls zufällige Allocations zu)",
                         "eggConfigDeployment": "Allocations basierend auf der Egg-Deployment-Konfiguration zuweisen (funktioniert nur, wenn das Egg eine Deployment-Konfiguration hat und die Ziel-Node kompatible Allocations bereitstellt)",
                         "eggConfigSelfAssignRange": "Neue Allocations basierend auf dem Egg-Portbereich selbst zuweisen (funktioniert nur, wenn das Egg einen Portbereich hat und die Ziel-Node kompatible Allocations bereitstellt)"
                       }

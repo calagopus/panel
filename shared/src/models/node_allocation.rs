@@ -262,6 +262,57 @@ impl NodeAllocation {
             .collect())
     }
 
+    pub async fn get_preserved(
+        database: &crate::database::Database,
+        node_uuid: uuid::Uuid,
+        ports: &[i32],
+    ) -> Result<
+        Option<(sqlx::types::ipnetwork::IpNetwork, Vec<(uuid::Uuid, i32)>)>,
+        crate::database::DatabaseError,
+    > {
+        let rows = sqlx::query(
+            r#"
+            WITH best_ip AS (
+                SELECT node_allocations.ip
+                FROM node_allocations
+                LEFT JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
+                WHERE
+                    node_allocations.node_uuid = $1
+                    AND node_allocations.port = ANY($2)
+                    AND server_allocations.uuid IS NULL
+                GROUP BY node_allocations.ip
+                ORDER BY COUNT(DISTINCT node_allocations.port) DESC, RANDOM()
+                LIMIT 1
+            )
+            SELECT node_allocations.uuid, node_allocations.ip, node_allocations.port
+            FROM node_allocations
+            LEFT JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
+            WHERE
+                node_allocations.node_uuid = $1
+                AND node_allocations.port = ANY($2)
+                AND server_allocations.uuid IS NULL
+                AND node_allocations.ip = (SELECT ip FROM best_ip)
+            "#,
+        )
+        .bind(node_uuid)
+        .bind(ports)
+        .fetch_all(database.write())
+        .await?;
+
+        let Some(first) = rows.first() else {
+            return Ok(None);
+        };
+
+        let ip = first.get::<sqlx::types::ipnetwork::IpNetwork, _>("ip");
+
+        Ok(Some((
+            ip,
+            rows.into_iter()
+                .map(|row| (row.get::<uuid::Uuid, _>("uuid"), row.get::<i32, _>("port")))
+                .collect(),
+        )))
+    }
+
     pub async fn by_node_uuid_ip_port_unused(
         database: &crate::database::Database,
         node_uuid: uuid::Uuid,

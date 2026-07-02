@@ -206,7 +206,6 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                     value={selectedEggRepositoryUuid}
                     onChange={(val) => {
                       setSelectedEggRepositoryUuid(val);
-                      // the selected egg belongs to the previous repository
                       setSelectedEgg(null);
                     }}
                   />

@@ -28,6 +28,7 @@ mod post {
         None,
         RandomPrimary,
         RandomAll,
+        PreservePorts,
         EggConfigDeployment,
         EggConfigSelfAssignRange,
     }
@@ -165,6 +166,119 @@ mod post {
                         allocation_uuids = deployment_allocation_uuids;
                     } else {
                         return Err(shared::response::DisplayError::new("egg configuration does not have any configured allocations for deployment").into());
+                    }
+                }
+                MassTransferAllocationMode::PreservePorts => {
+                    let mut ports = Vec::with_capacity(total_allocations as usize);
+                    if let Some(primary) = &server.allocation {
+                        ports.push(primary.allocation.port);
+                    }
+
+                    for server_allocation in
+                        ServerAllocation::all_by_server_uuid(&state.database, server.uuid).await?
+                    {
+                        if server
+                            .allocation
+                            .as_ref()
+                            .is_some_and(|primary| primary.uuid == server_allocation.uuid)
+                        {
+                            continue;
+                        }
+
+                        ports.push(server_allocation.allocation.port);
+                    }
+
+                    if !ports.is_empty() {
+                        let preserved = NodeAllocation::get_preserved(
+                            &state.database,
+                            destination_node.uuid,
+                            &ports,
+                        )
+                        .await?;
+
+                        let (preferred_ip, mut available) = match preserved {
+                            Some((ip, allocations)) => {
+                                let mut available: HashMap<i32, Vec<uuid::Uuid>> = HashMap::new();
+                                for (node_allocation_uuid, port) in allocations {
+                                    available
+                                        .entry(port)
+                                        .or_default()
+                                        .push(node_allocation_uuid);
+                                }
+
+                                (Some(ip), available)
+                            }
+                            None => (None, HashMap::new()),
+                        };
+
+                        let mut assigned = Vec::with_capacity(ports.len());
+                        let mut used = Vec::new();
+                        for port in &ports {
+                            let node_allocation_uuid =
+                                available.get_mut(port).and_then(|uuids| uuids.pop());
+                            if let Some(node_allocation_uuid) = node_allocation_uuid {
+                                used.push(node_allocation_uuid);
+                            }
+
+                            assigned.push(node_allocation_uuid);
+                        }
+
+                        let missing = assigned.iter().filter(|uuid| uuid.is_none()).count() as i64;
+                        if missing > 0 {
+                            let fallback = match preferred_ip {
+                                Some(ip) => match NodeAllocation::get_random_ip(
+                                    &state.database,
+                                    destination_node.uuid,
+                                    &ip,
+                                    1,
+                                    u16::MAX,
+                                    missing,
+                                    &used,
+                                )
+                                .await
+                                {
+                                    Ok(node_allocations) => node_allocations,
+                                    Err(_) => {
+                                        NodeAllocation::get_random(
+                                            &state.database,
+                                            destination_node.uuid,
+                                            1,
+                                            u16::MAX,
+                                            missing,
+                                            &used,
+                                        )
+                                        .await?
+                                    }
+                                },
+                                None => {
+                                    NodeAllocation::get_random(
+                                        &state.database,
+                                        destination_node.uuid,
+                                        1,
+                                        u16::MAX,
+                                        missing,
+                                        &used,
+                                    )
+                                    .await?
+                                }
+                            };
+
+                            let mut fallback = fallback.into_iter();
+                            for slot in assigned.iter_mut() {
+                                if slot.is_none() {
+                                    *slot = fallback.next();
+                                }
+                            }
+                        }
+
+                        for (i, node_allocation_uuid) in assigned.into_iter().flatten().enumerate()
+                        {
+                            if has_primary && i == 0 {
+                                allocation_uuid = Some(node_allocation_uuid);
+                            } else {
+                                allocation_uuids.push(node_allocation_uuid);
+                            }
+                        }
                     }
                 }
                 mode => {

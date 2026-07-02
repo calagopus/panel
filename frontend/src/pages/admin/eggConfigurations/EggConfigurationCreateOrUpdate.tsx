@@ -306,7 +306,6 @@ export default function EggConfigurationCreateOrUpdate({
     );
   };
 
-  // this form is controlled and the schema is recursive; validate once per render
   const formIsValid = form.isValid();
 
   return (

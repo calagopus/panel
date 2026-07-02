@@ -199,7 +199,6 @@ export default function Login() {
           .finally(() => setLoading(false));
       })
       .catch((err) => {
-        // captcha token retrieval failed; without this the button spins forever
         setError(httpErrorToHuman(err));
         captchaRef.current?.resetCaptcha();
         setLoading(false);

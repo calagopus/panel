@@ -119,14 +119,13 @@ interface UseChartOptions {
 
 function useChart(label: string, opts?: UseChartOptions) {
   const isDark = useComputedColorScheme('dark') === 'dark';
-  // chart options are static per call site; only recompute when the theme flips
+
   const options = useMemo(() => {
     const baseOptions =
       typeof opts?.options === 'number'
         ? getOptions({ scales: { y: { min: 0, suggestedMax: opts.options } } })
         : getOptions(opts?.options);
     return deepmerge(baseOptions, getThemeOverrides()) as ChartOptions<'line'>;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDark]);
 
   const [data, setData] = useState(() => getEmptyData(label, opts?.sets || 1, opts?.callback, isDark));

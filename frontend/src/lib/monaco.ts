@@ -4,8 +4,6 @@ type IMonarchLanguageRule = import('monaco-editor').languages.IMonarchLanguageRu
 type ITextModel = import('monaco-editor').editor.ITextModel;
 type IPosition = import('monaco-editor').IPosition;
 
-// monaco is a page-level singleton; registering twice duplicates completion
-// providers and leaks them across editor mounts
 let hoconRegistered = false;
 let tomlRegistered = false;
 

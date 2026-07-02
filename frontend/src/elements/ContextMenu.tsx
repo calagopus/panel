@@ -52,7 +52,6 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
     };
 
     if (state.visible) {
-      // capture phase: scroll events don't bubble from nested scroll containers
       document.addEventListener('scroll', handleScroll, { capture: true });
     }
 

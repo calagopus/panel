@@ -99,8 +99,6 @@ export default function EggCreateOrUpdate({
     validate: zod4Resolver(adminEggUpdateSchema),
   });
 
-  // uncontrolled form: mirror the stop type into state so the conditional
-  // command/signal input reliably re-renders when it changes
   const [stopType, setStopType] = useState(() => form.getValues().configStop.type);
   form.watch('configStop.type', ({ value }) => setStopType(value));
 
@@ -328,7 +326,6 @@ export default function EggCreateOrUpdate({
               value={selectedEggRepositoryUuid}
               onChange={(value) => {
                 setSelectedEggRepositoryUuid(value ?? '');
-                // an egg from the previous repository must not be submitted
                 form.setFieldValue('eggRepositoryEggUuid', null);
               }}
               data={eggRepositories.items.map((eggRepository) => ({
@@ -411,8 +408,6 @@ export default function EggCreateOrUpdate({
                   if (!value) return;
                   form.setFieldValue('configStop.type', value as 'command' | 'signal' | 'docker');
 
-                  // the signal select previously only *displayed* SIGKILL as a fallback
-                  // while the form kept the old value; persist a valid signal instead
                   if (
                     value === 'signal' &&
                     !['SIGABRT', 'SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGKILL'].includes(

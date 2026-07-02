@@ -108,8 +108,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
     validate: zod4Resolver(formSchema),
   });
 
-  // the form is uncontrolled, so render-time form.getValues() reads don't react to
-  // changes; mirror the egg into state via form.watch
   const [selectedEggUuid, setSelectedEggUuid] = useState(contextServer?.egg.uuid ?? '');
   form.watch('eggUuid', ({ value }) => setSelectedEggUuid(value));
 
@@ -175,8 +173,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
   const eggImages = eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.dockerImages || {};
 
   useEffect(() => {
-    // populate egg defaults only when the admin picks a different egg; the
-    // server's saved image/startup must not be clobbered on load
     if (!selectedEggUuid || selectedEggUuid === contextServer.egg.uuid) {
       return;
     }
@@ -188,7 +184,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
 
     form.setFieldValue('image', Object.values(egg.dockerImages)[0] ?? '');
     form.setFieldValue('startup', egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEggUuid]);
 
   return (
@@ -321,7 +316,6 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
                   value={selectedNestUuid}
                   onChange={(value) => {
                     setSelectedNestUuid(value);
-                    // a stale egg from the previous nest must not be submitted
                     form.setFieldValue('eggUuid', '');
                   }}
                   data={nests.items.map((nest) => ({
