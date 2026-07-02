@@ -1,6 +1,5 @@
 import { type OnMount } from '@monaco-editor/react';
 import { useEffect, useRef, useState } from 'react';
-import stripAnsi from 'strip-ansi';
 import { z } from 'zod';
 import downloadNodeLog from '@/api/admin/nodes/system/downloadNodeLog.ts';
 import getNodeLog from '@/api/admin/nodes/system/getNodeLog.ts';
@@ -13,6 +12,7 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import { stripAnsi } from '@/lib/ansi.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
