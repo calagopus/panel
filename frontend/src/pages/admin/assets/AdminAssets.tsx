@@ -88,15 +88,11 @@ export default function AdminAssets() {
   }, []);
 
   const addSelectedAsset = (asset: z.infer<typeof storageAssetSchema>) =>
-    setSelectedAssets((prev) => {
-      const next = new ObjectSet('name', prev.values());
-      next.add(asset);
-      return next;
-    });
+    setSelectedAssets((prev) => prev.clone().add(asset));
 
   const removeSelectedAsset = (asset: z.infer<typeof storageAssetSchema>) =>
     setSelectedAssets((prev) => {
-      const next = new ObjectSet('name', prev.values());
+      const next = prev.clone();
       next.delete(asset);
       return next;
     });

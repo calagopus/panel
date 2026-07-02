@@ -4,18 +4,19 @@ import { useSearchParams } from 'react-router';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FileRowIcon from '@/pages/server/files/FileRowIcon.tsx';
 import { useDraggedFileMove } from '@/pages/server/files/hooks/useDraggedFileMove.ts';
-import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
+import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 
 function FileParentDirectoryRow() {
   const [_, setSearchParams] = useSearchParams();
-  const { browsingDirectory, doSelectFiles } = useFileManager();
-  const { isDropTarget, getDropHandlers } = useDraggedFileMove();
+  const store = useFileManagerApi();
+  const browsingDirectory = useFileManagerStore((state) => state.browsingDirectory);
 
   const parentDirectory = join(browsingDirectory, '..');
+  const { isDropTarget, getDropHandlers } = useDraggedFileMove({ targetDirectory: parentDirectory });
   const parentIsDropTarget = isDropTarget(parentDirectory);
 
   const openParentDirectory = () => {
-    doSelectFiles([]);
+    store.getState().doSelectFiles([]);
     setSearchParams({ directory: parentDirectory });
   };
 

@@ -64,6 +64,11 @@ export default function AdminExtensions() {
           }
         })
         .catch((err) => {
+          // stop polling instead of toasting the same error every 5 seconds
+          if (statusIntervalRef.current) {
+            clearInterval(statusIntervalRef.current);
+            statusIntervalRef.current = null;
+          }
           addToast(httpErrorToHuman(err), 'error');
         });
     }, 5000);
@@ -78,13 +83,17 @@ export default function AdminExtensions() {
         addToast(httpErrorToHuman(err), 'error');
       });
 
-    getExtensionStatus().then((status) => {
-      setExtensionStatus(status);
+    getExtensionStatus()
+      .then((status) => {
+        setExtensionStatus(status);
 
-      if (status.isBuilding) {
-        createStatusInterval();
-      }
-    });
+        if (status.isBuilding) {
+          createStatusInterval();
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to get extension status:', err);
+      });
 
     return () => {
       if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);

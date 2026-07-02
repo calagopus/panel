@@ -99,6 +99,11 @@ export default function EggCreateOrUpdate({
     validate: zod4Resolver(adminEggUpdateSchema),
   });
 
+  // uncontrolled form: mirror the stop type into state so the conditional
+  // command/signal input reliably re-renders when it changes
+  const [stopType, setStopType] = useState(() => form.getValues().configStop.type);
+  form.watch('configStop.type', ({ value }) => setStopType(value));
+
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
     z.infer<typeof adminEggUpdateSchema>,
     z.infer<typeof adminEggSchema>
@@ -321,7 +326,11 @@ export default function EggCreateOrUpdate({
             <Select
               label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.eggRepository', {})}
               value={selectedEggRepositoryUuid}
-              onChange={(value) => setSelectedEggRepositoryUuid(value ?? '')}
+              onChange={(value) => {
+                setSelectedEggRepositoryUuid(value ?? '');
+                // an egg from the previous repository must not be submitted
+                form.setFieldValue('eggRepositoryEggUuid', null);
+              }}
               data={eggRepositories.items.map((eggRepository) => ({
                 label: eggRepository.name,
                 value: eggRepository.uuid,
@@ -398,15 +407,30 @@ export default function EggCreateOrUpdate({
                 ]}
                 key={form.key('configStop.type')}
                 {...form.getInputProps('configStop.type')}
+                onChange={(value) => {
+                  if (!value) return;
+                  form.setFieldValue('configStop.type', value as 'command' | 'signal' | 'docker');
+
+                  // the signal select previously only *displayed* SIGKILL as a fallback
+                  // while the form kept the old value; persist a valid signal instead
+                  if (
+                    value === 'signal' &&
+                    !['SIGABRT', 'SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGKILL'].includes(
+                      form.getValues().configStop.value ?? '',
+                    )
+                  ) {
+                    form.setFieldValue('configStop.value', 'SIGKILL');
+                  }
+                }}
               />
-              {form.getValues().configStop.type === 'command' ? (
+              {stopType === 'command' ? (
                 <TextInput
                   withAsterisk
                   label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stopCommand', {})}
                   key={form.key('configStop.value')}
                   {...form.getInputProps('configStop.value')}
                 />
-              ) : form.getValues().configStop.type === 'signal' ? (
+              ) : stopType === 'signal' ? (
                 <Select
                   withAsterisk
                   label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stopSignal', {})}
@@ -419,7 +443,6 @@ export default function EggCreateOrUpdate({
                   ]}
                   key={form.key('configStop.value')}
                   {...form.getInputProps('configStop.value')}
-                  value={form.getValues().configStop.value || 'SIGKILL'}
                 />
               ) : null}
             </Group>

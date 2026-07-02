@@ -63,7 +63,7 @@ export default function AdminOverview() {
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  }, []);
+  }, [canReadStats]);
 
   const containerTypeLabel = (type: AdminSystemOverview['containerType']) => {
     switch (type) {

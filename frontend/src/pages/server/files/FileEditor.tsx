@@ -6,6 +6,7 @@ import { join } from 'pathe';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { createSearchParams, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
 import saveFileContent from '@/api/server/files/saveFileContent.ts';
@@ -103,7 +104,21 @@ function FileEditorComponent() {
     browsingWritableDirectory,
     browsingDirectory,
     setBrowsingDirectory,
-  } = useFileManager();
+  } = useFileManager(
+    useShallow((state) => ({
+      editorMinimap: state.editorMinimap,
+      editorLineOverflow: state.editorLineOverflow,
+      imageViewerSmoothing: state.imageViewerSmoothing,
+      audioPlayerVolume: state.audioPlayerVolume,
+      audioPlayerPlaybackRate: state.audioPlayerPlaybackRate,
+      setAudioPlayerVolume: state.setAudioPlayerVolume,
+      setAudioPlayerPlaybackRate: state.setAudioPlayerPlaybackRate,
+      browsingPrimaryFilesystem: state.browsingPrimaryFilesystem,
+      browsingWritableDirectory: state.browsingWritableDirectory,
+      browsingDirectory: state.browsingDirectory,
+      setBrowsingDirectory: state.setBrowsingDirectory,
+    })),
+  );
 
   const { getParent } = useCurrentWindow();
 
@@ -119,7 +134,11 @@ function FileEditorComponent() {
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const contentRef = useRef(content);
+  const savedContentRef = useRef('');
   const originalHashRef = useRef('');
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const draftPathRef = useRef<string | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const blocker = useBlocker(dirty, false, (tx) => {
     if (!tx.location.pathname.includes('/files/diff')) return true;
     return new URLSearchParams(tx.location.search).has('previousRevision');
@@ -153,7 +172,9 @@ function FileEditorComponent() {
         }
 
         if (params.action === 'image' || params.action === 'audio') {
-          return URL.createObjectURL(content);
+          if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+          objectUrlRef.current = URL.createObjectURL(content);
+          return objectUrlRef.current;
         } else {
           return content.text();
         }
@@ -162,6 +183,7 @@ function FileEditorComponent() {
         startTransition(() => {
           if (typeof content === 'string') {
             setContent(content);
+            savedContentRef.current = content;
 
             if (params.action === 'edit') {
               const hash = hashContent(content);
@@ -188,21 +210,23 @@ function FileEditorComponent() {
         addToast(httpErrorToHuman(msg), 'error');
         setLoading(false);
       });
-  }, [fileName]);
+  }, [fileName, browsingDirectory]);
 
   useEffect(() => {
     contentRef.current = content;
   }, [content]);
 
   useEffect(() => {
-    if (!dirty || !fileName || !browsingDirectory || params.action !== 'edit') return;
-    const key = draftKey(server.uuid, join(browsingDirectory, fileName));
-    const timer = setTimeout(() => {
-      const draft: FileDraft = { content, originalHash: originalHashRef.current, savedAt: Date.now() };
-      localStorage.setItem(key, JSON.stringify(draft));
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [content, dirty]);
+    draftPathRef.current =
+      params.action === 'edit' && fileName && browsingDirectory ? join(browsingDirectory, fileName) : null;
+  }, [params.action, fileName, browsingDirectory]);
+
+  useEffect(() => {
+    return () => {
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+      if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const el = editorContainerRef.current;
@@ -241,6 +265,18 @@ function FileEditorComponent() {
     return () => observer.disconnect();
   }, [loading, getParent, params.action, fileName]);
 
+  const saveShortcutRef = useRef(() => void 0);
+
+  useEffect(() => {
+    saveShortcutRef.current = () => {
+      if (params.action === 'new') {
+        setNameModalOpen(true);
+      } else {
+        saveFile();
+      }
+    };
+  });
+
   const saveFile = (name?: string) => {
     setDirty(false);
 
@@ -256,6 +292,9 @@ function FileEditorComponent() {
           setNameModalOpen(false);
         });
 
+        savedContentRef.current = currentContent;
+        originalHashRef.current = hashContent(currentContent);
+        if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
         localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, name ?? fileName)));
         addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
 
@@ -428,7 +467,7 @@ function FileEditorComponent() {
           />
 
           <div className='flex justify-between w-full py-4'>
-            <FileBreadcrumbs inFileEditor path={join(decodeURIComponent(browsingDirectory), fileName)} />
+            <FileBreadcrumbs inFileEditor path={join(browsingDirectory, fileName)} />
           </div>
           <div className='relative'>
             <div ref={editorContainerRef} className='flex max-w-full w-full z-1 absolute'>
@@ -520,19 +559,29 @@ function FileEditorComponent() {
                     touchScrollEnabled: true,
                     fixedOverflowWidgets: true,
                   }}
-                  onChange={(value) => setContent(value || '')}
                   onMount={(editor, monaco) => {
                     editorRef.current = editor;
                     editor.onDidChangeModelContent(() => {
-                      contentRef.current = editor.getValue();
-                      setDirty(contentRef.current !== content);
+                      const value = editor.getValue();
+                      contentRef.current = value;
+                      const isDirty = value !== savedContentRef.current;
+                      setDirty(isDirty);
+
+                      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+                      if (isDirty && draftPathRef.current) {
+                        const path = draftPathRef.current;
+                        draftTimerRef.current = setTimeout(() => {
+                          const draft: FileDraft = {
+                            content: value,
+                            originalHash: originalHashRef.current,
+                            savedAt: Date.now(),
+                          };
+                          localStorage.setItem(draftKey(server.uuid, path), JSON.stringify(draft));
+                        }, 1000);
+                      }
                     });
                     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-                      if (params.action === 'new') {
-                        setNameModalOpen(true);
-                      } else {
-                        saveFile();
-                      }
+                      saveShortcutRef.current();
                     });
                     registerTomlLanguage(monaco);
                     registerHoconLanguage(monaco);

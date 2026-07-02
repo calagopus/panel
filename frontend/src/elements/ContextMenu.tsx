@@ -24,7 +24,6 @@ interface ContextMenuState {
 }
 
 interface ContextMenuContextType {
-  state: ContextMenuState;
   showMenu: (x: number, y: number, items: ContextMenuItem[], menuProps?: MenuProps) => void;
   hideMenu: () => void;
 }
@@ -39,13 +38,13 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
     items: [],
   });
 
-  const showMenu = (x: number, y: number, items: ContextMenuItem[], menuProps?: MenuProps) => {
+  const showMenu = useCallback((x: number, y: number, items: ContextMenuItem[], menuProps?: MenuProps) => {
     setState({ visible: true, x, y, items, menuProps });
-  };
+  }, []);
 
-  const hideMenu = () => {
-    setState((prev) => ({ ...prev, visible: false }));
-  };
+  const hideMenu = useCallback(() => {
+    setState((prev) => (prev.visible ? { ...prev, visible: false } : prev));
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,14 +52,17 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
     };
 
     if (state.visible) {
-      document.addEventListener('scroll', handleScroll);
+      // capture phase: scroll events don't bubble from nested scroll containers
+      document.addEventListener('scroll', handleScroll, { capture: true });
     }
 
-    return () => document.removeEventListener('scroll', handleScroll);
-  }, [state.visible]);
+    return () => document.removeEventListener('scroll', handleScroll, { capture: true });
+  }, [state.visible, hideMenu]);
+
+  const contextValue = useMemo(() => ({ showMenu, hideMenu }), [showMenu, hideMenu]);
 
   return (
-    <ContextMenuContext.Provider value={{ state, showMenu, hideMenu }}>
+    <ContextMenuContext.Provider value={contextValue}>
       <Menu
         disabled={!state.items.some((item) => !item.hidden && item.canAccess !== false)}
         opened={state.visible}

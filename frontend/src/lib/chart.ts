@@ -12,7 +12,7 @@ import {
 import 'chartjs-adapter-moment';
 import { useComputedColorScheme } from '@mantine/core';
 import { deepmerge, deepmergeCustom } from 'deepmerge-ts';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 ChartJS.register(LineElement, PointElement, Filler, LinearScale, StreamingPlugin);
 
@@ -119,11 +119,15 @@ interface UseChartOptions {
 
 function useChart(label: string, opts?: UseChartOptions) {
   const isDark = useComputedColorScheme('dark') === 'dark';
-  const baseOptions =
-    typeof opts?.options === 'number'
-      ? getOptions({ scales: { y: { min: 0, suggestedMax: opts.options } } })
-      : getOptions(opts?.options);
-  const options = deepmerge(baseOptions, getThemeOverrides()) as ChartOptions<'line'>;
+  // chart options are static per call site; only recompute when the theme flips
+  const options = useMemo(() => {
+    const baseOptions =
+      typeof opts?.options === 'number'
+        ? getOptions({ scales: { y: { min: 0, suggestedMax: opts.options } } })
+        : getOptions(opts?.options);
+    return deepmerge(baseOptions, getThemeOverrides()) as ChartOptions<'line'>;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDark]);
 
   const [data, setData] = useState(() => getEmptyData(label, opts?.sets || 1, opts?.callback, isDark));
 
@@ -177,7 +181,7 @@ function useChart(label: string, opts?: UseChartOptions) {
 function useChartTickLabel(label: string, max: number, tickLabel: string, roundTo?: number) {
   return useChart(label, {
     sets: 1,
-    options: getOptions({
+    options: {
       scales: {
         y: {
           suggestedMax: max,
@@ -188,7 +192,7 @@ function useChartTickLabel(label: string, max: number, tickLabel: string, roundT
           },
         },
       },
-    }),
+    },
   });
 }
 

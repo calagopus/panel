@@ -1,5 +1,6 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useShallow } from 'zustand/react/shallow';
 import Alert from '@/elements/Alert.tsx';
 import { bytesToString } from '@/lib/size.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
@@ -7,7 +8,13 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function FileSearchBanner({ resetEntries }: { resetEntries: () => void }) {
   const { t, tItem } = useTranslations();
-  const { browsingEntries, searchInfo, setSearchInfo } = useFileManager();
+  const { browsingEntries, searchInfo, setSearchInfo } = useFileManager(
+    useShallow((state) => ({
+      browsingEntries: state.browsingEntries,
+      searchInfo: state.searchInfo,
+      setSearchInfo: state.setSearchInfo,
+    })),
+  );
 
   const closeSearch = async () => {
     setSearchInfo(null);

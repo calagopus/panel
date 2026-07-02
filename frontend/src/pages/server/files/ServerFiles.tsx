@@ -2,7 +2,7 @@ import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { join } from 'pathe';
-import { type Ref, useCallback, useEffect, useRef } from 'react';
+import { type Ref, useCallback, useEffect, useMemo, useRef } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { z } from 'zod';
@@ -13,13 +13,13 @@ import ServerContentContainer from '@/elements/containers/ServerContentContainer
 import Group from '@/elements/Group.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Spinner from '@/elements/Spinner.tsx';
-import Table from '@/elements/Table.tsx';
+import Table, { TableHeaderProps } from '@/elements/Table.tsx';
 import Title from '@/elements/Title.tsx';
 import { isOpenableFile } from '@/lib/files.ts';
-import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
 import FileActionBar from '@/pages/server/files/FileActionBar.tsx';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
+import FileMassContextMenu from '@/pages/server/files/FileMassContextMenu.tsx';
 import FileModals from '@/pages/server/files/FileModals.tsx';
 import FileOperationsProgress from '@/pages/server/files/FileOperationsProgress.tsx';
 import FileParentDirectoryRow from '@/pages/server/files/FileParentDirectoryRow.tsx';
@@ -29,10 +29,10 @@ import FileSettings from '@/pages/server/files/FileSettings.tsx';
 import FileToolbar from '@/pages/server/files/FileToolbar.tsx';
 import FileUpload from '@/pages/server/files/FileUpload.tsx';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
-import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { FileManagerProvider } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 
 type ServerFilesColumn = 'name' | 'size' | 'physical_size' | 'modified';
@@ -52,7 +52,8 @@ const columnOnClick = (
 };
 
 function ServerFilesColumnRightSection({ name }: { name: ServerFilesColumn }) {
-  const { sortMode, setSortMode } = useFileManager();
+  const sortMode = useFileManagerStore((state) => state.sortMode);
+  const setSortMode = useFileManagerStore((state) => state.setSortMode);
 
   const isActive = sortMode.startsWith(name);
   const isAsc = sortMode.endsWith('asc');
@@ -85,34 +86,27 @@ function ServerFilesComponent() {
   const { addToast } = useToast();
   const [_, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const multipleSelectedRef = useRef(false);
-  const actingFilesRef = useRef(new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'));
   const typeAheadBuffer = useRef('');
   const typeAheadTimeout = useRef<ReturnType<typeof setTimeout>>(null);
-  const fileManagerContext = useFileManager();
-  const fileManagerContextRef = useRef(fileManagerContext);
 
-  const {
-    isLoading,
-    actingFiles,
-    actingFilesSource,
-    selectedFiles,
-    browsingDirectory,
-    browsingEntries,
-    openModal,
-    browsingWritableDirectory,
-    doSelectFiles,
-    doOpenModal,
-    sortMode,
-    setSortMode,
-    preferPhysicalSize,
-    resetEntries,
-  } = fileManagerContext;
+  const store = useFileManagerApi();
+  const isLoading = useFileManagerStore((state) => state.isLoading);
+  const browsingEntries = useFileManagerStore((state) => state.browsingEntries);
+  const selectedFiles = useFileManagerStore((state) => state.selectedFiles);
+  const actingFiles = useFileManagerStore((state) => state.actingFiles);
+  const actingFilesSource = useFileManagerStore((state) => state.actingFilesSource);
+  const browsingDirectory = useFileManagerStore((state) => state.browsingDirectory);
+  const browsingBackup = useFileManagerStore((state) => state.browsingBackup);
+  const searchInfo = useFileManagerStore((state) => state.searchInfo);
+  const sortMode = useFileManagerStore((state) => state.sortMode);
+  const clickOnce = useFileManagerStore((state) => state.clickOnce);
+  const preferPhysicalSize = useFileManagerStore((state) => state.preferPhysicalSize);
+  const { doSelectFiles, doOpenModal, setSortMode, resetEntries } = store.getState();
 
   const previousSelected = useRef<z.infer<typeof serverDirectoryEntrySchema>[]>([]);
 
   const onSelectedStart = (event: React.MouseEvent | MouseEvent) => {
-    previousSelected.current = event.shiftKey ? selectedFiles.values() : [];
+    previousSelected.current = event.shiftKey ? store.getState().selectedFiles.values() : [];
   };
 
   const onSelected = (selected: z.infer<typeof serverDirectoryEntrySchema>[]) => {
@@ -127,7 +121,7 @@ function ServerFilesComponent() {
         if (typeAheadTimeout.current) clearTimeout(typeAheadTimeout.current);
         typeAheadBuffer.current = '';
 
-        const fileManagerContext = fileManagerContextRef.current;
+        const fileManagerContext = store.getState();
 
         openMode.handleOpen({
           server,
@@ -152,12 +146,14 @@ function ServerFilesComponent() {
         });
       }
     },
-    [server, navigate, setSearchParams],
+    [server, navigate, setSearchParams, store],
   );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey || openModal !== null) return;
+      const state = store.getState();
+
+      if (e.ctrlKey || e.metaKey || e.altKey || state.openModal !== null) return;
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
       if (e.key.length !== 1) return;
@@ -167,10 +163,12 @@ function ServerFilesComponent() {
       if (typeAheadTimeout.current) clearTimeout(typeAheadTimeout.current);
       typeAheadBuffer.current += e.key.toLowerCase();
 
-      const match = browsingEntries.data.find((entry) => entry.name.toLowerCase().startsWith(typeAheadBuffer.current));
+      const match = state.browsingEntries.data.find((entry) =>
+        entry.name.toLowerCase().startsWith(typeAheadBuffer.current),
+      );
 
       if (match) {
-        doSelectFiles([match]);
+        state.doSelectFiles([match]);
       }
 
       typeAheadTimeout.current = setTimeout(() => {
@@ -183,25 +181,32 @@ function ServerFilesComponent() {
       window.removeEventListener('keydown', handleKeyDown);
       if (typeAheadTimeout.current) clearTimeout(typeAheadTimeout.current);
     };
-  }, [browsingEntries.data, openModal, doSelectFiles]);
+  }, [store]);
 
-  useEffect(() => {
-    multipleSelectedRef.current = selectedFiles.size > 1;
-  }, [selectedFiles]);
+  const moveSelection = (direction: -1 | 1) => {
+    const state = store.getState();
+    if (state.selectedFiles.size === 0) return;
 
-  useEffect(() => {
-    actingFilesRef.current = actingFiles;
-  }, [actingFiles]);
+    const entries = state.browsingEntries.data;
+    const indexByName = new Map(entries.map((entry, index) => [entry.name, index]));
 
-  useEffect(() => {
-    fileManagerContextRef.current = fileManagerContext;
-  }, [fileManagerContext]);
+    const selectedIndices = state.selectedFiles
+      .keys()
+      .map((file) => indexByName.get(file) ?? -1)
+      .filter((index) => index !== -1);
+
+    if (selectedIndices.length === 0) return;
+
+    const nextFiles = selectedIndices.map((index) => entries[(index + direction + entries.length) % entries.length]);
+
+    state.doSelectFiles(nextFiles);
+  };
 
   useKeyboardShortcuts({
     shortcuts: [
       {
         id: 'files.selectAll',
-        callback: () => doSelectFiles(browsingEntries.data),
+        callback: () => doSelectFiles(store.getState().browsingEntries.data),
       },
       {
         id: 'files.search',
@@ -209,58 +214,27 @@ function ServerFilesComponent() {
       },
       {
         id: 'files.moveUpSelection',
-        callback: () => {
-          if (selectedFiles.size === 0) return;
-
-          const selectedIndices = selectedFiles
-            .keys()
-            .map((file) => browsingEntries.data.findIndex((value) => value.name === file))
-            .filter((index) => index !== -1);
-
-          if (selectedIndices.length === 0) return;
-
-          const nextFiles = selectedIndices.map((index) => {
-            const newIndex = (index - 1 + browsingEntries.data.length) % browsingEntries.data.length;
-            return browsingEntries.data[newIndex];
-          });
-
-          doSelectFiles(nextFiles);
-        },
+        callback: () => moveSelection(-1),
       },
       {
         id: 'files.moveDownSelection',
-        callback: () => {
-          if (selectedFiles.size === 0) return;
-
-          const selectedIndices = selectedFiles
-            .keys()
-            .map((file) => browsingEntries.data.findIndex((value) => value.name === file))
-            .filter((index) => index !== -1);
-
-          if (selectedIndices.length === 0) return;
-
-          const nextFiles = selectedIndices.map((index) => {
-            const newIndex = (index + 1) % browsingEntries.data.length;
-            return browsingEntries.data[newIndex];
-          });
-
-          doSelectFiles(nextFiles);
-        },
+        callback: () => moveSelection(1),
       },
       {
         id: 'files.moveUpDirectory',
         callback: () =>
           setSearchParams({
-            directory: join(browsingDirectory, '..'),
+            directory: join(store.getState().browsingDirectory, '..'),
           }),
       },
       {
         id: 'files.duplicate',
         callback: () => {
-          if (selectedFiles.size === 1 && browsingWritableDirectory) {
-            const file = selectedFiles.values()[0];
+          const state = store.getState();
+          if (state.selectedFiles.size === 1 && state.browsingWritableDirectory) {
+            const file = state.selectedFiles.values()[0];
 
-            copyFile(server.uuid, join(browsingDirectory, file.name), null)
+            copyFile(server.uuid, join(state.browsingDirectory, file.name), null)
               .then(() => {
                 addToast(t('pages.server.files.toast.fileCopyingStarted', {}), 'success');
               })
@@ -273,31 +247,58 @@ function ServerFilesComponent() {
       {
         id: 'files.rename',
         callback: () => {
-          if (selectedFiles.size === 1 && browsingWritableDirectory) {
-            doOpenModal('rename', [selectedFiles.values()[0]]);
+          const state = store.getState();
+          if (state.selectedFiles.size === 1 && state.browsingWritableDirectory) {
+            doOpenModal('rename', [state.selectedFiles.values()[0]]);
           }
         },
       },
       {
         key: 'Enter',
         callback: () => {
-          if (selectedFiles.size === 1 && openModal === null) {
-            handleOpen(isOpenableFile(selectedFiles.values()[0], fileManagerContext));
+          const state = store.getState();
+          if (state.selectedFiles.size === 1 && state.openModal === null) {
+            handleOpen(isOpenableFile(state.selectedFiles.values()[0], state));
           }
         },
       },
     ],
-    deps: [browsingEntries.data, selectedFiles, handleOpen, browsingWritableDirectory],
+    deps: [handleOpen],
   });
 
+  const columns = useMemo(() => {
+    const sizeColumn: ServerFilesColumn = preferPhysicalSize ? 'physical_size' : 'size';
+    const columns: TableHeaderProps[] = [
+      { name: '' },
+      {
+        name: t('common.table.columns.name', {}),
+        rightSection: <ServerFilesColumnRightSection name='name' />,
+        onClick: columnOnClick('name', sortMode, setSortMode),
+      },
+      {
+        name: t('common.table.columns.size', {}),
+        rightSection: <ServerFilesColumnRightSection name={sizeColumn} />,
+        onClick: columnOnClick(sizeColumn, sortMode, setSortMode),
+      },
+    ];
+
+    if (window.innerWidth >= 768) {
+      columns.push(
+        {
+          name: t('pages.server.files.table.columns.modified', {}),
+          rightSection: <ServerFilesColumnRightSection name='modified' />,
+        },
+        { name: '' },
+      );
+    }
+
+    return columns;
+  }, [t, sortMode, preferPhysicalSize]);
+
   const normalizedBrowsingDirectory = join('/', browsingDirectory);
-  const backupRootDirectory = fileManagerContext.browsingBackup
-    ? `/.backups/${fileManagerContext.browsingBackup.uuid}`
-    : null;
+  const backupRootDirectory = browsingBackup ? `/.backups/${browsingBackup.uuid}` : null;
   const showParentDirectoryRow =
-    normalizedBrowsingDirectory !== '/' &&
-    normalizedBrowsingDirectory !== backupRootDirectory &&
-    !fileManagerContext.searchInfo;
+    normalizedBrowsingDirectory !== '/' && normalizedBrowsingDirectory !== backupRootDirectory && !searchInfo;
 
   return (
     <div className='h-fit relative'>
@@ -318,7 +319,7 @@ function ServerFilesComponent() {
       </Group>
 
       <Card mb='sm'>
-        <FileBreadcrumbs path={decodeURIComponent(browsingDirectory)} />
+        <FileBreadcrumbs path={browsingDirectory} />
       </Card>
 
       <FileSearchBanner resetEntries={resetEntries} />
@@ -326,77 +327,38 @@ function ServerFilesComponent() {
       {isLoading ? (
         <Spinner.Centered />
       ) : (
-        <SelectionArea
-          onSelectedStart={onSelectedStart}
-          onSelected={onSelected}
-          fireEvents={false}
-          className='h-full'
-          disabled={actingFiles.size > 0}
-        >
-          <Table
-            columns={
-              window.innerWidth < 768
-                ? [
-                    { name: '' },
-                    {
-                      name: t('common.table.columns.name', {}),
-                      rightSection: <ServerFilesColumnRightSection name='name' />,
-                      onClick: columnOnClick('name', sortMode, setSortMode),
-                    },
-                    {
-                      name: t('common.table.columns.size', {}),
-                      rightSection: (
-                        <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
-                      ),
-                      onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
-                    },
-                  ]
-                : [
-                    { name: '' },
-                    {
-                      name: t('common.table.columns.name', {}),
-                      rightSection: <ServerFilesColumnRightSection name='name' />,
-                      onClick: columnOnClick('name', sortMode, setSortMode),
-                    },
-                    {
-                      name: t('common.table.columns.size', {}),
-                      rightSection: (
-                        <ServerFilesColumnRightSection name={preferPhysicalSize ? 'physical_size' : 'size'} />
-                      ),
-                      onClick: columnOnClick(preferPhysicalSize ? 'physical_size' : 'size', sortMode, setSortMode),
-                    },
-                    {
-                      name: t('pages.server.files.table.columns.modified', {}),
-                      rightSection: <ServerFilesColumnRightSection name='modified' />,
-                    },
-                    { name: '' },
-                  ]
-            }
-            pagination={browsingEntries}
-            onPageSelect={onPageSelect}
-            allowSelect={false}
-          >
-            {showParentDirectoryRow && <FileParentDirectoryRow />}
+        <FileMassContextMenu>
+          {({ openMassMenu }) => (
+            <SelectionArea
+              onSelectedStart={onSelectedStart}
+              onSelected={onSelected}
+              fireEvents={false}
+              className='h-full'
+              disabled={actingFiles.size > 0}
+            >
+              <Table columns={columns} pagination={browsingEntries} onPageSelect={onPageSelect} allowSelect={false}>
+                {showParentDirectoryRow && <FileParentDirectoryRow />}
 
-            {browsingEntries.data.map((entry) => (
-              <SelectionArea.Selectable key={entry.name} item={entry}>
-                {(innerRef: Ref<HTMLElement>) => (
-                  <FileRow
-                    ref={innerRef as Ref<HTMLTableRowElement>}
-                    file={entry}
-                    handleOpen={handleOpen}
-                    isSelected={selectedFiles.has(entry)}
-                    isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
-                    multipleSelectedRef={multipleSelectedRef}
-                    actingFilesRef={actingFilesRef}
-                    clickOnce={fileManagerContext.clickOnce}
-                    preferPhysicalSize={fileManagerContext.preferPhysicalSize}
-                  />
-                )}
-              </SelectionArea.Selectable>
-            ))}
-          </Table>
-        </SelectionArea>
+                {browsingEntries.data.map((entry) => (
+                  <SelectionArea.Selectable key={entry.name} item={entry}>
+                    {(innerRef: Ref<HTMLElement>) => (
+                      <FileRow
+                        ref={innerRef as Ref<HTMLTableRowElement>}
+                        file={entry}
+                        handleOpen={handleOpen}
+                        openMassMenu={openMassMenu}
+                        isSelected={selectedFiles.has(entry)}
+                        isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
+                        clickOnce={clickOnce}
+                        preferPhysicalSize={preferPhysicalSize}
+                      />
+                    )}
+                  </SelectionArea.Selectable>
+                ))}
+              </Table>
+            </SelectionArea>
+          )}
+        </FileMassContextMenu>
       )}
     </div>
   );

@@ -1,10 +1,20 @@
+import { useShallow } from 'zustand/react/shallow';
 import FileUploadOverlay from '@/pages/server/files/FileUploadOverlay.tsx';
 import { useFileDragAndDrop } from '@/pages/server/files/hooks/useFileDragAndDrop.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 
 export default function FileUpload() {
-  const { fileUploader, browsingWritableDirectory, fileInputRef, folderInputRef } = useFileManager();
-  const { uploadFiles, handleFileSelect, handleFolderSelect } = fileUploader;
+  const { uploadFiles, handleFileSelect, handleFolderSelect, browsingWritableDirectory, fileInputRef, folderInputRef } =
+    useFileManager(
+      useShallow((state) => ({
+        uploadFiles: state.fileUploader.uploadFiles,
+        handleFileSelect: state.fileUploader.handleFileSelect,
+        handleFolderSelect: state.fileUploader.handleFolderSelect,
+        browsingWritableDirectory: state.browsingWritableDirectory,
+        fileInputRef: state.fileInputRef,
+        folderInputRef: state.folderInputRef,
+      })),
+    );
 
   const { isDragging } = useFileDragAndDrop({
     onDrop: uploadFiles,

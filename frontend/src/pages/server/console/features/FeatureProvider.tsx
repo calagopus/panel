@@ -3,7 +3,7 @@ import EulaModalFeature from './EulaModalFeature.tsx';
 import JavaVersionModalFeature from './JavaVersionModalFeature.tsx';
 
 export default function FeatureProvider() {
-  const { server } = useServerStore();
+  const server = useServerStore((s) => s.server);
 
   return (
     <>

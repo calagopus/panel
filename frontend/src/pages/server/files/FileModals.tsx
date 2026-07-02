@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import ArchiveCreateModal from '@/pages/server/files/modals/ArchiveCreateModal.tsx';
 import DirectoryNameModal from '@/pages/server/files/modals/DirectoryNameModal.tsx';
 import FileCopyModal from '@/pages/server/files/modals/FileCopyModal.tsx';
@@ -14,7 +15,13 @@ import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import FileDetailsModal from './modals/FileDetailsModal.tsx';
 
 export default function FileModals() {
-  const { openModal, modalDirectoryEntries, doCloseModal } = useFileManager();
+  const { openModal, modalDirectoryEntries, doCloseModal } = useFileManager(
+    useShallow((state) => ({
+      openModal: state.openModal,
+      modalDirectoryEntries: state.modalDirectoryEntries,
+      doCloseModal: state.doCloseModal,
+    })),
+  );
 
   return (
     <>

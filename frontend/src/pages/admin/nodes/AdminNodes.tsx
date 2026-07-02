@@ -76,7 +76,7 @@ function NodesContainer() {
 
   const handleNodeSelectionChange = useCallback((node: z.infer<typeof adminNodeSchema>, selected: boolean) => {
     setSelectedNodes((prev) => {
-      const next = new ObjectSet('uuid', prev.values());
+      const next = prev.clone();
       if (selected) {
         next.add(node);
       } else {

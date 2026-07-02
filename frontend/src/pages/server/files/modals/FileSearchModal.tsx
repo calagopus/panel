@@ -59,10 +59,14 @@ export default function FileSearchModal({ ...props }: ModalProps) {
     validate: zod4Resolver(serverFilesSearchSchema),
     onClose: props.onClose,
     onSubmit: async (values) => {
+      const queryInclude = query ? [`**/*${query}*`] : [];
       const searchFilters = {
         ...values,
-        pathFilter:
-          values.pathFilter ?? (query ? { include: [`**/*${query}*`], exclude: [], caseInsensitive: true } : null),
+        pathFilter: values.pathFilter
+          ? { ...values.pathFilter, include: [...values.pathFilter.include, ...queryInclude] }
+          : query
+            ? { include: queryInclude, exclude: [], caseInsensitive: true }
+            : null,
       };
 
       const entries = await searchFiles(server.uuid, { root: browsingDirectory, ...searchFilters });

@@ -80,7 +80,7 @@ export default function DashboardHomeAll() {
 
   const handleServerSelectionChange = (server: z.infer<typeof serverSchema>, selected: boolean) => {
     setSelectedServers((prev) => {
-      const newSet = new ObjectSet('uuid', prev.values());
+      const newSet = prev.clone();
       if (selected) {
         newSet.add(server);
       } else {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
+import { useShallow } from 'zustand/react/shallow';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -11,7 +12,14 @@ import { useServerStore } from '@/stores/server.ts';
 export default function ServerPowerControls() {
   const { t } = useTranslations();
   const [open, setOpen] = useState(false);
-  const { server, state, socketInstance, socketConnected } = useServerStore();
+  const { server, state, socketInstance, socketConnected } = useServerStore(
+    useShallow((s) => ({
+      server: s.server,
+      state: s.state,
+      socketInstance: s.socketInstance,
+      socketConnected: s.socketConnected,
+    })),
+  );
 
   const killable = state === 'stopping';
 

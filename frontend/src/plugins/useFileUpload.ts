@@ -38,7 +38,7 @@ export interface UploadResult {
   continuationToken?: string | null;
 }
 
-export type UploadFunction = (form: FormData, config: AxiosRequestConfig) => Promise<UploadResult>;
+export type UploadFunction = (form: FormData, config: AxiosRequestConfig, target?: string) => Promise<UploadResult>;
 
 export type SplitUploadFunction = (
   form: FormData,
@@ -135,10 +135,13 @@ function chunkFiles(files: File[]): File[][] {
   return chunks;
 }
 
+const PROGRESS_FLUSH_MS = 100;
+
 export function useFileUpload(
   uploadFunction: UploadFunction,
   onUploadComplete: () => void,
   splitUploadFunction?: SplitUploadFunction,
+  getUploadTarget?: () => string,
 ): FileUploader {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
@@ -148,11 +151,54 @@ export function useFileUpload(
   const activeUploads = useRef(0);
   const controllers = useRef<Map<string, AbortController>>(new Map());
   const folderFileCounts = useRef<Map<string, number>>(new Map());
+  const pendingProgress = useRef<Map<string, number>>(new Map());
+  const progressFlushTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onUploadCompleteRef = useRef(onUploadComplete);
   useEffect(() => {
     onUploadCompleteRef.current = onUploadComplete;
   }, [onUploadComplete]);
+
+  const uploadingFilesRef = useRef(uploadingFiles);
+  useEffect(() => {
+    uploadingFilesRef.current = uploadingFiles;
+  }, [uploadingFiles]);
+
+  useEffect(() => {
+    return () => {
+      if (progressFlushTimer.current !== null) clearTimeout(progressFlushTimer.current);
+    };
+  }, []);
+
+  const queueProgress = useCallback((key: string, uploaded: number) => {
+    pendingProgress.current.set(key, uploaded);
+    if (progressFlushTimer.current !== null) return;
+
+    progressFlushTimer.current = setTimeout(() => {
+      progressFlushTimer.current = null;
+      const updates = pendingProgress.current;
+      pendingProgress.current = new Map();
+
+      setUploadingFiles((prev) => {
+        let changed = false;
+        const next = new Map(prev);
+        updates.forEach((uploaded, key) => {
+          const entry = next.get(key);
+          if (!entry || entry.status === 'completed' || entry.status === 'error') return;
+
+          const clamped = Math.min(uploaded, entry.size);
+          if (clamped === entry.uploaded) return;
+          next.set(key, {
+            ...entry,
+            uploaded: clamped,
+            progress: entry.size === 0 ? 100 : (clamped / entry.size) * 100,
+          });
+          changed = true;
+        });
+        return changed ? next : prev;
+      });
+    }, PROGRESS_FLUSH_MS);
+  }, []);
 
   useEffect(() => {
     if (uploadingFiles.size === 0) return;
@@ -173,8 +219,12 @@ export function useFileUpload(
     });
 
     const keysToRemove: string[] = [];
-    batchFiles.forEach((batch) => {
-      if (batch.allDone) keysToRemove.push(...batch.keys);
+    batchFiles.forEach((batch, batchId) => {
+      if (batch.allDone) {
+        keysToRemove.push(...batch.keys);
+        controllers.current.delete(batchId);
+        batch.keys.forEach((key) => controllers.current.delete(key));
+      }
     });
 
     if (keysToRemove.length > 0) {
@@ -186,12 +236,12 @@ export function useFileUpload(
         }
       });
 
-      const nextUploadingFiles = new Map(uploadingFiles);
-      keysToRemove.forEach((key) => nextUploadingFiles.delete(key));
+      const remainingFiles = new Map(uploadingFiles);
+      keysToRemove.forEach((key) => remainingFiles.delete(key));
 
       foldersBeingRemoved.forEach((folder) => {
         let hasRemainingFiles = false;
-        for (const file of nextUploadingFiles.values()) {
+        for (const file of remainingFiles.values()) {
           if (file.filePath.split('/')[0] === folder) {
             hasRemainingFiles = true;
             break;
@@ -203,13 +253,17 @@ export function useFileUpload(
         }
       });
 
-      setUploadingFiles(nextUploadingFiles);
+      setUploadingFiles((prev) => {
+        const next = new Map(prev);
+        keysToRemove.forEach((key) => next.delete(key));
+        return next;
+      });
       onUploadCompleteRef.current();
     }
   }, [uploadingFiles]);
 
   const uploadRequest = useCallback(
-    async (files: File[], indices: number[], batchId: string, controller: AbortController) => {
+    async (files: File[], indices: number[], batchId: string, controller: AbortController, target?: string) => {
       activeUploads.current++;
 
       try {
@@ -232,42 +286,23 @@ export function useFileUpload(
         }
 
         const totalRequestSize = files.reduce((sum, f) => sum + f.size, 0);
-        let lastLoaded = 0;
 
         const config: AxiosRequestConfig = {
           signal: controller.signal,
           headers: { 'Content-Type': 'multipart/form-data' },
           onUploadProgress: (event) => {
             const loaded = event.loaded ?? 0;
-            const delta = loaded - lastLoaded;
-            lastLoaded = loaded;
-            if (delta <= 0) return;
 
-            setUploadingFiles((prev) => {
-              const next = new Map(prev);
-              for (let i = 0; i < indices.length; i++) {
-                const key = `file-${indices[i]}`;
-                const entry = next.get(key);
-
-                if (!entry || entry.status === 'completed' || entry.status === 'error') continue;
-
-                const ratio = files[i].size / totalRequestSize;
-                const newUploaded = Math.min(entry.uploaded + delta * ratio, files[i].size);
-                next.set(key, {
-                  ...entry,
-                  uploaded: newUploaded,
-                  progress: (newUploaded / files[i].size) * 100,
-                });
-              }
-              return next;
-            });
+            for (let i = 0; i < indices.length; i++) {
+              const ratio = totalRequestSize === 0 ? 1 : files[i].size / totalRequestSize;
+              queueProgress(`file-${indices[i]}`, Math.min(loaded * ratio, files[i].size));
+            }
           },
         };
 
         for (let attempt = 0; ; attempt++) {
           try {
-            lastLoaded = 0;
-            await uploadFunction(formData, config);
+            await uploadFunction(formData, config, target);
             break;
           } catch (err) {
             if (
@@ -328,11 +363,11 @@ export function useFileUpload(
         activeUploads.current--;
       }
     },
-    [uploadFunction, addToast],
+    [uploadFunction, addToast, queueProgress],
   );
 
   const uploadSplitFile = useCallback(
-    async (file: File, fileIndex: number, batchId: string, controller: AbortController) => {
+    async (file: File, fileIndex: number, batchId: string, controller: AbortController, target?: string) => {
       if (!splitUploadFunction) {
         throw new Error('uploadSplitFile called without a splitUploadFunction');
       }
@@ -374,7 +409,6 @@ export function useFileUpload(
           formData.append('files', sliceFile, filename);
 
           const sliceSize = sliceEnd - offset;
-          let lastLoaded = 0;
 
           const params: Record<string, string> = {};
           if (!isLastSlice) {
@@ -387,34 +421,16 @@ export function useFileUpload(
             params,
             onUploadProgress: (event) => {
               const loaded = event.loaded ?? 0;
-              const delta = loaded - lastLoaded;
-              lastLoaded = loaded;
-              if (delta <= 0) return;
-
-              setUploadingFiles((prev) => {
-                const entry = prev.get(key);
-
-                if (!entry || entry.status === 'completed' || entry.status === 'error') return prev;
-
-                const next = new Map(prev);
-                const newUploaded = Math.min(priorUploaded + loaded, totalSize);
-                next.set(key, {
-                  ...entry,
-                  uploaded: newUploaded,
-                  progress: (newUploaded / totalSize) * 100,
-                });
-                return next;
-              });
+              queueProgress(key, Math.min(priorUploaded + loaded, totalSize));
             },
           };
 
           let result!: UploadResult;
           for (let attempt = 0; ; attempt++) {
             try {
-              lastLoaded = 0;
               result =
                 continuationToken === undefined || prevUrl === undefined
-                  ? await uploadFunction(formData, config)
+                  ? await uploadFunction(formData, config, target)
                   : await splitUploadFunction!(formData, config, continuationToken, prevUrl);
               break;
             } catch (err) {
@@ -481,7 +497,7 @@ export function useFileUpload(
 
       void batchId;
     },
-    [uploadFunction, splitUploadFunction, addToast],
+    [uploadFunction, splitUploadFunction, addToast, queueProgress],
   );
 
   const uploadFiles = useCallback(
@@ -489,6 +505,7 @@ export function useFileUpload(
       if (files.length === 0) return;
 
       const splittingEnabled = splitUploadFunction !== undefined;
+      const target = getUploadTarget?.();
 
       const startIndex = fileIndexCounter.current;
       fileIndexCounter.current += files.length;
@@ -576,9 +593,9 @@ export function useFileUpload(
             try {
               if (controller.signal.aborted) return;
               if (splittingEnabled && file.size > CHUNK_TARGET_BYTES) {
-                await uploadSplitFile(file, index, key, controller);
+                await uploadSplitFile(file, index, key, controller, target);
               } else {
-                await uploadRequest([file], [index], key, controller);
+                await uploadRequest([file], [index], key, controller, target);
               }
             } finally {
               fileSemaphore.release();
@@ -605,7 +622,7 @@ export function useFileUpload(
           entriesToPack = entries.filter((e) => e.file.size <= CHUNK_TARGET_BYTES);
 
           for (const entry of oversized) {
-            promises.push(uploadSplitFile(entry.file, entry.index, batchId, controller));
+            promises.push(uploadSplitFile(entry.file, entry.index, batchId, controller, target));
           }
         }
 
@@ -625,7 +642,7 @@ export function useFileUpload(
             semaphore.acquire().then(async () => {
               try {
                 if (controller.signal.aborted) return;
-                await uploadRequest(chunk, chunkIndices, batchId, controller);
+                await uploadRequest(chunk, chunkIndices, batchId, controller, target);
               } finally {
                 semaphore.release();
               }
@@ -643,20 +660,24 @@ export function useFileUpload(
 
       await Promise.allSettled(promises);
     },
-    [uploadRequest, uploadSplitFile, addToast, splitUploadFunction],
+    [uploadRequest, uploadSplitFile, addToast, splitUploadFunction, getUploadTarget, t, tItem],
   );
 
-  const cancelFileUpload = useCallback((fileKey: string) => {
-    setUploadingFiles((prev) => {
-      const entry = prev.get(fileKey);
-      if (!entry) return prev;
+  const cancelFileUpload = useCallback(
+    (fileKey: string) => {
+      const entry = uploadingFilesRef.current.get(fileKey);
+      if (!entry) return;
 
-      const controller = controllers.current.get(entry.batchId);
+      const controller = controllers.current.get(fileKey);
       controller?.abort();
-      controllers.current.delete(entry.batchId);
+      controllers.current.delete(fileKey);
 
-      const next = new Map(prev);
-      next.delete(fileKey);
+      setUploadingFiles((prev) => {
+        if (!prev.has(fileKey)) return prev;
+        const next = new Map(prev);
+        next.delete(fileKey);
+        return next;
+      });
 
       addToast(
         t('elements.fileUpload.toast.cancelledFile', {
@@ -664,56 +685,57 @@ export function useFileUpload(
         }).md(),
         'success',
       );
-      return next;
-    });
-  }, []);
+    },
+    [addToast, t],
+  );
 
   const cancelFolderUpload = useCallback(
     (folderName: string) => {
       folderFileCounts.current.delete(folderName);
 
-      setUploadingFiles((prev) => {
-        const keysToRemove: string[] = [];
-        let batchId: string | null = null;
+      const keysToRemove: string[] = [];
+      const batchIds = new Set<string>();
 
-        prev.forEach((file, key) => {
-          if (file.filePath.split('/')[0] === folderName) {
-            keysToRemove.push(key);
-            batchId = file.batchId;
-          }
-        });
-
-        if (keysToRemove.length === 0) return prev;
-
-        if (batchId) {
-          controllers.current.get(batchId)?.abort();
-          controllers.current.delete(batchId);
+      uploadingFilesRef.current.forEach((file, key) => {
+        if (file.filePath.split('/')[0] === folderName) {
+          keysToRemove.push(key);
+          batchIds.add(file.batchId);
         }
+      });
 
+      if (keysToRemove.length === 0) return;
+
+      batchIds.forEach((batchId) => {
+        controllers.current.get(batchId)?.abort();
+        controllers.current.delete(batchId);
+      });
+
+      setUploadingFiles((prev) => {
         const next = new Map(prev);
         keysToRemove.forEach((key) => next.delete(key));
-
-        addToast(
-          t('elements.fileUpload.toast.cancelledFolder', {
-            folder: folderName,
-            files: tItem('file', keysToRemove.length),
-          }).md(),
-          'success',
-        );
         return next;
       });
+
+      addToast(
+        t('elements.fileUpload.toast.cancelledFolder', {
+          folder: folderName,
+          files: tItem('file', keysToRemove.length),
+        }).md(),
+        'success',
+      );
     },
-    [addToast],
+    [addToast, t, tItem],
   );
 
   const cancelAllUploads = useCallback(() => {
     controllers.current.forEach((controller) => controller.abort());
     controllers.current.clear();
     folderFileCounts.current.clear();
+    pendingProgress.current.clear();
     setUploadingFiles(new Map());
     onUploadCompleteRef.current();
     addToast(t('elements.fileUpload.toast.cancelledAll', {}), 'success');
-  }, []);
+  }, [addToast, t]);
 
   const aggregatedUploadProgress = useMemo(() => {
     const map = new Map<string, AggregatedUploadProgress>();

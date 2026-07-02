@@ -1,7 +1,7 @@
 import { CollisionDetection, closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, SortingStrategy, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ComponentProps, CSSProperties, ReactNode } from 'react';
+import { ComponentProps, CSSProperties, ReactNode, useMemo } from 'react';
 import { createDropAnimation, useDndSensors, useDndState } from '@/lib/dragAndDrop.ts';
 
 export type DndItem = {
@@ -56,14 +56,17 @@ export function SortableItem({
     touchAction: isDragging ? 'none' : 'manipulation',
   };
 
-  const dragHandleProps = {
-    ...attributes,
-    ...listeners,
-    style: {
-      cursor: isDragging ? 'grabbing' : 'grab',
-      touchAction: isDragging ? 'none' : 'manipulation',
-    } satisfies CSSProperties,
-  };
+  const dragHandleProps = useMemo(
+    () => ({
+      ...attributes,
+      ...listeners,
+      style: {
+        cursor: isDragging ? 'grabbing' : 'grab',
+        touchAction: isDragging ? 'none' : 'manipulation',
+      } satisfies CSSProperties,
+    }),
+    [attributes, listeners, isDragging],
+  );
 
   return (
     <div ref={setNodeRef} style={style}>
@@ -88,19 +91,23 @@ export interface DndContainerProps<T extends DndItem> {
   renderOverlay?: (activeItem: T | null) => ReactNode;
 }
 
+const defaultConfig: DndConfig = {};
+
 export function DndContainer<T extends DndItem>({
   items,
   callbacks,
-  config = {},
+  config = defaultConfig,
   strategy = verticalListSortingStrategy,
   collisionDetection = closestCenter,
   children,
   renderOverlay,
 }: DndContainerProps<T>) {
   const sensors = useDndSensors(config);
-  const dropAnimation = createDropAnimation(config);
+  const dropAnimation = useMemo(() => createDropAnimation(config), [config]);
 
   const { activeItem, localItems, handleDragStart, handleDragEnd, handleDragCancel } = useDndState(items, callbacks);
+
+  const itemIds = useMemo(() => localItems.map((item) => item.id), [localItems]);
 
   return (
     <DndContext
@@ -110,7 +117,7 @@ export function DndContainer<T extends DndItem>({
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <SortableContext items={items.map((item) => item.id)} strategy={strategy}>
+      <SortableContext items={itemIds} strategy={strategy}>
         {children(localItems)}
       </SortableContext>
       <DragOverlay dropAnimation={dropAnimation}>

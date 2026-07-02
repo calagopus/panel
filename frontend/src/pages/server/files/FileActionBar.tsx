@@ -12,6 +12,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { join } from 'pathe';
 import { memo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFiles from '@/api/server/files/copyFiles.ts';
 import downloadFiles from '@/api/server/files/downloadFiles.ts';
@@ -29,7 +30,7 @@ import { useServerStore } from '@/stores/server.ts';
 function FileActionBar() {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
   const {
     actingMode,
     actingFiles,
@@ -42,7 +43,21 @@ function FileActionBar() {
     clearActingFiles,
     doOpenModal,
     invalidateFilemanager,
-  } = useFileManager();
+  } = useFileManager(
+    useShallow((state) => ({
+      actingMode: state.actingMode,
+      actingFiles: state.actingFiles,
+      selectedFiles: state.selectedFiles,
+      actingFilesSource: state.actingFilesSource,
+      browsingDirectory: state.browsingDirectory,
+      browsingWritableDirectory: state.browsingWritableDirectory,
+      doActFiles: state.doActFiles,
+      doSelectFiles: state.doSelectFiles,
+      clearActingFiles: state.clearActingFiles,
+      doOpenModal: state.doOpenModal,
+      invalidateFilemanager: state.invalidateFilemanager,
+    })),
+  );
 
   const [loading, setLoading] = useState(false);
 

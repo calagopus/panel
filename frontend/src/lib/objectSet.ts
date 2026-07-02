@@ -37,6 +37,12 @@ export class ObjectSet<E extends Record<K, string>, const K extends string> {
     return this;
   }
 
+  public clone(): ObjectSet<E, K> {
+    const copy = new ObjectSet<E, K>(this.identifier);
+    copy.internalMap = new Map(this.internalMap);
+    return copy;
+  }
+
   public keys(): string[] {
     return Array.from(this.internalMap.keys());
   }

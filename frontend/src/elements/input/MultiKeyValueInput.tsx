@@ -1,7 +1,7 @@
 import { faCheck, faGripVertical, faPencil, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ActionIcon, Badge, Button, Group, Input, Stack, Text, TextInput } from '@mantine/core';
-import { ComponentProps, startTransition, useEffect, useRef, useState } from 'react';
+import { ComponentProps, startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -141,12 +141,19 @@ function MultiKeyValueInput({
     }
   };
 
-  const visibleOptions = selectedOptions.filter(({ key }) => !hideKey?.(key));
+  const visibleOptions = useMemo(
+    () => selectedOptions.filter(({ key }) => !hideKey?.(key)),
+    [selectedOptions, hideKey],
+  );
 
-  const dndItems: DndKeyValue[] = visibleOptions.map((opt) => ({
-    ...opt,
-    id: opt.key,
-  }));
+  const dndItems: DndKeyValue[] = useMemo(
+    () =>
+      visibleOptions.map((opt) => ({
+        ...opt,
+        id: opt.key,
+      })),
+    [visibleOptions],
+  );
 
   const handleDragEnd = (items: DndKeyValue[]) => {
     const reorderedVisible = items.map((item) => ({

@@ -43,7 +43,7 @@ export enum SocketRequest {
 }
 
 const useWebsocketEvent = (event: SocketEvent, callback: (...data: string[]) => void) => {
-  const { socketInstance } = useServerStore();
+  const socketInstance = useServerStore((state) => state.socketInstance);
   const savedCallback = useRef<(...data: string[]) => void>(null);
 
   useEffect(() => {

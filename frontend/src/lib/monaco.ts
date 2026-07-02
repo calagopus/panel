@@ -4,7 +4,15 @@ type IMonarchLanguageRule = import('monaco-editor').languages.IMonarchLanguageRu
 type ITextModel = import('monaco-editor').editor.ITextModel;
 type IPosition = import('monaco-editor').IPosition;
 
+// monaco is a page-level singleton; registering twice duplicates completion
+// providers and leaks them across editor mounts
+let hoconRegistered = false;
+let tomlRegistered = false;
+
 export function registerHoconLanguage(monaco: Monaco) {
+  if (hoconRegistered) return;
+  hoconRegistered = true;
+
   monaco.languages.register({ id: 'hocon', extensions: ['.conf', '.hocon'], aliases: ['HOCON', 'hocon'] });
 
   monaco.languages.setMonarchTokensProvider('hocon', {
@@ -218,6 +226,9 @@ export function registerHoconLanguage(monaco: Monaco) {
 
 // https://github.com/microsoft/monaco-editor/blob/f7beb75f38c38b065d26f05760438d84224fdb1a/src/basic-languages/toml/toml.ts
 export function registerTomlLanguage(monaco: Monaco) {
+  if (tomlRegistered) return;
+  tomlRegistered = true;
+
   monaco.languages.register({
     id: 'toml',
     extensions: ['.toml', '.tml'],

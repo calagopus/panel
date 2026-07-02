@@ -133,6 +133,13 @@ export default function ServerCreate() {
   const [selectedNestUuid, setSelectedNestUuid] = useState<string | null>('');
   const [eggVariables, setEggVariables] = useState<z.infer<typeof adminEggVariableSchema>[]>([]);
 
+  // the form is uncontrolled, so render-time form.getValues() reads don't react to
+  // changes; mirror the fields that drive queries/effects into state via form.watch
+  const [selectedEggUuid, setSelectedEggUuid] = useState('');
+  const [selectedNodeUuid, setSelectedNodeUuid] = useState('');
+  form.watch('eggUuid', ({ value }) => setSelectedEggUuid(value));
+  form.watch('nodeUuid', ({ value }) => setSelectedNodeUuid(value));
+
   const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
     fetcher: (search) => getNodes(1, search),
@@ -156,24 +163,24 @@ export default function ServerCreate() {
     canRequest: canReadEggs,
   });
   const availablePrimaryAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
-    queryKey: form.getValues().nodeUuid
-      ? queryKeys.admin.nodes.allocations(form.getValues().nodeUuid)
+    queryKey: selectedNodeUuid
+      ? queryKeys.admin.nodes.allocations(selectedNodeUuid)
       : ['admin', 'nodes', 'primary-allocations'],
     fetcher: (search) =>
-      form.getValues().nodeUuid
-        ? getAvailableNodeAllocations(form.getValues().nodeUuid, 1, search)
+      selectedNodeUuid
+        ? getAvailableNodeAllocations(selectedNodeUuid, 1, search)
         : Promise.resolve(getEmptyPaginationSet()),
-    deps: [form.getValues().nodeUuid],
+    deps: [selectedNodeUuid],
   });
   const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
-    queryKey: form.getValues().nodeUuid
-      ? queryKeys.admin.nodes.allocations(form.getValues().nodeUuid)
+    queryKey: selectedNodeUuid
+      ? queryKeys.admin.nodes.allocations(selectedNodeUuid)
       : ['admin', 'nodes', 'allocations'],
     fetcher: (search) =>
-      form.getValues().nodeUuid
-        ? getAvailableNodeAllocations(form.getValues().nodeUuid, 1, search)
+      selectedNodeUuid
+        ? getAvailableNodeAllocations(selectedNodeUuid, 1, search)
         : Promise.resolve(getEmptyPaginationSet()),
-    deps: [form.getValues().nodeUuid],
+    deps: [selectedNodeUuid],
   });
   const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
@@ -182,22 +189,25 @@ export default function ServerCreate() {
   });
 
   useEffect(() => {
-    const egg = eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid);
+    const egg = eggs.items.find((egg) => egg.uuid === selectedEggUuid);
     if (!egg) {
       return;
     }
 
     form.setFieldValue('image', Object.values(egg.dockerImages)[0] ?? '');
     form.setFieldValue('startup', egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '');
-  }, [form.getValues().eggUuid, eggs.items]);
+    // only react to the egg actually changing: `eggs.items` refetches (e.g. while
+    // typing in the egg search box) must not clobber user-edited image/startup
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEggUuid]);
 
   useEffect(() => {
-    if (!selectedNestUuid || !form.getValues().eggUuid) {
+    if (!selectedNestUuid || !selectedEggUuid) {
       return;
     }
 
     setEggVariablesLoading(true);
-    getEggVariables(selectedNestUuid, form.getValues().eggUuid)
+    getEggVariables(selectedNestUuid, selectedEggUuid)
       .then((variables) => {
         setEggVariables(variables);
       })
@@ -205,7 +215,7 @@ export default function ServerCreate() {
         addToast(httpErrorToHuman(err), 'error');
       })
       .finally(() => setEggVariablesLoading(false));
-  }, [selectedNestUuid, form.getValues().eggUuid]);
+  }, [selectedNestUuid, selectedEggUuid]);
 
   const basicInfoFields: FieldDef<ServerCreateFormValues>[] = [
     {
@@ -268,7 +278,11 @@ export default function ServerCreate() {
           withAsterisk
           label={t('common.form.nest', {})}
           value={selectedNestUuid}
-          onChange={(value) => setSelectedNestUuid(value)}
+          onChange={(value) => {
+            setSelectedNestUuid(value);
+            // a stale egg from the previous nest must not be submitted
+            form.setFieldValue('eggUuid', '');
+          }}
           data={nests.items.map((nest) => ({ label: nest.name, value: nest.uuid }))}
           searchable
           searchValue={nests.search}
@@ -387,9 +401,12 @@ export default function ServerCreate() {
       name: 'image',
       label: t('common.form.dockerImage', {}),
       required: true,
-      options: Object.entries(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.dockerImages || {}).map(
-        ([label, value]) => ({ label, value }),
-      ),
+      options: Object.entries(eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.dockerImages || {}).map(
+          ([label, value]) => ({
+            label,
+            value,
+          }),
+        ),
       props: {
         placeholder: t('pages.admin.servers.tabs.general.page.form.dockerImagePlaceholder', {}),
         searchable: true,
@@ -574,7 +591,7 @@ export default function ServerCreate() {
                 <Group grow>
                   <Select
                     label={t('common.form.primaryAllocation', {})}
-                    disabled={!form.getValues().nodeUuid}
+                    disabled={!selectedNodeUuid}
                     data={availablePrimaryAllocations.items
                       .filter((alloc) => !form.getValues().allocationUuids.includes(alloc.uuid))
                       .map((alloc) => ({
@@ -590,7 +607,7 @@ export default function ServerCreate() {
                   />
                   <MultiSelect
                     label={t('common.form.additionalAllocations', {})}
-                    disabled={!form.getValues().nodeUuid}
+                    disabled={!selectedNodeUuid}
                     data={availableAllocations.items
                       .filter((alloc) => alloc.uuid !== form.getValues().allocationUuid)
                       .map((alloc) => ({
@@ -613,7 +630,7 @@ export default function ServerCreate() {
               className='col-span-full'
             >
               <Stack>
-                {!selectedNestUuid || !form.getValues().eggUuid ? (
+                {!selectedNestUuid || !selectedEggUuid ? (
                   <Alert>{t('pages.admin.servers.tabs.general.page.alert.selectEggForVariables', {})}</Alert>
                 ) : eggVariablesLoading ? (
                   <Spinner.Centered />

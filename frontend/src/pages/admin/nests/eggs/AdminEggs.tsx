@@ -103,16 +103,11 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
     setSelectedEggs(new ObjectSet('uuid'));
   }, []);
 
-  const addSelectedEgg = (egg: z.infer<typeof adminEggSchema>) =>
-    setSelectedEggs((prev) => {
-      const next = new ObjectSet('uuid', prev.values());
-      next.add(egg);
-      return next;
-    });
+  const addSelectedEgg = (egg: z.infer<typeof adminEggSchema>) => setSelectedEggs((prev) => prev.clone().add(egg));
 
   const removeSelectedEgg = (egg: z.infer<typeof adminEggSchema>) =>
     setSelectedEggs((prev) => {
-      const next = new ObjectSet('uuid', prev.values());
+      const next = prev.clone();
       next.delete(egg);
       return next;
     });

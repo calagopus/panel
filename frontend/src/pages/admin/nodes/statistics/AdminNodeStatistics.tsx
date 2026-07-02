@@ -118,6 +118,7 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
     let socketRef: WebSocket | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
     let destroyed = false;
+    let lossNotified = false;
 
     const connect = () => {
       if (destroyed) {
@@ -140,6 +141,7 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
             stats?: NodeStatistics;
           };
 
+          lossNotified = false;
           setStats(data.stats ?? data);
         } catch {
           // ignore malformed messages
@@ -157,7 +159,11 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
           return;
         }
 
-        addToast(t('pages.admin.nodes.tabs.statistics.page.toast.connectionLost', {}), 'error');
+        // toast only once per outage instead of on every 5s reconnect attempt
+        if (!lossNotified) {
+          lossNotified = true;
+          addToast(t('pages.admin.nodes.tabs.statistics.page.toast.connectionLost', {}), 'error');
+        }
         setStats(null);
 
         reconnectTimer = setTimeout(() => {
