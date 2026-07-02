@@ -402,11 +402,11 @@ export default function ServerCreate() {
       label: t('common.form.dockerImage', {}),
       required: true,
       options: Object.entries(eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.dockerImages || {}).map(
-          ([label, value]) => ({
-            label,
-            value,
-          }),
-        ),
+        ([label, value]) => ({
+          label,
+          value,
+        }),
+      ),
       props: {
         placeholder: t('pages.admin.servers.tabs.general.page.form.dockerImagePlaceholder', {}),
         searchable: true,

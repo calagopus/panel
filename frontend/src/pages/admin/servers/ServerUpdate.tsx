@@ -106,10 +106,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
   const [selectedEggUuid, setSelectedEggUuid] = useState(contextServer?.egg.uuid ?? '');
   form.watch('eggUuid', ({ value }) => setSelectedEggUuid(value));
 
-  const { loading, doCreateOrUpdate } = useResourceForm<
-    ServerUpdateFormValues,
-    z.infer<typeof adminServerSchema>
-  >({
+  const { loading, doCreateOrUpdate } = useResourceForm<ServerUpdateFormValues, z.infer<typeof adminServerSchema>>({
     form,
     updateFn: () => updateServer(contextServer.uuid, form.getValues()),
     doUpdate: true,
