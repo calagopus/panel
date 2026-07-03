@@ -4,11 +4,24 @@ import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import Group from '@/elements/Group.tsx';
+import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
+import SizeInput from '@/elements/input/SizeInput.tsx';
+import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
-import { scheduleConditionLabelMapping } from '@/lib/enums.ts';
-import { serverScheduleConditionSchema } from '@/lib/schemas/server/schedules.ts';
+import {
+  scheduleComparatorLabelMapping,
+  scheduleConditionLabelMapping,
+  scheduleResourceMetricLabelMapping,
+  serverPowerStateLabelMapping,
+} from '@/lib/enums.ts';
+import {
+  serverScheduleComparator,
+  serverScheduleConditionSchema,
+  serverScheduleResourceMetric,
+} from '@/lib/schemas/server/schedules.ts';
+import { serverPowerState } from '@/lib/schemas/server/server.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ScheduleDynamicParameterInput from './ScheduleDynamicParameterInput.tsx';
 
@@ -35,6 +48,18 @@ export default function ScheduleConditionBuilder({ condition, onChange, depth = 
         break;
       case 'not':
         onChange({ type: 'not', condition: { type: 'none' } });
+        break;
+      case 'server_state':
+        onChange({ type: 'server_state', state: 'running' });
+        break;
+      case 'uptime':
+        onChange({ type: 'uptime', comparator: 'greater_than', value: 0 });
+        break;
+      case 'resource_usage':
+        onChange({ type: 'resource_usage', metric: 'cpu', comparator: 'greater_than', value: 0 });
+        break;
+      case 'file_exists':
+        onChange({ type: 'file_exists', file: '' });
         break;
       case 'variable_exists':
         onChange({ type: 'variable_exists', variable: { variable: '' } });
@@ -92,6 +117,80 @@ export default function ScheduleConditionBuilder({ condition, onChange, depth = 
             }))
             .filter((c) => depth < maxConditionDepth || !['and', 'or', 'not'].includes(c.value))}
         />
+
+        {condition.type === 'server_state' && (
+          <Select
+            label={t('pages.server.schedules.form.serverState', {})}
+            value={condition.state}
+            onChange={(value) => value && onChange({ ...condition, state: value as z.infer<typeof serverPowerState> })}
+            data={Object.entries(serverPowerStateLabelMapping).map(([value, label]) => ({
+              value,
+              label: label(),
+            }))}
+          />
+        )}
+
+        {(condition.type === 'uptime' || condition.type === 'resource_usage') && (
+          <Group grow>
+            {condition.type === 'resource_usage' && (
+              <Select
+                label={t('pages.server.schedules.condition.metric', {})}
+                value={condition.metric}
+                onChange={(value) =>
+                  value && onChange({ ...condition, metric: value as z.infer<typeof serverScheduleResourceMetric> })
+                }
+                data={Object.entries(scheduleResourceMetricLabelMapping).map(([value, label]) => ({
+                  value,
+                  label: label(),
+                }))}
+              />
+            )}
+            <Select
+              label={t('pages.server.schedules.form.comparator', {})}
+              value={condition.comparator}
+              onChange={(value) =>
+                value && onChange({ ...condition, comparator: value as z.infer<typeof serverScheduleComparator> })
+              }
+              data={Object.entries(scheduleComparatorLabelMapping).map(([value, label]) => ({
+                value,
+                label: label(),
+              }))}
+            />
+            {condition.type === 'uptime' && (
+              <NumberInput
+                label={t('pages.server.schedules.preCondition.valueSeconds', {})}
+                value={Number(condition.value) / 1000}
+                onChange={(value) => onChange({ ...condition, value: Number(value) * 1000 || 0 })}
+                min={0}
+              />
+            )}
+            {condition.type === 'resource_usage' && condition.metric === 'cpu' && (
+              <NumberInput
+                label={t('pages.server.schedules.preCondition.valuePercent', {})}
+                value={condition.value}
+                onChange={(value) => onChange({ ...condition, value: Number(value) || 0 })}
+                min={0}
+              />
+            )}
+            {condition.type === 'resource_usage' && condition.metric !== 'cpu' && (
+              <SizeInput
+                label={t('pages.server.schedules.preCondition.value', {})}
+                mode='b'
+                min={0}
+                value={condition.value}
+                onChange={(value) => onChange({ ...condition, value })}
+              />
+            )}
+          </Group>
+        )}
+
+        {condition.type === 'file_exists' && (
+          <TextInput
+            label={t('common.form.filePath', {})}
+            value={condition.file}
+            onChange={(e) => onChange({ ...condition, file: e.target.value })}
+          />
+        )}
 
         {(condition.type === 'variable_exists' ||
           condition.type === 'variable_equals' ||

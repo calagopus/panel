@@ -166,6 +166,30 @@ pub enum ScheduleActionInner {
         #[garde(dive, custom(ScheduleCondition::validate_nesting))]
         condition: ScheduleCondition,
     },
+    If {
+        #[garde(dive, custom(ScheduleCondition::validate_nesting))]
+        condition: ScheduleCondition,
+    },
+    ElseIf {
+        #[garde(dive, custom(ScheduleCondition::validate_nesting))]
+        condition: ScheduleCondition,
+    },
+    Else,
+    EndIf,
+    Exit {
+        #[garde(skip)]
+        successful: bool,
+    },
+    WaitForState {
+        #[garde(skip)]
+        ignore_failure: bool,
+
+        #[garde(skip)]
+        state: super::ServerState,
+        #[garde(range(min = 1, max = 24 * 60 * 60 * 1000))]
+        #[schema(minimum = 1, maximum = 86400000)]
+        timeout: u64,
+    },
     Format {
         #[garde(length(chars, min = 1, max = 2048))]
         #[schema(min_length = 1, max_length = 2048)]
@@ -258,12 +282,20 @@ pub enum ScheduleActionInner {
         destination: ScheduleDynamicParameter,
     },
     DeleteFiles {
+        #[garde(skip)]
+        #[serde(default)]
+        ignore_failure: bool,
+
         #[garde(dive)]
         root: ScheduleDynamicParameter,
         #[garde(skip)]
         files: Vec<compact_str::CompactString>,
     },
     RenameFiles {
+        #[garde(skip)]
+        #[serde(default)]
+        ignore_failure: bool,
+
         #[garde(dive)]
         root: ScheduleDynamicParameter,
         #[garde(skip)]
@@ -326,6 +358,12 @@ impl ScheduleActionInner {
         match self {
             ScheduleActionInner::Sleep { .. } => None,
             ScheduleActionInner::Ensure { .. } => None,
+            ScheduleActionInner::If { .. } => None,
+            ScheduleActionInner::ElseIf { .. } => None,
+            ScheduleActionInner::Else => None,
+            ScheduleActionInner::EndIf => None,
+            ScheduleActionInner::Exit { .. } => None,
+            ScheduleActionInner::WaitForState { .. } => None,
             ScheduleActionInner::Format { .. } => None,
             ScheduleActionInner::MatchRegex { .. } => None,
             ScheduleActionInner::WaitForConsoleLine { .. } => Some("control.read-console"),
@@ -371,6 +409,24 @@ pub enum ScheduleTrigger {
         #[garde(skip)]
         status: ServerBackupStatus,
     },
+    ScheduleCompletion {
+        #[garde(skip)]
+        schedule: uuid::Uuid,
+        #[garde(skip)]
+        successful: bool,
+    },
+    ResourceUsage {
+        #[garde(skip)]
+        metric: ScheduleResourceMetric,
+        #[garde(skip)]
+        comparator: ScheduleConditionComparator,
+        #[garde(range(min = 0.0))]
+        value: f64,
+        #[garde(range(min = 0, max = 24 * 60 * 60))]
+        #[schema(minimum = 0, maximum = 86400)]
+        #[serde(default)]
+        for_seconds: u64,
+    },
     ConsoleLine {
         #[garde(length(chars, min = 1, max = 1024))]
         #[schema(min_length = 1, max_length = 1024)]
@@ -384,9 +440,9 @@ pub enum ScheduleTrigger {
     Crash,
 }
 
-#[derive(ToSchema, Deserialize, Serialize, Clone)]
+#[derive(ToSchema, Deserialize, Serialize, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
-pub enum SchedulePreConditionComparator {
+pub enum ScheduleConditionComparator {
     SmallerThan,
     SmallerThanOrEquals,
     Equal,
@@ -394,91 +450,12 @@ pub enum SchedulePreConditionComparator {
     GreaterThanOrEquals,
 }
 
-#[derive(ToSchema, Validate, Deserialize, Serialize, Clone)]
-#[serde(rename_all = "snake_case", tag = "type")]
-#[schema(no_recursion)]
-pub enum SchedulePreCondition {
-    None,
-    And {
-        #[garde(dive)]
-        conditions: Vec<SchedulePreCondition>,
-    },
-    Or {
-        #[garde(dive)]
-        conditions: Vec<SchedulePreCondition>,
-    },
-    Not {
-        #[garde(dive)]
-        condition: Box<SchedulePreCondition>,
-    },
-    ServerState {
-        #[garde(skip)]
-        state: super::ServerState,
-    },
-    Uptime {
-        #[garde(skip)]
-        comparator: SchedulePreConditionComparator,
-        #[garde(skip)]
-        value: u64,
-    },
-    CpuUsage {
-        #[garde(skip)]
-        comparator: SchedulePreConditionComparator,
-        #[garde(skip)]
-        value: f64,
-    },
-    MemoryUsage {
-        #[garde(skip)]
-        comparator: SchedulePreConditionComparator,
-        #[garde(skip)]
-        value: u64,
-    },
-    DiskUsage {
-        #[garde(skip)]
-        comparator: SchedulePreConditionComparator,
-        #[garde(skip)]
-        value: u64,
-    },
-    FileExists {
-        #[garde(length(chars, min = 1, max = 255))]
-        #[schema(min_length = 1, max_length = 255)]
-        file: String,
-    },
-}
-
-impl SchedulePreCondition {
-    pub const MAX_NESTING_DEPTH: usize = 3;
-
-    fn nested_within_limit(&self, depth: usize) -> bool {
-        match self {
-            SchedulePreCondition::And { conditions } | SchedulePreCondition::Or { conditions } => {
-                depth < Self::MAX_NESTING_DEPTH
-                    && conditions.iter().all(|c| c.nested_within_limit(depth + 1))
-            }
-            SchedulePreCondition::Not { condition } => {
-                depth < Self::MAX_NESTING_DEPTH && condition.nested_within_limit(depth + 1)
-            }
-            _ => true,
-        }
-    }
-
-    pub fn validate_nesting(value: &Self, _context: &()) -> garde::Result {
-        if value.nested_within_limit(0) {
-            Ok(())
-        } else {
-            Err(garde::Error::new(format!(
-                "condition may not nest groups more than {} levels deep",
-                Self::MAX_NESTING_DEPTH
-            )))
-        }
-    }
-
-    pub fn validate_optional_nesting(value: &Option<Self>, context: &()) -> garde::Result {
-        match value {
-            Some(condition) => Self::validate_nesting(condition, context),
-            None => Ok(()),
-        }
-    }
+#[derive(ToSchema, Deserialize, Serialize, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum ScheduleResourceMetric {
+    Cpu,
+    Memory,
+    Disk,
 }
 
 #[derive(ToSchema, Deserialize, Serialize, Clone, Validate)]
@@ -497,6 +474,29 @@ pub enum ScheduleCondition {
     Not {
         #[garde(dive)]
         condition: Box<ScheduleCondition>,
+    },
+    ServerState {
+        #[garde(skip)]
+        state: super::ServerState,
+    },
+    Uptime {
+        #[garde(skip)]
+        comparator: ScheduleConditionComparator,
+        #[garde(skip)]
+        value: u64,
+    },
+    ResourceUsage {
+        #[garde(skip)]
+        metric: ScheduleResourceMetric,
+        #[garde(skip)]
+        comparator: ScheduleConditionComparator,
+        #[garde(range(min = 0.0))]
+        value: f64,
+    },
+    FileExists {
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
+        file: String,
     },
     VariableExists {
         #[garde(dive)]
@@ -552,6 +552,13 @@ impl ScheduleCondition {
                 "condition may not nest groups more than {} levels deep",
                 Self::MAX_NESTING_DEPTH
             )))
+        }
+    }
+
+    pub fn validate_optional_nesting(value: &Option<Self>, context: &()) -> garde::Result {
+        match value {
+            Some(condition) => Self::validate_nesting(condition, context),
+            None => Ok(()),
         }
     }
 }

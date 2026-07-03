@@ -104,8 +104,8 @@ mod post {
         enabled: bool,
         #[garde(dive)]
         triggers: Vec<wings_api::ScheduleTrigger>,
-        #[garde(dive, custom(wings_api::SchedulePreCondition::validate_nesting))]
-        condition: wings_api::SchedulePreCondition,
+        #[garde(dive, custom(wings_api::ScheduleCondition::validate_nesting))]
+        condition: wings_api::ScheduleCondition,
     }
 
     #[derive(ToSchema, Serialize)]

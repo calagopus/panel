@@ -1,5 +1,6 @@
 import {
   DragEndEvent,
+  DragOverEvent,
   DragStartEvent,
   DropAnimation,
   defaultDropAnimationSideEffects,
@@ -53,9 +54,14 @@ export function useDndState<T extends DndItem>(items: T[], callbacks: DndCallbac
     }
   };
 
+  const handleDragOver = (event: DragOverEvent) => {
+    callbacks.onDragOver?.(event.active.id as string, (event.over?.id as string | undefined) ?? null);
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
+    callbacks.onDragOver?.(active.id as string, null);
 
     if (!over || active.id === over.id) return;
 
@@ -86,6 +92,7 @@ export function useDndState<T extends DndItem>(items: T[], callbacks: DndCallbac
     activeItem,
     localItems,
     handleDragStart,
+    handleDragOver,
     handleDragEnd,
     handleDragCancel,
   };

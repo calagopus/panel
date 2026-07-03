@@ -9,9 +9,16 @@ import Text from '@/elements/Text.tsx';
 import ThemeIcon from '@/elements/ThemeIcon.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { scheduleTriggerColorMapping, scheduleTriggerIconMapping } from '@/lib/enums.ts';
+import {
+  scheduleComparatorLabelMapping,
+  scheduleResourceMetricLabelMapping,
+  scheduleTriggerColorMapping,
+  scheduleTriggerIconMapping,
+} from '@/lib/enums.ts';
 import { serverScheduleTriggerSchema } from '@/lib/schemas/server/schedules.ts';
+import { bytesToString } from '@/lib/size.ts';
 import { getTranslations, useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useServerStore } from '@/stores/server.ts';
 
 function cronTooltip(cron: string) {
   const { t, language } = getTranslations();
@@ -34,6 +41,7 @@ interface TriggerCardProps {
 
 export default function TriggerCard({ date, timezone, trigger }: TriggerCardProps) {
   const { t, tReact } = useTranslations();
+  const schedules = useServerStore((state) => state.schedules);
 
   return (
     <Card>
@@ -93,6 +101,21 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
           <Text>
             {t('pages.server.schedules.triggers.backupStatus.card.content', {
               status: trigger.status,
+            }).md()}
+          </Text>
+        ) : trigger.type === 'schedule_completion' ? (
+          <Text>
+            {t('pages.server.schedules.triggers.scheduleCompletion.card.content', {
+              schedule: schedules.data.find((s) => s.uuid === trigger.schedule)?.name ?? trigger.schedule,
+              status: t(trigger.successful ? 'common.badge.successful' : 'common.badge.failed', {}),
+            }).md()}
+          </Text>
+        ) : trigger.type === 'resource_usage' ? (
+          <Text>
+            {t('pages.server.schedules.triggers.resourceUsage.card.content', {
+              metric: scheduleResourceMetricLabelMapping[trigger.metric](),
+              comparator: scheduleComparatorLabelMapping[trigger.comparator](),
+              value: trigger.metric === 'cpu' ? `${trigger.value}%` : bytesToString(trigger.value),
             }).md()}
           </Text>
         ) : trigger.type === 'console_line' ? (

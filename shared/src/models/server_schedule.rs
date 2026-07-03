@@ -21,8 +21,8 @@ pub struct ExportedServerSchedule {
 
     #[garde(dive)]
     pub triggers: Vec<wings_api::ScheduleTrigger>,
-    #[garde(dive, custom(wings_api::SchedulePreCondition::validate_nesting))]
-    pub condition: wings_api::SchedulePreCondition,
+    #[garde(dive, custom(wings_api::ScheduleCondition::validate_nesting))]
+    pub condition: wings_api::ScheduleCondition,
 
     #[garde(dive)]
     pub steps: Vec<super::server_schedule_step::ExportedServerScheduleStep>,
@@ -36,7 +36,7 @@ pub struct ServerSchedule {
     pub enabled: bool,
 
     pub triggers: Vec<wings_api::ScheduleTrigger>,
-    pub condition: wings_api::SchedulePreCondition,
+    pub condition: wings_api::ScheduleCondition,
 
     pub last_run: Option<chrono::NaiveDateTime>,
     pub last_failure: Option<chrono::NaiveDateTime>,
@@ -262,8 +262,8 @@ pub struct CreateServerScheduleOptions {
     pub enabled: bool,
     #[garde(dive)]
     pub triggers: Vec<wings_api::ScheduleTrigger>,
-    #[garde(dive, custom(wings_api::SchedulePreCondition::validate_nesting))]
-    pub condition: wings_api::SchedulePreCondition,
+    #[garde(dive, custom(wings_api::ScheduleCondition::validate_nesting))]
+    pub condition: wings_api::ScheduleCondition,
 }
 
 #[async_trait::async_trait]
@@ -317,11 +317,8 @@ pub struct UpdateServerScheduleOptions {
     pub enabled: Option<bool>,
     #[garde(dive)]
     pub triggers: Option<Vec<wings_api::ScheduleTrigger>>,
-    #[garde(
-        dive,
-        custom(wings_api::SchedulePreCondition::validate_optional_nesting)
-    )]
-    pub condition: Option<wings_api::SchedulePreCondition>,
+    #[garde(dive, custom(wings_api::ScheduleCondition::validate_optional_nesting))]
+    pub condition: Option<wings_api::ScheduleCondition>,
 }
 
 #[async_trait::async_trait]
@@ -543,7 +540,7 @@ pub struct ApiServerSchedule {
     pub enabled: bool,
 
     pub triggers: Vec<wings_api::ScheduleTrigger>,
-    pub condition: wings_api::SchedulePreCondition,
+    pub condition: wings_api::ScheduleCondition,
 
     pub last_run: Option<chrono::DateTime<chrono::Utc>>,
     pub last_failure: Option<chrono::DateTime<chrono::Utc>>,

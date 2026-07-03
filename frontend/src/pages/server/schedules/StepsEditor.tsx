@@ -1,9 +1,12 @@
-import { faGear, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { arrayMove } from '@dnd-kit/sortable';
+import { faExclamationTriangle, faGear, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { memo, startTransition, useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import createScheduleStep from '@/api/server/schedules/steps/createScheduleStep.ts';
 import updateScheduleStepsOrder from '@/api/server/schedules/steps/updateScheduleStepsOrder.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
 import Group from '@/elements/Group.tsx';
@@ -13,10 +16,11 @@ import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import ThemeIcon from '@/elements/ThemeIcon.tsx';
 import Title from '@/elements/Title.tsx';
+import { scheduleStepDefaultMapping } from '@/lib/enums.ts';
 import { serverScheduleSchema, serverScheduleStepSchema } from '@/lib/schemas/server/schedules.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useServerStore } from '@/stores/server.ts';
+import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
 import StepCreateOrUpdateModal from './modals/StepCreateOrUpdateModal.tsx';
 import StepCard from './StepCard.tsx';
 
@@ -26,13 +30,51 @@ interface DndScheduleStep extends z.infer<typeof serverScheduleStepSchema>, DndI
 
 const MemoizedStepCard = memo(StepCard);
 
+const maxStepIndent = 8;
+
+export function stepIndents(steps: z.infer<typeof serverScheduleStepSchema>[]): number[] {
+  let depth = 0;
+
+  return steps.map((step) => {
+    const type = step.action.type;
+    const indent = type === 'else_if' || type === 'else' || type === 'end_if' ? Math.max(depth - 1, 0) : depth;
+
+    if (type === 'if') depth = Math.min(depth + 1, maxStepIndent);
+    else if (type === 'end_if') depth = Math.max(depth - 1, 0);
+
+    return indent;
+  });
+}
+
+function stepBlockIssues(steps: z.infer<typeof serverScheduleStepSchema>[]): {
+  unclosedIf: boolean;
+  orphanBranch: boolean;
+} {
+  let depth = 0;
+  let orphanBranch = false;
+
+  for (const step of steps) {
+    const type = step.action.type;
+
+    if (type === 'if') depth++;
+    else if (type === 'end_if') {
+      if (depth === 0) orphanBranch = true;
+      else depth--;
+    } else if ((type === 'else' || type === 'else_if') && depth === 0) orphanBranch = true;
+  }
+
+  return { unclosedIf: depth > 0, orphanBranch };
+}
+
 export default function StepsEditor({ schedule }: { schedule: z.infer<typeof serverScheduleSchema> }) {
   const { t } = useTranslations();
   const { server, scheduleSteps, setScheduleSteps } = useServerStore();
+  const storeApi = useServerStoreApi();
   const { addToast } = useToast();
 
   const [openModal, setOpenModal] = useState<'edit' | 'create' | null>(null);
   const [childModalOpen, setChildModalOpen] = useState(false);
+  const [dragProjection, setDragProjection] = useState<{ activeId: string; overId: string } | null>(null);
 
   const nextStepOrder = useMemo(
     () =>
@@ -58,13 +100,72 @@ export default function StepsEditor({ schedule }: { schedule: z.infer<typeof ser
 
   const handleStepCreate = useCallback(
     (step: z.infer<typeof serverScheduleStepSchema>) => {
-      setScheduleSteps([...scheduleSteps, step]);
+      setScheduleSteps([...storeApi.getState().scheduleSteps, step]);
     },
-    [scheduleSteps, setScheduleSteps],
+    [storeApi, setScheduleSteps],
   );
+
+  const handleStepAddBranch = useCallback(
+    async (step: z.infer<typeof serverScheduleStepSchema>, type: 'else_if' | 'else') => {
+      const steps = [...storeApi.getState().scheduleSteps].sort((a, b) => a.order - b.order);
+      const startIndex = steps.findIndex((s) => s.uuid === step.uuid);
+      if (startIndex === -1) return;
+
+      let insertIndex = steps.length;
+      let depth = 0;
+      for (let i = startIndex + 1; i < steps.length; i++) {
+        const actionType = steps[i].action.type;
+
+        if (actionType === 'if') depth++;
+        else if (actionType === 'end_if') {
+          if (depth === 0) {
+            insertIndex = i;
+            break;
+          }
+          depth--;
+        } else if (depth === 0 && type === 'else_if' && (actionType === 'else_if' || actionType === 'else')) {
+          insertIndex = i;
+          break;
+        }
+      }
+
+      try {
+        const created = await createScheduleStep(server.uuid, schedule.uuid, {
+          order: insertIndex + 1,
+          action: scheduleStepDefaultMapping[type],
+        });
+
+        const reordered = [...steps.slice(0, insertIndex), created, ...steps.slice(insertIndex)].map((s, index) => ({
+          ...s,
+          order: index + 1,
+        }));
+        setScheduleSteps(reordered);
+        addToast(t('pages.server.schedules.toast.step.created', {}), 'success');
+
+        await updateScheduleStepsOrder(
+          server.uuid,
+          schedule.uuid,
+          reordered.map((s) => s.uuid),
+        );
+      } catch (err) {
+        addToast(httpErrorToHuman(err), 'error');
+      }
+    },
+    [server.uuid, schedule.uuid, storeApi, setScheduleSteps, addToast, t],
+  );
+
+  const handleDragOver = useCallback((activeId: string, overId: string | null) => {
+    setDragProjection(overId && overId !== activeId ? { activeId, overId } : null);
+  }, []);
+
+  const handleDragCancel = useCallback(() => {
+    setDragProjection(null);
+  }, []);
 
   const handleDragEnd = useCallback(
     async (reorderedSteps: DndScheduleStep[]) => {
+      setDragProjection(null);
+
       const stepsWithNewOrder = reorderedSteps.map((step, index) => ({
         ...step,
         order: index + 1,
@@ -87,6 +188,34 @@ export default function StepsEditor({ schedule }: { schedule: z.infer<typeof ser
   );
 
   const sortedSteps = useMemo(() => [...scheduleSteps].sort((a, b) => a.order - b.order), [scheduleSteps]);
+  const blockIssues = useMemo(() => stepBlockIssues(sortedSteps), [sortedSteps]);
+
+  const canAddElseMap = useMemo(() => {
+    const map = new Map<string, boolean>();
+
+    sortedSteps.forEach((step, index) => {
+      if (step.action.type !== 'if' && step.action.type !== 'else_if') return;
+
+      let depth = 0;
+      let hasElse = false;
+      for (let i = index + 1; i < sortedSteps.length; i++) {
+        const type = sortedSteps[i].action.type;
+
+        if (type === 'if') depth++;
+        else if (type === 'end_if') {
+          if (depth === 0) break;
+          depth--;
+        } else if (type === 'else' && depth === 0) {
+          hasElse = true;
+          break;
+        }
+      }
+
+      map.set(step.uuid, !hasElse);
+    });
+
+    return map;
+  }, [sortedSteps]);
 
   const dndSteps: DndScheduleStep[] = useMemo(
     () =>
@@ -147,31 +276,68 @@ export default function StepsEditor({ schedule }: { schedule: z.infer<typeof ser
             </Button>
           </Paper>
         ) : (
-          <DndContainer items={dndSteps} callbacks={{ onDragEnd: handleDragEnd }} renderOverlay={renderOverlay}>
-            {(items) => (
-              <Stack gap='md'>
-                {items.map((step) => (
-                  <SortableItem
-                    key={step.id}
-                    id={step.id}
-                    disabled={openModal !== null || childModalOpen}
-                    renderItem={({ dragHandleProps }) => (
-                      <div {...dragHandleProps}>
-                        <MemoizedStepCard
-                          onStepToggle={setChildModalOpen}
-                          schedule={schedule}
-                          step={step}
-                          onStepUpdate={handleStepUpdate}
-                          onStepDelete={handleStepDelete}
-                          onStepDuplicate={handleStepCreate}
-                        />
-                      </div>
-                    )}
-                  />
-                ))}
-              </Stack>
-            )}
+          <DndContainer
+            items={dndSteps}
+            callbacks={{ onDragEnd: handleDragEnd, onDragOver: handleDragOver, onDragCancel: handleDragCancel }}
+            renderOverlay={renderOverlay}
+          >
+            {(items) => {
+              let projectedItems = items;
+              if (dragProjection) {
+                const fromIndex = items.findIndex((item) => item.id === dragProjection.activeId);
+                const toIndex = items.findIndex((item) => item.id === dragProjection.overId);
+
+                if (fromIndex !== -1 && toIndex !== -1) {
+                  projectedItems = arrayMove(items, fromIndex, toIndex);
+                }
+              }
+
+              const projectedIndents = stepIndents(projectedItems);
+              const indents = new Map(projectedItems.map((item, index) => [item.id, projectedIndents[index]]));
+
+              return (
+                <Stack gap='md'>
+                  {items.map((step) => (
+                    <SortableItem
+                      key={step.id}
+                      id={step.id}
+                      disabled={openModal !== null || childModalOpen}
+                      renderItem={({ dragHandleProps }) => (
+                        <div
+                          {...dragHandleProps}
+                          style={{
+                            ...dragHandleProps.style,
+                            marginLeft: (indents.get(step.id) ?? 0) * 28,
+                            transition: 'margin-left 150ms ease',
+                          }}
+                        >
+                          <MemoizedStepCard
+                            onStepToggle={setChildModalOpen}
+                            schedule={schedule}
+                            step={step}
+                            onStepUpdate={handleStepUpdate}
+                            onStepDelete={handleStepDelete}
+                            onStepDuplicate={handleStepCreate}
+                            onStepAddBranch={handleStepAddBranch}
+                            canAddElse={canAddElseMap.get(step.id) ?? false}
+                          />
+                        </div>
+                      )}
+                    />
+                  ))}
+                </Stack>
+              );
+            }}
           </DndContainer>
+        )}
+
+        {(blockIssues.unclosedIf || blockIssues.orphanBranch) && (
+          <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
+            <Stack gap={4}>
+              {blockIssues.unclosedIf && <span>{t('pages.server.schedules.steps.warning.unclosedIf', {})}</span>}
+              {blockIssues.orphanBranch && <span>{t('pages.server.schedules.steps.warning.orphanBranch', {})}</span>}
+            </Stack>
+          </Alert>
         )}
 
         {sortedSteps.length > 0 && (

@@ -18,6 +18,7 @@ export interface DndConfig {
 
 export interface DndCallbacks<T extends DndItem> {
   onDragStart?: (item: T) => void;
+  onDragOver?: (activeId: string, overId: string | null) => void;
   onDragEnd: (items: T[], oldIndex: number, newIndex: number) => void | Promise<void>;
   onDragCancel?: () => void;
   onError?: (error: unknown, originalItems: T[]) => void;
@@ -105,7 +106,10 @@ export function DndContainer<T extends DndItem>({
   const sensors = useDndSensors(config);
   const dropAnimation = useMemo(() => createDropAnimation(config), [config]);
 
-  const { activeItem, localItems, handleDragStart, handleDragEnd, handleDragCancel } = useDndState(items, callbacks);
+  const { activeItem, localItems, handleDragStart, handleDragOver, handleDragEnd, handleDragCancel } = useDndState(
+    items,
+    callbacks,
+  );
 
   const itemIds = useMemo(() => localItems.map((item) => item.id), [localItems]);
 
@@ -114,6 +118,7 @@ export function DndContainer<T extends DndItem>({
       sensors={sensors}
       collisionDetection={collisionDetection}
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >

@@ -3852,18 +3852,6 @@
             }
           },
           "enum": {
-            "schedulePreConditionType": {
-              "none": "Keine",
-              "and": "UND (Alle müssen wahr sein)",
-              "or": "ODER (Mindestens eine muss wahr sein)",
-              "not": "NICHT (Darf nicht wahr sein)",
-              "serverState": "Server-Status",
-              "uptime": "Laufzeit",
-              "cpuUsage": "CPU-Auslastung",
-              "memoryUsage": "RAM-Auslastung",
-              "diskUsage": "Festplattennutzung",
-              "fileExists": "Datei existiert"
-            },
             "scheduleConditionType": {
               "none": "Keine",
               "and": "UND (Alle müssen wahr sein)",
@@ -3881,6 +3869,18 @@
               "equal": "Gleich",
               "greaterThanOrEqual": "Größer oder gleich",
               "greaterThan": "Größer als"
+            },
+            "schedulePreConditionType": {
+              "none": "Keine",
+              "and": "UND (Alle müssen wahr sein)",
+              "or": "ODER (Mindestens eine muss wahr sein)",
+              "not": "NICHT (Darf nicht wahr sein)",
+              "serverState": "Server-Status",
+              "uptime": "Laufzeit",
+              "cpuUsage": "CPU-Auslastung",
+              "memoryUsage": "RAM-Auslastung",
+              "diskUsage": "Festplattennutzung",
+              "fileExists": "Datei existiert"
             }
           },
           "modal": {

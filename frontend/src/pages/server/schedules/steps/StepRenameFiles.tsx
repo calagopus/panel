@@ -2,6 +2,7 @@ import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import Button from '@/elements/Button.tsx';
 import Group from '@/elements/Group.tsx';
+import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
@@ -53,6 +54,11 @@ export default function StepRenameFiles({
       <Button onClick={() => form.insertListItem('action.files', { from: '', to: '' })}>
         {t('pages.server.schedules.button.addFile', {})}
       </Button>
+
+      <Switch
+        label={t('pages.server.schedules.form.ignoreFailure', {})}
+        {...form.getInputProps('action.ignoreFailure', { type: 'checkbox' })}
+      />
     </Stack>
   );
 }

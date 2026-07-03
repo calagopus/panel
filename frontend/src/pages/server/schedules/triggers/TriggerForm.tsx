@@ -2,9 +2,11 @@ import { UseFormReturnType } from '@mantine/form';
 import cronstrue from 'cronstrue/i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
+import getSchedules from '@/api/server/schedules/getSchedules.ts';
 import Group from '@/elements/Group.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
+import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import TimeInput from '@/elements/input/TimeInput.tsx';
@@ -12,6 +14,8 @@ import Popover from '@/elements/Popover.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import {
+  scheduleComparatorLabelMapping,
+  scheduleResourceMetricLabelMapping,
   serverBackupStatusLabelMapping,
   serverPowerActionLabelMapping,
   serverPowerStateLabelMapping,
@@ -377,6 +381,116 @@ function BackupStatusTriggerForm({ form, index }: TriggerFormProps) {
   );
 }
 
+function ScheduleCompletionTriggerForm({ form, index }: TriggerFormProps) {
+  const { t } = useTranslations();
+  const server = useServerStore((state) => state.server);
+  const currentSchedule = useServerStore((state) => state.schedule);
+  const [schedules, setSchedules] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    getSchedules(server.uuid, 1).then((page) =>
+      setSchedules(
+        page.data
+          .filter((schedule) => schedule.uuid !== currentSchedule?.uuid)
+          .map((schedule) => ({ value: schedule.uuid, label: schedule.name })),
+      ),
+    );
+  }, [server.uuid, currentSchedule?.uuid]);
+
+  if (form.values.triggers[index].type !== 'schedule_completion') return null;
+
+  return (
+    <Select
+      withAsterisk
+      searchable
+      label={t('pages.server.schedules.triggers.scheduleCompletion.form.schedule', {})}
+      className='flex-1'
+      data={schedules}
+      {...form.getInputProps(`triggers.${index}.schedule`)}
+    />
+  );
+}
+
+function ScheduleCompletionExtraForm({ form, index }: TriggerFormProps) {
+  const { t } = useTranslations();
+
+  const trigger = form.values.triggers[index];
+  if (trigger.type !== 'schedule_completion') return null;
+
+  return (
+    <Select
+      label={t('pages.server.schedules.triggers.scheduleCompletion.form.completionStatus', {})}
+      value={trigger.successful ? 'successful' : 'failed'}
+      onChange={(value) => value && form.setFieldValue(`triggers.${index}.successful`, value === 'successful')}
+      data={[
+        { value: 'successful', label: t('common.badge.successful', {}) },
+        { value: 'failed', label: t('common.badge.failed', {}) },
+      ]}
+    />
+  );
+}
+
+function ResourceUsageTriggerForm({ form, index }: TriggerFormProps) {
+  const { t } = useTranslations();
+
+  if (form.values.triggers[index].type !== 'resource_usage') return null;
+
+  return (
+    <Select
+      withAsterisk
+      label={t('pages.server.schedules.condition.metric', {})}
+      className='flex-1'
+      data={Object.entries(scheduleResourceMetricLabelMapping).map(([value, label]) => ({
+        value,
+        label: label(),
+      }))}
+      {...form.getInputProps(`triggers.${index}.metric`)}
+    />
+  );
+}
+
+function ResourceUsageExtraForm({ form, index }: TriggerFormProps) {
+  const { t } = useTranslations();
+
+  const trigger = form.values.triggers[index];
+  if (trigger.type !== 'resource_usage') return null;
+
+  return (
+    <Group grow align='end'>
+      <Select
+        label={t('pages.server.schedules.form.comparator', {})}
+        data={Object.entries(scheduleComparatorLabelMapping).map(([value, label]) => ({
+          value,
+          label: label(),
+        }))}
+        {...form.getInputProps(`triggers.${index}.comparator`)}
+      />
+      {trigger.metric === 'cpu' ? (
+        <NumberInput
+          label={t('pages.server.schedules.preCondition.valuePercent', {})}
+          min={0}
+          value={trigger.value}
+          onChange={(value) => form.setFieldValue(`triggers.${index}.value`, Number(value) || 0)}
+        />
+      ) : (
+        <SizeInput
+          label={t('pages.server.schedules.preCondition.value', {})}
+          mode='b'
+          min={0}
+          value={trigger.value}
+          onChange={(value) => form.setFieldValue(`triggers.${index}.value`, value)}
+        />
+      )}
+      <NumberInput
+        label={t('pages.server.schedules.triggers.resourceUsage.form.forSeconds', {})}
+        min={0}
+        max={24 * 60 * 60}
+        {...form.getInputProps(`triggers.${index}.forSeconds`)}
+      />
+    </Group>
+  );
+}
+
 function ConsoleLineTriggerForm({ form, index }: TriggerFormProps) {
   const { t } = useTranslations();
 
@@ -422,6 +536,8 @@ const TRIGGER_INLINE_FORMS: Record<ServerScheduleTriggerType, React.FC<TriggerFo
   power_action: PowerActionTriggerForm,
   server_state: ServerStateTriggerForm,
   backup_status: BackupStatusTriggerForm,
+  schedule_completion: ScheduleCompletionTriggerForm,
+  resource_usage: ResourceUsageTriggerForm,
   console_line: ConsoleLineTriggerForm,
   crash: null,
 };
@@ -431,6 +547,8 @@ const TRIGGER_EXTRA_FORMS: Record<ServerScheduleTriggerType, React.FC<TriggerFor
   power_action: null,
   server_state: null,
   backup_status: null,
+  schedule_completion: ScheduleCompletionExtraForm,
+  resource_usage: ResourceUsageExtraForm,
   console_line: ConsoleLineExtraForm,
   crash: null,
 };

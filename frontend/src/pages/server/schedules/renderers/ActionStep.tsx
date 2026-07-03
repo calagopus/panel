@@ -14,16 +14,29 @@ import { serverScheduleStepSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ActionRenderer from './ActionRenderer.tsx';
 
+const INDENT_WIDTH = 28;
+const LINE_WIDTH = 2;
+const BULLET_SIZE = 40;
+
 interface ActionStepProps {
   step: z.infer<typeof serverScheduleStepSchema>;
   isActive: boolean;
+  indent?: number;
+  nextIndent?: number;
 }
 
-export default function ActionStep({ step, isActive }: ActionStepProps) {
+export default function ActionStep({ step, isActive, indent = 0, nextIndent = indent }: ActionStepProps) {
   const { t } = useTranslations();
+  const delta = nextIndent - indent;
 
   return (
     <Timeline.Item
+      style={
+        {
+          marginLeft: indent * INDENT_WIDTH,
+          ...(delta !== 0 && { '--timeline-line-display': 'none' }),
+        } as React.CSSProperties
+      }
       bullet={
         isActive ? (
           <AnimatedHourglass />
@@ -45,6 +58,30 @@ export default function ActionStep({ step, isActive }: ActionStepProps) {
         </Group>
       }
     >
+      {delta !== 0 && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            pointerEvents: 'none',
+            top: 0,
+            bottom: `calc(-1 * var(--mantine-spacing-xl) - ${BULLET_SIZE / 2}px)`,
+            left: (delta > 0 ? 0 : delta * INDENT_WIDTH) - LINE_WIDTH,
+            width: Math.abs(delta) * INDENT_WIDTH,
+            borderBottom: `${LINE_WIDTH}px solid var(--item-border-color)`,
+            ...(delta > 0
+              ? {
+                  borderLeft: `${LINE_WIDTH}px solid var(--item-border-color)`,
+                  borderBottomLeftRadius: 12,
+                }
+              : {
+                  borderRight: `${LINE_WIDTH}px solid var(--item-border-color)`,
+                  borderBottomRightRadius: 12,
+                }),
+          }}
+        />
+      )}
+
       <Card p='sm' mt='xs'>
         <ActionRenderer action={step.action} mode='detailed' />
       </Card>

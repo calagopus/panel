@@ -3803,18 +3803,6 @@
             }
           },
           "enum": {
-            "schedulePreConditionType": {
-              "none": "žiadne",
-              "and": "A (všetko musí byť pravdivé)",
-              "or": "ALEBO (aspoň jedno musí byť pravdivé)",
-              "not": "NIE (nesmie byť pravdivé)",
-              "serverState": "Stav servera",
-              "uptime": "Doba prevádzky",
-              "cpuUsage": "Využitie CPU",
-              "memoryUsage": "Využitie pamäte",
-              "diskUsage": "Využitie disku",
-              "fileExists": "Súbor existuje"
-            },
             "scheduleConditionType": {
               "none": "žiadne",
               "and": "A (všetko musí byť pravdivé)",
@@ -3832,6 +3820,18 @@
               "equal": "Rovná sa",
               "greaterThanOrEqual": "Väčšie alebo rovné",
               "greaterThan": "Väčšie ako"
+            },
+            "schedulePreConditionType": {
+              "none": "žiadne",
+              "and": "A (všetko musí byť pravdivé)",
+              "or": "ALEBO (aspoň jedno musí byť pravdivé)",
+              "not": "NIE (nesmie byť pravdivé)",
+              "serverState": "Stav servera",
+              "uptime": "Doba prevádzky",
+              "cpuUsage": "Využitie CPU",
+              "memoryUsage": "Využitie pamäte",
+              "diskUsage": "Využitie disku",
+              "fileExists": "Súbor existuje"
             }
           },
           "modal": {

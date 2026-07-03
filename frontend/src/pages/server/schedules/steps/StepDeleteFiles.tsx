@@ -1,5 +1,6 @@
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
+import Switch from '@/elements/input/Switch.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
@@ -27,6 +28,10 @@ export default function StepDeleteFiles({
         label={t('pages.server.schedules.steps.deleteFiles.form.filesToDelete', {})}
         placeholder={t('pages.server.schedules.steps.deleteFiles.form.filesToDelete', {})}
         {...form.getInputProps('action.files', { type: 'checkbox' })}
+      />
+      <Switch
+        label={t('pages.server.schedules.form.ignoreFailure', {})}
+        {...form.getInputProps('action.ignoreFailure', { type: 'checkbox' })}
       />
     </Stack>
   );
