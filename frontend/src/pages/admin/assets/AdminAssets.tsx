@@ -1,6 +1,6 @@
 import { faFolderPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MouseEvent as ReactMouseEvent, Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { createSearchParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
@@ -11,7 +11,6 @@ import { AdminCan } from '@/elements/Can.tsx';
 import Card from '@/elements/Card.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
-import Spinner from '@/elements/Spinner.tsx';
 import Table from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -41,9 +40,10 @@ export default function AdminAssets() {
   );
   const [openModal, setOpenModal] = useState<'newDirectory' | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: [...queryKeys.admin.assets.all(), { page, currentDirectory }],
     queryFn: () => getAssets(page, currentDirectory),
+    placeholderData: keepPreviousData,
   });
 
   const invalidateAssets = useCallback(() => {
@@ -160,36 +160,32 @@ export default function AdminAssets() {
         }}
       />
 
-      {!data || isLoading ? (
-        <Spinner.Centered />
-      ) : (
-        <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
-          <Table
-            columns={assetTableColumns()}
-            loading={isLoading}
-            pagination={data}
-            onPageSelect={onPageSelect}
-            allowSelect={false}
-          >
-            {data.data.map((asset) => (
-              <SelectionArea.Selectable key={asset.name} item={asset}>
-                {(innerRef: Ref<HTMLElement>) => (
-                  <AssetRow
-                    key={asset.name}
-                    asset={asset}
-                    isSelected={selectedAssets.has(asset.name)}
-                    addSelectedAsset={addSelectedAsset}
-                    removeSelectedAsset={removeSelectedAsset}
-                    invalidateAssets={invalidateAssets}
-                    onDirectoryClick={navigateToDirectory}
-                    ref={innerRef as Ref<HTMLTableRowElement>}
-                  />
-                )}
-              </SelectionArea.Selectable>
-            ))}
-          </Table>
-        </SelectionArea>
-      )}
+      <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
+        <Table
+          columns={assetTableColumns()}
+          loading={isFetching}
+          pagination={data}
+          onPageSelect={onPageSelect}
+          allowSelect={false}
+        >
+          {data?.data.map((asset) => (
+            <SelectionArea.Selectable key={asset.name} item={asset}>
+              {(innerRef: Ref<HTMLElement>) => (
+                <AssetRow
+                  key={asset.name}
+                  asset={asset}
+                  isSelected={selectedAssets.has(asset.name)}
+                  addSelectedAsset={addSelectedAsset}
+                  removeSelectedAsset={removeSelectedAsset}
+                  invalidateAssets={invalidateAssets}
+                  onDirectoryClick={navigateToDirectory}
+                  ref={innerRef as Ref<HTMLTableRowElement>}
+                />
+              )}
+            </SelectionArea.Selectable>
+          ))}
+        </Table>
+      </SelectionArea>
     </AdminContentContainer>
   );
 }

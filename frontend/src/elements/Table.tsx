@@ -11,7 +11,8 @@ import {
   TableTrProps,
   Text,
 } from '@mantine/core';
-import { forwardRef, ReactNode, startTransition, useEffect } from 'react';
+import classNames from 'classnames';
+import { forwardRef, ReactNode, useEffect, useState } from 'react';
 import Spinner from '@/elements/Spinner.tsx';
 import { matchesShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -77,16 +78,22 @@ export function Pagination<T>({
 }: PaginationProps<T> & { withShortcuts?: boolean } & GroupProps) {
   const { t } = useTranslations();
 
+  const [pendingPage, setPendingPage] = useState<number | null>(null);
+
   const totalPages = data.total === 0 ? 0 : Math.ceil(data.total / data.perPage);
+  const currentPage = pendingPage ?? data.page;
+
+  useEffect(() => {
+    setPendingPage(null);
+  }, [data.page]);
 
   const setPage = (page: number) => {
-    if (page < 1 || page > totalPages) {
+    if (page < 1 || page > totalPages || page === currentPage) {
       return;
     }
 
-    startTransition(() => {
-      onPageSelect(page);
-    });
+    setPendingPage(page);
+    onPageSelect(page);
   };
 
   useEffect(() => {
@@ -107,13 +114,13 @@ export function Pagination<T>({
         setPage(1);
       } else if (matchesShortcut(event, 'table.previousPage')) {
         event.preventDefault();
-        setPage(data.page - 1);
+        setPage(currentPage - 1);
       } else if (matchesShortcut(event, 'table.lastPage')) {
         event.preventDefault();
         setPage(totalPages);
       } else if (matchesShortcut(event, 'table.nextPage')) {
         event.preventDefault();
-        setPage(data.page + 1);
+        setPage(currentPage + 1);
       }
     };
 
@@ -121,13 +128,13 @@ export function Pagination<T>({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [data.page, totalPages, withShortcuts]);
+  }, [currentPage, totalPages, withShortcuts]);
 
-  const isFirstPage = data.page === 1;
-  const isLastPage = data.page >= totalPages;
+  const isFirstPage = currentPage === 1;
+  const isLastPage = currentPage >= totalPages;
 
-  const rangeStart = (data.page - 1) * data.perPage + 1;
-  const rangeEnd = Math.min(data.page * data.perPage, data.total);
+  const rangeStart = (currentPage - 1) * data.perPage + 1;
+  const rangeEnd = Math.min(currentPage * data.perPage, data.total);
 
   return isFirstPage && isLastPage ? null : (
     <Group justify='space-between' hidden={rangeEnd === 0} {...props}>
@@ -138,7 +145,7 @@ export function Pagination<T>({
           total: data.total,
         })}
       </p>
-      <MantinePagination boundaries={1} value={data.page} total={totalPages} onChange={setPage} />
+      <MantinePagination boundaries={1} value={currentPage} total={totalPages} onChange={setPage} />
     </Group>
   );
 }
@@ -187,41 +194,50 @@ export default function Table({
         <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} withShortcuts={false} />
       )}
 
-      <MantineTable
-        stickyHeader
-        highlightOnHover={(pagination?.total ?? 0) > 0 && !loading}
-        className={allowSelect ? undefined : 'select-none'}
-      >
-        <TableHead>
-          {columns.map((column, index) => (
-            <TableHeader
-              key={`column-${index}`}
-              {...(typeof column === 'string'
-                ? { name: column }
-                : typeof column === 'function'
-                  ? { name: column() }
-                  : column)}
-            />
-          ))}
-        </TableHead>
-        <MantineTable.Tbody>
-          {loading ? (
-            <MantineTable.Tr>
-              <MantineTable.Td colSpan={columns.length}>
-                <Spinner.Centered />
-              </MantineTable.Td>
-            </MantineTable.Tr>
-          ) : pagination?.total === 0 ? (
-            <MantineTable.Tr>
-              <MantineTable.Td colSpan={columns.length}>
-                <NoItems />
-              </MantineTable.Td>
-            </MantineTable.Tr>
-          ) : (
-            children
+      <div style={{ position: 'relative' }}>
+        <MantineTable
+          stickyHeader
+          highlightOnHover={(pagination?.total ?? 0) > 0 && !loading}
+          className={classNames(
+            allowSelect ? undefined : 'select-none',
+            loading && 'opacity-50 pointer-events-none transition-opacity',
           )}
-        </MantineTable.Tbody>
-      </MantineTable>
+        >
+          <TableHead>
+            {columns.map((column, index) => (
+              <TableHeader
+                key={`column-${index}`}
+                {...(typeof column === 'string'
+                  ? { name: column }
+                  : typeof column === 'function'
+                    ? { name: column() }
+                    : column)}
+              />
+            ))}
+          </TableHead>
+          <MantineTable.Tbody>
+            {!pagination && loading ? (
+              <MantineTable.Tr>
+                <MantineTable.Td colSpan={columns.length} className='py-6' />
+              </MantineTable.Tr>
+            ) : pagination?.total === 0 && !loading ? (
+              <MantineTable.Tr>
+                <MantineTable.Td colSpan={columns.length}>
+                  <NoItems />
+                </MantineTable.Td>
+              </MantineTable.Tr>
+            ) : (
+              children
+            )}
+          </MantineTable.Tbody>
+        </MantineTable>
+
+        {loading && (
+          <div className='absolute inset-0 z-20 flex items-center justify-center pointer-events-none'>
+            <Spinner />
+          </div>
+        )}
+      </div>
 
       {pagination && onPageSelect && <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} />}
     </MantineTable.ScrollContainer>

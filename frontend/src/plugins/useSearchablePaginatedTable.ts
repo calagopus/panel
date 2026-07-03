@@ -82,7 +82,7 @@ export function useSearchablePaginatedTable<T>({
     }
   }, [search]);
 
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isFetching, error, refetch } = useQuery({
     queryKey: [...queryKey, ...deps, { page, search: debouncedSearch }],
     queryFn: () => fetcher(page, debouncedSearch),
     placeholderData: keepPreviousData,
@@ -130,7 +130,7 @@ export function useSearchablePaginatedTable<T>({
 
   return {
     data: data as T | undefined,
-    loading: isLoading,
+    loading: isFetching,
     search,
     setSearch,
     page,

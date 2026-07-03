@@ -12,7 +12,6 @@ import Card from '@/elements/Card.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
-import Spinner from '@/elements/Spinner.tsx';
 import Table, { TableHeaderProps } from '@/elements/Table.tsx';
 import Title from '@/elements/Title.tsx';
 import { isOpenableFile } from '@/lib/files.ts';
@@ -324,42 +323,44 @@ function ServerFilesComponent() {
 
       <FileSearchBanner resetEntries={resetEntries} />
 
-      {isLoading ? (
-        <Spinner.Centered />
-      ) : (
-        <FileMassContextMenu>
-          {({ openMassMenu }) => (
-            <SelectionArea
-              onSelectedStart={onSelectedStart}
-              onSelected={onSelected}
-              fireEvents={false}
-              className='h-full'
-              disabled={actingFiles.size > 0}
+      <FileMassContextMenu>
+        {({ openMassMenu }) => (
+          <SelectionArea
+            onSelectedStart={onSelectedStart}
+            onSelected={onSelected}
+            fireEvents={false}
+            className='h-full'
+            disabled={actingFiles.size > 0}
+          >
+            <Table
+              columns={columns}
+              loading={isLoading}
+              pagination={browsingEntries}
+              onPageSelect={onPageSelect}
+              allowSelect={false}
             >
-              <Table columns={columns} pagination={browsingEntries} onPageSelect={onPageSelect} allowSelect={false}>
-                {showParentDirectoryRow && <FileParentDirectoryRow />}
+              {showParentDirectoryRow && <FileParentDirectoryRow />}
 
-                {browsingEntries.data.map((entry) => (
-                  <SelectionArea.Selectable key={entry.name} item={entry}>
-                    {(innerRef: Ref<HTMLElement>) => (
-                      <FileRow
-                        ref={innerRef as Ref<HTMLTableRowElement>}
-                        file={entry}
-                        handleOpen={handleOpen}
-                        openMassMenu={openMassMenu}
-                        isSelected={selectedFiles.has(entry)}
-                        isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
-                        clickOnce={clickOnce}
-                        preferPhysicalSize={preferPhysicalSize}
-                      />
-                    )}
-                  </SelectionArea.Selectable>
-                ))}
-              </Table>
-            </SelectionArea>
-          )}
-        </FileMassContextMenu>
-      )}
+              {browsingEntries.data.map((entry) => (
+                <SelectionArea.Selectable key={entry.name} item={entry}>
+                  {(innerRef: Ref<HTMLElement>) => (
+                    <FileRow
+                      ref={innerRef as Ref<HTMLTableRowElement>}
+                      file={entry}
+                      handleOpen={handleOpen}
+                      openMassMenu={openMassMenu}
+                      isSelected={selectedFiles.has(entry)}
+                      isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
+                      clickOnce={clickOnce}
+                      preferPhysicalSize={preferPhysicalSize}
+                    />
+                  )}
+                </SelectionArea.Selectable>
+              ))}
+            </Table>
+          </SelectionArea>
+        )}
+      </FileMassContextMenu>
     </div>
   );
 }
