@@ -1,6 +1,12 @@
 import { createRoot } from 'react-dom/client';
 import { Extension, ExtensionContext } from 'shared';
 import App from '@/App.tsx';
+import {
+  applyShadcnMinimalTheme,
+  applyShadcnTheme,
+  isShadcnMinimalThemeEnabled,
+  isShadcnThemeEnabled,
+} from '@/themes/shadcn/index.ts';
 
 import.meta.glob('../extensions/*/src/app.css', { eager: true });
 
@@ -47,9 +53,13 @@ if (!root) {
   throw new Error('Root element not found');
 }
 
-createRoot(root).render(
-  <App
-    theme={window.extensionContext.getMantineTheme()}
-    cssVariablesResolver={window.extensionContext.getMantineCssResolver()}
-  />,
-);
+let theme = window.extensionContext.getMantineTheme();
+let cssVariablesResolver = window.extensionContext.getMantineCssResolver();
+
+if (isShadcnThemeEnabled()) {
+  ({ theme, cssVariablesResolver } = applyShadcnTheme(theme, cssVariablesResolver));
+} else if (isShadcnMinimalThemeEnabled()) {
+  ({ theme, cssVariablesResolver } = applyShadcnMinimalTheme(theme, cssVariablesResolver));
+}
+
+createRoot(root).render(<App theme={theme} cssVariablesResolver={cssVariablesResolver} />);
