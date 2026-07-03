@@ -3,7 +3,7 @@ import { AxiosRequestConfig } from 'axios';
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useStore } from 'zustand';
-import { axiosInstance, httpErrorToHuman } from '@/api/axios.ts';
+import { axiosInstance, getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getBackup from '@/api/server/backups/getBackup.ts';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl.ts';
 import loadDirectory from '@/api/server/files/loadDirectory.ts';
@@ -30,7 +30,11 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const page = useStore(store, (state) => state.page);
   const sortMode = useStore(store, (state) => state.sortMode);
 
-  const { data, isLoading } = useQuery({
+  const {
+    data,
+    error: directoryError,
+    isLoading,
+  } = useQuery({
     queryKey: ['server', server.uuid, 'files', { browsingDirectory, page, sortMode }],
     queryFn: () => loadDirectory(server.uuid, browsingDirectory, page, sortMode),
     staleTime: 30_000,
@@ -58,6 +62,12 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
       addToast(httpErrorToHuman(browsingBackupError), 'error');
     }
   }, [browsingBackupError]);
+
+  useEffect(() => {
+    if (directoryError) {
+      addToast(httpErrorToHuman(directoryError), 'error');
+    }
+  }, [directoryError]);
 
   const doUpload = useCallback(
     async (form: FormData, config: AxiosRequestConfig, target?: string): Promise<UploadResult> => {
@@ -106,15 +116,24 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   }, [browsingBackup]);
 
   useEffect(() => {
-    if (!data) return;
+    if (!data) {
+      if (directoryError) {
+        store.setState({
+          browsingEntries: getEmptyPaginationSet(),
+          browsingError: httpErrorToHuman(directoryError),
+        });
+      }
+      return;
+    }
 
     store.setState({
       browsingEntries: data.entries,
+      browsingError: null,
       browsingPrimaryFilesystem: data.isFilesystemPrimary,
       browsingWritableDirectory: data.isFilesystemWritable,
       browsingFastDirectory: data.isFilesystemFast,
     });
-  }, [data]);
+  }, [data, directoryError]);
 
   useEffect(() => {
     const state = store.getState();

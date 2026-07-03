@@ -92,6 +92,7 @@ function ServerFilesComponent() {
   const store = useFileManagerApi();
   const isLoading = useFileManagerStore((state) => state.isLoading);
   const browsingEntries = useFileManagerStore((state) => state.browsingEntries);
+  const browsingError = useFileManagerStore((state) => state.browsingError);
   const selectedFiles = useFileManagerStore((state) => state.selectedFiles);
   const actingFiles = useFileManagerStore((state) => state.actingFiles);
   const actingFilesSource = useFileManagerStore((state) => state.actingFilesSource);
@@ -336,7 +337,13 @@ function ServerFilesComponent() {
               className='h-full'
               disabled={actingFiles.size > 0}
             >
-              <Table columns={columns} pagination={browsingEntries} onPageSelect={onPageSelect} allowSelect={false}>
+              <Table
+                columns={columns}
+                pagination={browsingEntries}
+                error={browsingError}
+                onPageSelect={onPageSelect}
+                allowSelect={false}
+              >
                 {showParentDirectoryRow && <FileParentDirectoryRow />}
 
                 {browsingEntries.data.map((entry) => (

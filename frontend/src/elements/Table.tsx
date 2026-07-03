@@ -1,4 +1,4 @@
-import { faCubesStacked } from '@fortawesome/free-solid-svg-icons';
+import { faCubesStacked, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Center,
@@ -156,9 +156,26 @@ export const NoItems = () => {
   );
 };
 
+export const ErrorItems = ({ error }: { error: string }) => {
+  const { t } = useTranslations();
+
+  return (
+    <Center py='lg'>
+      <Stack align='center' c='red' gap='xs'>
+        <FontAwesomeIcon icon={faTriangleExclamation} size='3x' className='-mb-2' />
+        <Text fw={500}>{t('common.alert.error', {})}</Text>
+        <Text c='dimmed' size='sm'>
+          {error}
+        </Text>
+      </Stack>
+    </Center>
+  );
+};
+
 interface TableProps {
   columns: (string | (() => string))[] | TableHeaderProps[];
   loading?: boolean;
+  error?: string | null;
   pagination?: Pagination<unknown>;
   onPageSelect?: (page: number) => void;
   allowSelect?: boolean;
@@ -168,6 +185,7 @@ interface TableProps {
 export default function Table({
   columns,
   loading,
+  error,
   pagination,
   onPageSelect,
   allowSelect = true,
@@ -209,6 +227,12 @@ export default function Table({
             <MantineTable.Tr>
               <MantineTable.Td colSpan={columns.length}>
                 <Spinner.Centered />
+              </MantineTable.Td>
+            </MantineTable.Tr>
+          ) : error ? (
+            <MantineTable.Tr>
+              <MantineTable.Td colSpan={columns.length}>
+                <ErrorItems error={error} />
               </MantineTable.Td>
             </MantineTable.Tr>
           ) : pagination?.total === 0 ? (
