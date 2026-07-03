@@ -1,4 +1,15 @@
+ARG WINGS_SOURCE=release
+
 FROM node:24-slim AS node_source
+
+FROM alpine AS wings-release
+RUN mkdir -p /wings && touch /wings/calagopus-wings
+
+FROM ghcr.io/calagopus/wings:nightly AS wings-nightly-image
+FROM alpine AS wings-nightly
+COPY --from=wings-nightly-image /usr/bin/calagopus-wings /wings/calagopus-wings
+
+FROM wings-${WINGS_SOURCE} AS wings
 
 # ---
 FROM rust:slim AS planner
@@ -42,7 +53,11 @@ RUN cargo chef cook --profile heavy-release --recipe-path recipe.json -p panel-r
 
 COPY . /app/repo
 RUN cd frontend && pnpm install --frozen-lockfile && pnpm build:ci
-RUN cargo build --profile heavy-release -p panel-rs-aio
+RUN --mount=from=wings,source=/wings,target=/wings \
+    if [ -s /wings/calagopus-wings ]; then \
+        export WINGS_BINARY_PATH=/wings/calagopus-wings WINGS_RELEASE=nightly; \
+    fi && \
+    cargo build --profile heavy-release -p panel-rs-aio
 
 RUN ln -s /app/repo/target/heavy-release/panel-rs-aio /usr/local/bin/panel-rs
 RUN ln -s /app/repo/target/heavy-release/panel-rs-aio /usr/local/bin/calagopus-panel

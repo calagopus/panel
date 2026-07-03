@@ -290,21 +290,25 @@ jobs:
             platform: linux/amd64
             runner: ubuntu-24.04
             tag_suffix: amd64
+            build_args: ""
           - variant: heavy
             dockerfile: Dockerfile.heavy
             platform: linux/arm64
             runner: ubuntu-24.04-arm
             tag_suffix: arm64
+            build_args: ""
           - variant: heavy-aio
             dockerfile: Dockerfile.heavy.aio
             platform: linux/amd64
             runner: ubuntu-24.04
             tag_suffix: amd64
+            build_args: WINGS_SOURCE=nightly
           - variant: heavy-aio
             dockerfile: Dockerfile.heavy.aio
             platform: linux/arm64
             runner: ubuntu-24.04-arm
             tag_suffix: arm64
+            build_args: WINGS_SOURCE=nightly
 
     steps:
       - name: Checkout code
@@ -332,6 +336,7 @@ jobs:
           context: .
           file: ./docker/${{ matrix.dockerfile }}
           platforms: ${{ matrix.platform }}
+          build-args: ${{ matrix.build_args }}
           push: true
           tags: |
             ${{ env.GHCR_IMAGE }}:${{ env.IMAGE_PREFIX }}-${{ matrix.variant }}-${{ matrix.tag_suffix }}
