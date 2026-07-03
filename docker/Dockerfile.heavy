@@ -24,7 +24,7 @@ COPY --from=node_source /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node_source /usr/local/bin/node /usr/local/bin/node
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
-RUN npm install -g pnpm@11
+RUN npm install -g npm@latest pnpm@11
 
 RUN cargo install cargo-chef
 

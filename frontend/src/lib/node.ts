@@ -1,4 +1,4 @@
-import jsYaml from 'js-yaml';
+import { dump } from 'js-yaml';
 import { z } from 'zod';
 import { adminNodeSchema, adminNodeTokenSchema } from '@/lib/schemas/admin/nodes.ts';
 
@@ -44,7 +44,15 @@ export const getNodeConfiguration = ({ node, token, remote, apiPort, sftpPort }:
 };
 
 export const getNodeConfigurationCommand = ({ node, token, remote, apiPort, sftpPort }: NodeConfigurationParams) => {
-  return `wings configure --join-data ${btoa(jsYaml.dump(getNodeConfiguration({ node, token, remote, apiPort, sftpPort }), { condenseFlow: true, indent: 1, noArrayIndent: true }))}`;
+  const nodeConfig = getNodeConfiguration({ node, token, remote, apiPort, sftpPort });
+  const yaml = dump(nodeConfig, {
+    flowSkipCommaSpace: true,
+    flowSkipColonSpace: true,
+    quoteFlowKeys: true,
+    indent: 1,
+    seqNoIndent: true,
+  });
+  return `wings configure --join-data ${btoa(yaml)}`;
 };
 
 export const getNodeUrl = (node: z.infer<typeof adminNodeSchema>, path: string = '') => {

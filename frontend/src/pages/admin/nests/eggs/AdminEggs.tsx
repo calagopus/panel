@@ -1,6 +1,6 @@
 import { faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import jsYaml from 'js-yaml';
+import { load } from 'js-yaml';
 import { ChangeEvent, MouseEvent as ReactMouseEvent, Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -58,7 +58,7 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
       if (text.startsWith('{')) {
         data = JSON.parse(text);
       } else {
-        data = jsYaml.load(text) as object;
+        data = load(text) as object;
       }
     } catch (err) {
       addToast(t('pages.admin.nests.tabs.eggs.page.toast.parseFailed', { error: String(err) }), 'error');

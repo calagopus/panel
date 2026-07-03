@@ -1,6 +1,6 @@
 import { faCopy, faExclamationTriangle, faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import jsYaml from 'js-yaml';
+import { dump, load } from 'js-yaml';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import getNodeConfig from '@/api/admin/nodes/getNodeConfig.ts';
@@ -69,7 +69,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
   useEffect(() => {
     getNodeConfig(node.uuid)
       .then((config) => {
-        setYaml(jsYaml.dump(config, { lineWidth: -1 }));
+        setYaml(dump(config, { lineWidth: -1 }));
       })
       .catch((err) => {
         setLiveConfigError(httpErrorToHuman(err));
@@ -81,7 +81,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
 
     let parsed: object;
     try {
-      parsed = jsYaml.load(yaml) as object;
+      parsed = load(yaml) as object;
     } catch (err) {
       addToast(
         t('pages.admin.nodes.tabs.configuration.page.toast.invalidYaml', { error: (err as Error).message }),
@@ -147,7 +147,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
                       languageName='yaml'
                       language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
                     >
-                      {jsYaml.dump(nodeConfiguration)}
+                      {dump(nodeConfiguration)}
                     </HljsCode>
 
                     <div className='mt-2'>
