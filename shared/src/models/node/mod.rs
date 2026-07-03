@@ -7,7 +7,7 @@ use crate::{
 };
 use compact_str::ToCompactString;
 use garde::Validate;
-use rand::distr::SampleString;
+use rand::{RngExt, distr::SampleString};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 use sqlx::{Row, postgres::PgRow};
@@ -374,18 +374,20 @@ impl Node {
         location_uuids: &[uuid::Uuid],
         limits: super::server::AdminApiServerLimits,
         allow_overallocation: bool,
+        suspension_penalty: f64,
+        randomness: f64,
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
         let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             WITH server_usage AS (
                 SELECT
                     node_uuid,
-                    COALESCE(SUM(memory), 0)::BIGINT AS used_memory,
-                    COALESCE(SUM(disk), 0)::BIGINT AS used_disk
+                    COALESCE(SUM((memory + memory_overhead) * CASE WHEN suspended THEN $5 ELSE 1.0 END), 0)::BIGINT AS used_memory,
+                    COALESCE(SUM(disk * CASE WHEN suspended THEN $5 ELSE 1.0 END), 0)::BIGINT AS used_disk
                 FROM servers
                 GROUP BY node_uuid
             )
-            SELECT {}
+            SELECT {}, COALESCE(u.used_memory, 0) AS used_memory, COALESCE(u.used_disk, 0) AS used_disk
             FROM nodes
             JOIN locations ON locations.uuid = nodes.location_uuid
             LEFT JOIN server_usage u ON nodes.uuid = u.node_uuid
@@ -399,11 +401,11 @@ impl Node {
             )
             ORDER BY
                 (
-                    GREATEST(COALESCE(u.used_memory, 0) + $2 - nodes.memory, 0) + 
+                    GREATEST(COALESCE(u.used_memory, 0) + $2 - nodes.memory, 0) +
                     GREATEST(COALESCE(u.used_disk, 0) + $3 - nodes.disk, 0)
                 ),
                 GREATEST(
-                    (COALESCE(u.used_memory, 0) + $2)::FLOAT / NULLIF(nodes.memory, 0), 
+                    (COALESCE(u.used_memory, 0) + $2)::FLOAT / NULLIF(nodes.memory, 0),
                     (COALESCE(u.used_disk, 0) + $3)::FLOAT / NULLIF(nodes.disk, 0)
                 )
             "#,
@@ -413,12 +415,46 @@ impl Node {
         .bind(limits.memory)
         .bind(limits.disk)
         .bind(allow_overallocation)
+        .bind(suspension_penalty)
         .fetch_all(database.read())
         .await?;
 
-        rows.into_iter()
-            .map(|row| Self::map(None, &row))
-            .try_collect_vec()
+        let nodes = rows
+            .into_iter()
+            .map(|row| {
+                Ok((
+                    Self::map(None, &row)?,
+                    row.try_get::<i64, _>("used_memory")?,
+                    row.try_get::<i64, _>("used_disk")?,
+                ))
+            })
+            .collect::<Result<Vec<_>, crate::database::DatabaseError>>()?;
+
+        if randomness > 0.0 {
+            let mut rng = rand::rng();
+
+            let mut keyed = nodes
+                .into_iter()
+                .map(|(node, used_memory, used_disk)| {
+                    let free_ratio = f64::min(
+                        1.0 - (used_memory + limits.memory) as f64 / node.memory.max(1) as f64,
+                        1.0 - (used_disk + limits.disk) as f64 / node.disk.max(1) as f64,
+                    )
+                    .clamp(0.0001, 1.0);
+
+                    let weight = free_ratio.powf(1.0 / randomness);
+                    let key = rng.random::<f64>().powf(1.0 / weight);
+
+                    (key, node)
+                })
+                .collect::<Vec<_>>();
+
+            keyed.sort_by(|(a, _), (b, _)| b.total_cmp(a));
+
+            return Ok(keyed.into_iter().map(|(_, node)| node).collect());
+        }
+
+        Ok(nodes.into_iter().map(|(node, _, _)| node).collect())
     }
 
     pub async fn by_name(
@@ -462,14 +498,15 @@ impl Node {
         location_uuids: &[uuid::Uuid],
         limits: super::server::AdminApiServerLimits,
         allow_overallocation: bool,
+        suspension_penalty: f64,
     ) -> Result<Option<NodeDeploymentBlocker>, crate::database::DatabaseError> {
         let row = sqlx::query(
             r#"
             WITH server_usage AS (
                 SELECT
                     node_uuid,
-                    COALESCE(SUM(memory), 0)::BIGINT AS used_memory,
-                    COALESCE(SUM(disk), 0)::BIGINT AS used_disk
+                    COALESCE(SUM((memory + memory_overhead) * CASE WHEN suspended THEN $5 ELSE 1.0 END), 0)::BIGINT AS used_memory,
+                    COALESCE(SUM(disk * CASE WHEN suspended THEN $5 ELSE 1.0 END), 0)::BIGINT AS used_disk
                 FROM servers
                 GROUP BY node_uuid
             )
@@ -498,6 +535,7 @@ impl Node {
         .bind(limits.memory)
         .bind(limits.disk)
         .bind(allow_overallocation)
+        .bind(suspension_penalty)
         .fetch_one(database.read())
         .await?;
 
