@@ -1,9 +1,11 @@
 use anyhow::Context;
 use clap::{Args, FromArgMatches, ValueEnum};
 use colored::Colorize;
+use dialoguer::{Select, theme::ColorfulTheme};
 use serde::Deserialize;
 use std::{
     collections::HashMap,
+    io::IsTerminal,
     path::{Path, PathBuf},
 };
 use tokio::process::Command;
@@ -32,6 +34,11 @@ impl ApplyProfile {
             Self::Balanced => "heavy-release",
             Self::Optimized => "release",
         }
+    }
+
+    #[inline]
+    fn is_dev(self) -> bool {
+        matches!(self, Self::Dev)
     }
 }
 
@@ -68,7 +75,7 @@ impl shared::extensions::commands::CliCommand<ApplyArgs> for ApplyCommand {
     fn get_executor(self) -> Box<shared::extensions::commands::ExecutorFunc> {
         Box::new(|_env, arg_matches| {
             Box::pin(async move {
-                let args = ApplyArgs::from_arg_matches(&arg_matches)?;
+                let mut args = ApplyArgs::from_arg_matches(&arg_matches)?;
 
                 if tokio::fs::metadata(".sqlx")
                     .await
@@ -82,6 +89,47 @@ impl shared::extensions::commands::CliCommand<ApplyArgs> for ApplyCommand {
                         "directory, make sure you are in the panel root.".red()
                     );
                     return Ok(1);
+                }
+
+                if !args.profile.is_dev()
+                    && tokio::fs::metadata("target/debug")
+                        .await
+                        .is_ok_and(|m| m.is_dir())
+                    && tokio::fs::metadata(Path::new("target").join(args.profile.to_target_path()))
+                        .await
+                        .is_err()
+                    && std::io::stdout().is_terminal()
+                {
+                    println!(
+                        "{} {} {} {} {}",
+                        "an existing".yellow(),
+                        "target/debug".bright_yellow(),
+                        "build was found, but no".yellow(),
+                        format!("target/{}", args.profile.to_target_path()).bright_yellow(),
+                        "build exists yet - building it from scratch may take a while.".yellow()
+                    );
+
+                    let selection = Select::with_theme(&ColorfulTheme::default())
+                        .with_prompt("How would you like to continue?")
+                        .default(0)
+                        .items(&[
+                            format!(
+                                "build with the {} profile anyway",
+                                args.profile.to_rust_profile()
+                            ),
+                            "switch to the dev profile (reuses target/debug)".to_string(),
+                            "abort".to_string(),
+                        ])
+                        .interact()?;
+
+                    match selection {
+                        0 => {}
+                        1 => args.profile = ApplyProfile::Dev,
+                        _ => {
+                            println!("{}", "aborting.".yellow());
+                            return Ok(0);
+                        }
+                    }
                 }
 
                 let cargo_bin = which("cargo")
