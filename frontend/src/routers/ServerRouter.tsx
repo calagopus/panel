@@ -164,52 +164,56 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
 
               <Sidebar.Divider />
 
-              {sidebarItems.map((item, index) => {
-                if (!item) return null;
+              {loading ? (
+                <Spinner.Centered />
+              ) : (
+                sidebarItems.map((item, index) => {
+                  if (!item) return null;
 
-                if (item.type === 'divider') {
-                  return <Sidebar.Divider key={`divider-${index}`} label={item.label} />;
-                }
+                  if (item.type === 'divider') {
+                    return <Sidebar.Divider key={`divider-${index}`} label={item.label} />;
+                  }
 
-                if (item.type === 'redirect') {
-                  return (
-                    <Sidebar.Link
-                      key={`redirect-${index}`}
-                      to={item.destination}
-                      icon={faArrowUpRightFromSquare}
-                      name={item.name}
-                    />
-                  );
-                }
-
-                if (item.type === 'route') {
-                  const { route } = item;
-                  const name = typeof route.name === 'function' ? route.name() : route.name!;
-
-                  return route.permission ? (
-                    <ServerCan key={route.path} action={route.permission} matchAny>
+                  if (item.type === 'redirect') {
+                    return (
                       <Sidebar.Link
+                        key={`redirect-${index}`}
+                        to={item.destination}
+                        icon={faArrowUpRightFromSquare}
+                        name={item.name}
+                      />
+                    );
+                  }
+
+                  if (item.type === 'route') {
+                    const { route } = item;
+                    const name = typeof route.name === 'function' ? route.name() : route.name!;
+
+                    return route.permission ? (
+                      <ServerCan key={route.path} action={route.permission} matchAny>
+                        <Sidebar.Link
+                          to={to(route.path, `/server/${params.id}`)}
+                          end={route.exact}
+                          icon={route.icon}
+                          name={name}
+                          activeMatches={route.activeMatches}
+                        />
+                      </ServerCan>
+                    ) : (
+                      <Sidebar.Link
+                        key={route.path}
                         to={to(route.path, `/server/${params.id}`)}
                         end={route.exact}
                         icon={route.icon}
                         name={name}
                         activeMatches={route.activeMatches}
                       />
-                    </ServerCan>
-                  ) : (
-                    <Sidebar.Link
-                      key={route.path}
-                      to={to(route.path, `/server/${params.id}`)}
-                      end={route.exact}
-                      icon={route.icon}
-                      name={name}
-                      activeMatches={route.activeMatches}
-                    />
-                  );
-                }
+                    );
+                  }
 
-                return null;
-              })}
+                  return null;
+                })
+              )}
             </>
           )}
         </Sidebar>
