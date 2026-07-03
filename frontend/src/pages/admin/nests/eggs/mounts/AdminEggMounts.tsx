@@ -28,6 +28,7 @@ export default function AdminEggMounts({
   const {
     data: eggMounts,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -55,7 +56,13 @@ export default function AdminEggMounts({
         onClose={() => setOpenModal(null)}
       />
 
-      <Table columns={eggMountTableColumns()} loading={loading} pagination={eggMounts} onPageSelect={setPage}>
+      <Table
+        columns={eggMountTableColumns()}
+        loading={loading}
+        error={error}
+        pagination={eggMounts}
+        onPageSelect={setPage}
+      >
         {eggMounts?.data.map((mount) => (
           <EggMountRow key={mount.mount.uuid} nest={contextNest} egg={contextEgg} mount={mount} />
         ))}

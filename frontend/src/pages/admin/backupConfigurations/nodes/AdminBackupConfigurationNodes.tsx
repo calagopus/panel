@@ -18,6 +18,7 @@ export default function AdminBackupConfigurationNodes({
   const {
     data: backupConfigurationNodes,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -38,6 +39,7 @@ export default function AdminBackupConfigurationNodes({
         loading={loading}
         pagination={backupConfigurationNodes}
         onPageSelect={setPage}
+        error={error}
       >
         {backupConfigurationNodes?.data.map((node) => (
           <NodeRow key={node.uuid} node={node} />

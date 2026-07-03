@@ -83,6 +83,7 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
   const {
     data: mountNestEggs,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -111,7 +112,13 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
         onClose={() => setOpenModal(null)}
       />
 
-      <Table columns={[...eggTableColumns(), '']} loading={loading} pagination={mountNestEggs} onPageSelect={setPage}>
+      <Table
+        columns={[...eggTableColumns(), '']}
+        loading={loading}
+        pagination={mountNestEggs}
+        onPageSelect={setPage}
+        error={error}
+      >
         {mountNestEggs?.data.map((nestEggMount) => (
           <MountEggRow
             key={nestEggMount.nestEgg.uuid}

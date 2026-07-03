@@ -1,4 +1,11 @@
-import { faClone, faEllipsisVertical, faGear, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faClone,
+  faCodeBranch,
+  faEllipsisVertical,
+  faGear,
+  faPencil,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import z from 'zod';
@@ -27,10 +34,21 @@ interface Props {
   onStepUpdate: (step: z.infer<typeof serverScheduleStepSchema>) => void;
   onStepDelete: (stepUuid: string) => void;
   onStepDuplicate?: (step: z.infer<typeof serverScheduleStepSchema>) => void;
+  onStepAddBranch?: (step: z.infer<typeof serverScheduleStepSchema>, type: 'else_if' | 'else') => void;
+  canAddElse?: boolean;
   onStepToggle?: (open: boolean) => void;
 }
 
-export default function StepCard({ schedule, step, onStepUpdate, onStepDelete, onStepDuplicate, onStepToggle }: Props) {
+export default function StepCard({
+  schedule,
+  step,
+  onStepUpdate,
+  onStepDelete,
+  onStepDuplicate,
+  onStepAddBranch,
+  canAddElse,
+  onStepToggle,
+}: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
@@ -63,6 +81,8 @@ export default function StepCard({ schedule, step, onStepUpdate, onStepDelete, o
       });
   };
 
+  const isBranchStart = step.action.type === 'if' || step.action.type === 'else_if';
+
   return (
     <ContextMenu
       items={[
@@ -70,6 +90,20 @@ export default function StepCard({ schedule, step, onStepUpdate, onStepDelete, o
           icon: faPencil,
           label: t('common.button.edit', {}),
           onClick: () => handleOpenModal('update'),
+          color: 'gray',
+        },
+        {
+          icon: faCodeBranch,
+          label: t('pages.server.schedules.button.addElseIf', {}),
+          hidden: !onStepAddBranch || !isBranchStart,
+          onClick: () => onStepAddBranch?.(step, 'else_if'),
+          color: 'gray',
+        },
+        {
+          icon: faCodeBranch,
+          label: t('pages.server.schedules.button.addElse', {}),
+          hidden: !onStepAddBranch || !isBranchStart || !canAddElse,
+          onClick: () => onStepAddBranch?.(step, 'else'),
           color: 'gray',
         },
         {

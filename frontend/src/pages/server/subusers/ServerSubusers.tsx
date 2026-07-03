@@ -32,6 +32,7 @@ export default function ServerSubusers() {
   const {
     data: subusers,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -82,6 +83,7 @@ export default function ServerSubusers() {
         loading={loading}
         pagination={subusers}
         onPageSelect={setPage}
+        error={error}
       >
         {subusers?.data.map((su) => (
           <SubuserRow subuser={su} key={su.user.uuid} />

@@ -17,6 +17,31 @@ function renderCompact(action: Action, { t, tReact, tItem }: Translations): Reac
       return <span>{t('pages.server.schedules.steps.sleep.renderer.compact', { duration: action.duration })}</span>;
     case 'ensure':
       return <span>{t('pages.server.schedules.steps.ensure.renderer.compact', {})}</span>;
+    case 'if':
+      return <span>{t('pages.server.schedules.steps.if.renderer.compact', {})}</span>;
+    case 'else_if':
+      return <span>{t('pages.server.schedules.steps.elseIf.renderer.compact', {})}</span>;
+    case 'else':
+      return <span>{t('pages.server.schedules.steps.else.renderer.compact', {})}</span>;
+    case 'end_if':
+      return <span>{t('pages.server.schedules.steps.endIf.renderer.compact', {})}</span>;
+    case 'exit':
+      return (
+        <span>
+          {t('pages.server.schedules.steps.exit.renderer.compact', {
+            successful: t(action.successful ? 'common.badge.successful' : 'common.badge.failed', {}),
+          })}
+        </span>
+      );
+    case 'wait_for_state':
+      return (
+        <span>
+          {t('pages.server.schedules.steps.waitForState.renderer.compact', {
+            timeout: formatMilliseconds(action.timeout),
+            state: t(`common.enum.serverState.${action.state}`, {}),
+          })}
+        </span>
+      );
     case 'format':
       return (
         <span>
@@ -54,7 +79,9 @@ function renderCompact(action: Action, { t, tReact, tItem }: Translations): Reac
         </span>
       );
     case 'create_backup':
-      return (
+      return !action.name ? (
+        <span>{t('pages.server.schedules.steps.createBackup.renderer.compactAuto', {})}</span>
+      ) : (
         <span>
           {tReact('pages.server.schedules.steps.createBackup.renderer.compact', {
             name: <ScheduleDynamicParameterRenderer value={action.name} />,
@@ -162,6 +189,36 @@ function renderDetailed(action: Action, { t, tReact, tItem }: Translations): Rea
       );
     case 'ensure':
       return <Text size='sm'>{t('pages.server.schedules.steps.ensure.renderer.compact', {})}</Text>;
+    case 'if':
+      return <Text size='sm'>{t('pages.server.schedules.steps.if.renderer.compact', {})}</Text>;
+    case 'else_if':
+      return <Text size='sm'>{t('pages.server.schedules.steps.elseIf.renderer.compact', {})}</Text>;
+    case 'else':
+      return <Text size='sm'>{t('pages.server.schedules.steps.else.renderer.compact', {})}</Text>;
+    case 'end_if':
+      return <Text size='sm'>{t('pages.server.schedules.steps.endIf.renderer.compact', {})}</Text>;
+    case 'exit':
+      return (
+        <Text size='sm'>
+          {t('pages.server.schedules.steps.exit.renderer.compact', {
+            successful: t(action.successful ? 'common.badge.successful' : 'common.badge.failed', {}),
+          })}
+        </Text>
+      );
+    case 'wait_for_state':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>
+            {t('pages.server.schedules.steps.waitForState.renderer.compact', {
+              timeout: formatMilliseconds(action.timeout),
+              state: t(`common.enum.serverState.${action.state}`, {}),
+            })}
+          </Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.renderer.ignoreFailure', { value: yesNo(action.ignoreFailure) })}
+          </Text>
+        </Stack>
+      );
     case 'format':
       return (
         <Text size='sm'>
@@ -232,9 +289,11 @@ function renderDetailed(action: Action, { t, tReact, tItem }: Translations): Rea
       return (
         <Stack gap='xs'>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.createBackup.renderer.detail.backupName', {
-              name: <ScheduleDynamicParameterRenderer value={action.name} />,
-            })}
+            {!action.name
+              ? t('pages.server.schedules.steps.createBackup.renderer.detail.backupNameAuto', {})
+              : tReact('pages.server.schedules.steps.createBackup.renderer.detail.backupName', {
+                  name: <ScheduleDynamicParameterRenderer value={action.name} />,
+                })}
           </Text>
           <Text size='xs' c='dimmed'>
             {t('pages.server.schedules.renderer.foreground', { value: yesNo(action.foreground) })}
@@ -319,6 +378,9 @@ function renderDetailed(action: Action, { t, tReact, tItem }: Translations): Rea
           <Text size='xs' c='dimmed'>
             {t('pages.server.schedules.steps.deleteFiles.renderer.detail.files', { files: action.files.join(', ') })}
           </Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.renderer.ignoreFailure', { value: yesNo(action.ignoreFailure) })}
+          </Text>
         </Stack>
       );
     case 'rename_files':
@@ -333,6 +395,9 @@ function renderDetailed(action: Action, { t, tReact, tItem }: Translations): Rea
             {t('pages.server.schedules.steps.renameFiles.renderer.detail.files', {
               files: tItem('file', action.files.length),
             })}
+          </Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.renderer.ignoreFailure', { value: yesNo(action.ignoreFailure) })}
           </Text>
         </Stack>
       );

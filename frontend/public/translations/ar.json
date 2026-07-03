@@ -1446,18 +1446,6 @@
             }
           },
           "enum": {
-            "schedulePreConditionType": {
-              "none": "لا شيء",
-              "and": "AND (يجب أن تكون كلها صحيحة)",
-              "or": "OR (أي واحدة يجب أن تكون صحيحة)",
-              "not": "NOT (يجب ألا تكون صحيحة)",
-              "serverState": "حالة الخادم",
-              "uptime": "وقت التشغيل",
-              "cpuUsage": "استخدام المعالج",
-              "memoryUsage": "استخدام الذاكرة",
-              "diskUsage": "استخدام القرص",
-              "fileExists": "الملف موجود"
-            },
             "scheduleConditionType": {
               "none": "لا شيء",
               "and": "AND (يجب أن تكون كلها صحيحة)",
@@ -1475,6 +1463,18 @@
               "equal": "يساوي",
               "greaterThanOrEqual": "أكبر من أو يساوي",
               "greaterThan": "أكبر من"
+            },
+            "schedulePreConditionType": {
+              "none": "لا شيء",
+              "and": "AND (يجب أن تكون كلها صحيحة)",
+              "or": "OR (أي واحدة يجب أن تكون صحيحة)",
+              "not": "NOT (يجب ألا تكون صحيحة)",
+              "serverState": "حالة الخادم",
+              "uptime": "وقت التشغيل",
+              "cpuUsage": "استخدام المعالج",
+              "memoryUsage": "استخدام الذاكرة",
+              "diskUsage": "استخدام القرص",
+              "fileExists": "الملف موجود"
             }
           },
           "modal": {

@@ -379,6 +379,7 @@ const baseTranslations = defineTranslations({
           impersonating:
             'You are currently impersonating a user. Please be aware that your actions may affect the impersonated user\'s account. To exit impersonation mode, click the "Stop Impersonating" button in the bottom left corner.',
         },
+        connectedTo: 'Connected to {name}',
       },
       sidebar: {
         button: {
@@ -4015,6 +4016,8 @@ const baseTranslations = defineTranslations({
             addTrigger: 'Add Trigger',
             addCondition: 'Add Condition',
             addStep: 'Add Step',
+            addElseIf: 'Add Else If',
+            addElse: 'Add Else',
             createFirstStep: 'Create First Step',
             addOutput: 'Add Output',
             addFile: 'Add File',
@@ -4037,28 +4040,25 @@ const baseTranslations = defineTranslations({
             },
           },
           enum: {
-            schedulePreConditionType: {
+            scheduleConditionType: {
               none: 'None',
               and: 'AND (All must be true)',
               or: 'OR (Any must be true)',
               not: 'NOT (Must not be true)',
               serverState: 'Server State',
               uptime: 'Uptime',
-              cpuUsage: 'CPU Usage',
-              memoryUsage: 'Memory Usage',
-              diskUsage: 'Disk Usage',
+              resourceUsage: 'Resource Usage',
               fileExists: 'File Exists',
-            },
-            scheduleConditionType: {
-              none: 'None',
-              and: 'AND (All must be true)',
-              or: 'OR (Any must be true)',
-              not: 'NOT (Must not be true)',
               variableExists: 'Variable Exists',
               variableContains: 'Variable Contains',
               variableEquals: 'Variable Equals',
               variableStartsWith: 'Variable Starts With',
               variableEndsWith: 'Variable Ends With',
+            },
+            scheduleResourceMetric: {
+              cpu: 'CPU Usage',
+              memory: 'Memory Usage',
+              disk: 'Disk Usage',
             },
             scheduleComparator: {
               smallerThan: 'Smaller than',
@@ -4140,6 +4140,7 @@ const baseTranslations = defineTranslations({
             contains: 'Contains',
             startsWith: 'Starts With',
             endsWith: 'Ends With',
+            metric: 'Metric',
             allMustBeTrue: 'All conditions must be true:',
             anyMustBeTrue: 'Any condition must be true:',
             mustNotBeTrue: 'Condition must not be true:',
@@ -4196,6 +4197,25 @@ const baseTranslations = defineTranslations({
                 content: 'When Backup reaches Status `{status}`.',
               },
             },
+            scheduleCompletion: {
+              title: 'Schedule Completion',
+              form: {
+                schedule: 'Schedule',
+                completionStatus: 'Completion Status',
+              },
+              card: {
+                content: 'When Schedule `{schedule}` completes with Status `{status}`.',
+              },
+            },
+            resourceUsage: {
+              title: 'Resource Usage',
+              form: {
+                forSeconds: 'For (seconds)',
+              },
+              card: {
+                content: 'When {metric} is {comparator} `{value}`.',
+              },
+            },
             consoleLine: {
               title: 'Console Line',
               card: {
@@ -4220,6 +4240,10 @@ const baseTranslations = defineTranslations({
               title: 'No Steps Configured',
               description: "This schedule doesn't have any steps yet. Add some actions to get started.",
             },
+            warning: {
+              unclosedIf: 'An "If" block is missing its "End If". All remaining steps run as part of the block.',
+              orphanBranch: 'There is an "Else", "Else If" or "End If" step without a matching "If" before it.',
+            },
             groups: {
               server: 'Server',
               files: 'Files & Backups',
@@ -4241,6 +4265,55 @@ const baseTranslations = defineTranslations({
               description: 'Stop the schedule here unless a condition is true.',
               renderer: {
                 compact: 'Ensure a condition matches',
+              },
+            },
+            if: {
+              title: 'If',
+              description:
+                'Run the following steps only when a condition is true, until Else/End If. A matching End If is added automatically.',
+              renderer: {
+                compact: 'If a condition matches',
+              },
+            },
+            elseIf: {
+              title: 'Else If',
+              description: 'Run the following steps when no earlier branch ran and a condition is true.',
+              renderer: {
+                compact: 'Else if a condition matches',
+              },
+            },
+            else: {
+              title: 'Else',
+              description: 'Run the following steps when no earlier branch of the If block ran.',
+              renderer: {
+                compact: 'Otherwise',
+              },
+            },
+            endIf: {
+              title: 'End If',
+              description: 'Close the current If block.',
+              renderer: {
+                compact: 'End of the If block',
+              },
+            },
+            exit: {
+              title: 'Exit',
+              description: 'Stop the schedule here, marking the run as successful or failed.',
+              form: {
+                successful: 'Mark run as successful',
+              },
+              renderer: {
+                compact: 'Exit the schedule ({successful})',
+              },
+            },
+            waitForState: {
+              title: 'Wait for Server State',
+              description: 'Wait until the server reaches a power state.',
+              form: {
+                timeout: 'Timeout (milliseconds)',
+              },
+              renderer: {
+                compact: 'Wait {timeout} for server to be {state}',
               },
             },
             format: {
@@ -4311,8 +4384,10 @@ const baseTranslations = defineTranslations({
               },
               renderer: {
                 compact: 'Create {name}',
+                compactAuto: 'Create a backup with an auto-generated name',
                 detail: {
                   backupName: 'Backup Name: {name}',
+                  backupNameAuto: 'Backup Name: Auto-generated',
                   ignoredFiles: 'Ignored Files: {files}',
                 },
               },

@@ -91,6 +91,7 @@ function ServerFilesComponent() {
   const store = useFileManagerApi();
   const isLoading = useFileManagerStore((state) => state.isLoading);
   const browsingEntries = useFileManagerStore((state) => state.browsingEntries);
+  const browsingError = useFileManagerStore((state) => state.browsingError);
   const selectedFiles = useFileManagerStore((state) => state.selectedFiles);
   const actingFiles = useFileManagerStore((state) => state.actingFiles);
   const actingFilesSource = useFileManagerStore((state) => state.actingFilesSource);
@@ -336,6 +337,7 @@ function ServerFilesComponent() {
               columns={columns}
               loading={isLoading}
               pagination={browsingEntries}
+              error={browsingError}
               onPageSelect={onPageSelect}
               allowSelect={false}
             >

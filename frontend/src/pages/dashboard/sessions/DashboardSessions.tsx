@@ -11,6 +11,7 @@ export default function DashboardSessions() {
   const {
     data: sessions,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -37,6 +38,7 @@ export default function DashboardSessions() {
         loading={loading}
         pagination={sessions}
         onPageSelect={setPage}
+        error={error}
       >
         {sessions?.data.map((session) => (
           <SessionRow key={session.uuid} session={session} />

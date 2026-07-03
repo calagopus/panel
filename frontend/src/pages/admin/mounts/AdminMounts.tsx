@@ -22,6 +22,7 @@ function MountsContainer() {
   const {
     data: mounts,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -47,7 +48,7 @@ function MountsContainer() {
         </AdminCan>
       }
     >
-      <Table columns={mountTableColumns()} loading={loading} pagination={mounts} onPageSelect={setPage}>
+      <Table columns={mountTableColumns()} loading={loading} pagination={mounts} onPageSelect={setPage} error={error}>
         {mounts?.data.map((m) => (
           <MountRow key={m.uuid} mount={m} />
         ))}

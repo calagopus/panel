@@ -22,6 +22,7 @@ export default function AdminEggServers({
   const {
     data: eggServers,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -37,7 +38,13 @@ export default function AdminEggServers({
       search={search}
       setSearch={setSearch}
     >
-      <Table columns={serverTableColumns()} loading={loading} pagination={eggServers} onPageSelect={setPage}>
+      <Table
+        columns={serverTableColumns()}
+        loading={loading}
+        error={error}
+        pagination={eggServers}
+        onPageSelect={setPage}
+      >
         {eggServers?.data.map((server) => (
           <ServerRow key={server.uuid} server={server} />
         ))}

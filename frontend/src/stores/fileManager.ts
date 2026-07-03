@@ -61,6 +61,8 @@ export interface FileManagerStore {
   setBrowsingDirectory: (directory: string) => void;
   browsingEntries: Pagination<z.infer<typeof serverDirectoryEntrySchema>>;
   setBrowsingEntries: (entries: Pagination<z.infer<typeof serverDirectoryEntrySchema>>) => void;
+  browsingError: string | null;
+  setBrowsingError: (error: string | null) => void;
   page: number;
   setPage: (page: number) => void;
   browsingPrimaryFilesystem: boolean;
@@ -159,6 +161,8 @@ export const createFileManagerStore = (
         }),
       browsingEntries: getEmptyPaginationSet<z.infer<typeof serverDirectoryEntrySchema>>(),
       setBrowsingEntries: (entries) => set({ browsingEntries: entries }),
+      browsingError: null,
+      setBrowsingError: (error) => set({ browsingError: error }),
       page: initial.page,
       setPage: (page) => set((state) => (state.page === page ? state : { page })),
       browsingPrimaryFilesystem: true,

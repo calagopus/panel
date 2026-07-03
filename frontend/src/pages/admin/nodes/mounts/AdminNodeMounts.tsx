@@ -21,6 +21,7 @@ export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNo
   const {
     data: nodeMounts,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -43,7 +44,13 @@ export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNo
     >
       <NodeMountAddModal node={node} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
 
-      <Table columns={nodeMountTableColumns()} loading={loading} pagination={nodeMounts} onPageSelect={setPage}>
+      <Table
+        columns={nodeMountTableColumns()}
+        loading={loading}
+        error={error}
+        pagination={nodeMounts}
+        onPageSelect={setPage}
+      >
         {nodeMounts?.data.map((mount) => (
           <NodeMountRow key={mount.mount.uuid} node={node} mount={mount} />
         ))}

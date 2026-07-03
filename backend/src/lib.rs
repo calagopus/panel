@@ -8,6 +8,7 @@ use axum::{
 };
 use colored::Colorize;
 use compact_str::ToCompactString;
+use hyper::body::Body as _;
 use sentry_tower::SentryHttpLayer;
 use sha2::Digest;
 use shared::{
@@ -78,13 +79,23 @@ fn handle_panic(err: Box<dyn std::any::Any + Send + 'static>) -> Response<Body> 
         .into_response()
 }
 
-pub async fn handle_postprocessing(req: Request, next: Next) -> Result<Response, StatusCode> {
+pub async fn handle_postprocessing(
+    state: GetState,
+    req: Request,
+    next: Next,
+) -> Result<Response, StatusCode> {
     let if_none_match = req
         .headers()
         .get("If-None-Match")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
     let mut response = next.run(req).await;
+
+    if let Some(server_name) = &state.env.server_name
+        && let Ok(header_value) = server_name.parse()
+    {
+        response.headers_mut().insert("X-Server-Name", header_value);
+    }
 
     if response
         .headers()
@@ -109,6 +120,15 @@ pub async fn handle_postprocessing(req: Request, next: Next) -> Result<Response,
         && response.status() != StatusCode::NOT_FOUND
     {
         let (mut parts, body) = response.into_parts();
+
+        let hashable = body
+            .size_hint()
+            .upper()
+            .is_some_and(|len| len <= 8 * 1024 * 1024);
+
+        if !hashable {
+            return Ok(Response::from_parts(parts, body));
+        }
 
         let bytes_body = match axum::body::to_bytes(body, usize::MAX).await {
             Ok(bytes) => bytes.into_iter().collect::<Vec<u8>>(),
@@ -908,7 +928,10 @@ pub async fn handle_startup() -> Result<
             handle_request,
         ))
         .layer(CookieManagerLayer::new())
-        .layer(axum::middleware::from_fn(handle_postprocessing))
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            handle_postprocessing,
+        ))
         .layer(tower_http::catch_panic::CatchPanicLayer::custom(
             handle_panic,
         ))

@@ -41,6 +41,7 @@ export default function AdminActivity() {
   const {
     data: activities,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -62,7 +63,13 @@ export default function AdminActivity() {
         ) : null
       }
     >
-      <Table columns={adminActivityColumns()} loading={loading} pagination={activities} onPageSelect={setPage}>
+      <Table
+        columns={adminActivityColumns()}
+        loading={loading}
+        error={error}
+        pagination={activities}
+        onPageSelect={setPage}
+      >
         {activities?.data.map((activity) => (
           <ActivityRow key={activity.created.toString()} activity={activity} />
         ))}

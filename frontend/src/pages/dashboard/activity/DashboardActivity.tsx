@@ -17,6 +17,7 @@ export default function DashboardActivity() {
   const {
     data: activities,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -44,6 +45,7 @@ export default function DashboardActivity() {
         loading={loading}
         pagination={activities}
         onPageSelect={setPage}
+        error={error}
       >
         {activities?.data.map((activity) => (
           <TableRow key={activity.created.toString()}>

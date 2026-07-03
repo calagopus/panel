@@ -22,6 +22,7 @@ export default function AdminServerAllocations({ server }: { server: z.infer<typ
   const {
     data: serverAllocations,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -55,6 +56,7 @@ export default function AdminServerAllocations({ server }: { server: z.infer<typ
         loading={loading}
         pagination={serverAllocations}
         onPageSelect={setPage}
+        error={error}
       >
         {serverAllocations?.data.map((allocation) => (
           <ServerAllocationRow key={allocation.uuid} server={server} allocation={allocation} />

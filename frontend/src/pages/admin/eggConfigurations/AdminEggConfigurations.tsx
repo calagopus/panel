@@ -22,6 +22,7 @@ function EggConfigurationsContainer() {
   const {
     data: eggConfigurations,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -50,6 +51,7 @@ function EggConfigurationsContainer() {
       <Table
         columns={eggConfigurationTableColumns()}
         loading={loading}
+        error={error}
         pagination={eggConfigurations}
         onPageSelect={setPage}
       >

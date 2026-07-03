@@ -1,0 +1,5 @@
+[build.env]
+passthrough = [
+    "WINGS_RELEASE",
+    "WINGS_BINARY_PATH",
+]

@@ -38,8 +38,8 @@ import ScheduleCreateOrUpdateModal from './modals/ScheduleCreateOrUpdateModal.ts
 import ActionStep from './renderers/ActionStep.tsx';
 import DetailCard from './renderers/DetailCard.tsx';
 import TriggerCard from './renderers/TriggerCard.tsx';
-import SchedulePreConditionBuilder from './SchedulePreConditionBuilder.tsx';
-import StepsEditor from './StepsEditor.tsx';
+import ScheduleConditionBuilder from './ScheduleConditionBuilder.tsx';
+import StepsEditor, { stepIndents } from './StepsEditor.tsx';
 
 export default function ScheduleView() {
   const params = useParams<'id'>();
@@ -104,6 +104,8 @@ export default function ScheduleView() {
       </div>
     );
   }
+
+  const indents = stepIndents(scheduleSteps);
 
   return (
     <ServerContentContainer title={t('pages.server.schedules.title', {})} hideTitleComponent>
@@ -258,10 +260,12 @@ export default function ScheduleView() {
                 bulletSize={40}
                 lineWidth={2}
               >
-                {scheduleSteps.map((step) => (
+                {scheduleSteps.map((step, index) => (
                   <ActionStep
                     key={step.uuid}
                     step={step}
+                    indent={indents[index]}
+                    nextIndent={indents[index + 1] ?? indents[index]}
                     isActive={step.uuid === runningScheduleSteps.get(schedule.uuid)}
                   />
                 ))}
@@ -274,7 +278,7 @@ export default function ScheduleView() {
               {t('pages.server.schedules.view.sections.preConditions', {})}
             </Title>
 
-            <SchedulePreConditionBuilder
+            <ScheduleConditionBuilder
               condition={schedule.condition}
               onChange={(condition) => {
                 setSchedule({ ...schedule, condition });

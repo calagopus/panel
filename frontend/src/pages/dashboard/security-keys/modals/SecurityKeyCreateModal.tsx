@@ -38,7 +38,29 @@ export default function SecurityKeyCreateModal({ ...props }: ModalProps) {
         credential = await window.navigator.credentials.create(options);
       } catch (error) {
         console.error(error);
-        addToast(t('pages.account.securityKeys.modal.createSecurityKey.toast.aborted', {}), 'error');
+
+        let message = t('pages.account.securityKeys.modal.createSecurityKey.toast.aborted', {});
+        if (error instanceof DOMException) {
+          switch (error.name) {
+            case 'InvalidStateError':
+              message = t('pages.auth.login.passkey.error.invalidState', {});
+              break;
+            case 'NotSupportedError':
+              message = t('pages.auth.login.passkey.error.notSupportedType', {});
+              break;
+            case 'SecurityError':
+              message = t('pages.auth.login.passkey.error.securityError', {});
+              break;
+            case 'UnknownError':
+              message = t('pages.auth.login.passkey.error.authenticatorError', {});
+              break;
+            case 'ConstraintError':
+              message = t('pages.auth.login.passkey.error.constraintError', {});
+              break;
+          }
+        }
+
+        addToast(message, 'error');
         deleteSecurityKey(key.uuid);
         return;
       }

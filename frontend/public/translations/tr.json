@@ -1437,18 +1437,6 @@
             }
           },
           "enum": {
-            "schedulePreConditionType": {
-              "none": "Yok",
-              "and": "VE (Hepsi doğru olmalı)",
-              "or": "VEYA (Herhangi biri doğru olmalı)",
-              "not": "DEĞİL (Doğru olmamalı)",
-              "serverState": "Sunucu Durumu",
-              "uptime": "Çalışma Süresi",
-              "cpuUsage": "CPU Kullanımı",
-              "memoryUsage": "Bellek Kullanımı",
-              "diskUsage": "Disk Kullanımı",
-              "fileExists": "Dosya Mevcut"
-            },
             "scheduleConditionType": {
               "none": "Yok",
               "and": "VE (Hepsi doğru olmalı)",
@@ -1466,6 +1454,18 @@
               "equal": "Eşittir",
               "greaterThanOrEqual": "Büyük eşittir",
               "greaterThan": "Büyüktür"
+            },
+            "schedulePreConditionType": {
+              "none": "Yok",
+              "and": "VE (Hepsi doğru olmalı)",
+              "or": "VEYA (Herhangi biri doğru olmalı)",
+              "not": "DEĞİL (Doğru olmamalı)",
+              "serverState": "Sunucu Durumu",
+              "uptime": "Çalışma Süresi",
+              "cpuUsage": "CPU Kullanımı",
+              "memoryUsage": "Bellek Kullanımı",
+              "diskUsage": "Disk Kullanımı",
+              "fileExists": "Dosya Mevcut"
             }
           },
           "modal": {

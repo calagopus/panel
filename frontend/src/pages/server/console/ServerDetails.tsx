@@ -25,10 +25,10 @@ export default function ServerDetails() {
   const [doNormalizeCpuLoad, setDoNormalizeCpuLoad] = useState(localStorage.getItem('normalize_cpu_load') === 'true');
 
   const networkRef = useRef({
-    rxBytes: stats?.network.rxBytes || 0,
-    txBytes: stats?.network.txBytes || 0,
-    rxPackets: stats?.network.rxPackets || 0,
-    txPackets: stats?.network.txPackets || 0,
+    rxBytes: -1,
+    txBytes: -1,
+    rxPackets: -1,
+    txPackets: -1,
     timestamp: Date.now(),
     rxBytesSpeed: 0,
     txBytesSpeed: 0,
@@ -47,10 +47,12 @@ export default function ServerDetails() {
     const timeDelta = (now - networkRef.current.timestamp) / 1000;
 
     if (timeDelta >= 0.5) {
-      const rxBytesDelta = stats.network.rxBytes - networkRef.current.rxBytes;
-      const txBytesDelta = stats.network.txBytes - networkRef.current.txBytes;
-      const rxPacketsDelta = stats.network.rxPackets - networkRef.current.rxPackets;
-      const txPacketsDelta = stats.network.txPackets - networkRef.current.txPackets;
+      const hasPreviousSample = networkRef.current.rxBytes >= 0;
+
+      const rxBytesDelta = hasPreviousSample ? stats.network.rxBytes - networkRef.current.rxBytes : 0;
+      const txBytesDelta = hasPreviousSample ? stats.network.txBytes - networkRef.current.txBytes : 0;
+      const rxPacketsDelta = hasPreviousSample ? stats.network.rxPackets - networkRef.current.rxPackets : 0;
+      const txPacketsDelta = hasPreviousSample ? stats.network.txPackets - networkRef.current.txPackets : 0;
 
       networkRef.current = {
         rxBytes: stats.network.rxBytes,

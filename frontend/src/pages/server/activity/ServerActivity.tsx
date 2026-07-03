@@ -48,6 +48,7 @@ export default function ServerActivity() {
   const {
     data: activities,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -82,6 +83,7 @@ export default function ServerActivity() {
         loading={loading}
         pagination={activities}
         onPageSelect={setPage}
+        error={error}
       >
         {activities?.data.map((activity) => (
           <TableRow key={activity.created.toString()}>

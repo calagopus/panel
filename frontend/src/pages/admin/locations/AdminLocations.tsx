@@ -22,6 +22,7 @@ function LocationsContainer() {
   const {
     data: locations,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -47,7 +48,13 @@ function LocationsContainer() {
         </AdminCan>
       }
     >
-      <Table columns={locationTableColumns()} loading={loading} pagination={locations} onPageSelect={setPage}>
+      <Table
+        columns={locationTableColumns()}
+        loading={loading}
+        error={error}
+        pagination={locations}
+        onPageSelect={setPage}
+      >
         {locations?.data.map((location) => (
           <LocationRow key={location.uuid} location={location} />
         ))}

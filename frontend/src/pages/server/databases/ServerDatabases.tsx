@@ -23,6 +23,7 @@ export default function ServerDatabases() {
   const {
     data: databases,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -74,6 +75,7 @@ export default function ServerDatabases() {
         loading={loading}
         pagination={databases}
         onPageSelect={setPage}
+        error={error}
       >
         {databases?.data.map((database) => (
           <DatabaseRow database={database} key={database.uuid} />

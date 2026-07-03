@@ -32,6 +32,7 @@ export default function ServerSchedules() {
   const {
     data: schedules,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -141,6 +142,7 @@ export default function ServerSchedules() {
           '',
         ]}
         loading={loading}
+        error={error}
         pagination={schedules}
         onPageSelect={setPage}
       >

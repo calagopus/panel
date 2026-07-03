@@ -26,6 +26,7 @@ export default function DashboardApiKeys() {
   const {
     data: apiKeys,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -87,6 +88,7 @@ export default function DashboardApiKeys() {
         loading={loading}
         pagination={apiKeys}
         onPageSelect={setPage}
+        error={error}
       >
         {apiKeys?.data.map((key) => (
           <ApiKeyRow key={key.uuid} apiKey={key} />

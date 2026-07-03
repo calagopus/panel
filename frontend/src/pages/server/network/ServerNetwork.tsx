@@ -23,6 +23,7 @@ export default function ServerNetwork() {
   const {
     data: allocations,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -83,6 +84,7 @@ export default function ServerNetwork() {
         loading={loading}
         pagination={allocations}
         onPageSelect={setPage}
+        error={error}
       >
         {allocations?.data.map((allocation) => (
           <AllocationRow key={allocation.uuid} allocation={allocation} />

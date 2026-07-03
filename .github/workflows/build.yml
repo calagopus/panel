@@ -72,18 +72,22 @@ jobs:
             os: ubuntu-24.04
             target: x86_64-unknown-linux-musl
             binary_suffix: ""
+            wings_platform: linux/amd64
           - build: aarch64-linux
             os: ubuntu-24.04
             target: aarch64-unknown-linux-musl
             binary_suffix: ""
+            wings_platform: linux/arm64
           - build: riscv64-linux
             os: ubuntu-24.04
             target: riscv64gc-unknown-linux-gnu
             binary_suffix: ""
+            wings_platform: linux/riscv64
           - build: ppc64le-linux
             os: ubuntu-24.04
             target: powerpc64le-unknown-linux-gnu
             binary_suffix: ""
+            wings_platform: linux/ppc64le
           #- build: x86_64-windows
           #  os: windows-latest
           #  target: x86_64-pc-windows-msvc
@@ -109,7 +113,19 @@ jobs:
       - name: Install cross
         run: cargo install cross --git https://github.com/cross-rs/cross
 
+      - name: Extract nightly wings binary
+        run: |
+          mkdir -p bins/all-in-one/bins
+          docker pull --platform ${{ matrix.wings_platform }} ghcr.io/calagopus/wings:nightly
+          cid=$(docker create --platform ${{ matrix.wings_platform }} ghcr.io/calagopus/wings:nightly)
+          docker cp "$cid:/usr/bin/calagopus-wings" bins/all-in-one/bins/wings-nightly-bin
+          docker rm "$cid"
+          chmod +x bins/all-in-one/bins/wings-nightly-bin
+
       - name: Build release binaries
+        env:
+          WINGS_RELEASE: nightly
+          WINGS_BINARY_PATH: bins/wings-nightly-bin
         run: |
           RUSTFLAGS="-C target-feature=+crt-static" \
           cross build --release --target ${{ matrix.target }} -p $BIN_NAME

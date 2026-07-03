@@ -27,6 +27,7 @@ export default function DashboardOAuthLinks() {
   const {
     data: oauthLinks,
     loading,
+    error,
     setPage,
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.oauthLinks.all(),
@@ -82,6 +83,7 @@ export default function DashboardOAuthLinks() {
         loading={loading}
         pagination={oauthLinks}
         onPageSelect={setPage}
+        error={error}
       >
         {oauthLinks?.data.map((link) => (
           <OAuthLinkRow key={link.uuid} oauthLink={link} />

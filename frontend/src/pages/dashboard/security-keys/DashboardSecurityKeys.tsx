@@ -22,6 +22,7 @@ export default function DashboardSecurityKeys() {
   const {
     data: securityKeys,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -73,6 +74,7 @@ export default function DashboardSecurityKeys() {
         loading={loading}
         pagination={securityKeys}
         onPageSelect={setPage}
+        error={error}
       >
         {securityKeys?.data.map((key) => (
           <SecurityKeyRow key={key.uuid} securityKey={key} />

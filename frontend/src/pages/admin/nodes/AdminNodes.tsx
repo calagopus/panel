@@ -35,6 +35,7 @@ function NodesContainer() {
   const {
     data: nodes,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -124,7 +125,14 @@ function NodesContainer() {
         <NodeActionBar selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} />
 
         <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
-          <Table columns={columns} loading={loading} pagination={nodes} onPageSelect={setPage} allowSelect={false}>
+          <Table
+            columns={columns}
+            loading={loading}
+            pagination={nodes}
+            onPageSelect={setPage}
+            allowSelect={false}
+            error={error}
+          >
             {nodes?.data.map((node) => (
               <SelectionArea.Selectable key={node.uuid} item={node}>
                 {(innerRef: Ref<HTMLElement>) => (

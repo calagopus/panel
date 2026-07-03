@@ -22,6 +22,7 @@ export default function DashboardCommandSnippets() {
   const {
     data: commandSnippets,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -68,6 +69,7 @@ export default function DashboardCommandSnippets() {
         loading={loading}
         pagination={commandSnippets}
         onPageSelect={setPage}
+        error={error}
       >
         {commandSnippets?.data.map((snippet) => (
           <CommandSnippetRow key={snippet.uuid} commandSnippet={snippet} />

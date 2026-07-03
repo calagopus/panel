@@ -65,6 +65,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
   const {
     data: nodeAllocations,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -212,6 +213,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
         <Table
           columns={nodeAllocationTableColumns()}
           loading={loading}
+          error={error}
           pagination={nodeAllocations}
           onPageSelect={setPage}
           allowSelect={false}

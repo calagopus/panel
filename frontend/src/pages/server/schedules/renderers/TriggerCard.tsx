@@ -1,7 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQuery } from '@tanstack/react-query';
 import { CronExpressionParser } from 'cron-parser';
 import cronstrue from 'cronstrue/i18n';
 import { z } from 'zod';
+import getSchedule from '@/api/server/schedules/getSchedule.ts';
 import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import Group from '@/elements/Group.tsx';
@@ -9,9 +11,17 @@ import Text from '@/elements/Text.tsx';
 import ThemeIcon from '@/elements/ThemeIcon.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { scheduleTriggerColorMapping, scheduleTriggerIconMapping } from '@/lib/enums.ts';
+import {
+  scheduleComparatorLabelMapping,
+  scheduleResourceMetricLabelMapping,
+  scheduleTriggerColorMapping,
+  scheduleTriggerIconMapping,
+} from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleTriggerSchema } from '@/lib/schemas/server/schedules.ts';
+import { bytesToString } from '@/lib/size.ts';
 import { getTranslations, useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useServerStore } from '@/stores/server.ts';
 
 function cronTooltip(cron: string) {
   const { t, language } = getTranslations();
@@ -34,6 +44,14 @@ interface TriggerCardProps {
 
 export default function TriggerCard({ date, timezone, trigger }: TriggerCardProps) {
   const { t, tReact } = useTranslations();
+  const server = useServerStore((state) => state.server);
+
+  const completionScheduleUuid = trigger.type === 'schedule_completion' ? trigger.schedule : null;
+  const { data: completionSchedule } = useQuery({
+    queryKey: queryKeys.server(server.uuid).schedules.detail(completionScheduleUuid ?? ''),
+    queryFn: () => getSchedule(server.uuid, completionScheduleUuid!),
+    enabled: completionScheduleUuid !== null,
+  });
 
   return (
     <Card>
@@ -93,6 +111,21 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
           <Text>
             {t('pages.server.schedules.triggers.backupStatus.card.content', {
               status: trigger.status,
+            }).md()}
+          </Text>
+        ) : trigger.type === 'schedule_completion' ? (
+          <Text>
+            {t('pages.server.schedules.triggers.scheduleCompletion.card.content', {
+              schedule: completionSchedule?.name ?? trigger.schedule,
+              status: t(trigger.successful ? 'common.badge.successful' : 'common.badge.failed', {}),
+            }).md()}
+          </Text>
+        ) : trigger.type === 'resource_usage' ? (
+          <Text>
+            {t('pages.server.schedules.triggers.resourceUsage.card.content', {
+              metric: scheduleResourceMetricLabelMapping[trigger.metric](),
+              comparator: scheduleComparatorLabelMapping[trigger.comparator](),
+              value: trigger.metric === 'cpu' ? `${trigger.value}%` : bytesToString(trigger.value),
             }).md()}
           </Text>
         ) : trigger.type === 'console_line' ? (

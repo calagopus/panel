@@ -16,6 +16,7 @@ struct GithubAsset {
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-env-changed=WINGS_RELEASE");
+    println!("cargo:rerun-if-env-changed=WINGS_BINARY_PATH");
 
     let target_arch =
         std::env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_else(|_| "unknown".to_string());
@@ -23,6 +24,7 @@ fn main() {
     let target_env =
         std::env::var("CARGO_CFG_TARGET_ENV").unwrap_or_else(|_| "unknown".to_string());
     let release_env = std::env::var("WINGS_RELEASE").unwrap_or_default();
+    let binary_path_env = std::env::var("WINGS_BINARY_PATH").unwrap_or_default();
 
     println!("cargo:rustc-env=CARGO_TARGET={target_arch}-{target_env}");
 
@@ -33,6 +35,33 @@ fn main() {
 
     let bin_path = bin_dir.join("wings-rs");
     let version_path = bin_dir.join("wings-rs.version");
+
+    if !binary_path_env.is_empty() {
+        let source_data = std::fs::read(&binary_path_env)
+            .unwrap_or_else(|e| panic!("Failed to read WINGS_BINARY_PATH {binary_path_env}: {e}"));
+
+        println!(
+            "cargo:warning=Compressing wings-rs from local path {binary_path_env} ({} bytes)...",
+            source_data.len()
+        );
+
+        let compressed_data = zstd::encode_all(source_data.as_slice(), 22)
+            .expect("Failed to compress binary with zstd");
+
+        let mut file = File::create(&bin_path).expect("Failed to create bin");
+        file.write_all(&compressed_data)
+            .expect("Failed to write compressed bin");
+
+        let version = if release_env.is_empty() {
+            "nightly".to_string()
+        } else {
+            release_env
+        };
+        std::fs::write(&version_path, &version).ok();
+
+        println!("cargo:rustc-env=WINGS_VERSION={version}");
+        return;
+    }
 
     let existing_version = std::fs::read_to_string(&version_path)
         .map(|s| s.trim().to_string())

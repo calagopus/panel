@@ -24,6 +24,7 @@ export default function DashboardSshKeys() {
   const {
     data: sshKeys,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -86,6 +87,7 @@ export default function DashboardSshKeys() {
         loading={loading}
         pagination={sshKeys}
         onPageSelect={setPage}
+        error={error}
       >
         {sshKeys?.data.map((key) => (
           <SshKeyRow key={key.uuid} sshKey={key} />

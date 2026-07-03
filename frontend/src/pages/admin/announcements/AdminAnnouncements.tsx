@@ -22,6 +22,7 @@ function AnnouncementsContainer() {
   const {
     data: announcements,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -47,7 +48,13 @@ function AnnouncementsContainer() {
         </AdminCan>
       }
     >
-      <Table columns={announcementTableColumns()} loading={loading} pagination={announcements} onPageSelect={setPage}>
+      <Table
+        columns={announcementTableColumns()}
+        loading={loading}
+        error={error}
+        pagination={announcements}
+        onPageSelect={setPage}
+      >
         {announcements?.data.map((announcement) => (
           <AnnouncementRow key={announcement.uuid} announcement={announcement} />
         ))}

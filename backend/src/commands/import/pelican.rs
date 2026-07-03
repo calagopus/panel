@@ -1620,18 +1620,18 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 wings_api::ScheduleTrigger::Cron { schedule: Box::new(schedule) }
                             ])?)
                             .bind(serde_json::to_value(if only_when_online {
-                                wings_api::SchedulePreCondition::Or {
+                                wings_api::ScheduleCondition::Or {
                                     conditions: vec![
-                                        wings_api::SchedulePreCondition::ServerState {
+                                        wings_api::ScheduleCondition::ServerState {
                                             state: wings_api::ServerState::Starting
                                         },
-                                        wings_api::SchedulePreCondition::ServerState {
+                                        wings_api::ScheduleCondition::ServerState {
                                             state: wings_api::ServerState::Running
                                         }
                                     ]
                                 }
                             } else {
-                                wings_api::SchedulePreCondition::None
+                                wings_api::ScheduleCondition::None
                             })?)
                             .bind(last_run)
                             .bind(created)

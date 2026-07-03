@@ -21,6 +21,7 @@ export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof ful
   const {
     data: userOAuthLinks,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -46,6 +47,7 @@ export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof ful
       <Table
         columns={adminUserOAuthLinkTableColumns()}
         loading={loading}
+        error={error}
         pagination={userOAuthLinks}
         onPageSelect={setPage}
       >

@@ -440,7 +440,8 @@
       "container": {
         "alert": {
           "impersonating": "Du impersonierst derzeit einen Benutzer. Bitte beachte, dass deine Aktionen das Konto des impersonierten Benutzers beeinflussen können. Um den Impersonation-Modus zu beenden, klicke unten links auf die Schaltfläche \"Impersonierung beenden\"."
-        }
+        },
+        "connectedTo": "Verbunden mit {name}"
       },
       "sidebar": {
         "button": {
@@ -1983,6 +1984,25 @@
                 "title": "Benutzer Aktivität"
               }
             }
+          },
+          "externalIdLookup": {
+            "button": "Über externe ID suchen",
+            "modal": {
+              "title": "Über externe ID suchen",
+              "form": {
+                "externalId": "Externe ID",
+                "externalIdPlaceholder": "z. B. my-user-001",
+                "search": "Suchen"
+              },
+              "result": {
+                "title": "Benutzer gefunden",
+                "username": "Benutzername",
+                "email": "E-Mail",
+                "role": "Rolle",
+                "viewUser": "Benutzer anzeigen"
+              },
+              "notFound": "Kein Benutzer mit dieser externen ID gefunden."
+            }
           }
         },
         "locations": {
@@ -2447,7 +2467,8 @@
                   "allocationsLimit": "Allocations",
                   "databasesLimit": "Datenbanken",
                   "backupsLimit": "Backups",
-                  "schedulesLimit": "Zeitpläne"
+                  "schedulesLimit": "Zeitpläne",
+                  "predefinedStartupCommands": "Vordefinierte Startbefehle"
                 },
                 "modal": {
                   "confirmNoAllocation": {
@@ -2624,7 +2645,8 @@
                       "force": "Möchtest du diesen Server zwangsweise löschen?",
                       "deleteBackups": "Möchtest du die Backups dieses Servers löschen?",
                       "confirmServerName": "Servername bestätigen",
-                      "confirmServerNamePlaceholder": "Servername"
+                      "confirmServerNamePlaceholder": "Servername",
+                      "forceWarning": "Das erzwungene Löschen überspringt den normalen Herunterfahrvorgang. Die Serverdateien auf dem Node werden möglicherweise nicht vollständig bereinigt, wodurch verwaiste Daten zurückbleiben."
                     }
                   }
                 }
@@ -2683,6 +2705,25 @@
                   "admin": "Admin"
                 }
               }
+            }
+          },
+          "externalIdLookup": {
+            "button": "Über externe ID suchen",
+            "modal": {
+              "title": "Über externe ID suchen",
+              "form": {
+                "externalId": "Externe ID",
+                "externalIdPlaceholder": "z. B. my-server-001",
+                "search": "Suchen"
+              },
+              "result": {
+                "title": "Server gefunden",
+                "name": "Name",
+                "owner": "Besitzer",
+                "node": "Node",
+                "viewServer": "Server anzeigen"
+              },
+              "notFound": "Kein Server mit dieser externen ID gefunden."
             }
           }
         },
@@ -2891,7 +2932,8 @@
                 "form": {
                   "order": "Reihenfolge",
                   "eggs": "Eggs",
-                  "eggsPlaceholder": "Eggs auswählen"
+                  "eggsPlaceholder": "Eggs auswählen",
+                  "eggsEmpty": "Es sind keine Eggs konfiguriert. Erstelle ein Nest und ein Egg, bevor du eine Egg-Konfiguration erstellst."
                 },
                 "enum": {
                   "deploymentType": {
@@ -3932,7 +3974,9 @@
             "createFirstStep": "Ersten Schritt erstellen",
             "addOutput": "Ausgabe hinzufügen",
             "addFile": "Datei hinzufügen",
-            "exitEditor": "Editor verlassen"
+            "exitEditor": "Editor verlassen",
+            "addElseIf": "Sonst wenn hinzufügen",
+            "addElse": "Sonst hinzufügen"
           },
           "toast": {
             "imported": "Zeitplan importiert.",
@@ -3951,6 +3995,28 @@
             }
           },
           "enum": {
+            "scheduleConditionType": {
+              "none": "Keine",
+              "and": "UND (Alle müssen wahr sein)",
+              "or": "ODER (Mindestens eine muss wahr sein)",
+              "not": "NICHT (Darf nicht wahr sein)",
+              "variableExists": "Variable existiert",
+              "variableContains": "Variable enthält",
+              "variableEquals": "Variable ist gleich",
+              "variableStartsWith": "Variable beginnt mit",
+              "variableEndsWith": "Variable endet mit",
+              "serverState": "Serverstatus",
+              "uptime": "Betriebszeit",
+              "resourceUsage": "Ressourcennutzung",
+              "fileExists": "Datei existiert"
+            },
+            "scheduleComparator": {
+              "smallerThan": "Kleiner als",
+              "smallerThanOrEqual": "Kleiner oder gleich",
+              "equal": "Gleich",
+              "greaterThanOrEqual": "Größer oder gleich",
+              "greaterThan": "Größer als"
+            },
             "schedulePreConditionType": {
               "none": "Keine",
               "and": "UND (Alle müssen wahr sein)",
@@ -3963,23 +4029,10 @@
               "diskUsage": "Festplattennutzung",
               "fileExists": "Datei existiert"
             },
-            "scheduleConditionType": {
-              "none": "Keine",
-              "and": "UND (Alle müssen wahr sein)",
-              "or": "ODER (Mindestens eine muss wahr sein)",
-              "not": "NICHT (Darf nicht wahr sein)",
-              "variableExists": "Variable existiert",
-              "variableContains": "Variable enthält",
-              "variableEquals": "Variable ist gleich",
-              "variableStartsWith": "Variable beginnt mit",
-              "variableEndsWith": "Variable endet mit"
-            },
-            "scheduleComparator": {
-              "smallerThan": "Kleiner als",
-              "smallerThanOrEqual": "Kleiner oder gleich",
-              "equal": "Gleich",
-              "greaterThanOrEqual": "Größer oder gleich",
-              "greaterThan": "Größer als"
+            "scheduleResourceMetric": {
+              "cpu": "CPU-Auslastung",
+              "memory": "Speichernutzung",
+              "disk": "Festplattennutzung"
             }
           },
           "modal": {
@@ -4055,7 +4108,8 @@
             "endsWith": "Endet mit",
             "allMustBeTrue": "Alle Bedingungen müssen wahr sein:",
             "anyMustBeTrue": "Mindestens eine Bedingung muss wahr sein:",
-            "mustNotBeTrue": "Bedingung darf nicht wahr sein:"
+            "mustNotBeTrue": "Bedingung darf nicht wahr sein:",
+            "metric": "Metrik"
           },
           "preCondition": {
             "valueSeconds": "Wert (Sekunden)",
@@ -4119,6 +4173,25 @@
               "title": "Absturz",
               "card": {
                 "content": "Wenn der Server abstürzt."
+              }
+            },
+            "scheduleCompletion": {
+              "title": "Zeitplan-Abschluss",
+              "form": {
+                "schedule": "Zeitplan",
+                "completionStatus": "Abschlussstatus"
+              },
+              "card": {
+                "content": "Wenn Zeitplan `{schedule}` mit Status `{status}` abgeschlossen wird."
+              }
+            },
+            "resourceUsage": {
+              "title": "Ressourcennutzung",
+              "form": {
+                "forSeconds": "Für (Sekunden)"
+              },
+              "card": {
+                "content": "Wenn {metric} {comparator} `{value}` ist."
               }
             }
           },
@@ -4225,8 +4298,10 @@
                 "compact": "Erstelle {name}",
                 "detail": {
                   "backupName": "Backup-Name: {name}",
-                  "ignoredFiles": "Ignorierte Dateien: {files}"
-                }
+                  "ignoredFiles": "Ignorierte Dateien: {files}",
+                  "backupNameAuto": "Backup-Name: Automatisch generiert"
+                },
+                "compactAuto": "Erstelle ein Backup mit automatisch generiertem Namen"
               }
             },
             "createDirectory": {
@@ -4358,6 +4433,58 @@
                 "detail": {
                   "image": "Image: {image}"
                 }
+              }
+            },
+            "warning": {
+              "unclosedIf": "Einem \"Wenn\"-Block fehlt das zugehörige \"Ende Wenn\". Alle verbleibenden Schritte werden als Teil des Blocks ausgeführt.",
+              "orphanBranch": "Es gibt einen \"Sonst\"-, \"Sonst wenn\"- oder \"Ende Wenn\"-Schritt ohne ein passendes \"Wenn\" davor."
+            },
+            "if": {
+              "title": "Wenn",
+              "description": "Führe die folgenden Schritte nur aus, wenn eine Bedingung wahr ist, bis Sonst/Ende Wenn. Ein passendes Ende Wenn wird automatisch hinzugefügt.",
+              "renderer": {
+                "compact": "Wenn eine Bedingung zutrifft"
+              }
+            },
+            "elseIf": {
+              "title": "Sonst wenn",
+              "description": "Führe die folgenden Schritte aus, wenn kein früherer Zweig ausgeführt wurde und eine Bedingung wahr ist.",
+              "renderer": {
+                "compact": "Sonst wenn eine Bedingung zutrifft"
+              }
+            },
+            "else": {
+              "title": "Sonst",
+              "description": "Führe die folgenden Schritte aus, wenn kein früherer Zweig des Wenn-Blocks ausgeführt wurde.",
+              "renderer": {
+                "compact": "Andernfalls"
+              }
+            },
+            "endIf": {
+              "title": "Ende Wenn",
+              "description": "Schließe den aktuellen Wenn-Block.",
+              "renderer": {
+                "compact": "Ende des Wenn-Blocks"
+              }
+            },
+            "exit": {
+              "title": "Beenden",
+              "description": "Beende den Zeitplan hier und markiere die Ausführung als erfolgreich oder fehlgeschlagen.",
+              "form": {
+                "successful": "Ausführung als erfolgreich markieren"
+              },
+              "renderer": {
+                "compact": "Zeitplan beenden ({successful})"
+              }
+            },
+            "waitForState": {
+              "title": "Auf Serverstatus warten",
+              "description": "Warte, bis der Server einen Energiestatus erreicht.",
+              "form": {
+                "timeout": "Zeitüberschreitung (Millisekunden)"
+              },
+              "renderer": {
+                "compact": "Warte {timeout}, bis Server {state} ist"
               }
             }
           }
@@ -4500,7 +4627,8 @@
               "content": "Du hast ungespeicherte Änderungen an deinen Startvariablen. Bist du sicher, dass du diese Seite verlassen möchtest? Wenn du die Seite verlässt, gehen deine Änderungen verloren."
             }
           },
-          "noVariables": "Keine Startvariablen für diesen Server gefunden."
+          "noVariables": "Keine Startvariablen für diesen Server gefunden.",
+          "predefinedStartupCommands": "Vordefinierte Startbefehle"
         },
         "mounts": {
           "title": "Mounts",

@@ -131,6 +131,7 @@ export function useSearchablePaginatedTable<T>({
   return {
     data: data as T | undefined,
     loading: isFetching,
+    error: error ? httpErrorToHuman(error) : null,
     search,
     setSearch,
     page,

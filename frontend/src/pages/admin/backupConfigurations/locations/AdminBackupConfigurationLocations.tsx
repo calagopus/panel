@@ -18,6 +18,7 @@ export default function AdminBackupConfigurationLocations({
   const {
     data: backupConfigurationLocations,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -36,6 +37,7 @@ export default function AdminBackupConfigurationLocations({
       <Table
         columns={locationTableColumns()}
         loading={loading}
+        error={error}
         pagination={backupConfigurationLocations}
         onPageSelect={setPage}
       >

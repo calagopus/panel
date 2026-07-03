@@ -22,6 +22,7 @@ function DatabaseHostsContainer() {
   const {
     data: databaseHosts,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -47,7 +48,13 @@ function DatabaseHostsContainer() {
         </AdminCan>
       }
     >
-      <Table columns={databaseHostTableColumns()} loading={loading} pagination={databaseHosts} onPageSelect={setPage}>
+      <Table
+        columns={databaseHostTableColumns()}
+        loading={loading}
+        pagination={databaseHosts}
+        onPageSelect={setPage}
+        error={error}
+      >
         {databaseHosts?.data.map((dh) => (
           <DatabaseHostRow key={dh.uuid} databaseHost={dh} />
         ))}

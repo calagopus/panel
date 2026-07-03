@@ -20,6 +20,7 @@ function Container({ children, isNormal }: LayoutProps) {
   const { impersonating } = useAuth();
   const { id } = useCurrentWindow();
   const { announcements } = useGlobalStore();
+  const serverName = useGlobalStore((state) => state.serverName);
 
   return (
     <div
@@ -42,7 +43,12 @@ function Container({ children, isNormal }: LayoutProps) {
 
         {children}
       </div>
-      <div className='my-2 ml-auto mr-12'>
+      <div className='my-2 ml-auto mr-12 flex flex-col items-end'>
+        {serverName && (
+          <span className='text-xs text-(--mantine-color-dimmed)'>
+            {t('elements.container.connectedTo', { name: serverName })}
+          </span>
+        )}
         <Copyright className='justify-end' />
       </div>
     </div>

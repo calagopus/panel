@@ -3824,18 +3824,6 @@
             }
           },
           "enum": {
-            "schedulePreConditionType": {
-              "none": "無",
-              "and": "AND（全部都必須為真）",
-              "or": "OR（任一為真即可）",
-              "not": "NOT（不得為真）",
-              "serverState": "伺服器狀態",
-              "uptime": "執行時間",
-              "cpuUsage": "CPU 使用量",
-              "memoryUsage": "記憶體使用量",
-              "diskUsage": "磁碟使用量",
-              "fileExists": "檔案存在"
-            },
             "scheduleConditionType": {
               "none": "無",
               "and": "AND（全部都必須為真）",
@@ -3853,6 +3841,18 @@
               "equal": "等於",
               "greaterThanOrEqual": "大於或等於",
               "greaterThan": "大於"
+            },
+            "schedulePreConditionType": {
+              "none": "無",
+              "and": "AND（全部都必須為真）",
+              "or": "OR（任一為真即可）",
+              "not": "NOT（不得為真）",
+              "serverState": "伺服器狀態",
+              "uptime": "執行時間",
+              "cpuUsage": "CPU 使用量",
+              "memoryUsage": "記憶體使用量",
+              "diskUsage": "磁碟使用量",
+              "fileExists": "檔案存在"
             }
           },
           "modal": {

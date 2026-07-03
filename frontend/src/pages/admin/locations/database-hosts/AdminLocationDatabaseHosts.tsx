@@ -22,6 +22,7 @@ export default function AdminLocationDatabaseHosts({ location }: { location: z.i
   const {
     data: locationDatabaseHosts,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -55,6 +56,7 @@ export default function AdminLocationDatabaseHosts({ location }: { location: z.i
       <Table
         columns={locationDatabaseHostTableColumns()}
         loading={loading}
+        error={error}
         pagination={locationDatabaseHosts}
         onPageSelect={setPage}
       >

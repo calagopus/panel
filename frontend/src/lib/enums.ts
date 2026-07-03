@@ -9,6 +9,7 @@ import {
   faCircleXmark,
   faCloud,
   faCode,
+  faCodeBranch,
   faCog,
   faCogs,
   faCompress,
@@ -37,6 +38,7 @@ import {
   faPlay,
   faPowerOff,
   faPuzzlePiece,
+  faRightFromBracket,
   faScroll,
   faServer,
   faSkull,
@@ -59,7 +61,7 @@ import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/sch
 import {
   serverScheduleComparator,
   serverScheduleConditionSchema,
-  serverSchedulePreConditionSchema,
+  serverScheduleResourceMetric,
   serverScheduleStepActionSchema,
   serverScheduleTriggerSchema,
 } from '@/lib/schemas/server/schedules.ts';
@@ -267,22 +269,6 @@ export const eggConfigurationDeploymentTypeLabelMapping: Record<
     getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.dividePrimary', {}),
 };
 
-export const schedulePreConditionLabelMapping: Record<
-  z.infer<typeof serverSchedulePreConditionSchema>['type'],
-  () => string
-> = {
-  none: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.none', {}),
-  and: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.and', {}),
-  or: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.or', {}),
-  not: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.not', {}),
-  server_state: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.serverState', {}),
-  uptime: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.uptime', {}),
-  cpu_usage: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.cpuUsage', {}),
-  memory_usage: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.memoryUsage', {}),
-  disk_usage: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.diskUsage', {}),
-  file_exists: () => getTranslations().t('pages.server.schedules.enum.schedulePreConditionType.fileExists', {}),
-};
-
 export const scheduleConditionLabelMapping: Record<
   z.infer<typeof serverScheduleConditionSchema>['type'],
   () => string
@@ -291,6 +277,10 @@ export const scheduleConditionLabelMapping: Record<
   and: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.and', {}),
   or: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.or', {}),
   not: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.not', {}),
+  server_state: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.serverState', {}),
+  uptime: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.uptime', {}),
+  resource_usage: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.resourceUsage', {}),
+  file_exists: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.fileExists', {}),
   variable_exists: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.variableExists', {}),
   variable_contains: () =>
     getTranslations().t('pages.server.schedules.enum.scheduleConditionType.variableContains', {}),
@@ -299,6 +289,12 @@ export const scheduleConditionLabelMapping: Record<
     getTranslations().t('pages.server.schedules.enum.scheduleConditionType.variableStartsWith', {}),
   variable_ends_with: () =>
     getTranslations().t('pages.server.schedules.enum.scheduleConditionType.variableEndsWith', {}),
+};
+
+export const scheduleResourceMetricLabelMapping: Record<z.infer<typeof serverScheduleResourceMetric>, () => string> = {
+  cpu: () => getTranslations().t('pages.server.schedules.enum.scheduleResourceMetric.cpu', {}),
+  memory: () => getTranslations().t('pages.server.schedules.enum.scheduleResourceMetric.memory', {}),
+  disk: () => getTranslations().t('pages.server.schedules.enum.scheduleResourceMetric.disk', {}),
 };
 
 export const scheduleComparatorLabelMapping: Record<z.infer<typeof serverScheduleComparator>, () => string> = {
@@ -342,6 +338,12 @@ export const serverBackupStatusLabelMapping: Record<z.infer<typeof serverBackupS
 export const scheduleStepLabelMapping: Record<z.infer<typeof serverScheduleStepActionSchema>['type'], () => string> = {
   sleep: () => getTranslations().t('pages.server.schedules.steps.sleep.title', {}),
   ensure: () => getTranslations().t('pages.server.schedules.steps.ensure.title', {}),
+  if: () => getTranslations().t('pages.server.schedules.steps.if.title', {}),
+  else_if: () => getTranslations().t('pages.server.schedules.steps.elseIf.title', {}),
+  else: () => getTranslations().t('pages.server.schedules.steps.else.title', {}),
+  end_if: () => getTranslations().t('pages.server.schedules.steps.endIf.title', {}),
+  exit: () => getTranslations().t('pages.server.schedules.steps.exit.title', {}),
+  wait_for_state: () => getTranslations().t('pages.server.schedules.steps.waitForState.title', {}),
   format: () => getTranslations().t('pages.server.schedules.steps.format.title', {}),
   match_regex: () => getTranslations().t('pages.server.schedules.steps.matchRegex.title', {}),
   wait_for_console_line: () => getTranslations().t('pages.server.schedules.steps.waitForConsoleLine.title', {}),
@@ -376,6 +378,12 @@ export const scheduleStepGroupMapping: Record<
 > = {
   sleep: 'advanced',
   ensure: 'advanced',
+  if: 'advanced',
+  else_if: 'advanced',
+  else: 'advanced',
+  end_if: 'advanced',
+  exit: 'advanced',
+  wait_for_state: 'server',
   format: 'advanced',
   match_regex: 'advanced',
   wait_for_console_line: 'advanced',
@@ -400,6 +408,12 @@ export const scheduleStepDescriptionMapping: Record<
 > = {
   sleep: () => getTranslations().t('pages.server.schedules.steps.sleep.description', {}),
   ensure: () => getTranslations().t('pages.server.schedules.steps.ensure.description', {}),
+  if: () => getTranslations().t('pages.server.schedules.steps.if.description', {}),
+  else_if: () => getTranslations().t('pages.server.schedules.steps.elseIf.description', {}),
+  else: () => getTranslations().t('pages.server.schedules.steps.else.description', {}),
+  end_if: () => getTranslations().t('pages.server.schedules.steps.endIf.description', {}),
+  exit: () => getTranslations().t('pages.server.schedules.steps.exit.description', {}),
+  wait_for_state: () => getTranslations().t('pages.server.schedules.steps.waitForState.description', {}),
   format: () => getTranslations().t('pages.server.schedules.steps.format.description', {}),
   match_regex: () => getTranslations().t('pages.server.schedules.steps.matchRegex.description', {}),
   wait_for_console_line: () => getTranslations().t('pages.server.schedules.steps.waitForConsoleLine.description', {}),
@@ -432,6 +446,30 @@ export const scheduleStepDefaultMapping: Record<
   ensure: {
     type: 'ensure',
     condition: { type: 'none' },
+  },
+  if: {
+    type: 'if',
+    condition: { type: 'none' },
+  },
+  else_if: {
+    type: 'else_if',
+    condition: { type: 'none' },
+  },
+  else: {
+    type: 'else',
+  },
+  end_if: {
+    type: 'end_if',
+  },
+  exit: {
+    type: 'exit',
+    successful: true,
+  },
+  wait_for_state: {
+    type: 'wait_for_state',
+    ignoreFailure: false,
+    state: 'running',
+    timeout: 60000,
   },
   format: {
     type: 'format',
@@ -491,11 +529,13 @@ export const scheduleStepDefaultMapping: Record<
   },
   delete_files: {
     type: 'delete_files',
+    ignoreFailure: false,
     root: '/',
     files: [],
   },
   rename_files: {
     type: 'rename_files',
+    ignoreFailure: false,
     root: '/',
     files: [],
   },
@@ -536,6 +576,12 @@ export const scheduleStepDefaultMapping: Record<
 export const scheduleStepIconMapping: Record<z.infer<typeof serverScheduleStepActionSchema>['type'], IconDefinition> = {
   sleep: faHourglass,
   ensure: faEquals,
+  if: faCodeBranch,
+  else_if: faCodeBranch,
+  else: faCodeBranch,
+  end_if: faCodeBranch,
+  exit: faRightFromBracket,
+  wait_for_state: faHourglass,
   format: faTextSlash,
   match_regex: faEquals,
   wait_for_console_line: faTerminal,
@@ -602,6 +648,8 @@ export const scheduleTriggerIconMapping: Record<z.infer<typeof serverScheduleTri
   power_action: faPowerOff,
   server_state: faServer,
   backup_status: faBoxArchive,
+  schedule_completion: faStopwatch,
+  resource_usage: faChartPie,
   console_line: faTerminal,
   crash: faSkull,
 };
@@ -611,6 +659,8 @@ export const scheduleTriggerColorMapping: Record<z.infer<typeof serverScheduleTr
   power_action: 'orange',
   server_state: 'green',
   backup_status: 'green',
+  schedule_completion: 'blue',
+  resource_usage: 'orange',
   console_line: 'gray',
   crash: 'red',
 };
@@ -620,6 +670,8 @@ export const scheduleTriggerLabelMapping: Record<z.infer<typeof serverScheduleTr
   power_action: () => getTranslations().t('pages.server.schedules.triggers.powerAction.title', {}),
   server_state: () => getTranslations().t('pages.server.schedules.triggers.serverState.title', {}),
   backup_status: () => getTranslations().t('pages.server.schedules.triggers.backupStatus.title', {}),
+  schedule_completion: () => getTranslations().t('pages.server.schedules.triggers.scheduleCompletion.title', {}),
+  resource_usage: () => getTranslations().t('pages.server.schedules.triggers.resourceUsage.title', {}),
   console_line: () => getTranslations().t('pages.server.schedules.triggers.consoleLine.title', {}),
   crash: () => getTranslations().t('pages.server.schedules.triggers.crash.title', {}),
 };
@@ -632,6 +684,14 @@ export const scheduleTriggerDefaultMapping: Record<
   power_action: { type: 'power_action', action: 'start' },
   server_state: { type: 'server_state', state: 'running' },
   backup_status: { type: 'backup_status', status: 'starting' },
+  schedule_completion: { type: 'schedule_completion', schedule: '', successful: true },
+  resource_usage: {
+    type: 'resource_usage',
+    metric: 'cpu',
+    comparator: 'greater_than',
+    value: 0,
+    forSeconds: 0,
+  },
   console_line: { type: 'console_line', contains: '', caseInsensitive: false, outputInto: null },
   crash: { type: 'crash' },
 };

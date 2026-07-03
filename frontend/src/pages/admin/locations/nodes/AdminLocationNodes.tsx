@@ -14,6 +14,7 @@ export default function AdminLocationNodes({ location }: { location: z.infer<typ
   const {
     data: locationNodes,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -29,7 +30,13 @@ export default function AdminLocationNodes({ location }: { location: z.infer<typ
       search={search}
       setSearch={setSearch}
     >
-      <Table columns={nodeTableColumns()} loading={loading} pagination={locationNodes} onPageSelect={setPage}>
+      <Table
+        columns={nodeTableColumns()}
+        loading={loading}
+        error={error}
+        pagination={locationNodes}
+        onPageSelect={setPage}
+      >
         {locationNodes?.data.map((node) => (
           <NodeRow key={node.uuid} node={node} />
         ))}

@@ -3824,18 +3824,6 @@
             }
           },
           "enum": {
-            "schedulePreConditionType": {
-              "none": "Không",
-              "and": "AND (Tất cả phải đúng)",
-              "or": "OR (Bất kỳ cái nào phải đúng)",
-              "not": "NOT (Phải không đúng)",
-              "serverState": "Trạng Thái Máy Chủ",
-              "uptime": "Thời Gian Hoạt Động",
-              "cpuUsage": "Sử Dụng CPU",
-              "memoryUsage": "Sử Dụng Bộ Nhớ",
-              "diskUsage": "Sử Dụng Đĩa",
-              "fileExists": "Tệp Tồn Tại"
-            },
             "scheduleConditionType": {
               "none": "Không",
               "and": "AND (Tất cả phải đúng)",
@@ -3853,6 +3841,18 @@
               "equal": "Bằng",
               "greaterThanOrEqual": "Lớn hơn hoặc bằng",
               "greaterThan": "Lớn hơn"
+            },
+            "schedulePreConditionType": {
+              "none": "Không",
+              "and": "AND (Tất cả phải đúng)",
+              "or": "OR (Bất kỳ cái nào phải đúng)",
+              "not": "NOT (Phải không đúng)",
+              "serverState": "Trạng Thái Máy Chủ",
+              "uptime": "Thời Gian Hoạt Động",
+              "cpuUsage": "Sử Dụng CPU",
+              "memoryUsage": "Sử Dụng Bộ Nhớ",
+              "diskUsage": "Sử Dụng Đĩa",
+              "fileExists": "Tệp Tồn Tại"
             }
           },
           "modal": {
