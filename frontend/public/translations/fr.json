@@ -506,12 +506,7 @@
       "scheduleDynamicInput": {
         "none": "Aucun",
         "variable": "Variable",
-        "enterVariable": "Veuillez entrer le nom de la variable à évaluer.",
-        "enterData": "Veuillez entrer les données à envoyer.",
-        "inputType": "Type d'entrée",
-        "dataType": "Type de données à envoyer",
-        "selectType": "Sélectionner le type",
-        "rawString": "Chaîne brute"
+        "enterVariable": "Veuillez entrer le nom de la variable à évaluer."
       },
       "serverWebsocket": {
         "error": {
@@ -3818,10 +3813,7 @@
             "createFirstStep": "Créer la première étape",
             "addOutput": "Ajouter une sortie",
             "addFile": "Ajouter un fichier",
-            "exitEditor": "Quitter l'éditeur",
-            "trigger": "Déclencher",
-            "triggerWithCondition": "Déclencher (ne pas ignorer la condition)",
-            "triggerSkipCondition": "Déclencher (ignorer la condition)"
+            "exitEditor": "Quitter l'éditeur"
           },
           "toast": {
             "imported": "Planification importée.",
@@ -3855,18 +3847,6 @@
               "equal": "Égal à",
               "greaterThanOrEqual": "Supérieur ou égal à",
               "greaterThan": "Supérieur à"
-            },
-            "schedulePreConditionType": {
-              "none": "Aucune",
-              "and": "ET (toutes doivent être vraies)",
-              "or": "OU (au moins une doit être vraie)",
-              "not": "NON (ne doit pas être vraie)",
-              "serverState": "État du serveur",
-              "uptime": "Temps de fonctionnement",
-              "cpuUsage": "Utilisation CPU",
-              "memoryUsage": "Utilisation mémoire",
-              "diskUsage": "Utilisation disque",
-              "fileExists": "Le fichier existe"
             }
           },
           "modal": {
@@ -3894,9 +3874,6 @@
           "view": {
             "badge": {
               "running": "En cours"
-            },
-            "tooltip": {
-              "cannotTrigger": "Impossible de déclencher une planification désactivée"
             },
             "tabs": {
               "actions": "Actions",

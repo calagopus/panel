@@ -332,12 +332,7 @@
       "scheduleDynamicInput": {
         "none": "Ingen",
         "variable": "Variabel",
-        "enterVariable": "Ange variabelnamnet för utvärdering.",
-        "enterData": "Ange data som ska skickas.",
-        "inputType": "Ingångstyp",
-        "dataType": "Datatyp att skicka",
-        "selectType": "Välj Typ",
-        "rawString": "Rå sträng"
+        "enterVariable": "Ange variabelnamnet för utvärdering."
       },
       "serverWebsocket": {
         "error": {
@@ -1431,10 +1426,7 @@
             "createFirstStep": "Skapa första steget",
             "addOutput": "Lägg till utdata",
             "addFile": "Lägg till fil",
-            "exitEditor": "Avsluta editor",
-            "trigger": "Utlösare",
-            "triggerWithCondition": "Utlösare (do not skip condition)",
-            "triggerSkipCondition": "Utlösare (skip condition)"
+            "exitEditor": "Avsluta editor"
           },
           "toast": {
             "imported": "Schema importerat.",
@@ -1468,18 +1460,6 @@
               "equal": "Likamed",
               "greaterThanOrEqual": "Större än eller lika med",
               "greaterThan": "Större än"
-            },
-            "schedulePreConditionType": {
-              "none": "Ingen",
-              "and": "OCH (Allt måste vara sant)",
-              "or": "ELLER (Vilken som helst måste vara sant)",
-              "not": "INTE (Måste inte vara sant)",
-              "serverState": "Serverstatus",
-              "uptime": "Drifttid",
-              "cpuUsage": "CPU-användning",
-              "memoryUsage": "Minnesanvändning",
-              "diskUsage": "Diskanvändning",
-              "fileExists": "Filen finns"
             }
           },
           "modal": {
@@ -1507,9 +1487,6 @@
           "view": {
             "badge": {
               "running": "Running"
-            },
-            "tooltip": {
-              "cannotTrigger": "Kan inte utlösa ett inaktiverat schema"
             },
             "tabs": {
               "actions": "Åtgärder",

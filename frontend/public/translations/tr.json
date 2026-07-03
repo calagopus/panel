@@ -331,12 +331,7 @@
       "scheduleDynamicInput": {
         "none": "Yok",
         "variable": "Değişken",
-        "enterVariable": "Lütfen değerlendirilecek değişken adını girin.",
-        "enterData": "Lütfen gönderilecek veriyi girin.",
-        "inputType": "Giriş Tipi",
-        "dataType": "Gönderilecek veri tipi",
-        "selectType": "Tip Seçin",
-        "rawString": "Ham Metin (Raw String)"
+        "enterVariable": "Lütfen değerlendirilecek değişken adını girin."
       },
       "serverWebsocket": {
         "error": {
@@ -1417,10 +1412,7 @@
             "createFirstStep": "İlk Adımı Oluştur",
             "addOutput": "Çıktı Ekle",
             "addFile": "Dosya Ekle",
-            "exitEditor": "Editörden Çık",
-            "trigger": "Tetikle",
-            "triggerWithCondition": "Tetikle (koşulu atlama)",
-            "triggerSkipCondition": "Tetikle (koşulu atla)"
+            "exitEditor": "Editörden Çık"
           },
           "toast": {
             "imported": "Zamanlayıcı içe aktarıldı.",
@@ -1454,18 +1446,6 @@
               "equal": "Eşittir",
               "greaterThanOrEqual": "Büyük eşittir",
               "greaterThan": "Büyüktür"
-            },
-            "schedulePreConditionType": {
-              "none": "Yok",
-              "and": "VE (Hepsi doğru olmalı)",
-              "or": "VEYA (Herhangi biri doğru olmalı)",
-              "not": "DEĞİL (Doğru olmamalı)",
-              "serverState": "Sunucu Durumu",
-              "uptime": "Çalışma Süresi",
-              "cpuUsage": "CPU Kullanımı",
-              "memoryUsage": "Bellek Kullanımı",
-              "diskUsage": "Disk Kullanımı",
-              "fileExists": "Dosya Mevcut"
             }
           },
           "modal": {
@@ -1493,9 +1473,6 @@
           "view": {
             "badge": {
               "running": "Çalışıyor"
-            },
-            "tooltip": {
-              "cannotTrigger": "Devre dışı bırakılmış bir zamanlayıcı tetiklenemez"
             },
             "tabs": {
               "actions": "Eylemler",

@@ -499,12 +499,7 @@
       "scheduleDynamicInput": {
         "none": "Không có",
         "variable": "Biến",
-        "enterVariable": "Vui lòng nhập tên biến để đánh giá.",
-        "enterData": "Vui lòng nhập dữ liệu để gửi.",
-        "inputType": "Kiểu nhập",
-        "dataType": "Loại dữ liệu để gửi",
-        "selectType": "Chọn loại",
-        "rawString": "Chuỗi thô"
+        "enterVariable": "Vui lòng nhập tên biến để đánh giá."
       },
       "serverWebsocket": {
         "error": {
@@ -3804,10 +3799,7 @@
             "createFirstStep": "Tạo Bước Đầu Tiên",
             "addOutput": "Thêm Đầu Ra",
             "addFile": "Thêm Tệp",
-            "exitEditor": "Thoát Trình Soạn Thảo",
-            "trigger": "Kích Hoạt",
-            "triggerWithCondition": "Kích Hoạt (không bỏ qua điều kiện)",
-            "triggerSkipCondition": "Kích Hoạt (bỏ qua điều kiện)"
+            "exitEditor": "Thoát Trình Soạn Thảo"
           },
           "toast": {
             "imported": "Lịch trình đã được nhập.",
@@ -3841,18 +3833,6 @@
               "equal": "Bằng",
               "greaterThanOrEqual": "Lớn hơn hoặc bằng",
               "greaterThan": "Lớn hơn"
-            },
-            "schedulePreConditionType": {
-              "none": "Không",
-              "and": "AND (Tất cả phải đúng)",
-              "or": "OR (Bất kỳ cái nào phải đúng)",
-              "not": "NOT (Phải không đúng)",
-              "serverState": "Trạng Thái Máy Chủ",
-              "uptime": "Thời Gian Hoạt Động",
-              "cpuUsage": "Sử Dụng CPU",
-              "memoryUsage": "Sử Dụng Bộ Nhớ",
-              "diskUsage": "Sử Dụng Đĩa",
-              "fileExists": "Tệp Tồn Tại"
             }
           },
           "modal": {
@@ -3880,9 +3860,6 @@
           "view": {
             "badge": {
               "running": "Đang Chạy"
-            },
-            "tooltip": {
-              "cannotTrigger": "Không thể kích hoạt lịch trình bị vô hiệu hóa"
             },
             "tabs": {
               "actions": "Hành Động",

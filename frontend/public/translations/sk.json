@@ -499,12 +499,7 @@
       "scheduleDynamicInput": {
         "none": "žiadne",
         "variable": "Premenná",
-        "enterVariable": "Zadajte názov premennej na vyhodnotenie.",
-        "enterData": "Zadajte údaje na odoslanie.",
-        "inputType": "Typ vstupu",
-        "dataType": "Typ údajov na odoslanie",
-        "selectType": "Vyberte typ",
-        "rawString": "Surový text"
+        "enterVariable": "Zadajte názov premennej na vyhodnotenie."
       },
       "serverWebsocket": {
         "error": {
@@ -3783,10 +3778,7 @@
             "createFirstStep": "Vytvoriť prvý krok",
             "addOutput": "Pridať výstup",
             "addFile": "Pridať súbor",
-            "exitEditor": "Ukončiť editor",
-            "trigger": "Spustiť",
-            "triggerWithCondition": "Spustiť (nepreskočiť podmienku)",
-            "triggerSkipCondition": "Spustiť (preskočiť podmienku)"
+            "exitEditor": "Ukončiť editor"
           },
           "toast": {
             "imported": "Plán bol importovaný.",
@@ -3820,18 +3812,6 @@
               "equal": "Rovná sa",
               "greaterThanOrEqual": "Väčšie alebo rovné",
               "greaterThan": "Väčšie ako"
-            },
-            "schedulePreConditionType": {
-              "none": "žiadne",
-              "and": "A (všetko musí byť pravdivé)",
-              "or": "ALEBO (aspoň jedno musí byť pravdivé)",
-              "not": "NIE (nesmie byť pravdivé)",
-              "serverState": "Stav servera",
-              "uptime": "Doba prevádzky",
-              "cpuUsage": "Využitie CPU",
-              "memoryUsage": "Využitie pamäte",
-              "diskUsage": "Využitie disku",
-              "fileExists": "Súbor existuje"
             }
           },
           "modal": {
@@ -3859,9 +3839,6 @@
           "view": {
             "badge": {
               "running": "Spustený"
-            },
-            "tooltip": {
-              "cannotTrigger": "Nedá sa spustiť zakázaný plán"
             },
             "tabs": {
               "actions": "Akcie",

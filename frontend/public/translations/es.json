@@ -331,12 +331,7 @@
       "scheduleDynamicInput": {
         "none": "Ninguno",
         "variable": "Variable",
-        "enterVariable": "Introduce el nombre de la variable a evaluar.",
-        "enterData": "Introduce los datos a enviar.",
-        "inputType": "Tipo de entrada",
-        "dataType": "Tipo de dato a enviar",
-        "selectType": "Seleccionar tipo",
-        "rawString": "Cadena sin procesar"
+        "enterVariable": "Introduce el nombre de la variable a evaluar."
       },
       "serverWebsocket": {
         "error": {
@@ -1426,10 +1421,7 @@
             "createFirstStep": "Crear primer paso",
             "addOutput": "Añadir salida",
             "addFile": "Añadir archivo",
-            "exitEditor": "Salir del editor",
-            "trigger": "Ejecutar",
-            "triggerWithCondition": "Ejecutar (no omitir condición)",
-            "triggerSkipCondition": "Ejecutar (omitir condición)"
+            "exitEditor": "Salir del editor"
           },
           "toast": {
             "imported": "Tarea programada importada.",
@@ -1463,18 +1455,6 @@
               "equal": "Igual a",
               "greaterThanOrEqual": "Mayor o igual que",
               "greaterThan": "Mayor que"
-            },
-            "schedulePreConditionType": {
-              "none": "Ninguno",
-              "and": "Y (todas deben ser verdaderas)",
-              "or": "O (cualquiera puede ser verdadera)",
-              "not": "NO (no debe ser verdadera)",
-              "serverState": "Estado del servidor",
-              "uptime": "Tiempo activo",
-              "cpuUsage": "Uso de CPU",
-              "memoryUsage": "Uso de memoria",
-              "diskUsage": "Uso de disco",
-              "fileExists": "El archivo existe"
             }
           },
           "modal": {
@@ -1502,9 +1482,6 @@
           "view": {
             "badge": {
               "running": "En ejecución"
-            },
-            "tooltip": {
-              "cannotTrigger": "No se puede ejecutar una tarea programada desactivada"
             },
             "tabs": {
               "actions": "Acciones",
