@@ -12,12 +12,10 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 import OAuthLinkRow from './OAuthLinkRow.tsx';
 
 export default function DashboardOAuthLinks() {
   const { t } = useTranslations();
-  const { oauthLinks, setOAuthLinks } = useUserStore();
   const [oAuthProviders, setOAuthProviders] = useState<z.infer<typeof oAuthProviderSchema>[]>([]);
 
   useEffect(() => {
@@ -26,10 +24,13 @@ export default function DashboardOAuthLinks() {
     });
   }, []);
 
-  const { loading, setPage } = useSearchablePaginatedTable({
+  const {
+    data: oauthLinks,
+    loading,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.oauthLinks.all(),
     fetcher: getOAuthLinks,
-    setStoreData: setOAuthLinks,
   });
 
   return (
@@ -38,7 +39,7 @@ export default function DashboardOAuthLinks() {
       contentRight={
         <ContextMenu
           items={oAuthProviders
-            .filter((p) => p.userManageable && !oauthLinks.data.some((l) => l.oauthProvider.uuid === p.uuid))
+            .filter((p) => p.userManageable && !oauthLinks?.data.some((l) => l.oauthProvider.uuid === p.uuid))
             .map(
               (oauthProvider) =>
                 ({
@@ -58,7 +59,7 @@ export default function DashboardOAuthLinks() {
                 openMenu(rect.left, rect.bottom);
               }}
               disabled={
-                !oAuthProviders.filter((p) => !oauthLinks.data.some((l) => l.oauthProvider.uuid === p.uuid)).length
+                !oAuthProviders.filter((p) => !oauthLinks?.data.some((l) => l.oauthProvider.uuid === p.uuid)).length
               }
               color='blue'
               rightSection={<FontAwesomeIcon icon={faChevronDown} />}
@@ -82,7 +83,7 @@ export default function DashboardOAuthLinks() {
         pagination={oauthLinks}
         onPageSelect={setPage}
       >
-        {oauthLinks.data.map((link) => (
+        {oauthLinks?.data.map((link) => (
           <OAuthLinkRow key={link.uuid} oauthLink={link} />
         ))}
       </Table>

@@ -1,6 +1,3 @@
-import { useState } from 'react';
-import { z } from 'zod';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getUserActivity from '@/api/me/getUserActivity.ts';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
 import Code from '@/elements/Code.tsx';
@@ -9,7 +6,6 @@ import Group from '@/elements/Group.tsx';
 import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { userActivitySchema } from '@/lib/schemas/user/activity.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -18,12 +14,15 @@ export default function DashboardActivity() {
   const { user } = useAuth();
   const { t } = useTranslations();
 
-  const [activities, setActivities] = useState<Pagination<z.infer<typeof userActivitySchema>>>(getEmptyPaginationSet());
-
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: activities,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.activity.all(),
     fetcher: getUserActivity,
-    setStoreData: setActivities,
   });
 
   return (
@@ -46,7 +45,7 @@ export default function DashboardActivity() {
         pagination={activities}
         onPageSelect={setPage}
       >
-        {activities.data.map((activity) => (
+        {activities?.data.map((activity) => (
           <TableRow key={activity.created.toString()}>
             <TableData>
               <div className='size-5 aspect-square relative'>

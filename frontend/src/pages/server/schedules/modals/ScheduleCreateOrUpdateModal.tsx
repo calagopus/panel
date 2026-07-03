@@ -1,6 +1,7 @@
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
@@ -18,6 +19,7 @@ import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
 import { scheduleTriggerDefaultMapping, scheduleTriggerLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleSchema, serverScheduleUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -33,7 +35,8 @@ type Props = ModalProps & {
 export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUpdate, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, addSchedule } = useServerStore();
+  const { server } = useServerStore();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
@@ -57,7 +60,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
       } else {
         const schedule = await createSchedule(server.uuid, values);
         addToast(t('pages.server.schedules.toast.created', {}), 'success');
-        addSchedule(schedule);
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).schedules.all() });
         navigate(`/server/${server.uuidShort}/schedules/${schedule.uuid}`);
       }
     },

@@ -18,18 +18,24 @@ import AllocationRow from './AllocationRow.tsx';
 export default function ServerNetwork() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, allocations, setAllocations, addAllocation } = useServerStore();
+  const { server } = useServerStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: allocations,
+    loading,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).network.all(),
     fetcher: (page, search) => getAllocations(server.uuid, page, search),
-    setStoreData: setAllocations,
   });
 
   const doAdd = () => {
     createAllocation(server.uuid)
-      .then((alloc) => {
-        addAllocation(alloc);
+      .then(() => {
+        refetch();
         addToast(t('pages.server.network.toast.created', {}), 'success');
       })
       .catch((msg) => {
@@ -41,7 +47,7 @@ export default function ServerNetwork() {
     <ServerContentContainer
       title={t('pages.server.network.title', {})}
       subtitle={t('pages.server.network.subtitle', {
-        current: allocations.total,
+        current: allocations?.total ?? 0,
         max: server.featureLimits.allocations,
       })}
       search={search}
@@ -49,11 +55,11 @@ export default function ServerNetwork() {
       contentRight={
         <ServerCan action='allocations.create'>
           <ConditionalTooltip
-            enabled={allocations.total >= server.featureLimits.allocations}
+            enabled={(allocations?.total ?? 0) >= server.featureLimits.allocations}
             label={t('pages.server.network.tooltip.limitReached', { max: server.featureLimits.allocations })}
           >
             <Button
-              disabled={allocations.total >= server.featureLimits.allocations}
+              disabled={(allocations?.total ?? 0) >= server.featureLimits.allocations}
               onClick={doAdd}
               color='blue'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
@@ -78,7 +84,7 @@ export default function ServerNetwork() {
         pagination={allocations}
         onPageSelect={setPage}
       >
-        {allocations.data.map((allocation) => (
+        {allocations?.data.map((allocation) => (
           <AllocationRow key={allocation.uuid} allocation={allocation} />
         ))}
       </Table>

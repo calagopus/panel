@@ -1,4 +1,5 @@
 import { faClone, faFileDownload, faPlay, faPlayCircle, faShareAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { dump } from 'js-yaml';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -12,6 +13,7 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleSchema } from '@/lib/schemas/server/schedules.ts';
 import ScheduleDuplicateModal from '@/pages/server/schedules/modals/ScheduleDuplicateModal.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
@@ -23,7 +25,8 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
-  const { server, removeSchedule } = useServerStore();
+  const { server } = useServerStore();
+  const queryClient = useQueryClient();
   const navigateUrl = `/server/${server.uuidShort}/schedules/${schedule.uuid}`;
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
@@ -33,7 +36,7 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
       .then(() => {
         addToast(t('pages.server.schedules.toast.deleted', {}), 'success');
         setOpenModal(null);
-        removeSchedule(schedule);
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).schedules.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

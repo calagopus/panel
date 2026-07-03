@@ -4,17 +4,19 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 import SessionRow from './SessionRow.tsx';
 
 export default function DashboardSessions() {
   const { t } = useTranslations();
-  const { sessions, setSessions } = useUserStore();
-
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: sessions,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.sessions.all(),
     fetcher: getSessions,
-    setStoreData: setSessions,
   });
 
   return (
@@ -36,7 +38,7 @@ export default function DashboardSessions() {
         pagination={sessions}
         onPageSelect={setPage}
       >
-        {sessions.data.map((session) => (
+        {sessions?.data.map((session) => (
           <SessionRow key={session.uuid} session={session} />
         ))}
       </Table>

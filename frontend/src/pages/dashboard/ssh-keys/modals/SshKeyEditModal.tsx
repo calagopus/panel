@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import updateSshKey from '@/api/me/ssh-keys/updateSshKey.ts';
@@ -7,11 +8,11 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { userSshKeySchema } from '@/lib/schemas/user/sshKeys.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 
 const schema = z.object({
   name: z.string().min(3).max(31),
@@ -24,7 +25,7 @@ type Props = ModalProps & {
 export default function SshKeyEditModal({ sshKey, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateSshKey: updateStateSshKey } = useUserStore();
+  const queryClient = useQueryClient();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
     initialValues: {
@@ -34,7 +35,7 @@ export default function SshKeyEditModal({ sshKey, ...props }: Props) {
     onClose: props.onClose,
     onSubmit: async (values) => {
       await updateSshKey(sshKey.uuid, values);
-      updateStateSshKey(sshKey.uuid, values);
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.sshKeys.all() });
       addToast(t('pages.account.sshKeys.modal.editSshKey.toast.updated', {}), 'success');
     },
   });

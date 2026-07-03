@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useRef } from 'react';
 import { z } from 'zod';
@@ -11,6 +12,7 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserCreateSchema } from '@/lib/schemas/server/subusers.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -21,8 +23,9 @@ import { useServerStore } from '@/stores/server.ts';
 export default function SubuserCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, addSubuser } = useServerStore();
+  const { server } = useServerStore();
   const { availablePermissions } = useGlobalStore();
+  const queryClient = useQueryClient();
 
   const captchaRef = useRef<CaptchaRef>(null);
 
@@ -37,13 +40,13 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
       onClose: props.onClose,
       onSubmit: async (values) => {
         const captcha = (await captchaRef.current?.getToken()) ?? null;
-        const subuser = await createSubuser(server.uuid, {
+        await createSubuser(server.uuid, {
           email: values.email,
           permissions: Array.from(values.permissions),
           ignoredFiles: values.ignoredFiles,
           captcha,
         });
-        addSubuser(subuser);
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).subusers.all() });
         addToast(t('pages.server.subusers.modal.createSubuser.toast.created', {}), 'success');
       },
     },

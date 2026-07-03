@@ -23,16 +23,22 @@ import ScheduleRow from './ScheduleRow.tsx';
 export default function ServerSchedules() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, schedules, setSchedules, addSchedule } = useServerStore();
+  const { server } = useServerStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: schedules,
+    loading,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).schedules.all(),
     fetcher: (page, search) => getSchedules(server.uuid, page, search),
-    setStoreData: setSchedules,
   });
 
   const handleImport = async (file: File) => {
@@ -50,8 +56,8 @@ export default function ServerSchedules() {
     }
 
     importSchedule(server.uuid, data)
-      .then((data) => {
-        addSchedule(data);
+      .then(() => {
+        refetch();
         addToast(t('pages.server.schedules.toast.imported', {}), 'success');
       })
       .catch((msg) => {
@@ -75,31 +81,34 @@ export default function ServerSchedules() {
   return (
     <ServerContentContainer
       title={t('pages.server.schedules.title', {})}
-      subtitle={t('pages.server.schedules.subtitle', { current: schedules.total, max: server.featureLimits.schedules })}
+      subtitle={t('pages.server.schedules.subtitle', {
+        current: schedules?.total ?? 0,
+        max: server.featureLimits.schedules,
+      })}
       search={search}
       setSearch={setSearch}
       contentRight={
         <>
           <ServerCan action='schedules.create'>
             <ConditionalTooltip
-              enabled={schedules.total >= server.featureLimits.schedules}
+              enabled={(schedules?.total ?? 0) >= server.featureLimits.schedules}
               label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
             >
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 color='blue'
-                disabled={schedules.total >= server.featureLimits.schedules}
+                disabled={(schedules?.total ?? 0) >= server.featureLimits.schedules}
               >
                 <FontAwesomeIcon icon={faUpload} className='mr-2' />
                 {t('common.button.import', {})}
               </Button>
             </ConditionalTooltip>
             <ConditionalTooltip
-              enabled={schedules.total >= server.featureLimits.schedules}
+              enabled={(schedules?.total ?? 0) >= server.featureLimits.schedules}
               label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
             >
               <Button
-                disabled={schedules.total >= server.featureLimits.schedules}
+                disabled={(schedules?.total ?? 0) >= server.featureLimits.schedules}
                 onClick={() => setOpenModal('create')}
                 color='blue'
                 leftSection={<FontAwesomeIcon icon={faPlus} />}
@@ -135,7 +144,7 @@ export default function ServerSchedules() {
         pagination={schedules}
         onPageSelect={setPage}
       >
-        {schedules.data.map((schedule) => (
+        {schedules?.data.map((schedule) => (
           <ScheduleRow key={schedule.uuid} schedule={schedule} />
         ))}
       </Table>

@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import deleteDatabase from '@/api/server/databases/deleteDatabase.ts';
 import Button from '@/elements/Button.tsx';
@@ -7,6 +8,7 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -21,7 +23,7 @@ export default function DatabaseDeleteModal({ database, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
-  const { removeDatabase } = useServerStore();
+  const queryClient = useQueryClient();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm({
     initialValues: { name: '' },
@@ -30,7 +32,7 @@ export default function DatabaseDeleteModal({ database, ...props }: Props) {
     onSubmit: async () => {
       await deleteDatabase(server.uuid, database.uuid);
       addToast(t('pages.server.databases.modal.deleteDatabase.toast.deleted', {}), 'success');
-      removeDatabase(database);
+      queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).databases.all() });
     },
   });
 

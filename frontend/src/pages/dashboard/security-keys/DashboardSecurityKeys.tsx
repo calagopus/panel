@@ -10,28 +10,31 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import { useUserStore } from '@/stores/user.ts';
 import SecurityKeyCreateModal from './modals/SecurityKeyCreateModal.tsx';
 import SecurityKeyRow from './SecurityKeyRow.tsx';
 
 export default function DashboardSecurityKeys() {
   const { t } = useTranslations();
-  const { securityKeys, setSecurityKeys } = useUserStore();
   const { settings } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: securityKeys,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.securityKeys.all(),
     fetcher: getSecurityKeys,
-    setStoreData: setSecurityKeys,
   });
 
   return (
     <AccountContentContainer
       title={t('pages.account.securityKeys.title', {})}
       subtitle={t('pages.account.securityKeys.subtitle', {
-        current: securityKeys.total,
+        current: securityKeys?.total ?? 0,
         max: settings.user.maxSecurityKeyCount,
       })}
       search={search}
@@ -39,15 +42,15 @@ export default function DashboardSecurityKeys() {
       contentRight={
         <ConditionalTooltip
           label={
-            securityKeys.total >= settings.user.maxSecurityKeyCount
+            (securityKeys?.total ?? 0) >= settings.user.maxSecurityKeyCount
               ? t('pages.account.securityKeys.tooltip.limitReached', { max: settings.user.maxSecurityKeyCount })
               : t('pages.account.securityKeys.tooltip.secureContextRequired', {})
           }
-          enabled={!window.navigator.credentials || securityKeys.total >= settings.user.maxSecurityKeyCount}
+          enabled={!window.navigator.credentials || (securityKeys?.total ?? 0) >= settings.user.maxSecurityKeyCount}
         >
           <Button
             onClick={() => setOpenModal('create')}
-            disabled={!window.navigator.credentials || securityKeys.total >= settings.user.maxSecurityKeyCount}
+            disabled={!window.navigator.credentials || (securityKeys?.total ?? 0) >= settings.user.maxSecurityKeyCount}
             color='blue'
             leftSection={<FontAwesomeIcon icon={faPlus} />}
           >
@@ -71,7 +74,7 @@ export default function DashboardSecurityKeys() {
         pagination={securityKeys}
         onPageSelect={setPage}
       >
-        {securityKeys.data.map((key) => (
+        {securityKeys?.data.map((key) => (
           <SecurityKeyRow key={key.uuid} securityKey={key} />
         ))}
       </Table>

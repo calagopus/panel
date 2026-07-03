@@ -1,4 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -8,22 +9,22 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { userOAuthLinkSchema } from '@/lib/schemas/user/oAuth.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 
 export default function OAuthLinkRow({ oauthLink }: { oauthLink: z.infer<typeof userOAuthLinkSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeOAuthLink } = useUserStore();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const doDelete = async () => {
     await deleteOAuthLink(oauthLink.uuid)
       .then(() => {
-        removeOAuthLink(oauthLink);
+        queryClient.invalidateQueries({ queryKey: queryKeys.user.oauthLinks.all() });
         addToast(t('pages.account.oauthLinks.modal.deleteOAuthLink.toast.removed', {}), 'success');
       })
       .catch((msg) => {

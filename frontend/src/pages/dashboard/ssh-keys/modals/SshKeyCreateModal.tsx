@@ -1,6 +1,7 @@
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { ChangeEvent, useRef } from 'react';
 import { z } from 'zod';
@@ -11,10 +12,10 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 
 const schema = z.object({
   name: z.string().min(3).max(31),
@@ -24,7 +25,7 @@ const schema = z.object({
 export default function SshKeyCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addSshKey } = useUserStore();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
@@ -35,9 +36,9 @@ export default function SshKeyCreateModal({ ...props }: ModalProps) {
     validate: zod4Resolver(schema),
     onClose: props.onClose,
     onSubmit: async (values) => {
-      const key = await createSshKey(values);
+      await createSshKey(values);
       addToast(t('pages.account.sshKeys.modal.createSshKey.toast.created', {}), 'success');
-      addSshKey(key);
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.sshKeys.all() });
     },
   });
 

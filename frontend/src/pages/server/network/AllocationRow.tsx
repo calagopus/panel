@@ -1,5 +1,6 @@
 import { faStar, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -13,6 +14,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -22,7 +24,8 @@ import { useServerStore } from '@/stores/server.ts';
 export default function AllocationRow({ allocation }: { allocation: z.infer<typeof serverAllocationSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, allocations, removeAllocation, setAllocations, updateServer } = useServerStore();
+  const { server, updateServer } = useServerStore();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
   const [notes, setNotes] = useState(allocation.notes ?? '');
@@ -51,13 +54,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
   const doSetPrimary = () => {
     updateAllocation(server.uuid, allocation.uuid, { primary: true })
       .then(() => {
-        setAllocations({
-          ...allocations,
-          data: allocations.data.map((a) => ({
-            ...a,
-            isPrimary: a.uuid === allocation.uuid,
-          })),
-        });
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
         updateServer({ allocation });
         addToast(t('pages.server.network.toast.setPrimary', {}), 'success');
       })
@@ -69,13 +66,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
   const doUnsetPrimary = () => {
     updateAllocation(server.uuid, allocation.uuid, { primary: false })
       .then(() => {
-        setAllocations({
-          ...allocations,
-          data: allocations.data.map((a) => ({
-            ...a,
-            isPrimary: false,
-          })),
-        });
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
         updateServer({ allocation: null });
         addToast(t('pages.server.network.toast.unsetPrimary', {}), 'success');
       })
@@ -87,7 +78,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
   const doRemove = async () => {
     await deleteAllocation(server.uuid, allocation.uuid)
       .then(() => {
-        removeAllocation(allocation);
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
         addToast(t('pages.server.network.toast.removed', {}), 'success');
         setOpenModal(null);
       })

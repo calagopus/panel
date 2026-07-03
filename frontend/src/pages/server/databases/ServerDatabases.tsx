@@ -16,21 +16,26 @@ import DatabaseCreateModal from './modals/DatabaseCreateModal.tsx';
 
 export default function ServerDatabases() {
   const { t } = useTranslations();
-  const { server, databases, setDatabases } = useServerStore();
+  const { server } = useServerStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: databases,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).databases.all(),
     fetcher: (page, search) => getDatabases(server.uuid, page, search),
-    setStoreData: setDatabases,
   });
 
   return (
     <ServerContentContainer
       title={t('pages.server.databases.title', {})}
       subtitle={t('pages.server.databases.subtitle', {
-        current: databases.total,
+        current: databases?.total ?? 0,
         max: server.featureLimits.databases,
       })}
       search={search}
@@ -38,11 +43,11 @@ export default function ServerDatabases() {
       contentRight={
         <ServerCan action='databases.create'>
           <ConditionalTooltip
-            enabled={databases.total >= server.featureLimits.databases}
+            enabled={(databases?.total ?? 0) >= server.featureLimits.databases}
             label={t('pages.server.databases.tooltip.limitReached', { max: server.featureLimits.databases })}
           >
             <Button
-              disabled={databases.total >= server.featureLimits.databases}
+              disabled={(databases?.total ?? 0) >= server.featureLimits.databases}
               onClick={() => setOpenModal('create')}
               color='blue'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
@@ -70,7 +75,7 @@ export default function ServerDatabases() {
         pagination={databases}
         onPageSelect={setPage}
       >
-        {databases.data.map((database) => (
+        {databases?.data.map((database) => (
           <DatabaseRow database={database} key={database.uuid} />
         ))}
       </Table>

@@ -1,11 +1,7 @@
-import { useState } from 'react';
-import { z } from 'zod';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getMounts from '@/api/server/mounts/getMounts.ts';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { serverMountSchema } from '@/lib/schemas/server/mounts.ts';
 import { MountRow } from '@/pages/server/mounts/MountRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -15,12 +11,9 @@ export default function ServerMounts() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
 
-  const [mounts, setMounts] = useState<Pagination<z.infer<typeof serverMountSchema>>>(getEmptyPaginationSet());
-
-  const { loading } = useSearchablePaginatedTable({
+  const { data: mounts, loading } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).mounts.all(),
     fetcher: () => getMounts(server.uuid),
-    setStoreData: setMounts,
   });
 
   return (
@@ -40,7 +33,7 @@ export default function ServerMounts() {
         loading={loading}
         pagination={mounts}
       >
-        {mounts.data.map((mount) => (
+        {mounts?.data.map((mount) => (
           <MountRow key={mount.uuid} contextMount={mount} />
         ))}
       </Table>

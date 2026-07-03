@@ -1,4 +1,5 @@
 import { faPencil, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -10,25 +11,28 @@ import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { userApiKeySchema } from '@/lib/schemas/user/apiKeys.ts';
 import ApiKeyCreateOrUpdateModal from '@/pages/dashboard/api-keys/modals/ApiKeyCreateOrUpdateModal.tsx';
+import ApiKeyTokenModal from '@/pages/dashboard/api-keys/modals/ApiKeyTokenModal.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 
 export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKeySchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateApiKey, removeApiKey } = useUserStore();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'edit' | 'recreate' | 'delete' | null>(null);
+  const [recreatedToken, setRecreatedToken] = useState<string | null>(null);
 
   const doRecreate = async () => {
     await recreateApiKey(apiKey.uuid)
       .then((newKey) => {
-        updateApiKey(apiKey.uuid, { keyStart: newKey });
+        queryClient.invalidateQueries({ queryKey: queryKeys.user.apiKeys.all() });
         addToast(t('pages.account.apiKeys.modal.recreateApiKey.toast.recreated', {}), 'success');
         setOpenModal(null);
+        setRecreatedToken(newKey);
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -38,7 +42,7 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
   const doDelete = async () => {
     await deleteApiKey(apiKey.uuid)
       .then(() => {
-        removeApiKey(apiKey);
+        queryClient.invalidateQueries({ queryKey: queryKeys.user.apiKeys.all() });
         addToast(t('pages.account.apiKeys.modal.deleteApiKey.toast.removed', {}), 'success');
       })
       .catch((msg) => {
@@ -53,6 +57,7 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
         opened={openModal === 'edit'}
         onClose={() => setOpenModal(null)}
       />
+      <ApiKeyTokenModal recreated token={recreatedToken} onClose={() => setRecreatedToken(null)} />
       <ConfirmationModal
         opened={openModal === 'recreate'}
         onClose={() => setOpenModal(null)}

@@ -1,5 +1,6 @@
 import { faLock, faLockOpen, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -7,6 +8,7 @@ import deleteSubuser from '@/api/server/subusers/deleteSubuser.ts';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserSchema } from '@/lib/schemas/server/subusers.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -17,7 +19,8 @@ import SubuserUpdateModal from './modals/SubuserUpdateModal.tsx';
 export default function SubuserRow({ subuser }: { subuser: z.infer<typeof serverSubuserSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, removeSubuser } = useServerStore();
+  const { server } = useServerStore();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'update' | 'remove' | null>(null);
 
@@ -25,7 +28,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
     await deleteSubuser(server.uuid, subuser.user.uuid)
       .then(() => {
         addToast(t('pages.server.subusers.modal.removeSubuser.toast.removed', {}), 'success');
-        removeSubuser(subuser);
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).subusers.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

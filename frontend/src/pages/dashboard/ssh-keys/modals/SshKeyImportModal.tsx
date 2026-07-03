@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import importSshKeys from '@/api/me/ssh-keys/importSshKeys.ts';
@@ -9,10 +10,10 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { sshKeyProviderLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 
 const schema = z.object({
   provider: z.enum(['github', 'gitlab', 'launchpad']),
@@ -22,7 +23,7 @@ const schema = z.object({
 export default function SshKeyImportModal({ ...props }: ModalProps) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { addSshKey } = useUserStore();
+  const queryClient = useQueryClient();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
     initialValues: {
@@ -37,9 +38,7 @@ export default function SshKeyImportModal({ ...props }: ModalProps) {
         t('pages.account.sshKeys.modal.importSshKeys.toast.created', { sshKeys: tItem('sshKey', keys.length) }),
         'success',
       );
-      for (const key of keys) {
-        addSshKey(key);
-      }
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.sshKeys.all() });
     },
   });
 

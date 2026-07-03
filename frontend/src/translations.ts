@@ -1249,6 +1249,14 @@ const baseTranslations = defineTranslations({
                 removed: 'API key removed.',
               },
             },
+            apiKeyToken: {
+              titleCreated: 'API Key Created',
+              titleRecreated: 'API Key Recreated',
+              descriptionCreated:
+                'Your new API key has been created. Make sure to copy it now, as it will not be shown again.',
+              descriptionRecreated:
+                'Your API key has been recreated. Make sure to copy the new key now, as it will not be shown again.',
+            },
           },
           form: {
             allowedIps: 'Allowed IPs',

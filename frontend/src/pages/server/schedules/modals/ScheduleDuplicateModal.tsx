@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
@@ -8,6 +9,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleSchema } from '@/lib/schemas/server/schedules.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -25,7 +27,8 @@ type Props = ModalProps & {
 export default function ScheduleDuplicateModal({ schedule, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, addSchedule } = useServerStore();
+  const { server } = useServerStore();
+  const queryClient = useQueryClient();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof duplicateScheduleSchema>>({
     initialValues: {
@@ -34,9 +37,9 @@ export default function ScheduleDuplicateModal({ schedule, ...props }: Props) {
     validate: zod4Resolver(duplicateScheduleSchema),
     onClose: props.onClose,
     onSubmit: async (values) => {
-      const duplicated = await duplicateSchedule(server.uuid, schedule.uuid, values.name);
+      await duplicateSchedule(server.uuid, schedule.uuid, values.name);
       addToast(t('pages.server.schedules.toast.duplicated', {}), 'success');
-      addSchedule(duplicated);
+      queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).schedules.all() });
     },
   });
 

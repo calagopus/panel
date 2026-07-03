@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import createCommandSnippet from '@/api/me/command-snippets/createCommandSnippet.ts';
@@ -17,12 +18,11 @@ import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 
 export default function CommandSnippetCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addCommandSnippet } = useUserStore();
+  const queryClient = useQueryClient();
 
   const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
     queryKey: [...queryKeys.user.servers.all(), 'eggs'],
@@ -40,9 +40,9 @@ export default function CommandSnippetCreateModal({ ...props }: ModalProps) {
     validate: zod4Resolver(userCommandSnippetUpdateSchema),
     onClose: props.onClose,
     onSubmit: async (values) => {
-      const snippet = await createCommandSnippet(values);
+      await createCommandSnippet(values);
       addToast(t('pages.account.commandSnippets.modal.createCommandSnippet.toast.created', {}), 'success');
-      addCommandSnippet(snippet);
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.commandSnippets.all() });
     },
   });
 

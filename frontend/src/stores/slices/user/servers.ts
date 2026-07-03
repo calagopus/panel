@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { StateCreator } from 'zustand';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getNodeResources from '@/api/me/servers/nodes/getNodeResources.ts';
-import { serverResourceUsageSchema, serverSchema } from '@/lib/schemas/server/server.ts';
+import { serverResourceUsageSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
 import { UserStore } from '@/stores/user.ts';
 
@@ -10,7 +9,6 @@ const CACHE_TTL_MS = 1000 * 30;
 const POLL_INTERVAL_MS = 30500;
 
 export interface ServerSlice {
-  servers: Pagination<z.infer<typeof serverSchema>>;
   serverGroups: z.infer<typeof userServerGroupSchema>[];
 
   serverResourceUsage: Record<string, z.infer<typeof serverResourceUsageSchema>>;
@@ -21,7 +19,6 @@ export interface ServerSlice {
   _nodeSubscribers: Map<string, number>;
   _nodeIntervals: Map<string, ReturnType<typeof setInterval>>;
 
-  setServers: (servers: Pagination<z.infer<typeof serverSchema>>) => void;
   setServerGroups: (serverGroups: z.infer<typeof userServerGroupSchema>[]) => void;
   addServerGroup: (serverGroup: z.infer<typeof userServerGroupSchema>) => void;
   removeServerGroup: (serverGroup: z.infer<typeof userServerGroupSchema>) => void;
@@ -34,7 +31,6 @@ export interface ServerSlice {
 }
 
 export const createServersSlice: StateCreator<UserStore, [], [], ServerSlice> = (set, get) => ({
-  servers: getEmptyPaginationSet<z.infer<typeof serverSchema>>(),
   serverGroups: [],
 
   serverResourceUsage: {},
@@ -45,7 +41,6 @@ export const createServersSlice: StateCreator<UserStore, [], [], ServerSlice> = 
   _nodeSubscribers: new Map(),
   _nodeIntervals: new Map(),
 
-  setServers: (value) => set({ servers: value }),
   setServerGroups: (value) => set({ serverGroups: value }),
   addServerGroup: (serverGroup) => set((state) => ({ serverGroups: [...state.serverGroups, serverGroup] })),
   removeServerGroup: (serverGroup) =>

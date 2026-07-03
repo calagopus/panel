@@ -18,7 +18,7 @@ import SubuserRow from './SubuserRow.tsx';
 
 export default function ServerSubusers() {
   const { t } = useTranslations();
-  const { server, subusers, setSubusers } = useServerStore();
+  const { server } = useServerStore();
   const { settings, setAvailablePermissions } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
@@ -29,29 +29,37 @@ export default function ServerSubusers() {
     });
   }, []);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: subusers,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).subusers.all(),
     fetcher: (page, search) => getSubusers(server.uuid, page, search),
-    setStoreData: setSubusers,
   });
 
   return (
     <ServerContentContainer
       title={t('pages.server.subusers.title', {})}
-      subtitle={t('pages.server.subusers.subtitle', { current: subusers.total, max: settings.server.maxSubuserCount })}
+      subtitle={t('pages.server.subusers.subtitle', {
+        current: subusers?.total ?? 0,
+        max: settings.server.maxSubuserCount,
+      })}
       search={search}
       setSearch={setSearch}
       contentRight={
         <ServerCan action='subusers.create'>
           <ConditionalTooltip
-            enabled={subusers.total >= settings.server.maxSubuserCount}
+            enabled={(subusers?.total ?? 0) >= settings.server.maxSubuserCount}
             label={t('pages.server.subusers.tooltip.limitReached', { max: settings.server.maxSubuserCount })}
           >
             <Button
               onClick={() => setOpenModal('create')}
               color='blue'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
-              disabled={subusers.total >= settings.server.maxSubuserCount}
+              disabled={(subusers?.total ?? 0) >= settings.server.maxSubuserCount}
             >
               {t('common.button.create', {})}
             </Button>
@@ -75,7 +83,7 @@ export default function ServerSubusers() {
         pagination={subusers}
         onPageSelect={setPage}
       >
-        {subusers.data.map((su) => (
+        {subusers?.data.map((su) => (
           <SubuserRow subuser={su} key={su.user.uuid} />
         ))}
       </Table>

@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -7,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -19,7 +21,8 @@ type Props = ModalProps & {
 export default function DatabaseDetailsModal({ database, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, databases, setDatabases } = useServerStore();
+  const { server } = useServerStore();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
 
   const host = `${database.host}:${database.port}`;
@@ -31,12 +34,9 @@ export default function DatabaseDetailsModal({ database, ...props }: Props) {
     setLoading(true);
 
     rotateDatabasePassword(server.uuid, database.uuid)
-      .then((password) => {
+      .then(() => {
         addToast(t('pages.server.databases.modal.databaseDetails.toast.passwordRotated', {}), 'success');
-        setDatabases({
-          ...databases,
-          data: databases.data.map((db) => (db.uuid === database.uuid ? { ...db, password } : db)),
-        });
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).databases.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

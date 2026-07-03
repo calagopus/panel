@@ -41,15 +41,15 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
   const state = useServerStore((state) => state.state);
   const socketInstance = useServerStore((state) => state.socketInstance);
 
-  const [activities, setActivities] = useState<Pagination<z.infer<typeof serverActivitySchema>>>(
-    getEmptyPaginationSet(),
-  );
   const [selectedCommand, setSelectedCommand] = useState<CommandDetail | null>(null);
 
-  const { loading, setPage } = useSearchablePaginatedTable({
+  const {
+    data: activities = getEmptyPaginationSet<z.infer<typeof serverActivitySchema>>(),
+    loading,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).activity.all(null),
     fetcher: (page) => getServerActivity(server.uuid, null, page, 'server:console.command'),
-    setStoreData: setActivities,
     modifyParams: false,
     canRequest: useServerCan('activity.read'),
     deps: [server.uuid],
