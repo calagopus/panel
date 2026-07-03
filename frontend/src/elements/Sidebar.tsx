@@ -36,11 +36,13 @@ type SidebarProps = {
 };
 
 function Sidebar({ children, header, footer }: SidebarProps) {
+  const { pathname } = useLocation();
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, []);
+  }, [pathname]);
 
   return (
     <>
