@@ -375,6 +375,7 @@ const baseTranslations = defineTranslations({
           impersonating:
             'You are currently impersonating a user. Please be aware that your actions may affect the impersonated user\'s account. To exit impersonation mode, click the "Stop Impersonating" button in the bottom left corner.',
         },
+        connectedTo: 'Connected to {name}',
       },
       sidebar: {
         button: {

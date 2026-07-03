@@ -1,5 +1,13 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios';
+import { getGlobalStore } from '@/stores/global.ts';
 import { transformKeysToCamelCase } from '../lib/transformers.ts';
+
+function captureServerName(headers: RawAxiosResponseHeaders | AxiosResponseHeaders | undefined) {
+  const serverName = headers?.['x-server-name'];
+  if (typeof serverName === 'string') {
+    getGlobalStore().setServerName(serverName);
+  }
+}
 
 export const axiosInstance: AxiosInstance = axios.create({
   headers: {
@@ -16,6 +24,8 @@ axiosInstance.interceptors.request.use((request) => {
 // Auto transform all data to camel case keys
 axiosInstance.interceptors.response.use(
   (response) => {
+    captureServerName(response.headers);
+
     const contentType = response.headers['content-type'];
     if (typeof contentType === 'string' && contentType.includes('application/json') && response.data) {
       response.data = transformKeysToCamelCase(response.data);
@@ -24,6 +34,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
+    if (error.response) {
+      captureServerName(error.response.headers);
+    }
+
     if (error.response && error.response.data) {
       const contentType = error.response.headers['content-type'];
       if (typeof contentType === 'string' && contentType.includes('application/json')) {

@@ -78,13 +78,23 @@ fn handle_panic(err: Box<dyn std::any::Any + Send + 'static>) -> Response<Body> 
         .into_response()
 }
 
-pub async fn handle_postprocessing(req: Request, next: Next) -> Result<Response, StatusCode> {
+pub async fn handle_postprocessing(
+    state: GetState,
+    req: Request,
+    next: Next,
+) -> Result<Response, StatusCode> {
     let if_none_match = req
         .headers()
         .get("If-None-Match")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
     let mut response = next.run(req).await;
+
+    if let Some(server_name) = &state.env.server_name
+        && let Ok(header_value) = server_name.parse()
+    {
+        response.headers_mut().insert("X-Server-Name", header_value);
+    }
 
     if response
         .headers()
@@ -908,7 +918,10 @@ pub async fn handle_startup() -> Result<
             handle_request,
         ))
         .layer(CookieManagerLayer::new())
-        .layer(axum::middleware::from_fn(handle_postprocessing))
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            handle_postprocessing,
+        ))
         .layer(tower_http::catch_panic::CatchPanicLayer::custom(
             handle_panic,
         ))
