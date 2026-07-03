@@ -42,6 +42,7 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
   const {
     data: eggs,
     loading,
+    error,
     refetch,
     search,
     setSearch,
@@ -170,7 +171,14 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
       <EggImportOverlay visible={isDragging} />
 
       <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
-        <Table columns={columns} loading={loading} pagination={eggs} onPageSelect={setPage} allowSelect={false}>
+        <Table
+          columns={columns}
+          loading={loading}
+          pagination={eggs}
+          onPageSelect={setPage}
+          allowSelect={false}
+          error={error}
+        >
           {eggs?.data.map((egg) => (
             <SelectionArea.Selectable key={egg.uuid} item={egg}>
               {(innerRef: Ref<HTMLElement>) => (

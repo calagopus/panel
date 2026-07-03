@@ -25,6 +25,7 @@ function UsersContainer() {
   const {
     data: users,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -62,7 +63,7 @@ function UsersContainer() {
         </>
       }
     >
-      <Table columns={userTableColumns()} loading={loading} pagination={users} onPageSelect={setPage}>
+      <Table columns={userTableColumns()} loading={loading} error={error} pagination={users} onPageSelect={setPage}>
         {users?.data.map((user) => (
           <UserRow key={user.uuid} user={user} />
         ))}

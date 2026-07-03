@@ -51,7 +51,7 @@ export default function ServerActivity() {
     }
   }, [searchParams, setSearchParams]);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).activity.all(filterUserUuid),
     fetcher: (page, search) => getServerActivity(server.uuid, filterUserUuid, page, search),
     setStoreData: setActivities,
@@ -83,6 +83,7 @@ export default function ServerActivity() {
         loading={loading}
         pagination={activities}
         onPageSelect={setPage}
+        error={error}
       >
         {activities.data.map((activity) => (
           <TableRow key={activity.created.toString()}>

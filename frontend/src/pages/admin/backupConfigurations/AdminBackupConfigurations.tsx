@@ -22,6 +22,7 @@ function BackupConfigurationsContainer() {
   const {
     data: backupConfigurations,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -52,6 +53,7 @@ function BackupConfigurationsContainer() {
         loading={loading}
         pagination={backupConfigurations}
         onPageSelect={setPage}
+        error={error}
       >
         {backupConfigurations?.data.map((bc) => (
           <BackupConfigurationRow key={bc.uuid} backupConfiguration={bc} />

@@ -19,6 +19,7 @@ export default function AdminOAuthProviderUsers({
   const {
     data: oauthProviderUsers,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -37,6 +38,7 @@ export default function AdminOAuthProviderUsers({
       <Table
         columns={adminOAuthProviderUsersTableColumns()}
         loading={loading}
+        error={error}
         pagination={oauthProviderUsers}
         onPageSelect={setPage}
       >

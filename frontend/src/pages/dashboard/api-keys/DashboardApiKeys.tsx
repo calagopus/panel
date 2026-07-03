@@ -23,7 +23,7 @@ export default function DashboardApiKeys() {
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.apiKeys.all(),
     fetcher: getApiKeys,
     setStoreData: setApiKeys,
@@ -74,6 +74,7 @@ export default function DashboardApiKeys() {
         loading={loading}
         pagination={apiKeys}
         onPageSelect={setPage}
+        error={error}
       >
         {apiKeys.data.map((key) => (
           <ApiKeyRow key={key.uuid} apiKey={key} />

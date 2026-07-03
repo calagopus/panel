@@ -18,6 +18,7 @@ export default function AdminBackupConfigurationServers({
   const {
     data: backupConfigurationServers,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -38,6 +39,7 @@ export default function AdminBackupConfigurationServers({
         loading={loading}
         pagination={backupConfigurationServers}
         onPageSelect={setPage}
+        error={error}
       >
         {backupConfigurationServers?.data.map((server) => (
           <ServerRow key={server.uuid} server={server} />

@@ -15,6 +15,7 @@ export default function AdminNodeTransfers({ node }: { node: z.infer<typeof admi
   const {
     data: nodeTransferringServers,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -53,6 +54,7 @@ export default function AdminNodeTransfers({ node }: { node: z.infer<typeof admi
             t('common.table.columns.created', {}),
           ]}
           loading={loading}
+          error={error}
           pagination={nodeTransferringServers?.servers}
           onPageSelect={setPage}
           allowSelect={false}

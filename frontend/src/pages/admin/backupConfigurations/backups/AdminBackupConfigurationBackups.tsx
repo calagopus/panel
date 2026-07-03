@@ -17,6 +17,7 @@ export default function AdminBackupConfigurationBackups({
   const {
     data: backupConfigurationBackups,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -44,6 +45,7 @@ export default function AdminBackupConfigurationBackups({
           '',
         ]}
         loading={loading}
+        error={error}
         pagination={backupConfigurationBackups}
         onPageSelect={setPage}
       >

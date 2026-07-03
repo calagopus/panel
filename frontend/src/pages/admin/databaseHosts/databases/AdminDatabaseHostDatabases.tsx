@@ -18,6 +18,7 @@ export default function AdminDatabaseHostDatabases({
   const {
     data: databaseHostDatabases,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -36,6 +37,7 @@ export default function AdminDatabaseHostDatabases({
       <Table
         columns={databaseHostDatabaseTableColumns()}
         loading={loading}
+        error={error}
         pagination={databaseHostDatabases}
         onPageSelect={setPage}
       >

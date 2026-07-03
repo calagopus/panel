@@ -60,6 +60,7 @@ export default function EggRepositoryEggs({
   const {
     data: eggRepositoryEggs,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -107,6 +108,7 @@ export default function EggRepositoryEggs({
         <Table
           columns={eggRepositoryEggTableColumns()}
           loading={loading}
+          error={error}
           pagination={eggRepositoryEggs}
           onPageSelect={setPage}
           allowSelect={false}

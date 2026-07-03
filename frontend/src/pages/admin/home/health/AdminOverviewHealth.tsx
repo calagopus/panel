@@ -42,6 +42,7 @@ export default function AdminOverviewHealth() {
   const {
     data: nodes,
     loading,
+    error,
     setPage,
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.health.nodes(),
@@ -238,6 +239,7 @@ export default function AdminOverviewHealth() {
                   ...nodeTableColumns().slice(2),
                 ]}
                 loading={loading}
+                error={error}
                 pagination={nodes.desyncNodes}
                 onPageSelect={setPage}
               >

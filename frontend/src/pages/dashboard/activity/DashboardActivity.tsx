@@ -20,7 +20,7 @@ export default function DashboardActivity() {
 
   const [activities, setActivities] = useState<Pagination<z.infer<typeof userActivitySchema>>>(getEmptyPaginationSet());
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.activity.all(),
     fetcher: getUserActivity,
     setStoreData: setActivities,
@@ -45,6 +45,7 @@ export default function DashboardActivity() {
         loading={loading}
         pagination={activities}
         onPageSelect={setPage}
+        error={error}
       >
         {activities.data.map((activity) => (
           <TableRow key={activity.created.toString()}>

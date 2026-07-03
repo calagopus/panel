@@ -17,6 +17,7 @@ export default function AdminUserActivity({ user }: { user: z.infer<typeof fullU
   const {
     data: userActivity,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -41,6 +42,7 @@ export default function AdminUserActivity({ user }: { user: z.infer<typeof fullU
           '',
         ]}
         loading={loading}
+        error={error}
         pagination={userActivity}
         onPageSelect={setPage}
       >

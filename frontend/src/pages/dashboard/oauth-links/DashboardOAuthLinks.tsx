@@ -26,7 +26,7 @@ export default function DashboardOAuthLinks() {
     });
   }, []);
 
-  const { loading, setPage } = useSearchablePaginatedTable({
+  const { loading, error, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.oauthLinks.all(),
     fetcher: getOAuthLinks,
     setStoreData: setOAuthLinks,
@@ -81,6 +81,7 @@ export default function DashboardOAuthLinks() {
         loading={loading}
         pagination={oauthLinks}
         onPageSelect={setPage}
+        error={error}
       >
         {oauthLinks.data.map((link) => (
           <OAuthLinkRow key={link.uuid} oauthLink={link} />

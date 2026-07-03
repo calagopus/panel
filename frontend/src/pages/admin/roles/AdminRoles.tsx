@@ -22,6 +22,7 @@ function RolesContainer() {
   const {
     data: roles,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -47,7 +48,7 @@ function RolesContainer() {
         </AdminCan>
       }
     >
-      <Table columns={roleTableColumns()} loading={loading} pagination={roles} onPageSelect={setPage}>
+      <Table columns={roleTableColumns()} loading={loading} pagination={roles} onPageSelect={setPage} error={error}>
         {roles?.data.map((role) => (
           <RoleRow key={role.uuid} role={role} />
         ))}

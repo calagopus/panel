@@ -25,6 +25,7 @@ function ServersContainer() {
   const {
     data: servers,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -63,7 +64,7 @@ function ServersContainer() {
       }
       registry={window.extensionContext.extensionRegistry.pages.admin.servers.container}
     >
-      <Table columns={serverTableColumns()} loading={loading} pagination={servers} onPageSelect={setPage}>
+      <Table columns={serverTableColumns()} loading={loading} pagination={servers} onPageSelect={setPage} error={error}>
         {servers?.data.map((server) => (
           <ServerRow key={server.uuid} server={server} />
         ))}

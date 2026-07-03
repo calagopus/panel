@@ -21,7 +21,7 @@ export default function DashboardCommandSnippets() {
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.commandSnippets.all(),
     fetcher: getCommandSnippets,
     setStoreData: setCommandSnippets,
@@ -65,6 +65,7 @@ export default function DashboardCommandSnippets() {
         loading={loading}
         pagination={commandSnippets}
         onPageSelect={setPage}
+        error={error}
       >
         {commandSnippets.data.map((snippet) => (
           <CommandSnippetRow key={snippet.uuid} commandSnippet={snippet} />

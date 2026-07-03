@@ -26,6 +26,7 @@ export default function AdminOAuthProviderMappings({
   const {
     data: mappings,
     loading,
+    error,
     setPage,
     refetch,
   } = useSearchablePaginatedTable({
@@ -53,6 +54,7 @@ export default function AdminOAuthProviderMappings({
       <Table
         columns={adminOAuthProviderMappingsTableColumns()}
         loading={loading}
+        error={error}
         pagination={mappings}
         onPageSelect={setPage}
       >

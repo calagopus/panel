@@ -47,6 +47,7 @@ export default function AdminOverviewUpdates() {
   const {
     data: nodes,
     loading,
+    error,
     setPage,
     refetch,
   } = useSearchablePaginatedTable({
@@ -293,6 +294,7 @@ export default function AdminOverviewUpdates() {
               <Table
                 columns={nodeTableColumns()}
                 loading={loading}
+                error={error}
                 pagination={nodes.outdatedNodes}
                 onPageSelect={setPage}
               >

@@ -22,6 +22,7 @@ function NestsContainer() {
   const {
     data: nests,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -47,7 +48,7 @@ function NestsContainer() {
         </AdminCan>
       }
     >
-      <Table columns={nestTableColumns()} loading={loading} pagination={nests} onPageSelect={setPage}>
+      <Table columns={nestTableColumns()} loading={loading} error={error} pagination={nests} onPageSelect={setPage}>
         {nests?.data.map((nest) => (
           <NestRow key={nest.uuid} nest={nest} />
         ))}

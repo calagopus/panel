@@ -43,6 +43,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
   const {
     data: nodeServers,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -302,6 +303,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
           <Table
             columns={columns}
             loading={loading}
+            error={error}
             pagination={nodeServers}
             onPageSelect={setPage}
             allowSelect={false}

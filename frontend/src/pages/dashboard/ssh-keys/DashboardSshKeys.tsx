@@ -23,7 +23,7 @@ export default function DashboardSshKeys() {
 
   const [openModal, setOpenModal] = useState<'create' | 'import' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.sshKeys.all(),
     fetcher: getSshKeys,
     setStoreData: setSshKeys,
@@ -80,6 +80,7 @@ export default function DashboardSshKeys() {
         loading={loading}
         pagination={sshKeys}
         onPageSelect={setPage}
+        error={error}
       >
         {sshKeys.data.map((key) => (
           <SshKeyRow key={key.uuid} sshKey={key} />

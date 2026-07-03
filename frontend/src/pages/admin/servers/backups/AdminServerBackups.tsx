@@ -17,6 +17,7 @@ export default function AdminServerBackups({ server }: { server: z.infer<typeof 
   const {
     data: serverBackups,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -51,6 +52,7 @@ export default function AdminServerBackups({ server }: { server: z.infer<typeof 
           '',
         ]}
         loading={loading}
+        error={error}
         pagination={serverBackups}
         onPageSelect={setPage}
       >

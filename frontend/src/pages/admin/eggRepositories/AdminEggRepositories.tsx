@@ -22,6 +22,7 @@ function EggRepositoriesContainer() {
   const {
     data: eggRepositories,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -50,6 +51,7 @@ function EggRepositoriesContainer() {
       <Table
         columns={eggRepositoryTableColumns()}
         loading={loading}
+        error={error}
         pagination={eggRepositories}
         onPageSelect={setPage}
       >

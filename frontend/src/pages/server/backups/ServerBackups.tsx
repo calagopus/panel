@@ -20,7 +20,7 @@ export default function ServerBackups() {
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).backups.all(),
     fetcher: (page, search) => getBackups(server.uuid, page, search),
     setStoreData: setBackups,
@@ -69,6 +69,7 @@ export default function ServerBackups() {
         loading={loading}
         pagination={backups}
         onPageSelect={setPage}
+        error={error}
       >
         {backups.data.map((backup) => (
           <BackupRow backup={backup} key={backup.uuid} />

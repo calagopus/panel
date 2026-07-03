@@ -29,7 +29,7 @@ export default function ServerSchedules() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).schedules.all(),
     fetcher: (page, search) => getSchedules(server.uuid, page, search),
     setStoreData: setSchedules,
@@ -132,6 +132,7 @@ export default function ServerSchedules() {
           '',
         ]}
         loading={loading}
+        error={error}
         pagination={schedules}
         onPageSelect={setPage}
       >

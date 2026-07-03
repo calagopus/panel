@@ -11,7 +11,7 @@ export default function DashboardSessions() {
   const { t } = useTranslations();
   const { sessions, setSessions } = useUserStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.sessions.all(),
     fetcher: getSessions,
     setStoreData: setSessions,
@@ -35,6 +35,7 @@ export default function DashboardSessions() {
         loading={loading}
         pagination={sessions}
         onPageSelect={setPage}
+        error={error}
       >
         {sessions.data.map((session) => (
           <SessionRow key={session.uuid} session={session} />

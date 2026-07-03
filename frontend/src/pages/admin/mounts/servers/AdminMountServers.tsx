@@ -14,6 +14,7 @@ export default function AdminMountServers({ mount }: { mount: z.infer<typeof adm
   const {
     data: mountServers,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -29,7 +30,13 @@ export default function AdminMountServers({ mount }: { mount: z.infer<typeof adm
       search={search}
       setSearch={setSearch}
     >
-      <Table columns={serverTableColumns()} loading={loading} pagination={mountServers} onPageSelect={setPage}>
+      <Table
+        columns={serverTableColumns()}
+        loading={loading}
+        pagination={mountServers}
+        onPageSelect={setPage}
+        error={error}
+      >
         {mountServers?.data.map((serverMount) => (
           <ServerRow key={serverMount.server.uuid} server={serverMount.server} />
         ))}

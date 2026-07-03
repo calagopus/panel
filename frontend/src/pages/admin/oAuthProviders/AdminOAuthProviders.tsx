@@ -35,6 +35,7 @@ function OAuthProvidersContainer() {
   const {
     data: oauthProviders,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -116,7 +117,13 @@ function OAuthProvidersContainer() {
     >
       <OAuthProviderImportOverlay visible={isDragging} />
 
-      <Table columns={oauthProviderTableColumns()} loading={loading} pagination={oauthProviders} onPageSelect={setPage}>
+      <Table
+        columns={oauthProviderTableColumns()}
+        loading={loading}
+        pagination={oauthProviders}
+        onPageSelect={setPage}
+        error={error}
+      >
         {oauthProviders?.data.map((oauthProvider) => (
           <OAuthProviderRow key={oauthProvider.uuid} oauthProvider={oauthProvider} />
         ))}

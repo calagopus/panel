@@ -17,7 +17,7 @@ export default function ServerMounts() {
 
   const [mounts, setMounts] = useState<Pagination<z.infer<typeof serverMountSchema>>>(getEmptyPaginationSet());
 
-  const { loading } = useSearchablePaginatedTable({
+  const { loading, error } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).mounts.all(),
     fetcher: () => getMounts(server.uuid),
     setStoreData: setMounts,
@@ -39,6 +39,7 @@ export default function ServerMounts() {
         ]}
         loading={loading}
         pagination={mounts}
+        error={error}
       >
         {mounts.data.map((mount) => (
           <MountRow key={mount.uuid} contextMount={mount} />

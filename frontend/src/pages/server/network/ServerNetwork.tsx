@@ -20,7 +20,7 @@ export default function ServerNetwork() {
   const { addToast } = useToast();
   const { server, allocations, setAllocations, addAllocation } = useServerStore();
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).network.all(),
     fetcher: (page, search) => getAllocations(server.uuid, page, search),
     setStoreData: setAllocations,
@@ -77,6 +77,7 @@ export default function ServerNetwork() {
         loading={loading}
         pagination={allocations}
         onPageSelect={setPage}
+        error={error}
       >
         {allocations.data.map((allocation) => (
           <AllocationRow key={allocation.uuid} allocation={allocation} />

@@ -80,6 +80,7 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
   const {
     data: mountNodes,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -108,7 +109,13 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
         onClose={() => setOpenModal(null)}
       />
 
-      <Table columns={[...nodeTableColumns(), '']} loading={loading} pagination={mountNodes} onPageSelect={setPage}>
+      <Table
+        columns={[...nodeTableColumns(), '']}
+        loading={loading}
+        pagination={mountNodes}
+        onPageSelect={setPage}
+        error={error}
+      >
         {mountNodes?.data.map((nodeMount) => (
           <MountNodeRow key={nodeMount.node.uuid} node={nodeMount.node} mount={mount} refetch={refetch} />
         ))}

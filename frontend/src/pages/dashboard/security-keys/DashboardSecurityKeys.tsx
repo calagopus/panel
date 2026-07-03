@@ -21,7 +21,7 @@ export default function DashboardSecurityKeys() {
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.securityKeys.all(),
     fetcher: getSecurityKeys,
     setStoreData: setSecurityKeys,
@@ -70,6 +70,7 @@ export default function DashboardSecurityKeys() {
         loading={loading}
         pagination={securityKeys}
         onPageSelect={setPage}
+        error={error}
       >
         {securityKeys.data.map((key) => (
           <SecurityKeyRow key={key.uuid} securityKey={key} />

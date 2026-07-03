@@ -201,7 +201,7 @@ export default function Table({
         background: 'var(--mantine-color-default)',
       }}
     >
-      {pagination && onPageSelect && pagination.total > pagination.perPage && (
+      {!error && pagination && onPageSelect && pagination.total > pagination.perPage && (
         <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} withShortcuts={false} />
       )}
 
@@ -247,7 +247,7 @@ export default function Table({
         </MantineTable.Tbody>
       </MantineTable>
 
-      {pagination && onPageSelect && <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} />}
+      {!error && pagination && onPageSelect && <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} />}
     </MantineTable.ScrollContainer>
   );
 }

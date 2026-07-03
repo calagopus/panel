@@ -17,6 +17,7 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
   const {
     data: nodeBackups,
     loading,
+    error,
     search,
     setSearch,
     setPage,
@@ -51,6 +52,7 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
           '',
         ]}
         loading={loading}
+        error={error}
         pagination={nodeBackups}
         onPageSelect={setPage}
       >

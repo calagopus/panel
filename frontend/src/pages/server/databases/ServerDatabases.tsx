@@ -20,7 +20,7 @@ export default function ServerDatabases() {
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).databases.all(),
     fetcher: (page, search) => getDatabases(server.uuid, page, search),
     setStoreData: setDatabases,
@@ -69,6 +69,7 @@ export default function ServerDatabases() {
         loading={loading}
         pagination={databases}
         onPageSelect={setPage}
+        error={error}
       >
         {databases.data.map((database) => (
           <DatabaseRow database={database} key={database.uuid} />

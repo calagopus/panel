@@ -29,7 +29,7 @@ export default function ServerSubusers() {
     });
   }, []);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).subusers.all(),
     fetcher: (page, search) => getSubusers(server.uuid, page, search),
     setStoreData: setSubusers,
@@ -74,6 +74,7 @@ export default function ServerSubusers() {
         loading={loading}
         pagination={subusers}
         onPageSelect={setPage}
+        error={error}
       >
         {subusers.data.map((su) => (
           <SubuserRow subuser={su} key={su.user.uuid} />
