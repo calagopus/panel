@@ -2,7 +2,7 @@ import { faArchive, faChartBar, faCog, faDesktop, faEarthAmerica, faServer } fro
 import { useParams } from 'react-router';
 import getBackupConfiguration from '@/api/admin/backup-configurations/getBackupConfiguration.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import Spinner from '@/elements/Spinner.tsx';
+import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import AdminBackupConfigurationLocations from '@/pages/admin/backupConfigurations/locations/AdminBackupConfigurationLocations.tsx';
 import AdminBackupConfigurationNodes from '@/pages/admin/backupConfigurations/nodes/AdminBackupConfigurationNodes.tsx';
@@ -17,60 +17,62 @@ export default function BackupConfigurationView() {
   const { t } = useTranslations();
   const params = useParams<'id'>();
 
-  const { data: backupConfiguration, loading: isLoading } = useResource({
+  const resource = useResource({
     queryKey: ['admin', 'backupConfigurations', { uuid: params.id }],
     queryFn: () => getBackupConfiguration(params.id!),
   });
 
-  return isLoading || !backupConfiguration ? (
-    <Spinner.Centered />
-  ) : (
-    <AdminContentContainer title={backupConfiguration.name}>
-      <SubNavigation
-        baseUrl={`/admin/backup-configurations/${params.id}`}
-        items={[
-          {
-            name: t('common.tabs.general', {}),
-            icon: faCog,
-            path: `/`,
-            element: <BackupConfigurationCreateOrUpdate contextBackupConfiguration={backupConfiguration} />,
-          },
-          {
-            name: t('pages.admin.backupConfigurations.tabs.stats.title', {}),
-            icon: faChartBar,
-            path: `/stats`,
-            element: <AdminBackupConfigurationStats backupConfiguration={backupConfiguration} />,
-          },
-          {
-            name: t('pages.admin.backupConfigurations.tabs.backups.title', {}),
-            icon: faArchive,
-            path: `/backups`,
-            permission: 'backup-configurations.backups',
-            element: <AdminBackupConfigurationBackups backupConfiguration={backupConfiguration} />,
-          },
-          {
-            name: t('pages.admin.backupConfigurations.tabs.locations.title', {}),
-            icon: faEarthAmerica,
-            path: `/locations`,
-            permission: 'locations.read',
-            element: <AdminBackupConfigurationLocations backupConfiguration={backupConfiguration} />,
-          },
-          {
-            name: t('pages.admin.backupConfigurations.tabs.nodes.title', {}),
-            icon: faServer,
-            path: `/nodes`,
-            permission: 'nodes.read',
-            element: <AdminBackupConfigurationNodes backupConfiguration={backupConfiguration} />,
-          },
-          {
-            name: t('pages.admin.backupConfigurations.tabs.servers.title', {}),
-            icon: faDesktop,
-            path: `/servers`,
-            permission: 'servers.read',
-            element: <AdminBackupConfigurationServers backupConfiguration={backupConfiguration} />,
-          },
-        ]}
-      />
-    </AdminContentContainer>
+  return (
+    <ResourceView resource={resource}>
+      {(backupConfiguration) => (
+        <AdminContentContainer title={backupConfiguration.name}>
+          <SubNavigation
+            baseUrl={`/admin/backup-configurations/${params.id}`}
+            items={[
+              {
+                name: t('common.tabs.general', {}),
+                icon: faCog,
+                path: `/`,
+                element: <BackupConfigurationCreateOrUpdate contextBackupConfiguration={backupConfiguration} />,
+              },
+              {
+                name: t('pages.admin.backupConfigurations.tabs.stats.title', {}),
+                icon: faChartBar,
+                path: `/stats`,
+                element: <AdminBackupConfigurationStats backupConfiguration={backupConfiguration} />,
+              },
+              {
+                name: t('pages.admin.backupConfigurations.tabs.backups.title', {}),
+                icon: faArchive,
+                path: `/backups`,
+                permission: 'backup-configurations.backups',
+                element: <AdminBackupConfigurationBackups backupConfiguration={backupConfiguration} />,
+              },
+              {
+                name: t('pages.admin.backupConfigurations.tabs.locations.title', {}),
+                icon: faEarthAmerica,
+                path: `/locations`,
+                permission: 'locations.read',
+                element: <AdminBackupConfigurationLocations backupConfiguration={backupConfiguration} />,
+              },
+              {
+                name: t('pages.admin.backupConfigurations.tabs.nodes.title', {}),
+                icon: faServer,
+                path: `/nodes`,
+                permission: 'nodes.read',
+                element: <AdminBackupConfigurationNodes backupConfiguration={backupConfiguration} />,
+              },
+              {
+                name: t('pages.admin.backupConfigurations.tabs.servers.title', {}),
+                icon: faDesktop,
+                path: `/servers`,
+                permission: 'servers.read',
+                element: <AdminBackupConfigurationServers backupConfiguration={backupConfiguration} />,
+              },
+            ]}
+          />
+        </AdminContentContainer>
+      )}
+    </ResourceView>
   );
 }

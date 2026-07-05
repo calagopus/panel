@@ -2,7 +2,7 @@ import { faCog, faEgg } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router';
 import getNest from '@/api/admin/nests/getNest.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import Spinner from '@/elements/Spinner.tsx';
+import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -13,33 +13,35 @@ export default function NestView() {
   const params = useParams<'nestId'>();
   const { t } = useTranslations();
 
-  const { data: nest, loading: isLoading } = useResource({
+  const resource = useResource({
     queryKey: ['admin', 'nests', { uuid: params.nestId }],
     queryFn: () => getNest(params.nestId!),
   });
 
-  return isLoading || !nest ? (
-    <Spinner.Centered />
-  ) : (
-    <AdminContentContainer title={nest.name}>
-      <SubNavigation
-        baseUrl={`/admin/nests/${params.nestId}`}
-        items={[
-          {
-            name: t('common.tabs.general', {}),
-            icon: faCog,
-            path: '/',
-            element: <NestCreateOrUpdate contextNest={nest} />,
-          },
-          {
-            name: t('pages.admin.nests.tabs.eggs.title', {}),
-            icon: faEgg,
-            path: '/eggs/*',
-            element: <AdminEggs contextNest={nest} />,
-            permission: 'eggs.read',
-          },
-        ]}
-      />
-    </AdminContentContainer>
+  return (
+    <ResourceView resource={resource}>
+      {(nest) => (
+        <AdminContentContainer title={nest.name}>
+          <SubNavigation
+            baseUrl={`/admin/nests/${params.nestId}`}
+            items={[
+              {
+                name: t('common.tabs.general', {}),
+                icon: faCog,
+                path: '/',
+                element: <NestCreateOrUpdate contextNest={nest} />,
+              },
+              {
+                name: t('pages.admin.nests.tabs.eggs.title', {}),
+                icon: faEgg,
+                path: '/eggs/*',
+                element: <AdminEggs contextNest={nest} />,
+                permission: 'eggs.read',
+              },
+            ]}
+          />
+        </AdminContentContainer>
+      )}
+    </ResourceView>
   );
 }
