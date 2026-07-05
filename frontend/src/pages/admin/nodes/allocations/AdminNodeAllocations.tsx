@@ -1,6 +1,6 @@
 import { faCheckDouble, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MouseEvent as ReactMouseEvent, Ref, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Ref, useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import getNodeAllocations from '@/api/admin/nodes/allocations/getNodeAllocations.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
@@ -17,6 +17,7 @@ import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/
 import { nodeAllocationTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AllocationActionBar from './AllocationActionBar.tsx';
 import NodeAllocationsCreateModal from './modals/NodeAllocationsCreateModal.tsx';
@@ -52,7 +53,6 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
   const [openModal, setOpenModal] = useState<'create' | null>(null);
   const [ipFilter, setIpFilter] = useState('');
   const [portFilter, setPortFilter] = useState('');
-  const selectedNodeAllocationsPreviousRef = useRef(selectedNodeAllocations.values());
 
   const buildSearch = useCallback((generalSearch: string, ip: string, port: string) => {
     const parts: string[] = [];
@@ -99,19 +99,11 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
     refetch();
   }, [ipFilter, portFilter]);
 
-  const onSelectedStart = useCallback(
-    (event: ReactMouseEvent | MouseEvent) => {
-      selectedNodeAllocationsPreviousRef.current = event.shiftKey ? selectedNodeAllocations.values() : [];
-    },
-    [selectedNodeAllocations],
-  );
-
-  const onSelected = useCallback(
-    (selected: z.infer<typeof adminNodeAllocationSchema>[]) => {
-      setSelectedNodeAllocations([...selectedNodeAllocationsPreviousRef.current, ...selected]);
-    },
-    [setSelectedNodeAllocations],
-  );
+  const { onSelectedStart, onSelected } = useSelectionArea({
+    identify: (allocation) => allocation.uuid,
+    getSelected: () => selectedNodeAllocations.values(),
+    setSelected: setSelectedNodeAllocations,
+  });
 
   useEffect(() => {
     setSelectedNodeAllocations([]);

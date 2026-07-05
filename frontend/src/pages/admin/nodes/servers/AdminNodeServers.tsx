@@ -1,4 +1,4 @@
-import { Ref, useCallback, useEffect, useRef, useState } from 'react';
+import { Ref, useEffect, useState } from 'react';
 import { z } from 'zod';
 import getNodeServers from '@/api/admin/nodes/servers/getNodeServers.ts';
 import sendNodeServersPowerAction from '@/api/admin/nodes/servers/sendNodeServersPowerAction.ts';
@@ -19,6 +19,7 @@ import { serverTableColumns } from '@/lib/tableColumns.ts';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BulkActionBar from './BulkActionBar.tsx';
@@ -30,7 +31,6 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
   const [selectedServers, setSelectedServers] = useState(
     new ObjectSet<z.infer<typeof adminServerSchema>, 'uuid'>('uuid'),
   );
-  const selectedServersPreviousRef = useRef<z.infer<typeof adminServerSchema>[]>([]);
   const [sKeyPressed, setSKeyPressed] = useState(false);
   const [bulkActionLoading, setBulkActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
   const [allActionLoading, setAllActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
@@ -52,16 +52,11 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
     fetcher: (page, search) => getNodeServers(node.uuid, page, search),
   });
 
-  const onSelectedStart = useCallback(
-    (event: React.MouseEvent | MouseEvent) => {
-      selectedServersPreviousRef.current = event.shiftKey ? selectedServers.values() : [];
-    },
-    [selectedServers],
-  );
-
-  const onSelected = useCallback((selected: z.infer<typeof adminServerSchema>[]) => {
-    setSelectedServers(new ObjectSet('uuid', [...selectedServersPreviousRef.current, ...selected]));
-  }, []);
+  const { onSelectedStart, onSelected } = useSelectionArea({
+    identify: (server) => server.uuid,
+    getSelected: () => selectedServers.values(),
+    setSelected: (servers) => setSelectedServers(new ObjectSet('uuid', servers)),
+  });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

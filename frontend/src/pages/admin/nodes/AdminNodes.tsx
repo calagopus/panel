@@ -1,6 +1,6 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Ref, useCallback, useEffect, useRef, useState } from 'react';
+import { Ref, useCallback, useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import { z } from 'zod';
 import getLocations from '@/api/admin/locations/getLocations.ts';
@@ -16,6 +16,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import LocationCreateOrUpdateModal from './LocationCreateOrUpdateModal.tsx';
@@ -30,7 +31,6 @@ function NodesContainer() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [checkingLocations, setCheckingLocations] = useState(true);
   const [selectedNodes, setSelectedNodes] = useState(new ObjectSet<z.infer<typeof adminNodeSchema>, 'uuid'>('uuid'));
-  const selectedNodesPreviousRef = useRef<z.infer<typeof adminNodeSchema>[]>([]);
 
   const {
     data: nodes,
@@ -64,16 +64,11 @@ function NodesContainer() {
     setShowLocationModal(false);
   };
 
-  const onSelectedStart = useCallback(
-    (event: React.MouseEvent | MouseEvent) => {
-      selectedNodesPreviousRef.current = event.shiftKey ? selectedNodes.values() : [];
-    },
-    [selectedNodes],
-  );
-
-  const onSelected = useCallback((selected: z.infer<typeof adminNodeSchema>[]) => {
-    setSelectedNodes(new ObjectSet('uuid', [...selectedNodesPreviousRef.current, ...selected]));
-  }, []);
+  const { onSelectedStart, onSelected } = useSelectionArea({
+    identify: (node) => node.uuid,
+    getSelected: () => selectedNodes.values(),
+    setSelected: (nodes) => setSelectedNodes(new ObjectSet('uuid', nodes)),
+  });
 
   const handleNodeSelectionChange = useCallback((node: z.infer<typeof adminNodeSchema>, selected: boolean) => {
     setSelectedNodes((prev) => {

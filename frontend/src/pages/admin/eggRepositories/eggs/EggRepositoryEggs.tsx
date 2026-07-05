@@ -1,4 +1,4 @@
-import { Ref, useCallback, useEffect, useRef, useState } from 'react';
+import { Ref, useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
 import getEggRepositoryEggs from '@/api/admin/egg-repositories/eggs/getEggRepositoryEggs.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -10,6 +10,7 @@ import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/sch
 import { eggRepositoryEggTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggRepositoryEggDrawer from './drawers/EggRepositoryEggDrawer.tsx';
 import EggActionBar from './EggActionBar.tsx';
@@ -24,23 +25,17 @@ export default function EggRepositoryEggs({
   const [selectedEggs, setSelectedEggs] = useState(
     new ObjectSet<z.infer<typeof adminEggRepositoryEggSchema>, 'uuid'>('uuid'),
   );
-  const selectedEggsPreviousRef = useRef<z.infer<typeof adminEggRepositoryEggSchema>[]>([]);
   const [drawerEgg, setDrawerEgg] = useState<z.infer<typeof adminEggRepositoryEggSchema> | null>(null);
 
   useEffect(() => {
     setSelectedEggs(new ObjectSet('uuid'));
   }, []);
 
-  const onSelectedStart = useCallback(
-    (event: React.MouseEvent | MouseEvent) => {
-      selectedEggsPreviousRef.current = event.shiftKey ? selectedEggs.values() : [];
-    },
-    [selectedEggs],
-  );
-
-  const onSelected = useCallback((selected: z.infer<typeof adminEggRepositoryEggSchema>[]) => {
-    setSelectedEggs(new ObjectSet('uuid', [...selectedEggsPreviousRef.current, ...selected.values()]));
-  }, []);
+  const { onSelectedStart, onSelected } = useSelectionArea({
+    identify: (egg) => egg.uuid,
+    getSelected: () => selectedEggs.values(),
+    setSelected: (eggs) => setSelectedEggs(new ObjectSet('uuid', eggs)),
+  });
 
   const handleEggSelectionChange = useCallback(
     (egg: z.infer<typeof adminEggRepositoryEggSchema>, selected: boolean) => {

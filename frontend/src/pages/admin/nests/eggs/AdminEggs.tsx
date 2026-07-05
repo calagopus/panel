@@ -1,7 +1,7 @@
 import { faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { load } from 'js-yaml';
-import { ChangeEvent, MouseEvent as ReactMouseEvent, Ref, useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, Ref, useEffect, useRef, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import { z } from 'zod';
 import getEggs from '@/api/admin/nests/eggs/getEggs.ts';
@@ -21,6 +21,7 @@ import EggView from '@/pages/admin/nests/eggs/EggView.tsx';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
@@ -34,7 +35,6 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
   const { addToast } = useToast();
   const { t } = useTranslations();
 
-  const selectedEggsPreviousRef = useRef<z.infer<typeof adminEggSchema>[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedEggs, setSelectedEggs] = useState(new ObjectSet<z.infer<typeof adminEggSchema>, 'uuid'>('uuid'));
@@ -89,16 +89,11 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
     handleImport(file);
   };
 
-  const onSelectedStart = useCallback(
-    (event: ReactMouseEvent | MouseEvent) => {
-      selectedEggsPreviousRef.current = event.shiftKey ? selectedEggs.values() : [];
-    },
-    [selectedEggs],
-  );
-
-  const onSelected = useCallback((selected: z.infer<typeof adminEggSchema>[]) => {
-    setSelectedEggs(new ObjectSet('uuid', [...selectedEggsPreviousRef.current, ...selected]));
-  }, []);
+  const { onSelectedStart, onSelected } = useSelectionArea({
+    identify: (egg) => egg.uuid,
+    getSelected: () => selectedEggs.values(),
+    setSelected: (eggs) => setSelectedEggs(new ObjectSet('uuid', eggs)),
+  });
 
   useEffect(() => {
     setSelectedEggs(new ObjectSet('uuid'));

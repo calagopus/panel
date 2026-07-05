@@ -1,7 +1,7 @@
 import { faFolderPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import { MouseEvent as ReactMouseEvent, Ref, useCallback, useEffect, useRef, useState } from 'react';
+import { Ref, useCallback, useEffect, useState } from 'react';
 import { createSearchParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import getAssets from '@/api/admin/assets/getAssets.ts';
@@ -20,6 +20,7 @@ import AssetUpload from '@/pages/admin/assets/AssetUpload.tsx';
 import AssetUploadProgress from '@/pages/admin/assets/AssetUploadProgress.tsx';
 import { useFileUpload } from '@/plugins/useFileUpload.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AssetActionBar from './AssetActionBar.tsx';
 import AssetBreadcrumbs from './AssetBreadcrumbs.tsx';
@@ -34,7 +35,6 @@ export default function AdminAssets() {
   const currentDirectory = searchParams.get('directory') ?? '';
   const page = Number(searchParams.get('page')) || 1;
 
-  const selectedAssetsPreviousRef = useRef<z.infer<typeof storageAssetSchema>[]>([]);
   const [selectedAssets, setSelectedAssets] = useState(
     new ObjectSet<z.infer<typeof storageAssetSchema>, 'name'>('name'),
   );
@@ -74,18 +74,17 @@ export default function AdminAssets() {
     setSelectedAssets(new ObjectSet('name'));
   }, [currentDirectory]);
 
-  const onSelectedStart = useCallback(
-    (event: ReactMouseEvent | MouseEvent) => {
-      selectedAssetsPreviousRef.current = event.shiftKey ? selectedAssets.values() : [];
-    },
-    [selectedAssets],
-  );
-
-  const onSelected = useCallback((selected: z.infer<typeof storageAssetSchema>[]) => {
-    setSelectedAssets(
-      new ObjectSet('name', [...selectedAssetsPreviousRef.current, ...selected.filter((a) => !a.isDirectory)]),
-    );
-  }, []);
+  const { onSelectedStart, onSelected } = useSelectionArea({
+    identify: (asset) => asset.name,
+    getSelected: () => selectedAssets.values(),
+    setSelected: (assets) =>
+      setSelectedAssets(
+        new ObjectSet(
+          'name',
+          assets.filter((asset) => !asset.isDirectory),
+        ),
+      ),
+  });
 
   const addSelectedAsset = (asset: z.infer<typeof storageAssetSchema>) =>
     setSelectedAssets((prev) => prev.clone().add(asset));
