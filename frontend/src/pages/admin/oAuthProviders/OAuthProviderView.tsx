@@ -1,5 +1,4 @@
 import { faCog, faSitemap, faUsers } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import getOAuthProvider from '@/api/admin/oauth-providers/getOAuthProvider.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -7,6 +6,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import AdminOAuthProviderMappings from '@/pages/admin/oAuthProviders/mappings/AdminOAuthProviderMappings.tsx';
 import AdminOAuthProviderUsers from '@/pages/admin/oAuthProviders/users/AdminOAuthProviderUsers.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import OAuthProviderCreateOrUpdate from './OAuthProviderCreateOrUpdate.tsx';
 
@@ -14,7 +14,7 @@ export default function OAuthProviderView() {
   const params = useParams<'id'>();
   const { t } = useTranslations();
 
-  const { data: oauthProvider, isLoading } = useQuery({
+  const { data: oauthProvider, loading: isLoading } = useResource({
     queryKey: ['admin', 'oauthProviders', { uuid: params.id }],
     queryFn: () => getOAuthProvider(params.id!),
   });

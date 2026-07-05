@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Stepper, Text, Title } from '@mantine/core';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -23,6 +23,7 @@ import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { oobeStepKey } from '@/lib/schemas/oobe.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { steps } from '@/routers/oobeSteps.ts';
@@ -59,28 +60,28 @@ export default function OobeRouter() {
   const activeStep = steps.find((step) => to(step.path, '/oobe') === location.pathname);
   const currentAllowedStep = settings.oobeStep ? steps.find((s) => s.stepKey === settings.oobeStep) : null;
 
-  const { data: locationsData, isLoading: locLoading } = useQuery({
+  const { data: locationsData, loading: locLoading } = useResource({
     queryKey: queryKeys.admin.locations.all(),
     queryFn: () => getLocations(1).then((r) => r.data),
     enabled: !!user,
   });
-  const { data: nodesData, isLoading: nodesLoading } = useQuery({
+  const { data: nodesData, loading: nodesLoading } = useResource({
     queryKey: queryKeys.admin.nodes.all(),
     queryFn: () => getNodes(1).then((r) => r.data),
     enabled: !!user,
   });
   const nodeUuid = nodesData?.[0]?.uuid;
-  const { data: nodeAllocationsData, isLoading: nodeAllocationsLoading } = useQuery({
+  const { data: nodeAllocationsData, loading: nodeAllocationsLoading } = useResource({
     queryKey: queryKeys.admin.nodes.allocations(nodeUuid ?? ''),
     queryFn: () => getNodeAllocations(nodeUuid!, 1).then((r) => r.data),
     enabled: !!user && !!nodeUuid,
   });
-  const { data: serversData, isLoading: serversLoading } = useQuery({
+  const { data: serversData, loading: serversLoading } = useResource({
     queryKey: queryKeys.admin.servers.all(),
     queryFn: () => getServers(1).then((r) => r.data),
     enabled: !!user,
   });
-  const { data: eggReposData, isLoading: eggReposLoading } = useQuery({
+  const { data: eggReposData, loading: eggReposLoading } = useResource({
     queryKey: queryKeys.admin.eggRepositories.all(),
     queryFn: () => getEggRepositories(1).then((r) => r.data),
     enabled: !!user,

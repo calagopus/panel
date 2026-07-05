@@ -9,7 +9,6 @@ import {
   faNetworkWired,
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import getServer from '@/api/admin/servers/getServer.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -24,13 +23,14 @@ import AdminServerMounts from '@/pages/admin/servers/mounts/AdminServerMounts.ts
 import ServerOverview from '@/pages/admin/servers/ServerOverview.tsx';
 import ServerUpdate from '@/pages/admin/servers/ServerUpdate.tsx';
 import AdminServerVariables from '@/pages/admin/servers/variables/AdminServerVariables.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServerView() {
   const { t } = useTranslations();
   const params = useParams<'id'>();
 
-  const { data: server, isLoading } = useQuery({
+  const { data: server, loading: isLoading } = useResource({
     queryKey: queryKeys.admin.servers.detail(params.id!),
     queryFn: () => getServer(params.id!),
   });

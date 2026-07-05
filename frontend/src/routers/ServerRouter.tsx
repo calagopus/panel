@@ -15,10 +15,13 @@ import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
 import Sidebar from '@/elements/Sidebar.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { isAdmin } from '@/lib/permissions.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { to } from '@/lib/routes.ts';
+import { isConflictingState } from '@/lib/server.ts';
 import WebsocketHandler from '@/pages/server/WebsocketHandler.tsx';
 import WebsocketListener from '@/pages/server/WebsocketListener.tsx';
 import WebsocketStatusBanner from '@/pages/server/WebsocketStatusBanner.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -41,6 +44,16 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   const setServer = useServerStore((state) => state.setServer);
   const setCommandSnippets = useServerStore((state) => state.setCommandSnippets);
   const setServerAnnouncements = useServerStore((state) => state.setServerAnnouncements);
+
+  const { data: announcements } = useResource({
+    queryKey: queryKeys.server(server.uuid).announcements.all(),
+    queryFn: () => getServerAnnouncements(server.uuid),
+    enabled: !!server.uuid && !isConflictingState(server, user),
+  });
+
+  useEffect(() => {
+    if (announcements) setServerAnnouncements(announcements);
+  }, [announcements]);
 
   const allServerRoutes = useMemo(() => {
     const routes = [...serverRoutes, ...window.extensionContext.extensionRegistry.routes.serverRoutes];
@@ -105,12 +118,6 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
             .then((snippets) => {
               setCommandSnippets(snippets);
             })
-            .catch((error) => {
-              addToast(httpErrorToHuman(error), 'error');
-            });
-
-          getServerAnnouncements(data.uuid)
-            .then(setServerAnnouncements)
             .catch((error) => {
               addToast(httpErrorToHuman(error), 'error');
             });

@@ -1,11 +1,11 @@
 import { faCog, faComputer, faEgg, faServer } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import getMount from '@/api/admin/mounts/getMount.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import MountCreateOrUpdate from '@/pages/admin/mounts/MountCreateOrUpdate.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminMountEggs from './eggs/AdminMountEggs.tsx';
 import AdminMountNodes from './nodes/AdminMountNodes.tsx';
@@ -15,7 +15,7 @@ export default function MountView() {
   const { t } = useTranslations();
   const params = useParams<'id'>();
 
-  const { data: mount, isLoading } = useQuery({
+  const { data: mount, loading: isLoading } = useResource({
     queryKey: ['admin', 'mounts', { uuid: params.id }],
     queryFn: () => getMount(params.id!),
   });

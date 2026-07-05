@@ -1,7 +1,6 @@
 import { faFolder } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Anchor, ModalProps } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
 import { join } from 'pathe';
 import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
@@ -25,6 +24,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { archiveFormat } from '@/lib/schemas/server/files.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -39,7 +39,7 @@ function DirectoryBrowser({
   onNavigate: (path: string) => void;
 }) {
   const { t } = useTranslations();
-  const { data, isLoading } = useQuery({
+  const { data, loading: isLoading } = useResource({
     queryKey: ['backup-export-browser', serverUuid, path],
     queryFn: () => loadDirectory(serverUuid, path, 1, 'name_asc'),
   });

@@ -1,5 +1,4 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useQuery } from '@tanstack/react-query';
 import { CronExpressionParser } from 'cron-parser';
 import cronstrue from 'cronstrue/i18n';
 import { z } from 'zod';
@@ -20,6 +19,7 @@ import {
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleTriggerSchema } from '@/lib/schemas/server/schedules.ts';
 import { bytesToString } from '@/lib/size.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { getTranslations, useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -47,7 +47,7 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
   const server = useServerStore((state) => state.server);
 
   const completionScheduleUuid = trigger.type === 'schedule_completion' ? trigger.schedule : null;
-  const { data: completionSchedule } = useQuery({
+  const { data: completionSchedule } = useResource({
     queryKey: queryKeys.server(server.uuid).schedules.detail(completionScheduleUuid ?? ''),
     queryFn: () => getSchedule(server.uuid, completionScheduleUuid!),
     enabled: completionScheduleUuid !== null,

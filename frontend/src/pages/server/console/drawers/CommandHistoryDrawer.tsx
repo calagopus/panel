@@ -20,8 +20,10 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverActivitySchema } from '@/lib/schemas/server/activity.ts';
+import { isConflictingState } from '@/lib/server.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -37,6 +39,7 @@ interface CommandDetail {
 export default function CommandHistoryDrawer({ opened, onClose, ...props }: DrawerProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const { user } = useAuth();
   const server = useServerStore((state) => state.server);
   const state = useServerStore((state) => state.state);
   const socketInstance = useServerStore((state) => state.socketInstance);
@@ -51,7 +54,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
     queryKey: queryKeys.server(server.uuid).activity.all(null),
     fetcher: (page) => getServerActivity(server.uuid, null, page, 'server:console.command'),
     modifyParams: false,
-    canRequest: useServerCan('activity.read'),
+    canRequest: useServerCan('activity.read') && !isConflictingState(server, user),
     deps: [server.uuid],
   });
 

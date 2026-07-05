@@ -1,5 +1,4 @@
 import { faBriefcase, faCog, faComputer, faFingerprint } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import getUser from '@/api/admin/users/getUser.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -7,6 +6,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import AdminUserServers from '@/pages/admin/users/servers/AdminUserServers.tsx';
 import UserCreateOrUpdate from '@/pages/admin/users/UserCreateOrUpdate.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminUserActivity from './activity/AdminUserActivity.tsx';
 import AdminUserOAuthLinks from './oauthLinks/AdminUserOAuthLinks.tsx';
@@ -15,7 +15,7 @@ export default function UserView() {
   const params = useParams<'id'>();
   const { t } = useTranslations();
 
-  const { data: user, isLoading } = useQuery({
+  const { data: user, loading: isLoading } = useResource({
     queryKey: ['admin', 'users', { uuid: params.id }],
     queryFn: () => getUser(params.id!),
   });

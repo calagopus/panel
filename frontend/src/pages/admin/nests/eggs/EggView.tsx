@@ -1,5 +1,4 @@
 import { faCodeCommit, faCog, faComputer, faFolderTree, faTerminal } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { z } from 'zod';
 import getEgg from '@/api/admin/nests/eggs/getEgg.ts';
@@ -10,6 +9,7 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import EggCreateOrUpdate from '@/pages/admin/nests/eggs/EggCreateOrUpdate.tsx';
 import AdminEggMounts from '@/pages/admin/nests/eggs/mounts/AdminEggMounts.tsx';
 import AdminEggVariables from '@/pages/admin/nests/eggs/variables/AdminEggVariables.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggInstallationScriptContainer from './installationScript/EggInstallationScriptContainer.tsx';
 import AdminEggServers from './servers/AdminEggServers.tsx';
@@ -18,7 +18,7 @@ export default function EggView({ contextNest }: { contextNest: z.infer<typeof a
   const params = useParams<'eggId'>();
   const { t } = useTranslations();
 
-  const { data: egg, isLoading } = useQuery({
+  const { data: egg, loading: isLoading } = useResource({
     queryKey: ['admin', 'eggs', { uuid: params.eggId }],
     queryFn: () => getEgg(contextNest.uuid, params.eggId!),
   });

@@ -127,6 +127,9 @@ const server = (serverUuid: string) => ({
   activity: {
     all: (userUuid: string | null) => ['server', serverUuid, 'activity', { uuid: userUuid }] as const,
   },
+  announcements: {
+    all: () => ['server', serverUuid, 'announcements'] as const,
+  },
   allocations: {
     all: () => ['server', serverUuid, 'allocations'] as const,
   },

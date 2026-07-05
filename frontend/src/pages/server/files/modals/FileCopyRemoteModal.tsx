@@ -1,5 +1,4 @@
 import { Anchor, ModalProps } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
 import { useEffect, useState } from 'react';
@@ -21,6 +20,7 @@ import { serverDirectoryEntrySchema, serverFilesCopyRemoteSchema } from '@/lib/s
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import FileRowIcon from '@/pages/server/files/FileRowIcon.tsx';
 import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -35,7 +35,7 @@ function RemoteFileBrowser({ serverUuid, onNavigate }: { serverUuid: string; onN
     onNavigate('/');
   }, [serverUuid]);
 
-  const { data, isLoading } = useQuery({
+  const { data, loading: isLoading } = useResource({
     queryKey: ['remote-file-browser', serverUuid, remotePath],
     queryFn: () => loadDirectory(serverUuid, remotePath, 1, 'name_asc'),
   });

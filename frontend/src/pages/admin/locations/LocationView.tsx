@@ -1,10 +1,10 @@
 import { faCog, faDatabase, faServer } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import getLocation from '@/api/admin/locations/getLocation.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminLocationDatabaseHosts from './database-hosts/AdminLocationDatabaseHosts.tsx';
 import LocationCreateOrUpdate from './LocationCreateOrUpdate.tsx';
@@ -14,7 +14,7 @@ export default () => {
   const { t } = useTranslations();
   const params = useParams<'id'>();
 
-  const { data: location, isLoading } = useQuery({
+  const { data: location, loading: isLoading } = useResource({
     queryKey: ['admin', 'locations', { uuid: params.id }],
     queryFn: () => getLocation(params.id!),
   });

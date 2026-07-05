@@ -10,7 +10,6 @@ import {
   faNetworkWired,
   faPenRuler,
 } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import getNode from '@/api/admin/nodes/getNode.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -18,6 +17,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import { isNodeAIO } from '@/lib/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminNodeAllocations from './allocations/AdminNodeAllocations.tsx';
 import AdminNodeBackups from './backups/AdminNodeBackups.tsx';
@@ -34,7 +34,7 @@ export default function NodeView() {
   const { t } = useTranslations();
   const params = useParams<'id'>();
 
-  const { data: node, isLoading } = useQuery({
+  const { data: node, loading: isLoading } = useResource({
     queryKey: queryKeys.admin.nodes.detail(params.id!),
     queryFn: () => getNode(params.id!),
   });

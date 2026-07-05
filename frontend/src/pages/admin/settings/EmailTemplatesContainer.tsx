@@ -1,5 +1,5 @@
 import { useForm } from '@mantine/form';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -25,6 +25,7 @@ import ScrollArea from '@/elements/ScrollArea.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -49,12 +50,12 @@ export default function EmailTemplatesContainer() {
     validate: zod4Resolver(templateFormSchema),
   });
 
-  const { data: templates, isLoading: templatesLoading } = useQuery({
+  const { data: templates, loading: templatesLoading } = useResource({
     queryKey: queryKeys.admin.emailTemplates.all(),
     queryFn: getEmailTemplates,
   });
 
-  const { data: template, isLoading: templateLoading } = useQuery({
+  const { data: template, loading: templateLoading } = useResource({
     queryKey: queryKeys.admin.emailTemplates.detail(selectedIdentifier!),
     queryFn: () => getEmailTemplate(selectedIdentifier!),
     enabled: selectedIdentifier !== null,

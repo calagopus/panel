@@ -136,7 +136,7 @@ export default function ServerSelectorModal() {
   );
 
   return (
-    <Modal opened onClose={() => navigate('/')} title={t('pages.server.selector.title', {})} size='xl'>
+    <Modal opened onClose={() => navigate('/')} title={t('pages.server.selector.title', {})} size='90%'>
       <Text c='dimmed' size='sm' mb='md'>
         {pageName
           ? t('pages.server.selector.descriptionWithPage', { page: pageName }).md()

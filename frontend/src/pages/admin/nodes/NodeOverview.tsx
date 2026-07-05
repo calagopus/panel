@@ -8,7 +8,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SimpleGrid, Text } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
 import getNodeCapacity from '@/api/admin/nodes/getNodeCapacity.ts';
@@ -122,7 +121,7 @@ export default function NodeOverview({ node }: { node: Node }) {
 
   const [systemInfo, setSystemInfo] = useState<SystemInfo | 'unavailable' | null>(null);
 
-  const { data: capacity } = useQuery({
+  const { data: capacity } = useResource({
     queryKey: queryKeys.admin.nodes.capacity(node.uuid),
     queryFn: () => getNodeCapacity(node.uuid),
   });

@@ -1,11 +1,11 @@
 import { faCog, faDatabase } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import getDatabaseHost from '@/api/admin/database-hosts/getDatabaseHost.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import AdminDatabaseHostDatabases from '@/pages/admin/databaseHosts/databases/AdminDatabaseHostDatabases.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DatabaseHostCreateOrUpdate from './DatabaseHostCreateOrUpdate.tsx';
 
@@ -13,7 +13,7 @@ export default function DatabaseHostView() {
   const { t } = useTranslations();
   const params = useParams<'id'>();
 
-  const { data: databaseHost, isLoading } = useQuery({
+  const { data: databaseHost, loading: isLoading } = useResource({
     queryKey: ['admin', 'databaseHosts', { uuid: params.id }],
     queryFn: () => getDatabaseHost(params.id!),
   });

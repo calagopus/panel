@@ -1,7 +1,6 @@
 import { faArrowsLeftRight, faCodeCompare, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DrawerProps } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -20,6 +19,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverFileRevisionSchema } from '@/lib/schemas/server/files.ts';
 import { bytesToString } from '@/lib/size.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -137,7 +137,7 @@ export default function FileRevisionsDrawer({ filePath, onRestore, getContent, o
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
 
-  const { data: revisions, isLoading } = useQuery({
+  const { data: revisions, loading: isLoading } = useResource({
     queryKey: queryKeys.server(server.uuid).files.fileRevisions(filePath),
     queryFn: () => getFileRevisions(server.uuid, filePath),
     enabled: opened && !!filePath,

@@ -1,8 +1,17 @@
 import { z } from 'zod';
+import { isAdmin } from '@/lib/permissions.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
-import { serverPowerState } from '@/lib/schemas/server/server.ts';
+import { serverPowerState, serverSchema } from '@/lib/schemas/server/server.ts';
+import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
+
+export function isConflictingState(
+  server: z.infer<typeof serverSchema>,
+  user: z.infer<typeof fullUserSchema> | null = null,
+): boolean {
+  return (server.isSuspended && !isAdmin(user)) || server.status !== null || server.isTransferring;
+}
 
 export function formatAllocation(
   allocation?: z.infer<typeof serverAllocationSchema> | z.infer<typeof adminNodeAllocationSchema> | null,
