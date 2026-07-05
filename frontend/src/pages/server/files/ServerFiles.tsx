@@ -19,6 +19,7 @@ import { isOpenableFile } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
 import FileActionBar from '@/pages/server/files/FileActionBar.tsx';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
+import FileDiskUsageBar from '@/pages/server/files/FileDiskUsageBar.tsx';
 import FileMassContextMenu from '@/pages/server/files/FileMassContextMenu.tsx';
 import FileModals from '@/pages/server/files/FileModals.tsx';
 import FileOperationsProgress from '@/pages/server/files/FileOperationsProgress.tsx';
@@ -318,6 +319,8 @@ function ServerFilesComponent() {
           <FileToolbar />
         </Group>
       </Group>
+
+      <FileDiskUsageBar />
 
       <Card mb='sm'>
         <FileBreadcrumbs path={browsingDirectory} />
