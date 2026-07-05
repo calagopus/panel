@@ -30,6 +30,31 @@ function unwrap(schema: AnySchema): AnySchema {
   }
 }
 
+function discriminatorValues(option: AnySchema, discriminator: string): unknown[] | undefined {
+  const inner = unwrap(option);
+  if (def<{ type: string }>(inner).type !== 'object') return undefined;
+
+  const field = def<{ shape: Def }>(inner).shape[discriminator];
+  if (!field) return undefined;
+
+  const litDef = def<{ type: string; values?: unknown[] }>(unwrap(field));
+  return litDef.type === 'literal' ? litDef.values : undefined;
+}
+
+function selectUnionOption(
+  options: AnySchema[],
+  discriminator: string | undefined,
+  data: unknown,
+): AnySchema | undefined {
+  if (discriminator !== undefined && data !== null && typeof data === 'object' && !Array.isArray(data)) {
+    const discValue = (data as Record<string, unknown>)[discriminator];
+    const match = options.find((opt) => discriminatorValues(opt, discriminator)?.includes(discValue));
+    if (match) return match;
+  }
+
+  return options.find((opt) => opt.safeParse(data).success);
+}
+
 // snake_case to camelCase, walks nested objects/arrays using the schema shape
 function applyTransform(schema: AnySchema, data: unknown): unknown {
   const inner = unwrap(schema);
@@ -52,6 +77,12 @@ function applyTransform(schema: AnySchema, data: unknown): unknown {
     return result;
   }
 
+  if (type === 'union') {
+    const { options, discriminator } = def<{ options: AnySchema[]; discriminator?: string }>(inner);
+    const option = selectUnionOption(options, discriminator, data);
+    return option ? applyTransform(option, data) : data;
+  }
+
   if (type === 'array') {
     if (!Array.isArray(data)) return data;
     const { element } = def<{ element: AnySchema }>(inner);
@@ -63,7 +94,7 @@ function applyTransform(schema: AnySchema, data: unknown): unknown {
     const { valueType } = def<{ valueType: AnySchema }>(inner);
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
-      result[key] = applyReverseTransform(valueType, value);
+      result[key] = applyTransform(valueType, value);
     }
     return result;
   }
@@ -97,6 +128,12 @@ function applyReverseTransform(schema: AnySchema, data: unknown): unknown {
     }
 
     return result;
+  }
+
+  if (type === 'union') {
+    const { options, discriminator } = def<{ options: AnySchema[]; discriminator?: string }>(inner);
+    const option = selectUnionOption(options, discriminator, data);
+    return option ? applyReverseTransform(option, data) : data;
   }
 
   if (type === 'array') {
