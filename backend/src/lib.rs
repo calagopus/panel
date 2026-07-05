@@ -107,6 +107,11 @@ pub async fn handle_postprocessing(
             .get("X-Accel-Buffering")
             .and_then(|v| v.to_str().ok())
             == Some("no")
+        || response
+            .body()
+            .size_hint()
+            .upper()
+            .is_none_or(|len| len > 8 * 1024 * 1024)
     {
         return Ok(response);
     }
@@ -120,15 +125,6 @@ pub async fn handle_postprocessing(
         && response.status() != StatusCode::NOT_FOUND
     {
         let (mut parts, body) = response.into_parts();
-
-        let hashable = body
-            .size_hint()
-            .upper()
-            .is_some_and(|len| len <= 8 * 1024 * 1024);
-
-        if !hashable {
-            return Ok(Response::from_parts(parts, body));
-        }
 
         let bytes_body = match axum::body::to_bytes(body, usize::MAX).await {
             Ok(bytes) => bytes.into_iter().collect::<Vec<u8>>(),

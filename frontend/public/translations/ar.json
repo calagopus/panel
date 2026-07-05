@@ -331,12 +331,7 @@
       "scheduleDynamicInput": {
         "none": "لا شيء",
         "variable": "متغير",
-        "enterVariable": "الرجاء إدخال اسم المتغير للتقييم.",
-        "enterData": "الرجاء إدخال البيانات للإرسال.",
-        "inputType": "نوع الإدخال",
-        "dataType": "نوع البيانات للإرسال",
-        "selectType": "تحديد النوع",
-        "rawString": "سلسلة نصية خام"
+        "enterVariable": "الرجاء إدخال اسم المتغير للتقييم."
       },
       "serverWebsocket": {
         "error": {
@@ -1426,10 +1421,7 @@
             "createFirstStep": "إنشاء الخطوة الأولى",
             "addOutput": "إضافة مخرجات",
             "addFile": "إضافة ملف",
-            "exitEditor": "خروج من المحرر",
-            "trigger": "تشغيل",
-            "triggerWithCondition": "تشغيل (عدم تخطي الشرط)",
-            "triggerSkipCondition": "تشغيل (تخطي الشرط)"
+            "exitEditor": "خروج من المحرر"
           },
           "toast": {
             "imported": "تم استيراد الجدول.",
@@ -1463,18 +1455,6 @@
               "equal": "يساوي",
               "greaterThanOrEqual": "أكبر من أو يساوي",
               "greaterThan": "أكبر من"
-            },
-            "schedulePreConditionType": {
-              "none": "لا شيء",
-              "and": "AND (يجب أن تكون كلها صحيحة)",
-              "or": "OR (أي واحدة يجب أن تكون صحيحة)",
-              "not": "NOT (يجب ألا تكون صحيحة)",
-              "serverState": "حالة الخادم",
-              "uptime": "وقت التشغيل",
-              "cpuUsage": "استخدام المعالج",
-              "memoryUsage": "استخدام الذاكرة",
-              "diskUsage": "استخدام القرص",
-              "fileExists": "الملف موجود"
             }
           },
           "modal": {
@@ -1502,9 +1482,6 @@
           "view": {
             "badge": {
               "running": "جاري التشغيل"
-            },
-            "tooltip": {
-              "cannotTrigger": "لا يمكن تشغيل جدول معطل"
             },
             "tabs": {
               "actions": "الإجراءات",

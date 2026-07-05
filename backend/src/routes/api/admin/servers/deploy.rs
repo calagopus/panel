@@ -27,6 +27,14 @@ mod post {
         value: String,
     }
 
+    fn default_suspension_penalty() -> f64 {
+        0.5
+    }
+
+    fn default_randomness() -> f64 {
+        0.5
+    }
+
     #[derive(ToSchema, Validate, Serialize, Deserialize)]
     pub struct PayloadDeployment {
         #[garde(skip)]
@@ -34,6 +42,14 @@ mod post {
 
         #[garde(skip)]
         allow_overallocation: bool,
+        #[serde(default = "default_suspension_penalty")]
+        #[garde(range(min = 0.0, max = 1.0))]
+        #[schema(minimum = 0.0, maximum = 1.0, default = 0.5)]
+        suspension_penalty: f64,
+        #[serde(default = "default_randomness")]
+        #[garde(range(min = 0.0, max = 1.0))]
+        #[schema(minimum = 0.0, maximum = 1.0, default = 0.5)]
+        randomness: f64,
 
         #[garde(dive)]
         allocations: Option<shared::models::egg_configuration::EggConfigAllocationsDeployment>,
@@ -167,6 +183,8 @@ mod post {
             &data.deployment.location_uuids,
             data.limits,
             data.deployment.allow_overallocation,
+            data.deployment.suspension_penalty,
+            data.deployment.randomness,
         )
         .await?;
 
@@ -249,6 +267,7 @@ mod post {
                 &data.deployment.location_uuids,
                 data.limits,
                 data.deployment.allow_overallocation,
+                data.deployment.suspension_penalty,
             )
             .await?
             {

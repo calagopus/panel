@@ -330,12 +330,7 @@
       "scheduleDynamicInput": {
         "none": "Нет",
         "variable": "Переменная",
-        "enterVariable": "Пожалуйста, введите имя переменной для вычисления.",
-        "enterData": "Пожалуйста, введите данные для отправки.",
-        "inputType": "Тип ввода",
-        "dataType": "Тип данных для отправки",
-        "selectType": "Выбрать тип",
-        "rawString": "Строка"
+        "enterVariable": "Пожалуйста, введите имя переменной для вычисления."
       },
       "serverWebsocket": {
         "error": {
@@ -1405,10 +1400,7 @@
             "createFirstStep": "Создать первый шаг",
             "addOutput": "Добавить вывод",
             "addFile": "Добавить файл",
-            "exitEditor": "Выйти из редактора",
-            "trigger": "Запустить",
-            "triggerWithCondition": "Запустить (не пропускать условие)",
-            "triggerSkipCondition": "Запустить (пропустить условие)"
+            "exitEditor": "Выйти из редактора"
           },
           "toast": {
             "imported": "Расписание импортировано.",
@@ -1442,18 +1434,6 @@
               "equal": "Равно",
               "greaterThanOrEqual": "Больше или равно",
               "greaterThan": "Больше"
-            },
-            "schedulePreConditionType": {
-              "none": "Нет",
-              "and": "И (Все должны быть истинны)",
-              "or": "ИЛИ (Любое должно быть истинно)",
-              "not": "НЕ (Не должно быть истинно)",
-              "serverState": "Состояние сервера",
-              "uptime": "Время работы",
-              "cpuUsage": "Нагрузка ЦП",
-              "memoryUsage": "Нагрузка памяти",
-              "diskUsage": "Использование диска",
-              "fileExists": "Файл существует"
             }
           },
           "modal": {
@@ -1481,9 +1461,6 @@
           "view": {
             "badge": {
               "running": "Выполняется"
-            },
-            "tooltip": {
-              "cannotTrigger": "Невозможно запустить отключённое расписание"
             },
             "tabs": {
               "actions": "Действия",

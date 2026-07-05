@@ -499,12 +499,7 @@
       "scheduleDynamicInput": {
         "none": "無",
         "variable": "變數",
-        "enterVariable": "請輸入要評估的變數名稱。",
-        "enterData": "請輸入要傳送的資料。",
-        "inputType": "輸入類型",
-        "dataType": "要傳送的資料類型",
-        "selectType": "選取類型",
-        "rawString": "原始字串"
+        "enterVariable": "請輸入要評估的變數名稱。"
       },
       "serverWebsocket": {
         "error": {
@@ -3804,10 +3799,7 @@
             "createFirstStep": "建立第一個步驟",
             "addOutput": "新增輸出",
             "addFile": "新增檔案",
-            "exitEditor": "離開編輯器",
-            "trigger": "觸發",
-            "triggerWithCondition": "觸發（不要略過條件）",
-            "triggerSkipCondition": "觸發（略過條件）"
+            "exitEditor": "離開編輯器"
           },
           "toast": {
             "imported": "排程已匯入。",
@@ -3841,18 +3833,6 @@
               "equal": "等於",
               "greaterThanOrEqual": "大於或等於",
               "greaterThan": "大於"
-            },
-            "schedulePreConditionType": {
-              "none": "無",
-              "and": "AND（全部都必須為真）",
-              "or": "OR（任一為真即可）",
-              "not": "NOT（不得為真）",
-              "serverState": "伺服器狀態",
-              "uptime": "執行時間",
-              "cpuUsage": "CPU 使用量",
-              "memoryUsage": "記憶體使用量",
-              "diskUsage": "磁碟使用量",
-              "fileExists": "檔案存在"
             }
           },
           "modal": {
@@ -3880,9 +3860,6 @@
           "view": {
             "badge": {
               "running": "執行中"
-            },
-            "tooltip": {
-              "cannotTrigger": "無法觸發已停用的排程"
             },
             "tabs": {
               "actions": "動作",

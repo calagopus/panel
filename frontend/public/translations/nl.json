@@ -506,12 +506,7 @@
       "scheduleDynamicInput": {
         "none": "Geen",
         "variable": "Variabele",
-        "enterVariable": "Voer de naam in van de variabele die geëvalueerd moet worden.",
-        "enterData": "Voer de te verzenden gegevens in.",
-        "inputType": "Invoertype",
-        "dataType": "Te verzenden gegevenstype",
-        "selectType": "Selecteer type",
-        "rawString": "Onbewerkte tekst"
+        "enterVariable": "Voer de naam in van de variabele die geëvalueerd moet worden."
       },
       "serverWebsocket": {
         "error": {
@@ -3818,10 +3813,7 @@
             "createFirstStep": "Eerste stap aanmaken",
             "addOutput": "Uitvoer toevoegen",
             "addFile": "Bestand toevoegen",
-            "exitEditor": "Editor verlaten",
-            "trigger": "Activeren",
-            "triggerWithCondition": "Activeren (conditie niet overslaan)",
-            "triggerSkipCondition": "Activeren (conditie overslaan)"
+            "exitEditor": "Editor verlaten"
           },
           "toast": {
             "imported": "Planning geïmporteerd.",
@@ -3855,18 +3847,6 @@
               "equal": "Gelijk aan",
               "greaterThanOrEqual": "Groter dan of gelijk aan",
               "greaterThan": "Groter dan"
-            },
-            "schedulePreConditionType": {
-              "none": "Geen",
-              "and": "EN (Alle moeten waar zijn)",
-              "or": "OF (Minstens één moet waar zijn)",
-              "not": "NIET (Mag niet waar zijn)",
-              "serverState": "Serverstatus",
-              "uptime": "Uptime",
-              "cpuUsage": "CPU-gebruik",
-              "memoryUsage": "Geheugengebruik",
-              "diskUsage": "Schijfgebruik",
-              "fileExists": "Bestand bestaat"
             }
           },
           "modal": {
@@ -3894,9 +3874,6 @@
           "view": {
             "badge": {
               "running": "Actief"
-            },
-            "tooltip": {
-              "cannotTrigger": "Kan een uitgeschakelde planning niet activeren"
             },
             "tabs": {
               "actions": "Acties",

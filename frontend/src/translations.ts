@@ -3642,6 +3642,10 @@ const baseTranslations = defineTranslations({
               modified: 'Modified',
             },
           },
+          diskUsage: {
+            title: 'Disk Usage',
+            details: '{used} of {total} used ({percentage}%)',
+          },
           button: {
             new: 'New',
             connect: 'Connect',
