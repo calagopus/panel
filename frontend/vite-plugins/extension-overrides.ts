@@ -20,12 +20,20 @@ interface OverrideTarget {
   owner: string;
 }
 
+const realpathCache = new Map<string, string>();
+
 function realpathOrSelf(file: string): string {
+  const cached = realpathCache.get(file);
+  if (cached !== undefined) return cached;
+
+  let real: string;
   try {
-    return fs.realpathSync(file);
+    real = fs.realpathSync(file);
   } catch {
-    return file;
+    real = file;
   }
+  realpathCache.set(file, real);
+  return real;
 }
 
 function stripExt(file: string): string {
@@ -143,10 +151,21 @@ function buildOverrideMap(reportError: (message: string) => void): Map<string, O
   return map;
 }
 
-export function extensionOverrides(): Plugin {
-  let map = new Map<string, OverrideTarget>();
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
-  return {
+function buildIdFilter(map: Map<string, OverrideTarget>): RegExp {
+  const names = [...new Set([...map.keys()].map((key) => path.basename(key)))];
+  const alternation = names.map(escapeRegExp).join('|');
+  return new RegExp(`^(?:@\\/|\\.\\.?\\/)(?:.*\\/)?(?:${alternation})(?:\\.[^./]+)?$`);
+}
+
+export function extensionOverrides(): Plugin {
+  const errors: string[] = [];
+  const map = buildOverrideMap((message) => errors.push(message));
+
+  const plugin: Plugin = {
     name: 'extension-overrides',
     enforce: 'pre',
 
@@ -161,23 +180,9 @@ export function extensionOverrides(): Plugin {
     },
 
     buildStart() {
-      map = buildOverrideMap((message) => this.error(`[extension-overrides] ${message}`));
-    },
-    resolveId: {
-      filter: { id: /^(@\/|\.{1,2}\/)/ },
-      handler(source, importer, options) {
-        if (map.size === 0 || !importer) return null;
-
-        const abs = resolveSpecifier(source, path.dirname(importer));
-        if (!abs) return null;
-
-        const hit = map.get(stripExt(realpathOrSelf(abs)));
-        if (!hit) return null;
-
-        if (realpathOrSelf(importer) === hit.replacementReal) return null;
-
-        return this.resolve(hit.replacementReal, importer, { ...options, skipSelf: true });
-      },
+      if (errors.length > 0) {
+        this.error(`[extension-overrides] ${errors[0]}`);
+      }
     },
 
     configureServer(server) {
@@ -204,4 +209,25 @@ export function extensionOverrides(): Plugin {
       server.watcher.on('unlink', handleOverridesChange);
     },
   };
+
+  if (map.size > 0) {
+    plugin.resolveId = {
+      filter: { id: buildIdFilter(map) },
+      handler(source, importer, options) {
+        if (!importer) return null;
+
+        const abs = resolveSpecifier(source, path.dirname(importer));
+        if (!abs) return null;
+
+        const hit = map.get(stripExt(realpathOrSelf(abs)));
+        if (!hit) return null;
+
+        if (realpathOrSelf(importer) === hit.replacementReal) return null;
+
+        return this.resolve(hit.replacementReal, importer, { ...options, skipSelf: true });
+      },
+    };
+  }
+
+  return plugin;
 }
