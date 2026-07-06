@@ -10,7 +10,7 @@ use clap::{Args, FromArgMatches};
 use colored::Colorize;
 use compact_str::ToCompactString;
 use indexmap::IndexMap;
-use shared::models::database_host::DatabaseCredentials;
+use shared::models::{OrderedJson, database_host::DatabaseCredentials};
 use sqlx::Row;
 use std::{
     collections::{HashMap, HashSet},
@@ -790,13 +790,13 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                             .bind(name)
                             .bind(description)
                             .bind(features)
-                            .bind(docker_images)
+                            .bind(OrderedJson(docker_images))
                             .bind(file_denylist)
                             .bind(serde_json::to_value(config_files)?)
                             .bind(serde_json::to_value(config_startup)?)
                             .bind(serde_json::to_value(config_stop)?)
                             .bind(serde_json::to_value(config_script)?)
-                            .bind(serde_json::to_value(startup_commands)?)
+                            .bind(OrderedJson(startup_commands))
                             .bind(force_outgoing_ip)
                             .bind(created)
                             .fetch_one(database.write())
