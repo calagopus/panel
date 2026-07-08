@@ -7,6 +7,7 @@ edition = { workspace = true }
 
 [dependencies]
 wings-api = { workspace = true }
+db-agent-api = { workspace = true }
 rule-validator = { workspace = true }
 shared = { workspace = true }
 database-migrator = { workspace = true }

@@ -56,6 +56,14 @@
       "many": "{count} Nodes",
       "other": "{count} Nodes"
     },
+    "databaseAgentHost": {
+      "zero": "{count} Datenbank-Agent-Hosts",
+      "one": "{count} Datenbank-Agent-Host",
+      "two": "{count} Datenbank-Agent-Hosts",
+      "few": "{count} Datenbank-Agent-Hosts",
+      "many": "{count} Datenbank-Agent-Hosts",
+      "other": "{count} Datenbank-Agent-Hosts"
+    },
     "allocation": {
       "zero": "{count} Node-Allocations",
       "one": "{count} Node-Allocation",
@@ -222,6 +230,7 @@
         "nest": "Nest",
         "lines": "Zeilen",
         "databaseHost": "Datenbank-Host",
+        "databaseAgentHost": "Datenbank-Agent-Host",
         "timezone": "Zeitzone",
         "timezoneSystem": "System",
         "protocol": "Protokoll",
@@ -1402,7 +1411,8 @@
                   "panelVersion": "Panel-Version",
                   "versionHistory": "Versionsverlauf",
                   "outdatedExtensions": "Veraltete Erweiterungen",
-                  "outdatedNodes": "Veraltete Nodes"
+                  "outdatedNodes": "Veraltete Nodes",
+                  "outdatedDatabaseAgentHosts": "Veraltete Datenbank-Agent-Hosts"
                 },
                 "panelVersion": "Dein Panel läuft derzeit auf Version `{current}`. Die neueste verfügbare Version ist `{latest}`.",
                 "unknown": "unbekannt",
@@ -1427,7 +1437,9 @@
                   "latestVersion": "Neueste Version",
                   "changes": "Änderungen",
                   "error": "Fehler"
-                }
+                },
+                "databaseAgentHostsUpToDate": "Es scheint, als wären alle Datenbank-Agent-Hosts aktuell. ({failed} konnten nicht geprüft werden)",
+                "databaseAgentHostsOutdated": "Einige Datenbank-Agent-Hosts sind veraltet, die neueste verfügbare Version ist `{latest}`. ({outdated} veraltet, {failed} konnten nicht geprüft werden)"
               }
             },
             "health": {
@@ -2048,6 +2060,25 @@
               "page": {
                 "title": "Standort Nodes"
               }
+            },
+            "databaseAgentHosts": {
+              "title": "Datenbank-Agent-Hosts",
+              "page": {
+                "title": "Datenbank-Agent-Hosts des Standorts",
+                "toast": {
+                  "created": "Datenbank-Agent-Host des Standorts erstellt.",
+                  "deleted": "Datenbank-Agent-Host des Standorts gelöscht."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Datenbank-Agent-Host des Standorts erstellen"
+                  },
+                  "delete": {
+                    "title": "Löschen des Datenbank-Agent-Hosts des Standorts bestätigen",
+                    "content": "Bist du sicher, dass du den Datenbank-Agent-Host **{name}** aus **{location}** entfernen möchtest?"
+                  }
+                }
+              }
             }
           }
         },
@@ -2141,10 +2172,10 @@
                 "chart": {
                   "cpuLoad": "CPU-Last",
                   "memoryUsage": "Speichernutzung",
-                  "diskIo": "Disk I/O",
+                  "diskIo": "Festplatten-I/O",
                   "networkTraffic": "Netzwerkverkehr",
-                  "diskRead": "Disk Lesen",
-                  "diskWrite": "Disk Schreiben",
+                  "diskRead": "Festplatte Lesen",
+                  "diskWrite": "Festplatte Schreiben",
                   "inbound": "Eingehend",
                   "outbound": "Ausgehend",
                   "networkInLabel": "Netzwerk Ein",
@@ -3475,6 +3506,184 @@
         },
         "activity": {
           "title": "Aktivität"
+        },
+        "databaseAgentHosts": {
+          "title": "Datenbank-Agent-Hosts",
+          "resourceName": "Datenbank-Agent-Host",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Datenbank-Agent-Host erstellen",
+                "titleUpdate": "Datenbank-Agent-Host aktualisieren",
+                "button": {
+                  "resetToken": "Token zurücksetzen",
+                  "testConnection": "Verbindung testen",
+                  "updateConfig": "Konfiguration aktualisieren"
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Löschen des Datenbank-Agent-Hosts bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                  }
+                },
+                "toast": {
+                  "tested": "Test erfolgreich abgeschlossen.",
+                  "tokenReset": "Datenbank-Agent-Host-Token zurückgesetzt."
+                }
+              }
+            },
+            "configuration": {
+              "title": "Konfiguration",
+              "page": {
+                "title": "Konfiguration",
+                "button": {
+                  "save": "Konfiguration speichern",
+                  "reveal": "Konfiguration anzeigen"
+                },
+                "alert": {
+                  "couldNotReach": "Der Datenbank-Agent-Host konnte nicht erreicht werden: {error}",
+                  "tokenWarning": "Die untenstehende Konfiguration enthält das Host-Token. Zeige sie nur bei Bedarf an."
+                },
+                "toast": {
+                  "applied": "Konfiguration erfolgreich angewendet.",
+                  "submittedNotApplied": "Konfiguration wurde übermittelt, aber nicht angewendet.",
+                  "invalidYaml": "Ungültiges YAML: {error}"
+                },
+                "section": {
+                  "initialSetup": "Ersteinrichtung",
+                  "liveConfiguration": "Live-Konfiguration"
+                },
+                "description": {
+                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/calagopus-db-agent/config.yml` ein oder führe aus"
+                },
+                "tooltip": {
+                  "copyCommand": "Befehl kopieren"
+                },
+                "form": {
+                  "apiPort": "API-Port"
+                }
+              }
+            },
+            "overview": {
+              "title": "Übersicht",
+              "page": {
+                "title": "Datenbank-Agent-Host-Übersicht",
+                "status": {
+                  "deploymentEnabled": "Bereitstellung aktiviert",
+                  "deploymentDisabled": "Bereitstellung deaktiviert",
+                  "maintenanceEnabled": "Wartung aktiviert",
+                  "maintenanceDisabled": "Wartung deaktiviert"
+                },
+                "card": {
+                  "hostDetails": "Host-Details",
+                  "systemInfo": "Systeminformationen"
+                },
+                "label": {
+                  "url": "URL",
+                  "description": "Beschreibung",
+                  "createdAt": "Erstellt",
+                  "version": "Version",
+                  "cpu": "CPU",
+                  "memory": "Arbeitsspeicher",
+                  "databases": "Datenbanken",
+                  "kernelVersion": "Kernel-Version",
+                  "architecture": "Architektur",
+                  "unavailable": "Nicht verfügbar"
+                },
+                "badge": {
+                  "updateAvailable": "Update verfügbar"
+                }
+              }
+            },
+            "statistics": {
+              "title": "Statistiken",
+              "page": {
+                "title": "Datenbank-Agent-Host-Statistiken",
+                "card": {
+                  "resources": "Ressourcen",
+                  "graphs": "Diagramme"
+                },
+                "label": {
+                  "cpu": "CPU",
+                  "cpuThreads": "{model} ({threads} Threads)",
+                  "memory": "Arbeitsspeicher",
+                  "usedByAgent": "{size} vom Agent verwendet",
+                  "disk": "Festplatte",
+                  "network": "Netzwerk",
+                  "networkIn": "Ein: {in}",
+                  "networkOut": "Aus: {out}"
+                },
+                "chart": {
+                  "cpuLoad": "CPU-Auslastung",
+                  "memoryUsage": "Arbeitsspeicher-Nutzung",
+                  "diskIo": "Festplatten-I/O",
+                  "diskRead": "Festplatte lesen",
+                  "diskWrite": "Festplatte schreiben",
+                  "networkTraffic": "Netzwerkverkehr",
+                  "networkInLabel": "Eingehend",
+                  "networkOutLabel": "Ausgehend",
+                  "inbound": "Eingehend",
+                  "outbound": "Ausgehend"
+                },
+                "toast": {
+                  "connectionLost": "Die Verbindung zum Datenbank-Agent-Host wurde unterbrochen."
+                }
+              }
+            }
+          },
+          "modal": {
+            "bulkConfig": {
+              "title": "Konfiguration aktualisieren - {hosts}",
+              "button": {
+                "apply": "Auf {hosts} anwenden"
+              },
+              "toast": {
+                "applied": "Konfiguration auf {hosts} angewendet."
+              },
+              "error": {
+                "invalidYaml": "Ungültiges YAML: {error}"
+              }
+            }
+          }
+        },
+        "databaseAgentTemplates": {
+          "title": "Datenbank-Agent-Vorlagen",
+          "resourceName": "Datenbank-Agent-Vorlage",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Datenbank-Agent-Vorlage erstellen",
+                "titleUpdate": "Datenbank-Agent-Vorlage aktualisieren",
+                "form": {
+                  "dockerImages": "Docker-Images",
+                  "env": "Umgebungsvariablen",
+                  "volumes": "Volumes",
+                  "imageUid": "Image-UID",
+                  "imageGid": "Image-GID",
+                  "cmd": "Befehl",
+                  "swap": "Swap",
+                  "cpu": "CPU-Limit (%)",
+                  "ioWeight": "IO-Gewichtung",
+                  "memoryDescription": "Das Speicherlimit des Datenbank-Containers.",
+                  "memoryTooltip": "0 setzt kein Limit.",
+                  "swapDescription": "Die Menge an Swap, die dieser Datenbank zugewiesen wird.",
+                  "swapTooltip": "-1 setzt kein Limit.",
+                  "diskDescription": "Das Festplattenlimit der Datenbank.",
+                  "diskTooltip": "0 setzt kein Limit. Dies ist ein Soft-Limit, sofern der Festplattenlimiter nicht auf Wings konfiguriert ist.",
+                  "cpuDescription": "Das CPU-Limit in %, das die Datenbank nutzen kann.",
+                  "cpuTooltip": "1 Thread = 100 %. 0 setzt kein Limit.",
+                  "ioWeightDescription": "Die relative IO-Gewichtung des Datenbank-Containers im Vergleich zu anderen Containern.",
+                  "ioWeightTooltip": "0-1000. Funktioniert möglicherweise nicht auf allen Systemen."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Löschen der Datenbank-Agent-Vorlage bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "server": {

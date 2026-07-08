@@ -16,6 +16,7 @@ const baseTranslations = defineTranslations({
     sshKey: defineEnglishItem('SSH Key', 'SSH Keys'),
     asset: defineEnglishItem('Asset', 'Assets'),
     node: defineEnglishItem('Node', 'Nodes'),
+    databaseAgentHost: defineEnglishItem('Database Agent Host', 'Database Agent Hosts'),
     allocation: defineEnglishItem('Node Allocation', 'Node Allocations'),
     egg: defineEnglishItem('Egg', 'Eggs'),
     shortcut: defineEnglishItem('Shortcut', 'Shortcuts'),
@@ -157,6 +158,7 @@ const baseTranslations = defineTranslations({
         nest: 'Nest',
         lines: 'Lines',
         databaseHost: 'Database Host',
+        databaseAgentHost: 'Database Agent Host',
         timezone: 'Timezone',
         timezoneSystem: 'System',
         protocol: 'Protocol',
@@ -1369,6 +1371,7 @@ const baseTranslations = defineTranslations({
                   versionHistory: 'Version History',
                   outdatedExtensions: 'Outdated Extensions',
                   outdatedNodes: 'Outdated Nodes',
+                  outdatedDatabaseAgentHosts: 'Outdated Database Agent Hosts',
                 },
                 panelVersion:
                   'Your panel is currently running version `{current}`. The latest available version is `{latest}`.',
@@ -1384,6 +1387,10 @@ const baseTranslations = defineTranslations({
                 nodesUpToDate: 'Seems like all nodes are up to date. ({failed} failed to check)',
                 nodesOutdated:
                   'Some nodes are outdated, the latest available version is `{latest}`. ({outdated} outdated, {failed} failed to check)',
+                databaseAgentHostsUpToDate:
+                  'Seems like all database agent hosts are up to date. ({failed} failed to check)',
+                databaseAgentHostsOutdated:
+                  'Some database agent hosts are outdated, the latest available version is `{latest}`. ({outdated} outdated, {failed} failed to check)',
                 table: {
                   version: 'Version',
                   installed: 'Installed',
@@ -2023,6 +2030,25 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Location Database Host Deletion',
                     content: 'Are you sure you want to delete the database host **{name}** from **{location}**?',
+                  },
+                },
+              },
+            },
+            databaseAgentHosts: {
+              title: 'Database Agent Hosts',
+              page: {
+                title: 'Location Database Agent Hosts',
+                toast: {
+                  created: 'Location database agent host created.',
+                  deleted: 'Location database agent host deleted.',
+                },
+                modal: {
+                  create: {
+                    title: 'Create Location Database Agent Host',
+                  },
+                  delete: {
+                    title: 'Confirm Location Database Agent Host Deletion',
+                    content: 'Are you sure you want to delete the database agent host **{name}** from **{location}**?',
                   },
                 },
               },
@@ -3114,6 +3140,185 @@ const baseTranslations = defineTranslations({
               title: 'Databases',
               page: {
                 title: 'Database Host Databases',
+              },
+            },
+          },
+        },
+        databaseAgentHosts: {
+          title: 'Database Agent Hosts',
+          resourceName: 'Database agent host',
+          tabs: {
+            general: {
+              page: {
+                titleCreate: 'Create Database Agent Host',
+                titleUpdate: 'Update Database Agent Host',
+                button: {
+                  resetToken: 'Reset Token',
+                  testConnection: 'Test Connection',
+                  updateConfig: 'Update Config',
+                },
+                toast: {
+                  tested: 'Test successfully completed.',
+                  tokenReset: 'Database agent host token reset.',
+                },
+                modal: {
+                  delete: {
+                    title: 'Confirm Database Agent Host Deletion',
+                    content: 'Are you sure you want to delete **{name}**?',
+                  },
+                },
+              },
+            },
+            configuration: {
+              title: 'Configuration',
+              page: {
+                title: 'Configuration',
+                section: {
+                  initialSetup: 'Initial Setup',
+                  liveConfiguration: 'Live Configuration',
+                },
+                description: {
+                  placeFile: 'Place this into the configuration file at `/etc/calagopus-db-agent/config.yml` or run',
+                },
+                tooltip: {
+                  copyCommand: 'Copy command',
+                },
+                form: {
+                  apiPort: 'API Port',
+                },
+                button: {
+                  save: 'Save Configuration',
+                  reveal: 'Reveal Configuration',
+                },
+                alert: {
+                  couldNotReach: 'Could not reach the database agent host: {error}',
+                  tokenWarning: 'The configuration below contains the host token. Reveal it only when needed.',
+                },
+                toast: {
+                  applied: 'Configuration applied successfully.',
+                  submittedNotApplied: 'Configuration was submitted but not applied.',
+                  invalidYaml: 'Invalid YAML: {error}',
+                },
+              },
+            },
+            overview: {
+              title: 'Overview',
+              page: {
+                title: 'Database Agent Host Overview',
+                status: {
+                  deploymentEnabled: 'Deployment Enabled',
+                  deploymentDisabled: 'Deployment Disabled',
+                  maintenanceEnabled: 'Maintenance Enabled',
+                  maintenanceDisabled: 'Maintenance Disabled',
+                },
+                card: {
+                  hostDetails: 'Host Details',
+                  systemInfo: 'System Information',
+                },
+                label: {
+                  url: 'URL',
+                  description: 'Description',
+                  createdAt: 'Created',
+                  version: 'Version',
+                  cpu: 'CPU',
+                  memory: 'Memory',
+                  databases: 'Databases',
+                  kernelVersion: 'Kernel Version',
+                  architecture: 'Architecture',
+                  unavailable: 'Unavailable',
+                },
+                badge: {
+                  updateAvailable: 'Update Available',
+                },
+              },
+            },
+            statistics: {
+              title: 'Statistics',
+              page: {
+                title: 'Database Agent Host Statistics',
+                card: {
+                  resources: 'Resources',
+                  graphs: 'Graphs',
+                },
+                label: {
+                  cpu: 'CPU',
+                  cpuThreads: '{model} ({threads} threads)',
+                  memory: 'Memory',
+                  usedByAgent: '{size} used by the agent',
+                  disk: 'Disk',
+                  network: 'Network',
+                  networkIn: 'In: {in}',
+                  networkOut: 'Out: {out}',
+                },
+                chart: {
+                  cpuLoad: 'CPU Load',
+                  memoryUsage: 'Memory Usage',
+                  diskIo: 'Disk I/O',
+                  diskRead: 'Disk Read',
+                  diskWrite: 'Disk Write',
+                  networkTraffic: 'Network Traffic',
+                  networkInLabel: 'Inbound',
+                  networkOutLabel: 'Outbound',
+                  inbound: 'Inbound',
+                  outbound: 'Outbound',
+                },
+                toast: {
+                  connectionLost: 'Connection to the database agent host was lost.',
+                },
+              },
+            },
+          },
+          modal: {
+            bulkConfig: {
+              title: 'Update Configuration - {hosts}',
+              button: {
+                apply: 'Apply to {hosts}',
+              },
+              toast: {
+                applied: 'Configuration applied to {hosts}.',
+              },
+              error: {
+                invalidYaml: 'Invalid YAML: {error}',
+              },
+            },
+          },
+        },
+        databaseAgentTemplates: {
+          title: 'Database Agent Templates',
+          resourceName: 'Database agent template',
+          tabs: {
+            general: {
+              page: {
+                titleCreate: 'Create Database Agent Template',
+                titleUpdate: 'Update Database Agent Template',
+                form: {
+                  dockerImages: 'Docker Images',
+                  env: 'Environment Variables',
+                  volumes: 'Volumes',
+                  imageUid: 'Image UID',
+                  imageGid: 'Image GID',
+                  cmd: 'Command',
+                  memoryDescription: 'The Memory limit of the database container.',
+                  memoryTooltip: '0 will not set a limit.',
+                  swap: 'Swap',
+                  swapDescription: 'The amount of swap to give this database.',
+                  swapTooltip: '-1 will not set a limit.',
+                  diskDescription: 'The disk limit of the database.',
+                  diskTooltip:
+                    '0 will not set a limit. This is a soft-limit unless the disk limiter is configured on Wings.',
+                  cpu: 'CPU Limit (%)',
+                  cpuDescription: 'The CPU limit in % that the database can use.',
+                  cpuTooltip: '1 thread = 100%. 0 will not set a limit.',
+                  ioWeight: 'IO Weight',
+                  ioWeightDescription: 'The relative IO Weight of the database container compared to other containers.',
+                  ioWeightTooltip: '0-1000. May not work on all systems.',
+                },
+                modal: {
+                  delete: {
+                    title: 'Confirm Database Agent Template Deletion',
+                    content: 'Are you sure you want to delete **{name}**?',
+                  },
+                },
               },
             },
           },

@@ -1,0 +1,6 @@
+import { untransformedAxiosInstance } from '@/api/axios.ts';
+
+export default async (hostUuid: string): Promise<object> => {
+  const { data } = await untransformedAxiosInstance.get(`/api/admin/database-agent-hosts/${hostUuid}/config`);
+  return data.config;
+};

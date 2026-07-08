@@ -47,6 +47,7 @@ export const bytea = customType<{
 });
 
 export const databaseTypeEnum = pgEnum('database_type', ['MYSQL', 'POSTGRES', 'MONGODB']);
+export const databaseAgentTypeEnum = pgEnum('database_agent_type', ['POSTGRES', 'MARIADB', 'MONGODB', 'REDIS']);
 export const serverStatusEnum = pgEnum('server_status', ['INSTALLING', 'INSTALL_FAILED', 'RESTORING_BACKUP']);
 export const serverAutoStartBehaviorEnum = pgEnum('server_auto_start_behavior', ['ALWAYS', 'UNLESS_STOPPED', 'NEVER']);
 export const backupDiskEnum = pgEnum('backup_disk', [
@@ -711,6 +712,71 @@ export const databaseHostsTable = pgTable(
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [uniqueIndex('database_hosts_name_idx').on(cols.name)],
+);
+
+export const databaseAgentHostsTable = pgTable(
+  'database_agent_hosts',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    description: text(),
+    deployment_enabled: boolean().default(false).notNull(),
+    maintenance_enabled: boolean().default(false).notNull(),
+    url: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    memory: bigint({ mode: 'number' }).notNull(),
+    disk: bigint({ mode: 'number' }).notNull(),
+    token: bytea().notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    uniqueIndex('database_agent_hosts_name_idx').on(cols.name),
+    uniqueIndex('database_agent_hosts_token_idx').on(cols.token),
+  ],
+);
+
+export const locationDatabaseAgentHostsTable = pgTable(
+  'location_database_agent_hosts',
+  {
+    location_uuid: uuid()
+      .references(() => locationsTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    database_agent_host_uuid: uuid()
+      .references(() => databaseAgentHostsTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    primaryKey({
+      name: 'location_database_agent_hosts_pk',
+      columns: [cols.location_uuid, cols.database_agent_host_uuid],
+    }),
+    index('location_database_agent_hosts_location_uuid_idx').on(cols.location_uuid),
+    index('location_database_agent_hosts_database_agent_host_uuid_idx').on(cols.database_agent_host_uuid),
+  ],
+);
+
+export const databaseAgentTemplatesTable = pgTable(
+  'database_agent_templates',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    description: text(),
+    type: databaseAgentTypeEnum().notNull(),
+    deployment_enabled: boolean().default(false).notNull(),
+    docker_images: json().notNull(),
+    env: json().notNull(),
+    image_uid: integer().notNull(),
+    image_gid: integer().notNull(),
+    cmd: text().array(),
+    volumes: json().notNull(),
+    memory: bigint({ mode: 'number' }).notNull(),
+    swap: bigint({ mode: 'number' }).notNull(),
+    disk: bigint({ mode: 'number' }).notNull(),
+    io_weight: smallint(),
+    cpu: integer().notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [uniqueIndex('database_agent_templates_name_idx').on(cols.name)],
 );
 
 export const serversTable = pgTable(

@@ -319,6 +319,10 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                             "database-hosts",
                             "Allows viewing and managing a location's database hosts.",
                         ),
+                        (
+                            "database-agent-hosts",
+                            "Allows viewing and managing a location's database agent hosts.",
+                        ),
                     ]),
                 },
             ),
@@ -457,6 +461,39 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("update", "Allows modifying database hosts."),
                         ("delete", "Allows deleting database hosts."),
                         ("test", "Allows testing database host connections."),
+                    ]),
+                },
+            ),
+            (
+                "database-agent-hosts",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage database agent hosts for the panel.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new database agent hosts."),
+                        ("read", "Allows viewing database agent hosts."),
+                        ("update", "Allows modifying database agent hosts."),
+                        ("delete", "Allows deleting database agent hosts."),
+                        (
+                            "read-token",
+                            "Allows viewing a database agent host's token.",
+                        ),
+                        (
+                            "reset-token",
+                            "Allows resetting database agent host tokens.",
+                        ),
+                        ("test", "Allows testing database agent host connections."),
+                    ]),
+                },
+            ),
+            (
+                "database-agent-templates",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage database agent templates for the panel.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new database agent templates."),
+                        ("read", "Allows viewing database agent templates."),
+                        ("update", "Allows modifying database agent templates."),
+                        ("delete", "Allows deleting database agent templates."),
                     ]),
                 },
             ),

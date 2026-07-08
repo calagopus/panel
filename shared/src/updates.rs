@@ -95,6 +95,8 @@ pub struct UpdateInformation {
     pub latest_panel_version: semver::Version,
     #[schema(value_type = String)]
     pub latest_wings_version: semver::Version,
+    #[schema(value_type = String)]
+    pub latest_db_agent_version: semver::Version,
 
     pub extensions: BTreeMap<&'static str, ExtensionUpdateCheckResult>,
 }
@@ -160,12 +162,14 @@ impl UpdateManager {
                         struct ResponseVersions {
                             panel: semver::Version,
                             wings: semver::Version,
+                            db_agent: semver::Version,
                         }
 
                         let mut update_info = UpdateInformation {
                             panel_version: state.version.to_compact_string(),
                             latest_panel_version: data.versions.panel,
                             latest_wings_version: data.versions.wings,
+                            latest_db_agent_version: data.versions.db_agent,
                             extensions: BTreeMap::new(),
                         };
 

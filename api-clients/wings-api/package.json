@@ -1,0 +1,26 @@
+{
+  "name": "wings-api",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "rm -rf lib && esbuild `find generator-src \\( -name '*.ts' -o -name '*.tsx' \\)` --platform='node' --sourcemap --ignore-annotations --format='cjs' --target='es2022' --outdir='lib' && esbuild generator-src/index.ts --platform='node' --sourcemap --ignore-annotations --format='cjs' --target='es2022' --outdir='lib' --banner:js='require(\"module-alias\").addAlias(\"@\", __dirname);'",
+    "generate": "pnpm build && cd lib && NODE_ENV=development node --enable-source-maps index && cd .."
+  },
+  "keywords": [],
+  "author": "Calagopus",
+  "license": "MIT",
+  "dependencies": {
+    "change-case": "^5.4.4",
+    "module-alias": "^2.3.4",
+    "openapi3-ts": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "esbuild": "^0.27.4",
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

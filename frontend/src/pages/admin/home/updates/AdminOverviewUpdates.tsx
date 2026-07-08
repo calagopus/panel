@@ -10,6 +10,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
+import getDatabaseAgentHostUpdates from '@/api/admin/system/updates/getDatabaseAgentHostUpdates.ts';
 import getNodeUpdates from '@/api/admin/system/updates/getNodeUpdates.ts';
 import getUpdateHistory from '@/api/admin/system/updates/getUpdateHistory.ts';
 import recheckUpdates from '@/api/admin/system/updates/recheckUpdates.ts';
@@ -27,12 +28,13 @@ import {
   adminExtensionUpdateCheckResultErrorSchema,
   adminExtensionUpdateCheckResultUpdateAvailableSchema,
 } from '@/lib/schemas/admin/system.ts';
-import { nodeTableColumns } from '@/lib/tableColumns.ts';
+import { databaseAgentHostTableColumns, nodeTableColumns } from '@/lib/tableColumns.ts';
 import { parseVersion } from '@/lib/version.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
+import DatabaseAgentHostRow from '../../databaseAgentHosts/DatabaseAgentHostRow.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
 
 export default function AdminOverviewUpdates() {
@@ -54,6 +56,18 @@ export default function AdminOverviewUpdates() {
     queryKey: queryKeys.admin.updates.nodes(),
     fetcher: (page) => getNodeUpdates(page),
     paginationKey: 'outdatedNodes',
+  });
+
+  const {
+    data: databaseAgentHosts,
+    loading: databaseAgentHostsLoading,
+    error: databaseAgentHostsError,
+    setPage: setDatabaseAgentHostsPage,
+    refetch: refetchDatabaseAgentHosts,
+  } = useSearchablePaginatedTable({
+    queryKey: queryKeys.admin.updates.databaseAgentHosts(),
+    fetcher: (page) => getDatabaseAgentHostUpdates(page),
+    paginationKey: 'outdatedDatabaseAgentHosts',
   });
 
   useEffect(() => {
@@ -87,6 +101,7 @@ export default function AdminOverviewUpdates() {
       .then((updateInformation) => {
         setUpdateInformation(updateInformation);
         refetch();
+        refetchDatabaseAgentHosts();
         addToast(t('pages.admin.home.tabs.updates.page.toast.recheckComplete', {}), 'success');
       })
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
@@ -300,6 +315,42 @@ export default function AdminOverviewUpdates() {
               >
                 {nodes.outdatedNodes.data.map((node) => (
                   <NodeRow key={node.node.uuid} node={node.node} />
+                ))}
+              </Table>
+            </>
+          )}
+        </TitleCard>
+        <TitleCard
+          title={t('pages.admin.home.tabs.updates.page.card.outdatedDatabaseAgentHosts', {})}
+          icon={<FontAwesomeIcon icon={faServer} />}
+        >
+          {databaseAgentHostsLoading || !databaseAgentHosts?.outdatedDatabaseAgentHosts ? (
+            <Spinner.Centered />
+          ) : !databaseAgentHosts?.outdatedDatabaseAgentHosts.total ? (
+            <>
+              <FontAwesomeIcon icon={faCheck} />{' '}
+              {t('pages.admin.home.tabs.updates.page.databaseAgentHostsUpToDate', {
+                failed: databaseAgentHosts?.failedDatabaseAgentHosts ?? 0,
+              })}
+            </>
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faExclamationTriangle} />{' '}
+              {t('pages.admin.home.tabs.updates.page.databaseAgentHostsOutdated', {
+                latest: updateInformation?.latestDbAgentVersion || unknownLabel,
+                outdated: databaseAgentHosts?.outdatedDatabaseAgentHosts.total ?? 0,
+                failed: databaseAgentHosts?.failedDatabaseAgentHosts ?? 0,
+              }).md()}
+              <div className='mt-4' />
+              <Table
+                columns={databaseAgentHostTableColumns()}
+                loading={databaseAgentHostsLoading}
+                error={databaseAgentHostsError}
+                pagination={databaseAgentHosts.outdatedDatabaseAgentHosts}
+                onPageSelect={setDatabaseAgentHostsPage}
+              >
+                {databaseAgentHosts.outdatedDatabaseAgentHosts.data.map((host) => (
+                  <DatabaseAgentHostRow key={host.databaseAgentHost.uuid} databaseAgentHost={host.databaseAgentHost} />
                 ))}
               </Table>
             </>

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "module": "CommonJS",
+    "lib": ["ES2023", "DOM"],
+    "pretty": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "declaration": false,
+    "esModuleInterop": true,
+    "target": "ES2022",
+    "outDir": "lib",
+    "paths": {
+      "@/*": ["./generator-src/*"]
+    }
+  },
+  "include": [
+    "generator-src/**/*"
+  ]
+}

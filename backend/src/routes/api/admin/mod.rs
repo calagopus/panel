@@ -20,6 +20,8 @@ mod activity;
 mod announcements;
 mod assets;
 mod backup_configurations;
+mod database_agent_hosts;
+mod database_agent_templates;
 mod database_hosts;
 mod egg_configurations;
 mod egg_repositories;
@@ -86,6 +88,11 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/egg-repositories", egg_repositories::router(state))
         .nest("/egg-configurations", egg_configurations::router(state))
         .nest("/database-hosts", database_hosts::router(state))
+        .nest("/database-agent-hosts", database_agent_hosts::router(state))
+        .nest(
+            "/database-agent-templates",
+            database_agent_templates::router(state),
+        )
         .nest(
             "/backup-configurations",
             backup_configurations::router(state),

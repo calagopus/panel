@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { nullableString } from '@/lib/transformers.ts';
+import { adminDatabaseAgentHostSchema } from './databaseAgentHosts.ts';
 import { adminDatabaseHostSchema } from './databaseHosts.ts';
 
 export const adminLocationSchema = z.object({
@@ -26,5 +27,10 @@ export const adminLocationUpdateSchema = z.lazy(() =>
 
 export const adminLocationDatabaseHostSchema = z.object({
   databaseHost: z.lazy(() => adminDatabaseHostSchema),
+  created: z.date(),
+});
+
+export const adminLocationDatabaseAgentHostSchema = z.object({
+  databaseAgentHost: z.lazy(() => adminDatabaseAgentHostSchema),
   created: z.date(),
 });

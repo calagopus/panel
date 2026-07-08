@@ -4,9 +4,9 @@ members = [
 	"backend",
 	"database-migrator",
 	"rule-validator",
-	"wings-api",
 	"shared",
 	"bins/*",
+	"api-clients/*",
 	"schema-extension/*",
 	"backend-extensions/*"
 ]
@@ -17,7 +17,8 @@ package.version = "1.1.0"
 package.edition = "2024"
 
 [workspace.dependencies]
-wings-api = { path = "wings-api" }
+wings-api = { path = "api-clients/wings-api" }
+db-agent-api = { path = "api-clients/db-agent-api" }
 rule-validator = { path = "rule-validator" }
 shared = { path = "shared" }
 backend = { path = "backend" }

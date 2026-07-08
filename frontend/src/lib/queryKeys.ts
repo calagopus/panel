@@ -51,6 +51,7 @@ const admin = {
     all: () => ['admin', 'locations'] as const,
     detail: (uuid: string) => ['admin', 'locations', { uuid }] as const,
     databaseHosts: (locationUuid: string) => ['admin', 'locations', locationUuid, 'database-hosts'] as const,
+    databaseAgentHosts: (locationUuid: string) => ['admin', 'locations', locationUuid, 'database-agent-hosts'] as const,
     nodes: (locationUuid: string) => ['admin', 'locations', locationUuid, 'nodes'] as const,
   },
 
@@ -66,6 +67,18 @@ const admin = {
     all: () => ['admin', 'database-hosts'] as const,
     detail: (uuid: string) => ['admin', 'database-hosts', { uuid }] as const,
     databases: (hostUuid: string) => ['admin', 'database-hosts', hostUuid, 'databases'] as const,
+  },
+
+  databaseAgentHosts: {
+    all: () => ['admin', 'database-agent-hosts'] as const,
+    detail: (uuid: string) => ['admin', 'database-agent-hosts', { uuid }] as const,
+    token: (uuid: string) => ['admin', 'database-agent-hosts', uuid, 'token'] as const,
+    systemOverview: (uuid: string) => ['admin', 'database-agent-hosts', uuid, 'system', 'overview'] as const,
+  },
+
+  databaseAgentTemplates: {
+    all: () => ['admin', 'database-agent-templates'] as const,
+    detail: (uuid: string) => ['admin', 'database-agent-templates', { uuid }] as const,
   },
 
   backupConfigurations: {
@@ -111,6 +124,7 @@ const admin = {
 
   updates: {
     nodes: () => ['admin', 'updates', 'nodes'] as const,
+    databaseAgentHosts: () => ['admin', 'updates', 'database-agent-hosts'] as const,
   },
 
   health: {

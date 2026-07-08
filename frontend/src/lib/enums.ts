@@ -56,7 +56,13 @@ import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfig
 import { adminEggConfigurationDeploymentSchema } from '@/lib/schemas/admin/eggConfigurations.ts';
 import { processConfigurationConfigParser } from '@/lib/schemas/admin/eggs.ts';
 import { adminSettingsEmailSchema, adminSettingsStorageSchema } from '@/lib/schemas/admin/settings.ts';
-import { compressionType, databaseType, streamingArchiveFormat, transferArchiveFormat } from '@/lib/schemas/generic.ts';
+import {
+  compressionType,
+  databaseAgentType,
+  databaseType,
+  streamingArchiveFormat,
+  transferArchiveFormat,
+} from '@/lib/schemas/generic.ts';
 import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
 import {
   serverScheduleComparator,
@@ -107,6 +113,13 @@ export const databaseTypeLabelMapping: Record<z.infer<typeof databaseType>, stri
   mysql: 'MySQL',
   postgres: 'PostgreSQL',
   mongodb: 'MongoDB',
+};
+
+export const databaseAgentTypeLabelMapping: Record<z.infer<typeof databaseAgentType>, string> = {
+  postgres: 'PostgreSQL',
+  mariadb: 'MariaDB',
+  mongodb: 'MongoDB',
+  redis: 'Redis',
 };
 
 export const announcementTypeLabelMapping: Record<z.infer<typeof announcementType>, () => string> = {

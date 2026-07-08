@@ -4,6 +4,7 @@ import {
   faBullhorn,
   faCogs,
   faCrow,
+  faCubes,
   faDatabase,
   faDownload,
   faEarthAmerica,
@@ -23,6 +24,8 @@ import AdminActivity from '@/pages/admin/activity/AdminActivity.tsx';
 import AdminAnnouncements from '@/pages/admin/announcements/AdminAnnouncements.tsx';
 import AdminAssets from '@/pages/admin/assets/AdminAssets.tsx';
 import AdminBackupConfigurations from '@/pages/admin/backupConfigurations/AdminBackupConfigurations.tsx';
+import AdminDatabaseAgentHosts from '@/pages/admin/databaseAgentHosts/AdminDatabaseAgentHosts.tsx';
+import AdminDatabaseAgentTemplates from '@/pages/admin/databaseAgentTemplates/AdminDatabaseAgentTemplates.tsx';
 import AdminDatabaseHosts from '@/pages/admin/databaseHosts/AdminDatabaseHosts.tsx';
 import AdminEggConfigurations from '@/pages/admin/eggConfigurations/AdminEggConfigurations.tsx';
 import AdminEggRepositories from '@/pages/admin/eggRepositories/AdminEggRepositories.tsx';
@@ -138,6 +141,20 @@ const routes: AdminRouteDefinition[] = [
     path: '/database-hosts/*',
     element: AdminDatabaseHosts,
     permission: ['database-hosts.*'],
+  },
+  {
+    name: () => getTranslations().t('pages.admin.databaseAgentHosts.title', {}),
+    icon: faServer,
+    path: '/database-agent-hosts/*',
+    element: AdminDatabaseAgentHosts,
+    permission: ['database-agent-hosts.*'],
+  },
+  {
+    name: () => getTranslations().t('pages.admin.databaseAgentTemplates.title', {}),
+    icon: faCubes,
+    path: '/database-agent-templates/*',
+    element: AdminDatabaseAgentTemplates,
+    permission: ['database-agent-templates.*'],
   },
   {
     name: () => getTranslations().t('pages.admin.oAuthProviders.title', {}),

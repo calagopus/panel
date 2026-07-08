@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { adminDatabaseAgentHostSchema } from './databaseAgentHosts.ts';
 import { adminNodeSchema } from './nodes.ts';
 
 export const adminExtensionUpdateCheckResultNoUpdateSchema = z.object({
@@ -37,12 +38,18 @@ export const adminUpdateInformationSchema = z.object({
   panelVersion: z.string(),
   latestPanelVersion: z.string(),
   latestWingsVersion: z.string(),
+  latestDbAgentVersion: z.string(),
   extensions: z.record(z.string(), adminExtensionUpdateCheckResultSchema),
 });
 
 export const adminNodeUpdateInformationSchema = z.object({
   version: z.string(),
   node: z.lazy(() => adminNodeSchema),
+});
+
+export const adminDatabaseAgentHostUpdateInformationSchema = z.object({
+  version: z.string(),
+  databaseAgentHost: z.lazy(() => adminDatabaseAgentHostSchema),
 });
 
 export const adminNodeDesyncSchema = z.object({

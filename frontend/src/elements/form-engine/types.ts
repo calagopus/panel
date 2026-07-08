@@ -166,6 +166,8 @@ export interface RegisteredFormIds {
   'admin.oAuthProviders.createOrUpdate': true;
   'admin.databaseHosts.createOrUpdate': true;
   'admin.databaseHosts.credentialDetails': true;
+  'admin.databaseAgentHosts.createOrUpdate': true;
+  'admin.databaseAgentTemplates.createOrUpdate': true;
   'admin.nodes.createOrUpdate': true;
   'admin.nodes.locationModal': true;
   'admin.mounts.createOrUpdate': true;
