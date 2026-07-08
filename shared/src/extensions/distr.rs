@@ -649,15 +649,17 @@ impl ExtensionDistrFileBuilder {
         while let Some(Ok((_, name))) = walker.next_entry() {
             let metadata = filesystem.metadata(&name)?;
             let virtual_path = Path::new("backend").join(&name);
+            let virtual_path = virtual_path.to_string_lossy();
+            // zip entry names use forward slashes, but Windows joins with `\`
+            #[cfg(windows)]
+            let virtual_path = virtual_path.replace('\\', "/");
 
             let options: FileOptions<()> = FileOptions::default().compression_level(Some(9));
 
             if metadata.is_dir() {
-                self.zip
-                    .add_directory(virtual_path.to_string_lossy(), options)?;
+                self.zip.add_directory(&*virtual_path, options)?;
             } else if metadata.is_file() {
-                self.zip
-                    .start_file(virtual_path.to_string_lossy(), options)?;
+                self.zip.start_file(&*virtual_path, options)?;
 
                 let mut reader = filesystem.open(&name)?;
                 std::io::copy(&mut reader, &mut self.zip)?;
@@ -700,15 +702,17 @@ impl ExtensionDistrFileBuilder {
         while let Some(Ok((_, name))) = walker.next_entry() {
             let metadata = filesystem.metadata(&name)?;
             let virtual_path = Path::new("frontend").join(&name);
+            let virtual_path = virtual_path.to_string_lossy();
+            // zip entry names use forward slashes, but Windows joins with `\`
+            #[cfg(windows)]
+            let virtual_path = virtual_path.replace('\\', "/");
 
             let options: FileOptions<()> = FileOptions::default().compression_level(Some(9));
 
             if metadata.is_dir() {
-                self.zip
-                    .add_directory(virtual_path.to_string_lossy(), options)?;
+                self.zip.add_directory(&*virtual_path, options)?;
             } else if metadata.is_file() {
-                self.zip
-                    .start_file(virtual_path.to_string_lossy(), options)?;
+                self.zip.start_file(&*virtual_path, options)?;
 
                 let mut reader = filesystem.open(&name)?;
                 std::io::copy(&mut reader, &mut self.zip)?;
@@ -744,15 +748,17 @@ impl ExtensionDistrFileBuilder {
         while let Some(Ok((_, name))) = walker.next_entry() {
             let metadata = filesystem.metadata(&name)?;
             let virtual_path = Path::new("migrations").join(&name);
+            let virtual_path = virtual_path.to_string_lossy();
+            // zip entry names use forward slashes, but Windows joins with `\`
+            #[cfg(windows)]
+            let virtual_path = virtual_path.replace('\\', "/");
 
             let options: FileOptions<()> = FileOptions::default().compression_level(Some(9));
 
             if metadata.is_dir() {
-                self.zip
-                    .add_directory(virtual_path.to_string_lossy(), options)?;
+                self.zip.add_directory(&*virtual_path, options)?;
             } else if metadata.is_file() {
-                self.zip
-                    .start_file(virtual_path.to_string_lossy(), options)?;
+                self.zip.start_file(&*virtual_path, options)?;
 
                 let mut reader = filesystem.open(&name)?;
                 std::io::copy(&mut reader, &mut self.zip)?;
