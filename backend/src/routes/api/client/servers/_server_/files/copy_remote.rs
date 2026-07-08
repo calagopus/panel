@@ -82,7 +82,7 @@ mod post {
 
         let permissions = permissions
             .0
-            .set_user_server_owner(user.uuid == destination_server.uuid)
+            .set_user_server_owner(user.uuid == destination_server.owner.uuid)
             .add_subuser_permissions(destination_server.subuser_permissions);
 
         permissions.has_server_permission("files.create")?;

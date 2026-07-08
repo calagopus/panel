@@ -101,8 +101,9 @@ type Props = ModalProps & {
 export default function FileCopyRemoteModal({ files, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
-  const { browsingDirectory, doSelectFiles } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const browsingDirectory = useFileManager((state) => state.browsingDirectory);
+  const doSelectFiles = useFileManager((state) => state.doSelectFiles);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
     z.infer<typeof serverFilesCopyRemoteSchema>

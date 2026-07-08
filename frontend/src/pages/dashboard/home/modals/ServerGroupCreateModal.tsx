@@ -19,7 +19,7 @@ const schema = z.object({
 export default function ServerGroupCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addServerGroup } = useUserStore();
+  const addServerGroup = useUserStore((state) => state.addServerGroup);
 
   const [loading, setLoading] = useState(false);
 

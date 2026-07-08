@@ -67,7 +67,8 @@ export default function ServerGroupItem({
   getServerTo?: (server: z.infer<typeof serverSchema>) => string;
 }) {
   const { t, tItem } = useTranslations();
-  const { updateServerGroup: updateStateServerGroup, removeServerGroup } = useUserStore();
+  const updateStateServerGroup = useUserStore((state) => state.updateServerGroup);
+  const removeServerGroup = useUserStore((state) => state.removeServerGroup);
   const { addToast } = useToast();
   const isDark = useComputedColorScheme('dark') === 'dark';
 

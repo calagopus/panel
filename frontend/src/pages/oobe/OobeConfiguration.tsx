@@ -24,7 +24,7 @@ import { useGlobalStore } from '@/stores/global.ts';
 
 export default function OobeConfiguration({ onNext }: OobeComponentProps) {
   const { t, setLanguage } = useTranslations();
-  const { languages } = useGlobalStore();
+  const languages = useGlobalStore((state) => state.languages);
   const { user, setUser } = useAuth();
 
   const [loading, setLoading] = useState(false);

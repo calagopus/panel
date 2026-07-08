@@ -70,8 +70,8 @@ export default function AdminActivity() {
         pagination={activities}
         onPageSelect={setPage}
       >
-        {activities?.data.map((activity) => (
-          <ActivityRow key={activity.created.toString()} activity={activity} />
+        {activities?.data.map((activity, index) => (
+          <ActivityRow key={`${activity.created.toISOString()}-${index}`} activity={activity} />
         ))}
       </Table>
     </AdminContentContainer>

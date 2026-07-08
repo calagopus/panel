@@ -48,7 +48,8 @@ export default function DashboardApiKeysCreate() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user } = useAuth();
-  const { availablePermissions, setAvailablePermissions } = useGlobalStore();
+  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
+  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

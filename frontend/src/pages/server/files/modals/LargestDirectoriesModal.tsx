@@ -97,8 +97,8 @@ function TreemapCell({
 export default function LargestDirectoriesModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
-  const { browsingDirectory } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const browsingDirectory = useFileManager((state) => state.browsingDirectory);
   const [, setSearchParams] = useSearchParams();
 
   const [loading, setLoading] = useState(false);

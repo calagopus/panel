@@ -28,7 +28,8 @@ type RoleFormValues = z.infer<typeof adminRoleUpdateSchema>;
 
 export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.infer<typeof roleSchema> }) {
   const { t } = useTranslations();
-  const { availablePermissions, setAvailablePermissions } = useGlobalStore();
+  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
+  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 

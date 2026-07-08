@@ -58,7 +58,7 @@ mod put {
             .await?
         {
             return ApiResponse::error("invalid password")
-                .with_status(StatusCode::UNAUTHORIZED)
+                .with_status(StatusCode::FORBIDDEN)
                 .ok();
         }
 

@@ -16,10 +16,11 @@ import { useServerStore } from '@/stores/server.ts';
 
 export default function ServerStateGuard() {
   const { t } = useTranslations();
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
   const { user } = useAuth();
   const { addToast } = useToast();
-  const { server, updateServer } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const updateServer = useServerStore((state) => state.updateServer);
   const canReadInstallationLogs = useAdminCan('servers.read');
   const location = useLocation();
 

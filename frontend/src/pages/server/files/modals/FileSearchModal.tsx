@@ -11,6 +11,7 @@ import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { startTransition, useEffect, useState } from 'react';
 import { z } from 'zod';
+import { useShallow } from 'zustand/react/shallow';
 import searchFiles from '@/api/server/files/searchFiles.ts';
 import Box from '@/elements/Box.tsx';
 import Button from '@/elements/Button.tsx';
@@ -36,8 +37,8 @@ import { useServerStore } from '@/stores/server.ts';
 
 export default function FileSearchModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
-  const { settings } = useGlobalStore();
-  const { server } = useServerStore();
+  const settings = useGlobalStore((state) => state.settings);
+  const server = useServerStore((state) => state.server);
   const {
     browsingDirectory,
     browsingFastDirectory,
@@ -45,7 +46,16 @@ export default function FileSearchModal({ ...props }: ModalProps) {
     setSearchInfo,
     doSelectFiles,
     clearActingFiles,
-  } = useFileManager();
+  } = useFileManager(
+    useShallow((state) => ({
+      browsingDirectory: state.browsingDirectory,
+      browsingFastDirectory: state.browsingFastDirectory,
+      setBrowsingEntries: state.setBrowsingEntries,
+      setSearchInfo: state.setSearchInfo,
+      doSelectFiles: state.doSelectFiles,
+      clearActingFiles: state.clearActingFiles,
+    })),
+  );
 
   const [query, setQuery] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);

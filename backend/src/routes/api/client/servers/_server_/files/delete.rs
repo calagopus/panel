@@ -49,13 +49,15 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_server_permission("files.delete")?;
 
+        let files = data
+            .files
+            .into_iter()
+            .filter(|f| !server.is_ignored(std::path::Path::new(&data.root).join(f), false))
+            .collect();
+
         let request_body = wings_api::servers_server_files_delete::post::RequestBody {
             root: data.root,
-            files: data
-                .files
-                .into_iter()
-                .filter(|f| !server.is_ignored(f, false))
-                .collect(),
+            files,
         };
 
         let data = match server

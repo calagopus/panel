@@ -25,7 +25,8 @@ import StorageS3 from './forms/StorageS3.tsx';
 export default function StorageContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { storageDriver, updateSettings } = useAdminStore();
+  const storageDriver = useAdminStore((state) => state.storageDriver);
+  const updateSettings = useAdminStore((state) => state.updateSettings);
 
   const [openModal, setOpenModal] = useState<'changeStorageType' | null>(null);
   const [loading, setLoading] = useState(false);

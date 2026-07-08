@@ -91,21 +91,24 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                     .ok();
             }
 
-            if state
-                .cache
-                .get::<u16>(&format!("oauth_state::{}", params.state))
-                .await?
-                .is_none()
+            let state_cookie = cookies.get("oauth_state").map(|cookie| cookie.value().to_owned());
+            cookies.remove(
+                tower_cookies::Cookie::build("oauth_state")
+                    .path("/api/auth/oauth")
+                    .build(),
+            );
+
+            let cache_key = format!("oauth_state::{}::{}", oauth_provider.uuid, params.state);
+
+            if state_cookie.as_deref() != Some(params.state.as_str())
+                || state.cache.get::<u16>(&cache_key).await?.is_none()
             {
                 return ApiResponse::error("oauth csrf state not found, please try again")
                     .with_status(StatusCode::NOT_FOUND)
                     .ok();
             }
 
-            state
-                .cache
-                .invalidate(&format!("oauth_state::{}", params.state))
-                .await?;
+            state.cache.invalidate(&cache_key).await?;
 
             let settings = state.settings.get().await?;
 

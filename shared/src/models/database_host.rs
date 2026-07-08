@@ -15,7 +15,7 @@ use tokio::sync::Mutex;
 use utoipa::ToSchema;
 
 pub enum DatabaseTransaction<'a> {
-    Mysql(sqlx::Transaction<'a, sqlx::MySql>),
+    Mysql(sqlx::Transaction<'a, sqlx::MySql>, sqlx::Pool<sqlx::MySql>),
     Postgres(
         sqlx::Transaction<'a, sqlx::Postgres>,
         sqlx::Pool<sqlx::Postgres>,

@@ -13,7 +13,7 @@ import { useServerStore } from '@/stores/server.ts';
 export default function SftpDetailsModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { user } = useAuth();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
 
   return (
     <Modal title={t('pages.server.files.modal.sftpDetails.title', {})} {...props}>

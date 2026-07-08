@@ -39,7 +39,7 @@ export default function AnnouncementCreateOrUpdate({
 }: {
   contextAnnouncement?: z.infer<typeof adminAnnouncementSchema>;
 }) {
-  const { languages } = useGlobalStore();
+  const languages = useGlobalStore((state) => state.languages);
   const { addToast } = useToast();
   const { t, tReact } = useTranslations();
 

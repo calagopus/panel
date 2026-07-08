@@ -46,7 +46,7 @@ function AdminSubContentContainer<P>(props: Props<P>) {
   } = props;
 
   const { t } = useTranslations();
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
 
   return (
     <ContentContainer title={`${title} | ${settings.app.name}`}>

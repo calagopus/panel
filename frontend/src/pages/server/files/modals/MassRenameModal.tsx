@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
+import { useShallow } from 'zustand/react/shallow';
 import renameFiles from '@/api/server/files/renameFiles.ts';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
@@ -63,8 +64,15 @@ const blockingStatuses: RenameStatus[] = ['invalid', 'invalidRegex', 'conflict',
 export default function MassRenameModal({ files, ...props }: Props) {
   const { t, tReact, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
-  const { browsingDirectory, browsingEntries, invalidateFilemanager, doSelectFiles } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const { browsingDirectory, browsingEntries, invalidateFilemanager, doSelectFiles } = useFileManager(
+    useShallow((state) => ({
+      browsingDirectory: state.browsingDirectory,
+      browsingEntries: state.browsingEntries,
+      invalidateFilemanager: state.invalidateFilemanager,
+      doSelectFiles: state.doSelectFiles,
+    })),
+  );
 
   const [options, setOptions] = useState<MassRenameOptions>(defaultOptions);
   const [excluded, setExcluded] = useState<Set<string>>(new Set());

@@ -9,6 +9,7 @@ mod get {
         models::{ByUuid, oauth_provider::OAuthProvider},
         response::{ApiResponse, ApiResponseResult},
     };
+    use tower_cookies::{Cookie, Cookies, cookie::SameSite};
 
     #[utoipa::path(get, path = "/", responses(
         (status = TEMPORARY_REDIRECT, body = String),
@@ -17,6 +18,7 @@ mod get {
     pub async fn route(
         state: GetState,
         ip: shared::GetIp,
+        cookies: Cookies,
         Path(oauth_provider): Path<uuid::Uuid>,
     ) -> ApiResponseResult {
         state
@@ -55,6 +57,9 @@ mod get {
                 oauth_provider.uuid
             ))?);
 
+        let secure = settings.app.url.starts_with("https://");
+        let provider_uuid = oauth_provider.uuid;
+
         drop(settings);
 
         let mut url = client.authorize_url(CsrfToken::new_random);
@@ -67,11 +72,21 @@ mod get {
         state
             .cache
             .set(
-                &format!("oauth_state::{}", csrf_state.secret()),
+                &format!("oauth_state::{}::{}", provider_uuid, csrf_state.secret()),
                 10 * 60,
                 &0u16,
             )
             .await?;
+
+        cookies.add(
+            Cookie::build(("oauth_state", csrf_state.secret().to_owned()))
+                .http_only(true)
+                .same_site(SameSite::Lax)
+                .secure(secure)
+                .path("/api/auth/oauth")
+                .max_age(tower_cookies::cookie::time::Duration::minutes(10))
+                .build(),
+        );
 
         ApiResponse::new(Body::empty())
             .with_header("Location", authorization_url.as_ref())

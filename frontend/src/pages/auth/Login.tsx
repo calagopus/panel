@@ -30,7 +30,8 @@ import AuthWrapper from './AuthWrapper.tsx';
 
 export default function Login() {
   const { doLogin } = useAuth();
-  const { settings, timeOffset } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
+  const timeOffset = useGlobalStore((state) => state.timeOffset);
   const { t } = useTranslations();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();

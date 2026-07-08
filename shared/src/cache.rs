@@ -205,9 +205,10 @@ impl Cache {
                 .await?;
 
             if limit_used >= limit {
+                let retry_after = expire_unix.saturating_sub(now as u64);
+
                 return Err(ApiResponse::error(format!(
-                    "you are ratelimited, retry in {}s",
-                    expiry - now
+                    "you are ratelimited, retry in {retry_after}s"
                 ))
                 .with_status(StatusCode::TOO_MANY_REQUESTS)
                 .with_header("X-RateLimit-Limit", limit.to_compact_string())
@@ -216,7 +217,7 @@ impl Cache {
                     limit.saturating_sub(limit_used).to_compact_string(),
                 )
                 .with_header("X-RateLimit-Reset", expire_unix.to_compact_string())
-                .with_header("Retry-After", (expiry - now).to_compact_string()));
+                .with_header("Retry-After", retry_after.to_compact_string()));
             }
         } else {
             let mut current_count = 0;

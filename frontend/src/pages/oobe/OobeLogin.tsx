@@ -26,7 +26,7 @@ export default function OobeLogin({ onNext }: OobeComponentProps) {
   const { t } = useTranslations();
   const { doLogin } = useAuth();
   const navigate = useNavigate();
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

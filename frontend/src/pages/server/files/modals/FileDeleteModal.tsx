@@ -19,8 +19,10 @@ type Props = ModalProps & {
 export default function FileDeleteModal({ files, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
-  const { browsingDirectory, doSelectFiles, invalidateFilemanager } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const browsingDirectory = useFileManager((state) => state.browsingDirectory);
+  const doSelectFiles = useFileManager((state) => state.doSelectFiles);
+  const invalidateFilemanager = useFileManager((state) => state.invalidateFilemanager);
 
   const [loading, setLoading] = useState(false);
 

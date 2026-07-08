@@ -44,7 +44,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { addWindow } = useWindows();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
   const store = useFileManagerApi();
   const browsingWritableDirectory = useFileManagerStore((state) => state.browsingWritableDirectory);
   const canReadContent = useServerCan('files.read-content');

@@ -24,8 +24,8 @@ type Props = ModalProps & {
 
 export default function FileFingerprintsModal({ file, ...props }: Props) {
   const { t } = useTranslations();
-  const { browsingDirectory } = useFileManager();
-  const { server } = useServerStore();
+  const browsingDirectory = useFileManager((state) => state.browsingDirectory);
+  const server = useServerStore((state) => state.server);
   const { addToast } = useToast();
 
   const [fingerprint, setFingerprint] = useState('');

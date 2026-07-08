@@ -38,7 +38,8 @@ import { useGlobalStore } from '@/stores/global.ts';
 export default function OobeFinished() {
   const { t } = useTranslations();
   const { user } = useAuth();
-  const { settings, setSettings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
+  const setSettings = useGlobalStore((state) => state.setSettings);
   const navigate = useNavigate();
 
   const eggRepositories = useSearchableResource<z.infer<typeof adminEggRepositorySchema>>({

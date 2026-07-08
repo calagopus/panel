@@ -42,7 +42,8 @@ import BackupRestoreModal from './modals/BackupRestoreModal.tsx';
 export default function BackupRow({ backup }: { backup: z.infer<typeof serverBackupWithProgressSchema> }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { server, removeBackup } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const removeBackup = useServerStore((state) => state.removeBackup);
   const navigate = useNavigate();
 
   const [openModal, setOpenModal] = useState<'edit' | 'restore' | 'export' | 'delete' | 'metadata' | null>(null);

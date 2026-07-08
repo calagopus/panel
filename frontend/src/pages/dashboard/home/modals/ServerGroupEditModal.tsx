@@ -25,7 +25,7 @@ type Props = ModalProps & {
 export default function ServerGroupEditModal({ serverGroup, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateServerGroup: updateStateServerGroup } = useUserStore();
+  const updateStateServerGroup = useUserStore((state) => state.updateServerGroup);
 
   const [loading, setLoading] = useState(false);
 

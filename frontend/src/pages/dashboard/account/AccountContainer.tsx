@@ -25,7 +25,8 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
-  const { languages, settings } = useGlobalStore();
+  const languages = useGlobalStore((state) => state.languages);
+  const settings = useGlobalStore((state) => state.settings);
 
   const [loading, setLoading] = useState(false);
 

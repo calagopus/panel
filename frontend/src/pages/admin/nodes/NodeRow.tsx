@@ -33,7 +33,7 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
   ref,
 ) {
   const { t } = useTranslations();
-  const { updateInformation } = useAdminStore();
+  const updateInformation = useAdminStore((state) => state.updateInformation);
 
   const [version, setVersion] = useState<string | null>(null);
   const { data: nodeToken } = useResource({

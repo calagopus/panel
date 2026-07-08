@@ -31,7 +31,7 @@ const ServerRouter = lazy(() => import('./routers/ServerRouter.tsx'));
 
 function RelativePageListener() {
   const { updateWindow } = useWindows();
-  const { title } = useRelativePageStore();
+  const title = useRelativePageStore((state) => state.title);
   const { id } = useCurrentWindow();
 
   useEffect(() => {

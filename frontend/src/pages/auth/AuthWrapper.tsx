@@ -5,7 +5,7 @@ import ContentContainer from '@/elements/containers/ContentContainer.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 export default function AuthWrapper({ title, children }: { title?: string; children: ReactNode }) {
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
 
   return (
     <ContentContainer title={settings.app.name}>

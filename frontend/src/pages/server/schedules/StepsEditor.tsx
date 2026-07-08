@@ -68,7 +68,9 @@ function stepBlockIssues(steps: z.infer<typeof serverScheduleStepSchema>[]): {
 
 export default function StepsEditor({ schedule }: { schedule: z.infer<typeof serverScheduleSchema> }) {
   const { t } = useTranslations();
-  const { server, scheduleSteps, setScheduleSteps } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const scheduleSteps = useServerStore((state) => state.scheduleSteps);
+  const setScheduleSteps = useServerStore((state) => state.setScheduleSteps);
   const storeApi = useServerStoreApi();
   const { addToast } = useToast();
 

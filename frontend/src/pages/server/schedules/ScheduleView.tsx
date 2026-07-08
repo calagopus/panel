@@ -10,6 +10,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 import getSchedule from '@/api/server/schedules/getSchedule.ts';
 import getScheduleSteps from '@/api/server/schedules/steps/getScheduleSteps.ts';
 import triggerSchedule from '@/api/server/schedules/triggerSchedule.ts';
@@ -45,7 +46,16 @@ export default function ScheduleView() {
   const params = useParams<'id'>();
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, schedule, setSchedule, runningScheduleSteps, scheduleSteps, setScheduleSteps } = useServerStore();
+  const { server, schedule, setSchedule, runningScheduleSteps, scheduleSteps, setScheduleSteps } = useServerStore(
+    useShallow((state) => ({
+      server: state.server,
+      schedule: state.schedule,
+      setSchedule: state.setSchedule,
+      runningScheduleSteps: state.runningScheduleSteps,
+      scheduleSteps: state.scheduleSteps,
+      setScheduleSteps: state.setScheduleSteps,
+    })),
+  );
 
   const [openModal, setOpenModal] = useState<'actions' | 'update' | null>(null);
   const [date, setDate] = useState(new Date());

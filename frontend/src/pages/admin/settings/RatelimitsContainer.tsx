@@ -47,7 +47,8 @@ const DEFAULT_VALUES: RatelimitsSchema = Object.fromEntries(
 export default function RatelimitsContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { ratelimits, updateSettings } = useAdminStore();
+  const ratelimits = useAdminStore((state) => state.ratelimits);
+  const updateSettings = useAdminStore((state) => state.updateSettings);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<RatelimitsSchema>({

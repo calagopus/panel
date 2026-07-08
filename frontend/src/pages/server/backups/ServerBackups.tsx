@@ -16,7 +16,9 @@ import BackupCreateModal from './modals/BackupCreateModal.tsx';
 
 export default function ServerBackups() {
   const { t } = useTranslations();
-  const { server, backups, setBackups } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const backups = useServerStore((state) => state.backups);
+  const setBackups = useServerStore((state) => state.setBackups);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 

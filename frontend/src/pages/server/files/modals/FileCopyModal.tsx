@@ -22,8 +22,9 @@ type Props = ModalProps & {
 export default function FileCopyModal({ file, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
-  const { browsingDirectory, browsingEntries } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const browsingDirectory = useFileManager((state) => state.browsingDirectory);
+  const browsingEntries = useFileManager((state) => state.browsingEntries);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverFilesCopySchema>>({
     initialValues: {

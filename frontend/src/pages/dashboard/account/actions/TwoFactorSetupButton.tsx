@@ -34,7 +34,7 @@ export default function TwoFactorSetupButton() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
-  const { timeOffset } = useGlobalStore();
+  const timeOffset = useGlobalStore((state) => state.timeOffset);
 
   const stageStack = useModalsStack(['setup', 'recovery']);
 

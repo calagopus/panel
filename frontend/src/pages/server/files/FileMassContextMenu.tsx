@@ -29,7 +29,7 @@ const registryProps = {};
 export default function FileMassContextMenu({ children }: FileMassContextMenuProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
   const store = useFileManagerApi();
   const actingMode = useFileManagerStore((state) => state.actingMode);
   const browsingWritableDirectory = useFileManagerStore((state) => state.browsingWritableDirectory);

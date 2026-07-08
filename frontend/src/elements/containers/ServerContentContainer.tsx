@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Text, Title, TitleOrder } from '@mantine/core';
 import { Dispatch, ReactNode, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
+import { useShallow } from 'zustand/react/shallow';
 import cancelTransfer from '@/api/admin/servers/cancelTransfer.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelServerInstall from '@/api/server/settings/cancelServerInstall.ts';
@@ -73,7 +74,20 @@ function ServerContentContainer(props: Props) {
     transferProgressTotal,
     transferProgressFiles,
     backupRestoreFiles,
-  } = useServerStore();
+  } = useServerStore(
+    useShallow((state) => ({
+      server: state.server,
+      serverAnnouncements: state.serverAnnouncements,
+      updateServer: state.updateServer,
+      pendingRestart: state.pendingRestart,
+      backupRestoreProgress: state.backupRestoreProgress,
+      transferProgressArchive: state.transferProgressArchive,
+      backupRestoreTotal: state.backupRestoreTotal,
+      transferProgressTotal: state.transferProgressTotal,
+      transferProgressFiles: state.transferProgressFiles,
+      backupRestoreFiles: state.backupRestoreFiles,
+    })),
+  );
   const { user } = useAuth();
   const { id } = useCurrentWindow();
   const { addToast } = useToast();

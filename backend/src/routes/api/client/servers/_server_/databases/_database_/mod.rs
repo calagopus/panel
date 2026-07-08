@@ -108,10 +108,14 @@ mod get {
     ) -> ApiResponseResult {
         permissions.has_server_permission("databases.read")?;
 
+        let can_read_password = permissions
+            .has_server_permission("databases.read-password")
+            .is_ok();
+
         ApiResponse::new_serialized(Response {
             database: database
                 .0
-                .into_api_object(&state, params.include_password)
+                .into_api_object(&state, params.include_password && can_read_password)
                 .await?,
         })
         .ok()

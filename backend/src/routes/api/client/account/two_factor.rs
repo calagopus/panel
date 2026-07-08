@@ -147,7 +147,7 @@ mod post {
             .await?
         {
             return ApiResponse::error("invalid password")
-                .with_status(StatusCode::UNAUTHORIZED)
+                .with_status(StatusCode::FORBIDDEN)
                 .ok();
         }
 
@@ -244,7 +244,7 @@ mod delete {
             .await?
         {
             return ApiResponse::error("invalid password")
-                .with_status(StatusCode::UNAUTHORIZED)
+                .with_status(StatusCode::FORBIDDEN)
                 .ok();
         }
 

@@ -19,7 +19,8 @@ import { useAdminStore } from '@/stores/admin.tsx';
 export default function ActivityContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { activity, updateSettings } = useAdminStore();
+  const activity = useAdminStore((state) => state.activity);
+  const updateSettings = useAdminStore((state) => state.updateSettings);
 
   const [loading, setLoading] = useState(false);
 

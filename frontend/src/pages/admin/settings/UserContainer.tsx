@@ -26,8 +26,10 @@ type UserFormValues = z.infer<typeof adminSettingsUserSchema>;
 export default function UserContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { user, updateSettings: updateAdminSettings } = useAdminStore();
-  const { updateSettings, languages } = useGlobalStore();
+  const user = useAdminStore((state) => state.user);
+  const updateAdminSettings = useAdminStore((state) => state.updateSettings);
+  const updateSettings = useGlobalStore((state) => state.updateSettings);
+  const languages = useGlobalStore((state) => state.languages);
 
   const [loading, setLoading] = useState(false);
   const [defaultRoutes, setDefaultRoutes] = useState<{

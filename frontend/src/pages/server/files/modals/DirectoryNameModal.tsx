@@ -18,8 +18,9 @@ import { useServerStore } from '@/stores/server.ts';
 export default function DirectoryNameModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const [_, setSearchParams] = useSearchParams();
-  const { server } = useServerStore();
-  const { browsingDirectory, invalidateFilemanager } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const browsingDirectory = useFileManager((state) => state.browsingDirectory);
+  const invalidateFilemanager = useFileManager((state) => state.invalidateFilemanager);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
     z.infer<typeof serverFilesDirectoryCreateSchema>

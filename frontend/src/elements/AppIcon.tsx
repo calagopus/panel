@@ -4,7 +4,7 @@ import { makeComponentHookable } from 'shared';
 import { useGlobalStore } from '@/stores/global.ts';
 
 function AppIcon({ className }: { className?: string }) {
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
   const isLight = useComputedColorScheme('dark') === 'light';
 
   return settings.app.banner ? (

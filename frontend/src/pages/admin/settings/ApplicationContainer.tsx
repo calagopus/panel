@@ -28,8 +28,11 @@ type AppFormValues = z.infer<typeof adminSettingsApplicationSchema>;
 export default function ApplicationContainer() {
   const { addToast } = useToast();
   const { t, tReact } = useTranslations();
-  const { app, updateSettings: updateAdminSettings } = useAdminStore();
-  const { languages, settings, updateSettings } = useGlobalStore();
+  const app = useAdminStore((state) => state.app);
+  const updateAdminSettings = useAdminStore((state) => state.updateSettings);
+  const languages = useGlobalStore((state) => state.languages);
+  const settings = useGlobalStore((state) => state.settings);
+  const updateSettings = useGlobalStore((state) => state.updateSettings);
 
   const [loading, setLoading] = useState(false);
   const [telemetryData, setTelemetryData] = useState<object | null>(null);

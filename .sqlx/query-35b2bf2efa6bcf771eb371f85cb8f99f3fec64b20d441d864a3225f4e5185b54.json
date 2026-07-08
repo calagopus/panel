@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT server_schedules.uuid FROM server_schedules\n                JOIN servers ON servers.uuid = server_schedules.server_uuid\n                WHERE server_schedules.uuid = $1 AND servers.node_uuid = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_schedules",
+            "name": "uuid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "35b2bf2efa6bcf771eb371f85cb8f99f3fec64b20d441d864a3225f4e5185b54"
+}

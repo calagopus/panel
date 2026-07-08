@@ -1,6 +1,7 @@
 import { faArrowUpRightFromSquare, faGraduationCap, faServer } from '@fortawesome/free-solid-svg-icons';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { NavLink, Route, Routes, useParams } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getEggCommandSnippets from '@/api/me/servers/eggs/getEggCommandSnippets.ts';
 import getServerAnnouncements from '@/api/server/announcements/getAnnouncements.ts';
@@ -39,11 +40,17 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   const params = useParams<'id'>();
   const [loading, setLoading] = useState(true);
 
-  const { server, setSocketInstance } = useServerStore();
-  const resetState = useServerStore((state) => state.reset);
-  const setServer = useServerStore((state) => state.setServer);
-  const setCommandSnippets = useServerStore((state) => state.setCommandSnippets);
-  const setServerAnnouncements = useServerStore((state) => state.setServerAnnouncements);
+  const { server, setSocketInstance, resetState, setServer, setCommandSnippets, setServerAnnouncements } =
+    useServerStore(
+      useShallow((state) => ({
+        server: state.server,
+        setSocketInstance: state.setSocketInstance,
+        resetState: state.reset,
+        setServer: state.setServer,
+        setCommandSnippets: state.setCommandSnippets,
+        setServerAnnouncements: state.setServerAnnouncements,
+      })),
+    );
 
   const { data: announcements } = useResource({
     queryKey: queryKeys.server(server.uuid).announcements.all(),

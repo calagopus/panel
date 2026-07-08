@@ -103,6 +103,12 @@ mod post {
             }
         };
 
+        if server.node.uuid != node.uuid {
+            return ApiResponse::error("server not found")
+                .with_status(StatusCode::NOT_FOUND)
+                .ok();
+        }
+
         ApiResponse::new_serialized(Response {
             user: user.uuid,
             server: server.uuid,

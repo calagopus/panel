@@ -28,7 +28,8 @@ import CaptchaTurnstile from './forms/CaptchaTurnstile.tsx';
 export default function CaptchaContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { captchaProvider, updateSettings } = useAdminStore();
+  const captchaProvider = useAdminStore((state) => state.captchaProvider);
+  const updateSettings = useAdminStore((state) => state.updateSettings);
 
   const [loading, setLoading] = useState(false);
 

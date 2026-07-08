@@ -11,8 +11,8 @@ import SftpDetailsModal from './modals/SftpDetailsModal.tsx';
 
 export default function FileConnectButton({ file }: { file?: string }) {
   const { t } = useTranslations();
-  const { server } = useServerStore();
-  const { vscodeUriScheme } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const vscodeUriScheme = useFileManager((state) => state.vscodeUriScheme);
   const [sftpDetailsOpen, setSftpDetailsOpen] = useState(false);
 
   const vscodeUrl =
