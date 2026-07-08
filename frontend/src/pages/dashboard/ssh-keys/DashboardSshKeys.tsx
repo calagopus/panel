@@ -18,8 +18,9 @@ import SshKeyRow from './SshKeyRow.tsx';
 
 export default function DashboardSshKeys() {
   const { t } = useTranslations();
-  const { sshKeys, setSshKeys } = useUserStore();
-  const { settings } = useGlobalStore();
+  const sshKeys = useUserStore((state) => state.sshKeys);
+  const setSshKeys = useUserStore((state) => state.setSshKeys);
+  const settings = useGlobalStore((state) => state.settings);
 
   const [openModal, setOpenModal] = useState<'create' | 'import' | null>(null);
 

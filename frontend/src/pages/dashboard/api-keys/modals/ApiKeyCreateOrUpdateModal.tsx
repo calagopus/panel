@@ -30,8 +30,10 @@ type Props = ModalProps & {
 export default function ApiKeyCreateOrUpdateModal({ contextApiKey, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addApiKey, updateApiKey: updateStateApiKey } = useUserStore();
-  const { availablePermissions, setAvailablePermissions } = useGlobalStore();
+  const addApiKey = useUserStore((state) => state.addApiKey);
+  const updateStateApiKey = useUserStore((state) => state.updateApiKey);
+  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
+  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
   const { user } = useAuth();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof userApiKeyUpdateSchema>>({

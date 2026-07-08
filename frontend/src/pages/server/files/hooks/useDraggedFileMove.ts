@@ -16,7 +16,7 @@ interface UseDraggedFileMoveOptions {
 export function useDraggedFileMove({ disabled = false, targetDirectory }: UseDraggedFileMoveOptions = {}) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
   const canUpdateFiles = useServerCan('files.update');
   const store = useFileManagerApi();
   const [moving, setMoving] = useState(false);

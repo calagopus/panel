@@ -18,8 +18,11 @@ import SubuserRow from './SubuserRow.tsx';
 
 export default function ServerSubusers() {
   const { t } = useTranslations();
-  const { server, subusers, setSubusers } = useServerStore();
-  const { settings, setAvailablePermissions } = useGlobalStore();
+  const server = useServerStore((state) => state.server);
+  const subusers = useServerStore((state) => state.subusers);
+  const setSubusers = useServerStore((state) => state.setSubusers);
+  const settings = useGlobalStore((state) => state.settings);
+  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 

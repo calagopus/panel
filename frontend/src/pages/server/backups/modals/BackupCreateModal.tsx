@@ -19,7 +19,8 @@ import { useServerStore } from '@/stores/server.ts';
 export default function BackupCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, addBackup } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const addBackup = useServerStore((state) => state.addBackup);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverBackupCreateSchema>>({
     initialValues: {

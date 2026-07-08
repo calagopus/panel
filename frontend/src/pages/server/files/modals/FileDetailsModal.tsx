@@ -19,7 +19,7 @@ type Props = ModalProps & {
 
 export default function FileDetailsModal({ file, ...props }: Props) {
   const { t } = useTranslations();
-  const { browsingDirectory } = useFileManager();
+  const browsingDirectory = useFileManager((state) => state.browsingDirectory);
 
   return (
     <Modal title={t('pages.server.files.modal.details.title', {})} size='sm' {...props}>

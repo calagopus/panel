@@ -180,7 +180,7 @@ export default function EggConfigurationCreateOrUpdate({
 }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { languages } = useGlobalStore();
+  const languages = useGlobalStore((state) => state.languages);
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
   const [eggs, setEggs] = useState<{ group: string; items: { label: string; value: string }[] }[]>([]);

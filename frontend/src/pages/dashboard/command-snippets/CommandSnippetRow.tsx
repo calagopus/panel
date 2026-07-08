@@ -20,7 +20,7 @@ export default function CommandSnippetRow({
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeCommandSnippet } = useUserStore();
+  const removeCommandSnippet = useUserStore((state) => state.removeCommandSnippet);
 
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
 

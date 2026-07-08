@@ -1,5 +1,6 @@
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useShallow } from 'zustand/react/shallow';
 import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -16,7 +17,16 @@ export default function FileEditorSettings() {
     setEditorMinimap,
     setEditorLineOverflow,
     setVscodeUriScheme,
-  } = useFileManager();
+  } = useFileManager(
+    useShallow((state) => ({
+      editorMinimap: state.editorMinimap,
+      editorLineOverflow: state.editorLineOverflow,
+      vscodeUriScheme: state.vscodeUriScheme,
+      setEditorMinimap: state.setEditorMinimap,
+      setEditorLineOverflow: state.setEditorLineOverflow,
+      setVscodeUriScheme: state.setVscodeUriScheme,
+    })),
+  );
 
   return (
     <Popover position='bottom' withArrow shadow='md'>

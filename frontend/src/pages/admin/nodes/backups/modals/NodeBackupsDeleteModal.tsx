@@ -21,7 +21,7 @@ type Props = ModalProps & {
 export default function NodeBackupsDeleteModal({ node, backup, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeNodeBackup } = useAdminStore();
+  const removeNodeBackup = useAdminStore((state) => state.removeNodeBackup);
 
   const [loading, setLoading] = useState(false);
   const [deleteDoForce, setDeleteDoForce] = useState(false);

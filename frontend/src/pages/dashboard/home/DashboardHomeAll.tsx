@@ -27,8 +27,11 @@ import ServerItem from './ServerItem.tsx';
 
 export default function DashboardHomeAll() {
   const { t } = useTranslations();
-  const { servers, setServers, setServerGroups } = useUserStore();
-  const { serverListShowOthers, setServerListShowOthers } = useGlobalStore();
+  const servers = useUserStore((state) => state.servers);
+  const setServers = useUserStore((state) => state.setServers);
+  const setServerGroups = useUserStore((state) => state.setServerGroups);
+  const serverListShowOthers = useGlobalStore((state) => state.serverListShowOthers);
+  const setServerListShowOthers = useGlobalStore((state) => state.setServerListShowOthers);
   const { addToast } = useToast();
 
   const [selectedServers, setSelectedServers] = useState(new ObjectSet<z.infer<typeof serverSchema>, 'uuid'>('uuid'));

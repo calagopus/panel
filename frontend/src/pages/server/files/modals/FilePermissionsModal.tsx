@@ -29,8 +29,9 @@ type PermissionType = 'read' | 'write' | 'execute';
 export default function FilePermissionsModal({ file, ...props }: Props) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
-  const { browsingWritableDirectory, browsingDirectory } = useFileManager();
+  const server = useServerStore((state) => state.server);
+  const browsingWritableDirectory = useFileManager((state) => state.browsingWritableDirectory);
+  const browsingDirectory = useFileManager((state) => state.browsingDirectory);
 
   const [permissions, setPermissions] = useState<Record<PermissionKey, Record<PermissionType, boolean>>>({
     owner: { read: false, write: false, execute: false },

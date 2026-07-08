@@ -16,7 +16,8 @@ import { useServerStore } from '@/stores/server.ts';
 export default function SettingsReinstallModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, updateServer } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const updateServer = useServerStore((state) => state.updateServer);
   const navigate = useNavigate();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<

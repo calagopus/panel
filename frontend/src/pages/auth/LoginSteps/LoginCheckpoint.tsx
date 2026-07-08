@@ -31,7 +31,8 @@ interface TwoFactorInformation {
 
 export default function LoginCheckpoint() {
   const { doLogin } = useAuth();
-  const { settings, timeOffset } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
+  const timeOffset = useGlobalStore((state) => state.timeOffset);
   const { t } = useTranslations();
   const [params] = useSearchParams();
   const navigate = useNavigate();

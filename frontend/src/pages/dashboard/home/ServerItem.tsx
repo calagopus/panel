@@ -16,7 +16,7 @@ import {
   faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router';
 import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
@@ -64,8 +64,8 @@ export default function ServerItem({
 }) {
   const { t } = useTranslations();
   const { user } = useAuth();
-  const { serverGroups } = useUserStore();
-  const { serverListShowOthers } = useGlobalStore();
+  const serverGroups = useUserStore((state) => state.serverGroups);
+  const serverListShowOthers = useGlobalStore((state) => state.serverListShowOthers);
 
   const [openModal, setOpenModal] = useState<'add-group' | 'kill' | null>(null);
   const stats = useServerStats(server);
@@ -75,7 +75,10 @@ export default function ServerItem({
   const state = stats?.state;
   const powerBlocked = !!server.status || server.isSuspended || server.isTransferring || server.nodeMaintenanceEnabled;
 
-  const permissionSet = new Set([...server.permissions, ...(user?.role?.serverPermissions ?? [])]);
+  const permissionSet = useMemo(
+    () => new Set([...server.permissions, ...(user?.role?.serverPermissions ?? [])]),
+    [server.permissions, user?.role?.serverPermissions],
+  );
   const canPower = (action: string) => permissionSet.has('*') || permissionSet.has(action);
 
   const doPowerAction = (action: z.infer<typeof serverPowerAction>) => handleBulkPowerAction([server.uuid], action);

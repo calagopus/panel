@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import debounce from 'debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteAllocation from '@/api/server/allocations/deleteAllocation.ts';
 import updateAllocation from '@/api/server/allocations/updateAllocation.ts';
@@ -22,7 +23,15 @@ import { useServerStore } from '@/stores/server.ts';
 export default function AllocationRow({ allocation }: { allocation: z.infer<typeof serverAllocationSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, allocations, removeAllocation, setAllocations, updateServer } = useServerStore();
+  const { server, allocations, removeAllocation, setAllocations, updateServer } = useServerStore(
+    useShallow((state) => ({
+      server: state.server,
+      allocations: state.allocations,
+      removeAllocation: state.removeAllocation,
+      setAllocations: state.setAllocations,
+      updateServer: state.updateServer,
+    })),
+  );
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
   const [notes, setNotes] = useState(allocation.notes ?? '');

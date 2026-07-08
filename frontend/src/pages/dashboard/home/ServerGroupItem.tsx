@@ -65,7 +65,8 @@ export default function ServerGroupItem({
   sKeyPressedRef: React.MutableRefObject<boolean>;
 }) {
   const { t, tItem } = useTranslations();
-  const { updateServerGroup: updateStateServerGroup, removeServerGroup } = useUserStore();
+  const updateStateServerGroup = useUserStore((state) => state.updateServerGroup);
+  const removeServerGroup = useUserStore((state) => state.removeServerGroup);
   const { addToast } = useToast();
   const isDark = useComputedColorScheme('dark') === 'dark';
 

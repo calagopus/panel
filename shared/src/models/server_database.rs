@@ -658,7 +658,7 @@ impl CreatableModel for ServerDatabase {
                 .execute(&mut *transaction)
                 .await?;
 
-                DatabaseTransaction::Mysql(transaction)
+                DatabaseTransaction::Mysql(transaction, pool)
             }
             crate::models::database_host::DatabasePool::Postgres(pool) => {
                 let transaction = pool.begin().await?;
@@ -710,8 +710,16 @@ impl CreatableModel for ServerDatabase {
             Ok(row) => row,
             Err(err) => {
                 match db_transaction {
-                    DatabaseTransaction::Mysql(db_tx) => {
+                    DatabaseTransaction::Mysql(db_tx, pool) => {
                         db_tx.rollback().await?;
+
+                        let drop_database = format!("DROP DATABASE IF EXISTS `{name}`");
+                        let drop_user = format!("DROP USER IF EXISTS '{username}'@'%'");
+
+                        let (_, _) = tokio::join!(
+                            sqlx::query(sqlx::AssertSqlSafe(drop_database)).execute(&pool),
+                            sqlx::query(sqlx::AssertSqlSafe(drop_user)).execute(&pool)
+                        );
                     }
                     DatabaseTransaction::Postgres(db_tx, pool) => {
                         db_tx.rollback().await?;
@@ -736,7 +744,7 @@ impl CreatableModel for ServerDatabase {
         let uuid: uuid::Uuid = row.try_get("uuid")?;
 
         match match db_transaction {
-            DatabaseTransaction::Mysql(db_tx) => db_tx.commit().await,
+            DatabaseTransaction::Mysql(db_tx, _) => db_tx.commit().await,
             DatabaseTransaction::Postgres(db_tx, _) => db_tx.commit().await,
             DatabaseTransaction::Mongodb(_) => Ok(()),
         } {

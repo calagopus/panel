@@ -24,7 +24,7 @@ import AuthWrapper from './AuthWrapper.tsx';
 export default function ForgotPassword() {
   const { t } = useTranslations();
   const navigate = useNavigate();
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

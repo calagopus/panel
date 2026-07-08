@@ -8,7 +8,8 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function FileImageViewerSettings() {
   const { t } = useTranslations();
-  const { imageViewerSmoothing, setImageViewerSmoothing } = useFileManager();
+  const imageViewerSmoothing = useFileManager((state) => state.imageViewerSmoothing);
+  const setImageViewerSmoothing = useFileManager((state) => state.setImageViewerSmoothing);
 
   return (
     <Popover position='bottom' withArrow shadow='md'>

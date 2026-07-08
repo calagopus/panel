@@ -46,8 +46,8 @@ export default function AdminUserActivity({ user }: { user: z.infer<typeof fullU
         pagination={userActivity}
         onPageSelect={setPage}
       >
-        {userActivity?.data.map((activity) => (
-          <TableRow key={activity.created.toString()}>
+        {userActivity?.data.map((activity, index) => (
+          <TableRow key={`${activity.created.toISOString()}-${index}`}>
             <TableData>{activity.isApi ? t('common.api', {}) : t('common.web', {})}</TableData>
 
             <TableData>

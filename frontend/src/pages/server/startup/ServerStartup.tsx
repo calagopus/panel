@@ -3,6 +3,7 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import debounce from 'debounce';
 import { useCallback, useEffect, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getVariables from '@/api/server/startup/getVariables.ts';
 import updateCommand from '@/api/server/startup/updateCommand.ts';
@@ -29,8 +30,16 @@ import { useServerStore } from '@/stores/server.ts';
 export default function ServerStartup() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { settings } = useGlobalStore();
-  const { server, updateServer, variables, setVariables, updateVariable } = useServerStore();
+  const settings = useGlobalStore((state) => state.settings);
+  const { server, updateServer, variables, setVariables, updateVariable } = useServerStore(
+    useShallow((state) => ({
+      server: state.server,
+      updateServer: state.updateServer,
+      variables: state.variables,
+      setVariables: state.setVariables,
+      updateVariable: state.updateVariable,
+    })),
+  );
   const canModifyVariables = useServerCan('startup.update');
   const canModifyStartupCommand = useServerCan('startup.command');
 

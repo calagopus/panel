@@ -77,7 +77,7 @@ mod get {
         permissions.has_server_permission("files.read-content")?;
 
         for file in &params.files {
-            if server.is_ignored(file, params.directory) {
+            if server.is_ignored(Path::new(&params.root).join(file), params.directory) {
                 return ApiResponse::new_serialized(ApiError::new_value(&["file not found"]))
                     .with_status(StatusCode::NOT_FOUND)
                     .ok();

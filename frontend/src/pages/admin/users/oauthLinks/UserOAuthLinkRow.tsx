@@ -24,7 +24,7 @@ export default function UserOAuthLinkRow({
 }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { removeUserOAuthLink } = useAdminStore();
+  const removeUserOAuthLink = useAdminStore((state) => state.removeUserOAuthLink);
 
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
 

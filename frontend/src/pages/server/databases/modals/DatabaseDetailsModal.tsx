@@ -19,7 +19,9 @@ type Props = ModalProps & {
 export default function DatabaseDetailsModal({ database, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, databases, setDatabases } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const databases = useServerStore((state) => state.databases);
+  const setDatabases = useServerStore((state) => state.setDatabases);
   const [loading, setLoading] = useState(false);
 
   const host = `${database.host}:${database.port}`;

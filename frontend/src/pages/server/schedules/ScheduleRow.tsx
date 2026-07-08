@@ -23,7 +23,8 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
-  const { server, removeSchedule } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const removeSchedule = useServerStore((state) => state.removeSchedule);
   const navigateUrl = `/server/${server.uuidShort}/schedules/${schedule.uuid}`;
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);

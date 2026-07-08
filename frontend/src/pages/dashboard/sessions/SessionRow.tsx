@@ -17,7 +17,7 @@ import { useUserStore } from '@/stores/user.ts';
 export default function SessionRow({ session }: { session: z.infer<typeof userSessionSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeSession } = useUserStore();
+  const removeSession = useUserStore((state) => state.removeSession);
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 

@@ -19,7 +19,8 @@ import { useUserStore } from '@/stores/user.ts';
 export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKeySchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateApiKey, removeApiKey } = useUserStore();
+  const updateApiKey = useUserStore((state) => state.updateApiKey);
+  const removeApiKey = useUserStore((state) => state.removeApiKey);
 
   const [openModal, setOpenModal] = useState<'edit' | 'recreate' | 'delete' | null>(null);
 

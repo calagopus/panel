@@ -1,5 +1,6 @@
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useShallow } from 'zustand/react/shallow';
 import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -10,7 +11,16 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 export default function FileSettings() {
   const { t } = useTranslations();
   const { clickOnce, preferPhysicalSize, vscodeUriScheme, setClickOnce, setPreferPhysicalSize, setVscodeUriScheme } =
-    useFileManager();
+    useFileManager(
+      useShallow((state) => ({
+        clickOnce: state.clickOnce,
+        preferPhysicalSize: state.preferPhysicalSize,
+        vscodeUriScheme: state.vscodeUriScheme,
+        setClickOnce: state.setClickOnce,
+        setPreferPhysicalSize: state.setPreferPhysicalSize,
+        setVscodeUriScheme: state.setVscodeUriScheme,
+      })),
+    );
 
   return (
     <Popover position='bottom' withArrow shadow='md'>

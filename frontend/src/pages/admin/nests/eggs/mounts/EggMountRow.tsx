@@ -26,7 +26,7 @@ export default function EggMountRow({
   mount: z.infer<typeof adminNodeMountSchema>;
 }) {
   const { addToast } = useToast();
-  const { removeEggMount } = useAdminStore();
+  const removeEggMount = useAdminStore((state) => state.removeEggMount);
   const { t } = useTranslations();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);

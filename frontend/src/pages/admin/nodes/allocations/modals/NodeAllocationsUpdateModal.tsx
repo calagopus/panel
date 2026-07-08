@@ -19,7 +19,8 @@ export default function NodeAllocationsUpdateModal({
 }: ModalProps & { node: z.infer<typeof adminNodeSchema>; loadAllocations: () => void }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
+  const selectedNodeAllocations = useAdminStore((state) => state.selectedNodeAllocations);
+  const setSelectedNodeAllocations = useAdminStore((state) => state.setSelectedNodeAllocations);
 
   const mostCommonIp = useMemo(() => {
     const ipCounts = new Map<string, number>();

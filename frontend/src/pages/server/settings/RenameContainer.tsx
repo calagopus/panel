@@ -20,7 +20,8 @@ import { useServerStore } from '@/stores/server.ts';
 export default function RenameContainer() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, updateServer } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const updateServer = useServerStore((state) => state.updateServer);
 
   const [loading, setLoading] = useState(false);
 

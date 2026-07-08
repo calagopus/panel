@@ -23,7 +23,9 @@ export default function AllocationActionBar({
 }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { removeNodeAllocations, selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
+  const removeNodeAllocations = useAdminStore((state) => state.removeNodeAllocations);
+  const selectedNodeAllocations = useAdminStore((state) => state.selectedNodeAllocations);
+  const setSelectedNodeAllocations = useAdminStore((state) => state.setSelectedNodeAllocations);
 
   const [openModal, setOpenModal] = useState<'update' | 'delete' | null>(null);
 

@@ -33,7 +33,8 @@ type Props = ModalProps & {
 export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUpdate, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, addSchedule } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const addSchedule = useServerStore((state) => state.addSchedule);
   const navigate = useNavigate();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<

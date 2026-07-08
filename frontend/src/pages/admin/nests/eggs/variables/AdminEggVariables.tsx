@@ -30,7 +30,9 @@ export default function AdminEggVariables({
   contextNest: z.infer<typeof adminNestSchema>;
   contextEgg: z.infer<typeof adminEggSchema>;
 }) {
-  const { eggVariables, setEggVariables, addEggVariable } = useAdminStore();
+  const eggVariables = useAdminStore((state) => state.eggVariables);
+  const setEggVariables = useAdminStore((state) => state.setEggVariables);
+  const addEggVariable = useAdminStore((state) => state.addEggVariable);
   const { addToast } = useToast();
   const { t } = useTranslations();
 

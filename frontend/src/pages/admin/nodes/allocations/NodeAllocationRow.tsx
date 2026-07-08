@@ -16,7 +16,9 @@ interface NodeAllocationRowProps {
 const NodeAllocationRow = memo(
   forwardRef<HTMLTableRowElement, NodeAllocationRowProps>(function FileRow({ allocation }, ref) {
     const { t } = useTranslations();
-    const { selectedNodeAllocations, addSelectedNodeAllocation, removeSelectedNodeAllocation } = useAdminStore();
+    const selectedNodeAllocations = useAdminStore((state) => state.selectedNodeAllocations);
+    const addSelectedNodeAllocation = useAdminStore((state) => state.addSelectedNodeAllocation);
+    const removeSelectedNodeAllocation = useAdminStore((state) => state.removeSelectedNodeAllocation);
 
     const isNodeAllocationSelected = selectedNodeAllocations.has(allocation);
 

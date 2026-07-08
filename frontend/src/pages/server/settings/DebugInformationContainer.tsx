@@ -9,7 +9,7 @@ import { useServerStore } from '@/stores/server.ts';
 
 export default function DebugInformationContainer() {
   const { t } = useTranslations();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
 
   return (
     <TitleCard

@@ -22,7 +22,7 @@ import { useUserStore } from '@/stores/user.ts';
 export default function CommandSnippetCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addCommandSnippet } = useUserStore();
+  const addCommandSnippet = useUserStore((state) => state.addCommandSnippet);
 
   const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
     queryKey: [...queryKeys.user.servers.all(), 'eggs'],

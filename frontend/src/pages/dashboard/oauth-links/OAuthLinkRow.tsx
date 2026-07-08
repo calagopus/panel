@@ -16,7 +16,7 @@ import { useUserStore } from '@/stores/user.ts';
 export default function OAuthLinkRow({ oauthLink }: { oauthLink: z.infer<typeof userOAuthLinkSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeOAuthLink } = useUserStore();
+  const removeOAuthLink = useUserStore((state) => state.removeOAuthLink);
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 

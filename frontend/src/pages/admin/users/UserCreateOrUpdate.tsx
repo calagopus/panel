@@ -30,7 +30,8 @@ import { useGlobalStore } from '@/stores/global.ts';
 
 export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.infer<typeof adminFullUserSchema> }) {
   const { user, doImpersonate } = useAuth();
-  const { settings, languages } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
+  const languages = useGlobalStore((state) => state.languages);
   const { addToast } = useToast();
   const { t } = useTranslations();
   const canReadRoles = useAdminCan('roles.read');

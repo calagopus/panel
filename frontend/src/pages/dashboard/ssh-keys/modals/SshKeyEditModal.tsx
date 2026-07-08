@@ -24,7 +24,7 @@ type Props = ModalProps & {
 export default function SshKeyEditModal({ sshKey, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateSshKey: updateStateSshKey } = useUserStore();
+  const updateStateSshKey = useUserStore((state) => state.updateSshKey);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
     initialValues: {

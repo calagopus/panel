@@ -9,7 +9,8 @@ import SessionRow from './SessionRow.tsx';
 
 export default function DashboardSessions() {
   const { t } = useTranslations();
-  const { sessions, setSessions } = useUserStore();
+  const sessions = useUserStore((state) => state.sessions);
+  const setSessions = useUserStore((state) => state.setSessions);
 
   const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.sessions.all(),

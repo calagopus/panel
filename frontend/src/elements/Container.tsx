@@ -19,7 +19,7 @@ function Container({ children, isNormal }: LayoutProps) {
   const { t } = useTranslations();
   const { impersonating } = useAuth();
   const { id } = useCurrentWindow();
-  const { announcements } = useGlobalStore();
+  const announcements = useGlobalStore((state) => state.announcements);
   const serverName = useGlobalStore((state) => state.serverName);
 
   return (

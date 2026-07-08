@@ -15,12 +15,6 @@ export const axiosInstance: AxiosInstance = axios.create({
   },
 });
 
-axiosInstance.interceptors.request.use((request) => {
-  request.headers.set('Calagopus-User', localStorage.getItem('impersonated_user'));
-
-  return request;
-});
-
 // Auto transform all data to camel case keys
 axiosInstance.interceptors.response.use(
   (response) => {
@@ -63,11 +57,31 @@ export const untransformedAxiosInstance: AxiosInstance = axios.create({
   },
 });
 
-untransformedAxiosInstance.interceptors.request.use((request) => {
-  request.headers.set('Calagopus-User', localStorage.getItem('impersonated_user'));
+const IMPERSONATED_USER_KEY = 'impersonated_user';
 
-  return request;
-});
+export function getImpersonatedUser(): string | null {
+  return sessionStorage.getItem(IMPERSONATED_USER_KEY);
+}
+
+/**
+ * Sets (or clears) the impersonated user for this tab. The impersonation id lives in
+ * per-tab sessionStorage and is applied as a default header on both axios instances, so
+ * requests are always issued as the identity this tab's auth state actually reflects —
+ * rather than reading origin-wide localStorage per request, which switched other tabs.
+ */
+export function setImpersonatedUser(uuid: string | null) {
+  if (uuid) {
+    sessionStorage.setItem(IMPERSONATED_USER_KEY, uuid);
+    axiosInstance.defaults.headers.common['Calagopus-User'] = uuid;
+    untransformedAxiosInstance.defaults.headers.common['Calagopus-User'] = uuid;
+  } else {
+    sessionStorage.removeItem(IMPERSONATED_USER_KEY);
+    delete axiosInstance.defaults.headers.common['Calagopus-User'];
+    delete untransformedAxiosInstance.defaults.headers.common['Calagopus-User'];
+  }
+}
+
+setImpersonatedUser(getImpersonatedUser());
 
 /**
  * Converts an error into a human readable response. Mostly just a generic helper to

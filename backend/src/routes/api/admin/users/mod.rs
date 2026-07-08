@@ -81,7 +81,7 @@ mod post {
         models::{
             CreatableModel,
             admin_activity::GetAdminActivityLogger,
-            user::{CreateUserOptions, GetPermissionManager, User},
+            user::{CreateUserOptions, GetPermissionManager, GetUser, User},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -100,10 +100,24 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        caller: GetUser,
         activity_logger: GetAdminActivityLogger,
         shared::Payload(data): shared::Payload<CreateUserOptions>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.create")?;
+
+        if !caller.admin {
+            if data.admin {
+                return ApiResponse::error("you cannot grant admin status")
+                    .with_status(StatusCode::FORBIDDEN)
+                    .ok();
+            }
+            if data.role_uuid.is_some() {
+                return ApiResponse::error("you cannot assign roles")
+                    .with_status(StatusCode::FORBIDDEN)
+                    .ok();
+            }
+        }
 
         let user = match User::create(&state, data).await {
             Ok(user) => user,

@@ -49,7 +49,7 @@ function AdminContentContainer(props: Props) {
   } = props;
 
   const { t } = useTranslations();
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
   const { id } = useCurrentWindow();
 
   return (

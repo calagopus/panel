@@ -22,8 +22,8 @@ type Props = ModalProps & {
 export default function SubuserUpdateModal({ subuser, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
-  const { availablePermissions } = useGlobalStore();
+  const server = useServerStore((state) => state.server);
+  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverSubuserUpdateSchema>>(
     {

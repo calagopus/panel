@@ -19,7 +19,7 @@ import { useAdminStore } from '@/stores/admin.tsx';
 export default function NodeMountAddModal({ node, ...props }: ModalProps & { node: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addNodeMount } = useAdminStore();
+  const addNodeMount = useAdminStore((state) => state.addNodeMount);
 
   const [loading, setLoading] = useState(false);
   const [selectedMount, setSelectedMount] = useState<z.infer<typeof adminMountSchema> | null>(null);

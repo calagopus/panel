@@ -22,7 +22,7 @@ const schema = z.object({
 export default function SshKeyImportModal({ ...props }: ModalProps) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const { addSshKey } = useUserStore();
+  const addSshKey = useUserStore((state) => state.addSshKey);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
     initialValues: {

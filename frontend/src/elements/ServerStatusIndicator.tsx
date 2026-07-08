@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { z } from 'zod';
+import { useShallow } from 'zustand/react/shallow';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -20,7 +21,14 @@ export default function ServerStatusIndicator() {
   const { t } = useTranslations();
   const params = useParams<'id'>();
   const [open, setOpen] = useState(false);
-  const { server, state, socketInstance, socketConnected } = useServerStore();
+  const { server, state, socketInstance, socketConnected } = useServerStore(
+    useShallow((state) => ({
+      server: state.server,
+      state: state.state,
+      socketInstance: state.socketInstance,
+      socketConnected: state.socketConnected,
+    })),
+  );
 
   const killable = state === 'stopping';
 

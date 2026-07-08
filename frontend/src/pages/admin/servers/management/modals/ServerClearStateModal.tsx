@@ -14,7 +14,7 @@ export default function ServerClearStateModal({
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateServer } = useAdminStore();
+  const updateServer = useAdminStore((state) => state.updateServer);
 
   const doClearState = async () => {
     await clearServerState(server.uuid)

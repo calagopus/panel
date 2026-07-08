@@ -21,8 +21,9 @@ import { useGlobalStore } from '@/stores/global.ts';
 export default function ServerContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { server, updateSettings: updateAdminSettings } = useAdminStore();
-  const { updateSettings } = useGlobalStore();
+  const server = useAdminStore((state) => state.server);
+  const updateAdminSettings = useAdminStore((state) => state.updateSettings);
+  const updateSettings = useGlobalStore((state) => state.updateSettings);
 
   const [loading, setLoading] = useState(false);
 

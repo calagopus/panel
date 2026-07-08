@@ -18,7 +18,7 @@ import SshKeyEditModal from './modals/SshKeyEditModal.tsx';
 export default function SshKeyRow({ sshKey }: { sshKey: z.infer<typeof userSshKeySchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeSshKey } = useUserStore();
+  const removeSshKey = useUserStore((state) => state.removeSshKey);
 
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
 

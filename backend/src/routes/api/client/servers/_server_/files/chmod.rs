@@ -78,20 +78,22 @@ mod put {
 
         permissions.has_server_permission("files.update")?;
 
+        let files = data
+            .files
+            .into_iter()
+            .filter(|f| !server.is_ignored(std::path::Path::new(&data.root).join(&f.file), false))
+            .map(
+                |f| wings_api::servers_server_files_chmod::post::RequestBodyFiles {
+                    file: f.file,
+                    mode: f.mode,
+                    recursive: f.recursive,
+                },
+            )
+            .collect();
+
         let request_body = wings_api::servers_server_files_chmod::post::RequestBody {
             root: data.root,
-            files: data
-                .files
-                .into_iter()
-                .filter(|f| !server.is_ignored(&f.file, false))
-                .map(
-                    |f| wings_api::servers_server_files_chmod::post::RequestBodyFiles {
-                        file: f.file,
-                        mode: f.mode,
-                        recursive: f.recursive,
-                    },
-                )
-                .collect(),
+            files,
         };
 
         let data = match server

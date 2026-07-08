@@ -83,7 +83,7 @@ function ServerFilesColumnRightSection({ name }: { name: ServerFilesColumn }) {
 
 function ServerFilesComponent() {
   const { t } = useTranslations();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
   const { addToast } = useToast();
   const [_, setSearchParams] = useSearchParams();
   const navigate = useNavigate();

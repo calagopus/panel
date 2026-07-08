@@ -23,7 +23,7 @@ export default function UserOAuthLinkAddModal({
 }: ModalProps & { user: z.infer<typeof fullUserSchema> }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { addUserOAuthLink } = useAdminStore();
+  const addUserOAuthLink = useAdminStore((state) => state.addUserOAuthLink);
 
   const [loading, setLoading] = useState(false);
   const [identifier, setIdentifier] = useState('');

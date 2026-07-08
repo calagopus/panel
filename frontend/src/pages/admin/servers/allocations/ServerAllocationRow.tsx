@@ -32,7 +32,9 @@ export default function ServerAllocationRow({
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
-  const { serverAllocations, setServerAllocations, removeServerAllocation } = useAdminStore();
+  const serverAllocations = useAdminStore((state) => state.serverAllocations);
+  const setServerAllocations = useAdminStore((state) => state.setServerAllocations);
+  const removeServerAllocation = useAdminStore((state) => state.removeServerAllocation);
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
   const [notes, setNotes] = useState(allocation.notes ?? '');

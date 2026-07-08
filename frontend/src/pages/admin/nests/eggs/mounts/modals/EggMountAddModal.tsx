@@ -23,7 +23,7 @@ export default function EggMountAddModal({
   ...props
 }: ModalProps & { nest: z.infer<typeof adminNestSchema>; egg: z.infer<typeof adminEggSchema> }) {
   const { addToast } = useToast();
-  const { addEggMount } = useAdminStore();
+  const addEggMount = useAdminStore((state) => state.addEggMount);
   const { t } = useTranslations();
 
   const [loading, setLoading] = useState(false);

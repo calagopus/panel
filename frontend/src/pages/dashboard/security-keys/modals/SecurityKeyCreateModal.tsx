@@ -21,7 +21,7 @@ const schema = z.object({
 export default function SecurityKeyCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addSecurityKey } = useUserStore();
+  const addSecurityKey = useUserStore((state) => state.addSecurityKey);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
     initialValues: {

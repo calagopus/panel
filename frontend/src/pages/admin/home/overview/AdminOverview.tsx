@@ -40,7 +40,7 @@ import { useAdminStore } from '@/stores/admin.tsx';
 export default function AdminOverview() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { updateInformation } = useAdminStore();
+  const updateInformation = useAdminStore((state) => state.updateInformation);
   const canReadStats = useAdminCan('stats.read');
 
   const [systemOverview, setSystemOverview] = useState<AdminSystemOverview | null>(null);

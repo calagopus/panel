@@ -32,9 +32,11 @@ export default function EggVariableContainer({
   contextEgg: z.infer<typeof adminEggSchema>;
   contextVariable?: z.infer<typeof adminEggVariableSchema>;
 }) {
-  const { eggVariables, setEggVariables, removeEggVariable } = useAdminStore();
+  const eggVariables = useAdminStore((state) => state.eggVariables);
+  const setEggVariables = useAdminStore((state) => state.setEggVariables);
+  const removeEggVariable = useAdminStore((state) => state.removeEggVariable);
   const { addToast } = useToast();
-  const { languages } = useGlobalStore();
+  const languages = useGlobalStore((state) => state.languages);
   const { t } = useTranslations();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);

@@ -38,7 +38,7 @@ export default function OAuthProviderCreateOrUpdate({
 }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
 
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);

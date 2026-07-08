@@ -23,7 +23,7 @@ export default function NodeMountRow({
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeNodeMount } = useAdminStore();
+  const removeNodeMount = useAdminStore((state) => state.removeNodeMount);
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
 

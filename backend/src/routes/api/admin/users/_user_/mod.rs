@@ -232,6 +232,25 @@ mod patch {
                     .with_status(StatusCode::FORBIDDEN)
                     .ok();
             }
+
+            if user.admin {
+                return ApiResponse::error("you cannot modify an administrator")
+                    .with_status(StatusCode::FORBIDDEN)
+                    .ok();
+            }
+
+            if caller.uuid != user.uuid {
+                if data.password.is_some() {
+                    return ApiResponse::error("you cannot change another user's password")
+                        .with_status(StatusCode::FORBIDDEN)
+                        .ok();
+                }
+                if data.email.is_some() {
+                    return ApiResponse::error("you cannot change another user's email")
+                        .with_status(StatusCode::FORBIDDEN)
+                        .ok();
+                }
+            }
         }
 
         match user.update(&state, data).await {

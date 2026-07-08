@@ -1,5 +1,6 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import createAllocation from '@/api/server/allocations/createAllocation.ts';
 import getAllocations from '@/api/server/allocations/getAllocations.ts';
@@ -18,7 +19,14 @@ import AllocationRow from './AllocationRow.tsx';
 export default function ServerNetwork() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, allocations, setAllocations, addAllocation } = useServerStore();
+  const { server, allocations, setAllocations, addAllocation } = useServerStore(
+    useShallow((state) => ({
+      server: state.server,
+      allocations: state.allocations,
+      setAllocations: state.setAllocations,
+      addAllocation: state.addAllocation,
+    })),
+  );
 
   const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).network.all(),

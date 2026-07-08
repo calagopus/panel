@@ -24,7 +24,8 @@ import NodeAllocationRow from './NodeAllocationRow.tsx';
 
 export default function AdminNodeAllocations({ node }: { node: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
-  const { selectedNodeAllocations, setSelectedNodeAllocations } = useAdminStore();
+  const selectedNodeAllocations = useAdminStore((state) => state.selectedNodeAllocations);
+  const setSelectedNodeAllocations = useAdminStore((state) => state.setSelectedNodeAllocations);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
   const [ipFilter, setIpFilter] = useState('');

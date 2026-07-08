@@ -21,7 +21,7 @@ export default function DatabaseDeleteModal({ database, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
-  const { removeDatabase } = useServerStore();
+  const removeDatabase = useServerStore((state) => state.removeDatabase);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm({
     initialValues: { name: '' },

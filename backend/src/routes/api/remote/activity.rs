@@ -5,9 +5,10 @@ mod post {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{CreatableModel, server_activity::ServerActivity},
+        models::{CreatableModel, node::GetNode, server_activity::ServerActivity},
         response::{ApiResponse, ApiResponseResult},
     };
+    use std::collections::HashSet;
     use utoipa::ToSchema;
 
     #[derive(ToSchema, Deserialize)]
@@ -38,13 +39,31 @@ mod post {
     ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
+        node: GetNode,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         let settings = state.settings.get().await?;
         let server_log_schedule_activity = settings.activity.server_log_schedule_activity;
         drop(settings);
 
+        let server_uuids: Vec<_> = data.data.iter().map(|activity| activity.server).collect();
+        let owned_servers: HashSet<_> = sqlx::query!(
+            "SELECT servers.uuid FROM servers
+            WHERE servers.uuid = ANY($1) AND servers.node_uuid = $2",
+            &server_uuids,
+            node.uuid
+        )
+        .fetch_all(state.database.read())
+        .await?
+        .into_iter()
+        .map(|row| row.uuid)
+        .collect();
+
         for activity in data.data {
+            if !owned_servers.contains(&activity.server) {
+                continue;
+            }
+
             if activity.schedule.is_some() && !server_log_schedule_activity {
                 continue;
             }

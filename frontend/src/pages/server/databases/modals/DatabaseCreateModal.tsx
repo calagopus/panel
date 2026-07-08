@@ -21,7 +21,8 @@ import { useServerStore } from '@/stores/server.ts';
 export default function DatabaseCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, addDatabase } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const addDatabase = useServerStore((state) => state.addDatabase);
 
   const [databaseHosts, setDatabaseHosts] = useState<z.infer<typeof databaseHostSchema>[]>([]);
 

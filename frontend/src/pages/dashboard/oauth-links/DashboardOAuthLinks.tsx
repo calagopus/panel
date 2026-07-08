@@ -17,7 +17,8 @@ import OAuthLinkRow from './OAuthLinkRow.tsx';
 
 export default function DashboardOAuthLinks() {
   const { t } = useTranslations();
-  const { oauthLinks, setOAuthLinks } = useUserStore();
+  const oauthLinks = useUserStore((state) => state.oauthLinks);
+  const setOAuthLinks = useUserStore((state) => state.setOAuthLinks);
   const [oAuthProviders, setOAuthProviders] = useState<z.infer<typeof oAuthProviderSchema>[]>([]);
 
   useEffect(() => {

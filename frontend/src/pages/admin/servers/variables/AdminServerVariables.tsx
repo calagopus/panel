@@ -15,7 +15,9 @@ import { useAdminStore } from '@/stores/admin.tsx';
 export default function AdminServerVariables({ server }: { server: z.infer<typeof adminServerSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { serverVariables, setServerVariables, updateServerVariable } = useAdminStore();
+  const serverVariables = useAdminStore((state) => state.serverVariables);
+  const setServerVariables = useAdminStore((state) => state.setServerVariables);
+  const updateServerVariable = useAdminStore((state) => state.updateServerVariable);
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 

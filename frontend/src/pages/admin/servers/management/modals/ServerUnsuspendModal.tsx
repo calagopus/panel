@@ -14,7 +14,7 @@ export default function ServerUnsuspendModal({
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateServer: updateStoreServer } = useAdminStore();
+  const updateStoreServer = useAdminStore((state) => state.updateServer);
 
   const doSuspend = async () => {
     await updateServer(server.uuid, {

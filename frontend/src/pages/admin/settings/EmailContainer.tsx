@@ -27,7 +27,8 @@ import EmailSendTestModal from './modals/EmailSendTestModal.tsx';
 export default function EmailContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { mailMode, updateSettings } = useAdminStore();
+  const mailMode = useAdminStore((state) => state.mailMode);
+  const updateSettings = useAdminStore((state) => state.updateSettings);
 
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState<'sendTestEmail' | null>(null);

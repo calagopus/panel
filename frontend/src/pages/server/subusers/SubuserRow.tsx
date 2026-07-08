@@ -17,7 +17,8 @@ import SubuserUpdateModal from './modals/SubuserUpdateModal.tsx';
 export default function SubuserRow({ subuser }: { subuser: z.infer<typeof serverSubuserSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, removeSubuser } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const removeSubuser = useServerStore((state) => state.removeSubuser);
 
   const [openModal, setOpenModal] = useState<'update' | 'remove' | null>(null);
 

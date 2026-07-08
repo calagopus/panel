@@ -29,7 +29,8 @@ function FileRevisionDiffComponent() {
   const { getParent } = useCurrentWindow();
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const { editorMinimap, editorLineOverflow } = useFileManager();
+  const editorMinimap = useFileManager((state) => state.editorMinimap);
+  const editorLineOverflow = useFileManager((state) => state.editorLineOverflow);
 
   const filePath = searchParams.get('file') || '';
   const revisionId = parseInt(searchParams.get('revision') || '0', 10);

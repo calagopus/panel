@@ -53,7 +53,8 @@ export default function OobeRouter() {
   const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { settings, setSettings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
+  const setSettings = useGlobalStore((state) => state.setSettings);
   const { user } = useAuth();
 
   const activeStep = steps.find((step) => to(step.path, '/oobe') === location.pathname);

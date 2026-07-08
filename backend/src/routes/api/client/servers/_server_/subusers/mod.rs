@@ -154,6 +154,16 @@ mod post {
                 .ok();
         }
 
+        if data
+            .permissions
+            .iter()
+            .any(|p| permissions.has_server_permission(p).is_err())
+        {
+            return ApiResponse::error("permissions: more permissions than self")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         permissions.has_server_permission("subusers.create")?;
 
         if let Err(error) = state.captcha.verify(ip, data.captcha).await {

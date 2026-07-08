@@ -17,7 +17,7 @@ import SecurityKeyEditModal from './modals/SecurityKeyEditModal.tsx';
 export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<typeof userSecurityKeySchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeSecurityKey } = useUserStore();
+  const removeSecurityKey = useUserStore((state) => state.removeSecurityKey);
 
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
 

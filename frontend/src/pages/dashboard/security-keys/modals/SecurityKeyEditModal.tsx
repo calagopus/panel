@@ -24,7 +24,7 @@ type Props = ModalProps & {
 export default function SecurityKeyEditModal({ securityKey, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateSecurityKey: updateStateSecurityKey } = useUserStore();
+  const updateStateSecurityKey = useUserStore((state) => state.updateSecurityKey);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof schema>>({
     initialValues: {

@@ -47,8 +47,8 @@ export default function DashboardActivity() {
         onPageSelect={setPage}
         error={error}
       >
-        {activities.data.map((activity) => (
-          <TableRow key={activity.created.toString()}>
+        {activities.data.map((activity, index) => (
+          <TableRow key={`${activity.created.toISOString()}-${index}`}>
             <TableData>
               <div className='size-5 aspect-square relative'>
                 <img

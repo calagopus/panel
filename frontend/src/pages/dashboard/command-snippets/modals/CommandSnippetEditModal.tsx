@@ -27,7 +27,7 @@ type Props = ModalProps & {
 export default function CommandSnippetEditModal({ commandSnippet, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { updateCommandSnippet: updateStateCommandSnippet } = useUserStore();
+  const updateStateCommandSnippet = useUserStore((state) => state.updateCommandSnippet);
 
   const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
     queryKey: [...queryKeys.user.servers.all(), 'eggs'],

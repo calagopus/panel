@@ -20,7 +20,8 @@ type Props = ModalProps & {
 export default function BackupRestoreModal({ backup, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, updateServer } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const updateServer = useServerStore((state) => state.updateServer);
   const navigate = useNavigate();
 
   const [truncateDirectory, setTruncateDirectory] = useState(false);

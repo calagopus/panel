@@ -23,7 +23,7 @@ export default function ServerMountRow({
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { removeServerMount } = useAdminStore();
+  const removeServerMount = useAdminStore((state) => state.removeServerMount);
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 

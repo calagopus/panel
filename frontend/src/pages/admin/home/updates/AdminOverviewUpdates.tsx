@@ -38,7 +38,8 @@ import NodeRow from '../../nodes/NodeRow.tsx';
 export default function AdminOverviewUpdates() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { updateInformation, setUpdateInformation } = useAdminStore();
+  const updateInformation = useAdminStore((state) => state.updateInformation);
+  const setUpdateInformation = useAdminStore((state) => state.setUpdateInformation);
 
   const [updateHistory, setUpdateHistory] = useState<Awaited<ReturnType<typeof getUpdateHistory>> | null>(null);
   const [selectedUpdateHistory, setSelectedUpdateHistory] = useState<string | null>(null);

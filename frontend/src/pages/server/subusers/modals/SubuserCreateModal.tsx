@@ -21,8 +21,9 @@ import { useServerStore } from '@/stores/server.ts';
 export default function SubuserCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, addSubuser } = useServerStore();
-  const { availablePermissions } = useGlobalStore();
+  const server = useServerStore((state) => state.server);
+  const addSubuser = useServerStore((state) => state.addSubuser);
+  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
 
   const captchaRef = useRef<CaptchaRef>(null);
 

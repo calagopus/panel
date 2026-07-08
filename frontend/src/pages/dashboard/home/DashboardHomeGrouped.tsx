@@ -30,7 +30,8 @@ const MemoizedServerGroupItem = memo(ServerGroupItem);
 
 export default function DashboardHomeGrouped() {
   const { t } = useTranslations();
-  const { serverGroups, setServerGroups } = useUserStore();
+  const serverGroups = useUserStore((state) => state.serverGroups);
+  const setServerGroups = useUserStore((state) => state.setServerGroups);
   const { addToast } = useToast();
 
   const [selectedServers, setSelectedServers] = useState(new ObjectSet<z.infer<typeof serverSchema>, 'uuid'>('uuid'));

@@ -20,7 +20,8 @@ import { useAdminStore } from '@/stores/admin.tsx';
 export default function WebauthnContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { webauthn, updateSettings } = useAdminStore();
+  const webauthn = useAdminStore((state) => state.webauthn);
+  const updateSettings = useAdminStore((state) => state.updateSettings);
 
   const [openModal, setOpenModal] = useState<'changeRpId' | null>(null);
   const [loading, setLoading] = useState(false);

@@ -60,15 +60,17 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_server_permission("files.archive")?;
 
+        let files = data
+            .files
+            .into_iter()
+            .filter(|f| !server.is_ignored(std::path::Path::new(&data.root).join(f), false))
+            .collect();
+
         let request_body = wings_api::servers_server_files_compress::post::RequestBody {
             name: data.name,
             format: data.format,
             root: data.root,
-            files: data
-                .files
-                .into_iter()
-                .filter(|f| !server.is_ignored(f, false))
-                .collect(),
+            files,
             foreground: data.foreground,
         };
 

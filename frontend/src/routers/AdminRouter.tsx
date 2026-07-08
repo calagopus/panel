@@ -19,7 +19,7 @@ import { useAdminStore } from '@/stores/admin.tsx';
 export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
   const { t } = useTranslations();
   const { user } = useAuth();
-  const { setUpdateInformation } = useAdminStore();
+  const setUpdateInformation = useAdminStore((state) => state.setUpdateInformation);
 
   useEffect(() => {
     getUpdates().then(setUpdateInformation).catch(console.error);

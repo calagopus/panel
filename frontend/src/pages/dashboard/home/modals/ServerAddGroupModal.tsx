@@ -19,7 +19,8 @@ type Props = ModalProps & {
 export default function ServerAddGroupModal({ server, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { serverGroups, updateServerGroup: updateStateServerGroup } = useUserStore();
+  const serverGroups = useUserStore((state) => state.serverGroups);
+  const updateStateServerGroup = useUserStore((state) => state.updateServerGroup);
 
   const [selectedServerGroup, setSelectedServerGroup] = useState<z.infer<typeof userServerGroupSchema> | null>(null);
   const [loading, setLoading] = useState(false);

@@ -22,7 +22,7 @@ export default function ServerMountAddModal({
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { addServerMount } = useAdminStore();
+  const addServerMount = useAdminStore((state) => state.addServerMount);
 
   const [loading, setLoading] = useState(false);
   const [selectedMount, setSelectedMount] = useState<z.infer<typeof adminNodeMountSchema> | null>(null);

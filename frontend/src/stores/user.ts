@@ -14,17 +14,24 @@ export interface UserStore
     SshKeySlice,
     CommandSnippetsSlice,
     SecurityKeySlice,
-    OAuthLinksSlice {}
+    OAuthLinksSlice {
+  reset: () => void;
+}
 
-export const useUserStore = create<UserStore>()((...a) => ({
-  ...createServersSlice(...a),
-  ...createApiKeysSlice(...a),
-  ...createSessionsSlice(...a),
-  ...createSshKeysSlice(...a),
-  ...createCommandSnippetsSlice(...a),
-  ...createSecurityKeysSlice(...a),
-  ...createOAuthLinksSlice(...a),
-}));
+export const useUserStore = create<UserStore>()((...a) => {
+  const initialState = {} as UserStore;
+  Object.assign(initialState, {
+    ...createServersSlice(...a),
+    ...createApiKeysSlice(...a),
+    ...createSessionsSlice(...a),
+    ...createSshKeysSlice(...a),
+    ...createCommandSnippetsSlice(...a),
+    ...createSecurityKeysSlice(...a),
+    ...createOAuthLinksSlice(...a),
+  });
+  initialState.reset = () => a[0]((state) => ({ ...initialState, reset: state.reset }), true);
+  return initialState;
+});
 
 export function getUserStore() {
   return useUserStore.getState();

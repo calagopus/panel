@@ -45,7 +45,7 @@ export default function OAuthProviderMappingModal({
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { availablePermissions } = useGlobalStore();
+  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
 
   const isEdit = !!mapping;
 

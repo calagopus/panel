@@ -16,7 +16,9 @@ import DatabaseCreateModal from './modals/DatabaseCreateModal.tsx';
 
 export default function ServerDatabases() {
   const { t } = useTranslations();
-  const { server, databases, setDatabases } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const databases = useServerStore((state) => state.databases);
+  const setDatabases = useServerStore((state) => state.setDatabases);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 

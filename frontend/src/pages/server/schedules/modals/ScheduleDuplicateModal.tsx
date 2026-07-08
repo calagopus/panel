@@ -25,7 +25,8 @@ type Props = ModalProps & {
 export default function ScheduleDuplicateModal({ schedule, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, addSchedule } = useServerStore();
+  const server = useServerStore((state) => state.server);
+  const addSchedule = useServerStore((state) => state.addSchedule);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof duplicateScheduleSchema>>({
     initialValues: {

@@ -33,7 +33,7 @@ import WebauthnContainer from './WebauthnContainer.tsx';
 export default function AdminSettings() {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const { setSettings } = useAdminStore();
+  const setSettings = useAdminStore((state) => state.setSettings);
 
   const [loading, setLoading] = useState(true);
 

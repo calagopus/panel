@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router';
 import { useGlobalStore } from '@/stores/global.ts';
 
 export default function OobeGuard() {
-  const { settings } = useGlobalStore();
+  const settings = useGlobalStore((state) => state.settings);
   const location = useLocation();
 
   const inOobe = location.pathname.startsWith('/oobe');

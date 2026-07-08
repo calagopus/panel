@@ -2,6 +2,7 @@ import { faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { load } from 'js-yaml';
 import { ChangeEvent, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getSchedules from '@/api/server/schedules/getSchedules.ts';
 import importSchedule from '@/api/server/schedules/importSchedule.ts';
@@ -23,7 +24,14 @@ import ScheduleRow from './ScheduleRow.tsx';
 export default function ServerSchedules() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, schedules, setSchedules, addSchedule } = useServerStore();
+  const { server, schedules, setSchedules, addSchedule } = useServerStore(
+    useShallow((state) => ({
+      server: state.server,
+      schedules: state.schedules,
+      setSchedules: state.setSchedules,
+      addSchedule: state.addSchedule,
+    })),
+  );
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 

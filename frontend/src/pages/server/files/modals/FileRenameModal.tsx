@@ -2,6 +2,7 @@ import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
+import { useShallow } from 'zustand/react/shallow';
 import renameFiles from '@/api/server/files/renameFiles.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -21,9 +22,17 @@ type Props = ModalProps & {
 export default function FileRenameModal({ file, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server } = useServerStore();
+  const server = useServerStore((state) => state.server);
   const { browsingDirectory, selectedFiles, addSelectedFile, removeSelectedFile, invalidateFilemanager } =
-    useFileManager();
+    useFileManager(
+      useShallow((state) => ({
+        browsingDirectory: state.browsingDirectory,
+        selectedFiles: state.selectedFiles,
+        addSelectedFile: state.addSelectedFile,
+        removeSelectedFile: state.removeSelectedFile,
+        invalidateFilemanager: state.invalidateFilemanager,
+      })),
+    );
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverFilesNameSchema>>({
     initialValues: {
