@@ -3127,7 +3127,11 @@
                 "modal": {
                   "delete": {
                     "title": "Confirm Database Host Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "content": "Are you sure you want to delete **{name}**?",
+                    "form": {
+                      "force": "Force delete",
+                      "forceWarning": "Force deletion removes all databases on this host. The databases on the host itself may not be fully cleaned up, leaving orphaned data behind."
+                    }
                   }
                 }
               }
@@ -3897,6 +3901,7 @@
             "preferPhysicalSize": "Show physical size instead of logical size",
             "editorMinimap": "Show File Minimap",
             "editorLineOverflow": "Wrap Line Overflow",
+            "editorFontSize": "Editor Font Size",
             "vscodeUriScheme": "VS Code URI Scheme",
             "imageViewerSmoothing": "Smoothen Image (Anti-Aliasing)"
           },

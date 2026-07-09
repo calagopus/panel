@@ -95,6 +95,7 @@ function FileEditorComponent() {
   const {
     editorMinimap,
     editorLineOverflow,
+    editorFontSize,
     imageViewerSmoothing,
     audioPlayerVolume,
     audioPlayerPlaybackRate,
@@ -108,6 +109,7 @@ function FileEditorComponent() {
     useShallow((state) => ({
       editorMinimap: state.editorMinimap,
       editorLineOverflow: state.editorLineOverflow,
+      editorFontSize: state.editorFontSize,
       imageViewerSmoothing: state.imageViewerSmoothing,
       audioPlayerVolume: state.audioPlayerVolume,
       audioPlayerPlaybackRate: state.audioPlayerPlaybackRate,
@@ -552,6 +554,7 @@ function FileEditorComponent() {
                     stickyScroll: { enabled: false },
                     minimap: { enabled: editorMinimap },
                     wordWrap: editorLineOverflow ? 'on' : 'off',
+                    fontSize: editorFontSize,
                     codeLens: false,
                     scrollBeyondLastLine: false,
                     smoothScrolling: false,

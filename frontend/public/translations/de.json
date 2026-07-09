@@ -3890,6 +3890,7 @@
             "preferPhysicalSize": "Physische Größe statt logischer Größe anzeigen",
             "editorMinimap": "Datei Minimap",
             "editorLineOverflow": "Zeilenumbruch für lange Zeilen im Editor",
+            "editorFontSize": "Editor-Schriftgröße",
             "vscodeUriScheme": "VS Code URI-Schema",
             "imageViewerSmoothing": "Bildglättung (Anti-Aliasing)"
           },

@@ -88,6 +88,8 @@ export interface FileManagerStore {
   setEditorMinimap: (state: boolean) => void;
   editorLineOverflow: boolean;
   setEditorLineOverflow: (state: boolean) => void;
+  editorFontSize: number;
+  setEditorFontSize: (size: number) => void;
   vscodeUriScheme: string;
   setVscodeUriScheme: (scheme: string) => void;
   imageViewerSmoothing: boolean;
@@ -203,6 +205,11 @@ export const createFileManagerStore = (
       setEditorLineOverflow: (state) => {
         localStorage.setItem('file_editor_lineoverflow', state.toString());
         set({ editorLineOverflow: state });
+      },
+      editorFontSize: Number(localStorage.getItem('file_editor_font_size')) || 14,
+      setEditorFontSize: (size) => {
+        localStorage.setItem('file_editor_font_size', size.toString());
+        set({ editorFontSize: size });
       },
       vscodeUriScheme: localStorage.getItem('file_vscode_uri_scheme') || 'vscode',
       setVscodeUriScheme: (scheme) => {
