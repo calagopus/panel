@@ -48,7 +48,7 @@ export default function DashboardActivity() {
         error={error}
       >
         {activities.data.map((activity, index) => (
-          <TableRow key={`${activity.created.toISOString()}-${index}`}>
+          <TableRow key={`${activity.created}-${index}`}>
             <TableData>
               <div className='size-5 aspect-square relative'>
                 <img

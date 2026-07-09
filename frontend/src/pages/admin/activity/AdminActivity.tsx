@@ -71,7 +71,7 @@ export default function AdminActivity() {
         onPageSelect={setPage}
       >
         {activities?.data.map((activity, index) => (
-          <ActivityRow key={`${activity.created.toISOString()}-${index}`} activity={activity} />
+          <ActivityRow key={`${activity.created}-${index}`} activity={activity} />
         ))}
       </Table>
     </AdminContentContainer>
