@@ -95,16 +95,24 @@ mod get {
 mod delete {
     use crate::routes::api::admin::database_hosts::_database_host_::GetDatabaseHost;
     use axum::http::StatusCode;
-    use serde::Serialize;
+    use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
-            DeletableModel, admin_activity::GetAdminActivityLogger,
-            server_database::ServerDatabase, user::GetPermissionManager,
+            DeletableModel,
+            admin_activity::GetAdminActivityLogger,
+            server_database::{DeleteServerDatabaseOptions, ServerDatabase},
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
+
+    #[derive(ToSchema, Deserialize)]
+    pub struct Payload {
+        #[serde(default)]
+        force: bool,
+    }
 
     #[derive(ToSchema, Serialize)]
     struct Response {}
@@ -113,28 +121,52 @@ mod delete {
         (status = OK, body = inline(Response)),
         (status = NOT_FOUND, body = ApiError),
         (status = CONFLICT, body = ApiError),
+        (status = EXPECTATION_FAILED, body = ApiError),
     ), params(
         (
             "database_host" = uuid::Uuid,
             description = "The database host ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
-    ))]
+    ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
         database_host: GetDatabaseHost,
         activity_logger: GetAdminActivityLogger,
+        shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("database-hosts.delete")?;
 
         let databases =
-            ServerDatabase::count_by_database_host_uuid(&state.database, database_host.uuid)
-                .await?;
-        if databases > 0 {
+            ServerDatabase::all_by_database_host_uuid(&state.database, database_host.uuid).await?;
+        if !databases.is_empty() && !data.force {
             return ApiResponse::error("database host has databases, cannot delete")
                 .with_status(StatusCode::CONFLICT)
                 .ok();
+        }
+
+        for database in databases {
+            let database_uuid = database.uuid;
+
+            if let Err(err) = database
+                .delete(&state, DeleteServerDatabaseOptions { force: data.force })
+                .await
+            {
+                tracing::error!(
+                    database_host = %database_host.uuid,
+                    database = %database_uuid,
+                    "failed to delete database: {:?}",
+                    err
+                );
+
+                let (err, status) = shared::response::extract_readable_error(&err)
+                    .unwrap_or_else(|| (err.to_string(), StatusCode::EXPECTATION_FAILED));
+
+                return ApiResponse::error(format!("failed to delete database: {err}"))
+                    .with_status(status)
+                    .ok();
+            }
         }
 
         database_host.delete(&state, ()).await?;

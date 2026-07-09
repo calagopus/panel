@@ -249,6 +249,28 @@ impl ServerDatabase {
         .await
     }
 
+    pub async fn all_by_database_host_uuid(
+        database: &crate::database::Database,
+        database_host_uuid: uuid::Uuid,
+    ) -> Result<Vec<Self>, crate::database::DatabaseError> {
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM server_databases
+            JOIN database_hosts ON database_hosts.uuid = server_databases.database_host_uuid
+            WHERE server_databases.database_host_uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(database_host_uuid)
+        .fetch_all(database.read())
+        .await?;
+
+        rows.into_iter()
+            .map(|row| Self::map(None, &row))
+            .try_collect_vec()
+    }
+
     pub async fn count_by_database_host_uuid(
         database: &crate::database::Database,
         database_host_uuid: uuid::Uuid,

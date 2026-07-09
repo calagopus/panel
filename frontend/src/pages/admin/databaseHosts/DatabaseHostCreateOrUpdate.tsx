@@ -1,4 +1,4 @@
-import { faExternalLink, faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
+import { faExternalLink, faTriangleExclamation, faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType, useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -9,6 +9,7 @@ import deleteDatabaseHost from '@/api/admin/database-hosts/deleteDatabaseHost.ts
 import testDatabaseHost from '@/api/admin/database-hosts/testDatabaseHost.ts';
 import updateDatabaseHost from '@/api/admin/database-hosts/updateDatabaseHost.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
@@ -16,7 +17,10 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
+import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import Stack from '@/elements/Stack.tsx';
+import Text from '@/elements/Text.tsx';
 import { databaseCredentialTypeLabelMapping, databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
@@ -43,6 +47,7 @@ export default function DatabaseHostCreateOrUpdate({
   const { addToast } = useToast();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [deleteDoForce, setDeleteDoForce] = useState(false);
 
   const {
     formExtension,
@@ -77,7 +82,9 @@ export default function DatabaseHostCreateOrUpdate({
     updateFn: contextDatabaseHost
       ? () => updateDatabaseHost(contextDatabaseHost.uuid, adminDatabaseHostUpdateSchema.parse(form.getValues()))
       : undefined,
-    deleteFn: contextDatabaseHost ? () => deleteDatabaseHost(contextDatabaseHost.uuid) : undefined,
+    deleteFn: contextDatabaseHost
+      ? () => deleteDatabaseHost(contextDatabaseHost.uuid, { force: deleteDoForce })
+      : undefined,
     doUpdate: !!contextDatabaseHost,
     basePath: '/admin/database-hosts',
     resourceName: t('pages.admin.databaseHosts.resourceName', {}),
@@ -203,14 +210,35 @@ export default function DatabaseHostCreateOrUpdate({
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
-        onClose={() => setOpenModal(null)}
+        onClose={() => {
+          setOpenModal(null);
+          setDeleteDoForce(false);
+        }}
         title={t('pages.admin.databaseHosts.tabs.general.page.modal.delete.title', {})}
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.databaseHosts.tabs.general.page.modal.delete.content', {
-          name: form.getValues().name ?? '',
-        }).md()}
+        <Stack>
+          <Text size='sm'>
+            {t('pages.admin.databaseHosts.tabs.general.page.modal.delete.content', {
+              name: form.getValues().name ?? '',
+            }).md()}
+          </Text>
+
+          <Switch
+            label={t('pages.admin.databaseHosts.tabs.general.page.modal.delete.form.force', {})}
+            name='force'
+            color='red'
+            checked={deleteDoForce}
+            onChange={(e) => setDeleteDoForce(e.target.checked)}
+          />
+
+          {deleteDoForce && (
+            <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+              {t('pages.admin.databaseHosts.tabs.general.page.modal.delete.form.forceWarning', {})}
+            </Alert>
+          )}
+        </Stack>
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.databaseHosts.all()))}>

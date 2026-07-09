@@ -3132,6 +3132,11 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Database Host Deletion',
                     content: 'Are you sure you want to delete **{name}**?',
+                    form: {
+                      force: 'Force delete',
+                      forceWarning:
+                        'Force deletion removes all databases on this host. The databases on the host itself may not be fully cleaned up, leaving orphaned data behind.',
+                    },
                   },
                 },
               },

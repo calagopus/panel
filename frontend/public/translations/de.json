@@ -3121,7 +3121,11 @@
                 "modal": {
                   "delete": {
                     "title": "Datenbank-Host-Löschung bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
+                    "form": {
+                      "force": "Möchtest du diesen Datenbank-Host zwangsweise löschen?",
+                      "forceWarning": "Das erzwungene Löschen entfernt alle Datenbanken auf diesem Host. Die Datenbanken auf dem Host selbst werden möglicherweise nicht vollständig bereinigt, wodurch verwaiste Daten zurückbleiben."
+                    }
                   }
                 }
               }
