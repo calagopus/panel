@@ -3649,11 +3649,22 @@
         "databaseAgentTemplates": {
           "title": "Datenbank-Agent-Vorlagen",
           "resourceName": "Datenbank-Agent-Vorlage",
+          "dropzone": {
+            "title": "Lege einige Dateien hier ab, um sie als Datenbank-Agent-Vorlagen zu importieren",
+            "subtitle": "Loslassen, um den Import zu starten"
+          },
+          "toast": {
+            "imported": "Datenbank-Agent-Vorlage importiert.",
+            "parseFailed": "Datenbank-Agent-Vorlage konnte nicht verarbeitet werden: {error}"
+          },
           "tabs": {
             "general": {
               "page": {
                 "titleCreate": "Datenbank-Agent-Vorlage erstellen",
                 "titleUpdate": "Datenbank-Agent-Vorlage aktualisieren",
+                "toast": {
+                  "exported": "Datenbank-Agent-Vorlage exportiert."
+                },
                 "form": {
                   "dockerImages": "Docker-Images",
                   "env": "Umgebungsvariablen",

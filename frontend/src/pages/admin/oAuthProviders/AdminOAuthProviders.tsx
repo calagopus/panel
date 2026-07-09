@@ -11,10 +11,10 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
+import { parseFromApi } from '@/lib/api-transform.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
+import { adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { oauthProviderTableColumns } from '@/lib/tableColumns.ts';
-import { transformKeysToCamelCase } from '@/lib/transformers.ts';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -47,23 +47,20 @@ function OAuthProvidersContainer() {
 
   const handleImport = async (file: File) => {
     const text = await file.text().then((t) => t.trim());
-    let data: object;
+    let data: z.infer<typeof adminOAuthProviderUpdateSchema>;
     try {
-      if (text.startsWith('{')) {
-        data = JSON.parse(text);
-      } else {
-        data = load(text) as object;
-      }
+      const raw: unknown = text.startsWith('{') ? JSON.parse(text) : load(text);
+      data = parseFromApi(adminOAuthProviderUpdateSchema, {
+        ...(raw as object),
+        client_id: 'example',
+        client_secret: 'example',
+      });
     } catch (err) {
       addToast(t('pages.admin.oAuthProviders.toast.parseFailed', { error: String(err) }), 'error');
       return;
     }
 
-    createOAuthProvider({
-      ...(transformKeysToCamelCase(data) as z.infer<typeof adminOAuthProviderSchema>),
-      clientId: 'example',
-      clientSecret: 'example',
-    })
+    createOAuthProvider(data)
       .then(() => {
         refetch();
         addToast(t('pages.admin.oAuthProviders.toast.imported', {}), 'success');

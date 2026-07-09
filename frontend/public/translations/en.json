@@ -3282,11 +3282,22 @@
         "databaseAgentTemplates": {
           "title": "Database Agent Templates",
           "resourceName": "Database agent template",
+          "dropzone": {
+            "title": "Drop some files here to import as Database Agent Templates",
+            "subtitle": "Release to start importing"
+          },
+          "toast": {
+            "imported": "Database Agent Template imported.",
+            "parseFailed": "Failed to parse database agent template: {error}"
+          },
           "tabs": {
             "general": {
               "page": {
                 "titleCreate": "Create Database Agent Template",
                 "titleUpdate": "Update Database Agent Template",
+                "toast": {
+                  "exported": "Database Agent Template exported."
+                },
                 "form": {
                   "dockerImages": "Docker Images",
                   "env": "Environment Variables",

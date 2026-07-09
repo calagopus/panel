@@ -8,8 +8,12 @@ function def<T>(schema: AnySchema): T {
   return schema._zod.def as unknown as T;
 }
 
+const snakeCaseOverrides: Record<string, string> = {
+  loginBypass2fa: 'login_bypass_2fa',
+};
+
 function toSnakeCase(key: string): string {
-  return key.replace(/([A-Z])/g, '_$1').toLowerCase();
+  return snakeCaseOverrides[key] ?? key.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
 
 // camelCase conversion mirrors the backend's snake_case keys. camel->snake is lossy around

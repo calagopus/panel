@@ -19,9 +19,9 @@ import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-en
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Title from '@/elements/Title.tsx';
+import { serializeForApi } from '@/lib/api-transform.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 import OAuthProviderDuplicateModal from '@/pages/admin/oAuthProviders/modals/OAuthProviderDuplicateModal.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -124,47 +124,21 @@ export default function OAuthProviderCreateOrUpdate({
 
     addToast(t('pages.admin.oAuthProviders.tabs.general.page.toast.exported', {}), 'success');
 
-    let data: Partial<z.infer<typeof adminOAuthProviderSchema>> & {
-      uuid?: string;
-      created?: Date;
-      clientId?: string;
-      clientSecret?: string;
-    } = JSON.parse(JSON.stringify(contextOAuthProvider));
+    const data = serializeForApi(adminOAuthProviderUpdateSchema, contextOAuthProvider) as Record<string, unknown>;
+    delete data.client_id;
+    delete data.client_secret;
 
-    delete data.uuid;
-    delete data.created;
-    delete data.clientId;
-    delete data.clientSecret;
-    data.description = data.description || null;
-    data.emailPath = data.emailPath || null;
-    data.usernamePath = data.usernamePath || null;
-    data.nameFirstPath = data.nameFirstPath || null;
-    data.nameLastPath = data.nameLastPath || null;
-    data = transformKeysToSnakeCase(data);
+    const contents =
+      format === 'json' ? JSON.stringify(data, undefined, 2) : dump(data, { flowLevel: -1, forceQuotes: true });
+    const fileURL = URL.createObjectURL(new Blob([contents], { type: 'text/plain' }));
+    const downloadLink = document.createElement('a');
+    downloadLink.href = fileURL;
+    downloadLink.download = `oauth-provider-${contextOAuthProvider.uuid}.${format === 'json' ? 'json' : 'yml'}`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
 
-    if (format === 'json') {
-      const jsonData = JSON.stringify(data, undefined, 2);
-      const fileURL = URL.createObjectURL(new Blob([jsonData], { type: 'text/plain' }));
-      const downloadLink = document.createElement('a');
-      downloadLink.href = fileURL;
-      downloadLink.download = `oauth-provider-${contextOAuthProvider.uuid}.json`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-
-      URL.revokeObjectURL(fileURL);
-      downloadLink.remove();
-    } else {
-      const yamlData = dump(data, { flowLevel: -1, forceQuotes: true });
-      const fileURL = URL.createObjectURL(new Blob([yamlData], { type: 'text/plain' }));
-      const downloadLink = document.createElement('a');
-      downloadLink.href = fileURL;
-      downloadLink.download = `oauth-provider-${contextOAuthProvider.uuid}.yml`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-
-      URL.revokeObjectURL(fileURL);
-      downloadLink.remove();
-    }
+    URL.revokeObjectURL(fileURL);
+    downloadLink.remove();
   };
 
   const fieldsTop: FieldDef<OAuthFormValues>[] = [
