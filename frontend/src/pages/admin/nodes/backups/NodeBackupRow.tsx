@@ -134,6 +134,7 @@ export default function NodeBackupRow({
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
             hidden: !backup.completed || isFailed,
@@ -141,6 +142,7 @@ export default function NodeBackupRow({
             color: 'gray',
             items: backup.isStreaming
               ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
+                  type: 'action',
                   icon: faFileArrowDown,
                   label: t('common.button.downloadAs', { format: label }),
                   onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
@@ -150,6 +152,7 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
             hidden: !backup.completed || isFailed,
@@ -158,6 +161,7 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
             hidden: !backup.completed || isFailed,
@@ -166,6 +170,7 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faLink,
             label: t('common.button.reattach', {}),
             hidden: !backup.completed || isFailed,
@@ -174,6 +179,7 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faLink,
             label: t('common.button.detach', {}),
             hidden: !backup.completed || isFailed || !backup.server,
@@ -182,6 +188,7 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faInfo,
             label: t('pages.server.backups.modal.viewMetadata.title', {}),
             hidden: Object.keys(backup.metadata).length === 0,
@@ -189,6 +196,7 @@ export default function NodeBackupRow({
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faTrash,
             hidden: !backup.completed,
             label: t('common.button.delete', {}),

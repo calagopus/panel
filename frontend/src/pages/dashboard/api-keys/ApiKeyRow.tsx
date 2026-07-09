@@ -84,18 +84,21 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
             onClick: () => setOpenModal('edit'),
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faRefresh,
             label: t('common.button.recreate', {}),
             onClick: () => setOpenModal('recreate'),
             color: 'red',
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('delete'),

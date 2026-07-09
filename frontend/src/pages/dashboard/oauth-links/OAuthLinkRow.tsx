@@ -49,6 +49,7 @@ export default function OAuthLinkRow({ oauthLink }: { oauthLink: z.infer<typeof 
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faTrash,
             disabled: !oauthLink.oauthProvider.userManageable,
             label: t('common.button.remove', {}),

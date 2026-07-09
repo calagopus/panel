@@ -108,6 +108,7 @@ export default function ServerAllocationRow({
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faStar,
             label: t('common.button.setPrimary', {}),
             hidden: allocation.isPrimary,
@@ -115,6 +116,7 @@ export default function ServerAllocationRow({
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faStar,
             label: t('common.button.unsetPrimary', {}),
             hidden: !allocation.isPrimary,
@@ -122,6 +124,7 @@ export default function ServerAllocationRow({
             color: 'red',
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),

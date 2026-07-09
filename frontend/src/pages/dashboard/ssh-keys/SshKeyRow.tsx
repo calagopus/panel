@@ -53,12 +53,14 @@ export default function SshKeyRow({ sshKey }: { sshKey: z.infer<typeof userSshKe
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
             onClick: () => setOpenModal('edit'),
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             onClick: () => setOpenModal('delete'),

@@ -50,6 +50,7 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
             onClick: () => setOpenModal('edit'),
@@ -57,6 +58,7 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
             canAccess: useServerCan('databases.update'),
           },
           {
+            type: 'action',
             icon: faEye,
             label: t('common.button.details', {}),
             onClick: () => setOpenModal('details'),
@@ -64,6 +66,7 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
             canAccess: useServerCan('databases.read'),
           },
           {
+            type: 'action',
             icon: faRefresh,
             label: t('common.button.recreate', {}),
             disabled: database.isLocked,
@@ -72,6 +75,7 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
             canAccess: useServerCan('databases.recreate'),
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             disabled: database.isLocked,

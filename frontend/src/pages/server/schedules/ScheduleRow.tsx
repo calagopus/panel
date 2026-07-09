@@ -104,16 +104,19 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPlay,
             label: t('pages.server.schedules.button.runNow', {}),
             items: [
               {
+                type: 'action',
                 icon: faPlayCircle,
                 label: t('pages.server.schedules.button.runNowWithConditions', {}),
                 onClick: () => doTriggerSchedule(false),
                 color: 'gray',
               },
               {
+                type: 'action',
                 icon: faPlay,
                 label: t('pages.server.schedules.button.runNowIgnoreConditions', {}),
                 onClick: () => doTriggerSchedule(true),
@@ -123,16 +126,19 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
             canAccess: useServerCan('schedules.update'),
           },
           {
+            type: 'action',
             icon: faShareAlt,
             label: t('common.button.export', {}),
             items: [
               {
+                type: 'action',
                 icon: faFileDownload,
                 label: t('common.button.exportAs', { format: 'JSON' }),
                 onClick: () => doExport('json'),
                 color: 'gray',
               },
               {
+                type: 'action',
                 icon: faFileDownload,
                 label: t('common.button.exportAs', { format: 'YAML' }),
                 onClick: () => doExport('yaml'),
@@ -142,6 +148,7 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
             canAccess: useServerCan('schedules.read'),
           },
           {
+            type: 'action',
             icon: faClone,
             label: t('common.button.duplicate', {}),
             onClick: () => setOpenModal('duplicate'),
@@ -149,6 +156,7 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
             canAccess: useServerCan('schedules.create'),
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             onClick: () => setOpenModal('delete'),

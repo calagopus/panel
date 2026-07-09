@@ -29,12 +29,14 @@ export default function FileConnectButton({ file }: { file?: string }) {
           menuProps={{ position: 'bottom-start' }}
           items={[
             {
+              type: 'action',
               icon: faServer,
               label: t('pages.server.files.button.connectSftp', {}),
               onClick: () => setSftpDetailsOpen(true),
               color: 'gray',
             },
             {
+              type: 'action',
               icon: faCode,
               label: t('pages.server.files.button.connectVscode', {}),
               onClick: () => window.open(vscodeUrl),

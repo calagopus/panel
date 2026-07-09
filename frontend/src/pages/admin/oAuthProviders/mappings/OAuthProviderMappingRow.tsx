@@ -63,11 +63,13 @@ export default function OAuthProviderMappingRow({
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
             onClick: () => setOpenModal('edit'),
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             onClick: () => setOpenModal('delete'),

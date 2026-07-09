@@ -151,12 +151,14 @@ export default function ScheduleView() {
                 <ContextMenu
                   items={[
                     {
+                      type: 'action',
                       icon: faPlayCircle,
                       label: t('pages.server.schedules.button.runNowWithConditions', {}),
                       onClick: () => doTriggerSchedule(false),
                       color: 'gray',
                     },
                     {
+                      type: 'action',
                       icon: faPlay,
                       label: t('pages.server.schedules.button.runNowIgnoreConditions', {}),
                       onClick: () => doTriggerSchedule(true),

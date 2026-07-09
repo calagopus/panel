@@ -4,16 +4,25 @@ import { Menu, MenuProps } from '@mantine/core';
 import { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ContextMenuRegistry } from 'shared/src/registries/slices/contextMenu';
 
-export interface ContextMenuItem {
-  icon: IconDefinition;
+export interface ContextMenuActionItem {
+  type: 'action';
+  icon?: IconDefinition;
   label: string;
   hidden?: boolean;
   disabled?: boolean;
   onClick?: () => void;
   color?: 'gray' | 'red';
-  items?: Omit<ContextMenuItem, 'items'>[];
+  items?: (Omit<ContextMenuActionItem, 'items'> | ContextMenuDividerItem)[];
   canAccess?: boolean;
 }
+
+export interface ContextMenuDividerItem {
+  type: 'divider';
+  hidden?: boolean;
+  canAccess?: boolean;
+}
+
+export type ContextMenuItem = ContextMenuActionItem | ContextMenuDividerItem;
 
 interface ContextMenuState {
   visible: boolean;
@@ -63,7 +72,7 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ContextMenuContext.Provider value={contextValue}>
       <Menu
-        disabled={!state.items.some((item) => !item.hidden && item.canAccess !== false)}
+        disabled={!state.items.some((item) => item.type === 'action' && !item.hidden && item.canAccess !== false)}
         opened={state.visible}
         onClose={hideMenu}
         width={200}
@@ -91,12 +100,14 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
           {state.items
             .filter((item) => !item.hidden && item.canAccess !== false)
             .map((item, idx) =>
-              (item.items || []).length > 0 ? (
+              item.type === 'divider' ? (
+                <Menu.Divider key={idx} />
+              ) : (item.items || []).length > 0 ? (
                 <Menu.Sub key={idx} position={state.x + 300 > window.innerWidth ? 'left-start' : 'right-start'}>
                   <Menu.Sub.Target>
                     <Menu.Sub.Item
                       key={idx}
-                      leftSection={<FontAwesomeIcon icon={item.icon} />}
+                      leftSection={item.icon ? <FontAwesomeIcon icon={item.icon} /> : undefined}
                       color={item.color === 'red' ? 'red' : undefined}
                       disabled={item.disabled}
                       onClick={(e) => {
@@ -115,30 +126,34 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
                   <Menu.Sub.Dropdown>
                     {item
                       .items!.filter((subItem) => !subItem.hidden && subItem.canAccess !== false)
-                      .map((subItem, subIdx) => (
-                        <Menu.Item
-                          key={idx.toString() + subIdx.toString()}
-                          leftSection={<FontAwesomeIcon icon={subItem.icon} />}
-                          color={subItem.color === 'red' ? 'red' : undefined}
-                          disabled={subItem.disabled}
-                          onClick={(e) => {
-                            if (!e.isTrusted) return;
+                      .map((subItem, subIdx) =>
+                        subItem.type === 'divider' ? (
+                          <Menu.Divider key={idx.toString() + subIdx.toString()} />
+                        ) : (
+                          <Menu.Item
+                            key={idx.toString() + subIdx.toString()}
+                            leftSection={subItem.icon ? <FontAwesomeIcon icon={subItem.icon} /> : undefined}
+                            color={subItem.color === 'red' ? 'red' : undefined}
+                            disabled={subItem.disabled}
+                            onClick={(e) => {
+                              if (!e.isTrusted) return;
 
-                            if (subItem.onClick) {
-                              subItem.onClick();
-                              hideMenu();
-                            }
-                          }}
-                        >
-                          {subItem.label}
-                        </Menu.Item>
-                      ))}
+                              if (subItem.onClick) {
+                                subItem.onClick();
+                                hideMenu();
+                              }
+                            }}
+                          >
+                            {subItem.label}
+                          </Menu.Item>
+                        ),
+                      )}
                   </Menu.Sub.Dropdown>
                 </Menu.Sub>
               ) : (
                 <Menu.Item
                   key={idx}
-                  leftSection={<FontAwesomeIcon icon={item.icon} />}
+                  leftSection={item.icon ? <FontAwesomeIcon icon={item.icon} /> : undefined}
                   color={item.color === 'red' ? 'red' : undefined}
                   disabled={item.disabled}
                   onClick={(e) => {
@@ -232,7 +247,7 @@ const ContextMenu = memo(ContextMenuBase) as typeof ContextMenuBase;
 
 const ContextMenuToggle = memo(
   ({ openMenu, items }: { openMenu: (x: number, y: number) => void; items: ContextMenuItem[] }) => {
-    if (!items.some((item) => !item.hidden && item.canAccess !== false)) {
+    if (!items.some((item) => item.type === 'action' && !item.hidden && item.canAccess !== false)) {
       return <td></td>;
     }
 

@@ -94,6 +94,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
             hidden: !backup.completed || isFailed,
@@ -101,6 +102,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             color: 'gray',
             items: backup.isStreaming
               ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
+                  type: 'action',
                   icon: faFileArrowDown,
                   label: t('common.button.downloadAs', { format: label }),
                   onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
@@ -110,6 +112,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
             hidden: !backup.completed || isFailed,
@@ -118,6 +121,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
             hidden: !backup.completed || isFailed,
@@ -126,6 +130,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faInfo,
             label: t('pages.server.backups.modal.viewMetadata.title', {}),
             hidden: Object.keys(backup.metadata).length === 0,
@@ -133,6 +138,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             hidden: !backup.completed,

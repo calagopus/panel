@@ -56,12 +56,14 @@ export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<t
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
             onClick: () => setOpenModal('edit'),
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             onClick: () => setOpenModal('delete'),

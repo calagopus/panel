@@ -50,6 +50,7 @@ export default function SessionRow({ session }: { session: z.infer<typeof userSe
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             disabled: session.isUsing,

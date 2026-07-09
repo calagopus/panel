@@ -295,12 +295,14 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
                 menuProps={{ position: 'top', offset: 40 }}
                 items={[
                   {
+                    type: 'action',
                     icon: faFileDownload,
                     label: t('common.button.exportAs', { format: 'JSON' }),
                     onClick: () => doExport('json'),
                     color: 'gray',
                   },
                   {
+                    type: 'action',
                     icon: faFileDownload,
                     label: t('common.button.exportAs', { format: 'YAML' }),
                     onClick: () => doExport('yaml'),

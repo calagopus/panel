@@ -54,6 +54,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
             onClick: () => setOpenModal('update'),
@@ -61,6 +62,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
             canAccess: useServerCan('subusers.update'),
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),

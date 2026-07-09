@@ -104,6 +104,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faStar,
             label: t('common.button.setPrimary', {}),
             hidden: allocation.isPrimary,
@@ -112,6 +113,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
             canAccess: canUpdate,
           },
           {
+            type: 'action',
             icon: faStar,
             label: t('common.button.unsetPrimary', {}),
             hidden: !allocation.isPrimary,
@@ -120,6 +122,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
             canAccess: canUpdate,
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),

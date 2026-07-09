@@ -114,6 +114,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
             onClick: () => setOpenModal('edit'),
@@ -121,6 +122,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             canAccess: useServerCan('backups.update'),
           },
           {
+            type: 'action',
             icon: faShare,
             label: t('pages.server.backups.button.browse', {}),
             hidden: !backup.completed || !backup.isBrowsable || isFailed,
@@ -134,6 +136,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             canAccess: useServerCan('files.read'),
           },
           {
+            type: 'action',
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
             hidden: !backup.completed || isFailed,
@@ -141,6 +144,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             color: 'gray',
             items: backup.isStreaming
               ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
+                  type: 'action',
                   icon: faFileArrowDown,
                   label: t('common.button.downloadAs', { format: label }),
                   onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
@@ -150,6 +154,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             canAccess: useServerCan('backups.download'),
           },
           {
+            type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
             hidden: !backup.completed || isFailed,
@@ -158,6 +163,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             canAccess: useServerCan('backups.restore'),
           },
           {
+            type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
             hidden: !backup.completed || isFailed,
@@ -166,6 +172,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             canAccess: useServerCan(['backups.download', 'files.create'], false),
           },
           {
+            type: 'action',
             icon: faInfo,
             label: t('pages.server.backups.modal.viewMetadata.title', {}),
             hidden: Object.keys(backup.metadata).length === 0,
@@ -173,6 +180,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             hidden: !backup.completed,

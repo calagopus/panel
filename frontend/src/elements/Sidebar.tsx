@@ -107,6 +107,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
       menuProps={{ width: 250 }}
       items={[
         {
+          type: 'action',
           icon: faWindowRestore,
           label: t('elements.sidebar.button.openInVirtualWindow', {}),
           onClick: () =>
@@ -119,6 +120,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
           color: 'gray',
         },
         {
+          type: 'action',
           icon: faWindowRestore,
           label: t('elements.sidebar.button.openInPopup', {}),
           onClick: () =>
@@ -130,6 +132,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
           color: 'gray',
         },
         {
+          type: 'action',
           icon: faWindowRestore,
           label: t('elements.sidebar.button.openInNewTab', {}),
           onClick: () => window.open(to, '_blank'),

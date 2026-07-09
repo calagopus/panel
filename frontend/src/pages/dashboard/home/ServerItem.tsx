@@ -108,6 +108,7 @@ export default function ServerItem({
         enabled={showContextMenu}
         items={[
           {
+            type: 'action',
             icon: faPlay,
             label: t('common.enum.serverPowerAction.start', {}),
             color: 'gray',
@@ -116,6 +117,7 @@ export default function ServerItem({
             onClick: () => doPowerAction('start'),
           },
           {
+            type: 'action',
             icon: faRotateRight,
             label: t('common.enum.serverPowerAction.restart', {}),
             canAccess: canPower('control.restart'),
@@ -123,6 +125,7 @@ export default function ServerItem({
             onClick: () => doPowerAction('restart'),
           },
           {
+            type: 'action',
             icon: faStop,
             label: t('common.enum.serverPowerAction.stop', {}),
             color: 'red',
@@ -131,6 +134,7 @@ export default function ServerItem({
             onClick: () => doPowerAction('stop'),
           },
           {
+            type: 'action',
             icon: faSkull,
             label: t('common.enum.serverPowerAction.kill', {}),
             color: 'red',
