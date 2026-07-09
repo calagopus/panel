@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminOAuthUserLinkSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 
 export default async (
@@ -10,5 +11,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/admin/oauth-providers/${oauthProviderUuid}/users`, {
     params: { page, search },
   });
-  return data.userOauthLinks;
+  return parsePaginationFromApi(adminOAuthUserLinkSchema, data.user_oauth_links);
 };

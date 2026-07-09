@@ -11,7 +11,7 @@ export const serverVariableSchema = z.object({
   isEditable: z.boolean(),
   isSecret: z.boolean(),
   rules: z.array(z.string()),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const serverEnvVariableSchema = z.object({

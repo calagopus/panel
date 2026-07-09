@@ -10,7 +10,7 @@ export const adminDatabaseAgentHostSchema = z.object({
   url: z.url().min(3).max(255),
   memory: z.number().min(1),
   disk: z.number().min(1),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminDatabaseAgentHostCreateSchema = z.lazy(() =>

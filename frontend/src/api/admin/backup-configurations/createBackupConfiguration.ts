@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminBackupConfigurationSchema,
   adminBackupConfigurationUpdateSchema,
@@ -13,5 +13,5 @@ export default async (
     '/api/admin/backup-configurations',
     serializeForApi(adminBackupConfigurationUpdateSchema, backupConfigurationData),
   );
-  return data.backupConfiguration;
+  return parseFromApi(adminBackupConfigurationSchema, data.backup_configuration);
 };

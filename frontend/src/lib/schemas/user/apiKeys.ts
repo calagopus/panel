@@ -8,9 +8,9 @@ export const userApiKeySchema = z.object({
   userPermissions: z.array(z.string()),
   serverPermissions: z.array(z.string()),
   adminPermissions: z.array(z.string()),
-  expires: z.date().nullable().optional(),
-  lastUsed: z.date(),
-  created: z.date(),
+  expires: z.coerce.date().nullable().optional(),
+  lastUsed: z.coerce.date(),
+  created: z.coerce.date(),
 });
 
 export const userApiKeyUpdateSchema = z.lazy(() =>

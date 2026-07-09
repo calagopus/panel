@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { userSshKeySchema } from '@/lib/schemas/user/sshKeys.ts';
 
 const createSshKeySchema = z.object({
@@ -13,5 +13,5 @@ export default async (keyData: z.infer<typeof createSshKeySchema>): Promise<z.in
     '/api/client/account/ssh-keys',
     serializeForApi(createSshKeySchema, keyData),
   );
-  return data.sshKey;
+  return parseFromApi(userSshKeySchema, data.ssh_key);
 };

@@ -4,6 +4,6 @@ export const userSecurityKeySchema = z.object({
   uuid: z.string(),
   name: z.string(),
   credentialId: z.string(),
-  lastUsed: z.date().nullable(),
-  created: z.date(),
+  lastUsed: z.coerce.date().nullable(),
+  created: z.coerce.date(),
 });

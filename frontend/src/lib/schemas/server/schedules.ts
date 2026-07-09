@@ -192,9 +192,9 @@ export const serverScheduleSchema = z.object({
   enabled: z.boolean(),
   triggers: z.array(serverScheduleTriggerSchema),
   condition: serverScheduleConditionSchema,
-  lastRun: z.date().nullable(),
-  lastFailure: z.date().nullable(),
-  created: z.date(),
+  lastRun: z.coerce.date().nullable(),
+  lastFailure: z.coerce.date().nullable(),
+  created: z.coerce.date(),
 });
 
 export const serverScheduleUpdateSchema = z.lazy(() =>
@@ -408,7 +408,7 @@ export const serverScheduleStepSchema = z.object({
   order: z.number(),
   action: serverScheduleStepActionSchema,
   error: z.string().nullable(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const serverScheduleStepUpdateSchema = z.lazy(() =>

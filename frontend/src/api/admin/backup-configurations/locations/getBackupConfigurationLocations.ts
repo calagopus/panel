@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 
 export default async (
@@ -10,5 +11,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/admin/backup-configurations/${backupConfigUuid}/locations`, {
     params: { page, search },
   });
-  return data.locations;
+  return parsePaginationFromApi(adminLocationSchema, data.locations);
 };

@@ -42,7 +42,6 @@ export default function ServerContainer() {
       maxSubuserCount: 0,
       maxScheduleStepCount: 0,
       allowOverwritingCustomDockerImage: false,
-      allowEditingStartupCommand: false,
       allowViewingInstallationLogs: false,
       allowAcknowledgingInstallationFailure: true,
       allowViewingTransferProgress: false,

@@ -59,7 +59,7 @@ export const serverFilesSearchSchema = z.object({
 });
 
 export const serverFileOperationBaseSchema = z.object({
-  startTime: z.date(),
+  startTime: z.coerce.date(),
   bytesProcessed: z.number(),
   bytesTotal: z.number(),
 });
@@ -161,8 +161,8 @@ export const serverDirectoryEntrySchema = z.object({
   file: z.boolean(),
   symlink: z.boolean(),
   mime: z.string(),
-  modified: z.date(),
-  created: z.date(),
+  modified: z.coerce.date(),
+  created: z.coerce.date(),
 });
 
 export const serverFilesPullQueryResultSchema = z.object({
@@ -209,5 +209,5 @@ export const serverFileRevisionSchema = z.object({
   user: userSchema.nullable(),
   size: z.number(),
   isSnapshot: z.boolean(),
-  created: z.date(),
+  created: z.coerce.date(),
 });

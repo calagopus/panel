@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminEggCreateSchema, adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 
 export default async (
@@ -11,5 +11,5 @@ export default async (
     `/api/admin/nests/${nestUuid}/eggs`,
     serializeForApi(adminEggCreateSchema, eggData),
   );
-  return data.egg;
+  return parseFromApi(adminEggSchema, data.egg);
 };

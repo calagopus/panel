@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminAnnouncementCreateSchema, adminAnnouncementSchema } from '@/lib/schemas/admin/announcements.ts';
 
 export default async (
@@ -10,5 +10,5 @@ export default async (
     '/api/admin/announcements',
     serializeForApi(adminAnnouncementCreateSchema, announcementData),
   );
-  return data.announcement;
+  return parseFromApi(adminAnnouncementSchema, data.announcement);
 };

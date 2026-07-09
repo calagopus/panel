@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
 
 const createServerGroupSchema = z.object({
@@ -15,5 +15,5 @@ export default async (
     '/api/client/servers/groups',
     serializeForApi(createServerGroupSchema, groupData),
   );
-  return data.serverGroup;
+  return parseFromApi(userServerGroupSchema, data.server_group);
 };

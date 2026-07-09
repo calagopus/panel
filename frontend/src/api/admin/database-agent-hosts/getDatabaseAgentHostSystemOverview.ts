@@ -1,31 +1,35 @@
+import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi } from '@/lib/api-transform.ts';
 
-export interface DatabaseAgentHostSystemOverview {
-  version: string;
-  containerType: string;
-  cpu: {
-    name: string;
-    brand: string;
-    vendorId: string;
-    frequencyMhz: number;
-    cpuCount: number;
-  };
-  memory: {
-    totalBytes: number;
-    freeBytes: number;
-    usedBytes: number;
-    usedBytesProcess: number;
-  };
-  databases: {
-    total: number;
-    online: number;
-    offline: number;
-  };
-  architecture: string;
-  kernelVersion: string;
-}
+const databaseAgentHostSystemOverviewSchema = z.object({
+  version: z.string(),
+  containerType: z.string(),
+  cpu: z.object({
+    name: z.string(),
+    brand: z.string(),
+    vendorId: z.string(),
+    frequencyMhz: z.number(),
+    cpuCount: z.number(),
+  }),
+  memory: z.object({
+    totalBytes: z.number(),
+    freeBytes: z.number(),
+    usedBytes: z.number(),
+    usedBytesProcess: z.number(),
+  }),
+  databases: z.object({
+    total: z.number(),
+    online: z.number(),
+    offline: z.number(),
+  }),
+  architecture: z.string(),
+  kernelVersion: z.string(),
+});
+
+export type DatabaseAgentHostSystemOverview = z.infer<typeof databaseAgentHostSystemOverviewSchema>;
 
 export default async (hostUuid: string): Promise<DatabaseAgentHostSystemOverview> => {
   const { data } = await axiosInstance.get(`/api/admin/database-agent-hosts/${hostUuid}/system/overview`);
-  return data;
+  return parseFromApi(databaseAgentHostSystemOverviewSchema, data);
 };

@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { axiosInstance, getPaginationSet } from '@/api/axios.ts';
+import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { userActivitySchema } from '@/lib/schemas/user/activity.ts';
 
 export default async (
@@ -10,8 +11,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/admin/users/${userUuid}/activity`, {
     params: { page, search },
   });
-  return {
-    ...getPaginationSet(data.activities),
-    data: data.activities.data || [],
-  };
+  return parsePaginationFromApi(userActivitySchema, data.activities);
 };

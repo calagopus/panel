@@ -4,15 +4,15 @@ import { databaseType, hostnameSchema } from '../generic.ts';
 
 export const adminDatabaseCredentialsConnectionStringSchema = z.object({
   type: z.literal('connection_string'),
-  connectionString: z.url().min(1).max(255),
+  connectionString: z.string(),
 });
 
 export const adminDatabaseCredentialsDetailsSchema = z.object({
   type: z.literal('details'),
-  username: z.string().min(3).max(255),
-  password: z.string().min(1).max(255),
+  username: z.string(),
+  password: z.string(),
   host: hostnameSchema,
-  port: z.number().min(1).max(65535),
+  port: z.number(),
 });
 
 export const adminDatabaseCredentialsSchema = z.discriminatedUnion('type', [
@@ -29,14 +29,37 @@ export const adminDatabaseHostSchema = z.object({
   publicHost: z.preprocess(nullableString, hostnameSchema.nullable()),
   publicPort: z.preprocess(nullableNumber, z.number().min(1).max(65535).nullable()),
   credentials: adminDatabaseCredentialsSchema,
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
+export const adminDatabaseCredentialsConnectionStringUpdateSchema = z.object({
+  type: z.literal('connection_string'),
+  connectionString: z.url().min(1).max(255),
+});
+
+export const adminDatabaseCredentialsDetailsUpdateSchema = z.object({
+  type: z.literal('details'),
+  username: z.string().min(3).max(255),
+  password: z.string().min(1).max(255),
+  host: hostnameSchema,
+  port: z.number().min(1).max(65535),
+});
+
+export const adminDatabaseCredentialsUpdateSchema = z.discriminatedUnion('type', [
+  adminDatabaseCredentialsConnectionStringUpdateSchema,
+  adminDatabaseCredentialsDetailsUpdateSchema,
+]);
+
 export const adminDatabaseHostCreateSchema = z.lazy(() =>
-  adminDatabaseHostSchema.omit({
-    uuid: true,
-    created: true,
-  }),
+  adminDatabaseHostSchema
+    .omit({
+      uuid: true,
+      created: true,
+      credentials: true,
+    })
+    .extend({
+      credentials: adminDatabaseCredentialsUpdateSchema,
+    }),
 );
 
 export const adminDatabaseHostUpdateSchema = z.lazy(() =>
@@ -44,6 +67,10 @@ export const adminDatabaseHostUpdateSchema = z.lazy(() =>
     .omit({
       uuid: true,
       created: true,
+      credentials: true,
+    })
+    .extend({
+      credentials: adminDatabaseCredentialsUpdateSchema,
     })
     .partial(),
 );

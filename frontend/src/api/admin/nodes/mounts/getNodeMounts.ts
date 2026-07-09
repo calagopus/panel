@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminNodeMountSchema } from '@/lib/schemas/admin/nodes.ts';
 
 export default async (
@@ -10,5 +11,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/admin/nodes/${nodeUuid}/mounts`, {
     params: { page, search },
   });
-  return data.mounts;
+  return parsePaginationFromApi(adminNodeMountSchema, data.mounts);
 };

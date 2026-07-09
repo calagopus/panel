@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { serverScheduleStepSchema, serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 
 export default async (
@@ -12,5 +12,5 @@ export default async (
     `/api/client/servers/${serverUuid}/schedules/${scheduleUuid}/steps`,
     serializeForApi(serverScheduleStepUpdateSchema, scheduleStepData),
   );
-  return data.scheduleStep;
+  return parseFromApi(serverScheduleStepSchema, data.schedule_step);
 };

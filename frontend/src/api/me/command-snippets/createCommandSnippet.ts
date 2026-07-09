@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { userCommandSnippetSchema, userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
 
 export default async (
@@ -10,5 +10,5 @@ export default async (
     '/api/client/account/command-snippets',
     serializeForApi(userCommandSnippetUpdateSchema, snippetData),
   );
-  return data.commandSnippet;
+  return parseFromApi(userCommandSnippetSchema, data.command_snippet);
 };

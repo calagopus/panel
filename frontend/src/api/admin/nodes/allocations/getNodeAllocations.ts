@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 
 export default async (
@@ -10,5 +11,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/admin/nodes/${nodeUuid}/allocations`, {
     params: { page, per_page: 100, search },
   });
-  return data.allocations;
+  return parsePaginationFromApi(adminNodeAllocationSchema, data.allocations);
 };

@@ -78,8 +78,8 @@ export const adminBackupConfigurationSchema = z.object({
       pbs: adminBackupConfigurationPbsSchema.nullable(),
       kopia: adminBackupConfigurationKopiaSchema.nullable(),
     })
-    .optional(),
-  created: z.date(),
+    .nullable(),
+  created: z.coerce.date(),
 });
 
 export const adminBackupConfigurationUpdateSchema = z.lazy(() =>

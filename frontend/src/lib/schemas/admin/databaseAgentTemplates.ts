@@ -19,7 +19,7 @@ export const adminDatabaseAgentTemplateSchema = z.object({
   disk: z.number().min(0),
   ioWeight: z.preprocess(nullableNumber, z.number().min(0).max(1000).nullable()),
   cpu: z.number().min(0),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminDatabaseAgentTemplateCreateSchema = z.lazy(() =>

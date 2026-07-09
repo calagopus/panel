@@ -112,7 +112,7 @@
     "globals": "^17.7.0",
     "monaco-editor": "^0.55.1",
     "tsx": "^4.23.0",
-    "typedoc": "^0.28.19",
+    "typedoc": "^0.28.20",
     "typedoc-plugin-rename-defaults": "^0.7.3",
     "typedoc-plugin-zod": "^1.4.3",
     "vite": "^8.1.3",

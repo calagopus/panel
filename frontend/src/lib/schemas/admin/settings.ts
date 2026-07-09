@@ -126,7 +126,6 @@ export const adminSettingsServerSchema = z.object({
   maxSubuserCount: z.number().min(0),
   maxScheduleStepCount: z.number().min(0),
   allowOverwritingCustomDockerImage: z.boolean(),
-  allowEditingStartupCommand: z.boolean(),
   allowViewingInstallationLogs: z.boolean(),
   allowAcknowledgingInstallationFailure: z.boolean(),
   allowViewingTransferProgress: z.boolean(),

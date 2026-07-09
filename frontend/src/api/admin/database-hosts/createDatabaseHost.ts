@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminDatabaseHostCreateSchema, adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 
 export default async (
@@ -10,5 +10,5 @@ export default async (
     '/api/admin/database-hosts',
     serializeForApi(adminDatabaseHostCreateSchema, databaseHostData),
   );
-  return data.databaseHost;
+  return parseFromApi(adminDatabaseHostSchema, data.database_host);
 };

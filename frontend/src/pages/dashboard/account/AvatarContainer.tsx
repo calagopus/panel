@@ -53,7 +53,7 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
       .then(() => {
         addToast(t('pages.account.account.containers.avatar.toast.removed', {}), 'success');
 
-        setUser({ ...user!, avatar: undefined });
+        setUser({ ...user!, avatar: null });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -72,7 +72,7 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
       <Group className='h-full'>
         <AvatarEditor
           ref={editor}
-          image={file ?? user!.avatar}
+          image={file ?? user!.avatar ?? undefined}
           height={512}
           width={512}
           showGrid

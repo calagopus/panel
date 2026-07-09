@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 
 export default async (
@@ -10,5 +10,5 @@ export default async (
     '/api/admin/oauth-providers',
     serializeForApi(adminOAuthProviderUpdateSchema, oauthProviderData),
   );
-  return data.oauthProvider;
+  return parseFromApi(adminOAuthProviderSchema, data.oauth_provider);
 };

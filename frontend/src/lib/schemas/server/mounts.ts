@@ -6,5 +6,5 @@ export const serverMountSchema = z.object({
   description: z.string().nullable(),
   readOnly: z.boolean(),
   target: z.string(),
-  created: z.date().nullable(),
+  created: z.coerce.date().nullable(),
 });

@@ -27,10 +27,10 @@ export const adminLocationUpdateSchema = z.lazy(() =>
 
 export const adminLocationDatabaseHostSchema = z.object({
   databaseHost: z.lazy(() => adminDatabaseHostSchema),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminLocationDatabaseAgentHostSchema = z.object({
   databaseAgentHost: z.lazy(() => adminDatabaseAgentHostSchema),
-  created: z.date(),
+  created: z.coerce.date(),
 });

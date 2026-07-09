@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 
 export default async (
@@ -11,5 +12,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/admin/nests/${nestUuid}/eggs/${eggUuid}/servers`, {
     params: { page, search },
   });
-  return data.servers;
+  return parsePaginationFromApi(adminServerSchema, data.servers);
 };

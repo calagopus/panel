@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminOAuthProviderMappingSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 
 export default async (
@@ -9,5 +10,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/admin/oauth-providers/${oauthProviderUuid}/mappings`, {
     params: { page },
   });
-  return data.oauthMappings;
+  return parsePaginationFromApi(adminOAuthProviderMappingSchema, data.oauth_mappings);
 };

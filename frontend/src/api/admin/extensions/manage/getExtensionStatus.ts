@@ -1,14 +1,17 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi } from '@/lib/api-transform.ts';
 import { adminBackendExtensionSchema } from '@/lib/schemas/admin/backendExtension.ts';
 
-export interface ExtensionStatus {
-  isBuilding: boolean;
-  pendingExtensions: z.infer<typeof adminBackendExtensionSchema>[];
-  removedExtensions: z.infer<typeof adminBackendExtensionSchema>[];
-}
+const extensionStatusSchema = z.object({
+  isBuilding: z.boolean(),
+  pendingExtensions: z.array(adminBackendExtensionSchema),
+  removedExtensions: z.array(adminBackendExtensionSchema),
+});
+
+export type ExtensionStatus = z.infer<typeof extensionStatusSchema>;
 
 export default async (): Promise<ExtensionStatus> => {
   const { data } = await axiosInstance.get('/api/admin/extensions/manage/status');
-  return data;
+  return parseFromApi(extensionStatusSchema, data);
 };

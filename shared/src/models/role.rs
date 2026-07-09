@@ -151,6 +151,7 @@ impl IntoAdminApiObject for Role {
                 uuid: self.uuid,
                 name: self.name,
                 description: self.description,
+                require_two_factor: self.require_two_factor,
                 admin_permissions: self.admin_permissions,
                 server_permissions: self.server_permissions,
                 created: self.created.and_utc(),
@@ -439,6 +440,8 @@ pub struct AdminApiRole {
 
     pub name: compact_str::CompactString,
     pub description: Option<compact_str::CompactString>,
+
+    pub require_two_factor: bool,
 
     pub admin_permissions: Arc<Vec<compact_str::CompactString>>,
     pub server_permissions: Arc<Vec<compact_str::CompactString>>,

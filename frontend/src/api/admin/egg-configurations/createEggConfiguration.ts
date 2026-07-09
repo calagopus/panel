@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminEggConfigurationSchema,
   adminEggConfigurationUpdateSchema,
@@ -13,5 +13,5 @@ export default async (
     '/api/admin/egg-configurations',
     serializeForApi(adminEggConfigurationUpdateSchema, eggConfigurationData),
   );
-  return data.eggConfiguration;
+  return parseFromApi(adminEggConfigurationSchema, data.egg_configuration);
 };

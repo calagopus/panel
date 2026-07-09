@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi } from '@/lib/api-transform.ts';
 import { serverScheduleSchema } from '@/lib/schemas/server/schedules.ts';
 
 export default async (
@@ -10,5 +11,5 @@ export default async (
   const { data } = await axiosInstance.post(`/api/client/servers/${serverUuid}/schedules/${scheduleUuid}/duplicate`, {
     name,
   });
-  return data.schedule;
+  return parseFromApi(serverScheduleSchema, data.schedule);
 };

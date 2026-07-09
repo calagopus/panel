@@ -75,5 +75,5 @@ export default async (securityKeyUuid: string, challenge: PublicKeyCredential): 
   const { data } = await axiosInstance.post(`/api/client/account/security-keys/${securityKeyUuid}/challenge`, {
     public_key_credential: prepareCredentialForTransport(challenge),
   });
-  return data.credentialId;
+  return data.credential_id;
 };

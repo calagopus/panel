@@ -1711,7 +1711,7 @@ impl super::IntoAdminApiObject for Server {
                 node: node?,
                 owner: self
                     .owner
-                    .into_api_full_object(state, storage_url_retriever)
+                    .into_admin_api_object(state, storage_url_retriever)
                     .await?,
                 egg: egg?,
                 nest: self.nest.into_admin_api_object(state, ()).await?,
@@ -2573,7 +2573,7 @@ pub struct AdminApiServer {
     pub external_id: Option<compact_str::CompactString>,
     pub allocation: Option<super::server_allocation::ApiServerAllocation>,
     pub node: super::node::AdminApiNode,
-    pub owner: super::user::ApiFullUser,
+    pub owner: super::user::AdminApiUser,
     pub egg: super::nest_egg::AdminApiNestEgg,
     pub nest: super::nest::AdminApiNest,
     pub backup_configuration: Option<super::backup_configuration::AdminApiBackupConfiguration>,

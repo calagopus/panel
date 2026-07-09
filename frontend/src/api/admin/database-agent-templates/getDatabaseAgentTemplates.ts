@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminDatabaseAgentTemplateSchema } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
 
 export default async (
@@ -9,5 +10,5 @@ export default async (
   const { data } = await axiosInstance.get('/api/admin/database-agent-templates', {
     params: { page, search },
   });
-  return data.databaseAgentTemplates;
+  return parsePaginationFromApi(adminDatabaseAgentTemplateSchema, data.database_agent_templates);
 };

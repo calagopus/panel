@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminLocationSchema, adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
 
 export default async (
@@ -10,5 +10,5 @@ export default async (
     '/api/admin/locations',
     serializeForApi(adminLocationUpdateSchema, locationData),
   );
-  return data.location;
+  return parseFromApi(adminLocationSchema, data.location);
 };

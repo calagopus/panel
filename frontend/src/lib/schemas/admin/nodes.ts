@@ -30,7 +30,7 @@ export const adminNodeSchema = z.object({
   sftpPort: z.number().min(0).max(65535),
   memory: z.number().min(0),
   disk: z.number().min(0),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminNodeTokenSchema = z.object({
@@ -89,7 +89,7 @@ export const adminNodeAllocationsSchema = z.object({
 
 export const adminNodeMountSchema = z.object({
   mount: z.lazy(() => adminMountSchema),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminNodeTransferProgressSchema = z.object({

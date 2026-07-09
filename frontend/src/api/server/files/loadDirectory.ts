@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
 
 export interface DirectoryResponse {
@@ -18,5 +19,10 @@ export default async (
   const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/files/list`, {
     params: { directory: directory ?? '/', page, per_page: 100, sort },
   });
-  return data;
+  return {
+    isFilesystemPrimary: data.is_filesystem_primary,
+    isFilesystemWritable: data.is_filesystem_writable,
+    isFilesystemFast: data.is_filesystem_fast,
+    entries: parsePaginationFromApi(serverDirectoryEntrySchema, data.entries),
+  };
 };

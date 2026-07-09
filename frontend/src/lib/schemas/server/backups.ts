@@ -12,8 +12,8 @@ export const serverBackupSchema = z.object({
   bytes: z.number(),
   files: z.number(),
   metadata: z.record(z.string(), z.unknown()),
-  completed: z.date().nullable(),
-  created: z.date(),
+  completed: z.coerce.date().nullable(),
+  created: z.coerce.date(),
 });
 
 export const serverBackupWithProgressSchema = z.lazy(() =>

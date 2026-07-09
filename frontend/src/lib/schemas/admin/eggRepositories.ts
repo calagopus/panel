@@ -6,7 +6,7 @@ export const adminEggRepositorySchema = z.object({
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),
   gitRepository: z.url({ protocol: /^https?$/ }),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminEggRepositoryUpdateSchema = z.lazy(() =>
@@ -27,7 +27,7 @@ export const adminEggRepositoryEggSchema = z.object({
     startupCommands: z.record(z.string(), z.string()),
     dockerImages: z.record(z.string(), z.string()),
   }),
-  updated: z.date(),
+  updated: z.coerce.date(),
 });
 
 export const adminEggEggRepositoryEggSchema = z.lazy(() =>

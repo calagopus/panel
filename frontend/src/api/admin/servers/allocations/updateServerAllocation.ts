@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 
 const updateAllocationSchema = z.object({
@@ -17,5 +17,5 @@ export default async (
     `/api/admin/servers/${serverUuid}/allocations/${allocationUuid}`,
     serializeForApi(updateAllocationSchema, allocationData),
   );
-  return data.allocation;
+  return parseFromApi(serverAllocationSchema, data.allocation);
 };

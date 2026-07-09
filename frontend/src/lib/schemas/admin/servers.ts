@@ -54,7 +54,7 @@ export const adminServerSchema = z.object({
   timezone: z.preprocess(nullableString, z.string().nullable()),
   hugepagesPassthroughEnabled: z.boolean(),
   kvmPassthroughEnabled: z.boolean(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 const adminServerBaseOmit = adminServerSchema.omit({
@@ -115,8 +115,8 @@ export const adminServerBackupSchema = z.object({
   bytes: z.number(),
   files: z.number(),
   metadata: z.record(z.string(), z.unknown()),
-  completed: z.date().nullable(),
-  created: z.date(),
+  completed: z.coerce.date().nullable(),
+  created: z.coerce.date(),
 });
 
 export const adminServerDatabaseSchema = z.object({
@@ -129,10 +129,10 @@ export const adminServerDatabaseSchema = z.object({
   host: z.string(),
   port: z.number(),
   type: databaseType,
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminServerMountSchema = z.object({
   mount: z.lazy(() => adminMountSchema),
-  created: z.date(),
+  created: z.coerce.date(),
 });
