@@ -170,7 +170,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
 
                   return (
                     <Card
-                      key={`${activity.created}-${index}`}
+                      key={`${activity.created.toISOString()}-${index}`}
                       onClick={() => handleRowClick(activity)}
                       className='p-3 rounded-md'
                       hoverable
