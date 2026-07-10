@@ -43,12 +43,15 @@ mod get {
             base: BasePayload,
 
             user_uuid: uuid::Uuid,
+            user_name: &'a str,
+            user_avatar: Option<String>,
             server_uuid: uuid::Uuid,
             permissions: Vec<&'a str>,
             ignored_files: &'a [compact_str::CompactString],
         }
 
         let node = server.node.fetch_cached(&state.database).await?;
+        let storage_url_retriever = state.storage.retrieve_urls().await?;
 
         let token = node.create_jwt(
             &state.database,
@@ -65,6 +68,11 @@ mod get {
                     jwt_id: user.uuid.to_compact_string(),
                 },
                 user_uuid: user.uuid,
+                user_name: &user.username,
+                user_avatar: user
+                    .avatar
+                    .as_ref()
+                    .map(|a| storage_url_retriever.get_url(a)),
                 server_uuid: server.uuid,
                 permissions: server.wings_permissions(
                     &*state.settings.get().await?,

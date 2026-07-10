@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteSubuser from '@/api/server/subusers/deleteSubuser.ts';
+import Avatar from '@/elements/Avatar.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
@@ -82,11 +83,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
           >
             <TableData>
               <div className='size-5 aspect-square relative'>
-                <img
-                  src={subuser.user.avatar ?? '/icon.svg'}
-                  alt={subuser.user.username}
-                  className='object-cover rounded-full select-none'
-                />
+                <Avatar size={20} className='select-none' src={subuser.user.avatar} name={subuser.user.username} />
               </div>
             </TableData>
 

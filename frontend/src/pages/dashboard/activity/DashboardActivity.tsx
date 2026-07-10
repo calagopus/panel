@@ -1,4 +1,5 @@
 import getUserActivity from '@/api/me/getUserActivity.ts';
+import Avatar from '@/elements/Avatar.tsx';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
 import Code from '@/elements/Code.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
@@ -50,13 +51,12 @@ export default function DashboardActivity() {
         {activities?.data.map((activity, index) => (
           <TableRow key={`${activity.created.toISOString()}-${index}`}>
             <TableData>
-              <div className='size-5 aspect-square relative'>
-                <img
-                  src={(activity.impersonator ?? user)?.avatar ?? '/icon.svg'}
-                  alt={(activity.impersonator ?? user)?.username}
-                  className='size-5 object-cover rounded-full select-none'
-                />
-              </div>
+              <Avatar
+                size={20}
+                className='select-none'
+                src={(activity.impersonator ?? user)?.avatar}
+                name={(activity.impersonator ?? user)?.username}
+              />
             </TableData>
 
             <TableData>

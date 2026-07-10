@@ -8,6 +8,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileRevisionContent from '@/api/server/files/getFileRevisionContent.ts';
 import getFileRevisions from '@/api/server/files/getFileRevisions.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Avatar from '@/elements/Avatar.tsx';
 import Badge from '@/elements/Badge.tsx';
 import Card from '@/elements/Card.tsx';
 import Drawer from '@/elements/Drawer.tsx';
@@ -84,14 +85,7 @@ function RevisionRow({
   return (
     <Card className='p-3 rounded-md'>
       <div className='flex items-start gap-3'>
-        <img
-          src={revision.user?.avatar ?? '/icon.svg'}
-          alt={revision.user?.username ?? t('common.system', {})}
-          className='size-6 rounded-full shrink-0 mt-0.5'
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/icon.svg';
-          }}
-        />
+        <Avatar size={24} className='shrink-0 mt-0.5' src={revision.user?.avatar} name={revision.user?.username} />
         <div className='flex-1 min-w-0'>
           <div className='flex items-center gap-2 mb-1'>
             <span className='text-sm font-medium'>#{revision.id}</span>

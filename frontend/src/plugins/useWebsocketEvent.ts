@@ -30,6 +30,12 @@ export enum SocketEvent {
   OPERATION_PROGRESS = 'operation progress',
   OPERATION_COMPLETED = 'operation completed',
   OPERATION_ERROR = 'operation error',
+  FILE_COLLAB_SYNC = 'file collab sync',
+  FILE_COLLAB_UPDATE = 'file collab update',
+  FILE_COLLAB_AWARENESS = 'file collab awareness',
+  FILE_COLLAB_PARTICIPANTS = 'file collab participants',
+  FILE_COLLAB_SAVED = 'file collab saved',
+  FILE_COLLAB_ERROR = 'file collab error',
 }
 
 export enum SocketRequest {
@@ -40,6 +46,11 @@ export enum SocketRequest {
   SEND_COMMAND = 'send command',
   SET_STATE = 'set state',
   PING = 'ping',
+  FILE_COLLAB_SUBSCRIBE = 'file collab subscribe',
+  FILE_COLLAB_UNSUBSCRIBE = 'file collab unsubscribe',
+  FILE_COLLAB_UPDATE = 'file collab update',
+  FILE_COLLAB_AWARENESS = 'file collab awareness',
+  FILE_COLLAB_SAVE = 'file collab save',
 }
 
 const useWebsocketEvent = (event: SocketEvent, callback: (...data: string[]) => void) => {

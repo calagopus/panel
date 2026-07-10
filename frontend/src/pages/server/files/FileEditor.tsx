@@ -1,6 +1,7 @@
 import { faClockRotateLeft, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Audio } from '@gfazioli/mantine-audio';
+import { AvatarGroup } from '@mantine/core';
 import { type OnMount } from '@monaco-editor/react';
 import { join } from 'pathe';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
@@ -12,6 +13,7 @@ import getFileContent from '@/api/server/files/getFileContent.ts';
 import saveFileContent from '@/api/server/files/saveFileContent.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Alert from '@/elements/Alert.tsx';
+import Avatar from '@/elements/Avatar.tsx';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
@@ -36,6 +38,7 @@ import FileBreadcrumbs from './FileBreadcrumbs.tsx';
 import FileConnectButton from './FileConnectButton.tsx';
 import FileEditorSettings from './FileEditorSettings.tsx';
 import FileImageViewerSettings from './FileImageViewerSettings.tsx';
+import useFileCollab from './hooks/useFileCollab.ts';
 import FileNameModal from './modals/FileNameModal.tsx';
 
 interface FileDraft {
@@ -141,11 +144,51 @@ function FileEditorComponent() {
   const draftTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
   const draftPathRef = useRef<string | null>(null);
   const objectUrlRef = useRef<string | null>(null);
+  const collabActiveRef = useRef(false);
+  const collabSavingRef = useRef(false);
+  const collabSaveTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
   const blocker = useBlocker(dirty, false, (tx) => {
     if (!tx.location.pathname.includes('/files/diff')) return true;
     return new URLSearchParams(tx.location.search).has('previousRevision');
   });
   const editorContainerRef = useRef<HTMLDivElement>(null);
+
+  const collab = useFileCollab({
+    enabled: params.action === 'edit' && !!fileName && !!browsingDirectory && browsingPrimaryFilesystem && !loading,
+    filePath: fileName && browsingDirectory ? join(browsingDirectory, fileName) : '',
+    onActivated: (dirty) => {
+      collabActiveRef.current = true;
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+      setPendingDraft(null);
+      setDirty(dirty);
+    },
+    onSaved: () => {
+      if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
+      setDirty(false);
+      savedContentRef.current = editorRef.current?.getValue() ?? savedContentRef.current;
+      originalHashRef.current = hashContent(savedContentRef.current);
+      localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, fileName)));
+
+      if (collabSavingRef.current) {
+        collabSavingRef.current = false;
+        setSaving(false);
+        addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
+      }
+    },
+    onError: (message) => {
+      if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
+
+      if (collabSavingRef.current) {
+        collabSavingRef.current = false;
+        setSaving(false);
+        addToast(message, 'error');
+      }
+    },
+  });
+
+  useEffect(() => {
+    collabActiveRef.current = collab.active;
+  }, [collab.active]);
 
   useEffect(() => {
     setBrowsingDirectory(searchParams.get('directory') || '/');
@@ -226,6 +269,7 @@ function FileEditorComponent() {
   useEffect(() => {
     return () => {
       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+      if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
       if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
     };
   }, []);
@@ -280,9 +324,29 @@ function FileEditorComponent() {
   });
 
   const saveFile = (name?: string) => {
-    setDirty(false);
-
     if (!editorRef.current || !browsingWritableDirectory) return;
+
+    if (!name && collabActiveRef.current) {
+      if (collab.save()) {
+        collabSavingRef.current = true;
+        setSaving(true);
+
+        if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
+        collabSaveTimerRef.current = setTimeout(() => {
+          if (collabSavingRef.current) {
+            collabSavingRef.current = false;
+            setSaving(false);
+            addToast(t('pages.server.files.toast.collabSaveTimeout', {}), 'error');
+          }
+        }, 15000);
+
+        return;
+      }
+
+      collabActiveRef.current = false;
+    }
+
+    setDirty(false);
 
     const currentContent = editorRef.current.getValue();
     setSaving(true);
@@ -356,6 +420,18 @@ function FileEditorComponent() {
           <matchedFileEditorAction.header.rightSection />
         ) : (
           <Group>
+            {collab.active && collab.participants.length > 1 && (
+              <AvatarGroup>
+                {collab.participants.map((participant) => (
+                  <Tooltip
+                    key={participant.user}
+                    label={t('pages.server.files.tooltip.collabEditing', { user: participant.name })}
+                  >
+                    <Avatar size='sm' src={participant.avatar} name={participant.name} />
+                  </Tooltip>
+                ))}
+              </AvatarGroup>
+            )}
             <ServerCan action='files.read-content'>
               {params.action === 'edit' && fileName && browsingPrimaryFilesystem && (
                 <Tooltip label={t('pages.server.files.tooltip.fileHistory', {})}>
@@ -564,9 +640,16 @@ function FileEditorComponent() {
                   }}
                   onMount={(editor, monaco) => {
                     editorRef.current = editor;
+                    collab.attachEditor(editor);
                     editor.onDidChangeModelContent(() => {
                       const value = editor.getValue();
                       contentRef.current = value;
+
+                      if (collabActiveRef.current) {
+                        setDirty(true);
+                        return;
+                      }
+
                       const isDirty = value !== savedContentRef.current;
                       setDirty(isDirty);
 

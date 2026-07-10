@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router';
 import { z } from 'zod';
+import Avatar from '@/elements/Avatar.tsx';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
 import Code from '@/elements/Code.tsx';
 import Group from '@/elements/Group.tsx';
@@ -16,13 +17,7 @@ export default function ActivityRow({ activity }: { activity: z.infer<typeof act
   return (
     <TableRow>
       <TableData>
-        <div className='size-5 aspect-square relative'>
-          <img
-            src={activity.user?.avatar ?? '/icon.svg'}
-            alt={activity.user?.username}
-            className='object-cover rounded-full select-none'
-          />
-        </div>
+        <Avatar size={20} className='select-none' src={activity.user?.avatar} name={activity.user?.username} />
       </TableData>
 
       <TableData>

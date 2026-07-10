@@ -3912,10 +3912,12 @@
             "permissionsUpdated": "Berechtigungen wurden aktualisiert.",
             "permissionsUpdatedMany": "Berechtigungen für {files} wurden aktualisiert.",
             "permissionsCouldNotBeUpdated": "Berechtigungen konnten nicht aktualisiert werden.",
-            "fileSaved": "Datei wurde gespeichert."
+            "fileSaved": "Datei wurde gespeichert.",
+            "collabSaveTimeout": "Die Datei konnte nicht gespeichert werden, der Daemon hat nicht rechtzeitig geantwortet."
           },
           "tooltip": {
             "fileHistory": "Dateiverlauf",
+            "collabEditing": "{user} bearbeitet diese Datei",
             "largestDirectories": "Verzeichnisgrößen analysieren",
             "dragToMove": "Zum Verschieben ziehen",
             "back": "{seconds} Sekunden zurück",

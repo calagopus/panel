@@ -61,12 +61,10 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                 let frontend_path = Path::new("frontend/extensions").join(&package_identifier);
                 let backend_path = Path::new("backend-extensions").join(&package_identifier);
                 let frontend_translations_path = Path::new("frontend/public/translations/en")
-                    .join(format!("{}.json", &args.package_name));
+                    .join(format!("{}.json", args.package_name));
                 let migrations_path =
                     Path::new("database/extension-migrations").join(&package_identifier);
 
-                // symlink_metadata so dangling compat symlinks still count as removable
-                // leftovers instead of aborting the cleanup.
                 let mut found_any = false;
                 for path in [&frontend_path, &backend_path, &migrations_path] {
                     if tokio::fs::symlink_metadata(path).await.is_ok() {

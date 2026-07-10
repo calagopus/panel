@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, useSearchParams } from 'react-router';
 import getServerActivity from '@/api/server/getServerActivity.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Avatar from '@/elements/Avatar.tsx';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
@@ -88,13 +89,7 @@ export default function ServerActivity() {
         {activities?.data.map((activity, index) => (
           <TableRow key={`${activity.created.toISOString()}-${index}`}>
             <TableData>
-              <div className='size-5 aspect-square relative'>
-                <img
-                  src={activity.user?.avatar ?? '/icon.svg'}
-                  alt={activity.user?.username}
-                  className='size-5 object-cover rounded-full select-none'
-                />
-              </div>
+              <Avatar size={20} className='select-none' src={activity.user?.avatar} name={activity.user?.username} />
             </TableData>
 
             <TableData>

@@ -11,7 +11,7 @@ members = [
 	"backend-extensions/*"
 ]
 default-members = ["bins/base", "bins/all-in-one"]
-package.rust-version = "1.95.0"
+package.rust-version = "1.97.0"
 package.license = "MIT"
 package.version = "1.1.0"
 package.edition = "2024"

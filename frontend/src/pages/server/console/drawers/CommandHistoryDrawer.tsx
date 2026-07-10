@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getServerActivity from '@/api/server/getServerActivity.ts';
+import Avatar from '@/elements/Avatar.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
@@ -106,14 +107,7 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
             </div>
 
             <Group gap='xs' className='text-sm text-(--mantine-color-dimmed)'>
-              <img
-                src={selectedCommand.avatar ?? '/icon.svg'}
-                alt={selectedCommand.user ?? 'System'}
-                className='size-5 rounded-full'
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/icon.svg';
-                }}
-              />
+              <Avatar size={20} src={selectedCommand.avatar} name={selectedCommand.user ?? undefined} />
               <span>
                 {selectedCommand.user ??
                   (selectedCommand.isSchedule ? t('common.schedule', {}) : t('common.system', {}))}
@@ -176,10 +170,11 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
                       hoverable
                     >
                       <div className='flex items-start gap-3'>
-                        <img
-                          src={activity.user?.avatar ?? '/icon.svg'}
-                          alt={activity.user?.username ?? 'System'}
-                          className='size-6 rounded-full shrink-0 mt-0.5'
+                        <Avatar
+                          size={24}
+                          className='shrink-0 mt-0.5'
+                          src={activity.user?.avatar}
+                          name={activity.user?.username}
                         />
                         <div className='flex-1 min-w-0'>
                           <Code className='block mb-1.5 text-xs wrap-break-word'>{data.command}</Code>

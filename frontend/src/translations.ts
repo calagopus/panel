@@ -3950,9 +3950,11 @@ const baseTranslations = defineTranslations({
             permissionsUpdatedMany: 'Permissions have been updated for {files}.',
             permissionsCouldNotBeUpdated: 'Permissions could not be updated.',
             fileSaved: 'File has been saved.',
+            collabSaveTimeout: 'The file could not be saved, the daemon did not respond in time.',
           },
           tooltip: {
             fileHistory: 'File History',
+            collabEditing: '{user} is editing this file',
             largestDirectories: 'Analyze directory sizes',
             dragToMove: 'Drag to move',
             back: 'Back {seconds} seconds',
