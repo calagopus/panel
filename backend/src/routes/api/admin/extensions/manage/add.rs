@@ -66,19 +66,12 @@ mod put {
             }
         };
 
-        if !distr
-            .metadata_toml
-            .panel_version
-            .matches(&shared::VERSION.parse()?)
-        {
+        if let Err(err) = distr.metadata_toml.check_panel_version(false) {
             let _ = shared::heavy::remove_extension(&distr.metadata_toml.package_name).await;
 
-            return ApiResponse::error(format!(
-                "extension requires panel version {} but the current panel version is incompatible",
-                distr.metadata_toml.panel_version
-            ))
-            .with_status(StatusCode::BAD_REQUEST)
-            .ok();
+            return ApiResponse::error(format!("extension {err}"))
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
         }
 
         if distr.metadata_toml.license_text.is_some() && !params.accept_license {

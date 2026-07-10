@@ -91,6 +91,8 @@ impl shared::extensions::commands::CliCommand<ApplyArgs> for ApplyCommand {
                     return Ok(1);
                 }
 
+                super::remove_stale_migration_links().await?;
+
                 if !args.profile.is_dev()
                     && tokio::fs::metadata("target/debug")
                         .await

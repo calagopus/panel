@@ -120,7 +120,17 @@ impl shared::extensions::commands::CliCommand<StatusArgs> for StatusCommand {
 
                     let mut dir_entries = tokio::fs::read_dir(live_path).await?;
                     while let Some(entry) = dir_entries.next_entry().await? {
-                        let metadata = tokio::fs::metadata(entry.path()).await?;
+                        let metadata = match tokio::fs::metadata(entry.path()).await {
+                            Ok(metadata) => metadata,
+                            Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+                                tracing::warn!(
+                                    path = %entry.path().display(),
+                                    "skipping dangling extension migrations symlink"
+                                );
+                                continue;
+                            }
+                            Err(err) => return Err(err.into()),
+                        };
                         if metadata.is_dir() {
                             let extension_identifier =
                                 entry.file_name().to_string_lossy().to_string();

@@ -44,6 +44,8 @@ impl shared::extensions::commands::CliCommand<ClearArgs> for ClearCommand {
                     return Ok(1);
                 }
 
+                super::remove_stale_migration_links().await?;
+
                 let installed_extensions = tokio::task::spawn_blocking(move || {
                     SlimExtensionDistrFile::parse_from_directory(".")
                 })
@@ -164,8 +166,14 @@ impl shared::extensions::commands::CliCommand<ClearArgs> for ClearCommand {
                         .join(extension.metadata_toml.get_package_identifier());
                     let had_migrations = tokio::fs::metadata(&migrations_path).await.is_ok();
 
+                    let migrations_is_link = tokio::fs::symlink_metadata(&migrations_path)
+                        .await
+                        .is_ok_and(|metadata| metadata.file_type().is_symlink());
+
                     super::remove_dir_or_symlink(&frontend_path).await?;
-                    super::remove_dir_or_symlink(&migrations_path).await?;
+                    if args.remove_migrations || migrations_is_link {
+                        super::remove_dir_or_symlink(&migrations_path).await?;
+                    }
                     super::remove_dir_or_symlink(&backend_path).await?;
                     tokio::fs::copy(
                         Path::new("backend-extensions/internal-list/Cargo.template.toml"),
@@ -177,6 +185,11 @@ impl shared::extensions::commands::CliCommand<ClearArgs> for ClearCommand {
                         println!("removed database migrations for this extension");
                         println!(
                             "this did NOT run any down migrations, it only removed the migration files from the filesystem, use with caution as this can lead to an inconsistent state if the migrations have already been applied to the database"
+                        );
+                    } else if had_migrations && !migrations_is_link {
+                        println!(
+                            "keeping database migration files at {}",
+                            migrations_path.to_string_lossy().bright_black()
                         );
                     }
 
