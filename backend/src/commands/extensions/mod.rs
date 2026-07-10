@@ -36,7 +36,18 @@ fn symlink_dir(original: &Path, link: &Path) -> std::io::Result<()> {
 
 #[cfg(windows)]
 fn symlink_dir(original: &Path, link: &Path) -> std::io::Result<()> {
-    std::os::windows::fs::symlink_dir(original, link)
+    // Windows symlinks require the SeCreateSymbolicLinkPrivilege privilege,
+    // std::os::windows::fs::symlink_dir(original, link);
+    // Use junctions instead to avoid this restriction.
+    //
+    // Junctions resolve relative targets differently from Unix symlinks, so
+    // rebase the target against the link's parent directory before creation.
+    let target = match link.parent() {
+        Some(parent) => parent.join(original),
+        None => original.to_path_buf(),
+    };
+
+    junction::create(target, link)
 }
 
 async fn remove_dir_or_symlink(path: &Path) -> std::io::Result<()> {
