@@ -178,6 +178,21 @@ pub struct ScheduleAction {
 }
 
 #[derive(ToSchema, Validate, Deserialize, Serialize, Clone)]
+#[serde(rename_all = "snake_case", tag = "mode")]
+#[non_exhaustive]
+pub enum ScheduleBackupSelector {
+    Latest,
+    Uuid {
+        #[garde(dive)]
+        uuid: ScheduleDynamicParameter,
+    },
+    Name {
+        #[garde(dive)]
+        name: ScheduleDynamicParameter,
+    },
+}
+
+#[derive(ToSchema, Validate, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case", tag = "type")]
 #[non_exhaustive]
 pub enum ScheduleActionInner {
@@ -273,6 +288,18 @@ pub enum ScheduleActionInner {
         name: Option<ScheduleDynamicParameter>,
         #[garde(skip)]
         ignored_files: Vec<compact_str::CompactString>,
+    },
+    RestoreBackup {
+        #[garde(skip)]
+        ignore_failure: bool,
+        #[garde(skip)]
+        truncate_directory: bool,
+        #[garde(skip)]
+        #[serde(default)]
+        restore_startup: bool,
+
+        #[garde(dive)]
+        backup: ScheduleBackupSelector,
     },
     CreateDirectory {
         #[garde(skip)]
@@ -399,6 +426,7 @@ impl ScheduleActionInner {
             },
             ScheduleActionInner::SendCommand { .. } => Some("control.console"),
             ScheduleActionInner::CreateBackup { .. } => Some("backups.create"),
+            ScheduleActionInner::RestoreBackup { .. } => Some("backups.restore"),
             ScheduleActionInner::CreateDirectory { .. } => Some("files.create"),
             ScheduleActionInner::WriteFile { .. } => Some("files.update"),
             ScheduleActionInner::CopyFile { .. } => Some("files.update"),

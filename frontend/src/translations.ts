@@ -4620,6 +4620,35 @@ const baseTranslations = defineTranslations({
                 },
               },
             },
+            restoreBackup: {
+              title: 'Restore Backup',
+              description: 'Stop the server and restore a backup of the server files.',
+              form: {
+                backupSelector: 'Backup to Restore',
+                selector: {
+                  latest: 'Latest Backup',
+                  uuid: 'Specific Backup (UUID)',
+                  name: 'By Name (newest match)',
+                },
+                backupUuid: 'Backup UUID',
+                backupName: 'Backup Name',
+                truncateDirectory: 'Delete all files before restore',
+                restoreStartup: 'Restore startup settings',
+                warning:
+                  'Restoring stops the server and overwrites its files. The schedule waits until the restore has finished before continuing. Avoid combining this step with power or server state triggers that could re-trigger the schedule.',
+              },
+              renderer: {
+                compact: 'Restore backup {backup}',
+                compactLatest: 'Restore the latest backup',
+                detail: {
+                  backupLatest: 'Backup: Latest successful backup',
+                  backupUuid: 'Backup UUID: {uuid}',
+                  backupName: 'Backup Name: {name}',
+                  truncateDirectory: 'Delete all files first: {value}',
+                  restoreStartup: 'Restore startup settings: {value}',
+                },
+              },
+            },
             createDirectory: {
               title: 'Create Directory',
               description: 'Create a new folder in the server files.',

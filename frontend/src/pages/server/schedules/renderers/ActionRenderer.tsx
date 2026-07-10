@@ -88,6 +88,20 @@ function renderCompact(action: Action, { t, tReact, tItem }: Translations): Reac
           })}
         </span>
       );
+    case 'restore_backup':
+      return action.backup.mode === 'latest' ? (
+        <span>{t('pages.server.schedules.steps.restoreBackup.renderer.compactLatest', {})}</span>
+      ) : (
+        <span>
+          {tReact('pages.server.schedules.steps.restoreBackup.renderer.compact', {
+            backup: (
+              <ScheduleDynamicParameterRenderer
+                value={action.backup.mode === 'uuid' ? action.backup.uuid : action.backup.name}
+              />
+            ),
+          })}
+        </span>
+      );
     case 'create_directory':
       return (
         <span>
@@ -308,6 +322,35 @@ function renderDetailed(action: Action, { t, tReact, tItem }: Translations): Rea
               })}
             </Text>
           )}
+        </Stack>
+      );
+    case 'restore_backup':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>
+            {action.backup.mode === 'latest'
+              ? t('pages.server.schedules.steps.restoreBackup.renderer.detail.backupLatest', {})
+              : action.backup.mode === 'uuid'
+                ? tReact('pages.server.schedules.steps.restoreBackup.renderer.detail.backupUuid', {
+                    uuid: <ScheduleDynamicParameterRenderer value={action.backup.uuid} />,
+                  })
+                : tReact('pages.server.schedules.steps.restoreBackup.renderer.detail.backupName', {
+                    name: <ScheduleDynamicParameterRenderer value={action.backup.name} />,
+                  })}
+          </Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.steps.restoreBackup.renderer.detail.truncateDirectory', {
+              value: yesNo(action.truncateDirectory),
+            })}
+          </Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.steps.restoreBackup.renderer.detail.restoreStartup', {
+              value: yesNo(action.restoreStartup),
+            })}
+          </Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.renderer.ignoreFailure', { value: yesNo(action.ignoreFailure) })}
+          </Text>
         </Stack>
       );
     case 'create_directory':

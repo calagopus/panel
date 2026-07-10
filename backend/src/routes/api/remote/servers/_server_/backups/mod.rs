@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod restore;
+
 mod post {
     use garde::Validate;
     use reqwest::StatusCode;
@@ -142,5 +144,6 @@ mod post {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(post::route))
+        .nest("/restore", restore::router(state))
         .with_state(state.clone())
 }

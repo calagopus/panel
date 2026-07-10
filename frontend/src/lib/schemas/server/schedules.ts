@@ -297,6 +297,28 @@ export const serverScheduleStepCreateBackupSchema = z.object({
   ignoredFiles: z.array(z.string()),
 });
 
+export const serverScheduleStepBackupSelectorSchema = z.discriminatedUnion('mode', [
+  z.object({
+    mode: z.literal('latest'),
+  }),
+  z.object({
+    mode: z.literal('uuid'),
+    uuid: serverScheduleStepDynamicSchema,
+  }),
+  z.object({
+    mode: z.literal('name'),
+    name: serverScheduleStepDynamicSchema,
+  }),
+]);
+
+export const serverScheduleStepRestoreBackupSchema = z.object({
+  type: z.literal('restore_backup'),
+  ignoreFailure: z.boolean(),
+  truncateDirectory: z.boolean(),
+  restoreStartup: z.boolean(),
+  backup: serverScheduleStepBackupSelectorSchema,
+});
+
 export const serverScheduleStepCreateDirectorySchema = z.object({
   type: z.literal('create_directory'),
   ignoreFailure: z.boolean(),
@@ -391,6 +413,7 @@ export const serverScheduleStepActionSchema = z.discriminatedUnion('type', [
   serverScheduleStepSendPowerSchema,
   serverScheduleStepSendCommandSchema,
   serverScheduleStepCreateBackupSchema,
+  serverScheduleStepRestoreBackupSchema,
   serverScheduleStepCreateDirectorySchema,
   serverScheduleStepWriteFileSchema,
   serverScheduleStepCopyFileSchema,

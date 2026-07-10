@@ -43,6 +43,7 @@ import StepFormat from '../steps/StepFormat.tsx';
 import StepIf from '../steps/StepIf.tsx';
 import StepMatchRegex from '../steps/StepMatchRegex.tsx';
 import StepRenameFiles from '../steps/StepRenameFiles.tsx';
+import StepRestoreBackup from '../steps/StepRestoreBackup.tsx';
 import StepSendCommand from '../steps/StepSendCommand.tsx';
 import StepSendPower from '../steps/StepSendPower.tsx';
 import StepSleep from '../steps/StepSleep.tsx';
@@ -187,6 +188,8 @@ export default function StepCreateOrUpdateModal({
           <StepSendCommand form={form} />
         ) : form.values.action.type === 'create_backup' ? (
           <StepCreateBackup form={form} />
+        ) : form.values.action.type === 'restore_backup' ? (
+          <StepRestoreBackup form={form} />
         ) : form.values.action.type === 'create_directory' ? (
           <StepCreateDirectory form={form} />
         ) : form.values.action.type === 'write_file' ? (
