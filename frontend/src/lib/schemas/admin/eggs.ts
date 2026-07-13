@@ -25,7 +25,7 @@ export const adminEggSchema = z.object({
           insertNew: z.boolean(),
           updateExisting: z.boolean(),
           ifValue: z.preprocess(nullableString, z.string().nullable()),
-          replaceWith: z.string(),
+          replaceWith: z.json(),
         }),
       ),
     }),

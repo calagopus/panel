@@ -52,7 +52,6 @@ function LocalizedTextInput({
   );
 
   const isEnglish = selectedLang === EN;
-
   const currentValue = isEnglish ? (value ?? '') : (valueTranslations[selectedLang] ?? '');
 
   const handleChange = useCallback(
@@ -76,7 +75,14 @@ function LocalizedTextInput({
 
   return (
     <Box pos='relative'>
-      <TextInput {...inputProps} label={label} value={currentValue} onChange={handleChange} disabled={disabled} />
+      <TextInput
+        {...inputProps}
+        label={label}
+        value={currentValue}
+        placeholder={typeof label === 'string' ? label : undefined}
+        onChange={handleChange}
+        disabled={disabled}
+      />
       <Select
         data={selectData}
         value={selectedLang}

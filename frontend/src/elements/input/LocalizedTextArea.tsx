@@ -52,7 +52,6 @@ function LocalizedTextArea({
   );
 
   const isEnglish = selectedLang === EN;
-
   const currentValue = isEnglish ? (value ?? '') : (valueTranslations[selectedLang] ?? '');
 
   const handleChange = useCallback(
@@ -76,7 +75,14 @@ function LocalizedTextArea({
 
   return (
     <Box pos='relative'>
-      <Textarea {...textareaProps} label={label} value={currentValue} onChange={handleChange} disabled={disabled} />
+      <Textarea
+        {...textareaProps}
+        label={label}
+        value={currentValue}
+        placeholder={typeof label === 'string' ? label : undefined}
+        onChange={handleChange}
+        disabled={disabled}
+      />
       <Select
         data={selectData}
         value={selectedLang}

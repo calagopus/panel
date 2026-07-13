@@ -32,6 +32,7 @@ import Card from '@/elements/Card.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
+import JsonInput from '@/elements/input/JsonInput.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -493,7 +494,7 @@ export default function EggCreateOrUpdate({
                         form.getValues().configFiles[index].replace.map((_, replaceIndex) => (
                           <Card key={replaceIndex} className='flex flex-row! mb-2'>
                             <div className='flex flex-col w-full'>
-                              <Group grow w='100%'>
+                              <Group grow w='100%' align='flex-start'>
                                 <TextInput
                                   withAsterisk
                                   label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.match', {})}
@@ -505,7 +506,7 @@ export default function EggCreateOrUpdate({
                                   key={form.key(`configFiles.${index}.replace.${replaceIndex}.ifValue`)}
                                   {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.ifValue`)}
                                 />
-                                <TextInput
+                                <JsonInput
                                   withAsterisk
                                   label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.replaceWith', {})}
                                   key={form.key(`configFiles.${index}.replace.${replaceIndex}.replaceWith`)}

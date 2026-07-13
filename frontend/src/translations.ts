@@ -82,6 +82,23 @@ const baseTranslations = defineTranslations({
       input: {
         search: 'Search...',
       },
+      elements: {
+        jsonInput: {
+          enum: {
+            type: {
+              string: 'String',
+              number: 'Number',
+              boolean: 'Boolean',
+              object: 'Object',
+              array: 'Array',
+              null: 'Null',
+            },
+          },
+          textMode: 'Text',
+          jsonMode: 'JSON',
+          invalidJson: 'Invalid JSON',
+        },
+      },
       modal: {
         duplicate: {
           title: 'Duplicate {resource}',
