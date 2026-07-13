@@ -9,7 +9,7 @@ export const adminLocationSchema = z.object({
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),
   flag: z.preprocess(nullableString, z.string().lowercase().length(2).nullable()),
-  backupConfiguration: z.lazy(() => adminBackupConfigurationSchema),
+  backupConfiguration: z.lazy(() => adminBackupConfigurationSchema).nullable(),
   created: z.string(),
 });
 
