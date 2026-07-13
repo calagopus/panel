@@ -45,8 +45,6 @@
 }
 
 :root[data-mantine-color-scheme="light"] {
-  --mantine-color-body: #f0eff0;
-
   /* Chart colors */
   --chart-grid-color: #e5e7eb;
   --chart-tick-color: #374151;
@@ -57,6 +55,21 @@
 }
 
 :root[data-mantine-color-scheme="dark"] {
+  /* Chart colors */
+  --chart-grid-color: #424242;
+  --chart-tick-color: #f3f4f6;
+  --chart-series-1-border: #22d3ee;
+  --chart-series-1-fill: rgba(14, 116, 144, 0.5);
+  --chart-series-2-border: #facc15;
+  --chart-series-2-fill: rgba(161, 98, 7, 0.5);
+}
+
+/* Default theme variable overrides, disabled when the shadcn theme (themes/shadcn) is active */
+:root[data-mantine-color-scheme="light"]:not([data-shadcn-theme]) {
+  --mantine-color-body: #f0eff0;
+}
+
+:root[data-mantine-color-scheme="dark"]:not([data-shadcn-theme]) {
   --mantine-color-anchor: var(--mantine-color-blue-4);
   --mantine-color-blue-filled: var(--mantine-color-blue-8);
   --mantine-color-blue-filled-hover: var(--mantine-color-blue-9);
@@ -185,14 +198,6 @@
   --mantine-color-yellow-outline-hover: rgba(255, 212, 59, 0.05);
   --mantine-color-yellow-text: var(--mantine-color-yellow-4);
   --mantine-primary-color-contrast: var(--mantine-color-white);
-
-  /* Chart colors */
-  --chart-grid-color: #424242;
-  --chart-tick-color: #f3f4f6;
-  --chart-series-1-border: #22d3ee;
-  --chart-series-1-fill: rgba(14, 116, 144, 0.5);
-  --chart-series-2-border: #facc15;
-  --chart-series-2-fill: rgba(161, 98, 7, 0.5);
 }
 
 html {
