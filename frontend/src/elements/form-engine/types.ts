@@ -12,13 +12,25 @@ import {
 import { DateTimePickerProps } from '@mantine/dates';
 import { UseFormReturnType } from '@mantine/form';
 import { ReactNode } from 'react';
+import type { ZodType } from 'zod';
+import { LazyString } from '@/lib/lazy.ts';
+
+export { resolveString } from '@/lib/lazy.ts';
+export type { LazyString };
+
+export type ZodFieldShape = Record<string, ZodType>;
+
+export interface FieldOption {
+  value: string;
+  label: LazyString;
+}
 
 export type ColSpan = 'full' | 1;
 
 interface BaseFieldDef<T extends Record<string, unknown>> {
   name: string;
-  label: string;
-  description?: string;
+  label: LazyString;
+  description?: LazyString;
   tooltip?: ReactNode;
   required?: boolean;
   advanced?: boolean;
@@ -59,19 +71,19 @@ export interface CheckboxFieldDef<T extends Record<string, unknown>> extends Bas
 
 export interface SelectFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'select';
-  options: { value: string; label: string }[];
+  options: FieldOption[];
   props?: Partial<SelectProps>;
 }
 
 export interface MultiSelectFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'multiselect';
-  options: { value: string; label: string }[];
+  options: FieldOption[];
   props?: Partial<MultiSelectProps>;
 }
 
 export interface MultiSelectGroupFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'multiselectgroup';
-  data: { group: string; items: { value: string; label: string }[] }[];
+  data: { group: LazyString; items: FieldOption[] }[];
   props?: Partial<Omit<MultiSelectProps, 'data' | 'value' | 'onChange'>>;
 }
 
@@ -89,7 +101,7 @@ export interface AutocompleteFieldDef<T extends Record<string, unknown>> extends
 export interface TagsFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'tags';
   allowReordering?: boolean;
-  placeholder?: string;
+  placeholder?: LazyString;
   allowDuplicates?: boolean;
 }
 
@@ -115,9 +127,9 @@ export interface LocalizedTextAreaFieldDef<T extends Record<string, unknown>> ex
 export interface DividerFieldDef<T extends Record<string, unknown>> {
   type: 'divider';
   name: string;
-  label?: string;
+  label?: LazyString;
   switchName?: string;
-  switchLabel?: string;
+  switchLabel?: LazyString;
   switchProps?: Partial<SwitchProps>;
   advanced?: boolean;
   when?: (values: T) => boolean;
@@ -126,14 +138,14 @@ export interface DividerFieldDef<T extends Record<string, unknown>> {
 export interface CustomFieldDef<T extends Record<string, unknown>> {
   type: 'custom';
   name: string;
-  label?: string;
+  label?: LazyString;
   advanced?: boolean;
   colSpan?: ColSpan;
   when?: (values: T) => boolean;
   render: (form: UseFormReturnType<T>) => ReactNode;
 }
 
-export type FieldDef<T extends Record<string, unknown>> =
+export type FieldDef<T extends Record<string, unknown> = Record<string, unknown>> =
   | TextFieldDef<T>
   | PasswordFieldDef<T>
   | TextAreaFieldDef<T>
@@ -152,23 +164,9 @@ export type FieldDef<T extends Record<string, unknown>> =
   | DividerFieldDef<T>
   | CustomFieldDef<T>;
 
-export type InsertPosition =
-  | { at: 'prepend' }
-  | { at: 'append' }
-  | { at: 'before'; name: string }
-  | { at: 'after'; name: string };
-
-export interface ExtensionField<T extends Record<string, unknown>> {
-  field: FieldDef<T>;
-  position: InsertPosition;
-}
-
-export interface FormExtension<T extends Record<string, unknown>> {
-  fields?: ExtensionField<T>[];
-  overrides?: {
-    [fieldName: string]: Partial<Omit<BaseFieldDef<T>, 'name'>>;
-  };
-}
+export type FieldTransform<T extends Record<string, unknown> = Record<string, unknown>> = (
+  fields: FieldDef<T>[],
+) => FieldDef<T>[];
 
 export interface RegisteredFormIds {
   'admin.roles.createOrUpdate': true;

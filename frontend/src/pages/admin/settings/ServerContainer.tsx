@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import updateServerSettings from '@/api/admin/settings/updateServerSettings.ts';
@@ -7,7 +5,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import { adminSettingsServerSchema } from '@/lib/schemas/admin/settings.ts';
@@ -27,29 +25,23 @@ export default function ServerContainer() {
 
   const [loading, setLoading] = useState(false);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<ServerFormValues>('admin.settings.server');
-  const mergedSchema = adminSettingsServerSchema.extend(zodShape);
-
-  const form = useForm<ServerFormValues>({
+  const form = useFormEngine<ServerFormValues>('admin.settings.server', {
+    schema: adminSettingsServerSchema,
     initialValues: {
       maxFileManagerViewSize: 0,
       maxFileManagerContentSearchSize: 0,
       maxFileManagerSearchResults: 1,
       maxSubuserCount: 0,
       maxScheduleStepCount: 0,
+      maxDatabaseInstanceDatabaseCount: 0,
+      maxDatabaseInstanceUserCount: 0,
       allowOverwritingCustomDockerImage: false,
       allowViewingInstallationLogs: false,
       allowAcknowledgingInstallationFailure: true,
       allowViewingTransferProgress: false,
       containerPrelude: '',
-      ...(extInitialValues as Partial<ServerFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   useEffect(() => {
@@ -116,6 +108,18 @@ export default function ServerContainer() {
       required: true,
     },
     {
+      type: 'number',
+      name: 'maxDatabaseInstanceDatabaseCount',
+      label: t('pages.admin.settings.tabs.server.page.form.maxDatabaseInstanceDatabaseCount', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxDatabaseInstanceUserCount',
+      label: t('pages.admin.settings.tabs.server.page.form.maxDatabaseInstanceUserCount', {}),
+      required: true,
+    },
+    {
       type: 'switch',
       name: 'allowOverwritingCustomDockerImage',
       label: t('pages.admin.settings.tabs.server.page.form.allowOverwritingCustomDockerImage', {}),
@@ -151,7 +155,7 @@ export default function ServerContainer() {
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.server.page.title', {})} titleOrder={2}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action='settings.update' cantSave>

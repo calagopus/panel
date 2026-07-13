@@ -1,12 +1,10 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import updateEggScript from '@/api/admin/nests/eggs/updateEggScript.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import Stack from '@/elements/Stack.tsx';
@@ -29,22 +27,14 @@ export default function EggInstallationScriptContainer({
 
   const [loading, setLoading] = useState(false);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<ScriptFormValues>('admin.nests.eggs.installationScript');
-  const mergedSchema = adminEggConfigScriptSchema.extend(zodShape);
-
-  const form = useForm<ScriptFormValues>({
+  const form = useFormEngine<ScriptFormValues>('admin.nests.eggs.installationScript', {
+    schema: adminEggConfigScriptSchema,
     initialValues: {
       container: '',
       entrypoint: '',
       content: '',
-      ...(extInitialValues as Partial<ScriptFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   useEffect(() => {
@@ -96,7 +86,7 @@ export default function EggInstallationScriptContainer({
       >
         <form onSubmit={form.onSubmit(doUpdate)}>
           <Stack>
-            <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+            <FormEngine form={form} fields={fields} />
 
             <div className='rounded-md overflow-hidden'>
               <MonacoEditor

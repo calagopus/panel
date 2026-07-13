@@ -1,8 +1,6 @@
 import { faChevronDown, faExternalLink, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
 import { dump } from 'js-yaml';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createOAuthProvider from '@/api/admin/oauth-providers/createOAuthProvider.ts';
@@ -15,7 +13,7 @@ import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Title from '@/elements/Title.tsx';
@@ -42,14 +40,8 @@ export default function OAuthProviderCreateOrUpdate({
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<OAuthFormValues>('admin.oAuthProviders.createOrUpdate');
-  const mergedSchema = adminOAuthProviderUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<OAuthFormValues>({
+  const form = useFormEngine<OAuthFormValues>('admin.oAuthProviders.createOrUpdate', {
+    schema: adminOAuthProviderUpdateSchema.unwrap(),
     mode: 'uncontrolled',
     initialValues: {
       name: '',
@@ -71,11 +63,9 @@ export default function OAuthProviderCreateOrUpdate({
       linkViewable: true,
       userManageable: true,
       basicAuth: false,
-      ...(extInitialValues as Partial<OAuthFormValues>),
     },
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -279,7 +269,7 @@ export default function OAuthProviderCreateOrUpdate({
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.oAuthProviders.all()))}>
-        <FormEngine form={form} fields={fieldsTop} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fieldsTop} />
 
         <Card className='flex flex-row! items-center justify-between mt-4'>
           <Title order={4}>{t('pages.admin.oAuthProviders.tabs.general.page.card.redirectUrl.title', {})}</Title>
@@ -290,7 +280,7 @@ export default function OAuthProviderCreateOrUpdate({
           </Code>
         </Card>
 
-        <FormEngine form={form} fields={fieldsMain} className='mt-4' extensions={[formExtension]} />
+        <FormEngine form={form} fields={fieldsMain} className='mt-4' />
 
         <Group mt='md'>
           <AdminCan action={contextOAuthProvider ? 'oauth-providers.update' : 'oauth-providers.create'} cantSave>

@@ -18,6 +18,7 @@ import Title from '@/elements/Title.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
 import DatabaseInstanceUserRow from './DatabaseInstanceUserRow.tsx';
 import DatabaseInstanceUserCreateModal from './modals/DatabaseInstanceUserCreateModal.tsx';
@@ -31,6 +32,7 @@ export default function DatabaseInstanceUsers({
 }) {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
+  const maxUserCount = useGlobalStore((state) => state.settings.server.maxDatabaseInstanceUserCount);
 
   const hasDatabases = instance.type !== 'redis';
 
@@ -53,6 +55,9 @@ export default function DatabaseInstanceUsers({
 
   const databaseNameByUuid = new Map((databases ?? []).map((database) => [database.uuid, database.name]));
 
+  const limitReached = (users?.length ?? 0) >= maxUserCount;
+  const createDisabled = (offline && hasDatabases) || limitReached;
+
   return (
     <Stack>
       <DatabaseInstanceUserCreateModal
@@ -63,15 +68,27 @@ export default function DatabaseInstanceUsers({
       />
 
       <Group justify='space-between'>
-        <Title order={2}>{t('pages.server.databases.instance.users.title', {})}</Title>
+        <div>
+          <Title order={2}>{t('pages.server.databases.instance.users.title', {})}</Title>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.databases.instance.users.subtitle', {
+              current: users?.length ?? 0,
+              max: maxUserCount,
+            })}
+          </Text>
+        </div>
         <ServerCan action='database-instances.users'>
           <ConditionalTooltip
-            enabled={offline && hasDatabases}
-            label={t('pages.server.databases.instance.databases.tooltip.offline', {})}
+            enabled={createDisabled}
+            label={
+              limitReached
+                ? t('pages.server.databases.instance.users.tooltip.limitReached', { max: maxUserCount })
+                : t('pages.server.databases.instance.databases.tooltip.offline', {})
+            }
           >
             <Button
               onClick={() => setCreateUserOpen(true)}
-              disabled={offline && hasDatabases}
+              disabled={createDisabled}
               leftSection={<FontAwesomeIcon icon={faPlus} />}
             >
               {t('common.button.create', {})}

@@ -1,7 +1,5 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createRole from '@/api/admin/roles/createRole.ts';
@@ -12,7 +10,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
@@ -33,24 +31,16 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<RoleFormValues>('admin.roles.createOrUpdate');
-  const mergedSchema = adminRoleUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<RoleFormValues>({
+  const form = useFormEngine<RoleFormValues>('admin.roles.createOrUpdate', {
+    schema: adminRoleUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
       requireTwoFactor: false,
       adminPermissions: [],
       serverPermissions: [],
-      ...(extInitialValues as Partial<RoleFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -170,7 +160,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.roles.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextRole ? 'roles.update' : 'roles.create'} cantSave>

@@ -15,6 +15,7 @@ import ServerStatusIndicator from '@/elements/ServerStatusIndicator.tsx';
 import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
 import Sidebar from '@/elements/Sidebar.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import { resolveString } from '@/lib/lazy.ts';
 import { isAdmin } from '@/lib/permissions.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { to } from '@/lib/routes.ts';
@@ -206,7 +207,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
 
                   if (item.type === 'route') {
                     const { route } = item;
-                    const name = typeof route.name === 'function' ? route.name() : route.name!;
+                    const name = resolveString(route.name)!;
 
                     return route.permission ? (
                       <ServerCan key={route.path} action={route.permission} matchAny>

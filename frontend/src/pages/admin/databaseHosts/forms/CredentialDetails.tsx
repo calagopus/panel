@@ -1,7 +1,7 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -12,8 +12,6 @@ type CredentialsForm = UseFormReturnType<{ credentials: z.infer<typeof adminData
 
 export default function CredentialDetails({ form }: { form: CredentialsForm }) {
   const { t } = useTranslations();
-  const { formExtension } = useFormExtensions('admin.databaseHosts.credentialDetails');
-
   useEffect(() => {
     form.setValues({
       credentials: {
@@ -77,5 +75,5 @@ export default function CredentialDetails({ form }: { form: CredentialsForm }) {
     },
   ];
 
-  return <FormEngine form={form} fields={fields} className='mt-4' extensions={[formExtension]} />;
+  return <FormEngine id='admin.databaseHosts.credentialDetails' form={form} fields={fields} className='mt-4' />;
 }

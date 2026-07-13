@@ -1,8 +1,6 @@
 import { faChevronDown, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
 import { dump } from 'js-yaml';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createDatabaseAgentTemplate from '@/api/admin/database-agent-templates/createDatabaseAgentTemplate.ts';
@@ -12,7 +10,7 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { AdvancedModeToggle, type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -40,18 +38,11 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<DatabaseAgentTemplateFormValues>('admin.databaseAgentTemplates.createOrUpdate');
-  const mergedSchema = (
-    contextDatabaseAgentTemplate ? adminDatabaseAgentTemplateUpdateSchema : adminDatabaseAgentTemplateCreateSchema
-  )
-    .unwrap()
-    .extend(zodShape);
-
-  const form = useForm<DatabaseAgentTemplateFormValues>({
+  const form = useFormEngine<DatabaseAgentTemplateFormValues>('admin.databaseAgentTemplates.createOrUpdate', {
+    schema: (contextDatabaseAgentTemplate
+      ? adminDatabaseAgentTemplateUpdateSchema
+      : adminDatabaseAgentTemplateCreateSchema
+    ).unwrap(),
     initialValues: {
       name: '',
       description: null,
@@ -69,10 +60,8 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       disk: 0,
       ioWeight: null,
       cpu: 0,
-      ...(extInitialValues as Partial<DatabaseAgentTemplateFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -286,7 +275,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.databaseAgentTemplates.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan

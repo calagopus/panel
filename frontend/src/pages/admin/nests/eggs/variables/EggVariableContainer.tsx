@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createEggVariable from '@/api/admin/nests/eggs/variables/createEggVariable.ts';
@@ -8,7 +6,7 @@ import updateEggVariable from '@/api/admin/nests/eggs/variables/updateEggVariabl
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -42,14 +40,8 @@ export default function EggVariableContainer({
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<VariableFormValues>('admin.nests.eggs.variables');
-  const mergedSchema = adminEggVariableUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<VariableFormValues>({
+  const form = useFormEngine<VariableFormValues>('admin.nests.eggs.variables', {
+    schema: adminEggVariableUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       nameTranslations: {},
@@ -62,10 +54,8 @@ export default function EggVariableContainer({
       userEditable: false,
       secret: false,
       rules: [],
-      ...(extInitialValues as Partial<VariableFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   useEffect(() => {
@@ -219,7 +209,7 @@ export default function EggVariableContainer({
 
       <Card className='flex flex-col justify-between h-full'>
         <form onSubmit={form.onSubmit(doCreateOrUpdate)}>
-          <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+          <FormEngine form={form} fields={fields} />
 
           <Group pt='md' mt='auto'>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>

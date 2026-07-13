@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { basename } from 'pathe';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -10,7 +8,7 @@ import updateLocation from '@/api/admin/locations/updateLocation.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -33,23 +31,15 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<LocationFormValues>('admin.locations.createOrUpdate');
-  const mergedSchema = adminLocationUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<LocationFormValues>({
+  const form = useFormEngine<LocationFormValues>('admin.locations.createOrUpdate', {
+    schema: adminLocationUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
       flag: null,
       backupConfigurationUuid: null,
-      ...(extInitialValues as Partial<LocationFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -166,7 +156,7 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.locations.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextLocation ? 'locations.update' : 'locations.create'} cantSave>

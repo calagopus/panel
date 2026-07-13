@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getDatabaseInstanceLogs from '@/api/server/databases/instances/getDatabaseInstanceLogs.ts';
@@ -22,6 +22,16 @@ export default function DatabaseInstanceLogs({ instance }: { instance: z.infer<t
 
   const [lines, setLines] = useState(100);
 
+  const editorRef = useRef<import('monaco-editor').editor.IStandaloneCodeEditor | null>(null);
+
+  const scrollToBottom = () => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const lineCount = editor.getModel()?.getLineCount() ?? 0;
+    editor.revealLine(lineCount, 1);
+  };
+
   const {
     data: logs,
     error,
@@ -31,6 +41,10 @@ export default function DatabaseInstanceLogs({ instance }: { instance: z.infer<t
     queryKey: queryKeys.server(server.uuid).databases.instances.logs(instance.uuid, lines),
     queryFn: () => getDatabaseInstanceLogs(server.uuid, instance.uuid, lines),
   });
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [logs]);
 
   return (
     <Stack>
@@ -65,6 +79,10 @@ export default function DatabaseInstanceLogs({ instance }: { instance: z.infer<t
             theme='vs-dark'
             value={stripAnsi(logs ?? '')}
             defaultLanguage='text'
+            onMount={(editor) => {
+              editorRef.current = editor;
+              scrollToBottom();
+            }}
             options={{
               readOnly: true,
               stickyScroll: { enabled: false },

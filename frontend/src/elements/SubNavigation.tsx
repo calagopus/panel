@@ -5,12 +5,13 @@ import React, { ReactNode, useMemo } from 'react';
 import { NavLink, Route, Routes, useLocation } from 'react-router';
 import { HookableComponentBase, makeComponentHookable } from 'shared';
 import { SubNavigationRegistry } from 'shared/src/registries/slices/subNavigation.ts';
+import { type LazyString, resolveString } from '@/lib/lazy.ts';
 import { to } from '@/lib/routes.ts';
 import { useAdminPermissions, useCan } from '@/plugins/usePermissions.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 
 interface BaseItemProp {
-  name: string | (() => string);
+  name: LazyString;
   icon: IconDefinition;
   hidden?: boolean;
   permission?: string;
@@ -44,17 +45,13 @@ function SubNavigationItem({ baseUrl, item }: { baseUrl: string; item: ItemProp 
   if (item.hidden) return null;
 
   return (
-    <NavLink
-      key={typeof item.name === 'string' ? item.name : item.name()}
-      to={item.link ?? to(item.path, baseUrl)}
-      end={item.end ?? true}
-    >
+    <NavLink key={resolveString(item.name)} to={item.link ?? to(item.path, baseUrl)} end={item.end ?? true}>
       <Tabs.Tab
-        key={typeof item.name === 'string' ? item.name : item.name()}
-        value={typeof item.name === 'string' ? item.name : item.name()}
+        key={resolveString(item.name)}
+        value={resolveString(item.name)}
         leftSection={<FontAwesomeIcon icon={item.icon} />}
       >
-        {typeof item.name === 'string' ? item.name : item.name()}
+        {resolveString(item.name)}
       </Tabs.Tab>
     </NavLink>
   );
@@ -98,21 +95,10 @@ function SubNavigation<P>({ baseUrl, items: baseItems, registry, registryProps }
 
   return (
     <>
-      <Tabs
-        my='xs'
-        value={
-          typeof activeItem?.name === 'string'
-            ? activeItem?.name
-            : (activeItem?.name() ?? (typeof items[0].name === 'string' ? items[0].name : items[0].name()))
-        }
-      >
+      <Tabs my='xs' value={resolveString(activeItem?.name) ?? resolveString(items[0].name)}>
         <Tabs.List>
           {items.map((item) => (
-            <SubNavigationItem
-              key={typeof item.name === 'string' ? item.name : item.name()}
-              baseUrl={baseUrl}
-              item={item}
-            />
+            <SubNavigationItem key={resolveString(item.name)} baseUrl={baseUrl} item={item} />
           ))}
         </Tabs.List>
       </Tabs>

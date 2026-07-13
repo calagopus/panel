@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getAssets from '@/api/admin/assets/getAssets.ts';
@@ -9,7 +7,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { AdvancedModeToggle, type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -39,14 +37,8 @@ export default function ApplicationContainer() {
   const [openModal, setOpenModal] = useState<'disableTelemetry' | 'enableRegistration' | null>(null);
   const canReadAssets = useAdminCan('assets.read');
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<AppFormValues>('admin.settings.application');
-  const mergedSchema = adminSettingsApplicationSchema.extend(zodShape);
-
-  const form = useForm<AppFormValues>({
+  const form = useFormEngine<AppFormValues>('admin.settings.application', {
+    schema: adminSettingsApplicationSchema,
     initialValues: {
       name: '',
       icon: '',
@@ -60,10 +52,8 @@ export default function ApplicationContainer() {
       sessionDurationSeconds: 3600,
       telemetryEnabled: true,
       registrationEnabled: true,
-      ...(extInitialValues as Partial<AppFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const assets = useSearchableResource<z.infer<typeof storageAssetSchema>>({
@@ -252,7 +242,7 @@ export default function ApplicationContainer() {
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action='settings.update' cantSave>

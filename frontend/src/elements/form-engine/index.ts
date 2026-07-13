@@ -1,17 +1,18 @@
 export { AdvancedModeToggle } from './AdvancedModeToggle.tsx';
 export type { FormEngineProps } from './FormEngine.tsx';
 export { FormEngine } from './FormEngine.tsx';
+export { insertFieldsAfter, insertFieldsBefore, removeField, updateField } from './transforms.ts';
 export type {
   AutocompleteFieldDef,
   CheckboxFieldDef,
   ColSpan,
   CustomFieldDef,
   DateFieldDef,
-  ExtensionField,
   FieldDef,
-  FormExtension,
+  FieldOption,
+  FieldTransform,
   FormId,
-  InsertPosition,
+  LazyString,
   LocalizedTextAreaFieldDef,
   LocalizedTextFieldDef,
   MultiSelectFieldDef,
@@ -25,6 +26,9 @@ export type {
   TagsFieldDef,
   TextAreaFieldDef,
   TextFieldDef,
+  ZodFieldShape,
 } from './types.ts';
+export { resolveString } from './types.ts';
 export { useAdvancedMode } from './useAdvancedMode.ts';
-export { useFormExtensions } from './useFormExtensions.ts';
+export type { ExtendableSchema, UseFormEngineOptions } from './useFormEngine.ts';
+export { useFormEngine } from './useFormEngine.ts';

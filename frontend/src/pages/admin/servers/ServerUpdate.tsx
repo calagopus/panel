@@ -7,8 +7,6 @@ import {
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { zones } from 'tzdata';
 import { z } from 'zod';
@@ -22,7 +20,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { AdvancedModeToggle, type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
@@ -58,14 +56,8 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
   const [isValid, setIsValid] = useState(false);
   const [selectedNestUuid, setSelectedNestUuid] = useState<string | null>(contextServer?.nest.uuid ?? '');
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<ServerUpdateFormValues>('admin.servers.update');
-  const mergedSchema = adminServerUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<ServerUpdateFormValues>({
+  const form = useFormEngine<ServerUpdateFormValues>('admin.servers.update', {
+    schema: adminServerUpdateSchema.unwrap(),
     mode: 'uncontrolled',
     initialValues: {
       ownerUuid: '',
@@ -94,11 +86,9 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
         backups: 5,
         schedules: 5,
       },
-      ...(extInitialValues as Partial<ServerUpdateFormValues>),
     },
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const [selectedEggUuid, setSelectedEggUuid] = useState(contextServer?.egg.uuid ?? '');
@@ -493,35 +483,35 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
               title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
               icon={<FontAwesomeIcon icon={faInfoCircle} />}
             >
-              <FormEngine form={form} fields={basicInfoFields} extensions={[formExtension]} />
+              <FormEngine form={form} fields={basicInfoFields} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.serverAssignment', {})}
               icon={<FontAwesomeIcon icon={faAddressCard} />}
             >
-              <FormEngine form={form} fields={serverAssignmentFields} extensions={[formExtension]} />
+              <FormEngine form={form} fields={serverAssignmentFields} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})}
               icon={<FontAwesomeIcon icon={faStopwatch} />}
             >
-              <FormEngine form={form} fields={resourceLimitsFields} extensions={[formExtension]} />
+              <FormEngine form={form} fields={resourceLimitsFields} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})}
               icon={<FontAwesomeIcon icon={faWrench} />}
             >
-              <FormEngine form={form} fields={serverConfigFields} extensions={[formExtension]} />
+              <FormEngine form={form} fields={serverConfigFields} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})}
               icon={<FontAwesomeIcon icon={faIcons} />}
             >
-              <FormEngine form={form} fields={featureLimitsFields} extensions={[formExtension]} />
+              <FormEngine form={form} fields={featureLimitsFields} />
             </TitleCard>
           </div>
 

@@ -11,7 +11,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { backupDiskLabelMapping } from '@/lib/enums.ts';
@@ -41,24 +41,16 @@ export default function BackupConfigurationCreateOrUpdate({
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<BackupConfigFormValues>('admin.backupConfigurations.createOrUpdate');
-  const mergedSchema = adminBackupConfigurationUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<BackupConfigFormValues>({
+  const form = useFormEngine<BackupConfigFormValues>('admin.backupConfigurations.createOrUpdate', {
+    schema: adminBackupConfigurationUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
       maintenanceEnabled: false,
       shared: false,
       backupDisk: 'local',
-      ...(extInitialValues as Partial<BackupConfigFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const backupConfigS3Form = useForm<z.infer<typeof adminBackupConfigurationS3Schema>>({
@@ -269,7 +261,7 @@ export default function BackupConfigurationCreateOrUpdate({
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.backupConfigurations.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan

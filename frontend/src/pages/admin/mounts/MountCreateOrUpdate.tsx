@@ -1,7 +1,5 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createMount from '@/api/admin/mounts/createMount.ts';
@@ -11,7 +9,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -26,14 +24,8 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<MountFormValues>('admin.mounts.createOrUpdate');
-  const mergedSchema = adminMountUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<MountFormValues>({
+  const form = useFormEngine<MountFormValues>('admin.mounts.createOrUpdate', {
+    schema: adminMountUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
@@ -41,10 +33,8 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
       target: '',
       readOnly: false,
       userMountable: false,
-      ...(extInitialValues as Partial<MountFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<MountFormValues, z.infer<typeof adminMountSchema>>({
@@ -115,7 +105,7 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
       </Alert>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.mounts.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextMount ? 'mounts.update' : 'mounts.create'} cantSave>

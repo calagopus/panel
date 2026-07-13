@@ -1650,6 +1650,8 @@ const baseTranslations = defineTranslations({
                   maxFileManagerContentSearchSize: 'Max File Manager Content Search Size',
                   maxFileManagerSearchResults: 'Max File Manager Search Results',
                   maxSubuserCount: 'Max Subuser Count',
+                  maxDatabaseInstanceDatabaseCount: 'Max Databases per Database Instance',
+                  maxDatabaseInstanceUserCount: 'Max Users per Database Instance',
                   allowOverwritingCustomDockerImage: 'Allow Overwriting Custom Docker Image',
                   allowOverwritingCustomDockerImageDescription:
                     'If enabled, users will be able to overwrite the Docker image specified in the server configuration using the Eggs list, even if an admin has set a custom Docker image.',
@@ -4236,10 +4238,12 @@ const baseTranslations = defineTranslations({
             },
             databases: {
               title: 'Databases',
+              subtitle: '{current} of {max} maximum databases created.',
               noDatabases: 'This instance has no databases yet.',
               tooltip: {
                 offline: 'The instance must be running to create databases.',
                 noUser: 'This database has no user attached yet. Create a user to access it.',
+                limitReached: 'This instance is limited to {max} databases.',
               },
               button: {
                 export: 'Export',
@@ -4283,7 +4287,11 @@ const baseTranslations = defineTranslations({
             },
             users: {
               title: 'Users',
+              subtitle: '{current} of {max} maximum users created.',
               noUsers: 'This instance has no users yet.',
+              tooltip: {
+                limitReached: 'This instance is limited to {max} users.',
+              },
               modal: {
                 createUser: {
                   title: 'Create User',

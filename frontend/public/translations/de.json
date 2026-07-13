@@ -1681,6 +1681,8 @@
                   "maxFileManagerContentSearchSize": "Max. Inhaltssuchgröße im Dateimanager",
                   "maxFileManagerSearchResults": "Max. Suchergebnisse im Dateimanager",
                   "maxSubuserCount": "Max. Anzahl Subbenutzer",
+                  "maxDatabaseInstanceDatabaseCount": "Max. Datenbanken pro Datenbank-Instanz",
+                  "maxDatabaseInstanceUserCount": "Max. Benutzer pro Datenbank-Instanz",
                   "allowOverwritingCustomDockerImage": "Überschreiben des benutzerdefinierten Docker-Images erlauben",
                   "allowOverwritingCustomDockerImageDescription": "Wenn aktiviert, können Benutzer das in der Server-Konfiguration angegebene Docker-Image über die Eggs-Liste überschreiben, selbst wenn ein Admin ein benutzerdefiniertes Docker-Image festgelegt hat.",
                   "allowViewingInstallationLogs": "Anzeigen von Installationsprotokollen erlauben",
@@ -4194,10 +4196,12 @@
             },
             "databases": {
               "title": "Datenbanken",
+              "subtitle": "{current} von {max} maximalen Datenbanken erstellt.",
               "noDatabases": "Diese Instanz hat noch keine Datenbanken.",
               "tooltip": {
                 "offline": "Die Instanz muss laufen, um Datenbanken zu erstellen.",
-                "noUser": "Dieser Datenbank ist noch kein Benutzer zugeordnet. Erstelle einen Benutzer, um darauf zuzugreifen."
+                "noUser": "Dieser Datenbank ist noch kein Benutzer zugeordnet. Erstelle einen Benutzer, um darauf zuzugreifen.",
+                "limitReached": "Diese Instanz ist auf {max} Datenbanken limitiert."
               },
               "button": {
                 "export": "Exportieren",
@@ -4239,7 +4243,11 @@
             },
             "users": {
               "title": "Benutzer",
+              "subtitle": "{current} von {max} maximalen Benutzern erstellt.",
               "noUsers": "Diese Instanz hat noch keine Benutzer.",
+              "tooltip": {
+                "limitReached": "Diese Instanz ist auf {max} Benutzer limitiert."
+              },
               "modal": {
                 "createUser": {
                   "title": "Benutzer erstellen",

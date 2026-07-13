@@ -123,10 +123,38 @@ mod post {
 
         permissions.has_server_permission("database-instances.users")?;
 
-        let response = database_instance
+        let api_client = database_instance
             .database_agent_host
             .api_client(&state.database)
+            .await?;
+
+        let users_lock = state
+            .cache
+            .lock(
+                format!("database-instances::{}::users", database_instance.uuid),
+                Some(30),
+                Some(5),
+            )
+            .await?;
+
+        let users = api_client
+            .get_instances_instance_users(database_instance.uuid)
             .await?
+            .users;
+        if users.len() as u64
+            >= state
+                .settings
+                .get()
+                .await?
+                .server
+                .max_database_instance_user_count
+        {
+            return ApiResponse::error("maximum number of users reached")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
+        let response = api_client
             .post_instances_instance_users(
                 database_instance.uuid,
                 &db_agent_api::instances_instance_users::post::RequestBody {
@@ -135,6 +163,8 @@ mod post {
                 },
             )
             .await?;
+
+        drop(users_lock);
 
         activity_logger
             .log(

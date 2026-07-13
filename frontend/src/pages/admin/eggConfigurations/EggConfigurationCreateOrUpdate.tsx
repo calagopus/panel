@@ -7,8 +7,6 @@ import {
   faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { ServerRouteDefinition } from 'shared';
 import { z } from 'zod';
@@ -24,7 +22,7 @@ import { AdminCan } from '@/elements/Can.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Divider from '@/elements/Divider.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
@@ -191,14 +189,8 @@ export default function EggConfigurationCreateOrUpdate({
     entries: ServerRouteDefinition[];
   }>({ order: [], entries: [] });
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<EggConfigFormValues>('admin.eggConfigurations.createOrUpdate');
-  const mergedSchema = adminEggConfigurationUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<EggConfigFormValues>({
+  const form = useFormEngine<EggConfigFormValues>('admin.eggConfigurations.createOrUpdate', {
+    schema: adminEggConfigurationUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
@@ -207,10 +199,8 @@ export default function EggConfigurationCreateOrUpdate({
       configAllocations: null,
       configStartup: null,
       configRoutes: null,
-      ...(extInitialValues as Partial<EggConfigFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -619,7 +609,7 @@ export default function EggConfigurationCreateOrUpdate({
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.eggConfigurations.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan

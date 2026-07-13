@@ -1,14 +1,12 @@
 import { Registry } from 'shared';
-import type { ZodType } from 'zod';
-import type { ExtensionField, FormExtension, FormId } from '@/elements/form-engine/types.ts';
+import type { FieldTransform, FormId, ZodFieldShape } from '@/elements/form-engine/types.ts';
 
-export type ZodFieldShape = Record<string, ZodType>;
+export type { ZodFieldShape };
 
-export interface FormExtensionSlot {
-  fields?: ExtensionField<Record<string, unknown>>[];
+export interface FormExtensionSlot<T extends Record<string, unknown> = Record<string, unknown>> {
   zodShape?: ZodFieldShape;
-  initialValues?: Record<string, unknown>;
-  overrides?: FormExtension<Record<string, unknown>>['overrides'];
+  initialValues?: Partial<T>;
+  transform?: FieldTransform<T>;
 }
 
 export class FormRegistry implements Registry {
@@ -22,9 +20,12 @@ export class FormRegistry implements Registry {
     return this;
   }
 
-  public extend(formId: FormId, slot: FormExtensionSlot): this {
+  public extend<T extends Record<string, unknown> = Record<string, unknown>>(
+    formId: FormId,
+    slot: FormExtensionSlot<T>,
+  ): this {
     const existing = this.slots.get(formId) ?? [];
-    this.slots.set(formId, [...existing, slot]);
+    this.slots.set(formId, [...existing, slot as FormExtensionSlot]);
     return this;
   }
 

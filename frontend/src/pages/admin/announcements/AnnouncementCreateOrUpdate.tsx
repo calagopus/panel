@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -15,7 +13,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { announcementTypeLabelMapping } from '@/lib/enums.ts';
@@ -51,14 +49,8 @@ export default function AnnouncementCreateOrUpdate({
   const navigate = useNavigate();
   const [eggs, setEggs] = useState<{ group: string; items: { label: string; value: string }[] }[]>([]);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<AnnouncementFormValues>('admin.announcements.createOrUpdate');
-  const mergedSchema = adminAnnouncementUpdateSchema.extend(zodShape);
-
-  const form = useForm<AnnouncementFormValues>({
+  const form = useFormEngine<AnnouncementFormValues>('admin.announcements.createOrUpdate', {
+    schema: adminAnnouncementUpdateSchema,
     initialValues: {
       type: 'info',
       enabled: true,
@@ -74,10 +66,8 @@ export default function AnnouncementCreateOrUpdate({
       nodes: [],
       backupConfigurations: [],
       eggs: [],
-      ...(extInitialValues as Partial<AnnouncementFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -308,7 +298,7 @@ export default function AnnouncementCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, [queryKeys.admin.announcements.all()]))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextAnnouncement ? 'announcements.update' : 'announcements.create'} cantSave>

@@ -1,8 +1,6 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createDatabaseAgentHost from '@/api/admin/database-agent-hosts/createDatabaseAgentHost.ts';
@@ -15,7 +13,7 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -46,18 +44,11 @@ export default function DatabaseAgentHostCreateOrUpdate({
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
   const [deleteDoForce, setDeleteDoForce] = useState(false);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<DatabaseAgentHostFormValues>('admin.databaseAgentHosts.createOrUpdate');
-  const mergedSchema = (
-    contextDatabaseAgentHost ? adminDatabaseAgentHostUpdateSchema : adminDatabaseAgentHostCreateSchema
-  )
-    .unwrap()
-    .extend(zodShape);
-
-  const form = useForm<DatabaseAgentHostFormValues>({
+  const form = useFormEngine<DatabaseAgentHostFormValues>('admin.databaseAgentHosts.createOrUpdate', {
+    schema: (contextDatabaseAgentHost
+      ? adminDatabaseAgentHostUpdateSchema
+      : adminDatabaseAgentHostCreateSchema
+    ).unwrap(),
     initialValues: {
       name: '',
       description: null,
@@ -72,10 +63,8 @@ export default function DatabaseAgentHostCreateOrUpdate({
         mongodb: { enabled: true, publicHost: null, publicPort: databaseAgentTypeDefaultPortMapping.mongodb },
         redis: { enabled: true, publicHost: null, publicPort: databaseAgentTypeDefaultPortMapping.redis },
       },
-      ...(extInitialValues as Partial<DatabaseAgentHostFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -229,7 +218,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.databaseAgentHosts.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan

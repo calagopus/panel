@@ -125,6 +125,8 @@ export const adminSettingsServerSchema = z.object({
   maxFileManagerSearchResults: z.number().min(1),
   maxSubuserCount: z.number().min(0),
   maxScheduleStepCount: z.number().min(0),
+  maxDatabaseInstanceDatabaseCount: z.number().min(0),
+  maxDatabaseInstanceUserCount: z.number().min(0),
   allowOverwritingCustomDockerImage: z.boolean(),
   allowViewingInstallationLogs: z.boolean(),
   allowAcknowledgingInstallationFailure: z.boolean(),

@@ -280,19 +280,17 @@ export default function DatabaseInstanceView() {
                   </Tabs.List>
 
                   {showDatabasesTab && (
-                    <Tabs.Panel value='databases' pt='md'>
+                    <Tabs.Panel value='databases' pt='xs'>
                       <DatabaseInstanceDatabases instance={instance} offline={offline} />
                     </Tabs.Panel>
                   )}
-
                   {showUsersTab && (
-                    <Tabs.Panel value='users' pt='md'>
+                    <Tabs.Panel value='users' pt='xs'>
                       <DatabaseInstanceUsers instance={instance} offline={offline} />
                     </Tabs.Panel>
                   )}
-
                   {canSeeLogs && (
-                    <Tabs.Panel value='logs' pt='md'>
+                    <Tabs.Panel value='logs' pt='xs'>
                       <DatabaseInstanceLogs instance={instance} />
                     </Tabs.Panel>
                   )}

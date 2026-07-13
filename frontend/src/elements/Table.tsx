@@ -14,24 +14,26 @@ import {
 import classNames from 'classnames';
 import { forwardRef, ReactNode, useEffect, useState } from 'react';
 import Spinner from '@/elements/Spinner.tsx';
+import { type LazyString, resolveString } from '@/lib/lazy.ts';
 import { matchesShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export interface TableHeaderProps {
-  name?: string | (() => string);
+  name?: LazyString;
   rightSection?: ReactNode;
   onClick?: () => void;
 }
 
 export const TableHeader = ({ name, rightSection, onClick }: TableHeaderProps) => {
-  if (!name || (typeof name === 'function' && !name())) {
+  const resolvedName = resolveString(name);
+  if (!resolvedName) {
     return <MantineTable.Th className='py-2' />;
   }
 
   return (
     <MantineTable.Th className='font-normal!' onClick={onClick}>
       <div className='flex flex-row items-center gap-2'>
-        <p>{typeof name === 'function' ? name() : name}</p> {rightSection}
+        <p>{resolvedName}</p> {rightSection}
       </div>
     </MantineTable.Th>
   );
@@ -180,7 +182,7 @@ export const ErrorItems = ({ error }: { error: string }) => {
 };
 
 interface TableProps {
-  columns: (string | (() => string))[] | TableHeaderProps[];
+  columns: LazyString[] | TableHeaderProps[];
   loading?: boolean;
   error?: string | null;
   pagination?: Pagination<unknown>;
@@ -223,14 +225,7 @@ export default function Table({
         >
           <TableHead>
             {columns.map((column, index) => (
-              <TableHeader
-                key={`column-${index}`}
-                {...(typeof column === 'string'
-                  ? { name: column }
-                  : typeof column === 'function'
-                    ? { name: column() }
-                    : column)}
-              />
+              <TableHeader key={`column-${index}`} {...(typeof column === 'object' ? column : { name: column })} />
             ))}
           </TableHead>
           <MantineTable.Tbody>

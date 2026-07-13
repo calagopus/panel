@@ -18,6 +18,7 @@ import Title from '@/elements/Title.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
 import DatabaseInstanceDatabaseRow from './DatabaseInstanceDatabaseRow.tsx';
 import DatabaseInstanceDatabaseCreateModal from './modals/DatabaseInstanceDatabaseCreateModal.tsx';
@@ -31,6 +32,7 @@ export default function DatabaseInstanceDatabases({
 }) {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
+  const maxDatabaseCount = useGlobalStore((state) => state.settings.server.maxDatabaseInstanceDatabaseCount);
 
   const [createDatabaseOpen, setCreateDatabaseOpen] = useState(false);
 
@@ -50,6 +52,8 @@ export default function DatabaseInstanceDatabases({
 
   const databasesWithUser = new Set((users ?? []).map((user) => user.databaseUuid).filter(Boolean));
 
+  const limitReached = (databases?.length ?? 0) >= maxDatabaseCount;
+
   return (
     <Stack>
       <DatabaseInstanceDatabaseCreateModal
@@ -59,15 +63,27 @@ export default function DatabaseInstanceDatabases({
       />
 
       <Group justify='space-between'>
-        <Title order={2}>{t('pages.server.databases.instance.databases.title', {})}</Title>
+        <div>
+          <Title order={2}>{t('pages.server.databases.instance.databases.title', {})}</Title>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.databases.instance.databases.subtitle', {
+              current: databases?.length ?? 0,
+              max: maxDatabaseCount,
+            })}
+          </Text>
+        </div>
         <ServerCan action='database-instances.databases'>
           <ConditionalTooltip
-            enabled={offline}
-            label={t('pages.server.databases.instance.databases.tooltip.offline', {})}
+            enabled={offline || limitReached}
+            label={
+              limitReached
+                ? t('pages.server.databases.instance.databases.tooltip.limitReached', { max: maxDatabaseCount })
+                : t('pages.server.databases.instance.databases.tooltip.offline', {})
+            }
           >
             <Button
               onClick={() => setCreateDatabaseOpen(true)}
-              disabled={offline}
+              disabled={offline || limitReached}
               leftSection={<FontAwesomeIcon icon={faPlus} />}
             >
               {t('common.button.create', {})}

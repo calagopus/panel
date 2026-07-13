@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createEggRepository from '@/api/admin/egg-repositories/createEggRepository.ts';
@@ -10,7 +8,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -31,22 +29,14 @@ export default function EggRepositoryCreateOrUpdate({
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<EggRepositoryFormValues>('admin.eggRepositories.createOrUpdate');
-  const mergedSchema = adminEggRepositoryUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<EggRepositoryFormValues>({
+  const form = useFormEngine<EggRepositoryFormValues>('admin.eggRepositories.createOrUpdate', {
+    schema: adminEggRepositoryUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
       gitRepository: '',
-      ...(extInitialValues as Partial<EggRepositoryFormValues>),
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -127,7 +117,7 @@ export default function EggRepositoryCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.eggRepositories.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextEggRepository ? 'egg-repositories.update' : 'egg-repositories.create'} cantSave>

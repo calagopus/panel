@@ -12,6 +12,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { Pagination } from '@/elements/Table.tsx';
+import { resolveString } from '@/lib/lazy.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
@@ -127,7 +128,7 @@ export default function ServerSelectorModal() {
       .filter((r) => !!r.name)
       .find((r) => subPath === r.path || (r.path !== '/' && subPath.startsWith(r.path + '/')));
     if (!matched?.name) return null;
-    return typeof matched.name === 'function' ? matched.name() : matched.name;
+    return resolveString(matched.name);
   }, [subPath]);
 
   const getServerTo = useCallback(

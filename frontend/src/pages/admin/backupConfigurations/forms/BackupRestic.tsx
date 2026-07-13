@@ -8,7 +8,7 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import Divider from '@/elements/Divider.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
@@ -85,7 +85,6 @@ type ResticFormValues = z.infer<typeof adminBackupConfigurationResticSchema>;
 
 export default function BackupRestic({ form }: { form: ResticForm }) {
   const { t } = useTranslations();
-  const { formExtension } = useFormExtensions('admin.backupConfigurations.restic');
   const pruneJobs = form.values.pruneJobs ?? [];
 
   const fields: FieldDef<ResticFormValues>[] = [
@@ -111,7 +110,7 @@ export default function BackupRestic({ form }: { form: ResticForm }) {
       </Stack>
 
       <Stack>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine id='admin.backupConfigurations.restic' form={form} fields={fields} />
 
         <PasswordInput
           withAsterisk

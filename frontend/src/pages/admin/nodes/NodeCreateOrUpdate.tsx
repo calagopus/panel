@@ -1,8 +1,6 @@
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
@@ -16,7 +14,7 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -42,14 +40,8 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
-  const {
-    formExtension,
-    zodShape,
-    initialValues: extInitialValues,
-  } = useFormExtensions<NodeFormValues>('admin.nodes.createOrUpdate');
-  const mergedSchema = adminNodeUpdateSchema.unwrap().extend(zodShape);
-
-  const form = useForm<NodeFormValues>({
+  const form = useFormEngine<NodeFormValues>('admin.nodes.createOrUpdate', {
+    schema: adminNodeUpdateSchema.unwrap(),
     mode: 'uncontrolled',
     initialValues: {
       locationUuid: '',
@@ -64,11 +56,9 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       sftpPort: 2022,
       memory: 8192,
       disk: 10240,
-      ...(extInitialValues as Partial<NodeFormValues>),
     },
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(mergedSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -237,7 +227,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nodes.all()))}>
-        <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextNode ? 'nodes.update' : 'nodes.create'} cantSave>

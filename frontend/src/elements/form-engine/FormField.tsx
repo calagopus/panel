@@ -19,7 +19,7 @@ import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { FieldDef } from './types.ts';
+import { FieldDef, FieldOption, resolveString } from './types.ts';
 
 interface Props<T extends Record<string, unknown>> {
   form: UseFormReturnType<T>;
@@ -33,8 +33,12 @@ function getByPath(obj: Record<string, unknown>, path: string): unknown {
   }, obj);
 }
 
+function resolveOptions(options: FieldOption[]) {
+  return options.map((o) => ({ value: o.value, label: resolveString(o.label) }));
+}
+
 function fieldLabel<T extends Record<string, unknown>>(field: FieldDef<T>): ReactNode {
-  const label = 'label' in field ? field.label : undefined;
+  const label = 'label' in field ? resolveString(field.label) : undefined;
   if (field.type === 'custom' || field.type === 'divider' || !field.tooltip) return label;
 
   return (
@@ -55,9 +59,9 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       const f = form as UseFormReturnType<Record<string, unknown>>;
       return (
         <div className='col-span-full flex items-center gap-4'>
-          <Divider className='flex-1' label={field.label} labelPosition='left' />
+          <Divider className='flex-1' label={resolveString(field.label)} labelPosition='left' />
           <Switch
-            label={field.switchLabel}
+            label={resolveString(field.switchLabel)}
             labelPosition='left'
             key={f.key(field.switchName)}
             {...f.getInputProps(field.switchName, { type: 'checkbox' })}
@@ -67,7 +71,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       );
     }
 
-    return <Divider className='col-span-full' label={field.label} labelPosition='left' />;
+    return <Divider className='col-span-full' label={resolveString(field.label)} labelPosition='left' />;
   }
 
   const colSpanClass = field.colSpan === 'full' ? 'col-span-full' : undefined;
@@ -79,7 +83,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <TextInput
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           key={f.key(field.name)}
           {...f.getInputProps(field.name)}
@@ -92,7 +96,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <PasswordInput
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           key={f.key(field.name)}
           {...f.getInputProps(field.name)}
@@ -105,7 +109,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <TextArea
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           rows={field.rows}
           key={f.key(field.name)}
@@ -119,7 +123,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <NumberInput
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           key={f.key(field.name)}
           {...f.getInputProps(field.name)}
@@ -132,7 +136,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <Switch
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           key={f.key(field.name)}
           {...f.getInputProps(field.name, { type: 'checkbox' })}
           {...field.props}
@@ -144,7 +148,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <Checkbox
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           key={f.key(field.name)}
           {...f.getInputProps(field.name, { type: 'checkbox' })}
           {...field.props}
@@ -156,9 +160,9 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <Select
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
-          data={field.options}
+          data={resolveOptions(field.options)}
           key={f.key(field.name)}
           {...f.getInputProps(field.name)}
           {...field.props}
@@ -170,9 +174,9 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <MultiSelect
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
-          data={field.options}
+          data={resolveOptions(field.options)}
           key={f.key(field.name)}
           {...f.getInputProps(field.name)}
           {...field.props}
@@ -184,7 +188,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <DateTimePicker
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           key={f.key(field.name)}
           {...f.getInputProps(field.name)}
@@ -197,7 +201,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <Autocomplete
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           data={field.options ?? []}
           key={f.key(field.name)}
@@ -212,10 +216,10 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <div className={colSpanClass}>
           <TagsInput
             label={fieldLabel(field)}
-            description={field.description}
+            description={resolveString(field.description)}
             withAsterisk={field.required}
             allowReordering={field.allowReordering}
-            placeholder={field.placeholder}
+            placeholder={resolveString(field.placeholder)}
             allowDuplicates={field.allowDuplicates}
             value={value as string[]}
             onChange={onChange as (tags: string[]) => void}
@@ -231,7 +235,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <SizeInput
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           mode={field.mode}
           min={field.min}
@@ -246,7 +250,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <LocalizedTextInput
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           value={f.values[field.name] as string | null}
           setValue={(value) => f.setFieldValue(field.name, value)}
@@ -264,7 +268,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <LocalizedTextArea
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
           value={f.values[field.name] as string | null}
           setValue={(value) => f.setFieldValue(field.name, value)}
@@ -283,9 +287,9 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
         <MultiSelectGroup
           className={colSpanClass}
           label={fieldLabel(field)}
-          description={field.description}
+          description={resolveString(field.description)}
           withAsterisk={field.required}
-          data={field.data}
+          data={field.data.map((g) => ({ group: resolveString(g.group), items: resolveOptions(g.items) }))}
           key={f.key(field.name)}
           {...(f.getInputProps(field.name) as {
             value?: string[];

@@ -1,7 +1,7 @@
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import Divider from '@/elements/Divider.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
 import { compressionTypeLabelMapping } from '@/lib/enums.ts';
@@ -12,8 +12,6 @@ type S3FormValues = z.infer<typeof adminBackupConfigurationS3Schema>;
 
 export default function BackupS3({ form }: { form: UseFormReturnType<S3FormValues> }) {
   const { t } = useTranslations();
-  const { formExtension } = useFormExtensions('admin.backupConfigurations.s3');
-
   const fields: FieldDef<S3FormValues>[] = [
     { type: 'text', name: 'accessKey', label: t('common.form.accessKey', {}), required: true },
     {
@@ -54,7 +52,7 @@ export default function BackupS3({ form }: { form: UseFormReturnType<S3FormValue
         <Divider />
       </Stack>
 
-      <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+      <FormEngine id='admin.backupConfigurations.s3' form={form} fields={fields} />
     </Stack>
   );
 }

@@ -1,7 +1,7 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsCaptchaProviderTurnstileSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -10,8 +10,6 @@ type TurnstileValues = z.infer<typeof adminSettingsCaptchaProviderTurnstileSchem
 
 export default function CaptchaTurnstile({ form }: { form: UseFormReturnType<TurnstileValues> }) {
   const { t } = useTranslations();
-  const { formExtension } = useFormExtensions('admin.settings.captcha.turnstile');
-
   useEffect(() => {
     form.setValues({
       siteKey: form.values.siteKey ?? '',
@@ -36,7 +34,7 @@ export default function CaptchaTurnstile({ form }: { form: UseFormReturnType<Tur
 
   return (
     <Stack mt='md'>
-      <FormEngine form={form} fields={fields} extensions={[formExtension]} />
+      <FormEngine id='admin.settings.captcha.turnstile' form={form} fields={fields} />
     </Stack>
   );
 }
