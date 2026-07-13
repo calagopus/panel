@@ -83,8 +83,12 @@ export const adminBackupConfigurationSchema = z.object({
 });
 
 export const adminBackupConfigurationUpdateSchema = z.lazy(() =>
-  adminBackupConfigurationSchema.omit({
-    uuid: true,
-    created: true,
-  }),
+  adminBackupConfigurationSchema
+    .omit({
+      uuid: true,
+      created: true,
+    })
+    .extend({
+      backupConfigs: adminBackupConfigurationSchema.shape.backupConfigs.optional(),
+    }),
 );
