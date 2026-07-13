@@ -15,7 +15,6 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import EggVariableContainer from '@/pages/admin/nests/eggs/variables/EggVariableContainer.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 interface DndEggVariable extends z.infer<typeof adminEggVariableSchema>, DndItem {
   id: string;
@@ -30,13 +29,11 @@ export default function AdminEggVariables({
   contextNest: z.infer<typeof adminNestSchema>;
   contextEgg: z.infer<typeof adminEggSchema>;
 }) {
-  const eggVariables = useAdminStore((state) => state.eggVariables);
-  const setEggVariables = useAdminStore((state) => state.setEggVariables);
-  const addEggVariable = useAdminStore((state) => state.addEggVariable);
   const { addToast } = useToast();
   const { t } = useTranslations();
 
   const [loading, setLoading] = useState(true);
+  const [eggVariables, setEggVariables] = useState<z.infer<typeof adminEggVariableSchema>[]>([]);
 
   useEffect(() => {
     getEggVariables(contextNest.uuid, contextEgg.uuid)
@@ -50,7 +47,7 @@ export default function AdminEggVariables({
   }, []);
 
   const addVariable = () => {
-    addEggVariable({
+    const newVariable: z.infer<typeof adminEggVariableSchema> = {
       uuid: '',
       name: '',
       nameTranslations: {},
@@ -66,7 +63,8 @@ export default function AdminEggVariables({
       isSecret: false,
       rules: [],
       created: new Date(),
-    });
+    };
+    setEggVariables([newVariable, ...eggVariables]);
   };
 
   const sortedEggVariables = useMemo(() => [...eggVariables].sort((a, b) => a.order - b.order), [eggVariables]);
@@ -120,6 +118,9 @@ export default function AdminEggVariables({
                   contextNest={contextNest}
                   contextEgg={contextEgg}
                   contextVariable={activeVariable}
+                  eggVariables={eggVariables}
+                  setEggVariables={setEggVariables}
+                  removeEggVariable={(v) => setEggVariables((prev) => prev.filter((x) => x.uuid !== v.uuid))}
                 />
               </div>
             ) : null
@@ -138,6 +139,9 @@ export default function AdminEggVariables({
                         contextNest={contextNest}
                         contextEgg={contextEgg}
                         contextVariable={variable}
+                        eggVariables={eggVariables}
+                        setEggVariables={setEggVariables}
+                        removeEggVariable={(v) => setEggVariables((prev) => prev.filter((x) => x.uuid !== v.uuid))}
                       />
                     </div>
                   )}

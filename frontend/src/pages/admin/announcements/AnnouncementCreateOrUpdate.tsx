@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -15,14 +13,8 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import DateTimePicker from '@/elements/input/DateTimePicker.tsx';
-import LocalizedTextArea from '@/elements/input/LocalizedTextArea.tsx';
-import LocalizedTextInput from '@/elements/input/LocalizedTextInput.tsx';
-import MultiSelect from '@/elements/input/MultiSelect.tsx';
-import MultiSelectGroup from '@/elements/input/MultiSelectGroup.tsx';
-import Select from '@/elements/input/Select.tsx';
-import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { announcementTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -37,6 +29,8 @@ import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+
+type AnnouncementFormValues = z.infer<typeof adminAnnouncementUpdateSchema>;
 
 export default function AnnouncementCreateOrUpdate({
   contextAnnouncement,
@@ -55,7 +49,8 @@ export default function AnnouncementCreateOrUpdate({
   const navigate = useNavigate();
   const [eggs, setEggs] = useState<{ group: string; items: { label: string; value: string }[] }[]>([]);
 
-  const form = useForm<z.infer<typeof adminAnnouncementUpdateSchema>>({
+  const form = useFormEngine<AnnouncementFormValues>('admin.announcements.createOrUpdate', {
+    schema: adminAnnouncementUpdateSchema,
     initialValues: {
       type: 'info',
       enabled: true,
@@ -73,11 +68,10 @@ export default function AnnouncementCreateOrUpdate({
       eggs: [],
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminAnnouncementUpdateSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminAnnouncementUpdateSchema>,
+    AnnouncementFormValues,
     z.infer<typeof adminAnnouncementSchema>
   >({
     form,
@@ -166,6 +160,110 @@ export default function AnnouncementCreateOrUpdate({
     canRequest: canReadBackupConfigurations,
   });
 
+  const fields: FieldDef<AnnouncementFormValues>[] = [
+    {
+      type: 'select',
+      name: 'type',
+      label: t('common.form.type', {}),
+      required: true,
+      options: Object.entries(announcementTypeLabelMapping).map(([value, label]) => ({ value, label: label() })),
+    },
+    {
+      type: 'localizedtext',
+      name: 'title',
+      label: t('common.form.title', {}),
+      required: true,
+      translationsName: 'titleTranslations',
+      languages,
+    },
+    {
+      type: 'localizedtextarea',
+      name: 'content',
+      label: t('common.form.content', {}),
+      required: true,
+      colSpan: 'full',
+      translationsName: 'contentTranslations',
+      languages,
+    },
+    {
+      type: 'date',
+      name: 'dismissibleEnd',
+      label: t('pages.admin.announcements.tabs.general.page.form.dismissibleEnd', {}),
+      props: { clearable: true },
+    },
+    {
+      type: 'date',
+      name: 'enabledStart',
+      label: t('pages.admin.announcements.tabs.general.page.form.enabledStart', {}),
+      props: { clearable: true },
+    },
+    {
+      type: 'date',
+      name: 'enabledEnd',
+      label: t('pages.admin.announcements.tabs.general.page.form.enabledEnd', {}),
+      props: { clearable: true },
+    },
+    {
+      type: 'multiselect',
+      name: 'locations',
+      label: t('pages.admin.announcements.tabs.general.page.form.locations', {}),
+      description: t('pages.admin.announcements.tabs.general.page.form.locationsDescription', {}),
+      options: locations.items.map((l) => ({ label: l.name, value: l.uuid })),
+      props: {
+        searchable: true,
+        searchValue: locations.search,
+        onSearchChange: locations.setSearch,
+        disabled: !canReadLocations,
+        loading: locations.loading,
+      },
+    },
+    {
+      type: 'multiselect',
+      name: 'nodes',
+      label: t('pages.admin.announcements.tabs.general.page.form.nodes', {}),
+      description: t('pages.admin.announcements.tabs.general.page.form.nodesDescription', {}),
+      options: nodes.items.map((n) => ({ label: n.name, value: n.uuid })),
+      props: {
+        searchable: true,
+        searchValue: nodes.search,
+        onSearchChange: nodes.setSearch,
+        disabled: !canReadNodes,
+        loading: nodes.loading,
+      },
+    },
+    {
+      type: 'multiselect',
+      name: 'backupConfigurations',
+      label: t('pages.admin.announcements.tabs.general.page.form.backupConfigurations', {}),
+      description: t('pages.admin.announcements.tabs.general.page.form.backupConfigurationsDescription', {}),
+      options: backupConfigurations.items.map((b) => ({ label: b.name, value: b.uuid })),
+      props: {
+        searchable: true,
+        searchValue: backupConfigurations.search,
+        onSearchChange: backupConfigurations.setSearch,
+        disabled: !canReadBackupConfigurations,
+        loading: backupConfigurations.loading,
+      },
+    },
+    {
+      type: 'multiselectgroup',
+      name: 'eggs',
+      label: t('common.form.eggs', {}),
+      data: eggs,
+      props: {
+        placeholder: t('pages.admin.announcements.tabs.general.page.form.eggsPlaceholder', {}),
+        searchable: true,
+        loading: !eggs.length,
+      },
+    },
+    { type: 'switch', name: 'enabled', label: t('common.form.enabled', {}) },
+    {
+      type: 'switch',
+      name: 'dismissible',
+      label: t('pages.admin.announcements.tabs.general.page.form.dismissible', {}),
+    },
+  ];
+
   return (
     <AdminContentContainer
       title={t(
@@ -200,119 +298,7 @@ export default function AnnouncementCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, [queryKeys.admin.announcements.all()]))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <Select
-            withAsterisk
-            label={t('common.form.type', {})}
-            data={Object.entries(announcementTypeLabelMapping).map(([value, label]) => ({ value, label: label() }))}
-            key={form.key('type')}
-            {...form.getInputProps('type')}
-          />
-
-          <LocalizedTextInput
-            withAsterisk
-            label={t('common.form.title', {})}
-            value={form.values.title}
-            setValue={(value) => form.setFieldValue('title', value ?? '')}
-            valueTranslations={form.values.titleTranslations}
-            setValueTranslations={(translations) => form.setFieldValue('titleTranslations', translations)}
-            languages={languages}
-            error={form.errors.title}
-          />
-
-          <LocalizedTextArea
-            withAsterisk
-            label={t('common.form.content', {})}
-            value={form.values.content}
-            setValue={(value) => form.setFieldValue('content', value ?? '')}
-            valueTranslations={form.values.contentTranslations}
-            setValueTranslations={(translations) => form.setFieldValue('contentTranslations', translations)}
-            languages={languages}
-            error={form.errors.content}
-            className='col-span-full'
-          />
-
-          <DateTimePicker
-            label={t('pages.admin.announcements.tabs.general.page.form.dismissibleEnd', {})}
-            clearable
-            value={form.values.dismissibleEnd}
-            onChange={(value) => form.setFieldValue('dismissibleEnd', value ? new Date(value) : null)}
-          />
-
-          <DateTimePicker
-            label={t('pages.admin.announcements.tabs.general.page.form.enabledStart', {})}
-            clearable
-            value={form.values.enabledStart}
-            onChange={(value) => form.setFieldValue('enabledStart', value ? new Date(value) : null)}
-          />
-
-          <DateTimePicker
-            label={t('pages.admin.announcements.tabs.general.page.form.enabledEnd', {})}
-            clearable
-            value={form.values.enabledEnd}
-            onChange={(value) => form.setFieldValue('enabledEnd', value ? new Date(value) : null)}
-          />
-
-          <MultiSelect
-            label={t('pages.admin.announcements.tabs.general.page.form.locations', {})}
-            description={t('pages.admin.announcements.tabs.general.page.form.locationsDescription', {})}
-            data={locations.items.map((l) => ({ label: l.name, value: l.uuid }))}
-            searchable
-            searchValue={locations.search}
-            onSearchChange={locations.setSearch}
-            disabled={!canReadLocations}
-            loading={locations.loading}
-            key={form.key('locations')}
-            {...form.getInputProps('locations')}
-          />
-
-          <MultiSelect
-            label={t('pages.admin.announcements.tabs.general.page.form.nodes', {})}
-            description={t('pages.admin.announcements.tabs.general.page.form.nodesDescription', {})}
-            data={nodes.items.map((n) => ({ label: n.name, value: n.uuid }))}
-            searchable
-            searchValue={nodes.search}
-            onSearchChange={nodes.setSearch}
-            disabled={!canReadNodes}
-            loading={nodes.loading}
-            key={form.key('nodes')}
-            {...form.getInputProps('nodes')}
-          />
-
-          <MultiSelect
-            label={t('pages.admin.announcements.tabs.general.page.form.backupConfigurations', {})}
-            description={t('pages.admin.announcements.tabs.general.page.form.backupConfigurationsDescription', {})}
-            data={backupConfigurations.items.map((b) => ({ label: b.name, value: b.uuid }))}
-            searchable
-            searchValue={backupConfigurations.search}
-            onSearchChange={backupConfigurations.setSearch}
-            disabled={!canReadBackupConfigurations}
-            loading={backupConfigurations.loading}
-            key={form.key('backupConfigurations')}
-            {...form.getInputProps('backupConfigurations')}
-          />
-
-          <MultiSelectGroup
-            label={t('common.form.eggs', {})}
-            placeholder={t('pages.admin.announcements.tabs.general.page.form.eggsPlaceholder', {})}
-            data={eggs}
-            searchable
-            loading={!eggs.length}
-            {...form.getInputProps('eggs')}
-          />
-
-          <Switch
-            label={t('common.form.enabled', {})}
-            key={form.key('enabled')}
-            {...form.getInputProps('enabled', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('pages.admin.announcements.tabs.general.page.form.dismissible', {})}
-            key={form.key('dismissible')}
-            {...form.getInputProps('dismissible', { type: 'checkbox' })}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextAnnouncement ? 'announcements.update' : 'announcements.create'} cantSave>

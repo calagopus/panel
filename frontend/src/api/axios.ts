@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios';
 import { getGlobalStore } from '@/stores/global.ts';
-import { transformKeysToCamelCase } from '../lib/transformers.ts';
 
 function captureServerName(headers: RawAxiosResponseHeaders | AxiosResponseHeaders | undefined) {
   const serverName = headers?.['x-server-name'];
@@ -20,23 +19,11 @@ axiosInstance.interceptors.response.use(
   (response) => {
     captureServerName(response.headers);
 
-    const contentType = response.headers['content-type'];
-    if (typeof contentType === 'string' && contentType.includes('application/json') && response.data) {
-      response.data = transformKeysToCamelCase(response.data);
-    }
-
     return response;
   },
   (error) => {
     if (error.response) {
       captureServerName(error.response.headers);
-    }
-
-    if (error.response && error.response.data) {
-      const contentType = error.response.headers['content-type'];
-      if (typeof contentType === 'string' && contentType.includes('application/json')) {
-        error.response.data = transformKeysToCamelCase(error.response.data);
-      }
     }
 
     if (
@@ -50,12 +37,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
-export const untransformedAxiosInstance: AxiosInstance = axios.create({
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 const IMPERSONATED_USER_KEY = 'impersonated_user';
 
@@ -73,11 +54,9 @@ export function setImpersonatedUser(uuid: string | null) {
   if (uuid) {
     sessionStorage.setItem(IMPERSONATED_USER_KEY, uuid);
     axiosInstance.defaults.headers.common['Calagopus-User'] = uuid;
-    untransformedAxiosInstance.defaults.headers.common['Calagopus-User'] = uuid;
   } else {
     sessionStorage.removeItem(IMPERSONATED_USER_KEY);
     delete axiosInstance.defaults.headers.common['Calagopus-User'];
-    delete untransformedAxiosInstance.defaults.headers.common['Calagopus-User'];
   }
 }
 
@@ -126,14 +105,6 @@ export function httpErrorToHuman(error: unknown): string {
   } else {
     return String(error);
   }
-}
-
-export function getPaginationSet(data: Pagination<unknown>) {
-  return {
-    total: data.total,
-    perPage: data.perPage,
-    page: data.page,
-  };
 }
 
 export function getEmptyPaginationSet<T>(): Pagination<T> {

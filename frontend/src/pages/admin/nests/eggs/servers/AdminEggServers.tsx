@@ -7,7 +7,7 @@ import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminEggServers({

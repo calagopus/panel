@@ -1,0 +1,28 @@
+[package]
+name = "db-agent-api"
+license = { workspace = true }
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+utoipa = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+reqwest = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+indexmap = { workspace = true }
+urlencoding = { workspace = true }
+anyhow = { workspace = true }
+cron = { workspace = true }
+regex = { workspace = true }
+serde_regex = { workspace = true }
+compact_str = { workspace = true }
+nestify = { workspace = true }
+rmp-serde = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+futures-util = { workspace = true }
+garde = { workspace = true }
+tokio-tungstenite = { workspace = true }
+sqlx = { workspace = true }

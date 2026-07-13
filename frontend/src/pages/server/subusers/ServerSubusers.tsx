@@ -9,7 +9,7 @@ import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
@@ -18,11 +18,8 @@ import SubuserRow from './SubuserRow.tsx';
 
 export default function ServerSubusers() {
   const { t } = useTranslations();
-  const server = useServerStore((state) => state.server);
-  const subusers = useServerStore((state) => state.subusers);
-  const setSubusers = useServerStore((state) => state.setSubusers);
-  const settings = useGlobalStore((state) => state.settings);
-  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
+  const { server } = useServerStore();
+  const { settings, setAvailablePermissions } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
@@ -32,29 +29,38 @@ export default function ServerSubusers() {
     });
   }, []);
 
-  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: subusers,
+    loading,
+    error,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).subusers.all(),
     fetcher: (page, search) => getSubusers(server.uuid, page, search),
-    setStoreData: setSubusers,
   });
 
   return (
     <ServerContentContainer
       title={t('pages.server.subusers.title', {})}
-      subtitle={t('pages.server.subusers.subtitle', { current: subusers.total, max: settings.server.maxSubuserCount })}
+      subtitle={t('pages.server.subusers.subtitle', {
+        current: subusers?.total ?? 0,
+        max: settings.server.maxSubuserCount,
+      })}
       search={search}
       setSearch={setSearch}
       contentRight={
         <ServerCan action='subusers.create'>
           <ConditionalTooltip
-            enabled={subusers.total >= settings.server.maxSubuserCount}
+            enabled={(subusers?.total ?? 0) >= settings.server.maxSubuserCount}
             label={t('pages.server.subusers.tooltip.limitReached', { max: settings.server.maxSubuserCount })}
           >
             <Button
               onClick={() => setOpenModal('create')}
               color='blue'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
-              disabled={subusers.total >= settings.server.maxSubuserCount}
+              disabled={(subusers?.total ?? 0) >= settings.server.maxSubuserCount}
             >
               {t('common.button.create', {})}
             </Button>
@@ -79,7 +85,7 @@ export default function ServerSubusers() {
         onPageSelect={setPage}
         error={error}
       >
-        {subusers.data.map((su) => (
+        {subusers?.data.map((su) => (
           <SubuserRow subuser={su} key={su.user.uuid} />
         ))}
       </Table>

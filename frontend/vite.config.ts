@@ -261,6 +261,11 @@ export default defineConfig({
               priority: 15,
             },
             {
+              name: 'mantine',
+              test: /node_modules\/(@mantine|@floating-ui|clsx|react-textarea-autosize)\//,
+              priority: 12,
+            },
+            {
               name: 'common',
               minShareCount: 5,
               minSize: 10240,
@@ -286,6 +291,12 @@ export default defineConfig({
   },
   resolve: {
     tsconfigPaths: true,
+    alias: [
+      {
+        find: 'monaco-editor/esm/vs/editor/editor.api.js',
+        replacement: path.resolve(__dirname, 'src/lib/monacoApiShim.ts'),
+      },
+    ],
   },
   publicDir: false,
 });

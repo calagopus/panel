@@ -87,6 +87,13 @@ impl ApiError {
             "errors": [error.error],
         })
     }
+
+    #[inline]
+    pub fn new_database_agent_value(error: db_agent_api::ApiError) -> serde_json::Value {
+        serde_json::json!({
+            "errors": [error.error],
+        })
+    }
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]

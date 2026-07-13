@@ -8,7 +8,7 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminActivityColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ActivityRow from './ActivityRow.tsx';
 
@@ -71,7 +71,7 @@ export default function AdminActivity() {
         onPageSelect={setPage}
       >
         {activities?.data.map((activity, index) => (
-          <ActivityRow key={`${activity.created}-${index}`} activity={activity} />
+          <ActivityRow key={`${activity.created.toISOString()}-${index}`} activity={activity} />
         ))}
       </Table>
     </AdminContentContainer>

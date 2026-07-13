@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CronExpressionParser } from 'cron-parser';
 import cronstrue from 'cronstrue/i18n';
 import { z } from 'zod';
+import getSchedule from '@/api/server/schedules/getSchedule.ts';
 import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import Group from '@/elements/Group.tsx';
@@ -15,8 +16,10 @@ import {
   scheduleTriggerColorMapping,
   scheduleTriggerIconMapping,
 } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleTriggerSchema } from '@/lib/schemas/server/schedules.ts';
 import { bytesToString } from '@/lib/size.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { getTranslations, useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -41,7 +44,14 @@ interface TriggerCardProps {
 
 export default function TriggerCard({ date, timezone, trigger }: TriggerCardProps) {
   const { t, tReact } = useTranslations();
-  const schedules = useServerStore((state) => state.schedules);
+  const server = useServerStore((state) => state.server);
+
+  const completionScheduleUuid = trigger.type === 'schedule_completion' ? trigger.schedule : null;
+  const { data: completionSchedule } = useResource({
+    queryKey: queryKeys.server(server.uuid).schedules.detail(completionScheduleUuid ?? ''),
+    queryFn: () => getSchedule(server.uuid, completionScheduleUuid!),
+    enabled: completionScheduleUuid !== null,
+  });
 
   return (
     <Card>
@@ -106,7 +116,7 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
         ) : trigger.type === 'schedule_completion' ? (
           <Text>
             {t('pages.server.schedules.triggers.scheduleCompletion.card.content', {
-              schedule: schedules.data.find((s) => s.uuid === trigger.schedule)?.name ?? trigger.schedule,
+              schedule: completionSchedule?.name ?? trigger.schedule,
               status: t(trigger.successful ? 'common.badge.successful' : 'common.badge.failed', {}),
             }).md()}
           </Text>

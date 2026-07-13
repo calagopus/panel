@@ -5,6 +5,6 @@ export const userSessionSchema = z.object({
   ip: z.string(),
   userAgent: z.string(),
   isUsing: z.boolean(),
-  lastUsed: z.date(),
-  created: z.date(),
+  lastUsed: z.coerce.date(),
+  created: z.coerce.date(),
 });

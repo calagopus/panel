@@ -1711,7 +1711,7 @@ impl super::IntoAdminApiObject for Server {
                 node: node?,
                 owner: self
                     .owner
-                    .into_api_full_object(state, storage_url_retriever)
+                    .into_admin_api_object(state, storage_url_retriever)
                     .await?,
                 egg: egg?,
                 nest: self.nest.into_admin_api_object(state, ()).await?,
@@ -2446,6 +2446,12 @@ impl DeletableModel for Server {
         let databases =
             super::server_database::ServerDatabase::all_by_server_uuid(&state.database, self.uuid)
                 .await?;
+        let database_instances =
+            super::server_database_instance::ServerDatabaseInstance::all_by_server_uuid(
+                &state.database,
+                self.uuid,
+            )
+            .await?;
 
         let mut transaction = state.database.write().begin().await?;
         self.run_delete_handlers(&options, state, &mut transaction)
@@ -2460,6 +2466,19 @@ impl DeletableModel for Server {
                     Ok(_) => {}
                     Err(err) => {
                         tracing::error!(server = %server_uuid, "failed to delete database: {:?}", err);
+
+                        if !options.force {
+                            return Err(err);
+                        }
+                    }
+                }
+            }
+
+            for database_instance in database_instances {
+                match database_instance.delete(&state, super::server_database_instance::DeleteServerDatabaseInstanceOptions { force: options.force }).await {
+                    Ok(_) => {}
+                    Err(err) => {
+                        tracing::error!(server = %server_uuid, "failed to delete database instance: {:?}", err);
 
                         if !options.force {
                             return Err(err);
@@ -2573,7 +2592,7 @@ pub struct AdminApiServer {
     pub external_id: Option<compact_str::CompactString>,
     pub allocation: Option<super::server_allocation::ApiServerAllocation>,
     pub node: super::node::AdminApiNode,
-    pub owner: super::user::ApiFullUser,
+    pub owner: super::user::AdminApiUser,
     pub egg: super::nest_egg::AdminApiNestEgg,
     pub nest: super::nest::AdminApiNest,
     pub backup_configuration: Option<super::backup_configuration::AdminApiBackupConfiguration>,

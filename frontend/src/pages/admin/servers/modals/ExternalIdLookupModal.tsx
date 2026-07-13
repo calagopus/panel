@@ -1,4 +1,4 @@
-import { faArrowRight, faServer } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faMagnifyingGlass, faServer } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useState } from 'react';
@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getServerByExternalId from '@/api/admin/servers/getServerByExternalId.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import Group from '@/elements/Group.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -85,9 +86,9 @@ export default function ExternalIdLookupModal({ ...props }: ModalProps) {
         </Group>
 
         {notFound && (
-          <Text size='sm' c='red'>
+          <Alert icon={<FontAwesomeIcon icon={faMagnifyingGlass} />}>
             {t('pages.admin.servers.externalIdLookup.modal.notFound', {})}
-          </Text>
+          </Alert>
         )}
 
         {result && (
@@ -121,7 +122,7 @@ export default function ExternalIdLookupModal({ ...props }: ModalProps) {
 
       <ModalFooter>
         {result && (
-          <Button color='blue' rightSection={<FontAwesomeIcon icon={faArrowRight} />} onClick={goToServer}>
+          <Button color='blue' leftSection={<FontAwesomeIcon icon={faEye} />} onClick={goToServer}>
             {t('pages.admin.servers.externalIdLookup.modal.result.viewServer', {})}
           </Button>
         )}

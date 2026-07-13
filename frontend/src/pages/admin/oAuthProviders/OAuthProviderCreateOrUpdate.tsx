@@ -1,8 +1,6 @@
 import { faChevronDown, faExternalLink, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
 import { dump } from 'js-yaml';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createOAuthProvider from '@/api/admin/oauth-providers/createOAuthProvider.ts';
@@ -15,21 +13,20 @@ import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TagsInput from '@/elements/input/TagsInput.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Title from '@/elements/Title.tsx';
+import { serializeForApi } from '@/lib/api-transform.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 import OAuthProviderDuplicateModal from '@/pages/admin/oAuthProviders/modals/OAuthProviderDuplicateModal.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+
+type OAuthFormValues = z.infer<typeof adminOAuthProviderUpdateSchema>;
 
 export default function OAuthProviderCreateOrUpdate({
   contextOAuthProvider,
@@ -43,7 +40,8 @@ export default function OAuthProviderCreateOrUpdate({
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
-  const form = useForm<z.infer<typeof adminOAuthProviderUpdateSchema>>({
+  const form = useFormEngine<OAuthFormValues>('admin.oAuthProviders.createOrUpdate', {
+    schema: adminOAuthProviderUpdateSchema.unwrap(),
     mode: 'uncontrolled',
     initialValues: {
       name: '',
@@ -68,11 +66,10 @@ export default function OAuthProviderCreateOrUpdate({
     },
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminOAuthProviderUpdateSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminOAuthProviderUpdateSchema>,
+    OAuthFormValues,
     z.infer<typeof adminOAuthProviderSchema>
   >({
     form,
@@ -117,48 +114,128 @@ export default function OAuthProviderCreateOrUpdate({
 
     addToast(t('pages.admin.oAuthProviders.tabs.general.page.toast.exported', {}), 'success');
 
-    let data: Partial<z.infer<typeof adminOAuthProviderSchema>> & {
-      uuid?: string;
-      created?: Date;
-      clientId?: string;
-      clientSecret?: string;
-    } = JSON.parse(JSON.stringify(contextOAuthProvider));
+    const data = serializeForApi(adminOAuthProviderUpdateSchema, contextOAuthProvider) as Record<string, unknown>;
+    delete data.client_id;
+    delete data.client_secret;
 
-    delete data.uuid;
-    delete data.created;
-    delete data.clientId;
-    delete data.clientSecret;
-    data.description = data.description || null;
-    data.emailPath = data.emailPath || null;
-    data.usernamePath = data.usernamePath || null;
-    data.nameFirstPath = data.nameFirstPath || null;
-    data.nameLastPath = data.nameLastPath || null;
-    data = transformKeysToSnakeCase(data);
+    const contents =
+      format === 'json' ? JSON.stringify(data, undefined, 2) : dump(data, { flowLevel: -1, forceQuotes: true });
+    const fileURL = URL.createObjectURL(new Blob([contents], { type: 'text/plain' }));
+    const downloadLink = document.createElement('a');
+    downloadLink.href = fileURL;
+    downloadLink.download = `oauth-provider-${contextOAuthProvider.uuid}.${format === 'json' ? 'json' : 'yml'}`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
 
-    if (format === 'json') {
-      const jsonData = JSON.stringify(data, undefined, 2);
-      const fileURL = URL.createObjectURL(new Blob([jsonData], { type: 'text/plain' }));
-      const downloadLink = document.createElement('a');
-      downloadLink.href = fileURL;
-      downloadLink.download = `oauth-provider-${contextOAuthProvider.uuid}.json`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-
-      URL.revokeObjectURL(fileURL);
-      downloadLink.remove();
-    } else {
-      const yamlData = dump(data, { flowLevel: -1, forceQuotes: true });
-      const fileURL = URL.createObjectURL(new Blob([yamlData], { type: 'text/plain' }));
-      const downloadLink = document.createElement('a');
-      downloadLink.href = fileURL;
-      downloadLink.download = `oauth-provider-${contextOAuthProvider.uuid}.yml`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-
-      URL.revokeObjectURL(fileURL);
-      downloadLink.remove();
-    }
+    URL.revokeObjectURL(fileURL);
+    downloadLink.remove();
   };
+
+  const fieldsTop: FieldDef<OAuthFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}) },
+  ];
+
+  const fieldsMain: FieldDef<OAuthFormValues>[] = [
+    {
+      type: 'text',
+      name: 'clientId',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.clientId', {}),
+      required: true,
+    },
+    {
+      type: 'password',
+      name: 'clientSecret',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.clientSecret', {}),
+      props: { withAsterisk: !contextOAuthProvider },
+    },
+    {
+      type: 'text',
+      name: 'authUrl',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.authUrl', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'tokenUrl',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.tokenUrl', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'infoUrl',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.infoUrl', {}),
+      required: true,
+    },
+    {
+      type: 'switch',
+      name: 'basicAuth',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.basicAuth', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.basicAuthDescription', {}),
+    },
+    {
+      type: 'tags',
+      name: 'scopes',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.scopes', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.scopesDescription', {}),
+    },
+    {
+      type: 'text',
+      name: 'identifierPath',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.identifierPath', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.identifierPathDescription', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'emailPath',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.emailPath', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.emailPathDescription', {}),
+    },
+    {
+      type: 'text',
+      name: 'usernamePath',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.usernamePath', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.usernamePathDescription', {}),
+    },
+    {
+      type: 'text',
+      name: 'nameFirstPath',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPath', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPathDescription', {}),
+      props: { placeholder: t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPathPlaceholder', {}) },
+    },
+    {
+      type: 'text',
+      name: 'nameLastPath',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.nameLastPath', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.nameLastPathDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'loginOnly',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.loginOnly', {}),
+    },
+    {
+      type: 'switch',
+      name: 'loginBypass2fa',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypass2fa', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypass2faDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'linkViewable',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.linkViewable', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.linkViewableDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'userManageable',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.userManageable', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.userManageableDescription', {}),
+    },
+    { type: 'switch', name: 'enabled', label: t('common.form.enabled', {}) },
+  ];
 
   return (
     <AdminContentContainer
@@ -192,141 +269,18 @@ export default function OAuthProviderCreateOrUpdate({
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.oAuthProviders.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <TextArea
-            label={t('common.form.description', {})}
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
+        <FormEngine form={form} fields={fieldsTop} />
 
-          <Card className='flex flex-row! items-center justify-between col-span-full'>
-            <Title order={4}>{t('pages.admin.oAuthProviders.tabs.general.page.card.redirectUrl.title', {})}</Title>
-            <Code>
-              {contextOAuthProvider
-                ? `${settings.app.url}/api/auth/oauth/${contextOAuthProvider.uuid}`
-                : t('pages.admin.oAuthProviders.tabs.general.page.card.redirectUrl.unavailable', {})}
-            </Code>
-          </Card>
+        <Card className='flex flex-row! items-center justify-between mt-4'>
+          <Title order={4}>{t('pages.admin.oAuthProviders.tabs.general.page.card.redirectUrl.title', {})}</Title>
+          <Code>
+            {contextOAuthProvider
+              ? `${settings.app.url}/api/auth/oauth/${contextOAuthProvider.uuid}`
+              : t('pages.admin.oAuthProviders.tabs.general.page.card.redirectUrl.unavailable', {})}
+          </Code>
+        </Card>
 
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.clientId', {})}
-            key={form.key('clientId')}
-            {...form.getInputProps('clientId')}
-          />
-          <TextInput
-            withAsterisk={!contextOAuthProvider}
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.clientSecret', {})}
-            type='password'
-            key={form.key('clientSecret')}
-            {...form.getInputProps('clientSecret')}
-          />
-
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.authUrl', {})}
-            key={form.key('authUrl')}
-            {...form.getInputProps('authUrl')}
-          />
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.tokenUrl', {})}
-            key={form.key('tokenUrl')}
-            {...form.getInputProps('tokenUrl')}
-          />
-
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.infoUrl', {})}
-            key={form.key('infoUrl')}
-            {...form.getInputProps('infoUrl')}
-          />
-          <Switch
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.basicAuth', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.basicAuthDescription', {})}
-            key={form.key('basicAuth')}
-            {...form.getInputProps('basicAuth', { type: 'checkbox' })}
-          />
-
-          <TagsInput
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.scopes', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.scopesDescription', {})}
-            key={form.key('scopes')}
-            {...form.getInputProps('scopes')}
-          />
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.identifierPath', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.identifierPathDescription', {})}
-            key={form.key('identifierPath')}
-            {...form.getInputProps('identifierPath')}
-          />
-
-          <TextInput
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.emailPath', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.emailPathDescription', {})}
-            key={form.key('emailPath')}
-            {...form.getInputProps('emailPath')}
-          />
-          <TextInput
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.usernamePath', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.usernamePathDescription', {})}
-            key={form.key('usernamePath')}
-            {...form.getInputProps('usernamePath')}
-          />
-
-          <TextInput
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPath', {})}
-            placeholder={t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPathPlaceholder', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.nameFirstPathDescription', {})}
-            key={form.key('nameFirstPath')}
-            {...form.getInputProps('nameFirstPath')}
-          />
-          <TextInput
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.nameLastPath', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.nameLastPathDescription', {})}
-            key={form.key('nameLastPath')}
-            {...form.getInputProps('nameLastPath')}
-          />
-
-          <Switch
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.loginOnly', {})}
-            key={form.key('loginOnly')}
-            {...form.getInputProps('loginOnly', { type: 'checkbox' })}
-          />
-          <Switch
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypass2fa', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypass2faDescription', {})}
-            key={form.key('loginBypass2fa')}
-            {...form.getInputProps('loginBypass2fa', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.linkViewable', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.linkViewableDescription', {})}
-            key={form.key('linkViewable')}
-            {...form.getInputProps('linkViewable', { type: 'checkbox' })}
-          />
-          <Switch
-            label={t('pages.admin.oAuthProviders.tabs.general.page.form.userManageable', {})}
-            description={t('pages.admin.oAuthProviders.tabs.general.page.form.userManageableDescription', {})}
-            key={form.key('userManageable')}
-            {...form.getInputProps('userManageable', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('common.form.enabled', {})}
-            key={form.key('enabled')}
-            {...form.getInputProps('enabled', { type: 'checkbox' })}
-          />
-        </div>
+        <FormEngine form={form} fields={fieldsMain} className='mt-4' />
 
         <Group mt='md'>
           <AdminCan action={contextOAuthProvider ? 'oauth-providers.update' : 'oauth-providers.create'} cantSave>
@@ -343,12 +297,14 @@ export default function OAuthProviderCreateOrUpdate({
                 menuProps={{ position: 'top', offset: 40 }}
                 items={[
                   {
+                    type: 'action',
                     icon: faFileDownload,
                     label: t('common.button.exportAs', { format: 'JSON' }),
                     onClick: () => doExport('json'),
                     color: 'gray',
                   },
                   {
+                    type: 'action',
                     icon: faFileDownload,
                     label: t('common.button.exportAs', { format: 'YAML' }),
                     onClick: () => doExport('yaml'),

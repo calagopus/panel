@@ -2,10 +2,9 @@ import { faCodeBranch, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { NavLink, useSearchParams } from 'react-router';
-import { z } from 'zod';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getServerActivity from '@/api/server/getServerActivity.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Avatar from '@/elements/Avatar.tsx';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
@@ -15,8 +14,7 @@ import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { serverActivitySchema } from '@/lib/schemas/server/activity.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -25,9 +23,6 @@ export default function ServerActivity() {
   const server = useServerStore((state) => state.server);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activities, setActivities] = useState<Pagination<z.infer<typeof serverActivitySchema>>>(
-    getEmptyPaginationSet(),
-  );
   const [filterUserUuid, setFilterUserUuid] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,10 +46,16 @@ export default function ServerActivity() {
     }
   }, [searchParams, setSearchParams]);
 
-  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: activities,
+    loading,
+    error,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).activity.all(filterUserUuid),
     fetcher: (page, search) => getServerActivity(server.uuid, filterUserUuid, page, search),
-    setStoreData: setActivities,
   });
 
   return (
@@ -85,16 +86,10 @@ export default function ServerActivity() {
         onPageSelect={setPage}
         error={error}
       >
-        {activities.data.map((activity, index) => (
-          <TableRow key={`${activity.created}-${index}`}>
+        {activities?.data.map((activity, index) => (
+          <TableRow key={`${activity.created.toISOString()}-${index}`}>
             <TableData>
-              <div className='size-5 aspect-square relative'>
-                <img
-                  src={activity.user?.avatar ?? '/icon.svg'}
-                  alt={activity.user?.username}
-                  className='size-5 object-cover rounded-full select-none'
-                />
-              </div>
+              <Avatar size={20} className='select-none' src={activity.user?.avatar} name={activity.user?.username} />
             </TableData>
 
             <TableData>

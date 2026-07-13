@@ -5,7 +5,7 @@ export const serverSubuserSchema = z.object({
   user: z.lazy(() => userSchema),
   permissions: z.array(z.string()),
   ignoredFiles: z.array(z.string()),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const serverSubuserCreateSchema = z.object({

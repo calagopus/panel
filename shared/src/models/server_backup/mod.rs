@@ -308,6 +308,34 @@ impl ServerBackup {
         row.try_map(|row| Self::map(None, &row))
     }
 
+    pub async fn latest_completed_by_server_uuid(
+        database: &crate::database::Database,
+        server_uuid: uuid::Uuid,
+        name: Option<&str>,
+    ) -> Result<Option<Self>, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM server_backups
+            WHERE
+                server_backups.server_uuid = $1
+                AND server_backups.deleted IS NULL
+                AND server_backups.completed IS NOT NULL
+                AND server_backups.successful
+                AND ($2 IS NULL OR server_backups.name = $2)
+            ORDER BY server_backups.created DESC
+            LIMIT 1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(server_uuid)
+        .bind(name)
+        .fetch_optional(database.read())
+        .await?;
+
+        row.try_map(|row| Self::map(None, &row))
+    }
+
     pub async fn by_node_uuid_uuid(
         database: &crate::database::Database,
         node_uuid: uuid::Uuid,
@@ -814,145 +842,8 @@ impl ServerBackup {
         }
 
         if options.restore_startup {
-            let startup_cmd = self
-                .metadata
-                .get("startup")
-                .and_then(|v| v.as_str())
-                .map(|s| s.to_compact_string());
-            let image_str = self
-                .metadata
-                .get("image")
-                .and_then(|v| v.as_str())
-                .map(|s| s.to_compact_string());
-            let variables = self
-                .metadata
-                .get("variables")
-                .and_then(|v| v.as_object())
-                .cloned()
-                .unwrap_or_default();
-
-            if let Some(startup) = startup_cmd
-                && let Ok(egg_config) = server.egg.configuration(&state.database).await
-            {
-                let is_predefined = server
-                    .egg
-                    .startup_commands
-                    .values()
-                    .any(|cmd| cmd == startup.as_str());
-                let custom_allowed = egg_config
-                    .config_startup
-                    .as_ref()
-                    .is_some_and(|c| c.allow_custom_startup_command);
-                if is_predefined || custom_allowed {
-                    server
-                        .update_with_transaction(
-                            state,
-                            super::server::UpdateServerOptions {
-                                startup: Some(startup),
-                                ..Default::default()
-                            },
-                            transaction,
-                        )
-                        .await?;
-                }
-            }
-
-            if let Some(image) = image_str {
-                let is_valid_image = server
-                    .egg
-                    .docker_images
-                    .values()
-                    .any(|img| img == image.as_str());
-                if is_valid_image {
-                    let current_is_custom = !server
-                        .egg
-                        .docker_images
-                        .values()
-                        .any(|img| img == server.image.as_str());
-                    let allow_overwrite = state
-                        .settings
-                        .get()
-                        .await
-                        .map(|s| s.server.allow_overwriting_custom_docker_image)
-                        .unwrap_or(false);
-                    if !current_is_custom || allow_overwrite {
-                        server
-                            .update_with_transaction(
-                                state,
-                                super::server::UpdateServerOptions {
-                                    image: Some(image),
-                                    ..Default::default()
-                                },
-                                transaction,
-                            )
-                            .await?;
-                    }
-                }
-            }
-
-            if !variables.is_empty() {
-                let existing_variables = ServerVariable::all_by_server_uuid_egg_uuid(
-                    &state.database,
-                    server.uuid,
-                    server.egg.uuid,
-                )
+            self.restore_startup(state, transaction, &mut server)
                 .await?;
-
-                let mut validator_variables = HashMap::new();
-                for variable in existing_variables.iter() {
-                    validator_variables.insert(
-                        variable.variable.env_variable.as_str(),
-                        (
-                            variable.variable.rules.as_slice(),
-                            if let Some(value) = variables
-                                .iter()
-                                .find(|v| v.0 == variable.variable.env_variable)
-                                && variable.variable.user_editable
-                                && let Some(value) = value.1.as_str()
-                            {
-                                value
-                            } else {
-                                variable.value.as_str()
-                            },
-                        ),
-                    );
-                }
-
-                let validator = match rule_validator::Validator::new(validator_variables) {
-                    Ok(validator) => validator,
-                    Err(error) => {
-                        return Err(crate::response::DisplayError::new(error)
-                            .with_status(StatusCode::EXPECTATION_FAILED)
-                            .into());
-                    }
-                };
-                if let Err(error) = validator.validate() {
-                    return Err(crate::response::DisplayError::new(error)
-                        .with_status(StatusCode::EXPECTATION_FAILED)
-                        .into());
-                }
-
-                for (env_var, value) in &variables {
-                    let Some(value) = value.as_str() else {
-                        continue;
-                    };
-                    let variable_uuid = match existing_variables
-                        .iter()
-                        .find(|v| v.variable.env_variable == env_var)
-                    {
-                        Some(variable) if variable.variable.user_editable => variable.variable.uuid,
-                        _ => continue,
-                    };
-
-                    ServerVariable::create_with_transaction(
-                        transaction,
-                        server.uuid,
-                        variable_uuid,
-                        value,
-                    )
-                    .await?;
-                }
-            }
         }
 
         server
@@ -966,41 +857,7 @@ impl ServerBackup {
                 self.uuid,
                 &wings_api::servers_server_backup_backup_restore::post::RequestBody {
                     adapter: self.disk.to_wings_adapter(),
-                    download_url: match self.disk {
-                        BackupDisk::S3 => {
-                            if let Some(mut s3_configuration) =
-                                backup_configuration.backup_configs.s3
-                            {
-                                s3_configuration.decrypt(&state.database).await?;
-
-                                let compression_type = s3_configuration.compression_type;
-                                let (client, bucket) = s3_configuration.into_client();
-
-                                let file_path = match &self.upload_path {
-                                    Some(path) => path.as_str(),
-                                    None => {
-                                        &Self::s3_path(server.uuid, self.uuid, compression_type)
-                                    }
-                                };
-
-                                let presigning_config =
-                                    aws_sdk_s3::presigning::PresigningConfig::expires_in(
-                                        std::time::Duration::from_mins(60),
-                                    )?;
-                                let presigned = client
-                                    .get_object()
-                                    .bucket(bucket)
-                                    .key(file_path)
-                                    .presigned(presigning_config)
-                                    .await?;
-
-                                Some(presigned.uri().to_compact_string())
-                            } else {
-                                None
-                            }
-                        }
-                        _ => None,
-                    },
+                    download_url: self.wings_restore_download_url(state, server.uuid).await?,
                     truncate_directory: options.truncate_directory,
                 },
             )
@@ -1015,6 +872,293 @@ impl ServerBackup {
         );
 
         Ok(())
+    }
+
+    pub async fn restore_startup(
+        &self,
+        state: &crate::State,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        server: &mut super::server::Server,
+    ) -> Result<(), anyhow::Error> {
+        let startup_cmd = self
+            .metadata
+            .get("startup")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_compact_string());
+        let image_str = self
+            .metadata
+            .get("image")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_compact_string());
+        let variables = self
+            .metadata
+            .get("variables")
+            .and_then(|v| v.as_object())
+            .cloned()
+            .unwrap_or_default();
+
+        if let Some(startup) = startup_cmd
+            && let Ok(egg_config) = server.egg.configuration(&state.database).await
+        {
+            let is_predefined = server
+                .egg
+                .startup_commands
+                .values()
+                .any(|cmd| cmd == startup.as_str());
+            let custom_allowed = egg_config
+                .config_startup
+                .as_ref()
+                .is_some_and(|c| c.allow_custom_startup_command);
+            if is_predefined || custom_allowed {
+                server
+                    .update_with_transaction(
+                        state,
+                        super::server::UpdateServerOptions {
+                            startup: Some(startup),
+                            ..Default::default()
+                        },
+                        transaction,
+                    )
+                    .await?;
+            }
+        }
+
+        if let Some(image) = image_str {
+            let is_valid_image = server
+                .egg
+                .docker_images
+                .values()
+                .any(|img| img == image.as_str());
+            if is_valid_image {
+                let current_is_custom = !server
+                    .egg
+                    .docker_images
+                    .values()
+                    .any(|img| img == server.image.as_str());
+                let allow_overwrite = state
+                    .settings
+                    .get()
+                    .await
+                    .map(|s| s.server.allow_overwriting_custom_docker_image)
+                    .unwrap_or(false);
+                if !current_is_custom || allow_overwrite {
+                    server
+                        .update_with_transaction(
+                            state,
+                            super::server::UpdateServerOptions {
+                                image: Some(image),
+                                ..Default::default()
+                            },
+                            transaction,
+                        )
+                        .await?;
+                }
+            }
+        }
+
+        if !variables.is_empty() {
+            let existing_variables = ServerVariable::all_by_server_uuid_egg_uuid(
+                &state.database,
+                server.uuid,
+                server.egg.uuid,
+            )
+            .await?;
+
+            let mut validator_variables = HashMap::new();
+            for variable in existing_variables.iter() {
+                validator_variables.insert(
+                    variable.variable.env_variable.as_str(),
+                    (
+                        variable.variable.rules.as_slice(),
+                        if let Some(value) = variables
+                            .iter()
+                            .find(|v| v.0 == variable.variable.env_variable)
+                            && variable.variable.user_editable
+                            && let Some(value) = value.1.as_str()
+                        {
+                            value
+                        } else {
+                            variable.value.as_str()
+                        },
+                    ),
+                );
+            }
+
+            let validator = match rule_validator::Validator::new(validator_variables) {
+                Ok(validator) => validator,
+                Err(error) => {
+                    return Err(crate::response::DisplayError::new(error)
+                        .with_status(StatusCode::EXPECTATION_FAILED)
+                        .into());
+                }
+            };
+            if let Err(error) = validator.validate() {
+                return Err(crate::response::DisplayError::new(error)
+                    .with_status(StatusCode::EXPECTATION_FAILED)
+                    .into());
+            }
+
+            for (env_var, value) in &variables {
+                let Some(value) = value.as_str() else {
+                    continue;
+                };
+                let variable_uuid = match existing_variables
+                    .iter()
+                    .find(|v| v.variable.env_variable == env_var)
+                {
+                    Some(variable) if variable.variable.user_editable => variable.variable.uuid,
+                    _ => continue,
+                };
+
+                ServerVariable::create_with_transaction(
+                    transaction,
+                    server.uuid,
+                    variable_uuid,
+                    value,
+                )
+                .await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub async fn wings_restore_download_url(
+        &self,
+        state: &crate::State,
+        server_uuid: uuid::Uuid,
+    ) -> Result<Option<compact_str::CompactString>, anyhow::Error> {
+        if !matches!(self.disk, BackupDisk::S3) {
+            return Ok(None);
+        }
+
+        let backup_configuration = self
+            .backup_configuration
+            .as_ref()
+            .ok_or_else(|| {
+                crate::response::DisplayError::new(
+                    "no backup configuration available, unable to restore backup",
+                )
+                .with_status(StatusCode::EXPECTATION_FAILED)
+            })?
+            .fetch_cached(&state.database)
+            .await?;
+
+        let Some(mut s3_configuration) = backup_configuration.backup_configs.s3 else {
+            return Ok(None);
+        };
+
+        s3_configuration.decrypt(&state.database).await?;
+
+        let compression_type = s3_configuration.compression_type;
+        let (client, bucket) = s3_configuration.into_client();
+
+        let file_path = match &self.upload_path {
+            Some(path) => path.as_str(),
+            None => &Self::s3_path(server_uuid, self.uuid, compression_type),
+        };
+
+        let presigning_config = aws_sdk_s3::presigning::PresigningConfig::expires_in(
+            std::time::Duration::from_mins(60),
+        )?;
+        let presigned = client
+            .get_object()
+            .bucket(bucket)
+            .key(file_path)
+            .presigned(presigning_config)
+            .await?;
+
+        Ok(Some(presigned.uri().to_compact_string()))
+    }
+
+    pub async fn export(
+        &self,
+        state: &crate::State,
+        server: &super::server::Server,
+        path: compact_str::CompactString,
+        archive_format: wings_api::StreamableArchiveFormat,
+        foreground: bool,
+    ) -> Result<wings_api::backups_backup_export::post::Response, anyhow::Error> {
+        let backup_configuration = self
+            .backup_configuration
+            .as_ref()
+            .ok_or_else(|| {
+                crate::response::DisplayError::new(
+                    "no backup configuration available, unable to export backup",
+                )
+                .with_status(StatusCode::EXPECTATION_FAILED)
+            })?
+            .fetch_cached(&state.database)
+            .await?;
+
+        if backup_configuration.maintenance_enabled {
+            return Err(crate::response::DisplayError::new(
+                "cannot export backup while backup configuration is in maintenance mode",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
+        let client = server
+            .node
+            .fetch_cached(&state.database)
+            .await?
+            .api_client(&state.database)
+            .await?;
+
+        match client
+            .post_backups_backup_export(
+                self.uuid,
+                &wings_api::backups_backup_export::post::RequestBody {
+                    adapter: self.disk.to_wings_adapter(),
+                    server: server.uuid,
+                    path,
+                    archive_format,
+                    foreground,
+                },
+            )
+            .await
+        {
+            Ok(response) => Ok(response),
+            Err(wings_api::client::ApiHttpError::Http(
+                status @ (StatusCode::NOT_FOUND | StatusCode::EXPECTATION_FAILED),
+                err,
+            )) => Err(crate::response::DisplayError::new(
+                crate::ApiError::new_wings_value(err).to_string(),
+            )
+            .with_status(status)
+            .into()),
+            Err(err) => Err(err.into()),
+        }
+    }
+
+    pub async fn query(
+        &self,
+        state: &crate::State,
+        node: &super::node::Node,
+    ) -> Result<wings_api::backups_backup_query::get::Response, anyhow::Error> {
+        let client = node.api_client(&state.database).await?;
+
+        match client
+            .get_backups_backup_query(
+                self.uuid,
+                &wings_api::backups_backup_query::get::Query {
+                    adapter: Some(self.disk.to_wings_adapter()),
+                    __priv: (),
+                },
+            )
+            .await
+        {
+            Ok(response) => Ok(response),
+            Err(wings_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, err)) => {
+                Err(crate::response::DisplayError::new(
+                    crate::ApiError::new_wings_value(err).to_string(),
+                )
+                .with_status(StatusCode::NOT_FOUND)
+                .into())
+            }
+            Err(err) => Err(err.into()),
+        }
     }
 
     pub async fn delete_oldest_by_server_uuid(

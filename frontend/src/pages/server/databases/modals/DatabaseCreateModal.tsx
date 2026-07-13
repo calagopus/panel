@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -11,6 +12,7 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { databaseHostSchema } from '@/lib/schemas/generic.ts';
 import { serverDatabaseCreateSchema } from '@/lib/schemas/server/databases.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
@@ -21,8 +23,8 @@ import { useServerStore } from '@/stores/server.ts';
 export default function DatabaseCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const server = useServerStore((state) => state.server);
-  const addDatabase = useServerStore((state) => state.addDatabase);
+  const { server } = useServerStore();
+  const queryClient = useQueryClient();
 
   const [databaseHosts, setDatabaseHosts] = useState<z.infer<typeof databaseHostSchema>[]>([]);
 
@@ -33,9 +35,9 @@ export default function DatabaseCreateModal({ ...props }: ModalProps) {
     validate: zod4Resolver(serverDatabaseCreateSchema),
     onClose: props.onClose,
     onSubmit: async (values) => {
-      const database = await createDatabase(server.uuid, values);
+      await createDatabase(server.uuid, values);
       addToast(t('pages.server.databases.modal.createDatabase.toast.created', {}), 'success');
-      addDatabase(database);
+      queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).databases.all() });
     },
   });
 

@@ -62,11 +62,13 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
   const items = useMemo<ContextMenuItem[]>(
     () => [
       {
+        type: 'action',
         icon: faFileArrowDown,
         label: t('common.button.download', {}),
         hidden: !!actingMode,
         color: 'gray',
         items: Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
+          type: 'action',
           icon: faFileArrowDown,
           label: t('common.button.downloadAs', { format: label }),
           onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
@@ -75,6 +77,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         canAccess: canReadContent,
       },
       {
+        type: 'action',
         icon: faClone,
         label: t('pages.server.files.button.remoteCopy', {}),
         hidden: !!actingMode,
@@ -86,6 +89,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         canAccess: canRead,
       },
       {
+        type: 'action',
         icon: faCopy,
         label: t('pages.server.files.button.copy', {}),
         hidden: !!actingMode,
@@ -98,6 +102,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         canAccess: canCreate,
       },
       {
+        type: 'action',
         icon: faFileZipper,
         label: t('pages.server.files.button.archive', {}),
         hidden: !!actingMode || !browsingWritableDirectory,
@@ -109,6 +114,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         canAccess: canArchive,
       },
       {
+        type: 'action',
         icon: faPen,
         label: t('pages.server.files.button.rename', {}),
         hidden: !!actingMode || !browsingWritableDirectory,
@@ -120,6 +126,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         canAccess: canUpdate,
       },
       {
+        type: 'action',
         icon: faAnglesUp,
         label: t('common.button.move', {}),
         hidden: !!actingMode || !browsingWritableDirectory,
@@ -132,6 +139,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         canAccess: canUpdate,
       },
       {
+        type: 'action',
         icon: faTrash,
         label: t('common.button.delete', {}),
         hidden: !!actingMode || !browsingWritableDirectory,

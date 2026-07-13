@@ -22,10 +22,19 @@ pub type GetMount = shared::extract::ConsumingExtension<Mount>;
 pub async fn auth(
     state: GetState,
     permissions: GetPermissionManager,
-    Path(mount): Path<uuid::Uuid>,
+    Path(mount): Path<Vec<String>>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
+    let mount = match mount.first().map(|s| s.parse::<uuid::Uuid>()) {
+        Some(Ok(id)) => id,
+        _ => {
+            return Ok(ApiResponse::error("invalid mount uuid")
+                .with_status(StatusCode::BAD_REQUEST)
+                .into_response());
+        }
+    };
+
     if let Err(err) = permissions.has_admin_permission("mounts.read") {
         return Ok(err.into_response());
     }

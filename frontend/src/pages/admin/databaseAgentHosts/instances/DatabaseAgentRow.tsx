@@ -1,0 +1,50 @@
+import { z } from 'zod';
+import Code from '@/elements/Code.tsx';
+import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import { TableData, TableRow } from '@/elements/Table.tsx';
+import TableLink from '@/elements/TableLink.tsx';
+import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
+import { adminServerDatabaseAgentSchema } from '@/lib/schemas/admin/servers.ts';
+
+export default function DatabaseAgentRow({
+  databaseAgent,
+}: {
+  databaseAgent: z.infer<typeof adminServerDatabaseAgentSchema>;
+}) {
+  const host = databaseAgent.host ? `${databaseAgent.host}${databaseAgent.port ? `:${databaseAgent.port}` : ''}` : null;
+
+  return (
+    <TableRow>
+      <TableData>{databaseAgent.name}</TableData>
+
+      <TableData>
+        <TableLink to={`/admin/servers/${databaseAgent.server.uuid}`}>
+          <Code>{databaseAgent.server.name}</Code>
+        </TableLink>
+      </TableData>
+
+      <TableData>{databaseAgentTypeLabelMapping[databaseAgent.type]}</TableData>
+
+      <TableData>
+        {host ? (
+          <CopyOnClick content={host}>
+            <Code>{host}</Code>
+          </CopyOnClick>
+        ) : null}
+      </TableData>
+
+      <TableData>
+        {databaseAgent.databaseAgentTemplate ? (
+          <TableLink to={`/admin/database-agent-templates/${databaseAgent.databaseAgentTemplate.uuid}`}>
+            <Code>{databaseAgent.databaseAgentTemplate.name}</Code>
+          </TableLink>
+        ) : null}
+      </TableData>
+
+      <TableData>
+        <FormattedTimestamp timestamp={databaseAgent.created} />
+      </TableData>
+    </TableRow>
+  );
+}

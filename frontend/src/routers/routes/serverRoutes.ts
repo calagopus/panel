@@ -15,6 +15,7 @@ import { lazy } from 'react';
 import type { ServerRouteDefinition } from 'shared';
 import ServerActivity from '@/pages/server/activity/ServerActivity.tsx';
 import ServerBackups from '@/pages/server/backups/ServerBackups.tsx';
+import DatabaseInstanceView from '@/pages/server/databases/instances/DatabaseInstanceView.tsx';
 import ServerDatabases from '@/pages/server/databases/ServerDatabases.tsx';
 import ServerFilesEditor from '@/pages/server/files/FileEditor.tsx';
 import FileRevisionDiff from '@/pages/server/files/FileRevisionDiff.tsx';
@@ -63,7 +64,13 @@ const routes: ServerRouteDefinition[] = [
     icon: faDatabase,
     path: '/databases',
     element: ServerDatabases,
-    permission: 'databases.read',
+    permission: ['databases.read', 'database-instances.read'],
+  },
+  {
+    name: undefined,
+    path: '/databases/instances/:id',
+    element: DatabaseInstanceView,
+    permission: 'database-instances.read',
   },
   {
     name: () => getTranslations().t('pages.server.schedules.title', {}),

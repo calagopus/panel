@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import updateWebauthnSettings from '@/api/admin/settings/updateWebauthnSettings.ts';
@@ -7,15 +5,16 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { isIP } from '@/lib/ip.ts';
 import { adminSettingsWebauthnSchema } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
+
+type WebauthnFormValues = z.infer<typeof adminSettingsWebauthnSchema>;
 
 export default function WebauthnContainer() {
   const { addToast } = useToast();
@@ -26,19 +25,17 @@ export default function WebauthnContainer() {
   const [openModal, setOpenModal] = useState<'changeRpId' | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof adminSettingsWebauthnSchema>>({
+  const form = useFormEngine<WebauthnFormValues>('admin.settings.webauthn', {
+    schema: adminSettingsWebauthnSchema,
     initialValues: {
       rpId: '',
       rpOrigin: '',
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminSettingsWebauthnSchema),
   });
 
   useEffect(() => {
-    form.setValues({
-      ...webauthn,
-    });
+    form.setValues({ ...webauthn });
   }, [webauthn]);
 
   const doUpdate = () => {
@@ -48,9 +45,7 @@ export default function WebauthnContainer() {
         addToast(t('pages.admin.settings.tabs.webauthn.page.toast.updated', {}), 'success');
         updateSettings({ webauthn: adminSettingsWebauthnSchema.parse(form.getValues()) });
       })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
+      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
       .finally(() => setLoading(false));
   };
 
@@ -59,12 +54,26 @@ export default function WebauthnContainer() {
       addToast(t('pages.admin.settings.tabs.webauthn.page.toast.ipNotAllowed', {}), 'error');
       return;
     }
-
     form.setValues({
       rpId: window.location.hostname.split('.').slice(-2).join('.'),
       rpOrigin: window.location.origin,
     });
   };
+
+  const fields: FieldDef<WebauthnFormValues>[] = [
+    {
+      type: 'text',
+      name: 'rpId',
+      label: t('pages.admin.settings.tabs.webauthn.page.form.rpId', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'rpOrigin',
+      label: t('pages.admin.settings.tabs.webauthn.page.form.rpOrigin', {}),
+      required: true,
+    },
+  ];
 
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.webauthn.page.title', {})} titleOrder={2}>
@@ -84,22 +93,7 @@ export default function WebauthnContainer() {
       <form
         onSubmit={form.onSubmit(() => (form.values.rpId !== webauthn.rpId ? setOpenModal('changeRpId') : doUpdate()))}
       >
-        <Stack>
-          <Group grow>
-            <TextInput
-              withAsterisk
-              label={t('pages.admin.settings.tabs.webauthn.page.form.rpId', {})}
-              key={form.key('rpId')}
-              {...form.getInputProps('rpId')}
-            />
-            <TextInput
-              withAsterisk
-              label={t('pages.admin.settings.tabs.webauthn.page.form.rpOrigin', {})}
-              key={form.key('rpOrigin')}
-              {...form.getInputProps('rpOrigin')}
-            />
-          </Group>
-        </Stack>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action='settings.update' cantSave>

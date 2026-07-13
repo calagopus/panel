@@ -5,7 +5,7 @@ export const userCommandSnippetSchema = z.object({
   name: z.string().min(1).max(31),
   eggs: z.uuid().array().max(100),
   command: z.string().min(1).max(1024),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const userCommandSnippetUpdateSchema = z.lazy(() =>

@@ -74,6 +74,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
     <ContextMenu
       items={[
         {
+          type: 'action',
           icon: faWindowRestore,
           label: t('pages.server.files.button.openInNewWindow', {}),
           hidden: !finePointer.matches || !openMode.openable,
@@ -122,6 +123,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
           canAccess: canReadContent,
         },
         {
+          type: 'action',
           icon: faFilePen,
           label: t('pages.server.files.button.rename', {}),
           hidden: !browsingWritableDirectory,
@@ -129,6 +131,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
           canAccess: canUpdate,
         },
         {
+          type: 'action',
           icon: faCopy,
           label: t('pages.server.files.button.copy', {}),
           hidden: !browsingWritableDirectory || (!file.file && !file.directory),
@@ -137,6 +140,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
           canAccess: canCreate,
         },
         {
+          type: 'action',
           icon: faAnglesUp,
           label: t('common.button.move', {}),
           hidden: !browsingWritableDirectory,
@@ -146,6 +150,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
         },
         isArchiveType(file)
           ? {
+              type: 'action',
               icon: faEnvelopesBulk,
               label: t('pages.server.files.button.unarchive', {}),
               hidden: !browsingWritableDirectory,
@@ -154,6 +159,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
               canAccess: canArchive,
             }
           : {
+              type: 'action',
               icon: faFileZipper,
               label: t('pages.server.files.button.archive', {}),
               hidden: !browsingWritableDirectory,
@@ -162,12 +168,17 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
               canAccess: canArchive,
             },
         {
+          type: 'divider',
+        },
+        {
+          type: 'action',
           icon: faFileArrowDown,
           label: t('common.button.download', {}),
           onClick: file.file ? () => doDownload('tar_gz') : undefined,
           color: 'gray',
           items: file.directory
             ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
+                type: 'action',
                 icon: faFileArrowDown,
                 label: t('common.button.downloadAs', { format: label }),
                 onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
@@ -177,17 +188,20 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
           canAccess: canReadContent,
         },
         {
+          type: 'action',
           icon: faListDots,
           label: t('pages.server.files.button.more', {}),
           color: 'gray',
           items: [
             {
+              type: 'action',
               icon: faInfoCircle,
               label: t('common.button.details', {}),
               onClick: () => store.getState().doOpenModal('details', [file]),
               color: 'gray',
             },
             {
+              type: 'action',
               icon: faFingerprint,
               label: t('pages.server.files.button.fingerprint', {}),
               hidden: !file.file,
@@ -196,6 +210,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
               canAccess: canReadContent,
             },
             {
+              type: 'action',
               icon: faFileShield,
               label: t('pages.server.files.button.permissions', {}),
               onClick: () => store.getState().doOpenModal('permissions', [file]),
@@ -205,6 +220,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
           ],
         },
         {
+          type: 'action',
           icon: faTrash,
           label: t('common.button.delete', {}),
           hidden: !browsingWritableDirectory,

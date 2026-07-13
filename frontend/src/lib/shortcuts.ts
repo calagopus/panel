@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { type LazyString, resolveString } from '@/lib/lazy.ts';
 
 export type ModifierKey = 'ctrl' | 'meta' | 'shift' | 'alt' | 'ctrlOrMeta';
 
@@ -16,7 +17,7 @@ export interface ShortcutCategory {
 export interface ShortcutDefinition {
   id: string;
   category: string;
-  description: string | (() => string);
+  description: LazyString;
   defaultBinding: ShortcutBinding | null;
   allowWhenInputFocused?: boolean;
   preventDefault?: boolean;
@@ -156,7 +157,7 @@ export function eventMatchesBinding(event: KeyboardEvent, binding: ShortcutBindi
 }
 
 export function shortcutDescription(definition: ShortcutDefinition): string {
-  return typeof definition.description === 'function' ? definition.description() : definition.description;
+  return resolveString(definition.description);
 }
 
 export function effectiveBinding(

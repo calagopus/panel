@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { adminServerFeatureLimitsSchema, adminServerLimitsSchema } from '@/lib/schemas/admin/servers.ts';
+import { adminServerFeatureLimitsSchema } from '@/lib/schemas/admin/servers.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { eggConfigurationRouteItemSchema } from '../generic.ts';
 
@@ -13,6 +13,13 @@ export const serverPowerAction = z.enum(['start', 'stop', 'restart', 'kill']);
 
 export const serverBackupStatus = z.enum(['starting', 'finished', 'failed']);
 
+export const serverLimitsSchema = z.object({
+  cpu: z.number().min(0),
+  memory: z.number().min(0),
+  swap: z.number().min(-1),
+  disk: z.number().min(0),
+});
+
 export const serverEggSchema = z.object({
   uuid: z.string(),
   name: z.string(),
@@ -21,7 +28,7 @@ export const serverEggSchema = z.object({
   separatePort: z.boolean(),
   features: z.array(z.string()),
   dockerImages: z.record(z.string(), z.string()),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const serverEggConfigurationSchema = z.object({
@@ -52,7 +59,7 @@ export const serverSchema = z.object({
   sftpPort: z.number().int().min(1).max(65535),
   name: z.string(),
   description: z.string().nullable(),
-  limits: z.lazy(() => adminServerLimitsSchema),
+  limits: z.lazy(() => serverLimitsSchema),
   featureLimits: z.lazy(() => adminServerFeatureLimitsSchema),
   startup: z.string(),
   image: z.string(),

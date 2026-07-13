@@ -99,12 +99,14 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faCopy,
             label: t('pages.admin.assets.button.copyLink', {}),
             onClick: () => handleRawCopyToClipboard(asset.url, addToast),
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             onClick: () => setOpenModal('delete'),

@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 export const databaseType = z.enum(['mysql', 'postgres', 'mongodb']);
 
+export const databaseAgentType = z.enum(['postgres', 'mariadb', 'mongodb', 'redis']);
+
 export const databaseHostSchema = z.object({
   uuid: z.string(),
   name: z.string(),

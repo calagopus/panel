@@ -8,7 +8,7 @@ export const serverAllocationSchema = z.object({
   port: z.number(),
   notes: z.string().nullable(),
   isPrimary: z.boolean(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const serverAllocationsEditSchema = z.object({

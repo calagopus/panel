@@ -10,6 +10,36 @@ use std::{
 use utoipa::ToSchema;
 use zip::write::FileOptions;
 
+pub const MINIMUM_PANEL_VERSION: semver::Version = semver::Version::new(1, 1, 0);
+
+#[derive(Debug)]
+pub enum PanelVersionError {
+    Incompatible {
+        required: semver::VersionReq,
+        current: semver::Version,
+    },
+    AllowsOutdated {
+        required: semver::VersionReq,
+    },
+}
+
+impl std::fmt::Display for PanelVersionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Incompatible { required, current } => write!(
+                f,
+                "requires panel version {required} but the current panel version ({current}) is incompatible"
+            ),
+            Self::AllowsOutdated { required } => write!(
+                f,
+                "declares panel version requirement {required} which allows panel versions older than {MINIMUM_PANEL_VERSION}"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for PanelVersionError {}
+
 #[derive(Clone, ToSchema, Deserialize, Serialize)]
 pub struct MetadataToml {
     pub package_name: String,
@@ -90,6 +120,53 @@ impl MetadataToml {
     #[inline]
     pub fn convert_identifier_to_package_name(identifier: &str) -> String {
         identifier.replace('_', ".")
+    }
+
+    /// Check the extension's `panel_version` requirement. Extensions whose requirement
+    /// admits panel versions older than [`MINIMUM_PANEL_VERSION`] are always declined;
+    /// compatibility with the current panel version is checked unless
+    /// `skip_compatibility` is set.
+    pub fn check_panel_version(&self, skip_compatibility: bool) -> Result<(), PanelVersionError> {
+        let excludes_outdated = self.panel_version.comparators.iter().any(|comparator| {
+            let lower_bound = match comparator.op {
+                semver::Op::Exact
+                | semver::Op::Greater
+                | semver::Op::GreaterEq
+                | semver::Op::Tilde
+                | semver::Op::Caret
+                | semver::Op::Wildcard => semver::Version {
+                    major: comparator.major,
+                    minor: comparator.minor.unwrap_or(0),
+                    patch: comparator.patch.unwrap_or(0),
+                    pre: comparator.pre.clone(),
+                    build: semver::BuildMetadata::EMPTY,
+                },
+                _ => return false,
+            };
+
+            lower_bound >= MINIMUM_PANEL_VERSION
+        });
+
+        if !excludes_outdated {
+            return Err(PanelVersionError::AllowsOutdated {
+                required: self.panel_version.clone(),
+            });
+        }
+
+        if !skip_compatibility {
+            let current: semver::Version = crate::VERSION
+                .parse()
+                .expect("CARGO_PKG_VERSION is valid semver");
+
+            if !self.panel_version.matches(&current) {
+                return Err(PanelVersionError::Incompatible {
+                    required: self.panel_version.clone(),
+                    current,
+                });
+            }
+        }
+
+        Ok(())
     }
 }
 

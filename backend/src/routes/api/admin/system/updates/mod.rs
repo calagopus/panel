@@ -1,6 +1,7 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod database_agent_hosts;
 mod history;
 mod nodes;
 mod recheck;
@@ -38,6 +39,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .nest("/recheck", recheck::router(state))
         .nest("/nodes", nodes::router(state))
+        .nest("/database-agent-hosts", database_agent_hosts::router(state))
         .nest("/history", history::router(state))
         .with_state(state.clone())
 }

@@ -15,11 +15,15 @@ import ServerStatusIndicator from '@/elements/ServerStatusIndicator.tsx';
 import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
 import Sidebar from '@/elements/Sidebar.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import { resolveString } from '@/lib/lazy.ts';
 import { isAdmin } from '@/lib/permissions.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { to } from '@/lib/routes.ts';
+import { isConflictingState } from '@/lib/server.ts';
 import WebsocketHandler from '@/pages/server/WebsocketHandler.tsx';
 import WebsocketListener from '@/pages/server/WebsocketListener.tsx';
 import WebsocketStatusBanner from '@/pages/server/WebsocketStatusBanner.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -27,6 +31,7 @@ import ServerPermissionGuard from '@/routers/guards/ServerPermissionGuard.tsx';
 import serverRoutes from '@/routers/routes/serverRoutes.ts';
 import { useServerStore } from '@/stores/server.ts';
 import ServerStateGuard from './guards/ServerStateGuard.tsx';
+import ServerSelectorModal from './ServerSelectorModal.tsx';
 
 export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   const { t, language } = useTranslations();
@@ -47,6 +52,16 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
         setServerAnnouncements: state.setServerAnnouncements,
       })),
     );
+
+  const { data: announcements } = useResource({
+    queryKey: queryKeys.server(server.uuid).announcements.all(),
+    queryFn: () => getServerAnnouncements(server.uuid),
+    enabled: !!server.uuid && !isConflictingState(server, user),
+  });
+
+  useEffect(() => {
+    if (announcements) setServerAnnouncements(announcements);
+  }, [announcements]);
 
   const allServerRoutes = useMemo(() => {
     const routes = [...serverRoutes, ...window.extensionContext.extensionRegistry.routes.serverRoutes];
@@ -100,7 +115,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
   }, []);
 
   useEffect(() => {
-    if (params.id) {
+    if (params.id && params.id !== ':id') {
       setLoading(true);
       getServer(params.id)
         .then((data) => {
@@ -114,12 +129,6 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
             .catch((error) => {
               addToast(httpErrorToHuman(error), 'error');
             });
-
-          getServerAnnouncements(data.uuid)
-            .then(setServerAnnouncements)
-            .catch((error) => {
-              addToast(httpErrorToHuman(error), 'error');
-            });
         })
         .catch((error) => {
           addToast(httpErrorToHuman(error), 'error');
@@ -127,6 +136,10 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
         .finally(() => setLoading(false));
     }
   }, [params.id]);
+
+  if (params.id === ':id') {
+    return <ServerSelectorModal />;
+  }
 
   return (
     <div className='lg:flex h-full'>
@@ -194,7 +207,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
 
                   if (item.type === 'route') {
                     const { route } = item;
-                    const name = typeof route.name === 'function' ? route.name() : route.name!;
+                    const name = resolveString(route.name)!;
 
                     return route.permission ? (
                       <ServerCan key={route.path} action={route.permission} matchAny>

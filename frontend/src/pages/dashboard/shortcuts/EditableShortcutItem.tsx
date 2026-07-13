@@ -19,7 +19,13 @@ import Group from '@/elements/Group.tsx';
 import KbdKey from '@/elements/KbdKey.tsx';
 import Text from '@/elements/Text.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { bindingFromEvent, ModifierKey, ShortcutBinding, ShortcutDefinition } from '@/lib/shortcuts.ts';
+import {
+  bindingFromEvent,
+  ModifierKey,
+  ShortcutBinding,
+  ShortcutDefinition,
+  shortcutDescription,
+} from '@/lib/shortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
@@ -125,7 +131,7 @@ export default function EditableShortcutItem({
     >
       <Group gap={6} wrap='nowrap' className='min-w-0'>
         <Text size='sm' truncate>
-          {typeof definition.description === 'function' ? definition.description() : definition.description}
+          {shortcutDescription(definition)}
         </Text>
         {overridden && (
           <Badge size='xs' variant='light' color='blue' style={{ flexShrink: 0 }}>

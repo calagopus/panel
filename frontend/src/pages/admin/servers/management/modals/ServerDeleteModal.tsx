@@ -1,7 +1,7 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import deleteServer from '@/api/admin/servers/deleteServer.ts';
@@ -10,7 +10,8 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
@@ -30,7 +31,8 @@ export default function ServerDeleteModal({
   const [deleteDoDeleteBackups, setDeleteDoDeleteBackups] = useState(false);
   const [deleteServerName, setDeleteServerName] = useState('');
 
-  const doDelete = () => {
+  const doDelete = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
     deleteServer(server.uuid, {
       force: deleteDoForce,
@@ -49,7 +51,12 @@ export default function ServerDeleteModal({
 
   return (
     <>
-      <Modal title={t('pages.admin.servers.tabs.management.page.delete.modal.title', {})} {...props}>
+      <FormModal
+        title={t('pages.admin.servers.tabs.management.page.delete.modal.title', {})}
+        loading={loading}
+        {...props}
+        onSubmit={doDelete}
+      >
         <Stack>
           <Text size='sm'>
             {t('pages.admin.servers.tabs.management.page.delete.modal.description', { name: server.name }).md()}
@@ -89,14 +96,14 @@ export default function ServerDeleteModal({
         </Stack>
 
         <ModalFooter>
-          <Button color='red' disabled={server.name != deleteServerName} loading={loading} onClick={doDelete}>
+          <Button color='red' type='submit' disabled={server.name != deleteServerName} loading={loading}>
             {t('common.button.delete', {})}
           </Button>
           <Button variant='default' onClick={() => props.onClose()}>
             {t('common.button.cancel', {})}
           </Button>
         </ModalFooter>
-      </Modal>
+      </FormModal>
     </>
   );
 }

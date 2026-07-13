@@ -2,7 +2,6 @@ import { faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { load } from 'js-yaml';
 import { ChangeEvent, useRef, useState } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getSchedules from '@/api/server/schedules/getSchedules.ts';
 import importSchedule from '@/api/server/schedules/importSchedule.ts';
@@ -13,7 +12,7 @@ import ServerContentContainer from '@/elements/containers/ServerContentContainer
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -24,23 +23,23 @@ import ScheduleRow from './ScheduleRow.tsx';
 export default function ServerSchedules() {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const { server, schedules, setSchedules, addSchedule } = useServerStore(
-    useShallow((state) => ({
-      server: state.server,
-      schedules: state.schedules,
-      setSchedules: state.setSchedules,
-      addSchedule: state.addSchedule,
-    })),
-  );
+  const { server } = useServerStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: schedules,
+    loading,
+    error,
+    search,
+    setSearch,
+    setPage,
+    refetch,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).schedules.all(),
     fetcher: (page, search) => getSchedules(server.uuid, page, search),
-    setStoreData: setSchedules,
   });
 
   const handleImport = async (file: File) => {
@@ -58,8 +57,8 @@ export default function ServerSchedules() {
     }
 
     importSchedule(server.uuid, data)
-      .then((data) => {
-        addSchedule(data);
+      .then(() => {
+        refetch();
         addToast(t('pages.server.schedules.toast.imported', {}), 'success');
       })
       .catch((msg) => {
@@ -83,31 +82,34 @@ export default function ServerSchedules() {
   return (
     <ServerContentContainer
       title={t('pages.server.schedules.title', {})}
-      subtitle={t('pages.server.schedules.subtitle', { current: schedules.total, max: server.featureLimits.schedules })}
+      subtitle={t('pages.server.schedules.subtitle', {
+        current: schedules?.total ?? 0,
+        max: server.featureLimits.schedules,
+      })}
       search={search}
       setSearch={setSearch}
       contentRight={
         <>
           <ServerCan action='schedules.create'>
             <ConditionalTooltip
-              enabled={schedules.total >= server.featureLimits.schedules}
+              enabled={(schedules?.total ?? 0) >= server.featureLimits.schedules}
               label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
             >
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 color='blue'
-                disabled={schedules.total >= server.featureLimits.schedules}
+                disabled={(schedules?.total ?? 0) >= server.featureLimits.schedules}
               >
                 <FontAwesomeIcon icon={faUpload} className='mr-2' />
                 {t('common.button.import', {})}
               </Button>
             </ConditionalTooltip>
             <ConditionalTooltip
-              enabled={schedules.total >= server.featureLimits.schedules}
+              enabled={(schedules?.total ?? 0) >= server.featureLimits.schedules}
               label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
             >
               <Button
-                disabled={schedules.total >= server.featureLimits.schedules}
+                disabled={(schedules?.total ?? 0) >= server.featureLimits.schedules}
                 onClick={() => setOpenModal('create')}
                 color='blue'
                 leftSection={<FontAwesomeIcon icon={faPlus} />}
@@ -144,7 +146,7 @@ export default function ServerSchedules() {
         pagination={schedules}
         onPageSelect={setPage}
       >
-        {schedules.data.map((schedule) => (
+        {schedules?.data.map((schedule) => (
           <ScheduleRow key={schedule.uuid} schedule={schedule} />
         ))}
       </Table>

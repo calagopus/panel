@@ -1,7 +1,5 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createRole from '@/api/admin/roles/createRole.ts';
@@ -12,10 +10,8 @@ import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -26,6 +22,8 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
+type RoleFormValues = z.infer<typeof adminRoleUpdateSchema>;
+
 export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.infer<typeof roleSchema> }) {
   const { t } = useTranslations();
   const availablePermissions = useGlobalStore((state) => state.availablePermissions);
@@ -33,7 +31,8 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
-  const form = useForm<z.infer<typeof adminRoleUpdateSchema>>({
+  const form = useFormEngine<RoleFormValues>('admin.roles.createOrUpdate', {
+    schema: adminRoleUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
@@ -42,11 +41,10 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       serverPermissions: [],
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminRoleUpdateSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminRoleUpdateSchema>,
+    RoleFormValues,
     z.infer<typeof roleSchema>
   >({
     form,
@@ -73,12 +71,62 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
 
   useEffect(() => {
     setLoading(true);
-
     getPermissions().then((res) => {
       setAvailablePermissions(res);
       setLoading(false);
     });
   }, []);
+
+  const fields: FieldDef<RoleFormValues>[] = [
+    {
+      type: 'text',
+      name: 'name',
+      label: t('common.form.name', {}),
+      required: true,
+    },
+    {
+      type: 'textarea',
+      name: 'description',
+      label: t('common.form.description', {}),
+      rows: 3,
+    },
+    {
+      type: 'switch',
+      name: 'requireTwoFactor',
+      label: t('pages.admin.roles.tabs.general.page.form.requireTwoFactor', {}),
+      description: t('pages.admin.roles.tabs.general.page.form.requireTwoFactorDescription', {}),
+    },
+    {
+      type: 'custom',
+      name: 'serverPermissions',
+      colSpan: 'full',
+      when: () => !!availablePermissions?.serverPermissions,
+      render: (f) => (
+        <PermissionSelector
+          label={t('pages.admin.roles.tabs.general.page.form.serverPermissions', {})}
+          permissionsMapType='serverPermissions'
+          permissions={availablePermissions!.serverPermissions}
+          selectedPermissions={f.getValues().serverPermissions}
+          setSelectedPermissions={(permissions) => f.setFieldValue('serverPermissions', permissions)}
+        />
+      ),
+    },
+    {
+      type: 'custom',
+      name: 'adminPermissions',
+      colSpan: 'full',
+      when: () => !!availablePermissions?.adminPermissions,
+      render: (f) => (
+        <PermissionSelector
+          label={t('pages.admin.roles.tabs.general.page.form.adminPermissions', {})}
+          permissionsMapType='adminPermissions'
+          permissions={availablePermissions!.adminPermissions}
+          selectedPermissions={f.getValues().adminPermissions}
+          setSelectedPermissions={(permissions) => f.setFieldValue('adminPermissions', permissions)}
+        />
+      ),
+    },
+  ];
 
   return (
     <AdminContentContainer
@@ -112,49 +160,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.roles.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-
-          <TextArea
-            label={t('common.form.description', {})}
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
-
-          <Switch
-            label={t('pages.admin.roles.tabs.general.page.form.requireTwoFactor', {})}
-            description={t('pages.admin.roles.tabs.general.page.form.requireTwoFactorDescription', {})}
-            key={form.key('requireTwoFactor')}
-            {...form.getInputProps('requireTwoFactor', { type: 'checkbox' })}
-          />
-
-          {availablePermissions?.serverPermissions && (
-            <PermissionSelector
-              label={t('pages.admin.roles.tabs.general.page.form.serverPermissions', {})}
-              className='col-span-full'
-              permissionsMapType='serverPermissions'
-              permissions={availablePermissions.serverPermissions}
-              selectedPermissions={form.getValues().serverPermissions}
-              setSelectedPermissions={(permissions) => form.setFieldValue('serverPermissions', permissions)}
-            />
-          )}
-          {availablePermissions?.adminPermissions && (
-            <PermissionSelector
-              label={t('pages.admin.roles.tabs.general.page.form.adminPermissions', {})}
-              className='col-span-full'
-              permissionsMapType='adminPermissions'
-              permissions={availablePermissions.adminPermissions}
-              selectedPermissions={form.getValues().adminPermissions}
-              setSelectedPermissions={(permissions) => form.setFieldValue('adminPermissions', permissions)}
-            />
-          )}
-        </div>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextRole ? 'roles.update' : 'roles.create'} cantSave>

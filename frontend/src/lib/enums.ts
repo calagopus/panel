@@ -7,6 +7,7 @@ import {
   faChartPie,
   faCheckCircle,
   faCircleXmark,
+  faClockRotateLeft,
   faCloud,
   faCode,
   faCodeBranch,
@@ -15,6 +16,7 @@ import {
   faCompress,
   faComputer,
   faCopy,
+  faCubes,
   faDatabase,
   faDownload,
   faEarthAmerica,
@@ -56,7 +58,13 @@ import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfig
 import { adminEggConfigurationDeploymentSchema } from '@/lib/schemas/admin/eggConfigurations.ts';
 import { processConfigurationConfigParser } from '@/lib/schemas/admin/eggs.ts';
 import { adminSettingsEmailSchema, adminSettingsStorageSchema } from '@/lib/schemas/admin/settings.ts';
-import { compressionType, databaseType, streamingArchiveFormat, transferArchiveFormat } from '@/lib/schemas/generic.ts';
+import {
+  compressionType,
+  databaseAgentType,
+  databaseType,
+  streamingArchiveFormat,
+  transferArchiveFormat,
+} from '@/lib/schemas/generic.ts';
 import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
 import {
   serverScheduleComparator,
@@ -107,6 +115,20 @@ export const databaseTypeLabelMapping: Record<z.infer<typeof databaseType>, stri
   mysql: 'MySQL',
   postgres: 'PostgreSQL',
   mongodb: 'MongoDB',
+};
+
+export const databaseAgentTypeLabelMapping: Record<z.infer<typeof databaseAgentType>, string> = {
+  postgres: 'PostgreSQL',
+  mariadb: 'MariaDB',
+  mongodb: 'MongoDB',
+  redis: 'Redis',
+};
+
+export const databaseAgentTypeDefaultPortMapping: Record<z.infer<typeof databaseAgentType>, number> = {
+  postgres: 5432,
+  mariadb: 3306,
+  mongodb: 27017,
+  redis: 6379,
 };
 
 export const announcementTypeLabelMapping: Record<z.infer<typeof announcementType>, () => string> = {
@@ -350,6 +372,7 @@ export const scheduleStepLabelMapping: Record<z.infer<typeof serverScheduleStepA
   send_power: () => getTranslations().t('pages.server.schedules.steps.sendPower.title', {}),
   send_command: () => getTranslations().t('pages.server.schedules.steps.sendCommand.title', {}),
   create_backup: () => getTranslations().t('pages.server.schedules.steps.createBackup.title', {}),
+  restore_backup: () => getTranslations().t('pages.server.schedules.steps.restoreBackup.title', {}),
   create_directory: () => getTranslations().t('pages.server.schedules.steps.createDirectory.title', {}),
   write_file: () => getTranslations().t('pages.server.schedules.steps.writeFile.title', {}),
   copy_file: () => getTranslations().t('pages.server.schedules.steps.copyFile.title', {}),
@@ -390,6 +413,7 @@ export const scheduleStepGroupMapping: Record<
   send_power: 'server',
   send_command: 'server',
   create_backup: 'server',
+  restore_backup: 'server',
   create_directory: 'files',
   write_file: 'files',
   copy_file: 'files',
@@ -420,6 +444,7 @@ export const scheduleStepDescriptionMapping: Record<
   send_power: () => getTranslations().t('pages.server.schedules.steps.sendPower.description', {}),
   send_command: () => getTranslations().t('pages.server.schedules.steps.sendCommand.description', {}),
   create_backup: () => getTranslations().t('pages.server.schedules.steps.createBackup.description', {}),
+  restore_backup: () => getTranslations().t('pages.server.schedules.steps.restoreBackup.description', {}),
   create_directory: () => getTranslations().t('pages.server.schedules.steps.createDirectory.description', {}),
   write_file: () => getTranslations().t('pages.server.schedules.steps.writeFile.description', {}),
   copy_file: () => getTranslations().t('pages.server.schedules.steps.copyFile.description', {}),
@@ -507,6 +532,13 @@ export const scheduleStepDefaultMapping: Record<
     name: null,
     ignoredFiles: [],
   },
+  restore_backup: {
+    type: 'restore_backup',
+    ignoreFailure: false,
+    truncateDirectory: false,
+    restoreStartup: false,
+    backup: { mode: 'latest' },
+  },
   create_directory: {
     type: 'create_directory',
     ignoreFailure: false,
@@ -588,6 +620,7 @@ export const scheduleStepIconMapping: Record<z.infer<typeof serverScheduleStepAc
   send_power: faPowerOff,
   send_command: faTerminal,
   create_backup: faDatabase,
+  restore_backup: faClockRotateLeft,
   create_directory: faFolder,
   write_file: faFile,
   copy_file: faCopy,
@@ -619,6 +652,9 @@ export const permissionCategoryIconMapping: Record<string, IconDefinition> = {
   announcements: faBullhorn,
   'database-hosts': faDatabase,
   databases: faDatabase,
+  'database-instances': faServer,
+  'database-agent-hosts': faServer,
+  'database-agent-templates': faCubes,
   eggs: faEgg,
   assets: faFolderOpen,
   extensions: faPuzzlePiece,

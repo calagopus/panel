@@ -12,11 +12,10 @@ import Card from '@/elements/Card.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
-import Spinner from '@/elements/Spinner.tsx';
 import Table, { TableHeaderProps } from '@/elements/Table.tsx';
 import Title from '@/elements/Title.tsx';
 import { isOpenableFile } from '@/lib/files.ts';
-import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
+import { serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
 import FileActionBar from '@/pages/server/files/FileActionBar.tsx';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
 import FileDiskUsageBar from '@/pages/server/files/FileDiskUsageBar.tsx';
@@ -30,6 +29,7 @@ import FileSettings from '@/pages/server/files/FileSettings.tsx';
 import FileToolbar from '@/pages/server/files/FileToolbar.tsx';
 import FileUpload from '@/pages/server/files/FileUpload.tsx';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { FileManagerProvider } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -105,15 +105,11 @@ function ServerFilesComponent() {
   const preferPhysicalSize = useFileManagerStore((state) => state.preferPhysicalSize);
   const { doSelectFiles, doOpenModal, setSortMode, resetEntries } = store.getState();
 
-  const previousSelected = useRef<z.infer<typeof serverDirectoryEntrySchema>[]>([]);
-
-  const onSelectedStart = (event: React.MouseEvent | MouseEvent) => {
-    previousSelected.current = event.shiftKey ? store.getState().selectedFiles.values() : [];
-  };
-
-  const onSelected = (selected: z.infer<typeof serverDirectoryEntrySchema>[]) => {
-    doSelectFiles([...previousSelected.current, ...selected.values()]);
-  };
+  const { onSelectedStart, onSelected } = useSelectionArea({
+    identify: (file) => file.name,
+    getSelected: () => store.getState().selectedFiles.values(),
+    setSelected: doSelectFiles,
+  });
 
   const onPageSelect = (page: number) => setSearchParams({ directory: browsingDirectory, page: page.toString() });
 
@@ -328,48 +324,45 @@ function ServerFilesComponent() {
 
       <FileSearchBanner resetEntries={resetEntries} />
 
-      {isLoading ? (
-        <Spinner.Centered />
-      ) : (
-        <FileMassContextMenu>
-          {({ openMassMenu }) => (
-            <SelectionArea
-              onSelectedStart={onSelectedStart}
-              onSelected={onSelected}
-              fireEvents={false}
-              className='h-full'
-              disabled={actingFiles.size > 0}
+      <FileMassContextMenu>
+        {({ openMassMenu }) => (
+          <SelectionArea
+            onSelectedStart={onSelectedStart}
+            onSelected={onSelected}
+            fireEvents={false}
+            className='h-full'
+            disabled={actingFiles.size > 0}
+          >
+            <Table
+              columns={columns}
+              loading={isLoading}
+              pagination={browsingEntries}
+              error={browsingError}
+              onPageSelect={onPageSelect}
+              allowSelect={false}
             >
-              <Table
-                columns={columns}
-                pagination={browsingEntries}
-                error={browsingError}
-                onPageSelect={onPageSelect}
-                allowSelect={false}
-              >
-                {showParentDirectoryRow && <FileParentDirectoryRow />}
+              {showParentDirectoryRow && <FileParentDirectoryRow />}
 
-                {browsingEntries.data.map((entry) => (
-                  <SelectionArea.Selectable key={entry.name} item={entry}>
-                    {(innerRef: Ref<HTMLElement>) => (
-                      <FileRow
-                        ref={innerRef as Ref<HTMLTableRowElement>}
-                        file={entry}
-                        handleOpen={handleOpen}
-                        openMassMenu={openMassMenu}
-                        isSelected={selectedFiles.has(entry)}
-                        isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
-                        clickOnce={clickOnce}
-                        preferPhysicalSize={preferPhysicalSize}
-                      />
-                    )}
-                  </SelectionArea.Selectable>
-                ))}
-              </Table>
-            </SelectionArea>
-          )}
-        </FileMassContextMenu>
-      )}
+              {browsingEntries.data.map((entry) => (
+                <SelectionArea.Selectable key={entry.name} item={entry}>
+                  {(innerRef: Ref<HTMLElement>) => (
+                    <FileRow
+                      ref={innerRef as Ref<HTMLTableRowElement>}
+                      file={entry}
+                      handleOpen={handleOpen}
+                      openMassMenu={openMassMenu}
+                      isSelected={selectedFiles.has(entry)}
+                      isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
+                      clickOnce={clickOnce}
+                      preferPhysicalSize={preferPhysicalSize}
+                    />
+                  )}
+                </SelectionArea.Selectable>
+              ))}
+            </Table>
+          </SelectionArea>
+        )}
+      </FileMassContextMenu>
     </div>
   );
 }

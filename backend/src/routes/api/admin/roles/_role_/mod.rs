@@ -20,10 +20,19 @@ pub type GetRole = shared::extract::ConsumingExtension<Role>;
 pub async fn auth(
     state: GetState,
     permissions: GetPermissionManager,
-    Path(role): Path<uuid::Uuid>,
+    Path(role): Path<Vec<String>>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
+    let role = match role.first().map(|s| s.parse::<uuid::Uuid>()) {
+        Some(Ok(id)) => id,
+        _ => {
+            return Ok(ApiResponse::error("invalid role uuid")
+                .with_status(StatusCode::BAD_REQUEST)
+                .into_response());
+        }
+    };
+
     if let Err(err) = permissions.has_admin_permission("roles.read") {
         return Ok(err.into_response());
     }

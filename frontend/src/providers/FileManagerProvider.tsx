@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosRequestConfig } from 'axios';
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
@@ -33,11 +33,12 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const {
     data,
     error: directoryError,
-    isLoading,
+    isFetching,
   } = useQuery({
     queryKey: ['server', server.uuid, 'files', { browsingDirectory, page, sortMode }],
     queryFn: () => loadDirectory(server.uuid, browsingDirectory, page, sortMode),
     staleTime: 30_000,
+    placeholderData: keepPreviousData,
   });
 
   externalsRef.current = { serverUuid: server.uuid, queryClient, directoryData: data ?? null };
@@ -104,8 +105,8 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const fileUploader = useFileUpload(doUpload, onUploadComplete, doSplitUpload, getUploadTarget);
 
   useEffect(() => {
-    store.setState({ isLoading });
-  }, [isLoading]);
+    store.setState({ isLoading: isFetching });
+  }, [isFetching]);
 
   useEffect(() => {
     store.setState({ fileUploader });

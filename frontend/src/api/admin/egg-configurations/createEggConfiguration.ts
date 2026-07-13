@@ -1,17 +1,21 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminEggConfigurationSchema,
   adminEggConfigurationUpdateSchema,
 } from '@/lib/schemas/admin/eggConfigurations.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   eggConfigurationData: z.infer<typeof adminEggConfigurationUpdateSchema>,
 ): Promise<z.infer<typeof adminEggConfigurationSchema>> => {
   const { data } = await axiosInstance.post(
     '/api/admin/egg-configurations',
-    transformKeysToSnakeCase(eggConfigurationData),
+    serializeForApi(
+      adminEggConfigurationUpdateSchema,
+      eggConfigurationData,
+      formExtensionSchemas('admin.eggConfigurations.createOrUpdate'),
+    ),
   );
-  return data.eggConfiguration;
+  return parseFromApi(adminEggConfigurationSchema, data.egg_configuration);
 };

@@ -1,4 +1,12 @@
-import { faFileArrowDown, faInfo, faLink, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import {
+  faFileArrowDown,
+  faFileExport,
+  faInfo,
+  faLink,
+  faRotateLeft,
+  faTrash,
+  faWarning,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
@@ -26,6 +34,7 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeBackupsDeleteModal from './modals/NodeBackupsDeleteModal.tsx';
+import NodeBackupsExportModal from './modals/NodeBackupsExportModal.tsx';
 import NodeBackupsReattachModal from './modals/NodeBackupsReattachModal.tsx';
 import NodeBackupsRestoreModal from './modals/NodeBackupsRestoreModal.tsx';
 
@@ -39,7 +48,9 @@ export default function NodeBackupRow({
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [openModal, setOpenModal] = useState<'restore' | 'reattach' | 'detach' | 'delete' | 'metadata' | null>(null);
+  const [openModal, setOpenModal] = useState<
+    'restore' | 'export' | 'reattach' | 'detach' | 'delete' | 'metadata' | null
+  >(null);
   const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
@@ -74,6 +85,12 @@ export default function NodeBackupRow({
         node={node}
         backup={backup}
         opened={openModal === 'restore'}
+        onClose={() => setOpenModal(null)}
+      />
+      <NodeBackupsExportModal
+        node={node}
+        backup={backup}
+        opened={openModal === 'export'}
         onClose={() => setOpenModal(null)}
       />
       <NodeBackupsReattachModal
@@ -117,6 +134,7 @@ export default function NodeBackupRow({
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
             hidden: !backup.completed || isFailed,
@@ -124,6 +142,7 @@ export default function NodeBackupRow({
             color: 'gray',
             items: backup.isStreaming
               ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
+                  type: 'action',
                   icon: faFileArrowDown,
                   label: t('common.button.downloadAs', { format: label }),
                   onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
@@ -133,6 +152,7 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
             hidden: !backup.completed || isFailed,
@@ -141,6 +161,16 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
+            icon: faFileExport,
+            label: t('pages.server.backups.button.exportToFiles', {}),
+            hidden: !backup.completed || isFailed,
+            onClick: () => setOpenModal('export'),
+            color: 'gray',
+            canAccess: useAdminCan('nodes.backups'),
+          },
+          {
+            type: 'action',
             icon: faLink,
             label: t('common.button.reattach', {}),
             hidden: !backup.completed || isFailed,
@@ -149,6 +179,7 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faLink,
             label: t('common.button.detach', {}),
             hidden: !backup.completed || isFailed || !backup.server,
@@ -157,6 +188,7 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faInfo,
             label: t('pages.server.backups.modal.viewMetadata.title', {}),
             hidden: Object.keys(backup.metadata).length === 0,
@@ -164,6 +196,7 @@ export default function NodeBackupRow({
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faTrash,
             hidden: !backup.completed,
             label: t('common.button.delete', {}),

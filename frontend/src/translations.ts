@@ -16,6 +16,7 @@ const baseTranslations = defineTranslations({
     sshKey: defineEnglishItem('SSH Key', 'SSH Keys'),
     asset: defineEnglishItem('Asset', 'Assets'),
     node: defineEnglishItem('Node', 'Nodes'),
+    databaseAgentHost: defineEnglishItem('Database Agent Host', 'Database Agent Hosts'),
     allocation: defineEnglishItem('Node Allocation', 'Node Allocations'),
     egg: defineEnglishItem('Egg', 'Eggs'),
     shortcut: defineEnglishItem('Shortcut', 'Shortcuts'),
@@ -157,11 +158,13 @@ const baseTranslations = defineTranslations({
         nest: 'Nest',
         lines: 'Lines',
         databaseHost: 'Database Host',
+        databaseAgentHost: 'Database Agent Host',
         timezone: 'Timezone',
         timezoneSystem: 'System',
         protocol: 'Protocol',
         powerAction: 'Power Action',
         destination: 'Destination',
+        destinationDirectory: 'Destination Directory',
         directoryName: 'Directory Name',
         locked: 'Locked',
         portRanges: 'Port Ranges',
@@ -220,6 +223,7 @@ const baseTranslations = defineTranslations({
           server: 'Server',
           address: 'Address',
           eggs: 'Eggs',
+          template: 'Template',
         },
       },
       tabs: {
@@ -233,6 +237,9 @@ const baseTranslations = defineTranslations({
         successful: 'Successful',
         failed: 'Failed',
         installed: 'Installed',
+      },
+      label: {
+        noSubdirectories: 'No subdirectories',
       },
       server: {
         noAllocation: 'No Allocation',
@@ -411,6 +418,9 @@ const baseTranslations = defineTranslations({
           updated: '{resource} updated.',
           deleted: '{resource} deleted.',
         },
+      },
+      formEngine: {
+        advancedMode: 'Advanced mode',
       },
       activityInfoButton: {
         modal: {
@@ -1243,6 +1253,14 @@ const baseTranslations = defineTranslations({
                 removed: 'API key removed.',
               },
             },
+            apiKeyToken: {
+              titleCreated: 'API Key Created',
+              titleRecreated: 'API Key Recreated',
+              descriptionCreated:
+                'Your new API key has been created. Make sure to copy it now, as it will not be shown again.',
+              descriptionRecreated:
+                'Your API key has been recreated. Make sure to copy the new key now, as it will not be shown again.',
+            },
           },
           form: {
             allowedIps: 'Allowed IPs',
@@ -1354,6 +1372,7 @@ const baseTranslations = defineTranslations({
                   versionHistory: 'Version History',
                   outdatedExtensions: 'Outdated Extensions',
                   outdatedNodes: 'Outdated Nodes',
+                  outdatedDatabaseAgentHosts: 'Outdated Database Agent Hosts',
                 },
                 panelVersion:
                   'Your panel is currently running version `{current}`. The latest available version is `{latest}`.',
@@ -1369,6 +1388,10 @@ const baseTranslations = defineTranslations({
                 nodesUpToDate: 'Seems like all nodes are up to date. ({failed} failed to check)',
                 nodesOutdated:
                   'Some nodes are outdated, the latest available version is `{latest}`. ({outdated} outdated, {failed} failed to check)',
+                databaseAgentHostsUpToDate:
+                  'Seems like all database agent hosts are up to date. ({failed} failed to check)',
+                databaseAgentHostsOutdated:
+                  'Some database agent hosts are outdated, the latest available version is `{latest}`. ({outdated} outdated, {failed} failed to check)',
                 table: {
                   version: 'Version',
                   installed: 'Installed',
@@ -1627,6 +1650,8 @@ const baseTranslations = defineTranslations({
                   maxFileManagerContentSearchSize: 'Max File Manager Content Search Size',
                   maxFileManagerSearchResults: 'Max File Manager Search Results',
                   maxSubuserCount: 'Max Subuser Count',
+                  maxDatabaseInstanceDatabaseCount: 'Max Databases per Database Instance',
+                  maxDatabaseInstanceUserCount: 'Max Users per Database Instance',
                   allowOverwritingCustomDockerImage: 'Allow Overwriting Custom Docker Image',
                   allowOverwritingCustomDockerImageDescription:
                     'If enabled, users will be able to overwrite the Docker image specified in the server configuration using the Eggs list, even if an admin has set a custom Docker image.',
@@ -2012,6 +2037,25 @@ const baseTranslations = defineTranslations({
                 },
               },
             },
+            databaseAgentHosts: {
+              title: 'Database Agent Hosts',
+              page: {
+                title: 'Location Database Agent Hosts',
+                toast: {
+                  created: 'Location database agent host created.',
+                  deleted: 'Location database agent host deleted.',
+                },
+                modal: {
+                  create: {
+                    title: 'Create Location Database Agent Host',
+                  },
+                  delete: {
+                    title: 'Confirm Location Database Agent Host Deletion',
+                    content: 'Are you sure you want to delete the database agent host **{name}** from **{location}**?',
+                  },
+                },
+              },
+            },
             nodes: {
               title: 'Nodes',
               page: {
@@ -2024,6 +2068,37 @@ const baseTranslations = defineTranslations({
           title: 'Nodes',
           resourceName: 'Node',
           tabs: {
+            overview: {
+              title: 'Overview',
+              page: {
+                title: 'Node Overview',
+                card: {
+                  nodeDetails: 'Node Details',
+                  systemInfo: 'System Information',
+                },
+                label: {
+                  location: 'Location',
+                  url: 'Internal URL',
+                  publicUrl: 'Public URL',
+                  sftpAddress: 'SFTP Address',
+                  backupConfiguration: 'Backup Configuration',
+                  description: 'Description',
+                  createdAt: 'Created',
+                  inheritedFromLocation: 'Inherited from Location',
+                  none: 'None',
+                  wingsVersion: 'Wings Version',
+                  cpu: 'CPU',
+                  memory: 'Memory',
+                  servers: 'Servers',
+                  architecture: 'Architecture',
+                  kernelVersion: 'Kernel Version',
+                  unavailable: 'Unavailable',
+                },
+                badge: {
+                  updateAvailable: 'Update Available',
+                },
+              },
+            },
             general: {
               page: {
                 tooltip: {
@@ -2242,9 +2317,13 @@ const baseTranslations = defineTranslations({
                   detached: 'Backup detached successfully.',
                   reattached: 'Reattached backup to {name} successfully.',
                   restoring: 'Restoring backup to {name}...',
+                  exporting: 'Exporting backup to files of {name}...',
                   deleted: 'Node backup deleted.',
                 },
                 modal: {
+                  export: {
+                    title: 'Export Node Backup to Files',
+                  },
                   detach: {
                     title: 'Confirm Backup Detachment',
                     content:
@@ -2369,6 +2448,58 @@ const baseTranslations = defineTranslations({
             },
           },
           tabs: {
+            overview: {
+              title: 'Overview',
+              page: {
+                title: 'Server Overview',
+                card: {
+                  owner: 'Owner',
+                  nodeAndLocation: 'Node & Location',
+                  serverDetails: 'Server Details',
+                  resourceLimits: 'Resource Limits',
+                  featureLimits: 'Feature Limits',
+                },
+                label: {
+                  email: 'Email',
+                  language: 'Language',
+                  createdAt: 'Created',
+                  node: 'Node',
+                  location: 'Location',
+                  memoryLimit: 'Memory Limit',
+                  diskLimit: 'Disk Limit',
+                  sftpAddress: 'SFTP Address',
+                  primaryAllocation: 'Primary Allocation',
+                  none: 'None',
+                  dockerImage: 'Docker Image',
+                  nest: 'Nest',
+                  egg: 'Egg',
+                  timezone: 'Timezone',
+                  autoKill: 'Auto-Kill',
+                  cpu: 'CPU',
+                  memory: 'Memory',
+                  disk: 'Disk',
+                  swap: 'Swap',
+                  allocations: 'Allocations',
+                  databases: 'Databases',
+                  databaseAgents: 'Agent Databases',
+                  backups: 'Backups',
+                  schedules: 'Schedules',
+                  unlimited: 'Unlimited',
+                  autoKillSeconds: '{seconds}s',
+                  autoKillDisabled: 'Disabled',
+                  externalId: 'External ID',
+                  uuid: 'UUID',
+                },
+                badge: {
+                  suspended: 'Suspended',
+                  transferring: 'Transferring',
+                  installing: 'Installing',
+                  installFailed: 'Install Failed',
+                  restoringBackup: 'Restoring Backup',
+                  admin: 'Admin',
+                },
+              },
+            },
             general: {
               page: {
                 titleCreate: 'Create Server',
@@ -2397,21 +2528,25 @@ const baseTranslations = defineTranslations({
                   egg: 'Egg',
                   backupConfigurationPlaceholder: 'Inherit from Node/Location',
                   cpuLimit: 'CPU Limit (%)',
-                  cpuLimitDescription: 'The CPU limit in % that the server can use, 1 thread = 100%.',
+                  cpuLimitDescription: 'The CPU limit in % that the server can use.',
+                  cpuLimitTooltip: '1 thread = 100%. 0 will not set a limit.',
                   swap: 'Swap',
-                  swapDescription: 'The amount of swap to give this server, -1 will not set a limit.',
-                  memoryDescription: 'The Memory limit of the server container, 0 will not set a limit.',
+                  swapDescription: 'The amount of swap to give this server.',
+                  swapTooltip: '-1 will not set a limit.',
+                  memoryDescription: 'The Memory limit of the server container.',
+                  memoryTooltip: '0 will not set a limit.',
                   memoryOverhead: 'Memory Overhead',
                   memoryOverheadDescription: 'Hidden Memory that will be added to the container.',
                   diskSpace: 'Disk Space',
-                  diskSpaceDescription:
-                    'The disk limit of the server. This is a soft-limit unless the disk limiter is configured on Wings.',
+                  diskSpaceDescription: 'The disk limit of the server.',
+                  diskSpaceTooltip:
+                    '0 will not set a limit. This is a soft-limit unless the disk limiter is configured on Wings.',
                   ioWeight: 'IO Weight',
-                  ioWeightDescription:
-                    'The relative IO Weight of the server container compared to other containers, 0-1000. May not work on all systems.',
+                  ioWeightDescription: 'The relative IO Weight of the server container compared to other containers.',
+                  ioWeightTooltip: '0-1000. May not work on all systems.',
                   pinnedCpus: 'Pinned CPUs',
-                  pinnedCpusDescription:
-                    'The CPU cores (by index, e.g. 0, 1, 2) this server is pinned to. Leave empty to allow all cores.',
+                  pinnedCpusDescription: 'The CPU cores this server is pinned to.',
+                  pinnedCpusTooltip: 'By index, e.g. 0, 1, 2. Leave empty to allow all cores.',
                   dockerImagePlaceholder: 'ghcr.io/...',
                   predefinedDockerImages: 'Predefined Docker Images',
                   predefinedDockerImagesPlaceholder: 'No predefined image selected',
@@ -2431,6 +2566,7 @@ const baseTranslations = defineTranslations({
                     'Enable KVM passthrough for the server (allows access to /dev/kvm inside the container).',
                   allocationsLimit: 'Allocations',
                   databasesLimit: 'Databases',
+                  databaseAgentsLimit: 'Agent Databases',
                   backupsLimit: 'Backups',
                   schedulesLimit: 'Schedules',
                 },
@@ -3002,6 +3138,11 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Database Host Deletion',
                     content: 'Are you sure you want to delete **{name}**?',
+                    form: {
+                      force: 'Force delete',
+                      forceWarning:
+                        'Force deletion removes all databases on this host. The databases on the host itself may not be fully cleaned up, leaving orphaned data behind.',
+                    },
                   },
                 },
               },
@@ -3010,6 +3151,226 @@ const baseTranslations = defineTranslations({
               title: 'Databases',
               page: {
                 title: 'Database Host Databases',
+              },
+            },
+          },
+        },
+        databaseAgentHosts: {
+          title: 'Database Agent Hosts',
+          resourceName: 'Database agent host',
+          tabs: {
+            general: {
+              page: {
+                titleCreate: 'Create Database Agent Host',
+                titleUpdate: 'Update Database Agent Host',
+                form: {
+                  typeEnabled: 'Enabled',
+                  typePublicHost: 'Public Host',
+                  typePublicPort: 'Public Port',
+                },
+                button: {
+                  resetToken: 'Reset Token',
+                  testConnection: 'Test Connection',
+                  updateConfig: 'Update Config',
+                },
+                toast: {
+                  tested: 'Test successfully completed.',
+                  tokenReset: 'Database agent host token reset.',
+                },
+                modal: {
+                  delete: {
+                    title: 'Confirm Database Agent Host Deletion',
+                    content: 'Are you sure you want to delete **{name}**?',
+                    form: {
+                      force: 'Force delete',
+                      forceWarning:
+                        'Force deletion removes all instances on this host. Instances the agent cannot be reached for may not be fully cleaned up, leaving orphaned data behind.',
+                    },
+                  },
+                },
+              },
+            },
+            instances: {
+              title: 'Instances',
+              page: {
+                title: 'Instances',
+              },
+            },
+            configuration: {
+              title: 'Configuration',
+              page: {
+                title: 'Configuration',
+                section: {
+                  initialSetup: 'Initial Setup',
+                  liveConfiguration: 'Live Configuration',
+                },
+                description: {
+                  placeFile: 'Place this into the configuration file at `/etc/calagopus-db-agent/config.yml` or run',
+                },
+                tooltip: {
+                  copyCommand: 'Copy command',
+                },
+                form: {
+                  apiPort: 'API Port',
+                },
+                button: {
+                  save: 'Save Configuration',
+                  reveal: 'Reveal Configuration',
+                },
+                alert: {
+                  couldNotReach: 'Could not reach the database agent host: {error}',
+                  tokenWarning: 'The configuration below contains the host token. Reveal it only when needed.',
+                },
+                toast: {
+                  applied: 'Configuration applied successfully.',
+                  submittedNotApplied: 'Configuration was submitted but not applied.',
+                  invalidYaml: 'Invalid YAML: {error}',
+                },
+              },
+            },
+            overview: {
+              title: 'Overview',
+              page: {
+                title: 'Database Agent Host Overview',
+                status: {
+                  deploymentEnabled: 'Deployment Enabled',
+                  deploymentDisabled: 'Deployment Disabled',
+                  maintenanceEnabled: 'Maintenance Enabled',
+                  maintenanceDisabled: 'Maintenance Disabled',
+                },
+                card: {
+                  hostDetails: 'Host Details',
+                  systemInfo: 'System Information',
+                  resources: 'Allocated Resources',
+                },
+                label: {
+                  url: 'URL',
+                  description: 'Description',
+                  createdAt: 'Created',
+                  version: 'Version',
+                  cpu: 'CPU',
+                  memory: 'Memory',
+                  disk: 'Disk',
+                  instances: 'Instances',
+                  kernelVersion: 'Kernel Version',
+                  architecture: 'Architecture',
+                  unavailable: 'Unavailable',
+                  noLimit: 'No host limit',
+                  free: '{size} free',
+                  cores: '{cores} cores allocated',
+                },
+                badge: {
+                  updateAvailable: 'Update Available',
+                },
+              },
+            },
+            statistics: {
+              title: 'Statistics',
+              page: {
+                title: 'Database Agent Host Statistics',
+                card: {
+                  resources: 'Resources',
+                  graphs: 'Graphs',
+                },
+                label: {
+                  cpu: 'CPU',
+                  cpuThreads: '{model} ({threads} threads)',
+                  memory: 'Memory',
+                  usedByAgent: '{size} used by the agent',
+                  disk: 'Disk',
+                  network: 'Network',
+                  networkIn: 'In: {in}',
+                  networkOut: 'Out: {out}',
+                },
+                chart: {
+                  cpuLoad: 'CPU Load',
+                  memoryUsage: 'Memory Usage',
+                  diskIo: 'Disk I/O',
+                  diskRead: 'Disk Read',
+                  diskWrite: 'Disk Write',
+                  networkTraffic: 'Network Traffic',
+                  networkInLabel: 'Inbound',
+                  networkOutLabel: 'Outbound',
+                  inbound: 'Inbound',
+                  outbound: 'Outbound',
+                },
+                toast: {
+                  connectionLost: 'Connection to the database agent host was lost.',
+                },
+              },
+            },
+          },
+          modal: {
+            bulkConfig: {
+              title: 'Update Configuration - {hosts}',
+              button: {
+                apply: 'Apply to {hosts}',
+              },
+              toast: {
+                applied: 'Configuration applied to {hosts}.',
+              },
+              error: {
+                invalidYaml: 'Invalid YAML: {error}',
+              },
+            },
+          },
+        },
+        databaseAgentTemplates: {
+          title: 'Database Agent Templates',
+          resourceName: 'Database agent template',
+          dropzone: {
+            title: 'Drop some files here to import as Database Agent Templates',
+            subtitle: 'Release to start importing',
+          },
+          toast: {
+            imported: 'Database Agent Template imported.',
+            parseFailed: 'Failed to parse database agent template: {error}',
+          },
+          tabs: {
+            general: {
+              page: {
+                titleCreate: 'Create Database Agent Template',
+                titleUpdate: 'Update Database Agent Template',
+                toast: {
+                  exported: 'Database Agent Template exported.',
+                },
+                form: {
+                  dockerImages: 'Docker Images',
+                  env: 'Environment Variables',
+                  volumes: 'Volumes',
+                  socketPath: 'Socket Path',
+                  socketPathDescription:
+                    'The unix socket file path inside the database container, must match where the configured image actually creates its socket.',
+                  imageUid: 'Image UID',
+                  imageGid: 'Image GID',
+                  cmd: 'Command',
+                  memoryDescription: 'The Memory limit of the database container.',
+                  memoryTooltip: '0 will not set a limit.',
+                  swap: 'Swap',
+                  swapDescription: 'The amount of swap to give this database.',
+                  swapTooltip: '-1 will not set a limit.',
+                  diskDescription: 'The disk limit of the database.',
+                  diskTooltip:
+                    '0 will not set a limit. This is a soft-limit unless the disk limiter is configured on Wings.',
+                  cpu: 'CPU Limit (%)',
+                  cpuDescription: 'The CPU limit in % that the database can use.',
+                  cpuTooltip: '1 thread = 100%. 0 will not set a limit.',
+                  ioWeight: 'IO Weight',
+                  ioWeightDescription: 'The relative IO Weight of the database container compared to other containers.',
+                  ioWeightTooltip: '0-1000. May not work on all systems.',
+                },
+                modal: {
+                  delete: {
+                    title: 'Confirm Database Agent Template Deletion',
+                    content: 'Are you sure you want to delete **{name}**?',
+                  },
+                },
+              },
+            },
+            instances: {
+              title: 'Instances',
+              page: {
+                title: 'Instances',
               },
             },
           },
@@ -3406,6 +3767,11 @@ const baseTranslations = defineTranslations({
         viewAdmin: {
           title: 'View in Admin Area',
         },
+        selector: {
+          title: 'Select a Server',
+          description: 'Choose which server you want to navigate to.',
+          descriptionWithPage: 'Select a server to go to **{page}**.',
+        },
         console: {
           title: 'Console',
           input: {
@@ -3583,6 +3949,7 @@ const baseTranslations = defineTranslations({
             copyingMany: 'Copying {files}',
             receivingRemote: 'Receiving {files} from remote server',
             sendingRemote: 'Sending {files} to remote server',
+            exportingBackup: 'Exporting backup to {destination}',
             rateLimited: 'Your upload has been rate limited. Waiting...',
             cancelAllUploads: 'Cancel all uploads',
             cancelAllOperations: 'Cancel all operations',
@@ -3596,6 +3963,7 @@ const baseTranslations = defineTranslations({
             preferPhysicalSize: 'Show physical size instead of logical size',
             editorMinimap: 'Show File Minimap',
             editorLineOverflow: 'Wrap Line Overflow',
+            editorFontSize: 'Editor Font Size',
             vscodeUriScheme: 'VS Code URI Scheme',
             imageViewerSmoothing: 'Smoothen Image (Anti-Aliasing)',
           },
@@ -3618,9 +3986,11 @@ const baseTranslations = defineTranslations({
             permissionsUpdatedMany: 'Permissions have been updated for {files}.',
             permissionsCouldNotBeUpdated: 'Permissions could not be updated.',
             fileSaved: 'File has been saved.',
+            collabSaveTimeout: 'The file could not be saved, the daemon did not respond in time.',
           },
           tooltip: {
             fileHistory: 'File History',
+            collabEditing: '{user} is editing this file',
             largestDirectories: 'Analyze directory sizes',
             dragToMove: 'Drag to move',
             back: 'Back {seconds} seconds',
@@ -3829,6 +4199,10 @@ const baseTranslations = defineTranslations({
         databases: {
           title: 'Databases',
           subtitle: '{current} of {max} maximum databases created.',
+          classic: {
+            title: 'Classic Databases',
+            subtitle: '{current} databases created.',
+          },
           tooltip: {
             limitReached: 'This server is limited to {max} databases.',
           },
@@ -3842,6 +4216,150 @@ const baseTranslations = defineTranslations({
           },
           form: {
             databaseName: 'Database Name',
+          },
+          instance: {
+            title: 'Managed Databases',
+            subtitle: '{current} managed databases created.',
+            tooltip: {
+              limitReached: 'This server is limited to {max} managed databases.',
+            },
+            view: {
+              tabs: {
+                databases: 'Databases',
+                users: 'Users',
+                logs: 'Logs',
+              },
+              stats: {
+                uptime: 'Uptime',
+                cpuLoad: 'CPU Load',
+                memoryLoad: 'Memory Load',
+                diskUsage: 'Disk Usage',
+              },
+            },
+            databases: {
+              title: 'Databases',
+              subtitle: '{current} of {max} maximum databases created.',
+              noDatabases: 'This instance has no databases yet.',
+              tooltip: {
+                offline: 'The instance must be running to create databases.',
+                noUser: 'This database has no user attached yet. Create a user to access it.',
+                limitReached: 'This instance is limited to {max} databases.',
+              },
+              button: {
+                export: 'Export',
+                import: 'Import',
+              },
+              modal: {
+                createDatabase: {
+                  title: 'Create Database',
+                  content:
+                    'Creates a new database with its own user inside this managed database instance. The credentials will be shown in the table afterwards.',
+                },
+                deleteDatabase: {
+                  title: 'Confirm Database Deletion',
+                  content:
+                    'Are you sure you want to delete the database for user **{username}**? This permanently deletes the database and all data within it.',
+                },
+                exportDatabase: {
+                  title: 'Export Database',
+                  content: 'Download a dump of this database. Large databases may take a while to prepare.',
+                },
+                importDatabase: {
+                  title: 'Import Database',
+                  content: 'Upload a dump to import into this database. Large imports may take a while to complete.',
+                  form: {
+                    file: 'Dump File',
+                    wipe: 'Wipe existing data before importing',
+                  },
+                },
+              },
+              table: {
+                columns: {
+                  database: 'Database',
+                },
+              },
+              toast: {
+                created: 'Database created.',
+                deleted: 'Database deleted.',
+                imported: 'Database import completed.',
+                passwordRotated: 'Password has been rotated.',
+              },
+            },
+            users: {
+              title: 'Users',
+              subtitle: '{current} of {max} maximum users created.',
+              noUsers: 'This instance has no users yet.',
+              tooltip: {
+                limitReached: 'This instance is limited to {max} users.',
+              },
+              modal: {
+                createUser: {
+                  title: 'Create User',
+                  content:
+                    'Creates a new user inside this managed database instance. The credentials will be shown in the table afterwards.',
+                  form: {
+                    database: 'Database',
+                    databaseHint: 'The database this user will be granted access to.',
+                    databaseRequired: 'Please select a database.',
+                  },
+                },
+                deleteUser: {
+                  title: 'Confirm User Deletion',
+                  content: 'Are you sure you want to delete the user **{username}**? This cannot be undone.',
+                },
+              },
+              toast: {
+                created: 'User created.',
+                deleted: 'User deleted.',
+              },
+            },
+            power: {
+              toast: {
+                start: 'Managed database is starting.',
+                stop: 'Managed database is stopping.',
+                restart: 'Managed database is restarting.',
+                kill: 'Managed database has been killed.',
+              },
+              modal: {
+                forceKill: {
+                  title: 'Forcibly Kill Database',
+                  content: 'Forcibly killing a database can lead to data corruption.',
+                },
+              },
+            },
+            modal: {
+              createDatabaseInstance: {
+                title: 'Create Managed Database',
+                toast: {
+                  created: 'Managed database created.',
+                },
+                form: {
+                  template: 'Template',
+                  noTemplatesFound: 'No templates available',
+                  image: 'Docker Image',
+                },
+              },
+              editDatabaseInstance: {
+                title: 'Edit Managed Database',
+                toast: {
+                  updated: 'Managed database updated.',
+                },
+              },
+              deleteDatabaseInstance: {
+                title: 'Confirm Managed Database Deletion',
+                content:
+                  'Deleting a managed database is a permanent action, it cannot be undone. This will permanently delete the **{name}** database and remove all associated data.',
+                toast: {
+                  deleted: 'Managed database deleted.',
+                },
+              },
+              credentials: {
+                title: 'Database Credentials',
+                form: {
+                  database: 'Database',
+                },
+              },
+            },
           },
           modal: {
             createDatabase: {
@@ -4286,6 +4804,35 @@ const baseTranslations = defineTranslations({
                 },
               },
             },
+            restoreBackup: {
+              title: 'Restore Backup',
+              description: 'Stop the server and restore a backup of the server files.',
+              form: {
+                backupSelector: 'Backup to Restore',
+                selector: {
+                  latest: 'Latest Backup',
+                  uuid: 'Specific Backup (UUID)',
+                  name: 'By Name (newest match)',
+                },
+                backupUuid: 'Backup UUID',
+                backupName: 'Backup Name',
+                truncateDirectory: 'Delete all files before restore',
+                restoreStartup: 'Restore startup settings',
+                warning:
+                  'Restoring stops the server and overwrites its files. The schedule waits until the restore has finished before continuing. Avoid combining this step with power or server state triggers that could re-trigger the schedule.',
+              },
+              renderer: {
+                compact: 'Restore backup {backup}',
+                compactLatest: 'Restore the latest backup',
+                detail: {
+                  backupLatest: 'Backup: Latest successful backup',
+                  backupUuid: 'Backup UUID: {uuid}',
+                  backupName: 'Backup Name: {name}',
+                  truncateDirectory: 'Delete all files first: {value}',
+                  restoreStartup: 'Restore startup settings: {value}',
+                },
+              },
+            },
             createDirectory: {
               title: 'Create Directory',
               description: 'Create a new folder in the server files.',
@@ -4475,10 +5022,12 @@ const baseTranslations = defineTranslations({
           },
           button: {
             browse: 'Browse',
+            exportToFiles: 'Export to Files',
           },
           toast: {
             downloadStarted: 'Download started.',
             restoringBackup: 'Restoring backup...',
+            exportStarted: 'Backup export started.',
           },
           modal: {
             createBackup: {
@@ -4495,6 +5044,9 @@ const baseTranslations = defineTranslations({
             },
             restoreBackup: {
               title: 'Restore Backup',
+            },
+            exportBackup: {
+              title: 'Export Backup to Files',
             },
             deleteBackup: {
               title: 'Confirm Backup Deletion',

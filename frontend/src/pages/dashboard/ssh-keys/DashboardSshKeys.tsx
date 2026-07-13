@@ -8,58 +8,64 @@ import AccountContentContainer from '@/elements/containers/AccountContentContain
 import Group from '@/elements/Group.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import { useUserStore } from '@/stores/user.ts';
 import SshKeyCreateModal from './modals/SshKeyCreateModal.tsx';
 import SshKeyImportModal from './modals/SshKeyImportModal.tsx';
 import SshKeyRow from './SshKeyRow.tsx';
 
 export default function DashboardSshKeys() {
   const { t } = useTranslations();
-  const sshKeys = useUserStore((state) => state.sshKeys);
-  const setSshKeys = useUserStore((state) => state.setSshKeys);
-  const settings = useGlobalStore((state) => state.settings);
+  const { settings } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'create' | 'import' | null>(null);
 
-  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: sshKeys,
+    loading,
+    error,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.sshKeys.all(),
     fetcher: getSshKeys,
-    setStoreData: setSshKeys,
   });
 
   return (
     <AccountContentContainer
       title={t('pages.account.sshKeys.title', {})}
-      subtitle={t('pages.account.sshKeys.subtitle', { current: sshKeys.total, max: settings.user.maxSshKeyCount })}
+      subtitle={t('pages.account.sshKeys.subtitle', {
+        current: sshKeys?.total ?? 0,
+        max: settings.user.maxSshKeyCount,
+      })}
       search={search}
       setSearch={setSearch}
       contentRight={
         <Group>
           <ConditionalTooltip
-            enabled={sshKeys.total >= settings.user.maxSshKeyCount}
+            enabled={(sshKeys?.total ?? 0) >= settings.user.maxSshKeyCount}
             label={t('pages.account.sshKeys.tooltip.limitReached', { max: settings.user.maxSshKeyCount })}
           >
             <Button
               onClick={() => setOpenModal('import')}
               color='blue'
               leftSection={<FontAwesomeIcon icon={faDownload} />}
-              disabled={sshKeys.total >= settings.user.maxSshKeyCount}
+              disabled={(sshKeys?.total ?? 0) >= settings.user.maxSshKeyCount}
             >
               {t('common.button.import', {})}
             </Button>
           </ConditionalTooltip>
           <ConditionalTooltip
-            enabled={sshKeys.total >= settings.user.maxSshKeyCount}
+            enabled={(sshKeys?.total ?? 0) >= settings.user.maxSshKeyCount}
             label={t('pages.account.sshKeys.tooltip.limitReached', { max: settings.user.maxSshKeyCount })}
           >
             <Button
               onClick={() => setOpenModal('create')}
               color='blue'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
-              disabled={sshKeys.total >= settings.user.maxSshKeyCount}
+              disabled={(sshKeys?.total ?? 0) >= settings.user.maxSshKeyCount}
             >
               {t('common.button.create', {})}
             </Button>
@@ -83,7 +89,7 @@ export default function DashboardSshKeys() {
         onPageSelect={setPage}
         error={error}
       >
-        {sshKeys.data.map((key) => (
+        {sshKeys?.data.map((key) => (
           <SshKeyRow key={key.uuid} sshKey={key} />
         ))}
       </Table>

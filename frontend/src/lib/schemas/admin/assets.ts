@@ -5,7 +5,7 @@ export const storageAssetSchema = z.object({
   url: z.string(),
   size: z.number(),
   isDirectory: z.boolean(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const assetDirectoryCreateSchema = z.object({

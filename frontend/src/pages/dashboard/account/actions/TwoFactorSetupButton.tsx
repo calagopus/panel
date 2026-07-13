@@ -4,7 +4,7 @@ import { useModalsStack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import QRCode from 'qrcode';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import enableTwoFactor from '@/api/me/account/enableTwoFactor.ts';
@@ -15,6 +15,7 @@ import Code from '@/elements/Code.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
@@ -77,7 +78,8 @@ export default function TwoFactorSetupButton() {
     [token],
   );
 
-  const doEnable = () => {
+  const doEnable = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
     enableTwoFactor(form.values)
@@ -95,9 +97,11 @@ export default function TwoFactorSetupButton() {
   return (
     <>
       <Modal.Stack>
-        <Modal
+        <FormModal
           {...stageStack.register('setup')}
           title={t('pages.account.account.containers.twoFactor.modal.setupTwoFactor.title', {})}
+          loading={loading}
+          onSubmit={doEnable}
         >
           {Math.abs(timeOffset) > 5000 && (
             <Alert
@@ -146,7 +150,7 @@ export default function TwoFactorSetupButton() {
             />
 
             <ModalFooter>
-              <Button onClick={doEnable} loading={loading} disabled={!form.isValid()}>
+              <Button type='submit' loading={loading} disabled={!form.isValid()}>
                 {t('common.button.enable', {})}
               </Button>
               <Button variant='default' onClick={() => stageStack.closeAll()}>
@@ -154,7 +158,7 @@ export default function TwoFactorSetupButton() {
               </Button>
             </ModalFooter>
           </Stack>
-        </Modal>
+        </FormModal>
         <Modal
           {...stageStack.register('recovery')}
           onClose={() => {

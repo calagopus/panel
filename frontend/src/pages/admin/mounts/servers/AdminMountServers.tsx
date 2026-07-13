@@ -5,7 +5,7 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ServerRow from '../../servers/ServerRow.tsx';
 

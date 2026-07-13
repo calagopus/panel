@@ -45,8 +45,20 @@ export const adminEggSchema = z.object({
   features: z.array(z.string()),
   dockerImages: z.record(z.string(), z.string()),
   fileDenylist: z.array(z.string()),
-  created: z.date(),
+  created: z.coerce.date(),
 });
+
+export const adminEggCreateSchema = z.lazy(() =>
+  adminEggSchema
+    .omit({
+      uuid: true,
+      eggRepositoryEgg: true,
+      created: true,
+    })
+    .extend({
+      eggRepositoryEggUuid: z.uuid().nullable(),
+    }),
+);
 
 export const adminEggUpdateSchema = z.lazy(() =>
   adminEggSchema
@@ -74,7 +86,7 @@ export const adminEggVariableSchema = z.object({
   userEditable: z.boolean(),
   isSecret: z.boolean(),
   rules: z.array(z.string()),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminEggVariableUpdateSchema = z.lazy(() =>

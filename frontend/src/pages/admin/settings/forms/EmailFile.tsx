@@ -1,19 +1,15 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import Group from '@/elements/Group.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsEmailFilesystemSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function EmailFile({
-  form,
-}: {
-  form: UseFormReturnType<z.infer<typeof adminSettingsEmailFilesystemSchema>>;
-}) {
-  const { t } = useTranslations();
+type EmailFileValues = z.infer<typeof adminSettingsEmailFilesystemSchema>;
 
+export default function EmailFile({ form }: { form: UseFormReturnType<EmailFileValues> }) {
+  const { t } = useTranslations();
   useEffect(() => {
     form.setValues({
       path: form.values.path ?? '',
@@ -22,23 +18,30 @@ export default function EmailFile({
     });
   }, []);
 
+  const fields: FieldDef<EmailFileValues>[] = [
+    {
+      type: 'text',
+      name: 'path',
+      label: t('common.form.path', {}),
+      required: true,
+      colSpan: 'full',
+    },
+    {
+      type: 'text',
+      name: 'fromAddress',
+      label: t('common.form.fromAddress', {}),
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'fromName',
+      label: t('common.form.fromName', {}),
+    },
+  ];
+
   return (
     <Stack mt='md'>
-      <TextInput
-        withAsterisk
-        label={t('common.form.path', {})}
-        key={form.key('path')}
-        {...form.getInputProps('path')}
-      />
-
-      <Group grow>
-        <TextInput withAsterisk label={t('common.form.fromAddress', {})} {...form.getInputProps('fromAddress')} />
-        <TextInput
-          label={t('common.form.fromName', {})}
-          key={form.key('fromName')}
-          {...form.getInputProps('fromName')}
-        />
-      </Group>
+      <FormEngine id='admin.settings.email.file' form={form} fields={fields} />
     </Stack>
   );
 }

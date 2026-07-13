@@ -8,7 +8,7 @@ import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminUserActivity({ user }: { user: z.infer<typeof fullUserSchema> }) {
@@ -47,7 +47,7 @@ export default function AdminUserActivity({ user }: { user: z.infer<typeof fullU
         onPageSelect={setPage}
       >
         {userActivity?.data.map((activity, index) => (
-          <TableRow key={`${activity.created}-${index}`}>
+          <TableRow key={`${activity.created.toISOString()}-${index}`}>
             <TableData>{activity.isApi ? t('common.api', {}) : t('common.web', {})}</TableData>
 
             <TableData>

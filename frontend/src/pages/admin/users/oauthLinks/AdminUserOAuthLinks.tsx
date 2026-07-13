@@ -9,7 +9,7 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { adminUserOAuthLinkTableColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import UserOAuthLinkAddModal from './modals/UserOAuthLinkAddModal.tsx';
 import UserOAuthLinkRow from './UserOAuthLinkRow.tsx';

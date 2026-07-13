@@ -1,20 +1,15 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import Group from '@/elements/Group.tsx';
-import PasswordInput from '@/elements/input/PasswordInput.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsCaptchaProviderFriendlyCaptchaSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function CaptchaFriendlyCaptcha({
-  form,
-}: {
-  form: UseFormReturnType<z.infer<typeof adminSettingsCaptchaProviderFriendlyCaptchaSchema>>;
-}) {
-  const { t } = useTranslations();
+type FriendlyCaptchaValues = z.infer<typeof adminSettingsCaptchaProviderFriendlyCaptchaSchema>;
 
+export default function CaptchaFriendlyCaptcha({ form }: { form: UseFormReturnType<FriendlyCaptchaValues> }) {
+  const { t } = useTranslations();
   useEffect(() => {
     form.setValues({
       siteKey: form.values.siteKey ?? '',
@@ -22,22 +17,24 @@ export default function CaptchaFriendlyCaptcha({
     });
   }, []);
 
+  const fields: FieldDef<FriendlyCaptchaValues>[] = [
+    {
+      type: 'text',
+      name: 'siteKey',
+      label: t('common.form.siteKey', {}),
+      required: true,
+    },
+    {
+      type: 'password',
+      name: 'apiKey',
+      label: t('common.form.apiKey', {}),
+      required: true,
+    },
+  ];
+
   return (
     <Stack mt='md'>
-      <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.siteKey', {})}
-          key={form.key('siteKey')}
-          {...form.getInputProps('siteKey')}
-        />
-        <PasswordInput
-          withAsterisk
-          label={t('common.form.apiKey', {})}
-          key={form.key('apiKey')}
-          {...form.getInputProps('apiKey')}
-        />
-      </Group>
+      <FormEngine id='admin.settings.captcha.friendlyCaptcha' form={form} fields={fields} />
     </Stack>
   );
 }

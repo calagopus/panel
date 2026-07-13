@@ -1,9 +1,16 @@
+import { isConflictingState } from '@/lib/server.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import EulaModalFeature from './EulaModalFeature.tsx';
 import JavaVersionModalFeature from './JavaVersionModalFeature.tsx';
 
 export default function FeatureProvider() {
-  const server = useServerStore((s) => s.server);
+  const { user } = useAuth();
+  const server = useServerStore((state) => state.server);
+
+  if (isConflictingState(server, user)) {
+    return null;
+  }
 
   return (
     <>

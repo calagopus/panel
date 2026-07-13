@@ -1,17 +1,15 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
 import { serverFilesCopyRemoteSchema } from '@/lib/schemas/server/files.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
-type Data = z.infer<typeof serverFilesCopyRemoteSchema> & {
-  root: string;
-  files: string[];
-};
-
-export default async (uuid: string, copyData: Data): Promise<string> => {
+export default async (
+  uuid: string,
+  copyData: z.infer<typeof serverFilesCopyRemoteSchema> & { root: string; files: string[] },
+): Promise<string> => {
   const { data } = await axiosInstance.post(
     `/api/client/servers/${uuid}/files/copy-remote`,
-    transformKeysToSnakeCase(copyData),
+    serializeForApi(serverFilesCopyRemoteSchema.extend({ root: z.string(), files: z.array(z.string()) }), copyData),
   );
   return data.identifier;
 };

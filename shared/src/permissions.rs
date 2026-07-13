@@ -319,6 +319,10 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                             "database-hosts",
                             "Allows viewing and managing a location's database hosts.",
                         ),
+                        (
+                            "database-agent-hosts",
+                            "Allows viewing and managing a location's database agent hosts.",
+                        ),
                     ]),
                 },
             ),
@@ -457,6 +461,39 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("update", "Allows modifying database hosts."),
                         ("delete", "Allows deleting database hosts."),
                         ("test", "Allows testing database host connections."),
+                    ]),
+                },
+            ),
+            (
+                "database-agent-hosts",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage database agent hosts for the panel.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new database agent hosts."),
+                        ("read", "Allows viewing database agent hosts."),
+                        ("update", "Allows modifying database agent hosts."),
+                        ("delete", "Allows deleting database agent hosts."),
+                        (
+                            "read-token",
+                            "Allows viewing a database agent host's token.",
+                        ),
+                        (
+                            "reset-token",
+                            "Allows resetting database agent host tokens.",
+                        ),
+                        ("test", "Allows testing database agent host connections."),
+                    ]),
+                },
+            ),
+            (
+                "database-agent-templates",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage database agent templates for the panel.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new database agent templates."),
+                        ("read", "Allows viewing database agent templates."),
+                        ("update", "Allows modifying database agent templates."),
+                        ("delete", "Allows deleting database agent templates."),
                     ]),
                 },
             ),
@@ -671,6 +708,42 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                             "delete",
                             "Allows removing database instances from this server.",
                         ),
+                    ]),
+                },
+            ),
+            (
+                "database-instances",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage agent-managed database instances on this server.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new database instances."),
+                        (
+                            "read",
+                            "Allows viewing database instances associated with this server.",
+                        ),
+                        (
+                            "update",
+                            "Allows updating database instances, such as locking them.",
+                        ),
+                        (
+                            "delete",
+                            "Allows removing database instances from this server.",
+                        ),
+                        (
+                            "power",
+                            "Allows starting, stopping and restarting database instances.",
+                        ),
+                        ("logs", "Allows viewing the logs of database instances."),
+                        (
+                            "databases",
+                            "Allows managing the databases inside database instances.",
+                        ),
+                        (
+                            "users",
+                            "Allows managing the users inside database instances, including viewing their credentials.",
+                        ),
+                        ("import", "Allows importing data into database instances."),
+                        ("export", "Allows exporting data from database instances."),
                     ]),
                 },
             ),

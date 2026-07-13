@@ -10,15 +10,12 @@ import AccountContentContainer from '@/elements/containers/AccountContentContain
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 import OAuthLinkRow from './OAuthLinkRow.tsx';
 
 export default function DashboardOAuthLinks() {
   const { t } = useTranslations();
-  const oauthLinks = useUserStore((state) => state.oauthLinks);
-  const setOAuthLinks = useUserStore((state) => state.setOAuthLinks);
   const [oAuthProviders, setOAuthProviders] = useState<z.infer<typeof oAuthProviderSchema>[]>([]);
 
   useEffect(() => {
@@ -27,10 +24,14 @@ export default function DashboardOAuthLinks() {
     });
   }, []);
 
-  const { loading, error, setPage } = useSearchablePaginatedTable({
+  const {
+    data: oauthLinks,
+    loading,
+    error,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.oauthLinks.all(),
     fetcher: getOAuthLinks,
-    setStoreData: setOAuthLinks,
   });
 
   return (
@@ -39,10 +40,11 @@ export default function DashboardOAuthLinks() {
       contentRight={
         <ContextMenu
           items={oAuthProviders
-            .filter((p) => p.userManageable && !oauthLinks.data.some((l) => l.oauthProvider.uuid === p.uuid))
+            .filter((p) => p.userManageable && !oauthLinks?.data.some((l) => l.oauthProvider.uuid === p.uuid))
             .map(
               (oauthProvider) =>
                 ({
+                  type: 'action',
                   icon: faFingerprint,
                   label: t('pages.account.oauthLinks.button.connectTo', { provider: oauthProvider.name }),
                   onClick: () => window.location.replace(`/api/auth/oauth/redirect/${oauthProvider.uuid}`),
@@ -59,7 +61,7 @@ export default function DashboardOAuthLinks() {
                 openMenu(rect.left, rect.bottom);
               }}
               disabled={
-                !oAuthProviders.filter((p) => !oauthLinks.data.some((l) => l.oauthProvider.uuid === p.uuid)).length
+                !oAuthProviders.filter((p) => !oauthLinks?.data.some((l) => l.oauthProvider.uuid === p.uuid)).length
               }
               color='blue'
               rightSection={<FontAwesomeIcon icon={faChevronDown} />}
@@ -84,7 +86,7 @@ export default function DashboardOAuthLinks() {
         onPageSelect={setPage}
         error={error}
       >
-        {oauthLinks.data.map((link) => (
+        {oauthLinks?.data.map((link) => (
           <OAuthLinkRow key={link.uuid} oauthLink={link} />
         ))}
       </Table>

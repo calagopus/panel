@@ -45,6 +45,7 @@ export default function FileToolbar() {
           <ContextMenu
             items={[
               {
+                type: 'action',
                 icon: faFileCirclePlus,
                 label: t('pages.server.files.button.fileFromEditor', {}),
                 onClick: () =>
@@ -54,24 +55,28 @@ export default function FileToolbar() {
                 color: 'gray',
               },
               {
+                type: 'action',
                 icon: faFolderPlus,
                 label: t('pages.server.files.button.directory', {}),
                 onClick: () => doOpenModal('nameDirectory'),
                 color: 'gray',
               },
               {
+                type: 'action',
                 icon: faDownload,
                 label: t('pages.server.files.button.fileFromPull', {}),
                 onClick: () => doOpenModal('pullFile'),
                 color: 'gray',
               },
               {
+                type: 'action',
                 icon: faFileUpload,
                 label: t('pages.server.files.button.fileFromUpload', {}),
                 onClick: () => fileInputRef.current?.click(),
                 color: 'gray',
               },
               {
+                type: 'action',
                 icon: faFolderOpen,
                 label: t('pages.server.files.button.directoryFromUpload', {}),
                 onClick: () => folderInputRef.current?.click(),

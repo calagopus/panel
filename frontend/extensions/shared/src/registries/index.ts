@@ -1,5 +1,6 @@
 import { ComponentListRegistry } from 'shared/src/registries/slices/componentList.ts';
 import { ElementsRegistry } from './elements/index.ts';
+import { FormRegistry } from './forms/index.ts';
 import { PageRegistry } from './pages/index.ts';
 import { PermissionIconRegistry } from './permission-icons.ts';
 import { RouteRegistry } from './routes.ts';
@@ -17,6 +18,7 @@ export class ExtensionRegistry implements Registry {
     this.permissionIcons.mergeFrom(other.permissionIcons);
     this.global.mergeFrom(other.global);
     this.shortcuts.mergeFrom(other.shortcuts);
+    this.forms.mergeFrom(other.forms);
 
     return this;
   }
@@ -27,6 +29,7 @@ export class ExtensionRegistry implements Registry {
   public permissionIcons: PermissionIconRegistry = new PermissionIconRegistry();
   public global: ComponentListRegistry = new ComponentListRegistry();
   public shortcuts: ShortcutRegistry = new ShortcutRegistry();
+  public forms: FormRegistry = new FormRegistry();
 
   public enterPages(callback: (registry: PageRegistry) => unknown): this {
     callback(this.pages);
@@ -55,6 +58,11 @@ export class ExtensionRegistry implements Registry {
 
   public enterShortcuts(callback: (registry: ShortcutRegistry) => unknown): this {
     callback(this.shortcuts);
+    return this;
+  }
+
+  public enterForms(callback: (registry: FormRegistry) => unknown): this {
+    callback(this.forms);
     return this;
   }
 }

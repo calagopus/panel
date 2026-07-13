@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
+import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
 import getServers from '@/api/server/getServers.ts';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -16,7 +16,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -27,11 +27,8 @@ import ServerItem from './ServerItem.tsx';
 
 export default function DashboardHomeAll() {
   const { t } = useTranslations();
-  const servers = useUserStore((state) => state.servers);
-  const setServers = useUserStore((state) => state.setServers);
-  const setServerGroups = useUserStore((state) => state.setServerGroups);
-  const serverListShowOthers = useGlobalStore((state) => state.serverListShowOthers);
-  const setServerListShowOthers = useGlobalStore((state) => state.setServerListShowOthers);
+  const { setServerGroups } = useUserStore();
+  const { serverListShowOthers, setServerListShowOthers } = useGlobalStore();
   const { addToast } = useToast();
 
   const [selectedServers, setSelectedServers] = useState(new ObjectSet<z.infer<typeof serverSchema>, 'uuid'>('uuid'));
@@ -74,10 +71,15 @@ export default function DashboardHomeAll() {
     };
   }, []);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: servers,
+    loading,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.servers.all(),
     fetcher: (page, search) => getServers(page, search, serverListShowOthers),
-    setStoreData: setServers,
     deps: [serverListShowOthers],
   });
 
@@ -131,19 +133,19 @@ export default function DashboardHomeAll() {
           />
         </AdminCan>
       </Group>
-      {servers.total > servers.perPage && (
+      {(servers?.total ?? 0) > (servers?.perPage ?? 0) && (
         <>
-          <Pagination data={servers} onPageSelect={setPage} />
+          <Pagination data={servers ?? getEmptyPaginationSet()} onPageSelect={setPage} />
           <Divider my='md' />
         </>
       )}
       {loading ? (
         <Spinner.Centered />
-      ) : servers.total === 0 ? (
+      ) : (servers?.total ?? 0) === 0 ? (
         <p className='text-(--mantine-color-dimmed)'>{t('pages.account.home.noServers', {})}</p>
       ) : (
         <div className='gap-4 grid md:grid-cols-2'>
-          {servers.data.map((server) => (
+          {servers?.data.map((server) => (
             <ServerItem
               key={server.uuid}
               server={server}
@@ -164,10 +166,10 @@ export default function DashboardHomeAll() {
         onAction={onBulkAction}
         loading={bulkActionLoading}
       />
-      {servers.total > servers.perPage && (
+      {(servers?.total ?? 0) > (servers?.perPage ?? 0) && (
         <>
           <Divider my='md' />
-          <Pagination data={servers} onPageSelect={setPage} />
+          <Pagination data={servers ?? getEmptyPaginationSet()} onPageSelect={setPage} />
         </>
       )}
     </AccountContentContainer>

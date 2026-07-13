@@ -6,6 +6,7 @@ edition = { workspace = true }
 
 [dependencies]
 wings-api = { workspace = true }
+db-agent-api = { workspace = true }
 rule-validator = { workspace = true }
 schema-extension-core = { workspace = true }
 schema-extension-derive = { workspace = true }
@@ -74,7 +75,7 @@ moka = { version = "0.12.12", features = ["future"] }
 serde_with = { workspace = true }
 minijinja = { workspace = true }
 sntpc-net-tokio = "1.0.1"
-sntpc = { version = "0.10.1", features = ["std"] }
+sntpc = { version = "0.11.0", features = ["std"] }
 xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 hex = { workspace = true }
 tower = "0.5.3"

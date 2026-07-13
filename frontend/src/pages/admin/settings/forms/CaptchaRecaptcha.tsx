@@ -1,21 +1,15 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import Group from '@/elements/Group.tsx';
-import PasswordInput from '@/elements/input/PasswordInput.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
+import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import Stack from '@/elements/Stack.tsx';
 import { adminSettingsCaptchaProviderRecaptchaSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function CaptchaRecaptcha({
-  form,
-}: {
-  form: UseFormReturnType<z.infer<typeof adminSettingsCaptchaProviderRecaptchaSchema>>;
-}) {
-  const { t } = useTranslations();
+type RecaptchaValues = z.infer<typeof adminSettingsCaptchaProviderRecaptchaSchema>;
 
+export default function CaptchaRecaptcha({ form }: { form: UseFormReturnType<RecaptchaValues> }) {
+  const { t } = useTranslations();
   useEffect(() => {
     form.setValues({
       siteKey: form.values.siteKey ?? '',
@@ -24,28 +18,30 @@ export default function CaptchaRecaptcha({
     });
   }, []);
 
+  const fields: FieldDef<RecaptchaValues>[] = [
+    {
+      type: 'text',
+      name: 'siteKey',
+      label: t('common.form.siteKey', {}),
+      required: true,
+    },
+    {
+      type: 'password',
+      name: 'secretKey',
+      label: t('common.form.secretKey', {}),
+      required: true,
+    },
+    {
+      type: 'switch',
+      name: 'v3',
+      label: t('pages.admin.settings.tabs.captcha.page.recaptcha.form.v3', {}),
+      colSpan: 'full',
+    },
+  ];
+
   return (
     <Stack mt='md'>
-      <Group grow>
-        <TextInput
-          withAsterisk
-          label={t('common.form.siteKey', {})}
-          key={form.key('siteKey')}
-          {...form.getInputProps('siteKey')}
-        />
-        <PasswordInput
-          withAsterisk
-          label={t('common.form.secretKey', {})}
-          key={form.key('secretKey')}
-          {...form.getInputProps('secretKey')}
-        />
-      </Group>
-
-      <Switch
-        label={t('pages.admin.settings.tabs.captcha.page.recaptcha.form.v3', {})}
-        key={form.key('v3')}
-        {...form.getInputProps('v3', { type: 'checkbox' })}
-      />
+      <FormEngine id='admin.settings.captcha.recaptcha' form={form} fields={fields} />
     </Stack>
   );
 }

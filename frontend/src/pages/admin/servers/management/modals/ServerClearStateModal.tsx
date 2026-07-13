@@ -1,12 +1,13 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import clearServerState from '@/api/admin/servers/clearServerState.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerClearStateModal({
   server,
@@ -14,14 +15,14 @@ export default function ServerClearStateModal({
 }: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const updateServer = useAdminStore((state) => state.updateServer);
+  const queryClient = useQueryClient();
 
   const doClearState = async () => {
     await clearServerState(server.uuid)
       .then(() => {
         addToast(t('pages.admin.servers.tabs.management.page.clearState.toast.cleared', {}), 'success');
         props.onClose();
-        updateServer({ ...server, status: null });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.detail(server.uuid) });
         server.status = null;
       })
       .catch((msg) => {

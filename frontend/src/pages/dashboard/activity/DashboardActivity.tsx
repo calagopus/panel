@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import { z } from 'zod';
-import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getUserActivity from '@/api/me/getUserActivity.ts';
+import Avatar from '@/elements/Avatar.tsx';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
 import Code from '@/elements/Code.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
@@ -9,8 +7,7 @@ import Group from '@/elements/Group.tsx';
 import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { userActivitySchema } from '@/lib/schemas/user/activity.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -18,12 +15,16 @@ export default function DashboardActivity() {
   const { user } = useAuth();
   const { t } = useTranslations();
 
-  const [activities, setActivities] = useState<Pagination<z.infer<typeof userActivitySchema>>>(getEmptyPaginationSet());
-
-  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: activities,
+    loading,
+    error,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.activity.all(),
     fetcher: getUserActivity,
-    setStoreData: setActivities,
   });
 
   return (
@@ -47,16 +48,15 @@ export default function DashboardActivity() {
         onPageSelect={setPage}
         error={error}
       >
-        {activities.data.map((activity, index) => (
-          <TableRow key={`${activity.created}-${index}`}>
+        {activities?.data.map((activity, index) => (
+          <TableRow key={`${activity.created.toISOString()}-${index}`}>
             <TableData>
-              <div className='size-5 aspect-square relative'>
-                <img
-                  src={(activity.impersonator ?? user)?.avatar ?? '/icon.svg'}
-                  alt={(activity.impersonator ?? user)?.username}
-                  className='size-5 object-cover rounded-full select-none'
-                />
-              </div>
+              <Avatar
+                size={20}
+                className='select-none'
+                src={(activity.impersonator ?? user)?.avatar}
+                name={(activity.impersonator ?? user)?.username}
+              />
             </TableData>
 
             <TableData>

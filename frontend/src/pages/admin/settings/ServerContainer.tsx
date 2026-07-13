@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import updateServerSettings from '@/api/admin/settings/updateServerSettings.ts';
@@ -7,16 +5,16 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import NumberInput from '@/elements/input/NumberInput.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import { adminSettingsServerSchema } from '@/lib/schemas/admin/settings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+
+type ServerFormValues = z.infer<typeof adminSettingsServerSchema>;
 
 export default function ServerContainer() {
   const { addToast } = useToast();
@@ -27,130 +25,137 @@ export default function ServerContainer() {
 
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof adminSettingsServerSchema>>({
+  const form = useFormEngine<ServerFormValues>('admin.settings.server', {
+    schema: adminSettingsServerSchema,
     initialValues: {
       maxFileManagerViewSize: 0,
       maxFileManagerContentSearchSize: 0,
       maxFileManagerSearchResults: 1,
       maxSubuserCount: 0,
       maxScheduleStepCount: 0,
+      maxDatabaseInstanceDatabaseCount: 0,
+      maxDatabaseInstanceUserCount: 0,
       allowOverwritingCustomDockerImage: false,
-      allowEditingStartupCommand: false,
       allowViewingInstallationLogs: false,
       allowAcknowledgingInstallationFailure: true,
       allowViewingTransferProgress: false,
       containerPrelude: '',
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminSettingsServerSchema),
   });
 
   useEffect(() => {
-    form.setValues({
-      ...server,
-    });
+    form.setValues({ ...server });
   }, [server]);
 
   const doUpdate = () => {
     setLoading(true);
-
     updateServerSettings(adminSettingsServerSchema.parse(form.getValues()))
       .then(() => {
         addToast(t('pages.admin.settings.tabs.server.page.toast.updated', {}), 'success');
         updateSettings({ server: { ...form.getValues() } });
         updateAdminSettings({ server: adminSettingsServerSchema.parse(form.getValues()) });
       })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
+      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
       .finally(() => setLoading(false));
   };
+
+  const fields: FieldDef<ServerFormValues>[] = [
+    {
+      type: 'custom',
+      name: 'maxFileManagerViewSize',
+      render: (f) => (
+        <SizeInput
+          withAsterisk
+          label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerViewSize', {})}
+          mode='b'
+          min={0}
+          value={f.getValues().maxFileManagerViewSize}
+          onChange={(v) => f.setFieldValue('maxFileManagerViewSize', v)}
+        />
+      ),
+    },
+    {
+      type: 'number',
+      name: 'maxScheduleStepCount',
+      label: t('pages.admin.settings.tabs.server.page.form.maxScheduleStepCount', {}),
+      required: true,
+    },
+    {
+      type: 'custom',
+      name: 'maxFileManagerContentSearchSize',
+      render: (f) => (
+        <SizeInput
+          withAsterisk
+          label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerContentSearchSize', {})}
+          mode='b'
+          min={0}
+          value={f.getValues().maxFileManagerContentSearchSize}
+          onChange={(v) => f.setFieldValue('maxFileManagerContentSearchSize', v)}
+        />
+      ),
+    },
+    {
+      type: 'number',
+      name: 'maxFileManagerSearchResults',
+      label: t('pages.admin.settings.tabs.server.page.form.maxFileManagerSearchResults', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxSubuserCount',
+      label: t('pages.admin.settings.tabs.server.page.form.maxSubuserCount', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxDatabaseInstanceDatabaseCount',
+      label: t('pages.admin.settings.tabs.server.page.form.maxDatabaseInstanceDatabaseCount', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxDatabaseInstanceUserCount',
+      label: t('pages.admin.settings.tabs.server.page.form.maxDatabaseInstanceUserCount', {}),
+      required: true,
+    },
+    {
+      type: 'switch',
+      name: 'allowOverwritingCustomDockerImage',
+      label: t('pages.admin.settings.tabs.server.page.form.allowOverwritingCustomDockerImage', {}),
+      description: t('pages.admin.settings.tabs.server.page.form.allowOverwritingCustomDockerImageDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'allowViewingInstallationLogs',
+      label: t('pages.admin.settings.tabs.server.page.form.allowViewingInstallationLogs', {}),
+      description: t('pages.admin.settings.tabs.server.page.form.allowViewingInstallationLogsDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'allowAcknowledgingInstallationFailure',
+      label: t('pages.admin.settings.tabs.server.page.form.allowAcknowledgingInstallationFailure', {}),
+      description: t('pages.admin.settings.tabs.server.page.form.allowAcknowledgingInstallationFailureDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'allowViewingTransferProgress',
+      label: t('pages.admin.settings.tabs.server.page.form.allowViewingTransferProgress', {}),
+      description: t('pages.admin.settings.tabs.server.page.form.allowViewingTransferProgressDescription', {}),
+    },
+    {
+      type: 'text',
+      name: 'containerPrelude',
+      label: t('pages.admin.settings.tabs.server.page.form.containerPrelude', {}),
+      description: t('pages.admin.settings.tabs.server.page.form.containerPreludeDescription', {}),
+      required: true,
+    },
+  ];
 
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.server.page.title', {})} titleOrder={2}>
       <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <SizeInput
-            withAsterisk
-            label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerViewSize', {})}
-            mode='b'
-            min={0}
-            value={form.getValues().maxFileManagerViewSize}
-            onChange={(v) => form.setFieldValue('maxFileManagerViewSize', v)}
-          />
-
-          <NumberInput
-            withAsterisk
-            label={t('pages.admin.settings.tabs.server.page.form.maxScheduleStepCount', {})}
-            key={form.key('maxScheduleStepCount')}
-            {...form.getInputProps('maxScheduleStepCount')}
-          />
-
-          <SizeInput
-            withAsterisk
-            label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerContentSearchSize', {})}
-            mode='b'
-            min={0}
-            value={form.getValues().maxFileManagerContentSearchSize}
-            onChange={(v) => form.setFieldValue('maxFileManagerContentSearchSize', v)}
-          />
-
-          <NumberInput
-            withAsterisk
-            label={t('pages.admin.settings.tabs.server.page.form.maxFileManagerSearchResults', {})}
-            key={form.key('maxFileManagerSearchResults')}
-            {...form.getInputProps('maxFileManagerSearchResults')}
-          />
-
-          <NumberInput
-            withAsterisk
-            label={t('pages.admin.settings.tabs.server.page.form.maxSubuserCount', {})}
-            key={form.key('maxSubuserCount')}
-            {...form.getInputProps('maxSubuserCount')}
-          />
-
-          <Switch
-            label={t('pages.admin.settings.tabs.server.page.form.allowOverwritingCustomDockerImage', {})}
-            description={t(
-              'pages.admin.settings.tabs.server.page.form.allowOverwritingCustomDockerImageDescription',
-              {},
-            )}
-            key={form.key('allowOverwritingCustomDockerImage')}
-            {...form.getInputProps('allowOverwritingCustomDockerImage', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('pages.admin.settings.tabs.server.page.form.allowViewingInstallationLogs', {})}
-            description={t('pages.admin.settings.tabs.server.page.form.allowViewingInstallationLogsDescription', {})}
-            key={form.key('allowViewingInstallationLogs')}
-            {...form.getInputProps('allowViewingInstallationLogs', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('pages.admin.settings.tabs.server.page.form.allowAcknowledgingInstallationFailure', {})}
-            description={t(
-              'pages.admin.settings.tabs.server.page.form.allowAcknowledgingInstallationFailureDescription',
-              {},
-            )}
-            key={form.key('allowAcknowledgingInstallationFailure')}
-            {...form.getInputProps('allowAcknowledgingInstallationFailure', { type: 'checkbox' })}
-          />
-
-          <Switch
-            label={t('pages.admin.settings.tabs.server.page.form.allowViewingTransferProgress', {})}
-            description={t('pages.admin.settings.tabs.server.page.form.allowViewingTransferProgressDescription', {})}
-            key={form.key('allowViewingTransferProgress')}
-            {...form.getInputProps('allowViewingTransferProgress', { type: 'checkbox' })}
-          />
-
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.settings.tabs.server.page.form.containerPrelude', {})}
-            description={t('pages.admin.settings.tabs.server.page.form.containerPreludeDescription', {})}
-            key={form.key('containerPrelude')}
-            {...form.getInputProps('containerPrelude')}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action='settings.update' cantSave>

@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
@@ -15,25 +16,24 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { userApiKeySchema, userApiKeyUpdateSchema } from '@/lib/schemas/user/apiKeys.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import { useUserStore } from '@/stores/user.ts';
 
 type Props = ModalProps & {
   contextApiKey?: z.infer<typeof userApiKeySchema>;
+  onCreated?: (token: string) => void;
 };
 
-export default function ApiKeyCreateOrUpdateModal({ contextApiKey, ...props }: Props) {
+export default function ApiKeyCreateOrUpdateModal({ contextApiKey, onCreated, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const addApiKey = useUserStore((state) => state.addApiKey);
-  const updateStateApiKey = useUserStore((state) => state.updateApiKey);
-  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
-  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
+  const queryClient = useQueryClient();
+  const { availablePermissions, setAvailablePermissions } = useGlobalStore();
   const { user } = useAuth();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof userApiKeyUpdateSchema>>({
@@ -51,12 +51,12 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, ...props }: P
       if (contextApiKey) {
         await updateApiKey(contextApiKey.uuid, values);
         addToast(t('pages.account.apiKeys.modal.updateApiKey.toast.updated', {}), 'success');
-        updateStateApiKey(contextApiKey.uuid, values);
       } else {
         const key = await createApiKey(values);
         addToast(t('pages.account.apiKeys.modal.createApiKey.toast.created', {}), 'success');
-        addApiKey({ ...key.apiKey, keyStart: key.key });
+        onCreated?.(key.key);
       }
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.apiKeys.all() });
     },
   });
 

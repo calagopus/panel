@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { serverBackupCreateSchema, serverBackupSchema } from '@/lib/schemas/server/backups.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   uuid: string,
@@ -9,7 +9,7 @@ export default async (
 ): Promise<z.infer<typeof serverBackupSchema>> => {
   const { data } = await axiosInstance.post(
     `/api/client/servers/${uuid}/backups`,
-    transformKeysToSnakeCase(backupData),
+    serializeForApi(serverBackupCreateSchema, backupData),
   );
-  return data.backup;
+  return parseFromApi(serverBackupSchema, data.backup);
 };

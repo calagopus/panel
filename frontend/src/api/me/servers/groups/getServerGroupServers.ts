@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 
 export default async (
@@ -10,5 +11,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/client/servers/groups/${serverGroupUuid}`, {
     params: { page, search },
   });
-  return data.servers;
+  return parsePaginationFromApi(serverSchema, data.servers);
 };

@@ -23,7 +23,7 @@ export const adminOAuthProviderSchema = z.object({
   linkViewable: z.boolean(),
   userManageable: z.boolean(),
   basicAuth: z.boolean(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminOAuthProviderUpdateSchema = z.lazy(() =>
@@ -37,8 +37,8 @@ export const adminOAuthUserLinkSchema = z.object({
   uuid: z.string(),
   user: z.lazy(() => adminFullUserSchema),
   identifier: z.string(),
-  lastUsed: z.date().nullable(),
-  created: z.date(),
+  lastUsed: z.coerce.date().nullable(),
+  created: z.coerce.date(),
 });
 
 export const adminOAuthProviderMappingTypeSchema = z.discriminatedUnion('type', [
@@ -58,7 +58,7 @@ export const adminOAuthProviderMappingSchema = z.object({
   uuid: z.string(),
   scopes: z.array(z.string()),
   mapping: adminOAuthProviderMappingTypeSchema,
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminOAuthProviderMappingCreateSchema = z.object({

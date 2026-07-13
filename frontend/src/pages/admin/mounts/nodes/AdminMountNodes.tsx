@@ -14,7 +14,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
@@ -60,6 +60,7 @@ function MountNodeRow({
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),

@@ -10,7 +10,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { eggMountTableColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggMountRow from './EggMountRow.tsx';
 import EggMountAddModal from './modals/EggMountAddModal.tsx';

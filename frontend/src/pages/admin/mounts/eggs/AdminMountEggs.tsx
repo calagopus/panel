@@ -15,7 +15,7 @@ import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { eggTableColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggRow from '../../nests/eggs/EggRow.tsx';
@@ -63,6 +63,7 @@ function MountEggRow({
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),

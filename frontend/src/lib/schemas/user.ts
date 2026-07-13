@@ -17,7 +17,7 @@ export const roleSchema = z.object({
   requireTwoFactor: z.boolean(),
   adminPermissions: z.array(z.string()),
   serverPermissions: z.array(z.string()),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const userSchema = z.object({
@@ -25,7 +25,7 @@ export const userSchema = z.object({
   username: z.string(),
   avatar: z.string().nullable(),
   totpEnabled: z.boolean(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const fullUserSchema = z.lazy(() =>
@@ -33,10 +33,10 @@ export const fullUserSchema = z.lazy(() =>
     email: z.string(),
     nameFirst: z.string(),
     nameLast: z.string(),
-    role: roleSchema,
-    avatar: z.string().optional(),
+    role: roleSchema.nullable(),
+    avatar: z.string().nullable(),
     totpEnabled: z.boolean(),
-    totpLastUsed: z.date().nullable(),
+    totpLastUsed: z.coerce.date().nullable(),
     requireTwoFactor: z.boolean(),
     toastPosition: userToastPosition,
     startOnGroupedServers: z.boolean(),
@@ -53,5 +53,5 @@ export const userServerGroupSchema = z.object({
   name: z.string(),
   order: z.number(),
   serverOrder: z.array(z.string()),
-  created: z.date(),
+  created: z.coerce.date(),
 });

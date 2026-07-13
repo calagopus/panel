@@ -10,7 +10,7 @@ export const serverDatabaseSchema = z.object({
   host: z.string(),
   port: z.number(),
   type: z.lazy(() => databaseType),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const serverDatabaseCreateSchema = z.object({

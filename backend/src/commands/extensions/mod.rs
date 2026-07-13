@@ -1,5 +1,6 @@
+use colored::Colorize;
 use shared::extensions::commands::CliCommandGroupBuilder;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 mod add;
 mod apply;
@@ -69,11 +70,68 @@ async fn remove_dir_or_symlink(path: &Path) -> std::io::Result<()> {
     }
 }
 
+async fn remove_stale_migration_links() -> std::io::Result<()> {
+    let mut entries = match tokio::fs::read_dir("database/extension-migrations").await {
+        Ok(entries) => entries,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(err) => return Err(err),
+    };
+
+    while let Some(entry) = entries.next_entry().await? {
+        if entry.file_type().await?.is_symlink() && tokio::fs::metadata(entry.path()).await.is_err()
+        {
+            tokio::fs::remove_file(entry.path()).await?;
+            println!(
+                "{} {}",
+                "removed stale extension migrations symlink".yellow(),
+                entry.path().to_string_lossy().bright_yellow()
+            );
+        }
+    }
+
+    Ok(())
+}
+
+async fn prepare_migrations_dir(identifier: &str) -> std::io::Result<PathBuf> {
+    let migrations_dir = if shared::AppContainerType::detect().is_heavy() {
+        Path::new("database/extension-migrations").join(identifier)
+    } else {
+        Path::new("backend-extensions")
+            .join(identifier)
+            .join("migrations")
+    };
+
+    if tokio::fs::symlink_metadata(&migrations_dir)
+        .await
+        .is_ok_and(|metadata| metadata.file_type().is_symlink())
+    {
+        remove_dir_or_symlink(&migrations_dir).await?;
+    }
+    tokio::fs::create_dir_all(&migrations_dir).await?;
+
+    Ok(migrations_dir)
+}
+
 async fn create_compat_links(identifier: &str) -> Result<(), anyhow::Error> {
     let frontend_link = Path::new("frontend/extensions").join(identifier);
-    let migrations_link = Path::new("database/extension-migrations").join(identifier);
+    let (migrations_link, migrations_target) = if shared::AppContainerType::detect().is_heavy() {
+        (
+            Path::new("backend-extensions")
+                .join(identifier)
+                .join("migrations"),
+            Path::new("../../database/extension-migrations").join(identifier),
+        )
+    } else {
+        (
+            Path::new("database/extension-migrations").join(identifier),
+            Path::new("../../backend-extensions")
+                .join(identifier)
+                .join("migrations"),
+        )
+    };
 
     remove_dir_or_symlink(&frontend_link).await?;
+    prepare_migrations_dir(identifier).await?;
     remove_dir_or_symlink(&migrations_link).await?;
 
     tokio::fs::write(
@@ -91,12 +149,7 @@ async fn create_compat_links(identifier: &str) -> Result<(), anyhow::Error> {
             .join("frontend"),
         &frontend_link,
     )?;
-    symlink_dir(
-        &Path::new("../../backend-extensions")
-            .join(identifier)
-            .join("migrations"),
-        &migrations_link,
-    )?;
+    symlink_dir(&migrations_target, &migrations_link)?;
 
     let node_modules_link = Path::new("backend-extensions")
         .join(identifier)

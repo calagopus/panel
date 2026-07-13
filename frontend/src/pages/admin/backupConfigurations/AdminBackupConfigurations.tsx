@@ -11,7 +11,7 @@ import { backupConfigurationTableColumns } from '@/lib/tableColumns.ts';
 import BackupConfigurationCreateOrUpdate from '@/pages/admin/backupConfigurations/BackupConfigurationCreateOrUpdate.tsx';
 import BackupConfigurationRow from '@/pages/admin/backupConfigurations/BackupConfigurationRow.tsx';
 import BackupConfigurationView from '@/pages/admin/backupConfigurations/BackupConfigurationView.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 

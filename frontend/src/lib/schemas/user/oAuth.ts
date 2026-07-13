@@ -5,6 +5,6 @@ export const userOAuthLinkSchema = z.object({
   uuid: z.string(),
   oauthProvider: oAuthProviderSchema,
   identifier: z.string(),
-  lastUsed: z.date().nullable(),
-  created: z.date(),
+  lastUsed: z.coerce.date().nullable(),
+  created: z.coerce.date(),
 });

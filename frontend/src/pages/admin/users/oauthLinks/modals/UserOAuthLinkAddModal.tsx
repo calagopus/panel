@@ -1,5 +1,6 @@
 import { ModalProps } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { FormEvent, useEffect, useState } from 'react';
 import { z } from 'zod';
 import getOAuthProviders from '@/api/admin/oauth-providers/getOAuthProviders.ts';
 import createUserOAuthLink from '@/api/admin/users/oauthLinks/createUserOAuthLink.ts';
@@ -7,7 +8,8 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
@@ -15,7 +17,6 @@ import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function UserOAuthLinkAddModal({
   user,
@@ -23,7 +24,7 @@ export default function UserOAuthLinkAddModal({
 }: ModalProps & { user: z.infer<typeof fullUserSchema> }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
-  const addUserOAuthLink = useAdminStore((state) => state.addUserOAuthLink);
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [identifier, setIdentifier] = useState('');
@@ -43,7 +44,9 @@ export default function UserOAuthLinkAddModal({
     }
   }, [props.opened]);
 
-  const doAdd = () => {
+  const doAdd = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!selectedOAuthProvider) {
       return;
     }
@@ -55,7 +58,7 @@ export default function UserOAuthLinkAddModal({
         addToast(t('pages.admin.users.tabs.oauthLinks.page.toast.added', {}), 'success');
 
         props.onClose();
-        addUserOAuthLink(oauthLink);
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.oauthLinks(user.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -64,7 +67,12 @@ export default function UserOAuthLinkAddModal({
   };
 
   return (
-    <Modal title={t('pages.admin.users.tabs.oauthLinks.page.modal.add.title', {})} {...props}>
+    <FormModal
+      title={t('pages.admin.users.tabs.oauthLinks.page.modal.add.title', {})}
+      loading={loading}
+      {...props}
+      onSubmit={doAdd}
+    >
       <Stack>
         <Select
           withAsterisk
@@ -91,7 +99,7 @@ export default function UserOAuthLinkAddModal({
         />
 
         <ModalFooter>
-          <Button onClick={doAdd} loading={loading} disabled={!selectedOAuthProvider || !identifier}>
+          <Button type='submit' loading={loading} disabled={!selectedOAuthProvider || !identifier}>
             {t('common.button.add', {})}
           </Button>
           <Button variant='default' onClick={props.onClose}>
@@ -99,6 +107,6 @@ export default function UserOAuthLinkAddModal({
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

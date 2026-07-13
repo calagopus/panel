@@ -35,23 +35,15 @@ impl shared::extensions::commands::CliCommand<UpdateArgs> for UpdateCommand {
                 })
                 .await??;
 
-                if !args.skip_version_check
-                    && !extension_distr
-                        .metadata_toml
-                        .panel_version
-                        .matches(&shared::VERSION.parse()?)
+                if let Err(err) = extension_distr
+                    .metadata_toml
+                    .check_panel_version(args.skip_version_check)
                 {
                     eprintln!(
-                        "{} {} {} {} {}",
+                        "{} {} {}",
                         "extension".red(),
                         extension_distr.metadata_toml.name.bright_red(),
-                        "requires panel version".red(),
-                        extension_distr
-                            .metadata_toml
-                            .panel_version
-                            .to_string()
-                            .bright_red(),
-                        "but the current panel version is incompatible.".red()
+                        err.to_string().red()
                     );
                     return Ok(1);
                 }
@@ -96,20 +88,17 @@ impl shared::extensions::commands::CliCommand<UpdateArgs> for UpdateCommand {
                 )
                 .await?;
                 super::remove_dir_or_symlink(
-                    &Path::new("database/extension-migrations").join(&package_identifier),
-                )
-                .await?;
-                super::remove_dir_or_symlink(
                     &Path::new("backend-extensions").join(&package_identifier),
                 )
                 .await?;
 
                 let backend_path = Path::new("backend-extensions").join(&package_identifier);
                 let frontend_path = backend_path.join("frontend");
-                let migrations_path = backend_path.join("migrations");
+                // on the heavy image this is the persistent mount and existing migration
+                // files are kept, so already applied migrations retain their down.sql
+                let migrations_path = super::prepare_migrations_dir(&package_identifier).await?;
                 tokio::fs::create_dir_all(&backend_path).await?;
                 tokio::fs::create_dir_all(&frontend_path).await?;
-                tokio::fs::create_dir_all(&migrations_path).await?;
 
                 let mut extension_distr = tokio::task::spawn_blocking(move || {
                     extension_distr.extract_frontend(frontend_path)?;

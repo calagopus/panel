@@ -11,7 +11,7 @@ import { Line } from 'react-chartjs-2';
 import ChartBlock from '@/elements/ChartBlock.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { useChart, useChartTickLabel } from '@/lib/chart.ts';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesToString, mapUnitToLocale } from '@/lib/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -24,7 +24,11 @@ export default function ServerStats() {
   const wasOffline = useRef(false);
 
   const cpu = useChartTickLabel(t('pages.server.console.stats.cpuLoad', {}), server.limits.cpu, '%', 2);
-  const memory = useChartTickLabel(t('pages.server.console.stats.memoryLoad', {}), server.limits.memory, 'MiB');
+  const memory = useChartTickLabel(
+    t('pages.server.console.stats.memoryLoad', {}),
+    server.limits.memory,
+    mapUnitToLocale('MiB'),
+  );
   const network = useChart(t('pages.server.console.stats.network', {}), {
     sets: 2,
     options: {

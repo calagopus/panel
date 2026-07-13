@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { adminSettingsSchema } from '@/lib/schemas/admin/settings.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
+import { formExtensionSchemas, serializeForApi } from '@/lib/api-transform.ts';
+import { adminSettingsUserSchema } from '@/lib/schemas/admin/settings.ts';
 
-export default async (data: z.infer<typeof adminSettingsSchema>['user']): Promise<void> => {
+export default async (data: z.infer<typeof adminSettingsUserSchema>): Promise<void> => {
   await axiosInstance.put('/api/admin/settings', {
-    user: transformKeysToSnakeCase(data),
+    user: serializeForApi(adminSettingsUserSchema, data, formExtensionSchemas('admin.settings.user')),
   });
 };

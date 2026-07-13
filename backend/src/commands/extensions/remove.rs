@@ -45,6 +45,8 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                     return Ok(1);
                 }
 
+                super::remove_stale_migration_links().await?;
+
                 let package_identifier =
                     MetadataToml::convert_package_name_to_identifier(&args.package_name);
                 if !MetadataToml::is_valid_package_identifier(&package_identifier) {
@@ -57,43 +59,35 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                 }
 
                 let frontend_path = Path::new("frontend/extensions").join(&package_identifier);
-                if tokio::fs::metadata(&frontend_path)
-                    .await
-                    .ok()
-                    .is_none_or(|e| !e.is_dir())
-                {
-                    eprintln!(
-                        "{} {} {}",
-                        "failed to find".red(),
-                        format!("frontend/extensions/{}", package_identifier).bright_red(),
-                        "directory, make sure you are in the panel root.".red()
-                    );
-                    return Ok(1);
-                }
-
                 let backend_path = Path::new("backend-extensions").join(&package_identifier);
-                if tokio::fs::metadata(&backend_path)
-                    .await
-                    .ok()
-                    .is_none_or(|e| !e.is_dir())
-                {
-                    eprintln!(
-                        "{} {} {}",
-                        "failed to find".red(),
-                        format!(
-                            "backend-extensions/{}",
-                            MetadataToml::convert_package_name_to_identifier(&args.package_name),
-                        )
-                        .bright_red(),
-                        "directory, make sure you are in the panel root.".red()
-                    );
-                    return Ok(1);
-                }
-
                 let frontend_translations_path = Path::new("frontend/public/translations/en")
                     .join(format!("{}.json", args.package_name));
                 let migrations_path =
                     Path::new("database/extension-migrations").join(&package_identifier);
+
+                let mut found_any = false;
+                for path in [&frontend_path, &backend_path, &migrations_path] {
+                    if tokio::fs::symlink_metadata(path).await.is_ok() {
+                        found_any = true;
+                    } else {
+                        eprintln!(
+                            "{} {} {}",
+                            "failed to find".yellow(),
+                            path.to_string_lossy().bright_yellow(),
+                            "- removing remaining files anyway.".yellow()
+                        );
+                    }
+                }
+
+                if !found_any {
+                    eprintln!(
+                        "{} {} {}",
+                        "extension".red(),
+                        args.package_name.bright_red(),
+                        "is not installed, make sure you are in the panel root.".red()
+                    );
+                    return Ok(1);
+                }
 
                 let cargo_bin = which("cargo")
                     .await
@@ -218,7 +212,18 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                 {
                     tokio::fs::remove_file(frontend_translations_path).await?;
                 }
-                super::remove_dir_or_symlink(&migrations_path).await?;
+                let migrations_is_link = tokio::fs::symlink_metadata(&migrations_path)
+                    .await
+                    .is_ok_and(|metadata| metadata.file_type().is_symlink());
+                if args.remove_migrations || migrations_is_link {
+                    super::remove_dir_or_symlink(&migrations_path).await?;
+                } else if tokio::fs::symlink_metadata(&migrations_path).await.is_ok() {
+                    println!(
+                        "keeping database migration files at {}, use {} to roll them back and delete them",
+                        migrations_path.to_string_lossy().bright_black(),
+                        "--remove-migrations".bright_black()
+                    );
+                }
                 super::remove_dir_or_symlink(&backend_path).await?;
                 tokio::fs::copy(
                     Path::new("backend-extensions/internal-list/Cargo.template.toml"),

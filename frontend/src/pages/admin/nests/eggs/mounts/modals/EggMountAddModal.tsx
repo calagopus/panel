@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import getMounts from '@/api/admin/mounts/getMounts.ts';
@@ -15,7 +16,6 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function EggMountAddModal({
   nest,
@@ -23,7 +23,7 @@ export default function EggMountAddModal({
   ...props
 }: ModalProps & { nest: z.infer<typeof adminNestSchema>; egg: z.infer<typeof adminEggSchema> }) {
   const { addToast } = useToast();
-  const addEggMount = useAdminStore((state) => state.addEggMount);
+  const queryClient = useQueryClient();
   const { t } = useTranslations();
 
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,7 @@ export default function EggMountAddModal({
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.toast.added', {}), 'success');
 
         props.onClose();
-        addEggMount({ mount, created: new Date() });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.eggs.mounts(egg.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

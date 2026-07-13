@@ -1,7 +1,6 @@
 import { faArrowsLeftRight, faCodeCompare, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DrawerProps } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -9,6 +8,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileRevisionContent from '@/api/server/files/getFileRevisionContent.ts';
 import getFileRevisions from '@/api/server/files/getFileRevisions.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Avatar from '@/elements/Avatar.tsx';
 import Badge from '@/elements/Badge.tsx';
 import Card from '@/elements/Card.tsx';
 import Drawer from '@/elements/Drawer.tsx';
@@ -20,6 +20,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverFileRevisionSchema } from '@/lib/schemas/server/files.ts';
 import { bytesToString } from '@/lib/size.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -84,14 +85,7 @@ function RevisionRow({
   return (
     <Card className='p-3 rounded-md'>
       <div className='flex items-start gap-3'>
-        <img
-          src={revision.user?.avatar ?? '/icon.svg'}
-          alt={revision.user?.username ?? t('common.system', {})}
-          className='size-6 rounded-full shrink-0 mt-0.5'
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/icon.svg';
-          }}
-        />
+        <Avatar size={24} className='shrink-0 mt-0.5' src={revision.user?.avatar} name={revision.user?.username} />
         <div className='flex-1 min-w-0'>
           <div className='flex items-center gap-2 mb-1'>
             <span className='text-sm font-medium'>#{revision.id}</span>
@@ -137,7 +131,7 @@ export default function FileRevisionsDrawer({ filePath, onRestore, getContent, o
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
 
-  const { data: revisions, isLoading } = useQuery({
+  const { data: revisions, loading: isLoading } = useResource({
     queryKey: queryKeys.server(server.uuid).files.fileRevisions(filePath),
     queryFn: () => getFileRevisions(server.uuid, filePath),
     enabled: opened && !!filePath,

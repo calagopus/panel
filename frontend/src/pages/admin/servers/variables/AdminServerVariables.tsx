@@ -7,17 +7,15 @@ import Button from '@/elements/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import VariableContainer from '@/elements/VariableContainer.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { serverVariableSchema } from '@/lib/schemas/server/startup.ts';
 import { useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function AdminServerVariables({ server }: { server: z.infer<typeof adminServerSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const serverVariables = useAdminStore((state) => state.serverVariables);
-  const setServerVariables = useAdminStore((state) => state.setServerVariables);
-  const updateServerVariable = useAdminStore((state) => state.updateServerVariable);
+  const [serverVariables, setServerVariables] = useState<z.infer<typeof serverVariableSchema>[]>([]);
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -35,10 +33,9 @@ export default function AdminServerVariables({ server }: { server: z.infer<typeo
     )
       .then(() => {
         addToast(t('pages.admin.servers.tabs.variables.page.toast.updated', {}), 'success');
-        for (const [envVariable, value] of Object.entries(values)) {
-          updateServerVariable(envVariable, { value });
-        }
-
+        setServerVariables((prev) =>
+          prev.map((v) => (v.envVariable in values ? { ...v, value: values[v.envVariable] } : v)),
+        );
         setValues({});
       })
       .catch((msg) => {

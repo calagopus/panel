@@ -56,6 +56,8 @@ export const publicSettingsSchema = z.object({
     maxFileManagerSearchResults: z.number(),
     maxSubuserCount: z.number(),
     maxScheduleStepCount: z.number(),
+    maxDatabaseInstanceDatabaseCount: z.number(),
+    maxDatabaseInstanceUserCount: z.number(),
     allowOverwritingCustomDockerImage: z.boolean(),
     allowAcknowledgingInstallationFailure: z.boolean(),
     containerPrelude: z.string(),

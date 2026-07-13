@@ -9,7 +9,7 @@ export const adminMountSchema = z.object({
   target: z.string().min(1).max(255),
   readOnly: z.boolean(),
   userMountable: z.boolean(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminMountUpdateSchema = z.lazy(() =>

@@ -1,4 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteServerMount from '@/api/admin/servers/mounts/deleteServerMount.ts';
@@ -9,10 +10,10 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 export default function ServerMountRow({
   server,
@@ -23,14 +24,14 @@ export default function ServerMountRow({
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const removeServerMount = useAdminStore((state) => state.removeServerMount);
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const doDelete = async () => {
     await deleteServerMount(server.uuid, mount.mount.uuid)
       .then(() => {
-        removeServerMount(mount);
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.mounts(server.uuid) });
         addToast(t('pages.admin.servers.tabs.mounts.page.toast.deleted', {}), 'success');
       })
       .catch((msg) => {
@@ -56,6 +57,7 @@ export default function ServerMountRow({
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('delete'),

@@ -1,12 +1,15 @@
 import { faLock, faLockOpen, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteSubuser from '@/api/server/subusers/deleteSubuser.ts';
+import Avatar from '@/elements/Avatar.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserSchema } from '@/lib/schemas/server/subusers.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -17,8 +20,8 @@ import SubuserUpdateModal from './modals/SubuserUpdateModal.tsx';
 export default function SubuserRow({ subuser }: { subuser: z.infer<typeof serverSubuserSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const server = useServerStore((state) => state.server);
-  const removeSubuser = useServerStore((state) => state.removeSubuser);
+  const { server } = useServerStore();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'update' | 'remove' | null>(null);
 
@@ -26,7 +29,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
     await deleteSubuser(server.uuid, subuser.user.uuid)
       .then(() => {
         addToast(t('pages.server.subusers.modal.removeSubuser.toast.removed', {}), 'success');
-        removeSubuser(subuser);
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).subusers.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -52,6 +55,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
             onClick: () => setOpenModal('update'),
@@ -59,6 +63,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
             canAccess: useServerCan('subusers.update'),
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),
@@ -78,11 +83,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
           >
             <TableData>
               <div className='size-5 aspect-square relative'>
-                <img
-                  src={subuser.user.avatar ?? '/icon.svg'}
-                  alt={subuser.user.username}
-                  className='object-cover rounded-full select-none'
-                />
+                <Avatar size={20} className='select-none' src={subuser.user.avatar} name={subuser.user.username} />
               </div>
             </TableData>
 

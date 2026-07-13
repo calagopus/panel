@@ -9,7 +9,7 @@ import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminOAuthProviderMappingsTableColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import OAuthProviderMappingModal from './modals/OAuthProviderMappingModal.tsx';
 import OAuthProviderMappingRow from './OAuthProviderMappingRow.tsx';

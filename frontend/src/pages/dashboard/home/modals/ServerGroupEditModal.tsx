@@ -1,13 +1,14 @@
 import { ModalProps } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import updateServerGroup from '@/api/me/servers/groups/updateServerGroup.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -37,7 +38,8 @@ export default function ServerGroupEditModal({ serverGroup, ...props }: Props) {
     validate: zod4Resolver(schema),
   });
 
-  const doUpdate = () => {
+  const doUpdate = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
     updateServerGroup(serverGroup.uuid, form.values)
@@ -54,12 +56,17 @@ export default function ServerGroupEditModal({ serverGroup, ...props }: Props) {
   };
 
   return (
-    <Modal title={t('pages.account.home.tabs.groupedServers.page.modal.editServerGroup.title', {})} {...props}>
+    <FormModal
+      title={t('pages.account.home.tabs.groupedServers.page.modal.editServerGroup.title', {})}
+      loading={loading}
+      {...props}
+      onSubmit={doUpdate}
+    >
       <Stack>
         <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
         <ModalFooter>
-          <Button onClick={doUpdate} loading={loading} disabled={!form.isValid()}>
+          <Button type='submit' loading={loading} disabled={!form.isValid()}>
             {t('common.button.save', {})}
           </Button>
           <Button variant='default' onClick={props.onClose}>
@@ -67,6 +74,6 @@ export default function ServerGroupEditModal({ serverGroup, ...props }: Props) {
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

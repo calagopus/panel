@@ -54,11 +54,22 @@ impl Captcha {
                     }))
                     .send()
                     .await
-                    .map_err(|e| e.to_compact_string())?;
+                    .map_err(|err| {
+                        tracing::error!(
+                            "captcha: turnstile verification request failed: {:?}",
+                            err
+                        );
+                        err.to_compact_string()
+                    })?;
 
                 if response.status().is_success() {
-                    let body: serde_json::Value =
-                        response.json().await.map_err(|e| e.to_compact_string())?;
+                    let body: serde_json::Value = response.json().await.map_err(|err| {
+                        tracing::error!(
+                            "captcha: turnstile verification response parsing failed: {:?}",
+                            err
+                        );
+                        err.to_compact_string()
+                    })?;
                     if let Some(success) = body.get("success")
                         && success.as_bool().unwrap_or(false)
                     {
@@ -78,11 +89,22 @@ impl Captcha {
                     ])
                     .send()
                     .await
-                    .map_err(|e| e.to_compact_string())?;
+                    .map_err(|err| {
+                        tracing::error!(
+                            "captcha: recaptcha verification request failed: {:?}",
+                            err
+                        );
+                        err.to_compact_string()
+                    })?;
 
                 if response.status().is_success() {
-                    let body: serde_json::Value =
-                        response.json().await.map_err(|e| e.to_compact_string())?;
+                    let body: serde_json::Value = response.json().await.map_err(|err| {
+                        tracing::error!(
+                            "captcha: recaptcha verification response parsing failed: {:?}",
+                            err
+                        );
+                        err.to_compact_string()
+                    })?;
                     if let Some(success) = body.get("success")
                         && success.as_bool().unwrap_or(false)
                     {
@@ -114,11 +136,19 @@ impl Captcha {
                     ])
                     .send()
                     .await
-                    .map_err(|e| e.to_compact_string())?;
+                    .map_err(|err| {
+                        tracing::error!("captcha: hcaptcha verification request failed: {:?}", err);
+                        err.to_compact_string()
+                    })?;
 
                 if response.status().is_success() {
-                    let body: serde_json::Value =
-                        response.json().await.map_err(|e| e.to_compact_string())?;
+                    let body: serde_json::Value = response.json().await.map_err(|err| {
+                        tracing::error!(
+                            "captcha: hcaptcha verification response parsing failed: {:?}",
+                            err
+                        );
+                        err.to_compact_string()
+                    })?;
                     if let Some(success) = body.get("success")
                         && success.as_bool().unwrap_or(false)
                     {
@@ -138,11 +168,22 @@ impl Captcha {
                     }))
                     .send()
                     .await
-                    .map_err(|e| e.to_compact_string())?;
+                    .map_err(|err| {
+                        tracing::error!(
+                            "captcha: friendlycaptcha verification request failed: {:?}",
+                            err
+                        );
+                        err.to_compact_string()
+                    })?;
 
                 if response.status().is_success() {
-                    let body: serde_json::Value =
-                        response.json().await.map_err(|e| e.to_compact_string())?;
+                    let body: serde_json::Value = response.json().await.map_err(|err| {
+                        tracing::error!(
+                            "captcha: friendlycaptcha verification response parsing failed: {:?}",
+                            err
+                        );
+                        err.to_compact_string()
+                    })?;
                     if let Some(success) = body.get("success")
                         && success.as_bool().unwrap_or(false)
                     {

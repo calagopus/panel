@@ -123,7 +123,10 @@ pub struct NestEggConfigStop {
 pub struct NestEggConfigScript {
     pub container: compact_str::CompactString,
     pub entrypoint: compact_str::CompactString,
-    #[serde(alias = "script")]
+    #[serde(
+        alias = "script",
+        deserialize_with = "crate::deserialize::deserialize_defaultable"
+    )]
     pub content: String,
 }
 

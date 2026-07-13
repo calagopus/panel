@@ -1,6 +1,5 @@
 import { faHardDrive, faMemory, faMicrochip, faServer, faUserLarge } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import getNodeCapacity from '@/api/admin/nodes/getNodeCapacity.ts';
 import Badge from '@/elements/Badge.tsx';
@@ -14,6 +13,7 @@ import TitleCard from '@/elements/TitleCard.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 function LimitedResource({
@@ -89,7 +89,7 @@ function UnlimitedResource({
 export default function AdminNodeCapacity({ node }: { node: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
 
-  const { data: capacity } = useQuery({
+  const { data: capacity } = useResource({
     queryKey: queryKeys.admin.nodes.capacity(node.uuid),
     queryFn: () => getNodeCapacity(node.uuid),
   });

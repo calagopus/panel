@@ -1,4 +1,5 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -9,22 +10,22 @@ import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { userSessionSchema } from '@/lib/schemas/user/sessions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
 
 export default function SessionRow({ session }: { session: z.infer<typeof userSessionSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const removeSession = useUserStore((state) => state.removeSession);
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const doDelete = async () => {
     await deleteSession(session.uuid)
       .then(() => {
-        removeSession(session);
+        queryClient.invalidateQueries({ queryKey: queryKeys.user.sessions.all() });
         addToast(t('pages.account.sessions.modal.deleteSession.toast.deleted', {}), 'success');
       })
       .catch((msg) => {
@@ -49,6 +50,7 @@ export default function SessionRow({ session }: { session: z.infer<typeof userSe
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             disabled: session.isUsing,

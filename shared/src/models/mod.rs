@@ -2,6 +2,7 @@ use crate::database::DatabaseError;
 use compact_str::CompactStringExt;
 use futures_util::{StreamExt, TryStreamExt};
 use garde::Validate;
+use parking_lot::RwLock;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use sqlx::{
     Arguments, Postgres, QueryBuilder, Row,
@@ -15,17 +16,19 @@ use std::{
     pin::Pin,
     sync::{Arc, LazyLock},
 };
-use tokio::sync::RwLock;
 use utoipa::ToSchema;
 
 pub mod admin_activity;
 pub mod announcement;
 pub mod backup_configuration;
+pub mod database_agent_host;
+pub mod database_agent_template;
 pub mod database_host;
 pub mod egg_configuration;
 pub mod egg_repository;
 pub mod egg_repository_egg;
 pub mod location;
+pub mod location_database_agent_host;
 pub mod location_database_host;
 pub mod mount;
 pub mod nest;
@@ -43,6 +46,7 @@ pub mod server_activity;
 pub mod server_allocation;
 pub mod server_backup;
 pub mod server_database;
+pub mod server_database_instance;
 pub mod server_mount;
 pub mod server_schedule;
 pub mod server_schedule_step;
@@ -267,32 +271,18 @@ pub trait BaseModel: Serialize + DeserializeOwned {
     fn map(prefix: Option<&str>, row: &PgRow) -> Result<Self, crate::database::DatabaseError>;
 }
 
-#[async_trait::async_trait]
 pub trait EventEmittingModel: BaseModel {
     type Event: Send + Sync + 'static;
 
     fn get_event_emitter() -> &'static crate::events::EventEmitter<Self::Event>;
 
-    async fn register_event_handler<
+    fn register_event_handler<
         F: Fn(crate::State, Arc<Self::Event>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = Result<(), anyhow::Error>> + Send + 'static,
     >(
         listener: F,
     ) -> crate::events::EventHandlerHandle {
-        Self::get_event_emitter()
-            .register_event_handler(listener)
-            .await
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_event_handler<
-        F: Fn(crate::State, Arc<Self::Event>) -> Fut + Send + Sync + 'static,
-        Fut: Future<Output = Result<(), anyhow::Error>> + Send + 'static,
-    >(
-        listener: F,
-    ) -> crate::events::EventHandlerHandle {
-        Self::get_event_emitter().blocking_register_event_handler(listener)
+        Self::get_event_emitter().register_event_handler(listener)
     }
 }
 
@@ -315,7 +305,7 @@ type CreateAfterHandler<M> = dyn for<'a> Fn(
     + Send
     + Sync;
 pub type CreateListenerList<M> =
-    Arc<ModelHandlerList<Box<CreateHandler<M>>, Box<CreateAfterHandler<M>>>>;
+    Arc<ModelHandlerList<Arc<CreateHandler<M>>, Arc<CreateAfterHandler<M>>>>;
 
 #[async_trait::async_trait]
 pub trait CreatableModel: BaseModel + Send + Sync + 'static {
@@ -324,7 +314,7 @@ pub trait CreatableModel: BaseModel + Send + Sync + 'static {
 
     fn get_create_handlers() -> &'static LazyLock<CreateListenerList<Self>>;
 
-    async fn register_create_handler<
+    fn register_create_handler<
         F: for<'a> Fn(
                 &'a mut Self::CreateOptions<'_>,
                 &'a mut InsertQueryBuilder,
@@ -339,14 +329,12 @@ pub trait CreatableModel: BaseModel + Send + Sync + 'static {
         priority: ListenerPriority,
         callback: F,
     ) {
-        let erased = Box::new(callback) as Box<CreateHandler<Self>>;
+        let erased = Arc::new(callback) as Arc<CreateHandler<Self>>;
 
-        Self::get_create_handlers()
-            .register_handler(priority, erased)
-            .await;
+        Self::get_create_handlers().register_handler(priority, erased);
     }
 
-    async fn register_after_create_handler<
+    fn register_after_create_handler<
         F: for<'a> Fn(
                 &'a mut Self::CreateResult,
                 &'a Self::CreateOptions<'_>,
@@ -361,55 +349,9 @@ pub trait CreatableModel: BaseModel + Send + Sync + 'static {
         priority: ListenerPriority,
         callback: F,
     ) {
-        let erased = Box::new(callback) as Box<CreateAfterHandler<Self>>;
+        let erased = Arc::new(callback) as Arc<CreateAfterHandler<Self>>;
 
-        Self::get_create_handlers()
-            .register_after_handler(priority, erased)
-            .await;
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_create_handler<
-        F: for<'a> Fn(
-                &'a mut Self::CreateOptions<'_>,
-                &'a mut InsertQueryBuilder,
-                &'a crate::State,
-                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
-            ) -> Pin<
-                Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>,
-            > + Send
-            + Sync
-            + 'static,
-    >(
-        priority: ListenerPriority,
-        callback: F,
-    ) {
-        let erased = Box::new(callback) as Box<CreateHandler<Self>>;
-
-        Self::get_create_handlers().blocking_register_handler(priority, erased);
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_after_create_handler<
-        F: for<'a> Fn(
-                &'a mut Self::CreateResult,
-                &'a Self::CreateOptions<'_>,
-                &'a crate::State,
-                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
-            ) -> Pin<
-                Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>,
-            > + Send
-            + Sync
-            + 'static,
-    >(
-        priority: ListenerPriority,
-        callback: F,
-    ) {
-        let erased = Box::new(callback) as Box<CreateAfterHandler<Self>>;
-
-        Self::get_create_handlers().blocking_register_after_handler(priority, erased);
+        Self::get_create_handlers().register_after_handler(priority, erased);
     }
 
     async fn run_create_handlers(
@@ -418,10 +360,15 @@ pub trait CreatableModel: BaseModel + Send + Sync + 'static {
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
-        let listeners = Self::get_create_handlers().before_handlers.read().await;
+        let callbacks = Self::get_create_handlers()
+            .before_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
 
-        for listener in listeners.iter() {
-            (*listener.callback)(options, query_builder, state, transaction).await?;
+        for callback in callbacks.iter() {
+            (*callback)(options, query_builder, state, transaction).await?;
         }
 
         Ok(())
@@ -433,10 +380,15 @@ pub trait CreatableModel: BaseModel + Send + Sync + 'static {
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
-        let listeners = Self::get_create_handlers().after_handlers.read().await;
+        let callbacks = Self::get_create_handlers()
+            .after_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
 
-        for listener in listeners.iter() {
-            (*listener.callback)(result, options, state, transaction).await?;
+        for callback in callbacks.iter() {
+            (*callback)(result, options, state, transaction).await?;
         }
 
         Ok(())
@@ -487,7 +439,7 @@ type UpdateAfterHandler<M> = dyn for<'a> Fn(
     + Send
     + Sync;
 pub type UpdateHandlerList<M> =
-    Arc<ModelHandlerList<Box<UpdateHandler<M>>, Box<UpdateAfterHandler<M>>>>;
+    Arc<ModelHandlerList<Arc<UpdateHandler<M>>, Arc<UpdateAfterHandler<M>>>>;
 
 #[async_trait::async_trait]
 pub trait UpdatableModel: BaseModel + Send + Sync + 'static {
@@ -495,7 +447,7 @@ pub trait UpdatableModel: BaseModel + Send + Sync + 'static {
 
     fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>>;
 
-    async fn register_update_handler<
+    fn register_update_handler<
         F: for<'a> Fn(
                 &'a mut Self,
                 &'a mut Self::UpdateOptions,
@@ -511,14 +463,12 @@ pub trait UpdatableModel: BaseModel + Send + Sync + 'static {
         priority: ListenerPriority,
         callback: F,
     ) {
-        let erased = Box::new(callback) as Box<UpdateHandler<Self>>;
+        let erased = Arc::new(callback) as Arc<UpdateHandler<Self>>;
 
-        Self::get_update_handlers()
-            .register_handler(priority, erased)
-            .await;
+        Self::get_update_handlers().register_handler(priority, erased);
     }
 
-    async fn register_after_update_handler<
+    fn register_after_update_handler<
         F: for<'a> Fn(
                 &'a mut Self,
                 &'a crate::State,
@@ -532,55 +482,9 @@ pub trait UpdatableModel: BaseModel + Send + Sync + 'static {
         priority: ListenerPriority,
         callback: F,
     ) {
-        let erased = Box::new(callback) as Box<UpdateAfterHandler<Self>>;
+        let erased = Arc::new(callback) as Arc<UpdateAfterHandler<Self>>;
 
-        Self::get_update_handlers()
-            .register_after_handler(priority, erased)
-            .await;
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_update_handler<
-        F: for<'a> Fn(
-                &'a mut Self,
-                &'a mut Self::UpdateOptions,
-                &'a mut UpdateQueryBuilder,
-                &'a crate::State,
-                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
-            ) -> Pin<
-                Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>,
-            > + Send
-            + Sync
-            + 'static,
-    >(
-        priority: ListenerPriority,
-        callback: F,
-    ) {
-        let erased = Box::new(callback) as Box<UpdateHandler<Self>>;
-
-        Self::get_update_handlers().blocking_register_handler(priority, erased);
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_after_update_handler<
-        F: for<'a> Fn(
-                &'a mut Self,
-                &'a crate::State,
-                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
-            ) -> Pin<
-                Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>,
-            > + Send
-            + Sync
-            + 'static,
-    >(
-        priority: ListenerPriority,
-        callback: F,
-    ) {
-        let erased = Box::new(callback) as Box<UpdateAfterHandler<Self>>;
-
-        Self::get_update_handlers().blocking_register_after_handler(priority, erased);
+        Self::get_update_handlers().register_after_handler(priority, erased);
     }
 
     async fn run_update_handlers(
@@ -590,10 +494,15 @@ pub trait UpdatableModel: BaseModel + Send + Sync + 'static {
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
-        let listeners = Self::get_update_handlers().before_handlers.read().await;
+        let callbacks = Self::get_update_handlers()
+            .before_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
 
-        for listener in listeners.iter() {
-            (*listener.callback)(self, options, query_builder, state, transaction).await?;
+        for callback in callbacks.iter() {
+            (*callback)(self, options, query_builder, state, transaction).await?;
         }
 
         Ok(())
@@ -604,10 +513,15 @@ pub trait UpdatableModel: BaseModel + Send + Sync + 'static {
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
-        let listeners = Self::get_update_handlers().after_handlers.read().await;
+        let callbacks = Self::get_update_handlers()
+            .after_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
 
-        for listener in listeners.iter() {
-            (*listener.callback)(self, state, transaction).await?;
+        for callback in callbacks.iter() {
+            (*callback)(self, state, transaction).await?;
         }
 
         Ok(())
@@ -659,7 +573,7 @@ type DeleteAfterHandler<M> = dyn for<'a> Fn(
     + Send
     + Sync;
 pub type DeleteHandlerList<M> =
-    Arc<ModelHandlerList<Box<DeleteHandler<M>>, Box<DeleteAfterHandler<M>>>>;
+    Arc<ModelHandlerList<Arc<DeleteHandler<M>>, Arc<DeleteAfterHandler<M>>>>;
 
 #[async_trait::async_trait]
 pub trait DeletableModel: BaseModel + Send + Sync + 'static {
@@ -667,7 +581,7 @@ pub trait DeletableModel: BaseModel + Send + Sync + 'static {
 
     fn get_delete_handlers() -> &'static LazyLock<DeleteHandlerList<Self>>;
 
-    async fn register_delete_handler<
+    fn register_delete_handler<
         F: for<'a> Fn(
                 &'a Self,
                 &'a Self::DeleteOptions,
@@ -682,14 +596,12 @@ pub trait DeletableModel: BaseModel + Send + Sync + 'static {
         priority: ListenerPriority,
         callback: F,
     ) {
-        let erased = Box::new(callback) as Box<DeleteHandler<Self>>;
+        let erased = Arc::new(callback) as Arc<DeleteHandler<Self>>;
 
-        Self::get_delete_handlers()
-            .register_handler(priority, erased)
-            .await;
+        Self::get_delete_handlers().register_handler(priority, erased);
     }
 
-    async fn register_after_delete_handler<
+    fn register_after_delete_handler<
         F: for<'a> Fn(
                 &'a Self,
                 &'a Self::DeleteOptions,
@@ -704,55 +616,9 @@ pub trait DeletableModel: BaseModel + Send + Sync + 'static {
         priority: ListenerPriority,
         callback: F,
     ) {
-        let erased = Box::new(callback) as Box<DeleteAfterHandler<Self>>;
+        let erased = Arc::new(callback) as Arc<DeleteAfterHandler<Self>>;
 
-        Self::get_delete_handlers()
-            .register_after_handler(priority, erased)
-            .await;
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_delete_handler<
-        F: for<'a> Fn(
-                &'a Self,
-                &'a Self::DeleteOptions,
-                &'a crate::State,
-                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
-            )
-                -> Pin<Box<dyn Future<Output = Result<(), anyhow::Error>> + Send + 'a>>
-            + Send
-            + Sync
-            + 'static,
-    >(
-        priority: ListenerPriority,
-        callback: F,
-    ) {
-        let erased = Box::new(callback) as Box<DeleteHandler<Self>>;
-
-        Self::get_delete_handlers().blocking_register_handler(priority, erased);
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_after_delete_handler<
-        F: for<'a> Fn(
-                &'a Self,
-                &'a Self::DeleteOptions,
-                &'a crate::State,
-                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
-            )
-                -> Pin<Box<dyn Future<Output = Result<(), anyhow::Error>> + Send + 'a>>
-            + Send
-            + Sync
-            + 'static,
-    >(
-        priority: ListenerPriority,
-        callback: F,
-    ) {
-        let erased = Box::new(callback) as Box<DeleteAfterHandler<Self>>;
-
-        Self::get_delete_handlers().blocking_register_after_handler(priority, erased);
+        Self::get_delete_handlers().register_after_handler(priority, erased);
     }
 
     async fn run_delete_handlers(
@@ -761,10 +627,15 @@ pub trait DeletableModel: BaseModel + Send + Sync + 'static {
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let listeners = Self::get_delete_handlers().before_handlers.read().await;
+        let callbacks = Self::get_delete_handlers()
+            .before_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
 
-        for listener in listeners.iter() {
-            (*listener.callback)(self, options, state, transaction).await?;
+        for callback in callbacks.iter() {
+            (*callback)(self, options, state, transaction).await?;
         }
 
         Ok(())
@@ -776,10 +647,15 @@ pub trait DeletableModel: BaseModel + Send + Sync + 'static {
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), anyhow::Error> {
-        let listeners = Self::get_delete_handlers().after_handlers.read().await;
+        let callbacks = Self::get_delete_handlers()
+            .after_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
 
-        for listener in listeners.iter() {
-            (*listener.callback)(self, options, state, transaction).await?;
+        for callback in callbacks.iter() {
+            (*callback)(self, options, state, transaction).await?;
         }
 
         Ok(())
@@ -833,7 +709,7 @@ type DuplicateAfterHandler<M> = dyn for<'a> Fn(
     + Send
     + Sync;
 pub type DuplicateHandlerList<M> =
-    Arc<ModelHandlerList<Box<DuplicateHandler<M>>, Box<DuplicateAfterHandler<M>>>>;
+    Arc<ModelHandlerList<Arc<DuplicateHandler<M>>, Arc<DuplicateAfterHandler<M>>>>;
 
 #[async_trait::async_trait]
 pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
@@ -841,7 +717,7 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
 
     fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>>;
 
-    async fn register_duplicate_handler<
+    fn register_duplicate_handler<
         F: for<'a> Fn(
                 &'a Self,
                 &'a Self::DuplicateOptions<'_>,
@@ -855,14 +731,12 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
         priority: ListenerPriority,
         callback: F,
     ) {
-        let erased = Box::new(callback) as Box<DuplicateHandler<Self>>;
+        let erased = Arc::new(callback) as Arc<DuplicateHandler<Self>>;
 
-        Self::get_duplicate_handlers()
-            .register_handler(priority, erased)
-            .await;
+        Self::get_duplicate_handlers().register_handler(priority, erased);
     }
 
-    async fn register_after_duplicate_handler<
+    fn register_after_duplicate_handler<
         F: for<'a> Fn(
                 &'a Self,
                 &'a mut Self,
@@ -877,54 +751,9 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
         priority: ListenerPriority,
         callback: F,
     ) {
-        let erased = Box::new(callback) as Box<DuplicateAfterHandler<Self>>;
+        let erased = Arc::new(callback) as Arc<DuplicateAfterHandler<Self>>;
 
-        Self::get_duplicate_handlers()
-            .register_after_handler(priority, erased)
-            .await;
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_duplicate_handler<
-        F: for<'a> Fn(
-                &'a Self,
-                &'a Self::DuplicateOptions<'_>,
-                &'a crate::State,
-                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
-            ) -> DuplicateHandlerResult<'a>
-            + Send
-            + Sync
-            + 'static,
-    >(
-        priority: ListenerPriority,
-        callback: F,
-    ) {
-        let erased = Box::new(callback) as Box<DuplicateHandler<Self>>;
-
-        Self::get_duplicate_handlers().blocking_register_handler(priority, erased);
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    fn blocking_register_after_duplicate_handler<
-        F: for<'a> Fn(
-                &'a Self,
-                &'a mut Self,
-                &'a Self::DuplicateOptions<'_>,
-                &'a crate::State,
-                &'a mut sqlx::Transaction<'_, sqlx::Postgres>,
-            ) -> DuplicateHandlerResult<'a>
-            + Send
-            + Sync
-            + 'static,
-    >(
-        priority: ListenerPriority,
-        callback: F,
-    ) {
-        let erased = Box::new(callback) as Box<DuplicateAfterHandler<Self>>;
-
-        Self::get_duplicate_handlers().blocking_register_after_handler(priority, erased);
+        Self::get_duplicate_handlers().register_after_handler(priority, erased);
     }
 
     async fn run_duplicate_handlers(
@@ -933,10 +762,15 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
-        let listeners = Self::get_duplicate_handlers().before_handlers.read().await;
+        let callbacks = Self::get_duplicate_handlers()
+            .before_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
 
-        for listener in listeners.iter() {
-            (*listener.callback)(self, options, state, transaction).await?;
+        for callback in callbacks.iter() {
+            (*callback)(self, options, state, transaction).await?;
         }
 
         Ok(())
@@ -949,10 +783,15 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
         state: &crate::State,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
-        let listeners = Self::get_duplicate_handlers().after_handlers.read().await;
+        let callbacks = Self::get_duplicate_handlers()
+            .after_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
 
-        for listener in listeners.iter() {
-            (*listener.callback)(self, duplicated, options, state, transaction).await?;
+        for callback in callbacks.iter() {
+            (*callback)(self, duplicated, options, state, transaction).await?;
         }
 
         Ok(())
@@ -1111,24 +950,13 @@ impl Ord for ListenerPriority {
     }
 }
 
-#[async_trait::async_trait]
 impl<F: Send + Sync, AfterF: Send + Sync> crate::events::DisconnectEventHandler
     for ModelHandlerList<F, AfterF>
 {
     #[inline]
-    async fn disconnect(&self, id: uuid::Uuid) {
-        self.before_handlers.write().await.retain(|l| l.uuid != id);
-        self.after_handlers.write().await.retain(|l| l.uuid != id);
-    }
-
-    #[inline]
-    fn blocking_disconnect(&self, id: uuid::Uuid) {
-        self.before_handlers
-            .blocking_write()
-            .retain(|l| l.uuid != id);
-        self.after_handlers
-            .blocking_write()
-            .retain(|l| l.uuid != id);
+    fn disconnect(&self, id: uuid::Uuid) {
+        self.before_handlers.write().retain(|l| l.uuid != id);
+        self.after_handlers.write().retain(|l| l.uuid != id);
     }
 }
 
@@ -1149,60 +977,28 @@ impl<F: Send + Sync + 'static, AfterF: Send + Sync + 'static> Default
 }
 
 impl<F: Send + Sync + 'static, AfterF: Send + Sync + 'static> ModelHandlerList<F, AfterF> {
-    pub async fn register_handler(
+    pub fn register_handler(
         self: &Arc<Self>,
         priority: ListenerPriority,
         callback: F,
     ) -> ModelHandlerHandle {
         let (listener, aborter) = ModelHandler::new(callback, priority, self.clone());
 
-        let mut self_listeners = self.before_handlers.write().await;
+        let mut self_listeners = self.before_handlers.write();
         self_listeners.push(listener);
         self_listeners.sort_by_key(|a| a.priority);
 
         aborter
     }
 
-    pub async fn register_after_handler(
+    pub fn register_after_handler(
         self: &Arc<Self>,
         priority: ListenerPriority,
         callback: AfterF,
     ) -> ModelHandlerHandle {
         let (listener, aborter) = ModelHandler::new(callback, priority, self.clone());
 
-        let mut self_listeners = self.after_handlers.write().await;
-        self_listeners.push(listener);
-        self_listeners.sort_by_key(|a| a.priority);
-
-        aborter
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    pub fn blocking_register_handler(
-        self: &Arc<Self>,
-        priority: ListenerPriority,
-        callback: F,
-    ) -> ModelHandlerHandle {
-        let (listener, aborter) = ModelHandler::new(callback, priority, self.clone());
-
-        let mut self_listeners = self.before_handlers.blocking_write();
-        self_listeners.push(listener);
-        self_listeners.sort_by_key(|a| a.priority);
-
-        aborter
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lock is not available
-    pub fn blocking_register_after_handler(
-        self: &Arc<Self>,
-        priority: ListenerPriority,
-        callback: AfterF,
-    ) -> ModelHandlerHandle {
-        let (listener, aborter) = ModelHandler::new(callback, priority, self.clone());
-
-        let mut self_listeners = self.after_handlers.blocking_write();
+        let mut self_listeners = self.after_handlers.write();
         self_listeners.push(listener);
         self_listeners.sort_by_key(|a| a.priority);
 
@@ -1242,14 +1038,8 @@ pub struct ModelHandlerHandle {
 }
 
 impl ModelHandlerHandle {
-    pub async fn disconnect(&self) {
-        self.list_ref.disconnect(self.id).await;
-    }
-
-    /// # Warning
-    /// This method will block the current thread if the lists' lock is not available
-    pub fn blocking_disconnect(&self) {
-        self.list_ref.blocking_disconnect(self.id);
+    pub fn disconnect(&self) {
+        self.list_ref.disconnect(self.id);
     }
 }
 

@@ -6,7 +6,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { locationTableColumns } from '@/lib/tableColumns.ts';
 import LocationRow from '@/pages/admin/locations/LocationRow.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminBackupConfigurationLocations({

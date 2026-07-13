@@ -1,14 +1,15 @@
 import { ModalProps } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { z } from 'zod';
 import createNodeAllocations from '@/api/admin/nodes/allocations/createNodeAllocations.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { resolvePorts } from '@/lib/ip.ts';
 import { adminNodeAllocationsSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -46,7 +47,8 @@ export default function NodeAllocationsCreateModal({
     setResolvedPorts(resolved);
   }, [form.values.ports]);
 
-  const doCreate = () => {
+  const doCreate = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
     createNodeAllocations(node.uuid, {
@@ -72,7 +74,12 @@ export default function NodeAllocationsCreateModal({
   };
 
   return (
-    <Modal title={t('pages.admin.nodes.tabs.allocations.page.modal.create.title', {})} {...props}>
+    <FormModal
+      title={t('pages.admin.nodes.tabs.allocations.page.modal.create.title', {})}
+      loading={loading}
+      {...props}
+      onSubmit={doCreate}
+    >
       <Stack>
         <TextInput
           withAsterisk
@@ -95,7 +102,7 @@ export default function NodeAllocationsCreateModal({
         />
 
         <ModalFooter>
-          <Button onClick={doCreate} loading={loading} disabled={!form.isValid() || !resolvedPorts.length}>
+          <Button type='submit' loading={loading} disabled={!form.isValid() || !resolvedPorts.length}>
             {t('pages.admin.nodes.tabs.allocations.page.modal.create.button.create', { count: resolvedPorts.length })}
           </Button>
           <Button variant='default' onClick={props.onClose}>
@@ -103,6 +110,6 @@ export default function NodeAllocationsCreateModal({
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

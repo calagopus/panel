@@ -11,7 +11,7 @@ import { roleTableColumns } from '@/lib/tableColumns.ts';
 import RoleCreateOrUpdate from '@/pages/admin/roles/RoleCreateOrUpdate.tsx';
 import RoleRow from '@/pages/admin/roles/RoleRow.tsx';
 import RoleView from '@/pages/admin/roles/RoleView.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 

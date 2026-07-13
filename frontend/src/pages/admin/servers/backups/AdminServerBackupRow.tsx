@@ -1,4 +1,11 @@
-import { faFileArrowDown, faInfo, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import {
+  faFileArrowDown,
+  faFileExport,
+  faInfo,
+  faRotateLeft,
+  faTrash,
+  faWarning,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
@@ -23,13 +30,14 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeBackupsDeleteModal from '../../nodes/backups/modals/NodeBackupsDeleteModal.tsx';
+import NodeBackupsExportModal from '../../nodes/backups/modals/NodeBackupsExportModal.tsx';
 import NodeBackupsRestoreModal from '../../nodes/backups/modals/NodeBackupsRestoreModal.tsx';
 
 export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeof adminNodeServerBackupSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [openModal, setOpenModal] = useState<'restore' | 'delete' | 'metadata' | null>(null);
+  const [openModal, setOpenModal] = useState<'restore' | 'export' | 'delete' | 'metadata' | null>(null);
   const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
@@ -52,6 +60,12 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
         node={backup.node}
         backup={backup}
         opened={openModal === 'restore'}
+        onClose={() => setOpenModal(null)}
+      />
+      <NodeBackupsExportModal
+        node={backup.node}
+        backup={backup}
+        opened={openModal === 'export'}
         onClose={() => setOpenModal(null)}
       />
       <NodeBackupsDeleteModal
@@ -80,6 +94,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
             hidden: !backup.completed || isFailed,
@@ -87,6 +102,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             color: 'gray',
             items: backup.isStreaming
               ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
+                  type: 'action',
                   icon: faFileArrowDown,
                   label: t('common.button.downloadAs', { format: label }),
                   onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
@@ -96,6 +112,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
             hidden: !backup.completed || isFailed,
@@ -104,6 +121,16 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             canAccess: useAdminCan('nodes.backups'),
           },
           {
+            type: 'action',
+            icon: faFileExport,
+            label: t('pages.server.backups.button.exportToFiles', {}),
+            hidden: !backup.completed || isFailed,
+            onClick: () => setOpenModal('export'),
+            color: 'gray',
+            canAccess: useAdminCan('nodes.backups'),
+          },
+          {
+            type: 'action',
             icon: faInfo,
             label: t('pages.server.backups.modal.viewMetadata.title', {}),
             hidden: Object.keys(backup.metadata).length === 0,
@@ -111,6 +138,7 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             color: 'gray',
           },
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
             hidden: !backup.completed,

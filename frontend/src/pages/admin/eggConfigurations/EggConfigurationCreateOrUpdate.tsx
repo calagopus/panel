@@ -7,8 +7,6 @@ import {
   faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { ServerRouteDefinition } from 'shared';
 import { z } from 'zod';
@@ -24,12 +22,11 @@ import { AdminCan } from '@/elements/Can.tsx';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Divider from '@/elements/Divider.tsx';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import MultiSelectGroup from '@/elements/input/MultiSelectGroup.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import RouteOrderEditor from '@/elements/RouteOrderEditor.tsx';
@@ -173,6 +170,8 @@ function DeploymentItemEditor({ index, value, onChange, onRemove }: DeploymentIt
   );
 }
 
+type EggConfigFormValues = z.infer<typeof adminEggConfigurationUpdateSchema>;
+
 export default function EggConfigurationCreateOrUpdate({
   contextEggConfiguration,
 }: {
@@ -190,7 +189,8 @@ export default function EggConfigurationCreateOrUpdate({
     entries: ServerRouteDefinition[];
   }>({ order: [], entries: [] });
 
-  const form = useForm<z.infer<typeof adminEggConfigurationUpdateSchema>>({
+  const form = useFormEngine<EggConfigFormValues>('admin.eggConfigurations.createOrUpdate', {
+    schema: adminEggConfigurationUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
@@ -201,11 +201,10 @@ export default function EggConfigurationCreateOrUpdate({
       configRoutes: null,
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminEggConfigurationUpdateSchema),
   });
 
   const { loading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminEggConfigurationUpdateSchema>,
+    EggConfigFormValues,
     z.infer<typeof adminEggConfigurationSchema>
   >({
     form,
@@ -308,6 +307,271 @@ export default function EggConfigurationCreateOrUpdate({
 
   const formIsValid = form.isValid();
 
+  const fields: FieldDef<EggConfigFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    {
+      type: 'number',
+      name: 'order',
+      label: t('pages.admin.eggConfigurations.tabs.general.page.form.order', {}),
+      required: true,
+    },
+    {
+      type: 'multiselectgroup',
+      name: 'eggs',
+      label: t('pages.admin.eggConfigurations.tabs.general.page.form.eggs', {}),
+      data: eggs,
+      props: {
+        placeholder: t('pages.admin.eggConfigurations.tabs.general.page.form.eggsPlaceholder', {}),
+        searchable: true,
+        loading: !eggs.length,
+      },
+    },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
+    {
+      type: 'custom',
+      name: 'configAllocations',
+      colSpan: 'full',
+      render: (f) => (
+        <CollapsibleSection
+          icon={<FontAwesomeIcon icon={faNetworkWired} />}
+          title={t('pages.admin.eggConfigurations.tabs.general.page.allocation.title', {})}
+          enabled={f.values.configAllocations !== null}
+          onToggle={(enabled) =>
+            f.setFieldValue(
+              'configAllocations',
+              enabled
+                ? {
+                    deployment: {
+                      additional: [] as EggConfigurationDeployment[],
+                      dedicated: false,
+                      primary: null as {
+                        startPort: number;
+                        endPort: number;
+                        assignToVariable: string | null;
+                      } | null,
+                    },
+                    userSelfAssign: {
+                      enabled: false,
+                      requirePrimaryAllocation: true,
+                      startPort: 1024,
+                      endPort: 65535,
+                    },
+                  }
+                : null,
+            )
+          }
+        >
+          <Stack>
+            <Group grow>
+              <Switch
+                label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.userSelfAssign', {})}
+                description={t(
+                  'pages.admin.eggConfigurations.tabs.general.page.allocation.form.userSelfAssignDescription',
+                  {},
+                )}
+                key={f.key('configAllocations.userSelfAssign.enabled')}
+                {...f.getInputProps('configAllocations.userSelfAssign.enabled', {
+                  type: 'checkbox',
+                })}
+              />
+              <Switch
+                label={t(
+                  'pages.admin.eggConfigurations.tabs.general.page.allocation.form.requirePrimaryAllocation',
+                  {},
+                )}
+                description={t(
+                  'pages.admin.eggConfigurations.tabs.general.page.allocation.form.requirePrimaryAllocationDescription',
+                  {},
+                )}
+                key={f.key('configAllocations.userSelfAssign.requirePrimaryAllocation')}
+                {...f.getInputProps('configAllocations.userSelfAssign.requirePrimaryAllocation', {
+                  type: 'checkbox',
+                })}
+              />
+            </Group>
+
+            <Group grow>
+              <NumberInput
+                label={t(
+                  'pages.admin.eggConfigurations.tabs.general.page.allocation.form.automaticAllocationStart',
+                  {},
+                )}
+                key={f.key('configAllocations.userSelfAssign.startPort')}
+                {...f.getInputProps('configAllocations.userSelfAssign.startPort')}
+              />
+              <NumberInput
+                label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.automaticAllocationEnd', {})}
+                key={f.key('configAllocations.userSelfAssign.endPort')}
+                {...f.getInputProps('configAllocations.userSelfAssign.endPort')}
+              />
+            </Group>
+
+            <Divider
+              label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.divider.deployment', {})}
+              labelPosition='left'
+            />
+
+            <Switch
+              label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.dedicatedIp', {})}
+              description={t(
+                'pages.admin.eggConfigurations.tabs.general.page.allocation.form.dedicatedIpDescription',
+                {},
+              )}
+              key={f.key('configAllocations.deployment.dedicated')}
+              {...f.getInputProps('configAllocations.deployment.dedicated', {
+                type: 'checkbox',
+              })}
+            />
+
+            <Stack gap='xs'>
+              <Switch
+                label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryAllocation', {})}
+                description={t(
+                  'pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryAllocationDescription',
+                  {},
+                )}
+                checked={primaryEnabled}
+                onChange={(e) => handlePrimaryToggle(e.currentTarget.checked)}
+              />
+
+              {primaryEnabled && (
+                <Stack gap='xs' pl='sm'>
+                  <Group grow>
+                    <NumberInput
+                      label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryStartPort', {})}
+                      placeholder='1024'
+                      min={0}
+                      max={65535}
+                      key={f.key('configAllocations.deployment.primary.startPort')}
+                      {...f.getInputProps('configAllocations.deployment.primary.startPort')}
+                    />
+                    <NumberInput
+                      label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryEndPort', {})}
+                      placeholder='65535'
+                      min={0}
+                      max={65535}
+                      key={f.key('configAllocations.deployment.primary.endPort')}
+                      {...f.getInputProps('configAllocations.deployment.primary.endPort')}
+                    />
+                  </Group>
+                  <TextInput
+                    label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariable', {})}
+                    description={t(
+                      'pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariableDescription',
+                      {},
+                    )}
+                    placeholder={t(
+                      'pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariablePlaceholder',
+                      {},
+                    )}
+                    key={f.key('configAllocations.deployment.primary.assignToVariable')}
+                    {...f.getInputProps('configAllocations.deployment.primary.assignToVariable')}
+                    onChange={(e) =>
+                      f.setFieldValue(
+                        'configAllocations.deployment.primary.assignToVariable',
+                        e.currentTarget.value.toUpperCase() || null,
+                      )
+                    }
+                  />
+                </Stack>
+              )}
+            </Stack>
+
+            <Stack gap='xs'>
+              <Group justify='space-between'>
+                <Text size='sm' fw={500}>
+                  {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.title', {})}
+                </Text>
+                <Button
+                  size='xs'
+                  variant='subtle'
+                  leftSection={<FontAwesomeIcon icon={faPlus} />}
+                  onClick={handleAddDeployment}
+                >
+                  {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.button', {})}
+                </Button>
+              </Group>
+
+              {additionalDeployments.length === 0 && (
+                <Text size='sm' c='dimmed'>
+                  {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.empty', {})}
+                </Text>
+              )}
+
+              {additionalDeployments.map((deployment, index) => (
+                <Stack key={index} gap='xs' pl='sm'>
+                  {index > 0 && <Divider />}
+                  <DeploymentItemEditor
+                    index={index}
+                    value={deployment}
+                    onChange={(v) => handleUpdateDeployment(index, v)}
+                    onRemove={() => handleRemoveDeployment(index)}
+                  />
+                </Stack>
+              ))}
+            </Stack>
+          </Stack>
+        </CollapsibleSection>
+      ),
+    },
+    {
+      type: 'custom',
+      name: 'configStartup',
+      colSpan: 'full',
+      render: (f) => (
+        <CollapsibleSection
+          icon={<FontAwesomeIcon icon={faPlay} />}
+          title={t('pages.admin.eggConfigurations.tabs.general.page.startup.title', {})}
+          enabled={f.values.configStartup !== null}
+          onToggle={(enabled) =>
+            f.setFieldValue(
+              'configStartup',
+              enabled
+                ? {
+                    allowCustomStartupCommand: false,
+                  }
+                : null,
+            )
+          }
+        >
+          <Switch
+            label={t('pages.admin.eggConfigurations.tabs.general.page.startup.form.allowCustomStartupCommand', {})}
+            description={t(
+              'pages.admin.eggConfigurations.tabs.general.page.startup.form.allowCustomStartupCommandDescription',
+              {},
+            )}
+            key={f.key('configStartup.allowCustomStartupCommand')}
+            {...f.getInputProps('configStartup.allowCustomStartupCommand', {
+              type: 'checkbox',
+            })}
+          />
+        </CollapsibleSection>
+      ),
+    },
+    {
+      type: 'custom',
+      name: 'configRoutes',
+      colSpan: 'full',
+      render: (f) => (
+        <CollapsibleSection
+          icon={<FontAwesomeIcon icon={faList} />}
+          title={t('elements.routeOrderEditor.title', {})}
+          enabled={f.values.configRoutes !== null}
+          onToggle={(enabled) => f.setFieldValue('configRoutes', enabled ? { order: defaultRoutes.order } : null)}
+        >
+          {f.values.configRoutes && (
+            <RouteOrderEditor
+              value={f.values.configRoutes.order}
+              onChange={(order) => f.setFieldValue('configRoutes.order', order)}
+              routes={defaultRoutes.entries}
+              languages={languages}
+            />
+          )}
+        </CollapsibleSection>
+      ),
+    },
+  ];
+
   return (
     <AdminContentContainer
       title={
@@ -337,6 +601,7 @@ export default function EggConfigurationCreateOrUpdate({
           onClose={() => setOpenModal(null)}
         />
       )}
+
       {!eggsLoading && eggs.length === 0 && (
         <Alert color='yellow' mb='xs' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
           {t('pages.admin.eggConfigurations.tabs.general.page.form.eggsEmpty', {})}
@@ -344,298 +609,37 @@ export default function EggConfigurationCreateOrUpdate({
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.eggConfigurations.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <NumberInput
-            withAsterisk
-            label={t('pages.admin.eggConfigurations.tabs.general.page.form.order', {})}
-            key={form.key('order')}
-            {...form.getInputProps('order')}
-          />
-          <MultiSelectGroup
-            label={t('pages.admin.eggConfigurations.tabs.general.page.form.eggs', {})}
-            placeholder={t('pages.admin.eggConfigurations.tabs.general.page.form.eggsPlaceholder', {})}
-            data={eggs}
-            searchable
-            loading={eggsLoading}
-            {...form.getInputProps('eggs')}
-          />
-          <TextArea
-            label={t('common.form.description', {})}
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
+        <FormEngine form={form} fields={fields} />
 
-          <CollapsibleSection
-            icon={<FontAwesomeIcon icon={faNetworkWired} />}
-            title={t('pages.admin.eggConfigurations.tabs.general.page.allocation.title', {})}
-            enabled={form.values.configAllocations !== null}
-            className='col-span-full'
-            onToggle={(enabled) =>
-              form.setFieldValue(
-                'configAllocations',
-                enabled
-                  ? {
-                      deployment: {
-                        additional: [] as EggConfigurationDeployment[],
-                        dedicated: false,
-                        primary: null as {
-                          startPort: number;
-                          endPort: number;
-                          assignToVariable: string | null;
-                        } | null,
-                      },
-                      userSelfAssign: {
-                        enabled: false,
-                        requirePrimaryAllocation: true,
-                        startPort: 1024,
-                        endPort: 65535,
-                      },
-                    }
-                  : null,
-              )
-            }
+        <Group mt='md'>
+          <AdminCan
+            action={contextEggConfiguration ? 'egg-configurations.update' : 'egg-configurations.create'}
+            cantSave
           >
-            <Stack>
-              <Group grow>
-                <Switch
-                  label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.userSelfAssign', {})}
-                  description={t(
-                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.userSelfAssignDescription',
-                    {},
-                  )}
-                  key={form.key('configAllocations.userSelfAssign.enabled')}
-                  {...form.getInputProps('configAllocations.userSelfAssign.enabled', {
-                    type: 'checkbox',
-                  })}
-                />
-                <Switch
-                  label={t(
-                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.requirePrimaryAllocation',
-                    {},
-                  )}
-                  description={t(
-                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.requirePrimaryAllocationDescription',
-                    {},
-                  )}
-                  key={form.key('configAllocations.userSelfAssign.requirePrimaryAllocation')}
-                  {...form.getInputProps('configAllocations.userSelfAssign.requirePrimaryAllocation', {
-                    type: 'checkbox',
-                  })}
-                />
-              </Group>
-
-              <Group grow>
-                <NumberInput
-                  label={t(
-                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.automaticAllocationStart',
-                    {},
-                  )}
-                  key={form.key('configAllocations.userSelfAssign.startPort')}
-                  {...form.getInputProps('configAllocations.userSelfAssign.startPort')}
-                />
-                <NumberInput
-                  label={t(
-                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.automaticAllocationEnd',
-                    {},
-                  )}
-                  key={form.key('configAllocations.userSelfAssign.endPort')}
-                  {...form.getInputProps('configAllocations.userSelfAssign.endPort')}
-                />
-              </Group>
-
-              <Divider
-                label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.divider.deployment', {})}
-                labelPosition='left'
-              />
-
-              <Switch
-                label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.dedicatedIp', {})}
-                description={t(
-                  'pages.admin.eggConfigurations.tabs.general.page.allocation.form.dedicatedIpDescription',
-                  {},
-                )}
-                key={form.key('configAllocations.deployment.dedicated')}
-                {...form.getInputProps('configAllocations.deployment.dedicated', {
-                  type: 'checkbox',
-                })}
-              />
-
-              <Stack gap='xs'>
-                <Switch
-                  label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryAllocation', {})}
-                  description={t(
-                    'pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryAllocationDescription',
-                    {},
-                  )}
-                  checked={primaryEnabled}
-                  onChange={(e) => handlePrimaryToggle(e.currentTarget.checked)}
-                />
-
-                {primaryEnabled && (
-                  <Stack gap='xs' pl='sm'>
-                    <Group grow>
-                      <NumberInput
-                        label={t(
-                          'pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryStartPort',
-                          {},
-                        )}
-                        placeholder='1024'
-                        min={0}
-                        max={65535}
-                        key={form.key('configAllocations.deployment.primary.startPort')}
-                        {...form.getInputProps('configAllocations.deployment.primary.startPort')}
-                      />
-                      <NumberInput
-                        label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.primaryEndPort', {})}
-                        placeholder='65535'
-                        min={0}
-                        max={65535}
-                        key={form.key('configAllocations.deployment.primary.endPort')}
-                        {...form.getInputProps('configAllocations.deployment.primary.endPort')}
-                      />
-                    </Group>
-                    <TextInput
-                      label={t('pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariable', {})}
-                      description={t(
-                        'pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariableDescription',
-                        {},
-                      )}
-                      placeholder={t(
-                        'pages.admin.eggConfigurations.tabs.general.page.allocation.form.assignToVariablePlaceholder',
-                        {},
-                      )}
-                      key={form.key('configAllocations.deployment.primary.assignToVariable')}
-                      {...form.getInputProps('configAllocations.deployment.primary.assignToVariable')}
-                      onChange={(e) =>
-                        form.setFieldValue(
-                          'configAllocations.deployment.primary.assignToVariable',
-                          e.currentTarget.value.toUpperCase() || null,
-                        )
-                      }
-                    />
-                  </Stack>
-                )}
-              </Stack>
-
-              <Stack gap='xs'>
-                <Group justify='space-between'>
-                  <Text size='sm' fw={500}>
-                    {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.title', {})}
-                  </Text>
-                  <Button
-                    size='xs'
-                    variant='subtle'
-                    leftSection={<FontAwesomeIcon icon={faPlus} />}
-                    onClick={handleAddDeployment}
-                  >
-                    {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.button', {})}
-                  </Button>
-                </Group>
-
-                {additionalDeployments.length === 0 && (
-                  <Text size='sm' c='dimmed'>
-                    {t('pages.admin.eggConfigurations.tabs.general.page.allocation.additionalPorts.empty', {})}
-                  </Text>
-                )}
-
-                {additionalDeployments.map((deployment, index) => (
-                  <Stack key={index} gap='xs' pl='sm'>
-                    {index > 0 && <Divider />}
-                    <DeploymentItemEditor
-                      index={index}
-                      value={deployment}
-                      onChange={(v) => handleUpdateDeployment(index, v)}
-                      onRemove={() => handleRemoveDeployment(index)}
-                    />
-                  </Stack>
-                ))}
-              </Stack>
-            </Stack>
-          </CollapsibleSection>
-
-          <CollapsibleSection
-            icon={<FontAwesomeIcon icon={faPlay} />}
-            title={t('pages.admin.eggConfigurations.tabs.general.page.startup.title', {})}
-            enabled={form.values.configStartup !== null}
-            className='col-span-full'
-            onToggle={(enabled) =>
-              form.setFieldValue(
-                'configStartup',
-                enabled
-                  ? {
-                      allowCustomStartupCommand: false,
-                    }
-                  : null,
-              )
-            }
-          >
-            <Switch
-              label={t('pages.admin.eggConfigurations.tabs.general.page.startup.form.allowCustomStartupCommand', {})}
-              description={t(
-                'pages.admin.eggConfigurations.tabs.general.page.startup.form.allowCustomStartupCommandDescription',
-                {},
-              )}
-              key={form.key('configStartup.allowCustomStartupCommand')}
-              {...form.getInputProps('configStartup.allowCustomStartupCommand', {
-                type: 'checkbox',
-              })}
-            />
-          </CollapsibleSection>
-
-          <CollapsibleSection
-            icon={<FontAwesomeIcon icon={faList} />}
-            title={t('elements.routeOrderEditor.title', {})}
-            className='col-span-full'
-            enabled={form.values.configRoutes !== null}
-            onToggle={(enabled) => form.setFieldValue('configRoutes', enabled ? { order: defaultRoutes.order } : null)}
-          >
-            {form.values.configRoutes && (
-              <RouteOrderEditor
-                value={form.values.configRoutes.order}
-                onChange={(order) => form.setFieldValue('configRoutes.order', order)}
-                routes={defaultRoutes.entries}
-                languages={languages}
-              />
-            )}
-          </CollapsibleSection>
-
-          <Group>
-            <AdminCan
-              action={contextEggConfiguration ? 'egg-configurations.update' : 'egg-configurations.create'}
-              cantSave
-            >
-              <Button type='submit' disabled={!formIsValid} loading={loading}>
-                {t('common.button.save', {})}
+            <Button type='submit' disabled={!formIsValid} loading={loading}>
+              {t('common.button.save', {})}
+            </Button>
+            {!contextEggConfiguration && (
+              <Button onClick={() => doCreateOrUpdate(true)} disabled={!formIsValid} loading={loading}>
+                {t('common.button.saveAndStay', {})}
               </Button>
-              {!contextEggConfiguration && (
-                <Button onClick={() => doCreateOrUpdate(true)} disabled={!formIsValid} loading={loading}>
-                  {t('common.button.saveAndStay', {})}
-                </Button>
-              )}
+            )}
+          </AdminCan>
+          {contextEggConfiguration && (
+            <AdminCan action='egg-configurations.create'>
+              <Button variant='default' onClick={() => setOpenModal('duplicate')} loading={loading}>
+                {t('common.button.duplicate', {})}
+              </Button>
             </AdminCan>
-            {contextEggConfiguration && (
-              <AdminCan action='egg-configurations.create'>
-                <Button variant='default' onClick={() => setOpenModal('duplicate')} loading={loading}>
-                  {t('common.button.duplicate', {})}
-                </Button>
-              </AdminCan>
-            )}
-            {contextEggConfiguration && (
-              <AdminCan action='egg-configurations.delete' cantDelete>
-                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  {t('common.button.delete', {})}
-                </Button>
-              </AdminCan>
-            )}
-          </Group>
-        </div>
+          )}
+          {contextEggConfiguration && (
+            <AdminCan action='egg-configurations.delete' cantDelete>
+              <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
+                {t('common.button.delete', {})}
+              </Button>
+            </AdminCan>
+          )}
+        </Group>
       </form>
     </AdminContentContainer>
   );

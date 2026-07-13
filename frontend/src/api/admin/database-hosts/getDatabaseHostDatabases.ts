@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminServerDatabaseSchema } from '@/lib/schemas/admin/servers.ts';
 
 export default async (
@@ -10,5 +11,5 @@ export default async (
   const { data } = await axiosInstance.get(`/api/admin/database-hosts/${databaseHostUuid}/databases`, {
     params: { page, search },
   });
-  return data.databases;
+  return parsePaginationFromApi(adminServerDatabaseSchema, data.databases);
 };

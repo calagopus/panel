@@ -9,6 +9,7 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import Sidebar from '@/elements/Sidebar.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import { resolveString } from '@/lib/lazy.ts';
 import { to } from '@/lib/routes.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -66,7 +67,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
                       to={to(route.path, '/admin')}
                       end={route.exact}
                       icon={route.icon}
-                      name={typeof route.name === 'function' ? route.name() : route.name}
+                      name={resolveString(route.name)}
                       activeMatches={route.activeMatches}
                     />
                   </AdminCan>
@@ -76,7 +77,7 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
                     to={to(route.path, '/admin')}
                     end={route.exact}
                     icon={route.icon}
-                    name={typeof route.name === 'function' ? route.name() : route.name}
+                    name={resolveString(route.name)}
                     activeMatches={route.activeMatches}
                   />
                 ),

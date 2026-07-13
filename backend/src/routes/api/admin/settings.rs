@@ -96,6 +96,10 @@ mod put {
         max_subuser_count: Option<u64>,
         #[garde(skip)]
         max_schedule_step_count: Option<u64>,
+        #[garde(skip)]
+        max_database_instance_database_count: Option<u64>,
+        #[garde(skip)]
+        max_database_instance_user_count: Option<u64>,
 
         #[garde(skip)]
         allow_overwriting_custom_docker_image: Option<bool>,
@@ -346,6 +350,16 @@ mod put {
             }
             if let Some(max_schedule_step_count) = server.max_schedule_step_count {
                 settings.server.max_schedule_step_count = max_schedule_step_count;
+            }
+            if let Some(max_database_instance_database_count) =
+                server.max_database_instance_database_count
+            {
+                settings.server.max_database_instance_database_count =
+                    max_database_instance_database_count;
+            }
+            if let Some(max_database_instance_user_count) = server.max_database_instance_user_count
+            {
+                settings.server.max_database_instance_user_count = max_database_instance_user_count;
             }
             if let Some(allow_overwriting_custom_docker_image) =
                 server.allow_overwriting_custom_docker_image

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi } from '@/lib/api-transform.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 
 export default async (
@@ -13,5 +14,5 @@ export default async (
       nest_uuid: nestUuid,
     },
   );
-  return data.egg;
+  return parseFromApi(adminEggSchema, data.egg);
 };

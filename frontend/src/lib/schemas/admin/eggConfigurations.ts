@@ -94,7 +94,7 @@ export const adminEggConfigurationSchema = z.object({
       order: z.array(eggConfigurationRouteItemSchema),
     })
     .nullable(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 export const adminEggConfigurationUpdateSchema = z.lazy(() =>

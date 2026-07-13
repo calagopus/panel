@@ -19,10 +19,19 @@ pub type GetEggConfiguration = shared::extract::ConsumingExtension<EggConfigurat
 pub async fn auth(
     state: GetState,
     permissions: GetPermissionManager,
-    Path(egg_configuration): Path<uuid::Uuid>,
+    Path(egg_configuration): Path<Vec<String>>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
+    let egg_configuration = match egg_configuration.first().map(|s| s.parse::<uuid::Uuid>()) {
+        Some(Ok(id)) => id,
+        _ => {
+            return Ok(ApiResponse::error("invalid egg configuration uuid")
+                .with_status(StatusCode::BAD_REQUEST)
+                .into_response());
+        }
+    };
+
     if let Err(err) = permissions.has_admin_permission("egg-configurations.read") {
         return Ok(err.into_response());
     }

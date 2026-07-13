@@ -41,6 +41,7 @@ import ServerAddGroupModal from './modals/ServerAddGroupModal.tsx';
 
 export default function ServerItem({
   server,
+  to,
   showGroupAddButton = false,
   showForeignServerBadge = false,
   showContextMenu = false,
@@ -52,6 +53,7 @@ export default function ServerItem({
   sKeyPressedRef,
 }: {
   server: z.infer<typeof serverSchema>;
+  to?: string;
   showGroupAddButton?: boolean;
   showForeignServerBadge?: boolean;
   showContextMenu?: boolean;
@@ -106,6 +108,7 @@ export default function ServerItem({
         enabled={showContextMenu}
         items={[
           {
+            type: 'action',
             icon: faPlay,
             label: t('common.enum.serverPowerAction.start', {}),
             color: 'gray',
@@ -114,6 +117,7 @@ export default function ServerItem({
             onClick: () => doPowerAction('start'),
           },
           {
+            type: 'action',
             icon: faRotateRight,
             label: t('common.enum.serverPowerAction.restart', {}),
             canAccess: canPower('control.restart'),
@@ -121,6 +125,7 @@ export default function ServerItem({
             onClick: () => doPowerAction('restart'),
           },
           {
+            type: 'action',
             icon: faStop,
             label: t('common.enum.serverPowerAction.stop', {}),
             color: 'red',
@@ -129,6 +134,7 @@ export default function ServerItem({
             onClick: () => doPowerAction('stop'),
           },
           {
+            type: 'action',
             icon: faSkull,
             label: t('common.enum.serverPowerAction.kill', {}),
             color: 'red',
@@ -149,7 +155,7 @@ export default function ServerItem({
               }}
             >
               <NavLink
-                to={`/server/${server.uuidShort}`}
+                to={to ?? `/server/${server.uuidShort}`}
                 onClick={(e) => {
                   if (sKeyPressedRef?.current) {
                     e.preventDefault();

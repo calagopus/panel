@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useShallow } from 'zustand/react/shallow';
 import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
+import NumberInput from '@/elements/input/NumberInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Popover from '@/elements/Popover.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
@@ -13,17 +14,21 @@ export default function FileEditorSettings() {
   const {
     editorMinimap,
     editorLineOverflow,
+    editorFontSize,
     vscodeUriScheme,
     setEditorMinimap,
     setEditorLineOverflow,
+    setEditorFontSize,
     setVscodeUriScheme,
   } = useFileManager(
     useShallow((state) => ({
       editorMinimap: state.editorMinimap,
       editorLineOverflow: state.editorLineOverflow,
+      editorFontSize: state.editorFontSize,
       vscodeUriScheme: state.vscodeUriScheme,
       setEditorMinimap: state.setEditorMinimap,
       setEditorLineOverflow: state.setEditorLineOverflow,
+      setEditorFontSize: state.setEditorFontSize,
       setVscodeUriScheme: state.setVscodeUriScheme,
     })),
   );
@@ -54,6 +59,14 @@ export default function FileEditorSettings() {
             className='order-20'
             checked={editorLineOverflow}
             onChange={(e) => setEditorLineOverflow(e.target.checked)}
+          />
+          <NumberInput
+            label={t('pages.server.files.settings.editorFontSize', {})}
+            className='order-25'
+            min={6}
+            max={72}
+            value={editorFontSize}
+            onChange={(value) => setEditorFontSize(Number(value) || 14)}
           />
           <TextInput
             label={t('pages.server.files.settings.vscodeUriScheme', {})}

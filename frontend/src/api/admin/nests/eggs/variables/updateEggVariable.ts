@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { formExtensionSchemas, serializeForApi } from '@/lib/api-transform.ts';
 import { adminEggVariableUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
-import { transformKeysToSnakeCase } from '@/lib/transformers.ts';
 
 export default async (
   nestUuid: string,
@@ -11,6 +11,6 @@ export default async (
 ): Promise<void> => {
   await axiosInstance.patch(
     `/api/admin/nests/${nestUuid}/eggs/${eggUuid}/variables/${variableUuid}`,
-    transformKeysToSnakeCase(data),
+    serializeForApi(adminEggVariableUpdateSchema, data, formExtensionSchemas('admin.nests.eggs.variables')),
   );
 };

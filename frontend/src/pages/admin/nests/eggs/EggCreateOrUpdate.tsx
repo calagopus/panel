@@ -692,12 +692,14 @@ export default function EggCreateOrUpdate({
                   menuProps={{ position: 'top', offset: 40 }}
                   items={[
                     {
+                      type: 'action',
                       icon: faUpload,
                       label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.fromFile', {}),
                       onClick: () => fileInputRef.current?.click(),
                       color: 'gray',
                     },
                     {
+                      type: 'action',
                       icon: faRefresh,
                       label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.fromRepository', {}),
                       disabled: !contextEgg.eggRepositoryEgg,
@@ -725,12 +727,14 @@ export default function EggCreateOrUpdate({
                   menuProps={{ position: 'top', offset: 40 }}
                   items={[
                     {
+                      type: 'action',
                       icon: faFileDownload,
                       label: t('common.button.exportAs', { format: 'JSON' }),
                       onClick: () => doExport('json'),
                       color: 'gray',
                     },
                     {
+                      type: 'action',
                       icon: faFileDownload,
                       label: t('common.button.exportAs', { format: 'YAML' }),
                       onClick: () => doExport('yaml'),

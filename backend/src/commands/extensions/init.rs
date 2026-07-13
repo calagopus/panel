@@ -132,10 +132,12 @@ impl shared::extensions::commands::CliCommand<InitArgs> for InitCommand {
                 extension_distr.metadata_toml.package_name = old_package_name;
 
                 let frontend_path = backend_path.join("frontend");
-                let migrations_path = backend_path.join("migrations");
+                let migrations_path = super::prepare_migrations_dir(
+                    &MetadataToml::convert_package_name_to_identifier(&args.package_name),
+                )
+                .await?;
                 tokio::fs::create_dir_all(&backend_path).await?;
                 tokio::fs::create_dir_all(&frontend_path).await?;
-                tokio::fs::create_dir_all(&migrations_path).await?;
 
                 let extension_distr = tokio::task::spawn_blocking({
                     let frontend_path = frontend_path.clone();

@@ -1,11 +1,12 @@
 import { z } from 'zod';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
+import { adminDatabaseAgentTemplateSchema } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
-import { databaseType } from '@/lib/schemas/generic.ts';
+import { databaseAgentType, databaseType } from '@/lib/schemas/generic.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { serverAutostartBehavior, serverStatus } from '@/lib/schemas/server/server.ts';
 import { nullableNumber, nullableString } from '@/lib/transformers.ts';
@@ -54,7 +55,7 @@ export const adminServerSchema = z.object({
   timezone: z.preprocess(nullableString, z.string().nullable()),
   hugepagesPassthroughEnabled: z.boolean(),
   kvmPassthroughEnabled: z.boolean(),
-  created: z.date(),
+  created: z.coerce.date(),
 });
 
 const adminServerBaseOmit = adminServerSchema.omit({
@@ -115,8 +116,8 @@ export const adminServerBackupSchema = z.object({
   bytes: z.number(),
   files: z.number(),
   metadata: z.record(z.string(), z.unknown()),
-  completed: z.date().nullable(),
-  created: z.date(),
+  completed: z.coerce.date().nullable(),
+  created: z.coerce.date(),
 });
 
 export const adminServerDatabaseSchema = z.object({
@@ -129,10 +130,27 @@ export const adminServerDatabaseSchema = z.object({
   host: z.string(),
   port: z.number(),
   type: databaseType,
-  created: z.date(),
+  created: z.coerce.date(),
+});
+
+export const adminServerDatabaseAgentSchema = z.object({
+  uuid: z.string(),
+  server: z.lazy(() => adminServerSchema),
+  databaseAgentTemplate: z.lazy(() => adminDatabaseAgentTemplateSchema).nullable(),
+  type: z.lazy(() => databaseAgentType),
+  host: z.string().nullable(),
+  port: z.number().nullable(),
+  name: z.string(),
+  isLocked: z.boolean(),
+  memory: z.number(),
+  swap: z.number(),
+  disk: z.number(),
+  ioWeight: z.number().nullable(),
+  cpu: z.number(),
+  created: z.coerce.date(),
 });
 
 export const adminServerMountSchema = z.object({
   mount: z.lazy(() => adminMountSchema),
-  created: z.date(),
+  created: z.coerce.date(),
 });

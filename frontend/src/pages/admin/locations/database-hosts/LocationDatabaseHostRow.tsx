@@ -58,6 +58,7 @@ export default function LocationDatabaseHostRow({
       <ContextMenu
         items={[
           {
+            type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('delete'),

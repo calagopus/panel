@@ -87,12 +87,14 @@ export default function StepCard({
     <ContextMenu
       items={[
         {
+          type: 'action',
           icon: faPencil,
           label: t('common.button.edit', {}),
           onClick: () => handleOpenModal('update'),
           color: 'gray',
         },
         {
+          type: 'action',
           icon: faCodeBranch,
           label: t('pages.server.schedules.button.addElseIf', {}),
           hidden: !onStepAddBranch || !isBranchStart,
@@ -100,6 +102,7 @@ export default function StepCard({
           color: 'gray',
         },
         {
+          type: 'action',
           icon: faCodeBranch,
           label: t('pages.server.schedules.button.addElse', {}),
           hidden: !onStepAddBranch || !isBranchStart || !canAddElse,
@@ -107,12 +110,14 @@ export default function StepCard({
           color: 'gray',
         },
         {
+          type: 'action',
           icon: faClone,
           label: t('common.button.duplicate', {}),
           onClick: doDuplicate,
           color: 'gray',
         },
         {
+          type: 'action',
           icon: faTrash,
           label: t('common.button.delete', {}),
           onClick: () => handleOpenModal('delete'),

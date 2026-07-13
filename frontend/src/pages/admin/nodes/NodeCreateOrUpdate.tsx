@@ -1,8 +1,6 @@
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
@@ -16,12 +14,8 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import NumberInput from '@/elements/input/NumberInput.tsx';
-import Select from '@/elements/input/Select.tsx';
-import SizeInput from '@/elements/input/SizeInput.tsx';
-import Switch from '@/elements/input/Switch.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
@@ -36,6 +30,8 @@ import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
+type NodeFormValues = z.infer<typeof adminNodeUpdateSchema>;
+
 export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
@@ -44,7 +40,8 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
-  const form = useForm<z.infer<typeof adminNodeUpdateSchema>>({
+  const form = useFormEngine<NodeFormValues>('admin.nodes.createOrUpdate', {
+    schema: adminNodeUpdateSchema.unwrap(),
     mode: 'uncontrolled',
     initialValues: {
       locationUuid: '',
@@ -62,11 +59,10 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
     },
     onValuesChange: () => setIsValid(form.isValid()),
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminNodeUpdateSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminNodeUpdateSchema>,
+    NodeFormValues,
     z.infer<typeof adminNodeSchema>
   >({
     form,
@@ -126,6 +122,86 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       .finally(() => setLoading(false));
   };
 
+  const fields: FieldDef<NodeFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    {
+      type: 'select',
+      name: 'locationUuid',
+      label: t('common.table.columns.location', {}),
+      required: true,
+      options: locations.items.map((l) => ({ label: l.name, value: l.uuid })),
+      props: {
+        searchable: true,
+        searchValue: locations.search,
+        onSearchChange: locations.setSearch,
+        loading: locations.loading,
+      },
+    },
+    {
+      type: 'text',
+      name: 'url',
+      label: t('common.form.url', {}),
+      required: true,
+      description: t('pages.admin.nodes.tabs.general.page.form.urlDescription', {}),
+      props: { disabled: contextNode ? isNodeAIO(contextNode) : false },
+    },
+    {
+      type: 'custom',
+      name: 'publicUrl',
+      render: (f) => (
+        <TextInput
+          label={t('common.form.publicUrl', {})}
+          description={t('pages.admin.nodes.tabs.general.page.form.publicUrlDescription', {})}
+          key={f.key('publicUrl')}
+          rightSection={
+            <Tooltip label={t('pages.admin.nodes.tabs.general.page.tooltip.useWingsProxyUrl', {})}>
+              <ActionIcon
+                variant='subtle'
+                onClick={() =>
+                  f.setFieldValue('publicUrl', `${window.location.origin}/wings-proxy/${contextNode?.uuid}`)
+                }
+                disabled={!contextNode}
+                size='lg'
+              >
+                <FontAwesomeIcon icon={faGlobe} />
+              </ActionIcon>
+            </Tooltip>
+          }
+          {...f.getInputProps('publicUrl')}
+          disabled={contextNode ? isNodeAIO(contextNode) : false}
+        />
+      ),
+    },
+    { type: 'text', name: 'sftpHost', label: t('common.form.sftpHost', {}) },
+    {
+      type: 'number',
+      name: 'sftpPort',
+      label: t('common.form.sftpPort', {}),
+      required: true,
+      props: { min: 1, max: 65535 },
+    },
+    { type: 'size', name: 'memory', label: t('common.form.memory', {}), required: true, mode: 'mb', min: 0 },
+    { type: 'size', name: 'disk', label: t('common.form.disk', {}), required: true, mode: 'mb', min: 0 },
+    {
+      type: 'select',
+      name: 'backupConfigurationUuid',
+      label: t('common.form.backupConfiguration', {}),
+      options: backupConfigurations.items.map((b) => ({ label: b.name, value: b.uuid })),
+      props: {
+        placeholder: t('pages.admin.nodes.tabs.general.page.form.backupConfigurationPlaceholder', {}),
+        searchable: true,
+        searchValue: backupConfigurations.search,
+        onSearchChange: backupConfigurations.setSearch,
+        allowDeselect: true,
+        clearable: true,
+        loading: backupConfigurations.loading,
+      },
+    },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
+    { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
+    { type: 'switch', name: 'maintenanceEnabled', label: t('common.form.maintenanceEnabled', {}) },
+  ];
+
   return (
     <AdminContentContainer
       title={
@@ -151,123 +227,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       )}
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nodes.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <Select
-            withAsterisk
-            label={t('common.table.columns.location', {})}
-            data={locations.items.map((location) => ({
-              label: location.name,
-              value: location.uuid,
-            }))}
-            searchable
-            searchValue={locations.search}
-            onSearchChange={locations.setSearch}
-            loading={locations.loading}
-            key={form.key('locationUuid')}
-            {...form.getInputProps('locationUuid')}
-          />
-
-          <TextInput
-            withAsterisk
-            label={t('common.form.url', {})}
-            description={t('pages.admin.nodes.tabs.general.page.form.urlDescription', {})}
-            key={form.key('url')}
-            {...form.getInputProps('url')}
-            disabled={contextNode ? isNodeAIO(contextNode) : false}
-          />
-          <TextInput
-            label={t('common.form.publicUrl', {})}
-            description={t('pages.admin.nodes.tabs.general.page.form.publicUrlDescription', {})}
-            key={form.key('publicUrl')}
-            rightSection={
-              <Tooltip label={t('pages.admin.nodes.tabs.general.page.tooltip.useWingsProxyUrl', {})}>
-                <ActionIcon
-                  variant='subtle'
-                  onClick={() =>
-                    form.setFieldValue('publicUrl', `${window.location.origin}/wings-proxy/${contextNode?.uuid}`)
-                  }
-                  disabled={!contextNode}
-                  size='lg'
-                >
-                  <FontAwesomeIcon icon={faGlobe} />
-                </ActionIcon>
-              </Tooltip>
-            }
-            {...form.getInputProps('publicUrl')}
-            disabled={contextNode ? isNodeAIO(contextNode) : false}
-          />
-
-          <TextInput
-            label={t('common.form.sftpHost', {})}
-            key={form.key('sftpHost')}
-            {...form.getInputProps('sftpHost')}
-          />
-          <NumberInput
-            withAsterisk
-            label={t('common.form.sftpPort', {})}
-            min={1}
-            max={65535}
-            key={form.key('sftpPort')}
-            {...form.getInputProps('sftpPort')}
-          />
-
-          <SizeInput
-            withAsterisk
-            label={t('common.form.memory', {})}
-            mode='mb'
-            min={0}
-            value={form.getValues().memory}
-            onChange={(value) => form.setFieldValue('memory', value)}
-          />
-          <SizeInput
-            withAsterisk
-            label={t('common.form.disk', {})}
-            mode='mb'
-            min={0}
-            value={form.getValues().disk}
-            onChange={(value) => form.setFieldValue('disk', value)}
-          />
-
-          <Select
-            label={t('common.form.backupConfiguration', {})}
-            placeholder={t('pages.admin.nodes.tabs.general.page.form.backupConfigurationPlaceholder', {})}
-            data={backupConfigurations.items.map((backupConfiguration) => ({
-              label: backupConfiguration.name,
-              value: backupConfiguration.uuid,
-            }))}
-            searchable
-            searchValue={backupConfigurations.search}
-            onSearchChange={backupConfigurations.setSearch}
-            allowDeselect
-            clearable
-            loading={backupConfigurations.loading}
-            key={form.key('backupConfigurationUuid')}
-            {...form.getInputProps('backupConfigurationUuid')}
-          />
-          <TextArea
-            label={t('common.form.description', {})}
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
-
-          <Switch
-            label={t('common.form.deploymentEnabled', {})}
-            key={form.key('deploymentEnabled')}
-            {...form.getInputProps('deploymentEnabled', { type: 'checkbox' })}
-          />
-          <Switch
-            label={t('common.form.maintenanceEnabled', {})}
-            key={form.key('maintenanceEnabled')}
-            {...form.getInputProps('maintenanceEnabled', { type: 'checkbox' })}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextNode ? 'nodes.update' : 'nodes.create'} cantSave>

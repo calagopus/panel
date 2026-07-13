@@ -8,6 +8,7 @@ import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
 import Sidebar from '@/elements/Sidebar.tsx';
 import Spinner from '@/elements/Spinner.tsx';
+import { resolveString } from '@/lib/lazy.ts';
 import { isAdmin } from '@/lib/permissions.ts';
 import { to } from '@/lib/routes.ts';
 import DashboardHomeAll from '@/pages/dashboard/home/DashboardHomeAll.tsx';
@@ -123,7 +124,7 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                   to={to(route.path, '/account')}
                   end={route.exact}
                   icon={route.icon}
-                  name={typeof route.name === 'function' ? route.name() : route.name}
+                  name={resolveString(route.name)}
                   activeMatches={route.activeMatches}
                 />
               );

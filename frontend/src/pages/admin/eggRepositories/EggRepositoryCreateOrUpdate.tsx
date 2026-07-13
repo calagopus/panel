@@ -1,5 +1,3 @@
-import { useForm } from '@mantine/form';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createEggRepository from '@/api/admin/egg-repositories/createEggRepository.ts';
@@ -10,15 +8,16 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositorySchema, adminEggRepositoryUpdateSchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+
+type EggRepositoryFormValues = z.infer<typeof adminEggRepositoryUpdateSchema>;
 
 export default function EggRepositoryCreateOrUpdate({
   contextEggRepository,
@@ -30,18 +29,18 @@ export default function EggRepositoryCreateOrUpdate({
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
-  const form = useForm<z.infer<typeof adminEggRepositoryUpdateSchema>>({
+  const form = useFormEngine<EggRepositoryFormValues>('admin.eggRepositories.createOrUpdate', {
+    schema: adminEggRepositoryUpdateSchema.unwrap(),
     initialValues: {
       name: '',
       description: null,
       gitRepository: '',
     },
     validateInputOnBlur: true,
-    validate: zod4Resolver(adminEggRepositoryUpdateSchema),
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
-    z.infer<typeof adminEggRepositoryUpdateSchema>,
+    EggRepositoryFormValues,
     z.infer<typeof adminEggRepositorySchema>
   >({
     form,
@@ -85,6 +84,17 @@ export default function EggRepositoryCreateOrUpdate({
       .finally(() => setLoading(false));
   };
 
+  const fields: FieldDef<EggRepositoryFormValues>[] = [
+    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    {
+      type: 'text',
+      name: 'gitRepository',
+      label: t('pages.admin.eggRepositories.tabs.general.page.form.gitRepository', {}),
+      required: true,
+    },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
+  ];
+
   return (
     <AdminContentContainer
       title={
@@ -107,28 +117,7 @@ export default function EggRepositoryCreateOrUpdate({
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.eggRepositories.all()))}>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <TextInput
-            withAsterisk
-            label={t('common.form.name', {})}
-            key={form.key('name')}
-            {...form.getInputProps('name')}
-          />
-          <TextInput
-            withAsterisk
-            label={t('pages.admin.eggRepositories.tabs.general.page.form.gitRepository', {})}
-            key={form.key('gitRepository')}
-            {...form.getInputProps('gitRepository')}
-          />
-
-          <TextArea
-            label={t('common.form.description', {})}
-            className='col-span-full'
-            rows={3}
-            key={form.key('description')}
-            {...form.getInputProps('description')}
-          />
-        </div>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
           <AdminCan action={contextEggRepository ? 'egg-repositories.update' : 'egg-repositories.create'} cantSave>

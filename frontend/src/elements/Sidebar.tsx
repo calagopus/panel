@@ -17,6 +17,7 @@ import { flushSync } from 'react-dom';
 import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
 import { makeComponentHookable } from 'shared';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Avatar from '@/elements/Avatar.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import CloseButton from '@/elements/CloseButton.tsx';
@@ -107,6 +108,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
       menuProps={{ width: 250 }}
       items={[
         {
+          type: 'action',
           icon: faWindowRestore,
           label: t('elements.sidebar.button.openInVirtualWindow', {}),
           onClick: () =>
@@ -119,6 +121,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
           color: 'gray',
         },
         {
+          type: 'action',
           icon: faWindowRestore,
           label: t('elements.sidebar.button.openInPopup', {}),
           onClick: () =>
@@ -130,6 +133,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
           color: 'gray',
         },
         {
+          type: 'action',
           icon: faWindowRestore,
           label: t('elements.sidebar.button.openInNewTab', {}),
           onClick: () => window.open(to, '_blank'),
@@ -236,11 +240,7 @@ function Footer() {
             navigate('/account');
           }}
         >
-          <img
-            src={user.avatar ?? '/icon.svg'}
-            alt={user.username}
-            className='h-10 w-10 rounded-full select-none shrink-0'
-          />
+          <Avatar size={40} className='select-none shrink-0' src={user.avatar} name={user.username} />
           <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
             {user.username}
           </span>

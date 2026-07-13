@@ -1,0 +1,1369 @@
+// This file is auto-generated from OpenAPI spec. Do not edit manually.
+use super::*;
+use futures_util::TryStreamExt;
+use reqwest::{Client, Method, StatusCode};
+use serde::de::DeserializeOwned;
+use std::{
+    pin::Pin,
+    sync::LazyLock,
+    task::{Context, Poll},
+};
+use tokio::io::AsyncRead;
+use tokio_tungstenite::tungstenite::{Error, client::IntoClientRequest, http::HeaderValue};
+
+static CLIENT: LazyLock<Client> = LazyLock::new(|| {
+    Client::builder()
+        .user_agent("Calagopus Panel")
+        .build()
+        .expect("Failed to create reqwest client")
+});
+
+#[derive(Debug)]
+pub enum ApiHttpError {
+    Http(StatusCode, super::ApiError),
+    Reqwest(reqwest::Error),
+    WebSocket(tokio_tungstenite::tungstenite::Error),
+    MsgpackEncode(rmp_serde::encode::Error),
+    MsgpackDecode(rmp_serde::decode::Error),
+}
+
+impl From<ApiHttpError> for anyhow::Error {
+    fn from(value: ApiHttpError) -> Self {
+        match value {
+            ApiHttpError::Http(status, err) => {
+                anyhow::anyhow!("wings api status code {status}: {}", err.error)
+            }
+            ApiHttpError::Reqwest(err) => anyhow::anyhow!(err),
+            ApiHttpError::WebSocket(err) => anyhow::anyhow!(err),
+            ApiHttpError::MsgpackEncode(err) => anyhow::anyhow!(err),
+            ApiHttpError::MsgpackDecode(err) => anyhow::anyhow!(err),
+        }
+    }
+}
+
+pub struct AsyncResponseReader(Box<dyn AsyncRead + Send + Unpin>);
+
+impl AsyncRead for AsyncResponseReader {
+    fn poll_read(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> Poll<std::io::Result<()>> {
+        Pin::new(&mut self.0).poll_read(cx, buf)
+    }
+}
+
+impl<'de> Deserialize<'de> for AsyncResponseReader {
+    fn deserialize<D>(_deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        Ok(Self(Box::new(tokio::io::empty())))
+    }
+}
+
+pub struct AsyncRequestReader(Box<dyn AsyncRead + Send + Unpin>);
+
+impl AsyncRequestReader {
+    #[inline]
+    pub fn new(reader: impl AsyncRead + Send + Unpin + 'static) -> Self {
+        Self(Box::new(reader))
+    }
+}
+
+impl AsyncRead for AsyncRequestReader {
+    fn poll_read(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> Poll<std::io::Result<()>> {
+        Pin::new(&mut self.0).poll_read(cx, buf)
+    }
+}
+
+async fn request_impl<T: DeserializeOwned + 'static>(
+    client: &WingsClient,
+    method: Method,
+    endpoint: impl AsRef<str>,
+    body: Option<&impl Serialize>,
+    body_reader: Option<AsyncRequestReader>,
+) -> Result<T, ApiHttpError> {
+    let url = format!(
+        "{}{}",
+        client.base_url.trim_end_matches('/'),
+        endpoint.as_ref()
+    );
+    let mut request = CLIENT.request(method, &url);
+    request = request.header("Accept", "application/msgpack");
+
+    if !client.token.is_empty() {
+        request = request.header("Authorization", format!("Bearer {}", client.token));
+    }
+
+    if let Some(body) = body {
+        request = request.header("Content-Type", "application/msgpack");
+
+        let mut bytes = Vec::new();
+        let mut se = rmp_serde::Serializer::new(&mut bytes)
+            .with_struct_map()
+            .with_human_readable();
+        if let Err(err) = body.serialize(&mut se) {
+            return Err(ApiHttpError::MsgpackEncode(err));
+        }
+        request = request.body(bytes);
+    } else if let Some(body_reader) = body_reader {
+        request = request.body(reqwest::Body::wrap_stream(
+            tokio_util::io::ReaderStream::new(body_reader),
+        ));
+    }
+
+    match request.send().await {
+        Ok(response) => {
+            if response.status().is_success() {
+                if std::any::type_name::<T>() == std::any::type_name::<AsyncResponseReader>() {
+                    let stream = response.bytes_stream().map_err(|err| {
+                        std::io::Error::other(format!("failed to read multipart field: {err}"))
+                    });
+                    let stream_reader = tokio_util::io::StreamReader::new(stream);
+
+                    return Ok(*(Box::new(AsyncResponseReader(Box::new(stream_reader)))
+                        as Box<dyn std::any::Any>)
+                        .downcast::<T>()
+                        .unwrap());
+                }
+
+                match response.bytes().await {
+                    Ok(data) => {
+                        let mut de =
+                            rmp_serde::Deserializer::new(data.as_ref()).with_human_readable();
+                        match T::deserialize(&mut de) {
+                            Ok(data) => Ok(data),
+                            Err(err) => Err(ApiHttpError::MsgpackDecode(err)),
+                        }
+                    }
+                    Err(err) => Err(ApiHttpError::Reqwest(err)),
+                }
+            } else {
+                Err(ApiHttpError::Http(
+                    response.status(),
+                    match response.bytes().await {
+                        Ok(data) => {
+                            let mut de =
+                                rmp_serde::Deserializer::new(data.as_ref()).with_human_readable();
+                            match super::ApiError::deserialize(&mut de) {
+                                Ok(data) => data,
+                                Err(err) => super::ApiError {
+                                    error: err.to_string().into(),
+                                },
+                            }
+                        }
+                        Err(err) => super::ApiError {
+                            error: err.to_string().into(),
+                        },
+                    },
+                ))
+            }
+        }
+        Err(err) => Err(ApiHttpError::Reqwest(err)),
+    }
+}
+
+pub struct WingsClient {
+    base_url: String,
+    token: String,
+}
+
+impl WingsClient {
+    #[inline]
+    pub fn new(base_url: String, token: String) -> Self {
+        Self { base_url, token }
+    }
+
+    pub fn request_raw(
+        &self,
+        method: Method,
+        endpoint: impl AsRef<str>,
+    ) -> reqwest::RequestBuilder {
+        let url = format!(
+            "{}/{}",
+            self.base_url.trim_end_matches('/'),
+            endpoint.as_ref().trim_start_matches('/')
+        );
+        let mut request = CLIENT.request(method, &url);
+
+        if !self.token.is_empty() {
+            request = request.header("Authorization", format!("Bearer {}", self.token));
+        }
+
+        request
+    }
+
+    pub async fn open_websocket(
+        &self,
+        endpoint: impl AsRef<str>,
+        headers: reqwest::header::HeaderMap,
+    ) -> Result<
+        tokio_tungstenite::WebSocketStream<
+            tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>,
+        >,
+        ApiHttpError,
+    > {
+        let url = format!(
+            "{}{}",
+            self.base_url.trim_end_matches('/'),
+            endpoint.as_ref()
+        );
+        let url = if let Some(rest) = url.strip_prefix("https://") {
+            format!("wss://{rest}")
+        } else if let Some(rest) = url.strip_prefix("http://") {
+            format!("ws://{rest}")
+        } else {
+            url
+        };
+
+        let mut request = url.into_client_request().map_err(ApiHttpError::WebSocket)?;
+
+        if !self.token.is_empty() {
+            let value = HeaderValue::from_str(&format!("Bearer {}", self.token))
+                .map_err(|err| ApiHttpError::WebSocket(Error::HttpFormat(err.into())))?;
+            request.headers_mut().insert("Authorization", value);
+        }
+
+        for (header, value) in headers {
+            let Some(header) = header else {
+                continue;
+            };
+            request.headers_mut().insert(header, value);
+        }
+
+        let (stream, _) = tokio_tungstenite::connect_async(request)
+            .await
+            .map_err(ApiHttpError::WebSocket)?;
+
+        Ok(stream)
+    }
+
+    pub async fn delete_backups_backup(
+        &self,
+        backup: uuid::Uuid,
+        data: &super::backups_backup::delete::RequestBody,
+    ) -> Result<super::backups_backup::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/backups/{backup}"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_backups_backup_export(
+        &self,
+        backup: uuid::Uuid,
+        data: &super::backups_backup_export::post::RequestBody,
+    ) -> Result<super::backups_backup_export::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/backups/{backup}/export"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_backups_backup_query(
+        &self,
+        backup: uuid::Uuid,
+        query: &super::backups_backup_query::get::Query,
+    ) -> Result<super::backups_backup_query::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.adapter {
+            query_parts.push(format!("adapter={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/backups/{backup}/query{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_deauthorize_user(
+        &self,
+        data: &super::deauthorize_user::post::RequestBody,
+    ) -> Result<super::deauthorize_user::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            "/api/deauthorize-user",
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers(&self) -> Result<super::servers::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/servers", None::<&()>, None).await
+    }
+
+    pub async fn post_servers(
+        &self,
+        data: &super::servers::post::RequestBody,
+    ) -> Result<super::servers::post::Response, ApiHttpError> {
+        request_impl(self, Method::POST, "/api/servers", Some(data), None).await
+    }
+
+    pub async fn post_servers_power(
+        &self,
+        data: &super::servers_power::post::RequestBody,
+    ) -> Result<super::servers_power::post::Response, ApiHttpError> {
+        request_impl(self, Method::POST, "/api/servers/power", Some(data), None).await
+    }
+
+    pub async fn get_servers_utilization(
+        &self,
+    ) -> Result<super::servers_utilization::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            "/api/servers/utilization",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn delete_servers_server(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/servers/{server}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_backup(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_backup::post::RequestBody,
+    ) -> Result<super::servers_server_backup::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/backup"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn delete_servers_server_backup_backup(
+        &self,
+        server: uuid::Uuid,
+        backup: uuid::Uuid,
+    ) -> Result<super::servers_server_backup_backup::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/servers/{server}/backup/{backup}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_backup_backup_restore(
+        &self,
+        server: uuid::Uuid,
+        backup: uuid::Uuid,
+        data: &super::servers_server_backup_backup_restore::post::RequestBody,
+    ) -> Result<super::servers_server_backup_backup_restore::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/backup/{backup}/restore"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_commands(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_commands::post::RequestBody,
+    ) -> Result<super::servers_server_commands::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/commands"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_chmod(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_chmod::post::RequestBody,
+    ) -> Result<super::servers_server_files_chmod::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/chmod"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_compress(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_compress::post::RequestBody,
+    ) -> Result<super::servers_server_files_compress::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/compress"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_contents(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_files_contents::get::Query,
+    ) -> Result<super::servers_server_files_contents::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.file {
+            query_parts.push(format!("file={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = query.download {
+            query_parts.push(format!("download={}", value).into());
+        }
+        if let Some(value) = query.max_size {
+            query_parts.push(format!("max_size={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/contents{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_copy(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_copy::post::RequestBody,
+    ) -> Result<super::servers_server_files_copy::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/copy"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_copy_many(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_copy_many::post::RequestBody,
+    ) -> Result<super::servers_server_files_copy_many::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/copy-many"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_copy_remote(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_copy_remote::post::RequestBody,
+    ) -> Result<super::servers_server_files_copy_remote::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/copy-remote"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_create_directory(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_create_directory::post::RequestBody,
+    ) -> Result<super::servers_server_files_create_directory::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/create-directory"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_decompress(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_decompress::post::RequestBody,
+    ) -> Result<super::servers_server_files_decompress::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/decompress"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_delete(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_delete::post::RequestBody,
+    ) -> Result<super::servers_server_files_delete::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/delete"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_fingerprints(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_files_fingerprints::get::Query,
+    ) -> Result<super::servers_server_files_fingerprints::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.algorithm {
+            query_parts.push(format!("algorithm={}", value).into());
+        }
+        if let Some(value) = &query.files {
+            for value in value {
+                query_parts.push(format!("files={}", urlencoding::encode(value)).into());
+            }
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/fingerprints{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_largest_directories(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_files_largest_directories::get::Query,
+    ) -> Result<super::servers_server_files_largest_directories::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.directory {
+            query_parts.push(format!("directory={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/largest-directories{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_list(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_files_list::get::Query,
+    ) -> Result<super::servers_server_files_list::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.directory {
+            query_parts.push(format!("directory={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
+        }
+        if let Some(value) = query.per_page {
+            query_parts.push(format!("per_page={}", value).into());
+        }
+        if let Some(value) = query.page {
+            query_parts.push(format!("page={}", value).into());
+        }
+        if let Some(value) = query.sort {
+            query_parts.push(format!("sort={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/list{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_list_directory(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_files_list_directory::get::Query,
+    ) -> Result<super::servers_server_files_list_directory::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.directory {
+            query_parts.push(format!("directory={}", urlencoding::encode(value)).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/list-directory{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_operations(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_files_operations::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/operations"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn delete_servers_server_files_operations_operation(
+        &self,
+        server: uuid::Uuid,
+        operation: uuid::Uuid,
+    ) -> Result<super::servers_server_files_operations_operation::delete::Response, ApiHttpError>
+    {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/servers/{server}/files/operations/{operation}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_pull(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_files_pull::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/pull"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_pull(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_pull::post::RequestBody,
+    ) -> Result<super::servers_server_files_pull::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/pull"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_pull_query(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_pull_query::post::RequestBody,
+    ) -> Result<super::servers_server_files_pull_query::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/pull/query"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn delete_servers_server_files_pull_pull(
+        &self,
+        server: uuid::Uuid,
+        pull: uuid::Uuid,
+    ) -> Result<super::servers_server_files_pull_pull::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/servers/{server}/files/pull/{pull}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn put_servers_server_files_rename(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_rename::put::RequestBody,
+    ) -> Result<super::servers_server_files_rename::put::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::PUT,
+            format!("/api/servers/{server}/files/rename"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_revisions(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_files_revisions::get::Query,
+    ) -> Result<super::servers_server_files_revisions::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.file {
+            query_parts.push(format!("file={}", urlencoding::encode(value)).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/revisions{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_files_revisions_revision(
+        &self,
+        server: uuid::Uuid,
+        revision: i64,
+    ) -> Result<super::servers_server_files_revisions_revision::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/revisions/{revision}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_search(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_search::post::RequestBody,
+    ) -> Result<super::servers_server_files_search::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/search"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_write(
+        &self,
+        server: uuid::Uuid,
+        data: super::servers_server_files_write::post::RequestBody,
+        query: &super::servers_server_files_write::post::Query,
+    ) -> Result<super::servers_server_files_write::post::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.file {
+            query_parts.push(format!("file={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = query.user {
+            query_parts.push(format!("user={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/write{query}"),
+            None::<&()>,
+            Some(data),
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_install_abort(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_install_abort::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/install/abort"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_logs(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_logs::get::Query,
+    ) -> Result<super::servers_server_logs::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.lines {
+            query_parts.push(format!("lines={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/logs{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_logs_install(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_logs_install::get::Query,
+    ) -> Result<super::servers_server_logs_install::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.lines {
+            query_parts.push(format!("lines={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/logs/install{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_power(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_power::post::RequestBody,
+    ) -> Result<super::servers_server_power::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/power"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_reinstall(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_reinstall::post::RequestBody,
+    ) -> Result<super::servers_server_reinstall::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/reinstall"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_schedules_schedule(
+        &self,
+        server: uuid::Uuid,
+        schedule: uuid::Uuid,
+    ) -> Result<super::servers_server_schedules_schedule::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/schedules/{schedule}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_schedules_schedule_abort(
+        &self,
+        server: uuid::Uuid,
+        schedule: uuid::Uuid,
+    ) -> Result<super::servers_server_schedules_schedule_abort::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/schedules/{schedule}/abort"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_schedules_schedule_trigger(
+        &self,
+        server: uuid::Uuid,
+        schedule: uuid::Uuid,
+        data: &super::servers_server_schedules_schedule_trigger::post::RequestBody,
+    ) -> Result<super::servers_server_schedules_schedule_trigger::post::Response, ApiHttpError>
+    {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/schedules/{schedule}/trigger"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_script(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_script::post::RequestBody,
+    ) -> Result<super::servers_server_script::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/script"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_sync(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_sync::post::RequestBody,
+    ) -> Result<super::servers_server_sync::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/sync"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn delete_servers_server_transfer(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_transfer::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/servers/{server}/transfer"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_transfer(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_transfer::post::RequestBody,
+    ) -> Result<super::servers_server_transfer::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/transfer"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_utilization(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_utilization::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/utilization"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_version(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_version::get::Query,
+    ) -> Result<super::servers_server_version::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.game {
+            query_parts.push(format!("game={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/version{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_ws_broadcast(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_ws_broadcast::post::RequestBody,
+    ) -> Result<super::servers_server_ws_broadcast::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/ws/broadcast"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_ws_deny(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_ws_deny::post::RequestBody,
+    ) -> Result<super::servers_server_ws_deny::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/ws/deny"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_ws_permissions(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_ws_permissions::post::RequestBody,
+    ) -> Result<super::servers_server_ws_permissions::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/ws/permissions"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_system(&self) -> Result<super::system::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/system", None::<&()>, None).await
+    }
+
+    pub async fn get_system_config(
+        &self,
+    ) -> Result<super::system_config::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/system/config", None::<&()>, None).await
+    }
+
+    pub async fn get_system_logs(&self) -> Result<super::system_logs::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/system/logs", None::<&()>, None).await
+    }
+
+    pub async fn get_system_logs_file(
+        &self,
+        file: &str,
+        query: &super::system_logs_file::get::Query,
+    ) -> Result<super::system_logs_file::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.lines {
+            query_parts.push(format!("lines={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/system/logs/{file}{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_system_overview(
+        &self,
+    ) -> Result<super::system_overview::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/system/overview", None::<&()>, None).await
+    }
+
+    pub async fn get_system_restic_prune(
+        &self,
+    ) -> Result<super::system_restic_prune::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            "/api/system/restic/prune",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_system_restic_prune(
+        &self,
+        data: &super::system_restic_prune::post::RequestBody,
+    ) -> Result<super::system_restic_prune::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            "/api/system/restic/prune",
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_system_restic_stats(
+        &self,
+    ) -> Result<super::system_restic_stats::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            "/api/system/restic/stats",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_system_restic_stats(
+        &self,
+        data: &super::system_restic_stats::post::RequestBody,
+    ) -> Result<super::system_restic_stats::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            "/api/system/restic/stats",
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_system_restic_unlock(
+        &self,
+    ) -> Result<super::system_restic_unlock::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            "/api/system/restic/unlock",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_system_restic_unlock(
+        &self,
+        data: &super::system_restic_unlock::post::RequestBody,
+    ) -> Result<super::system_restic_unlock::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            "/api/system/restic/unlock",
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_system_stats(
+        &self,
+    ) -> Result<super::system_stats::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/system/stats", None::<&()>, None).await
+    }
+
+    pub async fn post_system_upgrade(
+        &self,
+        data: &super::system_upgrade::post::RequestBody,
+    ) -> Result<super::system_upgrade::post::Response, ApiHttpError> {
+        request_impl(self, Method::POST, "/api/system/upgrade", Some(data), None).await
+    }
+
+    pub async fn get_transfers(&self) -> Result<super::transfers::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/transfers", None::<&()>, None).await
+    }
+
+    pub async fn post_transfers(&self) -> Result<super::transfers::post::Response, ApiHttpError> {
+        request_impl(self, Method::POST, "/api/transfers", None::<&()>, None).await
+    }
+
+    pub async fn get_transfers_capabilities(
+        &self,
+    ) -> Result<super::transfers_capabilities::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            "/api/transfers/capabilities",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_transfers_files(
+        &self,
+    ) -> Result<super::transfers_files::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            "/api/transfers/files",
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_transfers_query(
+        &self,
+    ) -> Result<super::transfers_query::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/transfers/query", None::<&()>, None).await
+    }
+
+    pub async fn delete_transfers_server(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::transfers_server::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/transfers/{server}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_update(
+        &self,
+        data: &super::update::post::RequestBody,
+    ) -> Result<super::update::post::Response, ApiHttpError> {
+        request_impl(self, Method::POST, "/api/update", Some(data), None).await
+    }
+}

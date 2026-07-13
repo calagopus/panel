@@ -8,6 +8,7 @@ import { z } from 'zod';
 import checkpointLogin from '@/api/auth/checkpointLogin.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
+import Avatar from '@/elements/Avatar.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import Center from '@/elements/Center.tsx';
@@ -125,10 +126,10 @@ export default function LoginCheckpoint() {
             <Card>
               <Stack>
                 <div className='flex items-center gap-2'>
-                  <img
-                    src={twoFactorInformation?.user.avatar ?? '/icon.svg'}
-                    alt={twoFactorInformation?.user.username}
-                    className='size-14 rounded-full'
+                  <Avatar
+                    size={56}
+                    src={twoFactorInformation?.user.avatar}
+                    name={twoFactorInformation?.user.username}
                   />
                   <span className='text-neutral-400'>
                     {t('pages.auth.login.step.totp.welcomeBack', {

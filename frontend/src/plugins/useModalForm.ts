@@ -1,15 +1,22 @@
 import { UseFormInput, useForm } from '@mantine/form';
-import { useState } from 'react';
+import { deepmerge } from 'deepmerge-ts';
+import { useMemo, useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import type { ExtendableSchema, FormId } from '@/elements/form-engine/index.ts';
+import { resolveFormValidation, tagFormId } from '@/elements/form-engine/useFormEngine.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 
 interface UseModalFormOptions<T extends Record<string, unknown>> extends UseFormInput<T> {
+  formId?: FormId;
+  schema?: ExtendableSchema;
   onClose: () => void;
   onSubmit: (values: T) => Promise<void> | void;
   onError?: (error: unknown) => void;
 }
 
 export function useModalForm<T extends Record<string, unknown>>({
+  formId,
+  schema,
   onClose,
   onSubmit,
   onError,
@@ -17,7 +24,18 @@ export function useModalForm<T extends Record<string, unknown>>({
   ...formInput
 }: UseModalFormOptions<T>) {
   const { addToast } = useToast();
-  const form = useForm<T>({ ...formInput, validateInputOnBlur });
+
+  const resolved = useMemo(() => (formId ? resolveFormValidation(formId, schema) : undefined), [formId, schema]);
+
+  const form = useForm<T>({
+    ...formInput,
+    initialValues: formInput.initialValues
+      ? (deepmerge(formInput.initialValues, resolved?.initialValues ?? {}) as T)
+      : undefined,
+    validate: resolved?.validate ?? formInput.validate,
+    validateInputOnBlur,
+  });
+  if (formId) tagFormId(form, formId);
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {

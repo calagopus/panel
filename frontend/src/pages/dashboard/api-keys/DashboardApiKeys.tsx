@@ -10,30 +10,38 @@ import Group from '@/elements/Group.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import ApiKeyCreateOrUpdateModal from '@/pages/dashboard/api-keys/modals/ApiKeyCreateOrUpdateModal.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePageableTable.ts';
+import ApiKeyTokenModal from '@/pages/dashboard/api-keys/modals/ApiKeyTokenModal.tsx';
+import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import { useUserStore } from '@/stores/user.ts';
 import ApiKeyRow from './ApiKeyRow.tsx';
 
 export default function DashboardApiKeys() {
   const { t } = useTranslations();
-  const apiKeys = useUserStore((state) => state.apiKeys);
-  const setApiKeys = useUserStore((state) => state.setApiKeys);
-  const settings = useGlobalStore((state) => state.settings);
+  const { settings } = useGlobalStore();
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
+  const [createdToken, setCreatedToken] = useState<string | null>(null);
 
-  const { loading, error, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const {
+    data: apiKeys,
+    loading,
+    error,
+    search,
+    setSearch,
+    setPage,
+  } = useSearchablePaginatedTable({
     queryKey: queryKeys.user.apiKeys.all(),
     fetcher: getApiKeys,
-    setStoreData: setApiKeys,
   });
 
   return (
     <AccountContentContainer
       title={t('pages.account.apiKeys.title', {})}
-      subtitle={t('pages.account.apiKeys.subtitle', { current: apiKeys.total, max: settings.user.maxApiKeyCount })}
+      subtitle={t('pages.account.apiKeys.subtitle', {
+        current: apiKeys?.total ?? 0,
+        max: settings.user.maxApiKeyCount,
+      })}
       search={search}
       setSearch={setSearch}
       contentRight={
@@ -44,14 +52,14 @@ export default function DashboardApiKeys() {
             </Button>
           </Anchor>
           <ConditionalTooltip
-            enabled={apiKeys.total >= settings.user.maxApiKeyCount}
+            enabled={(apiKeys?.total ?? 0) >= settings.user.maxApiKeyCount}
             label={t('pages.account.apiKeys.tooltip.limitReached', { max: settings.user.maxApiKeyCount })}
           >
             <Button
               onClick={() => setOpenModal('create')}
               color='blue'
               leftSection={<FontAwesomeIcon icon={faPlus} />}
-              disabled={apiKeys.total >= settings.user.maxApiKeyCount}
+              disabled={(apiKeys?.total ?? 0) >= settings.user.maxApiKeyCount}
             >
               {t('common.button.create', {})}
             </Button>
@@ -60,7 +68,12 @@ export default function DashboardApiKeys() {
       }
       registry={window.extensionContext.extensionRegistry.pages.dashboard.apiKeys.container}
     >
-      <ApiKeyCreateOrUpdateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
+      <ApiKeyCreateOrUpdateModal
+        opened={openModal === 'create'}
+        onClose={() => setOpenModal(null)}
+        onCreated={setCreatedToken}
+      />
+      <ApiKeyTokenModal token={createdToken} onClose={() => setCreatedToken(null)} />
 
       <Table
         columns={[
@@ -77,7 +90,7 @@ export default function DashboardApiKeys() {
         onPageSelect={setPage}
         error={error}
       >
-        {apiKeys.data.map((key) => (
+        {apiKeys?.data.map((key) => (
           <ApiKeyRow key={key.uuid} apiKey={key} />
         ))}
       </Table>
