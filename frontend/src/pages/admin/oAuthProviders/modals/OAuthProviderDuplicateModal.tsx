@@ -1,12 +1,13 @@
 import { ModalProps } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import duplicateOAuthProvider from '@/api/admin/oauth-providers/duplicateOAuthProvider.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -25,7 +26,8 @@ export default function OAuthProviderDuplicateModal({
 
   useEffect(() => setName(`${oauthProvider.name} (copy)`), [oauthProvider, props.opened]);
 
-  const doDuplicate = () => {
+  const doDuplicate = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
     duplicateOAuthProvider(oauthProvider.uuid, name)
@@ -42,9 +44,11 @@ export default function OAuthProviderDuplicateModal({
   };
 
   return (
-    <Modal
+    <FormModal
       title={t('common.modal.duplicate.title', { resource: t('pages.admin.oAuthProviders.resourceName', {}) })}
+      loading={loading}
       {...props}
+      onSubmit={doDuplicate}
     >
       <Stack>
         <TextInput
@@ -55,7 +59,7 @@ export default function OAuthProviderDuplicateModal({
         />
 
         <ModalFooter>
-          <Button onClick={doDuplicate} loading={loading} disabled={name.length < 1}>
+          <Button type='submit' loading={loading} disabled={name.length < 1}>
             {t('common.button.duplicate', {})}
           </Button>
           <Button variant='default' onClick={props.onClose}>
@@ -63,6 +67,6 @@ export default function OAuthProviderDuplicateModal({
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

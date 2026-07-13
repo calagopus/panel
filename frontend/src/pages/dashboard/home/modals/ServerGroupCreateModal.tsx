@@ -1,13 +1,14 @@
 import { ModalProps } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import createServerGroup from '@/api/me/servers/groups/createServerGroup.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useUserStore } from '@/stores/user.ts';
@@ -31,7 +32,8 @@ export default function ServerGroupCreateModal({ ...props }: ModalProps) {
     validate: zod4Resolver(schema),
   });
 
-  const doCreate = () => {
+  const doCreate = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
     createServerGroup({
@@ -51,17 +53,22 @@ export default function ServerGroupCreateModal({ ...props }: ModalProps) {
   };
 
   return (
-    <Modal title={t('pages.account.home.tabs.groupedServers.page.modal.createServerGroup.title', {})} {...props}>
+    <FormModal
+      title={t('pages.account.home.tabs.groupedServers.page.modal.createServerGroup.title', {})}
+      loading={loading}
+      {...props}
+      onSubmit={doCreate}
+    >
       <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
       <ModalFooter>
-        <Button onClick={doCreate} loading={loading} disabled={!form.isValid()}>
+        <Button type='submit' loading={loading} disabled={!form.isValid()}>
           {t('common.button.create', {})}
         </Button>
         <Button variant='default' onClick={props.onClose}>
           {t('common.button.close', {})}
         </Button>
       </ModalFooter>
-    </Modal>
+    </FormModal>
   );
 }

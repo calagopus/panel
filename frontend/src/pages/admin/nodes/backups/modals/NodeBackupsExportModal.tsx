@@ -2,7 +2,7 @@ import { faFolder } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Anchor, ModalProps } from '@mantine/core';
 import { join } from 'pathe';
-import { useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import exportNodeBackup from '@/api/admin/nodes/backups/exportNodeBackup.ts';
 import queryNodeBackup from '@/api/admin/nodes/backups/queryNodeBackup.ts';
@@ -15,7 +15,8 @@ import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { archiveFormatLabelMapping, streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
@@ -136,7 +137,9 @@ export default function NodeBackupsExportModal({ node, backup, ...props }: Props
     [forcedFormat, format],
   );
 
-  const doExport = () => {
+  const doExport = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!selectedServer) {
       return;
     }
@@ -160,7 +163,13 @@ export default function NodeBackupsExportModal({ node, backup, ...props }: Props
   };
 
   return (
-    <Modal title={t('pages.admin.nodes.tabs.backups.page.modal.export.title', {})} size='lg' {...props}>
+    <FormModal
+      title={t('pages.admin.nodes.tabs.backups.page.modal.export.title', {})}
+      size='lg'
+      loading={loading}
+      {...props}
+      onSubmit={doExport}
+    >
       <Stack>
         <Select
           withAsterisk
@@ -228,13 +237,13 @@ export default function NodeBackupsExportModal({ node, backup, ...props }: Props
       </p>
 
       <ModalFooter>
-        <Button onClick={doExport} loading={loading} disabled={!selectedServer}>
+        <Button type='submit' loading={loading} disabled={!selectedServer}>
           {t('common.button.export', {})}
         </Button>
         <Button variant='default' onClick={props.onClose}>
           {t('common.button.close', {})}
         </Button>
       </ModalFooter>
-    </Modal>
+    </FormModal>
   );
 }

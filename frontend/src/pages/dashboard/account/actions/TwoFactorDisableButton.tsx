@@ -1,13 +1,14 @@
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import disableTwoFactor from '@/api/me/account/disableTwoFactor.ts';
 import Button from '@/elements/Button.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import { dashboardTwoFactorDisableSchema } from '@/lib/schemas/dashboard.ts';
@@ -39,7 +40,8 @@ export default function TwoFactorDisableButton() {
     }
   }, [openModal]);
 
-  const doDisable = () => {
+  const doDisable = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
     disableTwoFactor(form.values)
@@ -56,10 +58,12 @@ export default function TwoFactorDisableButton() {
 
   return (
     <>
-      <Modal
+      <FormModal
         title={t('pages.account.account.containers.twoFactor.modal.disableTwoFactor.title', {})}
         onClose={() => setOpenModal(null)}
         opened={openModal === 'disable'}
+        loading={loading}
+        onSubmit={doDisable}
       >
         <Stack>
           <Text>{t('pages.account.account.containers.twoFactor.modal.disableTwoFactor.description', {}).md()}</Text>
@@ -80,7 +84,7 @@ export default function TwoFactorDisableButton() {
           />
 
           <ModalFooter>
-            <Button color='red' onClick={doDisable} loading={loading} disabled={!form.isValid()}>
+            <Button color='red' type='submit' loading={loading} disabled={!form.isValid()}>
               {t('common.button.disable', {})}
             </Button>
             <Button variant='default' onClick={() => setOpenModal(null)}>
@@ -88,7 +92,7 @@ export default function TwoFactorDisableButton() {
             </Button>
           </ModalFooter>
         </Stack>
-      </Modal>
+      </FormModal>
 
       <Button color='red' onClick={() => setOpenModal('disable')}>
         {t('pages.account.account.containers.twoFactor.button.disableTwoFactor', {})}

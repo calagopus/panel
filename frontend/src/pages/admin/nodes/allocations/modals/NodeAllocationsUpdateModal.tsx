@@ -1,11 +1,12 @@
 import { ModalProps } from '@mantine/core';
-import { useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import updateNodeAllocations from '@/api/admin/nodes/allocations/updateNodeAllocations.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -91,7 +92,8 @@ export default function NodeAllocationsUpdateModal({
     setIpAlias(mostCommonIpAlias);
   }, [mostCommonIpAlias, props.opened]);
 
-  const doUpdate = () => {
+  const doUpdate = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
     updateNodeAllocations(node.uuid, [...selectedNodeAllocations.values().map((a) => a.uuid)], {
@@ -117,7 +119,12 @@ export default function NodeAllocationsUpdateModal({
   };
 
   return (
-    <Modal title={t('pages.admin.nodes.tabs.allocations.page.modal.update.title', {})} {...props}>
+    <FormModal
+      title={t('pages.admin.nodes.tabs.allocations.page.modal.update.title', {})}
+      loading={loading}
+      {...props}
+      onSubmit={doUpdate}
+    >
       <Stack>
         <TextInput
           withAsterisk
@@ -133,7 +140,7 @@ export default function NodeAllocationsUpdateModal({
         />
 
         <ModalFooter>
-          <Button onClick={doUpdate} loading={loading} disabled={!ip}>
+          <Button type='submit' loading={loading} disabled={!ip}>
             {t('common.button.update', {})}
           </Button>
           <Button variant='default' onClick={props.onClose}>
@@ -141,6 +148,6 @@ export default function NodeAllocationsUpdateModal({
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }

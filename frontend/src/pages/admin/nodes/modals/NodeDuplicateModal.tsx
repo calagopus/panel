@@ -1,12 +1,13 @@
 import { ModalProps } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import duplicateNode from '@/api/admin/nodes/duplicateNode.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import FormModal from '@/elements/modals/FormModal.tsx';
+import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -22,7 +23,8 @@ export default function NodeDuplicateModal({ node, ...props }: ModalProps & { no
 
   useEffect(() => setName(`${node.name} (copy)`), [node, props.opened]);
 
-  const doDuplicate = () => {
+  const doDuplicate = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
     duplicateNode(node.uuid, name)
@@ -36,7 +38,12 @@ export default function NodeDuplicateModal({ node, ...props }: ModalProps & { no
   };
 
   return (
-    <Modal title={t('common.modal.duplicate.title', { resource: t('pages.admin.nodes.resourceName', {}) })} {...props}>
+    <FormModal
+      title={t('common.modal.duplicate.title', { resource: t('pages.admin.nodes.resourceName', {}) })}
+      loading={loading}
+      {...props}
+      onSubmit={doDuplicate}
+    >
       <Stack>
         <TextInput
           withAsterisk
@@ -46,7 +53,7 @@ export default function NodeDuplicateModal({ node, ...props }: ModalProps & { no
         />
 
         <ModalFooter>
-          <Button onClick={doDuplicate} loading={loading} disabled={name.length < 1}>
+          <Button type='submit' loading={loading} disabled={name.length < 1}>
             {t('common.button.duplicate', {})}
           </Button>
           <Button variant='default' onClick={props.onClose}>
@@ -54,6 +61,6 @@ export default function NodeDuplicateModal({ node, ...props }: ModalProps & { no
           </Button>
         </ModalFooter>
       </Stack>
-    </Modal>
+    </FormModal>
   );
 }
