@@ -31,7 +31,7 @@ impl From<ApiHttpError> for anyhow::Error {
     fn from(value: ApiHttpError) -> Self {
         match value {
             ApiHttpError::Http(status, err) => {
-                anyhow::anyhow!("wings api status code {status}: {}", err.error)
+                anyhow::anyhow!("db agent api status code {status}: {}", err.error)
             }
             ApiHttpError::Reqwest(err) => anyhow::anyhow!(err),
             ApiHttpError::WebSocket(err) => anyhow::anyhow!(err),
@@ -243,78 +243,153 @@ impl DbAgentClient {
         Ok(stream)
     }
 
-    pub async fn get_databases(&self) -> Result<super::databases::get::Response, ApiHttpError> {
-        request_impl(self, Method::GET, "/api/databases", None::<&()>, None).await
+    pub async fn get_instances(&self) -> Result<super::instances::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/instances", None::<&()>, None).await
     }
 
-    pub async fn post_databases(
+    pub async fn post_instances(
         &self,
-        data: &super::databases::post::RequestBody,
-    ) -> Result<super::databases::post::Response, ApiHttpError> {
-        request_impl(self, Method::POST, "/api/databases", Some(data), None).await
+        data: &super::instances::post::RequestBody,
+    ) -> Result<super::instances::post::Response, ApiHttpError> {
+        request_impl(self, Method::POST, "/api/instances", Some(data), None).await
     }
 
-    pub async fn get_databases_utilization(
+    pub async fn get_instances_utilization(
         &self,
-    ) -> Result<super::databases_utilization::get::Response, ApiHttpError> {
+    ) -> Result<super::instances_utilization::get::Response, ApiHttpError> {
         request_impl(
             self,
             Method::GET,
-            "/api/databases/utilization",
+            "/api/instances/utilization",
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn get_databases_database(
+    pub async fn get_instances_instance(
         &self,
-        database: uuid::Uuid,
-    ) -> Result<super::databases_database::get::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+    ) -> Result<super::instances_instance::get::Response, ApiHttpError> {
         request_impl(
             self,
             Method::GET,
-            format!("/api/databases/{database}"),
+            format!("/api/instances/{instance}"),
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn delete_databases_database(
+    pub async fn delete_instances_instance(
         &self,
-        database: uuid::Uuid,
-    ) -> Result<super::databases_database::delete::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+    ) -> Result<super::instances_instance::delete::Response, ApiHttpError> {
         request_impl(
             self,
             Method::DELETE,
-            format!("/api/databases/{database}"),
+            format!("/api/instances/{instance}"),
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn patch_databases_database(
+    pub async fn patch_instances_instance(
         &self,
-        database: uuid::Uuid,
-        data: &super::databases_database::patch::RequestBody,
-    ) -> Result<super::databases_database::patch::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+        data: &super::instances_instance::patch::RequestBody,
+    ) -> Result<super::instances_instance::patch::Response, ApiHttpError> {
         request_impl(
             self,
             Method::PATCH,
-            format!("/api/databases/{database}"),
+            format!("/api/instances/{instance}"),
             Some(data),
             None,
         )
         .await
     }
 
-    pub async fn get_databases_database_export(
+    pub async fn get_instances_instance_databases(
         &self,
+        instance: uuid::Uuid,
+    ) -> Result<super::instances_instance_databases::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/instances/{instance}/databases"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases(
+        &self,
+        instance: uuid::Uuid,
+        data: &super::instances_instance_databases::post::RequestBody,
+    ) -> Result<super::instances_instance_databases::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_instances_instance_databases_database(
+        &self,
+        instance: uuid::Uuid,
         database: uuid::Uuid,
-        query: &super::databases_database_export::get::Query,
-    ) -> Result<super::databases_database_export::get::Response, ApiHttpError> {
+    ) -> Result<super::instances_instance_databases_database::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/instances/{instance}/databases/{database}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn delete_instances_instance_databases_database(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+    ) -> Result<super::instances_instance_databases_database::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/instances/{instance}/databases/{database}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_instances_instance_databases_database_size(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+    ) -> Result<super::instances_instance_databases_database_size::get::Response, ApiHttpError>
+    {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/instances/{instance}/databases/{database}/size"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_instances_instance_export(
+        &self,
+        instance: uuid::Uuid,
+        query: &super::instances_instance_export::get::Query,
+    ) -> Result<super::instances_instance_export::get::Response, ApiHttpError> {
         let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
         if let Some(value) = &query.db {
             query_parts.push(format!("db={}", urlencoding::encode(value)).into());
@@ -327,22 +402,25 @@ impl DbAgentClient {
         request_impl(
             self,
             Method::GET,
-            format!("/api/databases/{database}/export{query}"),
+            format!("/api/instances/{instance}/export{query}"),
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn post_databases_database_import(
+    pub async fn post_instances_instance_import(
         &self,
-        database: uuid::Uuid,
-        data: super::databases_database_import::post::RequestBody,
-        query: &super::databases_database_import::post::Query,
-    ) -> Result<super::databases_database_import::post::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+        data: super::instances_instance_import::post::RequestBody,
+        query: &super::instances_instance_import::post::Query,
+    ) -> Result<super::instances_instance_import::post::Response, ApiHttpError> {
         let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
         if let Some(value) = &query.db {
             query_parts.push(format!("db={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = query.wipe {
+            query_parts.push(format!("wipe={}", value).into());
         }
         let query = if query_parts.is_empty() {
             String::new()
@@ -352,18 +430,18 @@ impl DbAgentClient {
         request_impl(
             self,
             Method::POST,
-            format!("/api/databases/{database}/import{query}"),
+            format!("/api/instances/{instance}/import{query}"),
             None::<&()>,
             Some(data),
         )
         .await
     }
 
-    pub async fn get_databases_database_logs(
+    pub async fn get_instances_instance_logs(
         &self,
-        database: uuid::Uuid,
-        query: &super::databases_database_logs::get::Query,
-    ) -> Result<super::databases_database_logs::get::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+        query: &super::instances_instance_logs::get::Query,
+    ) -> Result<super::instances_instance_logs::get::Response, ApiHttpError> {
         let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
         if let Some(value) = query.lines {
             query_parts.push(format!("lines={}", value).into());
@@ -376,126 +454,126 @@ impl DbAgentClient {
         request_impl(
             self,
             Method::GET,
-            format!("/api/databases/{database}/logs{query}"),
+            format!("/api/instances/{instance}/logs{query}"),
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn post_databases_database_power(
+    pub async fn post_instances_instance_power(
         &self,
-        database: uuid::Uuid,
-        data: &super::databases_database_power::post::RequestBody,
-    ) -> Result<super::databases_database_power::post::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+        data: &super::instances_instance_power::post::RequestBody,
+    ) -> Result<super::instances_instance_power::post::Response, ApiHttpError> {
         request_impl(
             self,
             Method::POST,
-            format!("/api/databases/{database}/power"),
+            format!("/api/instances/{instance}/power"),
             Some(data),
             None,
         )
         .await
     }
 
-    pub async fn post_databases_database_query(
+    pub async fn post_instances_instance_query(
         &self,
-        database: uuid::Uuid,
-        data: &super::databases_database_query::post::RequestBody,
-    ) -> Result<super::databases_database_query::post::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+        data: &super::instances_instance_query::post::RequestBody,
+    ) -> Result<super::instances_instance_query::post::Response, ApiHttpError> {
         request_impl(
             self,
             Method::POST,
-            format!("/api/databases/{database}/query"),
+            format!("/api/instances/{instance}/query"),
             Some(data),
             None,
         )
         .await
     }
 
-    pub async fn get_databases_database_users(
+    pub async fn get_instances_instance_users(
         &self,
-        database: uuid::Uuid,
-    ) -> Result<super::databases_database_users::get::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+    ) -> Result<super::instances_instance_users::get::Response, ApiHttpError> {
         request_impl(
             self,
             Method::GET,
-            format!("/api/databases/{database}/users"),
+            format!("/api/instances/{instance}/users"),
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn post_databases_database_users(
+    pub async fn post_instances_instance_users(
         &self,
-        database: uuid::Uuid,
-        data: &super::databases_database_users::post::RequestBody,
-    ) -> Result<super::databases_database_users::post::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+        data: &super::instances_instance_users::post::RequestBody,
+    ) -> Result<super::instances_instance_users::post::Response, ApiHttpError> {
         request_impl(
             self,
             Method::POST,
-            format!("/api/databases/{database}/users"),
+            format!("/api/instances/{instance}/users"),
             Some(data),
             None,
         )
         .await
     }
 
-    pub async fn get_databases_database_users_user(
+    pub async fn get_instances_instance_users_user(
         &self,
-        database: uuid::Uuid,
+        instance: uuid::Uuid,
         user: uuid::Uuid,
-    ) -> Result<super::databases_database_users_user::get::Response, ApiHttpError> {
+    ) -> Result<super::instances_instance_users_user::get::Response, ApiHttpError> {
         request_impl(
             self,
             Method::GET,
-            format!("/api/databases/{database}/users/{user}"),
+            format!("/api/instances/{instance}/users/{user}"),
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn delete_databases_database_users_user(
+    pub async fn delete_instances_instance_users_user(
         &self,
-        database: uuid::Uuid,
+        instance: uuid::Uuid,
         user: uuid::Uuid,
-    ) -> Result<super::databases_database_users_user::delete::Response, ApiHttpError> {
+    ) -> Result<super::instances_instance_users_user::delete::Response, ApiHttpError> {
         request_impl(
             self,
             Method::DELETE,
-            format!("/api/databases/{database}/users/{user}"),
+            format!("/api/instances/{instance}/users/{user}"),
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn post_databases_database_users_user_rotate_password(
+    pub async fn post_instances_instance_users_user_rotate_password(
         &self,
-        database: uuid::Uuid,
+        instance: uuid::Uuid,
         user: uuid::Uuid,
-    ) -> Result<super::databases_database_users_user_rotate_password::post::Response, ApiHttpError>
+    ) -> Result<super::instances_instance_users_user_rotate_password::post::Response, ApiHttpError>
     {
         request_impl(
             self,
             Method::POST,
-            format!("/api/databases/{database}/users/{user}/rotate-password"),
+            format!("/api/instances/{instance}/users/{user}/rotate-password"),
             None::<&()>,
             None,
         )
         .await
     }
 
-    pub async fn get_databases_database_utilization(
+    pub async fn get_instances_instance_utilization(
         &self,
-        database: uuid::Uuid,
-    ) -> Result<super::databases_database_utilization::get::Response, ApiHttpError> {
+        instance: uuid::Uuid,
+    ) -> Result<super::instances_instance_utilization::get::Response, ApiHttpError> {
         request_impl(
             self,
             Method::GET,
-            format!("/api/databases/{database}/utilization"),
+            format!("/api/instances/{instance}/utilization"),
             None::<&()>,
             None,
         )

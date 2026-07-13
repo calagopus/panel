@@ -67,7 +67,7 @@ impl From<ApiHttpError> for anyhow::Error {
     fn from(value: ApiHttpError) -> Self {
         match value {
             ApiHttpError::Http(status, err) => {
-                anyhow::anyhow!("wings api status code {status}: {}", err.error)
+                anyhow::anyhow!("db agent api status code {status}: {}", err.error)
             }
             ApiHttpError::Reqwest(err) => anyhow::anyhow!(err),
             ApiHttpError::WebSocket(err) => anyhow::anyhow!(err),

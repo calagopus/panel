@@ -223,6 +223,7 @@ const baseTranslations = defineTranslations({
           server: 'Server',
           address: 'Address',
           eggs: 'Eggs',
+          template: 'Template',
         },
       },
       tabs: {
@@ -2084,9 +2085,10 @@ const baseTranslations = defineTranslations({
                   inheritedFromLocation: 'Inherited from Location',
                   none: 'None',
                   wingsVersion: 'Wings Version',
-                  os: 'Operating System',
+                  cpu: 'CPU',
+                  memory: 'Memory',
+                  servers: 'Servers',
                   architecture: 'Architecture',
-                  cpuCount: 'CPU Threads',
                   kernelVersion: 'Kernel Version',
                   unavailable: 'Unavailable',
                 },
@@ -2477,6 +2479,7 @@ const baseTranslations = defineTranslations({
                   swap: 'Swap',
                   allocations: 'Allocations',
                   databases: 'Databases',
+                  databaseAgents: 'Agent Databases',
                   backups: 'Backups',
                   schedules: 'Schedules',
                   unlimited: 'Unlimited',
@@ -2561,6 +2564,7 @@ const baseTranslations = defineTranslations({
                     'Enable KVM passthrough for the server (allows access to /dev/kvm inside the container).',
                   allocationsLimit: 'Allocations',
                   databasesLimit: 'Databases',
+                  databaseAgentsLimit: 'Agent Databases',
                   backupsLimit: 'Backups',
                   schedulesLimit: 'Schedules',
                 },
@@ -3157,6 +3161,11 @@ const baseTranslations = defineTranslations({
               page: {
                 titleCreate: 'Create Database Agent Host',
                 titleUpdate: 'Update Database Agent Host',
+                form: {
+                  typeEnabled: 'Enabled',
+                  typePublicHost: 'Public Host',
+                  typePublicPort: 'Public Port',
+                },
                 button: {
                   resetToken: 'Reset Token',
                   testConnection: 'Test Connection',
@@ -3170,8 +3179,19 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Database Agent Host Deletion',
                     content: 'Are you sure you want to delete **{name}**?',
+                    form: {
+                      force: 'Force delete',
+                      forceWarning:
+                        'Force deletion removes all instances on this host. Instances the agent cannot be reached for may not be fully cleaned up, leaving orphaned data behind.',
+                    },
                   },
                 },
+              },
+            },
+            instances: {
+              title: 'Instances',
+              page: {
+                title: 'Instances',
               },
             },
             configuration: {
@@ -3219,6 +3239,7 @@ const baseTranslations = defineTranslations({
                 card: {
                   hostDetails: 'Host Details',
                   systemInfo: 'System Information',
+                  resources: 'Allocated Resources',
                 },
                 label: {
                   url: 'URL',
@@ -3227,10 +3248,14 @@ const baseTranslations = defineTranslations({
                   version: 'Version',
                   cpu: 'CPU',
                   memory: 'Memory',
-                  databases: 'Databases',
+                  disk: 'Disk',
+                  instances: 'Instances',
                   kernelVersion: 'Kernel Version',
                   architecture: 'Architecture',
                   unavailable: 'Unavailable',
+                  noLimit: 'No host limit',
+                  free: '{size} free',
+                  cores: '{cores} cores allocated',
                 },
                 badge: {
                   updateAvailable: 'Update Available',
@@ -3311,6 +3336,9 @@ const baseTranslations = defineTranslations({
                   dockerImages: 'Docker Images',
                   env: 'Environment Variables',
                   volumes: 'Volumes',
+                  socketPath: 'Socket Path',
+                  socketPathDescription:
+                    'The unix socket file path inside the database container, must match where the configured image actually creates its socket.',
                   imageUid: 'Image UID',
                   imageGid: 'Image GID',
                   cmd: 'Command',
@@ -3335,6 +3363,12 @@ const baseTranslations = defineTranslations({
                     content: 'Are you sure you want to delete **{name}**?',
                   },
                 },
+              },
+            },
+            instances: {
+              title: 'Instances',
+              page: {
+                title: 'Instances',
               },
             },
           },
@@ -4163,6 +4197,10 @@ const baseTranslations = defineTranslations({
         databases: {
           title: 'Databases',
           subtitle: '{current} of {max} maximum databases created.',
+          classic: {
+            title: 'Classic Databases',
+            subtitle: '{current} databases created.',
+          },
           tooltip: {
             limitReached: 'This server is limited to {max} databases.',
           },
@@ -4176,6 +4214,144 @@ const baseTranslations = defineTranslations({
           },
           form: {
             databaseName: 'Database Name',
+          },
+          instance: {
+            title: 'Managed Databases',
+            subtitle: '{current} managed databases created.',
+            tooltip: {
+              limitReached: 'This server is limited to {max} managed databases.',
+            },
+            view: {
+              tabs: {
+                databases: 'Databases',
+                users: 'Users',
+                logs: 'Logs',
+              },
+              stats: {
+                uptime: 'Uptime',
+                cpuLoad: 'CPU Load',
+                memoryLoad: 'Memory Load',
+                diskUsage: 'Disk Usage',
+              },
+            },
+            databases: {
+              title: 'Databases',
+              noDatabases: 'This instance has no databases yet.',
+              tooltip: {
+                offline: 'The instance must be running to create databases.',
+                noUser: 'This database has no user attached yet. Create a user to access it.',
+              },
+              button: {
+                export: 'Export',
+                import: 'Import',
+              },
+              modal: {
+                createDatabase: {
+                  title: 'Create Database',
+                  content:
+                    'Creates a new database with its own user inside this managed database instance. The credentials will be shown in the table afterwards.',
+                },
+                deleteDatabase: {
+                  title: 'Confirm Database Deletion',
+                  content:
+                    'Are you sure you want to delete the database for user **{username}**? This permanently deletes the database and all data within it.',
+                },
+                exportDatabase: {
+                  title: 'Export Database',
+                  content: 'Download a dump of this database. Large databases may take a while to prepare.',
+                },
+                importDatabase: {
+                  title: 'Import Database',
+                  content: 'Upload a dump to import into this database. Large imports may take a while to complete.',
+                  form: {
+                    file: 'Dump File',
+                    wipe: 'Wipe existing data before importing',
+                  },
+                },
+              },
+              table: {
+                columns: {
+                  database: 'Database',
+                },
+              },
+              toast: {
+                created: 'Database created.',
+                deleted: 'Database deleted.',
+                imported: 'Database import completed.',
+                passwordRotated: 'Password has been rotated.',
+              },
+            },
+            users: {
+              title: 'Users',
+              noUsers: 'This instance has no users yet.',
+              modal: {
+                createUser: {
+                  title: 'Create User',
+                  content:
+                    'Creates a new user inside this managed database instance. The credentials will be shown in the table afterwards.',
+                  form: {
+                    database: 'Database',
+                    databaseHint: 'The database this user will be granted access to.',
+                    databaseRequired: 'Please select a database.',
+                  },
+                },
+                deleteUser: {
+                  title: 'Confirm User Deletion',
+                  content: 'Are you sure you want to delete the user **{username}**? This cannot be undone.',
+                },
+              },
+              toast: {
+                created: 'User created.',
+                deleted: 'User deleted.',
+              },
+            },
+            power: {
+              toast: {
+                start: 'Managed database is starting.',
+                stop: 'Managed database is stopping.',
+                restart: 'Managed database is restarting.',
+                kill: 'Managed database has been killed.',
+              },
+              modal: {
+                forceKill: {
+                  title: 'Forcibly Kill Database',
+                  content: 'Forcibly killing a database can lead to data corruption.',
+                },
+              },
+            },
+            modal: {
+              createDatabaseInstance: {
+                title: 'Create Managed Database',
+                toast: {
+                  created: 'Managed database created.',
+                },
+                form: {
+                  template: 'Template',
+                  noTemplatesFound: 'No templates available',
+                  image: 'Docker Image',
+                },
+              },
+              editDatabaseInstance: {
+                title: 'Edit Managed Database',
+                toast: {
+                  updated: 'Managed database updated.',
+                },
+              },
+              deleteDatabaseInstance: {
+                title: 'Confirm Managed Database Deletion',
+                content:
+                  'Deleting a managed database is a permanent action, it cannot be undone. This will permanently delete the **{name}** database and remove all associated data.',
+                toast: {
+                  deleted: 'Managed database deleted.',
+                },
+              },
+              credentials: {
+                title: 'Database Credentials',
+                form: {
+                  database: 'Database',
+                },
+              },
+            },
           },
           modal: {
             createDatabase: {

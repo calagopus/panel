@@ -18,7 +18,7 @@ const databaseAgentHostSystemOverviewSchema = z.object({
     usedBytes: z.number(),
     usedBytesProcess: z.number(),
   }),
-  databases: z.object({
+  instances: z.object({
     total: z.number(),
     online: z.number(),
     offline: z.number(),

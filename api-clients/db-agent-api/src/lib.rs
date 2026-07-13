@@ -16,7 +16,14 @@ use client::{AsyncRequestReader, AsyncResponseReader};
 pub use extra::*;
 
 nestify::nest! {
-    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ApiDatabase {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ApiError {
+        #[schema(inline)]
+        pub error: compact_str::CompactString,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ApiInstance {
         #[schema(inline)]
         pub uuid: uuid::Uuid,
         #[schema(inline)]
@@ -52,14 +59,9 @@ nestify::nest! {
         #[schema(inline)]
         pub cmd: Option<Vec<compact_str::CompactString>>,
         #[schema(inline)]
-        pub utilization: ResourceUsage,
-    }
-}
-
-nestify::nest! {
-    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ApiError {
+        pub created: chrono::DateTime<chrono::Local>,
         #[schema(inline)]
-        pub error: compact_str::CompactString,
+        pub utilization: ResourceUsage,
     }
 }
 
@@ -162,6 +164,19 @@ nestify::nest! {
         #[schema(inline)]
         pub uuid: uuid::Uuid,
         #[schema(inline)]
+        pub instance_uuid: uuid::Uuid,
+        #[schema(inline)]
+        pub name: compact_str::CompactString,
+        #[schema(inline)]
+        pub created: chrono::DateTime<chrono::Local>,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct StoredInstance {
+        #[schema(inline)]
+        pub uuid: uuid::Uuid,
+        #[schema(inline)]
         pub uuid_short: i64,
         #[schema(inline)]
         pub database_type: DatabaseAgentType,
@@ -193,21 +208,27 @@ nestify::nest! {
         pub env: IndexMap<compact_str::CompactString, compact_str::CompactString>,
         #[schema(inline)]
         pub cmd: Option<Vec<compact_str::CompactString>>,
+        #[schema(inline)]
+        pub created: chrono::DateTime<chrono::Local>,
     }
 }
 
 nestify::nest! {
-    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct StoredDatabaseUser {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct StoredUser {
         #[schema(inline)]
         pub uuid: uuid::Uuid,
         #[schema(inline)]
         pub uuid_short: i64,
         #[schema(inline)]
-        pub database_uuid: uuid::Uuid,
+        pub instance_uuid: uuid::Uuid,
+        #[schema(inline)]
+        pub database_uuid: Option<uuid::Uuid>,
         #[schema(inline)]
         pub username: compact_str::CompactString,
         #[schema(inline)]
         pub password: compact_str::CompactString,
+        #[schema(inline)]
+        pub created: chrono::DateTime<chrono::Local>,
     }
 }
 
@@ -293,7 +314,7 @@ nestify::nest! {
 }
 
 pub type VolumeMapping = IndexMap<compact_str::CompactString, compact_str::CompactString>;
-pub mod databases {
+pub mod instances {
     use super::*;
 
     pub mod get {
@@ -302,7 +323,7 @@ pub mod databases {
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
-                pub databases: Vec<ApiDatabase>,
+                pub instances: Vec<ApiInstance>,
             }
         }
 
@@ -350,14 +371,14 @@ pub mod databases {
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
-                pub database: ApiDatabase,
+                pub instance: ApiInstance,
             }
         }
 
         pub type Response = Response200;
     }
 }
-pub mod databases_utilization {
+pub mod instances_utilization {
     use super::*;
 
     pub mod get {
@@ -367,7 +388,7 @@ pub mod databases_utilization {
         pub type Response = Response200;
     }
 }
-pub mod databases_database {
+pub mod instances_instance {
     use super::*;
 
     pub mod get {
@@ -376,7 +397,7 @@ pub mod databases_database {
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
-                pub database: ApiDatabase,
+                pub instance: ApiInstance,
             }
         }
 
@@ -444,13 +465,106 @@ pub mod databases_database {
         pub type Response = Response200;
     }
 }
-pub mod databases_database_export {
+pub mod instances_instance_databases {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub databases: Vec<StoredDatabase>,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub name: compact_str::CompactString,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub database: StoredDatabase,
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub database: StoredDatabase,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+
+    pub mod delete {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_size {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub size: i64,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_export {
     use super::*;
 
     pub mod get {
         use super::*;
 
         pub type Response200 = AsyncResponseReader;
+
+        pub type Response400 = ApiError;
 
         pub type Response404 = ApiError;
 
@@ -465,7 +579,7 @@ pub mod databases_database_export {
         }
     }
 }
-pub mod databases_database_import {
+pub mod instances_instance_import {
     use super::*;
 
     pub mod post {
@@ -478,6 +592,8 @@ pub mod databases_database_import {
             }
         }
 
+        pub type Response400 = ApiError;
+
         pub type Response404 = ApiError;
 
         pub type Response = Response200;
@@ -486,12 +602,13 @@ pub mod databases_database_import {
         #[allow(clippy::manual_non_exhaustive)]
         pub struct Query {
             pub db: Option<compact_str::CompactString>,
+            pub wipe: Option<bool>,
             #[doc(hidden)]
             pub __priv: (),
         }
     }
 }
-pub mod databases_database_logs {
+pub mod instances_instance_logs {
     use super::*;
 
     pub mod get {
@@ -512,7 +629,7 @@ pub mod databases_database_logs {
         }
     }
 }
-pub mod databases_database_power {
+pub mod instances_instance_power {
     use super::*;
 
     pub mod post {
@@ -537,7 +654,7 @@ pub mod databases_database_power {
         pub type Response = Response200;
     }
 }
-pub mod databases_database_query {
+pub mod instances_instance_query {
     use super::*;
 
     pub mod post {
@@ -559,12 +676,14 @@ pub mod databases_database_query {
             }
         }
 
+        pub type Response400 = ApiError;
+
         pub type Response404 = ApiError;
 
         pub type Response = Response200;
     }
 }
-pub mod databases_database_users {
+pub mod instances_instance_users {
     use super::*;
 
     pub mod get {
@@ -573,7 +692,7 @@ pub mod databases_database_users {
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
-                pub users: Vec<StoredDatabaseUser>,
+                pub users: Vec<StoredUser>,
             }
         }
 
@@ -589,26 +708,28 @@ pub mod databases_database_users {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
                 #[schema(inline)]
                 pub username: compact_str::CompactString,
+                #[schema(inline)]
+                pub database_uuid: Option<uuid::Uuid>,
             }
         }
 
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
-                pub user: StoredDatabaseUser,
+                pub user: StoredUser,
                 #[schema(inline)]
                 pub username: compact_str::CompactString,
-                #[schema(inline)]
-                pub db: Option<compact_str::CompactString>,
             }
         }
+
+        pub type Response400 = ApiError;
 
         pub type Response404 = ApiError;
 
         pub type Response = Response200;
     }
 }
-pub mod databases_database_users_user {
+pub mod instances_instance_users_user {
     use super::*;
 
     pub mod get {
@@ -617,7 +738,7 @@ pub mod databases_database_users_user {
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
-                pub user: StoredDatabaseUser,
+                pub user: StoredUser,
             }
         }
 
@@ -639,7 +760,7 @@ pub mod databases_database_users_user {
         pub type Response = Response200;
     }
 }
-pub mod databases_database_users_user_rotate_password {
+pub mod instances_instance_users_user_rotate_password {
     use super::*;
 
     pub mod post {
@@ -657,7 +778,7 @@ pub mod databases_database_users_user_rotate_password {
         pub type Response = Response200;
     }
 }
-pub mod databases_database_utilization {
+pub mod instances_instance_utilization {
     use super::*;
 
     pub mod get {
@@ -893,7 +1014,7 @@ pub mod system_overview {
                 },
 
                 #[schema(inline)]
-                pub databases: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200Databases {
+                pub instances: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200Instances {
                     #[schema(inline)]
                     pub total: u64,
                     #[schema(inline)]

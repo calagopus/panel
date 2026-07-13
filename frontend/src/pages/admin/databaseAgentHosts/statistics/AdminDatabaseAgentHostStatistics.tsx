@@ -25,7 +25,7 @@ import TitleCard from '@/elements/TitleCard.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { useChart, useChartTickLabel } from '@/lib/chart.ts';
 import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesToString, mapUnitToLocale } from '@/lib/size.ts';
 import { transformKeysToCamelCase } from '@/lib/transformers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -71,7 +71,7 @@ export default function AdminDatabaseAgentHostStatistics({
   const memory = useChartTickLabel(
     t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.memory', {}),
     stats ? Math.floor(stats.memory.total / 1024 / 1024) : 0,
-    'MiB',
+    mapUnitToLocale('MiB'),
   );
   const disk = useChart(t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.disk', {}), {
     sets: 2,

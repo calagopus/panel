@@ -18,6 +18,7 @@ const admin = {
     detail: (uuid: string) => ['admin', 'nodes', { uuid }] as const,
     token: (uuid: string) => ['admin', 'nodes', uuid, 'token'] as const,
     capacity: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'capacity'] as const,
+    systemOverview: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'system', 'overview'] as const,
     allocations: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'allocations'] as const,
     backups: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'backups'] as const,
     mounts: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'mounts'] as const,
@@ -73,12 +74,15 @@ const admin = {
     all: () => ['admin', 'database-agent-hosts'] as const,
     detail: (uuid: string) => ['admin', 'database-agent-hosts', { uuid }] as const,
     token: (uuid: string) => ['admin', 'database-agent-hosts', uuid, 'token'] as const,
+    capacity: (uuid: string) => ['admin', 'database-agent-hosts', uuid, 'capacity'] as const,
     systemOverview: (uuid: string) => ['admin', 'database-agent-hosts', uuid, 'system', 'overview'] as const,
+    instances: (uuid: string) => ['admin', 'database-agent-hosts', uuid, 'instances'] as const,
   },
 
   databaseAgentTemplates: {
     all: () => ['admin', 'database-agent-templates'] as const,
     detail: (uuid: string) => ['admin', 'database-agent-templates', { uuid }] as const,
+    instances: (uuid: string) => ['admin', 'database-agent-templates', uuid, 'instances'] as const,
   },
 
   backupConfigurations: {
@@ -153,6 +157,21 @@ const server = (serverUuid: string) => ({
   },
   databases: {
     all: () => ['server', serverUuid, 'databases'] as const,
+    hosts: () => ['server', serverUuid, 'databases', 'hosts'] as const,
+    size: (databaseUuid: string) => ['server', serverUuid, 'databases', databaseUuid, 'size'] as const,
+    instances: {
+      all: () => ['server', serverUuid, 'databases', 'instances'] as const,
+      templates: () => ['server', serverUuid, 'databases', 'instances', 'templates'] as const,
+      detail: (instanceUuid: string) =>
+        ['server', serverUuid, 'databases', 'instances', { uuid: instanceUuid }] as const,
+      databases: (instanceUuid: string) =>
+        ['server', serverUuid, 'databases', 'instances', instanceUuid, 'databases'] as const,
+      databaseSize: (instanceUuid: string, databaseUuid: string) =>
+        ['server', serverUuid, 'databases', 'instances', instanceUuid, 'databases', databaseUuid, 'size'] as const,
+      users: (instanceUuid: string) => ['server', serverUuid, 'databases', 'instances', instanceUuid, 'users'] as const,
+      logs: (instanceUuid: string, lines: number) =>
+        ['server', serverUuid, 'databases', 'instances', instanceUuid, 'logs', lines] as const,
+    },
   },
   files: {
     all: () => ['server', serverUuid, 'files'] as const,

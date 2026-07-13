@@ -1,11 +1,12 @@
 import { z } from 'zod';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
+import { adminDatabaseAgentTemplateSchema } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
-import { databaseType } from '@/lib/schemas/generic.ts';
+import { databaseAgentType, databaseType } from '@/lib/schemas/generic.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { serverAutostartBehavior, serverStatus } from '@/lib/schemas/server/server.ts';
 import { nullableNumber, nullableString } from '@/lib/transformers.ts';
@@ -129,6 +130,23 @@ export const adminServerDatabaseSchema = z.object({
   host: z.string(),
   port: z.number(),
   type: databaseType,
+  created: z.coerce.date(),
+});
+
+export const adminServerDatabaseAgentSchema = z.object({
+  uuid: z.string(),
+  server: z.lazy(() => adminServerSchema),
+  databaseAgentTemplate: z.lazy(() => adminDatabaseAgentTemplateSchema).nullable(),
+  type: z.lazy(() => databaseAgentType),
+  host: z.string().nullable(),
+  port: z.number().nullable(),
+  name: z.string(),
+  isLocked: z.boolean(),
+  memory: z.number(),
+  swap: z.number(),
+  disk: z.number(),
+  ioWeight: z.number().nullable(),
+  cpu: z.number(),
   created: z.coerce.date(),
 });
 

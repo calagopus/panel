@@ -15,10 +15,10 @@ import { useServerStore } from '@/stores/server.ts';
 
 type Props = ModalProps & {
   database: z.infer<typeof serverDatabaseSchema>;
-  setSizeLoading: (loading: boolean) => void;
+  onRecreated: () => void;
 };
 
-export default function DatabaseRecreateModal({ database, setSizeLoading, ...props }: Props) {
+export default function DatabaseRecreateModal({ database, onRecreated, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
@@ -30,7 +30,7 @@ export default function DatabaseRecreateModal({ database, setSizeLoading, ...pro
     onSubmit: async () => {
       await recreateDatabase(server.uuid, database.uuid);
       addToast(t('pages.server.databases.modal.recreateDatabase.toast.recreated', {}), 'success');
-      setSizeLoading(true);
+      onRecreated();
     },
   });
 

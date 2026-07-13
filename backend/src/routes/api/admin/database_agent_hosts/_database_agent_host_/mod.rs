@@ -12,7 +12,9 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod capacity;
 mod config;
+mod instances;
 mod reset_token;
 mod system;
 mod test;
@@ -101,15 +103,27 @@ mod get {
 
 mod delete {
     use crate::routes::api::admin::database_agent_hosts::_database_agent_host_::GetDatabaseAgentHost;
-    use serde::Serialize;
+    use axum::http::StatusCode;
+    use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
-            DeletableModel, admin_activity::GetAdminActivityLogger, user::GetPermissionManager,
+            DeletableModel,
+            admin_activity::GetAdminActivityLogger,
+            server_database_instance::{
+                DeleteServerDatabaseInstanceOptions, ServerDatabaseInstance,
+            },
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
+
+    #[derive(ToSchema, Deserialize)]
+    pub struct Payload {
+        #[serde(default)]
+        force: bool,
+    }
 
     #[derive(ToSchema, Serialize)]
     struct Response {}
@@ -117,20 +131,60 @@ mod delete {
     #[utoipa::path(delete, path = "/", responses(
         (status = OK, body = inline(Response)),
         (status = NOT_FOUND, body = ApiError),
+        (status = CONFLICT, body = ApiError),
+        (status = EXPECTATION_FAILED, body = ApiError),
     ), params(
         (
             "database_agent_host" = uuid::Uuid,
             description = "The database agent host ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
-    ))]
+    ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
         database_agent_host: GetDatabaseAgentHost,
         activity_logger: GetAdminActivityLogger,
+        shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("database-agent-hosts.delete")?;
+
+        let database_agents = ServerDatabaseInstance::all_by_database_agent_host_uuid(
+            &state.database,
+            database_agent_host.uuid,
+        )
+        .await?;
+        if !database_agents.is_empty() && !data.force {
+            return ApiResponse::error("database agent host has databases, cannot delete")
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+        }
+
+        for database_agent in database_agents {
+            let database_agent_uuid = database_agent.uuid;
+
+            if let Err(err) = database_agent
+                .delete(
+                    &state,
+                    DeleteServerDatabaseInstanceOptions { force: data.force },
+                )
+                .await
+            {
+                tracing::error!(
+                    database_agent_host = %database_agent_host.uuid,
+                    database_agent = %database_agent_uuid,
+                    "failed to delete database agent: {:?}",
+                    err
+                );
+
+                let (err, status) = shared::response::extract_readable_error(&err)
+                    .unwrap_or_else(|| (err.to_string(), StatusCode::EXPECTATION_FAILED));
+
+                return ApiResponse::error(format!("failed to delete database agent: {err}"))
+                    .with_status(status)
+                    .ok();
+            }
+        }
 
         database_agent_host.delete(&state, ()).await?;
 
@@ -218,6 +272,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
+        .nest("/capacity", capacity::router(state))
+        .nest("/instances", instances::router(state))
         .nest("/token", token::router(state))
         .nest("/reset-token", reset_token::router(state))
         .nest("/config", config::router(state))

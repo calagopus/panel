@@ -14,6 +14,7 @@ export const adminDatabaseAgentTemplateSchema = z.object({
   imageGid: z.number().min(0),
   cmd: z.array(z.string()).nullable(),
   volumes: z.record(z.string(), z.string()),
+  socketPath: z.string().min(1).max(255),
   memory: z.number().min(0),
   swap: z.number().min(-1),
   disk: z.number().min(0),

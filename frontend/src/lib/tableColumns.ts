@@ -55,6 +55,29 @@ export const databaseHostDatabaseTableColumns = (): string[] => {
   ];
 };
 
+export const databaseAgentHostInstanceTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.name', {}),
+    t('common.table.columns.server', {}),
+    t('common.table.columns.type', {}),
+    t('common.table.columns.address', {}),
+    t('common.table.columns.template', {}),
+    t('common.table.columns.created', {}),
+  ];
+};
+
+export const databaseAgentTemplateInstanceTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.name', {}),
+    t('common.table.columns.server', {}),
+    t('common.table.columns.type', {}),
+    t('common.table.columns.address', {}),
+    t('common.table.columns.created', {}),
+  ];
+};
+
 export const locationDatabaseHostTableColumns = (): string[] => {
   const { t } = getTranslations();
   return [

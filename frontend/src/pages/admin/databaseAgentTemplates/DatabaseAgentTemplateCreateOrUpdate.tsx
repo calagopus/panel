@@ -12,7 +12,7 @@ import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
+import { AdvancedModeToggle, type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -63,6 +63,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       imageGid: 0,
       cmd: [],
       volumes: {},
+      socketPath: '',
       memory: 0,
       swap: 0,
       disk: 0,
@@ -108,6 +109,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
         imageGid: contextDatabaseAgentTemplate.imageGid,
         cmd: contextDatabaseAgentTemplate.cmd ?? [],
         volumes: contextDatabaseAgentTemplate.volumes,
+        socketPath: contextDatabaseAgentTemplate.socketPath,
         memory: contextDatabaseAgentTemplate.memory,
         swap: contextDatabaseAgentTemplate.swap,
         disk: contextDatabaseAgentTemplate.disk,
@@ -185,6 +187,14 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       ),
     },
     {
+      type: 'text',
+      name: 'socketPath',
+      label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.socketPath', {}),
+      required: true,
+      description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.socketPathDescription', {}),
+      colSpan: 'full',
+    },
+    {
       type: 'number',
       name: 'imageUid',
       label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.imageUid', {}),
@@ -201,6 +211,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       name: 'cmd',
       label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cmd', {}),
       colSpan: 'full',
+      advanced: true,
     },
     {
       type: 'size',
@@ -246,6 +257,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeight', {}),
       description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeightDescription', {}),
       tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeightTooltip', {}),
+      advanced: true,
     },
     { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
   ];
@@ -259,6 +271,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       }
       fullscreen={!!contextDatabaseAgentTemplate}
       titleOrder={2}
+      contentRight={<AdvancedModeToggle />}
     >
       <ConfirmationModal
         opened={openModal === 'delete'}

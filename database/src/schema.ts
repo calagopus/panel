@@ -725,6 +725,14 @@ export const databaseAgentHostsTable = pgTable(
     url: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     memory: bigint({ mode: 'number' }).notNull(),
     disk: bigint({ mode: 'number' }).notNull(),
+    types: jsonb()
+      .default({
+        postgres: { enabled: true, public_host: null, public_port: null },
+        mariadb: { enabled: true, public_host: null, public_port: null },
+        mongodb: { enabled: true, public_host: null, public_port: null },
+        redis: { enabled: true, public_host: null, public_port: null },
+      })
+      .notNull(),
     token: bytea().notNull(),
     created: timestamp().defaultNow().notNull(),
   },
@@ -769,6 +777,7 @@ export const databaseAgentTemplatesTable = pgTable(
     image_gid: integer().notNull(),
     cmd: text().array(),
     volumes: json().notNull(),
+    socket_path: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     memory: bigint({ mode: 'number' }).notNull(),
     swap: bigint({ mode: 'number' }).notNull(),
     disk: bigint({ mode: 'number' }).notNull(),
@@ -993,6 +1002,36 @@ export const serverDatabasesTable = pgTable(
     index('server_databases_server_uuid_idx').on(cols.server_uuid),
     index('server_databases_database_host_uuid_idx').on(cols.database_host_uuid),
     uniqueIndex('server_databases_server_uuid_database_idx').on(cols.server_uuid, cols.name),
+  ],
+);
+
+export const serverDatabaseInstancesTable = pgTable(
+  'server_database_instances',
+  {
+    uuid: uuid().primaryKey().notNull(),
+    server_uuid: uuid()
+      .references(() => serversTable.uuid)
+      .notNull(),
+    database_agent_host_uuid: uuid()
+      .references(() => databaseAgentHostsTable.uuid)
+      .notNull(),
+    database_agent_template_uuid: uuid().references(() => databaseAgentTemplatesTable.uuid, {
+      onDelete: 'set null',
+    }),
+    type: databaseAgentTypeEnum().notNull(),
+    name: varchar({ length: 31 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    locked: boolean().default(false).notNull(),
+    memory: bigint({ mode: 'number' }).notNull(),
+    swap: bigint({ mode: 'number' }).notNull(),
+    disk: bigint({ mode: 'number' }).notNull(),
+    io_weight: smallint(),
+    cpu: integer().notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('server_database_instances_server_uuid_idx').on(cols.server_uuid),
+    index('server_database_instances_database_agent_host_uuid_idx').on(cols.database_agent_host_uuid),
+    uniqueIndex('server_database_instances_server_uuid_name_idx').on(cols.server_uuid, cols.name),
   ],
 );
 

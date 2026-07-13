@@ -46,6 +46,7 @@ pub mod server_activity;
 pub mod server_allocation;
 pub mod server_backup;
 pub mod server_database;
+pub mod server_database_instance;
 pub mod server_mount;
 pub mod server_schedule;
 pub mod server_schedule_step;

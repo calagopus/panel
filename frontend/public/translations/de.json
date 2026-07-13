@@ -293,7 +293,8 @@
           "files": "Dateien",
           "server": "Server",
           "address": "Adresse",
-          "eggs": "Eggs"
+          "eggs": "Eggs",
+          "template": "Vorlage"
         }
       },
       "tabs": {
@@ -2400,9 +2401,10 @@
                   "inheritedFromLocation": "Vom Standort geerbt",
                   "none": "Keine",
                   "wingsVersion": "Wings-Version",
-                  "os": "Betriebssystem",
+                  "cpu": "CPU",
+                  "memory": "Arbeitsspeicher",
+                  "servers": "Server",
                   "architecture": "Architektur",
-                  "cpuCount": "CPU-Threads",
                   "kernelVersion": "Kernel-Version",
                   "unavailable": "Nicht verfügbar"
                 },
@@ -2517,6 +2519,7 @@
                   "kvmPassthroughEnabledDescription": "KVM-Passthrough für den Server aktivieren (ermöglicht Zugriff auf /dev/kvm im Container).",
                   "allocationsLimit": "Allocations",
                   "databasesLimit": "Datenbanken",
+                  "databaseAgentsLimit": "Agent-Datenbanken",
                   "backupsLimit": "Backups",
                   "schedulesLimit": "Zeitpläne"
                 },
@@ -2738,6 +2741,7 @@
                   "swap": "Swap",
                   "allocations": "Allocations",
                   "databases": "Datenbanken",
+                  "databaseAgents": "Agent-Datenbanken",
                   "backups": "Backups",
                   "schedules": "Zeitpläne",
                   "unlimited": "Unendlich",
@@ -3519,6 +3523,11 @@
               "page": {
                 "titleCreate": "Datenbank-Agent-Host erstellen",
                 "titleUpdate": "Datenbank-Agent-Host aktualisieren",
+                "form": {
+                  "typeEnabled": "Aktiviert",
+                  "typePublicHost": "Öffentlicher Host",
+                  "typePublicPort": "Öffentlicher Port"
+                },
                 "button": {
                   "resetToken": "Token zurücksetzen",
                   "testConnection": "Verbindung testen",
@@ -3527,13 +3536,23 @@
                 "modal": {
                   "delete": {
                     "title": "Löschen des Datenbank-Agent-Hosts bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
+                    "form": {
+                      "force": "Löschen erzwingen",
+                      "forceWarning": "Erzwungenes Löschen entfernt alle Instanzen auf diesem Host. Instanzen, für die der Agent nicht erreichbar ist, werden möglicherweise nicht vollständig bereinigt, sodass verwaiste Daten zurückbleiben."
+                    }
                   }
                 },
                 "toast": {
                   "tested": "Test erfolgreich abgeschlossen.",
                   "tokenReset": "Datenbank-Agent-Host-Token zurückgesetzt."
                 }
+              }
+            },
+            "instances": {
+              "title": "Instanzen",
+              "page": {
+                "title": "Instanzen"
               }
             },
             "configuration": {
@@ -3580,7 +3599,8 @@
                 },
                 "card": {
                   "hostDetails": "Host-Details",
-                  "systemInfo": "Systeminformationen"
+                  "systemInfo": "Systeminformationen",
+                  "resources": "Zugewiesene Ressourcen"
                 },
                 "label": {
                   "url": "URL",
@@ -3589,10 +3609,14 @@
                   "version": "Version",
                   "cpu": "CPU",
                   "memory": "Arbeitsspeicher",
-                  "databases": "Datenbanken",
+                  "disk": "Speicher",
+                  "instances": "Instanzen",
                   "kernelVersion": "Kernel-Version",
                   "architecture": "Architektur",
-                  "unavailable": "Nicht verfügbar"
+                  "unavailable": "Nicht verfügbar",
+                  "noLimit": "Kein Host-Limit",
+                  "free": "{size} frei",
+                  "cores": "{cores} Kerne zugewiesen"
                 },
                 "badge": {
                   "updateAvailable": "Update verfügbar"
@@ -3673,6 +3697,8 @@
                   "dockerImages": "Docker-Images",
                   "env": "Umgebungsvariablen",
                   "volumes": "Volumes",
+                  "socketPath": "Socket-Pfad",
+                  "socketPathDescription": "Der Unix-Socket-Dateipfad innerhalb des Datenbank-Containers, muss mit dem Ort übereinstimmen, an dem das konfigurierte Image seinen Socket tatsächlich erstellt.",
                   "imageUid": "Image-UID",
                   "imageGid": "Image-GID",
                   "cmd": "Befehl",
@@ -3696,6 +3722,12 @@
                     "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
                   }
                 }
+              }
+            },
+            "instances": {
+              "title": "Instanzen",
+              "page": {
+                "title": "Instanzen"
               }
             }
           }
@@ -4123,6 +4155,10 @@
         "databases": {
           "title": "Datenbanken",
           "subtitle": "{current} von maximal {max} Datenbanken erstellt.",
+          "classic": {
+            "title": "Klassische Datenbanken",
+            "subtitle": "{current} Datenbanken erstellt."
+          },
           "tooltip": {
             "limitReached": "Dieser Server ist auf {max} Datenbanken limitiert."
           },
@@ -4136,6 +4172,140 @@
           },
           "form": {
             "databaseName": "Datenbank Name"
+          },
+          "instance": {
+            "title": "Verwaltete Datenbanken",
+            "subtitle": "{current} verwaltete Datenbanken erstellt.",
+            "tooltip": {
+              "limitReached": "Dieser Server ist auf {max} verwaltete Datenbanken limitiert."
+            },
+            "view": {
+              "tabs": {
+                "databases": "Datenbanken",
+                "users": "Benutzer",
+                "logs": "Logs"
+              },
+              "stats": {
+                "uptime": "Laufzeit",
+                "cpuLoad": "CPU-Auslastung",
+                "memoryLoad": "Speicherauslastung",
+                "diskUsage": "Festplattennutzung"
+              }
+            },
+            "databases": {
+              "title": "Datenbanken",
+              "noDatabases": "Diese Instanz hat noch keine Datenbanken.",
+              "tooltip": {
+                "offline": "Die Instanz muss laufen, um Datenbanken zu erstellen.",
+                "noUser": "Dieser Datenbank ist noch kein Benutzer zugeordnet. Erstelle einen Benutzer, um darauf zuzugreifen."
+              },
+              "button": {
+                "export": "Exportieren",
+                "import": "Importieren"
+              },
+              "modal": {
+                "createDatabase": {
+                  "title": "Datenbank erstellen",
+                  "content": "Erstellt eine neue Datenbank mit eigenem Benutzer innerhalb dieser verwalteten Datenbank-Instanz. Die Zugangsdaten werden anschließend in der Tabelle angezeigt."
+                },
+                "deleteDatabase": {
+                  "title": "Datenbanklöschung bestätigen",
+                  "content": "Möchtest du die Datenbank für den Benutzer **{username}** wirklich löschen? Dadurch werden die Datenbank und alle darin enthaltenen Daten dauerhaft gelöscht."
+                },
+                "exportDatabase": {
+                  "title": "Datenbank exportieren",
+                  "content": "Lade einen Abzug dieser Datenbank herunter. Bei großen Datenbanken kann die Vorbereitung eine Weile dauern."
+                },
+                "importDatabase": {
+                  "title": "Datenbank importieren",
+                  "content": "Lade einen Abzug hoch, um ihn in diese Datenbank zu importieren. Große Importe können eine Weile dauern.",
+                  "form": {
+                    "file": "Abzugsdatei",
+                    "wipe": "Vorhandene Daten vor dem Import löschen"
+                  }
+                }
+              },
+              "table": {
+                "columns": {
+                  "database": "Datenbank"
+                }
+              },
+              "toast": {
+                "created": "Datenbank erstellt.",
+                "deleted": "Datenbank gelöscht.",
+                "imported": "Datenbank-Import abgeschlossen.",
+                "passwordRotated": "Passwort wurde rotiert."
+              }
+            },
+            "users": {
+              "title": "Benutzer",
+              "noUsers": "Diese Instanz hat noch keine Benutzer.",
+              "modal": {
+                "createUser": {
+                  "title": "Benutzer erstellen",
+                  "content": "Erstellt einen neuen Benutzer in dieser verwalteten Datenbank-Instanz. Die Zugangsdaten werden anschließend in der Tabelle angezeigt.",
+                  "form": {
+                    "database": "Datenbank",
+                    "databaseHint": "Die Datenbank, auf die dieser Benutzer Zugriff erhält.",
+                    "databaseRequired": "Bitte wähle eine Datenbank aus."
+                  }
+                },
+                "deleteUser": {
+                  "title": "Benutzerlöschung bestätigen",
+                  "content": "Bist du sicher, dass du den Benutzer **{username}** löschen möchtest? Dies kann nicht rückgängig gemacht werden."
+                }
+              },
+              "toast": {
+                "created": "Benutzer erstellt.",
+                "deleted": "Benutzer gelöscht."
+              }
+            },
+            "power": {
+              "toast": {
+                "start": "Verwaltete Datenbank wird gestartet.",
+                "stop": "Verwaltete Datenbank wird gestoppt.",
+                "restart": "Verwaltete Datenbank wird neu gestartet.",
+                "kill": "Verwaltete Datenbank wurde beendet."
+              },
+              "modal": {
+                "forceKill": {
+                  "title": "Datenbank zwangsweise beenden",
+                  "content": "Das zwangsweise Beenden einer Datenbank kann zu Datenverlust führen."
+                }
+              }
+            },
+            "modal": {
+              "createDatabaseInstance": {
+                "title": "Verwaltete Datenbank erstellen",
+                "toast": {
+                  "created": "Verwaltete Datenbank erstellt."
+                },
+                "form": {
+                  "template": "Vorlage",
+                  "noTemplatesFound": "Keine Vorlagen verfügbar",
+                  "image": "Docker-Image"
+                }
+              },
+              "editDatabaseInstance": {
+                "title": "Verwaltete Datenbank bearbeiten",
+                "toast": {
+                  "updated": "Verwaltete Datenbank aktualisiert."
+                }
+              },
+              "deleteDatabaseInstance": {
+                "title": "Löschen der verwalteten Datenbank bestätigen",
+                "content": "Das Löschen einer verwalteten Datenbank ist dauerhaft und kann nicht rückgängig gemacht werden. Dies löscht die Datenbank **{name}** und alle zugehörigen Daten unwiderruflich.",
+                "toast": {
+                  "deleted": "Verwaltete Datenbank gelöscht."
+                }
+              },
+              "credentials": {
+                "title": "Datenbank-Zugangsdaten",
+                "form": {
+                  "database": "Datenbank"
+                }
+              }
+            }
           },
           "modal": {
             "createDatabase": {

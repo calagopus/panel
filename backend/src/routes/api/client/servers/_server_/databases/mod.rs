@@ -3,6 +3,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _database_;
 mod hosts;
+mod instances;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
@@ -260,7 +261,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
         .routes(routes!(post::route))
-        .nest("/{database}", _database_::router(state))
+        .nest("/instances", instances::router(state))
         .nest("/hosts", hosts::router(state))
+        .nest("/{database}", _database_::router(state))
         .with_state(state.clone())
 }

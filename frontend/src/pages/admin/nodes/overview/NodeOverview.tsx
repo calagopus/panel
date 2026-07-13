@@ -8,11 +8,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SimpleGrid, Text } from '@mantine/core';
-import { useCallback, useEffect, useState } from 'react';
 import { z } from 'zod';
 import getNodeCapacity from '@/api/admin/nodes/getNodeCapacity.ts';
-import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
-import { axiosInstance } from '@/api/axios.ts';
+import getNodeSystemOverview from '@/api/admin/nodes/system/getNodeSystemOverview.ts';
 import Badge from '@/elements/Badge.tsx';
 import Card from '@/elements/Card.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -23,26 +21,16 @@ import Stack from '@/elements/Stack.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import Title from '@/elements/Title.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
-import { getNodeUrl } from '@/lib/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { formatDateTime } from '@/lib/time.ts';
 import { parseVersion } from '@/lib/version.ts';
-import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 
 type Node = z.infer<typeof adminNodeSchema>;
-
-interface SystemInfo {
-  architecture: string;
-  cpuCount: number;
-  kernelVersion: string;
-  os: string;
-  version: string;
-}
 
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -117,37 +105,22 @@ function CapacityResource({
 export default function NodeOverview({ node }: { node: Node }) {
   const { t } = useTranslations();
   const { updateInformation } = useAdminStore();
-  const canReadToken = useAdminCan('nodes.read-token');
-
-  const [systemInfo, setSystemInfo] = useState<SystemInfo | 'unavailable' | null>(null);
 
   const { data: capacity } = useResource({
     queryKey: queryKeys.admin.nodes.capacity(node.uuid),
     queryFn: () => getNodeCapacity(node.uuid),
-  });
-
-  const { data: nodeToken } = useResource({
-    queryKey: queryKeys.admin.nodes.token(node.uuid),
-    queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
     silent: true,
-    enabled: canReadToken,
   });
 
-  useEffect(() => {
-    if (!nodeToken?.token) return;
+  const { data: overview, error } = useResource({
+    queryKey: queryKeys.admin.nodes.systemOverview(node.uuid),
+    queryFn: () => getNodeSystemOverview(node.uuid),
+    silent: true,
+  });
 
-    axiosInstance
-      .get<SystemInfo>(getNodeUrl(node, '/api/system'), {
-        headers: { Authorization: `Bearer ${nodeToken.token}` },
-      })
-      .then(({ data }) => setSystemInfo(data))
-      .catch(() => setSystemInfo('unavailable'));
-  }, [node, nodeToken?.token]);
-
-  const versionString = systemInfo && systemInfo !== 'unavailable' ? systemInfo.version : null;
   const hasUpdate =
-    versionString && updateInformation
-      ? parseVersion(updateInformation.latestWingsVersion).isNewerThan(versionString)
+    overview && updateInformation
+      ? parseVersion(updateInformation.latestWingsVersion).isNewerThan(overview.version)
       : false;
 
   return (
@@ -234,17 +207,7 @@ export default function NodeOverview({ node }: { node: Node }) {
             title={t('pages.admin.nodes.tabs.overview.page.card.systemInfo', {})}
             icon={<FontAwesomeIcon icon={faCircleInfo} />}
           >
-            {!canReadToken ? (
-              <Stack gap={0}>
-                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.wingsVersion', {})}>
-                  <Text size='sm' c='dimmed'>
-                    {t('elements.screenBlock.permissionDenied.title', {})}
-                  </Text>
-                </InfoRow>
-              </Stack>
-            ) : systemInfo === null ? (
-              <Spinner.Centered />
-            ) : systemInfo === 'unavailable' ? (
+            {error ? (
               <Stack gap={0}>
                 <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.wingsVersion', {})}>
                   <Text size='sm' c='dimmed'>
@@ -252,12 +215,14 @@ export default function NodeOverview({ node }: { node: Node }) {
                   </Text>
                 </InfoRow>
               </Stack>
+            ) : !overview ? (
+              <Spinner.Centered />
             ) : (
               <Stack gap={0}>
                 <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.wingsVersion', {})}>
                   <Group gap='xs' justify='flex-end'>
                     <Text size='sm' ff='monospace'>
-                      {systemInfo.version}
+                      {overview.version}
                     </Text>
                     {hasUpdate && (
                       <Badge color='yellow' variant='light' size='sm'>
@@ -266,23 +231,28 @@ export default function NodeOverview({ node }: { node: Node }) {
                     )}
                   </Group>
                 </InfoRow>
-                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.os', {})}>
-                  <Text size='sm' tt='capitalize'>
-                    {systemInfo.os}
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.cpu', {})}>
+                  <Text size='sm'>
+                    {overview.cpu.brand} ({overview.cpu.cpuCount})
+                  </Text>
+                </InfoRow>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.memory', {})}>
+                  <Text size='sm'>{bytesToString(overview.memory.totalBytes)}</Text>
+                </InfoRow>
+                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.servers', {})}>
+                  <Text size='sm'>
+                    {overview.servers.online} / {overview.servers.total}
                   </Text>
                 </InfoRow>
                 <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.kernelVersion', {})}>
                   <Text size='sm' ff='monospace'>
-                    {systemInfo.kernelVersion}
+                    {overview.kernelVersion}
                   </Text>
                 </InfoRow>
                 <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.architecture', {})}>
                   <Text size='sm' ff='monospace'>
-                    {systemInfo.architecture}
+                    {overview.architecture}
                   </Text>
-                </InfoRow>
-                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.cpuCount', {})}>
-                  <Text size='sm'>{systemInfo.cpuCount}</Text>
                 </InfoRow>
               </Stack>
             )}

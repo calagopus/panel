@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod ws;
+
 mod get {
     use serde::Serialize;
     use shared::{
@@ -42,5 +44,6 @@ mod get {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
+        .nest("/ws", ws::router(state))
         .with_state(state.clone())
 }

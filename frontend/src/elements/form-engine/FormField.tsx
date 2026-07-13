@@ -2,6 +2,7 @@ import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType } from '@mantine/form';
 import { ReactNode } from 'react';
+import Divider from '@/elements/Divider.tsx';
 import Autocomplete from '@/elements/input/Autocomplete.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import DateTimePicker from '@/elements/input/DateTimePicker.tsx';
@@ -34,7 +35,7 @@ function getByPath(obj: Record<string, unknown>, path: string): unknown {
 
 function fieldLabel<T extends Record<string, unknown>>(field: FieldDef<T>): ReactNode {
   const label = 'label' in field ? field.label : undefined;
-  if (field.type === 'custom' || !field.tooltip) return label;
+  if (field.type === 'custom' || field.type === 'divider' || !field.tooltip) return label;
 
   return (
     <span className='inline-flex items-center gap-1'>
@@ -48,6 +49,26 @@ function fieldLabel<T extends Record<string, unknown>>(field: FieldDef<T>): Reac
 
 export function FormField<T extends Record<string, unknown>>({ form, field }: Props<T>) {
   if (field.when && !field.when(form.values)) return null;
+
+  if (field.type === 'divider') {
+    if (field.switchName) {
+      const f = form as UseFormReturnType<Record<string, unknown>>;
+      return (
+        <div className='col-span-full flex items-center gap-4'>
+          <Divider className='flex-1' label={field.label} labelPosition='left' />
+          <Switch
+            label={field.switchLabel}
+            labelPosition='left'
+            key={f.key(field.switchName)}
+            {...f.getInputProps(field.switchName, { type: 'checkbox' })}
+            {...field.switchProps}
+          />
+        </div>
+      );
+    }
+
+    return <Divider className='col-span-full' label={field.label} labelPosition='left' />;
+  }
 
   const colSpanClass = field.colSpan === 'full' ? 'col-span-full' : undefined;
   const f = form as UseFormReturnType<Record<string, unknown>>;

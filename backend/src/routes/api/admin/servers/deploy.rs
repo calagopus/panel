@@ -208,9 +208,6 @@ mod post {
 
         let mut allocation_uuid = data.allocation_uuid;
         let mut allocation_uuids = data.allocation_uuids;
-
-        // When the deployment couldn't be placed, the last allocation-assignment
-        // failure (if any) is the most specific explanation we can give.
         let mut allocation_error: Option<String> = None;
 
         let mut node_uuid = None;
@@ -235,9 +232,6 @@ mod post {
                         Err(err) => return ApiResponse::from(err).ok(),
                     };
 
-                // Defense in depth: never deploy a server with fewer additional
-                // allocations than the rule configured. `get_from_deployment` already
-                // guarantees this, but a partial set must never silently slip through.
                 if deployment_allocation_uuids.len() != allocations.additional.len() {
                     allocation_error = Some(format!(
                         "a node could only satisfy {} of the {} required additional allocations",

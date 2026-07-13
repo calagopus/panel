@@ -6,7 +6,7 @@ import JavaVersionModalFeature from './JavaVersionModalFeature.tsx';
 
 export default function FeatureProvider() {
   const { user } = useAuth();
-  const server = useServerStore((s) => s.server);
+  const server = useServerStore((state) => state.server);
 
   if (isConflictingState(server, user)) {
     return null;

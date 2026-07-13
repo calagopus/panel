@@ -12,6 +12,65 @@ use std::{
 };
 use utoipa::ToSchema;
 
+#[inline]
+fn default_true() -> bool {
+    true
+}
+
+#[derive(ToSchema, Serialize, Deserialize, Validate, Clone)]
+pub struct DatabaseAgentHostTypeSettings {
+    #[garde(skip)]
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+
+    #[garde(length(chars, min = 3, max = 255))]
+    #[schema(min_length = 3, max_length = 255)]
+    #[serde(default)]
+    pub public_host: Option<compact_str::CompactString>,
+    #[garde(range(min = 1))]
+    #[schema(minimum = 1)]
+    #[serde(default)]
+    pub public_port: Option<u16>,
+}
+
+impl Default for DatabaseAgentHostTypeSettings {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            public_host: None,
+            public_port: None,
+        }
+    }
+}
+
+#[derive(ToSchema, Serialize, Deserialize, Validate, Clone, Default)]
+pub struct DatabaseAgentHostTypes {
+    #[garde(dive)]
+    #[serde(default)]
+    pub postgres: DatabaseAgentHostTypeSettings,
+    #[garde(dive)]
+    #[serde(default)]
+    pub mariadb: DatabaseAgentHostTypeSettings,
+    #[garde(dive)]
+    #[serde(default)]
+    pub mongodb: DatabaseAgentHostTypeSettings,
+    #[garde(dive)]
+    #[serde(default)]
+    pub redis: DatabaseAgentHostTypeSettings,
+}
+
+impl DatabaseAgentHostTypes {
+    #[inline]
+    pub fn get(&self, r#type: db_agent_api::DatabaseAgentType) -> &DatabaseAgentHostTypeSettings {
+        match r#type {
+            db_agent_api::DatabaseAgentType::Postgres => &self.postgres,
+            db_agent_api::DatabaseAgentType::Mariadb => &self.mariadb,
+            db_agent_api::DatabaseAgentType::Mongodb => &self.mongodb,
+            db_agent_api::DatabaseAgentType::Redis => &self.redis,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DatabaseAgentHost {
     pub uuid: uuid::Uuid,
@@ -26,6 +85,8 @@ pub struct DatabaseAgentHost {
 
     pub memory: i64,
     pub disk: i64,
+
+    pub types: DatabaseAgentHostTypes,
 
     pub token: Vec<u8>,
 
@@ -86,6 +147,10 @@ impl BaseModel for DatabaseAgentHost {
                 compact_str::format_compact!("{prefix}disk"),
             ),
             (
+                "database_agent_hosts.types",
+                compact_str::format_compact!("{prefix}types"),
+            ),
+            (
                 "database_agent_hosts.token",
                 compact_str::format_compact!("{prefix}token"),
             ),
@@ -115,6 +180,9 @@ impl BaseModel for DatabaseAgentHost {
                 .map_err(anyhow::Error::new)?,
             memory: row.try_get(compact_str::format_compact!("{prefix}memory").as_str())?,
             disk: row.try_get(compact_str::format_compact!("{prefix}disk").as_str())?,
+            types: serde_json::from_value(
+                row.try_get(compact_str::format_compact!("{prefix}types").as_str())?,
+            )?,
             token: row.try_get(compact_str::format_compact!("{prefix}token").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
@@ -158,6 +226,52 @@ impl DatabaseAgentHost {
                 .map(|row| Self::map(None, &row))
                 .try_collect_vec()?,
         })
+    }
+
+    pub async fn by_location_uuid_most_eligible(
+        database: &crate::database::Database,
+        location_uuid: uuid::Uuid,
+        r#type: db_agent_api::DatabaseAgentType,
+        memory: i64,
+        disk: i64,
+    ) -> Result<Vec<Self>, crate::database::DatabaseError> {
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            WITH database_usage AS (
+                SELECT
+                    database_agent_host_uuid,
+                    COALESCE(SUM(memory), 0)::BIGINT AS used_memory,
+                    COALESCE(SUM(disk), 0)::BIGINT AS used_disk
+                FROM server_database_instances
+                GROUP BY database_agent_host_uuid
+            )
+            SELECT {}
+            FROM database_agent_hosts
+            JOIN location_database_agent_hosts ON location_database_agent_hosts.database_agent_host_uuid = database_agent_hosts.uuid AND location_database_agent_hosts.location_uuid = $1
+            LEFT JOIN database_usage u ON database_agent_hosts.uuid = u.database_agent_host_uuid
+            WHERE database_agent_hosts.deployment_enabled
+            AND NOT database_agent_hosts.maintenance_enabled
+            AND COALESCE((database_agent_hosts.types -> $2 ->> 'enabled')::BOOL, TRUE)
+            AND COALESCE(u.used_memory, 0) + $3 <= database_agent_hosts.memory
+            AND COALESCE(u.used_disk, 0) + $4 <= database_agent_hosts.disk
+            ORDER BY
+                GREATEST(
+                    (COALESCE(u.used_memory, 0) + $3)::FLOAT / NULLIF(database_agent_hosts.memory, 0),
+                    (COALESCE(u.used_disk, 0) + $4)::FLOAT / NULLIF(database_agent_hosts.disk, 0)
+                )
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(location_uuid)
+        .bind(r#type.as_str())
+        .bind(memory)
+        .bind(disk)
+        .fetch_all(database.read())
+        .await?;
+
+        rows.into_iter()
+            .map(|row| Self::map(None, &row))
+            .try_collect_vec()
     }
 
     pub async fn by_location_uuid_uuid(
@@ -237,6 +351,32 @@ impl DatabaseAgentHost {
             .await
     }
 
+    /// Fetch the current resource usages of all databases on this host.
+    ///
+    /// Cached for 15 seconds.
+    pub async fn fetch_database_resources(
+        &self,
+        database: &crate::database::Database,
+    ) -> Result<std::collections::HashMap<uuid::Uuid, db_agent_api::ResourceUsage>, anyhow::Error>
+    {
+        database
+            .cache
+            .cached(
+                &format!("database_agent_host::{}::database_resources", self.uuid),
+                15,
+                || async {
+                    let resources = self
+                        .api_client(database)
+                        .await?
+                        .get_instances_utilization()
+                        .await?;
+
+                    Ok::<_, anyhow::Error>(resources.into_iter().collect())
+                },
+            )
+            .await
+    }
+
     /// Update the configuration of this database agent host
     ///
     /// Invalidates the cached configuration.
@@ -288,6 +428,7 @@ impl IntoAdminApiObject for DatabaseAgentHost {
                 url: self.url.to_string(),
                 memory: self.memory,
                 disk: self.disk,
+                types: self.types,
                 created: self.created.and_utc(),
             },
             api_object,
@@ -363,6 +504,10 @@ pub struct CreateDatabaseAgentHostOptions {
     #[garde(range(min = 1))]
     #[schema(minimum = 1)]
     pub disk: i64,
+
+    #[garde(dive)]
+    #[serde(default)]
+    pub types: DatabaseAgentHostTypes,
 }
 
 #[async_trait::async_trait]
@@ -398,6 +543,7 @@ impl CreatableModel for DatabaseAgentHost {
             .set("url", &options.url)
             .set("memory", options.memory)
             .set("disk", options.disk)
+            .set("types", serde_json::to_value(&options.types)?)
             .set("token", state.database.encrypt(token.clone()).await?);
 
         let row = query_builder
@@ -442,6 +588,9 @@ pub struct UpdateDatabaseAgentHostOptions {
     #[garde(range(min = 1))]
     #[schema(minimum = 1)]
     pub disk: Option<i64>,
+
+    #[garde(dive)]
+    pub types: Option<DatabaseAgentHostTypes>,
 }
 
 #[async_trait::async_trait]
@@ -479,6 +628,14 @@ impl UpdatableModel for DatabaseAgentHost {
             .set("url", options.url.as_ref())
             .set("memory", options.memory)
             .set("disk", options.disk)
+            .set(
+                "types",
+                options
+                    .types
+                    .as_ref()
+                    .map(serde_json::to_value)
+                    .transpose()?,
+            )
             .where_eq("uuid", self.uuid);
 
         query_builder.execute(&mut **transaction).await?;
@@ -503,6 +660,9 @@ impl UpdatableModel for DatabaseAgentHost {
         }
         if let Some(disk) = options.disk {
             self.disk = disk;
+        }
+        if let Some(types) = options.types {
+            self.types = types;
         }
 
         self.run_after_update_handlers(state, transaction).await?;
@@ -567,6 +727,8 @@ pub struct AdminApiDatabaseAgentHost {
 
     pub memory: i64,
     pub disk: i64,
+
+    pub types: DatabaseAgentHostTypes,
 
     pub created: chrono::DateTime<chrono::Utc>,
 }

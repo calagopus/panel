@@ -16,6 +16,7 @@ import {
   faCompress,
   faComputer,
   faCopy,
+  faCubes,
   faDatabase,
   faDownload,
   faEarthAmerica,
@@ -121,6 +122,13 @@ export const databaseAgentTypeLabelMapping: Record<z.infer<typeof databaseAgentT
   mariadb: 'MariaDB',
   mongodb: 'MongoDB',
   redis: 'Redis',
+};
+
+export const databaseAgentTypeDefaultPortMapping: Record<z.infer<typeof databaseAgentType>, number> = {
+  postgres: 5432,
+  mariadb: 3306,
+  mongodb: 27017,
+  redis: 6379,
 };
 
 export const announcementTypeLabelMapping: Record<z.infer<typeof announcementType>, () => string> = {
@@ -644,6 +652,9 @@ export const permissionCategoryIconMapping: Record<string, IconDefinition> = {
   announcements: faBullhorn,
   'database-hosts': faDatabase,
   databases: faDatabase,
+  'database-instances': faServer,
+  'database-agent-hosts': faServer,
+  'database-agent-templates': faCubes,
   eggs: faEgg,
   assets: faFolderOpen,
   extensions: faPuzzlePiece,

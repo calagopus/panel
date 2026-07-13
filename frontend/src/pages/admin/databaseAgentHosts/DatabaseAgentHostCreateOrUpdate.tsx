@@ -1,3 +1,5 @@
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -9,12 +11,17 @@ import resetDatabaseAgentHostToken from '@/api/admin/database-agent-hosts/resetD
 import testDatabaseAgentHost from '@/api/admin/database-agent-hosts/testDatabaseAgentHost.ts';
 import updateDatabaseAgentHost from '@/api/admin/database-agent-hosts/updateDatabaseAgentHost.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import { type FieldDef, FormEngine, useFormExtensions } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
+import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import Stack from '@/elements/Stack.tsx';
+import Text from '@/elements/Text.tsx';
+import { databaseAgentTypeDefaultPortMapping, databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminDatabaseAgentHostCreateSchema,
@@ -37,6 +44,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
   const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [deleteDoForce, setDeleteDoForce] = useState(false);
 
   const {
     formExtension,
@@ -58,6 +66,12 @@ export default function DatabaseAgentHostCreateOrUpdate({
       url: '',
       memory: 0,
       disk: 0,
+      types: {
+        postgres: { enabled: true, publicHost: null, publicPort: databaseAgentTypeDefaultPortMapping.postgres },
+        mariadb: { enabled: true, publicHost: null, publicPort: databaseAgentTypeDefaultPortMapping.mariadb },
+        mongodb: { enabled: true, publicHost: null, publicPort: databaseAgentTypeDefaultPortMapping.mongodb },
+        redis: { enabled: true, publicHost: null, publicPort: databaseAgentTypeDefaultPortMapping.redis },
+      },
       ...(extInitialValues as Partial<DatabaseAgentHostFormValues>),
     },
     validateInputOnBlur: true,
@@ -77,7 +91,9 @@ export default function DatabaseAgentHostCreateOrUpdate({
             adminDatabaseAgentHostUpdateSchema.parse(form.getValues()),
           )
       : undefined,
-    deleteFn: contextDatabaseAgentHost ? () => deleteDatabaseAgentHost(contextDatabaseAgentHost.uuid) : undefined,
+    deleteFn: contextDatabaseAgentHost
+      ? () => deleteDatabaseAgentHost(contextDatabaseAgentHost.uuid, { force: deleteDoForce })
+      : undefined,
     doUpdate: !!contextDatabaseAgentHost,
     basePath: '/admin/database-agent-hosts',
     resourceName: t('pages.admin.databaseAgentHosts.resourceName', {}),
@@ -93,6 +109,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
         url: contextDatabaseAgentHost.url,
         memory: contextDatabaseAgentHost.memory,
         disk: contextDatabaseAgentHost.disk,
+        types: contextDatabaseAgentHost.types,
       });
     }
   }, [contextDatabaseAgentHost]);
@@ -136,6 +153,36 @@ export default function DatabaseAgentHostCreateOrUpdate({
     { type: 'size', name: 'disk', label: t('common.form.disk', {}), required: true, mode: 'mb', min: 1 },
     { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
     { type: 'switch', name: 'maintenanceEnabled', label: t('common.form.maintenanceEnabled', {}) },
+    ...Object.entries(databaseAgentTypeLabelMapping).flatMap(
+      ([type, label]): FieldDef<DatabaseAgentHostFormValues>[] => [
+        {
+          type: 'divider',
+          name: `types.${type}.divider`,
+          label,
+          switchName: `types.${type}.enabled`,
+          switchLabel: t('pages.admin.databaseAgentHosts.tabs.general.page.form.typeEnabled', {}),
+        },
+        {
+          type: 'text',
+          name: `types.${type}.publicHost`,
+          label: t('pages.admin.databaseAgentHosts.tabs.general.page.form.typePublicHost', {}),
+          when: (values) => values.types?.[type as keyof typeof values.types]?.enabled !== false,
+        },
+        {
+          type: 'number',
+          name: `types.${type}.publicPort`,
+          label: t('pages.admin.databaseAgentHosts.tabs.general.page.form.typePublicPort', {}),
+          props: {
+            min: 1,
+            max: 65535,
+            placeholder: String(
+              databaseAgentTypeDefaultPortMapping[type as keyof typeof databaseAgentTypeDefaultPortMapping],
+            ),
+          },
+          when: (values) => values.types?.[type as keyof typeof values.types]?.enabled !== false,
+        },
+      ],
+    ),
   ];
 
   return (
@@ -150,14 +197,35 @@ export default function DatabaseAgentHostCreateOrUpdate({
     >
       <ConfirmationModal
         opened={openModal === 'delete'}
-        onClose={() => setOpenModal(null)}
+        onClose={() => {
+          setOpenModal(null);
+          setDeleteDoForce(false);
+        }}
         title={t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.title', {})}
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.content', {
-          name: form.getValues().name ?? '',
-        }).md()}
+        <Stack>
+          <Text size='sm'>
+            {t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.content', {
+              name: form.getValues().name ?? '',
+            }).md()}
+          </Text>
+
+          <Switch
+            label={t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.form.force', {})}
+            name='force'
+            color='red'
+            checked={deleteDoForce}
+            onChange={(e) => setDeleteDoForce(e.target.checked)}
+          />
+
+          {deleteDoForce && (
+            <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+              {t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.form.forceWarning', {})}
+            </Alert>
+          )}
+        </Stack>
       </ConfirmationModal>
 
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.databaseAgentHosts.all()))}>

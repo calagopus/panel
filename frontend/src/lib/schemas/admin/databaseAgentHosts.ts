@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableNumber, nullableString } from '@/lib/transformers.ts';
+import { hostnameSchema } from '../generic.ts';
+
+export const adminDatabaseAgentHostTypeSettingsSchema = z.object({
+  enabled: z.boolean(),
+  publicHost: z.preprocess(nullableString, hostnameSchema.nullable()),
+  publicPort: z.preprocess(nullableNumber, z.number().min(1).max(65535).nullable()),
+});
 
 export const adminDatabaseAgentHostSchema = z.object({
   uuid: z.string(),
@@ -10,7 +17,26 @@ export const adminDatabaseAgentHostSchema = z.object({
   url: z.url().min(3).max(255),
   memory: z.number().min(1),
   disk: z.number().min(1),
+  types: z.object({
+    postgres: adminDatabaseAgentHostTypeSettingsSchema,
+    mariadb: adminDatabaseAgentHostTypeSettingsSchema,
+    mongodb: adminDatabaseAgentHostTypeSettingsSchema,
+    redis: adminDatabaseAgentHostTypeSettingsSchema,
+  }),
   created: z.coerce.date(),
+});
+
+export const adminDatabaseAgentHostCapacitySchema = z.object({
+  limits: z.object({
+    memory: z.number(),
+    disk: z.number(),
+  }),
+  allocated: z.object({
+    instances: z.number(),
+    cpu: z.number(),
+    memory: z.number(),
+    disk: z.number(),
+  }),
 });
 
 export const adminDatabaseAgentHostCreateSchema = z.lazy(() =>

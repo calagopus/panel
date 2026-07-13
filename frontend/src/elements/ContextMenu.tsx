@@ -1,7 +1,17 @@
 import { faEllipsis, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Menu, MenuProps } from '@mantine/core';
-import { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  type MouseEvent,
+  memo,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { ContextMenuRegistry } from 'shared/src/registries/slices/contextMenu';
 
 export interface ContextMenuActionItem {
@@ -10,7 +20,7 @@ export interface ContextMenuActionItem {
   label: string;
   hidden?: boolean;
   disabled?: boolean;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent) => void;
   color?: 'gray' | 'red';
   items?: (Omit<ContextMenuActionItem, 'items'> | ContextMenuDividerItem)[];
   canAccess?: boolean;
@@ -114,7 +124,7 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
                         if (!e.isTrusted) return;
 
                         if (item.onClick) {
-                          item.onClick();
+                          item.onClick(e);
                           hideMenu();
                         }
                       }}
@@ -139,7 +149,7 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
                               if (!e.isTrusted) return;
 
                               if (subItem.onClick) {
-                                subItem.onClick();
+                                subItem.onClick(e);
                                 hideMenu();
                               }
                             }}
@@ -160,7 +170,7 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
                     if (!e.isTrusted) return;
 
                     if (item.onClick) {
-                      item.onClick();
+                      item.onClick(e);
                       hideMenu();
                     }
                   }}

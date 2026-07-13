@@ -50,6 +50,7 @@ pub struct DatabaseAgentTemplate {
     pub image_gid: i32,
     pub cmd: Option<Vec<compact_str::CompactString>>,
     pub volumes: IndexMap<compact_str::CompactString, compact_str::CompactString>,
+    pub socket_path: compact_str::CompactString,
 
     pub memory: i64,
     pub swap: i64,
@@ -126,6 +127,10 @@ impl BaseModel for DatabaseAgentTemplate {
                 compact_str::format_compact!("{prefix}volumes"),
             ),
             (
+                "database_agent_templates.socket_path",
+                compact_str::format_compact!("{prefix}socket_path"),
+            ),
+            (
                 "database_agent_templates.memory",
                 compact_str::format_compact!("{prefix}memory"),
             ),
@@ -176,6 +181,8 @@ impl BaseModel for DatabaseAgentTemplate {
             volumes: serde_json::from_value(
                 row.try_get(compact_str::format_compact!("{prefix}volumes").as_str())?,
             )?,
+            socket_path: row
+                .try_get(compact_str::format_compact!("{prefix}socket_path").as_str())?,
             memory: row.try_get(compact_str::format_compact!("{prefix}memory").as_str())?,
             swap: row.try_get(compact_str::format_compact!("{prefix}swap").as_str())?,
             disk: row.try_get(compact_str::format_compact!("{prefix}disk").as_str())?,
@@ -188,6 +195,26 @@ impl BaseModel for DatabaseAgentTemplate {
 }
 
 impl DatabaseAgentTemplate {
+    pub async fn all_deployment_enabled(
+        database: &crate::database::Database,
+    ) -> Result<Vec<Self>, crate::database::DatabaseError> {
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM database_agent_templates
+            WHERE database_agent_templates.deployment_enabled
+            ORDER BY database_agent_templates.created
+            "#,
+            Self::columns_sql(None)
+        )))
+        .fetch_all(database.read())
+        .await?;
+
+        rows.into_iter()
+            .map(|row| Self::map(None, &row))
+            .try_collect_vec()
+    }
+
     pub async fn all_with_pagination(
         database: &crate::database::Database,
         page: i64,
@@ -251,6 +278,7 @@ impl IntoAdminApiObject for DatabaseAgentTemplate {
                 image_gid: self.image_gid,
                 cmd: self.cmd,
                 volumes: self.volumes,
+                socket_path: self.socket_path,
                 memory: self.memory,
                 swap: self.swap,
                 disk: self.disk,
@@ -285,6 +313,11 @@ impl IntoApiObject for DatabaseAgentTemplate {
                 description: self.description,
                 r#type: self.r#type,
                 docker_images: self.docker_images,
+                memory: self.memory,
+                swap: self.swap,
+                disk: self.disk,
+                io_weight: self.io_weight,
+                cpu: self.cpu,
                 created: self.created.and_utc(),
             },
             api_object,
@@ -365,6 +398,9 @@ pub struct CreateDatabaseAgentTemplateOptions {
     pub cmd: Option<Vec<compact_str::CompactString>>,
     #[garde(skip)]
     pub volumes: IndexMap<compact_str::CompactString, compact_str::CompactString>,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub socket_path: compact_str::CompactString,
 
     #[garde(range(min = 0))]
     #[schema(minimum = 0)]
@@ -417,6 +453,7 @@ impl CreatableModel for DatabaseAgentTemplate {
             .set("image_gid", options.image_gid)
             .set("cmd", options.cmd.as_ref())
             .set("volumes", OrderedJson(&options.volumes))
+            .set("socket_path", &options.socket_path)
             .set("memory", options.memory)
             .set("swap", options.swap)
             .set("disk", options.disk)
@@ -475,6 +512,9 @@ pub struct UpdateDatabaseAgentTemplateOptions {
     pub cmd: Option<Option<Vec<compact_str::CompactString>>>,
     #[garde(skip)]
     pub volumes: Option<IndexMap<compact_str::CompactString, compact_str::CompactString>>,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub socket_path: Option<compact_str::CompactString>,
 
     #[garde(range(min = 0))]
     #[schema(minimum = 0)]
@@ -538,6 +578,7 @@ impl UpdatableModel for DatabaseAgentTemplate {
             .set("image_gid", options.image_gid)
             .set("cmd", options.cmd.as_ref().map(|c| c.as_ref()))
             .set("volumes", options.volumes.as_ref().map(OrderedJson))
+            .set("socket_path", options.socket_path.as_ref())
             .set("memory", options.memory)
             .set("swap", options.swap)
             .set("disk", options.disk)
@@ -576,6 +617,9 @@ impl UpdatableModel for DatabaseAgentTemplate {
         }
         if let Some(volumes) = options.volumes {
             self.volumes = volumes;
+        }
+        if let Some(socket_path) = options.socket_path {
+            self.socket_path = socket_path;
         }
         if let Some(memory) = options.memory {
             self.memory = memory;
@@ -657,6 +701,7 @@ pub struct AdminApiDatabaseAgentTemplate {
     pub image_gid: i32,
     pub cmd: Option<Vec<compact_str::CompactString>>,
     pub volumes: IndexMap<compact_str::CompactString, compact_str::CompactString>,
+    pub socket_path: compact_str::CompactString,
 
     pub memory: i64,
     pub swap: i64,
@@ -681,6 +726,12 @@ pub struct ApiDatabaseAgentTemplate {
     pub r#type: db_agent_api::DatabaseAgentType,
 
     pub docker_images: IndexMap<compact_str::CompactString, compact_str::CompactString>,
+
+    pub memory: i64,
+    pub swap: i64,
+    pub disk: i64,
+    pub io_weight: Option<i16>,
+    pub cpu: i32,
 
     pub created: chrono::DateTime<chrono::Utc>,
 }

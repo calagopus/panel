@@ -1,4 +1,4 @@
-import { faCog, faHouse, faInfoCircle, faPenRuler } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faDatabase, faHouse, faInfoCircle, faPenRuler } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router';
 import getDatabaseAgentHost from '@/api/admin/database-agent-hosts/getDatabaseAgentHost.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -9,6 +9,7 @@ import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminDatabaseAgentHostConfiguration from './configuration/AdminDatabaseAgentHostConfiguration.tsx';
 import DatabaseAgentHostCreateOrUpdate from './DatabaseAgentHostCreateOrUpdate.tsx';
+import AdminDatabaseAgentHostInstances from './instances/AdminDatabaseAgentHostInstances.tsx';
 import DatabaseAgentHostOverview from './overview/DatabaseAgentHostOverview.tsx';
 import AdminDatabaseAgentHostStatistics from './statistics/AdminDatabaseAgentHostStatistics.tsx';
 
@@ -39,6 +40,12 @@ export default function DatabaseAgentHostView() {
                 icon: faCog,
                 path: `/settings`,
                 element: <DatabaseAgentHostCreateOrUpdate contextDatabaseAgentHost={databaseAgentHost} />,
+              },
+              {
+                name: t('pages.admin.databaseAgentHosts.tabs.instances.title', {}),
+                icon: faDatabase,
+                path: `/instances`,
+                element: <AdminDatabaseAgentHostInstances databaseAgentHost={databaseAgentHost} />,
               },
               {
                 name: t('pages.admin.databaseAgentHosts.tabs.configuration.title', {}),

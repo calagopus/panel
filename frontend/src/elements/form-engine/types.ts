@@ -112,6 +112,17 @@ export interface LocalizedTextAreaFieldDef<T extends Record<string, unknown>> ex
   rows?: number;
 }
 
+export interface DividerFieldDef<T extends Record<string, unknown>> {
+  type: 'divider';
+  name: string;
+  label?: string;
+  switchName?: string;
+  switchLabel?: string;
+  switchProps?: Partial<SwitchProps>;
+  advanced?: boolean;
+  when?: (values: T) => boolean;
+}
+
 export interface CustomFieldDef<T extends Record<string, unknown>> {
   type: 'custom';
   name: string;
@@ -138,6 +149,7 @@ export type FieldDef<T extends Record<string, unknown>> =
   | LocalizedTextFieldDef<T>
   | LocalizedTextAreaFieldDef<T>
   | MultiSelectGroupFieldDef<T>
+  | DividerFieldDef<T>
   | CustomFieldDef<T>;
 
 export type InsertPosition =

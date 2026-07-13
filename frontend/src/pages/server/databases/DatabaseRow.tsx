@@ -1,6 +1,6 @@
 import { faEye, faLock, faLockOpen, faPencil, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import getDatabaseSize from '@/api/server/databases/getDatabaseSize.ts';
 import Code from '@/elements/Code.tsx';
@@ -9,9 +9,11 @@ import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import DatabaseDeleteModal from './modals/DatabaseDeleteModal.tsx';
@@ -22,18 +24,17 @@ import DatabaseRecreateModal from './modals/DatabaseRecreateModal.tsx';
 export default function DatabaseRow({ database }: { database: z.infer<typeof serverDatabaseSchema> }) {
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'edit' | 'details' | 'recreate' | 'delete' | null>(null);
-  const [size, setSize] = useState(0);
-  const [sizeLoading, setSizeLoading] = useState(true);
   const server = useServerStore((state) => state.server);
   const host = `${database.host}:${database.port}`;
 
-  useEffect(() => {
-    if (!sizeLoading) return;
-
-    getDatabaseSize(server.uuid, database.uuid)
-      .then(setSize)
-      .finally(() => setSizeLoading(false));
-  }, [sizeLoading]);
+  const {
+    data: size,
+    loading: sizeLoading,
+    refetch: refetchSize,
+  } = useResource({
+    queryKey: queryKeys.server(server.uuid).databases.size(database.uuid),
+    queryFn: () => getDatabaseSize(server.uuid, database.uuid),
+  });
 
   return (
     <>
@@ -43,7 +44,7 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
         database={database}
         opened={openModal === 'recreate'}
         onClose={() => setOpenModal(null)}
-        setSizeLoading={setSizeLoading}
+        onRecreated={refetchSize}
       />
       <DatabaseDeleteModal database={database} opened={openModal === 'delete'} onClose={() => setOpenModal(null)} />
 
@@ -106,7 +107,7 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
 
             <TableData>{database.username}</TableData>
 
-            <TableData>{sizeLoading ? <Spinner size={16} /> : bytesToString(size)}</TableData>
+            <TableData>{sizeLoading ? <Spinner size={16} /> : bytesToString(size ?? 0)}</TableData>
 
             <TableData>
               {database.isLocked ? (

@@ -151,7 +151,7 @@ impl UserCommandSnippet {
             r#"
             SELECT {}
             FROM user_command_snippets
-            WHERE user_command_snippets.user_uuid = $1 AND $2 = ANY(user_command_snippets.eggs)
+            WHERE user_command_snippets.user_uuid = $1 AND ($2 = ANY(user_command_snippets.eggs) OR user_command_snippets.eggs = '{{}}'::uuid[])
             ORDER BY user_command_snippets.created
             "#,
             Self::columns_sql(None)

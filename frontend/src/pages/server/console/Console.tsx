@@ -91,7 +91,7 @@ export default function Terminal() {
       state: s.state,
     })),
   );
-  const settings = useGlobalStore((s) => s.settings);
+  const settings = useGlobalStore((state) => state.settings);
   const computedColorScheme = useComputedColorScheme('dark');
 
   const [history, setHistory] = useState<string[]>([]);

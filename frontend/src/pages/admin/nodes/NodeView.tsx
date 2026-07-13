@@ -25,7 +25,7 @@ import AdminNodeConfiguration from './configuration/AdminNodeConfiguration.tsx';
 import AdminNodeLogs from './logs/AdminNodeLogs.tsx';
 import AdminNodeMounts from './mounts/AdminNodeMounts.tsx';
 import NodeCreateOrUpdate from './NodeCreateOrUpdate.tsx';
-import NodeOverview from './NodeOverview.tsx';
+import NodeOverview from './overview/NodeOverview.tsx';
 import AdminNodeServers from './servers/AdminNodeServers.tsx';
 import AdminNodeStatistics from './statistics/AdminNodeStatistics.tsx';
 import AdminNodeTransfers from './transfers/AdminNodeTransfers.tsx';

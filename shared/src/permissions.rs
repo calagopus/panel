@@ -712,6 +712,42 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                 },
             ),
             (
+                "database-instances",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage agent-managed database instances on this server.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new database instances."),
+                        (
+                            "read",
+                            "Allows viewing database instances associated with this server.",
+                        ),
+                        (
+                            "update",
+                            "Allows updating database instances, such as locking them.",
+                        ),
+                        (
+                            "delete",
+                            "Allows removing database instances from this server.",
+                        ),
+                        (
+                            "power",
+                            "Allows starting, stopping and restarting database instances.",
+                        ),
+                        ("logs", "Allows viewing the logs of database instances."),
+                        (
+                            "databases",
+                            "Allows managing the databases inside database instances.",
+                        ),
+                        (
+                            "users",
+                            "Allows managing the users inside database instances, including viewing their credentials.",
+                        ),
+                        ("import", "Allows importing data into database instances."),
+                        ("export", "Allows exporting data from database instances."),
+                    ]),
+                },
+            ),
+            (
                 "mounts",
                 PermissionGroup {
                     description: "Permissions that control the ability to manage server mounts.",
