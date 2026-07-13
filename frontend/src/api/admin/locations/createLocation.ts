@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminLocationSchema, adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
 
 export default async (
@@ -8,7 +8,10 @@ export default async (
 ): Promise<z.infer<typeof adminLocationSchema>> => {
   const { data } = await axiosInstance.post(
     '/api/admin/locations',
-    serializeForApi(adminLocationUpdateSchema, locationData),
+    serializeForApi(adminLocationUpdateSchema, locationData, [
+      ...formExtensionSchemas('admin.locations.createOrUpdate'),
+      ...formExtensionSchemas('admin.nodes.locationModal'),
+    ]),
   );
   return parseFromApi(adminLocationSchema, data.location);
 };

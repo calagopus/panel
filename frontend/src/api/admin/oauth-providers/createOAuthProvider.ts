@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 
 export default async (
@@ -8,7 +8,11 @@ export default async (
 ): Promise<z.infer<typeof adminOAuthProviderSchema>> => {
   const { data } = await axiosInstance.post(
     '/api/admin/oauth-providers',
-    serializeForApi(adminOAuthProviderUpdateSchema, oauthProviderData),
+    serializeForApi(
+      adminOAuthProviderUpdateSchema,
+      oauthProviderData,
+      formExtensionSchemas('admin.oAuthProviders.createOrUpdate'),
+    ),
   );
   return parseFromApi(adminOAuthProviderSchema, data.oauth_provider);
 };

@@ -1,4 +1,5 @@
 import { UseFormInput, useForm } from '@mantine/form';
+import { deepmerge } from 'deepmerge-ts';
 import { useMemo, useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import type { ExtendableSchema, FormId } from '@/elements/form-engine/index.ts';
@@ -29,7 +30,7 @@ export function useModalForm<T extends Record<string, unknown>>({
   const form = useForm<T>({
     ...formInput,
     initialValues: formInput.initialValues
-      ? ({ ...formInput.initialValues, ...(resolved?.initialValues as Partial<T>) } as T)
+      ? (deepmerge(formInput.initialValues, resolved?.initialValues ?? {}) as T)
       : undefined,
     validate: resolved?.validate ?? formInput.validate,
     validateInputOnBlur,

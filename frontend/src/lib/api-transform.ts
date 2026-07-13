@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { FormId } from '@/elements/form-engine/types.ts';
 
 type AnySchema = z.ZodTypeAny;
 type Def = Record<string, AnySchema>;
@@ -244,7 +245,54 @@ function applyReverseTransform(schema: AnySchema, data: unknown): unknown {
   return data;
 }
 
-// Main entry point for outgoing request bodies
-export function serializeForApi<T extends z.ZodTypeAny>(schema: T, data: z.infer<T>): unknown {
-  return applyReverseTransform(schema, data);
+// Recursively merges plain objects; arrays and scalars from `source` replace the target value
+function deepMergeSerialized(target: Record<string, unknown>, source: Record<string, unknown>): void {
+  for (const [key, value] of Object.entries(source)) {
+    const existing = target[key];
+    if (
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      existing !== null &&
+      typeof existing === 'object' &&
+      !Array.isArray(existing)
+    ) {
+      deepMergeSerialized(existing as Record<string, unknown>, value as Record<string, unknown>);
+    } else {
+      target[key] = value;
+    }
+  }
+}
+
+// Main entry point for outgoing request bodies. `extraSchemas` serialize additional
+// fields the core schema doesn't know about (e.g. registered by extensions through
+// the form registry, see formExtensionSchemas) and are deep-merged into the result.
+export function serializeForApi<T extends z.ZodTypeAny>(
+  schema: T,
+  data: z.infer<T>,
+  extraSchemas: z.ZodTypeAny[] = [],
+): unknown {
+  const base = applyReverseTransform(schema, data);
+  if (extraSchemas.length === 0 || base === null || typeof base !== 'object' || Array.isArray(base)) {
+    return base;
+  }
+
+  for (const extra of extraSchemas) {
+    const serialized = applyReverseTransform(extra, data);
+    if (serialized !== null && typeof serialized === 'object' && !Array.isArray(serialized)) {
+      deepMergeSerialized(base as Record<string, unknown>, serialized as Record<string, unknown>);
+    }
+  }
+
+  return base;
+}
+
+// The zod shapes extensions registered for a form, as schemas for serializeForApi -
+// endpoints that submit an extensible form pass these so extension fields survive
+// the schema-guided serialization
+export function formExtensionSchemas(formId: FormId): z.ZodTypeAny[] {
+  return window.extensionContext.extensionRegistry.forms
+    .getSlots(formId)
+    .filter((slot) => slot.zodShape && Object.keys(slot.zodShape).length > 0)
+    .map((slot) => z.object(slot.zodShape as z.ZodRawShape));
 }

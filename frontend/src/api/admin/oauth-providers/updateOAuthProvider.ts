@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { formExtensionSchemas, serializeForApi } from '@/lib/api-transform.ts';
 import { adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 
 export default async (
@@ -9,6 +9,6 @@ export default async (
 ): Promise<void> => {
   await axiosInstance.patch(
     `/api/admin/oauth-providers/${oauthProviderUuid}`,
-    serializeForApi(adminOAuthProviderUpdateSchema, data),
+    serializeForApi(adminOAuthProviderUpdateSchema, data, formExtensionSchemas('admin.oAuthProviders.createOrUpdate')),
   );
 };

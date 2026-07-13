@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminDatabaseHostCreateSchema, adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 
 export default async (
@@ -8,7 +8,10 @@ export default async (
 ): Promise<z.infer<typeof adminDatabaseHostSchema>> => {
   const { data } = await axiosInstance.post(
     '/api/admin/database-hosts',
-    serializeForApi(adminDatabaseHostCreateSchema, databaseHostData),
+    serializeForApi(adminDatabaseHostCreateSchema, databaseHostData, [
+      ...formExtensionSchemas('admin.databaseHosts.createOrUpdate'),
+      ...formExtensionSchemas('admin.databaseHosts.credentialDetails'),
+    ]),
   );
   return parseFromApi(adminDatabaseHostSchema, data.database_host);
 };

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { formExtensionSchemas, serializeForApi } from '@/lib/api-transform.ts';
 import { adminServerUpdateSchema } from '@/lib/schemas/admin/servers.ts';
 
 export default async (
@@ -9,6 +9,10 @@ export default async (
 ): Promise<void> => {
   await axiosInstance.patch(
     `/api/admin/servers/${serverUuid}`,
-    serializeForApi(adminServerUpdateSchema, data as z.infer<typeof adminServerUpdateSchema>),
+    serializeForApi(
+      adminServerUpdateSchema,
+      data as z.infer<typeof adminServerUpdateSchema>,
+      formExtensionSchemas('admin.servers.update'),
+    ),
   );
 };

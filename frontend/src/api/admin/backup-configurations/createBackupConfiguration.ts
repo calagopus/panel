@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminBackupConfigurationSchema,
   adminBackupConfigurationUpdateSchema,
@@ -11,7 +11,13 @@ export default async (
 ): Promise<z.infer<typeof adminBackupConfigurationSchema>> => {
   const { data } = await axiosInstance.post(
     '/api/admin/backup-configurations',
-    serializeForApi(adminBackupConfigurationUpdateSchema, backupConfigurationData),
+    serializeForApi(adminBackupConfigurationUpdateSchema, backupConfigurationData, [
+      ...formExtensionSchemas('admin.backupConfigurations.createOrUpdate'),
+      ...formExtensionSchemas('admin.backupConfigurations.pbs'),
+      ...formExtensionSchemas('admin.backupConfigurations.s3'),
+      ...formExtensionSchemas('admin.backupConfigurations.restic'),
+      ...formExtensionSchemas('admin.backupConfigurations.kopia'),
+    ]),
   );
   return parseFromApi(adminBackupConfigurationSchema, data.backup_configuration);
 };

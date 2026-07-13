@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { formExtensionSchemas, serializeForApi } from '@/lib/api-transform.ts';
 import { adminEggRepositoryUpdateSchema } from '@/lib/schemas/admin/eggRepositories.ts';
 
 export default async (
@@ -9,6 +9,6 @@ export default async (
 ): Promise<void> => {
   await axiosInstance.patch(
     `/api/admin/egg-repositories/${eggRepositoryUuid}`,
-    serializeForApi(adminEggRepositoryUpdateSchema, data),
+    serializeForApi(adminEggRepositoryUpdateSchema, data, formExtensionSchemas('admin.eggRepositories.createOrUpdate')),
   );
 };

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminDatabaseAgentTemplateCreateSchema,
   adminDatabaseAgentTemplateSchema,
@@ -11,7 +11,11 @@ export default async (
 ): Promise<z.infer<typeof adminDatabaseAgentTemplateSchema>> => {
   const { data } = await axiosInstance.post(
     '/api/admin/database-agent-templates',
-    serializeForApi(adminDatabaseAgentTemplateCreateSchema, templateData),
+    serializeForApi(
+      adminDatabaseAgentTemplateCreateSchema,
+      templateData,
+      formExtensionSchemas('admin.databaseAgentTemplates.createOrUpdate'),
+    ),
   );
   return parseFromApi(adminDatabaseAgentTemplateSchema, data.database_agent_template);
 };
