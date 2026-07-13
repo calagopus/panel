@@ -172,6 +172,77 @@ function formatSchemaError(schema: AnySchema, error: z.ZodError, data: unknown):
     .join('\n');
 }
 
+// Response fields the schema didn't declare (e.g. added by backend model extensions)
+// are kept on the parsed object under this key, mirroring the backend's hidden
+// extension_data. A plain enumerable property so it survives spreads (zustand store
+// updates like `{ ...state.server, ...props }`) - it's invisible to the TS types,
+// serializeForApi never sends it (schema-guided), and zod already ran, so it can't
+// interfere with validation. Read it back with parseExtendedFromApi.
+export const EXTENSION_DATA_KEY = '__extension_data';
+
+// Walks raw and parsed data in parallel along the schema, stashing raw keys the
+// schema shape doesn't know about on the corresponding parsed object node
+function collectExtensionFields(schema: AnySchema, raw: unknown, parsed: unknown): void {
+  const inner = unwrap(schema);
+  const { type } = def<{ type: string }>(inner);
+
+  if (type === 'object') {
+    if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return;
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return;
+
+    const { shape } = def<{ shape: Def }>(inner);
+    const rawObj = raw as Record<string, unknown>;
+    const parsedObj = parsed as Record<string, unknown>;
+
+    const extras: Record<string, unknown> = {};
+    const byCamel: Record<string, unknown> = {};
+    for (const key of Object.keys(rawObj)) {
+      if (key === EXTENSION_DATA_KEY) continue;
+
+      const camelKey = toCamelCase(key);
+      if (Object.hasOwn(shape, camelKey)) {
+        byCamel[camelKey] = rawObj[key];
+      } else {
+        extras[key] = rawObj[key];
+      }
+    }
+
+    if (Object.keys(extras).length) {
+      parsedObj[EXTENSION_DATA_KEY] = extras;
+    }
+
+    for (const [camelKey, fieldSchema] of Object.entries(shape)) {
+      const rawValue = Object.hasOwn(byCamel, camelKey) ? byCamel[camelKey] : rawObj[camelKey];
+      collectExtensionFields(fieldSchema, rawValue, parsedObj[camelKey]);
+    }
+
+    return;
+  }
+
+  if (type === 'union') {
+    const { options, discriminator } = def<{ options: AnySchema[]; discriminator?: string }>(inner);
+    const option = selectUnionOption(options, discriminator, raw);
+    if (option) collectExtensionFields(option, raw, parsed);
+    return;
+  }
+
+  if (type === 'array') {
+    if (!Array.isArray(raw) || !Array.isArray(parsed)) return;
+    const { element } = def<{ element: AnySchema }>(inner);
+    raw.forEach((item, index) => collectExtensionFields(element, item, parsed[index]));
+    return;
+  }
+
+  if (type === 'record') {
+    if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return;
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return;
+    const { valueType } = def<{ valueType: AnySchema }>(inner);
+    for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+      collectExtensionFields(valueType, value, (parsed as Record<string, unknown>)[key]);
+    }
+  }
+}
+
 // Remap keys then validate, main entry point for incoming API responses
 export function parseFromApi<T extends z.ZodTypeAny>(schema: T, data: unknown): z.infer<T> {
   const transformed = applyTransform(schema, data);
@@ -181,7 +252,18 @@ export function parseFromApi<T extends z.ZodTypeAny>(schema: T, data: unknown): 
     console.error(formatSchemaError(schema, result.error, transformed), '\nfull response:', data);
     throw result.error;
   }
+  collectExtensionFields(schema, data, result.data);
   return result.data;
+}
+
+// Typed view of the response fields a backend model extension added to a parsed API
+// object - the frontend counterpart of parse_model_extension. Works on any object
+// node of a parseFromApi result (e.g. `server` or `server.featureLimits`); the
+// extension's schema gets the same snake_case remap and validation as parseFromApi,
+// so absent fields throw unless the schema marks them optional.
+export function parseExtendedFromApi<T extends z.ZodTypeAny>(schema: T, parsed: object): z.infer<T> {
+  const extras = (parsed as Record<string, unknown>)[EXTENSION_DATA_KEY];
+  return parseFromApi(schema, extras !== null && typeof extras === 'object' ? extras : {});
 }
 
 // Parse a raw paginated API response, running each entry through parseFromApi
