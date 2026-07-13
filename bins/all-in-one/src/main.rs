@@ -1,9 +1,6 @@
-use axum::{
-    ServiceExt,
-    body::Body,
-    extract::{ConnectInfo, Request},
-    middleware::Next,
-};
+use axum::{ServiceExt, extract::Request};
+#[cfg(unix)]
+use axum::{body::Body, extract::ConnectInfo, middleware::Next};
 use colored::Colorize;
 use shared::models::{
     ByUuid, CreatableModel, UpdatableModel, backup_configuration::BackupConfiguration,
