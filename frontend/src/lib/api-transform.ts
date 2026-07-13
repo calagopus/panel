@@ -266,6 +266,62 @@ export function parseExtendedFromApi<T extends z.ZodTypeAny>(schema: T, parsed: 
   return parseFromApi(schema, extras !== null && typeof extras === 'object' ? extras : {});
 }
 
+// collectExtensionFields stashes fields the base schema didn't know about under
+// __extension_data at the node they arrived on; this walks the shapes extensions
+// registered for `formId` and merges those values back onto the node under their
+// real field name, so extension form fields hydrate when an update form seeds its
+// values from a loaded resource. Schema-guided (reuses applyTransform), so multi-word
+// keys and z.record values are handled exactly as parseFromApi would. Returns a clone;
+// the input is left untouched, and a form with no registered fields is returned as-is.
+export function hydrateExtensionData<T>(formId: FormId, resource: T): T {
+  if (resource === null || typeof resource !== 'object' || Array.isArray(resource)) return resource;
+
+  const shapes = window.extensionContext.extensionRegistry.forms
+    .getSlots(formId)
+    .map((slot) => slot.zodShape as Def | undefined)
+    .filter((shape): shape is Def => !!shape && Object.keys(shape).length > 0);
+  if (shapes.length === 0) return resource;
+
+  const clone = structuredClone(resource) as Record<string, unknown>;
+  for (const shape of shapes) {
+    mergeExtensionShape(shape, clone);
+  }
+
+  return clone as T;
+}
+
+function mergeExtensionShape(shape: Def, node: Record<string, unknown> | undefined): void {
+  if (node === null || node === undefined || typeof node !== 'object') return;
+
+  const extras = node[EXTENSION_DATA_KEY];
+  const extrasObj =
+    extras !== null && typeof extras === 'object' && !Array.isArray(extras) ? (extras as Record<string, unknown>) : {};
+
+  for (const [fieldKey, fieldSchema] of Object.entries(shape)) {
+    const existing = node[fieldKey];
+
+    if (existing !== null && typeof existing === 'object' && !Array.isArray(existing)) {
+      const inner = unwrap(fieldSchema);
+      if (def<{ type: string }>(inner).type === 'object') {
+        mergeExtensionShape(def<{ shape: Def }>(inner).shape, existing as Record<string, unknown>);
+        continue;
+      }
+    }
+
+    const snakeKey = toSnakeCase(fieldKey);
+    let rawValue: unknown;
+    if (Object.hasOwn(extrasObj, snakeKey)) {
+      rawValue = extrasObj[snakeKey];
+    } else if (Object.hasOwn(extrasObj, fieldKey)) {
+      rawValue = extrasObj[fieldKey];
+    } else {
+      continue;
+    }
+
+    node[fieldKey] = applyTransform(fieldSchema, rawValue);
+  }
+}
+
 // Parse a raw paginated API response, running each entry through parseFromApi
 export function parsePaginationFromApi<T extends z.ZodTypeAny>(
   schema: T,
