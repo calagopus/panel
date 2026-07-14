@@ -53,12 +53,25 @@ pub struct ServerBackupRestoreOptions {
     pub restore_startup: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GroupRotationOutcome {
+    /// The group has no `retention_count`, so count-based rotation does not apply.
+    NotConfigured,
+    /// The group is still under its `retention_count`; nothing was evicted.
+    WithinRetention,
+    /// The oldest unlocked usable backup in the group was evicted to make room.
+    Evicted,
+    /// The group is at/over `retention_count` but every usable backup is locked.
+    BlockedAllLocked,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ServerBackup {
     pub uuid: uuid::Uuid,
     pub server: Option<Fetchable<super::server::Server>>,
     pub node: Fetchable<super::node::Node>,
     pub backup_configuration: Option<Fetchable<super::backup_configuration::BackupConfiguration>>,
+    pub backup_group_uuid: Option<uuid::Uuid>,
 
     pub name: compact_str::CompactString,
     pub successful: bool,
@@ -118,6 +131,10 @@ impl BaseModel for ServerBackup {
             (
                 "server_backups.backup_configuration_uuid",
                 compact_str::format_compact!("{prefix}backup_configuration_uuid"),
+            ),
+            (
+                "server_backups.backup_group_uuid",
+                compact_str::format_compact!("{prefix}backup_group_uuid"),
             ),
             (
                 "server_backups.name",
@@ -208,6 +225,8 @@ impl BaseModel for ServerBackup {
             node: super::node::Node::get_fetchable(
                 row.try_get(compact_str::format_compact!("{prefix}node_uuid").as_str())?,
             ),
+            backup_group_uuid: row
+                .try_get(compact_str::format_compact!("{prefix}backup_group_uuid").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
             successful: row.try_get(compact_str::format_compact!("{prefix}successful").as_str())?,
             browsable: row.try_get(compact_str::format_compact!("{prefix}browsable").as_str())?,
@@ -267,6 +286,7 @@ impl ServerBackup {
             .set("server_uuid", options.server.uuid)
             .set("node_uuid", options.server.node.uuid)
             .set("backup_configuration_uuid", backup_configuration.uuid)
+            .set("backup_group_uuid", options.backup_group_uuid)
             .set("name", &options.name)
             .set("ignored_files", &options.ignored_files)
             .set("bytes", 0i64)
@@ -416,6 +436,100 @@ impl ServerBackup {
             WHERE
                 server_backups.server_uuid = $1
                 AND server_backups.node_uuid = $2
+                AND server_backups.deleted IS NULL
+                AND ($3 IS NULL OR server_backups.name ILIKE '%' || $3 || '%')
+            ORDER BY server_backups.created
+            LIMIT $4 OFFSET $5
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(server_uuid)
+        .bind(node_uuid)
+        .bind(search)
+        .bind(per_page)
+        .bind(offset)
+        .fetch_all(database.read())
+        .await?;
+
+        Ok(super::Pagination {
+            total: rows
+                .first()
+                .map_or(Ok(0), |row| row.try_get("total_count"))?,
+            per_page,
+            page,
+            data: rows
+                .into_iter()
+                .map(|row| Self::map(None, &row))
+                .try_collect_vec()?,
+        })
+    }
+
+    pub async fn by_server_uuid_node_uuid_backup_group_uuid_with_pagination(
+        database: &crate::database::Database,
+        server_uuid: uuid::Uuid,
+        node_uuid: uuid::Uuid,
+        backup_group_uuid: uuid::Uuid,
+        page: i64,
+        per_page: i64,
+        search: Option<&str>,
+    ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let offset = (page - 1) * per_page;
+
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}, COUNT(*) OVER() AS total_count
+            FROM server_backups
+            WHERE
+                server_backups.server_uuid = $1
+                AND server_backups.node_uuid = $2
+                AND server_backups.backup_group_uuid = $3
+                AND server_backups.deleted IS NULL
+                AND ($4 IS NULL OR server_backups.name ILIKE '%' || $4 || '%')
+            ORDER BY server_backups.created
+            LIMIT $5 OFFSET $6
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(server_uuid)
+        .bind(node_uuid)
+        .bind(backup_group_uuid)
+        .bind(search)
+        .bind(per_page)
+        .bind(offset)
+        .fetch_all(database.read())
+        .await?;
+
+        Ok(super::Pagination {
+            total: rows
+                .first()
+                .map_or(Ok(0), |row| row.try_get("total_count"))?,
+            per_page,
+            page,
+            data: rows
+                .into_iter()
+                .map(|row| Self::map(None, &row))
+                .try_collect_vec()?,
+        })
+    }
+
+    pub async fn by_ungrouped_server_uuid_node_uuid_with_pagination(
+        database: &crate::database::Database,
+        server_uuid: uuid::Uuid,
+        node_uuid: uuid::Uuid,
+        page: i64,
+        per_page: i64,
+        search: Option<&str>,
+    ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let offset = (page - 1) * per_page;
+
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}, COUNT(*) OVER() AS total_count
+            FROM server_backups
+            WHERE
+                server_backups.server_uuid = $1
+                AND server_backups.node_uuid = $2
+                AND server_backups.backup_group_uuid IS NULL
                 AND server_backups.deleted IS NULL
                 AND ($3 IS NULL OR server_backups.name ILIKE '%' || $3 || '%')
             ORDER BY server_backups.created
@@ -1161,33 +1275,234 @@ impl ServerBackup {
         }
     }
 
-    pub async fn delete_oldest_by_server_uuid(
+    pub async fn evict_one_by_server_uuid(
         state: &crate::State,
         server: &super::server::Server,
     ) -> Result<(), anyhow::Error> {
-        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+        let row = sqlx::query!(
             r#"
-            SELECT {}
-            FROM server_backups
-            WHERE server_backups.server_uuid = $1
-                AND server_backups.locked = false
-                AND server_backups.completed IS NOT NULL
-                AND server_backups.deleted IS NULL
-            ORDER BY server_backups.created ASC
+            SELECT candidates.uuid AS "uuid!", candidates.tier AS "tier!", candidates.group_name AS "group_name?"
+            FROM (
+                SELECT
+                    server_backups.uuid,
+                    server_backups.created,
+                    (CASE
+                        WHEN NOT server_backups.successful THEN 0
+                        WHEN g.retention_count IS NOT NULL AND (
+                            SELECT COUNT(*)
+                            FROM server_backups b2
+                            WHERE b2.backup_group_uuid = server_backups.backup_group_uuid
+                                AND b2.deleted IS NULL
+                                AND b2.successful
+                                AND b2.completed IS NOT NULL
+                                AND b2.created >= server_backups.created
+                        ) > g.retention_count THEN 1
+                        WHEN server_backups.backup_group_uuid IS NULL THEN 2
+                        ELSE 3
+                    END) AS tier,
+                    g.name AS group_name
+                FROM server_backups
+                LEFT JOIN server_backup_groups g ON g.uuid = server_backups.backup_group_uuid
+                WHERE server_backups.server_uuid = $1
+                    AND server_backups.locked = false
+                    AND server_backups.completed IS NOT NULL
+                    AND server_backups.deleted IS NULL
+            ) candidates
+            ORDER BY candidates.tier ASC, candidates.created ASC
             LIMIT 1
             "#,
-            Self::columns_sql(None)
-        )))
-        .bind(server.uuid)
+            server.uuid,
+        )
         .fetch_optional(state.database.read())
         .await?;
 
-        if let Some(row) = row {
+        let Some(row) = row else {
+            return Err(sqlx::Error::RowNotFound.into());
+        };
+
+        let rule = match row.tier {
+            0 => "failed",
+            1 => "over-retention",
+            2 => "ungrouped",
+            _ => "in-retention",
+        };
+
+        if row.tier == 3 {
+            tracing::warn!(
+                server = %server.uuid,
+                backup = %row.uuid,
+                group = ?row.group_name,
+                "evicting an in-retention grouped backup to satisfy backup_limit; retention quota exceeds backup_limit"
+            );
+        }
+
+        let Some(backup) =
+            Self::by_server_uuid_uuid(&state.database, server.uuid, row.uuid).await?
+        else {
+            return Err(sqlx::Error::RowNotFound.into());
+        };
+
+        backup.delete(state, Default::default()).await?;
+
+        Self::log_eviction_activity(
+            state,
+            server.uuid,
+            backup.uuid,
+            &backup.name,
+            rule,
+            row.group_name.as_deref(),
+        )
+        .await;
+
+        Ok(())
+    }
+
+    pub async fn rotate_group_for_create(
+        state: &crate::State,
+        group: &super::server_backup_group::ServerBackupGroup,
+    ) -> Result<GroupRotationOutcome, anyhow::Error> {
+        let Some(retention_count) = group.retention_count else {
+            return Ok(GroupRotationOutcome::NotConfigured);
+        };
+
+        let row = sqlx::query!(
+            r#"
+            SELECT
+                (SELECT COUNT(*)
+                    FROM server_backups
+                    WHERE server_backups.backup_group_uuid = $1
+                        AND server_backups.deleted IS NULL
+                        AND server_backups.successful
+                        AND server_backups.completed IS NOT NULL) AS "usable!",
+                (SELECT server_backups.uuid
+                    FROM server_backups
+                    WHERE server_backups.backup_group_uuid = $1
+                        AND server_backups.deleted IS NULL
+                        AND server_backups.successful
+                        AND server_backups.completed IS NOT NULL
+                        AND server_backups.locked = false
+                    ORDER BY server_backups.created ASC
+                    LIMIT 1) AS "oldest_unlocked?"
+            "#,
+            group.uuid,
+        )
+        .fetch_one(state.database.read())
+        .await?;
+
+        if row.usable < retention_count as i64 {
+            return Ok(GroupRotationOutcome::WithinRetention);
+        }
+
+        let Some(oldest_unlocked) = row.oldest_unlocked else {
+            return Ok(GroupRotationOutcome::BlockedAllLocked);
+        };
+
+        let Some(backup) =
+            Self::by_server_uuid_uuid(&state.database, group.server_uuid, oldest_unlocked).await?
+        else {
+            return Ok(GroupRotationOutcome::WithinRetention);
+        };
+
+        backup.delete(state, Default::default()).await?;
+
+        Self::log_eviction_activity(
+            state,
+            group.server_uuid,
+            backup.uuid,
+            &backup.name,
+            "group-rotation",
+            Some(group.name.as_str()),
+        )
+        .await;
+
+        Ok(GroupRotationOutcome::Evicted)
+    }
+
+    pub async fn prune_expired_group_backups(state: &crate::State) -> Result<u64, anyhow::Error> {
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}, g.name AS group_name
+            FROM server_backups
+            JOIN server_backup_groups g ON g.uuid = server_backups.backup_group_uuid
+            WHERE g.retention_days IS NOT NULL
+                AND server_backups.deleted IS NULL
+                AND server_backups.locked = false
+                AND server_backups.completed IS NOT NULL
+                AND server_backups.created < NOW() - make_interval(days => g.retention_days)
+            "#,
+            Self::columns_sql(None)
+        )))
+        .fetch_all(state.database.read())
+        .await?;
+
+        let mut pruned = 0u64;
+        for row in rows {
+            let group_name: compact_str::CompactString = row.try_get("group_name")?;
+            let server_uuid: Option<uuid::Uuid> = row.try_get("server_uuid")?;
             let backup = Self::map(None, &row)?;
 
-            backup.delete(state, Default::default()).await
-        } else {
-            Err(sqlx::Error::RowNotFound.into())
+            if let Err(err) = backup.delete(state, Default::default()).await {
+                tracing::error!(
+                    backup = %backup.uuid,
+                    "failed to prune expired group backup: {:#?}",
+                    err
+                );
+                continue;
+            }
+
+            if let Some(server_uuid) = server_uuid {
+                Self::log_eviction_activity(
+                    state,
+                    server_uuid,
+                    backup.uuid,
+                    &backup.name,
+                    "retention-days",
+                    Some(group_name.as_str()),
+                )
+                .await;
+            }
+
+            pruned += 1;
+        }
+
+        Ok(pruned)
+    }
+
+    async fn log_eviction_activity(
+        state: &crate::State,
+        server_uuid: uuid::Uuid,
+        backup_uuid: uuid::Uuid,
+        backup_name: &str,
+        rule: &str,
+        group_name: Option<&str>,
+    ) {
+        if let Err(err) = super::server_activity::ServerActivity::create(
+            state,
+            super::server_activity::CreateServerActivityOptions {
+                server_uuid,
+                user_uuid: None,
+                impersonator_uuid: None,
+                api_key_uuid: None,
+                schedule_uuid: None,
+                event: "server:backup.delete".into(),
+                ip: None,
+                data: serde_json::json!({
+                    "source": "eviction",
+                    "uuid": backup_uuid,
+                    "name": backup_name,
+                    "rule": rule,
+                    "group": group_name,
+                }),
+                created: None,
+            },
+        )
+        .await
+        {
+            tracing::warn!(
+                server = %server_uuid,
+                "failed to log backup eviction activity: {:#?}",
+                err
+            );
         }
     }
 
@@ -1262,6 +1577,7 @@ impl ServerBackup {
                 .await?
                 .into_admin_api_object(state, ())
                 .await?,
+            backup_group_uuid: self.backup_group_uuid,
             name: self.name,
             ignored_files: self.ignored_files,
             is_successful: self.successful,
@@ -1304,6 +1620,7 @@ impl IntoAdminApiObject for ServerBackup {
                     ),
                     None => None,
                 },
+                backup_group_uuid: self.backup_group_uuid,
                 name: self.name,
                 ignored_files: self.ignored_files,
                 is_successful: self.successful,
@@ -1341,6 +1658,7 @@ impl IntoApiObject for ServerBackup {
         let api_object = finish_extendible!(
             ApiServerBackup {
                 uuid: self.uuid,
+                backup_group_uuid: self.backup_group_uuid,
                 name: self.name,
                 ignored_files: self.ignored_files,
                 is_successful: self.successful,
@@ -1368,6 +1686,8 @@ pub struct CreateServerBackupOptions<'a> {
     pub server: &'a super::server::Server,
     #[garde(length(chars, min = 1, max = 255))]
     pub name: compact_str::CompactString,
+    #[garde(skip)]
+    pub backup_group_uuid: Option<uuid::Uuid>,
     #[garde(skip)]
     pub ignored_files: Vec<compact_str::CompactString>,
     #[garde(skip)]
@@ -1434,6 +1754,7 @@ impl CreatableModel for ServerBackup {
             .set("server_uuid", options.server.uuid)
             .set("node_uuid", options.server.node.uuid)
             .set("backup_configuration_uuid", backup_configuration.uuid)
+            .set("backup_group_uuid", options.backup_group_uuid)
             .set("name", &options.name)
             .set("ignored_files", &options.ignored_files)
             .set("bytes", 0i64)
@@ -1544,6 +1865,9 @@ pub struct UpdateServerBackupOptions {
     #[schema(min_length = 1, max_length = 255)]
     pub name: Option<compact_str::CompactString>,
     #[garde(skip)]
+    #[serde(default, with = "::serde_with::rust::double_option")]
+    pub backup_group_uuid: Option<Option<uuid::Uuid>>,
+    #[garde(skip)]
     pub locked: Option<bool>,
 }
 
@@ -1573,6 +1897,7 @@ impl UpdatableModel for ServerBackup {
 
         query_builder
             .set("name", options.name.as_ref())
+            .set("backup_group_uuid", options.backup_group_uuid)
             .set("locked", options.locked)
             .where_eq("uuid", self.uuid);
 
@@ -1580,6 +1905,9 @@ impl UpdatableModel for ServerBackup {
 
         if let Some(name) = options.name {
             self.name = name;
+        }
+        if let Some(backup_group_uuid) = options.backup_group_uuid {
+            self.backup_group_uuid = backup_group_uuid;
         }
         if let Some(locked) = options.locked {
             self.locked = locked;
@@ -1812,6 +2140,7 @@ pub struct AdminApiNodeServerBackup {
     pub uuid: uuid::Uuid,
     pub server: Option<super::server::AdminApiServer>,
     pub node: super::node::AdminApiNode,
+    pub backup_group_uuid: Option<uuid::Uuid>,
 
     pub name: compact_str::CompactString,
     pub ignored_files: Vec<compact_str::CompactString>,
@@ -1840,6 +2169,7 @@ pub struct AdminApiNodeServerBackup {
 pub struct AdminApiServerBackup {
     pub uuid: uuid::Uuid,
     pub server: Option<super::server::AdminApiServer>,
+    pub backup_group_uuid: Option<uuid::Uuid>,
 
     pub name: compact_str::CompactString,
     pub ignored_files: Vec<compact_str::CompactString>,
@@ -1867,6 +2197,7 @@ pub struct AdminApiServerBackup {
 #[schema(title = "ServerBackup")]
 pub struct ApiServerBackup {
     pub uuid: uuid::Uuid,
+    pub backup_group_uuid: Option<uuid::Uuid>,
 
     pub name: compact_str::CompactString,
     pub ignored_files: Vec<compact_str::CompactString>,

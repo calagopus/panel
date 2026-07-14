@@ -2,19 +2,41 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _backup_;
+mod groups;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
-    use serde::Serialize;
+    use garde::Validate;
+    use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
-            IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
-            server_backup::ServerBackup, user::GetPermissionManager,
+            IntoApiObject, Pagination, server::GetServer, server_backup::ServerBackup,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
+
+    #[derive(ToSchema, Validate, Deserialize)]
+    pub struct Params {
+        #[garde(range(min = 1))]
+        #[serde(default = "Pagination::default_page")]
+        page: i64,
+        #[garde(range(min = 1, max = 100))]
+        #[serde(default = "Pagination::default_per_page")]
+        per_page: i64,
+        #[garde(length(chars, min = 1, max = 100))]
+        #[serde(
+            default,
+            deserialize_with = "shared::deserialize::deserialize_string_option"
+        )]
+        search: Option<compact_str::CompactString>,
+
+        #[garde(skip)]
+        #[serde(default)]
+        ungrouped: bool,
+    }
 
     #[derive(ToSchema, Serialize)]
     struct Response {
@@ -45,12 +67,17 @@ mod get {
             "search" = Option<String>, Query,
             description = "Search term for items",
         ),
+        (
+            "ungrouped" = bool, Query,
+            description = "Only show backups that are not assigned to a backup group",
+            example = "false",
+        ),
     ))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
         server: GetServer,
-        Query(params): Query<PaginationParamsWithSearch>,
+        Query(params): Query<Params>,
     ) -> ApiResponseResult {
         if let Err(errors) = shared::utils::validate_data(&params) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
@@ -60,15 +87,27 @@ mod get {
 
         permissions.has_server_permission("backups.read")?;
 
-        let backups = ServerBackup::by_server_uuid_node_uuid_with_pagination(
-            &state.database,
-            server.uuid,
-            server.node.uuid,
-            params.page,
-            params.per_page,
-            params.search.as_deref(),
-        )
-        .await?;
+        let backups = if params.ungrouped {
+            ServerBackup::by_ungrouped_server_uuid_node_uuid_with_pagination(
+                &state.database,
+                server.uuid,
+                server.node.uuid,
+                params.page,
+                params.per_page,
+                params.search.as_deref(),
+            )
+            .await
+        } else {
+            ServerBackup::by_server_uuid_node_uuid_with_pagination(
+                &state.database,
+                server.uuid,
+                server.node.uuid,
+                params.page,
+                params.per_page,
+                params.search.as_deref(),
+            )
+            .await
+        }?;
 
         ApiResponse::new_serialized(Response {
             backups: backups
@@ -88,7 +127,8 @@ mod post {
         models::{
             CreatableModel, IntoApiObject,
             server::{GetServer, GetServerActivityLogger},
-            server_backup::ServerBackup,
+            server_backup::{GroupRotationOutcome, ServerBackup},
+            server_backup_group::ServerBackupGroup,
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -100,6 +140,8 @@ mod post {
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
         name: Option<compact_str::CompactString>,
+        #[garde(skip)]
+        backup_group_uuid: Option<uuid::Uuid>,
 
         #[garde(skip)]
         ignored_files: Vec<compact_str::CompactString>,
@@ -136,6 +178,21 @@ mod post {
 
         permissions.has_server_permission("backups.create")?;
 
+        let backup_group = if let Some(group_uuid) = data.backup_group_uuid {
+            match ServerBackupGroup::by_server_uuid_uuid(&state.database, server.uuid, group_uuid)
+                .await?
+            {
+                Some(group) => Some(group),
+                None => {
+                    return ApiResponse::error("backup group not found")
+                        .with_status(StatusCode::NOT_FOUND)
+                        .ok();
+                }
+            }
+        } else {
+            None
+        };
+
         let backups_lock = state
             .cache
             .lock(
@@ -144,6 +201,15 @@ mod post {
                 Some(5),
             )
             .await?;
+
+        if let Some(group) = &backup_group
+            && ServerBackup::rotate_group_for_create(&state, group).await?
+                == GroupRotationOutcome::BlockedAllLocked
+        {
+            return ApiResponse::error("backup group is full and all of its backups are locked")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
 
         let backups = ServerBackup::count_by_server_uuid(&state.database, server.uuid).await?;
         if backups >= server.backup_limit as i64 {
@@ -169,6 +235,7 @@ mod post {
         let options = shared::models::server_backup::CreateServerBackupOptions {
             server: &server,
             name: data.name.unwrap_or_else(ServerBackup::default_name),
+            backup_group_uuid: backup_group.as_ref().map(|group| group.uuid),
             ignored_files: data.ignored_files,
             metadata: ServerBackup::generate_metadata(&state, &server).await?,
         };
@@ -198,6 +265,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
         .routes(routes!(post::route))
+        .nest("/groups", groups::router(state))
         .nest("/{backup}", _backup_::router(state))
         .with_state(state.clone())
 }

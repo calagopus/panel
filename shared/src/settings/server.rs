@@ -13,6 +13,7 @@ pub struct AppSettingsServer {
     pub max_file_manager_search_results: u64,
     pub max_subuser_count: u64,
     pub max_schedule_step_count: u64,
+    pub max_backup_group_count: u64,
     pub max_database_instance_database_count: u64,
     pub max_database_instance_user_count: u64,
 
@@ -51,6 +52,10 @@ impl SettingsSerializeExt for AppSettingsServer {
             .write_raw_setting(
                 "max_schedule_step_count",
                 self.max_schedule_step_count.to_compact_string(),
+            )
+            .write_raw_setting(
+                "max_backup_group_count",
+                self.max_backup_group_count.to_compact_string(),
             )
             .write_raw_setting(
                 "max_database_instance_database_count",
@@ -112,6 +117,10 @@ impl SettingsDeserializeExt for AppSettingsServerDeserializer {
                 .take_raw_setting("max_schedule_step_count")
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(50),
+            max_backup_group_count: deserializer
+                .take_raw_setting("max_backup_group_count")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(10),
             max_database_instance_database_count: deserializer
                 .take_raw_setting("max_database_instance_database_count")
                 .and_then(|s| s.parse().ok())

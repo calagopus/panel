@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE server_backups\n                SET locked = true\n                WHERE server_backups.backup_group_uuid = $1 AND server_backups.deleted IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7c206cdf28f62ed63366e1b309c3843f7f5614fffb86c3251ead62bc501610f1"
+}

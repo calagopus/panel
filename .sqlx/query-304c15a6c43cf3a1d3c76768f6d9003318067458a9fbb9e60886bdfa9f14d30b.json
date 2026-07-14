@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM server_backup_groups\n            WHERE server_backup_groups.uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "304c15a6c43cf3a1d3c76768f6d9003318067458a9fbb9e60886bdfa9f14d30b"
+}

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const serverBackupSchema = z.object({
   uuid: z.uuid(),
+  backupGroupUuid: z.uuid().nullable(),
   name: z.string(),
   ignoredFiles: z.array(z.string()),
   isSuccessful: z.boolean(),
@@ -16,24 +17,33 @@ export const serverBackupSchema = z.object({
   created: z.coerce.date(),
 });
 
-export const serverBackupWithProgressSchema = z.lazy(() =>
-  serverBackupSchema.extend({
-    progress: z
-      .object({
-        progress: z.number(),
-        total: z.number(),
-        files: z.number(),
-      })
-      .optional(),
-  }),
-);
-
 export const serverBackupCreateSchema = z.object({
   name: z.string().min(1).max(255),
+  backupGroupUuid: z.uuid().nullable().optional(),
   ignoredFiles: z.array(z.string()),
 });
 
 export const serverBackupEditSchema = z.object({
   name: z.string().min(1).max(255),
   locked: z.boolean(),
+  backupGroupUuid: z.uuid().nullable(),
 });
+
+export const serverBackupGroupSchema = z.object({
+  uuid: z.uuid(),
+  name: z.string(),
+  retentionCount: z.number().nullable(),
+  retentionDays: z.number().nullable(),
+  totalBackups: z.number(),
+  usableBackups: z.number(),
+  usableUnlockedBackups: z.number(),
+  created: z.coerce.date(),
+});
+
+export const serverBackupGroupCreateSchema = z.object({
+  name: z.string().min(1).max(255),
+  retentionCount: z.number().int().min(1).nullable(),
+  retentionDays: z.number().int().min(1).nullable(),
+});
+
+export const serverBackupGroupUpdateSchema = serverBackupGroupCreateSchema;

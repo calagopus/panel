@@ -29,6 +29,7 @@ mod get {
         max_file_manager_search_results: u64,
         max_subuser_count: u64,
         max_schedule_step_count: u64,
+        max_backup_group_count: u64,
         max_database_instance_database_count: u64,
         max_database_instance_user_count: u64,
 
@@ -95,6 +96,7 @@ mod get {
                 max_file_manager_search_results: settings.server.max_file_manager_search_results,
                 max_subuser_count: settings.server.max_subuser_count,
                 max_schedule_step_count: settings.server.max_schedule_step_count,
+                max_backup_group_count: settings.server.max_backup_group_count,
                 max_database_instance_database_count: settings
                     .server
                     .max_database_instance_database_count,

@@ -21,6 +21,8 @@ const baseTranslations = defineTranslations({
     egg: defineEnglishItem('Egg', 'Eggs'),
     shortcut: defineEnglishItem('Shortcut', 'Shortcuts'),
     line: defineEnglishItem('Line', 'Lines'),
+    backup: defineEnglishItem('Backup', 'Backups'),
+    day: defineEnglishItem('Day', 'Days'),
   },
   translations: {
     common: {
@@ -1667,6 +1669,7 @@ const baseTranslations = defineTranslations({
                   maxFileManagerContentSearchSize: 'Max File Manager Content Search Size',
                   maxFileManagerSearchResults: 'Max File Manager Search Results',
                   maxSubuserCount: 'Max Subuser Count',
+                  maxBackupGroupCount: 'Max Backup Groups per Server',
                   maxDatabaseInstanceDatabaseCount: 'Max Databases per Database Instance',
                   maxDatabaseInstanceUserCount: 'Max Users per Database Instance',
                   allowOverwritingCustomDockerImage: 'Allow Overwriting Custom Docker Image',
@@ -5040,6 +5043,8 @@ const baseTranslations = defineTranslations({
           button: {
             browse: 'Browse',
             exportToFiles: 'Export to Files',
+            createBackup: 'Create Backup',
+            createGroup: 'Create Backup Group',
           },
           toast: {
             downloadStarted: 'Download started.',
@@ -5049,6 +5054,7 @@ const baseTranslations = defineTranslations({
           modal: {
             createBackup: {
               title: 'Create Backup',
+              noGroup: 'No group',
               toast: {
                 created: 'Backup created.',
               },
@@ -5075,6 +5081,52 @@ const baseTranslations = defineTranslations({
             viewMetadata: {
               title: 'Backup Metadata',
             },
+          },
+        },
+        backupGroups: {
+          title: 'Backup Groups',
+          group: 'Backup Group',
+          ungrouped: 'Ungrouped',
+          noBackups: 'This group has no backups yet.',
+          button: {
+            createInGroup: 'Create backup in this group',
+          },
+          badge: {
+            keepCount: 'Keep {count}',
+            keepDays: 'Keep {days}',
+            noRetention: 'No auto-deletion',
+            allLocked: 'All locked',
+          },
+          form: {
+            retentionCount: 'Keep count',
+            retentionCountDescription:
+              'Maximum number of usable backups to keep in this group. Leave empty for no limit.',
+            retentionDays: 'Keep days',
+            retentionDaysDescription:
+              'Delete backups in this group older than this many days. Leave empty for no limit.',
+            noRetentionDescription:
+              'With no retention set, this group is just a label and never deletes backups automatically.',
+          },
+          modal: {
+            createGroup: {
+              title: 'Create Backup Group',
+            },
+            updateGroup: {
+              title: 'Edit Backup Group',
+            },
+            deleteGroup: {
+              title: 'Confirm Backup Group Deletion',
+              content:
+                'Are you sure you want to delete **{name}**? {backups} in this group will become ungrouped and follow standard rotation.',
+              lockBackups: 'Lock backups',
+              lockBackupsDescription:
+                'Locks all backups in this group before deletion so they cannot be rotated out automatically.',
+            },
+          },
+          toast: {
+            created: 'Backup group created.',
+            updated: 'Backup group updated.',
+            deleted: 'Backup group deleted.',
           },
         },
         network: {

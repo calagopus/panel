@@ -11,7 +11,7 @@ mod post {
         ApiError, GetState,
         models::{
             CreatableModel, server::GetServer, server_activity::ServerActivity,
-            server_backup::ServerBackup,
+            server_backup::ServerBackup, server_backup_group::ServerBackupGroup,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -25,6 +25,9 @@ mod post {
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
         name: Option<compact_str::CompactString>,
+
+        #[garde(skip)]
+        backup_group_uuid: Option<uuid::Uuid>,
 
         #[garde(skip)]
         ignored_files: Vec<compact_str::CompactString>,
@@ -62,6 +65,53 @@ mod post {
                 .ok();
         }
 
+        let backup_group = match data.backup_group_uuid {
+            Some(group_uuid) => {
+                match ServerBackupGroup::by_server_uuid_uuid(
+                    &state.database,
+                    server.uuid,
+                    group_uuid,
+                )
+                .await?
+                {
+                    Some(group) => Some(group),
+                    None => {
+                        tracing::warn!(
+                            server = %server.uuid,
+                            group = %group_uuid,
+                            "scheduled backup referenced a deleted backup group, creating ungrouped"
+                        );
+
+                        if let Err(err) = ServerActivity::create(
+                            &state,
+                            shared::models::server_activity::CreateServerActivityOptions {
+                                server_uuid: server.uuid,
+                                user_uuid: None,
+                                impersonator_uuid: None,
+                                api_key_uuid: None,
+                                schedule_uuid: data.schedule_uuid,
+                                event: "server:backup-group.stale".into(),
+                                ip: None,
+                                data: serde_json::json!({ "backup_group_uuid": group_uuid }),
+                                created: None,
+                            },
+                        )
+                        .await
+                        {
+                            tracing::warn!(
+                                server = %server.uuid,
+                                "failed to log stale backup group activity: {:#?}",
+                                err
+                            );
+                        }
+
+                        None
+                    }
+                }
+            }
+            None => None,
+        };
+
         let backups_lock = state
             .cache
             .lock(
@@ -71,9 +121,13 @@ mod post {
             )
             .await?;
 
+        if let Some(group) = &backup_group {
+            ServerBackup::rotate_group_for_create(&state, group).await?;
+        }
+
         let backups = ServerBackup::count_by_server_uuid(&state.database, server.uuid).await?;
         if backups >= server.backup_limit as i64
-            && let Err(err) = ServerBackup::delete_oldest_by_server_uuid(&state, &server).await
+            && let Err(err) = ServerBackup::evict_one_by_server_uuid(&state, &server).await
         {
             tracing::error!(server = %server.uuid, "failed to delete old backup: {:?}", err);
 
@@ -99,6 +153,7 @@ mod post {
         let options = shared::models::server_backup::CreateServerBackupOptions {
             server: &server,
             name: data.name.unwrap_or_else(ServerBackup::default_name),
+            backup_group_uuid: backup_group.as_ref().map(|group| group.uuid),
             ignored_files: data.ignored_files,
             metadata: ServerBackup::generate_metadata(&state, &server).await?,
         };

@@ -1,0 +1,37 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                COUNT(*) AS \"total!\",\n                COUNT(*) FILTER (\n                    WHERE server_backups.successful AND server_backups.completed IS NOT NULL\n                ) AS \"usable!\",\n                COUNT(*) FILTER (\n                    WHERE server_backups.successful\n                        AND server_backups.completed IS NOT NULL\n                        AND NOT server_backups.locked\n                ) AS \"usable_unlocked!\"\n            FROM server_backups\n            WHERE server_backups.backup_group_uuid = $1 AND server_backups.deleted IS NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "usable!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "usable_unlocked!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "871831ae9c2968e4234a1e46bca59235ba8fa819e29b3879ff3b8aa9badc8bd2"
+}

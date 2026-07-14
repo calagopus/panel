@@ -287,6 +287,9 @@ pub enum ScheduleActionInner {
         #[garde(dive)]
         name: Option<ScheduleDynamicParameter>,
         #[garde(skip)]
+        #[serde(default)]
+        backup_group_uuid: Option<uuid::Uuid>,
+        #[garde(skip)]
         ignored_files: Vec<compact_str::CompactString>,
     },
     RestoreBackup {

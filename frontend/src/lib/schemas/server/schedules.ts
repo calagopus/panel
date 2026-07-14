@@ -294,6 +294,7 @@ export const serverScheduleStepCreateBackupSchema = z.object({
   ignoreFailure: z.boolean(),
   foreground: z.boolean(),
   name: serverScheduleStepDynamicSchema.nullable(),
+  backupGroupUuid: z.uuid().nullable().optional(),
   ignoredFiles: z.array(z.string()),
 });
 

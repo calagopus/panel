@@ -154,6 +154,10 @@ const server = (serverUuid: string) => ({
   backups: {
     all: () => ['server', serverUuid, 'backups'] as const,
     detail: (backupUuid: string) => ['server', serverUuid, 'backups', { uuid: backupUuid }] as const,
+    groups: {
+      all: () => ['server', serverUuid, 'backups', 'groups'] as const,
+      detail: (groupUuid: string) => ['server', serverUuid, 'backups', 'groups', { uuid: groupUuid }] as const,
+    },
   },
   databases: {
     all: () => ['server', serverUuid, 'databases'] as const,

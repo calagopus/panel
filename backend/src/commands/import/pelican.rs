@@ -1706,6 +1706,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 "backup" => {
                                     actions.push(wings_api::ScheduleActionInner::CreateBackup {
                                         name: None,
+                                        backup_group_uuid: None,
                                         ignored_files: payload
                                             .split('\n')
                                             .map(compact_str::CompactString::from)

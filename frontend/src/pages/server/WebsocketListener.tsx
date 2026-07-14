@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
 import getServer from '@/api/server/getServer.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverFileOperationSchema } from '@/lib/schemas/server/files.ts';
 import { serverImagePullProgressSchema, serverResourceUsageSchema } from '@/lib/schemas/server/server.ts';
 import { formatMilliseconds } from '@/lib/time.ts';
@@ -31,6 +32,7 @@ export default function WebsocketListener() {
     setPendingRestart,
     setStats,
     setBackupProgress,
+    clearBackupProgress,
     setBackupRestoreProgress,
     setTransferProgress,
     updateBackup,
@@ -49,6 +51,7 @@ export default function WebsocketListener() {
       setPendingRestart: state.setPendingRestart,
       setStats: state.setStats,
       setBackupProgress: state.setBackupProgress,
+      clearBackupProgress: state.clearBackupProgress,
       setBackupRestoreProgress: state.setBackupRestoreProgress,
       setTransferProgress: state.setTransferProgress,
       updateBackup: state.updateBackup,
@@ -127,7 +130,11 @@ export default function WebsocketListener() {
       return;
     }
 
-    setBackupProgress(uuid, wsData.bytes_processed, wsData.bytes_total, wsData.files_processed);
+    setBackupProgress(uuid, {
+      progress: wsData.bytes_processed,
+      total: wsData.bytes_total,
+      files: wsData.files_processed,
+    });
   });
 
   useWebsocketEvent(SocketEvent.BACKUP_COMPLETED, (uuid, data) => {
@@ -152,6 +159,10 @@ export default function WebsocketListener() {
       addToast(t('elements.serverWebsocket.listener.toast.backupFailed', {}), 'error');
     }
 
+    clearBackupProgress(uuid);
+
+    // Ungrouped backups live in the store; grouped backups live in component-local
+    // state fed by react-query, so refetch the groups to reflect the completed backup.
     updateBackup(uuid, {
       isSuccessful: wsData.successful,
       checksum: `${wsData.checksum_type}:${wsData.checksum}`,
@@ -161,6 +172,7 @@ export default function WebsocketListener() {
       isStreaming: wsData.streaming,
       completed: new Date(),
     });
+    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.groups.all());
   });
 
   useWebsocketEvent(SocketEvent.BACKUP_RESTORE_STARTED, () => {

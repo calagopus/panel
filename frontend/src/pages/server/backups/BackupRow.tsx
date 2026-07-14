@@ -10,6 +10,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -28,8 +29,9 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
-import { serverBackupWithProgressSchema } from '@/lib/schemas/server/backups.ts';
+import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -39,12 +41,14 @@ import BackupEditModal from './modals/BackupEditModal.tsx';
 import BackupExportModal from './modals/BackupExportModal.tsx';
 import BackupRestoreModal from './modals/BackupRestoreModal.tsx';
 
-export default function BackupRow({ backup }: { backup: z.infer<typeof serverBackupWithProgressSchema> }) {
+export default function BackupRow({ backup }: { backup: z.infer<typeof serverBackupSchema> }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const removeBackup = useServerStore((state) => state.removeBackup);
+  const progress = useServerStore((state) => state.backupProgress.get(backup.uuid));
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'edit' | 'restore' | 'export' | 'delete' | 'metadata' | null>(null);
   const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
@@ -68,6 +72,13 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
         addToast(t('pages.server.backups.modal.deleteBackup.toast.deleted', {}), 'success');
         setOpenModal(null);
         removeBackup(backup);
+
+        if (backup.backupGroupUuid) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.server(server.uuid).backups.groups.detail(backup.backupGroupUuid),
+          });
+          queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).backups.groups.all() });
+        }
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -211,10 +222,10 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
                 ) : (
                   <TableData colSpan={2}>
                     <Tooltip
-                      label={`${bytesToString(backup.progress?.progress || 0)} / ${bytesToString(backup.progress?.total || 0)} · ${tItem('file', backup.progress?.files || 0)}`}
+                      label={`${bytesToString(progress?.progress || 0)} / ${bytesToString(progress?.total || 0)} · ${tItem('file', progress?.files || 0)}`}
                       innerClassName='w-full'
                     >
-                      <Progress value={((backup.progress?.progress || 0) / (backup.progress?.total || 1)) * 100} />
+                      <Progress value={((progress?.progress || 0) / (progress?.total || 1)) * 100} />
                     </Tooltip>
                   </TableData>
                 )}

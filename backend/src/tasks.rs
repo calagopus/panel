@@ -418,4 +418,25 @@ pub async fn define_background_tasks(
             Ok(())
         })
         .await;
+    background_task_builder
+        .add_cron_task(
+            "prune_backup_groups",
+            cron::Schedule::from_str("0 0 * * * *").unwrap(),
+            async |state| {
+                let pruned =
+                    shared::models::server_backup::ServerBackup::prune_expired_group_backups(
+                        &state,
+                    )
+                    .await?;
+                if pruned > 0 {
+                    tracing::info!(
+                        "pruned {} backups past their group retention window",
+                        pruned
+                    );
+                }
+
+                Ok(())
+            },
+        )
+        .await;
 }

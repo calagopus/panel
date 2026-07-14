@@ -95,6 +95,22 @@
       "few": "{count} Zeilen",
       "many": "{count} Zeilen",
       "other": "{count} Zeilen"
+    },
+    "backup": {
+      "zero": "{count} Backups",
+      "one": "{count} Backup",
+      "two": "{count} Backups",
+      "few": "{count} Backups",
+      "many": "{count} Backups",
+      "other": "{count} Backups"
+    },
+    "day": {
+      "zero": "{count} Tage",
+      "one": "{count} Tag",
+      "two": "{count} Tage",
+      "few": "{count} Tage",
+      "many": "{count} Tage",
+      "other": "{count} Tage"
     }
   },
   "translations": {
@@ -155,6 +171,23 @@
       },
       "input": {
         "search": "Suchen..."
+      },
+      "elements": {
+        "jsonInput": {
+          "enum": {
+            "type": {
+              "string": "Zeichenkette",
+              "number": "Zahl",
+              "boolean": "Boolescher Wert",
+              "object": "Objekt",
+              "array": "Array",
+              "null": "Null"
+            }
+          },
+          "textMode": "Text",
+          "jsonMode": "JSON",
+          "invalidJson": "Ungültiges JSON"
+        }
       },
       "modal": {
         "duplicate": {
@@ -488,6 +521,9 @@
           "deleted": "{resource} gelöscht."
         }
       },
+      "formEngine": {
+        "advancedMode": "Erweiterter Modus"
+      },
       "activityInfoButton": {
         "modal": {
           "info": {
@@ -595,9 +631,6 @@
           "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen.",
           "cancelledAll": "Alle Uploads wurden abgebrochen."
         }
-      },
-      "formEngine": {
-        "advancedMode": "Erweiterter Modus"
       }
     },
     "pages": {
@@ -1431,6 +1464,8 @@
                 "noChangelog": "Kein Änderungsprotokoll",
                 "nodesUpToDate": "Es scheint, als wären alle Nodes auf dem neuesten Stand. ({failed} Prüfungen fehlgeschlagen)",
                 "nodesOutdated": "Einige Nodes sind veraltet, die neueste verfügbare Version ist `{latest}`. ({outdated} veraltet, {failed} Prüfungen fehlgeschlagen)",
+                "databaseAgentHostsUpToDate": "Es scheint, als wären alle Datenbank-Agent-Hosts aktuell. ({failed} konnten nicht geprüft werden)",
+                "databaseAgentHostsOutdated": "Einige Datenbank-Agent-Hosts sind veraltet, die neueste verfügbare Version ist `{latest}`. ({outdated} veraltet, {failed} konnten nicht geprüft werden)",
                 "table": {
                   "version": "Version",
                   "installed": "Installiert",
@@ -1438,9 +1473,7 @@
                   "latestVersion": "Neueste Version",
                   "changes": "Änderungen",
                   "error": "Fehler"
-                },
-                "databaseAgentHostsUpToDate": "Es scheint, als wären alle Datenbank-Agent-Hosts aktuell. ({failed} konnten nicht geprüft werden)",
-                "databaseAgentHostsOutdated": "Einige Datenbank-Agent-Hosts sind veraltet, die neueste verfügbare Version ist `{latest}`. ({outdated} veraltet, {failed} konnten nicht geprüft werden)"
+                }
               }
             },
             "health": {
@@ -1681,6 +1714,7 @@
                   "maxFileManagerContentSearchSize": "Max. Inhaltssuchgröße im Dateimanager",
                   "maxFileManagerSearchResults": "Max. Suchergebnisse im Dateimanager",
                   "maxSubuserCount": "Max. Anzahl Subbenutzer",
+                  "maxBackupGroupCount": "Max. Backup-Gruppen pro Server",
                   "maxDatabaseInstanceDatabaseCount": "Max. Datenbanken pro Datenbank-Instanz",
                   "maxDatabaseInstanceUserCount": "Max. Benutzer pro Datenbank-Instanz",
                   "allowOverwritingCustomDockerImage": "Überschreiben des benutzerdefinierten Docker-Images erlauben",
@@ -2058,12 +2092,6 @@
                 }
               }
             },
-            "nodes": {
-              "title": "Nodes",
-              "page": {
-                "title": "Standort Nodes"
-              }
-            },
             "databaseAgentHosts": {
               "title": "Datenbank-Agent-Hosts",
               "page": {
@@ -2082,6 +2110,12 @@
                   }
                 }
               }
+            },
+            "nodes": {
+              "title": "Nodes",
+              "page": {
+                "title": "Standort Nodes"
+              }
             }
           }
         },
@@ -2089,6 +2123,37 @@
           "title": "Nodes",
           "resourceName": "Node",
           "tabs": {
+            "overview": {
+              "title": "Übersicht",
+              "page": {
+                "title": "Knoten-Übersicht",
+                "card": {
+                  "nodeDetails": "Knoten-Details",
+                  "systemInfo": "Systeminformationen"
+                },
+                "label": {
+                  "location": "Standort",
+                  "url": "Interne URL",
+                  "publicUrl": "Öffentliche URL",
+                  "sftpAddress": "SFTP-Adresse",
+                  "backupConfiguration": "Backup-Konfiguration",
+                  "description": "Beschreibung",
+                  "createdAt": "Erstellt",
+                  "inheritedFromLocation": "Vom Standort geerbt",
+                  "none": "Keine",
+                  "wingsVersion": "Wings-Version",
+                  "cpu": "CPU",
+                  "memory": "Arbeitsspeicher",
+                  "servers": "Server",
+                  "architecture": "Architektur",
+                  "kernelVersion": "Kernel-Version",
+                  "unavailable": "Nicht verfügbar"
+                },
+                "badge": {
+                  "updateAvailable": "Update verfügbar"
+                }
+              }
+            },
             "general": {
               "page": {
                 "tooltip": {
@@ -2383,37 +2448,6 @@
                   }
                 }
               }
-            },
-            "overview": {
-              "title": "Übersicht",
-              "page": {
-                "title": "Knoten-Übersicht",
-                "card": {
-                  "nodeDetails": "Knoten-Details",
-                  "systemInfo": "Systeminformationen"
-                },
-                "label": {
-                  "location": "Standort",
-                  "url": "Interne URL",
-                  "publicUrl": "Öffentliche URL",
-                  "sftpAddress": "SFTP-Adresse",
-                  "backupConfiguration": "Backup-Konfiguration",
-                  "description": "Beschreibung",
-                  "createdAt": "Erstellt",
-                  "inheritedFromLocation": "Vom Standort geerbt",
-                  "none": "Keine",
-                  "wingsVersion": "Wings-Version",
-                  "cpu": "CPU",
-                  "memory": "Arbeitsspeicher",
-                  "servers": "Server",
-                  "architecture": "Architektur",
-                  "kernelVersion": "Kernel-Version",
-                  "unavailable": "Nicht verfügbar"
-                },
-                "badge": {
-                  "updateAvailable": "Update verfügbar"
-                }
-              }
             }
           },
           "modal": {
@@ -2458,6 +2492,58 @@
             }
           },
           "tabs": {
+            "overview": {
+              "title": "Übersicht",
+              "page": {
+                "title": "Server-Übersicht",
+                "card": {
+                  "owner": "Besitzer",
+                  "nodeAndLocation": "Knoten & Standort",
+                  "serverDetails": "Server-Details",
+                  "resourceLimits": "Ressourcenlimits",
+                  "featureLimits": "Funktionslimits"
+                },
+                "label": {
+                  "email": "E-Mail",
+                  "language": "Sprache",
+                  "createdAt": "Erstellt",
+                  "node": "Knoten",
+                  "location": "Standort",
+                  "memoryLimit": "Arbeitsspeicher-Limit",
+                  "diskLimit": "Speicherplatz-Limit",
+                  "sftpAddress": "SFTP-Adresse",
+                  "primaryAllocation": "Primäre Allocation",
+                  "none": "Keine",
+                  "dockerImage": "Docker-Image",
+                  "nest": "Nest",
+                  "egg": "Egg",
+                  "timezone": "Zeitzone",
+                  "autoKill": "Auto-Kill",
+                  "cpu": "CPU",
+                  "memory": "Arbeitsspeicher",
+                  "disk": "Speicherplatz",
+                  "swap": "Swap",
+                  "allocations": "Allocations",
+                  "databases": "Datenbanken",
+                  "databaseAgents": "Agent-Datenbanken",
+                  "backups": "Backups",
+                  "schedules": "Zeitpläne",
+                  "unlimited": "Unendlich",
+                  "autoKillSeconds": "{seconds}s",
+                  "autoKillDisabled": "Deaktiviert",
+                  "externalId": "Externe ID",
+                  "uuid": "UUID"
+                },
+                "badge": {
+                  "suspended": "Suspendiert",
+                  "transferring": "Server wird übertragen",
+                  "installing": "Wird installiert",
+                  "installFailed": "Installation fehlgeschlagen",
+                  "restoringBackup": "Backup wird wiederhergestellt",
+                  "admin": "Admin"
+                }
+              }
+            },
             "general": {
               "page": {
                 "titleCreate": "Server erstellen",
@@ -2709,58 +2795,6 @@
             },
             "viewClient": {
               "title": "Im Client-Bereich ansehen"
-            },
-            "overview": {
-              "title": "Übersicht",
-              "page": {
-                "title": "Server-Übersicht",
-                "card": {
-                  "owner": "Besitzer",
-                  "nodeAndLocation": "Knoten & Standort",
-                  "serverDetails": "Server-Details",
-                  "resourceLimits": "Ressourcenlimits",
-                  "featureLimits": "Funktionslimits"
-                },
-                "label": {
-                  "email": "E-Mail",
-                  "language": "Sprache",
-                  "createdAt": "Erstellt",
-                  "node": "Knoten",
-                  "location": "Standort",
-                  "memoryLimit": "Arbeitsspeicher-Limit",
-                  "diskLimit": "Speicherplatz-Limit",
-                  "sftpAddress": "SFTP-Adresse",
-                  "primaryAllocation": "Primäre Allocation",
-                  "none": "Keine",
-                  "dockerImage": "Docker-Image",
-                  "nest": "Nest",
-                  "egg": "Egg",
-                  "timezone": "Zeitzone",
-                  "autoKill": "Auto-Kill",
-                  "cpu": "CPU",
-                  "memory": "Arbeitsspeicher",
-                  "disk": "Speicherplatz",
-                  "swap": "Swap",
-                  "allocations": "Allocations",
-                  "databases": "Datenbanken",
-                  "databaseAgents": "Agent-Datenbanken",
-                  "backups": "Backups",
-                  "schedules": "Zeitpläne",
-                  "unlimited": "Unendlich",
-                  "autoKillSeconds": "{seconds}s",
-                  "autoKillDisabled": "Deaktiviert",
-                  "externalId": "Externe ID",
-                  "uuid": "UUID"
-                },
-                "badge": {
-                  "suspended": "Suspendiert",
-                  "transferring": "Server wird übertragen",
-                  "installing": "Wird installiert",
-                  "installFailed": "Installation fehlgeschlagen",
-                  "restoringBackup": "Backup wird wiederhergestellt",
-                  "admin": "Admin"
-                }
-              }
             }
           }
         },
@@ -3144,6 +3178,223 @@
             }
           }
         },
+        "databaseAgentHosts": {
+          "title": "Datenbank-Agent-Hosts",
+          "resourceName": "Datenbank-Agent-Host",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Datenbank-Agent-Host erstellen",
+                "titleUpdate": "Datenbank-Agent-Host aktualisieren",
+                "form": {
+                  "typeEnabled": "Aktiviert",
+                  "typePublicHost": "Öffentlicher Host",
+                  "typePublicPort": "Öffentlicher Port"
+                },
+                "button": {
+                  "resetToken": "Token zurücksetzen",
+                  "testConnection": "Verbindung testen",
+                  "updateConfig": "Konfiguration aktualisieren"
+                },
+                "toast": {
+                  "tested": "Test erfolgreich abgeschlossen.",
+                  "tokenReset": "Datenbank-Agent-Host-Token zurückgesetzt."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Löschen des Datenbank-Agent-Hosts bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
+                    "form": {
+                      "force": "Löschen erzwingen",
+                      "forceWarning": "Erzwungenes Löschen entfernt alle Instanzen auf diesem Host. Instanzen, für die der Agent nicht erreichbar ist, werden möglicherweise nicht vollständig bereinigt, sodass verwaiste Daten zurückbleiben."
+                    }
+                  }
+                }
+              }
+            },
+            "instances": {
+              "title": "Instanzen",
+              "page": {
+                "title": "Instanzen"
+              }
+            },
+            "configuration": {
+              "title": "Konfiguration",
+              "page": {
+                "title": "Konfiguration",
+                "section": {
+                  "initialSetup": "Ersteinrichtung",
+                  "liveConfiguration": "Live-Konfiguration"
+                },
+                "description": {
+                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/calagopus-db-agent/config.yml` ein oder führe aus"
+                },
+                "tooltip": {
+                  "copyCommand": "Befehl kopieren"
+                },
+                "form": {
+                  "apiPort": "API-Port"
+                },
+                "button": {
+                  "save": "Konfiguration speichern",
+                  "reveal": "Konfiguration anzeigen"
+                },
+                "alert": {
+                  "couldNotReach": "Der Datenbank-Agent-Host konnte nicht erreicht werden: {error}",
+                  "tokenWarning": "Die untenstehende Konfiguration enthält das Host-Token. Zeige sie nur bei Bedarf an."
+                },
+                "toast": {
+                  "applied": "Konfiguration erfolgreich angewendet.",
+                  "submittedNotApplied": "Konfiguration wurde übermittelt, aber nicht angewendet.",
+                  "invalidYaml": "Ungültiges YAML: {error}"
+                }
+              }
+            },
+            "overview": {
+              "title": "Übersicht",
+              "page": {
+                "title": "Datenbank-Agent-Host-Übersicht",
+                "status": {
+                  "deploymentEnabled": "Bereitstellung aktiviert",
+                  "deploymentDisabled": "Bereitstellung deaktiviert",
+                  "maintenanceEnabled": "Wartung aktiviert",
+                  "maintenanceDisabled": "Wartung deaktiviert"
+                },
+                "card": {
+                  "hostDetails": "Host-Details",
+                  "systemInfo": "Systeminformationen",
+                  "resources": "Zugewiesene Ressourcen"
+                },
+                "label": {
+                  "url": "URL",
+                  "description": "Beschreibung",
+                  "createdAt": "Erstellt",
+                  "version": "Version",
+                  "cpu": "CPU",
+                  "memory": "Arbeitsspeicher",
+                  "disk": "Speicher",
+                  "instances": "Instanzen",
+                  "kernelVersion": "Kernel-Version",
+                  "architecture": "Architektur",
+                  "unavailable": "Nicht verfügbar",
+                  "noLimit": "Kein Host-Limit",
+                  "free": "{size} frei",
+                  "cores": "{cores} Kerne zugewiesen"
+                },
+                "badge": {
+                  "updateAvailable": "Update verfügbar"
+                }
+              }
+            },
+            "statistics": {
+              "title": "Statistiken",
+              "page": {
+                "title": "Datenbank-Agent-Host-Statistiken",
+                "card": {
+                  "resources": "Ressourcen",
+                  "graphs": "Diagramme"
+                },
+                "label": {
+                  "cpu": "CPU",
+                  "cpuThreads": "{model} ({threads} Threads)",
+                  "memory": "Arbeitsspeicher",
+                  "usedByAgent": "{size} vom Agent verwendet",
+                  "disk": "Festplatte",
+                  "network": "Netzwerk",
+                  "networkIn": "Ein: {in}",
+                  "networkOut": "Aus: {out}"
+                },
+                "chart": {
+                  "cpuLoad": "CPU-Auslastung",
+                  "memoryUsage": "Arbeitsspeicher-Nutzung",
+                  "diskIo": "Festplatten-I/O",
+                  "diskRead": "Festplatte lesen",
+                  "diskWrite": "Festplatte schreiben",
+                  "networkTraffic": "Netzwerkverkehr",
+                  "networkInLabel": "Eingehend",
+                  "networkOutLabel": "Ausgehend",
+                  "inbound": "Eingehend",
+                  "outbound": "Ausgehend"
+                },
+                "toast": {
+                  "connectionLost": "Die Verbindung zum Datenbank-Agent-Host wurde unterbrochen."
+                }
+              }
+            }
+          },
+          "modal": {
+            "bulkConfig": {
+              "title": "Konfiguration aktualisieren - {hosts}",
+              "button": {
+                "apply": "Auf {hosts} anwenden"
+              },
+              "toast": {
+                "applied": "Konfiguration auf {hosts} angewendet."
+              },
+              "error": {
+                "invalidYaml": "Ungültiges YAML: {error}"
+              }
+            }
+          }
+        },
+        "databaseAgentTemplates": {
+          "title": "Datenbank-Agent-Vorlagen",
+          "resourceName": "Datenbank-Agent-Vorlage",
+          "dropzone": {
+            "title": "Lege einige Dateien hier ab, um sie als Datenbank-Agent-Vorlagen zu importieren",
+            "subtitle": "Loslassen, um den Import zu starten"
+          },
+          "toast": {
+            "imported": "Datenbank-Agent-Vorlage importiert.",
+            "parseFailed": "Datenbank-Agent-Vorlage konnte nicht verarbeitet werden: {error}"
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Datenbank-Agent-Vorlage erstellen",
+                "titleUpdate": "Datenbank-Agent-Vorlage aktualisieren",
+                "toast": {
+                  "exported": "Datenbank-Agent-Vorlage exportiert."
+                },
+                "form": {
+                  "dockerImages": "Docker-Images",
+                  "env": "Umgebungsvariablen",
+                  "volumes": "Volumes",
+                  "socketPath": "Socket-Pfad",
+                  "socketPathDescription": "Der Unix-Socket-Dateipfad innerhalb des Datenbank-Containers, muss mit dem Ort übereinstimmen, an dem das konfigurierte Image seinen Socket tatsächlich erstellt.",
+                  "imageUid": "Image-UID",
+                  "imageGid": "Image-GID",
+                  "cmd": "Befehl",
+                  "memoryDescription": "Das Speicherlimit des Datenbank-Containers.",
+                  "memoryTooltip": "0 setzt kein Limit.",
+                  "swap": "Swap",
+                  "swapDescription": "Die Menge an Swap, die dieser Datenbank zugewiesen wird.",
+                  "swapTooltip": "-1 setzt kein Limit.",
+                  "diskDescription": "Das Festplattenlimit der Datenbank.",
+                  "diskTooltip": "0 setzt kein Limit. Dies ist ein Soft-Limit, sofern der Festplattenlimiter nicht auf Wings konfiguriert ist.",
+                  "cpu": "CPU-Limit (%)",
+                  "cpuDescription": "Das CPU-Limit in %, das die Datenbank nutzen kann.",
+                  "cpuTooltip": "1 Thread = 100 %. 0 setzt kein Limit.",
+                  "ioWeight": "IO-Gewichtung",
+                  "ioWeightDescription": "Die relative IO-Gewichtung des Datenbank-Containers im Vergleich zu anderen Containern.",
+                  "ioWeightTooltip": "0-1000. Funktioniert möglicherweise nicht auf allen Systemen."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Löschen der Datenbank-Agent-Vorlage bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                  }
+                }
+              }
+            },
+            "instances": {
+              "title": "Instanzen",
+              "page": {
+                "title": "Instanzen"
+              }
+            }
+          }
+        },
         "oAuthProviders": {
           "title": "OAuth-Anbieter",
           "resourceName": "OAuth-Anbieter",
@@ -3516,228 +3767,16 @@
         },
         "activity": {
           "title": "Aktivität"
-        },
-        "databaseAgentHosts": {
-          "title": "Datenbank-Agent-Hosts",
-          "resourceName": "Datenbank-Agent-Host",
-          "tabs": {
-            "general": {
-              "page": {
-                "titleCreate": "Datenbank-Agent-Host erstellen",
-                "titleUpdate": "Datenbank-Agent-Host aktualisieren",
-                "form": {
-                  "typeEnabled": "Aktiviert",
-                  "typePublicHost": "Öffentlicher Host",
-                  "typePublicPort": "Öffentlicher Port"
-                },
-                "button": {
-                  "resetToken": "Token zurücksetzen",
-                  "testConnection": "Verbindung testen",
-                  "updateConfig": "Konfiguration aktualisieren"
-                },
-                "modal": {
-                  "delete": {
-                    "title": "Löschen des Datenbank-Agent-Hosts bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
-                    "form": {
-                      "force": "Löschen erzwingen",
-                      "forceWarning": "Erzwungenes Löschen entfernt alle Instanzen auf diesem Host. Instanzen, für die der Agent nicht erreichbar ist, werden möglicherweise nicht vollständig bereinigt, sodass verwaiste Daten zurückbleiben."
-                    }
-                  }
-                },
-                "toast": {
-                  "tested": "Test erfolgreich abgeschlossen.",
-                  "tokenReset": "Datenbank-Agent-Host-Token zurückgesetzt."
-                }
-              }
-            },
-            "instances": {
-              "title": "Instanzen",
-              "page": {
-                "title": "Instanzen"
-              }
-            },
-            "configuration": {
-              "title": "Konfiguration",
-              "page": {
-                "title": "Konfiguration",
-                "button": {
-                  "save": "Konfiguration speichern",
-                  "reveal": "Konfiguration anzeigen"
-                },
-                "alert": {
-                  "couldNotReach": "Der Datenbank-Agent-Host konnte nicht erreicht werden: {error}",
-                  "tokenWarning": "Die untenstehende Konfiguration enthält das Host-Token. Zeige sie nur bei Bedarf an."
-                },
-                "toast": {
-                  "applied": "Konfiguration erfolgreich angewendet.",
-                  "submittedNotApplied": "Konfiguration wurde übermittelt, aber nicht angewendet.",
-                  "invalidYaml": "Ungültiges YAML: {error}"
-                },
-                "section": {
-                  "initialSetup": "Ersteinrichtung",
-                  "liveConfiguration": "Live-Konfiguration"
-                },
-                "description": {
-                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/calagopus-db-agent/config.yml` ein oder führe aus"
-                },
-                "tooltip": {
-                  "copyCommand": "Befehl kopieren"
-                },
-                "form": {
-                  "apiPort": "API-Port"
-                }
-              }
-            },
-            "overview": {
-              "title": "Übersicht",
-              "page": {
-                "title": "Datenbank-Agent-Host-Übersicht",
-                "status": {
-                  "deploymentEnabled": "Bereitstellung aktiviert",
-                  "deploymentDisabled": "Bereitstellung deaktiviert",
-                  "maintenanceEnabled": "Wartung aktiviert",
-                  "maintenanceDisabled": "Wartung deaktiviert"
-                },
-                "card": {
-                  "hostDetails": "Host-Details",
-                  "systemInfo": "Systeminformationen",
-                  "resources": "Zugewiesene Ressourcen"
-                },
-                "label": {
-                  "url": "URL",
-                  "description": "Beschreibung",
-                  "createdAt": "Erstellt",
-                  "version": "Version",
-                  "cpu": "CPU",
-                  "memory": "Arbeitsspeicher",
-                  "disk": "Speicher",
-                  "instances": "Instanzen",
-                  "kernelVersion": "Kernel-Version",
-                  "architecture": "Architektur",
-                  "unavailable": "Nicht verfügbar",
-                  "noLimit": "Kein Host-Limit",
-                  "free": "{size} frei",
-                  "cores": "{cores} Kerne zugewiesen"
-                },
-                "badge": {
-                  "updateAvailable": "Update verfügbar"
-                }
-              }
-            },
-            "statistics": {
-              "title": "Statistiken",
-              "page": {
-                "title": "Datenbank-Agent-Host-Statistiken",
-                "card": {
-                  "resources": "Ressourcen",
-                  "graphs": "Diagramme"
-                },
-                "label": {
-                  "cpu": "CPU",
-                  "cpuThreads": "{model} ({threads} Threads)",
-                  "memory": "Arbeitsspeicher",
-                  "usedByAgent": "{size} vom Agent verwendet",
-                  "disk": "Festplatte",
-                  "network": "Netzwerk",
-                  "networkIn": "Ein: {in}",
-                  "networkOut": "Aus: {out}"
-                },
-                "chart": {
-                  "cpuLoad": "CPU-Auslastung",
-                  "memoryUsage": "Arbeitsspeicher-Nutzung",
-                  "diskIo": "Festplatten-I/O",
-                  "diskRead": "Festplatte lesen",
-                  "diskWrite": "Festplatte schreiben",
-                  "networkTraffic": "Netzwerkverkehr",
-                  "networkInLabel": "Eingehend",
-                  "networkOutLabel": "Ausgehend",
-                  "inbound": "Eingehend",
-                  "outbound": "Ausgehend"
-                },
-                "toast": {
-                  "connectionLost": "Die Verbindung zum Datenbank-Agent-Host wurde unterbrochen."
-                }
-              }
-            }
-          },
-          "modal": {
-            "bulkConfig": {
-              "title": "Konfiguration aktualisieren - {hosts}",
-              "button": {
-                "apply": "Auf {hosts} anwenden"
-              },
-              "toast": {
-                "applied": "Konfiguration auf {hosts} angewendet."
-              },
-              "error": {
-                "invalidYaml": "Ungültiges YAML: {error}"
-              }
-            }
-          }
-        },
-        "databaseAgentTemplates": {
-          "title": "Datenbank-Agent-Vorlagen",
-          "resourceName": "Datenbank-Agent-Vorlage",
-          "dropzone": {
-            "title": "Lege einige Dateien hier ab, um sie als Datenbank-Agent-Vorlagen zu importieren",
-            "subtitle": "Loslassen, um den Import zu starten"
-          },
-          "toast": {
-            "imported": "Datenbank-Agent-Vorlage importiert.",
-            "parseFailed": "Datenbank-Agent-Vorlage konnte nicht verarbeitet werden: {error}"
-          },
-          "tabs": {
-            "general": {
-              "page": {
-                "titleCreate": "Datenbank-Agent-Vorlage erstellen",
-                "titleUpdate": "Datenbank-Agent-Vorlage aktualisieren",
-                "toast": {
-                  "exported": "Datenbank-Agent-Vorlage exportiert."
-                },
-                "form": {
-                  "dockerImages": "Docker-Images",
-                  "env": "Umgebungsvariablen",
-                  "volumes": "Volumes",
-                  "socketPath": "Socket-Pfad",
-                  "socketPathDescription": "Der Unix-Socket-Dateipfad innerhalb des Datenbank-Containers, muss mit dem Ort übereinstimmen, an dem das konfigurierte Image seinen Socket tatsächlich erstellt.",
-                  "imageUid": "Image-UID",
-                  "imageGid": "Image-GID",
-                  "cmd": "Befehl",
-                  "swap": "Swap",
-                  "cpu": "CPU-Limit (%)",
-                  "ioWeight": "IO-Gewichtung",
-                  "memoryDescription": "Das Speicherlimit des Datenbank-Containers.",
-                  "memoryTooltip": "0 setzt kein Limit.",
-                  "swapDescription": "Die Menge an Swap, die dieser Datenbank zugewiesen wird.",
-                  "swapTooltip": "-1 setzt kein Limit.",
-                  "diskDescription": "Das Festplattenlimit der Datenbank.",
-                  "diskTooltip": "0 setzt kein Limit. Dies ist ein Soft-Limit, sofern der Festplattenlimiter nicht auf Wings konfiguriert ist.",
-                  "cpuDescription": "Das CPU-Limit in %, das die Datenbank nutzen kann.",
-                  "cpuTooltip": "1 Thread = 100 %. 0 setzt kein Limit.",
-                  "ioWeightDescription": "Die relative IO-Gewichtung des Datenbank-Containers im Vergleich zu anderen Containern.",
-                  "ioWeightTooltip": "0-1000. Funktioniert möglicherweise nicht auf allen Systemen."
-                },
-                "modal": {
-                  "delete": {
-                    "title": "Löschen der Datenbank-Agent-Vorlage bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
-                  }
-                }
-              }
-            },
-            "instances": {
-              "title": "Instanzen",
-              "page": {
-                "title": "Instanzen"
-              }
-            }
-          }
         }
       },
       "server": {
         "viewAdmin": {
           "title": "Im Admin-Bereich ansehen"
+        },
+        "selector": {
+          "title": "Server auswählen",
+          "description": "Wähle aus, zu welchem Server du navigieren möchtest.",
+          "descriptionWithPage": "Wähle einen Server, um zu **{page}** zu gelangen."
         },
         "console": {
           "title": "Konsole",
@@ -4941,7 +4980,9 @@
           },
           "button": {
             "browse": "Durchsuchen",
-            "exportToFiles": "In Dateien exportieren"
+            "exportToFiles": "In Dateien exportieren",
+            "createBackup": "Backup erstellen",
+            "createGroup": "Backup-Gruppe erstellen"
           },
           "toast": {
             "downloadStarted": "Download gestartet.",
@@ -4951,6 +4992,7 @@
           "modal": {
             "createBackup": {
               "title": "Backup erstellen",
+              "noGroup": "Keine Gruppe",
               "toast": {
                 "created": "Backup erstellt."
               }
@@ -4977,6 +5019,47 @@
             "viewMetadata": {
               "title": "Backup-Metadaten"
             }
+          }
+        },
+        "backupGroups": {
+          "title": "Backup-Gruppen",
+          "group": "Backup-Gruppe",
+          "ungrouped": "Ohne Gruppe",
+          "noBackups": "Diese Gruppe enthält noch keine Backups.",
+          "button": {
+            "createInGroup": "Backup in dieser Gruppe erstellen"
+          },
+          "badge": {
+            "keepCount": "{count} behalten",
+            "keepDays": "{days} behalten",
+            "noRetention": "Keine automatische Löschung",
+            "allLocked": "Alle gesperrt"
+          },
+          "form": {
+            "retentionCount": "Anzahl behalten",
+            "retentionCountDescription": "Maximale Anzahl nutzbarer Backups, die in dieser Gruppe behalten werden. Leer lassen für kein Limit.",
+            "retentionDays": "Tage behalten",
+            "retentionDaysDescription": "Backups in dieser Gruppe löschen, die älter als diese Anzahl an Tagen sind. Leer lassen für kein Limit.",
+            "noRetentionDescription": "Ohne Aufbewahrungsrichtlinie ist diese Gruppe nur eine Bezeichnung und löscht niemals automatisch Backups."
+          },
+          "modal": {
+            "createGroup": {
+              "title": "Backup-Gruppe erstellen"
+            },
+            "updateGroup": {
+              "title": "Backup-Gruppe bearbeiten"
+            },
+            "deleteGroup": {
+              "title": "Löschen der Backup-Gruppe bestätigen",
+              "content": "Bist du sicher, dass du **{name}** löschen möchtest? {backups} in dieser Gruppe verlieren ihre Gruppe und folgen der normalen Rotation.",
+              "lockBackups": "Backups sperren",
+              "lockBackupsDescription": "Sperrt alle Backups in dieser Gruppe vor dem Löschen, damit sie nicht automatisch rotiert werden."
+            }
+          },
+          "toast": {
+            "created": "Backup-Gruppe erstellt.",
+            "updated": "Backup-Gruppe aktualisiert.",
+            "deleted": "Backup-Gruppe gelöscht."
           }
         },
         "network": {
@@ -5115,11 +5198,6 @@
           "button": {
             "clearUserFilter": "Benutzerfilter löschen"
           }
-        },
-        "selector": {
-          "title": "Server auswählen",
-          "description": "Wähle aus, zu welchem Server du navigieren möchtest.",
-          "descriptionWithPage": "Wähle einen Server, um zu **{page}** zu gelangen."
         }
       }
     }

@@ -170,6 +170,7 @@ mod delete {
             .log(
                 "server:backup.delete",
                 serde_json::json!({
+                    "source": "user",
                     "uuid": backup.uuid,
                     "name": backup.name,
                 }),
@@ -187,8 +188,11 @@ mod patch {
     use shared::{
         ApiError, GetState,
         models::{
-            UpdatableModel, server::GetServerActivityLogger,
-            server_backup::UpdateServerBackupOptions, user::GetPermissionManager,
+            UpdatableModel,
+            server::{GetServer, GetServerActivityLogger},
+            server_backup::UpdateServerBackupOptions,
+            server_backup_group::ServerBackupGroup,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -217,6 +221,7 @@ mod patch {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        server: GetServer,
         activity_logger: GetServerActivityLogger,
         mut backup: GetServerBackup,
         shared::Payload(data): shared::Payload<UpdateServerBackupOptions>,
@@ -229,6 +234,16 @@ mod patch {
 
         permissions.has_server_permission("backups.update")?;
 
+        if let Some(Some(group_uuid)) = data.backup_group_uuid
+            && ServerBackupGroup::by_server_uuid_uuid(&state.database, server.uuid, group_uuid)
+                .await?
+                .is_none()
+        {
+            return ApiResponse::error("backup group not found")
+                .with_status(StatusCode::NOT_FOUND)
+                .ok();
+        }
+
         backup.update(&state, data).await?;
 
         activity_logger
@@ -237,6 +252,7 @@ mod patch {
                 serde_json::json!({
                     "uuid": backup.uuid,
                     "name": backup.name,
+                    "backup_group_uuid": backup.backup_group_uuid,
                     "locked": backup.locked,
                 }),
             )

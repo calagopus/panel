@@ -4,13 +4,13 @@ import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 
 export default async (
-  uuid: string,
+  serverUuid: string,
+  backupGroupUuid: string,
   page: number,
   search?: string,
-  ungrouped?: boolean,
 ): Promise<Pagination<z.infer<typeof serverBackupSchema>>> => {
-  const { data } = await axiosInstance.get(`/api/client/servers/${uuid}/backups`, {
-    params: { page, search, ungrouped },
+  const { data } = await axiosInstance.get(`/api/client/servers/${serverUuid}/backups/groups/${backupGroupUuid}`, {
+    params: { page, search },
   });
   return parsePaginationFromApi(serverBackupSchema, data.backups);
 };

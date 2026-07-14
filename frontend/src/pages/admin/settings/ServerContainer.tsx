@@ -33,6 +33,7 @@ export default function ServerContainer() {
       maxFileManagerSearchResults: 1,
       maxSubuserCount: 0,
       maxScheduleStepCount: 0,
+      maxBackupGroupCount: 0,
       maxDatabaseInstanceDatabaseCount: 0,
       maxDatabaseInstanceUserCount: 0,
       allowOverwritingCustomDockerImage: false,
@@ -105,6 +106,12 @@ export default function ServerContainer() {
       type: 'number',
       name: 'maxSubuserCount',
       label: t('pages.admin.settings.tabs.server.page.form.maxSubuserCount', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxBackupGroupCount',
+      label: t('pages.admin.settings.tabs.server.page.form.maxBackupGroupCount', {}),
       required: true,
     },
     {

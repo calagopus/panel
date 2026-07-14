@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                (SELECT COUNT(*)\n                    FROM server_backups\n                    WHERE server_backups.backup_group_uuid = $1\n                        AND server_backups.deleted IS NULL\n                        AND server_backups.successful\n                        AND server_backups.completed IS NOT NULL) AS \"usable!\",\n                (SELECT server_backups.uuid\n                    FROM server_backups\n                    WHERE server_backups.backup_group_uuid = $1\n                        AND server_backups.deleted IS NULL\n                        AND server_backups.successful\n                        AND server_backups.completed IS NOT NULL\n                        AND server_backups.locked = false\n                    ORDER BY server_backups.created ASC\n                    LIMIT 1) AS \"oldest_unlocked?\"\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "usable!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "oldest_unlocked?",
+        "type_info": "Uuid",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "a4a8dec7fdd46ca359cb2096c0358cd77d09694d8bb7bc32472d48e5a3577671"
+}

@@ -188,6 +188,7 @@ interface TableProps {
   pagination?: Pagination<unknown>;
   onPageSelect?: (page: number) => void;
   allowSelect?: boolean;
+  flush?: boolean;
   children: ReactNode;
 }
 
@@ -198,17 +199,22 @@ export default function Table({
   pagination,
   onPageSelect,
   allowSelect = true,
+  flush = false,
   children,
 }: TableProps) {
   return (
     <MantineTable.ScrollContainer
       minWidth={0}
       type='native'
-      style={{
-        borderRadius: 'var(--mantine-radius-md)',
-        border: '1px solid var(--mantine-color-default-border)',
-        background: 'var(--mantine-color-default)',
-      }}
+      style={
+        flush
+          ? undefined
+          : {
+              borderRadius: 'var(--mantine-radius-md)',
+              border: '1px solid var(--mantine-color-default-border)',
+              background: 'var(--mantine-color-default)',
+            }
+      }
     >
       {!error && pagination && onPageSelect && pagination.total > pagination.perPage && (
         <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} withShortcuts={false} />

@@ -629,6 +629,18 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                 },
             ),
             (
+                "backup-groups",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage server backup groups (retention policies).",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new backup groups."),
+                        ("read", "Allows viewing existing backup groups."),
+                        ("update", "Allows updating existing backup groups."),
+                        ("delete", "Allows deleting backup groups."),
+                    ]),
+                },
+            ),
+            (
                 "schedules",
                 PermissionGroup {
                     description: "Permissions that control the ability to manage server schedules.",

@@ -947,6 +947,24 @@ export const serverMountsTable = pgTable(
   ],
 );
 
+export const serverBackupGroupsTable = pgTable(
+  'server_backup_groups',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    server_uuid: uuid()
+      .references(() => serversTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    retention_count: integer(),
+    retention_days: integer(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('server_backup_groups_server_uuid_idx').on(cols.server_uuid),
+    uniqueIndex('server_backup_groups_server_uuid_name_idx').on(cols.server_uuid, cols.name),
+  ],
+);
+
 export const serverBackupsTable = pgTable(
   'server_backups',
   {
@@ -956,6 +974,7 @@ export const serverBackupsTable = pgTable(
       .references(() => nodesTable.uuid, { onDelete: 'cascade' })
       .notNull(),
     backup_configuration_uuid: uuid().references(() => backupConfigurationsTable.uuid, { onDelete: 'set null' }),
+    backup_group_uuid: uuid().references(() => serverBackupGroupsTable.uuid, { onDelete: 'set null' }),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     successful: boolean().default(false).notNull(),
     browsable: boolean().default(false).notNull(),
@@ -978,6 +997,7 @@ export const serverBackupsTable = pgTable(
     index('server_backups_server_uuid_idx').on(cols.server_uuid),
     index('server_backups_node_uuid_idx').on(cols.node_uuid),
     index('server_backups_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
+    index('server_backups_backup_group_uuid_idx').on(cols.backup_group_uuid),
     index('server_backups_successful_idx').on(cols.successful),
   ],
 );
