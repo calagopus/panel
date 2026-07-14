@@ -9,6 +9,7 @@ const Drawer = forwardRef<HTMLDivElement, DrawerProps>(({ children, className, .
         backgroundOpacity: 0.55,
         blur: 3,
       }}
+      removeScrollProps={{ removeScrollBar: false }}
       ref={ref}
       className={className}
       {...rest}

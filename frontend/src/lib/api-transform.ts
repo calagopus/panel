@@ -24,6 +24,33 @@ function toCamelCase(key: string): string {
   return key.replace(/_([a-z0-9])/gi, (_, letter: string) => letter.toUpperCase());
 }
 
+// z.json() is a lazy union of exactly the JSON value types. It represents opaque arbitrary
+// JSON, so its value must pass through verbatim: no snake_case->camelCase key remap and no
+// __extension_data collection, leaving the raw backend payload intact (e.g. the activity log
+// `data` field). Recognised structurally so any bare z.json() works, no wrapper needed.
+const JSON_UNION_TYPES = ['string', 'number', 'boolean', 'null', 'array', 'record'];
+
+function isOpaqueJson(schema: AnySchema): boolean {
+  const { type } = def<{ type: string }>(schema);
+  switch (type) {
+    case 'optional':
+    case 'nullable':
+    case 'default':
+      return isOpaqueJson(def<{ innerType: AnySchema }>(schema).innerType);
+    case 'pipe':
+      return isOpaqueJson(def<{ in: AnySchema }>(schema).in);
+    case 'lazy': {
+      const inner = def<{ getter: () => AnySchema }>(schema).getter();
+      const innerDef = def<{ type: string; options?: AnySchema[] }>(inner);
+      if (innerDef.type !== 'union' || !innerDef.options) return false;
+      const optionTypes = innerDef.options.map((option) => def<{ type: string }>(option).type);
+      return optionTypes.length === JSON_UNION_TYPES.length && JSON_UNION_TYPES.every((t) => optionTypes.includes(t));
+    }
+    default:
+      return false;
+  }
+}
+
 // Remove optional/nullable/default/etc wrappers to get to the actual type
 function unwrap(schema: AnySchema): AnySchema {
   const { type } = def<{ type: string }>(schema);
@@ -69,6 +96,8 @@ function selectUnionOption(
 
 // snake_case to camelCase, walks nested objects/arrays using the schema shape
 function applyTransform(schema: AnySchema, data: unknown): unknown {
+  if (isOpaqueJson(schema)) return data;
+
   const inner = unwrap(schema);
   const { type } = def<{ type: string }>(inner);
 
@@ -183,6 +212,8 @@ export const EXTENSION_DATA_KEY = '__extension_data';
 // Walks raw and parsed data in parallel along the schema, stashing raw keys the
 // schema shape doesn't know about on the corresponding parsed object node
 function collectExtensionFields(schema: AnySchema, raw: unknown, parsed: unknown): void {
+  if (isOpaqueJson(schema)) return;
+
   const inner = unwrap(schema);
   const { type } = def<{ type: string }>(inner);
 

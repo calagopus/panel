@@ -86,57 +86,61 @@ export default function ServerActivity() {
         onPageSelect={setPage}
         error={error}
       >
-        {activities?.data.map((activity, index) => (
-          <TableRow key={`${activity.created.toISOString()}-${index}`}>
-            <TableData>
-              <Avatar size={20} className='select-none' src={activity.user?.avatar} name={activity.user?.username} />
-            </TableData>
+        {activities?.data.map((activity, index) => {
+          const fileWriteData = activity.data as { file?: string; revision_id?: string } | null;
 
-            <TableData>
-              {activity.user ? (
-                <>
-                  <TableLink to={{ search: `?${searchParams.toString()}&user=${activity.user.uuid}` }}>
-                    {activity.user.username}
-                  </TableLink>{' '}
-                  ({activity.isApi ? t('common.api', {}) : t('common.web', {})})
-                </>
-              ) : activity.isSchedule ? (
-                t('common.schedule', {})
-              ) : (
-                t('common.system', {})
-              )}
-              {activity.impersonator &&
-                ` (${t('common.impersonatedBy', { username: activity.impersonator.username })})`}
-            </TableData>
+          return (
+            <TableRow key={`${activity.created.toISOString()}-${index}`}>
+              <TableData>
+                <Avatar size={20} className='select-none' src={activity.user?.avatar} name={activity.user?.username} />
+              </TableData>
 
-            <TableData>
-              <Code>{activity.event}</Code>
-            </TableData>
+              <TableData>
+                {activity.user ? (
+                  <>
+                    <TableLink to={{ search: `?${searchParams.toString()}&user=${activity.user.uuid}` }}>
+                      {activity.user.username}
+                    </TableLink>{' '}
+                    ({activity.isApi ? t('common.api', {}) : t('common.web', {})})
+                  </>
+                ) : activity.isSchedule ? (
+                  t('common.schedule', {})
+                ) : (
+                  t('common.system', {})
+                )}
+                {activity.impersonator &&
+                  ` (${t('common.impersonatedBy', { username: activity.impersonator.username })})`}
+              </TableData>
 
-            <TableData>
-              <Code>{activity.ip ? activity.ip : t('common.na', {})}</Code>
-            </TableData>
+              <TableData>
+                <Code>{activity.event}</Code>
+              </TableData>
 
-            <TableData>
-              <FormattedTimestamp timestamp={activity.created} />
-            </TableData>
+              <TableData>
+                <Code>{activity.ip ? activity.ip : t('common.na', {})}</Code>
+              </TableData>
 
-            <TableData>
-              <Group gap={4} justify='right' wrap='nowrap'>
-                {activity.event === 'server:file.write' && activity.data?.file && activity.data?.revisionId ? (
-                  <NavLink
-                    to={`/server/${server.uuidShort}/files/diff?file=${encodeURIComponent(activity.data.file)}&revision=${activity.data.revisionId}`}
-                  >
-                    <ActionIcon>
-                      <FontAwesomeIcon icon={faCodeBranch} />
-                    </ActionIcon>
-                  </NavLink>
-                ) : null}
-                {Object.keys(activity.data ?? {}).length > 0 ? <ActivityInfoButton activity={activity} /> : null}
-              </Group>
-            </TableData>
-          </TableRow>
-        ))}
+              <TableData>
+                <FormattedTimestamp timestamp={activity.created} />
+              </TableData>
+
+              <TableData>
+                <Group gap={4} justify='right' wrap='nowrap'>
+                  {activity.event === 'server:file.write' && fileWriteData?.file && fileWriteData?.revision_id ? (
+                    <NavLink
+                      to={`/server/${server.uuidShort}/files/diff?file=${encodeURIComponent(fileWriteData.file)}&revision=${fileWriteData.revision_id}`}
+                    >
+                      <ActionIcon>
+                        <FontAwesomeIcon icon={faCodeBranch} />
+                      </ActionIcon>
+                    </NavLink>
+                  ) : null}
+                  {Object.keys(activity.data ?? {}).length > 0 ? <ActivityInfoButton activity={activity} /> : null}
+                </Group>
+              </TableData>
+            </TableRow>
+          );
+        })}
       </Table>
     </ServerContentContainer>
   );

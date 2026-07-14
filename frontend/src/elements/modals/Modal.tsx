@@ -11,6 +11,7 @@ export const Modal = makeComponentHookable(
           backgroundOpacity: 0.55,
           blur: 3,
         }}
+        removeScrollProps={{ removeScrollBar: false }}
         ref={ref}
         className={className}
         {...rest}

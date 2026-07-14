@@ -249,6 +249,7 @@ mod post {
                 serde_json::json!({
                     "uuid": backup.uuid,
                     "name": backup.name,
+                    "backup_group_uuid": backup.backup_group_uuid,
                     "ignored_files": backup.ignored_files,
                 }),
             )

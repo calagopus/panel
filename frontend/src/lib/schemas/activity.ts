@@ -6,7 +6,7 @@ export const activitySchema = z.object({
   impersonator: userSchema.nullable(),
   event: z.string(),
   ip: z.string().nullable(),
-  data: z.object().nullable(),
+  data: z.json().nullable(),
   isApi: z.boolean(),
   created: z.coerce.date(),
 });
