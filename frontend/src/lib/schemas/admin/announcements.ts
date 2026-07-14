@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { announcementType } from '../announcements.ts';
 
-export const adminAnnouncementSchema = z.object({
+export const adminAnnouncementSchema = z.looseObject({
   uuid: z.string(),
   type: z.lazy(() => announcementType),
   enabled: z.boolean(),

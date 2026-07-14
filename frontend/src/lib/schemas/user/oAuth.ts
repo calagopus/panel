@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
 
-export const userOAuthLinkSchema = z.object({
+export const userOAuthLinkSchema = z.looseObject({
   uuid: z.string(),
   oauthProvider: oAuthProviderSchema,
   identifier: z.string(),

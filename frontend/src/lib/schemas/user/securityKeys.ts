@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const userSecurityKeySchema = z.object({
+export const userSecurityKeySchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
   credentialId: z.string(),

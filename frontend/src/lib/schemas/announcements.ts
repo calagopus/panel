@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const announcementType = z.enum(['info', 'success', 'warning', 'error']);
 
-export const announcementSchema = z.object({
+export const announcementSchema = z.looseObject({
   uuid: z.string(),
   type: announcementType,
   dismissible: z.boolean(),

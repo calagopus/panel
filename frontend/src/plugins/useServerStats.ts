@@ -6,7 +6,7 @@ import { useUserStore } from '@/stores/user.ts';
 
 export function useServerStats(server: z.infer<typeof adminServerSchema> | z.infer<typeof serverSchema>) {
   const subscribeToNode = useUserStore((state) => state.subscribeToNode);
-  const nodeUuid = 'nodeUuid' in server ? server.nodeUuid : server.node?.uuid;
+  const nodeUuid = ('nodeUuid' in server ? server.nodeUuid : server.node?.uuid) as string | undefined;
 
   const stats = useUserStore((state) => state.serverResourceUsage[server.uuid] ?? null);
 

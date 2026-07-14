@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const serverVariableSchema = z.object({
+export const serverVariableSchema = z.looseObject({
   name: z.string(),
   nameTranslations: z.record(z.string(), z.string()),
   description: z.string().nullable(),

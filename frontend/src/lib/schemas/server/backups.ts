@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const serverBackupSchema = z.object({
+export const serverBackupSchema = z.looseObject({
   uuid: z.uuid(),
   backupGroupUuid: z.uuid().nullable(),
   name: z.string(),

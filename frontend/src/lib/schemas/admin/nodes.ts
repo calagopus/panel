@@ -6,7 +6,7 @@ import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/
 import { nullableString } from '@/lib/transformers.ts';
 import { hostnameSchema } from '../generic.ts';
 
-export const adminNodeSchema = z.object({
+export const adminNodeSchema = z.looseObject({
   uuid: z.string(),
   location: z.lazy(() => adminLocationSchema),
   backupConfiguration: z.lazy(() => adminBackupConfigurationSchema).nullable(),
@@ -72,7 +72,7 @@ export const adminNodeServerBackupSchema = z.lazy(() =>
   }),
 );
 
-export const adminNodeAllocationSchema = z.object({
+export const adminNodeAllocationSchema = z.looseObject({
   uuid: z.string(),
   server: z.lazy(() => adminServerSchema).nullable(),
   ip: z.string(),
@@ -87,7 +87,7 @@ export const adminNodeAllocationsSchema = z.object({
   ports: z.array(z.string()).min(1),
 });
 
-export const adminNodeMountSchema = z.object({
+export const adminNodeMountSchema = z.looseObject({
   mount: z.lazy(() => adminMountSchema),
   created: z.coerce.date(),
 });

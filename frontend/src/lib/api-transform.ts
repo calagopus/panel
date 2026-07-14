@@ -104,7 +104,7 @@ function applyTransform(schema: AnySchema, data: unknown): unknown {
   if (type === 'object') {
     if (data === null || typeof data !== 'object' || Array.isArray(data)) return data;
 
-    const { shape } = def<{ shape: Def }>(inner);
+    const { shape, catchall } = def<{ shape: Def; catchall?: AnySchema }>(inner);
     const raw = data as Record<string, unknown>;
 
     // Index raw keys by their camelCase form - the authoritative direction, since schema
@@ -118,6 +118,13 @@ function applyTransform(schema: AnySchema, data: unknown): unknown {
     for (const [camelKey, fieldSchema] of Object.entries(shape)) {
       const value = Object.hasOwn(byCamel, camelKey) ? byCamel[camelKey] : raw[camelKey];
       result[camelKey] = applyTransform(fieldSchema, value);
+    }
+
+    if (catchall) {
+      for (const [camelKey, value] of Object.entries(byCamel)) {
+        if (Object.hasOwn(shape, camelKey)) continue;
+        result[camelKey] = applyTransform(catchall, value);
+      }
     }
 
     return result;
@@ -201,79 +208,6 @@ function formatSchemaError(schema: AnySchema, error: z.ZodError, data: unknown):
     .join('\n');
 }
 
-// Response fields the schema didn't declare (e.g. added by backend model extensions)
-// are kept on the parsed object under this key, mirroring the backend's hidden
-// extension_data. A plain enumerable property so it survives spreads (zustand store
-// updates like `{ ...state.server, ...props }`) - it's invisible to the TS types,
-// serializeForApi never sends it (schema-guided), and zod already ran, so it can't
-// interfere with validation. Read it back with parseExtendedFromApi.
-export const EXTENSION_DATA_KEY = '__extension_data';
-
-// Walks raw and parsed data in parallel along the schema, stashing raw keys the
-// schema shape doesn't know about on the corresponding parsed object node
-function collectExtensionFields(schema: AnySchema, raw: unknown, parsed: unknown): void {
-  if (isOpaqueJson(schema)) return;
-
-  const inner = unwrap(schema);
-  const { type } = def<{ type: string }>(inner);
-
-  if (type === 'object') {
-    if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return;
-    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return;
-
-    const { shape } = def<{ shape: Def }>(inner);
-    const rawObj = raw as Record<string, unknown>;
-    const parsedObj = parsed as Record<string, unknown>;
-
-    const extras: Record<string, unknown> = {};
-    const byCamel: Record<string, unknown> = {};
-    for (const key of Object.keys(rawObj)) {
-      if (key === EXTENSION_DATA_KEY) continue;
-
-      const camelKey = toCamelCase(key);
-      if (Object.hasOwn(shape, camelKey)) {
-        byCamel[camelKey] = rawObj[key];
-      } else {
-        extras[key] = rawObj[key];
-      }
-    }
-
-    if (Object.keys(extras).length) {
-      parsedObj[EXTENSION_DATA_KEY] = extras;
-    }
-
-    for (const [camelKey, fieldSchema] of Object.entries(shape)) {
-      const rawValue = Object.hasOwn(byCamel, camelKey) ? byCamel[camelKey] : rawObj[camelKey];
-      collectExtensionFields(fieldSchema, rawValue, parsedObj[camelKey]);
-    }
-
-    return;
-  }
-
-  if (type === 'union') {
-    const { options, discriminator } = def<{ options: AnySchema[]; discriminator?: string }>(inner);
-    const option = selectUnionOption(options, discriminator, raw);
-    if (option) collectExtensionFields(option, raw, parsed);
-    return;
-  }
-
-  if (type === 'array') {
-    if (!Array.isArray(raw) || !Array.isArray(parsed)) return;
-    const { element } = def<{ element: AnySchema }>(inner);
-    raw.forEach((item, index) => collectExtensionFields(element, item, parsed[index]));
-    return;
-  }
-
-  if (type === 'record') {
-    if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return;
-    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return;
-    const { valueType } = def<{ valueType: AnySchema }>(inner);
-    for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
-      collectExtensionFields(valueType, value, (parsed as Record<string, unknown>)[key]);
-    }
-  }
-}
-
 // Remap keys then validate, main entry point for incoming API responses
 export function parseFromApi<T extends z.ZodTypeAny>(schema: T, data: unknown): z.infer<T> {
   const transformed = applyTransform(schema, data);
@@ -283,74 +217,7 @@ export function parseFromApi<T extends z.ZodTypeAny>(schema: T, data: unknown): 
     console.error(formatSchemaError(schema, result.error, transformed), '\nfull response:', data);
     throw result.error;
   }
-  collectExtensionFields(schema, data, result.data);
   return result.data;
-}
-
-// Typed view of the response fields a backend model extension added to a parsed API
-// object - the frontend counterpart of parse_model_extension. Works on any object
-// node of a parseFromApi result (e.g. `server` or `server.featureLimits`); the
-// extension's schema gets the same snake_case remap and validation as parseFromApi,
-// so absent fields throw unless the schema marks them optional.
-export function parseExtendedFromApi<T extends z.ZodTypeAny>(schema: T, parsed: object): z.infer<T> {
-  const extras = (parsed as Record<string, unknown>)[EXTENSION_DATA_KEY];
-  return parseFromApi(schema, extras !== null && typeof extras === 'object' ? extras : {});
-}
-
-// collectExtensionFields stashes fields the base schema didn't know about under
-// __extension_data at the node they arrived on; this walks the shapes extensions
-// registered for `formId` and merges those values back onto the node under their
-// real field name, so extension form fields hydrate when an update form seeds its
-// values from a loaded resource. Schema-guided (reuses applyTransform), so multi-word
-// keys and z.record values are handled exactly as parseFromApi would. Returns a clone;
-// the input is left untouched, and a form with no registered fields is returned as-is.
-export function hydrateExtensionData<T>(formId: FormId, resource: T): T {
-  if (resource === null || typeof resource !== 'object' || Array.isArray(resource)) return resource;
-
-  const shapes = window.extensionContext.extensionRegistry.forms
-    .getSlots(formId)
-    .map((slot) => slot.zodShape as Def | undefined)
-    .filter((shape): shape is Def => !!shape && Object.keys(shape).length > 0);
-  if (shapes.length === 0) return resource;
-
-  const clone = structuredClone(resource) as Record<string, unknown>;
-  for (const shape of shapes) {
-    mergeExtensionShape(shape, clone);
-  }
-
-  return clone as T;
-}
-
-function mergeExtensionShape(shape: Def, node: Record<string, unknown> | undefined): void {
-  if (node === null || node === undefined || typeof node !== 'object') return;
-
-  const extras = node[EXTENSION_DATA_KEY];
-  const extrasObj =
-    extras !== null && typeof extras === 'object' && !Array.isArray(extras) ? (extras as Record<string, unknown>) : {};
-
-  for (const [fieldKey, fieldSchema] of Object.entries(shape)) {
-    const existing = node[fieldKey];
-
-    if (existing !== null && typeof existing === 'object' && !Array.isArray(existing)) {
-      const inner = unwrap(fieldSchema);
-      if (def<{ type: string }>(inner).type === 'object') {
-        mergeExtensionShape(def<{ shape: Def }>(inner).shape, existing as Record<string, unknown>);
-        continue;
-      }
-    }
-
-    const snakeKey = toSnakeCase(fieldKey);
-    let rawValue: unknown;
-    if (Object.hasOwn(extrasObj, snakeKey)) {
-      rawValue = extrasObj[snakeKey];
-    } else if (Object.hasOwn(extrasObj, fieldKey)) {
-      rawValue = extrasObj[fieldKey];
-    } else {
-      continue;
-    }
-
-    node[fieldKey] = applyTransform(fieldSchema, rawValue);
-  }
 }
 
 // Parse a raw paginated API response, running each entry through parseFromApi

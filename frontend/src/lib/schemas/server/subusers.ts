@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { userSchema } from '@/lib/schemas/user.ts';
 
-export const serverSubuserSchema = z.object({
+export const serverSubuserSchema = z.looseObject({
   user: z.lazy(() => userSchema),
   permissions: z.array(z.string()),
   ignoredFiles: z.array(z.string()),

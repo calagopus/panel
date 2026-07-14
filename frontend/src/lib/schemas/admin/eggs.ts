@@ -8,7 +8,7 @@ export const adminEggConfigScriptSchema = z.object({
   entrypoint: z.string().min(2).max(255),
 });
 
-export const adminEggSchema = z.object({
+export const adminEggSchema = z.looseObject({
   uuid: z.string(),
   eggRepositoryEgg: adminEggEggRepositoryEggSchema.nullable(),
   author: z.string().min(2).max(255),
@@ -73,7 +73,7 @@ export const adminEggUpdateSchema = z.lazy(() =>
     }),
 );
 
-export const adminEggVariableSchema = z.object({
+export const adminEggVariableSchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   nameTranslations: z.record(z.string(), z.string().min(1).max(255)),

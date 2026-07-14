@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { databaseType } from '@/lib/schemas/generic.ts';
 
-export const serverDatabaseSchema = z.object({
+export const serverDatabaseSchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
   isLocked: z.boolean(),

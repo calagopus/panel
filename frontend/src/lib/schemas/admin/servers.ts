@@ -20,14 +20,16 @@ export const adminServerLimitsSchema = z.object({
   ioWeight: z.preprocess(nullableNumber, z.number().min(0).max(1000).nullable()),
 });
 
-export const adminServerFeatureLimitsSchema = z.object({
+// Loose: extensions flatten their own limits into this object (ApiServerFeatureLimits is
+// extendible server-side), so unknown keys here are extension-provided limits, not junk
+export const adminServerFeatureLimitsSchema = z.looseObject({
   allocations: z.number().min(0),
   databases: z.number().min(0),
   backups: z.number().min(0),
   schedules: z.number().min(0),
 });
 
-export const adminServerSchema = z.object({
+export const adminServerSchema = z.looseObject({
   uuid: z.string(),
   uuidShort: z.string(),
   externalId: z.preprocess(nullableString, z.string().max(255).nullable()),
@@ -102,7 +104,7 @@ export const adminServerUpdateSchema = z.lazy(() =>
   }),
 );
 
-export const adminServerBackupSchema = z.object({
+export const adminServerBackupSchema = z.looseObject({
   uuid: z.string(),
   server: z.lazy(() => adminServerSchema).nullable(),
   name: z.string(),
@@ -120,7 +122,7 @@ export const adminServerBackupSchema = z.object({
   created: z.coerce.date(),
 });
 
-export const adminServerDatabaseSchema = z.object({
+export const adminServerDatabaseSchema = z.looseObject({
   uuid: z.string(),
   server: z.lazy(() => adminServerSchema),
   name: z.string(),
@@ -133,7 +135,7 @@ export const adminServerDatabaseSchema = z.object({
   created: z.coerce.date(),
 });
 
-export const adminServerDatabaseAgentSchema = z.object({
+export const adminServerDatabaseAgentSchema = z.looseObject({
   uuid: z.string(),
   server: z.lazy(() => adminServerSchema),
   databaseAgentTemplate: z.lazy(() => adminDatabaseAgentTemplateSchema).nullable(),
@@ -150,7 +152,7 @@ export const adminServerDatabaseAgentSchema = z.object({
   created: z.coerce.date(),
 });
 
-export const adminServerMountSchema = z.object({
+export const adminServerMountSchema = z.looseObject({
   mount: z.lazy(() => adminMountSchema),
   created: z.coerce.date(),
 });

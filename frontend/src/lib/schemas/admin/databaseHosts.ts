@@ -20,7 +20,7 @@ export const adminDatabaseCredentialsSchema = z.discriminatedUnion('type', [
   adminDatabaseCredentialsDetailsSchema,
 ]);
 
-export const adminDatabaseHostSchema = z.object({
+export const adminDatabaseHostSchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   type: z.lazy(() => databaseType),

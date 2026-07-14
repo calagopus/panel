@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { nullableString } from '@/lib/transformers.ts';
 
-export const adminOAuthProviderSchema = z.object({
+export const adminOAuthProviderSchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),
@@ -33,7 +33,7 @@ export const adminOAuthProviderUpdateSchema = z.lazy(() =>
   }),
 );
 
-export const adminOAuthUserLinkSchema = z.object({
+export const adminOAuthUserLinkSchema = z.looseObject({
   uuid: z.string(),
   user: z.lazy(() => adminFullUserSchema),
   identifier: z.string(),
@@ -54,7 +54,7 @@ export const adminOAuthProviderMappingTypeSchema = z.discriminatedUnion('type', 
   }),
 ]);
 
-export const adminOAuthProviderMappingSchema = z.object({
+export const adminOAuthProviderMappingSchema = z.looseObject({
   uuid: z.string(),
   scopes: z.array(z.string()),
   mapping: adminOAuthProviderMappingTypeSchema,

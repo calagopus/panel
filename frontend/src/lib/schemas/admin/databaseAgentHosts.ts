@@ -8,7 +8,7 @@ export const adminDatabaseAgentHostTypeSettingsSchema = z.object({
   publicPort: z.preprocess(nullableNumber, z.number().min(1).max(65535).nullable()),
 });
 
-export const adminDatabaseAgentHostSchema = z.object({
+export const adminDatabaseAgentHostSchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().min(1).max(1024).nullable()),

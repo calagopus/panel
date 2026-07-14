@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { nullableNumber, nullableString } from '@/lib/transformers.ts';
 import { databaseAgentType } from '../generic.ts';
 
-export const adminDatabaseAgentTemplateSchema = z.object({
+export const adminDatabaseAgentTemplateSchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().min(1).max(1024).nullable()),

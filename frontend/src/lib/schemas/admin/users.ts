@@ -3,7 +3,7 @@ import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
 import { roleSchema, userToastPosition } from '@/lib/schemas/user.ts';
 import { nullableString } from '@/lib/transformers.ts';
 
-export const adminUserSchema = z.object({
+export const adminUserSchema = z.looseObject({
   uuid: z.string(),
   externalId: z.preprocess(nullableString, z.string().nullable()),
   username: z.string(),
@@ -43,7 +43,7 @@ export const adminUserUpdateSchema = z.lazy(() =>
     }),
 );
 
-export const adminUserOAuthLinkSchema = z.object({
+export const adminUserOAuthLinkSchema = z.looseObject({
   uuid: z.string(),
   oauthProvider: z.lazy(() => oAuthProviderSchema),
   identifier: z.string(),

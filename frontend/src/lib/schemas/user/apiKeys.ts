@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const userApiKeySchema = z.object({
+export const userApiKeySchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(3).max(31),
   keyStart: z.string(),

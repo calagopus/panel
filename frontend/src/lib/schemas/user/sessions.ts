@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const userSessionSchema = z.object({
+export const userSessionSchema = z.looseObject({
   uuid: z.string(),
   ip: z.string(),
   userAgent: z.string(),

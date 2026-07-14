@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const serverMountSchema = z.object({
+export const serverMountSchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
   description: z.string().nullable(),

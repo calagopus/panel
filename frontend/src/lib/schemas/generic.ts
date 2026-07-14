@@ -4,7 +4,7 @@ export const databaseType = z.enum(['mysql', 'postgres', 'mongodb']);
 
 export const databaseAgentType = z.enum(['postgres', 'mariadb', 'mongodb', 'redis']);
 
-export const databaseHostSchema = z.object({
+export const databaseHostSchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
   host: z.string().nullable(),
@@ -12,7 +12,7 @@ export const databaseHostSchema = z.object({
   type: databaseType,
 });
 
-export const oAuthProviderSchema = z.object({
+export const oAuthProviderSchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
   linkViewable: z.boolean(),

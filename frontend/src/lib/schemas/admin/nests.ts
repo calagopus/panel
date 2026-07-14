@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { nullableString } from '@/lib/transformers.ts';
 
-export const adminNestSchema = z.object({
+export const adminNestSchema = z.looseObject({
   uuid: z.string(),
   author: z.string().min(2).max(255),
   name: z.string().min(1).max(255),

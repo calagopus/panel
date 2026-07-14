@@ -10,7 +10,7 @@ export const userToastPosition = z.enum([
   'bottom_right',
 ]);
 
-export const roleSchema = z.object({
+export const roleSchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),
@@ -20,7 +20,7 @@ export const roleSchema = z.object({
   created: z.coerce.date(),
 });
 
-export const userSchema = z.object({
+export const userSchema = z.looseObject({
   uuid: z.string(),
   username: z.string(),
   avatar: z.string().nullable(),
@@ -48,7 +48,7 @@ export const fullUserSchema = z.lazy(() =>
   }),
 );
 
-export const userServerGroupSchema = z.object({
+export const userServerGroupSchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
   order: z.number(),

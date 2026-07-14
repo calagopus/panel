@@ -186,7 +186,7 @@ export const serverScheduleConditionSchema: ZodType<ServerScheduleCondition> = z
   ]),
 );
 
-export const serverScheduleSchema = z.object({
+export const serverScheduleSchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   enabled: z.boolean(),
@@ -427,7 +427,7 @@ export const serverScheduleStepActionSchema = z.discriminatedUnion('type', [
   serverScheduleStepUpdateStartupDockerImageSchema,
 ]);
 
-export const serverScheduleStepSchema = z.object({
+export const serverScheduleStepSchema = z.looseObject({
   uuid: z.string(),
   order: z.number(),
   action: serverScheduleStepActionSchema,

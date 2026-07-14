@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { nullableString } from '@/lib/transformers.ts';
 
-export const serverAllocationSchema = z.object({
+export const serverAllocationSchema = z.looseObject({
   uuid: z.string(),
   ip: z.string(),
   ipAlias: z.string().nullable(),

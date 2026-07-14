@@ -64,7 +64,7 @@ export const adminBackupConfigurationKopiaSchema = z.object({
   tags: z.record(z.string().min(1).max(255), z.string().min(1).max(255)),
 });
 
-export const adminBackupConfigurationSchema = z.object({
+export const adminBackupConfigurationSchema = z.looseObject({
   uuid: z.string(),
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),

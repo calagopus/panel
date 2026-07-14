@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { databaseAgentType } from '@/lib/schemas/generic.ts';
 import { nullableString } from '@/lib/transformers.ts';
 
-export const serverDatabaseInstanceSchema = z.object({
+export const serverDatabaseInstanceSchema = z.looseObject({
   uuid: z.string(),
   type: z.lazy(() => databaseAgentType),
   host: z.string().nullable(),
@@ -43,7 +43,7 @@ export const serverDatabaseInstanceUserSchema = z.object({
   databaseUuid: z.preprocess(nullableString, z.string().nullable()),
 });
 
-export const serverDatabaseInstanceTemplateSchema = z.object({
+export const serverDatabaseInstanceTemplateSchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
   description: z.preprocess(nullableString, z.string().nullable()),

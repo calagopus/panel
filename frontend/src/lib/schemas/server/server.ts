@@ -20,7 +20,7 @@ export const serverLimitsSchema = z.object({
   disk: z.number().min(0),
 });
 
-export const serverEggSchema = z.object({
+export const serverEggSchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
   description: z.string().nullable(),
@@ -31,14 +31,14 @@ export const serverEggSchema = z.object({
   created: z.coerce.date(),
 });
 
-export const serverEggConfigurationSchema = z.object({
+export const serverEggConfigurationSchema = z.looseObject({
   allocationSelfAssignEnabled: z.boolean(),
   allocationSelfAssignRequirePrimary: z.boolean(),
   startupAllowCustomCommand: z.boolean(),
   routeOrder: z.array(eggConfigurationRouteItemSchema).nullable(),
 });
 
-export const serverSchema = z.object({
+export const serverSchema = z.looseObject({
   uuid: z.string(),
   uuidShort: z.string(),
   allocation: z.lazy(() => serverAllocationSchema).nullable(),
