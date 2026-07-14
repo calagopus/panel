@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi } from '@/lib/api-transform.ts';
 import { adminBackendExtensionSchema } from '@/lib/schemas/admin/backendExtension.ts';
 
 export default async (
@@ -16,7 +17,7 @@ export default async (
     params: acceptLicense ? { accept_license: true } : undefined,
   });
   return {
-    extension: data.extension,
+    extension: parseFromApi(adminBackendExtensionSchema, data.extension),
     needsLicenseAcceptance: data.needs_license_acceptance,
   };
 };
