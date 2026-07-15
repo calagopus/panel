@@ -425,6 +425,9 @@ const baseTranslations = defineTranslations({
       selectInput: {
         noResults: 'No Results found.',
       },
+      serverSelect: {
+        showOtherUsersServers: "Show other user's servers",
+      },
       can: {
         tooltip: {
           cantSave: 'You do not have permission to save.',

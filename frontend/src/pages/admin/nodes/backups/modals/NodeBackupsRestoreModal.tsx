@@ -6,14 +6,13 @@ import getNodeServers from '@/api/admin/nodes/servers/getNodeServers.ts';
 import getServers from '@/api/admin/servers/getServers.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
-import Select from '@/elements/input/Select.tsx';
+import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -31,14 +30,8 @@ export default function NodeBackupsRestoreModal({ node, backup, ...props }: Prop
   const [selectedServer, setSelectedServer] = useState<z.infer<typeof adminServerSchema> | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const servers = useSearchableResource<z.infer<typeof adminServerSchema>>({
-    queryKey: backup.isShared ? queryKeys.admin.servers.all() : queryKeys.admin.nodes.servers(node.uuid),
-    fetcher: (search) => (backup.isShared ? getServers(1, search) : getNodeServers(node.uuid, 1, search)),
-  });
-
   useEffect(() => {
     if (!props.opened) {
-      servers.setSearch('');
       setSelectedServer(null);
     }
   }, [props.opened]);
@@ -64,20 +57,15 @@ export default function NodeBackupsRestoreModal({ node, backup, ...props }: Prop
   return (
     <Modal title={t('pages.admin.nodes.tabs.backups.page.modal.restore.title', {})} {...props}>
       <Stack>
-        <Select
+        <ServerSelect<z.infer<typeof adminServerSchema>>
           withAsterisk
           label={t('common.table.columns.server', {})}
           placeholder={t('common.table.columns.server', {})}
-          value={selectedServer?.uuid}
-          onChange={(value) => setSelectedServer(servers.items.find((m) => m.uuid === value) ?? null)}
-          data={servers.items.map((server) => ({
-            label: server.name,
-            value: server.uuid,
-          }))}
-          searchable
-          searchValue={servers.search}
-          onSearchChange={servers.setSearch}
-          loading={servers.loading}
+          queryKey={backup.isShared ? queryKeys.admin.servers.all() : queryKeys.admin.nodes.servers(node.uuid)}
+          fetcher={(search) => (backup.isShared ? getServers(1, search) : getNodeServers(node.uuid, 1, search))}
+          value={selectedServer?.uuid ?? null}
+          selectedItem={selectedServer}
+          onChange={(_, server) => setSelectedServer(server)}
         />
 
         <Switch

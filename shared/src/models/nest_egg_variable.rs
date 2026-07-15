@@ -78,7 +78,11 @@ pub struct ExportedNestEggVariable {
     #[serde(default)]
     pub description_translations: BTreeMap<compact_str::CompactString, compact_str::CompactString>,
     #[garde(skip)]
-    #[serde(default, alias = "sort")]
+    #[serde(
+        default,
+        alias = "sort",
+        deserialize_with = "crate::deserialize::deserialize_defaultable"
+    )]
     pub order: i16,
 
     #[garde(length(chars, min = 1, max = 255))]

@@ -508,6 +508,9 @@
       "selectInput": {
         "noResults": "Keine Ergebnisse gefunden."
       },
+      "serverSelect": {
+        "showOtherUsersServers": "Server anderer Benutzer anzeigen"
+      },
       "can": {
         "tooltip": {
           "cantSave": "Du hast keine Berechtigung zum Speichern.",

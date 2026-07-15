@@ -7,6 +7,7 @@ import getRoles from '@/api/admin/roles/getRoles.ts';
 import getServers from '@/api/admin/servers/getServers.ts';
 import Button from '@/elements/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
+import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -52,11 +53,6 @@ export default function OAuthProviderMappingModal({
   const roles = useSearchableResource<z.infer<typeof roleSchema>>({
     queryKey: queryKeys.admin.roles.all(),
     fetcher: (search) => getRoles(1, search),
-  });
-
-  const servers = useSearchableResource<z.infer<typeof adminServerSchema>>({
-    queryKey: queryKeys.admin.servers.all(),
-    fetcher: (search) => getServers(1, search),
   });
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<FormValues>({
@@ -118,11 +114,6 @@ export default function OAuthProviderMappingModal({
     roleOptions.unshift({ label: form.values.roleUuid, value: form.values.roleUuid });
   }
 
-  const serverOptions = servers.items.map((server) => ({ label: server.name, value: server.uuid }));
-  if (form.values.serverUuid && !serverOptions.some((o) => o.value === form.values.serverUuid)) {
-    serverOptions.unshift({ label: form.values.serverUuid, value: form.values.serverUuid });
-  }
-
   const canSubmit = form.values.type === 'role' ? !!form.values.roleUuid : !!form.values.serverUuid;
 
   return (
@@ -174,15 +165,14 @@ export default function OAuthProviderMappingModal({
           />
         ) : (
           <>
-            <Select
+            <ServerSelect<z.infer<typeof adminServerSchema>>
               withAsterisk
               label={t('common.form.server', {})}
-              data={serverOptions}
-              searchable
-              searchValue={servers.search}
-              onSearchChange={servers.setSearch}
-              loading={servers.loading}
-              {...form.getInputProps('serverUuid')}
+              queryKey={queryKeys.admin.servers.all()}
+              fetcher={(search) => getServers(1, search)}
+              value={form.values.serverUuid}
+              error={form.errors.serverUuid}
+              onChange={(value) => form.setFieldValue('serverUuid', value || '')}
             />
 
             <PermissionSelector

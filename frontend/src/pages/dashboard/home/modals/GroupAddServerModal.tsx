@@ -3,14 +3,11 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import updateServerGroup from '@/api/me/servers/groups/updateServerGroup.ts';
-import getServers from '@/api/server/getServers.ts';
 import Button from '@/elements/Button.tsx';
-import Select from '@/elements/input/Select.tsx';
+import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useUserStore } from '@/stores/user.ts';
@@ -27,13 +24,6 @@ export default function GroupAddServerModal({ serverGroup, onServerAdded, ...pro
 
   const [selectedServer, setSelectedServer] = useState<z.infer<typeof serverSchema> | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const servers = useSearchableResource<z.infer<typeof serverSchema>>({
-    queryKey: queryKeys.user.servers.all(),
-    fetcher: (search) => getServers(1, search),
-  });
-
-  const otherServers = servers.items.filter((s) => !serverGroup.serverOrder.includes(s.uuid));
 
   const doAdd = () => {
     if (!selectedServer || serverGroup.serverOrder.includes(selectedServer.uuid)) {
@@ -63,19 +53,13 @@ export default function GroupAddServerModal({ serverGroup, onServerAdded, ...pro
       title={t('pages.account.home.tabs.groupedServers.page.modal.addServerToGroup.title', { group: serverGroup.name })}
       {...props}
     >
-      <Select
+      <ServerSelect
         withAsterisk
         label={t('common.form.server', {})}
-        data={otherServers.map((server) => ({
-          label: server.name,
-          value: server.uuid,
-        }))}
-        onChange={(value) => setSelectedServer(otherServers.find((s) => s.uuid === value)!)}
+        exclude={serverGroup.serverOrder}
         value={selectedServer?.uuid || ''}
-        searchable
-        searchValue={servers.search}
-        onSearchChange={servers.setSearch}
-        loading={servers.loading}
+        selectedItem={selectedServer}
+        onChange={(_, server) => setSelectedServer(server)}
       />
 
       <ModalFooter>

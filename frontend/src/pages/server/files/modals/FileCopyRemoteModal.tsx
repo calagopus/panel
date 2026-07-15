@@ -5,23 +5,19 @@ import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import copyFilesRemote from '@/api/server/files/copyFilesRemote.ts';
 import loadDirectory from '@/api/server/files/loadDirectory.ts';
-import getServers from '@/api/server/getServers.ts';
 import Breadcrumbs from '@/elements/Breadcrumbs.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
-import Select from '@/elements/input/Select.tsx';
+import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
-import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDirectoryEntrySchema, serverFilesCopyRemoteSchema } from '@/lib/schemas/server/files.ts';
-import { serverSchema } from '@/lib/schemas/server/server.ts';
 import FileRowIcon from '@/pages/server/files/FileRowIcon.tsx';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useResource } from '@/plugins/useResource.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -125,11 +121,6 @@ export default function FileCopyRemoteModal({ files, ...props }: Props) {
     },
   });
 
-  const servers = useSearchableResource<z.infer<typeof serverSchema>>({
-    queryKey: queryKeys.user.servers.all(),
-    fetcher: (search) => getServers(1, search),
-  });
-
   const handleBrowserNavigate = (path: string) => {
     form.setFieldValue('destination', path.replace(/^\/+/, ''));
   };
@@ -145,32 +136,15 @@ export default function FileCopyRemoteModal({ files, ...props }: Props) {
       onSubmit={handleSubmit}
     >
       <Stack>
-        <Select
+        <ServerSelect
           withAsterisk
           label={t('pages.server.files.modal.copyRemote.form.server', {})}
-          data={servers.items
-            .filter((s) => s.uuid !== server.uuid)
-            .reduce(
-              (acc, server) => {
-                const group = acc.find((g) => g.group === server.nodeName);
-                const serverItem = { label: server.name, value: server.uuid };
-
-                if (group) {
-                  group.items.push(serverItem);
-                } else {
-                  acc.push({ group: server.nodeName, items: [serverItem] });
-                }
-
-                return acc;
-              },
-              [] as Array<{ group: string; items: Array<{ label: string; value: string }> }>,
-            )}
-          searchable
-          searchValue={servers.search}
-          onSearchChange={servers.setSearch}
-          loading={servers.loading}
+          exclude={[server.uuid]}
+          groupBy={(s) => s.nodeName}
+          withOthersSwitch
           allowDeselect
-          {...form.getInputProps('destinationServer')}
+          value={form.values.destinationServer}
+          error={form.errors.destinationServer}
           onChange={(value) => form.setFieldValue('destinationServer', value || '')}
         />
 

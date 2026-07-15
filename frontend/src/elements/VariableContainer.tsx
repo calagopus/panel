@@ -50,13 +50,13 @@ export default function VariableContainer({
               defaultChecked={value === '1' || value === 'true'}
               onChange={(e) =>
                 setValue(
-                  variable.rules.includes('in:1,0') || variable.rules.includes('in:0,1')
+                  variable.rules.includes('in:true,false') || variable.rules.includes('in:false,true')
                     ? e.target.checked
-                      ? '1'
-                      : '0'
-                    : e.target.checked
                       ? 'true'
-                      : 'false',
+                      : 'false'
+                    : e.target.checked
+                      ? '1'
+                      : '0',
                 )
               }
               disabled={disabled || loading || (!variable.isEditable && !overrideReadonly)}
