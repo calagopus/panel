@@ -130,7 +130,7 @@ export default function AdminBackupConfigurationBackupRow({
                 {backup.server ? (
                   <TableLink to={`/admin/servers/${backup.server.uuid}`}>{backup.server.name}</TableLink>
                 ) : (
-                  '-'
+                  t('common.na', {})
                 )}
               </Code>
             </TableData>

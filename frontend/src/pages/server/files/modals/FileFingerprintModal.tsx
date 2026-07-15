@@ -71,7 +71,7 @@ export default function FileFingerprintsModal({ file, ...props }: Props) {
           <CopyOnClick content={fingerprint} className='text-left col-span-2'>
             <TextInput
               label={t('pages.server.files.modal.fileFingerprints.form.fingerprint', {})}
-              value={fingerprint || '-'}
+              value={fingerprint || t('common.na', {})}
               className='pointer-events-none'
               readOnly
             />

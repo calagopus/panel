@@ -113,7 +113,7 @@ export default function ExternalIdLookupModal({ ...props }: ModalProps) {
                 <Text size='sm' fw={500}>
                   {t('pages.admin.users.externalIdLookup.modal.result.role', {})}
                 </Text>
-                <Text size='sm'>{result.role?.name ?? '-'}</Text>
+                <Text size='sm'>{result.role?.name ?? t('common.na', {})}</Text>
               </Group>
             </Stack>
           </TitleCard>

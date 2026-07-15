@@ -143,7 +143,9 @@ export default function DatabaseInstanceDatabaseRow({
               )}
             </TableData>
 
-            <TableData>{offline ? '—' : sizeLoading ? <Spinner size={16} /> : bytesToString(size ?? 0)}</TableData>
+            <TableData>
+              {offline ? t('common.na', {}) : sizeLoading ? <Spinner size={16} /> : bytesToString(size ?? 0)}
+            </TableData>
 
             <ContextMenuToggle items={items} openMenu={openMenu} />
           </TableRow>

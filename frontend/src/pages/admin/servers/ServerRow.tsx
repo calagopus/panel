@@ -71,7 +71,7 @@ const ServerRow = memo(
         </TableData>
 
         <TableData>
-          <Code>{server.allocation ? `${server.allocation.ip}:${server.allocation.port}` : '-'}</Code>
+          <Code>{server.allocation ? `${server.allocation.ip}:${server.allocation.port}` : t('common.na', {})}</Code>
         </TableData>
 
         <TableData>

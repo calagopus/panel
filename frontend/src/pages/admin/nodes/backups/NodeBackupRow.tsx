@@ -220,7 +220,7 @@ export default function NodeBackupRow({
                 {backup.server ? (
                   <TableLink to={`/admin/servers/${backup.server.uuid}`}>{backup.server.name}</TableLink>
                 ) : (
-                  '-'
+                  t('common.na', {})
                 )}
               </Code>
               {backup.server && backup.server.node.uuid !== node.uuid && (

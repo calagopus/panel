@@ -62,7 +62,7 @@ const NodeAllocationRow = memo(
             {allocation.server ? (
               <TableLink to={`/admin/servers/${allocation.server.uuid}`}>{allocation.server.name}</TableLink>
             ) : (
-              '-'
+              t('common.na', {})
             )}
           </Code>
         </TableData>

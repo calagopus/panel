@@ -47,7 +47,13 @@ export default function UserRow({ user }: { user: z.infer<typeof fullUserSchema>
       </TableData>
 
       <TableData>
-        <Code>{user.role ? <TableLink to={`/admin/roles/${user.role.uuid}`}>{user.role.name}</TableLink> : '-'}</Code>
+        <Code>
+          {user.role ? (
+            <TableLink to={`/admin/roles/${user.role.uuid}`}>{user.role.name}</TableLink>
+          ) : (
+            t('common.na', {})
+          )}
+        </Code>
       </TableData>
 
       <TableData>

@@ -4,8 +4,11 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default ({ location }: { location: z.infer<typeof adminLocationSchema> }) => {
+  const { t } = useTranslations();
+
   return (
     <TableRow>
       <TableData>
@@ -32,7 +35,7 @@ export default ({ location }: { location: z.infer<typeof adminLocationSchema> })
               {location.backupConfiguration.name}
             </TableLink>
           ) : (
-            '-'
+            t('common.na', {})
           )}
         </Code>
       </TableData>
