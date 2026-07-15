@@ -57,6 +57,7 @@ export default function GroupAddServerModal({ serverGroup, onServerAdded, ...pro
         withAsterisk
         label={t('common.form.server', {})}
         exclude={serverGroup.serverOrder}
+        withOthersSwitch
         value={selectedServer?.uuid || ''}
         selectedItem={selectedServer}
         onChange={(_, server) => setSelectedServer(server)}

@@ -1,6 +1,8 @@
 import {
   faArrowRightFromBracket,
   faBars,
+  faCheck,
+  faCircleHalfStroke,
   faEllipsisVertical,
   faGraduationCap,
   faMoon,
@@ -181,20 +183,24 @@ function Footer() {
   const { t } = useTranslations();
   const { impersonating, user, doLogout } = useAuth();
   const navigate = useNavigate();
-  const { setColorScheme } = useMantineColorScheme();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('dark');
 
   if (!user) {
     return null;
   }
 
-  const isDark = computedColorScheme === 'dark';
   const suspended = Boolean(user.suspended);
 
-  const toggleTheme = async (event: React.MouseEvent) => {
-    const nextTheme = isDark ? 'light' : 'dark';
+  const changeTheme = async (event: React.MouseEvent, nextTheme: 'auto' | 'dark' | 'light') => {
+    if (nextTheme === colorScheme) {
+      return;
+    }
 
-    if (!document.startViewTransition) {
+    const nextComputed =
+      nextTheme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : nextTheme;
+
+    if (nextComputed === computedColorScheme || !document.startViewTransition) {
       setColorScheme(nextTheme);
       return;
     }
@@ -273,9 +279,36 @@ function Footer() {
                 <Menu.Divider />
               </>
             )}
-            <Menu.Item leftSection={<FontAwesomeIcon icon={isDark ? faSun : faMoon} />} onClick={toggleTheme}>
-              {isDark ? t('elements.sidebar.button.switchToLight', {}) : t('elements.sidebar.button.switchToDark', {})}
-            </Menu.Item>
+            <Menu.Sub>
+              <Menu.Sub.Target>
+                <Menu.Sub.Item leftSection={<FontAwesomeIcon icon={faCircleHalfStroke} />}>
+                  {t('elements.sidebar.button.theme', {})}
+                </Menu.Sub.Item>
+              </Menu.Sub.Target>
+              <Menu.Sub.Dropdown>
+                <Menu.Item
+                  leftSection={<FontAwesomeIcon icon={faCircleHalfStroke} />}
+                  rightSection={colorScheme === 'auto' && <FontAwesomeIcon icon={faCheck} size='sm' />}
+                  onClick={(e) => changeTheme(e, 'auto')}
+                >
+                  {t('elements.sidebar.button.themeAuto', {})}
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<FontAwesomeIcon icon={faMoon} />}
+                  rightSection={colorScheme === 'dark' && <FontAwesomeIcon icon={faCheck} size='sm' />}
+                  onClick={(e) => changeTheme(e, 'dark')}
+                >
+                  {t('elements.sidebar.button.themeDark', {})}
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<FontAwesomeIcon icon={faSun} />}
+                  rightSection={colorScheme === 'light' && <FontAwesomeIcon icon={faCheck} size='sm' />}
+                  onClick={(e) => changeTheme(e, 'light')}
+                >
+                  {t('elements.sidebar.button.themeLight', {})}
+                </Menu.Item>
+              </Menu.Sub.Dropdown>
+            </Menu.Sub>
             <Menu.Divider />
             <Menu.Item leftSection={<FontAwesomeIcon icon={faArrowRightFromBracket} />} color='red' onClick={doLogout}>
               {impersonating

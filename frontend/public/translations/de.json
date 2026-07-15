@@ -493,8 +493,10 @@
           "openInVirtualWindow": "In virtuellem Fenster öffnen",
           "openInPopup": "In Popup öffnen",
           "openInNewTab": "In neuem Tab öffnen",
-          "switchToDark": "Zum dunklen Modus wechseln",
-          "switchToLight": "Zum hellen Modus wechseln"
+          "theme": "Design",
+          "themeAuto": "Automatisch",
+          "themeDark": "Dunkel",
+          "themeLight": "Hell"
         }
       },
       "permissionSelector": {
