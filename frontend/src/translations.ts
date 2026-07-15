@@ -3514,6 +3514,25 @@ const baseTranslations = defineTranslations({
             },
             users: {
               title: 'Users',
+              identifierLookup: {
+                button: 'Find by Identifier',
+                modal: {
+                  title: 'Look Up by Identifier',
+                  form: {
+                    identifier: 'Identifier',
+                    identifierPlaceholder: 'e.g. email or username',
+                    search: 'Search',
+                  },
+                  result: {
+                    title: 'User Found',
+                    username: 'Username',
+                    email: 'Email',
+                    identifier: 'Identifier',
+                    viewUser: 'View User',
+                  },
+                  notFound: 'No user found with that identifier.',
+                },
+              },
               page: {
                 title: 'OAuth Provider Users',
                 table: {

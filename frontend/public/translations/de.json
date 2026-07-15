@@ -3507,6 +3507,25 @@
             },
             "users": {
               "title": "Benutzer",
+              "identifierLookup": {
+                "button": "Über Identifier suchen",
+                "modal": {
+                  "title": "Über Identifier suchen",
+                  "form": {
+                    "identifier": "Identifier",
+                    "identifierPlaceholder": "z. B. E-Mail oder Benutzername",
+                    "search": "Suchen"
+                  },
+                  "result": {
+                    "title": "Benutzer gefunden",
+                    "username": "Benutzername",
+                    "email": "E-Mail",
+                    "identifier": "Identifier",
+                    "viewUser": "Benutzer anzeigen"
+                  },
+                  "notFound": "Kein Benutzer mit diesem Identifier gefunden."
+                }
+              },
               "page": {
                 "title": "OAuth-Anbieter Benutzer",
                 "table": {
