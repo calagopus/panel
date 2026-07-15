@@ -427,9 +427,7 @@
           "stopImpersonating": "停止模擬身分",
           "openInVirtualWindow": "在虛擬視窗中開啟",
           "openInPopup": "在彈出視窗中開啟",
-          "openInNewTab": "在新分頁中開啟",
-          "switchToDark": "切換至深色模式",
-          "switchToLight": "切換至淺色模式"
+          "openInNewTab": "在新分頁中開啟"
         }
       },
       "permissionSelector": {

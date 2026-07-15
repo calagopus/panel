@@ -434,9 +434,7 @@
           "stopImpersonating": "Arrêter l'usurpation",
           "openInVirtualWindow": "Ouvrir dans une fenêtre virtuelle",
           "openInPopup": "Ouvrir dans une fenêtre contextuelle",
-          "openInNewTab": "Ouvrir dans un nouvel onglet",
-          "switchToDark": "Passer en mode sombre",
-          "switchToLight": "Passer en mode clair"
+          "openInNewTab": "Ouvrir dans un nouvel onglet"
         }
       },
       "permissionSelector": {

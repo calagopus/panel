@@ -434,9 +434,7 @@
           "stopImpersonating": "Stop met nabootsen",
           "openInVirtualWindow": "Openen in virtueel venster",
           "openInPopup": "Openen in pop-up",
-          "openInNewTab": "Openen in nieuw tabblad",
-          "switchToDark": "Switch to Dark Mode",
-          "switchToLight": "Switch to Light Mode"
+          "openInNewTab": "Openen in nieuw tabblad"
         }
       },
       "permissionSelector": {

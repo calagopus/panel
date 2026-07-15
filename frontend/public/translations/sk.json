@@ -427,9 +427,7 @@
           "stopImpersonating": "Zastaviť zastupovanie",
           "openInVirtualWindow": "Otvoriť vo virtuálnom okne",
           "openInPopup": "Otvoriť vo vyskakovacom okne",
-          "openInNewTab": "Otvoriť na novej karte",
-          "switchToDark": "Prepnúť do tmavého režimu",
-          "switchToLight": "Prepnúť do svetlého režimu"
+          "openInNewTab": "Otvoriť na novej karte"
         }
       },
       "permissionSelector": {

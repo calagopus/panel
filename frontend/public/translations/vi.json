@@ -492,9 +492,7 @@
           "stopImpersonating": "Dừng mạo danh",
           "openInVirtualWindow": "Mở trong cửa sổ ảo",
           "openInPopup": "Mở trong cửa sổ pop-up",
-          "openInNewTab": "Mở trong tab mới",
-          "switchToDark": "Chuyển sang Chế Độ Tối",
-          "switchToLight": "Chuyển sang Chế Độ Sáng"
+          "openInNewTab": "Mở trong tab mới"
         }
       },
       "permissionSelector": {
