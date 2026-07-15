@@ -50,10 +50,7 @@ pub fn validate_language(
     Ok(())
 }
 
-pub fn validate_host(
-    host: &compact_str::CompactString,
-    _context: &(),
-) -> Result<(), garde::Error> {
+pub fn validate_host(host: &compact_str::CompactString, _context: &()) -> Result<(), garde::Error> {
     if host.parse::<std::net::IpAddr>().is_ok() {
         return Ok(());
     }

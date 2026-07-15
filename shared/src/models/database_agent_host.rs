@@ -23,7 +23,10 @@ pub struct DatabaseAgentHostTypeSettings {
     #[serde(default = "default_true")]
     pub enabled: bool,
 
-    #[garde(length(chars, min = 3, max = 255), inner(custom(crate::utils::validate_host)))]
+    #[garde(
+        length(chars, min = 3, max = 255),
+        inner(custom(crate::utils::validate_host))
+    )]
     #[schema(min_length = 3, max_length = 255)]
     #[serde(default)]
     pub public_host: Option<compact_str::CompactString>,
