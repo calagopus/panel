@@ -56,6 +56,14 @@
       "many": "{count} Node",
       "other": "{count} Node"
     },
+    "databaseAgentHost": {
+      "zero": "{count} Máy Chủ Agent Cơ Sở Dữ Liệu",
+      "one": "{count} Máy Chủ Agent Cơ Sở Dữ Liệu",
+      "two": "{count} Máy Chủ Agent Cơ Sở Dữ Liệu",
+      "few": "{count} Máy Chủ Agent Cơ Sở Dữ Liệu",
+      "many": "{count} Máy Chủ Agent Cơ Sở Dữ Liệu",
+      "other": "{count} Máy Chủ Agent Cơ Sở Dữ Liệu"
+    },
     "allocation": {
       "zero": "{count} Phân Bổ Node",
       "one": "{count} Phân Bổ Node",
@@ -87,6 +95,22 @@
       "few": "{count} Dòng",
       "many": "{count} Dòng",
       "other": "{count} Dòng"
+    },
+    "backup": {
+      "zero": "{count} Bản Sao Lưu",
+      "one": "{count} Bản Sao Lưu",
+      "two": "{count} Bản Sao Lưu",
+      "few": "{count} Bản Sao Lưu",
+      "many": "{count} Bản Sao Lưu",
+      "other": "{count} Bản Sao Lưu"
+    },
+    "day": {
+      "zero": "{count} Ngày",
+      "one": "{count} Ngày",
+      "two": "{count} Ngày",
+      "few": "{count} Ngày",
+      "many": "{count} Ngày",
+      "other": "{count} Ngày"
     }
   },
   "translations": {
@@ -97,6 +121,7 @@
         "save": "Lưu",
         "saveAndStay": "Lưu &Ở lại",
         "edit": "Chỉnh sửa",
+        "duplicate": "Nhân bản",
         "delete": "Xóa",
         "remove": "Gỡ bỏ",
         "enable": "Kích hoạt",
@@ -147,6 +172,31 @@
       "input": {
         "search": "Tìm kiếm..."
       },
+      "elements": {
+        "jsonInput": {
+          "enum": {
+            "type": {
+              "string": "Chuỗi",
+              "number": "Số",
+              "boolean": "Boolean",
+              "object": "Đối tượng",
+              "array": "Mảng",
+              "null": "Null"
+            }
+          },
+          "textMode": "Văn bản",
+          "jsonMode": "JSON",
+          "invalidJson": "JSON không hợp lệ"
+        }
+      },
+      "modal": {
+        "duplicate": {
+          "title": "Nhân bản {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "Đã nhân bản {resource}."
+      },
       "tooltip": {
         "resetToDefault": "Đặt lại về mặc định",
         "edit": "Chỉnh sửa",
@@ -157,6 +207,7 @@
       },
       "form": {
         "name": "Tên",
+        "newName": "Tên mới",
         "description": "Mô tả",
         "author": "Tác giả",
         "type": "Loại",
@@ -212,11 +263,13 @@
         "nest": "Nest",
         "lines": "Số Dòng",
         "databaseHost": "Máy Chủ Cơ Sở Dữ Liệu",
+        "databaseAgentHost": "Máy Chủ Agent Cơ Sở Dữ Liệu",
         "timezone": "Múi Giờ",
         "timezoneSystem": "Hệ Thống",
         "protocol": "Giao Thức",
         "powerAction": "Hành Động Nguồn Điện",
         "destination": "Đích Đến",
+        "destinationDirectory": "Thư mục đích",
         "directoryName": "Tên Thư Mục",
         "locked": "Khóa",
         "portRanges": "Dãi cổng",
@@ -253,6 +306,7 @@
           "size": "Kích thước",
           "lastUsed": "Lần Sử Dụng Cuối",
           "created": "Đã Tạo",
+          "updated": "Đã cập nhật",
           "actor": "Người Thực Hiện",
           "event": "Sự Kiện",
           "ip": "IP",
@@ -272,7 +326,8 @@
           "files": "Tệp",
           "server": "Máy chủ",
           "address": "Địa chỉ",
-          "eggs": "Egg"
+          "eggs": "Egg",
+          "template": "Mẫu"
         }
       },
       "tabs": {
@@ -286,6 +341,9 @@
         "successful": "Thành công",
         "failed": "Thất bại",
         "installed": "Đã cài đặt"
+      },
+      "label": {
+        "noSubdirectories": "Không có thư mục con"
       },
       "server": {
         "noAllocation": "Không có địa chỉ ip.",
@@ -339,6 +397,12 @@
           "stopped": "Đã dừng",
           "restarted": "Đã khởi động lại",
           "killed": "Đã buộc dừng"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Tốc độ nhanh nhất",
+          "goodSpeed": "Tốc độ tốt",
+          "goodCompression": "Nén tốt",
+          "bestCompression": "Nén tốt nhất"
         }
       },
       "unit": {
@@ -419,7 +483,8 @@
       "container": {
         "alert": {
           "impersonating": "Bạn hiện đang mạo danh một người dùng. Xin lưu ý rằng hành động của bạn có thể ảnh hưởng đến tài khoản của người dùng mà bạn đang mạo danh. Để thoát khỏi chế độ mạo danh, hãy nhấp vào nút \"Dừng mạo danh\" ở góc dưới bên trái.."
-        }
+        },
+        "connectedTo": "Đã kết nối với {name}"
       },
       "sidebar": {
         "button": {
@@ -455,6 +520,9 @@
           "updated": "{resource} đã được cập nhật.",
           "deleted": "{resource} đã được xóa."
         }
+      },
+      "formEngine": {
+        "advancedMode": "Chế độ nâng cao"
       },
       "activityInfoButton": {
         "modal": {
@@ -499,7 +567,10 @@
       "scheduleDynamicInput": {
         "none": "Không có",
         "variable": "Biến",
-        "enterVariable": "Vui lòng nhập tên biến để đánh giá."
+        "enterVariable": "Vui lòng nhập tên biến để đánh giá.",
+        "useVariable": "Sử dụng một biến thay vì văn bản thuần túy",
+        "usePlainText": "Sử dụng văn bản thuần túy thay vì một biến",
+        "optionalPlaceholder": "Không có (tùy chọn)"
       },
       "serverWebsocket": {
         "error": {
@@ -536,6 +607,7 @@
               },
               "copying": {
                 "completed": "Đã sao chép `{path}` tới `{destination}` trong {time}.",
+                "completedMany": "Đã sao chép `{path}` tới `{destination}` ({files}) trong {time}.",
                 "failed": "Sao chép thất bại `{path}` tới `{destination}`:\n{error}"
               },
               "copyingMany": {
@@ -1265,6 +1337,12 @@
               "toast": {
                 "removed": "Khóa API đã được xóa."
               }
+            },
+            "apiKeyToken": {
+              "titleCreated": "Đã tạo API Key",
+              "titleRecreated": "Đã tạo lại API Key",
+              "descriptionCreated": "Khóa API mới của bạn đã được tạo. Hãy chắc chắn sao chép nó ngay bây giờ, vì nó sẽ không được hiển thị lại.",
+              "descriptionRecreated": "Khóa API của bạn đã được tạo lại. Hãy chắc chắn sao chép khóa mới ngay bây giờ, vì nó sẽ không được hiển thị lại."
             }
           },
           "form": {
@@ -1373,7 +1451,8 @@
                   "panelVersion": "Phiên Bản Panel",
                   "versionHistory": "Lịch Sử Phiên Bản",
                   "outdatedExtensions": "Tiện Ích Mở Rộng Lỗi Thời",
-                  "outdatedNodes": "Node Lỗi Thời"
+                  "outdatedNodes": "Node Lỗi Thời",
+                  "outdatedDatabaseAgentHosts": "Máy Chủ Agent Cơ Sở Dữ Liệu Lỗi Thời"
                 },
                 "panelVersion": "Panel đang chạy phiên bản `{current}`. Phiên bản mới nhất là `{latest}`.",
                 "unknown": "không rõ",
@@ -1391,6 +1470,8 @@
                 "noChangelog": "Không có nhật ký thay đổi",
                 "nodesUpToDate": "Có vẻ tất cả các node đều đã cập nhật. ({failed} kiểm tra thất bại)",
                 "nodesOutdated": "Một số node đã lỗi thời, phiên bản mới nhất là `{latest}`. ({outdated} lỗi thời, {failed} kiểm tra thất bại)",
+                "databaseAgentHostsUpToDate": "Dường như tất cả các máy chủ agent cơ sở dữ liệu đều đã được cập nhật. ({failed} lỗi khi kiểm tra)",
+                "databaseAgentHostsOutdated": "Một số máy chủ agent cơ sở dữ liệu đã lỗi thời, phiên bản mới nhất hiện có là `{latest}`. ({outdated} lỗi thời, {failed} lỗi khi kiểm tra)",
                 "table": {
                   "version": "Phiên Bản",
                   "installed": "Đã Cài Đặt",
@@ -1639,6 +1720,9 @@
                   "maxFileManagerContentSearchSize": "Kích Thước Tìm Kiếm Nội Dung Tối Đa",
                   "maxFileManagerSearchResults": "Số Kết Quả Tìm Kiếm Tối Đa",
                   "maxSubuserCount": "Số Người Dùng Phụ Tối Đa",
+                  "maxBackupGroupCount": "Số Nhóm Sao Lưu Tối Đa cho mỗi Máy Chủ",
+                  "maxDatabaseInstanceDatabaseCount": "Số Cơ Sở Dữ Liệu Tối Đa cho mỗi Phiên Bản Cơ Sở Dữ Liệu",
+                  "maxDatabaseInstanceUserCount": "Số Người Dùng Tối Đa cho mỗi Phiên Bản Cơ Sở Dữ Liệu",
                   "allowOverwritingCustomDockerImage": "Cho Phép Ghi Đè Hình Ảnh Docker Tùy Chỉnh",
                   "allowOverwritingCustomDockerImageDescription": "Nếu bật, người dùng sẽ có thể ghi đè hình ảnh Docker được chỉ định trong cấu hình máy chủ bằng danh sách Egg, ngay cả khi quản trị viên đã đặt hình ảnh Docker tùy chỉnh.",
                   "allowViewingInstallationLogs": "Cho Phép Xem Nhật Ký Cài Đặt",
@@ -1724,6 +1808,9 @@
                   "delete": {
                     "title": "Xác Nhận Xóa Thông Báo",
                     "content": "Bạn có chắc muốn xóa **{title}** không?"
+                  },
+                  "duplicate": {
+                    "content": "Bạn có chắc chắn muốn nhân bản **{title}** không?"
                   }
                 },
                 "form": {
@@ -1863,6 +1950,25 @@
         "users": {
           "title": "Người Dùng",
           "resourceName": "Người Dùng",
+          "externalIdLookup": {
+            "button": "Tìm bằng ID Bên Ngoài",
+            "modal": {
+              "title": "Tra cứu bằng ID Bên Ngoài",
+              "form": {
+                "externalId": "ID Bên Ngoài",
+                "externalIdPlaceholder": "ví dụ: my-user-001",
+                "search": "Tìm kiếm"
+              },
+              "result": {
+                "title": "Đã tìm thấy người dùng",
+                "username": "Tên người dùng",
+                "email": "Email",
+                "role": "Vai trò",
+                "viewUser": "Xem người dùng"
+              },
+              "notFound": "Không tìm thấy người dùng nào với ID bên ngoài đó."
+            }
+          },
           "tooltip": {
             "admin": "Quản Trị Viên",
             "twoFactorEnabled": "2FA Đã Bật",
@@ -1992,6 +2098,25 @@
                 }
               }
             },
+            "databaseAgentHosts": {
+              "title": "Máy Chủ Agent Cơ Sở Dữ Liệu",
+              "page": {
+                "title": "Máy Chủ Agent Cơ Sở Dữ Liệu Vị Trí",
+                "toast": {
+                  "created": "Đã tạo máy chủ agent cơ sở dữ liệu vị trí.",
+                  "deleted": "Đã xóa máy chủ agent cơ sở dữ liệu vị trí."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Tạo Máy Chủ Agent Cơ Sở Dữ Liệu Vị Trí"
+                  },
+                  "delete": {
+                    "title": "Xác nhận Xóa Máy Chủ Agent Cơ Sở Dữ Liệu Vị Trí",
+                    "content": "Bạn có chắc chắn muốn xóa máy chủ agent cơ sở dữ liệu **{name}** khỏi **{location}** không?"
+                  }
+                }
+              }
+            },
             "nodes": {
               "title": "Node",
               "page": {
@@ -2004,6 +2129,37 @@
           "title": "Node",
           "resourceName": "Node",
           "tabs": {
+            "overview": {
+              "title": "Tổng Quan",
+              "page": {
+                "title": "Tổng Quan Node",
+                "card": {
+                  "nodeDetails": "Chi Tiết Node",
+                  "systemInfo": "Thông Tin Hệ Thống"
+                },
+                "label": {
+                  "location": "Vị trí",
+                  "url": "URL Nội Bộ",
+                  "publicUrl": "URL Công Khai",
+                  "sftpAddress": "Địa chỉ SFTP",
+                  "backupConfiguration": "Cấu Hinh Sao Lưu",
+                  "description": "Mô tả",
+                  "createdAt": "Đã tạo",
+                  "inheritedFromLocation": "Kế thừa từ Vị Trí",
+                  "none": "Không có",
+                  "wingsVersion": "Phiên bản Wings",
+                  "cpu": "CPU",
+                  "memory": "Bộ nhớ",
+                  "servers": "Máy chủ",
+                  "architecture": "Kiến trúc",
+                  "kernelVersion": "Phiên bản Kernel",
+                  "unavailable": "Không khả dụng"
+                },
+                "badge": {
+                  "updateAvailable": "Có Bản Cập Nhật"
+                }
+              }
+            },
             "general": {
               "page": {
                 "tooltip": {
@@ -2052,10 +2208,12 @@
                   "apiPort": "Cổng API"
                 },
                 "button": {
-                  "save": "Lưu Cấu Hình"
+                  "save": "Lưu Cấu Hình",
+                  "reveal": "Hiển thị Cấu Hình"
                 },
                 "alert": {
-                  "couldNotReach": "Không thể kết nối với node: {error}"
+                  "couldNotReach": "Không thể kết nối với node: {error}",
+                  "tokenWarning": "Cấu hình dưới đây chứa token của node. Chỉ hiển thị nó khi cần thiết."
                 },
                 "toast": {
                   "applied": "Cấu hình đã được áp dụng thành công.",
@@ -2217,9 +2375,13 @@
                   "detached": "Sao lưu đã được tách thành công.",
                   "reattached": "Đã gắn lại sao lưu vào {name} thành công.",
                   "restoring": "Đang khôi phục sao lưu vào {name}...",
+                  "exporting": "Đang xuất bản sao lưu sang các tệp của {name}...",
                   "deleted": "Sao lưu node đã được xóa."
                 },
                 "modal": {
+                  "export": {
+                    "title": "Xuất Sao Lưu Node Sang Tệp"
+                  },
                   "detach": {
                     "title": "Xác Nhận Tách Sao Lưu",
                     "content": "Bạn có chắc muốn tách sao lưu này khỏi máy chủ? Nó sẽ không bị xóa và có thể được gắn lại sau."
@@ -2267,6 +2429,7 @@
                         "none": "Không (bỏ tất cả phân bổ, máy chủ sẽ không được tự động gán phân bổ mới trên node đích)",
                         "randomPrimary": "Ngẫu nhiên phân bổ chính (xóa phân bổ bổ sung)",
                         "randomAll": "Ngẫu nhiên tất cả phân bổ (khuyến nghị để tránh vấn đề tương thích với node đích)",
+                        "preservePorts": "Giữ nguyên số cổng (sử dụng lại cùng số cổng trên node đích khi có sẵn, nếu không sẽ quay lại phân bổ ngẫu nhiên)",
                         "eggConfigDeployment": "Gán phân bổ dựa trên cấu hình triển khai Egg (chỉ hoạt động nếu Egg có cấu hình triển khai và node đích có phân bổ tương thích)",
                         "eggConfigSelfAssignRange": "Tự gán phân bổ mới dựa trên phạm vi cổng Egg (chỉ hoạt động nếu Egg có phạm vi cổng và node đích có phân bổ tương thích)"
                       }
@@ -2315,7 +2478,78 @@
         "servers": {
           "title": "Máy Chủ",
           "resourceName": "Máy Chủ",
+          "externalIdLookup": {
+            "button": "Tìm bằng ID Bên Ngoài",
+            "modal": {
+              "title": "Tra cứu bằng ID Bên Ngoài",
+              "form": {
+                "externalId": "ID Bên Ngoài",
+                "externalIdPlaceholder": "ví dụ: my-server-001",
+                "search": "Tìm kiếm"
+              },
+              "result": {
+                "title": "Đã tìm thấy máy chủ",
+                "name": "Tên",
+                "owner": "Chủ sở hữu",
+                "node": "Node",
+                "viewServer": "Xem máy chủ"
+              },
+              "notFound": "Không tìm thấy máy chủ nào với ID bên ngoài đó."
+            }
+          },
           "tabs": {
+            "overview": {
+              "title": "Tổng Quan",
+              "page": {
+                "title": "Tổng Quan Máy Chủ",
+                "card": {
+                  "owner": "Chủ sở hữu",
+                  "nodeAndLocation": "Node & Vị Trí",
+                  "serverDetails": "Chi Tiết Máy Chủ",
+                  "resourceLimits": "Giới Hạn Tài Nguyên",
+                  "featureLimits": "Giới Hạn Tính Năng"
+                },
+                "label": {
+                  "email": "Email",
+                  "language": "Ngôn ngữ",
+                  "createdAt": "Đã tạo",
+                  "node": "Node",
+                  "location": "Vị trí",
+                  "memoryLimit": "Giới hạn Bộ nhớ",
+                  "diskLimit": "Giới hạn Đĩa",
+                  "sftpAddress": "Địa chỉ SFTP",
+                  "primaryAllocation": "Phân Bổ Chính",
+                  "none": "Không có",
+                  "dockerImage": "Hình Ảnh Docker",
+                  "nest": "Nest",
+                  "egg": "Egg",
+                  "timezone": "Múi giờ",
+                  "autoKill": "Tự Động Buộc Dừng",
+                  "cpu": "CPU",
+                  "memory": "Bộ nhớ",
+                  "disk": "Đĩa",
+                  "swap": "Swap",
+                  "allocations": "Phân bổ",
+                  "databases": "Cơ sở dữ liệu",
+                  "databaseAgents": "Cơ sở dữ liệu Agent",
+                  "backups": "Sao lưu",
+                  "schedules": "Lịch trình",
+                  "unlimited": "Không giới hạn",
+                  "autoKillSeconds": "{seconds} giây",
+                  "autoKillDisabled": "Đã vô hiệu hóa",
+                  "externalId": "ID Bên Ngoài",
+                  "uuid": "UUID"
+                },
+                "badge": {
+                  "suspended": "Bị tạm đình chỉ",
+                  "transferring": "Đang chuyển",
+                  "installing": "Đang cài đặt",
+                  "installFailed": "Cài đặt thất bại",
+                  "restoringBackup": "Đang khôi phục sao lưu",
+                  "admin": "Quản trị"
+                }
+              }
+            },
             "general": {
               "page": {
                 "titleCreate": "Tạo Máy Chủ",
@@ -2345,23 +2579,30 @@
                   "backupConfigurationPlaceholder": "Kế Thừa Từ Node/Vị Trí",
                   "cpuLimit": "Giới Hạn CPU (%)",
                   "cpuLimitDescription": "Giới hạn CPU tính theo % mà máy chủ có thể sử dụng.",
+                  "cpuLimitTooltip": "1 luồng = 100%. 0 sẽ không đặt giới hạn.",
                   "swap": "Swap",
                   "swapDescription": "Lượng swap cấp cho máy chủ này.",
+                  "swapTooltip": "-1 sẽ không đặt giới hạn.",
                   "memoryDescription": "Giới hạn bộ nhớ của container máy chủ.",
+                  "memoryTooltip": "0 sẽ không đặt giới hạn.",
                   "memoryOverhead": "Phí Tổn Bộ Nhớ",
                   "memoryOverheadDescription": "Bộ nhớ ẩn sẽ được thêm vào container.",
                   "diskSpace": "Dung Lượng Đĩa",
                   "diskSpaceDescription": "Giới hạn đĩa của máy chủ.",
+                  "diskSpaceTooltip": "0 sẽ không đặt giới hạn. Đây là giới hạn mềm trừ khi bộ giới hạn đĩa được cấu hình trên Wings.",
                   "ioWeight": "Trọng Số IO",
                   "ioWeightDescription": "Trọng số IO tương đối của container máy chủ so với các container khác.",
+                  "ioWeightTooltip": "0-1000. Có thể không hoạt động trên tất cả hệ thống.",
                   "pinnedCpus": "CPU Được Ghim",
                   "pinnedCpusDescription": "Các nhân CPU mà máy chủ này được ghim vào.",
+                  "pinnedCpusTooltip": "Theo chỉ mục, ví dụ: 0, 1, 2. Để trống để cho phép tất cả các lõi.",
                   "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Hình Ảnh Docker Được Định Nghĩa Trước",
                   "predefinedDockerImagesPlaceholder": "Chưa chọn hình ảnh định nghĩa trước",
                   "timezonePlaceholder": "Europe/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Tùy Chỉnh",
+                  "predefinedStartupCommands": "Lệnh Khởi Động Được Định Nghĩa Trước",
                   "startOnCompletion": "Khởi Động Khi Hoàn Tất",
                   "startOnCompletionDescription": "Khởi động máy chủ sau khi cài đặt hoàn tất.",
                   "skipInstaller": "Bỏ Qua Cài Đặt",
@@ -2372,6 +2613,7 @@
                   "kvmPassthroughEnabledDescription": "Bật KVM passthrough cho máy chủ (cho phép truy cập /dev/kvm bên trong container).",
                   "allocationsLimit": "Phân Bổ",
                   "databasesLimit": "Cơ Sở Dữ Liệu",
+                  "databaseAgentsLimit": "Số Cơ Sở Dữ Liệu Agent Tối Đa",
                   "backupsLimit": "Sao Lưu",
                   "schedulesLimit": "Lịch Trình"
                 },
@@ -2548,6 +2790,7 @@
                     "description": "Bạn sắp xóa **{name}**. Bạn có chắc không?",
                     "form": {
                       "force": "Bạn có muốn xóa cưỡng bức máy chủ này?",
+                      "forceWarning": "Buộc xóa sẽ bỏ qua trình tự tắt máy thông thường. Các tệp máy chủ trên node có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác.",
                       "deleteBackups": "Bạn có muốn xóa sao lưu của máy chủ này?",
                       "confirmServerName": "Xác Nhận Tên Máy Chủ",
                       "confirmServerNamePlaceholder": "Tên Máy Chủ"
@@ -2766,7 +3009,8 @@
                 "form": {
                   "order": "Thứ Tự",
                   "eggs": "Eggs",
-                  "eggsPlaceholder": "Chọn Egg"
+                  "eggsPlaceholder": "Chọn Egg",
+                  "eggsEmpty": "Chưa cấu hình egg nào. Hãy tạo một nest và egg trước khi tạo cấu hình egg."
                 },
                 "enum": {
                   "deploymentType": {
@@ -2884,6 +3128,9 @@
                     "title": "Cài Đặt Egg Kho Lưu Trữ",
                     "button": "Cài đặt {eggs}"
                   }
+                },
+                "drawer": {
+                  "noReadme": "Egg này không có tệp README."
                 }
               }
             }
@@ -2920,7 +3167,11 @@
                 "modal": {
                   "delete": {
                     "title": "Xác Nhận Xóa Máy Chủ CSDL",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?"
+                    "content": "Bạn có chắc muốn xóa **{name}** không?",
+                    "form": {
+                      "force": "Buộc xóa",
+                      "forceWarning": "Buộc xóa sẽ xóa tất cả cơ sở dữ liệu trên máy chủ lưu trữ này. Các cơ sở dữ liệu trên chính máy chủ lưu trữ có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác."
+                    }
                   }
                 }
               }
@@ -2929,6 +3180,223 @@
               "title": "Cơ Sở Dữ Liệu",
               "page": {
                 "title": "Cơ Sở Dữ Liệu Máy Chủ"
+              }
+            }
+          }
+        },
+        "databaseAgentHosts": {
+          "title": "Máy Chủ Agent Cơ Sở Dữ Liệu",
+          "resourceName": "Máy chủ agent cơ sở dữ liệu",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Tạo Máy Chủ Agent Cơ Sở Dữ Liệu",
+                "titleUpdate": "Cập Nhật Máy Chủ Agent Cơ Sở Dữ Liệu",
+                "form": {
+                  "typeEnabled": "Đã bật",
+                  "typePublicHost": "Host Công Khai",
+                  "typePublicPort": "Cổng Công Khai"
+                },
+                "button": {
+                  "resetToken": "Đặt Lại Token",
+                  "testConnection": "Kiểm Tra Kết Nối",
+                  "updateConfig": "Cập Nhật Cấu Hình"
+                },
+                "toast": {
+                  "tested": "Kiểm tra đã hoàn thành thành công.",
+                  "tokenReset": "Đã đặt lại token máy chủ agent cơ sở dữ liệu."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Xác nhận Xóa Máy Chủ Agent Cơ Sở Dữ Liệu",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
+                    "form": {
+                      "force": "Buộc xóa",
+                      "forceWarning": "Buộc xóa sẽ xóa tất cả các phiên bản trên máy chủ này. Các phiên bản mà agent không thể kết nối tới có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác."
+                    }
+                  }
+                }
+              }
+            },
+            "instances": {
+              "title": "Các Phiên Bản",
+              "page": {
+                "title": "Các Phiên Bản"
+              }
+            },
+            "configuration": {
+              "title": "Cấu hình",
+              "page": {
+                "title": "Cấu hình",
+                "section": {
+                  "initialSetup": "Thiết Lập Ban Đầu",
+                  "liveConfiguration": "Cấu Hình Trực Tiếp"
+                },
+                "description": {
+                  "placeFile": "Đặt mã này vào tệp cấu hình tại `/etc/calagopus-db-agent/config.yml` hoặc chạy"
+                },
+                "tooltip": {
+                  "copyCommand": "Sao chép lệnh"
+                },
+                "form": {
+                  "apiPort": "Cổng API"
+                },
+                "button": {
+                  "save": "Lưu Cấu Hình",
+                  "reveal": "Hiển thị Cấu Hình"
+                },
+                "alert": {
+                  "couldNotReach": "Không thể kết nối tới máy chủ agent cơ sở dữ liệu: {error}",
+                  "tokenWarning": "Cấu hình dưới đây chứa token của host. Chỉ hiển thị nó khi cần thiết."
+                },
+                "toast": {
+                  "applied": "Đã áp dụng cấu hình thành công.",
+                  "submittedNotApplied": "Cấu hình đã được gửi đi nhưng chưa được áp dụng.",
+                  "invalidYaml": "YAML không hợp lệ: {error}"
+                }
+              }
+            },
+            "overview": {
+              "title": "Tổng Quan",
+              "page": {
+                "title": "Tổng Quan Máy Chủ Agent Cơ Sở Dữ Liệu",
+                "status": {
+                  "deploymentEnabled": "Cho Phép Triển Khai",
+                  "deploymentDisabled": "Không Cho Phép Triển Khai",
+                  "maintenanceEnabled": "Đang Bảo Trì",
+                  "maintenanceDisabled": "Không Bảo Trì"
+                },
+                "card": {
+                  "hostDetails": "Chi Tiết Máy Chủ",
+                  "systemInfo": "Thông Tin Hệ Thống",
+                  "resources": "Tài Nguyên Đã Phân Bổ"
+                },
+                "label": {
+                  "url": "URL",
+                  "description": "Mô tả",
+                  "createdAt": "Đã tạo",
+                  "version": "Phiên bản",
+                  "cpu": "CPU",
+                  "memory": "Bộ nhớ",
+                  "disk": "Đĩa",
+                  "instances": "Các phiên bản",
+                  "kernelVersion": "Phiên bản Kernel",
+                  "architecture": "Kiến trúc",
+                  "unavailable": "Không khả dụng",
+                  "noLimit": "Không giới hạn máy chủ",
+                  "free": "{size} còn trống",
+                  "cores": "Đã phân bổ {cores} lõi"
+                },
+                "badge": {
+                  "updateAvailable": "Có Bản Cập Nhật"
+                }
+              }
+            },
+            "statistics": {
+              "title": "Thống kê",
+              "page": {
+                "title": "Thống Kê Máy Chủ Agent Cơ Sở Dữ Liệu",
+                "card": {
+                  "resources": "Tài nguyên",
+                  "graphs": "Biểu đồ"
+                },
+                "label": {
+                  "cpu": "CPU",
+                  "cpuThreads": "{model} ({threads} luồng)",
+                  "memory": "Bộ nhớ",
+                  "usedByAgent": "{size} được sử dụng bởi agent",
+                  "disk": "Đĩa",
+                  "network": "Mạng",
+                  "networkIn": "Vào: {in}",
+                  "networkOut": "Ra: {out}"
+                },
+                "chart": {
+                  "cpuLoad": "Tải CPU",
+                  "memoryUsage": "Sử Dụng Bộ Nhớ",
+                  "diskIo": "I/O Đĩa",
+                  "diskRead": "Đọc Đĩa",
+                  "diskWrite": "Ghi Đĩa",
+                  "networkTraffic": "Lưu Lượng Mạng",
+                  "networkInLabel": "Băng thông vào",
+                  "networkOutLabel": "Băng thông ra",
+                  "inbound": "Băng thông vào",
+                  "outbound": "Băng thông ra"
+                },
+                "toast": {
+                  "connectionLost": "Mất kết nối tới máy chủ agent cơ sở dữ liệu."
+                }
+              }
+            }
+          },
+          "modal": {
+            "bulkConfig": {
+              "title": "Cập Nhật Cấu Hình - {hosts}",
+              "button": {
+                "apply": "Áp dụng cho {hosts}"
+              },
+              "toast": {
+                "applied": "Đã áp dụng cấu hình cho {hosts}."
+              },
+              "error": {
+                "invalidYaml": "YAML không hợp lệ: {error}"
+              }
+            }
+          }
+        },
+        "databaseAgentTemplates": {
+          "title": "Mẫu Agent Cơ Sở Dữ Liệu",
+          "resourceName": "Mẫu agent cơ sở dữ liệu",
+          "dropzone": {
+            "title": "Thả một số tệp vào đây để nhập làm Mẫu Agent Cơ Sở Dữ Liệu",
+            "subtitle": "Thả ra để bắt đầu nhập"
+          },
+          "toast": {
+            "imported": "Đã nhập Mẫu Agent Cơ Sở Dữ Liệu.",
+            "parseFailed": "Không thể phân tích mẫu agent cơ sở dữ liệu: {error}"
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Tạo Mẫu Agent Cơ Sở Dữ Liệu",
+                "titleUpdate": "Cập Nhật Mẫu Agent Cơ Sở Dữ Liệu",
+                "toast": {
+                  "exported": "Đã xuất Mẫu Agent Cơ Sở Dữ Liệu."
+                },
+                "form": {
+                  "dockerImages": "Hình Ảnh Docker",
+                  "env": "Biến Môi Trường",
+                  "volumes": "Các Volume",
+                  "socketPath": "Đường Dẫn Socket",
+                  "socketPathDescription": "Đường dẫn tệp unix socket bên trong container cơ sở dữ liệu, phải khớp với nơi hình ảnh được cấu hình thực sự tạo ra socket của nó.",
+                  "imageUid": "UID Hình Ảnh",
+                  "imageGid": "GID Hình Ảnh",
+                  "cmd": "Lệnh",
+                  "memoryDescription": "Giới hạn bộ nhớ của container cơ sở dữ liệu.",
+                  "memoryTooltip": "0 sẽ không đặt giới hạn.",
+                  "swap": "Swap",
+                  "swapDescription": "Dung lượng swap cấp cho cơ sở dữ liệu này.",
+                  "swapTooltip": "-1 sẽ không đặt giới hạn.",
+                  "diskDescription": "Giới hạn đĩa của cơ sở dữ liệu.",
+                  "diskTooltip": "0 sẽ không đặt giới hạn. Đây là giới hạn mềm trừ khi bộ giới hạn đĩa được cấu hình trên Wings.",
+                  "cpu": "Giới Hạn CPU (%)",
+                  "cpuDescription": "Giới hạn CPU tính bằng % mà cơ sở dữ liệu có thể sử dụng.",
+                  "cpuTooltip": "1 luồng = 100%. 0 sẽ không đặt giới hạn.",
+                  "ioWeight": "Trọng Số IO",
+                  "ioWeightDescription": "Trọng số IO tương đối của container cơ sở dữ liệu so với các container khác.",
+                  "ioWeightTooltip": "0-1000. Có thể không hoạt động trên tất cả hệ thống."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Xác nhận Xóa Mẫu Agent Cơ Sở Dữ Liệu",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?"
+                  }
+                }
+              }
+            },
+            "instances": {
+              "title": "Các Phiên Bản",
+              "page": {
+                "title": "Các Phiên Bản"
               }
             }
           }
@@ -3091,6 +3559,7 @@
                   "title": "Cài Đặt S3",
                   "form": {
                     "partSize": "Kích Thước Phần",
+                    "compressionType": "Loại Nén",
                     "pathStyle": "Sử dụng URL kiểu đường dẫn"
                   }
                 },
@@ -3310,6 +3779,11 @@
         "viewAdmin": {
           "title": "Xem admin"
         },
+        "selector": {
+          "title": "Chọn một Máy Chủ",
+          "description": "Chọn máy chủ bạn muốn điều hướng tới.",
+          "descriptionWithPage": "Chọn một máy chủ để đi tới **{page}**."
+        },
         "console": {
           "title": "Bảng Điều Khiển",
           "input": {
@@ -3431,6 +3905,10 @@
               "modified": "Đã Sửa Đổi"
             }
           },
+          "diskUsage": {
+            "title": "Dung Lượng Đĩa Đã Dùng",
+            "details": "Đã dùng {used} trên {total} ({percentage}%)"
+          },
           "button": {
             "new": "Mới",
             "connect": "Kết Nối",
@@ -3477,6 +3955,7 @@
             "copyingMany": "Đang Sao Chép {files}",
             "receivingRemote": "Đang Nhận {files} Từ máy chủ điều khiển",
             "sendingRemote": "Đang Gửi {files}  tới máy chủ điều khiển",
+            "exportingBackup": "Đang xuất bản sao lưu tới {destination}",
             "rateLimited": "Tải lên của bạn đã bị giới hạn tốc độ. Đang chờ...",
             "cancelAllUploads": "Hủy tất cả tải lên",
             "cancelAllOperations": "Hủy tất cả hoạt động"
@@ -3490,6 +3969,7 @@
             "preferPhysicalSize": "Hiển thị kích thước vật lý thay vì kích thước logic",
             "editorMinimap": "Hiển thị Minimap Tệp",
             "editorLineOverflow": "Bao Ngoặc Dòng Tràn",
+            "editorFontSize": "Cỡ Chữ Trình Biên Tập",
             "vscodeUriScheme": "Lược Đồ URI VS Code",
             "imageViewerSmoothing": "Làm Mịn Hình Ảnh (Anti-Aliasing)"
           },
@@ -3511,10 +3991,12 @@
             "permissionsUpdated": "Quyền đã được cập nhật.",
             "permissionsUpdatedMany": "Quyền đã được cập nhật cho {files}.",
             "permissionsCouldNotBeUpdated": "Không thể cập nhật quyền.",
-            "fileSaved": "Tệp đã được lưu."
+            "fileSaved": "Tệp đã được lưu.",
+            "collabSaveTimeout": "Không thể lưu tệp, daemon không phản hồi kịp thời."
           },
           "tooltip": {
             "fileHistory": "Lịch Sử Tệp",
+            "collabEditing": "{user} đang chỉnh sửa tệp này",
             "largestDirectories": "Phân tích kích thước thư mục",
             "dragToMove": "Kéo để di chuyển",
             "back": "Lùi {seconds} giây",
@@ -3720,6 +4202,10 @@
         "databases": {
           "title": "Cơ Sở Dữ Liệu",
           "subtitle": "{current} của {max} cơ sở dữ liệu tối đa được tạo.",
+          "classic": {
+            "title": "Cơ Sở Dữ Liệu Cổ Điển",
+            "subtitle": "Đã tạo {current} cơ sở dữ liệu."
+          },
           "tooltip": {
             "limitReached": "Máy chủ này được giới hạn ở {max} cơ sở dữ liệu."
           },
@@ -3733,6 +4219,146 @@
           },
           "form": {
             "databaseName": "Tên Cơ Sở Dữ Liệu"
+          },
+          "instance": {
+            "title": "Cơ Sở Dữ Liệu Được Quản Lý",
+            "subtitle": "Đã tạo {current} cơ sở dữ liệu được quản lý.",
+            "tooltip": {
+              "limitReached": "Máy chủ này bị giới hạn ở {max} cơ sở dữ liệu được quản lý."
+            },
+            "view": {
+              "tabs": {
+                "databases": "Cơ sở dữ liệu",
+                "users": "Người dùng",
+                "logs": "Nhật ký"
+              },
+              "stats": {
+                "uptime": "Thời gian hoạt động",
+                "cpuLoad": "Tải CPU",
+                "memoryLoad": "Tải Bộ Nhớ",
+                "diskUsage": "Dung Lượng Đĩa"
+              }
+            },
+            "databases": {
+              "title": "Cơ sở dữ liệu",
+              "subtitle": "Đã tạo {current} trên tối đa {max} cơ sở dữ liệu.",
+              "noDatabases": "Phiên bản này chưa có cơ sở dữ liệu nào.",
+              "tooltip": {
+                "offline": "Phiên bản phải đang chạy để tạo cơ sở dữ liệu.",
+                "noUser": "Cơ sở dữ liệu này chưa được đính kèm người dùng. Hãy tạo người dùng để truy cập.",
+                "limitReached": "Phiên bản này bị giới hạn ở {max} cơ sở dữ liệu."
+              },
+              "button": {
+                "export": "Xuất",
+                "import": "Nhập"
+              },
+              "modal": {
+                "createDatabase": {
+                  "title": "Tạo Cơ Sở Dữ Liệu",
+                  "content": "Tạo một cơ sở dữ liệu mới với người dùng riêng bên trong phiên bản cơ sở dữ liệu được quản lý này. Thông tin đăng nhập sẽ được hiển thị trong bảng sau đó."
+                },
+                "deleteDatabase": {
+                  "title": "Xác nhận Xóa Cơ Sở Dữ Liệu",
+                  "content": "Bạn có chắc chắn muốn xóa cơ sở dữ liệu cho người dùng **{username}** không? Hành động này sẽ xóa vĩnh viễn cơ sở dữ liệu và tất cả dữ liệu bên trong nó."
+                },
+                "exportDatabase": {
+                  "title": "Xuất Cơ Sở Dữ Liệu",
+                  "content": "Tải xuống bản sao của cơ sở dữ liệu này. Cơ sở dữ liệu lớn có thể mất một lúc để chuẩn bị."
+                },
+                "importDatabase": {
+                  "title": "Nhập Cơ Sở Dữ Liệu",
+                  "content": "Tải lên tệp sao lưu để nhập vào cơ sở dữ liệu này. Quá trình nhập dữ liệu lớn có thể mất một lúc để hoàn thành.",
+                  "form": {
+                    "file": "Tệp Sao Lưu (Dump File)",
+                    "wipe": "Xóa dữ liệu hiện có trước khi nhập"
+                  }
+                }
+              },
+              "table": {
+                "columns": {
+                  "database": "Cơ sở dữ liệu"
+                }
+              },
+              "toast": {
+                "created": "Đã tạo cơ sở dữ liệu.",
+                "deleted": "Đã xóa cơ sở dữ liệu.",
+                "imported": "Đã hoàn thành nhập cơ sở dữ liệu.",
+                "passwordRotated": "Mật khẩu đã được xoay vòng."
+              }
+            },
+            "users": {
+              "title": "Người dùng",
+              "subtitle": "Đã tạo {current} trên tối đa {max} người dùng.",
+              "noUsers": "Phiên bản này chưa có người dùng nào.",
+              "tooltip": {
+                "limitReached": "Phiên bản này bị giới hạn ở {max} người dùng."
+              },
+              "modal": {
+                "createUser": {
+                  "title": "Tạo Người Dùng",
+                  "content": "Tạo một người dùng mới bên trong phiên bản cơ sở dữ liệu được quản lý này. Thông tin đăng nhập sẽ được hiển thị trong bảng sau đó.",
+                  "form": {
+                    "database": "Cơ sở dữ liệu",
+                    "databaseHint": "Cơ sở dữ liệu mà người dùng này sẽ được cấp quyền truy cập.",
+                    "databaseRequired": "Vui lòng chọn cơ sở dữ liệu."
+                  }
+                },
+                "deleteUser": {
+                  "title": "Xác nhận Xóa Người Dùng",
+                  "content": "Bạn có chắc chắn muốn xóa người dùng **{username}** không? Hành động này không thể hoàn tác."
+                }
+              },
+              "toast": {
+                "created": "Đã tạo người dùng.",
+                "deleted": "Đã xóa người dùng."
+              }
+            },
+            "power": {
+              "toast": {
+                "start": "Cơ sở dữ liệu được quản lý đang khởi động.",
+                "stop": "Cơ sở dữ liệu được quản lý đang dừng.",
+                "restart": "Cơ sở dữ liệu được quản lý đang khởi động lại.",
+                "kill": "Cơ sở dữ liệu được quản lý đã bị buộc dừng."
+              },
+              "modal": {
+                "forceKill": {
+                  "title": "Buộc Dừng Cơ Sở Dữ Liệu",
+                  "content": "Buộc dừng một cơ sở dữ liệu có thể dẫn đến hỏng dữ liệu."
+                }
+              }
+            },
+            "modal": {
+              "createDatabaseInstance": {
+                "title": "Tạo Cơ Sở Dữ Liệu Được Quản Lý",
+                "toast": {
+                  "created": "Đã tạo cơ sở dữ liệu được quản lý."
+                },
+                "form": {
+                  "template": "Mẫu",
+                  "noTemplatesFound": "Không có mẫu nào khả dụng",
+                  "image": "Hình Ảnh Docker"
+                }
+              },
+              "editDatabaseInstance": {
+                "title": "Chỉnh Sửa Cơ Sở Dữ Liệu Được Quản Lý",
+                "toast": {
+                  "updated": "Đã cập nhật cơ sở dữ liệu được quản lý."
+                }
+              },
+              "deleteDatabaseInstance": {
+                "title": "Xác nhận Xóa Cơ Sở Dữ Liệu Được Quản Lý",
+                "content": "Xóa cơ sở dữ liệu được quản lý là một hành động vĩnh viễn và không thể hoàn tác. Hành động này sẽ xóa vĩnh viễn cơ sở dữ liệu **{name}** và loại bỏ tất cả dữ liệu liên quan.",
+                "toast": {
+                  "deleted": "Đã xóa cơ sở dữ liệu được quản lý."
+                }
+              },
+              "credentials": {
+                "title": "Thông Tin Đăng Nhập Cơ Sở Dữ Liệu",
+                "form": {
+                  "database": "Cơ sở dữ liệu"
+                }
+              }
+            }
           },
           "modal": {
             "createDatabase": {
@@ -3793,9 +4419,14 @@
             }
           },
           "button": {
+            "runNow": "Chạy Ngay",
+            "runNowWithConditions": "Chạy ngay (kiểm tra điều kiện trước)",
+            "runNowIgnoreConditions": "Chạy ngay (bỏ qua điều kiện)",
             "addTrigger": "Thêm Trình Kích Hoạt",
             "addCondition": "Thêm Điều Kiện",
             "addStep": "Thêm Bước",
+            "addElseIf": "Thêm Else If",
+            "addElse": "Thêm Else",
             "createFirstStep": "Tạo Bước Đầu Tiên",
             "addOutput": "Thêm Đầu Ra",
             "addFile": "Thêm Tệp",
@@ -3805,6 +4436,7 @@
             "imported": "Lịch trình đã được nhập.",
             "created": "Lịch trình đã được tạo.",
             "updated": "Lịch trình đã được cập nhật.",
+            "duplicated": "Đã nhân bản lịch trình.",
             "deleted": "Lịch trình đã được xóa.",
             "triggered": "Lịch trình đã được kích hoạt.",
             "exported": "Lịch trình đã được xuất.",
@@ -3812,6 +4444,7 @@
             "step": {
               "created": "Bước lịch trình đã được tạo.",
               "updated": "Bước lịch trình đã được cập nhật.",
+              "duplicated": "Đã nhân bản bước lịch trình.",
               "deleted": "Bước lịch trình đã được xóa."
             }
           },
@@ -3821,11 +4454,20 @@
               "and": "AND (Tất cả phải đúng)",
               "or": "OR (Bất kỳ cái nào phải đúng)",
               "not": "NOT (Phải không đúng)",
+              "serverState": "Trạng Thái Máy Chủ",
+              "uptime": "Thời Gian Hoạt Động",
+              "resourceUsage": "Sử Dụng Tài Nguyên",
+              "fileExists": "Tệp Tồn Tại",
               "variableExists": "Biến Tồn Tại",
               "variableContains": "Biến Chứa",
               "variableEquals": "Biến Bằng",
               "variableStartsWith": "Biến Bắt Đầu Với",
               "variableEndsWith": "Biến Kết Thúc Với"
+            },
+            "scheduleResourceMetric": {
+              "cpu": "Sử Dụng CPU",
+              "memory": "Sử Dụng Bộ Nhớ",
+              "disk": "Sử Dụng Đĩa"
             },
             "scheduleComparator": {
               "smallerThan": "Nhỏ hơn",
@@ -3842,6 +4484,9 @@
             "updateSchedule": {
               "title": "Cập Nhật Lịch Trình"
             },
+            "duplicateSchedule": {
+              "title": "Nhân Bản Lịch Trình"
+            },
             "deleteSchedule": {
               "title": "Xác Nhận Xóa Lịch Trình",
               "content": "Bạn có chắc muốn xóa {name} khỏi máy chủ này không?"
@@ -3855,11 +4500,18 @@
             "deleteStep": {
               "title": "Xác Nhận Xóa Bước Lịch Trình",
               "content": "Bạn có chắc muốn xóa bước lịch trình này không?"
+            },
+            "unsavedChanges": {
+              "title": "Thay Đổi Chưa Lưu",
+              "content": "Bạn có các thay đổi chưa lưu đối với điều kiện lịch trình của mình. Bạn có chắc chắn muốn rời khỏi trang này không? Nếu bạn rời đi, các thay đổi của bạn sẽ bị mất."
             }
           },
           "view": {
             "badge": {
               "running": "Đang Chạy"
+            },
+            "tooltip": {
+              "cannotRun": "Không thể chạy một lịch trình đã bị vô hiệu hóa"
             },
             "tabs": {
               "actions": "Hành Động",
@@ -3896,6 +4548,7 @@
             "contains": "Chứa",
             "startsWith": "Bắt Đầu Với",
             "endsWith": "Kết Thúc Với",
+            "metric": "Chỉ số",
             "allMustBeTrue": "Tất cả điều kiện phải đúng:",
             "anyMustBeTrue": "Bất kỳ điều kiện nào phải đúng:",
             "mustNotBeTrue": "Điều kiện phải không đúng:"
@@ -3909,8 +4562,23 @@
             "cron": {
               "title": "Cron",
               "form": {
-                "cronSchedule": "Lịch Trình Cron"
+                "cronSchedule": "Lịch Trình Cron",
+                "frequency": "Tần suất chạy",
+                "intervalMinutes": "Mỗi (phút)",
+                "intervalHours": "Mỗi (giờ)",
+                "time": "Vào lúc",
+                "weekday": "Vào ngày trong tuần",
+                "dayOfMonth": "Vào ngày trong tháng",
+                "advanced": "Chỉnh sửa dưới dạng biểu thức cron"
               },
+              "frequency": {
+                "everyMinutes": "Mỗi vài phút",
+                "everyHours": "Mỗi vài giờ",
+                "daily": "Hàng ngày",
+                "weekly": "Hàng tuần",
+                "monthly": "Hàng tháng"
+              },
+              "timezoneHint": "Thời gian sử dụng múi giờ của máy chủ ({timezone}).",
               "card": {
                 "content": "Trên Khoảng Thời Gian Cron {schedule}, Lần Chạy Tiếp Theo Là {timestamp} - Lần Chạy Cuối Là {lastTimestamp}."
               },
@@ -3937,6 +4605,25 @@
                 "content": "Khi Sao Lưu Đạt Tới Trạng Thái `{status}`."
               }
             },
+            "scheduleCompletion": {
+              "title": "Hoàn Thành Lịch Trình",
+              "form": {
+                "schedule": "Lịch trình",
+                "completionStatus": "Trạng Thái Hoàn Thành"
+              },
+              "card": {
+                "content": "Khi Lịch trình `{schedule}` hoàn thành với Trạng thái `{status}`."
+              }
+            },
+            "resourceUsage": {
+              "title": "Sử Dụng Tài Nguyên",
+              "form": {
+                "forSeconds": "Trong vòng (giây)"
+              },
+              "card": {
+                "content": "Khi {metric} là {comparator} `{value}`."
+              }
+            },
             "consoleLine": {
               "title": "Dòng Bảng Điều Khiển",
               "card": {
@@ -3961,8 +4648,19 @@
               "title": "Không có Bước nào Được Cấu Hình",
               "description": "Lịch trình này chưa có bước nào. Thêm một số hành động để bắt đầu."
             },
+            "warning": {
+              "unclosedIf": "Khối \"If\" đang thiếu \"End If\". Tất cả các bước còn lại sẽ chạy như một phần của khối.",
+              "orphanBranch": "Có một bước \"Else\", \"Else If\" hoặc \"End If\" mà không có bước \"If\" phù hợp trước đó."
+            },
+            "groups": {
+              "server": "Máy chủ",
+              "files": "Tệp & Sao Lưu",
+              "startup": "Thiết Lập Khởi Động",
+              "advanced": "Logic Nâng Cao"
+            },
             "sleep": {
               "title": "Ngủ",
+              "description": "Chờ một khoảng thời gian nhất định trước khi tiếp tục hành động tiếp theo.",
               "form": {
                 "duration": "Thời lượng (miligiây)"
               },
@@ -3972,12 +4670,62 @@
             },
             "ensure": {
               "title": "Đảm Bảo",
+              "description": "Dừng lịch trình tại đây trừ khi một điều kiện là đúng.",
               "renderer": {
                 "compact": "Đảm bảo một điều kiện khớp"
               }
             },
+            "if": {
+              "title": "If",
+              "description": "Chỉ chạy các bước sau khi một điều kiện là đúng, cho đến khi gặp Else/End If. Một bước End If phù hợp sẽ được thêm tự động.",
+              "renderer": {
+                "compact": "Nếu một điều kiện khớp"
+              }
+            },
+            "elseIf": {
+              "title": "Else If",
+              "description": "Chạy các bước sau khi không có nhánh nào trước đó được chạy và một điều kiện là đúng.",
+              "renderer": {
+                "compact": "Nếu không, nếu một điều kiện khớp"
+              }
+            },
+            "else": {
+              "title": "Else",
+              "description": "Chạy các bước sau khi không có nhánh nào trước đó của khối If được chạy.",
+              "renderer": {
+                "compact": "Nếu không"
+              }
+            },
+            "endIf": {
+              "title": "End If",
+              "description": "Đóng khối If hiện tại.",
+              "renderer": {
+                "compact": "Kết thúc khối If"
+              }
+            },
+            "exit": {
+              "title": "Thoát",
+              "description": "Dừng lịch trình tại đây, đánh dấu lượt chạy là thành công hoặc thất bại.",
+              "form": {
+                "successful": "Đánh dấu lượt chạy là thành công"
+              },
+              "renderer": {
+                "compact": "Thoát lịch trình ({successful})"
+              }
+            },
+            "waitForState": {
+              "title": "Chờ Trạng Thái Máy Chủ",
+              "description": "Chờ cho đến khi máy chủ đạt đến một trạng thái nguồn điện.",
+              "form": {
+                "timeout": "Thời gian chờ (mili giây)"
+              },
+              "renderer": {
+                "compact": "Chờ {timeout} để máy chủ ở trạng thái {state}"
+              }
+            },
             "format": {
               "title": "Định Dạng",
+              "description": "Xây dựng một giá trị văn bản từ các biến và lưu trữ nó vào một biến.",
               "form": {
                 "formatString": "Chuỗi Định Dạng",
                 "formatStringDescription": "Chuỗi định dạng. Có thể bao gồm các biến bằng cách bọc chúng trong {wrapper}."
@@ -3988,6 +4736,7 @@
             },
             "matchRegex": {
               "title": "Khớp Regex",
+              "description": "Trích xuất các phần của một giá trị văn bản bằng biểu thức chính quy (regular expression).",
               "form": {
                 "input": "Đầu Vào",
                 "regex": "Regex",
@@ -4000,6 +4749,7 @@
             },
             "waitForConsoleLine": {
               "title": "Chờ Dòng Bảng Điều Khiển",
+              "description": "Chờ cho đến khi console máy chủ xuất ra một dòng khớp.",
               "form": {
                 "timeout": "Thời gian chờ (miligiây)"
               },
@@ -4014,6 +4764,7 @@
             },
             "sendCommand": {
               "title": "Gửi Lệnh",
+              "description": "Gửi một lệnh tới console máy chủ.",
               "renderer": {
                 "compact": "Chạy {command}",
                 "detail": {
@@ -4023,6 +4774,7 @@
             },
             "sendPower": {
               "title": "Gửi Tín Hiệu Nguồn Điện",
+              "description": "Khởi động, khởi động lại, dừng hoặc buộc dừng máy chủ.",
               "renderer": {
                 "compact": "Thực hiện {action}",
                 "detail": {
@@ -4032,19 +4784,51 @@
             },
             "createBackup": {
               "title": "Tạo Sao Lưu",
+              "description": "Tạo một bản sao lưu các tệp máy chủ.",
               "form": {
                 "backupName": "Tên Sao Lưu"
               },
               "renderer": {
                 "compact": "Tạo {name}",
+                "compactAuto": "Tạo một bản sao lưu với tên tự động tạo",
                 "detail": {
                   "backupName": "Tên Sao Lưu: {name}",
+                  "backupNameAuto": "Tên Sao Lưu: Tự động tạo",
                   "ignoredFiles": "Tệp Bị Bỏ Qua: {files}"
+                }
+              }
+            },
+            "restoreBackup": {
+              "title": "Khôi Phục Sao Lưu",
+              "description": "Dừng máy chủ và khôi phục một bản sao lưu của các tệp máy chủ.",
+              "form": {
+                "backupSelector": "Bản Sao Lưu Cần Khôi Phục",
+                "selector": {
+                  "latest": "Bản Sao Lưu Mới Nhất",
+                  "uuid": "Bản Sao Lưu Cụ Thể (UUID)",
+                  "name": "Theo Tên (khớp mới nhất)"
+                },
+                "backupUuid": "UUID Sao Lưu",
+                "backupName": "Tên Bản Sao Lưu",
+                "truncateDirectory": "Xóa tất cả các tệp trước khi khôi phục",
+                "restoreStartup": "Khôi phục thiết lập khởi động",
+                "warning": "Việc khôi phục sẽ dừng máy chủ và ghi đè lên các tệp của nó. Lịch trình sẽ chờ cho đến khi quá trình khôi phục hoàn thành trước khi tiếp tục. Tránh kết hợp bước này với các trigger nguồn điện hoặc trạng thái máy chủ có thể kích hoạt lại lịch trình."
+              },
+              "renderer": {
+                "compact": "Khôi phục bản sao lưu {backup}",
+                "compactLatest": "Khôi phục bản sao lưu mới nhất",
+                "detail": {
+                  "backupLatest": "Bản sao lưu: Bản sao lưu thành công mới nhất",
+                  "backupUuid": "UUID Sao Lưu: {uuid}",
+                  "backupName": "Tên Bản Sao Lưu: {name}",
+                  "truncateDirectory": "Xóa tất cả tệp trước: {value}",
+                  "restoreStartup": "Khôi phục thiết lập khởi động: {value}"
                 }
               }
             },
             "createDirectory": {
               "title": "Tạo Thư Mục",
+              "description": "Tạo một thư mục mới trong các tệp máy chủ.",
               "renderer": {
                 "compact": "Tạo {name} trong {root}",
                 "detail": {
@@ -4055,6 +4839,7 @@
             },
             "writeFile": {
               "title": "Ghi Tệp",
+              "description": "Ghi hoặc nối thêm văn bản vào một tệp.",
               "form": {
                 "content": "Nội Dung",
                 "appendToFile": "Nối Vào Tệp"
@@ -4069,6 +4854,7 @@
             },
             "copyFile": {
               "title": "Sao Chép Tệp",
+              "description": "Sao chép một tệp sang một vị trí mới.",
               "form": {
                 "sourceFile": "Tệp Nguồn"
               },
@@ -4082,6 +4868,7 @@
             },
             "deleteFiles": {
               "title": "Xóa Tệp",
+              "description": "Xóa các tệp hoặc thư mục.",
               "form": {
                 "filesToDelete": "Tệp Để Xóa"
               },
@@ -4095,6 +4882,7 @@
             },
             "renameFiles": {
               "title": "Đổi Tên Tệp",
+              "description": "Đổi tên hoặc di chuyển các tệp.",
               "form": {
                 "files": "Tệp",
                 "from": "từ",
@@ -4110,6 +4898,7 @@
             },
             "compressFiles": {
               "title": "Nén Tệp",
+              "description": "Nén các tệp thành một kho lưu trữ.",
               "form": {
                 "filesToCompress": "Tệp Để Nén"
               },
@@ -4125,6 +4914,7 @@
             },
             "decompressFile": {
               "title": "Giải Nén Tệp",
+              "description": "Giải nén một kho lưu trữ vào một thư mục.",
               "form": {
                 "file": "Tệp"
               },
@@ -4138,6 +4928,7 @@
             },
             "updateStartupVariable": {
               "title": "Cập Nhật Biến Khởi Động",
+              "description": "Thay đổi giá trị của một biến khởi động.",
               "renderer": {
                 "compact": "Đặt {variable} thành {value}",
                 "detail": {
@@ -4148,6 +4939,7 @@
             },
             "updateStartupCommand": {
               "title": "Cập Nhật Lệnh Khởi Động",
+              "description": "Thay đổi lệnh được sử dụng để khởi động máy chủ.",
               "renderer": {
                 "compact": "Đặt thành {command}",
                 "detail": {
@@ -4157,6 +4949,7 @@
             },
             "updateStartupDockerImage": {
               "title": "Cập Nhật Hình Ảnh Docker",
+              "description": "Thay đổi hình ảnh Docker mà máy chủ chạy trong đó.",
               "renderer": {
                 "compact": "Đặt thành {image}",
                 "detail": {
@@ -4220,15 +5013,20 @@
             }
           },
           "button": {
-            "browse": "Duyệt"
+            "browse": "Duyệt",
+            "exportToFiles": "Xuất ra Tệp",
+            "createBackup": "Tạo Sao Lưu",
+            "createGroup": "Tạo Nhóm Sao Lưu"
           },
           "toast": {
             "downloadStarted": "Tải xuống đã bắt đầu.",
-            "restoringBackup": "Đang khôi phục sao lưu..."
+            "restoringBackup": "Đang khôi phục sao lưu...",
+            "exportStarted": "Đã bắt đầu xuất bản sao lưu."
           },
           "modal": {
             "createBackup": {
               "title": "Tạo Sao Lưu",
+              "noGroup": "Không có nhóm",
               "toast": {
                 "created": "Sao lưu đã được tạo."
               }
@@ -4242,6 +5040,9 @@
             "restoreBackup": {
               "title": "Khôi Phục Sao Lưu"
             },
+            "exportBackup": {
+              "title": "Xuất Sao Lưu Sang Tệp"
+            },
             "deleteBackup": {
               "title": "Xác Nhận Xóa Sao Lưu",
               "content": "Bạn có chắc muốn xóa **{name}** khỏi máy chủ này không?",
@@ -4252,6 +5053,47 @@
             "viewMetadata": {
               "title": "Siêu Dữ Liệu Sao Lưu"
             }
+          }
+        },
+        "backupGroups": {
+          "title": "Nhóm Sao Lưu",
+          "group": "Nhóm Sao Lưu",
+          "ungrouped": "Không nằm trong nhóm",
+          "noBackups": "Nhóm này chưa có bản sao lưu nào.",
+          "button": {
+            "createInGroup": "Tạo bản sao lưu trong nhóm này"
+          },
+          "badge": {
+            "keepCount": "Giữ {count}",
+            "keepDays": "Giữ {days} ngày",
+            "noRetention": "Không tự động xóa",
+            "allLocked": "All locked"
+          },
+          "form": {
+            "retentionCount": "Số lượng giữ lại",
+            "retentionCountDescription": "Số lượng bản sao lưu tối đa có thể sử dụng được để giữ lại trong nhóm này. Để trống để không giới hạn.",
+            "retentionDays": "Số ngày giữ lại",
+            "retentionDaysDescription": "Xóa các bản sao lưu trong nhóm này cũ hơn số ngày quy định. Để trống để không giới hạn.",
+            "noRetentionDescription": "Khi không thiết lập chính sách giữ lại, nhóm này chỉ đóng vai trò là một nhãn phân loại và không bao giờ tự động xóa các bản sao lưu."
+          },
+          "modal": {
+            "createGroup": {
+              "title": "Tạo Nhóm Sao Lưu"
+            },
+            "updateGroup": {
+              "title": "Chỉnh Sửa Nhóm Sao Lưu"
+            },
+            "deleteGroup": {
+              "title": "Xác nhận Xóa Nhóm Sao Lưu",
+              "content": "Bạn có chắc chắn muốn xóa **{name}** không? Các bản sao lưu {backups} trong nhóm này sẽ trở thành không có nhóm và tuân theo quy trình luân phiên tiêu chuẩn.",
+              "lockBackups": "Khóa các bản sao lưu",
+              "lockBackupsDescription": "Khóa tất cả các bản sao lưu trong nhóm này trước khi xóa để chúng không bị luân phiên xóa tự động."
+            }
+          },
+          "toast": {
+            "created": "Đã tạo nhóm sao lưu.",
+            "updated": "Đã cập nhật nhóm sao lưu.",
+            "deleted": "Đã xóa nhóm sao lưu."
           }
         },
         "network": {
@@ -4299,7 +5141,8 @@
               "content": "Bạn có thay đổi chưa lưu đối với các biến khởi động. Bạn có chắc muốn rời khỏi trang này không? Nếu bạn rời khỏi, các thay đổi sẽ bị mất."
             }
           },
-          "noVariables": "Không tìm thấy biến khởi động cho máy chủ này."
+          "noVariables": "Không tìm thấy biến khởi động cho máy chủ này.",
+          "predefinedStartupCommands": "Lệnh Khởi Động Được Định Nghĩa Trước"
         },
         "mounts": {
           "title": "Điểm Gắn",
