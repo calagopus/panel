@@ -7,7 +7,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import Tooltip from '../Tooltip.tsx';
 
 interface FormattedTimestampProps {
-  timestamp: string | number | Date;
+  timestamp: string | number | Date | null | undefined;
   tooltipClassName?: string;
   tooltipInnerClassName?: string;
   className?: string;
@@ -30,7 +30,7 @@ function FormattedTimestamp({
   const [, forceRender] = useState(0);
 
   useEffect(() => {
-    if (!autoUpdate) return;
+    if (!autoUpdate || timestamp == null) return;
 
     let timeoutId: ReturnType<typeof setTimeout>;
     const targetTime = new Date(timestamp).getTime();
@@ -56,7 +56,7 @@ function FormattedTimestamp({
     return () => clearTimeout(timeoutId);
   }, [timestamp, autoUpdate]);
 
-  if (showNA && (!timestamp || new Date(timestamp).getTime() === 0)) {
+  if (timestamp == null || (showNA && (!timestamp || new Date(timestamp).getTime() === 0))) {
     return <span className={className}>{t('common.na', {})}</span>;
   }
 

@@ -411,8 +411,8 @@ pub struct CreateDatabaseAgentTemplateOptions {
     #[garde(range(min = 0))]
     #[schema(minimum = 0)]
     pub disk: i64,
-    #[garde(range(min = 0))]
-    #[schema(minimum = 0)]
+    #[garde(range(min = 0, max = 1000))]
+    #[schema(minimum = 0, maximum = 1000)]
     pub io_weight: Option<i16>,
     #[garde(range(min = 0))]
     #[schema(minimum = 0)]

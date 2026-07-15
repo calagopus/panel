@@ -206,6 +206,8 @@ export const twoFactorRequirement = z.enum(['admins', 'all_users', 'none']);
 
 export const adminSettingsSchema = z.object({
   oobeStep: oobeStepKey.nullable(),
+  telemetryUuid: z.string().uuid().nullable().optional(),
+  telemetryCronSchedule: z.string().nullable().optional(),
   storageDriver: adminSettingsStorageSchema,
   mailMode: adminSettingsEmailSchema,
   captchaProvider: adminSettingsCaptchaProviderSchema,

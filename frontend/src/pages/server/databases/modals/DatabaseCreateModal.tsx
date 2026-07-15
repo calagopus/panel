@@ -45,6 +45,8 @@ export default function DatabaseCreateModal({ ...props }: ModalProps) {
     getDatabaseHosts(server.uuid).then((data) => setDatabaseHosts(data));
   }, []);
 
+  const selectedHost = databaseHosts.find((host) => host.uuid === form.getValues().databaseHostUuid);
+
   return (
     <FormModal
       title={t('pages.server.databases.modal.createDatabase.title', {})}
@@ -68,10 +70,13 @@ export default function DatabaseCreateModal({ ...props }: ModalProps) {
           nothingFoundMessage={t('pages.server.databases.modal.createDatabase.form.noHostsFound', {})}
           data={Object.values(
             databaseHosts.reduce(
-              (acc, { uuid, name, type }) => (
+              (acc, { uuid, name, type, maintenanceEnabled }) => (
                 (acc[type] ??= { group: databaseTypeLabelMapping[type], items: [] }).items.push({
                   value: uuid,
-                  label: name,
+                  label: maintenanceEnabled
+                    ? `${name} (${t('pages.server.databases.modal.createDatabase.form.hostInMaintenance', {})})`
+                    : name,
+                  disabled: maintenanceEnabled,
                 }),
                 acc
               ),
@@ -82,7 +87,11 @@ export default function DatabaseCreateModal({ ...props }: ModalProps) {
         />
 
         <ModalFooter>
-          <Button type='submit' loading={loading} disabled={!form.isValid()}>
+          <Button
+            type='submit'
+            loading={loading}
+            disabled={!form.isValid() || Boolean(selectedHost?.maintenanceEnabled)}
+          >
             {t('common.button.create', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>

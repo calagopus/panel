@@ -50,6 +50,30 @@ pub fn validate_language(
     Ok(())
 }
 
+pub fn validate_host(
+    host: &compact_str::CompactString,
+    _context: &(),
+) -> Result<(), garde::Error> {
+    if host.parse::<std::net::IpAddr>().is_ok() {
+        return Ok(());
+    }
+
+    let is_valid_hostname = host.len() <= 253
+        && host.split('.').all(|label| {
+            !label.is_empty()
+                && label.len() <= 63
+                && !label.starts_with('-')
+                && !label.ends_with('-')
+                && label.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+        });
+
+    if !is_valid_hostname {
+        return Err(garde::Error::new("must be a valid IP address or hostname"));
+    }
+
+    Ok(())
+}
+
 pub fn validate_time_in_future(
     time: &chrono::DateTime<chrono::Utc>,
     _context: &(),

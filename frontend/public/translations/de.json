@@ -4380,7 +4380,8 @@
                 "created": "Datenbank erstellt."
               },
               "form": {
-                "noHostsFound": "Keine Hosts gefunden"
+                "noHostsFound": "Keine Hosts gefunden",
+                "hostInMaintenance": "In Wartung"
               }
             },
             "editDatabase": {

@@ -446,4 +446,5 @@ export const serverScheduleStepUpdateSchema = z.lazy(() =>
 export const serverScheduleStatusSchema = z.object({
   running: z.boolean(),
   step: z.string().nullable(),
+  errors: z.record(z.string(), z.string()),
 });

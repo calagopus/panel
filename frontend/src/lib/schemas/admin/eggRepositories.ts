@@ -20,7 +20,7 @@ export const adminEggRepositoryEggSchema = z.looseObject({
   uuid: z.string(),
   path: z.string(),
   readme: z.string().nullable(),
-  exportedEgg: z.object({
+  exportedEgg: z.looseObject({
     name: z.string(),
     description: z.string().nullable(),
     author: z.string(),

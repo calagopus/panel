@@ -7,9 +7,10 @@ export const databaseAgentType = z.enum(['postgres', 'mariadb', 'mongodb', 'redi
 export const databaseHostSchema = z.looseObject({
   uuid: z.string(),
   name: z.string(),
-  host: z.string().nullable(),
+  host: z.string(),
   port: z.number(),
   type: databaseType,
+  maintenanceEnabled: z.boolean(),
 });
 
 export const oAuthProviderSchema = z.looseObject({

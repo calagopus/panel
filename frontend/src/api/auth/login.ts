@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi } from '@/lib/api-transform.ts';
 import { fullUserSchema, userSchema } from '@/lib/schemas/user.ts';
 
 interface Data {
@@ -21,5 +22,8 @@ type Response =
 
 export default async ({ user, password, captcha }: Data): Promise<Response> => {
   const { data } = await axiosInstance.post('/api/auth/login', { user, password, captcha });
-  return data;
+  return {
+    ...data,
+    user: parseFromApi(data.type === 'completed' ? fullUserSchema : userSchema, data.user),
+  };
 };

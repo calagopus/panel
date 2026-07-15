@@ -4408,6 +4408,7 @@ const baseTranslations = defineTranslations({
               },
               form: {
                 noHostsFound: 'No hosts found',
+                hostInMaintenance: 'Under Maintenance',
               },
             },
             editDatabase: {

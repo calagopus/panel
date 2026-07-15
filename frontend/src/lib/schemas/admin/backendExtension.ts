@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const adminBackendExtensionSchema = z.object({
+  packageName: z.string(),
   metadataToml: z.object({
     packageName: z.string(),
     name: z.string(),

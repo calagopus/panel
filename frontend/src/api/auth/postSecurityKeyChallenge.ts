@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi } from '@/lib/api-transform.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { prepareCredentialForTransport } from '../me/security-keys/postSecurityKeyChallenge.ts';
 
@@ -12,5 +13,5 @@ export default async (uuid: string, challenge: PublicKeyCredential): Promise<Res
     uuid,
     public_key_credential: prepareCredentialForTransport(challenge),
   });
-  return data;
+  return { ...data, user: parseFromApi(fullUserSchema, data.user) };
 };

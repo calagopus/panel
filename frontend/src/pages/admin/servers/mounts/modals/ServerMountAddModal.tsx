@@ -10,7 +10,6 @@ import Select from '@/elements/input/Select.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminNodeMountSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -25,7 +24,7 @@ export default function ServerMountAddModal({
   const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
-  const [selectedMount, setSelectedMount] = useState<z.infer<typeof adminNodeMountSchema> | null>(null);
+  const [selectedMount, setSelectedMount] = useState<z.infer<typeof adminServerMountSchema> | null>(null);
 
   const mounts = useSearchableResource<z.infer<typeof adminServerMountSchema>>({
     queryKey: queryKeys.admin.servers.mounts(server.uuid),

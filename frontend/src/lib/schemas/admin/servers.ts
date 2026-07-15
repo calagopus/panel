@@ -101,6 +101,7 @@ export const adminServerUpdateSchema = z.lazy(() =>
     ownerUuid: z.uuid(),
     eggUuid: z.uuid(),
     backupConfigurationUuid: z.uuid().nullable(),
+    suspended: z.boolean().optional(),
   }),
 );
 
@@ -154,5 +155,5 @@ export const adminServerDatabaseAgentSchema = z.looseObject({
 
 export const adminServerMountSchema = z.looseObject({
   mount: z.lazy(() => adminMountSchema),
-  created: z.coerce.date(),
+  created: z.coerce.date().nullable(),
 });

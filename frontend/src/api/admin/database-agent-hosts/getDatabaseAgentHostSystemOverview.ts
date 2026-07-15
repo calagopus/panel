@@ -25,6 +25,7 @@ const databaseAgentHostSystemOverviewSchema = z.object({
   }),
   architecture: z.string(),
   kernelVersion: z.string(),
+  localTime: z.coerce.date(),
 });
 
 export type DatabaseAgentHostSystemOverview = z.infer<typeof databaseAgentHostSystemOverviewSchema>;

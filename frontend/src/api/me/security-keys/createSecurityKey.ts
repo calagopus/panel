@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { parseFromApi } from '@/lib/api-transform.ts';
 import { userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
 import { base64ToArrayBuffer } from '@/lib/transformers.ts';
 
@@ -46,5 +47,8 @@ interface Data {
 
 export default async (data: Data): Promise<[z.infer<typeof userSecurityKeySchema>, CredentialCreationOptions]> => {
   const { data: responseData } = await axiosInstance.post('/api/client/account/security-keys', data);
-  return [responseData.securityKey, prepareCredentialOptions(responseData.options)];
+  return [
+    parseFromApi(userSecurityKeySchema, responseData.security_key),
+    prepareCredentialOptions(responseData.options),
+  ];
 };

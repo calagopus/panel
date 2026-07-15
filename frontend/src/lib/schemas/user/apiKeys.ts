@@ -9,7 +9,7 @@ export const userApiKeySchema = z.looseObject({
   serverPermissions: z.array(z.string()),
   adminPermissions: z.array(z.string()),
   expires: z.coerce.date().nullable().optional(),
-  lastUsed: z.coerce.date(),
+  lastUsed: z.coerce.date().nullable(),
   created: z.coerce.date(),
 });
 

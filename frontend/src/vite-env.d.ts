@@ -23,7 +23,7 @@ declare global {
   type GroupedDatabaseHosts = {
     [key in z.infer<typeof databaseType>]: {
       group: string;
-      items: { value: string; label: string }[];
+      items: { value: string; label: string; disabled?: boolean }[];
     };
   };
 }
