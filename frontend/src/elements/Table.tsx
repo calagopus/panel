@@ -220,7 +220,7 @@ export default function Table({
         <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} withShortcuts={false} />
       )}
 
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', ...(loading ? { minHeight: '10rem' } : {}) }}>
         <MantineTable
           stickyHeader
           highlightOnHover={(pagination?.total ?? 0) > 0 && !loading}
@@ -235,13 +235,7 @@ export default function Table({
             ))}
           </TableHead>
           <MantineTable.Tbody>
-            {loading ? (
-              <MantineTable.Tr>
-                <MantineTable.Td colSpan={columns.length}>
-                  <Spinner.Centered />
-                </MantineTable.Td>
-              </MantineTable.Tr>
-            ) : error ? (
+            {error ? (
               <MantineTable.Tr>
                 <MantineTable.Td colSpan={columns.length}>
                   <ErrorItems error={error} />
