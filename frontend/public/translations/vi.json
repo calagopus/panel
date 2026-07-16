@@ -4652,7 +4652,8 @@
             },
             "groups": {
               "server": "Máy chủ",
-              "files": "Tệp & Sao Lưu",
+              "backups": "Sao Lưu",
+              "files": "Tệp",
               "startup": "Thiết Lập Khởi Động",
               "advanced": "Logic Nâng Cao"
             },

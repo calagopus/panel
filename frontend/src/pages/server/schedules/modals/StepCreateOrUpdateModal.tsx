@@ -137,7 +137,7 @@ export default function StepCreateOrUpdateModal({
       <Stack gap='md'>
         <Select
           label={t('pages.server.schedules.form.actionType', {})}
-          data={(['server', 'files', 'startup', 'advanced'] as ScheduleStepGroup[]).map((group) => ({
+          data={(['server', 'backups', 'files', 'startup', 'advanced'] as ScheduleStepGroup[]).map((group) => ({
             group: scheduleStepGroupLabelMapping[group](),
             items: Object.entries(scheduleStepLabelMapping)
               .filter(([value]) => scheduleStepGroupMapping[value as keyof typeof scheduleStepGroupMapping] === group)

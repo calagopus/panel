@@ -389,10 +389,11 @@ export const scheduleStepLabelMapping: Record<z.infer<typeof serverScheduleStepA
     getTranslations().t('pages.server.schedules.steps.updateStartupDockerImage.title', {}),
 };
 
-export type ScheduleStepGroup = 'server' | 'files' | 'startup' | 'advanced';
+export type ScheduleStepGroup = 'server' | 'backups' | 'files' | 'startup' | 'advanced';
 
 export const scheduleStepGroupLabelMapping: Record<ScheduleStepGroup, () => string> = {
   server: () => getTranslations().t('pages.server.schedules.steps.groups.server', {}),
+  backups: () => getTranslations().t('pages.server.schedules.steps.groups.backups', {}),
   files: () => getTranslations().t('pages.server.schedules.steps.groups.files', {}),
   startup: () => getTranslations().t('pages.server.schedules.steps.groups.startup', {}),
   advanced: () => getTranslations().t('pages.server.schedules.steps.groups.advanced', {}),
@@ -415,10 +416,10 @@ export const scheduleStepGroupMapping: Record<
   wait_for_console_line: 'advanced',
   send_power: 'server',
   send_command: 'server',
-  create_backup: 'server',
-  restore_backup: 'server',
-  delete_backup: 'server',
-  move_backup: 'server',
+  create_backup: 'backups',
+  restore_backup: 'backups',
+  delete_backup: 'backups',
+  move_backup: 'backups',
   create_directory: 'files',
   write_file: 'files',
   copy_file: 'files',

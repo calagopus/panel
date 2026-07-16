@@ -4703,7 +4703,8 @@ const baseTranslations = defineTranslations({
             },
             groups: {
               server: 'Server',
-              files: 'Files & Backups',
+              backups: 'Backups',
+              files: 'Files',
               startup: 'Startup Settings',
               advanced: 'Advanced Logic',
             },

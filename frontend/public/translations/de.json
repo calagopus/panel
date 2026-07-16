@@ -4679,7 +4679,8 @@
             },
             "groups": {
               "server": "Server",
-              "files": "Dateien & Backups",
+              "backups": "Backups",
+              "files": "Dateien",
               "startup": "Starteinstellungen",
               "advanced": "Erweiterte Logik"
             },
