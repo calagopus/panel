@@ -211,7 +211,7 @@ pub async fn handle_startup() -> Result<
     let extensions = Arc::clone(EXTENSIONS.get().context("extensions not initialized")?);
 
     let cli = CliCommandGroupBuilder::new(
-        "panel-rs",
+        "calagopus-panel",
         "The panel server allowing control of game servers.",
     );
 
