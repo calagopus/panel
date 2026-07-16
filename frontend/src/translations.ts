@@ -4856,8 +4856,10 @@ const baseTranslations = defineTranslations({
                 backupSelector: 'Backup to Restore',
                 selector: {
                   latest: 'Latest Backup',
+                  oldest: 'Oldest Backup',
                   uuid: 'Specific Backup (UUID)',
-                  name: 'By Name (newest match)',
+                  name: 'By Name',
+                  oldestFirst: 'Match the oldest backup instead of the newest',
                 },
                 backupUuid: 'Backup UUID',
                 backupName: 'Backup Name',
@@ -4869,12 +4871,35 @@ const baseTranslations = defineTranslations({
               renderer: {
                 compact: 'Restore backup {backup}',
                 compactLatest: 'Restore the latest backup',
+                compactOldest: 'Restore the oldest backup',
                 detail: {
                   backupLatest: 'Backup: Latest successful backup',
+                  backupOldest: 'Backup: Oldest successful backup',
                   backupUuid: 'Backup UUID: {uuid}',
                   backupName: 'Backup Name: {name}',
                   truncateDirectory: 'Delete all files first: {value}',
                   restoreStartup: 'Restore startup settings: {value}',
+                },
+              },
+            },
+            deleteBackup: {
+              title: 'Delete Backup',
+              description: 'Delete a backup selected by the backup selector.',
+              form: {
+                warning:
+                  'This permanently deletes the selected backup, including its files on the node. Locked backups are skipped.',
+              },
+            },
+            moveBackup: {
+              title: 'Move Backup',
+              description: 'Move a backup selected by the backup selector into a backup group.',
+              form: {
+                targetGroup: 'Target Backup Group',
+              },
+              renderer: {
+                detail: {
+                  targetGroup: 'Target Group: {uuid}',
+                  targetGroupNone: 'Target Group: None (ungrouped)',
                 },
               },
             },

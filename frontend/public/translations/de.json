@@ -1342,6 +1342,12 @@
               "toast": {
                 "removed": "API-Schlüssel entfernt."
               }
+            },
+            "apiKeyToken": {
+              "titleCreated": "API-Schlüssel erstellt",
+              "titleRecreated": "API-Schlüssel neu erstellt",
+              "descriptionCreated": "Dein neuer API-Schlüssel wurde erstellt. Kopiere ihn jetzt, da er nicht erneut angezeigt wird.",
+              "descriptionRecreated": "Dein API-Schlüssel wurde neu erstellt. Kopiere den neuen Schlüssel jetzt, da er nicht erneut angezeigt wird."
             }
           },
           "form": {
@@ -4814,6 +4820,58 @@
                   "backupName": "Backup-Name: {name}",
                   "backupNameAuto": "Backup-Name: Automatisch generiert",
                   "ignoredFiles": "Ignorierte Dateien: {files}"
+                }
+              }
+            },
+            "restoreBackup": {
+              "title": "Backup wiederherstellen",
+              "description": "Stoppe den Server und stelle ein Backup der Serverdateien wieder her.",
+              "form": {
+                "backupSelector": "Wiederherzustellendes Backup",
+                "selector": {
+                  "latest": "Neuestes Backup",
+                  "oldest": "Ältestes Backup",
+                  "uuid": "Bestimmtes Backup (UUID)",
+                  "name": "Nach Name",
+                  "oldestFirst": "Das älteste Backup statt des neuesten verwenden"
+                },
+                "backupUuid": "Backup-UUID",
+                "backupName": "Backup-Name",
+                "truncateDirectory": "Alle Dateien vor dem Wiederherstellen löschen",
+                "restoreStartup": "Starteinstellungen wiederherstellen",
+                "warning": "Beim Wiederherstellen wird der Server gestoppt und seine Dateien werden überschrieben. Der Zeitplan wartet, bis die Wiederherstellung abgeschlossen ist, bevor er fortfährt. Kombiniere diesen Schritt nicht mit Power- oder Serverstatus-Auslösern, die den Zeitplan erneut auslösen könnten."
+              },
+              "renderer": {
+                "compact": "Backup {backup} wiederherstellen",
+                "compactLatest": "Neuestes Backup wiederherstellen",
+                "compactOldest": "Ältestes Backup wiederherstellen",
+                "detail": {
+                  "backupLatest": "Backup: Neuestes erfolgreiches Backup",
+                  "backupOldest": "Backup: Ältestes erfolgreiches Backup",
+                  "backupUuid": "Backup-UUID: {uuid}",
+                  "backupName": "Backup-Name: {name}",
+                  "truncateDirectory": "Zuerst alle Dateien löschen: {value}",
+                  "restoreStartup": "Starteinstellungen wiederherstellen: {value}"
+                }
+              }
+            },
+            "deleteBackup": {
+              "title": "Backup löschen",
+              "description": "Lösche ein durch die Backup-Auswahl ausgewähltes Backup.",
+              "form": {
+                "warning": "Dadurch wird das ausgewählte Backup einschließlich seiner Dateien auf dem Node dauerhaft gelöscht. Gesperrte Backups werden übersprungen."
+              }
+            },
+            "moveBackup": {
+              "title": "Backup verschieben",
+              "description": "Verschiebe ein durch die Backup-Auswahl ausgewähltes Backup in eine Backup-Gruppe.",
+              "form": {
+                "targetGroup": "Ziel-Backup-Gruppe"
+              },
+              "renderer": {
+                "detail": {
+                  "targetGroup": "Zielgruppe: {uuid}",
+                  "targetGroupNone": "Zielgruppe: Keine (ungruppiert)"
                 }
               }
             },

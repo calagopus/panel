@@ -287,9 +287,23 @@ mod post {
             database_agent_template: &template,
             name: data.name,
         };
-        let database_instance = match ServerDatabaseInstance::create(&state, options).await {
-            Ok(database_instance) => database_instance,
+
+        let mut transaction = state.database.write().begin().await?;
+
+        let database_instance = match ServerDatabaseInstance::create_with_transaction(
+            &state,
+            options,
+            &mut transaction,
+        )
+        .await
+        {
+            Ok(database_instance) => {
+                transaction.commit().await?;
+                database_instance
+            }
             Err(err) => {
+                transaction.rollback().await.ok();
+
                 if let Err(err) = client.delete_instances_instance(agent_instance.uuid).await {
                     tracing::error!(
                         host = %database_agent_host.uuid,
@@ -316,9 +330,9 @@ mod post {
                 "server:database-instance.create",
                 serde_json::json!({
                     "uuid": database_instance.uuid,
+                    "template_uuid": template.uuid,
                     "name": database_instance.name,
                     "type": database_instance.r#type,
-                    "template_uuid": template.uuid,
                 }),
             )
             .await;

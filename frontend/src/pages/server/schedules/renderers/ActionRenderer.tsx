@@ -89,8 +89,15 @@ function renderCompact(action: Action, { t, tReact, tItem }: Translations): Reac
         </span>
       );
     case 'restore_backup':
-      return action.backup.mode === 'latest' ? (
-        <span>{t('pages.server.schedules.steps.restoreBackup.renderer.compactLatest', {})}</span>
+    case 'delete_backup':
+    case 'move_backup':
+      return action.backup.mode === 'latest' || action.backup.mode === 'oldest' ? (
+        <span>
+          {t(
+            `pages.server.schedules.steps.restoreBackup.renderer.compact${action.backup.mode === 'oldest' ? 'Oldest' : 'Latest'}`,
+            {},
+          )}
+        </span>
       ) : (
         <span>
           {tReact('pages.server.schedules.steps.restoreBackup.renderer.compact', {
@@ -195,6 +202,23 @@ function renderCompact(action: Action, { t, tReact, tItem }: Translations): Reac
 
 function renderDetailed(action: Action, { t, tReact, tItem }: Translations): React.ReactNode {
   const yesNo = (val: boolean) => t(val ? 'common.yes' : 'common.no', {});
+
+  const renderBackupSelector = (backup: Extract<Action, { type: 'restore_backup' }>['backup']): React.ReactNode => {
+    switch (backup.mode) {
+      case 'latest':
+        return t('pages.server.schedules.steps.restoreBackup.renderer.detail.backupLatest', {});
+      case 'oldest':
+        return t('pages.server.schedules.steps.restoreBackup.renderer.detail.backupOldest', {});
+      case 'uuid':
+        return tReact('pages.server.schedules.steps.restoreBackup.renderer.detail.backupUuid', {
+          uuid: <ScheduleDynamicParameterRenderer value={backup.uuid} />,
+        });
+      case 'name':
+        return tReact('pages.server.schedules.steps.restoreBackup.renderer.detail.backupName', {
+          name: <ScheduleDynamicParameterRenderer value={backup.name} />,
+        });
+    }
+  };
 
   switch (action.type) {
     case 'sleep':
@@ -327,17 +351,7 @@ function renderDetailed(action: Action, { t, tReact, tItem }: Translations): Rea
     case 'restore_backup':
       return (
         <Stack gap='xs'>
-          <Text size='sm'>
-            {action.backup.mode === 'latest'
-              ? t('pages.server.schedules.steps.restoreBackup.renderer.detail.backupLatest', {})
-              : action.backup.mode === 'uuid'
-                ? tReact('pages.server.schedules.steps.restoreBackup.renderer.detail.backupUuid', {
-                    uuid: <ScheduleDynamicParameterRenderer value={action.backup.uuid} />,
-                  })
-                : tReact('pages.server.schedules.steps.restoreBackup.renderer.detail.backupName', {
-                    name: <ScheduleDynamicParameterRenderer value={action.backup.name} />,
-                  })}
-          </Text>
+          <Text size='sm'>{renderBackupSelector(action.backup)}</Text>
           <Text size='xs' c='dimmed'>
             {t('pages.server.schedules.steps.restoreBackup.renderer.detail.truncateDirectory', {
               value: yesNo(action.truncateDirectory),
@@ -347,6 +361,31 @@ function renderDetailed(action: Action, { t, tReact, tItem }: Translations): Rea
             {t('pages.server.schedules.steps.restoreBackup.renderer.detail.restoreStartup', {
               value: yesNo(action.restoreStartup),
             })}
+          </Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.renderer.ignoreFailure', { value: yesNo(action.ignoreFailure) })}
+          </Text>
+        </Stack>
+      );
+    case 'delete_backup':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>{renderBackupSelector(action.backup)}</Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.renderer.ignoreFailure', { value: yesNo(action.ignoreFailure) })}
+          </Text>
+        </Stack>
+      );
+    case 'move_backup':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>{renderBackupSelector(action.backup)}</Text>
+          <Text size='xs' c='dimmed'>
+            {action.backupGroupUuid
+              ? t('pages.server.schedules.steps.moveBackup.renderer.detail.targetGroup', {
+                  uuid: action.backupGroupUuid,
+                })
+              : t('pages.server.schedules.steps.moveBackup.renderer.detail.targetGroupNone', {})}
           </Text>
           <Text size='xs' c='dimmed'>
             {t('pages.server.schedules.renderer.ignoreFailure', { value: yesNo(action.ignoreFailure) })}

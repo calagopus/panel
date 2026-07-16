@@ -328,10 +328,12 @@ impl ServerBackup {
         row.try_map(|row| Self::map(None, &row))
     }
 
-    pub async fn latest_completed_by_server_uuid(
+    pub async fn select_completed_by_server_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,
         name: Option<&str>,
+        backup_group_uuid: Option<uuid::Uuid>,
+        oldest: bool,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
         let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
@@ -343,13 +345,16 @@ impl ServerBackup {
                 AND server_backups.completed IS NOT NULL
                 AND server_backups.successful
                 AND ($2 IS NULL OR server_backups.name = $2)
-            ORDER BY server_backups.created DESC
+                AND ($3::uuid IS NULL OR server_backups.backup_group_uuid = $3)
+            ORDER BY server_backups.created {}
             LIMIT 1
             "#,
-            Self::columns_sql(None)
+            Self::columns_sql(None),
+            if oldest { "ASC" } else { "DESC" }
         )))
         .bind(server_uuid)
         .bind(name)
+        .bind(backup_group_uuid)
         .fetch_optional(database.read())
         .await?;
 

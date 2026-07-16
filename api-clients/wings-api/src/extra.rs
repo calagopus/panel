@@ -181,7 +181,16 @@ pub struct ScheduleAction {
 #[serde(rename_all = "snake_case", tag = "mode")]
 #[non_exhaustive]
 pub enum ScheduleBackupSelector {
-    Latest,
+    Latest {
+        #[garde(skip)]
+        #[serde(default)]
+        backup_group_uuid: Option<uuid::Uuid>,
+    },
+    Oldest {
+        #[garde(skip)]
+        #[serde(default)]
+        backup_group_uuid: Option<uuid::Uuid>,
+    },
     Uuid {
         #[garde(dive)]
         uuid: ScheduleDynamicParameter,
@@ -189,6 +198,12 @@ pub enum ScheduleBackupSelector {
     Name {
         #[garde(dive)]
         name: ScheduleDynamicParameter,
+        #[garde(skip)]
+        #[serde(default)]
+        backup_group_uuid: Option<uuid::Uuid>,
+        #[garde(skip)]
+        #[serde(default)]
+        oldest: bool,
     },
 }
 
@@ -303,6 +318,25 @@ pub enum ScheduleActionInner {
 
         #[garde(dive)]
         backup: ScheduleBackupSelector,
+    },
+    DeleteBackup {
+        #[garde(skip)]
+        #[serde(default)]
+        ignore_failure: bool,
+
+        #[garde(dive)]
+        backup: ScheduleBackupSelector,
+    },
+    MoveBackup {
+        #[garde(skip)]
+        #[serde(default)]
+        ignore_failure: bool,
+
+        #[garde(dive)]
+        backup: ScheduleBackupSelector,
+        #[garde(skip)]
+        #[serde(default)]
+        backup_group_uuid: Option<uuid::Uuid>,
     },
     CreateDirectory {
         #[garde(skip)]
@@ -430,6 +464,8 @@ impl ScheduleActionInner {
             ScheduleActionInner::SendCommand { .. } => Some("control.console"),
             ScheduleActionInner::CreateBackup { .. } => Some("backups.create"),
             ScheduleActionInner::RestoreBackup { .. } => Some("backups.restore"),
+            ScheduleActionInner::DeleteBackup { .. } => Some("backups.delete"),
+            ScheduleActionInner::MoveBackup { .. } => Some("backups.update"),
             ScheduleActionInner::CreateDirectory { .. } => Some("files.create"),
             ScheduleActionInner::WriteFile { .. } => Some("files.update"),
             ScheduleActionInner::CopyFile { .. } => Some("files.update"),

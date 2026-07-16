@@ -36,12 +36,14 @@ import StepCopyFile from '../steps/StepCopyFile.tsx';
 import StepCreateBackup from '../steps/StepCreateBackup.tsx';
 import StepCreateDirectory from '../steps/StepCreateDirectory.tsx';
 import StepDecompressFile from '../steps/StepDecompressFile.tsx';
+import StepDeleteBackup from '../steps/StepDeleteBackup.tsx';
 import StepDeleteFiles from '../steps/StepDeleteFiles.tsx';
 import StepEnsure from '../steps/StepEnsure.tsx';
 import StepExit from '../steps/StepExit.tsx';
 import StepFormat from '../steps/StepFormat.tsx';
 import StepIf from '../steps/StepIf.tsx';
 import StepMatchRegex from '../steps/StepMatchRegex.tsx';
+import StepMoveBackup from '../steps/StepMoveBackup.tsx';
 import StepRenameFiles from '../steps/StepRenameFiles.tsx';
 import StepRestoreBackup from '../steps/StepRestoreBackup.tsx';
 import StepSendCommand from '../steps/StepSendCommand.tsx';
@@ -190,6 +192,10 @@ export default function StepCreateOrUpdateModal({
           <StepCreateBackup form={form} />
         ) : form.values.action.type === 'restore_backup' ? (
           <StepRestoreBackup form={form} />
+        ) : form.values.action.type === 'delete_backup' ? (
+          <StepDeleteBackup form={form} />
+        ) : form.values.action.type === 'move_backup' ? (
+          <StepMoveBackup form={form} />
         ) : form.values.action.type === 'create_directory' ? (
           <StepCreateDirectory form={form} />
         ) : form.values.action.type === 'write_file' ? (

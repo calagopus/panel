@@ -27,6 +27,12 @@ mod post {
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
         backup_name: Option<compact_str::CompactString>,
+        #[garde(skip)]
+        #[serde(default)]
+        backup_group_uuid: Option<uuid::Uuid>,
+        #[garde(skip)]
+        #[serde(default)]
+        oldest: bool,
 
         #[garde(skip)]
         truncate_directory: bool,
@@ -82,10 +88,12 @@ mod post {
                 .await?
                 .filter(|backup| backup.deleted.is_none()),
             None => {
-                ServerBackup::latest_completed_by_server_uuid(
+                ServerBackup::select_completed_by_server_uuid(
                     &state.database,
                     server.uuid,
                     data.backup_name.as_deref(),
+                    data.backup_group_uuid,
+                    data.oldest,
                 )
                 .await?
             }

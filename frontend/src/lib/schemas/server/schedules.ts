@@ -301,6 +301,11 @@ export const serverScheduleStepCreateBackupSchema = z.object({
 export const serverScheduleStepBackupSelectorSchema = z.discriminatedUnion('mode', [
   z.object({
     mode: z.literal('latest'),
+    backupGroupUuid: z.uuid().nullable().optional(),
+  }),
+  z.object({
+    mode: z.literal('oldest'),
+    backupGroupUuid: z.uuid().nullable().optional(),
   }),
   z.object({
     mode: z.literal('uuid'),
@@ -309,6 +314,8 @@ export const serverScheduleStepBackupSelectorSchema = z.discriminatedUnion('mode
   z.object({
     mode: z.literal('name'),
     name: serverScheduleStepDynamicSchema,
+    backupGroupUuid: z.uuid().nullable().optional(),
+    oldest: z.boolean().optional(),
   }),
 ]);
 
@@ -318,6 +325,19 @@ export const serverScheduleStepRestoreBackupSchema = z.object({
   truncateDirectory: z.boolean(),
   restoreStartup: z.boolean(),
   backup: serverScheduleStepBackupSelectorSchema,
+});
+
+export const serverScheduleStepDeleteBackupSchema = z.object({
+  type: z.literal('delete_backup'),
+  ignoreFailure: z.boolean(),
+  backup: serverScheduleStepBackupSelectorSchema,
+});
+
+export const serverScheduleStepMoveBackupSchema = z.object({
+  type: z.literal('move_backup'),
+  ignoreFailure: z.boolean(),
+  backup: serverScheduleStepBackupSelectorSchema,
+  backupGroupUuid: z.uuid().nullable().optional(),
 });
 
 export const serverScheduleStepCreateDirectorySchema = z.object({
@@ -415,6 +435,8 @@ export const serverScheduleStepActionSchema = z.discriminatedUnion('type', [
   serverScheduleStepSendCommandSchema,
   serverScheduleStepCreateBackupSchema,
   serverScheduleStepRestoreBackupSchema,
+  serverScheduleStepDeleteBackupSchema,
+  serverScheduleStepMoveBackupSchema,
   serverScheduleStepCreateDirectorySchema,
   serverScheduleStepWriteFileSchema,
   serverScheduleStepCopyFileSchema,
