@@ -41,7 +41,7 @@ totp-rs = { version = "5.7.0", features = ["gen_secret"] }
 garde = { workspace = true }
 russh = { workspace = true }
 urlencoding = { workspace = true }
-infer = "0.19.0"
+infer = "0.22.0"
 anyhow = { workspace = true }
 clap = { workspace = true }
 dialoguer = { workspace = true }

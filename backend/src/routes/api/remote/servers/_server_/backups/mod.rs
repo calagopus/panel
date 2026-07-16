@@ -524,7 +524,9 @@ mod patch {
 
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
-        .routes(routes!(post::route, delete::route, patch::route))
+        .routes(routes!(post::route))
+        .routes(routes!(delete::route))
+        .routes(routes!(patch::route))
         .nest("/restore", restore::router(state))
         .with_state(state.clone())
 }
