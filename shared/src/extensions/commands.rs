@@ -38,6 +38,10 @@ impl CliCommandGroupBuilder {
         }
     }
 
+    pub fn get_command(&self) -> Command {
+        self.command.clone()
+    }
+
     pub fn get_matches(&mut self) -> ArgMatches {
         self.command.get_matches_mut()
     }

@@ -68,6 +68,7 @@ spki = "0.8.0"
 rsa = "0.9.10"
 rustls = { version = "0.23.40", features = ["aws-lc-rs"] }
 http-body-util = "0.1.3"
+clap_complete = "4.6.7"
 
 [target.'cfg(windows)'.dependencies]
 junction = "2.0.0"

@@ -1,6 +1,7 @@
 use shared::extensions::commands::CliCommandGroupBuilder;
 
 mod backups;
+mod completions;
 mod diagnostics;
 mod extensions;
 mod import;
@@ -15,6 +16,11 @@ pub fn commands(cli: CliCommandGroupBuilder) -> CliCommandGroupBuilder {
         "version",
         "Prints the current executable version and exits.",
         version::VersionCommand,
+    )
+    .add_command(
+        "completions",
+        "Generates shell completions for the current executable.",
+        completions::CompletionsCommand,
     )
     .add_command(
         "service-install",

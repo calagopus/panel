@@ -29,6 +29,7 @@ use utoipa_axum::router::OpenApiRouter;
 
 pub static EXTENSIONS: OnceLock<Arc<shared::extensions::manager::ExtensionManager>> =
     OnceLock::new();
+pub static CLAP_COMMAND: OnceLock<clap::Command> = OnceLock::new();
 
 pub mod commands;
 pub mod routes;
@@ -218,6 +219,10 @@ pub async fn handle_startup() -> Result<
     cli = extensions
         .init_cli(env.as_ref().ok().map(|e| &e.0), cli)
         .await;
+
+    CLAP_COMMAND
+        .set(cli.get_command())
+        .map_err(|_| anyhow::anyhow!("failed to set CLI"))?;
 
     let mut matches = cli.get_matches();
     let debug = *matches.get_one::<bool>("debug").unwrap();
