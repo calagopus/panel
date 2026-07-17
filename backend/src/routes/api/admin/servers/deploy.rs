@@ -217,9 +217,9 @@ mod post {
             for node in nodes {
                 let (deployment_allocation_uuid, deployment_allocation_uuids) =
                     match NodeAllocation::get_from_deployment(
-                        &state.database,
+                        &state,
                         allocations,
-                        node.uuid,
+                        &node,
                         &mut deployment_variables,
                     )
                     .await

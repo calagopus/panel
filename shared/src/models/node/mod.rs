@@ -723,6 +723,75 @@ impl Node {
         ))
     }
 
+    pub async fn used_ports(
+        &self,
+        state: &crate::State,
+        ips: &[std::net::IpAddr],
+    ) -> Result<HashMap<std::net::IpAddr, Vec<u16>>, anyhow::Error> {
+        let mut used = HashMap::new();
+        let mut missing = Vec::new();
+
+        const USED_PORTS_TTL: u64 = 10;
+        const USED_PORTS_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(3);
+
+        #[inline]
+        fn used_ports_cache_key(
+            node_uuid: uuid::Uuid,
+            ip: std::net::IpAddr,
+        ) -> compact_str::CompactString {
+            compact_str::format_compact!("nodes::{node_uuid}::used_ports::{ip}")
+        }
+
+        for ip in ips {
+            match state
+                .cache
+                .get(&used_ports_cache_key(self.uuid, *ip))
+                .await?
+            {
+                Some(ports) => {
+                    used.insert(*ip, ports);
+                }
+                None => missing.push(*ip),
+            }
+        }
+
+        if missing.is_empty() {
+            return Ok(used);
+        }
+
+        let client = self.api_client(&state.database).await?;
+        let response = tokio::time::timeout(
+            USED_PORTS_TIMEOUT,
+            client.get_ports_used(&wings_api::ports_used::get::Query {
+                ip: Some(
+                    missing
+                        .iter()
+                        .map(|ip| compact_str::format_compact!("{ip}"))
+                        .collect(),
+                ),
+                ..Default::default()
+            }),
+        )
+        .await
+        .map_err(|_| anyhow::anyhow!("timed out asking the node which ports are in use"))??;
+
+        for ip in missing {
+            let ports: Vec<_> = response
+                .used
+                .get(compact_str::format_compact!("{ip}").as_str())
+                .map(|ports| ports.iter().map(|port| port.port as u16).collect())
+                .unwrap_or_default();
+
+            state
+                .cache
+                .set(&used_ports_cache_key(self.uuid, ip), USED_PORTS_TTL, &ports)
+                .await?;
+            used.insert(ip, ports);
+        }
+
+        Ok(used)
+    }
+
     #[inline]
     pub fn create_jwt<T: Serialize>(
         &self,

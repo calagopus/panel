@@ -57,6 +57,31 @@ export function bytesToString(bytes: number, decimals = 2, shortBytes = false): 
     : `${value} ${mapUnitToLocale(unit)}`;
 }
 
+/**
+ * Picks the unit that yields the "nicest" human-facing number for the given
+ * amount of bytes. Unlike closestUnit, this prefers a clean value in a smaller
+ * unit over a messy value in a larger unit.
+ */
+export function bestUnit(bytes: number, units: readonly Unit[] = UNITS): Unit {
+  if (!bytes || bytes < 1) return units[0];
+
+  const closest = closestUnit(bytes);
+  const closestIndex = UNITS.indexOf(closest);
+
+  for (let i = closestIndex; i >= 0; i--) {
+    const unit = UNITS[i];
+    const value = bytes / _CONVERSION_UNIT ** i;
+
+    if (units.includes(unit) && Number(value.toFixed(2)) === value) {
+      return unit;
+    }
+
+    if (value >= 10_000) break;
+  }
+
+  return units.includes(closest) ? closest : units[0];
+}
+
 export function closestUnit(bytes: number): (typeof UNITS)[number] {
   const k = _CONVERSION_UNIT;
 

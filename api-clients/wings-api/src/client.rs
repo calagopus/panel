@@ -311,6 +311,31 @@ impl WingsClient {
         .await
     }
 
+    pub async fn get_ports_used(
+        &self,
+        query: &super::ports_used::get::Query,
+    ) -> Result<super::ports_used::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.ip {
+            for value in value {
+                query_parts.push(format!("ip={}", urlencoding::encode(value)).into());
+            }
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/ports/used{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn get_servers(&self) -> Result<super::servers::get::Response, ApiHttpError> {
         request_impl(self, Method::GET, "/api/servers", None::<&()>, None).await
     }

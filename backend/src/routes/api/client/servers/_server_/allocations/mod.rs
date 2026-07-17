@@ -148,15 +148,10 @@ mod post {
                 .ok();
         }
 
-        let allocation = match ServerAllocation::create_random(&state.database, &server).await {
+        let allocation = match ServerAllocation::create_random(&state, &server).await {
             Ok(allocation_uuid) => ServerAllocation::by_uuid(&state.database, allocation_uuid)
                 .await?
                 .ok_or_else(|| anyhow::anyhow!("allocation not found after creation"))?,
-            Err(err) if err.to_string().contains("null value in column") => {
-                return ApiResponse::error("no node allocations are available")
-                    .with_status(StatusCode::EXPECTATION_FAILED)
-                    .ok();
-            }
             Err(err) => return ApiResponse::from(err).ok(),
         };
 

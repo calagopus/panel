@@ -106,6 +106,69 @@ impl NodeAllocation {
         Ok(())
     }
 
+    pub async fn used_by_node(
+        state: &crate::State,
+        node: &super::node::Node,
+        ips: &[std::net::IpAddr],
+    ) -> Result<Vec<uuid::Uuid>, anyhow::Error> {
+        if ips.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let (used_ips, used_ports): (Vec<_>, Vec<_>) = node
+            .used_ports(state, ips)
+            .await?
+            .into_iter()
+            .flat_map(|(ip, ports)| {
+                ports
+                    .into_iter()
+                    .map(move |port| (sqlx::types::ipnetwork::IpNetwork::from(ip), port as i32))
+            })
+            .unzip();
+
+        if used_ips.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        Ok(sqlx::query_scalar(
+            r#"
+            SELECT node_allocations.uuid
+            FROM node_allocations
+            JOIN UNNEST($2::inet[], $3::int[]) AS used(ip, port)
+                ON used.ip = node_allocations.ip AND used.port = node_allocations.port
+            WHERE node_allocations.node_uuid = $1
+            "#,
+        )
+        .bind(node.uuid)
+        .bind(&used_ips)
+        .bind(&used_ports)
+        .fetch_all(state.database.read())
+        .await?)
+    }
+
+    pub async fn used_by_node_any_ip(
+        state: &crate::State,
+        node: &super::node::Node,
+    ) -> Result<Vec<uuid::Uuid>, anyhow::Error> {
+        let ips: Vec<sqlx::types::ipnetwork::IpNetwork> = sqlx::query_scalar(
+            r#"
+            SELECT DISTINCT node_allocations.ip
+            FROM node_allocations
+            WHERE node_allocations.node_uuid = $1
+            "#,
+        )
+        .bind(node.uuid)
+        .fetch_all(state.database.read())
+        .await?;
+
+        Self::used_by_node(
+            state,
+            node,
+            &ips.iter().map(|ip| ip.ip()).collect::<Vec<_>>(),
+        )
+        .await
+    }
+
     pub async fn get_random(
         database: &crate::database::Database,
         node_uuid: uuid::Uuid,
@@ -215,6 +278,7 @@ impl NodeAllocation {
         start_port: u16,
         end_port: u16,
         amount: i64,
+        exclude: &[uuid::Uuid],
     ) -> Result<Vec<uuid::Uuid>, crate::database::DatabaseError> {
         let rows = sqlx::query(
             r#"
@@ -224,8 +288,9 @@ impl NodeAllocation {
                 LEFT JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
                 WHERE node_allocations.node_uuid = $1
                 GROUP BY node_allocations.ip
-                HAVING 
+                HAVING
                     COUNT(server_allocations.uuid) = 0
+                    AND COUNT(*) FILTER (WHERE node_allocations.uuid = ANY($5)) = 0
                     AND SUM(CASE WHEN node_allocations.port BETWEEN $2 AND $3 THEN 1 ELSE 0 END) >= $4
             ),
             random_ip AS (
@@ -245,6 +310,7 @@ impl NodeAllocation {
         .bind(start_port as i32)
         .bind(end_port as i32)
         .bind(amount)
+        .bind(exclude)
         .fetch_all(database.write())
         .await?;
 
@@ -266,6 +332,7 @@ impl NodeAllocation {
         database: &crate::database::Database,
         node_uuid: uuid::Uuid,
         ports: &[i32],
+        exclude: &[uuid::Uuid],
     ) -> Result<
         Option<(sqlx::types::ipnetwork::IpNetwork, Vec<(uuid::Uuid, i32)>)>,
         crate::database::DatabaseError,
@@ -280,6 +347,7 @@ impl NodeAllocation {
                     node_allocations.node_uuid = $1
                     AND node_allocations.port = ANY($2)
                     AND server_allocations.uuid IS NULL
+                    AND NOT (node_allocations.uuid = ANY($3))
                 GROUP BY node_allocations.ip
                 ORDER BY COUNT(DISTINCT node_allocations.port) DESC, RANDOM()
                 LIMIT 1
@@ -291,11 +359,13 @@ impl NodeAllocation {
                 node_allocations.node_uuid = $1
                 AND node_allocations.port = ANY($2)
                 AND server_allocations.uuid IS NULL
+                AND NOT (node_allocations.uuid = ANY($3))
                 AND node_allocations.ip = (SELECT ip FROM best_ip)
             "#,
         )
         .bind(node_uuid)
         .bind(ports)
+        .bind(exclude)
         .fetch_all(database.write())
         .await?;
 
@@ -318,6 +388,7 @@ impl NodeAllocation {
         node_uuid: uuid::Uuid,
         ip: &sqlx::types::ipnetwork::IpNetwork,
         port: i32,
+        exclude: &[uuid::Uuid],
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
         let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
@@ -325,12 +396,14 @@ impl NodeAllocation {
             FROM node_allocations
             LEFT JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
             WHERE node_allocations.node_uuid = $1 AND node_allocations.ip = $2 AND node_allocations.port = $3 AND server_allocations.uuid IS NULL
+                AND NOT (node_allocations.uuid = ANY($4))
             "#,
             Self::columns_sql(None)
         )))
         .bind(node_uuid)
         .bind(ip)
         .bind(port)
+        .bind(exclude)
         .fetch_optional(database.read())
         .await?;
 
@@ -338,11 +411,16 @@ impl NodeAllocation {
     }
 
     pub async fn get_from_deployment<'a>(
-        database: &crate::database::Database,
+        state: &crate::State,
         deployment: &'a super::egg_configuration::EggConfigAllocationsDeployment,
-        node_uuid: uuid::Uuid,
+        node: &super::node::Node,
         variables: &mut HashMap<&'a str, compact_str::CompactString>,
     ) -> Result<(Option<uuid::Uuid>, Vec<uuid::Uuid>), crate::database::DatabaseError> {
+        let database = &state.database;
+        let node_uuid = node.uuid;
+
+        let used = Self::used_by_node_any_ip(state, node).await?;
+
         let mut primary = None;
         let mut additional = Vec::new();
 
@@ -356,7 +434,8 @@ impl NodeAllocation {
 
         macro_rules! get_random {
             ($start_port:expr, $end_port:expr) => {{
-                let mut exclude = additional.clone();
+                let mut exclude = used.clone();
+                exclude.extend_from_slice(&additional);
                 if let Some(primary) = &primary {
                     exclude.push(primary.uuid);
                     Self::get_random_ip(
@@ -394,6 +473,7 @@ impl NodeAllocation {
                         primary_allocation.start_port,
                         primary_allocation.end_port,
                         1,
+                        &used,
                     )
                     .await?
                 } else {
@@ -403,7 +483,7 @@ impl NodeAllocation {
                         primary_allocation.start_port,
                         primary_allocation.end_port,
                         1,
-                        &[],
+                        &used,
                     )
                     .await?
                 };
@@ -485,7 +565,7 @@ impl NodeAllocation {
 
                         let allocation_port = primary.port + value as i32;
 
-                        let allocation = match Self::by_node_uuid_ip_port_unused(database, node_uuid, &primary.ip, allocation_port).await? {
+                        let allocation = match Self::by_node_uuid_ip_port_unused(database, node_uuid, &primary.ip, allocation_port, &used).await? {
                             Some(allocation) => allocation,
                             None => continue 'primary,
                         };
@@ -508,7 +588,7 @@ impl NodeAllocation {
 
                         let allocation_port = primary.port - value as i32;
 
-                        let allocation = match Self::by_node_uuid_ip_port_unused(database, node_uuid, &primary.ip, allocation_port).await? {
+                        let allocation = match Self::by_node_uuid_ip_port_unused(database, node_uuid, &primary.ip, allocation_port, &used).await? {
                             Some(allocation) => allocation,
                             None => continue 'primary,
                         };
@@ -531,7 +611,7 @@ impl NodeAllocation {
 
                         let allocation_port = (primary.port as f64 * value) as i32;
 
-                        let allocation = match Self::by_node_uuid_ip_port_unused(database, node_uuid, &primary.ip, allocation_port).await? {
+                        let allocation = match Self::by_node_uuid_ip_port_unused(database, node_uuid, &primary.ip, allocation_port, &used).await? {
                             Some(allocation) => allocation,
                             None => continue 'primary,
                         };
@@ -554,7 +634,7 @@ impl NodeAllocation {
 
                         let allocation_port = (primary.port as f64 / value) as i32;
 
-                        let allocation = match Self::by_node_uuid_ip_port_unused(database, node_uuid, &primary.ip, allocation_port).await? {
+                        let allocation = match Self::by_node_uuid_ip_port_unused(database, node_uuid, &primary.ip, allocation_port, &used).await? {
                             Some(allocation) => allocation,
                             None => continue 'primary,
                         };

@@ -239,6 +239,8 @@ pub fn extract_readable_error(err: &anyhow::Error) -> Option<(String, axum::http
     } else if let Some(DatabaseError::InvalidRelation(error)) = err.downcast_ref::<DatabaseError>()
     {
         return Some((error.to_string(), axum::http::StatusCode::BAD_REQUEST));
+    } else if let Some(DatabaseError::Any(error)) = err.downcast_ref::<DatabaseError>() {
+        return extract_readable_error(error);
     }
 
     None

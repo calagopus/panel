@@ -621,6 +621,15 @@ nestify::nest! {
     }
 }
 
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct UsedPort {
+        #[schema(inline)]
+        pub port: u32,
+        #[schema(inline)]
+        pub server: Option<uuid::Uuid>,
+    }
+}
+
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
 pub enum WebsocketEvent {
     #[serde(rename = "auth success")]
@@ -679,6 +688,8 @@ pub enum WebsocketEvent {
     BackupProgress,
     #[serde(rename = "backup completed")]
     BackupCompleted,
+    #[serde(rename = "backup deleted")]
+    BackupDeleted,
     #[serde(rename = "backup restore started")]
     BackupRestoreStarted,
     #[serde(rename = "backup restore progress")]
@@ -869,6 +880,37 @@ pub mod deauthorize_user {
         }
 
         pub type Response = Response200;
+    }
+}
+pub mod ports_used {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub used: IndexMap<compact_str::CompactString, Vec<UsedPort>>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response400 {
+                #[schema(inline)]
+                pub error: compact_str::CompactString,
+            }
+        }
+
+        pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub ip: Option<Vec<compact_str::CompactString>>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod servers {

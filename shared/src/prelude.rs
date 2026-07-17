@@ -136,6 +136,7 @@ pub trait SqlxErrorExt {
     fn is_unique_violation(&self) -> bool;
     fn is_foreign_key_violation(&self) -> bool;
     fn is_check_violation(&self) -> bool;
+    fn is_not_null_violation(&self) -> bool;
 
     fn code(&self) -> Option<Cow<'_, str>>;
     fn message(&self) -> Option<&str>;
@@ -158,6 +159,11 @@ impl SqlxErrorExt for sqlx::Error {
     fn is_check_violation(&self) -> bool {
         self.as_database_error()
             .is_some_and(|e| e.is_check_violation())
+    }
+
+    #[inline]
+    fn is_not_null_violation(&self) -> bool {
+        self.code().as_deref() == Some("23502")
     }
 
     #[inline]

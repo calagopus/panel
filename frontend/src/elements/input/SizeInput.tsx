@@ -1,6 +1,6 @@
 import { ReactNode, startTransition, useEffect, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
-import { closestUnit, formatUnitBytes, mapUnitToLocale, mbToBytes, UNITS, unitToBytes } from '@/lib/size.ts';
+import { bestUnit, formatUnitBytes, mapUnitToLocale, mbToBytes, UNITS, unitToBytes } from '@/lib/size.ts';
 import NumberInput from './NumberInput.tsx';
 import Select from './Select.tsx';
 
@@ -23,13 +23,11 @@ function SizeInput({ mode, min, value, onChange, ...rest }: SizeInputProps) {
 
   const getAppropriateUnit = (bytes: number) => {
     if (bytes <= 0) return availableUnits[0];
-    const closest = closestUnit(bytes);
-    return availableUnits.includes(closest) ? closest : availableUnits[0];
+    return bestUnit(bytes, availableUnits);
   };
 
   const [unit, setUnit] = useState(() => getAppropriateUnit(bytes));
   const [displayValue, setDisplayValue] = useState(isSpecialValue ? -1 : formatUnitBytes(unit, bytes));
-
   const isInternalChange = useRef(false);
 
   useEffect(() => {

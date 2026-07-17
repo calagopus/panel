@@ -118,9 +118,9 @@ mod post {
 
                         let (deployment_allocation_uuid, deployment_allocation_uuids) =
                             match NodeAllocation::get_from_deployment(
-                                &state.database,
+                                &state,
                                 &allocations.deployment,
-                                destination_node.uuid,
+                                &destination_node,
                                 &mut deployment_variables,
                             )
                             .await
@@ -189,10 +189,14 @@ mod post {
                     }
 
                     if !ports.is_empty() {
+                        let bound =
+                            NodeAllocation::used_by_node_any_ip(&state, &destination_node).await?;
+
                         let preserved = NodeAllocation::get_preserved(
                             &state.database,
                             destination_node.uuid,
                             &ports,
+                            &bound,
                         )
                         .await?;
 
@@ -212,7 +216,7 @@ mod post {
                         };
 
                         let mut assigned = Vec::with_capacity(ports.len());
-                        let mut used = Vec::new();
+                        let mut used = bound;
                         for port in &ports {
                             let node_allocation_uuid =
                                 available.get_mut(port).and_then(|uuids| uuids.pop());
@@ -321,7 +325,7 @@ mod post {
                             start_port,
                             end_port,
                             required_allocation_count,
-                            &[],
+                            &NodeAllocation::used_by_node_any_ip(&state, &destination_node).await?,
                         )
                         .await?;
 

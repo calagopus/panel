@@ -94,10 +94,10 @@ impl ServerAllocation {
     }
 
     pub async fn create_random(
-        database: &crate::database::Database,
+        state: &crate::State,
         server: &super::server::Server,
     ) -> Result<uuid::Uuid, crate::database::DatabaseError> {
-        let egg_configuration = server.egg.configuration(database).await?;
+        let egg_configuration = server.egg.configuration(&state.database).await?;
 
         let Some(config_allocations) = egg_configuration.config_allocations else {
             return Err(anyhow::Error::new(
@@ -107,6 +107,61 @@ impl ServerAllocation {
                 .with_status(StatusCode::EXPECTATION_FAILED),
             )
             .into());
+        };
+
+        let ip = server.allocation.as_ref().map(|a| a.allocation.ip);
+        let start_port = config_allocations.user_self_assign.start_port as i32;
+        let end_port = config_allocations.user_self_assign.end_port as i32;
+
+        let candidate_ips: Vec<sqlx::types::ipnetwork::IpNetwork> = sqlx::query_scalar(
+            r#"
+            SELECT DISTINCT node_allocations.ip
+            FROM node_allocations
+            LEFT JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
+            WHERE
+                node_allocations.node_uuid = $1
+                AND ($2 IS NULL OR node_allocations.ip = $2)
+                AND node_allocations.port BETWEEN $3 AND $4
+                AND server_allocations.uuid IS NULL
+            "#,
+        )
+        .bind(server.node.uuid)
+        .bind(ip)
+        .bind(start_port)
+        .bind(end_port)
+        .fetch_all(state.database.read())
+        .await?;
+
+        if candidate_ips.is_empty() {
+            return Err(anyhow::Error::new(
+                crate::response::DisplayError::new("no node allocations are available")
+                    .with_status(StatusCode::EXPECTATION_FAILED),
+            )
+            .into());
+        }
+
+        let exclude = match super::node_allocation::NodeAllocation::used_by_node(
+            state,
+            &server.node.fetch_cached(&state.database).await?,
+            &candidate_ips.iter().map(|ip| ip.ip()).collect::<Vec<_>>(),
+        )
+        .await
+        {
+            Ok(exclude) => exclude,
+            Err(err) => {
+                tracing::warn!(
+                    node = %server.node.uuid,
+                    "failed to resolve used ports, refusing to assign an allocation: {err:#}"
+                );
+
+                return Err(anyhow::Error::new(
+                    crate::response::DisplayError::new(
+                        "could not reach the node to check which ports are free",
+                    )
+                    .with_status(StatusCode::EXPECTATION_FAILED),
+                )
+                .into());
+            }
         };
 
         let row = sqlx::query(
@@ -120,6 +175,7 @@ impl ServerAllocation {
                     AND ($3 IS NULL OR node_allocations.ip = $3)
                     AND node_allocations.port BETWEEN $4 AND $5
                     AND server_allocations.uuid IS NULL
+                    AND NOT (node_allocations.uuid = ANY($6))
                 ORDER BY RANDOM()
                 LIMIT 1
             ))
@@ -128,11 +184,26 @@ impl ServerAllocation {
         )
         .bind(server.uuid)
         .bind(server.node.uuid)
-        .bind(server.allocation.as_ref().map(|a| a.allocation.ip))
-        .bind(config_allocations.user_self_assign.start_port as i32)
-        .bind(config_allocations.user_self_assign.end_port as i32)
-        .fetch_one(database.write())
-        .await?;
+        .bind(ip)
+        .bind(start_port)
+        .bind(end_port)
+        .bind(&exclude)
+        .fetch_one(state.database.write())
+        .await;
+
+        let row = match row {
+            Ok(row) => row,
+            Err(err) if err.is_not_null_violation() => {
+                return Err(anyhow::Error::new(
+                    crate::response::DisplayError::new(
+                        "every free port on this node is currently in use",
+                    )
+                    .with_status(StatusCode::EXPECTATION_FAILED),
+                )
+                .into());
+            }
+            Err(err) => return Err(err.into()),
+        };
 
         Ok(row.get("uuid"))
     }
