@@ -25,9 +25,9 @@ import {
   adminBackupConfigurationUpdateSchema,
 } from '@/lib/schemas/admin/backupConfigurations.ts';
 import BackupPBS from '@/pages/admin/backupConfigurations/forms/BackupPBS.tsx';
-import BackupConfigurationDuplicateModal from '@/pages/admin/backupConfigurations/modals/BackupConfigurationDuplicateModal.tsx';
 import BackupRestic from '@/pages/admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '@/pages/admin/backupConfigurations/forms/BackupS3.tsx';
+import BackupConfigurationDuplicateModal from '@/pages/admin/backupConfigurations/modals/BackupConfigurationDuplicateModal.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BackupKopia from './forms/BackupKopia.tsx';
