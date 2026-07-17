@@ -746,6 +746,8 @@ pub mod backups_backup {
                 pub adapter: BackupAdapter,
                 #[schema(inline)]
                 pub foreground: bool,
+                #[schema(inline)]
+                pub server: Option<uuid::Uuid>,
             }
         }
 

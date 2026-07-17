@@ -91,10 +91,19 @@ pub struct ServerBackup {
     pub metadata: serde_json::Value,
 
     pub completed: Option<chrono::NaiveDateTime>,
+    pub deleting: Option<chrono::NaiveDateTime>,
+    pub deletion_retries: i32,
     pub deleted: Option<chrono::NaiveDateTime>,
     pub created: chrono::NaiveDateTime,
 
     extension_data: super::ModelExtensionData,
+}
+
+#[derive(Debug, ToSchema, Serialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ServerBackupDeletionStatus {
+    Deleting,
+    Failed,
 }
 
 impl BaseModel for ServerBackup {
@@ -197,6 +206,14 @@ impl BaseModel for ServerBackup {
                 compact_str::format_compact!("{prefix}completed"),
             ),
             (
+                "server_backups.deleting",
+                compact_str::format_compact!("{prefix}deleting"),
+            ),
+            (
+                "server_backups.deletion_retries",
+                compact_str::format_compact!("{prefix}deletion_retries"),
+            ),
+            (
                 "server_backups.deleted",
                 compact_str::format_compact!("{prefix}deleted"),
             ),
@@ -244,6 +261,9 @@ impl BaseModel for ServerBackup {
                 .try_get(compact_str::format_compact!("{prefix}upload_path").as_str())?,
             metadata: row.try_get(compact_str::format_compact!("{prefix}metadata").as_str())?,
             completed: row.try_get(compact_str::format_compact!("{prefix}completed").as_str())?,
+            deleting: row.try_get(compact_str::format_compact!("{prefix}deleting").as_str())?,
+            deletion_retries: row
+                .try_get(compact_str::format_compact!("{prefix}deletion_retries").as_str())?,
             deleted: row.try_get(compact_str::format_compact!("{prefix}deleted").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
@@ -342,6 +362,7 @@ impl ServerBackup {
             WHERE
                 server_backups.server_uuid = $1
                 AND server_backups.deleted IS NULL
+                AND server_backups.deleting IS NULL
                 AND server_backups.completed IS NOT NULL
                 AND server_backups.successful
                 AND ($2 IS NULL OR server_backups.name = $2)
@@ -1284,9 +1305,9 @@ impl ServerBackup {
         state: &crate::State,
         server: &super::server::Server,
     ) -> Result<(), anyhow::Error> {
-        let row = sqlx::query!(
+        let row = sqlx::query(
             r#"
-            SELECT candidates.uuid AS "uuid!", candidates.tier AS "tier!", candidates.group_name AS "group_name?"
+            SELECT candidates.uuid, candidates.tier, candidates.group_name
             FROM (
                 SELECT
                     server_backups.uuid,
@@ -1298,6 +1319,7 @@ impl ServerBackup {
                             FROM server_backups b2
                             WHERE b2.backup_group_uuid = server_backups.backup_group_uuid
                                 AND b2.deleted IS NULL
+                                AND b2.deleting IS NULL
                                 AND b2.successful
                                 AND b2.completed IS NOT NULL
                                 AND b2.created >= server_backups.created
@@ -1312,12 +1334,13 @@ impl ServerBackup {
                     AND server_backups.locked = false
                     AND server_backups.completed IS NOT NULL
                     AND server_backups.deleted IS NULL
+                    AND server_backups.deleting IS NULL
             ) candidates
             ORDER BY candidates.tier ASC, candidates.created ASC
             LIMIT 1
             "#,
-            server.uuid,
         )
+        .bind(server.uuid)
         .fetch_optional(state.database.read())
         .await?;
 
@@ -1325,24 +1348,28 @@ impl ServerBackup {
             return Err(sqlx::Error::RowNotFound.into());
         };
 
-        let rule = match row.tier {
+        let row_uuid: uuid::Uuid = row.try_get("uuid")?;
+        let row_tier: i32 = row.try_get("tier")?;
+        let row_group_name: Option<String> = row.try_get("group_name")?;
+
+        let rule = match row_tier {
             0 => "failed",
             1 => "over-retention",
             2 => "ungrouped",
             _ => "in-retention",
         };
 
-        if row.tier == 3 {
+        if row_tier == 3 {
             tracing::warn!(
                 server = %server.uuid,
-                backup = %row.uuid,
-                group = ?row.group_name,
+                backup = %row_uuid,
+                group = ?row_group_name,
                 "evicting an in-retention grouped backup to satisfy backup_limit; retention quota exceeds backup_limit"
             );
         }
 
         let Some(backup) =
-            Self::by_server_uuid_uuid(&state.database, server.uuid, row.uuid).await?
+            Self::by_server_uuid_uuid(&state.database, server.uuid, row_uuid).await?
         else {
             return Err(sqlx::Error::RowNotFound.into());
         };
@@ -1355,7 +1382,7 @@ impl ServerBackup {
             backup.uuid,
             &backup.name,
             rule,
-            row.group_name.as_deref(),
+            row_group_name.as_deref(),
         )
         .await;
 
@@ -1370,35 +1397,40 @@ impl ServerBackup {
             return Ok(GroupRotationOutcome::NotConfigured);
         };
 
-        let row = sqlx::query!(
+        let row = sqlx::query(
             r#"
             SELECT
                 (SELECT COUNT(*)
                     FROM server_backups
                     WHERE server_backups.backup_group_uuid = $1
                         AND server_backups.deleted IS NULL
+                        AND server_backups.deleting IS NULL
                         AND server_backups.successful
-                        AND server_backups.completed IS NOT NULL) AS "usable!",
+                        AND server_backups.completed IS NOT NULL) AS usable,
                 (SELECT server_backups.uuid
                     FROM server_backups
                     WHERE server_backups.backup_group_uuid = $1
                         AND server_backups.deleted IS NULL
+                        AND server_backups.deleting IS NULL
                         AND server_backups.successful
                         AND server_backups.completed IS NOT NULL
                         AND server_backups.locked = false
                     ORDER BY server_backups.created ASC
-                    LIMIT 1) AS "oldest_unlocked?"
+                    LIMIT 1) AS oldest_unlocked
             "#,
-            group.uuid,
         )
+        .bind(group.uuid)
         .fetch_one(state.database.read())
         .await?;
 
-        if row.usable < retention_count as i64 {
+        let usable: i64 = row.try_get("usable")?;
+        let oldest_unlocked: Option<uuid::Uuid> = row.try_get("oldest_unlocked")?;
+
+        if usable < retention_count as i64 {
             return Ok(GroupRotationOutcome::WithinRetention);
         }
 
-        let Some(oldest_unlocked) = row.oldest_unlocked else {
+        let Some(oldest_unlocked) = oldest_unlocked else {
             return Ok(GroupRotationOutcome::BlockedAllLocked);
         };
 
@@ -1431,6 +1463,7 @@ impl ServerBackup {
             JOIN server_backup_groups g ON g.uuid = server_backups.backup_group_uuid
             WHERE g.retention_days IS NOT NULL
                 AND server_backups.deleted IS NULL
+                AND server_backups.deleting IS NULL
                 AND server_backups.locked = false
                 AND server_backups.completed IS NOT NULL
                 AND server_backups.created < NOW() - make_interval(days => g.retention_days)
@@ -1440,7 +1473,7 @@ impl ServerBackup {
         .fetch_all(state.database.read())
         .await?;
 
-        let mut pruned = 0u64;
+        let mut pruned = 0;
         for row in rows {
             let group_name: compact_str::CompactString = row.try_get("group_name")?;
             let server_uuid: Option<uuid::Uuid> = row.try_get("server_uuid")?;
@@ -1564,6 +1597,8 @@ impl ServerBackup {
         state: &crate::State,
         storage_url_retriever: &StorageUrlRetriever<'_>,
     ) -> Result<AdminApiNodeServerBackup, crate::database::DatabaseError> {
+        let deletion_status = self.deletion_status();
+
         Ok(AdminApiNodeServerBackup {
             uuid: self.uuid,
             server: match self.server {
@@ -1593,6 +1628,7 @@ impl ServerBackup {
             checksum: self.checksum,
             bytes: self.bytes,
             files: self.files,
+            deletion_status,
             metadata: self.metadata,
             completed: self.completed.map(|dt| dt.and_utc()),
             created: self.created.and_utc(),
@@ -1610,6 +1646,7 @@ impl IntoAdminApiObject for ServerBackup {
         state: &crate::State,
         storage_url_retriever: Self::ExtraArgs<'a>,
     ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
+        let deletion_status = self.deletion_status();
         let api_object = AdminApiServerBackup::init_hooks(&self, state).await?;
 
         let api_object = finish_extendible!(
@@ -1636,6 +1673,7 @@ impl IntoAdminApiObject for ServerBackup {
                 checksum: self.checksum,
                 bytes: self.bytes,
                 files: self.files,
+                deletion_status,
                 metadata: self.metadata,
                 completed: self.completed.map(|dt| dt.and_utc()),
                 created: self.created.and_utc(),
@@ -1658,6 +1696,7 @@ impl IntoApiObject for ServerBackup {
         state: &crate::State,
         _args: Self::ExtraArgs<'a>,
     ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
+        let deletion_status = self.deletion_status();
         let api_object = ApiServerBackup::init_hooks(&self, state).await?;
 
         let api_object = finish_extendible!(
@@ -1673,6 +1712,7 @@ impl IntoApiObject for ServerBackup {
                 checksum: self.checksum,
                 bytes: self.bytes,
                 files: self.files,
+                deletion_status,
                 metadata: self.metadata,
                 completed: self.completed.map(|dt| dt.and_utc()),
                 created: self.created.and_utc(),
@@ -1970,6 +2010,315 @@ pub struct DeleteServerBackupOptions {
     pub force: bool,
 }
 
+impl ServerBackup {
+    pub const MAX_DELETION_RETRIES: i32 = 8;
+
+    #[inline]
+    pub fn deletion_status(&self) -> Option<ServerBackupDeletionStatus> {
+        if self.deleted.is_some() || self.deleting.is_none() {
+            return None;
+        }
+
+        if self.deletion_retries >= Self::MAX_DELETION_RETRIES {
+            Some(ServerBackupDeletionStatus::Failed)
+        } else {
+            Some(ServerBackupDeletionStatus::Deleting)
+        }
+    }
+
+    pub async fn dispatch_deletion(
+        &self,
+        state: &crate::State,
+        options: &DeleteServerBackupOptions,
+    ) -> Result<bool, anyhow::Error> {
+        let node = self.node.fetch_cached(&state.database).await?;
+
+        let backup_configuration = match &self.backup_configuration {
+            Some(backup_configuration) => {
+                Some(backup_configuration.fetch_cached(&state.database).await?)
+            }
+            None if options.force => None,
+            None => {
+                return Err(crate::response::DisplayError::new(
+                    "no backup configuration available, unable to delete backup",
+                )
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .into());
+            }
+        };
+
+        if let Some(backup_configuration) = &backup_configuration
+            && backup_configuration.maintenance_enabled
+        {
+            return Err(crate::response::DisplayError::new(
+                "cannot delete backup while backup configuration is in maintenance mode",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
+        if self.disk == BackupDisk::S3 {
+            let Some(mut s3_configuration) =
+                backup_configuration.and_then(|c| c.backup_configs.s3.clone())
+            else {
+                if options.force {
+                    tracing::warn!(server = ?self.server.as_ref().map(|s| s.uuid), backup = %self.uuid, "S3 backup deletion attempted but no S3 configuration found, ignoring");
+
+                    return Ok(true);
+                }
+
+                return Err(anyhow::anyhow!(
+                    "s3 backup deletion attempted but no S3 configuration found"
+                ));
+            };
+
+            s3_configuration.decrypt(&state.database).await?;
+
+            let compression_type = s3_configuration.compression_type;
+            let (client, bucket) = s3_configuration.into_client();
+
+            let file_path = match &self.upload_path {
+                Some(path) => path,
+                None => {
+                    if let Some(server) = &self.server {
+                        &Self::s3_path(server.uuid, self.uuid, compression_type)
+                    } else {
+                        return Err(anyhow::anyhow!("backup upload path not found"));
+                    }
+                }
+            };
+
+            if let Err(err) = client
+                .delete_object()
+                .bucket(bucket)
+                .key(&**file_path)
+                .send()
+                .await
+            {
+                if options.force {
+                    tracing::error!(server = ?self.server.as_ref().map(|s| s.uuid), backup = %self.uuid, "failed to delete S3 backup, ignoring: {:?}", err);
+                } else {
+                    return Err(err.into());
+                }
+            }
+
+            return Ok(true);
+        }
+
+        match node
+            .api_client(&state.database)
+            .await?
+            .delete_backups_backup(
+                self.uuid,
+                &wings_api::backups_backup::delete::RequestBody {
+                    adapter: self.disk.to_wings_adapter(),
+                    foreground: false,
+                    server: self.server.as_ref().map(|s| s.uuid),
+                },
+            )
+            .await
+        {
+            Ok(_) => Ok(false),
+            Err(wings_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, _)) => Ok(true),
+            Err(err) if options.force => {
+                tracing::error!(node = %node.uuid, backup = %self.uuid, "unable to delete backup on node, finalizing anyway: {:?}", err);
+
+                Ok(true)
+            }
+            Err(err) => Err(err.into()),
+        }
+    }
+
+    pub async fn finish_deletion(
+        &self,
+        state: &crate::State,
+        options: &DeleteServerBackupOptions,
+    ) -> Result<(), anyhow::Error> {
+        let mut transaction = state.database.write().begin().await?;
+
+        let finalized = sqlx::query(
+            r#"
+            UPDATE server_backups
+            SET deleted = NOW(), deleting = NULL
+            WHERE server_backups.uuid = $1 AND server_backups.deleted IS NULL
+            "#,
+        )
+        .bind(self.uuid)
+        .execute(&mut *transaction)
+        .await?
+        .rows_affected();
+
+        if finalized == 0 {
+            return Ok(());
+        }
+
+        self.run_after_delete_handlers(options, state, &mut transaction)
+            .await?;
+
+        transaction.commit().await?;
+
+        Self::get_event_emitter().emit(
+            state.clone(),
+            ServerBackupEvent::DeletionCompleted {
+                backup: Box::new(self.clone()),
+                successful: true,
+            },
+        );
+
+        Ok(())
+    }
+
+    pub async fn fail_deletion_attempt(&self, state: &crate::State) -> Result<i32, anyhow::Error> {
+        let deletion_retries: Option<i32> = sqlx::query_scalar(
+            r#"
+            UPDATE server_backups
+            SET deletion_retries = deletion_retries + 1
+            WHERE
+                server_backups.uuid = $1
+                AND server_backups.deleted IS NULL
+                AND server_backups.deleting IS NOT NULL
+            RETURNING server_backups.deletion_retries
+            "#,
+        )
+        .bind(self.uuid)
+        .fetch_optional(state.database.write())
+        .await?;
+
+        let Some(deletion_retries) = deletion_retries else {
+            return Ok(0);
+        };
+
+        if deletion_retries >= Self::MAX_DELETION_RETRIES {
+            if let Some(server) = &self.server
+                && let Err(err) = super::server_activity::ServerActivity::create(
+                    state,
+                    super::server_activity::CreateServerActivityOptions {
+                        server_uuid: server.uuid,
+                        user_uuid: None,
+                        impersonator_uuid: None,
+                        api_key_uuid: None,
+                        schedule_uuid: None,
+                        event: "server:backup.delete-failed".into(),
+                        ip: None,
+                        data: serde_json::json!({
+                            "uuid": self.uuid,
+                            "name": self.name,
+                        }),
+                        created: None,
+                    },
+                )
+                .await
+            {
+                tracing::warn!(
+                    backup = %self.uuid,
+                    "failed to log backup deletion failure activity: {:#?}",
+                    err
+                );
+            }
+
+            Self::get_event_emitter().emit(
+                state.clone(),
+                ServerBackupEvent::DeletionCompleted {
+                    backup: Box::new(self.clone()),
+                    successful: false,
+                },
+            );
+        }
+
+        Ok(deletion_retries)
+    }
+
+    pub async fn redispatch_stale_deletions(state: &crate::State) -> Result<u64, anyhow::Error> {
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM server_backups
+            WHERE
+                server_backups.deleted IS NULL
+                AND server_backups.deleting IS NOT NULL
+                AND server_backups.deletion_retries < $1
+                AND server_backups.deleting < NOW() - make_interval(mins => LEAST(60.0, 5.0 * POWER(2.0, server_backups.deletion_retries))::int)
+            ORDER BY server_backups.deleting
+            LIMIT 32
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(Self::MAX_DELETION_RETRIES)
+        .fetch_all(state.database.read())
+        .await?;
+
+        let mut redispatched = 0;
+        for row in rows {
+            let backup = Self::map(None, &row)?;
+
+            if let Some(backup_configuration) = &backup.backup_configuration
+                && let Ok(backup_configuration) =
+                    backup_configuration.fetch_cached(&state.database).await
+                && backup_configuration.maintenance_enabled
+            {
+                sqlx::query(
+                    "UPDATE server_backups
+                    SET deleting = NOW()
+                    WHERE server_backups.uuid = $1 AND server_backups.deleted IS NULL",
+                )
+                .bind(backup.uuid)
+                .execute(state.database.write())
+                .await?;
+
+                continue;
+            }
+
+            let deletion_retries: i32 = sqlx::query_scalar(
+                r#"
+                UPDATE server_backups
+                SET deleting = NOW(), deletion_retries = deletion_retries + 1
+                WHERE server_backups.uuid = $1 AND server_backups.deleted IS NULL
+                RETURNING server_backups.deletion_retries
+                "#,
+            )
+            .bind(backup.uuid)
+            .fetch_one(state.database.write())
+            .await?;
+
+            match backup
+                .dispatch_deletion(state, &DeleteServerBackupOptions::default())
+                .await
+            {
+                Ok(true) => {
+                    backup
+                        .finish_deletion(state, &DeleteServerBackupOptions::default())
+                        .await?;
+                }
+                Ok(false) => {}
+                Err(err) => {
+                    tracing::error!(
+                        backup = %backup.uuid,
+                        deletion_retries,
+                        "failed to redispatch backup deletion: {:#?}",
+                        err
+                    );
+
+                    if deletion_retries >= Self::MAX_DELETION_RETRIES {
+                        Self::get_event_emitter().emit(
+                            state.clone(),
+                            ServerBackupEvent::DeletionCompleted {
+                                backup: Box::new(backup.clone()),
+                                successful: false,
+                            },
+                        );
+                    }
+
+                    continue;
+                }
+            }
+
+            redispatched += 1;
+        }
+
+        Ok(redispatched)
+    }
+}
+
 #[async_trait::async_trait]
 impl DeletableModel for ServerBackup {
     type DeleteOptions = DeleteServerBackupOptions;
@@ -1997,70 +2346,12 @@ impl DeletableModel for ServerBackup {
         state: &crate::State,
         options: Self::DeleteOptions,
     ) -> Result<(), anyhow::Error> {
-        let mut transaction = state.database.write().begin().await?;
-
-        self.run_delete_handlers(&options, state, &mut transaction)
-            .await?;
-
-        let node = self.node.fetch_cached(&state.database).await?;
-
-        let backup_configuration = match &self.backup_configuration {
-            Some(backup_configuration) => {
-                backup_configuration.fetch_cached(&state.database).await?
-            }
-            None if options.force => {
-                let database = Arc::clone(&state.database);
-                let backup_uuid = self.uuid;
-                let backup_disk = self.disk;
-
-                return tokio::spawn(async move {
-                    if backup_disk != BackupDisk::S3
-                        && let Err(err) = node
-                            .api_client(&database)
-                            .await?
-                            .delete_backups_backup(
-                                backup_uuid,
-                                &wings_api::backups_backup::delete::RequestBody {
-                                    adapter: backup_disk.to_wings_adapter(),
-                                    foreground: false,
-                                },
-                            )
-                            .await
-                            && !matches!(
-                                err,
-                                wings_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, _)
-                            )
-                    {
-                        tracing::error!(node = %node.uuid, backup = %backup_uuid, "unable to delete backup on node: {:?}", err)
-                    }
-
-                    sqlx::query(
-                        r#"
-                        UPDATE server_backups
-                        SET deleted = NOW()
-                        WHERE server_backups.uuid = $1
-                        "#,
-                    )
-                    .bind(backup_uuid)
-                    .execute(&mut *transaction)
-                    .await?;
-
-                    transaction.commit().await?;
-
-                    Ok(())
-                })
-                .await?;
-            }
-            None => {
-                return Err(crate::response::DisplayError::new(
-                    "no backup configuration available, unable to delete backup",
-                )
-                .with_status(StatusCode::EXPECTATION_FAILED)
-                .into());
-            }
-        };
-
-        if backup_configuration.maintenance_enabled {
+        if let Some(backup_configuration) = &self.backup_configuration
+            && backup_configuration
+                .fetch_cached(&state.database)
+                .await?
+                .maintenance_enabled
+        {
             return Err(crate::response::DisplayError::new(
                 "cannot delete backup while backup configuration is in maintenance mode",
             )
@@ -2068,76 +2359,55 @@ impl DeletableModel for ServerBackup {
             .into());
         }
 
-        let backup = self.clone();
-        let state = state.clone();
+        let mut transaction = state.database.write().begin().await?;
 
-        tokio::spawn(async move {
-            match backup.disk {
-                BackupDisk::S3 => {
-                    if let Some(mut s3_configuration) = backup_configuration.backup_configs.s3 {
-                        s3_configuration.decrypt(&state.database).await?;
-
-                        let compression_type = s3_configuration.compression_type;
-                        let (client, bucket) = s3_configuration.into_client();
-
-                        let file_path = match &backup.upload_path {
-                            Some(path) => path,
-                            None => if let Some(server) = &backup.server {
-                                &Self::s3_path(server.uuid, backup.uuid, compression_type)
-                            } else {
-                                return Err(anyhow::anyhow!("backup upload path not found"))
-                            }
-                        };
-
-                        if let Err(err) = client.delete_object().bucket(bucket).key(&**file_path).send().await {
-                            if options.force {
-                                tracing::error!(server = ?backup.server.as_ref().map(|s| s.uuid), backup = %backup.uuid, "failed to delete S3 backup, ignoring: {:?}", err);
-                            } else {
-                                return Err(err.into());
-                            }
-                        }
-                    } else if options.force {
-                        tracing::warn!(server = ?backup.server.as_ref().map(|s| s.uuid), backup = %backup.uuid, "S3 backup deletion attempted but no S3 configuration found, ignoring");
-                    } else {
-                        return Err(anyhow::anyhow!("s3 backup deletion attempted but no S3 configuration found"));
-                    }
-                }
-                _ => {
-                    if let Err(err) = node
-                        .api_client(&state.database)
-                        .await?
-                        .delete_backups_backup(
-                            backup.uuid,
-                            &wings_api::backups_backup::delete::RequestBody {
-                                adapter: backup.disk.to_wings_adapter(),
-                                foreground: false,
-                            },
-                        )
-                        .await
-                        && !matches!(err, wings_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, _))
-                    {
-                        return Err(err.into());
-                    }
-                }
-            }
-
-            sqlx::query(
-                r#"
-                UPDATE server_backups
-                SET deleted = NOW()
-                WHERE server_backups.uuid = $1
-                "#,
-            )
-            .bind(backup.uuid)
-            .execute(&mut *transaction)
+        self.run_delete_handlers(&options, state, &mut transaction)
             .await?;
 
-            backup.run_after_delete_handlers(&options, &state, &mut transaction).await?;
+        let claimed = sqlx::query(
+            r#"
+            UPDATE server_backups
+            SET deleting = NOW(), deletion_retries = 0
+            WHERE
+                server_backups.uuid = $1
+                AND server_backups.deleted IS NULL
+                AND (server_backups.deleting IS NULL OR server_backups.deletion_retries >= $2)
+            "#,
+        )
+        .bind(self.uuid)
+        .bind(Self::MAX_DELETION_RETRIES)
+        .execute(&mut *transaction)
+        .await?
+        .rows_affected();
 
-            transaction.commit().await?;
+        if claimed == 0 {
+            return Err(
+                crate::response::DisplayError::new("backup is already being deleted")
+                    .with_status(StatusCode::EXPECTATION_FAILED)
+                    .into(),
+            );
+        }
 
-            Ok(())
-        }).await?
+        transaction.commit().await?;
+
+        match self.dispatch_deletion(state, &options).await {
+            Ok(true) => self.finish_deletion(state, &options).await,
+            Ok(false) => Ok(()),
+            Err(err) => {
+                sqlx::query(
+                    r#"
+                    UPDATE server_backups
+                    SET deleting = NULL, deletion_retries = 0
+                    WHERE server_backups.uuid = $1 AND server_backups.deleted IS NULL
+                    "#,
+                )
+                .bind(self.uuid)
+                .execute(state.database.write())
+                .await?;
+
+                Err(err)
+            }
+        }
     }
 }
 
@@ -2163,6 +2433,7 @@ pub struct AdminApiNodeServerBackup {
     pub files: i64,
 
     pub metadata: serde_json::Value,
+    pub deletion_status: Option<ServerBackupDeletionStatus>,
 
     pub completed: Option<chrono::DateTime<chrono::Utc>>,
     pub created: chrono::DateTime<chrono::Utc>,
@@ -2192,6 +2463,7 @@ pub struct AdminApiServerBackup {
     pub files: i64,
 
     pub metadata: serde_json::Value,
+    pub deletion_status: Option<ServerBackupDeletionStatus>,
 
     pub completed: Option<chrono::DateTime<chrono::Utc>>,
     pub created: chrono::DateTime<chrono::Utc>,
@@ -2219,6 +2491,7 @@ pub struct ApiServerBackup {
     pub files: i64,
 
     pub metadata: serde_json::Value,
+    pub deletion_status: Option<ServerBackupDeletionStatus>,
 
     pub completed: Option<chrono::DateTime<chrono::Utc>>,
     pub created: chrono::DateTime<chrono::Utc>,

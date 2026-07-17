@@ -15,7 +15,7 @@ export interface BackupsSlice {
 
   setBackups: (backups: Pagination<z.infer<typeof serverBackupSchema>>) => void;
   addBackup: (backups: z.infer<typeof serverBackupSchema>) => void;
-  removeBackup: (backups: z.infer<typeof serverBackupSchema>) => void;
+  removeBackup: (uuid: string) => void;
   updateBackup: (uuid: string, updatedProps: Partial<z.infer<typeof serverBackupSchema>>) => void;
 
   // Live in-progress backups keyed by uuid, kept separate from the lists so it can
@@ -44,14 +44,18 @@ export const createBackupsSlice: StateCreator<ServerStore, [], [], BackupsSlice>
         total: state.backups.total + 1,
       },
     })),
-  removeBackup: (backup) =>
-    set((state) => ({
-      backups: {
-        ...state.backups,
-        data: state.backups.data.filter((b) => b.uuid !== backup.uuid),
-        total: state.backups.total - 1,
-      },
-    })),
+  removeBackup: (uuid) =>
+    set((state) => {
+      if (!state.backups.data.some((b) => b.uuid === uuid)) return state;
+
+      return {
+        backups: {
+          ...state.backups,
+          data: state.backups.data.filter((b) => b.uuid !== uuid),
+          total: state.backups.total - 1,
+        },
+      };
+    }),
   updateBackup: (uuid, updatedProps) =>
     set((state) => ({
       backups: {

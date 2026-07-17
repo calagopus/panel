@@ -12,6 +12,7 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod deletion;
 mod kopia;
 mod pbs;
 mod restic;
@@ -302,6 +303,7 @@ mod post {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(post::route))
+        .nest("/deletion", deletion::router(state))
         .nest("/s3", s3::router(state))
         .nest("/pbs", pbs::router(state))
         .nest("/restic", restic::router(state))

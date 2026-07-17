@@ -594,6 +594,7 @@
           "toast": {
             "backupCompleted": "Backup erfolgreich abgeschlossen.",
             "backupFailed": "Backup fehlgeschlagen.",
+            "backupDeleteFailed": "Backup-Löschung fehlgeschlagen.",
             "backupRestoreCompleted": "Backup-Wiederherstellung erfolgreich abgeschlossen.",
             "installCompleted": "Server-Installation erfolgreich abgeschlossen.",
             "installFailed": "Server-Installation fehlgeschlagen.",
@@ -5072,6 +5073,10 @@
               "locked": "Gesperrt?"
             }
           },
+          "badge": {
+            "deleting": "Wird gelöscht…",
+            "deleteFailed": "Löschen fehlgeschlagen"
+          },
           "button": {
             "browse": "Durchsuchen",
             "exportToFiles": "In Dateien exportieren",
@@ -5107,6 +5112,7 @@
               "title": "Löschen des Backups bestätigen",
               "content": "Bist du sicher, dass du **{name}** von diesem Server löschen möchtest?",
               "toast": {
+                "started": "Backup-Löschung gestartet.",
                 "deleted": "Backup gelöscht."
               }
             },

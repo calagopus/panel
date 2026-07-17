@@ -54,6 +54,12 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_server_permission("backups.restore")?;
 
+        if backup.deleting.is_some() {
+            return ApiResponse::error("backup is being deleted")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         if backup.completed.is_none() {
             return ApiResponse::error("backup has not been completed yet")
                 .with_status(StatusCode::EXPECTATION_FAILED)

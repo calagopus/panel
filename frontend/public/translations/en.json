@@ -594,6 +594,7 @@
           "toast": {
             "backupCompleted": "Backup completed successfully.",
             "backupFailed": "Backup failed.",
+            "backupDeleteFailed": "Backup deletion failed.",
             "backupRestoreCompleted": "Backup restore completed successfully.",
             "installCompleted": "Server Installation completed successfully.",
             "installFailed": "Server Installation failed.",
@@ -1275,6 +1276,12 @@
               "content": "Are you sure you want to delete **{name}** from your account?",
               "toast": {
                 "removed": "Command snippet removed."
+              }
+            },
+            "duplicateCommandSnippet": {
+              "title": "Duplicate Command Snippet",
+              "toast": {
+                "duplicated": "Command snippet duplicated."
               }
             }
           }
@@ -2957,13 +2964,17 @@
                       "toast": {
                         "created": "Egg variable created.",
                         "updated": "Egg variable updated.",
-                        "deleted": "Egg variable deleted."
+                        "deleted": "Egg variable deleted.",
+                        "duplicated": "Egg variable duplicated."
                       },
                       "modal": {
                         "delete": {
                           "title": "Confirm Egg Variable Removal",
                           "content": "Are you sure you want to remove **{variable}**?",
                           "emptyVariable": "this empty variable"
+                        },
+                        "duplicate": {
+                          "title": "Duplicate Egg Variable"
                         }
                       }
                     }
@@ -5062,6 +5073,10 @@
               "locked": "Locked?"
             }
           },
+          "badge": {
+            "deleting": "Deleting…",
+            "deleteFailed": "Deletion failed"
+          },
           "button": {
             "browse": "Browse",
             "exportToFiles": "Export to Files",
@@ -5097,6 +5112,7 @@
               "title": "Confirm Backup Deletion",
               "content": "Are you sure you want to delete **{name}** from this server?",
               "toast": {
+                "started": "Backup deletion started.",
                 "deleted": "Backup deleted."
               }
             },

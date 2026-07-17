@@ -19,6 +19,11 @@ pub enum ServerBackupEvent {
         backup: Box<super::ServerBackup>,
         successful: bool,
     },
+    /// Emitted when a server backup deletion completes, either successfully or unsuccessfully.
+    DeletionCompleted {
+        backup: Box<super::ServerBackup>,
+        successful: bool,
+    },
 }
 
 #[async_trait::async_trait]

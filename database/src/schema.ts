@@ -990,6 +990,8 @@ export const serverBackupsTable = pgTable(
     upload_id: text(),
     upload_path: text(),
     completed: timestamp(),
+    deleting: timestamp(),
+    deletion_retries: integer().default(0).notNull(),
     deleted: timestamp(),
     created: timestamp().defaultNow().notNull(),
   },

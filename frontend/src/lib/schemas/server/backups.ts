@@ -13,6 +13,7 @@ export const serverBackupSchema = z.looseObject({
   bytes: z.number(),
   files: z.number(),
   metadata: z.record(z.string(), z.unknown()),
+  deletionStatus: z.enum(['deleting', 'failed']).nullable(),
   completed: z.coerce.date().nullable(),
   created: z.coerce.date(),
 });

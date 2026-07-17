@@ -66,6 +66,12 @@ mod post {
         permissions.has_server_permission("backups.download")?;
         permissions.has_server_permission("files.create")?;
 
+        if backup.deleting.is_some() {
+            return ApiResponse::error("backup is being deleted")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         if backup.completed.is_none() {
             return ApiResponse::error("backup has not been completed yet")
                 .with_status(StatusCode::EXPECTATION_FAILED)

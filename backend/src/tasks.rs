@@ -420,6 +420,25 @@ pub async fn define_background_tasks(
         .await;
     background_task_builder
         .add_cron_task(
+            "redispatch_stale_backup_deletions",
+            cron::Schedule::from_str("0 * * * * *").unwrap(),
+            async |state| {
+                let redispatched =
+                    shared::models::server_backup::ServerBackup::redispatch_stale_deletions(&state)
+                        .await?;
+                if redispatched > 0 {
+                    tracing::info!(
+                        "redispatched {} backup deletions without a completion callback",
+                        redispatched
+                    );
+                }
+
+                Ok(())
+            },
+        )
+        .await;
+    background_task_builder
+        .add_cron_task(
             "prune_backup_groups",
             cron::Schedule::from_str("0 0 * * * *").unwrap(),
             async |state| {

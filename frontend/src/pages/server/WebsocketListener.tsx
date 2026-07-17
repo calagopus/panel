@@ -36,6 +36,7 @@ export default function WebsocketListener() {
     setBackupRestoreProgress,
     setTransferProgress,
     updateBackup,
+    removeBackup,
     setRunningScheduleStep,
     setScheduleSteps,
     setFileOperation,
@@ -55,6 +56,7 @@ export default function WebsocketListener() {
       setBackupRestoreProgress: state.setBackupRestoreProgress,
       setTransferProgress: state.setTransferProgress,
       updateBackup: state.updateBackup,
+      removeBackup: state.removeBackup,
       setRunningScheduleStep: state.setRunningScheduleStep,
       setScheduleSteps: state.setScheduleSteps,
       setFileOperation: state.setFileOperation,
@@ -161,8 +163,6 @@ export default function WebsocketListener() {
 
     clearBackupProgress(uuid);
 
-    // Ungrouped backups live in the store; grouped backups live in component-local
-    // state fed by react-query, so refetch the groups to reflect the completed backup.
     updateBackup(uuid, {
       isSuccessful: wsData.successful,
       checksum: `${wsData.checksum_type}:${wsData.checksum}`,
@@ -172,6 +172,24 @@ export default function WebsocketListener() {
       isStreaming: wsData.streaming,
       completed: new Date(),
     });
+    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.groups.all());
+  });
+
+  useWebsocketEvent(SocketEvent.BACKUP_DELETED, (uuid, data) => {
+    let wsData: { successful: boolean };
+    try {
+      wsData = JSON.parse(data);
+    } catch {
+      return;
+    }
+
+    if (wsData.successful) {
+      removeBackup(uuid);
+    } else {
+      addToast(t('elements.serverWebsocket.listener.toast.backupDeleteFailed', {}), 'error');
+      updateBackup(uuid, { deletionStatus: 'failed' });
+    }
+
     invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.groups.all());
   });
 

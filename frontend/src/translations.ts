@@ -516,6 +516,7 @@ const baseTranslations = defineTranslations({
           toast: {
             backupCompleted: 'Backup completed successfully.',
             backupFailed: 'Backup failed.',
+            backupDeleteFailed: 'Backup deletion failed.',
             backupRestoreCompleted: 'Backup restore completed successfully.',
             installCompleted: 'Server Installation completed successfully.',
             installFailed: 'Server Installation failed.',
@@ -5101,6 +5102,10 @@ const baseTranslations = defineTranslations({
               locked: 'Locked?',
             },
           },
+          badge: {
+            deleting: 'Deleting…',
+            deleteFailed: 'Deletion failed',
+          },
           button: {
             browse: 'Browse',
             exportToFiles: 'Export to Files',
@@ -5136,6 +5141,7 @@ const baseTranslations = defineTranslations({
               title: 'Confirm Backup Deletion',
               content: 'Are you sure you want to delete **{name}** from this server?',
               toast: {
+                started: 'Backup deletion started.',
                 deleted: 'Backup deleted.',
               },
             },

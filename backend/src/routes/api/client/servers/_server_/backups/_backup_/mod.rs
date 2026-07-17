@@ -121,7 +121,7 @@ mod delete {
     struct Response {}
 
     #[utoipa::path(delete, path = "/", responses(
-        (status = OK, body = inline(Response)),
+        (status = ACCEPTED, body = inline(Response)),
         (status = UNAUTHORIZED, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
         (status = EXPECTATION_FAILED, body = ApiError),
@@ -158,6 +158,15 @@ mod delete {
                 .ok();
         }
 
+        if matches!(
+            backup.deletion_status(),
+            Some(shared::models::server_backup::ServerBackupDeletionStatus::Deleting)
+        ) {
+            return ApiResponse::error("backup is already being deleted")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         if let Err(err) = backup.delete(&state, Default::default()).await {
             tracing::error!(server = %server.uuid, backup = %backup.uuid, "failed to delete backup: {:?}", err);
 
@@ -177,7 +186,9 @@ mod delete {
             )
             .await;
 
-        ApiResponse::new_serialized(Response {}).ok()
+        ApiResponse::new_serialized(Response {})
+            .with_status(StatusCode::ACCEPTED)
+            .ok()
     }
 }
 

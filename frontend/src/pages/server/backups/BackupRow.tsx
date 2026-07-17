@@ -34,6 +34,7 @@ import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
+import { SocketEvent } from '@/plugins/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -44,15 +45,16 @@ import BackupRestoreModal from './modals/BackupRestoreModal.tsx';
 export default function BackupRow({ backup }: { backup: z.infer<typeof serverBackupSchema> }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
+
   const server = useServerStore((state) => state.server);
-  const removeBackup = useServerStore((state) => state.removeBackup);
+  const socketInstance = useServerStore((state) => state.socketInstance);
+  const updateBackup = useServerStore((state) => state.updateBackup);
   const progress = useServerStore((state) => state.backupProgress.get(backup.uuid));
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'edit' | 'restore' | 'export' | 'delete' | 'metadata' | null>(null);
   const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
-
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
@@ -66,26 +68,59 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
       });
   };
 
-  const doDelete = async () => {
-    await deleteBackup(server.uuid, backup.uuid)
-      .then(() => {
-        addToast(t('pages.server.backups.modal.deleteBackup.toast.deleted', {}), 'success');
-        setOpenModal(null);
-        removeBackup(backup);
+  const waitForBackupDeleted = (uuid: string) =>
+    new Promise<boolean>((resolve) => {
+      if (!socketInstance) {
+        resolve(false);
+        return;
+      }
 
-        if (backup.backupGroupUuid) {
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.server(server.uuid).backups.groups.detail(backup.backupGroupUuid),
-          });
-          queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).backups.groups.all() });
-        }
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
+      let timeout: ReturnType<typeof setTimeout>;
+      const listener = (eventUuid: string) => {
+        if (eventUuid !== uuid) return;
+
+        clearTimeout(timeout);
+        socketInstance.removeListener(SocketEvent.BACKUP_DELETED, listener);
+        resolve(true);
+      };
+
+      timeout = setTimeout(() => {
+        socketInstance.removeListener(SocketEvent.BACKUP_DELETED, listener);
+        resolve(false);
+      }, 1000);
+
+      socketInstance.addListener(SocketEvent.BACKUP_DELETED, listener);
+    });
+
+  const doDelete = async () => {
+    try {
+      await deleteBackup(server.uuid, backup.uuid);
+    } catch (msg) {
+      addToast(httpErrorToHuman(msg), 'error');
+      return;
+    }
+
+    setOpenModal(null);
+
+    const deleted = await waitForBackupDeleted(backup.uuid);
+    if (deleted) {
+      addToast(t('pages.server.backups.modal.deleteBackup.toast.deleted', {}), 'success');
+    } else {
+      addToast(t('pages.server.backups.modal.deleteBackup.toast.started', {}), 'success');
+      updateBackup(backup.uuid, { deletionStatus: 'deleting' });
+    }
+
+    if (backup.backupGroupUuid) {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.server(server.uuid).backups.groups.detail(backup.backupGroupUuid),
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).backups.groups.all() });
+    }
   };
 
   const isFailed = !backup.isSuccessful && !!backup.completed;
+  const isDeleting = backup.deletionStatus === 'deleting';
+  const isDeleteFailed = backup.deletionStatus === 'failed';
 
   return (
     <>
@@ -128,6 +163,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
+            hidden: isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('edit'),
             color: 'gray',
             canAccess: useServerCan('backups.update'),
@@ -136,7 +172,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             type: 'action',
             icon: faShare,
             label: t('pages.server.backups.button.browse', {}),
-            hidden: !backup.completed || !backup.isBrowsable || isFailed,
+            hidden: !backup.completed || !backup.isBrowsable || isFailed || isDeleting || isDeleteFailed,
             onClick: () =>
               navigate(
                 `/server/${server?.uuidShort}/files?${createSearchParams({
@@ -150,7 +186,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             type: 'action',
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: !backup.isStreaming ? () => doDownload('tar_gz') : undefined,
             color: 'gray',
             items: backup.isStreaming
@@ -168,7 +204,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('restore'),
             color: 'gray',
             canAccess: useServerCan('backups.restore'),
@@ -177,7 +213,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: useServerCan(['backups.download', 'files.create'], false),
@@ -194,7 +230,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
-            hidden: !backup.completed,
+            hidden: !backup.completed || isDeleting,
             disabled: backup.isLocked,
             onClick: () => setOpenModal('delete'),
             color: 'red',
@@ -206,6 +242,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
       >
         {({ items, openMenu }) => (
           <TableRow
+            className={isDeleting ? 'opacity-50' : undefined}
             onContextMenu={(e) => {
               e.preventDefault();
               openMenu(e.clientX, e.clientY);
@@ -213,7 +250,15 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
           >
             <TableData>{backup.name}</TableData>
 
-            {!isFailed ? (
+            {isDeleting || isDeleteFailed ? (
+              <TableData colSpan={3}>
+                {isDeleting ? (
+                  <Badge color='yellow'>{t('pages.server.backups.badge.deleting', {})}</Badge>
+                ) : (
+                  <Badge color='red'>{t('pages.server.backups.badge.deleteFailed', {})}</Badge>
+                )}
+              </TableData>
+            ) : !isFailed ? (
               <>
                 <TableData>{backup.checksum && <Code>{backup.checksum}</Code>}</TableData>
 

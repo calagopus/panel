@@ -273,7 +273,7 @@ mod delete {
         let backup = match data.backup_uuid {
             Some(uuid) => ServerBackup::by_server_uuid_uuid(&state.database, server.uuid, uuid)
                 .await?
-                .filter(|backup| backup.deleted.is_none()),
+                .filter(|backup| backup.deleted.is_none() && backup.deleting.is_none()),
             None => {
                 ServerBackup::select_completed_by_server_uuid(
                     &state.database,
@@ -452,7 +452,7 @@ mod patch {
         let backup = match data.backup_uuid {
             Some(uuid) => ServerBackup::by_server_uuid_uuid(&state.database, server.uuid, uuid)
                 .await?
-                .filter(|backup| backup.deleted.is_none()),
+                .filter(|backup| backup.deleted.is_none() && backup.deleting.is_none()),
             None => {
                 ServerBackup::select_completed_by_server_uuid(
                     &state.database,
