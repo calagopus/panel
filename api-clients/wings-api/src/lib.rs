@@ -705,6 +705,24 @@ pub enum WebsocketEvent {
     OperationError,
     #[serde(rename = "operation completed")]
     OperationCompleted,
+    #[serde(rename = "file collab subscribe")]
+    FileCollabSubscribe,
+    #[serde(rename = "file collab unsubscribe")]
+    FileCollabUnsubscribe,
+    #[serde(rename = "file collab update")]
+    FileCollabUpdate,
+    #[serde(rename = "file collab awareness")]
+    FileCollabAwareness,
+    #[serde(rename = "file collab save")]
+    FileCollabSave,
+    #[serde(rename = "file collab sync")]
+    FileCollabSync,
+    #[serde(rename = "file collab participants")]
+    FileCollabParticipants,
+    #[serde(rename = "file collab saved")]
+    FileCollabSaved,
+    #[serde(rename = "file collab error")]
+    FileCollabError,
 }
 
 nestify::nest! {
@@ -726,6 +744,13 @@ pub mod backups_backup {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
                 #[schema(inline)]
                 pub adapter: BackupAdapter,
+                #[schema(inline)]
+                pub foreground: bool,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
             }
         }
 
@@ -736,7 +761,12 @@ pub mod backups_backup {
 
         pub type Response404 = ApiError;
 
-        pub type Response = Response202;
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        pub enum Response {
+            Ok(Response200),
+            Accepted(Response202),
+        }
     }
 }
 pub mod backups_backup_export {
@@ -1238,7 +1268,7 @@ pub mod servers_server_files_copy_remote {
                 #[schema(inline)]
                 pub root: compact_str::CompactString,
                 #[schema(inline)]
-                pub files: Vec<compact_str::CompactString>,
+                pub files: Vec<CopyFile>,
                 #[schema(inline)]
                 pub destination_server: uuid::Uuid,
                 #[schema(inline)]
@@ -2382,6 +2412,20 @@ pub mod system_config {
                     },
 
                     #[schema(inline)]
+                    pub file_collaboration: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemFileCollaboration {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                        #[schema(inline)]
+                        pub file_size_cap: u64,
+                        #[schema(inline)]
+                        pub max_sessions_per_server: u64,
+                        #[schema(inline)]
+                        pub max_sessions_per_connection: u64,
+                        #[schema(inline)]
+                        pub session_grace_period: u64,
+                    },
+
+                    #[schema(inline)]
                     pub backups: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemBackups {
                         #[schema(inline)]
                         pub write_limit: MiB,
@@ -2451,6 +2495,14 @@ pub mod system_config {
                             pub restore_threads: u64,
                         },
 
+                        #[schema(inline)]
+                        pub pbs: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemBackupsPbs {
+                            #[schema(inline)]
+                            pub create_threads: u64,
+                            #[schema(inline)]
+                            pub download_concurrency: u64,
+                        },
+
                     },
 
                     #[schema(inline)]
@@ -2477,6 +2529,8 @@ pub mod system_config {
                         pub disable_interface_binding: bool,
                         #[schema(inline)]
                         pub dns: Vec<compact_str::CompactString>,
+                        #[schema(inline)]
+                        pub dns_options: Vec<compact_str::CompactString>,
                         #[schema(inline)]
                         pub name: compact_str::CompactString,
                         #[schema(inline)]

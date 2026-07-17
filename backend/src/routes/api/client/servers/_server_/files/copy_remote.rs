@@ -21,7 +21,8 @@ mod post {
         #[serde(default)]
         #[schema(default = "/")]
         root: compact_str::CompactString,
-        files: Vec<compact_str::CompactString>,
+        #[schema(inline)]
+        files: Vec<wings_api::CopyFile>,
 
         destination: compact_str::CompactString,
         #[schema(example = "123e4567-e89b-12d3-a456-426614174000")]

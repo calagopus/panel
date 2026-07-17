@@ -2022,6 +2022,7 @@ impl DeletableModel for ServerBackup {
                                 backup_uuid,
                                 &wings_api::backups_backup::delete::RequestBody {
                                     adapter: backup_disk.to_wings_adapter(),
+                                    foreground: false,
                                 },
                             )
                             .await
@@ -2109,6 +2110,7 @@ impl DeletableModel for ServerBackup {
                             backup.uuid,
                             &wings_api::backups_backup::delete::RequestBody {
                                 adapter: backup.disk.to_wings_adapter(),
+                                foreground: false,
                             },
                         )
                         .await

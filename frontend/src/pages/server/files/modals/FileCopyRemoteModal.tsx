@@ -15,6 +15,7 @@ import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { serverDirectoryEntrySchema, serverFilesCopyRemoteSchema } from '@/lib/schemas/server/files.ts';
+import { nullableString } from '@/lib/transformers.ts';
 import FileRowIcon from '@/pages/server/files/FileRowIcon.tsx';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useResource } from '@/plugins/useResource.ts';
@@ -94,6 +95,10 @@ type Props = ModalProps & {
   files: z.infer<typeof serverDirectoryEntrySchema>[];
 };
 
+const formSchema = serverFilesCopyRemoteSchema.extend({
+  name: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+});
+
 export default function FileCopyRemoteModal({ files, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
@@ -101,20 +106,25 @@ export default function FileCopyRemoteModal({ files, ...props }: Props) {
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
   const doSelectFiles = useFileManager((state) => state.doSelectFiles);
 
-  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
-    z.infer<typeof serverFilesCopyRemoteSchema>
-  >({
+  const isSingleFile = files.length === 1;
+
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof formSchema>>({
     initialValues: {
       destination: '',
       destinationServer: '',
+      name: '',
     },
-    validate: zod4Resolver(serverFilesCopyRemoteSchema),
+    validate: zod4Resolver(formSchema),
     onClose: props.onClose,
     onSubmit: async (values) => {
       await copyFilesRemote(server.uuid, {
-        ...values,
+        destination: values.destination,
+        destinationServer: values.destinationServer,
         root: browsingDirectory,
-        files: files.map((f) => f.name),
+        files: files.map((f) => ({
+          from: f.name,
+          to: (isSingleFile && values.name) || f.name,
+        })),
       });
       doSelectFiles([]);
       addToast(t('pages.server.files.toast.fileCopyingStarted', {}), 'success');
@@ -153,13 +163,26 @@ export default function FileCopyRemoteModal({ files, ...props }: Props) {
         )}
 
         <TextInput label={t('common.form.destination', {})} {...form.getInputProps('destination')} />
+
+        {isSingleFile && (
+          <TextInput
+            label={t('common.form.fileName', {})}
+            placeholder={files[0].name}
+            {...form.getInputProps('name')}
+          />
+        )}
       </Stack>
 
       <p className='mt-2 text-sm md:text-base break-all'>
         <span>{t('pages.server.files.modal.copyRemote.createdAs', {})}</span>
         <Code>
           /home/container/
-          <span className='text-cyan-200'>{form.values.destination.replace(/^(\.\.\/|\/)+/, '')}</span>
+          <span className='text-cyan-200'>
+            {(isSingleFile
+              ? join(form.values.destination, form.values.name || files[0].name)
+              : form.values.destination
+            ).replace(/^(\.\.\/|\/)+/, '')}
+          </span>
         </Code>
       </p>
 
