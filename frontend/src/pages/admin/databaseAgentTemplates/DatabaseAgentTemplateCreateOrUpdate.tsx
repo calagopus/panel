@@ -22,6 +22,7 @@ import {
   adminDatabaseAgentTemplateSchema,
   adminDatabaseAgentTemplateUpdateSchema,
 } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
+import DatabaseAgentTemplateDuplicateModal from '@/pages/admin/databaseAgentTemplates/modals/DatabaseAgentTemplateDuplicateModal.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -36,7 +37,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
   const form = useFormEngine<DatabaseAgentTemplateFormValues>('admin.databaseAgentTemplates.createOrUpdate', {
     schema: (contextDatabaseAgentTemplate
@@ -274,6 +275,14 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
         }).md()}
       </ConfirmationModal>
 
+      {contextDatabaseAgentTemplate && (
+        <DatabaseAgentTemplateDuplicateModal
+          databaseAgentTemplate={contextDatabaseAgentTemplate}
+          opened={openModal === 'duplicate'}
+          onClose={() => setOpenModal(null)}
+        />
+      )}
+
       <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.databaseAgentTemplates.all()))}>
         <FormEngine form={form} fields={fields} />
 
@@ -329,6 +338,13 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
               </ContextMenu>
             )}
           </AdminCan>
+          {contextDatabaseAgentTemplate && (
+            <AdminCan action='database-agent-templates.create'>
+              <Button variant='default' onClick={() => setOpenModal('duplicate')} loading={loading}>
+                {t('common.button.duplicate', {})}
+              </Button>
+            </AdminCan>
+          )}
           {contextDatabaseAgentTemplate && (
             <AdminCan action='database-agent-templates.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>

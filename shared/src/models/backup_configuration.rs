@@ -872,6 +872,60 @@ impl DeletableModel for BackupConfiguration {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateBackupConfigurationOptions {
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for BackupConfiguration {
+    type DuplicateOptions<'a> = DuplicateBackupConfigurationOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<BackupConfiguration>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("backup_configurations");
+
+        query_builder
+            .set("name", &options.name)
+            .set("description", &self.description)
+            .set("maintenance_enabled", self.maintenance_enabled)
+            .set("shared", self.shared)
+            .set("backup_disk", self.backup_disk)
+            .set(
+                "backup_configs",
+                serde_json::to_value(&self.backup_configs)?,
+            );
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut backup_configuration = Self::map(None, &row)?;
+
+        self.run_after_duplicate_handlers(&mut backup_configuration, &options, state, transaction)
+            .await?;
+
+        Ok(backup_configuration)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(BackupConfiguration, crate::State)]
 #[hook_args(crate::State)]

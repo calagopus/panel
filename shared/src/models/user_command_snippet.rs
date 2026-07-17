@@ -390,6 +390,57 @@ impl DeletableModel for UserCommandSnippet {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateUserCommandSnippetOptions {
+    #[garde(skip)]
+    pub user_uuid: uuid::Uuid,
+    #[garde(length(chars, min = 1, max = 31))]
+    pub name: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for UserCommandSnippet {
+    type DuplicateOptions<'a> = DuplicateUserCommandSnippetOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<UserCommandSnippet>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("user_command_snippets");
+
+        query_builder
+            .set("user_uuid", options.user_uuid)
+            .set("name", &options.name)
+            .set("eggs", &self.eggs)
+            .set("command", &self.command);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut user_command_snippet = Self::map(None, &row)?;
+
+        self.run_after_duplicate_handlers(&mut user_command_snippet, &options, state, transaction)
+            .await?;
+
+        Ok(user_command_snippet)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(UserCommandSnippet, crate::State)]
 #[hook_args(crate::State)]

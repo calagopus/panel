@@ -1276,6 +1276,12 @@
               "toast": {
                 "removed": "Befehlskürzel entfernt."
               }
+            },
+            "duplicateCommandSnippet": {
+              "title": "Befehlskürzel duplizieren",
+              "toast": {
+                "duplicated": "Befehlskürzel dupliziert."
+              }
             }
           }
         },
@@ -2957,13 +2963,17 @@
                       "toast": {
                         "created": "Egg Variable erstellt.",
                         "updated": "Egg Variable aktualisiert.",
-                        "deleted": "Egg Variable gelöscht."
+                        "deleted": "Egg Variable gelöscht.",
+                        "duplicated": "Egg Variable dupliziert."
                       },
                       "modal": {
                         "delete": {
                           "title": "Entfernen der Egg Variable bestätigen",
                           "content": "Bist du sicher, dass du **{variable}** entfernen möchtest?",
                           "emptyVariable": "diese leere Variable"
+                        },
+                        "duplicate": {
+                          "title": "Egg Variable duplizieren"
                         }
                       }
                     }

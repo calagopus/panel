@@ -25,6 +25,7 @@ import {
   adminBackupConfigurationUpdateSchema,
 } from '@/lib/schemas/admin/backupConfigurations.ts';
 import BackupPBS from '@/pages/admin/backupConfigurations/forms/BackupPBS.tsx';
+import BackupConfigurationDuplicateModal from '@/pages/admin/backupConfigurations/modals/BackupConfigurationDuplicateModal.tsx';
 import BackupRestic from '@/pages/admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '@/pages/admin/backupConfigurations/forms/BackupS3.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
@@ -39,7 +40,7 @@ export default function BackupConfigurationCreateOrUpdate({
   contextBackupConfiguration?: z.infer<typeof adminBackupConfigurationSchema>;
 }) {
   const { t } = useTranslations();
-  const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
 
   const form = useFormEngine<BackupConfigFormValues>('admin.backupConfigurations.createOrUpdate', {
     schema: adminBackupConfigurationUpdateSchema.unwrap(),
@@ -235,6 +236,14 @@ export default function BackupConfigurationCreateOrUpdate({
         }).md()}
       </ConfirmationModal>
 
+      {contextBackupConfiguration && (
+        <BackupConfigurationDuplicateModal
+          backupConfiguration={contextBackupConfiguration}
+          opened={openModal === 'duplicate'}
+          onClose={() => setOpenModal(null)}
+        />
+      )}
+
       {form.values.backupDisk === 'ddup-bak' && (
         <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
           {t('pages.admin.backupConfigurations.tabs.general.page.alert.ddupBak', {})}
@@ -305,6 +314,13 @@ export default function BackupConfigurationCreateOrUpdate({
               </Button>
             )}
           </AdminCan>
+          {contextBackupConfiguration && (
+            <AdminCan action='backup-configurations.create'>
+              <Button variant='default' onClick={() => setOpenModal('duplicate')} loading={loading}>
+                {t('common.button.duplicate', {})}
+              </Button>
+            </AdminCan>
+          )}
           {contextBackupConfiguration && (
             <AdminCan action='backup-configurations.delete' cantDelete>
               <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>

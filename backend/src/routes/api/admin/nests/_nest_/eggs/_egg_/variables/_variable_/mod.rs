@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod duplicate;
+
 mod delete {
     use crate::routes::api::admin::nests::_nest_::{GetNest, eggs::_egg_::GetNestEgg};
     use axum::{extract::Path, http::StatusCode};
@@ -183,5 +185,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
+        .nest("/duplicate", duplicate::router(state))
         .with_state(state.clone())
 }

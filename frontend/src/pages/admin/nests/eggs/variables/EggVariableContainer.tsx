@@ -12,6 +12,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminEggSchema, adminEggVariableSchema, adminEggVariableUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
+import EggVariableDuplicateModal from '@/pages/admin/nests/eggs/variables/modals/EggVariableDuplicateModal.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -37,7 +38,7 @@ export default function EggVariableContainer({
   const { languages } = useGlobalStore();
   const { t } = useTranslations();
 
-  const [openModal, setOpenModal] = useState<'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
   const [loading, setLoading] = useState(false);
 
   const form = useFormEngine<VariableFormValues>('admin.nests.eggs.variables', {
@@ -207,14 +208,30 @@ export default function EggVariableContainer({
         }).md()}
       </ConfirmationModal>
 
+      {contextVariable?.uuid && (
+        <EggVariableDuplicateModal
+          contextNest={contextNest}
+          contextEgg={contextEgg}
+          variable={contextVariable}
+          onDuplicated={(variable) => setEggVariables([...eggVariables, variable])}
+          opened={openModal === 'duplicate'}
+          onClose={() => setOpenModal(null)}
+        />
+      )}
+
       <Card className='flex flex-col justify-between h-full'>
-        <form onSubmit={form.onSubmit(doCreateOrUpdate)}>
+        <form onSubmit={form.onSubmit(doCreateOrUpdate)} className='flex flex-col flex-1'>
           <FormEngine form={form} fields={fields} />
 
-          <Group pt='md' mt='auto'>
+          <Group pt='md' mt='auto' justify='flex-end'>
             <Button type='submit' disabled={!form.isValid()} loading={loading}>
               {t('common.button.save', {})}
             </Button>
+            {contextVariable?.uuid && (
+              <Button variant='default' onClick={() => setOpenModal('duplicate')}>
+                {t('common.button.duplicate', {})}
+              </Button>
+            )}
             <Button color='red' variant='outline' onClick={() => setOpenModal('delete')}>
               {t('common.button.remove', {})}
             </Button>

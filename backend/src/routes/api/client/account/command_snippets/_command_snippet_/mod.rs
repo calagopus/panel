@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod duplicate;
+
 mod patch {
     use axum::{extract::Path, http::StatusCode};
     use serde::Serialize;
@@ -150,5 +152,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(patch::route))
         .routes(routes!(delete::route))
+        .nest("/duplicate", duplicate::router(state))
         .with_state(state.clone())
 }

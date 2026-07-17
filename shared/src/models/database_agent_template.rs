@@ -680,6 +680,72 @@ impl DeletableModel for DatabaseAgentTemplate {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateDatabaseAgentTemplateOptions {
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for DatabaseAgentTemplate {
+    type DuplicateOptions<'a> = DuplicateDatabaseAgentTemplateOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<DatabaseAgentTemplate>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("database_agent_templates");
+
+        query_builder
+            .set("name", &options.name)
+            .set("description", &self.description)
+            .set("type", self.r#type)
+            .set("deployment_enabled", self.deployment_enabled)
+            .set("docker_images", OrderedJson(&self.docker_images))
+            .set("env", OrderedJson(&self.env))
+            .set("image_uid", self.image_uid)
+            .set("image_gid", self.image_gid)
+            .set("cmd", self.cmd.as_ref())
+            .set("volumes", OrderedJson(&self.volumes))
+            .set("socket_path", &self.socket_path)
+            .set("memory", self.memory)
+            .set("swap", self.swap)
+            .set("disk", self.disk)
+            .set("io_weight", self.io_weight)
+            .set("cpu", self.cpu);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut database_agent_template = Self::map(None, &row)?;
+
+        self.run_after_duplicate_handlers(
+            &mut database_agent_template,
+            &options,
+            state,
+            transaction,
+        )
+        .await?;
+
+        Ok(database_agent_template)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(DatabaseAgentTemplate, crate::State)]
 #[hook_args(crate::State)]

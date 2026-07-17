@@ -12,6 +12,7 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod duplicate;
 mod instances;
 
 pub type GetDatabaseAgentTemplate = shared::extract::ConsumingExtension<DatabaseAgentTemplate>;
@@ -218,6 +219,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
+        .nest("/duplicate", duplicate::router(state))
         .nest("/instances", instances::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())

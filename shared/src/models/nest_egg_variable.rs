@@ -614,6 +614,73 @@ impl DeletableModel for NestEggVariable {
     }
 }
 
+#[derive(Validate)]
+pub struct DuplicateNestEggVariableOptions {
+    #[garde(skip)]
+    pub egg_uuid: uuid::Uuid,
+    #[garde(length(chars, min = 1, max = 255))]
+    pub name: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 255))]
+    pub env_variable: compact_str::CompactString,
+}
+
+#[async_trait::async_trait]
+impl DuplicableModel for NestEggVariable {
+    type DuplicateOptions<'a> = DuplicateNestEggVariableOptions;
+
+    fn get_duplicate_handlers() -> &'static LazyLock<DuplicateHandlerList<Self>> {
+        static DUPLICATE_LISTENERS: LazyLock<DuplicateHandlerList<NestEggVariable>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &DUPLICATE_LISTENERS
+    }
+
+    async fn duplicate_with_transaction(
+        &self,
+        state: &crate::State,
+        options: Self::DuplicateOptions<'_>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        options.validate()?;
+
+        self.run_duplicate_handlers(&options, state, transaction)
+            .await?;
+
+        let mut query_builder = InsertQueryBuilder::new("nest_egg_variables");
+
+        query_builder
+            .set("egg_uuid", options.egg_uuid)
+            .set("name", &options.name)
+            .set(
+                "name_translations",
+                serde_json::to_value(&self.name_translations)?,
+            )
+            .set("description", &self.description)
+            .set(
+                "description_translations",
+                serde_json::to_value(&self.description_translations)?,
+            )
+            .set("order_", self.order)
+            .set("env_variable", &options.env_variable)
+            .set("default_value", &self.default_value)
+            .set("user_viewable", self.user_viewable)
+            .set("user_editable", self.user_editable)
+            .set("secret", self.secret)
+            .set("rules", &self.rules);
+
+        let row = query_builder
+            .returning(&Self::columns_sql(None))
+            .fetch_one(&mut **transaction)
+            .await?;
+        let mut nest_egg_variable = Self::map(None, &row)?;
+
+        self.run_after_duplicate_handlers(&mut nest_egg_variable, &options, state, transaction)
+            .await?;
+
+        Ok(nest_egg_variable)
+    }
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(NestEggVariable, crate::State)]
 #[hook_args(crate::State)]

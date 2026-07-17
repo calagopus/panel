@@ -1210,6 +1210,12 @@ const baseTranslations = defineTranslations({
                 removed: 'Command snippet removed.',
               },
             },
+            duplicateCommandSnippet: {
+              title: 'Duplicate Command Snippet',
+              toast: {
+                duplicated: 'Command snippet duplicated.',
+              },
+            },
           },
         },
         oauthLinks: {
@@ -2945,12 +2951,16 @@ const baseTranslations = defineTranslations({
                         created: 'Egg variable created.',
                         updated: 'Egg variable updated.',
                         deleted: 'Egg variable deleted.',
+                        duplicated: 'Egg variable duplicated.',
                       },
                       modal: {
                         delete: {
                           title: 'Confirm Egg Variable Removal',
                           content: 'Are you sure you want to remove **{variable}**?',
                           emptyVariable: 'this empty variable',
+                        },
+                        duplicate: {
+                          title: 'Duplicate Egg Variable',
                         },
                       },
                     },
