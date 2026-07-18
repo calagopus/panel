@@ -32,6 +32,13 @@ fi
 PROFILE=${CARGO_BUILD_PROFILE:-balanced}
 PROFILE_PATH=${CARGO_TARGET_PROFILE:-heavy-release}
 
+# pristine no-extension binary saved at image build time; the target/ copy
+# gets overwritten by runtime extension builds
+STOCK_BINARY="/app/panel-rs.stock"
+if [ ! -f "$STOCK_BINARY" ]; then
+  STOCK_BINARY="/app/repo/target/$PROFILE_PATH/panel-rs"
+fi
+
 cp -R /app/repo/frontend/public/translations/* /app/translations/ 2>/dev/null || true
 
 # calculate the combined sha256 hash of all arguments' contents
@@ -164,6 +171,14 @@ BINARY_PATH="/app/binaries/$PANEL_VERSION/$EXT_HASH/panel-rs"
 if [ -f "$BINARY_PATH" ]; then
   echo "Found existing binary for current extensions."
   start_panel "$BINARY_PATH"
+elif [ -z "$(ls -A /app/extensions/*.c7s.zip 2>/dev/null)" ]; then
+  # No extensions installed: the pristine stock binary from the image build is
+  # exactly the empty-extension-set build, so use it directly instead of a
+  # stale extension binary. Cache it so future boots hit the exact match above.
+  echo "No extensions found in /app/extensions. Using stock binary."
+  mkdir -p "$(dirname "$BINARY_PATH")"
+  cp "$STOCK_BINARY" "$BINARY_PATH" 2>/dev/null || true
+  start_panel "$STOCK_BINARY"
 else
   # Check for the most recently compiled binary for this version as a fallback
   LAST_COMPILED=$(ls -t /app/binaries/"$PANEL_VERSION"/*/panel-rs 2>/dev/null | head -n 1)
@@ -179,16 +194,11 @@ else
     echo "No exact match found for current extensions. Temporarily using the last compiled binary: $LAST_COMPILED"
     start_panel "$LAST_COMPILED"
   else
-    echo "No existing or previous compiled binary found. Temporarily using default binary."
-    start_panel "/app/repo/target/$PROFILE_PATH/panel-rs"
+    echo "No existing or previous compiled binary found. Temporarily using stock binary."
+    start_panel "$STOCK_BINARY"
   fi
 
-  # execute build if extensions directory is not empty
-  if [ -n "$(ls -A /app/extensions/*.c7s.zip 2>/dev/null)" ]; then
-    execute_build
-  else
-    echo "No extensions found in /app/extensions. Skipping build."
-  fi
+  execute_build
 fi
 
 # watch for changes in /tmp/rebuild_trigger

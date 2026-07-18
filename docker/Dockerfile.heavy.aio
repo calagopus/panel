@@ -59,6 +59,8 @@ RUN --mount=from=wings,source=/wings,target=/wings \
     fi && \
     cargo build --profile heavy-release -p panel-rs-aio
 
+RUN cp /app/repo/target/heavy-release/panel-rs-aio /app/panel-rs-aio.stock
+
 RUN ln -s /app/repo/target/heavy-release/panel-rs-aio /usr/local/bin/panel-rs
 RUN ln -s /app/repo/target/heavy-release/panel-rs-aio /usr/local/bin/calagopus-panel
 

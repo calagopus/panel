@@ -39,6 +39,8 @@ COPY . /app/repo
 RUN cd frontend && pnpm install --frozen-lockfile && pnpm build:ci
 RUN cargo build --profile heavy-release -p panel-rs
 
+RUN cp /app/repo/target/heavy-release/panel-rs /app/panel-rs.stock
+
 RUN ln -s /app/repo/target/heavy-release/panel-rs /usr/local/bin/panel-rs
 RUN ln -s /app/repo/target/heavy-release/panel-rs /usr/local/bin/calagopus-panel
 
