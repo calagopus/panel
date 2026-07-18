@@ -1,4 +1,4 @@
-import { faDatabase, faFileLines, faPencil, faTrash, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faDatabase, faDownload, faFileLines, faPencil, faTrash, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -34,6 +34,7 @@ import DatabaseInstanceStats from './DatabaseInstanceStats.tsx';
 import DatabaseInstanceUsers from './DatabaseInstanceUsers.tsx';
 import DatabaseInstanceDeleteModal from './modals/DatabaseInstanceDeleteModal.tsx';
 import DatabaseInstanceEditModal from './modals/DatabaseInstanceEditModal.tsx';
+import DatabaseInstanceExportModal from './modals/DatabaseInstanceExportModal.tsx';
 
 export default function DatabaseInstanceView() {
   const params = useParams<'id'>();
@@ -42,7 +43,7 @@ export default function DatabaseInstanceView() {
   const navigate = useNavigate();
   const server = useServerStore((state) => state.server);
 
-  const [openModal, setOpenModal] = useState<'edit' | 'delete' | 'kill' | null>(null);
+  const [openModal, setOpenModal] = useState<'edit' | 'delete' | 'kill' | 'export' | null>(null);
   const [usage, setUsage] = useState<z.infer<typeof serverDatabaseInstanceResourceUsageSchema> | null>(null);
   const [powerLoading, setPowerLoading] = useState<DatabaseInstancePowerAction | null>(null);
   const [connected, setConnected] = useState(false);
@@ -180,6 +181,13 @@ export default function DatabaseInstanceView() {
               onClose={() => setOpenModal(null)}
               onDeleted={() => navigate(`/server/${server.uuidShort}/databases`)}
             />
+            {instance.type === 'redis' && (
+              <DatabaseInstanceExportModal
+                instance={instance}
+                opened={openModal === 'export'}
+                onClose={() => setOpenModal(null)}
+              />
+            )}
 
             <Stack gap='lg'>
               <Group justify='space-between'>
@@ -224,6 +232,18 @@ export default function DatabaseInstanceView() {
                         : t('common.enum.serverPowerAction.stop', {})}
                     </Button>
                   </ServerCan>
+                  {instance.type === 'redis' && (
+                    <ServerCan action='database-instances.export'>
+                      <Button
+                        onClick={() => setOpenModal('export')}
+                        color='gray'
+                        disabled={offline}
+                        leftSection={<FontAwesomeIcon icon={faDownload} />}
+                      >
+                        {t('pages.server.databases.instance.databases.button.export', {})}
+                      </Button>
+                    </ServerCan>
+                  )}
                   <ServerCan action='database-instances.update'>
                     <Button
                       onClick={() => setOpenModal('edit')}

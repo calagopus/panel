@@ -16,6 +16,7 @@ use shared::{
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod databases;
+mod export;
 mod logs;
 mod power;
 mod resources;
@@ -324,6 +325,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(patch::route))
         .routes(routes!(delete::route))
         .nest("/databases", databases::router(state))
+        .nest("/export", export::router(state))
         .nest("/users", users::router(state))
         .nest("/logs", logs::router(state))
         .nest("/power", power::router(state))

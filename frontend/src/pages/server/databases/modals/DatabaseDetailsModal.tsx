@@ -8,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { getJdbcConnectionString } from '@/lib/database.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -26,9 +27,13 @@ export default function DatabaseDetailsModal({ database, ...props }: Props) {
   const [loading, setLoading] = useState(false);
 
   const host = `${database.host}:${database.port}`;
-  const jdbcConnectionString = `jdbc:${database.type}://${database.username}${
-    database.password ? `:${encodeURIComponent(database.password)}` : ''
-  }@${host}/${database.name}`;
+  const jdbcConnectionString = getJdbcConnectionString({
+    type: database.type,
+    username: database.username,
+    password: database.password,
+    host,
+    database: database.name,
+  });
 
   const onRotatePassword = () => {
     setLoading(true);

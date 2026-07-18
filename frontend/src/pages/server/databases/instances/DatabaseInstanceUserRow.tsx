@@ -54,6 +54,7 @@ export default function DatabaseInstanceUserRow({
       <DatabaseInstanceCredentialsModal
         instance={instance}
         user={user}
+        databaseName={databaseName}
         opened={openModal === 'details'}
         onClose={() => setOpenModal(null)}
       />

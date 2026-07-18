@@ -4412,7 +4412,13 @@ const baseTranslations = defineTranslations({
                 title: 'Database Credentials',
                 form: {
                   database: 'Database',
+                  jdbcConnectionString: 'JDBC Connection String',
                 },
+              },
+              exportInstance: {
+                title: 'Export Instance',
+                content:
+                  'Download a dump of this managed database instance. Large instances may take a while to prepare.',
               },
             },
           },

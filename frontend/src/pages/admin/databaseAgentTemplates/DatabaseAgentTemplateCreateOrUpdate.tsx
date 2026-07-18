@@ -1,4 +1,4 @@
-import { faChevronDown, faFileDownload } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faExternalLink, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { dump } from 'js-yaml';
 import { useEffect, useState } from 'react';
@@ -6,6 +6,7 @@ import { z } from 'zod';
 import createDatabaseAgentTemplate from '@/api/admin/database-agent-templates/createDatabaseAgentTemplate.ts';
 import deleteDatabaseAgentTemplate from '@/api/admin/database-agent-templates/deleteDatabaseAgentTemplate.ts';
 import updateDatabaseAgentTemplate from '@/api/admin/database-agent-templates/updateDatabaseAgentTemplate.ts';
+import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
@@ -352,6 +353,11 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
               </Button>
             </AdminCan>
           )}
+          <Anchor href='https://calagopus.com/docs/db-agent/templates' target='_blank' rel='noopener noreferrer'>
+            <Button variant='subtle' leftSection={<FontAwesomeIcon icon={faExternalLink} />}>
+              {t('common.button.viewDocumentation', {})}
+            </Button>
+          </Anchor>
         </Group>
       </form>
     </AdminContentContainer>

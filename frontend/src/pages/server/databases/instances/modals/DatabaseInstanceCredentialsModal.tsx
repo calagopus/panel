@@ -8,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { getJdbcConnectionString } from '@/lib/database.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   serverDatabaseInstanceSchema,
@@ -20,9 +21,10 @@ import { useServerStore } from '@/stores/server.ts';
 type Props = ModalProps & {
   instance: z.infer<typeof serverDatabaseInstanceSchema>;
   user: z.infer<typeof serverDatabaseInstanceUserSchema>;
+  databaseName: string | null;
 };
 
-export default function DatabaseInstanceCredentialsModal({ instance, user, ...props }: Props) {
+export default function DatabaseInstanceCredentialsModal({ instance, user, databaseName, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
@@ -30,6 +32,15 @@ export default function DatabaseInstanceCredentialsModal({ instance, user, ...pr
   const [loading, setLoading] = useState(false);
 
   const host = instance.host ? `${instance.host}${instance.port ? `:${instance.port}` : ''}` : null;
+  const jdbcConnectionString = host
+    ? getJdbcConnectionString({
+        type: instance.type,
+        username: user.username,
+        password: user.password,
+        host,
+        database: databaseName,
+      })
+    : null;
 
   const onRotatePassword = () => {
     setLoading(true);
@@ -51,6 +62,13 @@ export default function DatabaseInstanceCredentialsModal({ instance, user, ...pr
         {host && <TextInput label={t('common.table.columns.address', {})} value={host} readOnly />}
         <TextInput label={t('common.form.username', {})} value={user.username} readOnly />
         <TextInput label={t('common.form.password', {})} value={user.password} readOnly />
+        {jdbcConnectionString && (
+          <TextInput
+            label={t('pages.server.databases.instance.modal.credentials.form.jdbcConnectionString', {})}
+            value={jdbcConnectionString}
+            readOnly
+          />
+        )}
 
         <ModalFooter>
           <Button color='red' onClick={onRotatePassword} loading={loading} disabled={instance.isLocked}>

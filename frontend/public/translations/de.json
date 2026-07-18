@@ -4390,8 +4390,13 @@
               "credentials": {
                 "title": "Datenbank-Zugangsdaten",
                 "form": {
-                  "database": "Datenbank"
+                  "database": "Datenbank",
+                  "jdbcConnectionString": "JDBC-Verbindungszeichenfolge"
                 }
+              },
+              "exportInstance": {
+                "title": "Instanz exportieren",
+                "content": "Lade einen Dump dieser verwalteten Datenbank-Instanz herunter. Bei großen Instanzen kann die Vorbereitung eine Weile dauern."
               }
             }
           },
