@@ -54,6 +54,20 @@ nestify::nest! {
             pub architecture: compact_str::CompactString,
             pub kernel_version: compact_str::CompactString,
         }>,
+
+        #[schema(inline)]
+        pub database_agent_hosts: Vec<#[derive(ToSchema, Serialize)] pub struct TelemetryDataDatabaseAgentHost {
+            pub version: compact_str::CompactString,
+            pub container_type: db_agent_api::AppContainerType,
+
+            #[schema(inline)]
+            pub memory: db_agent_api::system_overview::get::Response200Memory,
+            #[schema(inline)]
+            pub instances: db_agent_api::system_overview::get::Response200Instances,
+
+            pub architecture: compact_str::CompactString,
+            pub kernel_version: compact_str::CompactString,
+        }>,
     }
 }
 
@@ -107,6 +121,45 @@ impl TelemetryData {
             }
 
             node_page += 1;
+        }
+
+        let mut database_agent_host_results = Vec::new();
+        let mut database_agent_host_page = 1;
+        loop {
+            let database_agent_hosts =
+                crate::models::database_agent_host::DatabaseAgentHost::all_with_pagination(
+                    &state.database,
+                    database_agent_host_page,
+                    50,
+                    None,
+                )
+                .await?;
+            if database_agent_hosts.data.is_empty() {
+                break;
+            }
+
+            for database_agent_host in database_agent_hosts.data {
+                let overview = match database_agent_host
+                    .api_client(&state.database)
+                    .await?
+                    .get_system_overview()
+                    .await
+                {
+                    Ok(overview) => overview,
+                    Err(_) => continue,
+                };
+
+                database_agent_host_results.push(TelemetryDataDatabaseAgentHost {
+                    version: overview.version,
+                    container_type: overview.container_type,
+                    memory: overview.memory,
+                    instances: overview.instances,
+                    architecture: overview.architecture,
+                    kernel_version: overview.kernel_version,
+                });
+            }
+
+            database_agent_host_page += 1;
         }
 
         let user_languages = sqlx::query!(
@@ -168,6 +221,7 @@ impl TelemetryData {
             },
             extensions: state.extensions.extensions().await.clone(),
             nodes: node_results,
+            database_agent_hosts: database_agent_host_results,
         })
     }
 }
