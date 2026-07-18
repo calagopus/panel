@@ -316,7 +316,7 @@ export default function ServerOverview({ server }: { server: Server }) {
                   </Badge>
                 ) : server.limits.swap === 0 ? (
                   <Badge color='gray' variant='light'>
-                    0
+                    {t('common.form.disabled', {})}
                   </Badge>
                 ) : (
                   bytesToString(mbToBytes(server.limits.swap))

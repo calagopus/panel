@@ -49,12 +49,14 @@ function CapacityResource({
   allocated,
   limit,
   footer,
+  formatValue = (value) => bytesToString(mbToBytes(value)),
 }: {
   label: string;
   icon: React.ReactNode;
   allocated: number;
   limit: number;
   footer?: React.ReactNode;
+  formatValue?: (value: number) => React.ReactNode;
 }) {
   const { t } = useTranslations();
   const percent = limit > 0 ? (allocated / limit) * 100 : 0;
@@ -70,7 +72,7 @@ function CapacityResource({
             <Title order={2}>
               {icon} {label}
             </Title>
-            <h2>{bytesToString(mbToBytes(allocated))}</h2>
+            <h2>{formatValue(allocated)}</h2>
             <p className='text-xs'>{footer ?? t('pages.admin.nodes.tabs.capacity.page.label.noLimit', {})}</p>
           </div>
         </Group>
@@ -93,7 +95,7 @@ function CapacityResource({
             {icon} {label}
           </Title>
           <h2>
-            {bytesToString(mbToBytes(allocated))} / {bytesToString(mbToBytes(limit))}
+            {formatValue(allocated)} / {formatValue(limit)}
           </h2>
           {footer}
         </div>
@@ -315,6 +317,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                 icon={<FontAwesomeIcon icon={faMicrochip} />}
                 allocated={capacity.allocated.cpu}
                 limit={0}
+                formatValue={(value) => `${value}%`}
                 footer={t('pages.admin.nodes.tabs.capacity.page.label.cores', {
                   cores: (capacity.allocated.cpu / 100).toFixed(2),
                 })}

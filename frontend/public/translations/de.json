@@ -237,6 +237,7 @@
         "language": "Sprache",
         "identifier": "Kennung",
         "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
         "title": "Titel",
         "content": "Inhalt",
         "backupConfiguration": "Backup-Konfiguration",
@@ -1482,8 +1483,8 @@
                 "noChangelog": "Kein Änderungsprotokoll",
                 "nodesUpToDate": "Es scheint, als wären alle Nodes auf dem neuesten Stand. ({failed} Prüfungen fehlgeschlagen)",
                 "nodesOutdated": "Einige Nodes sind veraltet, die neueste verfügbare Version ist `{latest}`. ({outdated} veraltet, {failed} Prüfungen fehlgeschlagen)",
-                "databaseAgentHostsUpToDate": "Es scheint, als wären alle Datenbank-Agent-Hosts aktuell. ({failed} konnten nicht geprüft werden)",
-                "databaseAgentHostsOutdated": "Einige Datenbank-Agent-Hosts sind veraltet, die neueste verfügbare Version ist `{latest}`. ({outdated} veraltet, {failed} konnten nicht geprüft werden)",
+                "databaseAgentHostsUpToDate": "Es scheint, als wären alle Datenbank-Agent-Hosts auf dem neuesten Stand. ({failed} Prüfungen fehlgeschlagen)",
+                "databaseAgentHostsOutdated": "Einige Datenbank-Agent-Hosts sind veraltet, die neueste verfügbare Version ist `{latest}`. ({outdated} veraltet, {failed} Prüfungen fehlgeschlagen)",
                 "table": {
                   "version": "Version",
                   "installed": "Installiert",

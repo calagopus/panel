@@ -150,6 +150,7 @@ const baseTranslations = defineTranslations({
         language: 'Language',
         identifier: 'Identifier',
         enabled: 'Enabled',
+        disabled: 'Disabled',
         title: 'Title',
         content: 'Content',
         backupConfiguration: 'Backup Configuration',
