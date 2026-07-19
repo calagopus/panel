@@ -76,4 +76,4 @@ See [LICENSE](https://github.com/calagopus/panel/blob/main/LICENSE).
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=calagopus/panel&type=date&legend=top-left)](https://www.star-history.com/#calagopus/panel&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/chart?repos=calagopus/panel&type=date&legend=top-left&sealed_token=a7EYc90bZ5UTWwpTmBWPtTz5ex-YZWjNeEaxDZbKR25XXjD0QGv5rqTXQ-1I94FTdIYC2OrxVf64V5wxHz7ftBZx5eihXdPy-gLo81pOLkcPIAbNlBl3uUC5zRfwjhW_KArhdxIw1SOzU7121dy52CP3TMvSmShvLYUL7lU0P0sFVjcRikTPK7u_13YG)](https://www.star-history.com/?repos=calagopus%2Fpanel&type=date&legend=top-left)
