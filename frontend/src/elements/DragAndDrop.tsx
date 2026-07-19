@@ -1,7 +1,8 @@
-import { CollisionDetection, closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
+import { CollisionDetection, closestCenter, DndContext, DragOverlay, Modifier } from '@dnd-kit/core';
 import { SortableContext, SortingStrategy, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ComponentProps, CSSProperties, ReactNode, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { createDropAnimation, useDndSensors, useDndState } from '@/lib/dragAndDrop.ts';
 
 export type DndItem = {
@@ -90,6 +91,7 @@ export interface DndContainerProps<T extends DndItem> {
   collisionDetection?: CollisionDetection;
   children: (items: T[]) => ReactNode;
   renderOverlay?: (activeItem: T | null) => ReactNode;
+  modifiers?: Modifier[];
 }
 
 const defaultConfig: DndConfig = {};
@@ -102,6 +104,7 @@ export function DndContainer<T extends DndItem>({
   collisionDetection = closestCenter,
   children,
   renderOverlay,
+  modifiers,
 }: DndContainerProps<T>) {
   const sensors = useDndSensors(config);
   const dropAnimation = useMemo(() => createDropAnimation(config), [config]);
@@ -116,6 +119,7 @@ export function DndContainer<T extends DndItem>({
   return (
     <DndContext
       sensors={sensors}
+      modifiers={modifiers}
       collisionDetection={collisionDetection}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
@@ -125,9 +129,12 @@ export function DndContainer<T extends DndItem>({
       <SortableContext items={itemIds} strategy={strategy}>
         {children(localItems)}
       </SortableContext>
-      <DragOverlay dropAnimation={dropAnimation}>
-        {renderOverlay && activeItem ? renderOverlay(activeItem) : null}
-      </DragOverlay>
+      {createPortal(
+        <DragOverlay dropAnimation={dropAnimation}>
+          {renderOverlay && activeItem ? renderOverlay(activeItem) : null}
+        </DragOverlay>,
+        document.body,
+      )}
     </DndContext>
   );
 }

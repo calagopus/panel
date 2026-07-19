@@ -8,6 +8,7 @@ import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import { restrictToVerticalAxis } from '@/lib/dragAndDrop.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface TagsInputProps {
@@ -201,6 +202,7 @@ function TagsInput({
       {selectedTags.length > 0 && (
         <DndContainer
           items={dndItems}
+          modifiers={[restrictToVerticalAxis]}
           callbacks={{ onDragEnd: handleDragEnd }}
           renderOverlay={(activeItem) => {
             if (!activeItem) return null;

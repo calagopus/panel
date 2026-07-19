@@ -6,8 +6,8 @@ import { z } from 'zod';
 import createBackup from '@/api/server/backups/createBackup.ts';
 import getBackupGroups from '@/api/server/backups/groups/getBackupGroups.ts';
 import Button from '@/elements/Button.tsx';
+import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
 import Select from '@/elements/input/Select.tsx';
-import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -94,7 +94,12 @@ export default function BackupCreateModal({ groupUuid, ...props }: ModalProps & 
           />
         )}
 
-        <TagsInput label={t('common.form.ignoredFiles', {})} {...form.getInputProps('ignoredFiles')} />
+        <IgnoredFilesInput
+          serverUuid={server.uuid}
+          label={t('common.form.ignoredFiles', {})}
+          value={form.values.ignoredFiles}
+          onChange={(value) => form.setFieldValue('ignoredFiles', value)}
+        />
 
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!form.isValid()}>

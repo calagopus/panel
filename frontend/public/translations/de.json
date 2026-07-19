@@ -288,7 +288,8 @@
         "yourControlPanelPassword": "Dein Control Panel Passwort",
         "deploymentEnabled": "Bereitstellung aktiviert",
         "maintenanceEnabled": "Wartung aktiviert",
-        "truncateDirectory": "Möchtest du alle Dateien dieses Servers löschen, bevor diese Aktion ausgeführt wird? Dies kann nicht rückgängig gemacht werden."
+        "truncateDirectory": "Möchtest du alle Dateien dieses Servers löschen, bevor diese Aktion ausgeführt wird? Dies kann nicht rückgängig gemacht werden.",
+        "previewIgnoredFiles": "Ignorierte Dateien anzeigen"
       },
       "table": {
         "pagination": {
@@ -344,7 +345,10 @@
         "installed": "Installiert"
       },
       "label": {
-        "noSubdirectories": "Keine Unterverzeichnisse"
+        "noSubdirectories": "Keine Unterverzeichnisse",
+        "ignored": "Ignoriert",
+        "emptyDirectory": "Dieses Verzeichnis ist leer",
+        "showingFirstEntries": "Die ersten {count} Einträge werden angezeigt"
       },
       "server": {
         "noAllocation": "Keine Allocation",

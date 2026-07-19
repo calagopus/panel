@@ -3,7 +3,7 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import updateSubuser from '@/api/server/subusers/updateSubuser.ts';
 import Button from '@/elements/Button.tsx';
-import TagsInput from '@/elements/input/TagsInput.tsx';
+import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
@@ -64,10 +64,12 @@ export default function SubuserUpdateModal({ subuser, ...props }: Props) {
           setSelectedPermissions={(permissions) => form.setFieldValue('permissions', permissions)}
         />
 
-        <TagsInput
+        <IgnoredFilesInput
+          serverUuid={server.uuid}
           label={t('common.form.ignoredFiles', {})}
           description={t('pages.server.subusers.modal.createSubuser.form.ignoredFilesDescription', {})}
-          {...form.getInputProps('ignoredFiles')}
+          value={form.values.ignoredFiles}
+          onChange={(value) => form.setFieldValue('ignoredFiles', value)}
         />
 
         <ModalFooter>

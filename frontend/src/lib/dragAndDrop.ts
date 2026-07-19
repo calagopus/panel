@@ -4,6 +4,7 @@ import {
   DragStartEvent,
   DropAnimation,
   defaultDropAnimationSideEffects,
+  Modifier,
   MouseSensor,
   TouchSensor,
   useSensor,
@@ -12,6 +13,8 @@ import {
 import { arrayMove } from '@dnd-kit/sortable';
 import { useEffect, useMemo, useState } from 'react';
 import { DndCallbacks, DndConfig, DndItem } from '@/elements/DragAndDrop.tsx';
+
+export const restrictToVerticalAxis: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 
 export function useDndSensors(config: DndConfig = {}) {
   const { pointerActivationDistance = 8, touchActivationDelay = 250, touchActivationTolerance = 8 } = config;

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import createSubuser from '@/api/server/subusers/createSubuser.ts';
 import Button from '@/elements/Button.tsx';
 import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
-import TagsInput from '@/elements/input/TagsInput.tsx';
+import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -78,10 +78,12 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
           setSelectedPermissions={(permissions) => form.setFieldValue('permissions', permissions)}
         />
 
-        <TagsInput
+        <IgnoredFilesInput
+          serverUuid={server.uuid}
           label={t('common.form.ignoredFiles', {})}
           description={t('pages.server.subusers.modal.createSubuser.form.ignoredFilesDescription', {})}
-          {...form.getInputProps('ignoredFiles')}
+          value={form.values.ignoredFiles}
+          onChange={(value) => form.setFieldValue('ignoredFiles', value)}
         />
 
         <Captcha ref={captchaRef} />

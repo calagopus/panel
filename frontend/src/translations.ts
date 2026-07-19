@@ -199,6 +199,7 @@ const baseTranslations = defineTranslations({
         value: 'Value',
         eggs: 'Eggs',
         ignoredFiles: 'Ignored Files',
+        previewIgnoredFiles: 'Preview ignored files',
         yourControlPanelPassword: 'Your Control Panel Password',
         deploymentEnabled: 'Deployment Enabled',
         maintenanceEnabled: 'Maintenance Enabled',
@@ -260,6 +261,9 @@ const baseTranslations = defineTranslations({
       },
       label: {
         noSubdirectories: 'No subdirectories',
+        emptyDirectory: 'This directory is empty',
+        ignored: 'Ignored',
+        showingFirstEntries: 'Showing the first {count} entries',
       },
       server: {
         noAllocation: 'No Allocation',
