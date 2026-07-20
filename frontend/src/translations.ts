@@ -19,6 +19,7 @@ const baseTranslations = defineTranslations({
     databaseAgentHost: defineEnglishItem('Database Agent Host', 'Database Agent Hosts'),
     allocation: defineEnglishItem('Node Allocation', 'Node Allocations'),
     egg: defineEnglishItem('Egg', 'Eggs'),
+    instance: defineEnglishItem('Instance', 'Instances'),
     shortcut: defineEnglishItem('Shortcut', 'Shortcuts'),
     line: defineEnglishItem('Line', 'Lines'),
     backup: defineEnglishItem('Backup', 'Backups'),
@@ -119,6 +120,7 @@ const baseTranslations = defineTranslations({
           'This backup is on a different node than the server. It is not viewable from the Client API.',
       },
       form: {
+        force: 'Do you want to execute this deletion forcefully?',
         name: 'Name',
         newName: 'New Name',
         description: 'Description',
@@ -245,6 +247,8 @@ const baseTranslations = defineTranslations({
           address: 'Address',
           eggs: 'Eggs',
           template: 'Template',
+          version: 'Version',
+          host: 'Host',
         },
       },
       tabs: {
@@ -2380,8 +2384,10 @@ const baseTranslations = defineTranslations({
                   },
                   delete: {
                     title: 'Confirm Node Backup Deletion',
-                    form: {
-                      force: 'Do you want to forcefully delete this node backup?',
+                    form: {},
+                    alert: {
+                      forceWarning:
+                        'Force deletion removes the backup even if its configuration is missing or the remote storage cannot be reached. The backup files themselves may not be fully cleaned up, leaving orphaned data behind.',
                     },
                   },
                 },
@@ -2692,6 +2698,17 @@ const baseTranslations = defineTranslations({
                 },
               },
             },
+            databases: {
+              title: 'Databases',
+              page: {
+                databases: {
+                  title: 'Classic Databases',
+                },
+                instances: {
+                  title: 'Managed Databases',
+                },
+              },
+            },
             logs: {
               title: 'Logs',
               page: {
@@ -2786,12 +2803,13 @@ const baseTranslations = defineTranslations({
                     title: 'Confirm Server Deletion',
                     description: 'You are about to delete **{name}**. Are you sure?',
                     form: {
-                      force: 'Force delete',
-                      forceWarning:
-                        'Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.',
                       deleteBackups: 'Do you want to delete backups of this server?',
                       confirmServerName: 'Confirm Server Name',
                       confirmServerNamePlaceholder: 'Server Name',
+                    },
+                    alert: {
+                      forceWarning:
+                        'Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind.',
                     },
                   },
                 },
@@ -3179,8 +3197,8 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Database Host Deletion',
                     content: 'Are you sure you want to delete **{name}**?',
-                    form: {
-                      force: 'Force delete',
+                    form: {},
+                    alert: {
                       forceWarning:
                         'Force deletion removes all databases on this host. The databases on the host itself may not be fully cleaned up, leaving orphaned data behind.',
                     },
@@ -3192,6 +3210,20 @@ const baseTranslations = defineTranslations({
               title: 'Databases',
               page: {
                 title: 'Database Host Databases',
+                modal: {
+                  delete: {
+                    title: 'Confirm Database Deletion',
+                    content: 'Are you sure you want to delete **{name}**?',
+                    toast: {
+                      deleted: 'Database has been deleted.',
+                    },
+                    form: {},
+                    alert: {
+                      forceWarning:
+                        'Force deletion ignores the database lock and the host maintenance state. The database on the host itself may not be fully cleaned up, leaving orphaned data behind.',
+                    },
+                  },
+                },
               },
             },
           },
@@ -3222,8 +3254,8 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Database Agent Host Deletion',
                     content: 'Are you sure you want to delete **{name}**?',
-                    form: {
-                      force: 'Force delete',
+                    form: {},
+                    alert: {
                       forceWarning:
                         'Force deletion removes all instances on this host. Instances the agent cannot be reached for may not be fully cleaned up, leaving orphaned data behind.',
                     },
@@ -3235,6 +3267,33 @@ const baseTranslations = defineTranslations({
               title: 'Instances',
               page: {
                 title: 'Instances',
+                modal: {
+                  editInstance: {
+                    title: 'Edit {name}',
+                    toast: {
+                      updated: 'Instance has been updated.',
+                    },
+                    form: {
+                      image: 'Docker Image',
+                      imageDescription:
+                        'Pins the instance to a specific docker image. Leave empty to follow the template image, including future template updates.',
+                      env: 'Environment Overrides',
+                      override: 'Override {field}',
+                    },
+                  },
+                  deleteInstance: {
+                    title: 'Confirm Managed Database Deletion',
+                    content: 'Are you sure you want to delete **{name}**?',
+                    toast: {
+                      deleted: 'Managed database deleted.',
+                    },
+                    form: {},
+                    alert: {
+                      forceWarning:
+                        'Force deletion removes the instance even if the agent cannot be reached. The instance and its data on the host itself may not be fully cleaned up, leaving orphaned data behind.',
+                    },
+                  },
+                },
               },
             },
             configuration: {
@@ -3375,6 +3434,7 @@ const baseTranslations = defineTranslations({
                 toast: {
                   exported: 'Database Agent Template exported.',
                 },
+                version: 'Version {version}',
                 form: {
                   dockerImages: 'Docker Images',
                   env: 'Environment Variables',
@@ -3412,6 +3472,23 @@ const baseTranslations = defineTranslations({
               title: 'Instances',
               page: {
                 title: 'Instances',
+                outdated: 'Outdated',
+                button: {
+                  applyUpdates: 'Apply Updates',
+                  applyAllUpdates: 'Update All Outdated',
+                },
+                toast: {
+                  updated: 'Applied template updates to {instances}.',
+                },
+                modal: {
+                  applyUpdates: {
+                    title: 'Apply Template Updates',
+                    content:
+                      'This will push the current configuration of **{name}** to the {count} selected instances. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped.',
+                    contentAll:
+                      'This will push the current configuration of **{name}** to every outdated instance, including instances not shown by the current search. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped.',
+                  },
+                },
               },
             },
           },
@@ -4280,6 +4357,10 @@ const baseTranslations = defineTranslations({
           instance: {
             title: 'Managed Databases',
             subtitle: '{current} managed databases created.',
+            updateAvailable: 'Update Available',
+            button: {
+              applyUpdate: 'Apply Update',
+            },
             tooltip: {
               limitReached: 'This server is limited to {max} managed databases.',
             },
@@ -4299,7 +4380,6 @@ const baseTranslations = defineTranslations({
             databases: {
               title: 'Databases',
               subtitle: '{current} of {max} maximum databases created.',
-              noDatabases: 'This instance has no databases yet.',
               tooltip: {
                 offline: 'The instance must be running to create databases.',
                 noUser: 'This database has no user attached yet. Create a user to access it.',
@@ -4348,7 +4428,6 @@ const baseTranslations = defineTranslations({
             users: {
               title: 'Users',
               subtitle: '{current} of {max} maximum users created.',
-              noUsers: 'This instance has no users yet.',
               tooltip: {
                 limitReached: 'This instance is limited to {max} users.',
               },
@@ -4403,6 +4482,14 @@ const baseTranslations = defineTranslations({
                 title: 'Edit Managed Database',
                 toast: {
                   updated: 'Managed database updated.',
+                },
+              },
+              applyDatabaseInstanceUpdate: {
+                title: 'Apply Template Update',
+                content:
+                  'This will update **{name}** to the latest template configuration. The database will be restarted to apply the new configuration.',
+                toast: {
+                  applied: 'Template update applied.',
                 },
               },
               deleteDatabaseInstance: {

@@ -2243,10 +2243,7 @@
                     }
                   },
                   "delete": {
-                    "title": "Confirm Node Backup Deletion",
-                    "form": {
-                      "force": "Do you want to forcefully delete this node backup?"
-                    }
+                    "title": "Confirm Node Backup Deletion"
                   }
                 }
               }
@@ -2555,7 +2552,6 @@
                     "title": "Confirm Server Deletion",
                     "description": "You are about to delete **{name}**. Are you sure?",
                     "form": {
-                      "force": "Do you want to forcefully delete this server?",
                       "deleteBackups": "Do you want to delete backups of this server?",
                       "confirmServerName": "Confirm Server Name",
                       "confirmServerNamePlaceholder": "Server Name"

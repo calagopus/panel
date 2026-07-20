@@ -2243,10 +2243,7 @@
                     }
                   },
                   "delete": {
-                    "title": "Confirmer la suppression de la sauvegarde du nœud",
-                    "form": {
-                      "force": "Voulez-vous forcer la suppression de cette sauvegarde de nœud ?"
-                    }
+                    "title": "Confirmer la suppression de la sauvegarde du nœud"
                   }
                 }
               }
@@ -2555,7 +2552,6 @@
                     "title": "Confirmer la suppression du serveur",
                     "description": "Vous êtes sur le point de supprimer **{name}**. Êtes-vous sûr ?",
                     "form": {
-                      "force": "Voulez-vous forcer la suppression de ce serveur ?",
                       "deleteBackups": "Voulez-vous supprimer les sauvegardes de ce serveur ?",
                       "confirmServerName": "Confirmer le nom du serveur",
                       "confirmServerNamePlaceholder": "Nom du serveur"

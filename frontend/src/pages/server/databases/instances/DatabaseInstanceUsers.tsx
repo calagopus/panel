@@ -1,6 +1,5 @@
-import { faPlus, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -10,13 +9,13 @@ import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import Group from '@/elements/Group.tsx';
-import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Table from '@/elements/Table.tsx';
 import Text from '@/elements/Text.tsx';
 import Title from '@/elements/Title.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
@@ -38,31 +37,39 @@ export default function DatabaseInstanceUsers({
 
   const [createUserOpen, setCreateUserOpen] = useState(false);
 
-  const { data: databases } = useQuery({
+  const { data: databases = [] } = useResource({
     queryKey: queryKeys.server(server.uuid).databases.instances.databases(instance.uuid),
     queryFn: () => getDatabaseInstanceDatabases(server.uuid, instance.uuid),
     enabled: hasDatabases,
+    silent: true,
   });
 
   const {
     data: users,
-    error: usersError,
-    isFetching: usersFetching,
-  } = useQuery({
+    loading,
+    error,
+  } = useResource({
     queryKey: queryKeys.server(server.uuid).databases.instances.users(instance.uuid),
     queryFn: () => getDatabaseInstanceUsers(server.uuid, instance.uuid),
   });
 
-  const databaseNameByUuid = new Map((databases ?? []).map((database) => [database.uuid, database.name]));
+  const pagination = {
+    total: users?.length ?? 0,
+    page: 1,
+    perPage: users?.length ?? 0,
+    data: users ?? [],
+  };
 
-  const limitReached = (users?.length ?? 0) >= maxUserCount;
+  const databaseNameByUuid = new Map(databases.map((database) => [database.uuid, database.name]));
+
+  const limitReached = pagination.total >= maxUserCount;
   const createDisabled = (offline && hasDatabases) || limitReached;
 
   return (
     <Stack>
       <DatabaseInstanceUserCreateModal
         instance={instance}
-        databases={databases ?? []}
+        databases={databases}
         opened={createUserOpen}
         onClose={() => setCreateUserOpen(false)}
       />
@@ -72,7 +79,7 @@ export default function DatabaseInstanceUsers({
           <Title order={2}>{t('pages.server.databases.instance.users.title', {})}</Title>
           <Text size='xs' c='dimmed'>
             {t('pages.server.databases.instance.users.subtitle', {
-              current: users?.length ?? 0,
+              current: pagination.total,
               max: maxUserCount,
             })}
           </Text>
@@ -97,33 +104,25 @@ export default function DatabaseInstanceUsers({
         </ServerCan>
       </Group>
 
-      {usersFetching && !users ? (
-        <Spinner.Centered />
-      ) : usersError ? (
-        <Text>{httpErrorToHuman(usersError)}</Text>
-      ) : !users?.length ? (
-        <Stack align='center' gap='sm' py='xl'>
-          <FontAwesomeIcon icon={faUser} size='2x' className='text-(--mantine-color-dimmed)' />
-          <Text c='dimmed'>{t('pages.server.databases.instance.users.noUsers', {})}</Text>
-        </Stack>
-      ) : (
-        <Table
-          columns={[
-            t('common.table.columns.username', {}),
-            t('pages.server.databases.instance.databases.table.columns.database', {}),
-            '',
-          ]}
-        >
-          {users.map((user) => (
-            <DatabaseInstanceUserRow
-              key={user.uuid}
-              instance={instance}
-              user={user}
-              databaseName={user.databaseUuid ? (databaseNameByUuid.get(user.databaseUuid) ?? null) : null}
-            />
-          ))}
-        </Table>
-      )}
+      <Table
+        columns={[
+          t('common.table.columns.username', {}),
+          t('pages.server.databases.instance.databases.table.columns.database', {}),
+          '',
+        ]}
+        loading={loading}
+        error={error ? httpErrorToHuman(error) : null}
+        pagination={pagination}
+      >
+        {pagination.data.map((user) => (
+          <DatabaseInstanceUserRow
+            key={user.uuid}
+            instance={instance}
+            user={user}
+            databaseName={user.databaseUuid ? (databaseNameByUuid.get(user.databaseUuid) ?? null) : null}
+          />
+        ))}
+      </Table>
     </Stack>
   );
 }

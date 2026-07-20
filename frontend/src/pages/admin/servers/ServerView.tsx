@@ -2,6 +2,7 @@ import {
   faArchive,
   faCodeCommit,
   faCog,
+  faDatabase,
   faExternalLink,
   faFileText,
   faFolderTree,
@@ -17,6 +18,7 @@ import SubNavigation from '@/elements/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminServerAllocations from '@/pages/admin/servers/allocations/AdminServerAllocations.tsx';
 import AdminServerBackups from '@/pages/admin/servers/backups/AdminServerBackups.tsx';
+import AdminServerDatabases from '@/pages/admin/servers/databases/AdminServerDatabases.tsx';
 import AdminServerLogs from '@/pages/admin/servers/logs/AdminServerLogs.tsx';
 import AdminServerManagement from '@/pages/admin/servers/management/AdminServerManagement.tsx';
 import AdminServerMounts from '@/pages/admin/servers/mounts/AdminServerMounts.tsx';
@@ -84,6 +86,13 @@ export default function ServerView() {
                 path: `/backups`,
                 element: <AdminServerBackups server={server} />,
                 permission: 'nodes.backups',
+              },
+              {
+                name: t('pages.admin.servers.tabs.databases.title', {}),
+                icon: faDatabase,
+                path: `/databases`,
+                element: <AdminServerDatabases server={server} />,
+                permission: 'database-hosts.read',
               },
               {
                 name: t('pages.admin.servers.tabs.logs.title', {}),

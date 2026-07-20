@@ -2233,10 +2233,7 @@
                     }
                   },
                   "delete": {
-                    "title": "Potvrdiť odstránenie zálohy uzla",
-                    "form": {
-                      "force": "Chcete túto zálohu uzla odstrániť vynútene?"
-                    }
+                    "title": "Potvrdiť odstránenie zálohy uzla"
                   }
                 }
               }
@@ -2545,7 +2542,6 @@
                     "title": "Potvrdiť odstránenie servera",
                     "description": "Chystáte sa odstrániť **{name}**. Naozaj chcete pokračovať?",
                     "form": {
-                      "force": "Chcete tento server odstrániť vynútene?",
                       "deleteBackups": "Chcete odstrániť zálohy tohto servera?",
                       "confirmServerName": "Potvrdiť názov servera",
                       "confirmServerNamePlaceholder": "Názov servera"

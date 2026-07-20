@@ -42,7 +42,7 @@ export default function AdminDatabaseHostDatabases({
         onPageSelect={setPage}
       >
         {databaseHostDatabases?.data.map((database) => (
-          <DatabaseRow key={database.uuid} database={database} />
+          <DatabaseRow key={database.uuid} hostUuid={databaseHost.uuid} database={database} />
         ))}
       </Table>
     </AdminSubContentContainer>

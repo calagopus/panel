@@ -2395,10 +2395,7 @@
                     }
                   },
                   "delete": {
-                    "title": "Xác Nhận Xóa Sao Lưu Node",
-                    "form": {
-                      "force": "Bạn có muốn xóa cưỡng bức sao lưu node này?"
-                    }
+                    "title": "Xác Nhận Xóa Sao Lưu Node"
                   }
                 }
               }
@@ -2787,11 +2784,10 @@
                     "title": "Xác Nhận Xóa Máy Chủ",
                     "description": "Bạn sắp xóa **{name}**. Bạn có chắc không?",
                     "form": {
-                      "force": "Bạn có muốn xóa cưỡng bức máy chủ này?",
-                      "forceWarning": "Buộc xóa sẽ bỏ qua trình tự tắt máy thông thường. Các tệp máy chủ trên node có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác.",
                       "deleteBackups": "Bạn có muốn xóa sao lưu của máy chủ này?",
                       "confirmServerName": "Xác Nhận Tên Máy Chủ",
-                      "confirmServerNamePlaceholder": "Tên Máy Chủ"
+                      "confirmServerNamePlaceholder": "Tên Máy Chủ",
+                      "forceWarning": "Buộc xóa sẽ bỏ qua trình tự tắt máy thông thường. Các tệp máy chủ trên node có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác."
                     }
                   }
                 }
@@ -4240,7 +4236,6 @@
             "databases": {
               "title": "Cơ sở dữ liệu",
               "subtitle": "Đã tạo {current} trên tối đa {max} cơ sở dữ liệu.",
-              "noDatabases": "Phiên bản này chưa có cơ sở dữ liệu nào.",
               "tooltip": {
                 "offline": "Phiên bản phải đang chạy để tạo cơ sở dữ liệu.",
                 "noUser": "Cơ sở dữ liệu này chưa được đính kèm người dùng. Hãy tạo người dùng để truy cập.",
@@ -4282,12 +4277,12 @@
                 "deleted": "Đã xóa cơ sở dữ liệu.",
                 "imported": "Đã hoàn thành nhập cơ sở dữ liệu.",
                 "passwordRotated": "Mật khẩu đã được xoay vòng."
-              }
+              },
+              "noDatabases": "Phiên bản này chưa có cơ sở dữ liệu nào."
             },
             "users": {
               "title": "Người dùng",
               "subtitle": "Đã tạo {current} trên tối đa {max} người dùng.",
-              "noUsers": "Phiên bản này chưa có người dùng nào.",
               "tooltip": {
                 "limitReached": "Phiên bản này bị giới hạn ở {max} người dùng."
               },
@@ -4309,7 +4304,8 @@
               "toast": {
                 "created": "Đã tạo người dùng.",
                 "deleted": "Đã xóa người dùng."
-              }
+              },
+              "noUsers": "Phiên bản này chưa có người dùng nào."
             },
             "power": {
               "toast": {

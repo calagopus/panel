@@ -1,4 +1,6 @@
-import { ModalProps } from '@mantine/core';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Alert, ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -48,11 +50,18 @@ export default function NodeBackupsDeleteModal({ node, backup, ...props }: Props
       <Modal title={t('pages.admin.nodes.tabs.backups.page.modal.delete.title', {})} {...props}>
         <Stack>
           <Switch
-            label={t('pages.admin.nodes.tabs.backups.page.modal.delete.form.force', {})}
+            label={t('common.form.force', {})}
             name='force'
-            defaultChecked={deleteDoForce}
+            color='red'
+            checked={deleteDoForce}
             onChange={(e) => setDeleteDoForce(e.target.checked)}
           />
+
+          {deleteDoForce && (
+            <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+              {t('pages.admin.nodes.tabs.backups.page.modal.delete.alert.forceWarning', {})}
+            </Alert>
+          )}
         </Stack>
 
         <ModalFooter>

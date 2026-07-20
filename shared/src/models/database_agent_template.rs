@@ -58,6 +58,8 @@ pub struct DatabaseAgentTemplate {
     pub io_weight: Option<i16>,
     pub cpu: i32,
 
+    pub version: i32,
+
     pub created: chrono::NaiveDateTime,
 
     extension_data: super::ModelExtensionData,
@@ -151,6 +153,10 @@ impl BaseModel for DatabaseAgentTemplate {
                 compact_str::format_compact!("{prefix}cpu"),
             ),
             (
+                "database_agent_templates.version",
+                compact_str::format_compact!("{prefix}version"),
+            ),
+            (
                 "database_agent_templates.created",
                 compact_str::format_compact!("{prefix}created"),
             ),
@@ -188,6 +194,7 @@ impl BaseModel for DatabaseAgentTemplate {
             disk: row.try_get(compact_str::format_compact!("{prefix}disk").as_str())?,
             io_weight: row.try_get(compact_str::format_compact!("{prefix}io_weight").as_str())?,
             cpu: row.try_get(compact_str::format_compact!("{prefix}cpu").as_str())?,
+            version: row.try_get(compact_str::format_compact!("{prefix}version").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
         })
@@ -284,6 +291,7 @@ impl IntoAdminApiObject for DatabaseAgentTemplate {
                 disk: self.disk,
                 io_weight: self.io_weight,
                 cpu: self.cpu,
+                version: self.version,
                 created: self.created.and_utc(),
             },
             api_object,
@@ -318,6 +326,7 @@ impl IntoApiObject for DatabaseAgentTemplate {
                 disk: self.disk,
                 io_weight: self.io_weight,
                 cpu: self.cpu,
+                version: self.version,
                 created: self.created.and_utc(),
             },
             api_object,
@@ -488,8 +497,6 @@ pub struct UpdateDatabaseAgentTemplateOptions {
     pub description: Option<Option<compact_str::CompactString>>,
 
     #[garde(skip)]
-    pub r#type: Option<db_agent_api::DatabaseAgentType>,
-    #[garde(skip)]
     pub deployment_enabled: Option<bool>,
 
     #[garde(inner(custom(validate_docker_images)))]
@@ -556,6 +563,25 @@ impl UpdatableModel for DatabaseAgentTemplate {
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
+        let spec_changed = options
+            .docker_images
+            .as_ref()
+            .is_some_and(|v| *v != self.docker_images)
+            || options.env.as_ref().is_some_and(|v| *v != self.env)
+            || options.image_uid.is_some_and(|v| v != self.image_uid)
+            || options.image_gid.is_some_and(|v| v != self.image_gid)
+            || options.cmd.as_ref().is_some_and(|v| *v != self.cmd)
+            || options.volumes.as_ref().is_some_and(|v| *v != self.volumes)
+            || options
+                .socket_path
+                .as_ref()
+                .is_some_and(|v| *v != self.socket_path)
+            || options.memory.is_some_and(|v| v != self.memory)
+            || options.swap.is_some_and(|v| v != self.swap)
+            || options.disk.is_some_and(|v| v != self.disk)
+            || options.io_weight.is_some_and(|v| v != self.io_weight)
+            || options.cpu.is_some_and(|v| v != self.cpu);
+
         let mut query_builder = UpdateQueryBuilder::new("database_agent_templates");
 
         self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
@@ -567,7 +593,6 @@ impl UpdatableModel for DatabaseAgentTemplate {
                 "description",
                 options.description.as_ref().map(|d| d.as_ref()),
             )
-            .set("type", options.r#type)
             .set("deployment_enabled", options.deployment_enabled)
             .set(
                 "docker_images",
@@ -588,14 +613,20 @@ impl UpdatableModel for DatabaseAgentTemplate {
 
         query_builder.execute(&mut **transaction).await?;
 
+        if spec_changed {
+            self.version = sqlx::query_scalar(
+                "UPDATE database_agent_templates SET version = version + 1 WHERE uuid = $1 RETURNING version",
+            )
+            .bind(self.uuid)
+            .fetch_one(&mut **transaction)
+            .await?;
+        }
+
         if let Some(name) = options.name {
             self.name = name;
         }
         if let Some(description) = options.description {
             self.description = description;
-        }
-        if let Some(r#type) = options.r#type {
-            self.r#type = r#type;
         }
         if let Some(deployment_enabled) = options.deployment_enabled {
             self.deployment_enabled = deployment_enabled;
@@ -662,6 +693,64 @@ impl DeletableModel for DatabaseAgentTemplate {
     ) -> Result<(), anyhow::Error> {
         self.run_delete_handlers(&options, state, transaction)
             .await?;
+
+        sqlx::query(
+            r#"
+            UPDATE server_database_instances SET
+                memory = COALESCE(memory, $2),
+                swap = COALESCE(swap, $3),
+                disk = COALESCE(disk, $4),
+                io_weight = COALESCE(io_weight, $5),
+                cpu = COALESCE(cpu, $6),
+                image = COALESCE(image, $7),
+                template_version = NULL
+            WHERE server_database_instances.database_agent_template_uuid = $1
+            "#,
+        )
+        .bind(self.uuid)
+        .bind(self.memory)
+        .bind(self.swap)
+        .bind(self.disk)
+        .bind(self.io_weight)
+        .bind(self.cpu)
+        .bind(self.docker_images.values().next())
+        .execute(&mut **transaction)
+        .await?;
+
+        let instance_envs = sqlx::query(
+            r#"
+            SELECT server_database_instances.uuid, server_database_instances.env
+            FROM server_database_instances
+            WHERE server_database_instances.database_agent_template_uuid = $1
+            "#,
+        )
+        .bind(self.uuid)
+        .fetch_all(&mut **transaction)
+        .await?;
+
+        for row in instance_envs {
+            let uuid: uuid::Uuid = row.try_get("uuid")?;
+            let env_overrides: Option<serde_json::Value> = row.try_get("env")?;
+
+            let mut env = self.env.clone();
+            if let Some(env_overrides) = env_overrides {
+                env.extend(serde_json::from_value::<
+                    IndexMap<compact_str::CompactString, compact_str::CompactString>,
+                >(env_overrides)?);
+            }
+
+            sqlx::query(
+                r#"
+                UPDATE server_database_instances
+                SET env = $2
+                WHERE server_database_instances.uuid = $1
+                "#,
+            )
+            .bind(uuid)
+            .bind(OrderedJson(&env))
+            .execute(&mut **transaction)
+            .await?;
+        }
 
         sqlx::query(
             r#"
@@ -775,6 +864,8 @@ pub struct AdminApiDatabaseAgentTemplate {
     pub io_weight: Option<i16>,
     pub cpu: i32,
 
+    pub version: i32,
+
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
@@ -798,6 +889,8 @@ pub struct ApiDatabaseAgentTemplate {
     pub disk: i64,
     pub io_weight: Option<i16>,
     pub cpu: i32,
+
+    pub version: i32,
 
     pub created: chrono::DateTime<chrono::Utc>,
 }

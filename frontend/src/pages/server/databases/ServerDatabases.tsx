@@ -115,10 +115,6 @@ export default function ServerDatabases() {
     silent: true,
   });
 
-  const limitReachedLabel = t('pages.server.databases.tooltip.limitReached', {
-    max: server.featureLimits.databases,
-  });
-
   const classicDisabled = full || databaseHosts.length === 0;
   const agentDisabled = full || agentTemplates.length === 0;
 
@@ -139,7 +135,13 @@ export default function ServerDatabases() {
     <ServerCan action='databases.create'>
       <ConditionalTooltip
         enabled={classicDisabled}
-        label={full ? limitReachedLabel : t('pages.server.databases.modal.createDatabase.form.noHostsFound', {})}
+        label={
+          full
+            ? t('pages.server.databases.tooltip.limitReached', {
+                max: server.featureLimits.databases,
+              })
+            : t('pages.server.databases.modal.createDatabase.form.noHostsFound', {})
+        }
       >
         <Button
           disabled={classicDisabled}
@@ -159,7 +161,9 @@ export default function ServerDatabases() {
         enabled={agentDisabled}
         label={
           full
-            ? limitReachedLabel
+            ? t('pages.server.databases.tooltip.limitReached', {
+                max: server.featureLimits.databases,
+              })
             : t('pages.server.databases.instance.modal.createDatabaseInstance.form.noTemplatesFound', {})
         }
       >

@@ -215,7 +215,7 @@ export default function DatabaseHostCreateOrUpdate({
           </Text>
 
           <Switch
-            label={t('pages.admin.databaseHosts.tabs.general.page.modal.delete.form.force', {})}
+            label={t('common.form.force', {})}
             name='force'
             color='red'
             checked={deleteDoForce}
@@ -224,7 +224,7 @@ export default function DatabaseHostCreateOrUpdate({
 
           {deleteDoForce && (
             <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
-              {t('pages.admin.databaseHosts.tabs.general.page.modal.delete.form.forceWarning', {})}
+              {t('pages.admin.databaseHosts.tabs.general.page.modal.delete.alert.forceWarning', {})}
             </Alert>
           )}
         </Stack>

@@ -20,12 +20,14 @@ export const adminDatabaseAgentTemplateSchema = z.looseObject({
   disk: z.number().min(0),
   ioWeight: z.preprocess(nullableNumber, z.number().min(0).max(1000).nullable()),
   cpu: z.number().min(0),
+  version: z.number(),
   created: z.coerce.date(),
 });
 
 export const adminDatabaseAgentTemplateCreateSchema = z.lazy(() =>
   adminDatabaseAgentTemplateSchema.omit({
     uuid: true,
+    version: true,
     created: true,
   }),
 );
@@ -34,6 +36,8 @@ export const adminDatabaseAgentTemplateUpdateSchema = z.lazy(() =>
   adminDatabaseAgentTemplateSchema
     .omit({
       uuid: true,
+      type: true,
+      version: true,
       created: true,
     })
     .partial(),

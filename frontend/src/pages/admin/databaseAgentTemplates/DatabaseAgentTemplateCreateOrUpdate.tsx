@@ -7,6 +7,7 @@ import createDatabaseAgentTemplate from '@/api/admin/database-agent-templates/cr
 import deleteDatabaseAgentTemplate from '@/api/admin/database-agent-templates/deleteDatabaseAgentTemplate.ts';
 import updateDatabaseAgentTemplate from '@/api/admin/database-agent-templates/updateDatabaseAgentTemplate.ts';
 import Anchor from '@/elements/Anchor.tsx';
+import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
@@ -28,7 +29,8 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-type DatabaseAgentTemplateFormValues = z.infer<typeof adminDatabaseAgentTemplateUpdateSchema>;
+type DatabaseAgentTemplateFormValues = z.infer<typeof adminDatabaseAgentTemplateUpdateSchema> &
+  Partial<Pick<z.infer<typeof adminDatabaseAgentTemplateCreateSchema>, 'type'>>;
 
 export default function DatabaseAgentTemplateCreateOrUpdate({
   contextDatabaseAgentTemplate,
@@ -138,6 +140,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       label: t('common.form.type', {}),
       required: true,
       options: Object.entries(databaseAgentTypeLabelMapping).map(([value, label]) => ({ value, label })),
+      props: { disabled: !!contextDatabaseAgentTemplate },
     },
     { type: 'textarea', name: 'description', label: t('common.form.description', {}), colSpan: 'full' },
     {
@@ -262,7 +265,18 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
       }
       fullscreen={!!contextDatabaseAgentTemplate}
       titleOrder={2}
-      contentRight={<AdvancedModeToggle />}
+      contentRight={
+        <Group gap='sm'>
+          {contextDatabaseAgentTemplate && (
+            <Badge variant='light' size='lg'>
+              {t('pages.admin.databaseAgentTemplates.tabs.general.page.version', {
+                version: contextDatabaseAgentTemplate.version.toString(),
+              })}
+            </Badge>
+          )}
+          <AdvancedModeToggle />
+        </Group>
+      }
     >
       <ConfirmationModal
         opened={openModal === 'delete'}

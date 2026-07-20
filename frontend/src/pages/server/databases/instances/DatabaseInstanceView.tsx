@@ -1,4 +1,12 @@
-import { faDatabase, faDownload, faFileLines, faPencil, faTrash, faUsers } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowsRotate,
+  faDatabase,
+  faDownload,
+  faFileLines,
+  faPencil,
+  faTrash,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -32,6 +40,7 @@ import DatabaseInstanceDetails from './DatabaseInstanceDetails.tsx';
 import DatabaseInstanceLogs from './DatabaseInstanceLogs.tsx';
 import DatabaseInstanceStats from './DatabaseInstanceStats.tsx';
 import DatabaseInstanceUsers from './DatabaseInstanceUsers.tsx';
+import DatabaseInstanceApplyUpdateModal from './modals/DatabaseInstanceApplyUpdateModal.tsx';
 import DatabaseInstanceDeleteModal from './modals/DatabaseInstanceDeleteModal.tsx';
 import DatabaseInstanceEditModal from './modals/DatabaseInstanceEditModal.tsx';
 import DatabaseInstanceExportModal from './modals/DatabaseInstanceExportModal.tsx';
@@ -43,7 +52,7 @@ export default function DatabaseInstanceView() {
   const navigate = useNavigate();
   const server = useServerStore((state) => state.server);
 
-  const [openModal, setOpenModal] = useState<'edit' | 'delete' | 'kill' | 'export' | null>(null);
+  const [openModal, setOpenModal] = useState<'edit' | 'applyUpdate' | 'delete' | 'kill' | 'export' | null>(null);
   const [usage, setUsage] = useState<z.infer<typeof serverDatabaseInstanceResourceUsageSchema> | null>(null);
   const [powerLoading, setPowerLoading] = useState<DatabaseInstancePowerAction | null>(null);
   const [connected, setConnected] = useState(false);
@@ -175,6 +184,11 @@ export default function DatabaseInstanceView() {
               opened={openModal === 'edit'}
               onClose={() => setOpenModal(null)}
             />
+            <DatabaseInstanceApplyUpdateModal
+              instance={instance}
+              opened={openModal === 'applyUpdate'}
+              onClose={() => setOpenModal(null)}
+            />
             <DatabaseInstanceDeleteModal
               instance={instance}
               opened={openModal === 'delete'}
@@ -199,6 +213,11 @@ export default function DatabaseInstanceView() {
                   {instance.isLocked && (
                     <Badge color='green' size='lg'>
                       {t('common.form.locked', {})}
+                    </Badge>
+                  )}
+                  {instance.updateAvailable && (
+                    <Badge color='yellow' size='lg'>
+                      {t('pages.server.databases.instance.updateAvailable', {})}
                     </Badge>
                   )}
                 </Group>
@@ -241,6 +260,18 @@ export default function DatabaseInstanceView() {
                         leftSection={<FontAwesomeIcon icon={faDownload} />}
                       >
                         {t('pages.server.databases.instance.databases.button.export', {})}
+                      </Button>
+                    </ServerCan>
+                  )}
+                  {instance.updateAvailable && (
+                    <ServerCan action='database-instances.apply-update'>
+                      <Button
+                        onClick={() => setOpenModal('applyUpdate')}
+                        color='yellow'
+                        disabled={instance.isLocked}
+                        leftSection={<FontAwesomeIcon icon={faArrowsRotate} />}
+                      >
+                        {t('pages.server.databases.instance.button.applyUpdate', {})}
                       </Button>
                     </ServerCan>
                   )}

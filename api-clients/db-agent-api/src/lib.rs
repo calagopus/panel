@@ -449,7 +449,7 @@ pub mod instances_instance {
                 #[schema(inline)]
                 pub timezone: Option<compact_str::CompactString>,
                 #[schema(inline)]
-                pub env: Option<serde_json::Value>,
+                pub env: Option<IndexMap<compact_str::CompactString, compact_str::CompactString>>,
                 #[schema(inline)]
                 pub cmd: Option<Vec<compact_str::CompactString>>,
             }

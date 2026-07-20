@@ -65,6 +65,17 @@ export function convertType(object: oas31.SchemaObject | oas31.ReferenceObject):
                 return 'compact_str::CompactString'
             }
             case 'array': return `Vec<${convertType(object.items!)}>`
+            case 'object': {
+                if (object.additionalProperties) {
+                    const key = object.propertyNames && !object.propertyNames.$ref && (object.propertyNames as oas31.SchemaObject).format === 'uuid'
+                        ? 'uuid::Uuid'
+                        : 'compact_str::CompactString'
+
+                    return `IndexMap<${key}, ${convertType(object.additionalProperties as any)}>`
+                }
+
+                break
+            }
         }
     } else {
         return `Option<${convertType({ ...object, type: object.type.find((t) => t !== 'null') })}>`

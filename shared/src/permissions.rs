@@ -738,6 +738,10 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                             "Allows updating database instances, such as locking them.",
                         ),
                         (
+                            "apply-update",
+                            "Allows applying database agent template updates to database instances.",
+                        ),
+                        (
                             "delete",
                             "Allows removing database instances from this server.",
                         ),

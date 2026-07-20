@@ -131,6 +131,28 @@ impl ServerDatabase {
         row.try_map(|row| Self::map(None, &row))
     }
 
+    pub async fn by_database_host_uuid_uuid(
+        database: &crate::database::Database,
+        database_host_uuid: uuid::Uuid,
+        uuid: uuid::Uuid,
+    ) -> Result<Option<Self>, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM server_databases
+            JOIN database_hosts ON database_hosts.uuid = server_databases.database_host_uuid
+            WHERE server_databases.database_host_uuid = $1 AND server_databases.uuid = $2
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(database_host_uuid)
+        .bind(uuid)
+        .fetch_optional(database.read())
+        .await?;
+
+        row.try_map(|row| Self::map(None, &row))
+    }
+
     pub async fn by_database_host_uuid_with_pagination(
         database: &crate::database::Database,
         database_host_uuid: uuid::Uuid,
@@ -478,6 +500,49 @@ impl ServerDatabase {
         }
 
         Ok(())
+    }
+}
+
+impl ServerDatabase {
+    pub async fn into_admin_server_api_object(
+        self,
+        state: &crate::State,
+    ) -> Result<AdminApiServerServerDatabase, crate::database::DatabaseError> {
+        let api_object = AdminApiServerServerDatabase::init_hooks(&self, state).await?;
+
+        let details = self
+            .database_host
+            .credentials
+            .parse_connection_details(&state.database)
+            .await?;
+        let host = self
+            .database_host
+            .public_host
+            .clone()
+            .unwrap_or(details.host);
+        let port = self
+            .database_host
+            .public_port
+            .unwrap_or(details.port as i32);
+
+        let api_object = finish_extendible!(
+            AdminApiServerServerDatabase {
+                uuid: self.uuid,
+                r#type: self.database_host.r#type,
+                database_host: self.database_host.into_admin_api_object(state, ()).await?,
+                host,
+                port,
+                name: self.name,
+                is_locked: self.locked,
+                username: self.username,
+                password: state.database.decrypt(self.password).await?,
+                created: self.created.and_utc(),
+            },
+            api_object,
+            state
+        )?;
+
+        Ok(api_object)
     }
 }
 
@@ -976,6 +1041,28 @@ impl DeletableModel for ServerDatabase {
         })
         .await?
     }
+}
+
+#[schema_extension_derive::extendible]
+#[init_args(ServerDatabase, crate::State)]
+#[hook_args(crate::State)]
+#[derive(ToSchema, Serialize)]
+#[schema(title = "AdminServerServerDatabase")]
+pub struct AdminApiServerServerDatabase {
+    pub uuid: uuid::Uuid,
+    pub database_host: super::database_host::AdminApiDatabaseHost,
+
+    pub r#type: DatabaseType,
+    pub host: compact_str::CompactString,
+    pub port: i32,
+
+    pub name: compact_str::CompactString,
+    pub is_locked: bool,
+
+    pub username: compact_str::CompactString,
+    pub password: compact_str::CompactString,
+
+    pub created: chrono::DateTime<chrono::Utc>,
 }
 
 #[schema_extension_derive::extendible]

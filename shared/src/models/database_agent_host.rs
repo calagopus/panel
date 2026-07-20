@@ -242,11 +242,12 @@ impl DatabaseAgentHost {
             r#"
             WITH database_usage AS (
                 SELECT
-                    database_agent_host_uuid,
-                    COALESCE(SUM(memory), 0)::BIGINT AS used_memory,
-                    COALESCE(SUM(disk), 0)::BIGINT AS used_disk
+                    server_database_instances.database_agent_host_uuid,
+                    COALESCE(SUM(COALESCE(server_database_instances.memory, t.memory)), 0)::BIGINT AS used_memory,
+                    COALESCE(SUM(COALESCE(server_database_instances.disk, t.disk)), 0)::BIGINT AS used_disk
                 FROM server_database_instances
-                GROUP BY database_agent_host_uuid
+                LEFT JOIN database_agent_templates t ON t.uuid = server_database_instances.database_agent_template_uuid
+                GROUP BY server_database_instances.database_agent_host_uuid
             )
             SELECT {}
             FROM database_agent_hosts

@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
+import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
 import { adminDatabaseAgentTemplateSchema } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
+import { adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
@@ -124,9 +126,8 @@ export const adminServerBackupSchema = z.looseObject({
   created: z.coerce.date(),
 });
 
-export const adminServerDatabaseSchema = z.looseObject({
+const adminServerDatabaseBaseShape = {
   uuid: z.string(),
-  server: z.lazy(() => adminServerSchema),
   name: z.string(),
   isLocked: z.boolean(),
   username: z.string(),
@@ -135,24 +136,64 @@ export const adminServerDatabaseSchema = z.looseObject({
   port: z.number(),
   type: databaseType,
   created: z.coerce.date(),
+};
+
+// Fields common to both variants — enough for the shared delete modal.
+export const adminServerDatabaseBaseSchema = z.looseObject(adminServerDatabaseBaseShape);
+
+export const adminServerDatabaseSchema = z.looseObject({
+  ...adminServerDatabaseBaseShape,
+  server: z.lazy(() => adminServerSchema),
 });
 
-export const adminServerDatabaseAgentSchema = z.looseObject({
+// Server-scoped admin listing: the server is already known from the page, and the host is
+// what the row needs to reach the database-hosts delete route.
+export const adminServerServerDatabaseSchema = z.looseObject({
+  ...adminServerDatabaseBaseShape,
+  databaseHost: z.lazy(() => adminDatabaseHostSchema),
+});
+
+const adminServerDatabaseAgentBaseShape = {
   uuid: z.string(),
-  server: z.lazy(() => adminServerSchema),
   databaseAgentTemplate: z.lazy(() => adminDatabaseAgentTemplateSchema).nullable(),
+  templateVersion: z.number().nullable(),
+  updateAvailable: z.boolean(),
   type: z.lazy(() => databaseAgentType),
   host: z.string().nullable(),
   port: z.number().nullable(),
   name: z.string(),
   isLocked: z.boolean(),
+  image: z.preprocess(nullableString, z.string().nullable()),
+  imageOverride: z.preprocess(nullableString, z.string().nullable()),
+  env: z.record(z.string(), z.string()),
+  envOverrides: z.record(z.string(), z.string()).nullable(),
   memory: z.number(),
   swap: z.number(),
   disk: z.number(),
   ioWeight: z.number().nullable(),
   cpu: z.number(),
+  memoryOverride: z.number().nullable(),
+  swapOverride: z.number().nullable(),
+  diskOverride: z.number().nullable(),
+  ioWeightOverride: z.number().nullable(),
+  cpuOverride: z.number().nullable(),
   created: z.coerce.date(),
+};
+
+export const adminServerDatabaseAgentSchema = z.looseObject({
+  ...adminServerDatabaseAgentBaseShape,
+  server: z.lazy(() => adminServerSchema),
 });
+
+// Server-scoped admin listing: carries the agent host instead of the redundant server, so the
+// row can delegate edits to the database-agent-hosts routes.
+export const adminServerServerDatabaseAgentSchema = z.looseObject({
+  ...adminServerDatabaseAgentBaseShape,
+  databaseAgentHost: z.lazy(() => adminDatabaseAgentHostSchema),
+});
+
+// Fields common to both variants — enough for the shared edit modal.
+export const adminDatabaseAgentBaseSchema = z.looseObject(adminServerDatabaseAgentBaseShape);
 
 export const adminServerMountSchema = z.looseObject({
   mount: z.lazy(() => adminMountSchema),

@@ -286,6 +286,7 @@ mod post {
             database_agent_host: &database_agent_host,
             database_agent_template: &template,
             name: data.name,
+            image: (template.docker_images.values().next() != Some(&image)).then(|| image.clone()),
         };
 
         let mut transaction = state.database.write().begin().await?;

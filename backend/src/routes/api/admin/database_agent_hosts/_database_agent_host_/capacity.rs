@@ -54,10 +54,11 @@ mod get {
             ResponseStats,
             "SELECT
                 COUNT(*) as instances,
-                COALESCE(SUM(cpu), 0)::int8 as cpu,
-                COALESCE(SUM(memory), 0)::int8 as memory,
-                COALESCE(SUM(disk), 0)::int8 as disk
+                COALESCE(SUM(COALESCE(server_database_instances.cpu, t.cpu)), 0)::int8 as cpu,
+                COALESCE(SUM(COALESCE(server_database_instances.memory, t.memory)), 0)::int8 as memory,
+                COALESCE(SUM(COALESCE(server_database_instances.disk, t.disk)), 0)::int8 as disk
             FROM server_database_instances
+            LEFT JOIN database_agent_templates t ON t.uuid = server_database_instances.database_agent_template_uuid
             WHERE server_database_instances.database_agent_host_uuid = $1",
             database_agent_host.uuid
         )

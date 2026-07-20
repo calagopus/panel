@@ -80,6 +80,14 @@
       "many": "{count} Eggs",
       "other": "{count} Eggs"
     },
+    "instance": {
+      "zero": "{count} Instanzen",
+      "one": "{count} Instanz",
+      "two": "{count} Instanzen",
+      "few": "{count} Instanzen",
+      "many": "{count} Instanzen",
+      "other": "{count} Instanzen"
+    },
     "shortcut": {
       "zero": "{count} Tastaturkürzel",
       "one": "{count} Tastaturkürzel",
@@ -206,6 +214,7 @@
         "backupOnDifferentNode": "Dieses Backup befindet sich auf einer anderen Node als der Server. Es ist nicht über die Client-API einsehbar."
       },
       "form": {
+        "force": "Möchtest du diesen Löschvorgang zwangsweise ausführen?",
         "name": "Name",
         "newName": "Neuer Name",
         "description": "Beschreibung",
@@ -285,11 +294,11 @@
         "value": "Wert",
         "eggs": "Eggs",
         "ignoredFiles": "Ignorierte Dateien",
+        "previewIgnoredFiles": "Ignorierte Dateien anzeigen",
         "yourControlPanelPassword": "Dein Control Panel Passwort",
         "deploymentEnabled": "Bereitstellung aktiviert",
         "maintenanceEnabled": "Wartung aktiviert",
-        "truncateDirectory": "Möchtest du alle Dateien dieses Servers löschen, bevor diese Aktion ausgeführt wird? Dies kann nicht rückgängig gemacht werden.",
-        "previewIgnoredFiles": "Ignorierte Dateien anzeigen"
+        "truncateDirectory": "Möchtest du alle Dateien dieses Servers löschen, bevor diese Aktion ausgeführt wird? Dies kann nicht rückgängig gemacht werden."
       },
       "table": {
         "pagination": {
@@ -329,7 +338,9 @@
           "server": "Server",
           "address": "Adresse",
           "eggs": "Eggs",
-          "template": "Vorlage"
+          "template": "Vorlage",
+          "version": "Version",
+          "host": "Host"
         }
       },
       "tabs": {
@@ -346,8 +357,8 @@
       },
       "label": {
         "noSubdirectories": "Keine Unterverzeichnisse",
-        "ignored": "Ignoriert",
         "emptyDirectory": "Dieses Verzeichnis ist leer",
+        "ignored": "Ignoriert",
         "showingFirstEntries": "Die ersten {count} Einträge werden angezeigt"
       },
       "server": {
@@ -2415,8 +2426,8 @@
                   },
                   "delete": {
                     "title": "Löschen des Node-Backups bestätigen",
-                    "form": {
-                      "force": "Möchtest du dieses Node-Backup zwangsweise löschen?"
+                    "alert": {
+                      "forceWarning": "Das erzwungene Löschen entfernt das Backup, auch wenn seine Konfiguration fehlt oder der Remote-Speicher nicht erreichbar ist. Die Backup-Dateien selbst werden möglicherweise nicht vollständig entfernt, sodass verwaiste Daten zurückbleiben."
                     }
                   }
                 }
@@ -2718,6 +2729,17 @@
                 }
               }
             },
+            "databases": {
+              "title": "Datenbanken",
+              "page": {
+                "databases": {
+                  "title": "Klassische Datenbanken"
+                },
+                "instances": {
+                  "title": "Verwaltete Datenbanken"
+                }
+              }
+            },
             "logs": {
               "title": "Logs",
               "page": {
@@ -2806,11 +2828,12 @@
                     "title": "Server-Löschung bestätigen",
                     "description": "Du bist dabei, **{name}** zu löschen. Bist du sicher?",
                     "form": {
-                      "force": "Möchtest du diesen Server zwangsweise löschen?",
-                      "forceWarning": "Das erzwungene Löschen überspringt den normalen Herunterfahrvorgang. Die Serverdateien auf dem Node werden möglicherweise nicht vollständig bereinigt, wodurch verwaiste Daten zurückbleiben.",
                       "deleteBackups": "Möchtest du die Backups dieses Servers löschen?",
                       "confirmServerName": "Servername bestätigen",
                       "confirmServerNamePlaceholder": "Servername"
+                    },
+                    "alert": {
+                      "forceWarning": "Das erzwungene Löschen überspringt den normalen Herunterfahrvorgang. Die Serverdateien auf dem Node werden möglicherweise nicht vollständig bereinigt, wodurch verwaiste Daten zurückbleiben."
                     }
                   }
                 }
@@ -3189,8 +3212,7 @@
                   "delete": {
                     "title": "Datenbank-Host-Löschung bestätigen",
                     "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
-                    "form": {
-                      "force": "Möchtest du diesen Datenbank-Host zwangsweise löschen?",
+                    "alert": {
                       "forceWarning": "Das erzwungene Löschen entfernt alle Datenbanken auf diesem Host. Die Datenbanken auf dem Host selbst werden möglicherweise nicht vollständig bereinigt, wodurch verwaiste Daten zurückbleiben."
                     }
                   }
@@ -3200,7 +3222,19 @@
             "databases": {
               "title": "Datenbanken",
               "page": {
-                "title": "Datenbank-Host Datenbanken"
+                "title": "Datenbank-Host Datenbanken",
+                "modal": {
+                  "delete": {
+                    "title": "Löschen der Datenbank bestätigen",
+                    "content": "Möchtest du **{name}** wirklich löschen?",
+                    "toast": {
+                      "deleted": "Die Datenbank wurde gelöscht."
+                    },
+                    "alert": {
+                      "forceWarning": "Das erzwungene Löschen ignoriert die Sperre der Datenbank und den Wartungsmodus des Hosts. Die Datenbank auf dem Host selbst wird möglicherweise nicht vollständig entfernt, sodass verwaiste Daten zurückbleiben."
+                    }
+                  }
+                }
               }
             }
           }
@@ -3231,8 +3265,7 @@
                   "delete": {
                     "title": "Löschen des Datenbank-Agent-Hosts bestätigen",
                     "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
-                    "form": {
-                      "force": "Löschen erzwingen",
+                    "alert": {
                       "forceWarning": "Erzwungenes Löschen entfernt alle Instanzen auf diesem Host. Instanzen, für die der Agent nicht erreichbar ist, werden möglicherweise nicht vollständig bereinigt, sodass verwaiste Daten zurückbleiben."
                     }
                   }
@@ -3242,7 +3275,31 @@
             "instances": {
               "title": "Instanzen",
               "page": {
-                "title": "Instanzen"
+                "title": "Instanzen",
+                "modal": {
+                  "editInstance": {
+                    "title": "{name} bearbeiten",
+                    "toast": {
+                      "updated": "Instanz wurde aktualisiert."
+                    },
+                    "form": {
+                      "image": "Docker-Image",
+                      "imageDescription": "Fixiert die Instanz auf ein bestimmtes Docker-Image. Leer lassen, um dem Template-Image zu folgen, einschließlich zukünftiger Template-Updates.",
+                      "env": "Umgebungs-Überschreibungen",
+                      "override": "{field} überschreiben"
+                    }
+                  },
+                  "deleteInstance": {
+                    "title": "Löschen der verwalteten Datenbank bestätigen",
+                    "content": "Möchtest du **{name}** wirklich löschen?",
+                    "toast": {
+                      "deleted": "Verwaltete Datenbank gelöscht."
+                    },
+                    "alert": {
+                      "forceWarning": "Das erzwungene Löschen entfernt die Instanz, auch wenn der Agent nicht erreichbar ist. Die Instanz und ihre Daten auf dem Host selbst werden möglicherweise nicht vollständig entfernt, sodass verwaiste Daten zurückbleiben."
+                    }
+                  }
+                }
               }
             },
             "configuration": {
@@ -3383,6 +3440,7 @@
                 "toast": {
                   "exported": "Datenbank-Agent-Vorlage exportiert."
                 },
+                "version": "Version {version}",
                 "form": {
                   "dockerImages": "Docker-Images",
                   "env": "Umgebungsvariablen",
@@ -3417,7 +3475,22 @@
             "instances": {
               "title": "Instanzen",
               "page": {
-                "title": "Instanzen"
+                "title": "Instanzen",
+                "outdated": "Veraltet",
+                "button": {
+                  "applyUpdates": "Updates anwenden",
+                  "applyAllUpdates": "Alle veralteten aktualisieren"
+                },
+                "toast": {
+                  "updated": "Template-Updates auf {instances} angewendet."
+                },
+                "modal": {
+                  "applyUpdates": {
+                    "title": "Template-Updates anwenden",
+                    "content": "Dies überträgt die aktuelle Konfiguration von **{name}** auf die {count} ausgewählten Instanzen. Die Instanzen werden neu gestartet, um die neue Konfiguration anzuwenden. Gesperrte Instanzen und Instanzen auf Hosts im Wartungsmodus werden übersprungen.",
+                    "contentAll": "Dies überträgt die aktuelle Konfiguration von **{name}** auf jede veraltete Instanz, einschließlich Instanzen, die durch die aktuelle Suche nicht angezeigt werden. Die Instanzen werden neu gestartet, um die neue Konfiguration anzuwenden. Gesperrte Instanzen und Instanzen auf Hosts im Wartungsmodus werden übersprungen."
+                  }
+                }
               }
             }
           }
@@ -4263,6 +4336,10 @@
           "instance": {
             "title": "Verwaltete Datenbanken",
             "subtitle": "{current} verwaltete Datenbanken erstellt.",
+            "updateAvailable": "Update verfügbar",
+            "button": {
+              "applyUpdate": "Update anwenden"
+            },
             "tooltip": {
               "limitReached": "Dieser Server ist auf {max} verwaltete Datenbanken limitiert."
             },
@@ -4282,7 +4359,6 @@
             "databases": {
               "title": "Datenbanken",
               "subtitle": "{current} von {max} maximalen Datenbanken erstellt.",
-              "noDatabases": "Diese Instanz hat noch keine Datenbanken.",
               "tooltip": {
                 "offline": "Die Instanz muss laufen, um Datenbanken zu erstellen.",
                 "noUser": "Dieser Datenbank ist noch kein Benutzer zugeordnet. Erstelle einen Benutzer, um darauf zuzugreifen.",
@@ -4329,7 +4405,6 @@
             "users": {
               "title": "Benutzer",
               "subtitle": "{current} von {max} maximalen Benutzern erstellt.",
-              "noUsers": "Diese Instanz hat noch keine Benutzer.",
               "tooltip": {
                 "limitReached": "Diese Instanz ist auf {max} Benutzer limitiert."
               },
@@ -4383,6 +4458,13 @@
                 "title": "Verwaltete Datenbank bearbeiten",
                 "toast": {
                   "updated": "Verwaltete Datenbank aktualisiert."
+                }
+              },
+              "applyDatabaseInstanceUpdate": {
+                "title": "Template-Update anwenden",
+                "content": "Dies aktualisiert **{name}** auf die neueste Template-Konfiguration. Die Datenbank wird neu gestartet, um die neue Konfiguration anzuwenden.",
+                "toast": {
+                  "applied": "Template-Update angewendet."
                 }
               },
               "deleteDatabaseInstance": {

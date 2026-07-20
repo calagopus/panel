@@ -63,7 +63,7 @@ export default function ServerDeleteModal({
           </Text>
 
           <Switch
-            label={t('pages.admin.servers.tabs.management.page.delete.modal.form.force', {})}
+            label={t('common.form.force', {})}
             name='force'
             color='red'
             defaultChecked={deleteDoForce}
@@ -72,7 +72,7 @@ export default function ServerDeleteModal({
 
           {deleteDoForce && (
             <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
-              {t('pages.admin.servers.tabs.management.page.delete.modal.form.forceWarning', {})}
+              {t('pages.admin.servers.tabs.management.page.delete.modal.alert.forceWarning', {})}
             </Alert>
           )}
 

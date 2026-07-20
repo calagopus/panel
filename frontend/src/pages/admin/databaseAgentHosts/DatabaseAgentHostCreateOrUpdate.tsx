@@ -202,7 +202,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
           </Text>
 
           <Switch
-            label={t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.form.force', {})}
+            label={t('common.form.force', {})}
             name='force'
             color='red'
             checked={deleteDoForce}
@@ -211,7 +211,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
 
           {deleteDoForce && (
             <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
-              {t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.form.forceWarning', {})}
+              {t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.alert.forceWarning', {})}
             </Alert>
           )}
         </Stack>

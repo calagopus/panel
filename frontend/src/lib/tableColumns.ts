@@ -52,6 +52,34 @@ export const databaseHostDatabaseTableColumns = (): string[] => {
     t('common.table.columns.username', {}),
     t('common.table.columns.size', {}),
     t('common.table.columns.created', {}),
+    '',
+  ];
+};
+
+export const serverDatabaseTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.name', {}),
+    t('common.table.columns.host', {}),
+    t('common.table.columns.type', {}),
+    t('common.table.columns.address', {}),
+    t('common.table.columns.username', {}),
+    t('common.table.columns.size', {}),
+    t('common.table.columns.created', {}),
+    '',
+  ];
+};
+
+export const serverDatabaseInstanceTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.name', {}),
+    t('common.table.columns.host', {}),
+    t('common.table.columns.type', {}),
+    t('common.table.columns.address', {}),
+    t('common.table.columns.template', {}),
+    t('common.table.columns.created', {}),
+    '',
   ];
 };
 
@@ -64,6 +92,7 @@ export const databaseAgentHostInstanceTableColumns = (): string[] => {
     t('common.table.columns.address', {}),
     t('common.table.columns.template', {}),
     t('common.table.columns.created', {}),
+    '',
   ];
 };
 
@@ -74,6 +103,7 @@ export const databaseAgentTemplateInstanceTableColumns = (): string[] => {
     t('common.table.columns.server', {}),
     t('common.table.columns.type', {}),
     t('common.table.columns.address', {}),
+    t('common.table.columns.version', {}),
     t('common.table.columns.created', {}),
   ];
 };

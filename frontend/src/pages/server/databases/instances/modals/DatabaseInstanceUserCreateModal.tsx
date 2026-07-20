@@ -78,7 +78,6 @@ export default function DatabaseInstanceUserCreateModal({ instance, databases, .
             label={t('pages.server.databases.instance.users.modal.createUser.form.database', {})}
             description={t('pages.server.databases.instance.users.modal.createUser.form.databaseHint', {})}
             data={databases.map((database) => ({ value: database.uuid, label: database.name }))}
-            nothingFoundMessage={t('pages.server.databases.instance.databases.noDatabases', {})}
             searchable
             {...form.getInputProps('databaseUuid')}
           />

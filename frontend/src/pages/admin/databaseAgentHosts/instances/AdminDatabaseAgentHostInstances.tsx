@@ -42,7 +42,7 @@ export default function AdminDatabaseAgentHostInstances({
         onPageSelect={setPage}
       >
         {instances?.data.map((databaseAgent) => (
-          <DatabaseAgentRow key={databaseAgent.uuid} databaseAgent={databaseAgent} />
+          <DatabaseAgentRow key={databaseAgent.uuid} hostUuid={databaseAgentHost.uuid} databaseAgent={databaseAgent} />
         ))}
       </Table>
     </AdminSubContentContainer>

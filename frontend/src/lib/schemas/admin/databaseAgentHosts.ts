@@ -54,3 +54,13 @@ export const adminDatabaseAgentHostUpdateSchema = z.lazy(() =>
     })
     .partial(),
 );
+
+export const adminDatabaseAgentHostInstanceUpdateSchema = z.object({
+  image: z.string().min(1).max(255).nullable(),
+  env: z.record(z.string(), z.string()).nullable(),
+  memory: z.number().min(0).nullable(),
+  swap: z.number().min(-1).nullable(),
+  disk: z.number().min(0).nullable(),
+  ioWeight: z.number().min(0).max(1000).nullable(),
+  cpu: z.number().min(0).nullable(),
+});

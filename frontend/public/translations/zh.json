@@ -2233,10 +2233,7 @@
                     }
                   },
                   "delete": {
-                    "title": "確認刪除節點備份",
-                    "form": {
-                      "force": "你要強制刪除此節點備份嗎？"
-                    }
+                    "title": "確認刪除節點備份"
                   }
                 }
               }
@@ -2545,7 +2542,6 @@
                     "title": "確認刪除伺服器",
                     "description": "你即將刪除 **{name}**。你確定嗎？",
                     "form": {
-                      "force": "你要強制刪除此伺服器嗎？",
                       "deleteBackups": "你要刪除此伺服器的備份嗎？",
                       "confirmServerName": "確認伺服器名稱",
                       "confirmServerNamePlaceholder": "伺服器名稱"

@@ -33,6 +33,8 @@ const admin = {
     allocations: (serverUuid: string) => ['admin', 'servers', serverUuid, 'allocations'] as const,
     backups: (serverUuid: string) => ['admin', 'servers', serverUuid, 'backups'] as const,
     mounts: (serverUuid: string) => ['admin', 'servers', serverUuid, 'mounts'] as const,
+    databases: (serverUuid: string) => ['admin', 'servers', serverUuid, 'databases'] as const,
+    databaseInstances: (serverUuid: string) => ['admin', 'servers', serverUuid, 'databases', 'instances'] as const,
   },
 
   nests: {

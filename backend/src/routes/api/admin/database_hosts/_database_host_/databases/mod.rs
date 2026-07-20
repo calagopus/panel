@@ -1,15 +1,17 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod _database_;
+
 mod get {
-    use crate::routes::api::admin::database_agent_templates::_database_agent_template_::GetDatabaseAgentTemplate;
+    use crate::routes::api::admin::database_hosts::_database_host_::GetDatabaseHost;
     use axum::{extract::Query, http::StatusCode};
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
         models::{
             IntoAdminApiObject, Pagination, PaginationParamsWithSearch,
-            server_database_instance::ServerDatabaseInstance, user::GetPermissionManager,
+            server_database::ServerDatabase, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -18,8 +20,7 @@ mod get {
     #[derive(ToSchema, Serialize)]
     struct Response {
         #[schema(inline)]
-        instances:
-            Pagination<shared::models::server_database_instance::AdminApiServerDatabaseInstance>,
+        databases: Pagination<shared::models::server_database::AdminApiServerDatabase>,
     }
 
     #[utoipa::path(get, path = "/", responses(
@@ -27,8 +28,8 @@ mod get {
         (status = NOT_FOUND, body = ApiError),
     ), params(
         (
-            "database_agent_template" = uuid::Uuid,
-            description = "The database agent template ID",
+            "database_host" = uuid::Uuid,
+            description = "The database host ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
         (
@@ -49,7 +50,7 @@ mod get {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        database_agent_template: GetDatabaseAgentTemplate,
+        database_host: GetDatabaseHost,
         Query(params): Query<PaginationParamsWithSearch>,
     ) -> ApiResponseResult {
         if let Err(errors) = shared::utils::validate_data(&params) {
@@ -58,11 +59,11 @@ mod get {
                 .ok();
         }
 
-        permissions.has_admin_permission("database-agent-templates.read")?;
+        permissions.has_admin_permission("database-hosts.read")?;
 
-        let instances = ServerDatabaseInstance::by_database_agent_template_uuid_with_pagination(
+        let databases = ServerDatabase::by_database_host_uuid_with_pagination(
             &state.database,
-            database_agent_template.uuid,
+            database_host.uuid,
             params.page,
             params.per_page,
             params.search.as_deref(),
@@ -72,9 +73,9 @@ mod get {
         let storage_url_retriever = state.storage.retrieve_urls().await?;
 
         ApiResponse::new_serialized(Response {
-            instances: instances
-                .try_async_map(|database_agent| {
-                    database_agent.into_admin_api_object(&state, &storage_url_retriever)
+            databases: databases
+                .try_async_map(|database| {
+                    database.into_admin_api_object(&state, &storage_url_retriever)
                 })
                 .await?,
         })
@@ -85,5 +86,6 @@ mod get {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
+        .nest("/{database}", _database_::router(state))
         .with_state(state.clone())
 }

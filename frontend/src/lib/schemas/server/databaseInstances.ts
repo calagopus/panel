@@ -4,6 +4,7 @@ import { nullableString } from '@/lib/transformers.ts';
 
 export const serverDatabaseInstanceSchema = z.looseObject({
   uuid: z.string(),
+  updateAvailable: z.boolean(),
   type: z.lazy(() => databaseAgentType),
   host: z.string().nullable(),
   port: z.number().nullable(),
@@ -45,6 +46,7 @@ export const serverDatabaseInstanceUserSchema = z.object({
 
 export const serverDatabaseInstanceTemplateSchema = z.looseObject({
   uuid: z.string(),
+  version: z.number(),
   name: z.string(),
   description: z.preprocess(nullableString, z.string().nullable()),
   type: z.lazy(() => databaseAgentType),

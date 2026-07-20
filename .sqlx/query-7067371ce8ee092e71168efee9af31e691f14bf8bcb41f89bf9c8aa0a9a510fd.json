@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT\n                COUNT(*) as instances,\n                COALESCE(SUM(cpu), 0)::int8 as cpu,\n                COALESCE(SUM(memory), 0)::int8 as memory,\n                COALESCE(SUM(disk), 0)::int8 as disk\n            FROM server_database_instances\n            WHERE server_database_instances.database_agent_host_uuid = $1",
+  "query": "SELECT\n                COUNT(*) as instances,\n                COALESCE(SUM(COALESCE(server_database_instances.cpu, t.cpu)), 0)::int8 as cpu,\n                COALESCE(SUM(COALESCE(server_database_instances.memory, t.memory)), 0)::int8 as memory,\n                COALESCE(SUM(COALESCE(server_database_instances.disk, t.disk)), 0)::int8 as disk\n            FROM server_database_instances\n            LEFT JOIN database_agent_templates t ON t.uuid = server_database_instances.database_agent_template_uuid\n            WHERE server_database_instances.database_agent_host_uuid = $1",
   "describe": {
     "columns": [
       {
@@ -40,5 +40,5 @@
       null
     ]
   },
-  "hash": "caf79c70578d242ee301c321666d3e0ab331a1659a0bcaf8d4e042c642e4e709"
+  "hash": "7067371ce8ee092e71168efee9af31e691f14bf8bcb41f89bf9c8aa0a9a510fd"
 }

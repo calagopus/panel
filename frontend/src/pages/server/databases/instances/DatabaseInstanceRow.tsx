@@ -15,9 +15,11 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import postDatabaseInstancePower, {
   DatabaseInstancePowerAction,
 } from '@/api/server/databases/instances/postDatabaseInstancePower.ts';
+import Badge from '@/elements/Badge.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
@@ -139,11 +141,16 @@ export default function DatabaseInstanceRow({ instance }: { instance: z.infer<ty
             <TableData>{bytesToString(mbToBytes(instance.disk))}</TableData>
 
             <TableData>
-              {instance.isLocked ? (
-                <FontAwesomeIcon className='text-green-500' icon={faLock} />
-              ) : (
-                <FontAwesomeIcon className='text-red-500' icon={faLockOpen} />
-              )}
+              <Group gap='xs' wrap='nowrap'>
+                {instance.isLocked ? (
+                  <FontAwesomeIcon className='text-green-500' icon={faLock} />
+                ) : (
+                  <FontAwesomeIcon className='text-red-500' icon={faLockOpen} />
+                )}
+                {instance.updateAvailable && (
+                  <Badge color='yellow'>{t('pages.server.databases.instance.updateAvailable', {})}</Badge>
+                )}
+              </Group>
             </TableData>
 
             <ContextMenuToggle items={items} openMenu={openMenu} />

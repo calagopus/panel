@@ -20,6 +20,7 @@ mod export;
 mod logs;
 mod power;
 mod resources;
+mod update;
 mod users;
 
 pub type GetServerDatabaseInstance = shared::extract::ConsumingExtension<ServerDatabaseInstance>;
@@ -144,7 +145,8 @@ mod get {
 
 mod patch {
     use crate::routes::api::client::servers::_server_::databases::instances::_instance_::GetServerDatabaseInstance;
-    use serde::Serialize;
+    use garde::Validate;
+    use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
@@ -155,6 +157,15 @@ mod patch {
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
+
+    #[derive(ToSchema, Validate, Deserialize)]
+    pub struct Payload {
+        #[garde(length(chars, min = 1, max = 31))]
+        #[schema(min_length = 1, max_length = 31)]
+        name: Option<compact_str::CompactString>,
+        #[garde(skip)]
+        locked: Option<bool>,
+    }
 
     #[derive(ToSchema, Serialize)]
     struct Response {}
@@ -176,17 +187,33 @@ mod patch {
             description = "The database instance ID",
             example = "123e4567-e89b-12d3-a456-426614174000",
         ),
-    ), request_body = inline(UpdateServerDatabaseInstanceOptions))]
+    ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
         activity_logger: GetServerActivityLogger,
         mut database_instance: GetServerDatabaseInstance,
-        shared::Payload(data): shared::Payload<UpdateServerDatabaseInstanceOptions>,
+        shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
+        if let Err(errors) = shared::utils::validate_data(&data) {
+            return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
+                .with_status(axum::http::StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         permissions.has_server_permission("database-instances.update")?;
 
-        match database_instance.update(&state, data).await {
+        match database_instance
+            .update(
+                &state,
+                UpdateServerDatabaseInstanceOptions {
+                    name: data.name,
+                    locked: data.locked,
+                    ..Default::default()
+                },
+            )
+            .await
+        {
             Ok(_) => {}
             Err(err) if err.is_unique_violation() => {
                 return ApiResponse::error("database instance with name already exists")
@@ -330,6 +357,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/logs", logs::router(state))
         .nest("/power", power::router(state))
         .nest("/resources", resources::router(state))
+        .nest("/update", update::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }
