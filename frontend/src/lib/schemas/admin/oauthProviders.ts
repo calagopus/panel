@@ -126,12 +126,14 @@ export const adminOAuthProviderMappingTypeSchema = z.discriminatedUnion('type', 
   z.object({
     type: z.literal('role'),
     roleUuid: z.string(),
+    revokeUnmatched: z.boolean(),
   }),
   z.object({
     type: z.literal('server_subuser'),
     serverUuid: z.string(),
     permissions: z.array(z.string()),
     ignoredFiles: z.array(z.string()),
+    revokeUnmatched: z.boolean(),
   }),
 ]);
 

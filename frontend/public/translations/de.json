@@ -3619,6 +3619,8 @@
                   "contains": "Enthält",
                   "startsWith": "Beginnt mit",
                   "endsWith": "Endet mit",
+                  "revokeUnmatched": "Bei Nichtübereinstimmung entziehen",
+                  "revokeUnmatchedDescription": "Entfernt die zugewiesene Rolle oder den Server-Unterbenutzer wieder, wenn der Matcher bei einer späteren Anmeldung nicht mehr zutrifft.",
                   "mappingType": "Zuordnungstyp",
                   "role": "Rolle",
                   "permissions": "Berechtigungen"

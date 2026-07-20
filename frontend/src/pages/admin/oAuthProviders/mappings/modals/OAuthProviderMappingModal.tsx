@@ -9,6 +9,7 @@ import Button from '@/elements/Button.tsx';
 import Divider from '@/elements/Divider.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
+import Switch from '@/elements/input/Switch.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -39,6 +40,7 @@ type FormValues = {
   serverUuid: string;
   permissions: string[];
   ignoredFiles: string[];
+  revokeUnmatched: boolean;
 };
 
 export default function OAuthProviderMappingModal({
@@ -70,17 +72,19 @@ export default function OAuthProviderMappingModal({
       serverUuid: '',
       permissions: [],
       ignoredFiles: [],
+      revokeUnmatched: false,
     },
     onClose: props.onClose,
     onSubmit: async (values) => {
       const mappingData =
         values.type === 'role'
-          ? { type: 'role' as const, roleUuid: values.roleUuid }
+          ? { type: 'role' as const, roleUuid: values.roleUuid, revokeUnmatched: values.revokeUnmatched }
           : {
               type: 'server_subuser' as const,
               serverUuid: values.serverUuid,
               permissions: values.permissions,
               ignoredFiles: values.ignoredFiles,
+              revokeUnmatched: values.revokeUnmatched,
             };
 
       const payload = { matcher: values.matcher, mapping: mappingData };
@@ -110,6 +114,7 @@ export default function OAuthProviderMappingModal({
         serverUuid: mapping.mapping.type === 'server_subuser' ? mapping.mapping.serverUuid : '',
         permissions: mapping.mapping.type === 'server_subuser' ? mapping.mapping.permissions : [],
         ignoredFiles: mapping.mapping.type === 'server_subuser' ? mapping.mapping.ignoredFiles : [],
+        revokeUnmatched: mapping.mapping.revokeUnmatched,
       });
     } else {
       form.reset();
@@ -187,6 +192,12 @@ export default function OAuthProviderMappingModal({
             <TagsInput label={t('common.form.ignoredFiles', {})} {...form.getInputProps('ignoredFiles')} />
           </>
         )}
+
+        <Switch
+          label={t('pages.admin.oAuthProviders.tabs.mappings.page.form.revokeUnmatched', {})}
+          description={t('pages.admin.oAuthProviders.tabs.mappings.page.form.revokeUnmatchedDescription', {})}
+          {...form.getInputProps('revokeUnmatched', { type: 'checkbox' })}
+        />
 
         <Divider />
 

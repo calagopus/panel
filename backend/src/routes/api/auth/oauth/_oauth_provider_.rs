@@ -277,6 +277,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                     Some(oauth_link) => {
                         let user = oauth_link.user.fetch(&state.database).await?;
 
+                        apply_oauth_provider_mappings(&state, &oauth_provider, user.uuid, &token, &info).await;
+
                         if user.totp_enabled && !oauth_provider.login_bypass_2fa {
                             if let Err(err) = UserActivity::create(
                                 &state,

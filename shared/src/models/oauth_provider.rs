@@ -944,8 +944,8 @@ impl DuplicableModel for OAuthProvider {
         let mut oauth_provider = Self::map(None, &row)?;
 
         sqlx::query!(
-            "INSERT INTO oauth_provider_mappings (oauth_provider_uuid, scopes, mapping)
-            SELECT $1, oauth_provider_mappings.scopes, oauth_provider_mappings.mapping
+            "INSERT INTO oauth_provider_mappings (oauth_provider_uuid, matcher, mapping)
+            SELECT $1, oauth_provider_mappings.matcher, oauth_provider_mappings.mapping
             FROM oauth_provider_mappings
             WHERE oauth_provider_mappings.oauth_provider_uuid = $2",
             oauth_provider.uuid,

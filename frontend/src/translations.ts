@@ -3625,6 +3625,9 @@ const baseTranslations = defineTranslations({
                   contains: 'Contains',
                   startsWith: 'Starts With',
                   endsWith: 'Ends With',
+                  revokeUnmatched: 'Revoke when not matched',
+                  revokeUnmatchedDescription:
+                    'Removes the assigned role or server subuser again when the matcher no longer matches on a later login.',
                   mappingType: 'Mapping Type',
                   role: 'Role',
                   permissions: 'Permissions',

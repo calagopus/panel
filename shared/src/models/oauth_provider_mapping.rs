@@ -2,6 +2,7 @@ use crate::{
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
 };
+use compact_str::ToCompactString;
 use garde::Validate;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
@@ -139,14 +140,14 @@ impl OAuthProviderMappingMatcher {
     fn node_equals_str(node: &serde_json::Value, expected: &str) -> bool {
         match node {
             serde_json::Value::String(value) => value == expected,
-            node => node == expected,
+            node => node.to_compact_string() == expected,
         }
     }
 
-    fn node_string(node: &serde_json::Value) -> String {
+    fn node_string(node: &serde_json::Value) -> compact_str::CompactString {
         match node {
-            serde_json::Value::String(value) => value.clone(),
-            node => node.to_string(),
+            serde_json::Value::String(value) => value.to_compact_string(),
+            node => node.to_compact_string(),
         }
     }
 
@@ -205,6 +206,9 @@ pub enum OAuthProviderMappingType {
     Role {
         #[garde(skip)]
         role_uuid: uuid::Uuid,
+        #[garde(skip)]
+        #[serde(default)]
+        revoke_unmatched: bool,
     },
     ServerSubuser {
         #[garde(skip)]
@@ -213,7 +217,23 @@ pub enum OAuthProviderMappingType {
         permissions: Vec<compact_str::CompactString>,
         #[garde(skip)]
         ignored_files: Vec<compact_str::CompactString>,
+        #[garde(skip)]
+        #[serde(default)]
+        revoke_unmatched: bool,
     },
+}
+
+impl OAuthProviderMappingType {
+    pub fn revoke_unmatched(&self) -> bool {
+        match self {
+            OAuthProviderMappingType::Role {
+                revoke_unmatched, ..
+            }
+            | OAuthProviderMappingType::ServerSubuser {
+                revoke_unmatched, ..
+            } => *revoke_unmatched,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -380,25 +400,71 @@ impl OAuthProviderMapping {
         granted_scopes: &[compact_str::CompactString],
         info: &serde_json::Value,
     ) -> Result<(), crate::database::DatabaseError> {
-        let mut mappings =
+        let mappings =
             Self::all_by_oauth_provider_uuid(&state.database, oauth_provider_uuid).await?;
-        mappings.retain(|mapping| mapping.matcher.matches(granted_scopes, info));
-        if mappings.is_empty() {
+        let (matched, unmatched): (Vec<Self>, Vec<Self>) = mappings
+            .into_iter()
+            .partition(|mapping| mapping.matcher.matches(granted_scopes, info));
+        if matched.is_empty() && !unmatched.iter().any(|m| m.mapping.revoke_unmatched()) {
             return Ok(());
         }
 
-        let mut user =
-            match super::user::User::by_uuid_optional_cached(&state.database, user_uuid).await? {
-                Some(user) => user,
-                None => return Ok(()),
-            };
+        let mut user = match super::user::User::by_uuid_optional(&state.database, user_uuid).await?
+        {
+            Some(user) => user,
+            None => return Ok(()),
+        };
 
-        for mapping in mappings {
+        let matched_role_uuids = matched
+            .iter()
+            .filter_map(|mapping| match &mapping.mapping {
+                OAuthProviderMappingType::Role { role_uuid, .. } => Some(*role_uuid),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        let matched_server_uuids = matched
+            .iter()
+            .filter_map(|mapping| match &mapping.mapping {
+                OAuthProviderMappingType::ServerSubuser { server_uuid, .. } => Some(*server_uuid),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+
+        for mapping in matched {
             if let Err(err) = mapping.apply(state, &mut user).await {
                 tracing::warn!(
                     mapping = %mapping.uuid,
                     user = %user.uuid,
                     "failed to apply oauth provider mapping: {:#?}",
+                    err
+                );
+            }
+        }
+
+        for mapping in unmatched {
+            if !mapping.mapping.revoke_unmatched() {
+                continue;
+            }
+
+            match &mapping.mapping {
+                OAuthProviderMappingType::Role { role_uuid, .. }
+                    if matched_role_uuids.contains(role_uuid) =>
+                {
+                    continue;
+                }
+                OAuthProviderMappingType::ServerSubuser { server_uuid, .. }
+                    if matched_server_uuids.contains(server_uuid) =>
+                {
+                    continue;
+                }
+                _ => {}
+            }
+
+            if let Err(err) = mapping.revert(state, &mut user).await {
+                tracing::warn!(
+                    mapping = %mapping.uuid,
+                    user = %user.uuid,
+                    "failed to revert oauth provider mapping: {:#?}",
                     err
                 );
             }
@@ -413,7 +479,7 @@ impl OAuthProviderMapping {
         user: &mut super::user::User,
     ) -> Result<(), crate::database::DatabaseError> {
         match &self.mapping {
-            OAuthProviderMappingType::Role { role_uuid } => {
+            OAuthProviderMappingType::Role { role_uuid, .. } => {
                 if super::role::Role::by_uuid_optional_cached(&state.database, *role_uuid)
                     .await?
                     .is_none()
@@ -434,6 +500,7 @@ impl OAuthProviderMapping {
                 server_uuid,
                 permissions,
                 ignored_files,
+                ..
             } => {
                 let server = match super::server::Server::by_uuid_optional_cached(
                     &state.database,
@@ -477,6 +544,61 @@ impl OAuthProviderMapping {
                         },
                     )
                     .await?;
+                }
+
+                Ok(())
+            }
+        }
+    }
+
+    async fn revert(
+        &self,
+        state: &crate::State,
+        user: &mut super::user::User,
+    ) -> Result<(), crate::database::DatabaseError> {
+        match &self.mapping {
+            OAuthProviderMappingType::Role { role_uuid, .. } => {
+                if !user
+                    .role
+                    .as_ref()
+                    .is_some_and(|role| role.uuid == *role_uuid)
+                {
+                    return Ok(());
+                }
+
+                user.update(
+                    state,
+                    super::user::UpdateUserOptions {
+                        role_uuid: Some(None),
+                        ..Default::default()
+                    },
+                )
+                .await
+            }
+            OAuthProviderMappingType::ServerSubuser { server_uuid, .. } => {
+                let server = match super::server::Server::by_uuid_optional_cached(
+                    &state.database,
+                    *server_uuid,
+                )
+                .await?
+                {
+                    Some(server) => server,
+                    None => return Ok(()),
+                };
+
+                if server.owner.uuid == user.uuid {
+                    return Ok(());
+                }
+
+                if let Some(subuser) =
+                    super::server_subuser::ServerSubuser::by_server_uuid_user_uuid(
+                        &state.database,
+                        server.uuid,
+                        user.uuid,
+                    )
+                    .await?
+                {
+                    subuser.delete(state, ()).await?;
                 }
 
                 Ok(())
