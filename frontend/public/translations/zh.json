@@ -3000,11 +3000,6 @@
               "title": "對應",
               "page": {
                 "title": "OAuth 提供者對應",
-                "table": {
-                  "columns": {
-                    "scopes": "範圍"
-                  }
-                },
                 "enum": {
                   "mappingType": {
                     "role": "角色",
@@ -3017,7 +3012,6 @@
                   "deleted": "OAuth 提供者對應已刪除。"
                 },
                 "form": {
-                  "scopes": "範圍",
                   "scopesDescription": "此對應套用所需的 OAuth 範圍。",
                   "mappingType": "對應類型",
                   "role": "角色",

@@ -3013,11 +3013,6 @@
               "title": "Mappages",
               "page": {
                 "title": "Mappages du fournisseur OAuth",
-                "table": {
-                  "columns": {
-                    "scopes": "Scopes"
-                  }
-                },
                 "enum": {
                   "mappingType": {
                     "role": "Rôle",
@@ -3030,7 +3025,6 @@
                   "deleted": "Mappage du fournisseur OAuth supprimé."
                 },
                 "form": {
-                  "scopes": "Scopes",
                   "scopesDescription": "Scopes OAuth requis pour que ce mappage s'applique.",
                   "mappingType": "Type de mappage",
                   "role": "Rôle",

@@ -3468,11 +3468,6 @@
               "title": "Ánh Xạ",
               "page": {
                 "title": "Ánh Xạ Nhà Cung Cấp OAuth",
-                "table": {
-                  "columns": {
-                    "scopes": "Phạm Vi"
-                  }
-                },
                 "enum": {
                   "mappingType": {
                     "role": "Vai Trò",
@@ -3485,7 +3480,6 @@
                   "deleted": "Ánh xạ nhà cung cấp OAuth đã được xóa."
                 },
                 "form": {
-                  "scopes": "Phạm Vi",
                   "scopesDescription": "Phạm vi OAuth cần thiết để ánh xạ này áp dụng.",
                   "mappingType": "Loại Ánh Xạ",
                   "role": "Vai Trò",

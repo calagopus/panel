@@ -3013,11 +3013,6 @@
               "title": "Mappings",
               "page": {
                 "title": "OAuth Provider Mappings",
-                "table": {
-                  "columns": {
-                    "scopes": "Scopes"
-                  }
-                },
                 "enum": {
                   "mappingType": {
                     "role": "Role",
@@ -3030,7 +3025,6 @@
                   "deleted": "OAuth provider mapping deleted."
                 },
                 "form": {
-                  "scopes": "Scopes",
                   "scopesDescription": "OAuth scopes required for this mapping to apply.",
                   "mappingType": "Mapping Type",
                   "role": "Role",

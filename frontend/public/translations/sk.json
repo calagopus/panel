@@ -3000,11 +3000,6 @@
               "title": "Mapovania",
               "page": {
                 "title": "Mapovania poskytovateľa OAuth",
-                "table": {
-                  "columns": {
-                    "scopes": "Rozsahy"
-                  }
-                },
                 "enum": {
                   "mappingType": {
                     "role": "Rola",
@@ -3017,7 +3012,6 @@
                   "deleted": "Mapovanie poskytovateľa OAuth bolo odstránené."
                 },
                 "form": {
-                  "scopes": "Rozsahy",
                   "scopesDescription": "Rozsahy OAuth potrebné na použitie tohto mapovania.",
                   "mappingType": "Typ mapovania",
                   "role": "Rola",
