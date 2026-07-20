@@ -129,36 +129,61 @@ export default function AdminNodeCapacity({ node }: { node: z.infer<typeof admin
               }
             >
               <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
-                <LimitedResource
-                  label={t('pages.admin.nodes.tabs.capacity.page.label.memory', {})}
-                  icon={<FontAwesomeIcon icon={faMemory} />}
-                  allocated={capacity.allocated.memory}
-                  limit={capacity.limits.memory}
-                  footer={
-                    <p className='text-xs'>
-                      {t('pages.admin.nodes.tabs.capacity.page.label.free', {
-                        size: bytesToString(mbToBytes(Math.max(capacity.limits.memory - capacity.allocated.memory, 0))),
-                      })}
-                      {capacity.allocated.memoryOverhead > 0 &&
-                        ` ${t('pages.admin.nodes.tabs.capacity.page.label.overhead', {
-                          size: bytesToString(mbToBytes(capacity.allocated.memoryOverhead)),
-                        })}`}
-                    </p>
-                  }
-                />
-                <LimitedResource
-                  label={t('pages.admin.nodes.tabs.capacity.page.label.disk', {})}
-                  icon={<FontAwesomeIcon icon={faHardDrive} />}
-                  allocated={capacity.allocated.disk}
-                  limit={capacity.limits.disk}
-                  footer={
-                    <p className='text-xs'>
-                      {t('pages.admin.nodes.tabs.capacity.page.label.free', {
-                        size: bytesToString(mbToBytes(Math.max(capacity.limits.disk - capacity.allocated.disk, 0))),
-                      })}
-                    </p>
-                  }
-                />
+                {capacity.limits.memory === 0 ? (
+                  <UnlimitedResource
+                    label={t('pages.admin.nodes.tabs.capacity.page.label.memory', {})}
+                    icon={<FontAwesomeIcon icon={faMemory} />}
+                    value={bytesToString(mbToBytes(capacity.allocated.memory))}
+                    footer={
+                      capacity.allocated.memoryOverhead > 0
+                        ? t('pages.admin.nodes.tabs.capacity.page.label.overhead', {
+                            size: bytesToString(mbToBytes(capacity.allocated.memoryOverhead)),
+                          })
+                        : undefined
+                    }
+                  />
+                ) : (
+                  <LimitedResource
+                    label={t('pages.admin.nodes.tabs.capacity.page.label.memory', {})}
+                    icon={<FontAwesomeIcon icon={faMemory} />}
+                    allocated={capacity.allocated.memory}
+                    limit={capacity.limits.memory}
+                    footer={
+                      <p className='text-xs'>
+                        {t('pages.admin.nodes.tabs.capacity.page.label.free', {
+                          size: bytesToString(
+                            mbToBytes(Math.max(capacity.limits.memory - capacity.allocated.memory, 0)),
+                          ),
+                        })}
+                        {capacity.allocated.memoryOverhead > 0 &&
+                          ` ${t('pages.admin.nodes.tabs.capacity.page.label.overhead', {
+                            size: bytesToString(mbToBytes(capacity.allocated.memoryOverhead)),
+                          })}`}
+                      </p>
+                    }
+                  />
+                )}
+                {capacity.limits.disk === 0 ? (
+                  <UnlimitedResource
+                    label={t('pages.admin.nodes.tabs.capacity.page.label.disk', {})}
+                    icon={<FontAwesomeIcon icon={faHardDrive} />}
+                    value={bytesToString(mbToBytes(capacity.allocated.disk))}
+                  />
+                ) : (
+                  <LimitedResource
+                    label={t('pages.admin.nodes.tabs.capacity.page.label.disk', {})}
+                    icon={<FontAwesomeIcon icon={faHardDrive} />}
+                    allocated={capacity.allocated.disk}
+                    limit={capacity.limits.disk}
+                    footer={
+                      <p className='text-xs'>
+                        {t('pages.admin.nodes.tabs.capacity.page.label.free', {
+                          size: bytesToString(mbToBytes(Math.max(capacity.limits.disk - capacity.allocated.disk, 0))),
+                        })}
+                      </p>
+                    }
+                  />
+                )}
                 <UnlimitedResource
                   label={t('pages.admin.nodes.tabs.capacity.page.label.cpu', {})}
                   icon={<FontAwesomeIcon icon={faMicrochip} />}

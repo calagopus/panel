@@ -2201,7 +2201,10 @@
                 "form": {
                   "urlDescription": "Wird für die interne Kommunikation mit dem Node verwendet.",
                   "publicUrlDescription": "Wird für WebSocket-Verbindungen und Downloads verwendet.",
-                  "backupConfigurationPlaceholder": "Vom Standort übernehmen"
+                  "backupConfigurationPlaceholder": "Vom Standort übernehmen",
+                  "memoryDescription": "Der gesamte für Server auf diesem Node verfügbare Arbeitsspeicher.",
+                  "diskDescription": "Der gesamte für Server auf diesem Node verfügbare Speicherplatz.",
+                  "unlimitedTooltip": "0 setzt kein Limit."
                 },
                 "button": {
                   "resetToken": "Token zurücksetzen",

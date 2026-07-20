@@ -395,18 +395,18 @@ impl Node {
             AND nodes.deployment_enabled
             AND (
                 $4 OR (
-                    COALESCE(u.used_memory, 0) + $2 <= nodes.memory
-                    AND COALESCE(u.used_disk, 0) + $3 <= nodes.disk
+                    (nodes.memory = 0 OR COALESCE(u.used_memory, 0) + $2 <= nodes.memory)
+                    AND (nodes.disk = 0 OR COALESCE(u.used_disk, 0) + $3 <= nodes.disk)
                 )
             )
             ORDER BY
                 (
-                    GREATEST(COALESCE(u.used_memory, 0) + $2 - nodes.memory, 0) +
-                    GREATEST(COALESCE(u.used_disk, 0) + $3 - nodes.disk, 0)
+                    CASE WHEN nodes.memory = 0 THEN 0 ELSE GREATEST(COALESCE(u.used_memory, 0) + $2 - nodes.memory, 0) END +
+                    CASE WHEN nodes.disk = 0 THEN 0 ELSE GREATEST(COALESCE(u.used_disk, 0) + $3 - nodes.disk, 0) END
                 ),
                 GREATEST(
-                    (COALESCE(u.used_memory, 0) + $2)::FLOAT / NULLIF(nodes.memory, 0),
-                    (COALESCE(u.used_disk, 0) + $3)::FLOAT / NULLIF(nodes.disk, 0)
+                    CASE WHEN nodes.memory = 0 THEN 0 ELSE (COALESCE(u.used_memory, 0) + $2)::FLOAT / nodes.memory END,
+                    CASE WHEN nodes.disk = 0 THEN 0 ELSE (COALESCE(u.used_disk, 0) + $3)::FLOAT / nodes.disk END
                 )
             "#,
             Self::columns_sql(None),
@@ -436,11 +436,18 @@ impl Node {
             let mut keyed = nodes
                 .into_iter()
                 .map(|(node, used_memory, used_disk)| {
-                    let free_ratio = f64::min(
-                        1.0 - (used_memory + limits.memory) as f64 / node.memory.max(1) as f64,
-                        1.0 - (used_disk + limits.disk) as f64 / node.disk.max(1) as f64,
-                    )
-                    .clamp(0.0001, 1.0);
+                    let memory_free = if node.memory == 0 {
+                        1.0
+                    } else {
+                        1.0 - (used_memory + limits.memory) as f64 / node.memory as f64
+                    };
+                    let disk_free = if node.disk == 0 {
+                        1.0
+                    } else {
+                        1.0 - (used_disk + limits.disk) as f64 / node.disk as f64
+                    };
+
+                    let free_ratio = f64::min(memory_free, disk_free).clamp(0.0001, 1.0);
 
                     let weight = free_ratio.powf(1.0 / randomness);
                     let key = rng.random::<f64>().powf(1.0 / weight);
@@ -515,16 +522,16 @@ impl Node {
                 COUNT(*) FILTER (WHERE nodes.deployment_enabled) AS deployable,
                 COUNT(*) FILTER (
                     WHERE nodes.deployment_enabled
-                    AND ($4 OR COALESCE(u.used_memory, 0) + $2 <= nodes.memory)
+                    AND ($4 OR nodes.memory = 0 OR COALESCE(u.used_memory, 0) + $2 <= nodes.memory)
                 ) AS memory_ok,
                 COUNT(*) FILTER (
                     WHERE nodes.deployment_enabled
-                    AND ($4 OR COALESCE(u.used_disk, 0) + $3 <= nodes.disk)
+                    AND ($4 OR nodes.disk = 0 OR COALESCE(u.used_disk, 0) + $3 <= nodes.disk)
                 ) AS disk_ok,
                 COUNT(*) FILTER (
                     WHERE nodes.deployment_enabled
-                    AND ($4 OR COALESCE(u.used_memory, 0) + $2 <= nodes.memory)
-                    AND ($4 OR COALESCE(u.used_disk, 0) + $3 <= nodes.disk)
+                    AND ($4 OR nodes.memory = 0 OR COALESCE(u.used_memory, 0) + $2 <= nodes.memory)
+                    AND ($4 OR nodes.disk = 0 OR COALESCE(u.used_disk, 0) + $3 <= nodes.disk)
                 ) AS resource_ok
             FROM nodes
             LEFT JOIN server_usage u ON nodes.uuid = u.node_uuid
@@ -937,11 +944,11 @@ pub struct CreateNodeOptions {
     #[garde(range(min = 1))]
     #[schema(minimum = 1)]
     pub sftp_port: u16,
-    #[garde(range(min = 1))]
-    #[schema(minimum = 1)]
+    #[garde(range(min = 0))]
+    #[schema(minimum = 0)]
     pub memory: i64,
-    #[garde(range(min = 1))]
-    #[schema(minimum = 1)]
+    #[garde(range(min = 0))]
+    #[schema(minimum = 0)]
     pub disk: i64,
 }
 
@@ -1062,11 +1069,11 @@ pub struct UpdateNodeOptions {
     #[garde(range(min = 1))]
     #[schema(minimum = 1)]
     pub sftp_port: Option<u16>,
-    #[garde(range(min = 1))]
-    #[schema(minimum = 1)]
+    #[garde(range(min = 0))]
+    #[schema(minimum = 0)]
     pub memory: Option<i64>,
-    #[garde(range(min = 1))]
-    #[schema(minimum = 1)]
+    #[garde(range(min = 0))]
+    #[schema(minimum = 0)]
     pub disk: Option<i64>,
 }
 

@@ -487,8 +487,8 @@ impl shared::extensions::commands::CliCommand<PterodactylArgs> for PterodactylCo
                                 let location_id: i32 = row.try_get("location_id")?;
                                 let fqdn = source_text(&row, "fqdn")?;
                                 let scheme = source_text(&row, "scheme")?;
-                                let memory: i64 = row.try_get("memory")?;
-                                let disk: i64 = row.try_get("disk")?;
+                                let memory: i64 = row.try_get::<i64, _>("memory")?.max(0);
+                                let disk: i64 = row.try_get::<i64, _>("disk")?.max(0);
                                 let token_id = source_text(&row, "daemon_token_id")?;
                                 let token = source_text(&row, "daemon_token")?;
                                 let daemon_listen: i32 = row.try_get("daemonListen")?;

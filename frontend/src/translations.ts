@@ -2154,6 +2154,9 @@ const baseTranslations = defineTranslations({
                   urlDescription: 'Used for internal communication with the node.',
                   publicUrlDescription: 'Used for websocket connections and downloads.',
                   backupConfigurationPlaceholder: 'Inherit from Location',
+                  memoryDescription: 'The total memory available for servers on this node.',
+                  diskDescription: 'The total disk available for servers on this node.',
+                  unlimitedTooltip: '0 will not set a limit.',
                 },
                 button: {
                   resetToken: 'Reset Token',

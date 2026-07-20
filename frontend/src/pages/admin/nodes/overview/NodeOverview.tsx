@@ -288,15 +288,25 @@ export default function NodeOverview({ node }: { node: Node }) {
                 allocated={capacity.allocated.memory}
                 limit={capacity.limits.memory}
                 footer={
-                  <p className='text-xs'>
-                    {t('pages.admin.nodes.tabs.capacity.page.label.free', {
-                      size: bytesToString(mbToBytes(Math.max(capacity.limits.memory - capacity.allocated.memory, 0))),
-                    })}
-                    {capacity.allocated.memoryOverhead > 0 &&
-                      ` ${t('pages.admin.nodes.tabs.capacity.page.label.overhead', {
-                        size: bytesToString(mbToBytes(capacity.allocated.memoryOverhead)),
-                      })}`}
-                  </p>
+                  capacity.limits.memory === 0 ? (
+                    capacity.allocated.memoryOverhead > 0 ? (
+                      <p className='text-xs'>
+                        {t('pages.admin.nodes.tabs.capacity.page.label.overhead', {
+                          size: bytesToString(mbToBytes(capacity.allocated.memoryOverhead)),
+                        })}
+                      </p>
+                    ) : undefined
+                  ) : (
+                    <p className='text-xs'>
+                      {t('pages.admin.nodes.tabs.capacity.page.label.free', {
+                        size: bytesToString(mbToBytes(Math.max(capacity.limits.memory - capacity.allocated.memory, 0))),
+                      })}
+                      {capacity.allocated.memoryOverhead > 0 &&
+                        ` ${t('pages.admin.nodes.tabs.capacity.page.label.overhead', {
+                          size: bytesToString(mbToBytes(capacity.allocated.memoryOverhead)),
+                        })}`}
+                    </p>
+                  )
                 }
               />
               <CapacityResource
@@ -305,11 +315,13 @@ export default function NodeOverview({ node }: { node: Node }) {
                 allocated={capacity.allocated.disk}
                 limit={capacity.limits.disk}
                 footer={
-                  <p className='text-xs'>
-                    {t('pages.admin.nodes.tabs.capacity.page.label.free', {
-                      size: bytesToString(mbToBytes(Math.max(capacity.limits.disk - capacity.allocated.disk, 0))),
-                    })}
-                  </p>
+                  capacity.limits.disk === 0 ? undefined : (
+                    <p className='text-xs'>
+                      {t('pages.admin.nodes.tabs.capacity.page.label.free', {
+                        size: bytesToString(mbToBytes(Math.max(capacity.limits.disk - capacity.allocated.disk, 0))),
+                      })}
+                    </p>
+                  )
                 }
               />
               <CapacityResource
