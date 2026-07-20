@@ -2786,8 +2786,7 @@
                     "form": {
                       "deleteBackups": "Bạn có muốn xóa sao lưu của máy chủ này?",
                       "confirmServerName": "Xác Nhận Tên Máy Chủ",
-                      "confirmServerNamePlaceholder": "Tên Máy Chủ",
-                      "forceWarning": "Buộc xóa sẽ bỏ qua trình tự tắt máy thông thường. Các tệp máy chủ trên node có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác."
+                      "confirmServerNamePlaceholder": "Tên Máy Chủ"
                     }
                   }
                 }
@@ -3161,11 +3160,7 @@
                 "modal": {
                   "delete": {
                     "title": "Xác Nhận Xóa Máy Chủ CSDL",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?",
-                    "form": {
-                      "force": "Buộc xóa",
-                      "forceWarning": "Buộc xóa sẽ xóa tất cả cơ sở dữ liệu trên máy chủ lưu trữ này. Các cơ sở dữ liệu trên chính máy chủ lưu trữ có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác."
-                    }
+                    "content": "Bạn có chắc muốn xóa **{name}** không?"
                   }
                 }
               }
@@ -3203,11 +3198,7 @@
                 "modal": {
                   "delete": {
                     "title": "Xác nhận Xóa Máy Chủ Agent Cơ Sở Dữ Liệu",
-                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
-                    "form": {
-                      "force": "Buộc xóa",
-                      "forceWarning": "Buộc xóa sẽ xóa tất cả các phiên bản trên máy chủ này. Các phiên bản mà agent không thể kết nối tới có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác."
-                    }
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?"
                   }
                 }
               }
@@ -4271,8 +4262,7 @@
                 "deleted": "Đã xóa cơ sở dữ liệu.",
                 "imported": "Đã hoàn thành nhập cơ sở dữ liệu.",
                 "passwordRotated": "Mật khẩu đã được xoay vòng."
-              },
-              "noDatabases": "Phiên bản này chưa có cơ sở dữ liệu nào."
+              }
             },
             "users": {
               "title": "Người dùng",
@@ -4298,8 +4288,7 @@
               "toast": {
                 "created": "Đã tạo người dùng.",
                 "deleted": "Đã xóa người dùng."
-              },
-              "noUsers": "Phiên bản này chưa có người dùng nào."
+              }
             },
             "power": {
               "toast": {
