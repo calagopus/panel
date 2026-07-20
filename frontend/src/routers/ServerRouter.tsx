@@ -18,7 +18,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import { resolveString } from '@/lib/lazy.ts';
 import { isAdmin } from '@/lib/permissions.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { to } from '@/lib/routes.ts';
+import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import { isConflictingState } from '@/lib/server.ts';
 import WebsocketHandler from '@/pages/server/WebsocketHandler.tsx';
 import WebsocketListener from '@/pages/server/WebsocketListener.tsx';
@@ -107,6 +107,11 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
       })
       .filter(Boolean);
   }, [server.eggConfiguration?.routeOrder, allServerRoutes, language]);
+
+  const accessibleRoutePaths = useMemo(
+    () => getAccessibleRoutePaths(allServerRoutes, server.eggConfiguration?.routeOrder),
+    [allServerRoutes, server.eggConfiguration?.routeOrder],
+  );
 
   useEffect(() => {
     return () => {
@@ -268,6 +273,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
                   <Route element={<ServerStateGuard />}>
                     {allServerRoutes
                       .filter((route) => !route.filter || route.filter())
+                      .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
                       .map(({ path, element: Element, permission }) => (
                         <Route key={path} element={<ServerPermissionGuard permission={permission ?? []} />}>
                           <Route path={path} element={<Element />} />

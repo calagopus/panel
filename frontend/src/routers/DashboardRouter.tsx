@@ -10,7 +10,7 @@ import Sidebar from '@/elements/Sidebar.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { resolveString } from '@/lib/lazy.ts';
 import { isAdmin } from '@/lib/permissions.ts';
-import { to } from '@/lib/routes.ts';
+import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import DashboardHomeAll from '@/pages/dashboard/home/DashboardHomeAll.tsx';
 import DashboardHomeGrouped from '@/pages/dashboard/home/DashboardHomeGrouped.tsx';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -62,6 +62,11 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
       })
       .filter(Boolean);
   }, [routeOrder, allAccountRoutes, language]);
+
+  const accessibleRoutePaths = useMemo(
+    () => getAccessibleRoutePaths(allAccountRoutes, routeOrder),
+    [allAccountRoutes, routeOrder],
+  );
 
   return (
     <div className='lg:flex h-full'>
@@ -163,6 +168,7 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                   )}
                   {allAccountRoutes
                     .filter((route) => !route.filter || route.filter())
+                    .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
                     .map(({ path, element: Element }) => (
                       <Route key={path} path={`/account/${path}`.replace('//', '/')} element={<Element />} />
                     ))}
