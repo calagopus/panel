@@ -39,6 +39,7 @@ async fn apply_oauth_provider_mappings(
     oauth_provider: &OAuthProvider,
     user_uuid: uuid::Uuid,
     token: &impl TokenResponse,
+    info: &serde_json::Value,
 ) {
     let granted_scopes: Vec<compact_str::CompactString> = token
         .scopes()
@@ -50,6 +51,7 @@ async fn apply_oauth_provider_mappings(
         oauth_provider.uuid,
         user_uuid,
         &granted_scopes,
+        info,
     )
     .await
     {
@@ -218,7 +220,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                     Err(err) => return ApiResponse::from(err).ok(),
                 }
 
-                apply_oauth_provider_mappings(&state, &oauth_provider, user.uuid, &token).await;
+                apply_oauth_provider_mappings(&state, &oauth_provider, user.uuid, &token, &info).await;
 
                 if let Err(err) = UserActivity::create(
                     &state,
@@ -447,7 +449,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                             Err(err) => return ApiResponse::from(err).ok(),
                         }
 
-                        apply_oauth_provider_mappings(&state, &oauth_provider, user.uuid, &token).await;
+                        apply_oauth_provider_mappings(&state, &oauth_provider, user.uuid, &token, &info).await;
 
                         let key = UserSession::create(
                             &state,

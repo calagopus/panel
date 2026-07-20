@@ -514,19 +514,34 @@ pub struct CreateOAuthProviderOptions {
     #[schema(max_length = 255)]
     pub scopes: Vec<compact_str::CompactString>,
 
-    #[garde(length(chars, min = 3, max = 255))]
+    #[garde(
+        length(chars, min = 3, max = 255),
+        custom(crate::utils::validate_json_path)
+    )]
     #[schema(min_length = 3, max_length = 255)]
     pub identifier_path: String,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(
+        length(chars, min = 1, max = 255),
+        inner(custom(crate::utils::validate_json_path))
+    )]
     #[schema(min_length = 1, max_length = 255)]
     pub email_path: Option<String>,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(
+        length(chars, min = 1, max = 255),
+        inner(custom(crate::utils::validate_json_path))
+    )]
     #[schema(min_length = 1, max_length = 255)]
     pub username_path: Option<String>,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(
+        length(chars, min = 1, max = 255),
+        inner(custom(crate::utils::validate_json_path))
+    )]
     #[schema(min_length = 1, max_length = 255)]
     pub name_first_path: Option<String>,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(
+        length(chars, min = 1, max = 255),
+        inner(custom(crate::utils::validate_json_path))
+    )]
     #[schema(min_length = 1, max_length = 255)]
     pub name_last_path: Option<String>,
 }
@@ -639,10 +654,16 @@ pub struct UpdateOAuthProviderOptions {
     #[schema(max_length = 255)]
     pub scopes: Option<Vec<compact_str::CompactString>>,
 
-    #[garde(length(chars, min = 3, max = 255))]
+    #[garde(
+        length(chars, min = 3, max = 255),
+        inner(custom(crate::utils::validate_json_path))
+    )]
     #[schema(min_length = 3, max_length = 255)]
     pub identifier_path: Option<String>,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(
+        length(chars, min = 1, max = 255),
+        inner(inner(custom(crate::utils::validate_json_path)))
+    )]
     #[schema(min_length = 1, max_length = 255)]
     #[serde(
         default,
@@ -650,7 +671,10 @@ pub struct UpdateOAuthProviderOptions {
         with = "::serde_with::rust::double_option"
     )]
     pub email_path: Option<Option<String>>,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(
+        length(chars, min = 1, max = 255),
+        inner(inner(custom(crate::utils::validate_json_path)))
+    )]
     #[schema(min_length = 1, max_length = 255)]
     #[serde(
         default,
@@ -658,7 +682,10 @@ pub struct UpdateOAuthProviderOptions {
         with = "::serde_with::rust::double_option"
     )]
     pub username_path: Option<Option<String>>,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(
+        length(chars, min = 1, max = 255),
+        inner(inner(custom(crate::utils::validate_json_path)))
+    )]
     #[schema(min_length = 1, max_length = 255)]
     #[serde(
         default,
@@ -666,7 +693,10 @@ pub struct UpdateOAuthProviderOptions {
         with = "::serde_with::rust::double_option"
     )]
     pub name_first_path: Option<Option<String>>,
-    #[garde(length(chars, min = 1, max = 255))]
+    #[garde(
+        length(chars, min = 1, max = 255),
+        inner(inner(custom(crate::utils::validate_json_path)))
+    )]
     #[schema(min_length = 1, max_length = 255)]
     #[serde(
         default,

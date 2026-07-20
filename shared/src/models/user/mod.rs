@@ -838,11 +838,11 @@ pub struct CreateUserOptions {
     #[garde(email, length(max = 255))]
     #[schema(format = "email", max_length = 255)]
     pub email: compact_str::CompactString,
-    #[garde(length(chars, min = 2, max = 255))]
-    #[schema(min_length = 2, max_length = 255)]
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
     pub name_first: compact_str::CompactString,
-    #[garde(length(chars, min = 2, max = 255))]
-    #[schema(min_length = 2, max_length = 255)]
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
     pub name_last: compact_str::CompactString,
     #[garde(length(chars, min = 1, max = 512))]
     #[schema(min_length = 1, max_length = 512)]
@@ -1007,11 +1007,11 @@ pub struct UpdateUserOptions {
     #[garde(email, length(max = 255))]
     #[schema(format = "email", max_length = 255)]
     pub email: Option<compact_str::CompactString>,
-    #[garde(length(chars, min = 2, max = 255))]
-    #[schema(min_length = 2, max_length = 255)]
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
     pub name_first: Option<compact_str::CompactString>,
-    #[garde(length(chars, min = 2, max = 255))]
-    #[schema(min_length = 2, max_length = 255)]
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
     pub name_last: Option<compact_str::CompactString>,
     #[garde(length(chars, min = 8, max = 512))]
     #[schema(min_length = 8, max_length = 512)]

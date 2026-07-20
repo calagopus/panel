@@ -40,6 +40,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
   );
 
   const form = useFormEngine<UserFormValues>('admin.users.createOrUpdate', {
+    schema: adminUserUpdateSchema.unwrap(),
     initialValues: {
       externalId: null,
       username: '',

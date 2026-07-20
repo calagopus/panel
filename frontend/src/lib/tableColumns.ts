@@ -359,7 +359,7 @@ export const adminOAuthProviderMappingsTableColumns = (): string[] => {
     t('common.table.columns.id', {}),
     t('common.table.columns.type', {}),
     t('common.table.columns.target', {}),
-    t('pages.admin.oAuthProviders.tabs.mappings.page.table.columns.scopes', {}),
+    t('pages.admin.oAuthProviders.tabs.mappings.page.table.columns.matcher', {}),
     t('common.table.columns.created', {}),
     '',
   ];

@@ -71,6 +71,16 @@ pub fn validate_host(host: &compact_str::CompactString, _context: &()) -> Result
     Ok(())
 }
 
+pub fn validate_json_path(path: &str, _context: &()) -> Result<(), garde::Error> {
+    if let Err(err) = serde_json_path::JsonPath::parse(path) {
+        return Err(garde::Error::new(compact_str::format_compact!(
+            "must be a valid json path: {err}"
+        )));
+    }
+
+    Ok(())
+}
+
 pub fn validate_time_in_future(
     time: &chrono::DateTime<chrono::Utc>,
     _context: &(),

@@ -6,8 +6,8 @@ export const dashboardAccountSchema = z.object({
     .min(3)
     .max(15)
     .regex(/^[a-zA-Z0-9_]+$/),
-  nameFirst: z.string().min(2).max(255),
-  nameLast: z.string().min(2).max(255),
+  nameFirst: z.string().min(1).max(255),
+  nameLast: z.string().min(1).max(255),
   language: z.string(),
   toastPosition: z.enum(['top_left', 'top_center', 'top_right', 'bottom_left', 'bottom_center', 'bottom_right']),
   startOnGroupedServers: z.boolean(),

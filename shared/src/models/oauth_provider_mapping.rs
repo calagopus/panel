@@ -13,6 +13,194 @@ use utoipa::ToSchema;
 
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
+#[schema(no_recursion)]
+pub enum OAuthProviderMappingMatcher {
+    None,
+    And {
+        #[garde(dive)]
+        matchers: Vec<OAuthProviderMappingMatcher>,
+    },
+    Or {
+        #[garde(dive)]
+        matchers: Vec<OAuthProviderMappingMatcher>,
+    },
+    Not {
+        #[garde(dive)]
+        matcher: Box<OAuthProviderMappingMatcher>,
+    },
+    Scopes {
+        #[garde(length(max = 255), inner(length(max = 255)))]
+        #[schema(max_length = 255)]
+        scopes: Vec<compact_str::CompactString>,
+    },
+    FieldExists {
+        #[garde(
+            length(chars, min = 1, max = 255),
+            custom(crate::utils::validate_json_path)
+        )]
+        #[schema(min_length = 1, max_length = 255)]
+        path: String,
+    },
+    FieldEquals {
+        #[garde(
+            length(chars, min = 1, max = 255),
+            custom(crate::utils::validate_json_path)
+        )]
+        #[schema(min_length = 1, max_length = 255)]
+        path: String,
+        #[garde(length(max = 255))]
+        #[schema(max_length = 255)]
+        equals: compact_str::CompactString,
+    },
+    FieldContains {
+        #[garde(
+            length(chars, min = 1, max = 255),
+            custom(crate::utils::validate_json_path)
+        )]
+        #[schema(min_length = 1, max_length = 255)]
+        path: String,
+        #[garde(length(max = 255))]
+        #[schema(max_length = 255)]
+        contains: compact_str::CompactString,
+    },
+    FieldStartsWith {
+        #[garde(
+            length(chars, min = 1, max = 255),
+            custom(crate::utils::validate_json_path)
+        )]
+        #[schema(min_length = 1, max_length = 255)]
+        path: String,
+        #[garde(length(max = 255))]
+        #[schema(max_length = 255)]
+        starts_with: compact_str::CompactString,
+    },
+    FieldEndsWith {
+        #[garde(
+            length(chars, min = 1, max = 255),
+            custom(crate::utils::validate_json_path)
+        )]
+        #[schema(min_length = 1, max_length = 255)]
+        path: String,
+        #[garde(length(max = 255))]
+        #[schema(max_length = 255)]
+        ends_with: compact_str::CompactString,
+    },
+}
+
+impl OAuthProviderMappingMatcher {
+    pub const MAX_NESTING_DEPTH: usize = 3;
+
+    fn nested_within_limit(&self, depth: usize) -> bool {
+        match self {
+            OAuthProviderMappingMatcher::And { matchers }
+            | OAuthProviderMappingMatcher::Or { matchers } => {
+                depth < Self::MAX_NESTING_DEPTH
+                    && matchers.iter().all(|m| m.nested_within_limit(depth + 1))
+            }
+            OAuthProviderMappingMatcher::Not { matcher } => {
+                depth < Self::MAX_NESTING_DEPTH && matcher.nested_within_limit(depth + 1)
+            }
+            _ => true,
+        }
+    }
+
+    pub fn validate_nesting(value: &Self, _context: &()) -> garde::Result {
+        if value.nested_within_limit(0) {
+            Ok(())
+        } else {
+            Err(garde::Error::new(format!(
+                "matcher may not nest groups more than {} levels deep",
+                Self::MAX_NESTING_DEPTH
+            )))
+        }
+    }
+
+    pub fn validate_optional_nesting(value: &Option<Self>, context: &()) -> garde::Result {
+        match value {
+            Some(matcher) => Self::validate_nesting(matcher, context),
+            None => Ok(()),
+        }
+    }
+
+    fn query_nodes<'a>(path: &str, info: &'a serde_json::Value) -> Vec<&'a serde_json::Value> {
+        match serde_json_path::JsonPath::parse(path) {
+            Ok(path) => path.query(info).all(),
+            Err(err) => {
+                tracing::warn!(
+                    path,
+                    "failed to parse oauth provider mapping matcher path: {err}"
+                );
+
+                Vec::new()
+            }
+        }
+    }
+
+    fn node_equals_str(node: &serde_json::Value, expected: &str) -> bool {
+        match node {
+            serde_json::Value::String(value) => value == expected,
+            node => node == expected,
+        }
+    }
+
+    fn node_string(node: &serde_json::Value) -> String {
+        match node {
+            serde_json::Value::String(value) => value.clone(),
+            node => node.to_string(),
+        }
+    }
+
+    pub fn matches(
+        &self,
+        granted_scopes: &[compact_str::CompactString],
+        info: &serde_json::Value,
+    ) -> bool {
+        match self {
+            OAuthProviderMappingMatcher::None => true,
+            OAuthProviderMappingMatcher::And { matchers } => {
+                matchers.iter().all(|m| m.matches(granted_scopes, info))
+            }
+            OAuthProviderMappingMatcher::Or { matchers } => {
+                matchers.iter().any(|m| m.matches(granted_scopes, info))
+            }
+            OAuthProviderMappingMatcher::Not { matcher } => !matcher.matches(granted_scopes, info),
+            OAuthProviderMappingMatcher::Scopes { scopes } => {
+                scopes.iter().all(|scope| granted_scopes.contains(scope))
+            }
+            OAuthProviderMappingMatcher::FieldExists { path } => {
+                !Self::query_nodes(path, info).is_empty()
+            }
+            OAuthProviderMappingMatcher::FieldEquals { path, equals } => {
+                Self::query_nodes(path, info)
+                    .into_iter()
+                    .any(|node| Self::node_equals_str(node, equals))
+            }
+            OAuthProviderMappingMatcher::FieldContains { path, contains } => {
+                Self::query_nodes(path, info)
+                    .into_iter()
+                    .any(|node| match node {
+                        serde_json::Value::Array(values) => values
+                            .iter()
+                            .any(|value| Self::node_equals_str(value, contains)),
+                        node => Self::node_string(node).contains(contains.as_str()),
+                    })
+            }
+            OAuthProviderMappingMatcher::FieldStartsWith { path, starts_with } => {
+                Self::query_nodes(path, info)
+                    .into_iter()
+                    .any(|node| Self::node_string(node).starts_with(starts_with.as_str()))
+            }
+            OAuthProviderMappingMatcher::FieldEndsWith { path, ends_with } => {
+                Self::query_nodes(path, info)
+                    .into_iter()
+                    .any(|node| Self::node_string(node).ends_with(ends_with.as_str()))
+            }
+        }
+    }
+}
+
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
 pub enum OAuthProviderMappingType {
     Role {
         #[garde(skip)]
@@ -33,7 +221,7 @@ pub struct OAuthProviderMapping {
     pub uuid: uuid::Uuid,
     pub oauth_provider: Fetchable<super::oauth_provider::OAuthProvider>,
 
-    pub scopes: Vec<compact_str::CompactString>,
+    pub matcher: OAuthProviderMappingMatcher,
     pub mapping: OAuthProviderMappingType,
 
     pub created: chrono::NaiveDateTime,
@@ -69,8 +257,8 @@ impl BaseModel for OAuthProviderMapping {
                 compact_str::format_compact!("{prefix}oauth_provider_uuid"),
             ),
             (
-                "oauth_provider_mappings.scopes",
-                compact_str::format_compact!("{prefix}scopes"),
+                "oauth_provider_mappings.matcher",
+                compact_str::format_compact!("{prefix}matcher"),
             ),
             (
                 "oauth_provider_mappings.mapping",
@@ -92,7 +280,9 @@ impl BaseModel for OAuthProviderMapping {
             oauth_provider: super::oauth_provider::OAuthProvider::get_fetchable(
                 row.try_get(compact_str::format_compact!("{prefix}oauth_provider_uuid").as_str())?,
             ),
-            scopes: row.try_get(compact_str::format_compact!("{prefix}scopes").as_str())?,
+            matcher: serde_json::from_value(
+                row.try_get(compact_str::format_compact!("{prefix}matcher").as_str())?,
+            )?,
             mapping: serde_json::from_value(
                 row.try_get(compact_str::format_compact!("{prefix}mapping").as_str())?,
             )?,
@@ -161,23 +351,20 @@ impl OAuthProviderMapping {
         })
     }
 
-    pub async fn by_applicable_for_scopes(
+    pub async fn all_by_oauth_provider_uuid(
         database: &crate::database::Database,
         oauth_provider_uuid: uuid::Uuid,
-        granted_scopes: &[compact_str::CompactString],
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
         let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}
             FROM oauth_provider_mappings
             WHERE oauth_provider_mappings.oauth_provider_uuid = $1
-                AND oauth_provider_mappings.scopes::text[] <@ $2::text[]
             ORDER BY oauth_provider_mappings.created
             "#,
             Self::columns_sql(None)
         )))
         .bind(oauth_provider_uuid)
-        .bind(granted_scopes)
         .fetch_all(database.read())
         .await?;
 
@@ -191,10 +378,11 @@ impl OAuthProviderMapping {
         oauth_provider_uuid: uuid::Uuid,
         user_uuid: uuid::Uuid,
         granted_scopes: &[compact_str::CompactString],
+        info: &serde_json::Value,
     ) -> Result<(), crate::database::DatabaseError> {
-        let mappings =
-            Self::by_applicable_for_scopes(&state.database, oauth_provider_uuid, granted_scopes)
-                .await?;
+        let mut mappings =
+            Self::all_by_oauth_provider_uuid(&state.database, oauth_provider_uuid).await?;
+        mappings.retain(|mapping| mapping.matcher.matches(granted_scopes, info));
         if mappings.is_empty() {
             return Ok(());
         }
@@ -331,7 +519,7 @@ impl IntoAdminApiObject for OAuthProviderMapping {
         let api_object = finish_extendible!(
             AdminApiOAuthProviderMapping {
                 uuid: self.uuid,
-                scopes: self.scopes,
+                matcher: self.matcher,
                 mapping: self.mapping,
                 created: self.created.and_utc(),
             },
@@ -348,9 +536,8 @@ pub struct CreateOAuthProviderMappingOptions {
     #[garde(skip)]
     pub oauth_provider_uuid: uuid::Uuid,
 
-    #[garde(length(max = 255))]
-    #[schema(max_length = 255)]
-    pub scopes: Vec<compact_str::CompactString>,
+    #[garde(dive, custom(OAuthProviderMappingMatcher::validate_nesting))]
+    pub matcher: OAuthProviderMappingMatcher,
     #[garde(dive)]
     pub mapping: OAuthProviderMappingType,
 }
@@ -387,7 +574,7 @@ impl CreatableModel for OAuthProviderMapping {
 
         query_builder
             .set("oauth_provider_uuid", options.oauth_provider_uuid)
-            .set("scopes", &options.scopes)
+            .set("matcher", serde_json::to_value(&options.matcher)?)
             .set("mapping", serde_json::to_value(&options.mapping)?);
 
         let row = query_builder
@@ -404,9 +591,8 @@ impl CreatableModel for OAuthProviderMapping {
 
 #[derive(ToSchema, Serialize, Deserialize, Validate, Default)]
 pub struct UpdateOAuthProviderMappingOptions {
-    #[garde(length(max = 255))]
-    #[schema(max_length = 255)]
-    pub scopes: Option<Vec<compact_str::CompactString>>,
+    #[garde(dive, custom(OAuthProviderMappingMatcher::validate_optional_nesting))]
+    pub matcher: Option<OAuthProviderMappingMatcher>,
     #[garde(dive)]
     pub mapping: Option<OAuthProviderMappingType>,
 }
@@ -435,6 +621,11 @@ impl UpdatableModel for OAuthProviderMapping {
         self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
+        let matcher = options
+            .matcher
+            .as_ref()
+            .map(serde_json::to_value)
+            .transpose()?;
         let mapping = options
             .mapping
             .as_ref()
@@ -442,14 +633,14 @@ impl UpdatableModel for OAuthProviderMapping {
             .transpose()?;
 
         query_builder
-            .set("scopes", options.scopes.as_ref())
+            .set("matcher", matcher)
             .set("mapping", mapping)
             .where_eq("uuid", self.uuid);
 
         query_builder.execute(&mut **transaction).await?;
 
-        if let Some(scopes) = options.scopes {
-            self.scopes = scopes;
+        if let Some(matcher) = options.matcher {
+            self.matcher = matcher;
         }
         if let Some(mapping) = options.mapping {
             self.mapping = mapping;
@@ -506,7 +697,7 @@ impl DeletableModel for OAuthProviderMapping {
 pub struct AdminApiOAuthProviderMapping {
     pub uuid: uuid::Uuid,
 
-    pub scopes: Vec<compact_str::CompactString>,
+    pub matcher: OAuthProviderMappingMatcher,
     pub mapping: OAuthProviderMappingType,
 
     pub created: chrono::DateTime<chrono::Utc>,

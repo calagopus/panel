@@ -139,7 +139,7 @@ mod patch {
                 serde_json::json!({
                     "uuid": oauth_mapping.uuid,
                     "oauth_provider_uuid": oauth_provider.uuid,
-                    "scopes": oauth_mapping.scopes,
+                    "matcher": oauth_mapping.matcher,
                     "mapping": oauth_mapping.mapping,
                 }),
             )

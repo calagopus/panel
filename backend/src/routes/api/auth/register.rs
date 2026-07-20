@@ -22,11 +22,11 @@ mod post {
         #[garde(email)]
         #[schema(format = "email")]
         email: String,
-        #[garde(length(chars, min = 2, max = 255))]
-        #[schema(min_length = 2, max_length = 255)]
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
         name_first: String,
-        #[garde(length(chars, min = 2, max = 255))]
-        #[schema(min_length = 2, max_length = 255)]
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
         name_last: String,
         #[garde(length(chars, min = 8, max = 512))]
         #[schema(min_length = 8, max_length = 512)]

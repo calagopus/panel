@@ -6,6 +6,7 @@ import updateOAuthProviderMapping from '@/api/admin/oauth-providers/mappings/upd
 import getRoles from '@/api/admin/roles/getRoles.ts';
 import getServers from '@/api/admin/servers/getServers.ts';
 import Button from '@/elements/Button.tsx';
+import Divider from '@/elements/Divider.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
@@ -13,8 +14,13 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import Stack from '@/elements/Stack.tsx';
+import Text from '@/elements/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminOAuthProviderMappingSchema, adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
+import {
+  AdminOAuthProviderMappingMatcher,
+  adminOAuthProviderMappingSchema,
+  adminOAuthProviderSchema,
+} from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
@@ -22,11 +28,12 @@ import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+import OAuthProviderMappingMatcherBuilder from '../OAuthProviderMappingMatcherBuilder.tsx';
 
 type MappingType = 'role' | 'server_subuser';
 
 type FormValues = {
-  scopes: string[];
+  matcher: AdminOAuthProviderMappingMatcher;
   type: MappingType;
   roleUuid: string;
   serverUuid: string;
@@ -57,7 +64,7 @@ export default function OAuthProviderMappingModal({
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<FormValues>({
     initialValues: {
-      scopes: [],
+      matcher: { type: 'none' },
       type: 'role',
       roleUuid: '',
       serverUuid: '',
@@ -76,7 +83,7 @@ export default function OAuthProviderMappingModal({
               ignoredFiles: values.ignoredFiles,
             };
 
-      const payload = { scopes: values.scopes, mapping: mappingData };
+      const payload = { matcher: values.matcher, mapping: mappingData };
 
       if (isEdit) {
         await updateOAuthProviderMapping(oauthProvider.uuid, mapping.uuid, payload);
@@ -97,7 +104,7 @@ export default function OAuthProviderMappingModal({
 
     if (mapping) {
       form.setValues({
-        scopes: mapping.scopes,
+        matcher: mapping.matcher,
         type: mapping.mapping.type,
         roleUuid: mapping.mapping.type === 'role' ? mapping.mapping.roleUuid : '',
         serverUuid: mapping.mapping.type === 'server_subuser' ? mapping.mapping.serverUuid : '',
@@ -126,18 +133,12 @@ export default function OAuthProviderMappingModal({
       )}
       isDirty={isDirty}
       loading={loading}
-      size={form.values.type === 'role' ? 'md' : '95%'}
+      size={form.values.type === 'role' ? 'lg' : '95%'}
       {...props}
       onClose={handleClose}
       onSubmit={handleSubmit}
     >
       <Stack>
-        <TagsInput
-          label={t('pages.admin.oAuthProviders.tabs.mappings.page.form.scopes', {})}
-          description={t('pages.admin.oAuthProviders.tabs.mappings.page.form.scopesDescription', {})}
-          {...form.getInputProps('scopes')}
-        />
-
         <Select
           withAsterisk
           label={t('pages.admin.oAuthProviders.tabs.mappings.page.form.mappingType', {})}
@@ -186,6 +187,20 @@ export default function OAuthProviderMappingModal({
             <TagsInput label={t('common.form.ignoredFiles', {})} {...form.getInputProps('ignoredFiles')} />
           </>
         )}
+
+        <Divider />
+
+        <div>
+          <Text fw={500}>{t('pages.admin.oAuthProviders.tabs.mappings.page.form.matcher', {})}</Text>
+          <Text size='xs' c='dimmed'>
+            {t('pages.admin.oAuthProviders.tabs.mappings.page.form.matcherDescription', {})}
+          </Text>
+        </div>
+
+        <OAuthProviderMappingMatcherBuilder
+          matcher={form.values.matcher}
+          onChange={(matcher) => form.setFieldValue('matcher', matcher)}
+        />
 
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!canSubmit}>

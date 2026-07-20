@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { ZodType, z } from 'zod';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { nullableString } from '@/lib/transformers.ts';
 
@@ -41,6 +41,87 @@ export const adminOAuthUserLinkSchema = z.looseObject({
   created: z.coerce.date(),
 });
 
+export const adminOAuthProviderMappingMatcherNoneSchema = z.object({
+  type: z.literal('none'),
+});
+
+export const adminOAuthProviderMappingMatcherScopesSchema = z.object({
+  type: z.literal('scopes'),
+  scopes: z.array(z.string()),
+});
+
+export const adminOAuthProviderMappingMatcherFieldExistsSchema = z.object({
+  type: z.literal('field_exists'),
+  path: z.string(),
+});
+
+export const adminOAuthProviderMappingMatcherFieldEqualsSchema = z.object({
+  type: z.literal('field_equals'),
+  path: z.string(),
+  equals: z.string(),
+});
+
+export const adminOAuthProviderMappingMatcherFieldContainsSchema = z.object({
+  type: z.literal('field_contains'),
+  path: z.string(),
+  contains: z.string(),
+});
+
+export const adminOAuthProviderMappingMatcherFieldStartsWithSchema = z.object({
+  type: z.literal('field_starts_with'),
+  path: z.string(),
+  startsWith: z.string(),
+});
+
+export const adminOAuthProviderMappingMatcherFieldEndsWithSchema = z.object({
+  type: z.literal('field_ends_with'),
+  path: z.string(),
+  endsWith: z.string(),
+});
+
+export type AdminOAuthProviderMappingMatcher =
+  | z.infer<typeof adminOAuthProviderMappingMatcherNoneSchema>
+  | {
+      type: 'and' | 'or';
+      matchers: AdminOAuthProviderMappingMatcher[];
+    }
+  | {
+      type: 'not';
+      matcher: AdminOAuthProviderMappingMatcher;
+    }
+  | z.infer<typeof adminOAuthProviderMappingMatcherScopesSchema>
+  | z.infer<typeof adminOAuthProviderMappingMatcherFieldExistsSchema>
+  | z.infer<typeof adminOAuthProviderMappingMatcherFieldEqualsSchema>
+  | z.infer<typeof adminOAuthProviderMappingMatcherFieldContainsSchema>
+  | z.infer<typeof adminOAuthProviderMappingMatcherFieldStartsWithSchema>
+  | z.infer<typeof adminOAuthProviderMappingMatcherFieldEndsWithSchema>;
+
+export const adminOAuthProviderMappingMatcherSchema: ZodType<AdminOAuthProviderMappingMatcher> = z.lazy(() =>
+  z.discriminatedUnion('type', [
+    adminOAuthProviderMappingMatcherNoneSchema,
+
+    z.object({
+      type: z.literal('and'),
+      matchers: z.array(adminOAuthProviderMappingMatcherSchema),
+    }),
+    z.object({
+      type: z.literal('or'),
+      matchers: z.array(adminOAuthProviderMappingMatcherSchema),
+    }),
+    z.object({
+      type: z.literal('not'),
+      matcher: adminOAuthProviderMappingMatcherSchema,
+    }),
+
+    adminOAuthProviderMappingMatcherScopesSchema,
+    adminOAuthProviderMappingMatcherFieldExistsSchema,
+    adminOAuthProviderMappingMatcherFieldEqualsSchema,
+    adminOAuthProviderMappingMatcherFieldContainsSchema,
+    adminOAuthProviderMappingMatcherFieldStartsWithSchema,
+    adminOAuthProviderMappingMatcherFieldEndsWithSchema,
+  ]),
+);
+
 export const adminOAuthProviderMappingTypeSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('role'),
@@ -56,12 +137,12 @@ export const adminOAuthProviderMappingTypeSchema = z.discriminatedUnion('type', 
 
 export const adminOAuthProviderMappingSchema = z.looseObject({
   uuid: z.string(),
-  scopes: z.array(z.string()),
+  matcher: adminOAuthProviderMappingMatcherSchema,
   mapping: adminOAuthProviderMappingTypeSchema,
   created: z.coerce.date(),
 });
 
 export const adminOAuthProviderMappingCreateSchema = z.object({
-  scopes: z.array(z.string().max(255)).max(255),
+  matcher: adminOAuthProviderMappingMatcherSchema,
   mapping: adminOAuthProviderMappingTypeSchema,
 });

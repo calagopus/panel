@@ -3578,7 +3578,7 @@ const baseTranslations = defineTranslations({
                 title: 'OAuth Provider Mappings',
                 table: {
                   columns: {
-                    scopes: 'Scopes',
+                    matcher: 'Matcher',
                   },
                 },
                 enum: {
@@ -3586,15 +3586,45 @@ const baseTranslations = defineTranslations({
                     role: 'Role',
                     serverSubuser: 'Server Subuser',
                   },
+                  matcherType: {
+                    none: 'None (Always applies)',
+                    and: 'AND (All must match)',
+                    or: 'OR (Any must match)',
+                    not: 'NOT (Must not match)',
+                    scopes: 'Granted Scopes',
+                    fieldExists: 'Field Exists',
+                    fieldEquals: 'Field Equals',
+                    fieldContains: 'Field Contains',
+                    fieldStartsWith: 'Field Starts With',
+                    fieldEndsWith: 'Field Ends With',
+                  },
                 },
                 toast: {
                   created: 'OAuth provider mapping created.',
                   updated: 'OAuth provider mapping updated.',
                   deleted: 'OAuth provider mapping deleted.',
                 },
+                button: {
+                  addMatcher: 'Add Matcher',
+                },
+                matcher: {
+                  allMustMatch: 'All matchers must match:',
+                  anyMustMatch: 'Any matcher must match:',
+                  mustNotMatch: 'Matcher must not match:',
+                },
                 form: {
+                  matcher: 'Matcher',
+                  matcherDescription: 'Decides whether this mapping applies to a user logging in with this provider.',
+                  matcherType: 'Matcher Type',
                   scopes: 'Scopes',
-                  scopesDescription: 'OAuth scopes required for this mapping to apply.',
+                  scopesDescription: 'OAuth scopes that must all have been granted for this matcher to match.',
+                  path: 'Field Path',
+                  pathDescription:
+                    'The path used to extract the compared field from the Info URL response (https://serdejsonpath.live).',
+                  equals: 'Equals',
+                  contains: 'Contains',
+                  startsWith: 'Starts With',
+                  endsWith: 'Ends With',
                   mappingType: 'Mapping Type',
                   role: 'Role',
                   permissions: 'Permissions',

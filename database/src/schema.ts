@@ -418,7 +418,7 @@ export const oauthProviderMappingsTable = pgTable(
     oauth_provider_uuid: uuid()
       .references(() => oauthProvidersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
-    scopes: varchar({ length: 255 }).array().notNull(),
+    matcher: jsonb().notNull(),
     mapping: jsonb().notNull(),
     created: timestamp().defaultNow().notNull(),
   },

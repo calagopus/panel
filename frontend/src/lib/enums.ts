@@ -58,6 +58,7 @@ import { z } from 'zod';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminEggConfigurationDeploymentSchema } from '@/lib/schemas/admin/eggConfigurations.ts';
 import { processConfigurationConfigParser } from '@/lib/schemas/admin/eggs.ts';
+import { AdminOAuthProviderMappingMatcher } from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminSettingsEmailSchema, adminSettingsStorageSchema } from '@/lib/schemas/admin/settings.ts';
 import {
   compressionType,
@@ -290,6 +291,24 @@ export const eggConfigurationDeploymentTypeLabelMapping: Record<
     getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.multiplyPrimary', {}),
   divide_primary: () =>
     getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.deploymentType.dividePrimary', {}),
+};
+
+export const oauthProviderMappingMatcherLabelMapping: Record<AdminOAuthProviderMappingMatcher['type'], () => string> = {
+  none: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.none', {}),
+  and: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.and', {}),
+  or: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.or', {}),
+  not: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.not', {}),
+  scopes: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.scopes', {}),
+  field_exists: () =>
+    getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.fieldExists', {}),
+  field_equals: () =>
+    getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.fieldEquals', {}),
+  field_contains: () =>
+    getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.fieldContains', {}),
+  field_starts_with: () =>
+    getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.fieldStartsWith', {}),
+  field_ends_with: () =>
+    getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.fieldEndsWith', {}),
 };
 
 export const scheduleConditionLabelMapping: Record<

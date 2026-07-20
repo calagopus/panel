@@ -86,7 +86,8 @@ mod post {
             CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,
             oauth_provider_mapping::{
-                CreateOAuthProviderMappingOptions, OAuthProviderMapping, OAuthProviderMappingType,
+                CreateOAuthProviderMappingOptions, OAuthProviderMapping,
+                OAuthProviderMappingMatcher, OAuthProviderMappingType,
             },
             user::GetPermissionManager,
         },
@@ -96,9 +97,8 @@ mod post {
 
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
-        #[garde(length(max = 255))]
-        #[schema(max_length = 255)]
-        scopes: Vec<compact_str::CompactString>,
+        #[garde(dive, custom(OAuthProviderMappingMatcher::validate_nesting))]
+        matcher: OAuthProviderMappingMatcher,
         #[garde(dive)]
         mapping: OAuthProviderMappingType,
     }
@@ -136,7 +136,7 @@ mod post {
 
         let options = CreateOAuthProviderMappingOptions {
             oauth_provider_uuid: oauth_provider.uuid,
-            scopes: data.scopes,
+            matcher: data.matcher,
             mapping: data.mapping,
         };
         let oauth_mapping = OAuthProviderMapping::create(&state, options).await?;
@@ -147,7 +147,7 @@ mod post {
                 serde_json::json!({
                     "uuid": oauth_mapping.uuid,
                     "oauth_provider_uuid": oauth_provider.uuid,
-                    "scopes": oauth_mapping.scopes,
+                    "matcher": oauth_mapping.matcher,
                     "mapping": oauth_mapping.mapping,
                 }),
             )

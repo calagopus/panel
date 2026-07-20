@@ -43,8 +43,8 @@ export default function FileCopyModal({ file, ...props }: Props) {
     if (!file) return '';
 
     const lastDotIndex = file.name.lastIndexOf('.');
-    let extension = lastDotIndex > -1 ? file.name.slice(lastDotIndex) : '';
-    let baseName = lastDotIndex > -1 ? file.name.slice(0, lastDotIndex) : file.name;
+    let extension = lastDotIndex > 0 ? file.name.slice(lastDotIndex) : '';
+    let baseName = lastDotIndex > 0 ? file.name.slice(0, lastDotIndex) : file.name;
 
     if (baseName.endsWith('.tar')) {
       extension = '.tar' + extension;

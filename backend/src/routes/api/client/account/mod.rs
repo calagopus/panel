@@ -63,11 +63,11 @@ mod patch {
         #[schema(min_length = 3, max_length = 15)]
         #[schema(pattern = "^[a-zA-Z0-9_]+$")]
         username: Option<compact_str::CompactString>,
-        #[garde(length(chars, min = 2, max = 255))]
-        #[schema(min_length = 2, max_length = 255)]
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
         name_first: Option<compact_str::CompactString>,
-        #[garde(length(chars, min = 2, max = 255))]
-        #[schema(min_length = 2, max_length = 255)]
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
         name_last: Option<compact_str::CompactString>,
 
         #[garde(

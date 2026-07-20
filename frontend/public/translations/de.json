@@ -3573,13 +3573,25 @@
                 "title": "OAuth-Anbieter Zuordnungen",
                 "table": {
                   "columns": {
-                    "scopes": "Scopes"
+                    "matcher": "Matcher"
                   }
                 },
                 "enum": {
                   "mappingType": {
                     "role": "Rolle",
                     "serverSubuser": "Server-Unterbenutzer"
+                  },
+                  "matcherType": {
+                    "none": "Keiner (Gilt immer)",
+                    "and": "UND (Alle müssen zutreffen)",
+                    "or": "ODER (Mindestens einer muss zutreffen)",
+                    "not": "NICHT (Darf nicht zutreffen)",
+                    "scopes": "Gewährte Scopes",
+                    "fieldExists": "Feld existiert",
+                    "fieldEquals": "Feld ist gleich",
+                    "fieldContains": "Feld enthält",
+                    "fieldStartsWith": "Feld beginnt mit",
+                    "fieldEndsWith": "Feld endet mit"
                   }
                 },
                 "toast": {
@@ -3587,9 +3599,26 @@
                   "updated": "OAuth-Anbieter-Zuordnung aktualisiert.",
                   "deleted": "OAuth-Anbieter-Zuordnung gelöscht."
                 },
+                "button": {
+                  "addMatcher": "Matcher hinzufügen"
+                },
+                "matcher": {
+                  "allMustMatch": "Alle Matcher müssen zutreffen:",
+                  "anyMustMatch": "Mindestens ein Matcher muss zutreffen:",
+                  "mustNotMatch": "Matcher darf nicht zutreffen:"
+                },
                 "form": {
+                  "matcher": "Matcher",
+                  "matcherDescription": "Bestimmt, ob diese Zuordnung auf einen Benutzer angewendet wird, der sich mit diesem Anbieter anmeldet.",
+                  "matcherType": "Matcher-Typ",
                   "scopes": "Scopes",
-                  "scopesDescription": "OAuth-Scopes, die erforderlich sind, damit diese Zuordnung angewendet wird.",
+                  "scopesDescription": "OAuth-Scopes, die alle gewährt worden sein müssen, damit dieser Matcher zutrifft.",
+                  "path": "Feldpfad",
+                  "pathDescription": "Der Pfad, um das verglichene Feld aus der Info-URL-Antwort zu extrahieren (https://serdejsonpath.live).",
+                  "equals": "Ist gleich",
+                  "contains": "Enthält",
+                  "startsWith": "Beginnt mit",
+                  "endsWith": "Endet mit",
                   "mappingType": "Zuordnungstyp",
                   "role": "Rolle",
                   "permissions": "Berechtigungen"

@@ -10,6 +10,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { oauthProviderMappingMatcherLabelMapping } from '@/lib/enums.ts';
 import { adminOAuthProviderMappingSchema, adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -108,7 +109,12 @@ export default function OAuthProviderMappingRow({
               )}
             </TableData>
 
-            <TableData>{mapping.scopes.length}</TableData>
+            <TableData>
+              {oauthProviderMappingMatcherLabelMapping[mapping.matcher.type]()}
+              {mapping.matcher.type === 'and' || mapping.matcher.type === 'or'
+                ? ` (${mapping.matcher.matchers.length})`
+                : ''}
+            </TableData>
 
             <TableData>
               <FormattedTimestamp timestamp={mapping.created} />
