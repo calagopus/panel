@@ -166,7 +166,8 @@
         "setPrimary": "Als primär festlegen",
         "unsetPrimary": "Als primär entfernen",
         "leavePage": "Seite verlassen",
-        "viewDocumentation": "Dokumentation ansehen"
+        "viewDocumentation": "Dokumentation ansehen",
+        "undo": "Rückgängig"
       },
       "alert": {
         "error": "Fehler",
@@ -4126,6 +4127,8 @@
             "copyingStarted": "Kopieren von {files} gestartet.",
             "filesCouldNotBeMoved": "Dateien konnten nicht verschoben werden.",
             "filesMoved": "{files} verschoben.",
+            "moveUndone": "Verschieben von {files} rückgängig gemacht.",
+            "moveCouldNotBeUndone": "Verschieben konnte nicht rückgängig gemacht werden.",
             "downloadStarted": "Download gestartet.",
             "filesDeleted": "Dateien wurden gelöscht.",
             "archiveCreationStarted": "Archiverstellung hat begonnen.",
@@ -4135,9 +4138,13 @@
             "fileRenamed": "Datei wurde umbenannt.",
             "fileCouldNotBeRenamed": "Datei konnte nicht umbenannt werden.",
             "filesRenamed": "{files} umbenannt.",
+            "renameUndone": "Umbenennung rückgängig gemacht.",
+            "renameCouldNotBeUndone": "Umbenennung konnte nicht rückgängig gemacht werden.",
             "permissionsUpdated": "Berechtigungen wurden aktualisiert.",
             "permissionsUpdatedMany": "Berechtigungen für {files} wurden aktualisiert.",
             "permissionsCouldNotBeUpdated": "Berechtigungen konnten nicht aktualisiert werden.",
+            "permissionsRestored": "Berechtigungen wiederhergestellt.",
+            "permissionsCouldNotBeRestored": "Berechtigungen konnten nicht wiederhergestellt werden.",
             "fileSaved": "Datei wurde gespeichert.",
             "collabSaveTimeout": "Die Datei konnte nicht gespeichert werden, der Daemon hat nicht rechtzeitig geantwortet."
           },

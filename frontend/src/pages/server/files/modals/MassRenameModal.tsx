@@ -1,4 +1,5 @@
 import {
+  faArrowLeftLong,
   faArrowRight,
   faFont,
   faHashtag,
@@ -119,10 +120,13 @@ export default function MassRenameModal({ files, ...props }: Props) {
 
     setLoading(true);
     try {
+      const directory = browsingDirectory;
+      const renames = includedRows.map((row) => ({ from: row.name, to: row.newName }));
+
       const { renamed } = await renameFiles({
         uuid: server.uuid,
-        root: browsingDirectory,
-        files: includedRows.map((row) => ({ from: row.name, to: row.newName })),
+        root: directory,
+        files: renames,
       });
 
       if (renamed < 1) {
@@ -130,7 +134,30 @@ export default function MassRenameModal({ files, ...props }: Props) {
         return;
       }
 
-      addToast(t('pages.server.files.toast.filesRenamed', { files: tItem('file', renamed) }), 'success');
+      addToast(t('pages.server.files.toast.filesRenamed', { files: tItem('file', renamed) }), [
+        {
+          name: t('common.button.undo', {}),
+          icon: faArrowLeftLong,
+          onClick: () =>
+            renameFiles({
+              uuid: server.uuid,
+              root: directory,
+              files: renames.map((rename) => ({ from: rename.to, to: rename.from })),
+            })
+              .then(({ renamed: undone }) => {
+                if (undone < 1) {
+                  addToast(t('pages.server.files.toast.renameCouldNotBeUndone', {}), 'error');
+                  return;
+                }
+
+                addToast(t('pages.server.files.toast.renameUndone', {}), 'success');
+                invalidateFilemanager();
+              })
+              .catch((err) => {
+                addToast(err instanceof Error ? err.message : String(err), 'error');
+              }),
+        },
+      ]);
       invalidateFilemanager();
       doSelectFiles([]);
       props.onClose();

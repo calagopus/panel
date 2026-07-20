@@ -1,7 +1,8 @@
+import { faArrowLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import { canMoveFilesToDirectory, moveFilesToDirectory } from '@/pages/server/files/fileMove.ts';
+import { canMoveFilesToDirectory, FileMoveEntry, moveFilesToDirectory } from '@/pages/server/files/fileMove.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -15,7 +16,7 @@ interface UseDraggedFileMoveOptions {
 
 export function useDraggedFileMove({ disabled = false, targetDirectory }: UseDraggedFileMoveOptions = {}) {
   const { t, tItem } = useTranslations();
-  const { addToast } = useToast();
+  const { addToast, dismissToast } = useToast();
   const server = useServerStore((state) => state.server);
   const canUpdateFiles = useServerCan('files.update');
   const store = useFileManagerApi();
@@ -47,26 +48,45 @@ export function useDraggedFileMove({ disabled = false, targetDirectory }: UseDra
       ? target === targetDirectory && scopedIsDropTarget
       : isDropTargetFor(store.getState(), target);
 
+  const undoMove = (movedFiles: FileMoveEntry[], source: string, target: string) =>
+    moveFilesToDirectory(server.uuid, movedFiles, target, source)
+      .then(({ renamed }) => {
+        if (renamed < 1) {
+          addToast(t('pages.server.files.toast.moveCouldNotBeUndone', {}), 'error');
+          return;
+        }
+
+        addToast(t('pages.server.files.toast.moveUndone', { files: tItem('file', renamed) }), 'success');
+        store.getState().invalidateFilemanager();
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
+
   const moveToDirectory = async (target: string) => {
     const state = store.getState();
     if (!state.draggingFilesSource || !canMoveToDirectory(state, target)) return;
 
+    const source = state.draggingFilesSource;
+    const movedFiles = state.draggingFiles.values();
+
     setMoving(true);
 
     try {
-      const { renamed } = await moveFilesToDirectory(
-        server.uuid,
-        state.draggingFiles.values(),
-        state.draggingFilesSource,
-        target,
-      );
+      const { renamed } = await moveFilesToDirectory(server.uuid, movedFiles, source, target);
 
       if (renamed < 1) {
         addToast(t('pages.server.files.toast.filesCouldNotBeMoved', {}), 'error');
         return;
       }
 
-      addToast(t('pages.server.files.toast.filesMoved', { files: tItem('file', renamed) }), 'success');
+      const toastId: number = addToast(t('pages.server.files.toast.filesMoved', { files: tItem('file', renamed) }), [
+        {
+          name: t('common.button.undo', {}),
+          icon: faArrowLeftLong,
+          onClick: () => undoMove(movedFiles, source, target).then(() => dismissToast(toastId)),
+        },
+      ]);
       state.doSelectFiles([]);
       state.invalidateFilemanager();
     } catch (msg) {

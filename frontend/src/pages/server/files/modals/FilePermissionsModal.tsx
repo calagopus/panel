@@ -1,3 +1,4 @@
+import { faArrowLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { ModalProps } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -15,6 +16,7 @@ import Title from '@/elements/Title.tsx';
 import { permissionStringToNumber } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
+import { ToastAction } from '@/providers/contexts/toastContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -32,6 +34,7 @@ export default function FilePermissionsModal({ file, ...props }: Props) {
   const server = useServerStore((state) => state.server);
   const browsingWritableDirectory = useFileManager((state) => state.browsingWritableDirectory);
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
+  const invalidateFilemanager = useFileManager((state) => state.invalidateFilemanager);
 
   const [permissions, setPermissions] = useState<Record<PermissionKey, Record<PermissionType, boolean>>>({
     owner: { read: false, write: false, execute: false },
@@ -135,24 +138,56 @@ export default function FilePermissionsModal({ file, ...props }: Props) {
   const doChmod = () => {
     if (!file) return;
 
+    const fileName = file.name;
+    const directory = browsingDirectory;
+    const wasRecursive = recursive;
+    const oldMode = permissionStringToNumber(file.mode ?? '').toString();
     const newPermissions = getOctalValue();
 
     setLoading(true);
 
     chmodFiles({
       uuid: server.uuid,
-      root: browsingDirectory,
-      files: [{ file: file.name, mode: newPermissions.toString(), recursive }],
+      root: directory,
+      files: [{ file: fileName, mode: newPermissions.toString(), recursive: wasRecursive }],
     })
       .then(({ updated }) => {
         props.onClose();
         if (updated > 0) {
+          const undoAction: ToastAction[] =
+            wasRecursive || oldMode === newPermissions.toString()
+              ? []
+              : [
+                  {
+                    name: t('common.button.undo', {}),
+                    icon: faArrowLeftLong,
+                    onClick: () =>
+                      chmodFiles({
+                        uuid: server.uuid,
+                        root: directory,
+                        files: [{ file: fileName, mode: oldMode, recursive: false }],
+                      })
+                        .then(({ updated: restored }) => {
+                          if (restored < 1) {
+                            addToast(t('pages.server.files.toast.permissionsCouldNotBeRestored', {}), 'error');
+                            return;
+                          }
+
+                          addToast(t('pages.server.files.toast.permissionsRestored', {}), 'success');
+                          invalidateFilemanager();
+                        })
+                        .catch((msg) => {
+                          addToast(httpErrorToHuman(msg), 'error');
+                        }),
+                  },
+                ];
+
           if (updated === 1) {
-            addToast(t('pages.server.files.toast.permissionsUpdated', {}), 'success');
+            addToast(t('pages.server.files.toast.permissionsUpdated', {}), undoAction);
           } else {
             addToast(
               t('pages.server.files.toast.permissionsUpdatedMany', { files: tItem('file', updated) }),
-              'success',
+              undoAction,
             );
           }
         } else {

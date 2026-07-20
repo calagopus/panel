@@ -1,12 +1,53 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { AnimatePresence, motion } from 'motion/react';
-import { FC, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { FC, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
+import ActionIcon from '@/elements/ActionIcon.tsx';
 import Notification from '@/elements/Notification.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { userToastPosition } from '@/lib/schemas/user.ts';
-import { Toast, ToastContext, ToastType } from '@/providers/contexts/toastContext.ts';
+import { Toast, ToastAction, ToastContext, ToastType } from '@/providers/contexts/toastContext.ts';
 
 const toastTimeout = 7500;
+
+const ToastActionButton: FC<{ action: ToastAction }> = ({ action }) => {
+  const [loading, setLoading] = useState(false);
+  const [triggered, setTriggered] = useState(false);
+  const firedRef = useRef(false);
+
+  const onClick = useCallback(
+    (e: ReactMouseEvent<HTMLButtonElement, MouseEvent>) => {
+      if (firedRef.current) return;
+      firedRef.current = true;
+      setTriggered(true);
+
+      const res = action.onClick(e);
+
+      if (res instanceof Promise) {
+        setLoading(true);
+
+        Promise.resolve(res).finally(() => setLoading(false));
+      }
+    },
+    [action],
+  );
+
+  return (
+    <Tooltip label={action.name} zIndex={1000}>
+      <ActionIcon
+        size='sm'
+        variant='subtle'
+        color='gray'
+        loading={loading}
+        disabled={action.disabled || triggered}
+        onClick={onClick}
+      >
+        <FontAwesomeIcon icon={action.icon} size='sm' />
+      </ActionIcon>
+    </Tooltip>
+  );
+};
 
 const getToastColor = (type: ToastType) => {
   switch (type) {
@@ -60,16 +101,22 @@ const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(1);
 
-  const addToast = useCallback((message: ReactNode, type: ToastType = 'success') => {
-    const id = toastId.current++;
-    setToasts((prev) => [...prev, { id, message, type }]);
+  const addToast = useCallback(
+    (message: ReactNode, typeOrActions?: ToastType | ToastAction[], maybeActions?: ToastAction[]) => {
+      const type = Array.isArray(typeOrActions) ? 'success' : (typeOrActions ?? 'success');
+      const actions = Array.isArray(typeOrActions) ? typeOrActions : maybeActions;
 
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, toastTimeout);
+      const id = toastId.current++;
+      setToasts((prev) => [...prev, { id, message, type, actions }]);
 
-    return id;
-  }, []);
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, toastTimeout);
+
+      return id;
+    },
+    [],
+  );
 
   const dismissToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -99,10 +146,24 @@ const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
               transition={{ duration: 0.3 }}
               className='w-72'
             >
-              <div className='pt-2'>
-                <Notification color={getToastColor(toast.type)} withCloseButton onClose={() => dismissToast(toast.id)}>
+              <div className='relative mt-2'>
+                <Notification
+                  color={getToastColor(toast.type)}
+                  withCloseButton
+                  onClose={() => dismissToast(toast.id)}
+                  styles={
+                    toast.actions?.length ? { description: { paddingInlineEnd: toast.actions.length * 30 } } : undefined
+                  }
+                >
                   {toast.message}
                 </Notification>
+                {toast.actions?.length ? (
+                  <div className='absolute top-1/2 right-9 flex -translate-y-1/2 items-center gap-1'>
+                    {toast.actions.map((action, i) => (
+                      <ToastActionButton key={i} action={action} />
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </motion.div>
           ))}

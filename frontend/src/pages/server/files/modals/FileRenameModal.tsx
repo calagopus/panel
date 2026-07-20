@@ -1,8 +1,10 @@
+import { faArrowLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
+import { httpErrorToHuman } from '@/api/axios.ts';
 import renameFiles from '@/api/server/files/renameFiles.ts';
 import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -43,13 +45,17 @@ export default function FileRenameModal({ file, ...props }: Props) {
     onSubmit: async (values) => {
       if (!file) return;
 
+      const oldName = file.name;
+      const newName = values.name;
+      const directory = browsingDirectory;
+
       const { renamed } = await renameFiles({
         uuid: server.uuid,
-        root: browsingDirectory,
+        root: directory,
         files: [
           {
-            from: file.name,
-            to: values.name,
+            from: oldName,
+            to: newName,
           },
         ],
       });
@@ -59,11 +65,34 @@ export default function FileRenameModal({ file, ...props }: Props) {
         return;
       }
 
-      addToast(t('pages.server.files.toast.fileRenamed', {}), 'success');
+      addToast(t('pages.server.files.toast.fileRenamed', {}), [
+        {
+          name: t('common.button.undo', {}),
+          icon: faArrowLeftLong,
+          onClick: () =>
+            renameFiles({
+              uuid: server.uuid,
+              root: directory,
+              files: [{ from: newName, to: oldName }],
+            })
+              .then(({ renamed: undone }) => {
+                if (undone < 1) {
+                  addToast(t('pages.server.files.toast.renameCouldNotBeUndone', {}), 'error');
+                  return;
+                }
+
+                addToast(t('pages.server.files.toast.renameUndone', {}), 'success');
+                invalidateFilemanager();
+              })
+              .catch((msg) => {
+                addToast(httpErrorToHuman(msg), 'error');
+              }),
+        },
+      ]);
       invalidateFilemanager();
       if (selectedFiles.has(file)) {
         removeSelectedFile(file);
-        file.name = values.name;
+        file.name = newName;
         addSelectedFile(file);
       }
     },

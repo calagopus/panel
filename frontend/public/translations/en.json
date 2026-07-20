@@ -166,7 +166,8 @@
         "setPrimary": "Set Primary",
         "unsetPrimary": "Unset Primary",
         "leavePage": "Leave Page",
-        "viewDocumentation": "View Documentation"
+        "viewDocumentation": "View Documentation",
+        "undo": "Undo"
       },
       "alert": {
         "error": "Error",
@@ -4131,6 +4132,8 @@
             "copyingStarted": "{files} started copying.",
             "filesCouldNotBeMoved": "Files could not be moved.",
             "filesMoved": "{files} moved.",
+            "moveUndone": "Move of {files} undone.",
+            "moveCouldNotBeUndone": "Move could not be undone.",
             "downloadStarted": "Download started.",
             "filesDeleted": "Files have been deleted.",
             "archiveCreationStarted": "Archive creation has begun.",
@@ -4140,9 +4143,13 @@
             "fileRenamed": "File has been renamed.",
             "fileCouldNotBeRenamed": "File could not be renamed.",
             "filesRenamed": "{files} renamed.",
+            "renameUndone": "Rename undone.",
+            "renameCouldNotBeUndone": "Rename could not be undone.",
             "permissionsUpdated": "Permissions have been updated.",
             "permissionsUpdatedMany": "Permissions have been updated for {files}.",
             "permissionsCouldNotBeUpdated": "Permissions could not be updated.",
+            "permissionsRestored": "Permissions restored.",
+            "permissionsCouldNotBeRestored": "Permissions could not be restored.",
             "fileSaved": "File has been saved.",
             "collabSaveTimeout": "The file could not be saved, the daemon did not respond in time."
           },
