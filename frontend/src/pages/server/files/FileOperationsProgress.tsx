@@ -44,6 +44,13 @@ function FileOperationsProgress() {
     return false;
   }, [uploadingFiles]);
 
+  const hasUploadErrors = useMemo(() => {
+    for (const file of uploadingFiles.values()) {
+      if (file.status === 'error') return true;
+    }
+    return false;
+  }, [uploadingFiles]);
+
   const cancelAllOperations = useCallback(() => {
     fileOperations.forEach((_, uuid) => {
       removeFileOperation(uuid);
@@ -99,14 +106,14 @@ function FileOperationsProgress() {
             sections={[
               {
                 value: averageOperationProgress,
-                color: isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue',
+                color: hasUploadErrors ? 'red' : isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue',
               },
             ]}
             roundCaps
             thickness={4}
             label={
               <Text
-                c={isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue'}
+                c={hasUploadErrors ? 'red' : isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue'}
                 fw={700}
                 ta='center'
                 size='xs'
@@ -145,10 +152,16 @@ function FileOperationsProgress() {
 
         {Array.from(aggregatedUploadProgress).map(([folderName, info]) => {
           const progress = info.totalSize > 0 ? (info.uploadedSize / info.totalSize) * 100 : 0;
-          const statusText = t('elements.fileUpload.uploadingFolder', {
-            folder: folderName,
-            files: tItem('file', info.fileCount),
-          });
+          const failed = info.erroredCount > 0 && info.activeCount === 0;
+          const statusText = failed
+            ? t('elements.fileUpload.failedFolder', {
+                folder: folderName,
+                files: tItem('file', info.erroredCount),
+              })
+            : t('elements.fileUpload.uploadingFolder', {
+                folder: folderName,
+                files: tItem('file', info.fileCount),
+              });
 
           return (
             <div key={folderName} className='flex flex-row items-center mb-3'>
@@ -158,7 +171,10 @@ function FileOperationsProgress() {
                   label={`${bytesToString(info.uploadedSize)} / ${bytesToString(info.totalSize)}`}
                   innerClassName='w-full'
                 >
-                  <Progress value={progress} color={isRateLimited ? 'orange' : undefined} />
+                  <Progress
+                    value={progress}
+                    color={info.erroredCount > 0 ? 'red' : isRateLimited ? 'orange' : undefined}
+                  />
                 </Tooltip>
               </div>
               <CloseButton className='ml-3' onClick={() => cancelFolderUpload(folderName)} />
@@ -175,15 +191,20 @@ function FileOperationsProgress() {
             <div key={key} className='flex flex-row items-center mb-2'>
               <div className='flex flex-col grow'>
                 <p className='break-all mb-1 text-sm'>
-                  {file.status === 'pending'
-                    ? t('elements.fileUpload.waiting', { file: file.filePath })
-                    : t('elements.fileUpload.uploading', { file: file.filePath })}
+                  {file.status === 'error'
+                    ? t('elements.fileUpload.failed', { file: file.filePath })
+                    : file.status === 'pending'
+                      ? t('elements.fileUpload.waiting', { file: file.filePath })
+                      : t('elements.fileUpload.uploading', { file: file.filePath })}
                 </p>
                 <Tooltip
                   label={`${bytesToString(file.uploaded)} / ${bytesToString(file.size)}`}
                   innerClassName='w-full'
                 >
-                  <Progress value={file.progress} color={isRateLimited ? 'orange' : undefined} />
+                  <Progress
+                    value={file.progress}
+                    color={file.status === 'error' ? 'red' : isRateLimited ? 'orange' : undefined}
+                  />
                 </Tooltip>
               </div>
               <CloseButton className='ml-3' onClick={() => cancelFileUpload(key)} />

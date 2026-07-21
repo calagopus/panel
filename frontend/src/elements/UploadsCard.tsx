@@ -114,23 +114,27 @@ export default function UploadsCard() {
         totalSize: 0,
         uploadedSize: 0,
         fileCount: getFolderFileCount(scope, folder),
+        erroredCount: 0,
+        activeCount: 0,
       };
       group.folders.set(folder, {
         ...prev,
         totalSize: prev.totalSize + item.size,
         uploadedSize: prev.uploadedSize + item.uploaded,
-        fileCount: prev.fileCount,
+        erroredCount: prev.erroredCount + (item.status === 'error' ? 1 : 0),
+        activeCount: prev.activeCount + (item.status === 'pending' || item.status === 'uploading' ? 1 : 0),
       });
     });
 
     return map;
   }, [uploads, location.pathname]);
 
-  const { totalFiles, overallProgress, isRateLimited } = useMemo(() => {
+  const { totalFiles, overallProgress, isRateLimited, hasErrors } = useMemo(() => {
     let totalFiles = 0;
     let totalSize = 0;
     let uploadedSize = 0;
     let isRateLimited = false;
+    let hasErrors = false;
 
     groups.forEach((group) => {
       totalFiles += group.files.length;
@@ -139,6 +143,7 @@ export default function UploadsCard() {
 
       for (const [, file] of group.files) {
         if (file.retryAttempt > 0 && file.status === 'uploading') isRateLimited = true;
+        if (file.status === 'error') hasErrors = true;
       }
     });
 
@@ -146,6 +151,7 @@ export default function UploadsCard() {
       totalFiles,
       overallProgress: totalSize > 0 ? (uploadedSize / totalSize) * 100 : 0,
       isRateLimited,
+      hasErrors,
     };
   }, [groups]);
 
@@ -167,7 +173,7 @@ export default function UploadsCard() {
             size={36}
             thickness={3}
             roundCaps
-            sections={[{ value: overallProgress, color: isRateLimited ? 'orange' : 'green' }]}
+            sections={[{ value: overallProgress, color: hasErrors ? 'red' : isRateLimited ? 'orange' : 'green' }]}
           />
           <Text fw={600} size='sm'>
             {t('elements.fileUpload.title', { files: tItem('file', totalFiles) })}
@@ -200,21 +206,30 @@ export default function UploadsCard() {
 
             {Array.from(group.folders).map(([folderName, info]) => {
               const progress = info.totalSize > 0 ? (info.uploadedSize / info.totalSize) * 100 : 0;
+              const failed = info.erroredCount > 0 && info.activeCount === 0;
 
               return (
                 <div key={folderName} className='flex flex-row items-center mb-2'>
                   <div className='flex flex-col grow'>
                     <p className='break-all mb-1 text-sm'>
-                      {t('elements.fileUpload.uploadingFolder', {
-                        folder: folderName,
-                        files: tItem('file', info.fileCount),
-                      })}
+                      {failed
+                        ? t('elements.fileUpload.failedFolder', {
+                            folder: folderName,
+                            files: tItem('file', info.erroredCount),
+                          })
+                        : t('elements.fileUpload.uploadingFolder', {
+                            folder: folderName,
+                            files: tItem('file', info.fileCount),
+                          })}
                     </p>
                     <Tooltip
                       label={`${bytesToString(info.uploadedSize)} / ${bytesToString(info.totalSize)}`}
                       innerClassName='w-full'
                     >
-                      <Progress value={progress} color={isRateLimited ? 'orange' : undefined} />
+                      <Progress
+                        value={progress}
+                        color={info.erroredCount > 0 ? 'red' : isRateLimited ? 'orange' : undefined}
+                      />
                     </Tooltip>
                   </div>
                   <CloseButton className='ml-3' onClick={() => cancelFolderUpload(scope, folderName)} />
@@ -231,15 +246,20 @@ export default function UploadsCard() {
                 <div key={key} className='flex flex-row items-center mb-2'>
                   <div className='flex flex-col grow'>
                     <p className='break-all mb-1 text-sm'>
-                      {file.status === 'pending'
-                        ? t('elements.fileUpload.waiting', { file: file.filePath })
-                        : t('elements.fileUpload.uploading', { file: file.filePath })}
+                      {file.status === 'error'
+                        ? t('elements.fileUpload.failed', { file: file.filePath })
+                        : file.status === 'pending'
+                          ? t('elements.fileUpload.waiting', { file: file.filePath })
+                          : t('elements.fileUpload.uploading', { file: file.filePath })}
                     </p>
                     <Tooltip
                       label={`${bytesToString(file.uploaded)} / ${bytesToString(file.size)}`}
                       innerClassName='w-full'
                     >
-                      <Progress value={file.progress} color={isRateLimited ? 'orange' : undefined} />
+                      <Progress
+                        value={file.progress}
+                        color={file.status === 'error' ? 'red' : isRateLimited ? 'orange' : undefined}
+                      />
                     </Tooltip>
                   </div>
                   <CloseButton className='ml-3' onClick={() => cancelFileUpload(key)} />

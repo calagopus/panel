@@ -653,10 +653,13 @@
         "waiting": "Waiting: {file}",
         "uploading": "Uploading: {file}",
         "uploadingFolder": "Uploading folder: {folder} ({files})",
+        "failed": "Failed: {file}",
+        "failedFolder": "Upload failed: {folder} ({files})",
         "rateLimited": "Your upload has been rate limited. Waiting...",
         "cancelAllUploads": "Cancel all uploads",
         "toast": {
           "uploading": "Started uploading {files}...",
+          "failed": "Upload failed: {error}",
           "cancelledFile": "Successfully cancelled upload of `{file}`.",
           "cancelledFolder": "Successfully cancelled upload of `{folder}` ({files}).",
           "cancelledAll": "All uploads have been cancelled.",

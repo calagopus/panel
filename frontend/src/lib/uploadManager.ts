@@ -2,7 +2,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import { ReactNode } from 'react';
 import uploadAssets from '@/api/admin/assets/uploadAssets.ts';
-import { axiosInstance } from '@/api/axios.ts';
+import { axiosInstance, httpErrorToHuman } from '@/api/axios.ts';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl.ts';
 import { ToastAction, ToastType } from '@/providers/contexts/toastContext.ts';
 import { getTranslations } from '@/providers/contexts/translationContext.ts';
@@ -111,6 +111,7 @@ const controllers = new Map<string, AbortController>();
 const folderFileCounts = new Map<string, number>();
 const pendingProgress = new Map<string, number>();
 const failureToastedBatches = new Set<string>();
+const settledErrorBatches = new Set<string>();
 let progressFlushTimer: ReturnType<typeof setTimeout> | null = null;
 let fileIndexCounter = 0;
 
@@ -249,6 +250,7 @@ function settleBatches(): void {
     allDone: boolean;
     hadError: boolean;
     keys: string[];
+    errorKeys: Set<string>;
     destination: UploadDestination;
   }
 
@@ -258,19 +260,18 @@ function settleBatches(): void {
       allDone: true,
       hadError: false,
       keys: [],
+      errorKeys: new Set<string>(),
       destination: file.destination,
     };
     entry.keys.push(key);
 
-    const isDone =
-      file.status === 'completed' ||
-      file.status === 'error' ||
-      (file.size > 0 && file.uploaded >= file.size && file.progress >= 100);
-    if (!isDone) {
-      entry.allDone = false;
-    }
+    // Only a server-acknowledged status counts as done: settling on bytes-sent hid
+    // rejections (e.g. upload limit) that arrive after the request body is buffered.
     if (file.status === 'error') {
       entry.hadError = true;
+      entry.errorKeys.add(key);
+    } else if (file.status !== 'completed') {
+      entry.allDone = false;
     }
     batches.set(file.batchId, entry);
   });
@@ -279,15 +280,19 @@ function settleBatches(): void {
   const completedBatches: BatchInfo[] = [];
   batches.forEach((batch, batchId) => {
     if (!batch.allDone) return;
+    // Errored entries stay visible until the user dismisses them; only settle such a
+    // batch once so the refresh/toast side effects don't repeat on later flushes.
+    if (batch.hadError && settledErrorBatches.has(batchId)) return;
 
-    keysToRemove.push(...batch.keys);
+    keysToRemove.push(...batch.keys.filter((key) => !batch.errorKeys.has(key)));
     controllers.delete(batchId);
     batch.keys.forEach((key) => controllers.delete(key));
     failureToastedBatches.delete(batchId);
+    if (batch.hadError) settledErrorBatches.add(batchId);
     completedBatches.push(batch);
   });
 
-  if (keysToRemove.length === 0) return;
+  if (keysToRemove.length === 0 && completedBatches.length === 0) return;
 
   const foldersBeingRemoved = new Set<string>();
   keysToRemove.forEach((key) => {
@@ -314,18 +319,19 @@ function settleBatches(): void {
     }
   });
 
-  setUploads((prev) => {
-    const next = new Map(prev);
-    keysToRemove.forEach((key) => next.delete(key));
-    return next;
-  });
+  if (keysToRemove.length > 0) {
+    setUploads((prev) => {
+      const next = new Map(prev);
+      keysToRemove.forEach((key) => next.delete(key));
+      return next;
+    });
+  }
 
-  const scopes = new Map<string, { destination: UploadDestination; fileCount: number; hadError: boolean }>();
+  const scopes = new Map<string, { destination: UploadDestination; fileCount: number }>();
   completedBatches.forEach((batch) => {
     const scope = uploadScopeKey(batch.destination);
-    const entry = scopes.get(scope) ?? { destination: batch.destination, fileCount: 0, hadError: false };
+    const entry = scopes.get(scope) ?? { destination: batch.destination, fileCount: 0 };
     if (!batch.hadError) entry.fileCount += batch.keys.length;
-    entry.hadError ||= batch.hadError;
     scopes.set(scope, entry);
   });
 
@@ -349,8 +355,8 @@ function handleUploadError(error: unknown, batchId: string, markError: () => voi
 
   if (!failureToastedBatches.has(batchId)) {
     failureToastedBatches.add(batchId);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    externals?.addToast(`Upload failed: ${message}`, 'error');
+    const { t } = getTranslations();
+    externals?.addToast(t('elements.fileUpload.toast.failed', { error: httpErrorToHuman(error) }), 'error');
   }
 }
 
@@ -572,6 +578,52 @@ async function uploadSplitFile(
   }
 }
 
+// Retained error rows for the same folder/file would merge with a retry's fresh entries
+// (folder rows aggregate by name), so a re-upload starts from a clean slate instead.
+function clearFailedEntries(scope: string, folderNames: Set<string>, fileNames: Set<string>): void {
+  const keysToRemove: string[] = [];
+  const removedPerFolder = new Map<string, number>();
+  const affectedBatches = new Set<string>();
+
+  useUploadsStore.getState().uploads.forEach((file, key) => {
+    if (file.status !== 'error' || uploadScopeKey(file.destination) !== scope) return;
+
+    const folder = file.filePath.includes('/') ? file.filePath.split('/')[0] : null;
+    if (folder !== null ? !folderNames.has(folder) : !fileNames.has(file.filePath)) return;
+
+    keysToRemove.push(key);
+    affectedBatches.add(file.batchId);
+    if (folder !== null) removedPerFolder.set(folder, (removedPerFolder.get(folder) ?? 0) + 1);
+  });
+
+  if (keysToRemove.length === 0) return;
+
+  setUploads((prev) => {
+    const next = new Map(prev);
+    keysToRemove.forEach((key) => next.delete(key));
+    return next;
+  });
+
+  removedPerFolder.forEach((removed, folder) => {
+    const countKey = folderCountKey(scope, folder);
+    const remaining = (folderFileCounts.get(countKey) ?? 0) - removed;
+    if (remaining > 0) folderFileCounts.set(countKey, remaining);
+    else folderFileCounts.delete(countKey);
+  });
+
+  const remaining = useUploadsStore.getState().uploads;
+  affectedBatches.forEach((batchId) => {
+    let batchHasEntries = false;
+    remaining.forEach((file) => {
+      if (file.batchId === batchId) batchHasEntries = true;
+    });
+    if (!batchHasEntries) {
+      settledErrorBatches.delete(batchId);
+      failureToastedBatches.delete(batchId);
+    }
+  });
+}
+
 export async function uploadFiles(destination: UploadDestination, files: File[]): Promise<void> {
   if (files.length === 0) return;
 
@@ -601,6 +653,8 @@ export async function uploadFiles(destination: UploadDestination, files: File[])
     }
     folderCounts.set(folder, (folderCounts.get(folder) ?? 0) + 1);
   }
+
+  clearFailedEntries(scope, new Set(folderCounts.keys()), new Set(individualFiles.map(({ file }) => file.name)));
 
   folderCounts.forEach((count, folder) => {
     const countKey = folderCountKey(scope, folder);
@@ -747,8 +801,16 @@ export function cancelFileUpload(fileKey: string): void {
     return next;
   });
 
-  const { t } = getTranslations();
-  externals?.addToast(t('elements.fileUpload.toast.cancelledFile', { file: entry.filePath }).md(), 'success');
+  let batchHasEntries = false;
+  useUploadsStore.getState().uploads.forEach((file) => {
+    if (file.batchId === entry.batchId) batchHasEntries = true;
+  });
+  if (!batchHasEntries) settledErrorBatches.delete(entry.batchId);
+
+  if (entry.status !== 'error') {
+    const { t } = getTranslations();
+    externals?.addToast(t('elements.fileUpload.toast.cancelledFile', { file: entry.filePath }).md(), 'success');
+  }
 
   settleBatches();
 }
@@ -758,11 +820,13 @@ export function cancelFolderUpload(scope: string, folderName: string): void {
 
   const keysToRemove: string[] = [];
   const batchIds = new Set<string>();
+  let cancelledCount = 0;
 
   useUploadsStore.getState().uploads.forEach((file, key) => {
     if (uploadScopeKey(file.destination) === scope && file.filePath.split('/')[0] === folderName) {
       keysToRemove.push(key);
       batchIds.add(file.batchId);
+      if (file.status !== 'error') cancelledCount++;
     }
   });
 
@@ -772,6 +836,7 @@ export function cancelFolderUpload(scope: string, folderName: string): void {
     controllers.get(batchId)?.abort();
     controllers.delete(batchId);
     failureToastedBatches.delete(batchId);
+    settledErrorBatches.delete(batchId);
   });
   keysToRemove.forEach((key) => pendingProgress.delete(key));
 
@@ -781,14 +846,16 @@ export function cancelFolderUpload(scope: string, folderName: string): void {
     return next;
   });
 
-  const { t, tItem } = getTranslations();
-  externals?.addToast(
-    t('elements.fileUpload.toast.cancelledFolder', {
-      folder: folderName,
-      files: tItem('file', keysToRemove.length),
-    }).md(),
-    'success',
-  );
+  if (cancelledCount > 0) {
+    const { t, tItem } = getTranslations();
+    externals?.addToast(
+      t('elements.fileUpload.toast.cancelledFolder', {
+        folder: folderName,
+        files: tItem('file', cancelledCount),
+      }).md(),
+      'success',
+    );
+  }
 
   settleBatches();
 }
@@ -820,6 +887,7 @@ export function cancelAllUploads(scope?: string, options?: { silent?: boolean })
     controllers.get(batchId)?.abort();
     controllers.delete(batchId);
     failureToastedBatches.delete(batchId);
+    settledErrorBatches.delete(batchId);
   });
 
   for (const countKey of [...folderFileCounts.keys()]) {
@@ -841,7 +909,12 @@ export function cancelAllUploads(scope?: string, options?: { silent?: boolean })
 }
 
 window.addEventListener('beforeunload', (event) => {
-  if (useUploadsStore.getState().uploads.size > 0) {
+  let hasActiveUploads = false;
+  useUploadsStore.getState().uploads.forEach((file) => {
+    if (file.status === 'pending' || file.status === 'uploading') hasActiveUploads = true;
+  });
+
+  if (hasActiveUploads) {
     event.preventDefault();
     event.returnValue = '';
   }

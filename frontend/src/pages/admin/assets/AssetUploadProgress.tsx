@@ -24,6 +24,11 @@ export default function AssetUploadProgress({
     return null;
   }
 
+  let hasErrors = false;
+  uploadingFiles.forEach((file) => {
+    if (file.status === 'error') hasErrors = true;
+  });
+
   return (
     <Popover position='bottom-start' shadow='md'>
       <Popover.Target>
@@ -33,13 +38,13 @@ export default function AssetUploadProgress({
             sections={[
               {
                 value: totalUploadProgress,
-                color: 'green',
+                color: hasErrors ? 'red' : 'green',
               },
             ]}
             roundCaps
             thickness={4}
             label={
-              <Text c='green' fw={700} ta='center' size='xs'>
+              <Text c={hasErrors ? 'red' : 'green'} fw={700} ta='center' size='xs'>
                 {totalUploadProgress.toFixed(0)}%
               </Text>
             }
@@ -51,12 +56,14 @@ export default function AssetUploadProgress({
           <div key={key} className='flex flex-row items-center mb-2'>
             <div className='flex flex-col grow'>
               <p className='break-all mb-1 text-sm'>
-                {file.status === 'pending'
-                  ? t('elements.fileUpload.waiting', { file: file.filePath })
-                  : t('elements.fileUpload.uploading', { file: file.filePath })}
+                {file.status === 'error'
+                  ? t('elements.fileUpload.failed', { file: file.filePath })
+                  : file.status === 'pending'
+                    ? t('elements.fileUpload.waiting', { file: file.filePath })
+                    : t('elements.fileUpload.uploading', { file: file.filePath })}
               </p>
               <Tooltip label={`${bytesToString(file.uploaded)} / ${bytesToString(file.size)}`} innerClassName='w-full'>
-                <Progress value={file.progress} />
+                <Progress value={file.progress} color={file.status === 'error' ? 'red' : undefined} />
               </Tooltip>
             </div>
             <CloseButton className='ml-3' onClick={() => cancelFileUpload(key)} />

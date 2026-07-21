@@ -653,10 +653,13 @@
         "waiting": "Warten: {file}",
         "uploading": "Wird hochgeladen: {file}",
         "uploadingFolder": "Verzeichnis wird hochgeladen: {folder} ({files})",
+        "failed": "Fehlgeschlagen: {file}",
+        "failedFolder": "Upload fehlgeschlagen: {folder} ({files})",
         "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
         "cancelAllUploads": "Alle Uploads abbrechen",
         "toast": {
           "uploading": "Hochladen von {files} gestartet...",
+          "failed": "Upload fehlgeschlagen: {error}",
           "cancelledFile": "Upload von `{file}` erfolgreich abgebrochen.",
           "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen.",
           "cancelledAll": "Alle Uploads wurden abgebrochen.",

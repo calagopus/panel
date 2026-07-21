@@ -26,6 +26,8 @@ export interface AggregatedUploadProgress {
   totalSize: number;
   uploadedSize: number;
   fileCount: number;
+  erroredCount: number;
+  activeCount: number;
 }
 
 export interface FileUploader {

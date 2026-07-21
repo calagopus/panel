@@ -41,13 +41,16 @@ export function useUploader(scope: string, getDestination: () => UploadDestinati
         totalSize: 0,
         uploadedSize: 0,
         fileCount: getFolderFileCount(scope, folder),
+        erroredCount: 0,
+        activeCount: 0,
       };
 
       map.set(folder, {
         ...prev,
         totalSize: prev.totalSize + file.size,
         uploadedSize: prev.uploadedSize + file.uploaded,
-        fileCount: prev.fileCount,
+        erroredCount: prev.erroredCount + (file.status === 'error' ? 1 : 0),
+        activeCount: prev.activeCount + (file.status === 'pending' || file.status === 'uploading' ? 1 : 0),
       });
     });
 
