@@ -30,6 +30,7 @@ export default function ForgotPassword() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [requested, setRequested] = useState(false);
+  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
   const captchaRef = useRef<CaptchaRef>(null);
 
   const form = useForm<z.infer<typeof authForgotPasswordSchema>>({
@@ -104,9 +105,14 @@ export default function ForgotPassword() {
         <Card>
           <Stack>
             <TextInput placeholder={t('common.form.email', {})} {...form.getInputProps('email')} />
-            <Captcha ref={captchaRef} />
 
-            <Button onClick={submit} loading={loading} disabled={requested || !form.isValid()} size='md' fullWidth>
+            <Button
+              onClick={submit}
+              loading={loading}
+              disabled={requested || !form.isValid() || !isCaptchaValid}
+              size='md'
+              fullWidth
+            >
               {t('pages.auth.forgotPassword.button.request', {})}
             </Button>
 
@@ -117,6 +123,7 @@ export default function ForgotPassword() {
             </Button>
           </Stack>
         </Card>
+        <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
       </Stack>
     </AuthWrapper>
   );
