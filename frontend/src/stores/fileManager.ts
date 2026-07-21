@@ -13,7 +13,7 @@ import {
   serverDirectorySortingModeSchema,
   serverFilesSearchSchema,
 } from '@/lib/schemas/server/files.ts';
-import { FileUploader } from '@/plugins/useFileUpload.ts';
+import { FileUploader } from '@/stores/uploads.ts';
 
 export type ModalType =
   | 'rename'

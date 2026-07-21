@@ -551,6 +551,11 @@
         }
       },
       "fileUpload": {
+        "waiting": "等待中：{file}",
+        "uploading": "上傳中：{file}",
+        "uploadingFolder": "正在上傳資料夾：{folder}（{files}）",
+        "rateLimited": "你的上傳受到速率限制。等待中...",
+        "cancelAllUploads": "取消所有上傳",
         "toast": {
           "uploading": "已開始上傳 {files}...",
           "cancelledFile": "已成功取消上傳 `{file}`。",
@@ -1761,10 +1766,6 @@
           "dropzone": {
             "title": "將檔案拖放到此處以上傳",
             "subtitle": "放開即可開始上傳"
-          },
-          "operations": {
-            "waiting": "等待中：",
-            "uploading": "上傳中："
           },
           "toast": {
             "assetDeleted": "資產已刪除。",
@@ -3455,9 +3456,6 @@
             "max": "最大："
           },
           "operations": {
-            "uploadingFolder": "正在上傳資料夾：{folder}（{files}）",
-            "waiting": "等待中：",
-            "uploading": "上傳中：",
             "compressing": "正在從 {path} 壓縮 {files}",
             "decompressing": "正在解壓縮 {path}",
             "pulling": "正在拉取 {destination}",
@@ -3465,8 +3463,6 @@
             "copyingMany": "正在複製 {files}",
             "receivingRemote": "正在從遠端伺服器接收 {files}",
             "sendingRemote": "正在傳送 {files} 到遠端伺服器",
-            "rateLimited": "你的上傳受到速率限制。等待中...",
-            "cancelAllUploads": "取消所有上傳",
             "cancelAllOperations": "取消所有操作"
           },
           "dropzone": {
@@ -3532,10 +3528,6 @@
             }
           },
           "modal": {
-            "activeUploads": {
-              "title": "進行中的上傳",
-              "content": "你確定要離開此頁面嗎？你有 {files} 個進行中的檔案上傳。若離開此頁面，檔案上傳將會中止。"
-            },
             "unsavedChanges": {
               "title": "未儲存的變更",
               "content": "檔案編輯器中有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。"

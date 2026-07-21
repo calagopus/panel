@@ -6,15 +6,15 @@ import Text from '@/elements/Text.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import UnstyledButton from '@/elements/UnstyledButton.tsx';
 import { bytesToString } from '@/lib/size.ts';
-import { FileUploadProgress } from '@/plugins/useFileUpload.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { UploadItem } from '@/stores/uploads.ts';
 
 export default function AssetUploadProgress({
   uploadingFiles,
   totalUploadProgress,
   cancelFileUpload,
 }: {
-  uploadingFiles: Map<string, FileUploadProgress>;
+  uploadingFiles: Map<string, UploadItem>;
   totalUploadProgress: number;
   cancelFileUpload: (key: string) => void;
 }) {
@@ -52,9 +52,8 @@ export default function AssetUploadProgress({
             <div className='flex flex-col grow'>
               <p className='break-all mb-1 text-sm'>
                 {file.status === 'pending'
-                  ? t('pages.admin.assets.operations.waiting', {})
-                  : t('pages.admin.assets.operations.uploading', {})}
-                {file.filePath}
+                  ? t('elements.fileUpload.waiting', { file: file.filePath })
+                  : t('elements.fileUpload.uploading', { file: file.filePath })}
               </p>
               <Tooltip label={`${bytesToString(file.uploaded)} / ${bytesToString(file.size)}`} innerClassName='w-full'>
                 <Progress value={file.progress} />

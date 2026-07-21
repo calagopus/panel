@@ -11,6 +11,7 @@ import OobeGuard from '@/routers/guards/OobeGuard.tsx';
 import { ContextMenuProvider } from './elements/ContextMenu.tsx';
 import ContentContainer from './elements/containers/ContentContainer.tsx';
 import ScreenBlock from './elements/ScreenBlock.tsx';
+import UploadsCard from './elements/UploadsCard.tsx';
 import { useCurrentWindow } from './providers/CurrentWindowProvider.tsx';
 import { useTranslations } from './providers/TranslationProvider.tsx';
 import { useWindows } from './providers/WindowProvider.tsx';
@@ -106,6 +107,8 @@ export default function RouterRoutes({ isNormal }: { isNormal: boolean }) {
                   </Route>
                 </Routes>
               </Suspense>
+
+              {isNormal && <UploadsCard />}
 
               {window.extensionContext.extensionRegistry.pages.global.appendedComponents.map((Component, index) => (
                 <Component key={`pagesGlobal-appended-${index}`} />

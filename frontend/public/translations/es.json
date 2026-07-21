@@ -385,6 +385,9 @@
         }
       },
       "fileUpload": {
+        "waiting": "Esperando: {file}",
+        "uploading": "Subiendo: {file}",
+        "uploadingFolder": "Subiendo carpeta: {folder} ({files})",
         "toast": {
           "uploading": "Se inició la subida de {files}...",
           "cancelledFile": "Se canceló correctamente la subida de `{file}`.",
@@ -1195,9 +1198,6 @@
             "max": "Máx:"
           },
           "operations": {
-            "uploadingFolder": "Subiendo carpeta: {folder} ({files})",
-            "waiting": "Esperando: ",
-            "uploading": "Subiendo: ",
             "compressing": "Comprimiendo {files} de {path}",
             "decompressing": "Descomprimiendo {path}",
             "pulling": "Descargando {destination}",
@@ -1234,10 +1234,6 @@
             "fileSaved": "El archivo se ha guardado."
           },
           "modal": {
-            "activeUploads": {
-              "title": "Subidas activas",
-              "content": "¿Seguro que quieres salir de esta página? Tienes {files} subidas de archivos activas. Si sales, las subidas se cancelarán."
-            },
             "unsavedChanges": {
               "title": "Cambios sin guardar",
               "content": "Tienes cambios sin guardar en el editor de archivos. ¿Seguro que quieres salir de esta página? Si sales, se perderán tus cambios."

@@ -563,11 +563,21 @@ const baseTranslations = defineTranslations({
         },
       },
       fileUpload: {
+        title: 'Uploading {files}',
+        adminAssets: 'Admin Assets',
+        waiting: 'Waiting: {file}',
+        uploading: 'Uploading: {file}',
+        uploadingFolder: 'Uploading folder: {folder} ({files})',
+        rateLimited: 'Your upload has been rate limited. Waiting...',
+        cancelAllUploads: 'Cancel all uploads',
         toast: {
           uploading: 'Started uploading {files}...',
           cancelledFile: 'Successfully cancelled upload of `{file}`.',
           cancelledFolder: 'Successfully cancelled upload of `{folder}` ({files}).',
           cancelledAll: 'All uploads have been cancelled.',
+          completedServer: 'Finished uploading {files} to `{server}`.',
+          completedAssets: 'Finished uploading {files} to the admin assets.',
+          showFiles: 'Show files',
         },
       },
     },
@@ -1829,10 +1839,6 @@ const baseTranslations = defineTranslations({
           dropzone: {
             title: 'Drop files here to upload',
             subtitle: 'Release to start uploading',
-          },
-          operations: {
-            waiting: 'Waiting: ',
-            uploading: 'Uploading: ',
           },
           toast: {
             assetDeleted: 'Asset deleted.',
@@ -4113,9 +4119,6 @@ const baseTranslations = defineTranslations({
             max: 'Max:',
           },
           operations: {
-            uploadingFolder: 'Uploading folder: {folder} ({files})',
-            waiting: 'Waiting: ',
-            uploading: 'Uploading: ',
             compressing: 'Compressing {files} from {path}',
             decompressing: 'Decompressing {path}',
             pulling: 'Pulling {destination}',
@@ -4124,8 +4127,6 @@ const baseTranslations = defineTranslations({
             receivingRemote: 'Receiving {files} from remote server',
             sendingRemote: 'Sending {files} to remote server',
             exportingBackup: 'Exporting backup to {destination}',
-            rateLimited: 'Your upload has been rate limited. Waiting...',
-            cancelAllUploads: 'Cancel all uploads',
             cancelAllOperations: 'Cancel all operations',
           },
           dropzone: {
@@ -4200,11 +4201,6 @@ const baseTranslations = defineTranslations({
             },
           },
           modal: {
-            activeUploads: {
-              title: 'Active Uploads',
-              content:
-                'Are you sure you want to leave this page? You have {files} active file uploads. If you leave this page, the file uploads will abort.',
-            },
             unsavedChanges: {
               title: 'Unsaved Changes',
               content:

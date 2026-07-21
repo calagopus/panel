@@ -559,6 +559,11 @@
         }
       },
       "fileUpload": {
+        "waiting": "Wachten: {file}",
+        "uploading": "Uploaden: {file}",
+        "uploadingFolder": "Map uploaden: {folder} ({files})",
+        "rateLimited": "Your upload has been rate limited. Waiting...",
+        "cancelAllUploads": "Cancel all uploads",
         "toast": {
           "uploading": "Uploaden van {files} gestart...",
           "cancelledFile": "Uploaden van `{file}` succesvol geannuleerd.",
@@ -1769,10 +1774,6 @@
           "dropzone": {
             "title": "Drop files here to upload",
             "subtitle": "Release to start uploading"
-          },
-          "operations": {
-            "waiting": "Waiting: ",
-            "uploading": "Uploading: "
           },
           "toast": {
             "assetDeleted": "Asset deleted.",
@@ -3469,9 +3470,6 @@
             "max": "Max:"
           },
           "operations": {
-            "uploadingFolder": "Map uploaden: {folder} ({files})",
-            "waiting": "Wachten: ",
-            "uploading": "Uploaden: ",
             "compressing": "{files} comprimeren vanuit {path}",
             "decompressing": "{path} decomprimeren",
             "pulling": "{destination} ophalen",
@@ -3479,8 +3477,6 @@
             "copyingMany": "{files} kopiëren",
             "receivingRemote": "{files} ontvangen van externe server",
             "sendingRemote": "{files} verzenden naar externe server",
-            "rateLimited": "Your upload has been rate limited. Waiting...",
-            "cancelAllUploads": "Cancel all uploads",
             "cancelAllOperations": "Cancel all operations"
           },
           "dropzone": {
@@ -3546,10 +3542,6 @@
             }
           },
           "modal": {
-            "activeUploads": {
-              "title": "Actieve uploads",
-              "content": "Weet u zeker dat u deze pagina wilt verlaten? U heeft {files} actieve bestandsuploads. Als u de pagina verlaat, worden de uploads afgebroken."
-            },
             "unsavedChanges": {
               "title": "Niet-opgeslagen wijzigingen",
               "content": "U heeft niet-opgeslagen wijzigingen in de bestandseditor. Weet u zeker dat u deze pagina wilt verlaten? Als u de pagina verlaat, gaan uw wijzigingen verloren."

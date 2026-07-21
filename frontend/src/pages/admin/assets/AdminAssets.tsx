@@ -1,11 +1,10 @@
 import { faFolderPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Ref, useCallback, useEffect, useState } from 'react';
+import { Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { createSearchParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import getAssets from '@/api/admin/assets/getAssets.ts';
-import uploadAssets from '@/api/admin/assets/uploadAssets.ts';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Card from '@/elements/Card.tsx';
@@ -18,10 +17,11 @@ import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { assetTableColumns } from '@/lib/tableColumns.ts';
 import AssetUpload from '@/pages/admin/assets/AssetUpload.tsx';
 import AssetUploadProgress from '@/pages/admin/assets/AssetUploadProgress.tsx';
-import { useFileUpload } from '@/plugins/useFileUpload.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
+import { useUploader } from '@/plugins/useUploader.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { UploadDestination } from '@/stores/uploads.ts';
 import AssetActionBar from './AssetActionBar.tsx';
 import AssetBreadcrumbs from './AssetBreadcrumbs.tsx';
 import AssetRow from './AssetRow.tsx';
@@ -50,13 +50,16 @@ export default function AdminAssets() {
     queryClient.invalidateQueries({ queryKey: ['admin', 'assets'] }).catch((e) => console.error(e));
   }, [queryClient]);
 
-  const { uploadingFiles, handleFileSelect, totalUploadProgress, cancelFileUpload, uploadFiles } = useFileUpload(
-    (form, config) =>
-      uploadAssets(form, config, currentDirectory).then(() => {
-        invalidateAssets();
-        return { url: '', continuationToken: null };
-      }),
-    () => null,
+  const currentDirectoryRef = useRef(currentDirectory);
+  currentDirectoryRef.current = currentDirectory;
+
+  const getDestination = useCallback(
+    (): UploadDestination => ({ type: 'adminAsset', directory: currentDirectoryRef.current }),
+    [],
+  );
+  const { uploadingFiles, handleFileSelect, totalUploadProgress, cancelFileUpload, uploadFiles } = useUploader(
+    'adminAsset',
+    getDestination,
   );
 
   const navigateToDirectory = useCallback(

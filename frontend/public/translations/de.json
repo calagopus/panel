@@ -648,11 +648,21 @@
         }
       },
       "fileUpload": {
+        "title": "{files} werden hochgeladen",
+        "adminAssets": "Admin-Assets",
+        "waiting": "Warten: {file}",
+        "uploading": "Wird hochgeladen: {file}",
+        "uploadingFolder": "Verzeichnis wird hochgeladen: {folder} ({files})",
+        "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
+        "cancelAllUploads": "Alle Uploads abbrechen",
         "toast": {
           "uploading": "Hochladen von {files} gestartet...",
           "cancelledFile": "Upload von `{file}` erfolgreich abgebrochen.",
           "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen.",
-          "cancelledAll": "Alle Uploads wurden abgebrochen."
+          "cancelledAll": "Alle Uploads wurden abgebrochen.",
+          "completedServer": "Upload von {files} nach `{server}` abgeschlossen.",
+          "completedAssets": "Upload von {files} in die Admin-Assets abgeschlossen.",
+          "showFiles": "Dateien anzeigen"
         }
       }
     },
@@ -1879,10 +1889,6 @@
           "dropzone": {
             "title": "Dateien hier ablegen zum Hochladen",
             "subtitle": "Loslassen um den Upload zu starten"
-          },
-          "operations": {
-            "waiting": "Warten: ",
-            "uploading": "Wird hochgeladen: "
           },
           "toast": {
             "assetDeleted": "Asset gelöscht.",
@@ -4093,9 +4099,6 @@
             "max": "Max:"
           },
           "operations": {
-            "uploadingFolder": "Verzeichnis wird hochgeladen: {folder} ({files})",
-            "waiting": "Warten: ",
-            "uploading": "Wird hochgeladen: ",
             "compressing": "Komprimiere {files} von {path}",
             "decompressing": "Entpacke {path}",
             "pulling": "Lade {destination} herunter",
@@ -4104,8 +4107,6 @@
             "receivingRemote": "Empfange {files} vom Remote-Server",
             "sendingRemote": "Sende {files} an Remote-Server",
             "exportingBackup": "Exportiere Backup nach {destination}",
-            "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
-            "cancelAllUploads": "Alle Uploads abbrechen",
             "cancelAllOperations": "Alle Vorgänge abbrechen"
           },
           "dropzone": {
@@ -4180,10 +4181,6 @@
             }
           },
           "modal": {
-            "activeUploads": {
-              "title": "Aktive Uploads",
-              "content": "Bist du sicher, dass du diese Seite verlassen möchtest? Du hast {files} aktive Datei-Uploads. Wenn du diese Seite verlässt, werden die Uploads abgebrochen."
-            },
             "unsavedChanges": {
               "title": "Ungespeicherte Änderungen",
               "content": "Du hast ungespeicherte Änderungen im Editor. Bist du sicher, dass du diese Seite verlassen möchtest? Wenn du die Seite verlässt, gehen deine Änderungen verloren."

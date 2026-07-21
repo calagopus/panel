@@ -385,6 +385,9 @@
         }
       },
       "fileUpload": {
+        "waiting": "انتظار: {file}",
+        "uploading": "جاري الرفع: {file}",
+        "uploadingFolder": "جاري رفع المجلد: {folder} ({files})",
         "toast": {
           "uploading": "بدأ رفع {files}...",
           "cancelledFile": "تم إلغاء رفع `{file}` بنجاح.",
@@ -1195,9 +1198,6 @@
             "max": "الحد الأقصى:"
           },
           "operations": {
-            "uploadingFolder": "جاري رفع المجلد: {folder} ({files})",
-            "waiting": "انتظار: ",
-            "uploading": "جاري الرفع: ",
             "compressing": "جاري ضغط {files} من {path}",
             "decompressing": "جاري فك ضغط {path}",
             "pulling": "جاري سحب {destination}",
@@ -1234,10 +1234,6 @@
             "fileSaved": "تم حفظ الملف."
           },
           "modal": {
-            "activeUploads": {
-              "title": "الرفعات النشطة",
-              "content": "هل أنت متأكد أنك تريد مغادرة هذه الصفحة؟ لديك {files} رفع ملف نشط. إذا غادرت هذه الصفحة، سيتم إجهاض رفع الملفات."
-            },
             "unsavedChanges": {
               "title": "تغييرات غير محفوظة",
               "content": "لديك تغييرات غير محفوظة في محرر الملفات. هل أنت متأكد أنك تريد مغادرة هذه الصفحة؟ إذا غادرت، ستفقد تغييراتك."

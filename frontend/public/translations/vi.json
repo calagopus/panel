@@ -623,6 +623,11 @@
         }
       },
       "fileUpload": {
+        "waiting": "Đang Chờ: {file}",
+        "uploading": "Đang Tải Lên: {file}",
+        "uploadingFolder": "Đang Tải Lên Thư Mục: {folder} ({files})",
+        "rateLimited": "Tải lên của bạn đã bị giới hạn tốc độ. Đang chờ...",
+        "cancelAllUploads": "Hủy tất cả tải lên",
         "toast": {
           "uploading": "Đang tải lên {files}...",
           "cancelledFile": "Đã hủy `{file}`.",
@@ -1848,10 +1853,6 @@
           "dropzone": {
             "title": "Thả tệp ở đây để tải lên",
             "subtitle": "Thả để bắt đầu tải lên"
-          },
-          "operations": {
-            "waiting": "Đang chờ: ",
-            "uploading": "Đang tải lên: "
           },
           "toast": {
             "assetDeleted": "Tài nguyên đã được xóa.",
@@ -3924,9 +3925,6 @@
             "max": "Tối Đa:"
           },
           "operations": {
-            "uploadingFolder": "Đang Tải Lên Thư Mục: {folder} ({files})",
-            "waiting": "Đang Chờ: ",
-            "uploading": "Đang Tải Lên: ",
             "compressing": "Đang Nén {files} từ {path}",
             "decompressing": "Đang Giải Nén {path}",
             "pulling": "Đang Kéo {destination}",
@@ -3935,8 +3933,6 @@
             "receivingRemote": "Đang Nhận {files} Từ máy chủ điều khiển",
             "sendingRemote": "Đang Gửi {files}  tới máy chủ điều khiển",
             "exportingBackup": "Đang xuất bản sao lưu tới {destination}",
-            "rateLimited": "Tải lên của bạn đã bị giới hạn tốc độ. Đang chờ...",
-            "cancelAllUploads": "Hủy tất cả tải lên",
             "cancelAllOperations": "Hủy tất cả hoạt động"
           },
           "dropzone": {
@@ -4005,10 +4001,6 @@
             }
           },
           "modal": {
-            "activeUploads": {
-              "title": "Tải Lên Đang Hoạt Động",
-              "content": "Bạn có chắc muốn rời khỏi trang này không? Bạn có {files} tệp tải lên đang hoạt động. Nếu bạn rời khỏi trang này, tệp tải lên sẽ bị hủy."
-            },
             "unsavedChanges": {
               "title": "Thay Đổi Chưa Lưu",
               "content": "Bạn có thay đổi chưa lưu trong trình soạn thảo tệp. Bạn có chắc muốn rời khỏi trang này không? Nếu bạn rời khỏi, thay đổi của bạn sẽ bị mất."

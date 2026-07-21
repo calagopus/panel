@@ -386,6 +386,9 @@
         }
       },
       "fileUpload": {
+        "waiting": "Väntar: {file}",
+        "uploading": "Laddar upp: {file}",
+        "uploadingFolder": "Laddar upp mapp: {folder} ({files})",
         "toast": {
           "uploading": "Började ladda upp {files}...",
           "cancelledFile": "Uppladdningen avbröts `{file}`.",
@@ -1200,9 +1203,6 @@
             "max": "Max:"
           },
           "operations": {
-            "uploadingFolder": "Laddar upp mapp: {folder} ({files})",
-            "waiting": "Väntar: ",
-            "uploading": "Laddar upp: ",
             "compressing": "Komprimerar {files} från {path}",
             "decompressing": "Avkomprimerar {path}",
             "pulling": "Hämtar {destination}",
@@ -1239,10 +1239,6 @@
             "fileSaved": "Filen har sparats."
           },
           "modal": {
-            "activeUploads": {
-              "title": "Aktiva uppladdningar",
-              "content": "Är du säker på att du vill lämna den här sidan? Du har {files} aktiva filuppladdningar. Om du lämnar den här sidan kommer filuppladdningarna att avbrytas."
-            },
             "unsavedChanges": {
               "title": "Osparade ändringar",
               "content": "Du har osparade ändringar i filredigeringen. Är du säker på att du vill lämna den här sidan? Om du lämnar sidan kommer dina ändringar att förloras."

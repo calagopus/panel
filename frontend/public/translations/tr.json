@@ -385,6 +385,9 @@
         }
       },
       "fileUpload": {
+        "waiting": "Bekliyor: {file}",
+        "uploading": "Yükleniyor: {file}",
+        "uploadingFolder": "Klasör yükleniyor: {folder} ({files})",
         "toast": {
           "uploading": "{files} yüklenmeye başlandı...",
           "cancelledFile": "`{file}` yüklemesi başarıyla iptal edildi.",
@@ -1186,9 +1189,6 @@
             "max": "Max:"
           },
           "operations": {
-            "uploadingFolder": "Klasör yükleniyor: {folder} ({files})",
-            "waiting": "Bekliyor: ",
-            "uploading": "Yükleniyor: ",
             "compressing": "{path} konumundaki {files} sıkıştırılıyor",
             "decompressing": "{path} arşivi açılıyor",
             "pulling": "{destination} çekiliyor",
@@ -1225,10 +1225,6 @@
             "fileSaved": "Dosya kaydedildi."
           },
           "modal": {
-            "activeUploads": {
-              "title": "Aktif Yüklemeler",
-              "content": "Bu sayfadan ayrılmak istediğinize emin misiniz? {files} adet aktif dosya yüklemeniz var. Ayrılırsanız yüklemeler iptal edilecektir."
-            },
             "unsavedChanges": {
               "title": "Kaydedilmemiş Değişiklikler",
               "content": "Dosya editöründe kaydedilmemiş değişiklikleriniz var. Sayfadan ayrılmak istediğinize emin misiniz? Ayrılırsanız değişiklikleriniz kaybolacaktır."

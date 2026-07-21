@@ -551,6 +551,11 @@
         }
       },
       "fileUpload": {
+        "waiting": "Čakanie: {file}",
+        "uploading": "Nahráva sa: {file}",
+        "uploadingFolder": "Nahráva sa priečinok: {folder} ({files})",
+        "rateLimited": "Rýchlosť nahrávania bola obmedzená. Čakanie...",
+        "cancelAllUploads": "Zrušiť všetky nahrávania",
         "toast": {
           "uploading": "Začalo sa nahrávanie: {files}...",
           "cancelledFile": "Nahrávanie `{file}` bolo úspešne zrušené.",
@@ -1761,10 +1766,6 @@
           "dropzone": {
             "title": "Sem presuňte súbory na nahranie",
             "subtitle": "Uvoľnením spustíte nahrávanie"
-          },
-          "operations": {
-            "waiting": "Čakanie: ",
-            "uploading": "Nahráva sa: "
           },
           "toast": {
             "assetDeleted": "Aktívum bolo odstránené.",
@@ -3434,9 +3435,6 @@
             "max": "Max:"
           },
           "operations": {
-            "uploadingFolder": "Nahráva sa priečinok: {folder} ({files})",
-            "waiting": "Čakanie: ",
-            "uploading": "Nahráva sa: ",
             "compressing": "Komprimuje sa {files} z {path}",
             "decompressing": "Rozbaľuje sa {path}",
             "pulling": "Sťahovanie {destination}",
@@ -3444,8 +3442,6 @@
             "copyingMany": "Kopíruje sa {files}",
             "receivingRemote": "Prijímanie {files} zo vzdialeného servera",
             "sendingRemote": "Odosielanie {files} na vzdialený server",
-            "rateLimited": "Rýchlosť nahrávania bola obmedzená. Čakanie...",
-            "cancelAllUploads": "Zrušiť všetky nahrávania",
             "cancelAllOperations": "Zrušiť všetky operácie"
           },
           "dropzone": {
@@ -3511,10 +3507,6 @@
             }
           },
           "modal": {
-            "activeUploads": {
-              "title": "Aktívne nahrávania",
-              "content": "Naozaj chcete opustiť túto stránku? Máte aktívne nahrávania súborov: {files}. Ak opustíte túto stránku, nahrávanie súborov sa preruší."
-            },
             "unsavedChanges": {
               "title": "Neuložené zmeny",
               "content": "V editore súborov máte neuložené zmeny. Naozaj chcete opustiť túto stránku? Ak odídete, vaše zmeny sa stratia."
