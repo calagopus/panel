@@ -1,12 +1,7 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-mod export;
-mod import;
-mod recreate;
-mod size;
-
-mod delete {
+mod post {
     use crate::routes::api::client::servers::_server_::databases::instances::_instance_::GetServerDatabaseInstance;
     use axum::extract::Path;
     use serde::Serialize;
@@ -20,7 +15,7 @@ mod delete {
     #[derive(ToSchema, Serialize)]
     struct Response {}
 
-    #[utoipa::path(delete, path = "/", responses(
+    #[utoipa::path(post, path = "/", responses(
         (status = OK, body = inline(Response)),
         (status = UNAUTHORIZED, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
@@ -48,18 +43,18 @@ mod delete {
         database_instance: GetServerDatabaseInstance,
         Path((_server, _database_instance, database)): Path<(String, uuid::Uuid, uuid::Uuid)>,
     ) -> ApiResponseResult {
-        permissions.has_server_permission("database-instances.databases")?;
+        permissions.has_server_permission("database-instances.recreate")?;
 
         database_instance
             .database_agent_host
             .api_client(&state.database)
             .await?
-            .delete_instances_instance_databases_database(database_instance.uuid, database)
+            .post_instances_instance_databases_database_recreate(database_instance.uuid, database)
             .await?;
 
         activity_logger
             .log(
-                "server:database-instance.database.delete",
+                "server:database-instance.database.recreate",
                 serde_json::json!({
                     "uuid": database_instance.uuid,
                     "name": database_instance.name,
@@ -74,10 +69,6 @@ mod delete {
 
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
-        .routes(routes!(delete::route))
-        .nest("/export", export::router(state))
-        .nest("/import", import::router(state))
-        .nest("/recreate", recreate::router(state))
-        .nest("/size", size::router(state))
+        .routes(routes!(post::route))
         .with_state(state.clone())
 }

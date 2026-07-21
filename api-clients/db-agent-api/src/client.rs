@@ -369,6 +369,22 @@ impl DbAgentClient {
         .await
     }
 
+    pub async fn post_instances_instance_databases_database_recreate(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+    ) -> Result<super::instances_instance_databases_database_recreate::post::Response, ApiHttpError>
+    {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/recreate"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn get_instances_instance_databases_database_size(
         &self,
         instance: uuid::Uuid,

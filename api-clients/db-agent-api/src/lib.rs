@@ -61,6 +61,8 @@ nestify::nest! {
         #[schema(inline)]
         pub created: chrono::DateTime<chrono::Local>,
         #[schema(inline)]
+        pub backend_auth_error: Option<compact_str::CompactString>,
+        #[schema(inline)]
         pub utilization: ResourceUsage,
     }
 }
@@ -538,6 +540,22 @@ pub mod instances_instance_databases_database {
         pub type Response = Response200;
     }
 }
+pub mod instances_instance_databases_database_recreate {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
 pub mod instances_instance_databases_database_size {
     use super::*;
 
@@ -926,6 +944,12 @@ pub mod system_config {
                     pub timezone: compact_str::CompactString,
                     #[schema(inline)]
                     pub userns_mode: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub rootless: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerRootless {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                    },
+
                     #[schema(inline)]
                     pub log_config: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerLogConfig {
                         #[schema(inline)]

@@ -755,6 +755,10 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                             "Allows managing the databases inside database instances.",
                         ),
                         (
+                            "recreate",
+                            "Allows deleting and recreating databases inside database instances, in the process wiping all data.",
+                        ),
+                        (
                             "users",
                             "Allows managing the users inside database instances, including viewing their credentials.",
                         ),

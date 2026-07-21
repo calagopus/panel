@@ -1,4 +1,4 @@
-import { faDownload, faTrash, faUpload, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faRefresh, faTrash, faUpload, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -26,6 +26,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import DatabaseInstanceDatabaseExportModal from './modals/DatabaseInstanceDatabaseExportModal.tsx';
 import DatabaseInstanceDatabaseImportModal from './modals/DatabaseInstanceDatabaseImportModal.tsx';
+import DatabaseInstanceDatabaseRecreateModal from './modals/DatabaseInstanceDatabaseRecreateModal.tsx';
 
 export default function DatabaseInstanceDatabaseRow({
   instance,
@@ -43,9 +44,13 @@ export default function DatabaseInstanceDatabaseRow({
   const server = useServerStore((state) => state.server);
   const queryClient = useQueryClient();
 
-  const [openModal, setOpenModal] = useState<'export' | 'import' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'export' | 'import' | 'recreate' | 'delete' | null>(null);
 
-  const { data: size, loading: sizeLoading } = useResource({
+  const {
+    data: size,
+    loading: sizeLoading,
+    refetch: refetchSize,
+  } = useResource({
     queryKey: queryKeys.server(server.uuid).databases.instances.databaseSize(instance.uuid, database.uuid),
     queryFn: () => getDatabaseInstanceDatabaseSize(server.uuid, instance.uuid, database.uuid),
     enabled: !offline,
@@ -54,6 +59,7 @@ export default function DatabaseInstanceDatabaseRow({
 
   const canExport = useServerCan('database-instances.export');
   const canImport = useServerCan('database-instances.import');
+  const canRecreate = useServerCan('database-instances.recreate');
 
   const doDelete = async () => {
     await deleteDatabaseInstanceDatabase(server.uuid, instance.uuid, database.uuid)
@@ -82,6 +88,13 @@ export default function DatabaseInstanceDatabaseRow({
         database={database}
         opened={openModal === 'import'}
         onClose={() => setOpenModal(null)}
+      />
+      <DatabaseInstanceDatabaseRecreateModal
+        instance={instance}
+        database={database}
+        opened={openModal === 'recreate'}
+        onClose={() => setOpenModal(null)}
+        onRecreated={refetchSize}
       />
       <ConfirmationModal
         opened={openModal === 'delete'}
@@ -115,6 +128,15 @@ export default function DatabaseInstanceDatabaseRow({
           },
           {
             type: 'divider',
+          },
+          {
+            type: 'action',
+            icon: faRefresh,
+            label: t('common.button.recreate', {}),
+            disabled: offline,
+            onClick: () => setOpenModal('recreate'),
+            color: 'red',
+            canAccess: canRecreate,
           },
           {
             type: 'action',

@@ -4434,6 +4434,10 @@
                     "file": "Dump File",
                     "wipe": "Wipe existing data before importing"
                   }
+                },
+                "recreateDatabase": {
+                  "title": "Confirm Database Recreation",
+                  "content": "Recreating a database will permanently delete all data in the **{name}** database and create a new empty one with the same name and user access."
                 }
               },
               "table": {
@@ -4445,7 +4449,8 @@
                 "created": "Database created.",
                 "deleted": "Database deleted.",
                 "imported": "Database import completed.",
-                "passwordRotated": "Password has been rotated."
+                "passwordRotated": "Password has been rotated.",
+                "recreated": "Database recreated."
               }
             },
             "users": {

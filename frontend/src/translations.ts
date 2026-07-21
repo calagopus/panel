@@ -4455,6 +4455,11 @@ const baseTranslations = defineTranslations({
                     wipe: 'Wipe existing data before importing',
                   },
                 },
+                recreateDatabase: {
+                  title: 'Confirm Database Recreation',
+                  content:
+                    'Recreating a database will permanently delete all data in the **{name}** database and create a new empty one with the same name and user access.',
+                },
               },
               table: {
                 columns: {
@@ -4466,6 +4471,7 @@ const baseTranslations = defineTranslations({
                 deleted: 'Database deleted.',
                 imported: 'Database import completed.',
                 passwordRotated: 'Password has been rotated.',
+                recreated: 'Database recreated.',
               },
             },
             users: {
