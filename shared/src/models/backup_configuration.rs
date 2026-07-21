@@ -108,7 +108,7 @@ impl BackupConfigsS3 {
 #[derive(ToSchema, Serialize, Deserialize, Clone)]
 pub struct BackupConfigsResticPruneJob {
     #[schema(value_type = String, example = "0 0 0 * * *")]
-    pub cron: cron::Schedule,
+    pub cron: croner::Cron,
     pub nodes: Vec<uuid::Uuid>,
 }
 

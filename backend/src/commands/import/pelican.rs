@@ -1597,7 +1597,7 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 None => continue,
                             };
 
-                            let schedule = match cron::Schedule::from_str(&format!(
+                            let schedule = match croner::Cron::from_str(&format!(
                                 "0 {} {} {} {} {}",
                                 cron_minute, cron_hour, cron_day_of_month, cron_month, cron_day_of_week
                             )) {

@@ -106,7 +106,7 @@ impl BackgroundTaskBuilder {
     >(
         &self,
         name: &'static str,
-        cron: cron::Schedule,
+        cron: croner::Cron,
         r#fn: F,
     ) {
         if !self.state.env.app_primary {
@@ -123,7 +123,7 @@ impl BackgroundTaskBuilder {
                 last_execution: std::time::Instant::now(),
                 last_error: None,
                 task: tokio::spawn(async move {
-                    let schedule_iter = cron.upcoming(chrono::Utc);
+                    let schedule_iter = cron.iter_after(chrono::Utc::now());
 
                     for target_datetime in schedule_iter {
                         let target_timestamp = target_datetime.timestamp();

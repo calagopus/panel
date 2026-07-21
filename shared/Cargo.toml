@@ -24,8 +24,15 @@ tracing-appender = { workspace = true }
 clap = { workspace = true }
 include_dir = { workspace = true }
 tower-cookies = { workspace = true }
-cron = { workspace = true }
-lettre = { version = "0.11.17", default-features = false, features = ["tokio1-rustls-tls", "builder", "pool", "smtp-transport", "sendmail-transport", "file-transport"] }
+croner = { workspace = true }
+lettre = { version = "0.11.17", default-features = false, features = [
+	"tokio1-rustls-tls",
+	"builder",
+	"pool",
+	"smtp-transport",
+	"sendmail-transport",
+	"file-transport",
+] }
 zip = { version = "8.0.0", default-features = false, features = ["deflate"] }
 toml = "1.0.1"
 serde = { workspace = true }
@@ -64,7 +71,9 @@ ignore = "0.4.23"
 futures-util = { workspace = true }
 cap-std = "4.0.0"
 semver = { workspace = true }
-gix = { version = "0.85.0", features = ["blocking-http-transport-reqwest-rust-tls"] }
+gix = { version = "0.85.0", features = [
+	"blocking-http-transport-reqwest-rust-tls",
+] }
 tempfile = { workspace = true }
 compact_str = { workspace = true }
 nestify = { workspace = true }
@@ -81,6 +90,8 @@ hex = { workspace = true }
 tower = "0.5.3"
 parking_lot = { workspace = true }
 ipnetwork = { version = "0.21.1", features = ["serde"] }
-openssl = { version = "0.10.80", features = ["vendored"] } # temporary for webauthn-rs
+openssl = { version = "0.10.80", features = [
+	"vendored",
+] } # temporary for webauthn-rs
 tokio-tungstenite = { workspace = true }
 arc-swap = "1.9.1"

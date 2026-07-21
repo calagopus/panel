@@ -487,7 +487,7 @@ pub enum ScheduleTrigger {
     Cron {
         #[garde(skip)]
         #[schema(value_type = String, example = "* * * * * *")]
-        schedule: Box<cron::Schedule>,
+        schedule: Box<croner::Cron>,
     },
     PowerAction {
         #[garde(skip)]

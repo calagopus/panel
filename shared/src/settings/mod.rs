@@ -228,7 +228,7 @@ pub enum PublicCaptchaProvider<'a> {
 pub struct AppSettings {
     pub telemetry_uuid: Option<uuid::Uuid>,
     #[schema(value_type = Option<String>)]
-    pub telemetry_cron_schedule: Option<cron::Schedule>,
+    pub telemetry_cron_schedule: Option<croner::Cron>,
     pub oobe_step: Option<compact_str::CompactString>,
 
     pub storage_driver: StorageDriver,
@@ -556,7 +556,7 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
                 .and_then(|s| uuid::Uuid::from_str(&s).ok()),
             telemetry_cron_schedule: deserializer
                 .take_raw_setting("telemetry_cron_schedule")
-                .and_then(|s| cron::Schedule::from_str(&s).ok()),
+                .and_then(|s| croner::Cron::from_str(&s).ok()),
             oobe_step: match deserializer.take_raw_setting("oobe_step") {
                 Some(step) if step.is_empty() => None,
                 Some(step) => Some(step),

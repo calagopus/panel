@@ -14,7 +14,7 @@ pub async fn define_background_tasks(
 ) {
     background_task_builder
         .add_task("collect_telemetry", async |state| {
-            fn generate_randomized_cron_schedule() -> cron::Schedule {
+            fn generate_randomized_cron_schedule() -> croner::Cron {
                 let mut rng = rand::rng();
                 let seconds: u8 = rng.random_range(0..60);
                 let minutes: u8 = rng.random_range(0..60);
@@ -45,7 +45,7 @@ pub async fn define_background_tasks(
                 drop(settings);
             }
 
-            let schedule_iter = cron_schedule.upcoming(chrono::Utc);
+            let schedule_iter = cron_schedule.iter_after(chrono::Utc::now());
 
             for target_datetime in schedule_iter {
                 let target_timestamp = target_datetime.timestamp();
@@ -85,7 +85,7 @@ pub async fn define_background_tasks(
     background_task_builder
         .add_cron_task(
             "delete_expired_sessions",
-            cron::Schedule::from_str("0 */5 * * * *").unwrap(),
+            croner::Cron::from_str("0 */5 * * * *").unwrap(),
             async |state| {
                 let session_duration = state
                     .settings
@@ -105,7 +105,7 @@ pub async fn define_background_tasks(
     background_task_builder
         .add_cron_task(
             "delete_expired_api_keys",
-            cron::Schedule::from_str("0 */30 * * * *").unwrap(),
+            croner::Cron::from_str("0 */30 * * * *").unwrap(),
             async |state| {
                 let deleted_api_keys = UserApiKey::delete_expired(&state.database).await?;
                 if deleted_api_keys > 0 {
@@ -119,7 +119,7 @@ pub async fn define_background_tasks(
     background_task_builder
         .add_cron_task(
             "delete_unconfigured_security_keys",
-            cron::Schedule::from_str("0 */30 * * * *").unwrap(),
+            croner::Cron::from_str("0 */30 * * * *").unwrap(),
             async |state| {
                 let deleted_security_keys =
                     UserSecurityKey::delete_unconfigured(&state.database).await?;
@@ -137,7 +137,7 @@ pub async fn define_background_tasks(
     background_task_builder
         .add_cron_task(
             "cleanup_uuid_arrays",
-            cron::Schedule::from_str("0 * * * * *").unwrap(),
+            croner::Cron::from_str("0 * * * * *").unwrap(),
             async |state| {
                 let cleaned_announcements =
                     Announcement::cleanup_uuid_arrays(&state.database).await?;
@@ -251,7 +251,7 @@ pub async fn define_background_tasks(
                         for prune_job in &restic.prune_jobs {
                             let due = prune_job
                                 .cron
-                                .after(&last_check)
+                                .iter_after(last_check)
                                 .next()
                                 .is_some_and(|next| next <= now);
                             if due {
@@ -330,7 +330,7 @@ pub async fn define_background_tasks(
         })
         .await;
     background_task_builder
-        .add_cron_task("delete_old_activity", cron::Schedule::from_str("0 */30 * * * *").unwrap(), async |state| {
+        .add_cron_task("delete_old_activity", croner::Cron::from_str("0 */30 * * * *").unwrap(), async |state| {
             let settings = state.settings.get().await?;
             let admin_retention_days = settings.activity.admin_log_retention_days;
             let admin_retention_count = settings.activity.admin_log_retention_count;
@@ -421,7 +421,7 @@ pub async fn define_background_tasks(
     background_task_builder
         .add_cron_task(
             "redispatch_stale_backup_deletions",
-            cron::Schedule::from_str("0 * * * * *").unwrap(),
+            croner::Cron::from_str("0 * * * * *").unwrap(),
             async |state| {
                 let redispatched =
                     shared::models::server_backup::ServerBackup::redispatch_stale_deletions(&state)
@@ -440,7 +440,7 @@ pub async fn define_background_tasks(
     background_task_builder
         .add_cron_task(
             "prune_backup_groups",
-            cron::Schedule::from_str("0 0 * * * *").unwrap(),
+            croner::Cron::from_str("0 0 * * * *").unwrap(),
             async |state| {
                 let pruned =
                     shared::models::server_backup::ServerBackup::prune_expired_group_backups(

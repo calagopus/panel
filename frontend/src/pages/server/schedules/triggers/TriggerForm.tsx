@@ -26,6 +26,7 @@ import { useServerStore } from '@/stores/server.ts';
 import ScheduleDynamicParameterInput from '../ScheduleDynamicParameterInput.tsx';
 
 const CRON_SEGMENTS = ['Second', 'Minute', 'Hour', 'Day', 'Month', 'Weekday'] as const;
+const CRON_WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
 
 type SimpleSchedule =
   | { frequency: 'everyMinutes'; interval: number }
@@ -69,7 +70,8 @@ function parseSimpleSchedule(schedule: string): SimpleSchedule | null {
   if (parsedHour === null || parsedMinute === null) return null;
 
   if (dayOfMonth === '*') {
-    const parsedWeekday = asNumber(weekday);
+    const namedWeekday = CRON_WEEKDAYS.indexOf(weekday.toUpperCase() as (typeof CRON_WEEKDAYS)[number]);
+    const parsedWeekday = namedWeekday !== -1 ? namedWeekday : asNumber(weekday);
     if (parsedWeekday !== null && parsedWeekday <= 6) {
       return { frequency: 'weekly', weekday: parsedWeekday, hour: parsedHour, minute: parsedMinute };
     }
@@ -92,7 +94,7 @@ function simpleScheduleToCron(schedule: SimpleSchedule): string {
     case 'daily':
       return `0 ${schedule.minute} ${schedule.hour} * * *`;
     case 'weekly':
-      return `0 ${schedule.minute} ${schedule.hour} * * ${schedule.weekday}`;
+      return `0 ${schedule.minute} ${schedule.hour} * * ${CRON_WEEKDAYS[schedule.weekday]}`;
     case 'monthly':
       return `0 ${schedule.minute} ${schedule.hour} ${schedule.day} * *`;
   }

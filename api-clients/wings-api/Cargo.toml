@@ -14,7 +14,7 @@ uuid = { workspace = true }
 indexmap = { workspace = true }
 urlencoding = { workspace = true }
 anyhow = { workspace = true }
-cron = { workspace = true }
+croner = { workspace = true }
 regex = { workspace = true }
 serde_regex = { workspace = true }
 compact_str = { workspace = true }
