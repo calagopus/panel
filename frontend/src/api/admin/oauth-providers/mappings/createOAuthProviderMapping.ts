@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminOAuthProviderMappingCreateSchema,
   adminOAuthProviderMappingSchema,
@@ -14,5 +14,5 @@ export default async (
     `/api/admin/oauth-providers/${oauthProviderUuid}/mappings`,
     serializeForApi(adminOAuthProviderMappingCreateSchema, data),
   );
-  return response.oauthMapping;
+  return parseFromApi(adminOAuthProviderMappingSchema, response.oauth_mapping);
 };

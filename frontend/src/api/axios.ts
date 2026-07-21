@@ -14,7 +14,6 @@ export const axiosInstance: AxiosInstance = axios.create({
   },
 });
 
-// Auto transform all data to camel case keys
 axiosInstance.interceptors.response.use(
   (response) => {
     captureServerName(response.headers);

@@ -78,7 +78,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
       );
       const { data } = await axiosInstance.post(url, form, config);
 
-      return { url, continuationToken: data.continuationToken ?? null };
+      return { url, continuationToken: data.continuation_token ?? null };
     },
     [store],
   );
@@ -95,7 +95,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         params: { ...config.params, continuation_token: continuationToken },
       });
 
-      return { url: prevUrl, continuationToken: data.continuationToken ?? null };
+      return { url: prevUrl, continuationToken: data.continuation_token ?? null };
     },
     [],
   );
