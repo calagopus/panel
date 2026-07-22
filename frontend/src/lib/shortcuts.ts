@@ -101,8 +101,6 @@ function eventKey(event: KeyboardEvent): string {
   return event.key;
 }
 
-// Map a physical `event.code` to its Latin character. `event.code` describes the
-// key's position on the keyboard and is independent of the active layout.
 function codeToKey(code: string): string | null {
   if (/^Key[A-Z]$/.test(code)) return code.charAt(3).toLowerCase();
   if (/^Digit[0-9]$/.test(code)) return code.charAt(5);

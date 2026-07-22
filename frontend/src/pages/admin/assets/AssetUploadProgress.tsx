@@ -5,7 +5,7 @@ import RingProgress from '@/elements/RingProgress.tsx';
 import Text from '@/elements/Text.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import UnstyledButton from '@/elements/UnstyledButton.tsx';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesProgressString } from '@/lib/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { UploadItem } from '@/stores/uploads.ts';
 
@@ -62,7 +62,7 @@ export default function AssetUploadProgress({
                     ? t('elements.fileUpload.waiting', { file: file.filePath })
                     : t('elements.fileUpload.uploading', { file: file.filePath })}
               </p>
-              <Tooltip label={`${bytesToString(file.uploaded)} / ${bytesToString(file.size)}`} innerClassName='w-full'>
+              <Tooltip label={bytesProgressString(file.uploaded, file.size)} innerClassName='w-full'>
                 <Progress value={file.progress} color={file.status === 'error' ? 'red' : undefined} />
               </Tooltip>
             </div>

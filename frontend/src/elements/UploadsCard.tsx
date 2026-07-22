@@ -7,11 +7,12 @@ import { useLocation, useNavigate } from 'react-router';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Card from '@/elements/Card.tsx';
 import CloseButton from '@/elements/CloseButton.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Progress from '@/elements/Progress.tsx';
 import RingProgress from '@/elements/RingProgress.tsx';
 import Text from '@/elements/Text.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesProgressString } from '@/lib/size.ts';
 import {
   cancelAllUploads,
   cancelFileUpload,
@@ -59,6 +60,7 @@ export default function UploadsCard() {
   const uploads = useUploadsStore((state) => state.uploads);
 
   const [collapsed, setCollapsed] = useState(false);
+  const [cancelAllScope, setCancelAllScope] = useState<string | null>(null);
 
   const locationRef = useRef(location);
   locationRef.current = location;
@@ -200,7 +202,7 @@ export default function UploadsCard() {
                   : t('elements.fileUpload.adminAssets', {})}
               </Text>
               <Tooltip label={t('elements.fileUpload.cancelAllUploads', {})}>
-                <CloseButton size='sm' onClick={() => cancelAllUploads(scope)} />
+                <CloseButton size='sm' onClick={() => setCancelAllScope(scope)} />
               </Tooltip>
             </div>
 
@@ -222,11 +224,9 @@ export default function UploadsCard() {
                             files: tItem('file', info.fileCount),
                           })}
                     </p>
-                    <Tooltip
-                      label={`${bytesToString(info.uploadedSize)} / ${bytesToString(info.totalSize)}`}
-                      innerClassName='w-full'
-                    >
+                    <Tooltip label={bytesProgressString(info.uploadedSize, info.totalSize)} innerClassName='w-full'>
                       <Progress
+                        indeterminate={info.totalSize === 0}
                         value={progress}
                         color={info.erroredCount > 0 ? 'red' : isRateLimited ? 'orange' : undefined}
                       />
@@ -252,10 +252,7 @@ export default function UploadsCard() {
                           ? t('elements.fileUpload.waiting', { file: file.filePath })
                           : t('elements.fileUpload.uploading', { file: file.filePath })}
                     </p>
-                    <Tooltip
-                      label={`${bytesToString(file.uploaded)} / ${bytesToString(file.size)}`}
-                      innerClassName='w-full'
-                    >
+                    <Tooltip label={bytesProgressString(file.uploaded, file.size)} innerClassName='w-full'>
                       <Progress
                         value={file.progress}
                         color={file.status === 'error' ? 'red' : isRateLimited ? 'orange' : undefined}
@@ -268,6 +265,20 @@ export default function UploadsCard() {
             })}
           </div>
         ))}
+
+      <ConfirmationModal
+        title={t('elements.fileUpload.modal.cancelAllUploads.title', {})}
+        opened={cancelAllScope !== null}
+        onClose={() => setCancelAllScope(null)}
+        onConfirmed={() => {
+          if (cancelAllScope !== null) cancelAllUploads(cancelAllScope);
+          setCancelAllScope(null);
+        }}
+        confirm={t('elements.fileUpload.cancelAllUploads', {})}
+        zIndex={1000}
+      >
+        {t('elements.fileUpload.modal.cancelAllUploads.content', {})}
+      </ConfirmationModal>
     </Card>
   );
 }

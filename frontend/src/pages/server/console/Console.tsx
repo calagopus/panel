@@ -636,7 +636,8 @@ export default function Terminal() {
                   : t('pages.server.console.message.extracting', {})}{' '}
                 <Progress
                   hourglass={false}
-                  value={progress.bytes_total === 0 ? 100 : (progress.bytes_processed / progress.bytes_total) * 100}
+                  indeterminate={progress.bytes_total === 0}
+                  value={(progress.bytes_processed / progress.bytes_total) * 100}
                   className='flex-1 ml-2'
                 />
               </span>

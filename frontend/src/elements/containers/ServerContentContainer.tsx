@@ -9,7 +9,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelServerInstall from '@/api/server/settings/cancelServerInstall.ts';
 import DismissibleAnnouncementAlert from '@/elements/DismissibleAnnouncementAlert.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesProgressString } from '@/lib/size.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -153,11 +153,12 @@ function ServerContentContainer(props: Props) {
                 </span>
 
                 <Tooltip
-                  label={`${bytesToString(transferProgressArchive)} / ${bytesToString(transferProgressTotal)} · ${tItem('file', transferProgressFiles)}`}
+                  label={`${bytesProgressString(transferProgressArchive, transferProgressTotal)} · ${tItem('file', transferProgressFiles)}`}
                   innerClassName='w-full'
                 >
                   <Progress
-                    value={transferProgressArchive > 0 ? (transferProgressArchive / transferProgressTotal) * 100 : 0}
+                    indeterminate={!transferProgressTotal}
+                    value={(transferProgressArchive / transferProgressTotal) * 100}
                   />
                 </Tooltip>
               </div>
@@ -193,10 +194,13 @@ function ServerContentContainer(props: Props) {
             </span>
 
             <Tooltip
-              label={`${bytesToString(backupRestoreProgress)} / ${bytesToString(backupRestoreTotal)} · ${tItem('file', backupRestoreFiles)}`}
+              label={`${bytesProgressString(backupRestoreProgress, backupRestoreTotal)} · ${tItem('file', backupRestoreFiles)}`}
               innerClassName='w-full'
             >
-              <Progress value={backupRestoreTotal > 0 ? (backupRestoreProgress / backupRestoreTotal) * 100 : 0} />
+              <Progress
+                indeterminate={!backupRestoreTotal}
+                value={(backupRestoreProgress / backupRestoreTotal) * 100}
+              />
             </Tooltip>
           </Notification>
         </div>

@@ -18,9 +18,6 @@ export interface BackupsSlice {
   removeBackup: (uuid: string) => void;
   updateBackup: (uuid: string, updatedProps: Partial<z.infer<typeof serverBackupSchema>>) => void;
 
-  // Live in-progress backups keyed by uuid, kept separate from the lists so it can
-  // drive both ungrouped (store) and grouped (component-local) rows uniformly. Entries
-  // are removed on completion to keep the map bounded to running backups.
   backupProgress: Map<string, BackupProgress>;
   setBackupProgress: (uuid: string, progress: BackupProgress) => void;
   clearBackupProgress: (uuid: string) => void;

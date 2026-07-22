@@ -265,8 +265,6 @@ function settleBatches(): void {
     };
     entry.keys.push(key);
 
-    // Only a server-acknowledged status counts as done: settling on bytes-sent hid
-    // rejections (e.g. upload limit) that arrive after the request body is buffered.
     if (file.status === 'error') {
       entry.hadError = true;
       entry.errorKeys.add(key);
@@ -280,8 +278,6 @@ function settleBatches(): void {
   const completedBatches: BatchInfo[] = [];
   batches.forEach((batch, batchId) => {
     if (!batch.allDone) return;
-    // Errored entries stay visible until the user dismisses them; only settle such a
-    // batch once so the refresh/toast side effects don't repeat on later flushes.
     if (batch.hadError && settledErrorBatches.has(batchId)) return;
 
     keysToRemove.push(...batch.keys.filter((key) => !batch.errorKeys.has(key)));
@@ -581,8 +577,6 @@ async function uploadSplitFile(
   }
 }
 
-// Retained error rows for the same folder/file would merge with a retry's fresh entries
-// (folder rows aggregate by name), so a re-upload starts from a clean slate instead.
 function clearFailedEntries(scope: string, folderNames: Set<string>, fileNames: Set<string>): void {
   const keysToRemove: string[] = [];
   const removedPerFolder = new Map<string, number>();

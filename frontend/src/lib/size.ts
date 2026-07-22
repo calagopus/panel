@@ -58,6 +58,14 @@ export function bytesToString(bytes: number, decimals = 2, shortBytes = false): 
 }
 
 /**
+ * Formats "processed / total" progress. When the total is unknown (0), only the
+ * processed amount is shown.
+ */
+export function bytesProgressString(processed: number, total: number): string {
+  return total > 0 ? `${bytesToString(processed)} / ${bytesToString(total)}` : bytesToString(processed);
+}
+
+/**
  * Picks the unit that yields the "nicest" human-facing number for the given
  * amount of bytes. Unlike closestUnit, this prefers a clean value in a smaller
  * unit over a messy value in a larger unit.

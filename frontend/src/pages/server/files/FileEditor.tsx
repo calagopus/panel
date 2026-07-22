@@ -164,15 +164,10 @@ function FileEditorComponent() {
     onActivated: (dirty) => {
       collabActiveRef.current = true;
       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
-      // Only drop a pending local draft when the session already carries
-      // unsaved changes; a clean session means the draft may be the sole copy
-      // of edits lost to a torn-down session, so keep offering to restore it.
+
       if (dirty) {
         setPendingDraft(null);
       } else {
-        // A clean session's synced doc is the on-disk state — reset the draft
-        // baseline so the binding-induced model rebuild doesn't write drafts
-        // of content the user never typed.
         savedContentRef.current = editorRef.current?.getValue() ?? savedContentRef.current;
         originalHashRef.current = hashContent(savedContentRef.current);
       }
@@ -193,8 +188,6 @@ function FileEditorComponent() {
       }
     },
     onConflict: (conflict) => {
-      // A conflict while a save is in flight means the save was rejected; the
-      // banner takes over from the save spinner.
       if (conflict && collabSavingRef.current) {
         if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
         collabSavingRef.current = false;
@@ -344,9 +337,7 @@ function FileEditorComponent() {
     } else {
       observer.observe(document.body);
     }
-    // The editor container is absolutely positioned, so anything appearing or
-    // disappearing above it (e.g. the collab conflict banner) shifts its top
-    // without resizing body/window — watch the in-flow wrapper for that.
+
     if (contentWrapRef.current) {
       observer.observe(contentWrapRef.current);
     }
@@ -831,13 +822,8 @@ function FileEditorComponent() {
                       contentRef.current = value;
 
                       const changed = value !== savedContentRef.current;
-                      // In collab mode the server's dirty flag is authoritative;
-                      // any model change means the shared session is dirty.
                       setDirty(collabActiveRef.current ? true : changed);
 
-                      // Local drafts are kept even in collab mode: the server
-                      // discards unsaved sessions after the grace period, so the
-                      // draft is the only crash/teardown recovery.
                       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
                       if (changed && draftPathRef.current) {
                         const path = draftPathRef.current;

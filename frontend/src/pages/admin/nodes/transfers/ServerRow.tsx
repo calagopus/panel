@@ -8,7 +8,7 @@ import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { adminNodeTransferProgressSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesProgressString, bytesToString } from '@/lib/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ServerRowProps {
@@ -44,10 +44,11 @@ const ServerRow = memo(
 
         <TableData>
           <Tooltip
-            label={`${bytesToString(transferProgress?.archiveBytesProcessed || 0)} / ${bytesToString(transferProgress?.bytesTotal || 0)} · ${tItem('file', transferProgress?.filesProcessed || 0)}`}
+            label={`${bytesProgressString(transferProgress?.archiveBytesProcessed || 0, transferProgress?.bytesTotal || 0)} · ${tItem('file', transferProgress?.filesProcessed || 0)}`}
             innerClassName='w-full'
           >
             <Progress
+              indeterminate={!transferProgress?.bytesTotal}
               value={((transferProgress?.archiveBytesProcessed || 0) / (transferProgress?.bytesTotal || 1)) * 100}
             />
           </Tooltip>

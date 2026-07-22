@@ -572,6 +572,12 @@ const baseTranslations = defineTranslations({
         failedFolder: 'Upload failed: {folder} ({files})',
         rateLimited: 'Your upload has been rate limited. Waiting...',
         cancelAllUploads: 'Cancel all uploads',
+        modal: {
+          cancelAllUploads: {
+            title: 'Cancel All Uploads',
+            content: 'Are you sure you want to cancel all active uploads? Partially uploaded files will be discarded.',
+          },
+        },
         toast: {
           uploading: 'Started uploading {files}...',
           failed: 'Upload failed: {error}',
@@ -4211,6 +4217,10 @@ const baseTranslations = defineTranslations({
             },
           },
           modal: {
+            cancelAllOperations: {
+              title: 'Cancel All Operations',
+              content: 'Are you sure you want to cancel all running file operations? Their progress will be lost.',
+            },
             unsavedChanges: {
               title: 'Unsaved Changes',
               content:

@@ -18,6 +18,17 @@
 
   --color-neutral-850: oklch(25.4% 0 0);
 
+  --animate-progress-indeterminate: progress-indeterminate 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+
+  @keyframes progress-indeterminate {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(250%);
+    }
+  }
+
   /* Server status colors - for status indicators (circles, cards, etc.) */
   --color-server-status-running: #22c55e;
   --color-server-status-offline: #ef4444;

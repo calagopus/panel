@@ -657,6 +657,12 @@
         "failedFolder": "Upload fehlgeschlagen: {folder} ({files})",
         "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
         "cancelAllUploads": "Alle Uploads abbrechen",
+        "modal": {
+          "cancelAllUploads": {
+            "title": "Alle Uploads abbrechen",
+            "content": "Bist du sicher, dass du alle aktiven Uploads abbrechen möchtest? Teilweise hochgeladene Dateien werden verworfen."
+          }
+        },
         "toast": {
           "uploading": "Hochladen von {files} gestartet...",
           "failed": "Upload fehlgeschlagen: {error}",
@@ -4191,6 +4197,10 @@
             }
           },
           "modal": {
+            "cancelAllOperations": {
+              "title": "Alle Vorgänge abbrechen",
+              "content": "Bist du sicher, dass du alle laufenden Dateivorgänge abbrechen möchtest? Ihr Fortschritt geht verloren."
+            },
             "unsavedChanges": {
               "title": "Ungespeicherte Änderungen",
               "content": "Du hast ungespeicherte Änderungen im Editor. Bist du sicher, dass du diese Seite verlassen möchtest? Wenn du die Seite verlässt, gehen deine Änderungen verloren."

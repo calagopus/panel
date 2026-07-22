@@ -32,7 +32,7 @@ import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesProgressString, bytesToString } from '@/lib/size.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { SocketEvent } from '@/plugins/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -267,10 +267,13 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
                 ) : (
                   <TableData colSpan={2}>
                     <Tooltip
-                      label={`${bytesToString(progress?.progress || 0)} / ${bytesToString(progress?.total || 0)} · ${tItem('file', progress?.files || 0)}`}
+                      label={`${bytesProgressString(progress?.progress || 0, progress?.total || 0)} · ${tItem('file', progress?.files || 0)}`}
                       innerClassName='w-full'
                     >
-                      <Progress value={((progress?.progress || 0) / (progress?.total || 1)) * 100} />
+                      <Progress
+                        indeterminate={!progress?.total}
+                        value={((progress?.progress || 0) / (progress?.total || 1)) * 100}
+                      />
                     </Tooltip>
                   </TableData>
                 )}

@@ -1,16 +1,17 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelOperation from '@/api/server/files/cancelOperation.ts';
 import Button from '@/elements/Button.tsx';
 import CloseButton from '@/elements/CloseButton.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Popover from '@/elements/Popover.tsx';
 import Progress from '@/elements/Progress.tsx';
 import RingProgress from '@/elements/RingProgress.tsx';
 import Text from '@/elements/Text.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import UnstyledButton from '@/elements/UnstyledButton.tsx';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesProgressString } from '@/lib/size.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -26,16 +27,25 @@ function FileOperationsProgress() {
       removeFileOperation: state.removeFileOperation,
     })),
   );
-  const { uploadingFiles, cancelFileUpload, cancelFolderUpload, cancelAllUploads, aggregatedUploadProgress } =
-    useFileManager(
-      useShallow((state) => ({
-        uploadingFiles: state.fileUploader.uploadingFiles,
-        cancelFileUpload: state.fileUploader.cancelFileUpload,
-        cancelFolderUpload: state.fileUploader.cancelFolderUpload,
-        cancelAllUploads: state.fileUploader.cancelAllUploads,
-        aggregatedUploadProgress: state.fileUploader.aggregatedUploadProgress,
-      })),
-    );
+  const {
+    uploadingFiles,
+    cancelFileUpload,
+    cancelFolderUpload,
+    cancelAllUploads,
+    aggregatedUploadProgress,
+    invalidateFilemanager,
+  } = useFileManager(
+    useShallow((state) => ({
+      uploadingFiles: state.fileUploader.uploadingFiles,
+      cancelFileUpload: state.fileUploader.cancelFileUpload,
+      cancelFolderUpload: state.fileUploader.cancelFolderUpload,
+      cancelAllUploads: state.fileUploader.cancelAllUploads,
+      aggregatedUploadProgress: state.fileUploader.aggregatedUploadProgress,
+      invalidateFilemanager: state.invalidateFilemanager,
+    })),
+  );
+
+  const [openModal, setOpenModal] = useState<'cancelUploads' | 'cancelOperations' | null>(null);
 
   const isRateLimited = useMemo(() => {
     for (const file of uploadingFiles.values()) {
@@ -52,18 +62,21 @@ function FileOperationsProgress() {
   }, [uploadingFiles]);
 
   const cancelAllOperations = useCallback(() => {
+    const cancellations: Promise<unknown>[] = [];
     fileOperations.forEach((_, uuid) => {
       removeFileOperation(uuid);
-      cancelOperation(server.uuid, uuid).catch(console.error);
+      cancellations.push(cancelOperation(server.uuid, uuid).catch(console.error));
     });
+    Promise.allSettled(cancellations).then(() => invalidateFilemanager());
     addToast(t('pages.server.files.toast.allOperationsCancelled', {}), 'success');
-  }, [fileOperations, server.uuid, removeFileOperation, addToast, t]);
+  }, [fileOperations, server.uuid, removeFileOperation, invalidateFilemanager, addToast, t]);
 
   const doCancelOperation = (uuid: string) => {
     removeFileOperation(uuid);
 
     cancelOperation(server.uuid, uuid)
       .then(() => {
+        invalidateFilemanager();
         addToast(t('pages.server.files.toast.operationCancelled', {}), 'success');
       })
       .catch((msg) => {
@@ -137,14 +150,42 @@ function FileOperationsProgress() {
           </Text>
         )}
 
+        <ConfirmationModal
+          title={t('elements.fileUpload.modal.cancelAllUploads.title', {})}
+          opened={openModal === 'cancelUploads'}
+          onClose={() => setOpenModal(null)}
+          onConfirmed={() => {
+            setOpenModal(null);
+            cancelAllUploads();
+          }}
+          confirm={t('elements.fileUpload.cancelAllUploads', {})}
+          zIndex={1000}
+        >
+          {t('elements.fileUpload.modal.cancelAllUploads.content', {})}
+        </ConfirmationModal>
+
+        <ConfirmationModal
+          title={t('pages.server.files.modal.cancelAllOperations.title', {})}
+          opened={openModal === 'cancelOperations'}
+          onClose={() => setOpenModal(null)}
+          onConfirmed={() => {
+            setOpenModal(null);
+            cancelAllOperations();
+          }}
+          confirm={t('pages.server.files.operations.cancelAllOperations', {})}
+          zIndex={1000}
+        >
+          {t('pages.server.files.modal.cancelAllOperations.content', {})}
+        </ConfirmationModal>
+
         <div className='flex gap-2 mb-3'>
           {uploadingFiles.size > 0 && (
-            <Button size='xs' variant='subtle' color='red' onClick={cancelAllUploads}>
+            <Button size='xs' variant='subtle' color='red' onClick={() => setOpenModal('cancelUploads')}>
               {t('elements.fileUpload.cancelAllUploads', {})}
             </Button>
           )}
           {fileOperations.size > 0 && (
-            <Button size='xs' variant='subtle' color='red' onClick={cancelAllOperations}>
+            <Button size='xs' variant='subtle' color='red' onClick={() => setOpenModal('cancelOperations')}>
               {t('pages.server.files.operations.cancelAllOperations', {})}
             </Button>
           )}
@@ -167,11 +208,9 @@ function FileOperationsProgress() {
             <div key={folderName} className='flex flex-row items-center mb-3'>
               <div className='flex flex-col grow'>
                 <p className='break-all mb-1'>{statusText}</p>
-                <Tooltip
-                  label={`${bytesToString(info.uploadedSize)} / ${bytesToString(info.totalSize)}`}
-                  innerClassName='w-full'
-                >
+                <Tooltip label={bytesProgressString(info.uploadedSize, info.totalSize)} innerClassName='w-full'>
                   <Progress
+                    indeterminate={info.totalSize === 0}
                     value={progress}
                     color={info.erroredCount > 0 ? 'red' : isRateLimited ? 'orange' : undefined}
                   />
@@ -197,10 +236,7 @@ function FileOperationsProgress() {
                       ? t('elements.fileUpload.waiting', { file: file.filePath })
                       : t('elements.fileUpload.uploading', { file: file.filePath })}
                 </p>
-                <Tooltip
-                  label={`${bytesToString(file.uploaded)} / ${bytesToString(file.size)}`}
-                  innerClassName='w-full'
-                >
+                <Tooltip label={bytesProgressString(file.uploaded, file.size)} innerClassName='w-full'>
                   <Progress
                     value={file.progress}
                     color={file.status === 'error' ? 'red' : isRateLimited ? 'orange' : undefined}
@@ -252,7 +288,7 @@ function FileOperationsProgress() {
                                 : null}
                 </p>
                 <Tooltip
-                  label={`${bytesToString(operation.bytesProcessed)} / ${bytesToString(operation.bytesTotal)}${
+                  label={`${bytesProgressString(operation.bytesProcessed, operation.bytesTotal)}${
                     operation.type === 'compress' ||
                     operation.type === 'copy' ||
                     operation.type === 'copy_remote' ||
@@ -262,7 +298,7 @@ function FileOperationsProgress() {
                   }`}
                   innerClassName='w-full'
                 >
-                  <Progress value={progress} />
+                  <Progress indeterminate={!operation.bytesTotal} value={progress} />
                 </Tooltip>
               </div>
               <CloseButton className='ml-3' onClick={() => doCancelOperation(uuid)} />

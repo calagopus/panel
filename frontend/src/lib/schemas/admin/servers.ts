@@ -22,8 +22,6 @@ export const adminServerLimitsSchema = z.object({
   ioWeight: z.preprocess(nullableNumber, z.number().min(0).max(1000).nullable()),
 });
 
-// Loose: extensions flatten their own limits into this object (ApiServerFeatureLimits is
-// extendible server-side), so unknown keys here are extension-provided limits, not junk
 export const adminServerFeatureLimitsSchema = z.looseObject({
   allocations: z.number().min(0),
   databases: z.number().min(0),
@@ -138,7 +136,6 @@ const adminServerDatabaseBaseShape = {
   created: z.coerce.date(),
 };
 
-// Fields common to both variants — enough for the shared delete modal.
 export const adminServerDatabaseBaseSchema = z.looseObject(adminServerDatabaseBaseShape);
 
 export const adminServerDatabaseSchema = z.looseObject({
@@ -146,8 +143,6 @@ export const adminServerDatabaseSchema = z.looseObject({
   server: z.lazy(() => adminServerSchema),
 });
 
-// Server-scoped admin listing: the server is already known from the page, and the host is
-// what the row needs to reach the database-hosts delete route.
 export const adminServerServerDatabaseSchema = z.looseObject({
   ...adminServerDatabaseBaseShape,
   databaseHost: z.lazy(() => adminDatabaseHostSchema),
@@ -185,14 +180,11 @@ export const adminServerDatabaseAgentSchema = z.looseObject({
   server: z.lazy(() => adminServerSchema),
 });
 
-// Server-scoped admin listing: carries the agent host instead of the redundant server, so the
-// row can delegate edits to the database-agent-hosts routes.
 export const adminServerServerDatabaseAgentSchema = z.looseObject({
   ...adminServerDatabaseAgentBaseShape,
   databaseAgentHost: z.lazy(() => adminDatabaseAgentHostSchema),
 });
 
-// Fields common to both variants — enough for the shared edit modal.
 export const adminDatabaseAgentBaseSchema = z.looseObject(adminServerDatabaseAgentBaseShape);
 
 export const adminServerMountSchema = z.looseObject({

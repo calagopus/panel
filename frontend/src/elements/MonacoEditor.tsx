@@ -14,8 +14,6 @@ loader.config({
 
 const SEPARATOR_ID = 'vs.actions.separator';
 
-// deferred so the menu click finishes before widgets (command palette, quick
-// pick) open, otherwise the click blurs them and they close immediately
 function runAction(editor: ICodeEditor, action: MonacoMenuAction) {
   setTimeout(() => {
     editor.focus();
@@ -31,17 +29,6 @@ interface MonacoMenuAction {
   actions?: MonacoMenuAction[];
 }
 
-const fallbackActionIds = [
-  'editor.action.clipboardCutAction',
-  'editor.action.clipboardCopyAction',
-  'editor.action.clipboardPasteAction',
-  'editor.action.changeAll',
-  'editor.action.formatDocument',
-  'editor.action.quickCommand',
-];
-
-// enumerates what monaco's built-in context menu would show, honoring readOnly
-// and language-specific when-clauses; relies on stable-but-internal monaco APIs
 function getMenuActions(editor: ICodeEditor): MonacoMenuAction[] {
   const model = editor.getModel();
   if (!model) return [];
@@ -51,18 +38,7 @@ function getMenuActions(editor: ICodeEditor): MonacoMenuAction[] {
   } | null;
   const menuId = (editor as unknown as { contextMenuId?: unknown }).contextMenuId;
 
-  if (controller?._getMenuActions && menuId) {
-    try {
-      return controller._getMenuActions(model, menuId) ?? [];
-    } catch {
-      // internals changed, use the public actions api below
-    }
-  }
-
-  return fallbackActionIds
-    .map((id) => editor.getAction(id))
-    .filter((action) => !!action && action.isSupported())
-    .map((action) => ({ id: action!.id, label: action!.label, run: () => action!.run() }));
+  return controller?._getMenuActions?.(model, menuId) ?? [];
 }
 
 function actionToItem(editor: ICodeEditor, action: MonacoMenuAction): ContextMenuItem {
