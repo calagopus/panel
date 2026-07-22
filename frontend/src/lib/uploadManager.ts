@@ -505,6 +505,9 @@ async function uploadSplitFile(
       if (!isLastSlice) {
         params.wants_continue = '0';
       }
+      if (offset === 0) {
+        params.total_size = String(totalSize);
+      }
 
       const config: AxiosRequestConfig = {
         signal: controller.signal,
