@@ -58,7 +58,7 @@ export default function NodeBackupRow({
     downloadNodeBackup(node.uuid, backup.uuid, archiveFormat)
       .then(({ url }) => {
         addToast(t('pages.admin.nodes.tabs.backups.page.toast.downloadStarted', {}), 'success');
-        window.open(url, '_blank');
+        window.location.href = url;
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
