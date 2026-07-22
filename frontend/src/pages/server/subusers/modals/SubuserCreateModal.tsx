@@ -89,9 +89,11 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
           onChange={(value) => form.setFieldValue('ignoredFiles', value)}
         />
 
-        <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
-
         <ModalFooter>
+          <div className='mr-auto w-full sm:w-auto'>
+            <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
+          </div>
+
           <Button type='submit' loading={loading} disabled={!form.isValid() || !isCaptchaValid}>
             {t('common.button.create', {})}
           </Button>
