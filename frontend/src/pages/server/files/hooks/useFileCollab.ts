@@ -18,11 +18,17 @@ export interface CollabSavedPayload {
   revisionId: number | null;
 }
 
+export interface CollabConflict {
+  hash: string | null;
+  deleted: boolean;
+}
+
 interface UseFileCollabOptions {
   enabled: boolean;
   filePath: string;
   onActivated: (dirty: boolean) => void;
   onSaved: (payload: CollabSavedPayload) => void;
+  onConflict: (conflict: CollabConflict | null) => void;
   onError: (message: string) => void;
 }
 
@@ -77,13 +83,21 @@ function updateCursorStyles(styleEl: HTMLStyleElement, awareness: Awareness): vo
   styleEl.textContent = rules.join('\n');
 }
 
-export default function useFileCollab({ enabled, filePath, onActivated, onSaved, onError }: UseFileCollabOptions) {
+export default function useFileCollab({
+  enabled,
+  filePath,
+  onActivated,
+  onSaved,
+  onConflict,
+  onError,
+}: UseFileCollabOptions) {
   const { user } = useAuth();
   const socketInstance = useServerStore((state) => state.socketInstance);
   const socketConnected = useServerStore((state) => state.socketConnected);
 
   const [active, setActive] = useState(false);
   const [participants, setParticipants] = useState<CollabParticipant[]>([]);
+  const [conflict, setConflict] = useState<CollabConflict | null>(null);
 
   const [editor, setEditor] = useState<Parameters<OnMount>[0] | null>(null);
 
@@ -93,9 +107,9 @@ export default function useFileCollab({ enabled, filePath, onActivated, onSaved,
   const styleRef = useRef<HTMLStyleElement | null>(null);
   const subscribedRef = useRef(false);
 
-  const callbacksRef = useRef({ onActivated, onSaved, onError });
+  const callbacksRef = useRef({ onActivated, onSaved, onConflict, onError });
   useEffect(() => {
-    callbacksRef.current = { onActivated, onSaved, onError };
+    callbacksRef.current = { onActivated, onSaved, onConflict, onError };
   });
 
   const destroySession = useCallback(() => {
@@ -111,6 +125,7 @@ export default function useFileCollab({ enabled, filePath, onActivated, onSaved,
     }
     setActive(false);
     setParticipants([]);
+    setConflict(null);
   }, []);
 
   useEffect(() => {
@@ -176,11 +191,15 @@ export default function useFileCollab({ enabled, filePath, onActivated, onSaved,
       setActive(true);
 
       let dirty = false;
+      let syncConflict: CollabConflict | null = null;
       try {
-        dirty = Boolean(JSON.parse(meta ?? '{}').dirty);
+        const parsed = JSON.parse(meta ?? '{}');
+        dirty = Boolean(parsed.dirty);
+        syncConflict = parsed.conflict ?? null;
       } catch {
         // ignore
       }
+      setConflict(syncConflict);
       callbacksRef.current.onActivated(dirty);
 
       socket.send(SocketRequest.FILE_COLLAB_AWARENESS, [
@@ -216,12 +235,26 @@ export default function useFileCollab({ enabled, filePath, onActivated, onSaved,
     const onSavedEvent = (savedPath: string, data: string) => {
       if (normalizePath(savedPath) !== normalizePath(path)) return;
 
+      setConflict(null);
       try {
         const payload = JSON.parse(data);
         callbacksRef.current.onSaved({ user: payload.user, revisionId: payload.revision_id ?? null });
       } catch {
         // ignore
       }
+    };
+
+    const onConflictEvent = (conflictPath: string, data: string) => {
+      if (normalizePath(conflictPath) !== normalizePath(path)) return;
+
+      let parsed: CollabConflict | null = null;
+      try {
+        parsed = JSON.parse(data);
+      } catch {
+        // ignore malformed payloads
+      }
+      setConflict(parsed);
+      callbacksRef.current.onConflict(parsed);
     };
 
     const onErrorEvent = (errorPath: string, message: string) => {
@@ -246,6 +279,7 @@ export default function useFileCollab({ enabled, filePath, onActivated, onSaved,
     socket.addListener(SocketEvent.FILE_COLLAB_AWARENESS, onAwareness);
     socket.addListener(SocketEvent.FILE_COLLAB_PARTICIPANTS, onParticipants);
     socket.addListener(SocketEvent.FILE_COLLAB_SAVED, onSavedEvent);
+    socket.addListener(SocketEvent.FILE_COLLAB_CONFLICT, onConflictEvent);
     socket.addListener(SocketEvent.FILE_COLLAB_ERROR, onErrorEvent);
 
     subscribedRef.current = true;
@@ -257,6 +291,7 @@ export default function useFileCollab({ enabled, filePath, onActivated, onSaved,
       socket.removeListener(SocketEvent.FILE_COLLAB_AWARENESS, onAwareness);
       socket.removeListener(SocketEvent.FILE_COLLAB_PARTICIPANTS, onParticipants);
       socket.removeListener(SocketEvent.FILE_COLLAB_SAVED, onSavedEvent);
+      socket.removeListener(SocketEvent.FILE_COLLAB_CONFLICT, onConflictEvent);
       socket.removeListener(SocketEvent.FILE_COLLAB_ERROR, onErrorEvent);
 
       if (subscribedRef.current) {
@@ -267,12 +302,29 @@ export default function useFileCollab({ enabled, filePath, onActivated, onSaved,
     };
   }, [enabled, socketConnected, socketInstance, editor, filePath]);
 
-  const save = useCallback(() => {
+  const save = useCallback(
+    (force?: boolean, expectedHash?: string | null) => {
+      if (!socketInstance || !subscribedRef.current) return false;
+
+      if (force) {
+        socketInstance.send(
+          SocketRequest.FILE_COLLAB_SAVE,
+          expectedHash ? [filePath, '1', expectedHash] : [filePath, '1'],
+        );
+      } else {
+        socketInstance.send(SocketRequest.FILE_COLLAB_SAVE, filePath);
+      }
+      return true;
+    },
+    [socketInstance, filePath],
+  );
+
+  const reload = useCallback(() => {
     if (!socketInstance || !subscribedRef.current) return false;
 
-    socketInstance.send(SocketRequest.FILE_COLLAB_SAVE, filePath);
+    socketInstance.send(SocketRequest.FILE_COLLAB_RELOAD, filePath);
     return true;
   }, [socketInstance, filePath]);
 
-  return { active, participants, save, attachEditor: setEditor };
+  return { active, participants, conflict, save, reload, attachEditor: setEditor };
 }

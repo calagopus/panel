@@ -4107,6 +4107,9 @@ const baseTranslations = defineTranslations({
             fileFromPull: 'File from Pull',
             fileFromUpload: 'File from Upload',
             directoryFromUpload: 'Directory from Upload',
+            viewDiff: 'View Diff',
+            loadDisk: 'Load Disk Version',
+            keepEditor: 'Keep Editor Version',
           },
           actionBar: {
             copyHere: 'Copy {files} here',
@@ -4144,6 +4147,10 @@ const baseTranslations = defineTranslations({
             editorFontSize: 'Editor Font Size',
             vscodeUriScheme: 'VS Code URI Scheme',
             imageViewerSmoothing: 'Smoothen Image (Anti-Aliasing)',
+          },
+          alert: {
+            collabConflictChanged: 'This file has been changed on disk outside of the editor (e.g. via SFTP).',
+            collabConflictDeleted: 'This file has been deleted on disk outside of the editor.',
           },
           toast: {
             operationCancelled: 'Operation cancelled',
@@ -4208,6 +4215,16 @@ const baseTranslations = defineTranslations({
               title: 'Unsaved Changes',
               content:
                 'You have unsaved changes in the file editor. Are you sure you want to leave this page? If you leave, your changes will be lost.',
+            },
+            collabConflictDiff: {
+              title: 'File Changed on Disk',
+            },
+            collabConflictLoadDisk: {
+              title: 'Load Disk Version',
+              content:
+                'This will replace the editor contents with the file currently on disk. Unsaved changes will be lost.',
+              contentMultiple:
+                'This will replace the editor contents for all {participants} people in this session with the file currently on disk. Unsaved changes will be lost.',
             },
             draftRestore: {
               title: 'Restore Draft',

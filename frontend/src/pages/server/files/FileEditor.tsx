@@ -19,7 +19,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
-import MonacoEditor from '@/elements/MonacoEditor.tsx';
+import MonacoEditor, { MonacoDiffEditor } from '@/elements/MonacoEditor.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
@@ -136,6 +136,9 @@ function FileEditorComponent() {
   const [content, setContent] = useState('');
   const [blobContent, setBlobContent] = useState(new Blob());
   const [pendingDraft, setPendingDraft] = useState<{ content: string; hashMismatch: boolean } | null>(null);
+  const [conflictDiffOpen, setConflictDiffOpen] = useState(false);
+  const [conflictLoadConfirm, setConflictLoadConfirm] = useState(false);
+  const [conflictDiskContent, setConflictDiskContent] = useState<string | null>(null);
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const contentRef = useRef(content);
@@ -147,11 +150,13 @@ function FileEditorComponent() {
   const collabActiveRef = useRef(false);
   const collabSavingRef = useRef(false);
   const collabSaveTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const conflictModelsRef = useRef<{ dispose: () => void }[]>([]);
   const blocker = useBlocker(dirty, false, (tx) => {
     if (!tx.location.pathname.includes('/files/diff')) return true;
     return new URLSearchParams(tx.location.search).has('previousRevision');
   });
   const editorContainerRef = useRef<HTMLDivElement>(null);
+  const contentWrapRef = useRef<HTMLDivElement>(null);
 
   const collab = useFileCollab({
     enabled: params.action === 'edit' && !!fileName && !!browsingDirectory && browsingPrimaryFilesystem && !loading,
@@ -159,11 +164,23 @@ function FileEditorComponent() {
     onActivated: (dirty) => {
       collabActiveRef.current = true;
       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
-      setPendingDraft(null);
+      // Only drop a pending local draft when the session already carries
+      // unsaved changes; a clean session means the draft may be the sole copy
+      // of edits lost to a torn-down session, so keep offering to restore it.
+      if (dirty) {
+        setPendingDraft(null);
+      } else {
+        // A clean session's synced doc is the on-disk state — reset the draft
+        // baseline so the binding-induced model rebuild doesn't write drafts
+        // of content the user never typed.
+        savedContentRef.current = editorRef.current?.getValue() ?? savedContentRef.current;
+        originalHashRef.current = hashContent(savedContentRef.current);
+      }
       setDirty(dirty);
     },
     onSaved: () => {
       if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
       setDirty(false);
       savedContentRef.current = editorRef.current?.getValue() ?? savedContentRef.current;
       originalHashRef.current = hashContent(savedContentRef.current);
@@ -173,6 +190,15 @@ function FileEditorComponent() {
         collabSavingRef.current = false;
         setSaving(false);
         addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
+      }
+    },
+    onConflict: (conflict) => {
+      // A conflict while a save is in flight means the save was rejected; the
+      // banner takes over from the save spinner.
+      if (conflict && collabSavingRef.current) {
+        if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
+        collabSavingRef.current = false;
+        setSaving(false);
       }
     },
     onError: (message) => {
@@ -238,7 +264,11 @@ function FileEditorComponent() {
               if (stored) {
                 try {
                   const draft: FileDraft = JSON.parse(stored);
-                  setPendingDraft({ content: draft.content, hashMismatch: draft.originalHash !== hash });
+                  if (draft.content === content) {
+                    localStorage.removeItem(key);
+                  } else {
+                    setPendingDraft({ content: draft.content, hashMismatch: draft.originalHash !== hash });
+                  }
                 } catch {
                   localStorage.removeItem(key);
                 }
@@ -271,8 +301,17 @@ function FileEditorComponent() {
       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
       if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
       if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+      conflictModelsRef.current.forEach((model) => model.dispose());
+      conflictModelsRef.current = [];
     };
   }, []);
+
+  useEffect(() => {
+    if (!collab.conflict) {
+      setConflictDiffOpen(false);
+      setConflictLoadConfirm(false);
+    }
+  }, [collab.conflict]);
 
   useEffect(() => {
     const el = editorContainerRef.current;
@@ -305,6 +344,12 @@ function FileEditorComponent() {
     } else {
       observer.observe(document.body);
     }
+    // The editor container is absolutely positioned, so anything appearing or
+    // disappearing above it (e.g. the collab conflict banner) shifts its top
+    // without resizing body/window — watch the in-flow wrapper for that.
+    if (contentWrapRef.current) {
+      observer.observe(contentWrapRef.current);
+    }
 
     updateHeight();
 
@@ -322,6 +367,37 @@ function FileEditorComponent() {
       }
     };
   });
+
+  const forceCollabSave = () => {
+    if (!collab.conflict) return;
+
+    if (collab.save(true, collab.conflict.hash)) {
+      collabSavingRef.current = true;
+      setSaving(true);
+
+      if (collabSaveTimerRef.current) clearTimeout(collabSaveTimerRef.current);
+      collabSaveTimerRef.current = setTimeout(() => {
+        if (collabSavingRef.current) {
+          collabSavingRef.current = false;
+          setSaving(false);
+          addToast(t('pages.server.files.toast.collabSaveTimeout', {}), 'error');
+        }
+      }, 15000);
+    }
+  };
+
+  const openConflictDiff = () => {
+    setConflictDiskContent(null);
+    setConflictDiffOpen(true);
+
+    getFileContent(server.uuid, join(browsingDirectory, fileName))
+      .then((content) => content.text())
+      .then((text) => setConflictDiskContent(text))
+      .catch((msg) => {
+        setConflictDiffOpen(false);
+        addToast(httpErrorToHuman(msg), 'error');
+      });
+  };
 
   const saveFile = (name?: string) => {
     if (!editorRef.current || !browsingWritableDirectory) return;
@@ -507,6 +583,82 @@ function FileEditorComponent() {
         </ModalFooter>
       </Modal>
 
+      <Modal
+        title={t('pages.server.files.modal.collabConflictDiff.title', {})}
+        opened={conflictDiffOpen}
+        onClose={() => setConflictDiffOpen(false)}
+        size='90%'
+      >
+        {conflictDiskContent === null ? (
+          <div className='w-full h-96 flex items-center justify-center'>
+            <Spinner />
+          </div>
+        ) : (
+          <div className='h-96 flex'>
+            <MonacoDiffEditor
+              height='100%'
+              width='100%'
+              options={{
+                readOnly: true,
+                minimap: { enabled: false },
+                codeLens: false,
+                scrollBeyondLastLine: false,
+                originalEditable: false,
+              }}
+              onMount={(diffEditor, monaco) => {
+                conflictModelsRef.current.forEach((model) => model.dispose());
+
+                const originalModel = monaco.editor.createModel(conflictDiskContent, undefined);
+                const modifiedModel = monaco.editor.createModel(editorRef.current?.getValue() ?? '', undefined);
+                conflictModelsRef.current = [originalModel, modifiedModel];
+
+                diffEditor.setModel({ original: originalModel, modified: modifiedModel });
+              }}
+            />
+          </div>
+        )}
+
+        <ModalFooter>
+          <ServerCan action='files.update'>
+            <Button
+              color='yellow'
+              onClick={() => {
+                setConflictDiffOpen(false);
+                forceCollabSave();
+              }}
+            >
+              {t('pages.server.files.button.keepEditor', {})}
+            </Button>
+            <Button
+              variant='default'
+              onClick={() => {
+                setConflictDiffOpen(false);
+                setConflictLoadConfirm(true);
+              }}
+            >
+              {t('pages.server.files.button.loadDisk', {})}
+            </Button>
+          </ServerCan>
+        </ModalFooter>
+      </Modal>
+
+      <ConfirmationModal
+        title={t('pages.server.files.modal.collabConflictLoadDisk.title', {})}
+        opened={conflictLoadConfirm}
+        onClose={() => setConflictLoadConfirm(false)}
+        onConfirmed={() => {
+          setConflictLoadConfirm(false);
+          collab.reload();
+        }}
+        confirm={t('pages.server.files.button.loadDisk', {})}
+      >
+        {collab.participants.length > 1
+          ? t('pages.server.files.modal.collabConflictLoadDisk.contentMultiple', {
+              participants: collab.participants.length,
+            })
+          : t('pages.server.files.modal.collabConflictLoadDisk.content', {})}
+      </ConfirmationModal>
+
       <ConfirmationModal
         title={t('pages.server.files.modal.unsavedChanges.title', {})}
         opened={blocker.state === 'blocked'}
@@ -537,7 +689,7 @@ function FileEditorComponent() {
           <Spinner size={75} />
         </div>
       ) : (
-        <div className='flex flex-col relative'>
+        <div ref={contentWrapRef} className='flex flex-col relative'>
           <FileNameModal
             onFileName={(name: string) => saveFile(name)}
             opened={nameModalOpen}
@@ -547,6 +699,39 @@ function FileEditorComponent() {
           <div className='flex justify-between w-full py-4'>
             <FileBreadcrumbs inFileEditor path={join(browsingDirectory, fileName)} />
           </div>
+          {collab.active && collab.conflict && (
+            <Alert
+              mb='sm'
+              color='yellow'
+              className='mx-4 lg:mx-6'
+              icon={<FontAwesomeIcon icon={faTriangleExclamation} />}
+            >
+              <Group justify='space-between'>
+                <span>
+                  {collab.conflict.deleted
+                    ? t('pages.server.files.alert.collabConflictDeleted', {})
+                    : t('pages.server.files.alert.collabConflictChanged', {})}
+                </span>
+                <Group gap='xs'>
+                  {!collab.conflict.deleted && (
+                    <Button size='xs' variant='default' onClick={openConflictDiff}>
+                      {t('pages.server.files.button.viewDiff', {})}
+                    </Button>
+                  )}
+                  <ServerCan action='files.update'>
+                    {!collab.conflict.deleted && (
+                      <Button size='xs' variant='default' onClick={() => setConflictLoadConfirm(true)}>
+                        {t('pages.server.files.button.loadDisk', {})}
+                      </Button>
+                    )}
+                    <Button size='xs' color='yellow' loading={saving} onClick={forceCollabSave}>
+                      {t('pages.server.files.button.keepEditor', {})}
+                    </Button>
+                  </ServerCan>
+                </Group>
+              </Group>
+            </Alert>
+          )}
           <div className='relative'>
             <div ref={editorContainerRef} className='flex max-w-full w-full z-1 absolute'>
               {matchedFileEditorAction?.contentType === 'string' ? (
@@ -645,16 +830,16 @@ function FileEditorComponent() {
                       const value = editor.getValue();
                       contentRef.current = value;
 
-                      if (collabActiveRef.current) {
-                        setDirty(true);
-                        return;
-                      }
+                      const changed = value !== savedContentRef.current;
+                      // In collab mode the server's dirty flag is authoritative;
+                      // any model change means the shared session is dirty.
+                      setDirty(collabActiveRef.current ? true : changed);
 
-                      const isDirty = value !== savedContentRef.current;
-                      setDirty(isDirty);
-
+                      // Local drafts are kept even in collab mode: the server
+                      // discards unsaved sessions after the grace period, so the
+                      // draft is the only crash/teardown recovery.
                       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
-                      if (isDirty && draftPathRef.current) {
+                      if (changed && draftPathRef.current) {
                         const path = draftPathRef.current;
                         draftTimerRef.current = setTimeout(() => {
                           const draft: FileDraft = {

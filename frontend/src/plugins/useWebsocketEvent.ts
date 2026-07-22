@@ -36,6 +36,7 @@ export enum SocketEvent {
   FILE_COLLAB_AWARENESS = 'file collab awareness',
   FILE_COLLAB_PARTICIPANTS = 'file collab participants',
   FILE_COLLAB_SAVED = 'file collab saved',
+  FILE_COLLAB_CONFLICT = 'file collab conflict',
   FILE_COLLAB_ERROR = 'file collab error',
 }
 
@@ -52,6 +53,7 @@ export enum SocketRequest {
   FILE_COLLAB_UPDATE = 'file collab update',
   FILE_COLLAB_AWARENESS = 'file collab awareness',
   FILE_COLLAB_SAVE = 'file collab save',
+  FILE_COLLAB_RELOAD = 'file collab reload',
 }
 
 const useWebsocketEvent = (event: SocketEvent, callback: (...data: string[]) => void) => {

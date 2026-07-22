@@ -732,6 +732,10 @@ pub enum WebsocketEvent {
     FileCollabParticipants,
     #[serde(rename = "file collab saved")]
     FileCollabSaved,
+    #[serde(rename = "file collab reload")]
+    FileCollabReload,
+    #[serde(rename = "file collab conflict")]
+    FileCollabConflict,
     #[serde(rename = "file collab error")]
     FileCollabError,
 }

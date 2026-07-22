@@ -4086,7 +4086,10 @@
             "directory": "Verzeichnis",
             "fileFromPull": "Datei aus Pull",
             "fileFromUpload": "Datei aus Upload",
-            "directoryFromUpload": "Verzeichnis aus Upload"
+            "directoryFromUpload": "Verzeichnis aus Upload",
+            "viewDiff": "Unterschiede anzeigen",
+            "loadDisk": "Festplattenversion laden",
+            "keepEditor": "Editor-Version behalten"
           },
           "actionBar": {
             "copyHere": "Kopiere {files} hierhin",
@@ -4124,6 +4127,10 @@
             "editorFontSize": "Editor-Schriftgröße",
             "vscodeUriScheme": "VS Code URI-Schema",
             "imageViewerSmoothing": "Bildglättung (Anti-Aliasing)"
+          },
+          "alert": {
+            "collabConflictChanged": "Diese Datei wurde außerhalb des Editors auf der Festplatte geändert (z. B. via SFTP).",
+            "collabConflictDeleted": "Diese Datei wurde außerhalb des Editors auf der Festplatte gelöscht."
           },
           "toast": {
             "operationCancelled": "Vorgang abgebrochen",
@@ -4187,6 +4194,14 @@
             "unsavedChanges": {
               "title": "Ungespeicherte Änderungen",
               "content": "Du hast ungespeicherte Änderungen im Editor. Bist du sicher, dass du diese Seite verlassen möchtest? Wenn du die Seite verlässt, gehen deine Änderungen verloren."
+            },
+            "collabConflictDiff": {
+              "title": "Datei auf Festplatte geändert"
+            },
+            "collabConflictLoadDisk": {
+              "title": "Festplattenversion laden",
+              "content": "Dies ersetzt den Editor-Inhalt durch die aktuell auf der Festplatte gespeicherte Datei. Ungespeicherte Änderungen gehen verloren.",
+              "contentMultiple": "Dies ersetzt den Editor-Inhalt für alle {participants} Personen in dieser Sitzung durch die aktuell auf der Festplatte gespeicherte Datei. Ungespeicherte Änderungen gehen verloren."
             },
             "draftRestore": {
               "title": "Entwurf wiederherstellen",
@@ -4429,6 +4444,10 @@
                     "file": "Abzugsdatei",
                     "wipe": "Vorhandene Daten vor dem Import löschen"
                   }
+                },
+                "recreateDatabase": {
+                  "title": "Datenbank-Neuerstellung bestätigen",
+                  "content": "Beim Neuerstellen einer Datenbank werden alle Daten in der Datenbank **{name}** dauerhaft gelöscht und eine neue, leere Datenbank mit demselben Namen und Benutzerzugriff erstellt."
                 }
               },
               "table": {
@@ -4440,7 +4459,8 @@
                 "created": "Datenbank erstellt.",
                 "deleted": "Datenbank gelöscht.",
                 "imported": "Datenbank-Import abgeschlossen.",
-                "passwordRotated": "Passwort wurde rotiert."
+                "passwordRotated": "Passwort wurde rotiert.",
+                "recreated": "Datenbank neu erstellt."
               }
             },
             "users": {

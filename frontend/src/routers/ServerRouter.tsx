@@ -247,7 +247,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
       <div
         id='server-root'
         className={
-          isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto h-full [scrollbar-gutter:stable]'
+          isNormal ? 'max-w-[100vw] flex-1 lg:ml-0' : 'flex-1 lg:ml-0 overflow-auto h-full scrollbar-gutter-stable'
         }
       >
         <Container isNormal={isNormal}>

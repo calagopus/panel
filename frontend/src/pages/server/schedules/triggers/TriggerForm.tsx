@@ -32,7 +32,7 @@ type SimpleSchedule =
   | { frequency: 'everyMinutes'; interval: number }
   | { frequency: 'everyHours'; interval: number }
   | { frequency: 'daily'; hour: number; minute: number }
-  | { frequency: 'weekly'; weekday: number; hour: number; minute: number }
+  | { frequency: 'weekly'; weekday: (typeof CRON_WEEKDAYS)[number]; hour: number; minute: number }
   | { frequency: 'monthly'; day: number; hour: number; minute: number };
 
 function parseSimpleSchedule(schedule: string): SimpleSchedule | null {
@@ -71,9 +71,9 @@ function parseSimpleSchedule(schedule: string): SimpleSchedule | null {
 
   if (dayOfMonth === '*') {
     const namedWeekday = CRON_WEEKDAYS.indexOf(weekday.toUpperCase() as (typeof CRON_WEEKDAYS)[number]);
-    const parsedWeekday = namedWeekday !== -1 ? namedWeekday : asNumber(weekday);
-    if (parsedWeekday !== null && parsedWeekday <= 6) {
-      return { frequency: 'weekly', weekday: parsedWeekday, hour: parsedHour, minute: parsedMinute };
+    const weekdayIndex = namedWeekday !== -1 ? namedWeekday : asNumber(weekday);
+    if (weekdayIndex !== null && weekdayIndex >= 0 && weekdayIndex <= 6) {
+      return { frequency: 'weekly', weekday: CRON_WEEKDAYS[weekdayIndex], hour: parsedHour, minute: parsedMinute };
     }
   } else if (weekday === '*') {
     const parsedDay = asNumber(dayOfMonth);
@@ -94,7 +94,7 @@ function simpleScheduleToCron(schedule: SimpleSchedule): string {
     case 'daily':
       return `0 ${schedule.minute} ${schedule.hour} * * *`;
     case 'weekly':
-      return `0 ${schedule.minute} ${schedule.hour} * * ${CRON_WEEKDAYS[schedule.weekday]}`;
+      return `0 ${schedule.minute} ${schedule.hour} * * ${schedule.weekday}`;
     case 'monthly':
       return `0 ${schedule.minute} ${schedule.hour} ${schedule.day} * *`;
   }
@@ -162,11 +162,23 @@ function CronTriggerExtraForm({ form, index }: TriggerFormProps) {
 
   const weekdayOptions = useMemo(() => {
     const formatter = new Intl.DateTimeFormat(language, { weekday: 'long', timeZone: 'UTC' });
-    // 2021-08-01 was a Sunday, matching cron weekday 0
-    return Array.from({ length: 7 }, (_, day) => ({
-      value: String(day),
-      label: formatter.format(new Date(Date.UTC(2021, 7, 1 + day))),
-    }));
+
+    let firstCronWeekday = 0;
+    try {
+      const locale = new Intl.Locale(language);
+      const weekInfo = locale.getWeekInfo?.() ?? (locale as { weekInfo?: { firstDay: number } }).weekInfo;
+      if (weekInfo?.firstDay) firstCronWeekday = weekInfo.firstDay % 7;
+    } catch {
+      // ignore
+    }
+
+    return Array.from({ length: 7 }, (_, offset) => {
+      const day = (firstCronWeekday + offset) % 7;
+      return {
+        value: CRON_WEEKDAYS[day],
+        label: formatter.format(new Date(Date.UTC(2021, 7, 1 + day))),
+      };
+    });
   }, [language]);
 
   if (trigger.type !== 'cron') return null;
@@ -191,7 +203,7 @@ function CronTriggerExtraForm({ form, index }: TriggerFormProps) {
         setSimple({ frequency, hour, minute });
         break;
       case 'weekly':
-        setSimple({ frequency, weekday: 0, hour, minute });
+        setSimple({ frequency, weekday: 'SUN', hour, minute });
         break;
       case 'monthly':
         setSimple({ frequency, day: 1, hour, minute });
@@ -275,9 +287,11 @@ function CronTriggerExtraForm({ form, index }: TriggerFormProps) {
             <Select
               label={t('pages.server.schedules.triggers.cron.form.weekday', {})}
               className='w-40'
-              value={String(simple!.weekday)}
+              value={simple!.weekday}
               onChange={(value) =>
-                value && simple!.frequency === 'weekly' && setSimple({ ...simple!, weekday: Number(value) })
+                value &&
+                simple!.frequency === 'weekly' &&
+                setSimple({ ...simple!, weekday: value as (typeof CRON_WEEKDAYS)[number] })
               }
               data={weekdayOptions}
             />
