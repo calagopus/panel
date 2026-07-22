@@ -61,7 +61,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
     downloadBackup(server.uuid, backup.uuid, archiveFormat)
       .then(({ url }) => {
         addToast(t('pages.server.backups.toast.downloadStarted', {}), 'success');
-        window.open(url, '_blank');
+        window.location.href = url;
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
