@@ -52,7 +52,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
     )
       .then(({ url }) => {
         addToast(t('pages.server.files.toast.downloadStarted', {}), 'success');
-        window.open(url);
+        window.location.href = url;
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
