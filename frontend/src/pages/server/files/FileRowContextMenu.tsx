@@ -18,7 +18,6 @@ import { createSearchParams, MemoryRouter } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import decompressFile from '@/api/server/files/decompressFile.ts';
 import downloadFiles from '@/api/server/files/downloadFiles.ts';
 import ContextMenu, { ContextMenuItem } from '@/elements/ContextMenu.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
@@ -54,12 +53,6 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
   const canUpdate = useServerCan('files.update');
   const canArchive = useServerCan('files.archive');
   const canDelete = useServerCan('files.delete');
-
-  const doUnarchive = () => {
-    decompressFile(server.uuid, store.getState().browsingDirectory, file.name).catch((msg) => {
-      addToast(httpErrorToHuman(msg), 'error');
-    });
-  };
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadFiles(server.uuid, store.getState().browsingDirectory, [file.name], file.directory, archiveFormat)
@@ -163,9 +156,9 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
           ? {
               type: 'action',
               icon: faEnvelopesBulk,
-              label: t('pages.server.files.button.unarchive', {}),
+              label: t('pages.server.files.button.extract', {}),
               hidden: !browsingWritableDirectory,
-              onClick: doUnarchive,
+              onClick: () => store.getState().doOpenModal('extract', [file]),
               color: 'gray',
               canAccess: canArchive,
             }

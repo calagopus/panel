@@ -266,6 +266,7 @@ const baseTranslations = defineTranslations({
       },
       label: {
         noSubdirectories: 'No subdirectories',
+        page: 'Page {page}',
         emptyDirectory: 'This directory is empty',
         ignored: 'Ignored',
         showingFirstEntries: 'Showing the first {count} entries',
@@ -4115,7 +4116,7 @@ const baseTranslations = defineTranslations({
             copy: 'Copy',
             fingerprint: 'Fingerprint',
             permissions: 'Permissions',
-            unarchive: 'Unarchive',
+            extract: 'Extract',
             archive: 'Archive',
             more: 'More',
             remoteCopy: 'Remote Copy',
@@ -4182,6 +4183,7 @@ const baseTranslations = defineTranslations({
             downloadStarted: 'Download started.',
             filesDeleted: 'Files have been deleted.',
             archiveCreationStarted: 'Archive creation has begun.',
+            decompressionStarted: 'Archive extraction has started.',
             fileCopyingStarted: 'File copying has started.',
             fileInfoRetrieved: 'File information retrieved successfully.',
             filePullingStarted: 'File pulling has started.',
@@ -4255,6 +4257,10 @@ const baseTranslations = defineTranslations({
               content: 'A draft of this file was found in your browser. Would you like to restore it?',
               contentHashMismatch:
                 'The file has been modified on the server since this draft was saved. Restoring the draft may overwrite those changes.',
+            },
+            extractFile: {
+              title: 'Extract Archive',
+              extractedTo: 'The contents of {file} will be extracted into ',
             },
             createArchive: {
               title: 'Create Archive',

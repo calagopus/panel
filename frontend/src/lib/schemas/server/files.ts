@@ -21,6 +21,10 @@ export const serverFilesCopyRemoteSchema = z.object({
   destinationServer: z.uuid(),
 });
 
+export const serverFilesExtractSchema = z.object({
+  destination: z.string().min(1).max(255),
+});
+
 export const serverFilesNameSchema = z.object({
   name: z.string().min(1).max(255),
 });

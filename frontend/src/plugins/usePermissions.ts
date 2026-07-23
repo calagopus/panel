@@ -21,22 +21,21 @@ const checkPermissions = (permissions: string[], action: string | string[]): boo
   });
 };
 
-export const useServerPermissions = (action: string | string[]): boolean[] => {
-  const server = useServerStore((state) => state.server);
+export const useServerPermissionsFor = (permissions: string[] | undefined, action: string | string[]): boolean[] => {
   const { user } = useAuth();
 
-  const serverPermissions = [...(server?.permissions || []), ...(user?.role?.serverPermissions || [])];
+  const serverPermissions = [...(permissions || []), ...(user?.role?.serverPermissions || [])];
   const actionLength = Array.isArray(action) ? action.length : 1;
-
-  if (!serverPermissions) {
-    return Array(actionLength).fill(false);
-  }
 
   if (serverPermissions.includes('*')) {
     return Array(actionLength).fill(true);
   }
 
   return checkPermissions(serverPermissions, action);
+};
+
+export const useServerPermissions = (action: string | string[]): boolean[] => {
+  return useServerPermissionsFor(useServerStore((state) => state.server)?.permissions, action);
 };
 
 export const useAdminPermissions = (action: string | string[]): boolean[] => {
@@ -61,4 +60,12 @@ export const useAdminCan = (action: string | string[], matchAny: boolean = true)
 
 export const useServerCan = (action: string | string[], matchAny: boolean = true) => {
   return useCan(useServerPermissions(action), matchAny);
+};
+
+export const useServerCanFor = (
+  permissions: string[] | undefined,
+  action: string | string[],
+  matchAny: boolean = true,
+) => {
+  return useCan(useServerPermissionsFor(permissions, action), matchAny);
 };

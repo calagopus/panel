@@ -55,6 +55,12 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_server_permission("files.archive")?;
 
+        if server.is_ignored(&data.root, true) {
+            return ApiResponse::error("root directory not found")
+                .with_status(StatusCode::NOT_FOUND)
+                .ok();
+        }
+
         if server.is_ignored(std::path::Path::new(&data.root).join(&data.file), false) {
             return ApiResponse::error("file not found")
                 .with_status(StatusCode::NOT_FOUND)

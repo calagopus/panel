@@ -23,6 +23,7 @@ export type ModalType =
   | 'fingerprint'
   | 'permissions'
   | 'archive'
+  | 'extract'
   | 'delete'
   | 'details'
   | 'nameDirectory'

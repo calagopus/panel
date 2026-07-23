@@ -1,6 +1,4 @@
-import { faFolder } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Anchor, ModalProps } from '@mantine/core';
+import { ModalProps } from '@mantine/core';
 import { join } from 'pathe';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
@@ -9,16 +7,14 @@ import queryNodeBackup from '@/api/admin/nodes/backups/queryNodeBackup.ts';
 import getNodeServers from '@/api/admin/nodes/servers/getNodeServers.ts';
 import getServers from '@/api/admin/servers/getServers.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import loadDirectory from '@/api/server/files/loadDirectory.ts';
-import Breadcrumbs from '@/elements/Breadcrumbs.tsx';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
+import DirectoryBrowser from '@/elements/DirectoryBrowser.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { archiveFormatLabelMapping, streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -26,74 +22,8 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { archiveFormat } from '@/lib/schemas/server/files.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-
-function DirectoryBrowser({
-  serverUuid,
-  path,
-  onNavigate,
-}: {
-  serverUuid: string;
-  path: string;
-  onNavigate: (path: string) => void;
-}) {
-  const { t } = useTranslations();
-  const { data, loading: isLoading } = useResource({
-    queryKey: ['backup-export-browser', serverUuid, path],
-    queryFn: () => loadDirectory(serverUuid, path, 1, 'name_asc'),
-  });
-
-  const pathSegments = path.split('/').filter(Boolean);
-
-  return (
-    <div className='border border-(--mantine-color-default-border) rounded-md overflow-hidden'>
-      <div className='px-3 py-2 border-b border-(--mantine-color-default-border) bg-(--mantine-color-body)'>
-        <Breadcrumbs separatorMargin='xs'>
-          <Anchor component='button' type='button' size='sm' onClick={() => onNavigate('/')}>
-            container
-          </Anchor>
-          {pathSegments.map((seg, i) => {
-            const segPath = '/' + pathSegments.slice(0, i + 1).join('/');
-            const isLast = i === pathSegments.length - 1;
-            return isLast ? (
-              <span key={segPath} className='text-sm'>
-                {seg}
-              </span>
-            ) : (
-              <Anchor component='button' type='button' key={segPath} size='sm' onClick={() => onNavigate(segPath)}>
-                {seg}
-              </Anchor>
-            );
-          })}
-        </Breadcrumbs>
-      </div>
-
-      <div className='overflow-y-auto max-h-52 bg-(--mantine-color-default)'>
-        {isLoading ? (
-          <Spinner.Centered size={20} />
-        ) : !data || data.entries.data.filter((e) => e.directory).length === 0 ? (
-          <p className='text-sm text-(--mantine-color-dimmed) px-3 py-2'>{t('common.label.noSubdirectories', {})}</p>
-        ) : (
-          data.entries.data
-            .filter((entry) => entry.directory)
-            .map((entry) => (
-              <button
-                key={entry.name}
-                type='button'
-                onClick={() => onNavigate(join(path, entry.name))}
-                className='w-full flex items-center gap-3 px-3 py-1.5 text-sm text-left hover:bg-(--mantine-color-default-hover)'
-              >
-                <FontAwesomeIcon icon={faFolder} className='text-(--mantine-color-dimmed)' />
-                <span className='truncate'>{entry.name}</span>
-              </button>
-            ))
-        )}
-      </div>
-    </div>
-  );
-}
 
 type Props = ModalProps & {
   node: z.infer<typeof adminNodeSchema>;
@@ -177,7 +107,12 @@ export default function NodeBackupsExportModal({ node, backup, ...props }: Props
         />
 
         {selectedServer && (
-          <DirectoryBrowser serverUuid={selectedServer.uuid} path={directory} onNavigate={setDirectory} />
+          <DirectoryBrowser
+            serverUuid={selectedServer.uuid}
+            path={directory}
+            onNavigate={setDirectory}
+            withCreateDirectory
+          />
         )}
 
         <TextInput

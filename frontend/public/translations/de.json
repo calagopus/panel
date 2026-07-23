@@ -358,6 +358,7 @@
       },
       "label": {
         "noSubdirectories": "Keine Unterverzeichnisse",
+        "page": "Seite {page}",
         "emptyDirectory": "Dieses Verzeichnis ist leer",
         "ignored": "Ignoriert",
         "showingFirstEntries": "Die ersten {count} Einträge werden angezeigt"
@@ -4083,7 +4084,7 @@
             "copy": "Kopieren",
             "fingerprint": "Fingerabdruck",
             "permissions": "Berechtigungen",
-            "unarchive": "Entpacken",
+            "extract": "Entpacken",
             "archive": "Archivieren",
             "more": "Mehr",
             "remoteCopy": "Remote-Kopie",
@@ -4150,6 +4151,7 @@
             "downloadStarted": "Download gestartet.",
             "filesDeleted": "Dateien wurden gelöscht.",
             "archiveCreationStarted": "Archiverstellung hat begonnen.",
+            "decompressionStarted": "Das Entpacken des Archivs hat begonnen.",
             "fileCopyingStarted": "Dateikopiervorgang hat begonnen.",
             "fileInfoRetrieved": "Dateiinformationen erfolgreich abgerufen.",
             "filePullingStarted": "Datei-Pull hat begonnen.",
@@ -4219,6 +4221,10 @@
               "title": "Entwurf wiederherstellen",
               "content": "Ein Entwurf dieser Datei wurde in deinem Browser gefunden. Möchtest du ihn wiederherstellen?",
               "contentHashMismatch": "Die Datei wurde auf dem Server geändert, seit dieser Entwurf gespeichert wurde. Das Wiederherstellen des Entwurfs überschreibt möglicherweise diese Änderungen."
+            },
+            "extractFile": {
+              "title": "Archiv entpacken",
+              "extractedTo": "Der Inhalt von {file} wird entpackt nach "
             },
             "createArchive": {
               "title": "Archiv erstellen",
