@@ -12,8 +12,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { memo } from 'react';
 import { z } from 'zod';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { isListenableAudio, isOpenableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { FileManagerStore, useFileManagerApi } from '@/stores/fileManager.ts';
 
 function getFileIcon(
@@ -57,14 +59,23 @@ function FileRowIcon({
   className?: string;
   directory?: boolean;
 }) {
+  const { t } = useTranslations();
   const store = useFileManagerApi();
   const isDirectory = directory || file?.directory;
+  const iconColor = isDirectory ? 'text-yellow-400' : 'text-(--mantine-color-dimmed)';
+  const iconDefinition = file ? getFileIcon(file, store.getState()) : directory ? faFolder : faFile;
+
+  if (!file?.virtual) {
+    return <FontAwesomeIcon className={classNames(iconColor, className)} icon={iconDefinition} />;
+  }
 
   return (
-    <FontAwesomeIcon
-      className={classNames(isDirectory ? 'text-yellow-400' : 'text-(--mantine-color-dimmed)', className)}
-      icon={file ? getFileIcon(file, store.getState()) : directory ? faFolder : faFile}
-    />
+    <Tooltip label={t('pages.server.files.tooltip.virtual', {})}>
+      <span className={classNames('relative inline-flex', className)}>
+        <FontAwesomeIcon className={iconColor} icon={iconDefinition} />
+        <span className='absolute -top-1 -right-1 h-1.5 w-1.5 rounded-full bg-(--mantine-color-blue-5) ring-1 ring-(--mantine-color-body)' />
+      </span>
+    </Tooltip>
   );
 }
 

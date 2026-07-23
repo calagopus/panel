@@ -379,6 +379,7 @@ function FileOperationsProgress() {
                 <Tooltip
                   label={`${bytesProgressString(operation.bytesProcessed, operation.bytesTotal)}${
                     operation.type === 'compress' ||
+                    operation.type === 'decompress' ||
                     operation.type === 'copy' ||
                     operation.type === 'copy_remote' ||
                     operation.type === 'copy_many'

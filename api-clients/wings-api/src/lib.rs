@@ -137,6 +137,8 @@ nestify::nest! {
         #[schema(inline)]
         pub symlink: bool,
         #[schema(inline)]
+        pub r#virtual: bool,
+        #[schema(inline)]
         pub mime: compact_str::CompactString,
         #[schema(inline)]
         pub created: chrono::DateTime<chrono::Local>,

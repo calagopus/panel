@@ -78,6 +78,7 @@ export const serverFileOperationDecompressSchema = z.lazy(() =>
     type: z.literal('decompress'),
     path: z.string(),
     destinationPath: z.string(),
+    filesProcessed: z.number(),
   }),
 );
 
@@ -160,6 +161,7 @@ export const serverDirectoryEntrySchema = z.object({
   directory: z.boolean(),
   file: z.boolean(),
   symlink: z.boolean(),
+  virtual: z.boolean(),
   mime: z.string(),
   modified: z.coerce.date(),
   created: z.coerce.date(),

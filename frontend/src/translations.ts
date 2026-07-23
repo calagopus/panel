@@ -4203,6 +4203,7 @@ const baseTranslations = defineTranslations({
             collabEditing: '{user} is editing this file',
             largestDirectories: 'Analyze directory sizes',
             dragToMove: 'Drag to move',
+            virtual: 'This item is virtual and does not exist on disk',
             back: 'Back {seconds} seconds',
             forward: 'Forward {seconds} seconds',
             play: 'Play',

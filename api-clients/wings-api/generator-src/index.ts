@@ -6,7 +6,7 @@ import { pascalCase, snakeCase } from "change-case"
 import { convertType } from "@/generate-schema-property"
 
 function rustIdent(name: string): string {
-    return ['type', 'override', 'match', 'move', 'ref', 'self', 'use', 'mod'].includes(name) ? `r#${name}` : name
+    return ['type', 'override', 'match', 'move', 'ref', 'virtual', 'self', 'use', 'mod'].includes(name) ? `r#${name}` : name
 }
 
 const openapi: oas31.OpenAPIObject = JSON.parse(fs.readFileSync('../openapi.json', 'utf-8'))

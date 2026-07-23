@@ -39,7 +39,7 @@ export function convertType(object: oas31.SchemaObject | oas31.ReferenceObject):
 }
 
 function rustPropertyEscape(property: string): string {
-    const keywords = ['type', 'override']
+    const keywords = ['type', 'override', 'virtual']
 
     return keywords.includes(property) ? `r#${property}` : property
 }
