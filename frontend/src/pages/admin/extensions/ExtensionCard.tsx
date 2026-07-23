@@ -35,7 +35,7 @@ export default function ExtensionCard({
     <Card>
       <div className='mb-3 flex items-start gap-3'>
         <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-(--mantine-color-default-hover) text-(--mantine-color-dimmed)'>
-          <FontAwesomeIcon icon={faPuzzlePiece} className='text-sm' />
+          {extension?.cardIcon ?? <FontAwesomeIcon icon={faPuzzlePiece} className='text-sm' />}
         </div>
         <div className='min-w-0 flex-1'>
           <h3 className='truncate text-md font-medium leading-tight'>{name}</h3>

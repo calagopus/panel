@@ -75,6 +75,8 @@ export class Extension {
   public cardConfigurationPage: React.FC | null = null;
   // This is the component added in your extension card in the admin extensions page
   public cardComponent: React.FC | null = null;
+  // This overrides the icon element shown in your extension row in the admin extensions page
+  public cardIcon: React.ReactNode = null;
 
   // Your extension entrypoint, this runs when the page is loaded
   public initialize(ctx: ExtensionContext): void {

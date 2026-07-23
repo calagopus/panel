@@ -3,9 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Popover } from '@mantine/core';
 import { ReactNode } from 'react';
 import Button from '@/elements/Button.tsx';
-import Card, { usageColor } from '@/elements/Card.tsx';
+import Card from '@/elements/Card.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import ThemeIcon from '@/elements/ThemeIcon.tsx';
+import { usageColor } from '@/lib/usage.ts';
 
 export default function StatCard({
   icon,
@@ -33,7 +34,7 @@ export default function StatCard({
   const color = usageColor(progress, total);
 
   return (
-    <Card style={{ order }} progress={progress} total={total}>
+    <Card style={{ order }} progress={progress} total={total} progressColor={color}>
       <div className='flex flex-row items-center'>
         <ThemeIcon size='xl' radius='md' color={color}>
           <FontAwesomeIcon size='xl' icon={icon} />
