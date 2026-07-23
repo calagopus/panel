@@ -170,10 +170,14 @@ export default function ServerOverview({ server }: { server: Server }) {
                 </Text>
               </InfoRow>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.memoryLimit', {})}>
-                <Text size='sm'>{bytesToString(mbToBytes(server.node.memory))}</Text>
+                <Text size='sm'>
+                  {server.node.memory === 0 ? unlimitedLabel : bytesToString(mbToBytes(server.node.memory))}
+                </Text>
               </InfoRow>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.diskLimit', {})}>
-                <Text size='sm'>{bytesToString(mbToBytes(server.node.disk))}</Text>
+                <Text size='sm'>
+                  {server.node.disk === 0 ? unlimitedLabel : bytesToString(mbToBytes(server.node.disk))}
+                </Text>
               </InfoRow>
               {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.nodeAndLocation.appendedComponents.map(
                 (Component, index) => (

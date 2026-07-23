@@ -115,6 +115,8 @@ export default function ServerDetails() {
         limit={
           doNormalizeCpuLoad ? null : server.limits.cpu !== 0 ? `${server.limits.cpu}%` : t('common.unlimited', {})
         }
+        progress={state === 'offline' && server.status !== 'installing' ? null : stats?.cpuAbsolute}
+        total={server.limits.cpu}
         popover={
           <Checkbox
             label={t('pages.server.console.details.normalizeCpuLoad', {})}
@@ -133,6 +135,8 @@ export default function ServerDetails() {
             : bytesToString(stats?.memoryBytes || 0)
         }
         limit={server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : t('common.unlimited', {})}
+        progress={state === 'offline' && server.status !== 'installing' ? null : stats?.memoryBytes}
+        total={mbToBytes(server.limits.memory)}
       />
       <StatCard
         icon={faHardDrive}
@@ -140,6 +144,8 @@ export default function ServerDetails() {
         order={60}
         value={bytesToString(stats?.diskBytes || 0)}
         limit={server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : t('common.unlimited', {})}
+        progress={stats?.diskBytes}
+        total={mbToBytes(server.limits.disk)}
       />
       <StatCard
         icon={faCloudDownload}
