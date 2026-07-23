@@ -2,6 +2,7 @@ import {
   faArrowDown,
   faArrowUp,
   faClockRotateLeft,
+  faCopy,
   faMagnifyingGlass,
   faMinus,
   faPlus,
@@ -26,9 +27,11 @@ import Popover from '@/elements/Popover.tsx';
 import Progress from '@/elements/Progress.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { handleRawCopyToClipboard } from '@/lib/copy.ts';
 import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { matchesShortcut, useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
+import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
@@ -50,6 +53,19 @@ const commandSnippetFilter: OptionsFilter = ({ options, search }) => {
     return splittedSearch.every((searchWord) => words.some((word) => word.includes(searchWord)));
   });
 };
+
+const LONG_PRESS_MS = 500;
+const LONG_PRESS_MOVE_TOLERANCE = 10;
+
+function getCellHeight(term: XTerm, fallback: number): number {
+  const core = (
+    term as unknown as {
+      _core?: { _renderService?: { dimensions?: { css?: { cell?: { height?: number } } } } };
+    }
+  )._core;
+
+  return core?._renderService?.dimensions?.css?.cell?.height || fallback;
+}
 
 const getXtermTheme = (isDark: boolean) => ({
   background: isDark ? '#00000000' : '#ffffff',
@@ -81,6 +97,7 @@ const getXtermTheme = (isDark: boolean) => ({
 
 export default function Terminal() {
   const { t } = useTranslations();
+  const { addToast } = useToast();
   const { server, commandSnippets, imagePulls, socketConnected, socketInstance, state } = useServerStore(
     useShallow((s) => ({
       server: s.server,
@@ -99,6 +116,7 @@ export default function Terminal() {
   const [inputValue, setInputValue] = useState('');
   const [searchText, setSearchText] = useState('');
   const [isAtBottom, setIsAtBottom] = useState(true);
+  const [selectionMenuTop, setSelectionMenuTop] = useState<number | null>(null);
   const [websocketPing, setWebsocketPing] = useState(0);
   const [consoleFontSize, setConsoleFontSize] = useState(14);
   const [openModal, setOpenModal] = useState<'search' | 'commandHistory' | 'sshDetails' | null>(null);
@@ -110,6 +128,8 @@ export default function Terminal() {
   const xtermInstance = useRef<XTerm | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const searchAddonRef = useRef<SearchAddon | null>(null);
+  const updateSelectionMenuRef = useRef<() => void>(() => void 0);
+  const touchSelectionRef = useRef(false);
   const isFirstLine = useRef(true);
 
   const HISTORY_STORAGE_KEY = `terminal_command_history_${server.uuid}`;
@@ -221,9 +241,30 @@ export default function Terminal() {
     });
     resizeObserver.observe(terminalRef.current);
 
+    const updateSelectionMenu = () => {
+      const range = term.hasSelection() ? term.getSelectionPosition() : undefined;
+      if (!range || !touchSelectionRef.current) {
+        touchSelectionRef.current = false;
+        setSelectionMenuTop(null);
+        return;
+      }
+
+      const cellHeight = getCellHeight(term, (term.options.fontSize ?? 14) * 1.2);
+      const lastLineTop = (range.end.y - term.buffer.active.viewportY) * cellHeight;
+
+      let top = lastLineTop - 40;
+      if (top < 4) top = lastLineTop + cellHeight + 8;
+      setSelectionMenuTop(Math.max(4, Math.min(top, term.rows * cellHeight - 44)));
+    };
+    updateSelectionMenuRef.current = updateSelectionMenu;
+
     term.onScroll(() => {
       setIsAtBottom(term.buffer.active.viewportY === term.buffer.active.baseY);
+      updateSelectionMenu();
     });
+
+    term.onSelectionChange(updateSelectionMenu);
+    term.onResize(updateSelectionMenu);
 
     term.attachCustomKeyEventHandler((e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && eventKeyMatches(e, 'c')) {
@@ -266,34 +307,204 @@ export default function Terminal() {
     const terminalElement = terminalRef.current;
     if (!terminalElement) return;
 
-    let touchStartY = 0;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
+    const pixelsPerLine = () => {
+      const term = xtermInstance.current;
+      return term ? getCellHeight(term, consoleFontSize + 4) : consoleFontSize + 4;
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
+    let lastY = 0;
+    let lastTime = 0;
+    let velocity = 0;
+    let lineRemainder = 0;
+    let momentumFrame: number | null = null;
+    let longPressTimer: ReturnType<typeof setTimeout> | null = null;
+    let selectionAnchor: number | null = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
 
-      const currentY = e.touches[0].clientY;
-      const deltaY = touchStartY - currentY;
-
-      const pixelsPerLine = consoleFontSize + 4;
-
-      if (Math.abs(deltaY) > pixelsPerLine) {
-        const linesToScroll = Math.trunc(deltaY / pixelsPerLine);
-        xtermInstance.current?.scrollLines(linesToScroll);
-
-        touchStartY -= linesToScroll * pixelsPerLine;
+    const stopMomentum = () => {
+      if (momentumFrame !== null) {
+        cancelAnimationFrame(momentumFrame);
+        momentumFrame = null;
       }
     };
 
-    terminalElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+    const cancelLongPress = () => {
+      if (longPressTimer !== null) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    };
+
+    const touchLine = (clientY: number) => {
+      const term = xtermInstance.current;
+      if (!term) return null;
+
+      const rect = terminalElement.getBoundingClientRect();
+      const row = Math.min(term.rows - 1, Math.floor((clientY - rect.top) / pixelsPerLine()));
+      const buffer = term.buffer.active;
+
+      return Math.max(0, Math.min(buffer.baseY + term.rows - 1, buffer.viewportY + row));
+    };
+
+    const canScroll = (direction: number) => {
+      const buffer = xtermInstance.current?.buffer.active;
+      if (!buffer) return false;
+
+      return direction > 0 ? buffer.viewportY < buffer.baseY : buffer.viewportY > 0;
+    };
+
+    const scrollByLines = (lines: number) => {
+      lineRemainder += lines;
+      const wholeLines = Math.trunc(lineRemainder);
+      if (wholeLines !== 0) {
+        xtermInstance.current?.scrollLines(wholeLines);
+        lineRemainder -= wholeLines;
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      stopMomentum();
+      cancelLongPress();
+      if (e.touches.length > 1) return;
+
+      selectionAnchor = null;
+      const touch = e.touches[0];
+      lastY = touch.clientY;
+      lastTime = e.timeStamp;
+      velocity = 0;
+      lineRemainder = 0;
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+
+      const pressY = touch.clientY;
+      longPressTimer = setTimeout(() => {
+        longPressTimer = null;
+
+        const line = touchLine(pressY);
+        if (line === null) return;
+
+        selectionAnchor = line;
+        touchSelectionRef.current = true;
+        xtermInstance.current?.selectLines(line, line);
+      }, LONG_PRESS_MS);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 1) return;
+
+      const touch = e.touches[0];
+
+      if (selectionAnchor !== null) {
+        if (e.cancelable) e.preventDefault();
+
+        const line = touchLine(touch.clientY);
+        if (line !== null) {
+          xtermInstance.current?.selectLines(Math.min(selectionAnchor, line), Math.max(selectionAnchor, line));
+        }
+        return;
+      }
+
+      if (
+        longPressTimer !== null &&
+        (Math.abs(touch.clientX - touchStartX) > LONG_PRESS_MOVE_TOLERANCE ||
+          Math.abs(touch.clientY - touchStartY) > LONG_PRESS_MOVE_TOLERANCE)
+      ) {
+        cancelLongPress();
+      }
+
+      const currentY = touch.clientY;
+      const deltaY = lastY - currentY;
+      const deltaTime = e.timeStamp - lastTime;
+      lastY = currentY;
+      lastTime = e.timeStamp;
+
+      if (deltaTime > 0) {
+        velocity = 0.8 * velocity + 0.2 * (deltaY / deltaTime);
+      }
+
+      if (deltaY !== 0 && !canScroll(deltaY)) {
+        lineRemainder = 0;
+        return;
+      }
+
+      if (!e.cancelable) return;
+
+      e.preventDefault();
+      scrollByLines(deltaY / pixelsPerLine());
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      cancelLongPress();
+
+      if (e.touches.length > 0) {
+        lastY = e.touches[0].clientY;
+        lastTime = e.timeStamp;
+        velocity = 0;
+        return;
+      }
+
+      if (selectionAnchor !== null) {
+        selectionAnchor = null;
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+
+      setTimeout(() => updateSelectionMenuRef.current(), 150);
+
+      if (Math.abs(velocity) < 0.05) return;
+
+      let previousTime = performance.now();
+      const step = (now: number) => {
+        momentumFrame = null;
+
+        const deltaTime = now - previousTime;
+        previousTime = now;
+
+        if (!canScroll(velocity)) {
+          velocity = 0;
+          return;
+        }
+
+        scrollByLines((velocity * deltaTime) / pixelsPerLine());
+        velocity *= Math.pow(0.95, deltaTime / (1000 / 60));
+
+        if (Math.abs(velocity) > 0.01) {
+          momentumFrame = requestAnimationFrame(step);
+        }
+      };
+      momentumFrame = requestAnimationFrame(step);
+    };
+
+    const handleTouchCancel = () => {
+      cancelLongPress();
+      selectionAnchor = null;
+    };
+
+    const handleMouseDown = () => {
+      touchSelectionRef.current = false;
+    };
+
+    const handleContextMenu = (e: Event) => {
+      if (selectionAnchor !== null || longPressTimer !== null) e.preventDefault();
+    };
+
+    terminalElement.addEventListener('touchstart', handleTouchStart, { passive: true });
     terminalElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+    terminalElement.addEventListener('touchend', handleTouchEnd, { passive: false });
+    terminalElement.addEventListener('touchcancel', handleTouchCancel, { passive: true });
+    terminalElement.addEventListener('contextmenu', handleContextMenu);
+    terminalElement.addEventListener('mousedown', handleMouseDown);
 
     return () => {
+      stopMomentum();
+      cancelLongPress();
       terminalElement.removeEventListener('touchstart', handleTouchStart);
       terminalElement.removeEventListener('touchmove', handleTouchMove);
+      terminalElement.removeEventListener('touchend', handleTouchEnd);
+      terminalElement.removeEventListener('touchcancel', handleTouchCancel);
+      terminalElement.removeEventListener('contextmenu', handleContextMenu);
+      terminalElement.removeEventListener('mousedown', handleMouseDown);
     };
   }, [consoleFontSize]);
 
@@ -344,6 +555,14 @@ export default function Terminal() {
       setIsAtBottom(true);
     }
   }, []);
+
+  const copySelection = useCallback(() => {
+    const term = xtermInstance.current;
+    if (!term?.hasSelection()) return;
+
+    handleRawCopyToClipboard(term.getSelection(), addToast);
+    term.clearSelection();
+  }, [addToast]);
 
   const containerPreludeRef = useRef(settings.server.containerPrelude);
   useEffect(() => {
@@ -624,6 +843,23 @@ export default function Terminal() {
 
         <div className='flex-1 min-h-0 relative overflow-hidden'>
           <div ref={terminalRef} className='absolute inset-0' />
+          {selectionMenuTop !== null && (
+            <div
+              className='absolute left-1/2 -translate-x-1/2 z-10 shadow-md rounded-(--mantine-radius-default)'
+              style={{ top: selectionMenuTop }}
+            >
+              <Tooltip label={t('pages.server.console.tooltip.copySelection', {})}>
+                <ActionIcon
+                  variant='default'
+                  size='lg'
+                  aria-label={t('pages.server.console.tooltip.copySelection', {})}
+                  onClick={copySelection}
+                >
+                  <FontAwesomeIcon icon={faCopy} />
+                </ActionIcon>
+              </Tooltip>
+            </div>
+          )}
         </div>
 
         {imagePulls.size > 0 && (

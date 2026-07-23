@@ -2,6 +2,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
 import Title from '@/elements/Title.tsx';
+import { useVisualViewportBottomInset } from '@/plugins/useVisualViewport.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import Console from './Console.tsx';
@@ -12,6 +13,7 @@ import ServerStats from './ServerStats.tsx';
 export default function ServerConsole() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
+  const keyboardInset = useVisualViewportBottomInset();
 
   return (
     <ServerContentContainer
@@ -35,7 +37,12 @@ export default function ServerConsole() {
       </div>
 
       <div className='grid xl:grid-cols-4 gap-4 mb-4'>
-        <div className='xl:col-span-3 flex flex-col h-[60vh] xl:h-auto'>
+        <div
+          className='xl:col-span-3 flex flex-col h-[60vh] xl:h-auto'
+          style={
+            keyboardInset > 0 ? { height: `max(8rem, min(60vh, calc(100dvh - ${keyboardInset}px - 7rem)))` } : undefined
+          }
+        >
           <Console />
         </div>
 

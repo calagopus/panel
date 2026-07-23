@@ -201,7 +201,9 @@ export const createFileManagerStore = (
         localStorage.setItem('file_editor_minimap', state.toString());
         set({ editorMinimap: state });
       },
-      editorLineOverflow: localStorage.getItem('file_editor_lineoverflow') === 'true',
+      editorLineOverflow:
+        (localStorage.getItem('file_editor_lineoverflow') ?? String(window.matchMedia('(pointer: coarse)').matches)) ===
+        'true',
       setEditorLineOverflow: (state) => {
         localStorage.setItem('file_editor_lineoverflow', state.toString());
         set({ editorLineOverflow: state });

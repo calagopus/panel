@@ -3990,7 +3990,8 @@
             "sshDetails": "SSH-Details",
             "commandHistory": "Befehlsverlauf",
             "decreaseFontSize": "Schriftgröße verringern",
-            "increaseFontSize": "Schriftgröße erhöhen"
+            "increaseFontSize": "Schriftgröße erhöhen",
+            "copySelection": "Auswahl kopieren"
           },
           "drawer": {
             "commandHistory": {

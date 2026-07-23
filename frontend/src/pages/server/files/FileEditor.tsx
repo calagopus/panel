@@ -28,6 +28,7 @@ import Title from '@/elements/Title.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/monaco.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
+import { visualViewportBottomInset } from '@/plugins/useVisualViewport.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { FileManagerProvider, useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -314,11 +315,13 @@ function FileEditorComponent() {
       const virtualWindowEl = getParent();
       const elRect = el.getBoundingClientRect();
 
+      const visibleBottom = window.innerHeight - visualViewportBottomInset();
+
       let bottomEdge;
       if (virtualWindowEl) {
-        bottomEdge = virtualWindowEl.getBoundingClientRect().bottom;
+        bottomEdge = Math.min(virtualWindowEl.getBoundingClientRect().bottom, visibleBottom);
       } else {
-        bottomEdge = window.innerHeight;
+        bottomEdge = visibleBottom;
       }
 
       const newHeight = Math.max(0, bottomEdge - elRect.top);
@@ -330,6 +333,10 @@ function FileEditorComponent() {
     };
 
     const observer = new ResizeObserver(() => updateHeight());
+
+    const viewport = window.visualViewport;
+    viewport?.addEventListener('resize', updateHeight);
+    viewport?.addEventListener('scroll', updateHeight);
 
     const virtualWindowEl = getParent();
     if (virtualWindowEl) {
@@ -344,7 +351,11 @@ function FileEditorComponent() {
 
     updateHeight();
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      viewport?.removeEventListener('resize', updateHeight);
+      viewport?.removeEventListener('scroll', updateHeight);
+    };
   }, [loading, getParent, params.action, fileName]);
 
   const saveShortcutRef = useRef(() => void 0);

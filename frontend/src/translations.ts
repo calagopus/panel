@@ -4020,6 +4020,7 @@ const baseTranslations = defineTranslations({
             commandHistory: 'Command History',
             decreaseFontSize: 'Decrease Font Size',
             increaseFontSize: 'Increase Font Size',
+            copySelection: 'Copy Selection',
           },
           drawer: {
             commandHistory: {
