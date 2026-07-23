@@ -2557,7 +2557,7 @@
                   "featureLimits": "Funktionslimits"
                 },
                 "label": {
-                  "email": "E-Mail",
+                  "user": "Benutzer",
                   "language": "Sprache",
                   "createdAt": "Erstellt",
                   "node": "Knoten",

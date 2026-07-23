@@ -2506,7 +2506,7 @@
                   "featureLimits": "Giới Hạn Tính Năng"
                 },
                 "label": {
-                  "email": "Email",
+                  "user": "Người dùng",
                   "language": "Ngôn ngữ",
                   "createdAt": "Đã tạo",
                   "node": "Node",

@@ -581,11 +581,11 @@ function FileEditorComponent() {
         size='90%'
       >
         {conflictDiskContent === null ? (
-          <div className='w-full h-96 flex items-center justify-center'>
+          <div className='w-full h-[70vh] flex items-center justify-center'>
             <Spinner />
           </div>
         ) : (
-          <div className='h-96 flex'>
+          <div className='h-[70vh] flex'>
             <MonacoDiffEditor
               height='100%'
               width='100%'
@@ -741,7 +741,7 @@ function FileEditorComponent() {
                 />
               ) : params.action === 'image' ? (
                 <div className='h-full w-full flex flex-row justify-center'>
-                  <TransformWrapper minScale={0.5}>
+                  <TransformWrapper minScale={0.5} centerOnInit>
                     <TransformComponent wrapperClass='w-[calc(100%-4rem)]! h-7/8! rounded-md'>
                       <img
                         src={content}

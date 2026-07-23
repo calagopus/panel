@@ -655,13 +655,31 @@
         "uploadingFolder": "Uploading folder: {folder} ({files})",
         "failed": "Failed: {file}",
         "failedFolder": "Upload failed: {folder} ({files})",
+        "paused": "Paused: {file}",
+        "pause": "Pause upload",
+        "resume": "Resume upload",
+        "cancel": "Cancel upload",
+        "reselect": "Re-select file to resume",
+        "badge": {
+          "uploading": "Uploading",
+          "waiting": "Waiting",
+          "paused": "Paused",
+          "failed": "Failed"
+        },
         "rateLimited": "Your upload has been rate limited. Waiting...",
         "cancelAllUploads": "Cancel all uploads",
+        "modal": {
+          "cancelAllUploads": {
+            "title": "Cancel All Uploads",
+            "content": "Are you sure you want to cancel all active uploads? Partially uploaded files will be discarded."
+          }
+        },
         "toast": {
           "uploading": "Started uploading {files}...",
           "failed": "Upload failed: {error}",
           "cancelledFile": "Successfully cancelled upload of `{file}`.",
           "cancelledFolder": "Successfully cancelled upload of `{folder}` ({files}).",
+          "wrongFile": "Selected file does not match `{file}`; pick the same file to resume.",
           "cancelledAll": "All uploads have been cancelled.",
           "completedServer": "Finished uploading {files} to `{server}`.",
           "completedAssets": "Finished uploading {files} to the admin assets.",
@@ -2552,7 +2570,7 @@
                   "featureLimits": "Feature Limits"
                 },
                 "label": {
-                  "email": "Email",
+                  "user": "User",
                   "language": "Language",
                   "createdAt": "Created",
                   "node": "Node",
@@ -4196,6 +4214,10 @@
             }
           },
           "modal": {
+            "cancelAllOperations": {
+              "title": "Cancel All Operations",
+              "content": "Are you sure you want to cancel all running file operations? Their progress will be lost."
+            },
             "unsavedChanges": {
               "title": "Unsaved Changes",
               "content": "You have unsaved changes in the file editor. Are you sure you want to leave this page? If you leave, your changes will be lost."

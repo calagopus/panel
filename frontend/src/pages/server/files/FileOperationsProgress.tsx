@@ -1,9 +1,12 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { faPause, faPlay, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelOperation from '@/api/server/files/cancelOperation.ts';
+import ActionIcon from '@/elements/ActionIcon.tsx';
+import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
-import CloseButton from '@/elements/CloseButton.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Popover from '@/elements/Popover.tsx';
 import Progress from '@/elements/Progress.tsx';
@@ -12,6 +15,7 @@ import Text from '@/elements/Text.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import UnstyledButton from '@/elements/UnstyledButton.tsx';
 import { bytesProgressString } from '@/lib/size.ts';
+import { canResumeInSession, pauseUpload, resumeDetachedUpload, resumeUpload } from '@/lib/uploadManager.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -46,6 +50,9 @@ function FileOperationsProgress() {
   );
 
   const [openModal, setOpenModal] = useState<'cancelUploads' | 'cancelOperations' | null>(null);
+
+  const reselectInputRef = useRef<HTMLInputElement | null>(null);
+  const reselectKeyRef = useRef<string | null>(null);
 
   const isRateLimited = useMemo(() => {
     for (const file of uploadingFiles.values()) {
@@ -216,7 +223,11 @@ function FileOperationsProgress() {
                   />
                 </Tooltip>
               </div>
-              <CloseButton className='ml-3' onClick={() => cancelFolderUpload(folderName)} />
+              <Tooltip label={t('elements.fileUpload.cancel', {})}>
+                <ActionIcon variant='light' color='red' className='ml-3' onClick={() => cancelFolderUpload(folderName)}>
+                  <FontAwesomeIcon icon={faXmark} size='sm' />
+                </ActionIcon>
+              </Tooltip>
             </div>
           );
         })}
@@ -226,16 +237,81 @@ function FileOperationsProgress() {
             return null;
           }
 
+          if (file.status === 'paused') {
+            const inSession = canResumeInSession(key);
+
+            return (
+              <div key={key} className='flex flex-row items-center mb-2'>
+                <div className='flex flex-col grow'>
+                  <div className='flex items-center gap-2 mb-1'>
+                    <Badge variant='light' color='yellow' size='sm'>
+                      {t('elements.fileUpload.badge.paused', {})}
+                    </Badge>
+                    <span className='break-all text-sm'>{file.filePath}</span>
+                  </div>
+                  {inSession ? (
+                    <Tooltip label={bytesProgressString(file.uploaded, file.size)} innerClassName='w-full'>
+                      <Progress value={file.progress} color='gray' />
+                    </Tooltip>
+                  ) : (
+                    <Button
+                      size='compact-xs'
+                      variant='light'
+                      leftSection={<FontAwesomeIcon icon={faPlay} size='sm' />}
+                      onClick={() => {
+                        reselectKeyRef.current = key;
+                        reselectInputRef.current?.click();
+                      }}
+                    >
+                      {t('elements.fileUpload.reselect', {})}
+                    </Button>
+                  )}
+                </div>
+                <div className='flex items-center gap-1 ml-3'>
+                  {inSession && (
+                    <Tooltip label={t('elements.fileUpload.resume', {})}>
+                      <ActionIcon variant='light' onClick={() => resumeUpload(key)}>
+                        <FontAwesomeIcon icon={faPlay} size='sm' />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                  <Tooltip label={t('elements.fileUpload.cancel', {})}>
+                    <ActionIcon variant='light' color='red' onClick={() => cancelFileUpload(key)}>
+                      <FontAwesomeIcon icon={faXmark} size='sm' />
+                    </ActionIcon>
+                  </Tooltip>
+                </div>
+              </div>
+            );
+          }
+
+          const canPause = file.resumable && file.status === 'uploading';
+
           return (
             <div key={key} className='flex flex-row items-center mb-2'>
               <div className='flex flex-col grow'>
-                <p className='break-all mb-1 text-sm'>
-                  {file.status === 'error'
-                    ? t('elements.fileUpload.failed', { file: file.filePath })
-                    : file.status === 'pending'
-                      ? t('elements.fileUpload.waiting', { file: file.filePath })
-                      : t('elements.fileUpload.uploading', { file: file.filePath })}
-                </p>
+                <div className='flex items-center gap-2 mb-1'>
+                  <Badge
+                    variant='light'
+                    size='sm'
+                    color={
+                      file.status === 'error'
+                        ? 'red'
+                        : file.status === 'pending'
+                          ? 'gray'
+                          : isRateLimited
+                            ? 'orange'
+                            : 'blue'
+                    }
+                  >
+                    {file.status === 'error'
+                      ? t('elements.fileUpload.badge.failed', {})
+                      : file.status === 'pending'
+                        ? t('elements.fileUpload.badge.waiting', {})
+                        : t('elements.fileUpload.badge.uploading', {})}
+                  </Badge>
+                  <span className='break-all text-sm'>{file.filePath}</span>
+                </div>
                 <Tooltip label={bytesProgressString(file.uploaded, file.size)} innerClassName='w-full'>
                   <Progress
                     value={file.progress}
@@ -243,7 +319,20 @@ function FileOperationsProgress() {
                   />
                 </Tooltip>
               </div>
-              <CloseButton className='ml-3' onClick={() => cancelFileUpload(key)} />
+              <div className='flex items-center gap-1 ml-3'>
+                {canPause && (
+                  <Tooltip label={t('elements.fileUpload.pause', {})}>
+                    <ActionIcon variant='light' onClick={() => pauseUpload(key)}>
+                      <FontAwesomeIcon icon={faPause} size='sm' />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+                <Tooltip label={t('elements.fileUpload.cancel', {})}>
+                  <ActionIcon variant='light' color='red' onClick={() => cancelFileUpload(key)}>
+                    <FontAwesomeIcon icon={faXmark} size='sm' />
+                  </ActionIcon>
+                </Tooltip>
+              </div>
             </div>
           );
         })}
@@ -301,7 +390,11 @@ function FileOperationsProgress() {
                   <Progress indeterminate={!operation.bytesTotal} value={progress} />
                 </Tooltip>
               </div>
-              <CloseButton className='ml-3' onClick={() => doCancelOperation(uuid)} />
+              <Tooltip label={t('common.button.cancel', {})}>
+                <ActionIcon variant='light' color='red' className='ml-3' onClick={() => doCancelOperation(uuid)}>
+                  <FontAwesomeIcon icon={faXmark} size='sm' />
+                </ActionIcon>
+              </Tooltip>
             </div>
           );
         })}
@@ -311,6 +404,19 @@ function FileOperationsProgress() {
             <Component key={`files-operationProgress-appended-${i}`} />
           ),
         )}
+
+        <input
+          ref={reselectInputRef}
+          type='file'
+          className='hidden'
+          onChange={(event) => {
+            const key = reselectKeyRef.current;
+            const file = event.target.files?.[0];
+            reselectKeyRef.current = null;
+            event.target.value = '';
+            if (key && file) resumeDetachedUpload(key, file);
+          }}
+        />
       </Popover.Dropdown>
     </Popover>
   );

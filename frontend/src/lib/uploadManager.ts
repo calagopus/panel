@@ -4,13 +4,27 @@ import { ReactNode } from 'react';
 import uploadAssets from '@/api/admin/assets/uploadAssets.ts';
 import { axiosInstance, httpErrorToHuman } from '@/api/axios.ts';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl.ts';
+import {
+  conflictOffset,
+  headUploadOffset,
+  patchUploadChunk,
+  withFileParam,
+} from '@/api/server/files/resumableUpload.ts';
 import { ToastAction, ToastType } from '@/providers/contexts/toastContext.ts';
 import { getTranslations } from '@/providers/contexts/translationContext.ts';
-import { UploadDestination, UploadItem, uploadScopeKey, useUploadsStore } from '@/stores/uploads.ts';
+import {
+  loadPersistedUploads,
+  PersistedResumableUpload,
+  persistUpload,
+  UploadDestination,
+  UploadItem,
+  unpersistUpload,
+  uploadScopeKey,
+  useUploadsStore,
+} from '@/stores/uploads.ts';
 
 export interface UploadResult {
   url: string;
-  continuationToken?: string | null;
 }
 
 interface UploadManagerExternals {
@@ -27,13 +41,6 @@ export function setUploadManagerExternals(ext: UploadManagerExternals): void {
 
 interface DestinationHandler<D extends UploadDestination = UploadDestination> {
   upload: (destination: D, form: FormData, config: AxiosRequestConfig) => Promise<UploadResult | undefined>;
-  splitUpload?: (
-    destination: D,
-    form: FormData,
-    config: AxiosRequestConfig,
-    continuationToken: string,
-    prevUrl: string,
-  ) => Promise<UploadResult>;
   onBatchComplete: (destination: D) => void;
 }
 
@@ -60,17 +67,9 @@ const handlers: {
   server: {
     upload: async (destination, form, config) => {
       const { url } = await getFileUploadUrl(destination.serverUuid, destination.directory);
-      const { data } = await axiosInstance.post(url, form, config);
+      await axiosInstance.post(url, form, config);
 
-      return { url, continuationToken: data.continuation_token ?? null };
-    },
-    splitUpload: async (_destination, form, config, continuationToken, prevUrl) => {
-      const { data } = await axiosInstance.post(prevUrl, form, {
-        ...config,
-        params: { ...config.params, continuation_token: continuationToken },
-      });
-
-      return { url: prevUrl, continuationToken: data.continuation_token ?? null };
+      return { url };
     },
     onBatchComplete: (destination) => {
       const refreshers = fileManagerRefreshers.get(uploadScopeKey(destination));
@@ -108,6 +107,9 @@ const MAX_RETRY_MS = 30_000;
 const PROGRESS_FLUSH_MS = 100;
 
 const controllers = new Map<string, AbortController>();
+// Files held in memory for the current session so a paused upload can resume without
+// re-selecting. Cleared on a reload (which is what forces the re-select fallback).
+const heldFiles = new Map<string, File>();
 const folderFileCounts = new Map<string, number>();
 const pendingProgress = new Map<string, number>();
 const failureToastedBatches = new Set<string>();
@@ -127,6 +129,12 @@ function setUploads(updater: (prev: Map<string, UploadItem>) => Map<string, Uplo
   const prev = useUploadsStore.getState().uploads;
   const next = updater(prev);
   if (next !== prev) useUploadsStore.setState({ uploads: next });
+}
+
+function unpersistItem(item: UploadItem | undefined): void {
+  if (item?.resumable && item.remotePath) {
+    unpersistUpload(item.destination, item.remotePath);
+  }
 }
 
 function is429Error(error: AxiosError): boolean {
@@ -449,112 +457,96 @@ async function uploadRequest(
   }
 }
 
-async function uploadSplitFile(
-  destination: UploadDestination,
+function markResumableError(key: string): void {
+  setUploads((prev) => {
+    const entry = prev.get(key);
+    if (!entry || entry.status === 'completed') return prev;
+    const next = new Map(prev);
+    next.set(key, { ...entry, status: 'error' });
+    return next;
+  });
+}
+
+async function runResumableUpload(
+  destination: Extract<UploadDestination, { type: 'server' }>,
   file: File,
-  fileIndex: number,
+  key: string,
+  remotePath: string,
   batchId: string,
   controller: AbortController,
 ): Promise<void> {
-  const handler = handlerFor(destination);
-  if (!handler.splitUpload) {
-    throw new Error('uploadSplitFile called for a destination without split upload support');
-  }
-
-  const key = `file-${fileIndex}`;
-  const filename = file.webkitRelativePath || file.name;
   const totalSize = file.size;
+  const signal = controller.signal;
+  heldFiles.set(key, file);
 
   try {
     setUploads((prev) => {
       const entry = prev.get(key);
-
       if (!entry || entry.status === 'completed' || entry.status === 'error') return prev;
       const next = new Map(prev);
-      next.set(key, { ...entry, status: 'uploading' });
+      next.set(key, { ...entry, status: 'uploading', detached: false, retryAttempt: 0 });
       return next;
     });
 
-    let offset = 0;
-    let priorUploaded = 0;
-    let continuationToken: string | undefined;
-    let prevUrl: string | undefined;
+    persistUpload({ destination, remotePath, localName: file.name, size: totalSize });
 
-    while (offset < totalSize) {
-      if (controller.signal.aborted) {
-        const err: Error & { code?: string } = new Error('canceled');
-        err.code = 'ERR_CANCELED';
-        throw err;
-      }
+    const refreshUrl = async (): Promise<string> =>
+      withFileParam((await getFileUploadUrl(destination.serverUuid, destination.directory)).url, remotePath);
 
-      const sliceEnd = Math.min(offset + CHUNK_TARGET_BYTES, totalSize);
-      const isLastSlice = sliceEnd >= totalSize;
-      const sliceBlob = file.slice(offset, sliceEnd);
-      const sliceFile = new File([sliceBlob], filename, { type: file.type });
+    let uploadUrl = await refreshUrl();
 
-      const formData = new FormData();
-      formData.append('files', sliceFile, filename);
+    let offset = await headUploadOffset(uploadUrl, signal);
+    if (offset > totalSize) offset = 0;
+    queueProgress(key, Math.min(offset, totalSize));
 
-      const sliceSize = sliceEnd - offset;
+    let finalized = false;
+    while (!finalized) {
+      if (signal.aborted) throw makeCancelled();
 
-      const params: Record<string, string> = {};
-      if (!isLastSlice) {
-        params.wants_continue = '0';
-      }
-      if (offset === 0) {
-        params.total_size = String(totalSize);
-      }
+      const sliceStart = offset;
+      const sliceEnd = Math.min(sliceStart + CHUNK_TARGET_BYTES, totalSize);
+      const isLast = sliceEnd >= totalSize;
+      const body = file.slice(sliceStart, sliceEnd);
 
-      const config: AxiosRequestConfig = {
-        signal: controller.signal,
-        headers: { 'Content-Type': 'multipart/form-data' },
-        params,
-        onUploadProgress: (event) => {
-          const loaded = event.loaded ?? 0;
-          queueProgress(key, Math.min(priorUploaded + loaded, totalSize));
-        },
-      };
+      let sliceDone = false;
+      for (let attempt = 0; !sliceDone; attempt++) {
+        if (signal.aborted) throw makeCancelled();
 
-      let result!: UploadResult;
-      for (let attempt = 0; ; attempt++) {
         try {
-          const res =
-            continuationToken === undefined || prevUrl === undefined
-              ? await handler.upload(destination, formData, config)
-              : await handler.splitUpload(destination, formData, config, continuationToken, prevUrl);
-          if (!res) {
-            throw new Error('upload handler did not return a result for a split upload');
-          }
-          result = res;
-          break;
+          offset = await patchUploadChunk(uploadUrl, body, sliceStart, totalSize, isLast, signal, (event) =>
+            queueProgress(key, Math.min(sliceStart + (event.loaded ?? 0), totalSize)),
+          );
+          if (isLast) finalized = true;
+          sliceDone = true;
         } catch (err) {
-          if (!(err instanceof AxiosError) || !is429Error(err) || attempt >= MAX_RETRIES || controller.signal.aborted) {
+          if (!(err instanceof AxiosError) || signal.aborted) throw err;
+
+          const status = err.response?.status;
+          if (status === 401) {
+            uploadUrl = await refreshUrl();
+            attempt--;
+          } else if (status === 409) {
+            const real = conflictOffset(err.response?.headers as Record<string, unknown> | undefined);
+            offset = real !== null ? Math.min(real, totalSize) : sliceStart;
+            sliceDone = true;
+          } else if (is429Error(err) && attempt < MAX_RETRIES) {
+            setUploads((prev) => {
+              const entry = prev.get(key);
+              if (!entry) return prev;
+              const next = new Map(prev);
+              next.set(key, { ...entry, retryAttempt: attempt + 1 });
+              return next;
+            });
+            await sleep(get429RetryDelay(err, attempt), signal);
+          } else {
             throw err;
           }
-          setUploads((prev) => {
-            const entry = prev.get(key);
-            if (!entry) return prev;
-            const next = new Map(prev);
-            next.set(key, { ...entry, retryAttempt: attempt + 1 });
-            return next;
-          });
-          await sleep(get429RetryDelay(err, attempt), controller.signal);
         }
-      }
-
-      priorUploaded += sliceSize;
-      offset = sliceEnd;
-
-      prevUrl = result.url;
-
-      if (!isLastSlice) {
-        if (!result.continuationToken) {
-          throw new Error('server did not return a continuation token for a non-final slice');
-        }
-        continuationToken = result.continuationToken;
       }
     }
 
+    unpersistUpload(destination, remotePath);
+    heldFiles.delete(key);
     setUploads((prev) => {
       const entry = prev.get(key);
       if (!entry || entry.status === 'error') return prev;
@@ -563,18 +555,148 @@ async function uploadSplitFile(
       return next;
     });
   } catch (error) {
-    handleUploadError(error, batchId, () =>
-      setUploads((prev) => {
-        const entry = prev.get(key);
-        if (!entry || entry.status === 'completed') return prev;
-        const next = new Map(prev);
-        next.set(key, { ...entry, status: 'error' });
-        return next;
-      }),
-    );
+    // A pause aborts the request but keeps the entry `paused` and the File held for resume; do
+    // not fall through to the error state in that case.
+    if (isCancelledError(error) && useUploadsStore.getState().uploads.get(key)?.status === 'paused') {
+      return;
+    }
+    // The descriptor is left persisted on failure so the upload can be resumed (in-session, or
+    // after a reload); an explicit cancel is what removes it.
+    handleUploadError(error, batchId, () => markResumableError(key));
   } finally {
     settleBatches();
   }
+}
+
+/**
+ * Pauses an in-flight resumable upload: aborts the current request but keeps the entry (with
+ * its progress) and the held File, so it can resume without re-selecting. The daemon keeps the
+ * partial file, so the next resume continues from its on-disk offset.
+ */
+export function pauseUpload(key: string): void {
+  const entry = useUploadsStore.getState().uploads.get(key);
+  // Only once the upload is actually running (its File is held and it has been persisted) can it
+  // be paused; a still-`pending` item would have nothing to resume from.
+  if (!entry?.resumable || entry.status !== 'uploading') return;
+
+  setUploads((prev) => {
+    const current = prev.get(key);
+    if (!current) return prev;
+    const next = new Map(prev);
+    next.set(key, { ...current, status: 'paused', retryAttempt: 0 });
+    return next;
+  });
+
+  controllers.get(key)?.abort();
+  controllers.delete(key);
+  pendingProgress.delete(key);
+}
+
+/**
+ * Resumes a paused upload whose File is still held from this session. Returns false when the
+ * File is gone (e.g. after a reload), in which case the caller must re-select it via
+ * {@link resumeDetachedUpload}.
+ */
+export function resumeUpload(key: string): boolean {
+  const entry = useUploadsStore.getState().uploads.get(key);
+  if (!entry?.resumable || entry.destination.type !== 'server' || !entry.remotePath) return false;
+
+  const file = heldFiles.get(key);
+  if (!file) return false;
+
+  const controller = new AbortController();
+  controllers.set(key, controller);
+
+  runResumableUpload(entry.destination, file, key, entry.remotePath, entry.batchId, controller).catch((error) =>
+    console.error('Resume error:', error),
+  );
+
+  return true;
+}
+
+/** Whether a paused upload can resume without a re-select (its File is still in memory). */
+export function canResumeInSession(key: string): boolean {
+  return heldFiles.has(key);
+}
+
+function makeCancelled(): Error & { code?: string } {
+  const err: Error & { code?: string } = new Error('canceled');
+  err.code = 'ERR_CANCELED';
+  return err;
+}
+
+async function uploadResumableFile(
+  destination: UploadDestination,
+  file: File,
+  fileIndex: number,
+  batchId: string,
+  controller: AbortController,
+): Promise<void> {
+  if (destination.type !== 'server') {
+    throw new Error('uploadResumableFile called for a destination without resumable support');
+  }
+
+  const remotePath = file.webkitRelativePath || file.name;
+  await runResumableUpload(destination, file, `file-${fileIndex}`, remotePath, batchId, controller);
+}
+
+export function resumeDetachedUpload(key: string, file: File): boolean {
+  const entry = useUploadsStore.getState().uploads.get(key);
+  if (!entry || !entry.resumable || entry.destination.type !== 'server' || !entry.remotePath) return false;
+
+  if (file.name !== entry.localName || file.size !== entry.size) {
+    const { t } = getTranslations();
+    addToastSafely(t('elements.fileUpload.toast.wrongFile', { file: entry.localName ?? file.name }).md(), 'error');
+    return false;
+  }
+
+  const controller = new AbortController();
+  controllers.set(key, controller);
+
+  runResumableUpload(entry.destination, file, key, entry.remotePath, entry.batchId, controller).catch((error) =>
+    console.error('Resume error:', error),
+  );
+
+  return true;
+}
+
+function addToastSafely(message: ReactNode, type?: ToastType): void {
+  externals?.addToast(message, type);
+}
+
+let hydratedPersistedUploads = false;
+export function hydratePersistedUploads(): void {
+  if (hydratedPersistedUploads) return;
+  hydratedPersistedUploads = true;
+
+  const persisted = loadPersistedUploads();
+  if (persisted.length === 0) return;
+
+  const startIndex = fileIndexCounter;
+  fileIndexCounter += persisted.length;
+
+  setUploads((prev) => {
+    const next = new Map(prev);
+    persisted.forEach((entry: PersistedResumableUpload, i) => {
+      const key = `file-${startIndex + i}`;
+      const scope = uploadScopeKey(entry.destination);
+      next.set(key, {
+        filePath: entry.remotePath,
+        progress: 0,
+        size: entry.size,
+        uploaded: 0,
+        batchId: `${scope}/detached-${entry.remotePath}`,
+        status: 'paused',
+        retryAttempt: 0,
+        destination: entry.destination,
+        resumable: true,
+        remotePath: entry.remotePath,
+        localName: entry.localName,
+        detached: true,
+      });
+    });
+    return next;
+  });
 }
 
 function clearFailedEntries(scope: string, folderNames: Set<string>, fileNames: Set<string>): void {
@@ -597,7 +719,10 @@ function clearFailedEntries(scope: string, folderNames: Set<string>, fileNames: 
 
   setUploads((prev) => {
     const next = new Map(prev);
-    keysToRemove.forEach((key) => next.delete(key));
+    keysToRemove.forEach((key) => {
+      unpersistItem(next.get(key));
+      next.delete(key);
+    });
     return next;
   });
 
@@ -625,7 +750,11 @@ export async function uploadFiles(destination: UploadDestination, files: File[])
   if (files.length === 0) return;
 
   const scope = uploadScopeKey(destination);
-  const splittingEnabled = handlerFor(destination).splitUpload !== undefined;
+  const splittingEnabled = destination.type === 'server';
+  const resumableFields = (file: File, path: string): Partial<UploadItem> =>
+    splittingEnabled && file.size > CHUNK_TARGET_BYTES
+      ? { resumable: true, remotePath: path, localName: file.name }
+      : {};
 
   const startIndex = fileIndexCounter;
   fileIndexCounter += files.length;
@@ -675,6 +804,7 @@ export async function uploadFiles(destination: UploadDestination, files: File[])
         status: 'pending',
         retryAttempt: 0,
         destination,
+        ...resumableFields(file, file.name),
       });
     }
 
@@ -691,6 +821,7 @@ export async function uploadFiles(destination: UploadDestination, files: File[])
         status: 'pending',
         retryAttempt: 0,
         destination,
+        ...resumableFields(file, path),
       });
     }
 
@@ -718,7 +849,7 @@ export async function uploadFiles(destination: UploadDestination, files: File[])
         try {
           if (controller.signal.aborted) return;
           if (splittingEnabled && file.size > CHUNK_TARGET_BYTES) {
-            await uploadSplitFile(destination, file, index, key, controller);
+            await uploadResumableFile(destination, file, index, key, controller);
           } else {
             await uploadRequest(destination, [file], [index], key, controller);
           }
@@ -747,7 +878,7 @@ export async function uploadFiles(destination: UploadDestination, files: File[])
       entriesToPack = entries.filter((e) => e.file.size <= CHUNK_TARGET_BYTES);
 
       for (const entry of oversized) {
-        promises.push(uploadSplitFile(destination, entry.file, entry.index, batchId, controller));
+        promises.push(uploadResumableFile(destination, entry.file, entry.index, batchId, controller));
       }
     }
 
@@ -790,6 +921,8 @@ export function cancelFileUpload(fileKey: string): void {
   controller?.abort();
   controllers.delete(fileKey);
   pendingProgress.delete(fileKey);
+  heldFiles.delete(fileKey);
+  unpersistItem(entry);
 
   setUploads((prev) => {
     if (!prev.has(fileKey)) return prev;
@@ -839,7 +972,11 @@ export function cancelFolderUpload(scope: string, folderName: string): void {
 
   setUploads((prev) => {
     const next = new Map(prev);
-    keysToRemove.forEach((key) => next.delete(key));
+    keysToRemove.forEach((key) => {
+      unpersistItem(next.get(key));
+      heldFiles.delete(key);
+      next.delete(key);
+    });
     return next;
   });
 
@@ -893,7 +1030,11 @@ export function cancelAllUploads(scope?: string, options?: { silent?: boolean })
 
   setUploads((prev) => {
     const next = new Map(prev);
-    keysToRemove.forEach((key) => next.delete(key));
+    keysToRemove.forEach((key) => {
+      if (!options?.silent) unpersistItem(next.get(key));
+      heldFiles.delete(key);
+      next.delete(key);
+    });
     return next;
   });
 

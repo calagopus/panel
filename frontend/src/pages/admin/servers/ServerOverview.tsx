@@ -56,16 +56,6 @@ function StatBox({ label, value, icon }: { label: string; value: React.ReactNode
   );
 }
 
-function countLabel(value: number, unlimited: string): React.ReactNode {
-  return value === 0 ? (
-    <Badge color='gray' variant='light'>
-      {unlimited}
-    </Badge>
-  ) : (
-    value
-  );
-}
-
 export default function ServerOverview({ server }: { server: Server }) {
   const { t } = useTranslations();
 
@@ -135,7 +125,7 @@ export default function ServerOverview({ server }: { server: Server }) {
             }
           >
             <Stack gap={0}>
-              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.email', {})}>
+              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.user', {})}>
                 <TableLink to={`/admin/users/${server.owner.uuid}`}>
                   {server.owner.nameFirst} {server.owner.nameLast} ({server.owner.username})
                 </TableLink>
@@ -339,22 +329,22 @@ export default function ServerOverview({ server }: { server: Server }) {
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.allocations', {})}
               icon={<FontAwesomeIcon icon={faNetworkWired} />}
-              value={countLabel(server.featureLimits.allocations, unlimitedLabel)}
+              value={server.featureLimits.allocations}
             />
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.databases', {})}
               icon={<FontAwesomeIcon icon={faDatabase} />}
-              value={countLabel(server.featureLimits.databases, unlimitedLabel)}
+              value={server.featureLimits.databases}
             />
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.backups', {})}
               icon={<FontAwesomeIcon icon={faArchive} />}
-              value={countLabel(server.featureLimits.backups, unlimitedLabel)}
+              value={server.featureLimits.backups}
             />
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.schedules', {})}
               icon={<FontAwesomeIcon icon={faClock} />}
-              value={countLabel(server.featureLimits.schedules, unlimitedLabel)}
+              value={server.featureLimits.schedules}
             />
             {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.featureLimits.appendedComponents.map(
               (Component, index) => (

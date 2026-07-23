@@ -1,4 +1,7 @@
-import CloseButton from '@/elements/CloseButton.tsx';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ActionIcon from '@/elements/ActionIcon.tsx';
+import Badge from '@/elements/Badge.tsx';
 import Popover from '@/elements/Popover.tsx';
 import Progress from '@/elements/Progress.tsx';
 import RingProgress from '@/elements/RingProgress.tsx';
@@ -55,18 +58,29 @@ export default function AssetUploadProgress({
         {Array.from(uploadingFiles).map(([key, file]) => (
           <div key={key} className='flex flex-row items-center mb-2'>
             <div className='flex flex-col grow'>
-              <p className='break-all mb-1 text-sm'>
-                {file.status === 'error'
-                  ? t('elements.fileUpload.failed', { file: file.filePath })
-                  : file.status === 'pending'
-                    ? t('elements.fileUpload.waiting', { file: file.filePath })
-                    : t('elements.fileUpload.uploading', { file: file.filePath })}
-              </p>
+              <div className='flex items-center gap-2 mb-1'>
+                <Badge
+                  variant='light'
+                  size='sm'
+                  color={file.status === 'error' ? 'red' : file.status === 'pending' ? 'gray' : 'blue'}
+                >
+                  {file.status === 'error'
+                    ? t('elements.fileUpload.badge.failed', {})
+                    : file.status === 'pending'
+                      ? t('elements.fileUpload.badge.waiting', {})
+                      : t('elements.fileUpload.badge.uploading', {})}
+                </Badge>
+                <span className='break-all text-sm'>{file.filePath}</span>
+              </div>
               <Tooltip label={bytesProgressString(file.uploaded, file.size)} innerClassName='w-full'>
                 <Progress value={file.progress} color={file.status === 'error' ? 'red' : undefined} />
               </Tooltip>
             </div>
-            <CloseButton className='ml-3' onClick={() => cancelFileUpload(key)} />
+            <Tooltip label={t('elements.fileUpload.cancel', {})}>
+              <ActionIcon variant='light' color='red' className='ml-3' onClick={() => cancelFileUpload(key)}>
+                <FontAwesomeIcon icon={faXmark} size='sm' />
+              </ActionIcon>
+            </Tooltip>
           </div>
         ))}
       </Popover.Dropdown>

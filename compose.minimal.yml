@@ -15,6 +15,9 @@ services:
       - APP_ENCRYPTION_KEY=CHANGEME
       - APP_USE_DECRYPTION_CACHE=true # caches decrypted values in memory to improve performance, can be considered less secure
       - APP_USE_INTERNAL_CACHE=true
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     volumes:
       - ./data:/var/lib/calagopus
       - ./logs:/var/log/calagopus
