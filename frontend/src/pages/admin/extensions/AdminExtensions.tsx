@@ -1,5 +1,6 @@
 import { faFileText, faRefresh, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import getAdminExtensions from '@/api/admin/extensions/getAdminExtensions.ts';
@@ -15,8 +16,11 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import Group from '@/elements/Group.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Title from '@/elements/Title.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackendExtensionSchema } from '@/lib/schemas/admin/backendExtension.ts';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
+import { usePollingResource } from '@/plugins/usePollingResource.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ExtensionCard from './ExtensionCard.tsx';
@@ -28,11 +32,21 @@ import RemoveExtensionModal from './modals/RemoveExtensionModal.tsx';
 export default function AdminExtensions() {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
 
-  const [backendExtensions, setBackendExtensions] = useState<z.infer<typeof adminBackendExtensionSchema>[] | null>(
-    null,
-  );
-  const [extensionStatus, setExtensionStatus] = useState<ExtensionStatus | null>(null);
+  const { data: backendExtensions, refetch: refetchExtensions } = useResource({
+    queryKey: queryKeys.admin.extensions.all(),
+    queryFn: getAdminExtensions,
+  });
+  const { data: extensionStatus } = usePollingResource({
+    queryKey: queryKeys.admin.extensions.status(),
+    queryFn: getExtensionStatus,
+    interval: 5000,
+    pollInBackground: true,
+    silent: true,
+    stopWhen: (status) => !status.isBuilding,
+  });
+
   const [removalExtension, setRemovalExtension] = useState<z.infer<typeof adminBackendExtensionSchema> | null>(null);
   const [pendingLicense, setPendingLicense] = useState<{
     file: File;
@@ -40,60 +54,23 @@ export default function AdminExtensions() {
   } | null>(null);
   const [openModal, setOpenModal] = useState<'logs' | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const statusIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const wasBuildingRef = useRef(false);
 
-  const createStatusInterval = () => {
-    if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
-
-    statusIntervalRef.current = setInterval(() => {
-      getExtensionStatus()
-        .then((status) => {
-          setExtensionStatus(status);
-          if (!status.isBuilding && statusIntervalRef.current) {
-            clearInterval(statusIntervalRef.current);
-            statusIntervalRef.current = null;
-            getAdminExtensions()
-              .then((extensions) => {
-                setBackendExtensions(extensions);
-                addToast(t('pages.admin.extensions.toast.buildCompleted', {}), 'success');
-                setOpenModal(null);
-              })
-              .catch((err) => {
-                addToast(httpErrorToHuman(err), 'error');
-              });
-          }
-        })
-        .catch((err) => {
-          addToast(httpErrorToHuman(err), 'error');
-        });
-    }, 5000);
+  const setExtensionStatus = (updater: (prev: ExtensionStatus | undefined) => ExtensionStatus | undefined) => {
+    queryClient.setQueryData<ExtensionStatus>(queryKeys.admin.extensions.status(), (prev) => updater(prev));
   };
 
   useEffect(() => {
-    getAdminExtensions()
-      .then((extensions) => {
-        setBackendExtensions(extensions);
-      })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      });
+    const isBuilding = extensionStatus?.isBuilding;
+    if (isBuilding === undefined) return;
 
-    getExtensionStatus()
-      .then((status) => {
-        setExtensionStatus(status);
-
-        if (status.isBuilding) {
-          createStatusInterval();
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to get extension status:', err);
-      });
-
-    return () => {
-      if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
-    };
-  }, []);
+    if (wasBuildingRef.current && !isBuilding) {
+      refetchExtensions();
+      addToast(t('pages.admin.extensions.toast.buildCompleted', {}), 'success');
+      setOpenModal(null);
+    }
+    wasBuildingRef.current = isBuilding;
+  }, [extensionStatus?.isBuilding]);
 
   const handleRebuild = () => {
     rebuildExtensions()
@@ -101,7 +78,6 @@ export default function AdminExtensions() {
         addToast(t('pages.admin.extensions.toast.buildStarted', {}), 'success');
         setExtensionStatus((prev) => prev && { ...prev, isBuilding: true });
 
-        createStatusInterval();
         setOpenModal('logs');
       })
       .catch((err) => {

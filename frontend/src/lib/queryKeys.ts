@@ -37,6 +37,11 @@ const admin = {
     databaseInstances: (serverUuid: string) => ['admin', 'servers', serverUuid, 'databases', 'instances'] as const,
   },
 
+  extensions: {
+    all: () => ['admin', 'extensions'] as const,
+    status: () => ['admin', 'extensions', 'status'] as const,
+  },
+
   nests: {
     all: () => ['admin', 'nests'] as const,
     detail: (uuid: string) => ['admin', 'nests', { uuid }] as const,
