@@ -58,7 +58,7 @@ export default function FileRowContextMenu({ file, openMode, children }: FileRow
     downloadFiles(server.uuid, store.getState().browsingDirectory, [file.name], file.directory, archiveFormat)
       .then(({ url }) => {
         addToast(t('pages.server.files.toast.downloadStarted', {}), 'success');
-        window.open(url);
+        window.location.href = url;
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

@@ -38,7 +38,7 @@ export default function FileConnectButton({ file }: { file?: string }) {
               label: t('pages.server.files.button.connectSftp', {}),
               onClick: (e) => {
                 if (e.shiftKey) {
-                  window.open(sftpUrl);
+                  window.location.href = sftpUrl;
                 } else {
                   setSftpDetailsOpen(true);
                 }
@@ -49,7 +49,7 @@ export default function FileConnectButton({ file }: { file?: string }) {
               type: 'action',
               icon: faCode,
               label: t('pages.server.files.button.connectVscode', {}),
-              onClick: () => window.open(vscodeUrl),
+              onClick: () => (window.location.href = vscodeUrl),
               color: 'gray',
             },
           ]}

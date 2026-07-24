@@ -121,7 +121,7 @@ function FileActionBar() {
     )
       .then(({ url }) => {
         addToast(t('pages.server.files.toast.downloadStarted', {}), 'success');
-        window.open(url);
+        window.location.href = url;
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
