@@ -143,13 +143,6 @@ export default function AdminDatabaseAgentHostConfiguration({
         window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.view.configuration.subContainer
       }
       registryProps={{ databaseAgentHost }}
-      contentRight={
-        revealed ? (
-          <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>
-            {t('pages.admin.databaseAgentHosts.tabs.configuration.page.button.save', {})}
-          </Button>
-        ) : undefined
-      }
     >
       {!revealed ? (
         <Stack>
@@ -286,9 +279,14 @@ export default function AdminDatabaseAgentHostConfiguration({
           <Divider />
 
           <div>
-            <Title order={4} mb='md'>
-              {t('pages.admin.databaseAgentHosts.tabs.configuration.page.section.liveConfiguration', {})}
-            </Title>
+            <Group justify='space-between' mb='md'>
+              <Title order={4}>
+                {t('pages.admin.databaseAgentHosts.tabs.configuration.page.section.liveConfiguration', {})}
+              </Title>
+              <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>
+                {t('pages.admin.databaseAgentHosts.tabs.configuration.page.button.save', {})}
+              </Button>
+            </Group>
             {liveConfigError ? (
               <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
                 <Stack gap='xs'>

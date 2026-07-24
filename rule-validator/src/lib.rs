@@ -61,16 +61,34 @@ impl<'a> Validator<'a> {
         false
     }
 
+    // Mirrors Laravel's Validator::isValidatable, position-independently:
+    // https://github.com/laravel/framework/blob/6291d28a53dbf5b768df0d0a009fcc636a1e5e65/src/Illuminate/Validation/Validator.php#L813
+    //
+    // All values here are strings, so the literal "null" (and "") stands in for
+    // PHP null when deciding whether `nullable` skips the field.
     pub fn validate(&self) -> Result<(), String> {
         for (key, rules) in &self.rules {
+            let value = self.data.get(key).copied().unwrap_or("");
+            let is_null = value.is_empty() || value == "null";
+            let nullable = self.has_rule(key, "nullable");
+
             for rule in rules {
-                match rule.validate(key, self) {
-                    Ok(abort_early) => {
-                        if abort_early {
-                            break;
-                        }
+                if !rule.is_implicit() {
+                    // presentOrRuleIsImplicit: blank fields only run implicit rules
+                    // https://github.com/laravel/framework/blob/6291d28a53dbf5b768df0d0a009fcc636a1e5e65/src/Illuminate/Validation/Validator.php#L833
+                    if value.trim().is_empty() {
+                        continue;
                     }
-                    Err(err) => return Err(format!("{key}: {err}")),
+
+                    // isNotNullIfMarkedAsNullable: nullable skips non-implicit rules on null
+                    // https://github.com/laravel/framework/blob/6291d28a53dbf5b768df0d0a009fcc636a1e5e65/src/Illuminate/Validation/Validator.php#L880
+                    if nullable && is_null {
+                        continue;
+                    }
+                }
+
+                if let Err(err) = rule.validate(key, self) {
+                    return Err(format!("{key}: {err}"));
                 }
             }
         }
@@ -86,11 +104,13 @@ impl<'a> Validator<'a> {
 pub trait ValidateRule: Send + Sync {
     fn label(&self) -> &'static str;
 
-    fn validate(
-        &self,
-        key: &str,
-        validator: &Validator,
-    ) -> Result<bool, compact_str::CompactString>;
+    // Whether the rule runs even when the field is blank, mirroring $implicitRules:
+    // https://github.com/laravel/framework/blob/6291d28a53dbf5b768df0d0a009fcc636a1e5e65/src/Illuminate/Validation/Validator.php#L207
+    fn is_implicit(&self) -> bool {
+        false
+    }
+
+    fn validate(&self, key: &str, validator: &Validator) -> Result<(), compact_str::CompactString>;
 }
 
 pub trait ParseValidationRule: Send + Sync {

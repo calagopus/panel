@@ -183,13 +183,6 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
       titleOrder={2}
       registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.configuration.subContainer}
       registryProps={{ node }}
-      contentRight={
-        revealed ? (
-          <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>
-            {t('pages.admin.nodes.tabs.configuration.page.button.save', {})}
-          </Button>
-        ) : undefined
-      }
     >
       {!revealed ? (
         <Stack>
@@ -336,9 +329,12 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
           <Divider />
 
           <div>
-            <Title order={4} mb='md'>
-              {t('pages.admin.nodes.tabs.configuration.page.section.liveConfiguration', {})}
-            </Title>
+            <Group justify='space-between' mb='md'>
+              <Title order={4}>{t('pages.admin.nodes.tabs.configuration.page.section.liveConfiguration', {})}</Title>
+              <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>
+                {t('pages.admin.nodes.tabs.configuration.page.button.save', {})}
+              </Button>
+            </Group>
             {liveConfigError ? (
               <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
                 <Stack gap='xs'>
