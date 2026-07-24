@@ -16,9 +16,11 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
+import { DATABASE_AGENT_DEFAULT_PORT } from '@/lib/databaseAgentHost.ts';
 import { databaseAgentTypeDefaultPortMapping, databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
@@ -26,6 +28,7 @@ import {
   adminDatabaseAgentHostSchema,
   adminDatabaseAgentHostUpdateSchema,
 } from '@/lib/schemas/admin/databaseAgentHosts.ts';
+import { getUrlConnectPort, urlIsMissingPort, withUrlPort } from '@/lib/url.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -134,9 +137,44 @@ export default function DatabaseAgentHostCreateOrUpdate({
       .finally(() => setLoading(false));
   };
 
+  const urlValue = form.getValues().url ?? '';
+  const showUrlPortWarning = urlIsMissingPort(urlValue);
+
   const fields: FieldDef<DatabaseAgentHostFormValues>[] = [
     { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    { type: 'text', name: 'url', label: t('common.form.url', {}), required: true },
+    {
+      type: 'custom',
+      name: 'url',
+      render: (f) => (
+        <div className='flex flex-col gap-2'>
+          <TextInput
+            withAsterisk
+            label={t('common.form.url', {})}
+            placeholder={t('pages.admin.databaseAgentHosts.tabs.general.page.form.urlPlaceholder', {})}
+            key={f.key('url')}
+            {...f.getInputProps('url')}
+          />
+          {showUrlPortWarning && (
+            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+              <div className='flex flex-col items-start gap-2'>
+                {t('pages.admin.databaseAgentHosts.tabs.general.page.alert.urlMissingPort', {
+                  port: String(getUrlConnectPort(urlValue) ?? 443),
+                  agentPort: String(DATABASE_AGENT_DEFAULT_PORT),
+                }).md()}
+                <Button
+                  size='compact-xs'
+                  variant='light'
+                  color='yellow'
+                  onClick={() => f.setFieldValue('url', withUrlPort(urlValue, DATABASE_AGENT_DEFAULT_PORT))}
+                >
+                  {t('common.button.addDefaultPort', { port: String(DATABASE_AGENT_DEFAULT_PORT) })}
+                </Button>
+              </div>
+            </Alert>
+          )}
+        </div>
+      ),
+    },
     { type: 'textarea', name: 'description', label: t('common.form.description', {}), colSpan: 'full' },
     { type: 'size', name: 'memory', label: t('common.form.memory', {}), required: true, mode: 'mb', min: 1 },
     { type: 'size', name: 'disk', label: t('common.form.disk', {}), required: true, mode: 'mb', min: 1 },

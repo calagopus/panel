@@ -47,16 +47,16 @@ export default function DatabaseAgentHostView() {
                 element: <DatabaseAgentHostCreateOrUpdate contextDatabaseAgentHost={databaseAgentHost} />,
               },
               {
-                name: t('pages.admin.databaseAgentHosts.tabs.instances.title', {}),
-                icon: faDatabase,
-                path: `/instances`,
-                element: <AdminDatabaseAgentHostInstances databaseAgentHost={databaseAgentHost} />,
-              },
-              {
                 name: t('pages.admin.databaseAgentHosts.tabs.configuration.title', {}),
                 icon: faPenRuler,
                 path: `/configuration`,
                 element: <AdminDatabaseAgentHostConfiguration databaseAgentHost={databaseAgentHost} />,
+              },
+              {
+                name: t('pages.admin.databaseAgentHosts.tabs.instances.title', {}),
+                icon: faDatabase,
+                path: `/instances`,
+                element: <AdminDatabaseAgentHostInstances databaseAgentHost={databaseAgentHost} />,
               },
               {
                 name: t('pages.admin.databaseAgentHosts.tabs.statistics.title', {}),

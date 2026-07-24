@@ -1,6 +1,7 @@
 import {
   faAddressCard,
   faChevronLeft,
+  faExclamationTriangle,
   faGlobe,
   faGlobeAmericas,
   faNetworkWired,
@@ -14,6 +15,7 @@ import createNodeAllocations from '@/api/admin/nodes/allocations/createNodeAlloc
 import createNode from '@/api/admin/nodes/createNode.ts';
 import updateNode from '@/api/admin/nodes/updateNode.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Alert from '@/elements/Alert.tsx';
 import AlertError from '@/elements/alerts/AlertError.tsx';
 import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
@@ -25,9 +27,10 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
 import { resolvePorts } from '@/lib/ip.ts';
-import { isNodeAIO } from '@/lib/node.ts';
+import { isNodeAIO, WINGS_DEFAULT_PORT } from '@/lib/node.ts';
 import { adminNodeAllocationsSchema } from '@/lib/schemas/admin/nodes.ts';
 import { oobeNodeSchema } from '@/lib/schemas/oobe.ts';
+import { getUrlConnectPort, urlIsMissingPort, withUrlPort } from '@/lib/url.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 
@@ -186,6 +189,26 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
                 disabled={isEdit && isNodeAIO(existingNode)}
               />
             </div>
+            {!(isEdit && isNodeAIO(existingNode)) && urlIsMissingPort(form.values.url) && (
+              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                <div className='flex flex-col items-start gap-2'>
+                  {t('pages.admin.nodes.tabs.general.page.alert.urlMissingPort', {
+                    port: String(getUrlConnectPort(form.values.url) ?? 443),
+                    wingsPort: String(WINGS_DEFAULT_PORT),
+                  }).md()}
+                  <Button
+                    size='compact-xs'
+                    variant='light'
+                    color='yellow'
+                    onClick={() => form.setFieldValue('url', withUrlPort(form.values.url, WINGS_DEFAULT_PORT))}
+                  >
+                    {t('common.button.addDefaultPort', {
+                      port: String(WINGS_DEFAULT_PORT),
+                    })}
+                  </Button>
+                </div>
+              </Alert>
+            )}
             <div className='flex flex-col sm:flex-row gap-2'>
               <TextInput
                 className='flex-1'

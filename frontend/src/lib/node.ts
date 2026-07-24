@@ -1,12 +1,18 @@
 import { dump } from 'js-yaml';
 import { z } from 'zod';
 import { adminNodeSchema, adminNodeTokenSchema } from '@/lib/schemas/admin/nodes.ts';
+import { getUrlConnectPort, getUrlPortOr } from '@/lib/url.ts';
 
 export const NODE_AIO_UUID = '7dbbbb63-1734-48c4-e1de-d1a65f62cada';
+export const WINGS_DEFAULT_PORT = 8080;
 
 export const isNodeAIO = (node: z.infer<typeof adminNodeSchema>) => {
   return node.uuid === NODE_AIO_UUID;
 };
+
+export const getNodeConnectPort = (node: z.infer<typeof adminNodeSchema>) => getUrlConnectPort(node.url);
+export const getNodeDefaultApiPort = (node: z.infer<typeof adminNodeSchema>) =>
+  getUrlPortOr(node.url, WINGS_DEFAULT_PORT);
 
 interface NodeConfigurationParams {
   node: z.infer<typeof adminNodeSchema>;
@@ -31,14 +37,13 @@ export const getNodeConfiguration = ({ node, token, remote, apiPort, sftpPort }:
     api: {
       port: apiPort,
       disable_openapi_docs: true,
-      upload_limit: 10240,
+      upload_limit: 0,
     },
     system: {
       sftp: {
         bind_port: sftpPort,
       },
     },
-    allowed_mounts: [],
     remote: origin,
   };
 };
@@ -52,7 +57,7 @@ export const getNodeConfigurationCommand = ({ node, token, remote, apiPort, sftp
     indent: 1,
     seqNoIndent: true,
   });
-  return `wings configure --join-data ${btoa(yaml)}`;
+  return `calagopus-wings configure --join-data ${btoa(yaml)}`;
 };
 
 export const getNodeUrl = (node: z.infer<typeof adminNodeSchema>, path: string = '') => {

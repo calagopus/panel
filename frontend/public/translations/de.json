@@ -126,6 +126,7 @@
       "button": {
         "create": "Erstellen",
         "add": "Hinzufügen",
+        "addDefaultPort": ":{port} hinzufügen",
         "save": "Speichern",
         "saveAndStay": "Speichern & Bleiben",
         "edit": "Bearbeiten",
@@ -656,6 +657,17 @@
         "uploadingFolder": "Verzeichnis wird hochgeladen: {folder} ({files})",
         "failed": "Fehlgeschlagen: {file}",
         "failedFolder": "Upload fehlgeschlagen: {folder} ({files})",
+        "paused": "Pausiert: {file}",
+        "pause": "Upload pausieren",
+        "resume": "Upload fortsetzen",
+        "cancel": "Upload abbrechen",
+        "reselect": "Datei erneut auswählen, um fortzusetzen",
+        "badge": {
+          "uploading": "Wird hochgeladen",
+          "waiting": "Wartend",
+          "paused": "Pausiert",
+          "failed": "Fehlgeschlagen"
+        },
         "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
         "cancelAllUploads": "Alle Uploads abbrechen",
         "modal": {
@@ -669,6 +681,7 @@
           "failed": "Upload fehlgeschlagen: {error}",
           "cancelledFile": "Upload von `{file}` erfolgreich abgebrochen.",
           "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen.",
+          "wrongFile": "Die ausgewählte Datei stimmt nicht mit `{file}` überein; wähle dieselbe Datei aus, um fortzusetzen.",
           "cancelledAll": "Alle Uploads wurden abgebrochen.",
           "completedServer": "Upload von {files} nach `{server}` abgeschlossen.",
           "completedAssets": "Upload von {files} in die Admin-Assets abgeschlossen.",
@@ -745,10 +758,10 @@
           "form": {
             "name": "Name",
             "namePlaceholder": "Mein Server",
-            "urlPlaceholder": "URL",
+            "urlPlaceholder": "https://node.example.com:8080",
             "urlDescription": "wird für die interne Kommunikation mit der Node verwendet",
             "publicUrl": "Öffentliche URL",
-            "publicUrlPlaceholder": "URL",
+            "publicUrlPlaceholder": "https://node.example.com:8080",
             "publicUrlDescription": "wird für Websocket/Downloads verwendet",
             "sftpHostPlaceholder": "SFTP Host",
             "sftpPortPlaceholder": "SFTP Port",
@@ -765,7 +778,8 @@
           "title": "Node-Konfiguration",
           "error": {
             "noNodes": "Etwas ist schiefgelaufen. Es wurden keine Nodes gefunden.",
-            "connectionError": "Etwas ist schiefgelaufen. Verbindungsfehler."
+            "connectionError": "Das Panel konnte die Node nicht erreichen. Prüfe, ob Wings läuft und die Node-URL (inklusive Port) korrekt ist.",
+            "frontendConnectionError": "Dein Browser konnte die Node nicht erreichen. Prüfe die (öffentliche) URL, das TLS-Zertifikat und die Firewall. Websockets und Downloads hängen von dieser Verbindung ab."
           },
           "successMessage": "Die Verbindung zu deiner Node wurde erfolgreich verifiziert. Du kannst nun fortfahren.",
           "configurationDescription": "Füge dies in die Konfigurationsdatei unter `{file}` ein oder führe Folgendes aus:",
@@ -2225,11 +2239,17 @@
                 },
                 "form": {
                   "urlDescription": "Wird für die interne Kommunikation mit dem Node verwendet.",
+                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Wird für WebSocket-Verbindungen und Downloads verwendet.",
                   "backupConfigurationPlaceholder": "Vom Standort übernehmen",
                   "memoryDescription": "Der gesamte für Server auf diesem Node verfügbare Arbeitsspeicher.",
                   "diskDescription": "Der gesamte für Server auf diesem Node verfügbare Speicherplatz.",
                   "unlimitedTooltip": "0 setzt kein Limit."
+                },
+                "section": {
+                  "connection": "Verbindung",
+                  "resources": "Ressourcen",
+                  "options": "Optionen"
                 },
                 "button": {
                   "resetToken": "Token zurücksetzen",
@@ -2239,7 +2259,8 @@
                   "tokenReset": "Node-Token zurückgesetzt."
                 },
                 "alert": {
-                  "noLocations": "Du musst mindestens einen Standort erstellen, bevor du Nodes erstellen kannst. Standorte helfen dabei, deine Nodes geografisch oder logisch zu organisieren."
+                  "noLocations": "Du musst mindestens einen Standort erstellen, bevor du Nodes erstellen kannst. Standorte helfen dabei, deine Nodes geografisch oder logisch zu organisieren.",
+                  "urlMissingPort": "Kein Port angegeben. Das Panel verbindet sich mit diesem Node über Port {port}. Wings lauscht standardmäßig auf Port {wingsPort}, füge ihn also zur URL hinzu, außer ein Reverse-Proxy auf Port {port} leitet an Wings weiter."
                 },
                 "titleCreate": "Node erstellen",
                 "titleUpdate": "Node aktualisieren"
@@ -2253,23 +2274,41 @@
                   "initialSetup": "Erste Einrichtung",
                   "liveConfiguration": "Live-Konfiguration"
                 },
+                "step": {
+                  "settings": "Einstellungen",
+                  "install": "Konfiguration anwenden",
+                  "verify": "Verbindung verifizieren"
+                },
                 "description": {
-                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/pterodactyl/config.yml` ein oder führe aus"
+                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/pterodactyl/config.yml` ein oder führe aus",
+                  "settings": "Diese Werte werden verwendet, um die untenstehende Wings-Konfiguration zu generieren.",
+                  "verify": "Prüft, ob sowohl das Panel (Backend) als auch dein Browser (Frontend) Wings erreichen können."
                 },
                 "tooltip": {
                   "copyCommand": "Befehl kopieren"
                 },
                 "form": {
                   "panelUrl": "Panel URL",
-                  "apiPort": "API Port"
+                  "panelUrlDescription": "Die URL, über die Wings dieses Panel erreicht.",
+                  "apiPort": "API Port",
+                  "apiPortDescription": "Der Port, auf dem Wings lauscht.",
+                  "sftpPortDescription": "Der Port, auf dem der Wings-SFTP-Server lauscht."
                 },
                 "button": {
                   "save": "Konfiguration speichern",
-                  "reveal": "Konfiguration anzeigen"
+                  "reveal": "Konfiguration anzeigen",
+                  "verify": "Verbindung verifizieren"
                 },
                 "alert": {
                   "couldNotReach": "Node konnte nicht erreicht werden: {error}",
-                  "tokenWarning": "Die folgende Konfiguration enthält den Node-Token. Zeige sie nur an, wenn nötig."
+                  "tokenWarning": "Die folgende Konfiguration enthält den Node-Token. Zeige sie nur an, wenn nötig.",
+                  "portMismatch": "Die Node-URL zeigt auf Port {connectPort}, aber diese Konfiguration lässt Wings auf Port {apiPort} lauschen. Außer ein Reverse-Proxy leitet Port {connectPort} an Wings weiter, kann das Panel den Node nicht erreichen.",
+                  "verifyBackend": "Backend zu Wings",
+                  "verifyFrontend": "Frontend zu Wings",
+                  "verifyNotTested": "Noch nicht getestet.",
+                  "verifySuccess": "Verbindung hergestellt. Wings {version} hat geantwortet.",
+                  "verifyFailed": "Das Panel konnte den Node nicht erreichen: {error}",
+                  "verifyFrontendFailed": "Dein Browser konnte den Node nicht erreichen: {error}. Konsole, Downloads und Uploads hängen von dieser Verbindung ab. Prüfe die (öffentliche) URL, das TLS-Zertifikat und die Firewall."
                 },
                 "toast": {
                   "applied": "Konfiguration erfolgreich angewendet.",
@@ -3276,9 +3315,13 @@
                 "titleCreate": "Datenbank-Agent-Host erstellen",
                 "titleUpdate": "Datenbank-Agent-Host aktualisieren",
                 "form": {
+                  "urlPlaceholder": "https://agent.example.com:8080",
                   "typeEnabled": "Aktiviert",
                   "typePublicHost": "Öffentlicher Host",
                   "typePublicPort": "Öffentlicher Port"
+                },
+                "alert": {
+                  "urlMissingPort": "Kein Port angegeben. Das Panel verbindet sich mit diesem Host über Port {port}. Der Datenbank-Agent lauscht standardmäßig auf Port {agentPort}, füge ihn also zur URL hinzu, außer ein Reverse-Proxy auf Port {port} leitet an den Agent weiter."
                 },
                 "button": {
                   "resetToken": "Token zurücksetzen",
@@ -3338,22 +3381,36 @@
                   "initialSetup": "Ersteinrichtung",
                   "liveConfiguration": "Live-Konfiguration"
                 },
+                "step": {
+                  "settings": "Einstellungen",
+                  "install": "Konfiguration anwenden",
+                  "verify": "Verbindung verifizieren"
+                },
                 "description": {
-                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/calagopus-db-agent/config.yml` ein oder führe aus"
+                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/calagopus-db-agent/config.yml` ein oder führe aus",
+                  "settings": "Diese Werte werden verwendet, um die untenstehende Agent-Konfiguration zu generieren.",
+                  "verify": "Prüft, ob das Panel den Datenbank-Agent über die Host-URL erreichen kann."
                 },
                 "tooltip": {
                   "copyCommand": "Befehl kopieren"
                 },
                 "form": {
-                  "apiPort": "API-Port"
+                  "apiPort": "API-Port",
+                  "apiPortDescription": "Der Port, auf dem der Datenbank-Agent lauscht."
                 },
                 "button": {
                   "save": "Konfiguration speichern",
-                  "reveal": "Konfiguration anzeigen"
+                  "reveal": "Konfiguration anzeigen",
+                  "verify": "Verbindung verifizieren"
                 },
                 "alert": {
                   "couldNotReach": "Der Datenbank-Agent-Host konnte nicht erreicht werden: {error}",
-                  "tokenWarning": "Die untenstehende Konfiguration enthält das Host-Token. Zeige sie nur bei Bedarf an."
+                  "tokenWarning": "Die untenstehende Konfiguration enthält das Host-Token. Zeige sie nur bei Bedarf an.",
+                  "portMismatch": "Die Host-URL zeigt auf Port {connectPort}, aber diese Konfiguration lässt den Agent auf Port {apiPort} lauschen. Außer ein Reverse-Proxy leitet Port {connectPort} an den Agent weiter, kann das Panel den Host nicht erreichen.",
+                  "verifyTitle": "Backend zu DB-Agent",
+                  "verifyNotTested": "Noch nicht getestet.",
+                  "verifySuccess": "Verbindung hergestellt. Der Agent hat geantwortet.",
+                  "verifyFailed": "Das Panel konnte den Host nicht erreichen: {error}"
                 },
                 "toast": {
                   "applied": "Konfiguration erfolgreich angewendet.",

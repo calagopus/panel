@@ -1,16 +1,17 @@
-import { faCopy, faExclamationTriangle, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleQuestion, faCopy, faExclamationTriangle, faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Text } from '@mantine/core';
 import { dump, load } from 'js-yaml';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import getDatabaseAgentHostConfig from '@/api/admin/database-agent-hosts/getDatabaseAgentHostConfig.ts';
 import getDatabaseAgentHostToken from '@/api/admin/database-agent-hosts/getDatabaseAgentHostToken.ts';
+import testDatabaseAgentHost from '@/api/admin/database-agent-hosts/testDatabaseAgentHost.ts';
 import updateDatabaseAgentHostConfig from '@/api/admin/database-agent-hosts/updateDatabaseAgentHostConfig.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
-import Card from '@/elements/Card.tsx';
 import Code from '@/elements/Code.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Divider from '@/elements/Divider.tsx';
@@ -24,11 +25,13 @@ import Title from '@/elements/Title.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
 import {
+  DATABASE_AGENT_DEFAULT_PORT,
   getDatabaseAgentHostConfiguration,
   getDatabaseAgentHostConfigurationCommand,
 } from '@/lib/databaseAgentHost.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
+import { getUrlConnectPort, getUrlPortOr, urlIsMissingPort } from '@/lib/url.ts';
 import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -41,11 +44,27 @@ export default function AdminDatabaseAgentHostConfiguration({
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [apiPort, setApiPort] = useState(parseInt(new URL(databaseAgentHost.url).port || '8080'));
+  const [apiPort, setApiPort] = useState(() => getUrlPortOr(databaseAgentHost.url, DATABASE_AGENT_DEFAULT_PORT));
   const { data: hostToken } = useResource({
     queryKey: queryKeys.admin.databaseAgentHosts.token(databaseAgentHost.uuid),
     queryFn: useCallback(() => getDatabaseAgentHostToken(databaseAgentHost.uuid), [databaseAgentHost.uuid]),
   });
+
+  const connectPort = getUrlConnectPort(databaseAgentHost.url);
+  const portMismatch = connectPort !== null && connectPort !== apiPort;
+
+  const [verifying, setVerifying] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<{ ok: true } | { ok: false; error: string } | null>(null);
+
+  const doVerify = () => {
+    setVerifying(true);
+    setVerifyResult(null);
+
+    testDatabaseAgentHost(databaseAgentHost.uuid)
+      .then(() => setVerifyResult({ ok: true }))
+      .catch((err) => setVerifyResult({ ok: false, error: httpErrorToHuman(err) }))
+      .finally(() => setVerifying(false));
+  };
 
   const configurationParams = useMemo(() => {
     if (!hostToken) {
@@ -152,11 +171,46 @@ export default function AdminDatabaseAgentHostConfiguration({
             <Title order={4} mb='md'>
               {t('pages.admin.databaseAgentHosts.tabs.configuration.page.section.initialSetup', {})}
             </Title>
-            <div className='grid md:grid-cols-4 grid-cols-1 gap-4'>
-              <div className='flex flex-col md:col-span-3'>
+            <Stack gap='lg' className='min-w-0'>
+              <div className='min-w-0'>
+                <Title order={5} mb='xs'>
+                  1. {t('pages.admin.databaseAgentHosts.tabs.configuration.page.step.settings', {})}
+                </Title>
+                <Text size='sm' c='dimmed' mb='sm'>
+                  {t('pages.admin.databaseAgentHosts.tabs.configuration.page.description.settings', {})}
+                </Text>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                  <NumberInput
+                    name='api_port'
+                    label={t('pages.admin.databaseAgentHosts.tabs.configuration.page.form.apiPort', {})}
+                    description={t(
+                      'pages.admin.databaseAgentHosts.tabs.configuration.page.form.apiPortDescription',
+                      {},
+                    )}
+                    value={apiPort}
+                    min={1}
+                    max={65535}
+                    onChange={(value) => setApiPort(Number(value) || DATABASE_AGENT_DEFAULT_PORT)}
+                  />
+                </div>
+                {portMismatch && (
+                  <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mt='md'>
+                    {t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.portMismatch', {
+                      connectPort: String(connectPort),
+                      apiPort: String(apiPort),
+                    }).md()}
+                  </Alert>
+                )}
+              </div>
+
+              <div className='min-w-0'>
+                <Title order={5} mb='xs'>
+                  2. {t('pages.admin.databaseAgentHosts.tabs.configuration.page.step.install', {})}
+                </Title>
                 {hostConfiguration && command ? (
                   <>
                     <HljsCode
+                      className='overflow-x-auto'
                       languageName='yaml'
                       language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
                     >
@@ -168,7 +222,7 @@ export default function AdminDatabaseAgentHostConfiguration({
                         {t('pages.admin.databaseAgentHosts.tabs.configuration.page.description.placeFile', {}).md()}
                       </p>
                       <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
-                        <Code block className='flex-1'>
+                        <Code block className='flex-1 min-w-0 overflow-x-auto'>
                           {command}
                         </Code>
                         <Tooltip
@@ -185,23 +239,48 @@ export default function AdminDatabaseAgentHostConfiguration({
                   <Spinner.Centered />
                 )}
               </div>
-              <Card>
-                <Title className='text-right'>
-                  {t('pages.admin.databaseAgentHosts.tabs.configuration.page.title', {})}
-                </Title>
 
-                <Stack>
-                  <NumberInput
-                    name='api_port'
-                    label={t('pages.admin.databaseAgentHosts.tabs.configuration.page.form.apiPort', {})}
-                    value={apiPort}
-                    min={1}
-                    max={65535}
-                    onChange={(value) => setApiPort(Number(value))}
-                  />
+              <div className='min-w-0'>
+                <Title order={5} mb='xs'>
+                  3. {t('pages.admin.databaseAgentHosts.tabs.configuration.page.step.verify', {})}
+                </Title>
+                <Text size='sm' c='dimmed' mb='sm'>
+                  {t('pages.admin.databaseAgentHosts.tabs.configuration.page.description.verify', {})}
+                </Text>
+                <Stack gap='sm' align='flex-start'>
+                  <Button onClick={doVerify} loading={verifying} leftSection={<FontAwesomeIcon icon={faCheck} />}>
+                    {t('pages.admin.databaseAgentHosts.tabs.configuration.page.button.verify', {})}
+                  </Button>
+                  <Alert
+                    color={verifyResult ? (verifyResult.ok ? 'green' : 'red') : 'gray'}
+                    icon={
+                      <FontAwesomeIcon
+                        icon={verifyResult ? (verifyResult.ok ? faCheck : faExclamationTriangle) : faCircleQuestion}
+                      />
+                    }
+                    title={t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.verifyTitle', {})}
+                    className='w-full'
+                  >
+                    {!verifyResult ? (
+                      t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.verifyNotTested', {})
+                    ) : verifyResult.ok ? (
+                      t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.verifySuccess', {})
+                    ) : (
+                      <Stack gap='xs'>
+                        {t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.verifyFailed', {
+                          error: verifyResult.error,
+                        })}
+                        {urlIsMissingPort(databaseAgentHost.url) &&
+                          t('pages.admin.databaseAgentHosts.tabs.general.page.alert.urlMissingPort', {
+                            port: String(connectPort ?? 443),
+                            agentPort: String(DATABASE_AGENT_DEFAULT_PORT),
+                          }).md()}
+                      </Stack>
+                    )}
+                  </Alert>
                 </Stack>
-              </Card>
-            </div>
+              </div>
+            </Stack>
           </div>
 
           <Divider />
@@ -212,9 +291,16 @@ export default function AdminDatabaseAgentHostConfiguration({
             </Title>
             {liveConfigError ? (
               <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
-                {t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.couldNotReach', {
-                  error: liveConfigError,
-                })}
+                <Stack gap='xs'>
+                  {t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.couldNotReach', {
+                    error: liveConfigError,
+                  })}
+                  {urlIsMissingPort(databaseAgentHost.url) &&
+                    t('pages.admin.databaseAgentHosts.tabs.general.page.alert.urlMissingPort', {
+                      port: String(connectPort ?? 443),
+                      agentPort: String(DATABASE_AGENT_DEFAULT_PORT),
+                    }).md()}
+                </Stack>
               </Alert>
             ) : yaml === null ? (
               <Spinner.Centered />

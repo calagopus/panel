@@ -126,6 +126,7 @@
       "button": {
         "create": "Create",
         "add": "Add",
+        "addDefaultPort": "Add :{port}",
         "save": "Save",
         "saveAndStay": "Save & Stay",
         "edit": "Edit",
@@ -757,10 +758,10 @@
           "form": {
             "name": "Name",
             "namePlaceholder": "My Server",
-            "urlPlaceholder": "URL",
+            "urlPlaceholder": "https://node.example.com:8080",
             "urlDescription": "used for internal communication with the node",
             "publicUrl": "Public URL",
-            "publicUrlPlaceholder": "URL",
+            "publicUrlPlaceholder": "https://node.example.com:8080",
             "publicUrlDescription": "used for websocket/downloads",
             "sftpHostPlaceholder": "SFTP Host",
             "sftpPortPlaceholder": "SFTP Port",
@@ -777,7 +778,8 @@
           "title": "Node Configuration",
           "error": {
             "noNodes": "Something went wrong. No nodes were found.",
-            "connectionError": "Something went wrong. Connection Error."
+            "connectionError": "The panel could not reach the node. Check that wings is running and that the node URL (including the port) is correct.",
+            "frontendConnectionError": "Your browser could not reach the node. Check the (public) URL, TLS certificate and firewall. Websockets and downloads depend on this connection."
           },
           "successMessage": "The connection to your node was successfully verified. You may now continue.",
           "configurationDescription": "Place this into the configuration file at `{file}` or run:",
@@ -2237,11 +2239,17 @@
                 },
                 "form": {
                   "urlDescription": "Used for internal communication with the node.",
+                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Used for websocket connections and downloads.",
                   "backupConfigurationPlaceholder": "Inherit from Location",
                   "memoryDescription": "The total memory available for servers on this node.",
                   "diskDescription": "The total disk available for servers on this node.",
                   "unlimitedTooltip": "0 will not set a limit."
+                },
+                "section": {
+                  "connection": "Connection",
+                  "resources": "Resources",
+                  "options": "Options"
                 },
                 "button": {
                   "resetToken": "Reset Token",
@@ -2251,7 +2259,8 @@
                   "tokenReset": "Node token reset."
                 },
                 "alert": {
-                  "noLocations": "You need to create at least one location before you can create nodes. Locations help organize your nodes geographically or logically."
+                  "noLocations": "You need to create at least one location before you can create nodes. Locations help organize your nodes geographically or logically.",
+                  "urlMissingPort": "No port specified. The panel will connect to this node on port {port}. Wings listens on port {wingsPort} by default, so add it to the URL unless a reverse proxy on port {port} forwards to wings."
                 },
                 "titleCreate": "Create Node",
                 "titleUpdate": "Update Node"
@@ -2265,23 +2274,41 @@
                   "initialSetup": "Initial Setup",
                   "liveConfiguration": "Live Configuration"
                 },
+                "step": {
+                  "settings": "Settings",
+                  "install": "Apply Configuration",
+                  "verify": "Verify Connection"
+                },
                 "description": {
-                  "placeFile": "Place this into the configuration file at `/etc/pterodactyl/config.yml` or run"
+                  "placeFile": "Place this into the configuration file at `/etc/pterodactyl/config.yml` or run",
+                  "settings": "These values are used to generate the wings configuration below.",
+                  "verify": "Checks that both the panel (backend) and your browser (frontend) can reach wings."
                 },
                 "tooltip": {
                   "copyCommand": "Copy command"
                 },
                 "form": {
                   "panelUrl": "Panel URL",
-                  "apiPort": "API Port"
+                  "panelUrlDescription": "The URL wings uses to reach this panel.",
+                  "apiPort": "API Port",
+                  "apiPortDescription": "The port wings listens on.",
+                  "sftpPortDescription": "The port the wings SFTP server listens on."
                 },
                 "button": {
                   "save": "Save Configuration",
-                  "reveal": "Reveal Configuration"
+                  "reveal": "Reveal Configuration",
+                  "verify": "Verify Connection"
                 },
                 "alert": {
                   "couldNotReach": "Could not reach the node: {error}",
-                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed."
+                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed.",
+                  "portMismatch": "The node URL points at port {connectPort}, but this configuration makes wings listen on port {apiPort}. Unless a reverse proxy forwards port {connectPort} to wings, the panel will not be able to reach the node.",
+                  "verifyBackend": "Backend to Wings",
+                  "verifyFrontend": "Frontend to Wings",
+                  "verifyNotTested": "Not tested yet.",
+                  "verifySuccess": "Connection established. Wings {version} responded.",
+                  "verifyFailed": "The panel could not reach the node: {error}",
+                  "verifyFrontendFailed": "Your browser could not reach the node: {error}. The console, downloads and uploads depend on this connection. Check the (public) URL, TLS certificate and firewall."
                 },
                 "toast": {
                   "applied": "Configuration applied successfully.",
@@ -3291,9 +3318,13 @@
                 "titleCreate": "Create Database Agent Host",
                 "titleUpdate": "Update Database Agent Host",
                 "form": {
+                  "urlPlaceholder": "https://agent.example.com:8080",
                   "typeEnabled": "Enabled",
                   "typePublicHost": "Public Host",
                   "typePublicPort": "Public Port"
+                },
+                "alert": {
+                  "urlMissingPort": "No port specified. The panel will connect to this host on port {port}. The database agent listens on port {agentPort} by default, so add it to the URL unless a reverse proxy on port {port} forwards to the agent."
                 },
                 "button": {
                   "resetToken": "Reset Token",
@@ -3355,22 +3386,36 @@
                   "initialSetup": "Initial Setup",
                   "liveConfiguration": "Live Configuration"
                 },
+                "step": {
+                  "settings": "Settings",
+                  "install": "Apply Configuration",
+                  "verify": "Verify Connection"
+                },
                 "description": {
-                  "placeFile": "Place this into the configuration file at `/etc/calagopus-db-agent/config.yml` or run"
+                  "placeFile": "Place this into the configuration file at `/etc/calagopus-db-agent/config.yml` or run",
+                  "settings": "These values are used to generate the agent configuration below.",
+                  "verify": "Checks that the panel can reach the database agent at the host URL."
                 },
                 "tooltip": {
                   "copyCommand": "Copy command"
                 },
                 "form": {
-                  "apiPort": "API Port"
+                  "apiPort": "API Port",
+                  "apiPortDescription": "The port the database agent listens on."
                 },
                 "button": {
                   "save": "Save Configuration",
-                  "reveal": "Reveal Configuration"
+                  "reveal": "Reveal Configuration",
+                  "verify": "Verify Connection"
                 },
                 "alert": {
                   "couldNotReach": "Could not reach the database agent host: {error}",
-                  "tokenWarning": "The configuration below contains the host token. Reveal it only when needed."
+                  "tokenWarning": "The configuration below contains the host token. Reveal it only when needed.",
+                  "portMismatch": "The host URL points at port {connectPort}, but this configuration makes the agent listen on port {apiPort}. Unless a reverse proxy forwards port {connectPort} to the agent, the panel will not be able to reach the host.",
+                  "verifyTitle": "Backend to DB Agent",
+                  "verifyNotTested": "Not tested yet.",
+                  "verifySuccess": "Connection established. The agent responded.",
+                  "verifyFailed": "The panel could not reach the host: {error}"
                 },
                 "toast": {
                   "applied": "Configuration applied successfully.",

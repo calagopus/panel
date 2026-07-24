@@ -1,5 +1,7 @@
 import { dump } from 'js-yaml';
 
+export const DATABASE_AGENT_DEFAULT_PORT = 8080;
+
 interface DatabaseAgentHostConfigurationParams {
   token: string;
   apiPort: number;

@@ -1,8 +1,9 @@
-import { faCheck, faChevronLeft, faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faChevronLeft, faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { dump } from 'js-yaml';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
+import getNodeSystemOverview from '@/api/admin/nodes/system/getNodeSystemOverview.ts';
 import { axiosInstance } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Alert from '@/elements/Alert.tsx';
@@ -14,7 +15,14 @@ import HljsCode from '@/elements/HljsCode.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
 import { handleCopyToClipboard } from '@/lib/copy.ts';
-import { getNodeConfiguration, getNodeConfigurationCommand, getNodeUrl } from '@/lib/node.ts';
+import {
+  getNodeConfiguration,
+  getNodeConfigurationCommand,
+  getNodeConnectPort,
+  getNodeDefaultApiPort,
+  getNodeUrl,
+  isNodeAIO,
+} from '@/lib/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
@@ -51,10 +59,14 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
       node,
       token: nodeToken,
       remote: window.location.origin,
-      apiPort: parseInt(new URL(node.url).port || '8080'),
+      apiPort: getNodeDefaultApiPort(node),
       sftpPort: node.sftpPort,
     };
   }, [node, nodeToken]);
+
+  const connectPort = node ? getNodeConnectPort(node) : null;
+  const apiPort = node ? getNodeDefaultApiPort(node) : null;
+  const portMismatch = !!node && !isNodeAIO(node) && connectPort !== null && connectPort !== apiPort;
 
   const nodeConfiguration = useMemo(
     () => (configurationParams ? getNodeConfiguration(configurationParams) : null),
@@ -71,24 +83,31 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
     setLoading(true);
     setIsVerified(false);
 
-    axiosInstance
-      .get(getNodeUrl(node, '/api/system'), {
+    const [backend, frontend] = await Promise.allSettled([
+      getNodeSystemOverview(node.uuid),
+      axiosInstance.get(getNodeUrl(node, '/api/system'), {
         headers: {
           Authorization: `Bearer ${nodeToken.token}`,
           'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
-      })
-      .then(({ data }) => {
-        if (data.version) {
-          setIsVerified(true);
-          setError('');
-        }
-      })
-      .catch((msg) => {
-        console.error('Error while connecting to node', msg);
-        setError(t('pages.oobe.nodeConfiguration.error.connectionError', {}));
-      })
-      .finally(() => setLoading(false));
+      }),
+    ]);
+
+    if (backend.status === 'rejected') {
+      console.error('Error while connecting to node from the panel', backend.reason);
+      setError(t('pages.oobe.nodeConfiguration.error.connectionError', {}));
+    } else if (frontend.status === 'rejected' || !frontend.value.data.version) {
+      console.error(
+        'Error while connecting to node from the browser',
+        frontend.status === 'rejected' ? frontend.reason : frontend.value,
+      );
+      setError(t('pages.oobe.nodeConfiguration.error.frontendConnectionError', {}));
+    } else {
+      setIsVerified(true);
+      setError('');
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -100,6 +119,14 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
         {isVerified && !error && (
           <Alert icon={<FontAwesomeIcon icon={faCheck} />} color='green' title={t('common.alert.success', {})}>
             {t('pages.oobe.nodeConfiguration.successMessage', {})}
+          </Alert>
+        )}
+        {portMismatch && (
+          <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
+            {t('pages.admin.nodes.tabs.configuration.page.alert.portMismatch', {
+              connectPort: String(connectPort),
+              apiPort: String(apiPort),
+            }).md()}
           </Alert>
         )}
 
@@ -127,7 +154,12 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
         )}
 
         {node && (
-          <Button loading={loading} leftSection={<FontAwesomeIcon icon={faCheck} />} onClick={() => verifyNode()}>
+          <Button
+            loading={loading}
+            disabled={!nodeToken}
+            leftSection={<FontAwesomeIcon icon={faCheck} />}
+            onClick={() => verifyNode()}
+          >
             {t('pages.oobe.nodeConfiguration.button.verify', {})}
           </Button>
         )}

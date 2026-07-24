@@ -1,4 +1,4 @@
-import { faGlobe } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -11,6 +11,7 @@ import resetNodeToken from '@/api/admin/nodes/resetNodeToken.ts';
 import updateNode from '@/api/admin/nodes/updateNode.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -19,11 +20,12 @@ import Group from '@/elements/Group.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { isNodeAIO } from '@/lib/node.ts';
+import { isNodeAIO, WINGS_DEFAULT_PORT } from '@/lib/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNodeSchema, adminNodeUpdateSchema } from '@/lib/schemas/admin/nodes.ts';
+import { getUrlConnectPort, urlIsMissingPort, withUrlPort } from '@/lib/url.ts';
 import NodeDuplicateModal from '@/pages/admin/nodes/modals/NodeDuplicateModal.tsx';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
@@ -38,7 +40,10 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
   const queryClient = useQueryClient();
 
   const [isValid, setIsValid] = useState(false);
+  const [urlValue, setUrlValue] = useState('');
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
+
+  const isAIO = contextNode ? isNodeAIO(contextNode) : false;
 
   const form = useFormEngine<NodeFormValues>('admin.nodes.createOrUpdate', {
     schema: adminNodeUpdateSchema.unwrap(),
@@ -57,7 +62,10 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       memory: 8192,
       disk: 10240,
     },
-    onValuesChange: () => setIsValid(form.isValid()),
+    onValuesChange: (values) => {
+      setIsValid(form.isValid());
+      setUrlValue(values.url ?? '');
+    },
     validateInputOnBlur: true,
   });
 
@@ -92,6 +100,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
         memory: contextNode.memory,
         disk: contextNode.disk,
       });
+      setUrlValue(contextNode.url);
     }
   }, [contextNode]);
 
@@ -122,6 +131,8 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       .finally(() => setLoading(false));
   };
 
+  const showUrlPortWarning = !isAIO && urlIsMissingPort(urlValue);
+
   const fields: FieldDef<NodeFormValues>[] = [
     { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
     {
@@ -137,13 +148,48 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
         loading: locations.loading,
       },
     },
+    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
     {
-      type: 'text',
+      type: 'divider',
+      name: 'connectionDivider',
+      label: t('pages.admin.nodes.tabs.general.page.section.connection', {}),
+    },
+    {
+      type: 'custom',
       name: 'url',
-      label: t('common.form.url', {}),
-      required: true,
-      description: t('pages.admin.nodes.tabs.general.page.form.urlDescription', {}),
-      props: { disabled: contextNode ? isNodeAIO(contextNode) : false },
+      render: (f) => (
+        <div className='flex flex-col gap-2'>
+          <TextInput
+            withAsterisk
+            label={t('common.form.url', {})}
+            description={t('pages.admin.nodes.tabs.general.page.form.urlDescription', {})}
+            placeholder={t('pages.admin.nodes.tabs.general.page.form.urlPlaceholder', {})}
+            key={f.key('url')}
+            {...f.getInputProps('url')}
+            disabled={isAIO}
+          />
+          {showUrlPortWarning && (
+            <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <div className='flex flex-col items-start gap-2'>
+                {t('pages.admin.nodes.tabs.general.page.alert.urlMissingPort', {
+                  port: String(getUrlConnectPort(urlValue) ?? 443),
+                  wingsPort: String(WINGS_DEFAULT_PORT),
+                }).md()}
+                <Button
+                  size='compact-xs'
+                  variant='light'
+                  color='yellow'
+                  onClick={() => f.setFieldValue('url', withUrlPort(urlValue, WINGS_DEFAULT_PORT))}
+                >
+                  {t('common.button.addDefaultPort', {
+                    port: String(WINGS_DEFAULT_PORT),
+                  })}
+                </Button>
+              </div>
+            </Alert>
+          )}
+        </div>
+      ),
     },
     {
       type: 'custom',
@@ -152,6 +198,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
         <TextInput
           label={t('common.form.publicUrl', {})}
           description={t('pages.admin.nodes.tabs.general.page.form.publicUrlDescription', {})}
+          placeholder={t('pages.admin.nodes.tabs.general.page.form.urlPlaceholder', {})}
           key={f.key('publicUrl')}
           rightSection={
             <Tooltip label={t('pages.admin.nodes.tabs.general.page.tooltip.useWingsProxyUrl', {})}>
@@ -168,7 +215,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
             </Tooltip>
           }
           {...f.getInputProps('publicUrl')}
-          disabled={contextNode ? isNodeAIO(contextNode) : false}
+          disabled={isAIO}
         />
       ),
     },
@@ -179,6 +226,11 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
       label: t('common.form.sftpPort', {}),
       required: true,
       props: { min: 1, max: 65535 },
+    },
+    {
+      type: 'divider',
+      name: 'resourcesDivider',
+      label: t('pages.admin.nodes.tabs.general.page.section.resources', {}),
     },
     {
       type: 'size',
@@ -215,7 +267,11 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
         loading: backupConfigurations.loading,
       },
     },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
+    {
+      type: 'divider',
+      name: 'optionsDivider',
+      label: t('pages.admin.nodes.tabs.general.page.section.options', {}),
+    },
     { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
     { type: 'switch', name: 'maintenanceEnabled', label: t('common.form.maintenanceEnabled', {}) },
   ];
