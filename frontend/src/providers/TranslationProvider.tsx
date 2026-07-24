@@ -13,7 +13,10 @@ import Code from '@/elements/Code.tsx';
 import { getGlobalStore } from '@/stores/global.ts';
 import baseTranslations from '@/translations.ts';
 
-const modules = import.meta.glob('/node_modules/zod/v4/locales/*.js');
+const zodLocaleModules = import.meta.glob('/node_modules/zod/v4/locales/*.js');
+const monacoNlsModules = import.meta.glob('/node_modules/monaco-editor/esm/nls.messages.*.js');
+const monacoLocaleAliases: Record<string, string> = { zh: 'zh-cn', pt: 'pt-br' };
+const monacoNlsCache: Record<string, string[] | undefined> = {};
 
 type LanguageData = {
   items: TranslationItemRecord;
@@ -28,6 +31,9 @@ declare global {
   interface String {
     md(options?: MarkdownOptions): ReactNode;
   }
+
+  var _VSCODE_NLS_MESSAGES: string[] | undefined;
+  var _VSCODE_NLS_LANGUAGE: string | undefined;
 }
 
 const SafeMarkdownLink = ({ href, children }: { href?: string; children?: ReactNode }) => {
@@ -107,15 +113,34 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const [languageData, setLanguageData] = useState<LanguageData | null>(null);
 
   const loadZod = async (lang: string) => {
-    if (!modules[`/node_modules/zod/v4/locales/${lang}.js`]) {
+    if (!zodLocaleModules[`/node_modules/zod/v4/locales/${lang}.js`]) {
       return;
     }
 
-    const { default: locale } = (await modules[`/node_modules/zod/v4/locales/${lang}.js`]()) as {
+    const { default: locale } = (await zodLocaleModules[`/node_modules/zod/v4/locales/${lang}.js`]()) as {
       default: () => $ZodConfig;
     };
 
     z.config(locale());
+  };
+
+  const loadMonaco = async (lang: string) => {
+    const locale = monacoLocaleAliases[lang] ?? lang;
+    const path = `/node_modules/monaco-editor/esm/nls.messages.${locale}.js`;
+
+    if (lang === 'en' || !monacoNlsModules[path]) {
+      globalThis._VSCODE_NLS_MESSAGES = undefined;
+      globalThis._VSCODE_NLS_LANGUAGE = undefined;
+      return;
+    }
+
+    if (!monacoNlsCache[locale]) {
+      await monacoNlsModules[path]();
+      monacoNlsCache[locale] = globalThis._VSCODE_NLS_MESSAGES;
+    }
+
+    globalThis._VSCODE_NLS_MESSAGES = monacoNlsCache[locale];
+    globalThis._VSCODE_NLS_LANGUAGE = locale;
   };
 
   useEffect(() => {
@@ -172,6 +197,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
       }
 
       loadZod(language);
+      loadMonaco(language);
     });
 
     localStorage.setItem('last_language', language);
