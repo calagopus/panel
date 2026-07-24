@@ -10,9 +10,14 @@ export default function AdminHome() {
   const { t } = useTranslations();
 
   return (
-    <AdminContentContainer title={t('pages.account.admin.title', {})}>
+    <AdminContentContainer
+      title={t('pages.account.admin.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.home.container}
+    >
       <SubNavigation
         baseUrl='/admin'
+        registry={window.extensionContext.extensionRegistry.pages.admin.home.subNavigation}
+        registryProps={{}}
         items={[
           {
             name: t('pages.admin.home.tabs.overview.title', {}),

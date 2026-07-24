@@ -65,6 +65,8 @@ export default function LocationDatabaseHostRow({
             color: 'red',
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.locations.view.databaseHosts.contextMenu}
+        registryProps={{ location, databaseHost }}
       >
         {({ items, openMenu }) => (
           <TableRow

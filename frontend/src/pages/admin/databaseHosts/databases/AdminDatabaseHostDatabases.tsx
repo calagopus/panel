@@ -33,6 +33,8 @@ export default function AdminDatabaseHostDatabases({
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.databaseHosts.view.databases.subContainer}
+      registryProps={{ databaseHost }}
     >
       <Table
         columns={databaseHostDatabaseTableColumns()}
@@ -42,7 +44,7 @@ export default function AdminDatabaseHostDatabases({
         onPageSelect={setPage}
       >
         {databaseHostDatabases?.data.map((database) => (
-          <DatabaseRow key={database.uuid} hostUuid={databaseHost.uuid} database={database} />
+          <DatabaseRow key={database.uuid} databaseHost={databaseHost} database={database} />
         ))}
       </Table>
     </AdminSubContentContainer>

@@ -4,6 +4,8 @@ import type { Props as SubContainerProps } from '@/elements/containers/AdminSubC
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { SubNavigationRegistry } from '../../../../slices/subNavigation.ts';
 import { AllocationsRegistry } from './allocations.ts';
+import { BackupsRegistry } from './backups.ts';
+import { DatabasesRegistry } from './databases.ts';
 import { LogsRegistry } from './logs.ts';
 import { ManagementRegistry } from './management.ts';
 import { MountsRegistry } from './mounts.ts';
@@ -20,6 +22,8 @@ export class ViewRegistry implements Registry {
     this.allocations.mergeFrom(other.allocations);
     this.variables.mergeFrom(other.variables);
     this.mounts.mergeFrom(other.mounts);
+    this.backups.mergeFrom(other.backups);
+    this.databases.mergeFrom(other.databases);
     this.logs.mergeFrom(other.logs);
     this.management.mergeFrom(other.management);
 
@@ -33,6 +37,8 @@ export class ViewRegistry implements Registry {
   public allocations: AllocationsRegistry = new AllocationsRegistry();
   public variables: VariablesRegistry = new VariablesRegistry();
   public mounts: MountsRegistry = new MountsRegistry();
+  public backups: BackupsRegistry = new BackupsRegistry();
+  public databases: DatabasesRegistry = new DatabasesRegistry();
   public logs: LogsRegistry = new LogsRegistry();
   public management: ManagementRegistry = new ManagementRegistry();
 
@@ -70,6 +76,16 @@ export class ViewRegistry implements Registry {
 
   public enterMounts(callback: (registry: MountsRegistry) => unknown): this {
     callback(this.mounts);
+    return this;
+  }
+
+  public enterBackups(callback: (registry: BackupsRegistry) => unknown): this {
+    callback(this.backups);
+    return this;
+  }
+
+  public enterDatabases(callback: (registry: DatabasesRegistry) => unknown): this {
+    callback(this.databases);
     return this;
   }
 

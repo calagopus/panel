@@ -258,6 +258,8 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
         titleOrder={2}
         search={search}
         setSearch={setSearch}
+        registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.servers.subContainer}
+        registryProps={{ node }}
         contentRight={
           <Group gap='sm'>
             <Button

@@ -42,9 +42,14 @@ export default function NodeView() {
   return (
     <ResourceView resource={resource}>
       {(node) => (
-        <AdminContentContainer title={node.name}>
+        <AdminContentContainer
+          title={node.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.nodes.container}
+        >
           <SubNavigation
             baseUrl={`/admin/nodes/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.subNavigation}
+            registryProps={{ node }}
             items={[
               {
                 name: t('pages.admin.nodes.tabs.overview.title', {}),

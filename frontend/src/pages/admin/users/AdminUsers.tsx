@@ -37,6 +37,7 @@ function UsersContainer() {
   return (
     <AdminContentContainer
       title={t('pages.admin.users.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.users.container}
       search={search}
       setSearch={setSearch}
       contentRight={

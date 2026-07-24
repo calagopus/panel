@@ -125,6 +125,12 @@ export default function AdminOverviewUpdates() {
         )}
 
       <div className='2xl:columns-2 gap-4 space-y-4'>
+        {window.extensionContext.extensionRegistry.pages.admin.home.updates.cards.prependedComponents.map(
+          (Component, index) => (
+            <Component key={`updates-prepended-${index}`} />
+          ),
+        )}
+
         <TitleCard
           title={t('pages.admin.home.tabs.updates.page.card.panelVersion', {})}
           icon={<FontAwesomeIcon icon={faInfoCircle} />}
@@ -357,6 +363,12 @@ export default function AdminOverviewUpdates() {
             </>
           )}
         </TitleCard>
+
+        {window.extensionContext.extensionRegistry.pages.admin.home.updates.cards.appendedComponents.map(
+          (Component, index) => (
+            <Component key={`updates-appended-${index}`} />
+          ),
+        )}
       </div>
     </>
   );

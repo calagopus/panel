@@ -24,6 +24,7 @@ import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { adminNodeServerBackupSchema } from '@/lib/schemas/admin/nodes.ts';
+import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -33,7 +34,13 @@ import NodeBackupsDeleteModal from '../../nodes/backups/modals/NodeBackupsDelete
 import NodeBackupsExportModal from '../../nodes/backups/modals/NodeBackupsExportModal.tsx';
 import NodeBackupsRestoreModal from '../../nodes/backups/modals/NodeBackupsRestoreModal.tsx';
 
-export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeof adminNodeServerBackupSchema> }) {
+export default function AdminServerBackupRow({
+  server,
+  backup,
+}: {
+  server: z.infer<typeof adminServerSchema>;
+  backup: z.infer<typeof adminNodeServerBackupSchema>;
+}) {
   const { t } = useTranslations();
   const { addToast } = useToast();
 
@@ -147,6 +154,8 @@ export default function AdminServerBackupRow({ backup }: { backup: z.infer<typeo
             canAccess: useAdminCan('nodes.backups'),
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.backups.contextMenu}
+        registryProps={{ server, backup }}
       >
         {({ items, openMenu }) => (
           <TableRow

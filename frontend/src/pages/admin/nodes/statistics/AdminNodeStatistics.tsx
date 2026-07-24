@@ -198,7 +198,12 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
   }, [stats]);
 
   return (
-    <AdminSubContentContainer title={t('pages.admin.nodes.tabs.statistics.page.title', {})} titleOrder={2}>
+    <AdminSubContentContainer
+      title={t('pages.admin.nodes.tabs.statistics.page.title', {})}
+      titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.statistics.subContainer}
+      registryProps={{ node }}
+    >
       {!stats ? (
         <Spinner.Centered />
       ) : (

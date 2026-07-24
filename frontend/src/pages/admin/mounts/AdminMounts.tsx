@@ -34,6 +34,7 @@ function MountsContainer() {
   return (
     <AdminContentContainer
       title={t('pages.admin.mounts.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.mounts.container}
       search={search}
       setSearch={setSearch}
       contentRight={

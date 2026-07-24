@@ -34,6 +34,7 @@ function AnnouncementsContainer() {
   return (
     <AdminContentContainer
       title={t('pages.admin.announcements.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.announcements.container}
       search={search}
       setSearch={setSearch}
       contentRight={

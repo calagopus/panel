@@ -22,9 +22,14 @@ export default function OAuthProviderView() {
   return (
     <ResourceView resource={resource}>
       {(oauthProvider) => (
-        <AdminContentContainer title={oauthProvider.name}>
+        <AdminContentContainer
+          title={oauthProvider.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.oauthProviders.container}
+        >
           <SubNavigation
             baseUrl={`/admin/oauth-providers/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.oauthProviders.view.subNavigation}
+            registryProps={{ oauthProvider }}
             items={[
               {
                 name: t('common.tabs.general', {}),

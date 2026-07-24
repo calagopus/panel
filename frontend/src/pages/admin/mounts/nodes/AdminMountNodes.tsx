@@ -67,6 +67,8 @@ function MountNodeRow({
             color: 'red',
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.mounts.view.nodes.contextMenu}
+        registryProps={{ mount, node }}
       >
         {(props) => <NodeRow node={node} contextMenuProps={props} />}
       </ContextMenu>
@@ -97,6 +99,8 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.mounts.view.nodes.subContainer}
+      registryProps={{ mount }}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
           {t('common.button.add', {})}

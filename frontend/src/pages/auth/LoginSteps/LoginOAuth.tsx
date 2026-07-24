@@ -30,7 +30,7 @@ export default function LoginOAuth() {
   }, []);
 
   return (
-    <AuthWrapper>
+    <AuthWrapper registry={window.extensionContext.extensionRegistry.pages.auth.oauth.container}>
       <Stack className='w-full'>
         {error && (
           <Alert

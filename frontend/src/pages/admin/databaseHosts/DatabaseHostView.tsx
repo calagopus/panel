@@ -21,9 +21,14 @@ export default function DatabaseHostView() {
   return (
     <ResourceView resource={resource}>
       {(databaseHost) => (
-        <AdminContentContainer title={databaseHost.name}>
+        <AdminContentContainer
+          title={databaseHost.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.databaseHosts.container}
+        >
           <SubNavigation
             baseUrl={`/admin/database-hosts/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.databaseHosts.view.subNavigation}
+            registryProps={{ databaseHost }}
             items={[
               {
                 name: t('common.tabs.general', {}),

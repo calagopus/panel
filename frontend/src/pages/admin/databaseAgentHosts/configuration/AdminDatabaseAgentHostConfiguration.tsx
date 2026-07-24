@@ -120,6 +120,10 @@ export default function AdminDatabaseAgentHostConfiguration({
     <AdminSubContentContainer
       title={t('pages.admin.databaseAgentHosts.tabs.configuration.page.title', {})}
       titleOrder={2}
+      registry={
+        window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.view.configuration.subContainer
+      }
+      registryProps={{ databaseAgentHost }}
       contentRight={
         revealed ? (
           <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>

@@ -8,10 +8,10 @@ import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { isAdmin } from '@/lib/permissions.ts';
-import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function UserRow({ user }: { user: z.infer<typeof fullUserSchema> }) {
+export default function UserRow({ user }: { user: z.infer<typeof adminFullUserSchema> }) {
   const { t } = useTranslations();
 
   return (

@@ -21,9 +21,14 @@ export default function RoleView() {
   return (
     <ResourceView resource={resource}>
       {(role) => (
-        <AdminContentContainer title={role.name}>
+        <AdminContentContainer
+          title={role.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.roles.container}
+        >
           <SubNavigation
             baseUrl={`/admin/roles/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.roles.view.subNavigation}
+            registryProps={{ role }}
             items={[
               {
                 name: t('common.tabs.general', {}),

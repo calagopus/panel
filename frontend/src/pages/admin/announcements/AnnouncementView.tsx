@@ -20,9 +20,14 @@ export default function AnnouncementView() {
   return (
     <ResourceView resource={resource}>
       {(announcement) => (
-        <AdminContentContainer title={announcement.title}>
+        <AdminContentContainer
+          title={announcement.title}
+          registry={window.extensionContext.extensionRegistry.pages.admin.announcements.container}
+        >
           <SubNavigation
             baseUrl={`/admin/announcements/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.announcements.view.subNavigation}
+            registryProps={{ announcement }}
             items={[
               {
                 name: t('common.tabs.general', {}),

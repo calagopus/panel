@@ -10,17 +10,17 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
-import { adminServerServerDatabaseSchema } from '@/lib/schemas/admin/servers.ts';
+import { adminServerSchema, adminServerServerDatabaseSchema } from '@/lib/schemas/admin/servers.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DatabaseHostDatabaseDeleteModal from '../../databaseHosts/databases/modals/DatabaseHostDatabaseDeleteModal.tsx';
 
 export default function AdminServerDatabaseRow({
-  serverUuid,
+  server,
   database,
 }: {
-  serverUuid: string;
+  server: z.infer<typeof adminServerSchema>;
   database: z.infer<typeof adminServerServerDatabaseSchema>;
 }) {
   const { t } = useTranslations();
@@ -30,7 +30,7 @@ export default function AdminServerDatabaseRow({
   const host = `${database.host}:${database.port}`;
 
   useEffect(() => {
-    getDatabaseSize(serverUuid, database.uuid)
+    getDatabaseSize(server.uuid, database.uuid)
       .then(setSize)
       .finally(() => setSizeLoading(false));
   }, []);
@@ -39,7 +39,7 @@ export default function AdminServerDatabaseRow({
     <>
       <DatabaseHostDatabaseDeleteModal
         hostUuid={database.databaseHost.uuid}
-        serverUuid={serverUuid}
+        serverUuid={server.uuid}
         database={database}
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -56,6 +56,8 @@ export default function AdminServerDatabaseRow({
             canAccess: useAdminCan('database-hosts.delete'),
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.databases.contextMenu}
+        registryProps={{ server, database }}
       >
         {({ items, openMenu }) => (
           <TableRow

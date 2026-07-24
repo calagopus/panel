@@ -169,7 +169,12 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   };
 
   return (
-    <AdminSubContentContainer title={t('pages.admin.nodes.tabs.logs.page.title', {})} titleOrder={2}>
+    <AdminSubContentContainer
+      title={t('pages.admin.nodes.tabs.logs.page.title', {})}
+      titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.logs.subContainer}
+      registryProps={{ node }}
+    >
       {!logs.length ? (
         <Spinner.Centered />
       ) : (

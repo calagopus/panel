@@ -8,6 +8,7 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
+import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
 import { adminServerDatabaseAgentSchema } from '@/lib/schemas/admin/servers.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -15,10 +16,10 @@ import DatabaseAgentHostInstanceDeleteModal from '../modals/DatabaseAgentHostIns
 import DatabaseAgentHostInstanceEditModal from '../modals/DatabaseAgentHostInstanceEditModal.tsx';
 
 export default function DatabaseAgentRow({
-  hostUuid,
+  databaseAgentHost,
   databaseAgent,
 }: {
-  hostUuid: string;
+  databaseAgentHost: z.infer<typeof adminDatabaseAgentHostSchema>;
   databaseAgent: z.infer<typeof adminServerDatabaseAgentSchema>;
 }) {
   const { t } = useTranslations();
@@ -28,7 +29,7 @@ export default function DatabaseAgentRow({
   return (
     <>
       <DatabaseAgentHostInstanceEditModal
-        hostUuid={hostUuid}
+        hostUuid={databaseAgentHost.uuid}
         serverUuid={databaseAgent.server.uuid}
         instance={databaseAgent}
         opened={openModal === 'edit'}
@@ -36,7 +37,7 @@ export default function DatabaseAgentRow({
       />
 
       <DatabaseAgentHostInstanceDeleteModal
-        hostUuid={hostUuid}
+        hostUuid={databaseAgentHost.uuid}
         serverUuid={databaseAgent.server.uuid}
         instance={databaseAgent}
         opened={openModal === 'delete'}
@@ -62,6 +63,8 @@ export default function DatabaseAgentRow({
             canAccess: useAdminCan('database-agent-hosts.delete'),
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.view.instances.contextMenu}
+        registryProps={{ databaseAgentHost, databaseAgent }}
       >
         {({ items, openMenu }) => (
           <TableRow

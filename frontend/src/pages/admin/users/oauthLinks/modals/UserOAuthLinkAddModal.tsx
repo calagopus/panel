@@ -13,7 +13,7 @@ import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
-import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -21,7 +21,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 export default function UserOAuthLinkAddModal({
   user,
   ...props
-}: ModalProps & { user: z.infer<typeof fullUserSchema> }) {
+}: ModalProps & { user: z.infer<typeof adminFullUserSchema> }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
   const queryClient = useQueryClient();

@@ -82,6 +82,7 @@ function DatabaseAgentTemplatesContainer() {
   return (
     <AdminContentContainer
       title={t('pages.admin.databaseAgentTemplates.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentTemplates.container}
       search={search}
       setSearch={setSearch}
       contentRight={

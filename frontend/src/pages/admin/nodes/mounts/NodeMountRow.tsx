@@ -64,6 +64,8 @@ export default function NodeMountRow({
             color: 'red',
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.mounts.contextMenu}
+        registryProps={{ node, mount }}
       >
         {({ items, openMenu }) => (
           <TableRow

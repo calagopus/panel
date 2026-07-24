@@ -23,9 +23,14 @@ export default () => {
   return (
     <ResourceView resource={resource}>
       {(location) => (
-        <AdminContentContainer title={location.name}>
+        <AdminContentContainer
+          title={location.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.locations.container}
+        >
           <SubNavigation
             baseUrl={`/admin/locations/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.locations.view.subNavigation}
+            registryProps={{ location }}
             items={[
               {
                 name: t('common.tabs.general', {}),

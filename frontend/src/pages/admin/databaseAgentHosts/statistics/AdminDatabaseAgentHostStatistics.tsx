@@ -205,7 +205,12 @@ export default function AdminDatabaseAgentHostStatistics({
   }, [stats]);
 
   return (
-    <AdminSubContentContainer title={t('pages.admin.databaseAgentHosts.tabs.statistics.page.title', {})} titleOrder={2}>
+    <AdminSubContentContainer
+      title={t('pages.admin.databaseAgentHosts.tabs.statistics.page.title', {})}
+      titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.view.statistics.subContainer}
+      registryProps={{ databaseAgentHost }}
+    >
       {!stats ? (
         <Spinner.Centered />
       ) : (

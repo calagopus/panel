@@ -7,11 +7,11 @@ import Group from '@/elements/Group.tsx';
 import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function AdminUserActivity({ user }: { user: z.infer<typeof fullUserSchema> }) {
+export default function AdminUserActivity({ user }: { user: z.infer<typeof adminFullUserSchema> }) {
   const { t } = useTranslations();
 
   const {
@@ -32,6 +32,8 @@ export default function AdminUserActivity({ user }: { user: z.infer<typeof fullU
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.users.view.activity.subContainer}
+      registryProps={{ user }}
     >
       <Table
         columns={[

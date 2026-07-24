@@ -205,6 +205,8 @@ export default function NodeBackupRow({
             canAccess: useAdminCan('nodes.backups'),
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.backups.contextMenu}
+        registryProps={{ node, backup }}
       >
         {({ items, openMenu }) => (
           <TableRow

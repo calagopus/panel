@@ -29,6 +29,8 @@ export default function AdminServerDatabaseInstances({ server }: { server: z.inf
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.databases.instancesSubContainer}
+      registryProps={{ server }}
     >
       <Table
         columns={serverDatabaseInstanceTableColumns()}
@@ -38,11 +40,7 @@ export default function AdminServerDatabaseInstances({ server }: { server: z.inf
         onPageSelect={setPage}
       >
         {instances?.data.map((databaseAgent) => (
-          <AdminServerDatabaseInstanceRow
-            key={databaseAgent.uuid}
-            serverUuid={server.uuid}
-            databaseAgent={databaseAgent}
-          />
+          <AdminServerDatabaseInstanceRow key={databaseAgent.uuid} server={server} databaseAgent={databaseAgent} />
         ))}
       </Table>
     </AdminSubContentContainer>

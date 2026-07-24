@@ -111,6 +111,8 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
     <AdminSubContentContainer
       title={t('pages.admin.nodes.tabs.configuration.page.title', {})}
       titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.configuration.subContainer}
+      registryProps={{ node }}
       contentRight={
         revealed ? (
           <Button onClick={doSave} loading={saving} disabled={yaml === null || liveConfigError !== null}>

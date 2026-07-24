@@ -207,7 +207,7 @@ export default function Login() {
   };
 
   return (
-    <AuthWrapper>
+    <AuthWrapper registry={window.extensionContext.extensionRegistry.pages.auth.login.container}>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
         {Math.abs(timeOffset) > 5000 && (
           <Alert

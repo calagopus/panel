@@ -41,6 +41,8 @@ export default function AdminLocationDatabaseAgentHosts({
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.locations.view.databaseAgentHosts.subContainer}
+      registryProps={{ location }}
       contentRight={
         <AdminCan action='database-agent-hosts.read'>
           <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>

@@ -11,8 +11,7 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminUserOAuthLinkSchema } from '@/lib/schemas/admin/users.ts';
-import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { adminFullUserSchema, adminUserOAuthLinkSchema } from '@/lib/schemas/admin/users.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -20,7 +19,7 @@ export default function UserOAuthLinkRow({
   user,
   userOAuthLink,
 }: {
-  user: z.infer<typeof fullUserSchema>;
+  user: z.infer<typeof adminFullUserSchema>;
   userOAuthLink: z.infer<typeof adminUserOAuthLinkSchema>;
 }) {
   const { addToast } = useToast();
@@ -65,6 +64,8 @@ export default function UserOAuthLinkRow({
             color: 'red',
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.users.view.oauthLinks.contextMenu}
+        registryProps={{ user, userOAuthLink }}
       >
         {({ items, openMenu }) => (
           <TableRow

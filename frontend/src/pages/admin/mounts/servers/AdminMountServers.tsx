@@ -29,6 +29,8 @@ export default function AdminMountServers({ mount }: { mount: z.infer<typeof adm
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.mounts.view.servers.subContainer}
+      registryProps={{ mount }}
     >
       <Table
         columns={serverTableColumns()}

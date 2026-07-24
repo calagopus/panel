@@ -41,6 +41,8 @@ export default function AdminNodeTransfers({ node }: { node: z.infer<typeof admi
         titleOrder={2}
         search={search}
         setSearch={setSearch}
+        registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.transfers.subContainer}
+        registryProps={{ node }}
       >
         <Table
           columns={[

@@ -23,9 +23,14 @@ export default function MountView() {
   return (
     <ResourceView resource={resource}>
       {(mount) => (
-        <AdminContentContainer title={mount.name}>
+        <AdminContentContainer
+          title={mount.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.mounts.container}
+        >
           <SubNavigation
             baseUrl={`/admin/mounts/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.mounts.view.subNavigation}
+            registryProps={{ mount }}
             items={[
               {
                 name: t('common.tabs.general', {}),

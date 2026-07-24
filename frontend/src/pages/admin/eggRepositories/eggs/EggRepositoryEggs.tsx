@@ -85,6 +85,8 @@ export default function EggRepositoryEggs({
       search={search}
       setSearch={setSearch}
       titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.eggRepositories.view.eggs.subContainer}
+      registryProps={{ eggRepository: contextEggRepository }}
     >
       <EggActionBar
         eggRepository={contextEggRepository}

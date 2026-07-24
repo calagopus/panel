@@ -34,6 +34,7 @@ function EggRepositoriesContainer() {
   return (
     <AdminContentContainer
       title={t('pages.admin.eggRepositories.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.eggRepositories.container}
       search={search}
       setSearch={setSearch}
       contentRight={

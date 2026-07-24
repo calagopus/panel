@@ -1,0 +1,23 @@
+import { ContainerRegistry, Registry } from 'shared';
+import { z } from 'zod';
+import type { Props as SubContainerProps } from '@/elements/containers/AdminSubContentContainer.tsx';
+import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts';
+
+type PageProps = { databaseAgentHost: z.infer<typeof adminDatabaseAgentHostSchema> };
+
+export class ConfigurationRegistry implements Registry {
+  public mergeFrom(other: this): this {
+    this.subContainer.mergeFrom(other.subContainer);
+
+    return this;
+  }
+
+  public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+
+  public enterSubContainer(
+    callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
+  ): this {
+    callback(this.subContainer);
+    return this;
+  }
+}

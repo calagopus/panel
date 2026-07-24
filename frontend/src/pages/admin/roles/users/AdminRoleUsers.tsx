@@ -29,6 +29,8 @@ export default function AdminRoleUsers({ role }: { role: z.infer<typeof roleSche
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.roles.view.users.subContainer}
+      registryProps={{ role }}
     >
       <Table columns={userTableColumns()} loading={loading} error={error} pagination={roleUsers} onPageSelect={setPage}>
         {roleUsers?.data.map((user) => (

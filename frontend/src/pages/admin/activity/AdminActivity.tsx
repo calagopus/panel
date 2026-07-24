@@ -62,6 +62,7 @@ export default function AdminActivity() {
           </Button>
         ) : null
       }
+      registry={window.extensionContext.extensionRegistry.pages.admin.activity.container}
     >
       <Table
         columns={adminActivityColumns()}

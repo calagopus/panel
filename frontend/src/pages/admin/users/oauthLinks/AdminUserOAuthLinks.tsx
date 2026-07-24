@@ -7,14 +7,14 @@ import Button from '@/elements/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { adminUserOAuthLinkTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import UserOAuthLinkAddModal from './modals/UserOAuthLinkAddModal.tsx';
 import UserOAuthLinkRow from './UserOAuthLinkRow.tsx';
 
-export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof fullUserSchema> }) {
+export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof adminFullUserSchema> }) {
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
@@ -36,6 +36,8 @@ export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof ful
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.users.view.oauthLinks.subContainer}
+      registryProps={{ user }}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
           {t('common.button.add', {})}

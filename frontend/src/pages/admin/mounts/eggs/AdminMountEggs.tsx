@@ -70,6 +70,8 @@ function MountEggRow({
             color: 'red',
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.mounts.view.eggs.contextMenu}
+        registryProps={{ mount, egg }}
       >
         {(props) => <EggRow nest={nest} egg={egg} contextMenuProps={props} />}
       </ContextMenu>
@@ -100,6 +102,8 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.mounts.view.eggs.subContainer}
+      registryProps={{ mount }}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
           {t('common.button.add', {})}

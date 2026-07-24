@@ -22,9 +22,14 @@ export default function DatabaseAgentTemplateView() {
   return (
     <ResourceView resource={resource}>
       {(databaseAgentTemplate) => (
-        <AdminContentContainer title={databaseAgentTemplate.name}>
+        <AdminContentContainer
+          title={databaseAgentTemplate.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentTemplates.container}
+        >
           <SubNavigation
             baseUrl={`/admin/database-agent-templates/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentTemplates.view.subNavigation}
+            registryProps={{ databaseAgentTemplate }}
             items={[
               {
                 name: t('common.tabs.general', {}),

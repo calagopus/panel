@@ -96,6 +96,12 @@ export default function AdminOverviewHealth() {
   return (
     <>
       <div className='2xl:columns-2 gap-4 space-y-4'>
+        {window.extensionContext.extensionRegistry.pages.admin.home.health.cards.prependedComponents.map(
+          (Component, index) => (
+            <Component key={`health-prepended-${index}`} />
+          ),
+        )}
+
         <TitleCard
           title={t('pages.admin.home.tabs.health.page.card.generalHealth', {})}
           icon={<FontAwesomeIcon icon={faInfoCircle} />}
@@ -254,6 +260,12 @@ export default function AdminOverviewHealth() {
             </>
           )}
         </TitleCard>
+
+        {window.extensionContext.extensionRegistry.pages.admin.home.health.cards.appendedComponents.map(
+          (Component, index) => (
+            <Component key={`health-appended-${index}`} />
+          ),
+        )}
       </div>
     </>
   );

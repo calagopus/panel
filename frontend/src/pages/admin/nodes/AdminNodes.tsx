@@ -116,6 +116,7 @@ function NodesContainer() {
             </Button>
           </AdminCan>
         }
+        registry={window.extensionContext.extensionRegistry.pages.admin.nodes.container}
       >
         <NodeActionBar selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} />
 

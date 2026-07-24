@@ -21,9 +21,14 @@ export default function EggRepositoryView() {
   return (
     <ResourceView resource={resource}>
       {(eggRepository) => (
-        <AdminContentContainer title={eggRepository.name}>
+        <AdminContentContainer
+          title={eggRepository.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.eggRepositories.container}
+        >
           <SubNavigation
             baseUrl={`/admin/egg-repositories/${params.eggRepositoryId}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.eggRepositories.view.subNavigation}
+            registryProps={{ eggRepository }}
             items={[
               {
                 name: t('common.tabs.general', {}),

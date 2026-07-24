@@ -41,6 +41,8 @@ export default function AdminOAuthProviderUsers({
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.oauthProviders.view.users.subContainer}
+      registryProps={{ oauthProvider }}
       contentRight={
         <>
           <IdentifierLookupModal

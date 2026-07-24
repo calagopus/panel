@@ -8,17 +8,17 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
-import { adminServerServerDatabaseAgentSchema } from '@/lib/schemas/admin/servers.ts';
+import { adminServerSchema, adminServerServerDatabaseAgentSchema } from '@/lib/schemas/admin/servers.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DatabaseAgentHostInstanceDeleteModal from '../../databaseAgentHosts/modals/DatabaseAgentHostInstanceDeleteModal.tsx';
 import DatabaseAgentHostInstanceEditModal from '../../databaseAgentHosts/modals/DatabaseAgentHostInstanceEditModal.tsx';
 
 export default function AdminServerDatabaseInstanceRow({
-  serverUuid,
+  server,
   databaseAgent,
 }: {
-  serverUuid: string;
+  server: z.infer<typeof adminServerSchema>;
   databaseAgent: z.infer<typeof adminServerServerDatabaseAgentSchema>;
 }) {
   const { t } = useTranslations();
@@ -29,7 +29,7 @@ export default function AdminServerDatabaseInstanceRow({
     <>
       <DatabaseAgentHostInstanceEditModal
         hostUuid={databaseAgent.databaseAgentHost.uuid}
-        serverUuid={serverUuid}
+        serverUuid={server.uuid}
         instance={databaseAgent}
         opened={openModal === 'edit'}
         onClose={() => setOpenModal(null)}
@@ -37,7 +37,7 @@ export default function AdminServerDatabaseInstanceRow({
 
       <DatabaseAgentHostInstanceDeleteModal
         hostUuid={databaseAgent.databaseAgentHost.uuid}
-        serverUuid={serverUuid}
+        serverUuid={server.uuid}
         instance={databaseAgent}
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
@@ -62,6 +62,8 @@ export default function AdminServerDatabaseInstanceRow({
             canAccess: useAdminCan('database-agent-hosts.delete'),
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.databases.instanceContextMenu}
+        registryProps={{ server, databaseAgent }}
       >
         {({ items, openMenu }) => (
           <TableRow

@@ -33,6 +33,8 @@ export default function AdminDatabaseAgentHostInstances({
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.view.instances.subContainer}
+      registryProps={{ databaseAgentHost }}
     >
       <Table
         columns={databaseAgentHostInstanceTableColumns()}
@@ -42,7 +44,11 @@ export default function AdminDatabaseAgentHostInstances({
         onPageSelect={setPage}
       >
         {instances?.data.map((databaseAgent) => (
-          <DatabaseAgentRow key={databaseAgent.uuid} hostUuid={databaseAgentHost.uuid} databaseAgent={databaseAgent} />
+          <DatabaseAgentRow
+            key={databaseAgent.uuid}
+            databaseAgentHost={databaseAgentHost}
+            databaseAgent={databaseAgent}
+          />
         ))}
       </Table>
     </AdminSubContentContainer>

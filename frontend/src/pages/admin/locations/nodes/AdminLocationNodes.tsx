@@ -29,6 +29,8 @@ export default function AdminLocationNodes({ location }: { location: z.infer<typ
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.locations.view.nodes.subContainer}
+      registryProps={{ location }}
     >
       <Table
         columns={nodeTableColumns()}

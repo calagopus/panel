@@ -23,9 +23,14 @@ export default function UserView() {
   return (
     <ResourceView resource={resource}>
       {(user) => (
-        <AdminContentContainer title={user.username}>
+        <AdminContentContainer
+          title={user.username}
+          registry={window.extensionContext.extensionRegistry.pages.admin.users.container}
+        >
           <SubNavigation
             baseUrl={`/admin/users/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.users.view.subNavigation}
+            registryProps={{ user }}
             items={[
               {
                 name: t('common.tabs.general', {}),

@@ -127,7 +127,12 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
       : false;
 
   return (
-    <AdminSubContentContainer title={t('pages.admin.databaseAgentHosts.tabs.overview.page.title', {})} titleOrder={2}>
+    <AdminSubContentContainer
+      title={t('pages.admin.databaseAgentHosts.tabs.overview.page.title', {})}
+      titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.view.overview.subContainer}
+      registryProps={{ databaseAgentHost }}
+    >
       <Group mb='md' gap='xs'>
         <Badge color={databaseAgentHost.deploymentEnabled ? 'green' : 'red'} variant='light'>
           {databaseAgentHost.deploymentEnabled

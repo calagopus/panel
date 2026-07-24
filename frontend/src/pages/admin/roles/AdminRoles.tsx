@@ -34,6 +34,7 @@ function RolesContainer() {
   return (
     <AdminContentContainer
       title={t('pages.admin.roles.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.roles.container}
       search={search}
       setSearch={setSearch}
       contentRight={

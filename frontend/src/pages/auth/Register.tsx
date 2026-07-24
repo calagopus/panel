@@ -61,7 +61,7 @@ export default function Register() {
   };
 
   return (
-    <AuthWrapper>
+    <AuthWrapper registry={window.extensionContext.extensionRegistry.pages.auth.register.container}>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
         {settings.app.url !== window.location.origin && (
           <Alert

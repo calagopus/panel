@@ -87,6 +87,7 @@ function DatabaseAgentHostsContainer() {
   return (
     <AdminContentContainer
       title={t('pages.admin.databaseAgentHosts.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.container}
       search={search}
       setSearch={setSearch}
       contentRight={

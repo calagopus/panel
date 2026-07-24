@@ -139,6 +139,8 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.allocations.subContainer}
+      registryProps={{ node }}
       contentRight={
         <Group gap='xs'>
           <Select

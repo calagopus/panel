@@ -77,6 +77,8 @@ export default function OAuthProviderMappingRow({
             color: 'red',
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.oauthProviders.view.mappings.contextMenu}
+        registryProps={{ oauthProvider, mapping }}
       >
         {({ items, openMenu }) => (
           <TableRow

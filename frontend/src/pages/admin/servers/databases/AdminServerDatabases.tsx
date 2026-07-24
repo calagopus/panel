@@ -32,6 +32,8 @@ export default function AdminServerDatabases({ server }: { server: z.infer<typeo
         titleOrder={2}
         search={search}
         setSearch={setSearch}
+        registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.databases.subContainer}
+        registryProps={{ server }}
       >
         <Table
           columns={serverDatabaseTableColumns()}
@@ -41,7 +43,7 @@ export default function AdminServerDatabases({ server }: { server: z.infer<typeo
           onPageSelect={setPage}
         >
           {databases?.data.map((database) => (
-            <AdminServerDatabaseRow key={database.uuid} serverUuid={server.uuid} database={database} />
+            <AdminServerDatabaseRow key={database.uuid} server={server} database={database} />
           ))}
         </Table>
       </AdminSubContentContainer>

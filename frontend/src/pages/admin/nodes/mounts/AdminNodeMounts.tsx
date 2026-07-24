@@ -36,6 +36,8 @@ export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNo
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.mounts.subContainer}
+      registryProps={{ node }}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
           {t('common.button.add', {})}

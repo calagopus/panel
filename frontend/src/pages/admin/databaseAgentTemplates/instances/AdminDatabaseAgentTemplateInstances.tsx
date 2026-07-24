@@ -117,6 +117,10 @@ export default function AdminDatabaseAgentTemplateInstances({
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={
+        window.extensionContext.extensionRegistry.pages.admin.databaseAgentTemplates.view.instances.subContainer
+      }
+      registryProps={{ databaseAgentTemplate }}
       contentRight={
         <AdminCan action='database-agent-templates.update'>
           <Button onClick={() => setApplyUpdatesScope('all')} loading={applyingAll} disabled={instances?.total === 0}>

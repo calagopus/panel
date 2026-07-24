@@ -86,6 +86,7 @@ function OAuthProvidersContainer() {
   return (
     <AdminContentContainer
       title={t('pages.admin.oAuthProviders.title', {})}
+      registry={window.extensionContext.extensionRegistry.pages.admin.oauthProviders.container}
       search={search}
       setSearch={setSearch}
       contentRight={

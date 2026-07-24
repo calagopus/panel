@@ -25,9 +25,14 @@ export default function DatabaseAgentHostView() {
   return (
     <ResourceView resource={resource}>
       {(databaseAgentHost) => (
-        <AdminContentContainer title={databaseAgentHost.name}>
+        <AdminContentContainer
+          title={databaseAgentHost.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.container}
+        >
           <SubNavigation
             baseUrl={`/admin/database-agent-hosts/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.view.subNavigation}
+            registryProps={{ databaseAgentHost }}
             items={[
               {
                 name: t('pages.admin.databaseAgentHosts.tabs.overview.title', {}),

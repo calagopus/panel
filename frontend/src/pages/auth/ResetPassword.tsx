@@ -59,7 +59,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <AuthWrapper>
+    <AuthWrapper registry={window.extensionContext.extensionRegistry.pages.auth.resetPassword.container}>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
         {error && (
           <Alert

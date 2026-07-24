@@ -47,6 +47,7 @@ function LocationsContainer() {
           </Button>
         </AdminCan>
       }
+      registry={window.extensionContext.extensionRegistry.pages.admin.locations.container}
     >
       <Table
         columns={locationTableColumns()}

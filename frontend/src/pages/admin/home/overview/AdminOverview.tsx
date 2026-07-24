@@ -93,6 +93,12 @@ export default function AdminOverview() {
           </Alert>
         )}
 
+      {window.extensionContext.extensionRegistry.pages.admin.home.overview.cards.prependedComponents.map(
+        (Component, index) => (
+          <Component key={`overview-prepended-${index}`} />
+        ),
+      )}
+
       <AdminCan
         action='stats.read'
         renderOnCant={
@@ -395,6 +401,12 @@ export default function AdminOverview() {
           )}
         </TitleCard>
       </AdminCan>
+
+      {window.extensionContext.extensionRegistry.pages.admin.home.overview.cards.appendedComponents.map(
+        (Component, index) => (
+          <Component key={`overview-appended-${index}`} />
+        ),
+      )}
     </>
   );
 }

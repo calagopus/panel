@@ -40,6 +40,8 @@ export default function AdminServerBackups({ server }: { server: z.infer<typeof 
           onChange={(e) => setShowPartiallyDetachedServerBackups(e.currentTarget.checked)}
         />
       }
+      registry={window.extensionContext.extensionRegistry.pages.admin.servers.view.backups.subContainer}
+      registryProps={{ server }}
     >
       <Table
         columns={[
@@ -57,7 +59,7 @@ export default function AdminServerBackups({ server }: { server: z.infer<typeof 
         onPageSelect={setPage}
       >
         {serverBackups?.data.map((backup) => (
-          <AdminServerBackupRow key={backup.uuid} backup={backup} />
+          <AdminServerBackupRow key={backup.uuid} server={server} backup={backup} />
         ))}
       </Table>
     </AdminSubContentContainer>

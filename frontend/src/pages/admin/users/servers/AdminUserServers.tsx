@@ -5,13 +5,13 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import Switch from '@/elements/input/Switch.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function AdminUserServers({ user }: { user: z.infer<typeof fullUserSchema> }) {
+export default function AdminUserServers({ user }: { user: z.infer<typeof adminFullUserSchema> }) {
   const { t } = useTranslations();
   const [showOwnedUserServers, setShowOwnedUserServers] = useState(false);
 
@@ -34,6 +34,8 @@ export default function AdminUserServers({ user }: { user: z.infer<typeof fullUs
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.users.view.servers.subContainer}
+      registryProps={{ user }}
       contentRight={
         <Switch
           label={t('pages.admin.users.tabs.servers.page.showOwnedOnly', {})}

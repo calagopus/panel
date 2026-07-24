@@ -10,6 +10,7 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
+import { adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 import { adminServerDatabaseSchema } from '@/lib/schemas/admin/servers.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -17,10 +18,10 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DatabaseHostDatabaseDeleteModal from './modals/DatabaseHostDatabaseDeleteModal.tsx';
 
 export default function DatabaseRow({
-  hostUuid,
+  databaseHost,
   database,
 }: {
-  hostUuid: string;
+  databaseHost: z.infer<typeof adminDatabaseHostSchema>;
   database: z.infer<typeof adminServerDatabaseSchema>;
 }) {
   const { t } = useTranslations();
@@ -38,7 +39,7 @@ export default function DatabaseRow({
   return (
     <>
       <DatabaseHostDatabaseDeleteModal
-        hostUuid={hostUuid}
+        hostUuid={databaseHost.uuid}
         serverUuid={database.server.uuid}
         database={database}
         opened={openModal === 'delete'}
@@ -56,6 +57,8 @@ export default function DatabaseRow({
             canAccess: useAdminCan('database-hosts.delete'),
           },
         ]}
+        registry={window.extensionContext.extensionRegistry.pages.admin.databaseHosts.view.databases.contextMenu}
+        registryProps={{ databaseHost, database }}
       >
         {({ items, openMenu }) => (
           <TableRow

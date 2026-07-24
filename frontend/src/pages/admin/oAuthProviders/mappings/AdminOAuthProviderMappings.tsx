@@ -38,6 +38,8 @@ export default function AdminOAuthProviderMappings({
     <AdminSubContentContainer
       title={t('pages.admin.oAuthProviders.tabs.mappings.page.title', {})}
       titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.oauthProviders.view.mappings.subContainer}
+      registryProps={{ oauthProvider }}
       contentRight={
         <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
           {t('common.button.add', {})}

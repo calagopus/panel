@@ -33,6 +33,8 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.backups.subContainer}
+      registryProps={{ node }}
       contentRight={
         <Switch
           label={t('pages.admin.nodes.tabs.backups.page.input.detachedOnly', {})}
