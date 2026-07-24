@@ -56,6 +56,14 @@
       "many": "{count} 個節點",
       "other": "{count} 個節點"
     },
+    "databaseAgentHost": {
+      "zero": "{count} Database Agent Hosts",
+      "one": "{count} Database Agent Host",
+      "two": "{count} Database Agent Hosts",
+      "few": "{count} Database Agent Hosts",
+      "many": "{count} Database Agent Hosts",
+      "other": "{count} Database Agent Hosts"
+    },
     "allocation": {
       "zero": "{count} 個節點分配",
       "one": "{count} 個節點分配",
@@ -72,6 +80,14 @@
       "many": "{count} 個 Egg",
       "other": "{count} 個 Egg"
     },
+    "instance": {
+      "zero": "{count} Instances",
+      "one": "{count} Instance",
+      "two": "{count} Instances",
+      "few": "{count} Instances",
+      "many": "{count} Instances",
+      "other": "{count} Instances"
+    },
     "shortcut": {
       "zero": "{count} 個快捷鍵",
       "one": "{count} 個快捷鍵",
@@ -87,6 +103,22 @@
       "few": "{count} 行",
       "many": "{count} 行",
       "other": "{count} 行"
+    },
+    "backup": {
+      "zero": "{count} Backups",
+      "one": "{count} Backup",
+      "two": "{count} Backups",
+      "few": "{count} Backups",
+      "many": "{count} Backups",
+      "other": "{count} Backups"
+    },
+    "day": {
+      "zero": "{count} Days",
+      "one": "{count} Day",
+      "two": "{count} Days",
+      "few": "{count} Days",
+      "many": "{count} Days",
+      "other": "{count} Days"
     }
   },
   "translations": {
@@ -94,9 +126,11 @@
       "button": {
         "create": "建立",
         "add": "新增",
+        "addDefaultPort": "Add :{port}",
         "save": "儲存",
         "saveAndStay": "儲存並停留",
         "edit": "編輯",
+        "duplicate": "Duplicate",
         "delete": "刪除",
         "remove": "移除",
         "enable": "啟用",
@@ -133,7 +167,8 @@
         "setPrimary": "設為主要",
         "unsetPrimary": "取消主要",
         "leavePage": "離開頁面",
-        "viewDocumentation": "檢視文件"
+        "viewDocumentation": "檢視文件",
+        "undo": "Undo"
       },
       "alert": {
         "error": "錯誤",
@@ -147,6 +182,31 @@
       "input": {
         "search": "搜尋..."
       },
+      "elements": {
+        "jsonInput": {
+          "enum": {
+            "type": {
+              "string": "String",
+              "number": "Number",
+              "boolean": "Boolean",
+              "object": "Object",
+              "array": "Array",
+              "null": "Null"
+            }
+          },
+          "textMode": "Text",
+          "jsonMode": "JSON",
+          "invalidJson": "Invalid JSON"
+        }
+      },
+      "modal": {
+        "duplicate": {
+          "title": "Duplicate {resource}"
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicated."
+      },
       "tooltip": {
         "resetToDefault": "重設為預設值",
         "edit": "編輯",
@@ -156,7 +216,9 @@
         "backupOnDifferentNode": "此備份位於與伺服器不同的節點上，無法從客戶端 API 檢視。"
       },
       "form": {
+        "force": "Do you want to execute this deletion forcefully?",
         "name": "名稱",
+        "newName": "New Name",
         "description": "描述",
         "author": "作者",
         "type": "類型",
@@ -186,6 +248,7 @@
         "language": "語言",
         "identifier": "識別碼",
         "enabled": "已啟用",
+        "disabled": "Disabled",
         "title": "標題",
         "content": "內容",
         "backupConfiguration": "備份設定",
@@ -212,11 +275,13 @@
         "nest": "Nest",
         "lines": "行數",
         "databaseHost": "資料庫主機",
+        "databaseAgentHost": "Database Agent Host",
         "timezone": "時區",
         "timezoneSystem": "系統",
         "protocol": "通訊協定",
         "powerAction": "電源動作",
         "destination": "目的地",
+        "destinationDirectory": "Destination Directory",
         "directoryName": "目錄名稱",
         "locked": "已鎖定",
         "portRanges": "連接埠範圍",
@@ -231,6 +296,7 @@
         "value": "值",
         "eggs": "Egg",
         "ignoredFiles": "忽略的檔案",
+        "previewIgnoredFiles": "Preview ignored files",
         "yourControlPanelPassword": "你的控制面板密碼",
         "deploymentEnabled": "部署已啟用",
         "maintenanceEnabled": "維護已啟用",
@@ -253,6 +319,7 @@
           "size": "大小",
           "lastUsed": "上次使用",
           "created": "已建立",
+          "updated": "Updated",
           "actor": "操作者",
           "event": "事件",
           "ip": "IP",
@@ -272,7 +339,10 @@
           "files": "檔案",
           "server": "伺服器",
           "address": "位址",
-          "eggs": "Egg"
+          "eggs": "Egg",
+          "template": "Template",
+          "version": "Version",
+          "host": "Host"
         }
       },
       "tabs": {
@@ -286,6 +356,13 @@
         "successful": "成功",
         "failed": "失敗",
         "installed": "已安裝"
+      },
+      "label": {
+        "noSubdirectories": "No subdirectories",
+        "page": "Page {page}",
+        "emptyDirectory": "This directory is empty",
+        "ignored": "Ignored",
+        "showingFirstEntries": "Showing the first {count} entries"
       },
       "server": {
         "noAllocation": "無分配",
@@ -339,6 +416,12 @@
           "stopped": "已停止",
           "restarted": "已重新啟動",
           "killed": "已強制終止"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Best Speed",
+          "goodSpeed": "Good Speed",
+          "goodCompression": "Good Compression",
+          "bestCompression": "Best Compression"
         }
       },
       "unit": {
@@ -419,7 +502,8 @@
       "container": {
         "alert": {
           "impersonating": "你目前正在模擬某位使用者的身分。請注意，你的操作可能會影響被模擬使用者的帳戶。若要離開模擬身分模式，請點選左下角的「停止模擬身分」按鈕。"
-        }
+        },
+        "connectedTo": "Connected to {name}"
       },
       "sidebar": {
         "button": {
@@ -427,7 +511,11 @@
           "stopImpersonating": "停止模擬身分",
           "openInVirtualWindow": "在虛擬視窗中開啟",
           "openInPopup": "在彈出視窗中開啟",
-          "openInNewTab": "在新分頁中開啟"
+          "openInNewTab": "在新分頁中開啟",
+          "theme": "Theme",
+          "themeAuto": "Auto",
+          "themeDark": "Dark",
+          "themeLight": "Light"
         }
       },
       "permissionSelector": {
@@ -441,6 +529,9 @@
       "selectInput": {
         "noResults": "找不到結果。"
       },
+      "serverSelect": {
+        "showOtherUsersServers": "Show other user's servers"
+      },
       "can": {
         "tooltip": {
           "cantSave": "你沒有儲存權限。",
@@ -453,6 +544,9 @@
           "updated": "已更新 {resource}。",
           "deleted": "已刪除 {resource}。"
         }
+      },
+      "formEngine": {
+        "advancedMode": "Advanced mode"
       },
       "activityInfoButton": {
         "modal": {
@@ -497,7 +591,10 @@
       "scheduleDynamicInput": {
         "none": "無",
         "variable": "變數",
-        "enterVariable": "請輸入要評估的變數名稱。"
+        "enterVariable": "請輸入要評估的變數名稱。",
+        "useVariable": "Use a variable instead of plain text",
+        "usePlainText": "Use plain text instead of a variable",
+        "optionalPlaceholder": "None (optional)"
       },
       "serverWebsocket": {
         "error": {
@@ -516,6 +613,7 @@
           "toast": {
             "backupCompleted": "備份已成功完成。",
             "backupFailed": "備份失敗。",
+            "backupDeleteFailed": "Backup deletion failed.",
             "backupRestoreCompleted": "備份還原已成功完成。",
             "installCompleted": "伺服器安裝已成功完成。",
             "installFailed": "伺服器安裝失敗。",
@@ -534,6 +632,7 @@
               },
               "copying": {
                 "completed": "已在 {time} 內將 `{path}` 複製到 `{destination}`。",
+                "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
                 "failed": "無法將 `{path}` 複製到 `{destination}`：\n{error}"
               },
               "copyingMany": {
@@ -551,16 +650,42 @@
         }
       },
       "fileUpload": {
+        "title": "Uploading {files}",
+        "adminAssets": "Admin Assets",
         "waiting": "等待中：{file}",
         "uploading": "上傳中：{file}",
         "uploadingFolder": "正在上傳資料夾：{folder}（{files}）",
+        "failed": "Failed: {file}",
+        "failedFolder": "Upload failed: {folder} ({files})",
+        "paused": "Paused: {file}",
+        "pause": "Pause upload",
+        "resume": "Resume upload",
+        "cancel": "Cancel upload",
+        "reselect": "Re-select file to resume",
+        "badge": {
+          "uploading": "Uploading",
+          "waiting": "Waiting",
+          "paused": "Paused",
+          "failed": "Failed"
+        },
         "rateLimited": "你的上傳受到速率限制。等待中...",
         "cancelAllUploads": "取消所有上傳",
+        "modal": {
+          "cancelAllUploads": {
+            "title": "Cancel All Uploads",
+            "content": "Are you sure you want to cancel all active uploads? Partially uploaded files will be discarded."
+          }
+        },
         "toast": {
           "uploading": "已開始上傳 {files}...",
+          "failed": "Upload failed: {error}",
           "cancelledFile": "已成功取消上傳 `{file}`。",
           "cancelledFolder": "已成功取消上傳 `{folder}`（{files}）。",
-          "cancelledAll": "所有上傳都已取消。"
+          "wrongFile": "Selected file does not match `{file}`; pick the same file to resume.",
+          "cancelledAll": "所有上傳都已取消。",
+          "completedServer": "Finished uploading {files} to `{server}`.",
+          "completedAssets": "Finished uploading {files} to the admin assets.",
+          "showFiles": "Show files"
         }
       }
     },
@@ -653,7 +778,8 @@
           "title": "節點設定",
           "error": {
             "noNodes": "發生錯誤。找不到任何節點。",
-            "connectionError": "發生錯誤。連線錯誤。"
+            "connectionError": "發生錯誤。連線錯誤。",
+            "frontendConnectionError": "Your browser could not reach the node. Check the (public) URL, TLS certificate and firewall. Websockets and downloads depend on this connection."
           },
           "successMessage": "已成功驗證與節點的連線。你現在可以繼續。",
           "configurationDescription": "將此內容放入 `{file}` 的設定檔中，或執行：",
@@ -1202,6 +1328,12 @@
               "toast": {
                 "removed": "指令片段已移除。"
               }
+            },
+            "duplicateCommandSnippet": {
+              "title": "Duplicate Command Snippet",
+              "toast": {
+                "duplicated": "Command snippet duplicated."
+              }
             }
           }
         },
@@ -1268,6 +1400,12 @@
               "toast": {
                 "removed": "API 金鑰已移除。"
               }
+            },
+            "apiKeyToken": {
+              "titleCreated": "API Key Created",
+              "titleRecreated": "API Key Recreated",
+              "descriptionCreated": "Your new API key has been created. Make sure to copy it now, as it will not be shown again.",
+              "descriptionRecreated": "Your API key has been recreated. Make sure to copy the new key now, as it will not be shown again."
             }
           },
           "form": {
@@ -1296,6 +1434,14 @@
         }
       },
       "admin": {
+        "categories": {
+          "infrastructure": "Infrastructure",
+          "eggs": "Nests & Eggs",
+          "databases": "Databases",
+          "storage": "Storage",
+          "access": "Users & Access",
+          "system": "System"
+        },
         "home": {
           "title": "首頁",
           "alert": {
@@ -1376,7 +1522,8 @@
                   "panelVersion": "面板版本",
                   "versionHistory": "版本歷史",
                   "outdatedExtensions": "過期的擴充功能",
-                  "outdatedNodes": "過期的節點"
+                  "outdatedNodes": "過期的節點",
+                  "outdatedDatabaseAgentHosts": "Outdated Database Agent Hosts"
                 },
                 "panelVersion": "你的面板目前執行版本 `{current}`，最新可用版本為 `{latest}`。",
                 "unknown": "未知",
@@ -1394,6 +1541,8 @@
                 "noChangelog": "無變更紀錄",
                 "nodesUpToDate": "所有節點似乎都是最新版本。（{failed} 個檢查失敗）",
                 "nodesOutdated": "部分節點已過期，最新可用版本為 `{latest}`。（{outdated} 個過期，{failed} 個檢查失敗）",
+                "databaseAgentHostsUpToDate": "Seems like all database agent hosts are up to date. ({failed} failed to check)",
+                "databaseAgentHostsOutdated": "Some database agent hosts are outdated, the latest available version is `{latest}`. ({outdated} outdated, {failed} failed to check)",
                 "table": {
                   "version": "版本",
                   "installed": "已安裝",
@@ -1642,6 +1791,9 @@
                   "maxFileManagerContentSearchSize": "檔案管理器最大內容搜尋大小",
                   "maxFileManagerSearchResults": "檔案管理器最大搜尋結果數",
                   "maxSubuserCount": "最大子使用者數量",
+                  "maxBackupGroupCount": "Max Backup Groups per Server",
+                  "maxDatabaseInstanceDatabaseCount": "Max Databases per Database Instance",
+                  "maxDatabaseInstanceUserCount": "Max Users per Database Instance",
                   "allowOverwritingCustomDockerImage": "允許覆寫自訂 Docker 映像檔",
                   "allowOverwritingCustomDockerImageDescription": "若啟用，即使管理員已設定自訂 Docker 映像檔，使用者仍可使用 Egg 清單覆寫伺服器設定中指定的 Docker 映像檔。",
                   "allowViewingInstallationLogs": "允許檢視安裝紀錄",
@@ -1727,6 +1879,9 @@
                   "delete": {
                     "title": "確認刪除公告",
                     "content": "你確定要刪除 **{title}** 嗎？"
+                  },
+                  "duplicate": {
+                    "content": "Are you sure you want to duplicate **{title}**?"
                   }
                 },
                 "form": {
@@ -1862,6 +2017,25 @@
         "users": {
           "title": "使用者",
           "resourceName": "使用者",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-user-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "User Found",
+                "username": "Username",
+                "email": "Email",
+                "role": "Role",
+                "viewUser": "View User"
+              },
+              "notFound": "No user found with that external ID."
+            }
+          },
           "tooltip": {
             "admin": "管理員",
             "twoFactorEnabled": "2FA 已啟用",
@@ -1991,6 +2165,25 @@
                 }
               }
             },
+            "databaseAgentHosts": {
+              "title": "Database Agent Hosts",
+              "page": {
+                "title": "Location Database Agent Hosts",
+                "toast": {
+                  "created": "Location database agent host created.",
+                  "deleted": "Location database agent host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Location Database Agent Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Location Database Agent Host Deletion",
+                    "content": "Are you sure you want to delete the database agent host **{name}** from **{location}**?"
+                  }
+                }
+              }
+            },
             "nodes": {
               "title": "節點",
               "page": {
@@ -2003,6 +2196,37 @@
           "title": "節點",
           "resourceName": "節點",
           "tabs": {
+            "overview": {
+              "title": "Overview",
+              "page": {
+                "title": "Node Overview",
+                "card": {
+                  "nodeDetails": "Node Details",
+                  "systemInfo": "System Information"
+                },
+                "label": {
+                  "location": "Location",
+                  "url": "Internal URL",
+                  "publicUrl": "Public URL",
+                  "sftpAddress": "SFTP Address",
+                  "backupConfiguration": "Backup Configuration",
+                  "description": "Description",
+                  "createdAt": "Created",
+                  "inheritedFromLocation": "Inherited from Location",
+                  "none": "None",
+                  "wingsVersion": "Wings Version",
+                  "cpu": "CPU",
+                  "memory": "Memory",
+                  "servers": "Servers",
+                  "architecture": "Architecture",
+                  "kernelVersion": "Kernel Version",
+                  "unavailable": "Unavailable"
+                },
+                "badge": {
+                  "updateAvailable": "Update Available"
+                }
+              }
+            },
             "general": {
               "page": {
                 "tooltip": {
@@ -2015,8 +2239,17 @@
                 },
                 "form": {
                   "urlDescription": "用於與節點進行內部通訊。",
+                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "用於 websocket 連線與下載。",
-                  "backupConfigurationPlaceholder": "繼承自位置"
+                  "backupConfigurationPlaceholder": "繼承自位置",
+                  "memoryDescription": "The total memory available for servers on this node.",
+                  "diskDescription": "The total disk available for servers on this node.",
+                  "unlimitedTooltip": "0 will not set a limit."
+                },
+                "section": {
+                  "connection": "Connection",
+                  "resources": "Resources",
+                  "options": "Options"
                 },
                 "button": {
                   "resetToken": "重設權杖",
@@ -2026,7 +2259,8 @@
                   "tokenReset": "節點權杖已重設。"
                 },
                 "alert": {
-                  "noLocations": "你需要先建立至少一個位置才能建立節點。位置可協助你按地理或邏輯方式組織節點。"
+                  "noLocations": "你需要先建立至少一個位置才能建立節點。位置可協助你按地理或邏輯方式組織節點。",
+                  "urlMissingPort": "No port specified. The panel will connect to this node on port {port}. Wings listens on port {wingsPort} by default, so add it to the URL unless a reverse proxy on port {port} forwards to wings."
                 },
                 "titleCreate": "建立節點",
                 "titleUpdate": "更新節點"
@@ -2040,21 +2274,41 @@
                   "initialSetup": "初始設定",
                   "liveConfiguration": "即時設定"
                 },
+                "step": {
+                  "settings": "Settings",
+                  "install": "Apply Configuration",
+                  "verify": "Verify Connection"
+                },
                 "description": {
-                  "placeFile": "將此內容放入 `/etc/pterodactyl/config.yml` 設定檔中，或執行"
+                  "placeFile": "將此內容放入 `/etc/pterodactyl/config.yml` 設定檔中，或執行",
+                  "settings": "These values are used to generate the wings configuration below.",
+                  "verify": "Checks that both the panel (backend) and your browser (frontend) can reach wings."
                 },
                 "tooltip": {
                   "copyCommand": "複製指令"
                 },
                 "form": {
                   "panelUrl": "面板 URL",
-                  "apiPort": "API 連接埠"
+                  "panelUrlDescription": "The URL wings uses to reach this panel.",
+                  "apiPort": "API 連接埠",
+                  "apiPortDescription": "The port wings listens on.",
+                  "sftpPortDescription": "The port the wings SFTP server listens on."
                 },
                 "button": {
-                  "save": "儲存設定"
+                  "save": "儲存設定",
+                  "reveal": "Reveal Configuration",
+                  "verify": "Verify Connection"
                 },
                 "alert": {
-                  "couldNotReach": "無法連線到節點：{error}"
+                  "couldNotReach": "無法連線到節點：{error}",
+                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed.",
+                  "portMismatch": "The node URL points at port {connectPort}, but this configuration makes wings listen on port {apiPort}. Unless a reverse proxy forwards port {connectPort} to wings, the panel will not be able to reach the node.",
+                  "verifyBackend": "Backend to Wings",
+                  "verifyFrontend": "Frontend to Wings",
+                  "verifyNotTested": "Not tested yet.",
+                  "verifySuccess": "Connection established. Wings {version} responded.",
+                  "verifyFailed": "The panel could not reach the node: {error}",
+                  "verifyFrontendFailed": "Your browser could not reach the node: {error}. The console, downloads and uploads depend on this connection. Check the (public) URL, TLS certificate and firewall."
                 },
                 "toast": {
                   "applied": "設定已成功套用。",
@@ -2216,9 +2470,13 @@
                   "detached": "備份已成功卸離。",
                   "reattached": "已成功將備份重新附加到 {name}。",
                   "restoring": "正在將備份還原到 {name}...",
+                  "exporting": "Exporting backup to files of {name}...",
                   "deleted": "節點備份已刪除。"
                 },
                 "modal": {
+                  "export": {
+                    "title": "Export Node Backup to Files"
+                  },
                   "detach": {
                     "title": "確認卸離備份",
                     "content": "你確定要將此備份從其伺服器卸離嗎？它不會被刪除，且稍後可以重新附加。"
@@ -2234,7 +2492,11 @@
                     }
                   },
                   "delete": {
-                    "title": "確認刪除節點備份"
+                    "title": "確認刪除節點備份",
+                    "form": {},
+                    "alert": {
+                      "forceWarning": "Force deletion removes the backup even if its configuration is missing or the remote storage cannot be reached. The backup files themselves may not be fully cleaned up, leaving orphaned data behind."
+                    }
                   }
                 }
               }
@@ -2263,6 +2525,7 @@
                         "none": "無（捨棄所有分配，伺服器不會在目標節點自動獲得新分配）",
                         "randomPrimary": "隨機化主要分配（移除額外分配）",
                         "randomAll": "隨機化所有分配（建議使用以避免與目標節點的相容性問題）",
+                        "preservePorts": "Preserve port numbers (reuses the same port numbers on the destination node where available, falls back to random allocations otherwise)",
                         "eggConfigDeployment": "根據 Egg 部署設定分配（僅在 Egg 有部署設定且目標節點有相容分配時有效）",
                         "eggConfigSelfAssignRange": "根據 Egg 連接埠範圍自行分配新分配（僅在 Egg 有連接埠範圍且目標節點有相容分配時有效）"
                       }
@@ -2311,7 +2574,78 @@
         "servers": {
           "title": "伺服器",
           "resourceName": "伺服器",
+          "externalIdLookup": {
+            "button": "Find by External ID",
+            "modal": {
+              "title": "Look Up by External ID",
+              "form": {
+                "externalId": "External ID",
+                "externalIdPlaceholder": "e.g. my-server-001",
+                "search": "Search"
+              },
+              "result": {
+                "title": "Server Found",
+                "name": "Name",
+                "owner": "Owner",
+                "node": "Node",
+                "viewServer": "View Server"
+              },
+              "notFound": "No server found with that external ID."
+            }
+          },
           "tabs": {
+            "overview": {
+              "title": "Overview",
+              "page": {
+                "title": "Server Overview",
+                "card": {
+                  "owner": "Owner",
+                  "nodeAndLocation": "Node & Location",
+                  "serverDetails": "Server Details",
+                  "resourceLimits": "Resource Limits",
+                  "featureLimits": "Feature Limits"
+                },
+                "label": {
+                  "user": "User",
+                  "language": "Language",
+                  "createdAt": "Created",
+                  "node": "Node",
+                  "location": "Location",
+                  "memoryLimit": "Memory Limit",
+                  "diskLimit": "Disk Limit",
+                  "sftpAddress": "SFTP Address",
+                  "primaryAllocation": "Primary Allocation",
+                  "none": "None",
+                  "dockerImage": "Docker Image",
+                  "nest": "Nest",
+                  "egg": "Egg",
+                  "timezone": "Timezone",
+                  "autoKill": "Auto-Kill",
+                  "cpu": "CPU",
+                  "memory": "Memory",
+                  "disk": "Disk",
+                  "swap": "Swap",
+                  "allocations": "Allocations",
+                  "databases": "Databases",
+                  "databaseAgents": "Agent Databases",
+                  "backups": "Backups",
+                  "schedules": "Schedules",
+                  "unlimited": "Unlimited",
+                  "autoKillSeconds": "{seconds}s",
+                  "autoKillDisabled": "Disabled",
+                  "externalId": "External ID",
+                  "uuid": "UUID"
+                },
+                "badge": {
+                  "suspended": "Suspended",
+                  "transferring": "Transferring",
+                  "installing": "Installing",
+                  "installFailed": "Install Failed",
+                  "restoringBackup": "Restoring Backup",
+                  "admin": "Admin"
+                }
+              }
+            },
             "general": {
               "page": {
                 "titleCreate": "建立伺服器",
@@ -2341,23 +2675,30 @@
                   "backupConfigurationPlaceholder": "繼承自節點/位置",
                   "cpuLimit": "CPU 限制（%）",
                   "cpuLimitDescription": "伺服器可使用的 CPU 限制百分比。",
+                  "cpuLimitTooltip": "1 thread = 100%. 0 will not set a limit.",
                   "swap": "Swap",
                   "swapDescription": "分配給此伺服器的 swap 大小。",
+                  "swapTooltip": "-1 will not set a limit.",
                   "memoryDescription": "伺服器容器的記憶體限制。",
+                  "memoryTooltip": "0 will not set a limit.",
                   "memoryOverhead": "記憶體額外開銷",
                   "memoryOverheadDescription": "將新增至容器的隱藏記憶體。",
                   "diskSpace": "磁碟空間",
                   "diskSpaceDescription": "伺服器的磁碟限制。",
+                  "diskSpaceTooltip": "0 will not set a limit. This is a soft-limit unless the disk limiter is configured on Wings.",
                   "ioWeight": "IO 權重",
                   "ioWeightDescription": "伺服器容器相對於其他容器的 IO 權重。",
+                  "ioWeightTooltip": "0-1000. May not work on all systems.",
                   "pinnedCpus": "固定 CPU",
                   "pinnedCpusDescription": "此伺服器固定使用的 CPU 核心。",
+                  "pinnedCpusTooltip": "By index, e.g. 0, 1, 2. Leave empty to allow all cores.",
                   "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "預定義 Docker 映像檔",
                   "predefinedDockerImagesPlaceholder": "未選取預定義映像檔",
                   "timezonePlaceholder": "Europe/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "自訂",
+                  "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "完成後啟動",
                   "startOnCompletionDescription": "安裝完成後啟動伺服器。",
                   "skipInstaller": "略過安裝程式",
@@ -2368,6 +2709,7 @@
                   "kvmPassthroughEnabledDescription": "為伺服器啟用 KVM 透傳（允許在容器內存取 /dev/kvm）。",
                   "allocationsLimit": "分配",
                   "databasesLimit": "資料庫",
+                  "databaseAgentsLimit": "Agent Databases",
                   "backupsLimit": "備份",
                   "schedulesLimit": "排程"
                 },
@@ -2452,6 +2794,17 @@
                 "title": "伺服器備份",
                 "input": {
                   "partiallyDetachedOnly": "僅顯示部分卸離的備份"
+                }
+              }
+            },
+            "databases": {
+              "title": "Databases",
+              "page": {
+                "databases": {
+                  "title": "Classic Databases"
+                },
+                "instances": {
+                  "title": "Managed Databases"
                 }
               }
             },
@@ -2546,6 +2899,9 @@
                       "deleteBackups": "你要刪除此伺服器的備份嗎？",
                       "confirmServerName": "確認伺服器名稱",
                       "confirmServerNamePlaceholder": "伺服器名稱"
+                    },
+                    "alert": {
+                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind."
                     }
                   }
                 }
@@ -2704,13 +3060,17 @@
                       "toast": {
                         "created": "Egg 變數已建立。",
                         "updated": "Egg 變數已更新。",
-                        "deleted": "Egg 變數已刪除。"
+                        "deleted": "Egg 變數已刪除。",
+                        "duplicated": "Egg variable duplicated."
                       },
                       "modal": {
                         "delete": {
                           "title": "確認移除 Egg 變數",
                           "content": "你確定要移除 **{variable}** 嗎？",
                           "emptyVariable": "此空白變數"
+                        },
+                        "duplicate": {
+                          "title": "Duplicate Egg Variable"
                         }
                       }
                     }
@@ -2761,7 +3121,8 @@
                 "form": {
                   "order": "順序",
                   "eggs": "Egg",
-                  "eggsPlaceholder": "選取 Egg"
+                  "eggsPlaceholder": "選取 Egg",
+                  "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
                 },
                 "enum": {
                   "deploymentType": {
@@ -2879,6 +3240,9 @@
                     "title": "安裝 Egg 儲存庫 Egg",
                     "button": "安裝 {eggs}"
                   }
+                },
+                "drawer": {
+                  "noReadme": "This egg does not have a README."
                 }
               }
             }
@@ -2915,7 +3279,11 @@
                 "modal": {
                   "delete": {
                     "title": "確認刪除資料庫主機",
-                    "content": "你確定要刪除 **{name}** 嗎？"
+                    "content": "你確定要刪除 **{name}** 嗎？",
+                    "form": {},
+                    "alert": {
+                      "forceWarning": "Force deletion removes all databases on this host. The databases on the host itself may not be fully cleaned up, leaving orphaned data behind."
+                    }
                   }
                 }
               }
@@ -2923,7 +3291,296 @@
             "databases": {
               "title": "資料庫",
               "page": {
-                "title": "資料庫主機資料庫"
+                "title": "資料庫主機資料庫",
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Database Deletion",
+                    "content": "Are you sure you want to delete **{name}**?",
+                    "toast": {
+                      "deleted": "Database has been deleted."
+                    },
+                    "form": {},
+                    "alert": {
+                      "forceWarning": "Force deletion ignores the database lock and the host maintenance state. The database on the host itself may not be fully cleaned up, leaving orphaned data behind."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "databaseAgentHosts": {
+          "title": "Database Agent Hosts",
+          "resourceName": "Database agent host",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Database Agent Host",
+                "titleUpdate": "Update Database Agent Host",
+                "form": {
+                  "urlPlaceholder": "https://agent.example.com:8080",
+                  "typeEnabled": "Enabled",
+                  "typePublicHost": "Public Host",
+                  "typePublicPort": "Public Port"
+                },
+                "alert": {
+                  "urlMissingPort": "No port specified. The panel will connect to this host on port {port}. The database agent listens on port {agentPort} by default, so add it to the URL unless a reverse proxy on port {port} forwards to the agent."
+                },
+                "button": {
+                  "resetToken": "Reset Token",
+                  "testConnection": "Test Connection",
+                  "updateConfig": "Update Config"
+                },
+                "toast": {
+                  "tested": "Test successfully completed.",
+                  "tokenReset": "Database agent host token reset."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Database Agent Host Deletion",
+                    "content": "Are you sure you want to delete **{name}**?",
+                    "form": {},
+                    "alert": {
+                      "forceWarning": "Force deletion removes all instances on this host. Instances the agent cannot be reached for may not be fully cleaned up, leaving orphaned data behind."
+                    }
+                  }
+                }
+              }
+            },
+            "instances": {
+              "title": "Instances",
+              "page": {
+                "title": "Instances",
+                "modal": {
+                  "editInstance": {
+                    "title": "Edit {name}",
+                    "toast": {
+                      "updated": "Instance has been updated."
+                    },
+                    "form": {
+                      "image": "Docker Image",
+                      "imageDescription": "Pins the instance to a specific docker image. Leave empty to follow the template image, including future template updates.",
+                      "env": "Environment Overrides",
+                      "override": "Override {field}"
+                    }
+                  },
+                  "deleteInstance": {
+                    "title": "Confirm Managed Database Deletion",
+                    "content": "Are you sure you want to delete **{name}**?",
+                    "toast": {
+                      "deleted": "Managed database deleted."
+                    },
+                    "form": {},
+                    "alert": {
+                      "forceWarning": "Force deletion removes the instance even if the agent cannot be reached. The instance and its data on the host itself may not be fully cleaned up, leaving orphaned data behind."
+                    }
+                  }
+                }
+              }
+            },
+            "configuration": {
+              "title": "Configuration",
+              "page": {
+                "title": "Configuration",
+                "section": {
+                  "initialSetup": "Initial Setup",
+                  "liveConfiguration": "Live Configuration"
+                },
+                "step": {
+                  "settings": "Settings",
+                  "install": "Apply Configuration",
+                  "verify": "Verify Connection"
+                },
+                "description": {
+                  "placeFile": "Place this into the configuration file at `/etc/calagopus-db-agent/config.yml` or run",
+                  "settings": "These values are used to generate the agent configuration below.",
+                  "verify": "Checks that the panel can reach the database agent at the host URL."
+                },
+                "tooltip": {
+                  "copyCommand": "Copy command"
+                },
+                "form": {
+                  "apiPort": "API Port",
+                  "apiPortDescription": "The port the database agent listens on."
+                },
+                "button": {
+                  "save": "Save Configuration",
+                  "reveal": "Reveal Configuration",
+                  "verify": "Verify Connection"
+                },
+                "alert": {
+                  "couldNotReach": "Could not reach the database agent host: {error}",
+                  "tokenWarning": "The configuration below contains the host token. Reveal it only when needed.",
+                  "portMismatch": "The host URL points at port {connectPort}, but this configuration makes the agent listen on port {apiPort}. Unless a reverse proxy forwards port {connectPort} to the agent, the panel will not be able to reach the host.",
+                  "verifyTitle": "Backend to DB Agent",
+                  "verifyNotTested": "Not tested yet.",
+                  "verifySuccess": "Connection established. The agent responded.",
+                  "verifyFailed": "The panel could not reach the host: {error}"
+                },
+                "toast": {
+                  "applied": "Configuration applied successfully.",
+                  "submittedNotApplied": "Configuration was submitted but not applied.",
+                  "invalidYaml": "Invalid YAML: {error}"
+                }
+              }
+            },
+            "overview": {
+              "title": "Overview",
+              "page": {
+                "title": "Database Agent Host Overview",
+                "status": {
+                  "deploymentEnabled": "Deployment Enabled",
+                  "deploymentDisabled": "Deployment Disabled",
+                  "maintenanceEnabled": "Maintenance Enabled",
+                  "maintenanceDisabled": "Maintenance Disabled"
+                },
+                "card": {
+                  "hostDetails": "Host Details",
+                  "systemInfo": "System Information",
+                  "resources": "Allocated Resources"
+                },
+                "label": {
+                  "url": "URL",
+                  "description": "Description",
+                  "createdAt": "Created",
+                  "version": "Version",
+                  "cpu": "CPU",
+                  "memory": "Memory",
+                  "disk": "Disk",
+                  "instances": "Instances",
+                  "kernelVersion": "Kernel Version",
+                  "architecture": "Architecture",
+                  "unavailable": "Unavailable",
+                  "noLimit": "No host limit",
+                  "free": "{size} free",
+                  "cores": "{cores} cores allocated"
+                },
+                "badge": {
+                  "updateAvailable": "Update Available"
+                }
+              }
+            },
+            "statistics": {
+              "title": "Statistics",
+              "page": {
+                "title": "Database Agent Host Statistics",
+                "card": {
+                  "resources": "Resources",
+                  "graphs": "Graphs"
+                },
+                "label": {
+                  "cpu": "CPU",
+                  "cpuThreads": "{model} ({threads} threads)",
+                  "memory": "Memory",
+                  "usedByAgent": "{size} used by the agent",
+                  "disk": "Disk",
+                  "network": "Network",
+                  "networkIn": "In: {in}",
+                  "networkOut": "Out: {out}"
+                },
+                "chart": {
+                  "cpuLoad": "CPU Load",
+                  "memoryUsage": "Memory Usage",
+                  "diskIo": "Disk I/O",
+                  "diskRead": "Disk Read",
+                  "diskWrite": "Disk Write",
+                  "networkTraffic": "Network Traffic",
+                  "networkInLabel": "Inbound",
+                  "networkOutLabel": "Outbound",
+                  "inbound": "Inbound",
+                  "outbound": "Outbound"
+                },
+                "toast": {
+                  "connectionLost": "Connection to the database agent host was lost."
+                }
+              }
+            }
+          },
+          "modal": {
+            "bulkConfig": {
+              "title": "Update Configuration - {hosts}",
+              "button": {
+                "apply": "Apply to {hosts}"
+              },
+              "toast": {
+                "applied": "Configuration applied to {hosts}."
+              },
+              "error": {
+                "invalidYaml": "Invalid YAML: {error}"
+              }
+            }
+          }
+        },
+        "databaseAgentTemplates": {
+          "title": "Database Agent Templates",
+          "resourceName": "Database agent template",
+          "dropzone": {
+            "title": "Drop some files here to import as Database Agent Templates",
+            "subtitle": "Release to start importing"
+          },
+          "toast": {
+            "imported": "Database Agent Template imported.",
+            "parseFailed": "Failed to parse database agent template: {error}"
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Database Agent Template",
+                "titleUpdate": "Update Database Agent Template",
+                "toast": {
+                  "exported": "Database Agent Template exported."
+                },
+                "version": "Version {version}",
+                "form": {
+                  "dockerImages": "Docker Images",
+                  "env": "Environment Variables",
+                  "volumes": "Volumes",
+                  "socketPath": "Socket Path",
+                  "socketPathDescription": "The unix socket file path inside the database container, must match where the configured image actually creates its socket.",
+                  "imageUid": "Image UID",
+                  "imageGid": "Image GID",
+                  "cmd": "Command",
+                  "memoryDescription": "The Memory limit of the database container.",
+                  "memoryTooltip": "0 will not set a limit.",
+                  "swap": "Swap",
+                  "swapDescription": "The amount of swap to give this database.",
+                  "swapTooltip": "-1 will not set a limit.",
+                  "diskDescription": "The disk limit of the database.",
+                  "diskTooltip": "0 will not set a limit. This is a soft-limit unless the disk limiter is configured on Wings.",
+                  "cpu": "CPU Limit (%)",
+                  "cpuDescription": "The CPU limit in % that the database can use.",
+                  "cpuTooltip": "1 thread = 100%. 0 will not set a limit.",
+                  "ioWeight": "IO Weight",
+                  "ioWeightDescription": "The relative IO Weight of the database container compared to other containers.",
+                  "ioWeightTooltip": "0-1000. May not work on all systems."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Database Agent Template Deletion",
+                    "content": "Are you sure you want to delete **{name}**?"
+                  }
+                }
+              }
+            },
+            "instances": {
+              "title": "Instances",
+              "page": {
+                "title": "Instances",
+                "outdated": "Outdated",
+                "button": {
+                  "applyUpdates": "Apply Updates",
+                  "applyAllUpdates": "Update All Outdated"
+                },
+                "toast": {
+                  "updated": "Applied template updates to {instances}."
+                },
+                "modal": {
+                  "applyUpdates": {
+                    "title": "Apply Template Updates",
+                    "content": "This will push the current configuration of **{name}** to the {count} selected instances. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped.",
+                    "contentAll": "This will push the current configuration of **{name}** to every outdated instance, including instances not shown by the current search. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped."
+                  }
+                }
               }
             }
           }
@@ -3001,10 +3658,27 @@
               "title": "對應",
               "page": {
                 "title": "OAuth 提供者對應",
+                "table": {
+                  "columns": {
+                    "matcher": "Matcher"
+                  }
+                },
                 "enum": {
                   "mappingType": {
                     "role": "角色",
                     "serverSubuser": "伺服器子使用者"
+                  },
+                  "matcherType": {
+                    "none": "None (Always applies)",
+                    "and": "AND (All must match)",
+                    "or": "OR (Any must match)",
+                    "not": "NOT (Must not match)",
+                    "scopes": "Granted Scopes",
+                    "fieldExists": "Field Exists",
+                    "fieldEquals": "Field Equals",
+                    "fieldContains": "Field Contains",
+                    "fieldStartsWith": "Field Starts With",
+                    "fieldEndsWith": "Field Ends With"
                   }
                 },
                 "toast": {
@@ -3012,8 +3686,28 @@
                   "updated": "OAuth 提供者對應已更新。",
                   "deleted": "OAuth 提供者對應已刪除。"
                 },
+                "button": {
+                  "addMatcher": "Add Matcher"
+                },
+                "matcher": {
+                  "allMustMatch": "All matchers must match:",
+                  "anyMustMatch": "Any matcher must match:",
+                  "mustNotMatch": "Matcher must not match:"
+                },
                 "form": {
+                  "matcher": "Matcher",
+                  "matcherDescription": "Decides whether this mapping applies to a user logging in with this provider.",
+                  "matcherType": "Matcher Type",
+                  "scopes": "範圍",
                   "scopesDescription": "此對應套用所需的 OAuth 範圍。",
+                  "path": "Field Path",
+                  "pathDescription": "The path used to extract the compared field from the Info URL response (https://serdejsonpath.live).",
+                  "equals": "Equals",
+                  "contains": "Contains",
+                  "startsWith": "Starts With",
+                  "endsWith": "Ends With",
+                  "revokeUnmatched": "Revoke when not matched",
+                  "revokeUnmatchedDescription": "Removes the assigned role or server subuser again when the matcher no longer matches on a later login.",
                   "mappingType": "對應類型",
                   "role": "角色",
                   "permissions": "權限"
@@ -3034,6 +3728,25 @@
             },
             "users": {
               "title": "使用者",
+              "identifierLookup": {
+                "button": "Find by Identifier",
+                "modal": {
+                  "title": "Look Up by Identifier",
+                  "form": {
+                    "identifier": "Identifier",
+                    "identifierPlaceholder": "e.g. email or username",
+                    "search": "Search"
+                  },
+                  "result": {
+                    "title": "User Found",
+                    "username": "Username",
+                    "email": "Email",
+                    "identifier": "Identifier",
+                    "viewUser": "View User"
+                  },
+                  "notFound": "No user found with that identifier."
+                }
+              },
               "page": {
                 "title": "OAuth 提供者使用者",
                 "table": {
@@ -3080,6 +3793,7 @@
                   "title": "S3 設定",
                   "form": {
                     "partSize": "分段大小",
+                    "compressionType": "Compression Type",
                     "pathStyle": "使用路徑樣式 URL"
                   }
                 },
@@ -3299,6 +4013,11 @@
         "viewAdmin": {
           "title": "查看管理"
         },
+        "selector": {
+          "title": "Select a Server",
+          "description": "Choose which server you want to navigate to.",
+          "descriptionWithPage": "Select a server to go to **{page}**."
+        },
         "console": {
           "title": "主控台",
           "input": {
@@ -3342,7 +4061,8 @@
             "sshDetails": "SSH 詳細資訊",
             "commandHistory": "指令歷史紀錄",
             "decreaseFontSize": "縮小字型大小",
-            "increaseFontSize": "放大字型大小"
+            "increaseFontSize": "放大字型大小",
+            "copySelection": "Copy Selection"
           },
           "drawer": {
             "commandHistory": {
@@ -3420,6 +4140,10 @@
               "modified": "已修改"
             }
           },
+          "diskUsage": {
+            "title": "Disk Usage",
+            "details": "{used} of {total} used ({percentage}%)"
+          },
           "button": {
             "new": "新增",
             "connect": "連線",
@@ -3430,6 +4154,7 @@
             "copy": "複製",
             "fingerprint": "指紋",
             "permissions": "權限",
+            "extract": "Extract",
             "archive": "壓縮",
             "more": "更多",
             "remoteCopy": "遠端複製",
@@ -3439,7 +4164,10 @@
             "directory": "建立目錄",
             "fileFromPull": "從網址匯入",
             "fileFromUpload": "上傳檔案",
-            "directoryFromUpload": "上傳目錄"
+            "directoryFromUpload": "上傳目錄",
+            "viewDiff": "View Diff",
+            "loadDisk": "Load Disk Version",
+            "keepEditor": "Keep Editor Version"
           },
           "actionBar": {
             "copyHere": "將 {files} 複製到這裡",
@@ -3462,6 +4190,7 @@
             "copyingMany": "正在複製 {files}",
             "receivingRemote": "正在從遠端伺服器接收 {files}",
             "sendingRemote": "正在傳送 {files} 到遠端伺服器",
+            "exportingBackup": "Exporting backup to {destination}",
             "cancelAllOperations": "取消所有操作"
           },
           "dropzone": {
@@ -3473,8 +4202,13 @@
             "preferPhysicalSize": "顯示實體大小而非邏輯大小",
             "editorMinimap": "顯示檔案迷你地圖",
             "editorLineOverflow": "換行顯示超出內容",
+            "editorFontSize": "Editor Font Size",
             "vscodeUriScheme": "VS Code URI 協定",
             "imageViewerSmoothing": "平滑圖片（反鋸齒）"
+          },
+          "alert": {
+            "collabConflictChanged": "This file has been changed on disk outside of the editor (e.g. via SFTP).",
+            "collabConflictDeleted": "This file has been deleted on disk outside of the editor."
           },
           "toast": {
             "operationCancelled": "操作已取消",
@@ -3482,24 +4216,34 @@
             "copyingStarted": "{files} 已開始複製。",
             "filesCouldNotBeMoved": "無法移動檔案。",
             "filesMoved": "{files} 已移動。",
+            "moveUndone": "Move of {files} undone.",
+            "moveCouldNotBeUndone": "Move could not be undone.",
             "downloadStarted": "下載已開始。",
             "filesDeleted": "檔案已刪除。",
             "archiveCreationStarted": "已開始建立壓縮檔。",
+            "decompressionStarted": "Archive extraction has started.",
             "fileCopyingStarted": "已開始複製檔案。",
             "fileInfoRetrieved": "已成功取得檔案資訊。",
             "filePullingStarted": "已開始拉取檔案。",
             "fileRenamed": "檔案已重新命名。",
             "fileCouldNotBeRenamed": "無法重新命名檔案。",
             "filesRenamed": "已重新命名 {files}。",
+            "renameUndone": "Rename undone.",
+            "renameCouldNotBeUndone": "Rename could not be undone.",
             "permissionsUpdated": "權限已更新。",
             "permissionsUpdatedMany": "已更新 {files} 的權限。",
             "permissionsCouldNotBeUpdated": "無法更新權限。",
-            "fileSaved": "檔案已儲存。"
+            "permissionsRestored": "Permissions restored.",
+            "permissionsCouldNotBeRestored": "Permissions could not be restored.",
+            "fileSaved": "檔案已儲存。",
+            "collabSaveTimeout": "The file could not be saved, the daemon did not respond in time."
           },
           "tooltip": {
             "fileHistory": "檔案歷史",
+            "collabEditing": "{user} is editing this file",
             "largestDirectories": "分析目錄大小",
             "dragToMove": "拖曳以移動",
+            "virtual": "This item is virtual and does not exist on disk",
             "back": "後退 {seconds} 秒",
             "forward": "前進 {seconds} 秒",
             "play": "播放",
@@ -3527,14 +4271,30 @@
             }
           },
           "modal": {
+            "cancelAllOperations": {
+              "title": "Cancel All Operations",
+              "content": "Are you sure you want to cancel all running file operations? Their progress will be lost."
+            },
             "unsavedChanges": {
               "title": "未儲存的變更",
               "content": "檔案編輯器中有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。"
+            },
+            "collabConflictDiff": {
+              "title": "File Changed on Disk"
+            },
+            "collabConflictLoadDisk": {
+              "title": "Load Disk Version",
+              "content": "This will replace the editor contents with the file currently on disk. Unsaved changes will be lost.",
+              "contentMultiple": "This will replace the editor contents for all {participants} people in this session with the file currently on disk. Unsaved changes will be lost."
             },
             "draftRestore": {
               "title": "還原草稿",
               "content": "在你的瀏覽器中找到此檔案的草稿。你要還原它嗎？",
               "contentHashMismatch": "自儲存此草稿後，伺服器上的檔案已被修改。還原草稿可能會覆寫那些變更。"
+            },
+            "extractFile": {
+              "title": "Extract Archive",
+              "extractedTo": "The contents of {file} will be extracted into "
             },
             "createArchive": {
               "title": "建立壓縮檔",
@@ -3699,6 +4459,10 @@
         "databases": {
           "title": "資料庫",
           "subtitle": "已建立 {current} / {max} 個資料庫。",
+          "classic": {
+            "title": "Classic Databases",
+            "subtitle": "{current} databases created."
+          },
           "tooltip": {
             "limitReached": "此伺服器最多只能使用 {max} 個資料庫。"
           },
@@ -3713,6 +4477,165 @@
           "form": {
             "databaseName": "資料庫名稱"
           },
+          "instance": {
+            "title": "Managed Databases",
+            "subtitle": "{current} managed databases created.",
+            "updateAvailable": "Update Available",
+            "button": {
+              "applyUpdate": "Apply Update"
+            },
+            "tooltip": {
+              "limitReached": "This server is limited to {max} managed databases."
+            },
+            "view": {
+              "tabs": {
+                "databases": "Databases",
+                "users": "Users",
+                "logs": "Logs"
+              },
+              "stats": {
+                "uptime": "Uptime",
+                "cpuLoad": "CPU Load",
+                "memoryLoad": "Memory Load",
+                "diskUsage": "Disk Usage"
+              }
+            },
+            "databases": {
+              "title": "Databases",
+              "subtitle": "{current} of {max} maximum databases created.",
+              "tooltip": {
+                "offline": "The instance must be running to create databases.",
+                "noUser": "This database has no user attached yet. Create a user to access it.",
+                "limitReached": "This instance is limited to {max} databases."
+              },
+              "button": {
+                "export": "Export",
+                "import": "Import"
+              },
+              "modal": {
+                "createDatabase": {
+                  "title": "Create Database",
+                  "content": "Creates a new database with its own user inside this managed database instance. The credentials will be shown in the table afterwards."
+                },
+                "deleteDatabase": {
+                  "title": "Confirm Database Deletion",
+                  "content": "Are you sure you want to delete the database for user **{username}**? This permanently deletes the database and all data within it."
+                },
+                "exportDatabase": {
+                  "title": "Export Database",
+                  "content": "Download a dump of this database. Large databases may take a while to prepare."
+                },
+                "importDatabase": {
+                  "title": "Import Database",
+                  "content": "Upload a dump to import into this database. Large imports may take a while to complete.",
+                  "form": {
+                    "file": "Dump File",
+                    "wipe": "Wipe existing data before importing"
+                  }
+                },
+                "recreateDatabase": {
+                  "title": "Confirm Database Recreation",
+                  "content": "Recreating a database will permanently delete all data in the **{name}** database and create a new empty one with the same name and user access."
+                }
+              },
+              "table": {
+                "columns": {
+                  "database": "Database"
+                }
+              },
+              "toast": {
+                "created": "Database created.",
+                "deleted": "Database deleted.",
+                "imported": "Database import completed.",
+                "passwordRotated": "Password has been rotated.",
+                "recreated": "Database recreated."
+              }
+            },
+            "users": {
+              "title": "Users",
+              "subtitle": "{current} of {max} maximum users created.",
+              "tooltip": {
+                "limitReached": "This instance is limited to {max} users."
+              },
+              "modal": {
+                "createUser": {
+                  "title": "Create User",
+                  "content": "Creates a new user inside this managed database instance. The credentials will be shown in the table afterwards.",
+                  "form": {
+                    "database": "Database",
+                    "databaseHint": "The database this user will be granted access to.",
+                    "databaseRequired": "Please select a database."
+                  }
+                },
+                "deleteUser": {
+                  "title": "Confirm User Deletion",
+                  "content": "Are you sure you want to delete the user **{username}**? This cannot be undone."
+                }
+              },
+              "toast": {
+                "created": "User created.",
+                "deleted": "User deleted."
+              }
+            },
+            "power": {
+              "toast": {
+                "start": "Managed database is starting.",
+                "stop": "Managed database is stopping.",
+                "restart": "Managed database is restarting.",
+                "kill": "Managed database has been killed."
+              },
+              "modal": {
+                "forceKill": {
+                  "title": "Forcibly Kill Database",
+                  "content": "Forcibly killing a database can lead to data corruption."
+                }
+              }
+            },
+            "modal": {
+              "createDatabaseInstance": {
+                "title": "Create Managed Database",
+                "toast": {
+                  "created": "Managed database created."
+                },
+                "form": {
+                  "template": "Template",
+                  "noTemplatesFound": "No templates available",
+                  "image": "Docker Image"
+                }
+              },
+              "editDatabaseInstance": {
+                "title": "Edit Managed Database",
+                "toast": {
+                  "updated": "Managed database updated."
+                }
+              },
+              "applyDatabaseInstanceUpdate": {
+                "title": "Apply Template Update",
+                "content": "This will update **{name}** to the latest template configuration. The database will be restarted to apply the new configuration.",
+                "toast": {
+                  "applied": "Template update applied."
+                }
+              },
+              "deleteDatabaseInstance": {
+                "title": "Confirm Managed Database Deletion",
+                "content": "Deleting a managed database is a permanent action, it cannot be undone. This will permanently delete the **{name}** database and remove all associated data.",
+                "toast": {
+                  "deleted": "Managed database deleted."
+                }
+              },
+              "credentials": {
+                "title": "Database Credentials",
+                "form": {
+                  "database": "Database",
+                  "jdbcConnectionString": "JDBC Connection String"
+                }
+              },
+              "exportInstance": {
+                "title": "Export Instance",
+                "content": "Download a dump of this managed database instance. Large instances may take a while to prepare."
+              }
+            }
+          },
           "modal": {
             "createDatabase": {
               "title": "建立資料庫",
@@ -3720,7 +4643,8 @@
                 "created": "資料庫已建立。"
               },
               "form": {
-                "noHostsFound": "找不到主機"
+                "noHostsFound": "找不到主機",
+                "hostInMaintenance": "Under Maintenance"
               }
             },
             "editDatabase": {
@@ -3772,9 +4696,14 @@
             }
           },
           "button": {
+            "runNow": "Run Now",
+            "runNowWithConditions": "Run now (check conditions first)",
+            "runNowIgnoreConditions": "Run now (ignore conditions)",
             "addTrigger": "新增觸發器",
             "addCondition": "新增條件",
             "addStep": "新增步驟",
+            "addElseIf": "Add Else If",
+            "addElse": "Add Else",
             "createFirstStep": "建立第一個步驟",
             "addOutput": "新增輸出",
             "addFile": "新增檔案",
@@ -3784,6 +4713,7 @@
             "imported": "排程已匯入。",
             "created": "排程已建立。",
             "updated": "排程已更新。",
+            "duplicated": "Schedule duplicated.",
             "deleted": "排程已刪除。",
             "triggered": "排程已觸發。",
             "exported": "排程已匯出。",
@@ -3791,6 +4721,7 @@
             "step": {
               "created": "排程步驟已建立。",
               "updated": "排程步驟已更新。",
+              "duplicated": "Schedule step duplicated.",
               "deleted": "排程步驟已刪除。"
             }
           },
@@ -3800,11 +4731,20 @@
               "and": "AND（全部都必須為真）",
               "or": "OR（任一為真即可）",
               "not": "NOT（不得為真）",
+              "serverState": "Server State",
+              "uptime": "Uptime",
+              "resourceUsage": "Resource Usage",
+              "fileExists": "File Exists",
               "variableExists": "變數存在",
               "variableContains": "變數包含",
               "variableEquals": "變數等於",
               "variableStartsWith": "變數開頭為",
               "variableEndsWith": "變數結尾為"
+            },
+            "scheduleResourceMetric": {
+              "cpu": "CPU Usage",
+              "memory": "Memory Usage",
+              "disk": "Disk Usage"
             },
             "scheduleComparator": {
               "smallerThan": "小於",
@@ -3821,6 +4761,9 @@
             "updateSchedule": {
               "title": "更新排程"
             },
+            "duplicateSchedule": {
+              "title": "Duplicate Schedule"
+            },
             "deleteSchedule": {
               "title": "確認刪除排程",
               "content": "你確定要從此伺服器刪除 {name} 嗎？"
@@ -3834,11 +4777,18 @@
             "deleteStep": {
               "title": "確認刪除排程步驟",
               "content": "你確定要刪除此排程步驟嗎？"
+            },
+            "unsavedChanges": {
+              "title": "Unsaved Changes",
+              "content": "You have unsaved changes to your schedule conditions. Are you sure you want to leave this page? If you leave, your changes will be lost."
             }
           },
           "view": {
             "badge": {
               "running": "執行中"
+            },
+            "tooltip": {
+              "cannotRun": "Cannot run a disabled schedule"
             },
             "tabs": {
               "actions": "動作",
@@ -3875,6 +4825,7 @@
             "contains": "包含",
             "startsWith": "開頭為",
             "endsWith": "結尾為",
+            "metric": "Metric",
             "allMustBeTrue": "所有條件都必須為真：",
             "anyMustBeTrue": "任一條件必須為真：",
             "mustNotBeTrue": "條件不得為真："
@@ -3888,8 +4839,23 @@
             "cron": {
               "title": "Cron",
               "form": {
-                "cronSchedule": "Cron 排程"
+                "cronSchedule": "Cron 排程",
+                "frequency": "Runs",
+                "intervalMinutes": "Every (minutes)",
+                "intervalHours": "Every (hours)",
+                "time": "At",
+                "weekday": "On",
+                "dayOfMonth": "On day",
+                "advanced": "Edit as cron expression"
               },
+              "frequency": {
+                "everyMinutes": "Every few minutes",
+                "everyHours": "Every few hours",
+                "daily": "Daily",
+                "weekly": "Weekly",
+                "monthly": "Monthly"
+              },
+              "timezoneHint": "Times use the server timezone ({timezone}).",
               "card": {
                 "content": "在 Cron 間隔 {schedule} 執行，下次執行為 {timestamp}，上次執行為 {lastTimestamp}。"
               },
@@ -3916,6 +4882,25 @@
                 "content": "當備份達到狀態 `{status}` 時。"
               }
             },
+            "scheduleCompletion": {
+              "title": "Schedule Completion",
+              "form": {
+                "schedule": "Schedule",
+                "completionStatus": "Completion Status"
+              },
+              "card": {
+                "content": "When Schedule `{schedule}` completes with Status `{status}`."
+              }
+            },
+            "resourceUsage": {
+              "title": "Resource Usage",
+              "form": {
+                "forSeconds": "For (seconds)"
+              },
+              "card": {
+                "content": "When {metric} is {comparator} `{value}`."
+              }
+            },
             "consoleLine": {
               "title": "主控台行",
               "card": {
@@ -3940,8 +4925,20 @@
               "title": "未設定步驟",
               "description": "此排程尚未有任何步驟。新增一些動作即可開始。"
             },
+            "warning": {
+              "unclosedIf": "An \"If\" block is missing its \"End If\". All remaining steps run as part of the block.",
+              "orphanBranch": "There is an \"Else\", \"Else If\" or \"End If\" step without a matching \"If\" before it."
+            },
+            "groups": {
+              "server": "Server",
+              "backups": "Backups",
+              "files": "Files",
+              "startup": "Startup Settings",
+              "advanced": "Advanced Logic"
+            },
             "sleep": {
               "title": "等待",
+              "description": "Wait for a set amount of time before continuing with the next action.",
               "form": {
                 "duration": "持續時間（毫秒）"
               },
@@ -3951,12 +4948,62 @@
             },
             "ensure": {
               "title": "確保",
+              "description": "Stop the schedule here unless a condition is true.",
               "renderer": {
                 "compact": "確保符合某個條件"
               }
             },
+            "if": {
+              "title": "If",
+              "description": "Run the following steps only when a condition is true, until Else/End If. A matching End If is added automatically.",
+              "renderer": {
+                "compact": "If a condition matches"
+              }
+            },
+            "elseIf": {
+              "title": "Else If",
+              "description": "Run the following steps when no earlier branch ran and a condition is true.",
+              "renderer": {
+                "compact": "Else if a condition matches"
+              }
+            },
+            "else": {
+              "title": "Else",
+              "description": "Run the following steps when no earlier branch of the If block ran.",
+              "renderer": {
+                "compact": "Otherwise"
+              }
+            },
+            "endIf": {
+              "title": "End If",
+              "description": "Close the current If block.",
+              "renderer": {
+                "compact": "End of the If block"
+              }
+            },
+            "exit": {
+              "title": "Exit",
+              "description": "Stop the schedule here, marking the run as successful or failed.",
+              "form": {
+                "successful": "Mark run as successful"
+              },
+              "renderer": {
+                "compact": "Exit the schedule ({successful})"
+              }
+            },
+            "waitForState": {
+              "title": "Wait for Server State",
+              "description": "Wait until the server reaches a power state.",
+              "form": {
+                "timeout": "Timeout (milliseconds)"
+              },
+              "renderer": {
+                "compact": "Wait {timeout} for server to be {state}"
+              }
+            },
             "format": {
               "title": "格式化",
+              "description": "Build a text value from variables and store it in a variable.",
               "form": {
                 "formatString": "格式字串",
                 "formatStringDescription": "格式字符串。可以通过将变量包装在 {wrapper} 中来包含它们。"
@@ -3967,6 +5014,7 @@
             },
             "matchRegex": {
               "title": "比對 Regex",
+              "description": "Extract parts of a text value using a regular expression.",
               "form": {
                 "input": "輸入",
                 "regex": "Regex",
@@ -3979,6 +5027,7 @@
             },
             "waitForConsoleLine": {
               "title": "等待主控台行",
+              "description": "Wait until the server console outputs a matching line.",
               "form": {
                 "timeout": "逾時（毫秒）"
               },
@@ -3993,6 +5042,7 @@
             },
             "sendCommand": {
               "title": "傳送指令",
+              "description": "Send a command to the server console.",
               "renderer": {
                 "compact": "執行 {command}",
                 "detail": {
@@ -4002,6 +5052,7 @@
             },
             "sendPower": {
               "title": "傳送電源訊號",
+              "description": "Start, restart, stop or kill the server.",
               "renderer": {
                 "compact": "執行 {action}",
                 "detail": {
@@ -4011,19 +5062,75 @@
             },
             "createBackup": {
               "title": "建立備份",
+              "description": "Create a backup of the server files.",
               "form": {
                 "backupName": "備份名稱"
               },
               "renderer": {
                 "compact": "建立 {name}",
+                "compactAuto": "Create a backup with an auto-generated name",
                 "detail": {
                   "backupName": "備份名稱：{name}",
+                  "backupNameAuto": "Backup Name: Auto-generated",
                   "ignoredFiles": "忽略的檔案：{files}"
+                }
+              }
+            },
+            "restoreBackup": {
+              "title": "Restore Backup",
+              "description": "Stop the server and restore a backup of the server files.",
+              "form": {
+                "backupSelector": "Backup to Restore",
+                "selector": {
+                  "latest": "Latest Backup",
+                  "oldest": "Oldest Backup",
+                  "uuid": "Specific Backup (UUID)",
+                  "name": "By Name",
+                  "oldestFirst": "Match the oldest backup instead of the newest"
+                },
+                "backupUuid": "Backup UUID",
+                "backupName": "Backup Name",
+                "truncateDirectory": "Delete all files before restore",
+                "restoreStartup": "Restore startup settings",
+                "warning": "Restoring stops the server and overwrites its files. The schedule waits until the restore has finished before continuing. Avoid combining this step with power or server state triggers that could re-trigger the schedule."
+              },
+              "renderer": {
+                "compact": "Restore backup {backup}",
+                "compactLatest": "Restore the latest backup",
+                "compactOldest": "Restore the oldest backup",
+                "detail": {
+                  "backupLatest": "Backup: Latest successful backup",
+                  "backupOldest": "Backup: Oldest successful backup",
+                  "backupUuid": "Backup UUID: {uuid}",
+                  "backupName": "Backup Name: {name}",
+                  "truncateDirectory": "Delete all files first: {value}",
+                  "restoreStartup": "Restore startup settings: {value}"
+                }
+              }
+            },
+            "deleteBackup": {
+              "title": "Delete Backup",
+              "description": "Delete a backup selected by the backup selector.",
+              "form": {
+                "warning": "This permanently deletes the selected backup, including its files on the node. Locked backups are skipped."
+              }
+            },
+            "moveBackup": {
+              "title": "Move Backup",
+              "description": "Move a backup selected by the backup selector into a backup group.",
+              "form": {
+                "targetGroup": "Target Backup Group"
+              },
+              "renderer": {
+                "detail": {
+                  "targetGroup": "Target Group: {uuid}",
+                  "targetGroupNone": "Target Group: None (ungrouped)"
                 }
               }
             },
             "createDirectory": {
               "title": "建立目錄",
+              "description": "Create a new folder in the server files.",
               "renderer": {
                 "compact": "在 {root} 建立 {name}",
                 "detail": {
@@ -4034,6 +5141,7 @@
             },
             "writeFile": {
               "title": "寫入檔案",
+              "description": "Write or append text to a file.",
               "form": {
                 "content": "內容",
                 "appendToFile": "附加到檔案"
@@ -4048,6 +5156,7 @@
             },
             "copyFile": {
               "title": "複製檔案",
+              "description": "Copy a file to a new location.",
               "form": {
                 "sourceFile": "來源檔案"
               },
@@ -4061,6 +5170,7 @@
             },
             "deleteFiles": {
               "title": "刪除檔案",
+              "description": "Delete files or folders.",
               "form": {
                 "filesToDelete": "要刪除的檔案"
               },
@@ -4074,6 +5184,7 @@
             },
             "renameFiles": {
               "title": "重新命名檔案",
+              "description": "Rename or move files.",
               "form": {
                 "files": "檔案",
                 "from": "從",
@@ -4089,6 +5200,7 @@
             },
             "compressFiles": {
               "title": "壓縮檔案",
+              "description": "Compress files into an archive.",
               "form": {
                 "filesToCompress": "要壓縮的檔案"
               },
@@ -4104,6 +5216,7 @@
             },
             "decompressFile": {
               "title": "解壓縮檔案",
+              "description": "Extract an archive into a folder.",
               "form": {
                 "file": "檔案"
               },
@@ -4117,6 +5230,7 @@
             },
             "updateStartupVariable": {
               "title": "更新啟動變數",
+              "description": "Change the value of a startup variable.",
               "renderer": {
                 "compact": "將 {variable} 設為 {value}",
                 "detail": {
@@ -4127,6 +5241,7 @@
             },
             "updateStartupCommand": {
               "title": "更新啟動指令",
+              "description": "Change the command used to start the server.",
               "renderer": {
                 "compact": "設為 {command}",
                 "detail": {
@@ -4136,6 +5251,7 @@
             },
             "updateStartupDockerImage": {
               "title": "更新 Docker 映像檔",
+              "description": "Change the Docker image the server runs in.",
               "renderer": {
                 "compact": "設為 {image}",
                 "detail": {
@@ -4198,16 +5314,25 @@
               "locked": "已鎖定？"
             }
           },
+          "badge": {
+            "deleting": "Deleting…",
+            "deleteFailed": "Deletion failed"
+          },
           "button": {
-            "browse": "瀏覽"
+            "browse": "瀏覽",
+            "exportToFiles": "Export to Files",
+            "createBackup": "Create Backup",
+            "createGroup": "Create Backup Group"
           },
           "toast": {
             "downloadStarted": "下載已開始。",
-            "restoringBackup": "正在還原備份..."
+            "restoringBackup": "正在還原備份...",
+            "exportStarted": "Backup export started."
           },
           "modal": {
             "createBackup": {
               "title": "建立備份",
+              "noGroup": "No group",
               "toast": {
                 "created": "備份已建立。"
               }
@@ -4221,16 +5346,61 @@
             "restoreBackup": {
               "title": "還原備份"
             },
+            "exportBackup": {
+              "title": "Export Backup to Files"
+            },
             "deleteBackup": {
               "title": "確認刪除備份",
               "content": "你確定要從此伺服器刪除 **{name}** 嗎？",
               "toast": {
+                "started": "Backup deletion started.",
                 "deleted": "備份已刪除。"
               }
             },
             "viewMetadata": {
               "title": "備份中繼資料"
             }
+          }
+        },
+        "backupGroups": {
+          "title": "Backup Groups",
+          "group": "Backup Group",
+          "ungrouped": "Ungrouped",
+          "noBackups": "This group has no backups yet.",
+          "button": {
+            "createInGroup": "Create backup in this group"
+          },
+          "badge": {
+            "keepCount": "Keep {count}",
+            "keepDays": "Keep {days}",
+            "noRetention": "No auto-deletion",
+            "allLocked": "All locked"
+          },
+          "form": {
+            "retentionCount": "Keep count",
+            "retentionCountDescription": "Maximum number of usable backups to keep in this group. Leave empty for no limit.",
+            "retentionDays": "Keep days",
+            "retentionDaysDescription": "Delete backups in this group older than this many days. Leave empty for no limit.",
+            "noRetentionDescription": "With no retention set, this group is just a label and never deletes backups automatically."
+          },
+          "modal": {
+            "createGroup": {
+              "title": "Create Backup Group"
+            },
+            "updateGroup": {
+              "title": "Edit Backup Group"
+            },
+            "deleteGroup": {
+              "title": "Confirm Backup Group Deletion",
+              "content": "Are you sure you want to delete **{name}**? {backups} in this group will become ungrouped and follow standard rotation.",
+              "lockBackups": "Lock backups",
+              "lockBackupsDescription": "Locks all backups in this group before deletion so they cannot be rotated out automatically."
+            }
+          },
+          "toast": {
+            "created": "Backup group created.",
+            "updated": "Backup group updated.",
+            "deleted": "Backup group deleted."
           }
         },
         "network": {
@@ -4278,7 +5448,8 @@
               "content": "你的啟動變數有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。"
             }
           },
-          "noVariables": "找不到此伺服器的啟動變數。"
+          "noVariables": "找不到此伺服器的啟動變數。",
+          "predefinedStartupCommands": "Predefined Startup Commands"
         },
         "mounts": {
           "title": "掛載",
