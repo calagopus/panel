@@ -1362,6 +1362,14 @@ const baseTranslations = defineTranslations({
         },
       },
       admin: {
+        categories: {
+          infrastructure: 'Infrastructure',
+          eggs: 'Nests & Eggs',
+          databases: 'Databases',
+          storage: 'Storage',
+          access: 'Users & Access',
+          system: 'System',
+        },
         home: {
           title: 'Home',
           alert: {

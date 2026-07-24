@@ -1,7 +1,7 @@
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
-const checkPermissions = (permissions: string[], action: string | string[]): boolean[] => {
+export const checkPermissions = (permissions: string[], action: string | string[]): boolean[] => {
   const permissionSet = new Set(permissions);
   const actions = Array.isArray(action) ? action : [action];
 

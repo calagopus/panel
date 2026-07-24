@@ -1420,6 +1420,14 @@
         }
       },
       "admin": {
+        "categories": {
+          "infrastructure": "Infrastruktur",
+          "eggs": "Nests & Eggs",
+          "databases": "Datenbanken",
+          "storage": "Speicher",
+          "access": "Benutzer & Zugriff",
+          "system": "System"
+        },
         "home": {
           "title": "Startseite",
           "alert": {

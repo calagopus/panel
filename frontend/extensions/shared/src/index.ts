@@ -18,6 +18,7 @@ export interface RouteDefinition extends GlobalRouteDefinition {
 
 export interface AdminRouteDefinition extends RouteDefinition {
   permission?: string | string[] | null;
+  category?: string;
 }
 
 export interface ServerRouteDefinition extends RouteDefinition {
