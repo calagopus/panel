@@ -43,6 +43,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import { processConfigurationParserLabelMapping } from '@/lib/enums.ts';
+import { toPterodactylEgg } from '@/lib/pterodactylEgg.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { adminEggSchema, adminEggUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
@@ -163,14 +164,16 @@ export default function EggCreateOrUpdate({
     deps: [selectedEggRepositoryUuid],
   });
 
-  const doExport = (format: 'json' | 'yaml') => {
+  const doExport = (format: 'calagopus' | 'pterodactyl', fileType: 'json' | 'yaml') => {
     setLoading(true);
 
     exportEgg(contextNest?.uuid, contextEgg!.uuid)
-      .then((data) => {
+      .then((exported) => {
+        const data = format === 'pterodactyl' ? toPterodactylEgg(exported) : exported;
+
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.general.page.toast.exported', {}), 'success');
 
-        if (format === 'json') {
+        if (fileType === 'json') {
           const jsonData = JSON.stringify(data, undefined, 2);
           const fileURL = URL.createObjectURL(new Blob([jsonData], { type: 'text/plain' }));
           const downloadLink = document.createElement('a');
@@ -731,14 +734,21 @@ export default function EggCreateOrUpdate({
                       type: 'action',
                       icon: faFileDownload,
                       label: t('common.button.exportAs', { format: 'JSON' }),
-                      onClick: () => doExport('json'),
+                      onClick: () => doExport('calagopus', 'json'),
                       color: 'gray',
                     },
                     {
                       type: 'action',
                       icon: faFileDownload,
                       label: t('common.button.exportAs', { format: 'YAML' }),
-                      onClick: () => doExport('yaml'),
+                      onClick: () => doExport('calagopus', 'yaml'),
+                      color: 'gray',
+                    },
+                    {
+                      type: 'action',
+                      icon: faFileDownload,
+                      label: t('common.button.exportAs', { format: 'Pterodactyl' }),
+                      onClick: () => doExport('pterodactyl', 'json'),
                       color: 'gray',
                     },
                   ]}
