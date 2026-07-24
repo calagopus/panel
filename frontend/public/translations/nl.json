@@ -57,12 +57,12 @@
       "other": "{count} Nodes"
     },
     "allocation": {
-      "zero": "{count} Node Allocations",
-      "one": "{count} Node Allocation",
-      "two": "{count} Node Allocations",
-      "few": "{count} Node Allocations",
-      "many": "{count} Node Allocations",
-      "other": "{count} Node Allocations"
+      "zero": "{count} Node-allocaties",
+      "one": "{count} Node-allocatie",
+      "two": "{count} Node-allocaties",
+      "few": "{count} Node-allocaties",
+      "many": "{count} Node-allocaties",
+      "other": "{count} Node-allocaties"
     },
     "egg": {
       "zero": "{count} Eggs",
@@ -73,20 +73,20 @@
       "other": "{count} Eggs"
     },
     "shortcut": {
-      "zero": "{count} Shortcuts",
-      "one": "{count} Shortcut",
-      "two": "{count} Shortcuts",
-      "few": "{count} Shortcuts",
-      "many": "{count} Shortcuts",
-      "other": "{count} Shortcuts"
+      "zero": "{count} Sneltoetsen",
+      "one": "{count} Sneltoets",
+      "two": "{count} Sneltoetsen",
+      "few": "{count} Sneltoetsen",
+      "many": "{count} Sneltoetsen",
+      "other": "{count} Sneltoetsen"
     },
     "line": {
-      "zero": "{count} Lines",
-      "one": "{count} Line",
-      "two": "{count} Lines",
-      "few": "{count} Lines",
-      "many": "{count} Lines",
-      "other": "{count} Lines"
+      "zero": "{count} Regels",
+      "one": "{count} Regel",
+      "two": "{count} Regels",
+      "few": "{count} Regels",
+      "many": "{count} Regels",
+      "other": "{count} Regels"
     }
   },
   "translations": {
@@ -113,27 +113,27 @@
         "selectAll": "Alles selecteren",
         "deselectAll": "Alles deselecteren",
         "restore": "Herstellen",
-        "discard": "Discard",
+        "discard": "Weggooien",
         "download": "Downloaden",
         "downloadAs": "Downloaden als {format}",
         "export": "Exporteren",
         "exportAs": "Exporteren als {format}",
         "recreate": "Opnieuw aanmaken",
-        "move": "Move",
-        "transfer": "Transfer",
-        "reattach": "Reattach",
-        "detach": "Detach",
-        "send": "Send",
+        "move": "Verplaatsen",
+        "transfer": "Overdragen",
+        "reattach": "Opnieuw koppelen",
+        "detach": "Loskoppelen",
+        "send": "Verzenden",
         "reset": "Reset",
-        "view": "View",
+        "view": "Bekijken",
         "import": "Importeren",
         "details": "Details",
-        "loadLogs": "Load Logs",
-        "sendTestEmail": "Send Test Email",
+        "loadLogs": "Logs laden",
+        "sendTestEmail": "Testmail verzenden",
         "setPrimary": "Instellen als primair",
         "unsetPrimary": "Primair verwijderen",
         "leavePage": "Pagina verlaten",
-        "viewDocumentation": "View Documentation"
+        "viewDocumentation": "Bekijk documentatie"
       },
       "alert": {
         "error": "Fout",
@@ -151,44 +151,44 @@
         "resetToDefault": "Herstellen naar standaard",
         "edit": "Bewerken",
         "delete": "Verwijderen",
-        "remove": "Remove",
+        "remove": "Verwijderen",
         "primary": "Primair",
-        "backupOnDifferentNode": "This backup is on a different node than the server. It is not viewable from the Client API."
+        "backupOnDifferentNode": "Deze back-up bevindt zich op een andere node dan de server. Hij is niet zichtbaar via de Client API."
       },
       "form": {
         "name": "Naam",
         "description": "Beschrijving",
-        "author": "Author",
+        "author": "Auteur",
         "type": "Type",
         "password": "Wachtwoord",
         "host": "Host",
         "username": "Gebruikersnaam",
-        "usernameOrEmail": "Username/Email",
+        "usernameOrEmail": "Gebruikersnaam/E-mail",
         "server": "Server",
         "url": "URL",
         "email": "E-mail",
-        "path": "Path",
+        "path": "Pad",
         "port": "Poort",
         "provider": "Provider",
         "command": "Opdracht",
-        "fromAddress": "From Address",
-        "fromName": "From Name",
+        "fromAddress": "Afzenderadres",
+        "fromName": "Naam afzender",
         "siteKey": "Site Key",
         "secretKey": "Secret Key",
-        "apiKey": "API Key",
+        "apiKey": "API-sleutel",
         "accessKey": "Access Key",
         "bucket": "Bucket",
-        "region": "Region",
+        "region": "Regio",
         "endpoint": "Endpoint",
-        "publicUrl": "Public URL",
+        "publicUrl": "Openbare URL",
         "firstName": "Voornaam",
         "lastName": "Achternaam",
         "language": "Taal",
         "identifier": "Identifier",
         "enabled": "Ingeschakeld",
-        "title": "Title",
-        "content": "Content",
-        "backupConfiguration": "Backup Configuration",
+        "title": "Titel",
+        "content": "Inhoud",
+        "backupConfiguration": "Backup Configuratie",
         "fileName": "Bestandsnaam",
         "sftpPort": "SFTP-poort",
         "sftpHost": "SFTP-host",
@@ -199,21 +199,21 @@
         "startupCommand": "Opstartcommando",
         "archiveName": "Archiefnaam",
         "archiveFormat": "Archiefformaat",
-        "compressionLevel": "Compression Level",
-        "multiplexChannels": "Multiplex Channels",
-        "multiplexChannelsDescription": "Add additional HTTP connections (and therefore also threads) for transferring split archives, total streams is 1 + multiplex channels.",
-        "deleteSourceBackups": "Delete source backups",
-        "deleteSourceBackupsDescription": "Deletes the transferred backups on the source node once transfer finishes.",
+        "compressionLevel": "Compressie level",
+        "multiplexChannels": "Multiplex-kanalen",
+        "multiplexChannelsDescription": "Voeg extra HTTP-verbindingen (en daarmee ook threads) toe voor het overdragen van gesplitste archieven; het totaal aantal streams is 1 + multiplex-kanalen.",
+        "deleteSourceBackups": "Bronback-ups verwijderen",
+        "deleteSourceBackupsDescription": "Verwijdert de overgedragen back-ups op de bronnode zodra de overdracht is voltooid.",
         "node": "Node",
-        "primaryAllocation": "Primary Allocation",
-        "additionalAllocations": "Additional Allocations",
-        "externalId": "External ID",
+        "primaryAllocation": "Primaire Allocatie",
+        "additionalAllocations": "Aanvullende Allocaties",
+        "externalId": "Externe ID",
         "mount": "Mount",
         "nest": "Nest",
-        "lines": "Lines",
+        "lines": "Regels",
         "databaseHost": "Databasehost",
         "timezone": "Tijdzone",
-        "timezoneSystem": "System",
+        "timezoneSystem": "Systeem",
         "protocol": "Protocol",
         "powerAction": "Stroomactie",
         "destination": "Bestemming",
@@ -224,16 +224,16 @@
         "currentPassword": "Huidig wachtwoord",
         "confirmPassword": "Wachtwoord bevestigen",
         "authenticationCode": "Authenticatiecode",
-        "restoreStartup": "Restore the startup command, image, and variables from this backup.",
+        "restoreStartup": "Herstel het opstartcommando, de image en de variabelen vanuit deze back-up.",
         "lineContains": "Regel bevat",
-        "filePath": "File Path",
-        "envVariable": "Environment Variable",
-        "value": "Value",
+        "filePath": "Bestandspad",
+        "envVariable": "Omgevings Variabele",
+        "value": "Waarde",
         "eggs": "Eggs",
         "ignoredFiles": "Genegeerde bestanden",
         "yourControlPanelPassword": "Uw configuratiepanelwachtwoord",
-        "deploymentEnabled": "Deployment Enabled",
-        "maintenanceEnabled": "Maintenance Enabled",
+        "deploymentEnabled": "Deployment Ingeschakeld",
+        "maintenanceEnabled": "Onderhoud Ingeschakeld",
         "truncateDirectory": "Wilt u alle bestanden van deze server verwijderen voordat u deze actie uitvoert? Dit kan niet ongedaan worden gemaakt."
       },
       "table": {
@@ -244,40 +244,40 @@
         "columns": {
           "id": "ID",
           "name": "Naam",
-          "author": "Author",
+          "author": "Auteur",
           "type": "Type",
-          "title": "Title",
-          "enabled": "Enabled",
+          "title": "Titel",
+          "enabled": "Ingeschakeld",
           "description": "Beschrijving",
           "username": "Gebruikersnaam",
           "size": "Grootte",
           "lastUsed": "Laatst gebruikt",
           "created": "Aangemaakt",
-          "updated": "Updated",
+          "updated": "Bijgewerkt",
           "actor": "Uitvoerder",
           "event": "Gebeurtenis",
           "ip": "IP",
           "when": "Wanneer",
           "command": "Opdracht",
-          "location": "Location",
+          "location": "Locatie",
           "node": "Node",
-          "owner": "Owner",
-          "added": "Added",
-          "backupConfiguration": "Backup Configuration",
+          "owner": "Eigenaar",
+          "added": "Toegevoegd",
+          "backupConfiguration": "Backup Configuratie",
           "status": "Status",
-          "allocation": "Allocation",
+          "allocation": "Allocatie",
           "notes": "Notities",
-          "source": "Source",
-          "target": "Target",
-          "checksum": "Checksum",
-          "files": "Files",
+          "source": "Bron",
+          "target": "Doel",
+          "checksum": "Controlesom",
+          "files": "Bestanden",
           "server": "Server",
-          "address": "Address",
+          "address": "Adres",
           "eggs": "Eggs"
         }
       },
       "tabs": {
-        "general": "General"
+        "general": "Algemeen"
       },
       "badge": {
         "active": "Actief",
@@ -286,7 +286,7 @@
         "disabled": "Uitgeschakeld",
         "successful": "Geslaagd",
         "failed": "Mislukt",
-        "installed": "Installed"
+        "installed": "Geïnstalleerd"
       },
       "server": {
         "noAllocation": "Geen allocatie",
@@ -319,7 +319,7 @@
           "start": "Starten",
           "stop": "Stoppen",
           "restart": "Herstarten",
-          "kill": "Forceer stop"
+          "kill": "Geforceerd stoppen"
         },
         "serverBackupStatus": {
           "starting": "Bezig",
@@ -342,10 +342,10 @@
           "killed": "Geforceerd gestopt"
         },
         "compressionLevel": {
-          "bestSpeed": "Best Speed",
-          "goodSpeed": "Good Speed",
-          "goodCompression": "Good Compression",
-          "bestCompression": "Best Compression"
+          "bestSpeed": "Beste Snelheid",
+          "goodSpeed": "Goede Snelheid",
+          "goodCompression": "Goede Compressie",
+          "bestCompression": "Beste Compressie"
         }
       },
       "unit": {
@@ -362,35 +362,35 @@
       "readOnly": "Alleen-lezen",
       "na": "N.v.t.",
       "never": "Nooit",
-      "none": "None",
-      "unknown": "Unknown",
+      "none": "Geen",
+      "unknown": "Onbekend",
       "yes": "Ja",
       "no": "Nee",
       "web": "Web",
       "api": "API",
-      "default": "Default",
-      "custom": "Custom",
+      "default": "Standaard",
+      "custom": "Aangepast",
       "system": "Systeem",
       "schedule": "Planning",
       "impersonatedBy": "Nagebootst door {username}"
     },
     "elements": {
       "routeOrderEditor": {
-        "title": "Route Configuration",
+        "title": "Route Configuratie",
         "label": {
           "route": "Route",
-          "divider": "Divider",
-          "redirect": "Redirect"
+          "divider": "Scheidingslijn",
+          "redirect": "Doorverwijzing"
         },
-        "empty": "No routes configured. Add routes, dividers, or redirects below.",
-        "unnamed": "(unnamed)",
-        "dividerPlaceholder": "Divider label (optional)",
-        "redirectNamePlaceholder": "Redirect name",
-        "destinationPlaceholder": "Destination URL (e.g. https://...)",
-        "selectRoutePlaceholder": "Select a route…",
+        "empty": "Geen routes geconfigureerd. Voeg hieronder routes, scheidingslijnen of doorverwijzingen toe.",
+        "unnamed": "(naamloos)",
+        "dividerPlaceholder": "Label scheidingslijn (optioneel)",
+        "redirectNamePlaceholder": "Naam doorverwijzing",
+        "destinationPlaceholder": "Bestemmings-URL (bijv. https://...)",
+        "selectRoutePlaceholder": "Selecteer een route…",
         "button": {
-          "addDivider": "Add Divider",
-          "addRedirect": "Add Redirect"
+          "addDivider": "Scheidingslijn toevoegen",
+          "addRedirect": "Doorverwijzing toevoegen"
         }
       },
       "errorBoundary": {
@@ -410,9 +410,9 @@
       },
       "pasteOnClick": {
         "toast": {
-          "pasted": "Pasted from clipboard.",
-          "failed": "Failed to paste from clipboard.",
-          "pasteManual": "Paste from clipboard: Ctrl+V or Command+V, Enter"
+          "pasted": "Geplakt vanuit klembord.",
+          "failed": "Plakken vanuit klembord mislukt.",
+          "pasteManual": "Plakken vanuit klembord: Ctrl+V of Command+V, Enter"
         }
       },
       "estimatedTimeArrival": {
@@ -425,7 +425,7 @@
       },
       "container": {
         "alert": {
-          "impersonating": "U bootst momenteel een gebruiker na. Houd er rekening mee dat uw acties gevolgen kunnen hebben voor het account van de nagebootste gebruiker. Klik op de knop \"Stop met nabootsen\" linksonder om de nagebootsmodus te verlaten."
+          "impersonating": "U bootst momenteel een gebruiker na. Houd er rekening mee dat uw acties gevolgen kunnen hebben voor het account van de nagebootste gebruiker. Klik op de knop \"Stop met nabootsen\" linksonder om de nabootsmodus te verlaten."
         }
       },
       "sidebar": {
@@ -439,8 +439,8 @@
       },
       "permissionSelector": {
         "button": {
-          "copyPermissions": "Copy Permissions",
-          "pastePermissions": "Paste Permissions"
+          "copyPermissions": "Rechten kopiëren",
+          "pastePermissions": "Rechten plakken"
         },
         "selectedPermissions": "Geselecteerde rechten ({count})",
         "noPermissions": "Geen rechten geselecteerd."
@@ -456,9 +456,9 @@
       },
       "resource": {
         "tooltip": {
-          "created": "{resource} created.",
-          "updated": "{resource} updated.",
-          "deleted": "{resource} deleted."
+          "created": "{resource} aangemaakt.",
+          "updated": "{resource} bijgewerkt.",
+          "deleted": "{resource} verwijderd."
         }
       },
       "activityInfoButton": {
@@ -478,8 +478,8 @@
           "content": "De pagina die u zoekt kon niet worden gevonden."
         },
         "suspended": {
-          "title": "Account Suspended",
-          "content": "Your account has been suspended. You cannot make changes to your account. Please contact an administrator for more information."
+          "title": "Account Opgeschort",
+          "content": "Uw account is opgeschort. U kunt geen wijzigingen aanbrengen aan uw account. Neem contact op met een beheerder voor meer informatie."
         },
         "serverConflict": {
           "title": "Conflicterende serverstatus",
@@ -541,7 +541,7 @@
               },
               "copying": {
                 "completed": "`{path}` gekopieerd naar `{destination}` in {time}.",
-                "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
+                "completedMany": "{path} gekopieerd naar `{destination}` ({files}) in {time}.",
                 "failed": "Kopiëren van `{path}` naar `{destination}` mislukt:\n{error}"
               },
               "copyingMany": {
@@ -562,13 +562,13 @@
         "waiting": "Wachten: {file}",
         "uploading": "Uploaden: {file}",
         "uploadingFolder": "Map uploaden: {folder} ({files})",
-        "rateLimited": "Your upload has been rate limited. Waiting...",
-        "cancelAllUploads": "Cancel all uploads",
+        "rateLimited": "Uw upload is beperkt door een ratelimiet. Even geduld...",
+        "cancelAllUploads": "Alle uploads annuleren",
         "toast": {
           "uploading": "Uploaden van {files} gestart...",
           "cancelledFile": "Uploaden van `{file}` succesvol geannuleerd.",
           "cancelledFolder": "Uploaden van map `{folder}` ({files}) succesvol geannuleerd.",
-          "cancelledAll": "All uploads have been cancelled."
+          "cancelledAll": "Alle uploads zijn geannuleerd."
         }
       }
     },
@@ -624,8 +624,8 @@
           "form": {
             "locationName": "Locatienaam",
             "locationNamePlaceholder": "Mijn thuis",
-            "locationFlag": "Location Flag",
-            "locationFlagPlaceholder": "The best country",
+            "locationFlag": "Locatievlag",
+            "locationFlagPlaceholder": "Het beste land",
             "backupName": "Naam back-upconfiguratie",
             "backupNamePlaceholder": "Unicorn Cloud",
             "backupDisk": "Back-upschijf",
@@ -704,7 +704,7 @@
         },
         "server": {
           "title": "Server",
-          "existingServer": "A server has already been created. You can change the settings later in the admin menu.",
+          "existingServer": "Er is al een server aangemaakt. U kunt de instellingen later wijzigen in het beheerdersmenu.",
           "egg": {
             "title": "Egg",
             "description": "Laten we uw eerste server instellen. Welke egg wilt u gebruiken?",
@@ -751,13 +751,13 @@
           "loginWith": "Inloggen met {name}"
         },
         "alert": {
-          "urlMismatch": "The application URL does not match the current URL. Expected: `{appUrl}`, Current: `{currentUrl}`."
+          "urlMismatch": "De applicatie-URL komt niet overeen met de huidige URL. Verwacht: `{appUrl}`, Huidig: `{currentUrl}`."
         },
         "login": {
           "error": {
             "usernameRequired": "Voer een gebruikersnaam in",
-            "registrationDisabled": "No matching Account could be found and registration is currently disabled.",
-            "userAlreadyExists": "An account with this username or email already exists."
+            "registrationDisabled": "Er kon geen bijbehorend account worden gevonden en registratie is momenteel uitgeschakeld.",
+            "userAlreadyExists": "Er bestaat al een account met deze gebruikersnaam of e-mailadres."
           },
           "passkey": {
             "error": {
@@ -775,9 +775,9 @@
           "step": {
             "username": {
               "title": "Inloggen",
-              "subtitle": "Enter your username or email address to continue",
+              "subtitle": "Voer uw gebruikersnaam of e-mailadres in om door te gaan",
               "form": {
-                "usernameOrEmailPlaceholder": "Your username or email address"
+                "usernameOrEmailPlaceholder": "Uw gebruikersnaam of e-mailadres"
               },
               "link": {
                 "forgotPassword": "Wachtwoord vergeten",
@@ -868,7 +868,7 @@
             "noGroup": "Deze server behoort niet tot een groep"
           },
           "badge": {
-            "foreign": "Foreign"
+            "foreign": "Extern"
           },
           "tabs": {
             "groupedServers": {
@@ -905,10 +905,10 @@
                     }
                   },
                   "removeServerFromGroup": {
-                    "title": "Confirm Server Removal",
-                    "content": "Are you sure you want to remove **{server}** from **{group}**?",
+                    "title": "Verwijderen van server bevestigen",
+                    "content": "Weet u zeker dat u **{server}** wilt verwijderen van **{group}**?",
                     "toast": {
-                      "removed": "Server removed from group."
+                      "removed": "Server verwijderd uit groep."
                     }
                   }
                 },
@@ -953,8 +953,8 @@
               "description": "Tweestapsverificatie is vereist voor uw account. Stel het hieronder in om het panel te blijven gebruiken."
             },
             "frozen": {
-              "title": "Account Frozen",
-              "description": "Your account has been frozen. You cannot make changes to your account until it is unfrozen. Please contact an administrator for more information."
+              "title": "Account Bevroren",
+              "description": "Uw account is bevroren. U kunt geen wijzigingen aanbrengen aan uw account totdat het is ontdooid. Neem contact op met een beheerder voor meer informatie."
             }
           },
           "containers": {
@@ -1030,7 +1030,7 @@
         },
         "securityKeys": {
           "title": "Beveiligingssleutels",
-          "subtitle": "{current} of {max} maximum security keys created.",
+          "subtitle": "{current} van {max} maximale beveiligingssleutels aangemaakt.",
           "table": {
             "columns": {
               "credentialId": "Referentie-ID"
@@ -1038,7 +1038,7 @@
           },
           "tooltip": {
             "secureContextRequired": "Een beveiligde context (HTTPS) is vereist om beveiligingssleutels te gebruiken.",
-            "limitReached": "You are limited to {max} security keys."
+            "limitReached": "U bent beperkt tot {max} beveiligingssleutels."
           },
           "modal": {
             "createSecurityKey": {
@@ -1088,21 +1088,21 @@
           "detectedMac": "macOS gedetecteerd",
           "detectedWindows": "Windows/Linux gedetecteerd",
           "label": {
-            "disabled": "Disabled",
-            "modified": "Modified",
-            "recording": "Press keys..."
+            "disabled": "Uitgeschakeld",
+            "modified": "Aangepast",
+            "recording": "Toetsen indrukken..."
           },
           "button": {
-            "rebind": "Rebind",
-            "resetAll": "Reset All",
-            "copy": "Copy All",
-            "paste": "Paste"
+            "rebind": "Opnieuw toewijzen",
+            "resetAll": "Alles herstellen",
+            "copy": "Alles kopiëren",
+            "paste": "Plakken"
           },
           "toast": {
-            "imported": "Updated {shortcuts}.",
-            "importedNone": "No shortcuts were changed.",
-            "importErrors": "Ignored {unknown} and {invalid}.",
-            "resetAll": "All shortcuts reset to defaults."
+            "imported": "{shortcuts} bijgewerkt.",
+            "importedNone": "Er zijn geen sneltoetsen gewijzigd.",
+            "importErrors": "{unknown} en {invalid} genegeerd.",
+            "resetAll": "Alle sneltoetsen hersteld naar standaardwaarden."
           },
           "fileManager": {
             "title": "Bestandsbeheer",
@@ -1139,9 +1139,9 @@
         },
         "sshKeys": {
           "title": "SSH-sleutels",
-          "subtitle": "{current} of {max} maximum ssh keys created.",
+          "subtitle": "{current} van {max} maximale ssh-sleutels aangemaakt.",
           "tooltip": {
-            "limitReached": "You are limited to {max} ssh keys."
+            "limitReached": "U bent beperkt tot {max} ssh-sleutels."
           },
           "table": {
             "columns": {
@@ -1187,9 +1187,9 @@
         },
         "commandSnippets": {
           "title": "Opdrachtfragmenten",
-          "subtitle": "{current} of {max} maximum command snippets created.",
+          "subtitle": "{current} van {max} maximale opdrachtfragmenten aangemaakt.",
           "tooltip": {
-            "limitReached": "You are limited to {max} command snippets."
+            "limitReached": "U bent beperkt tot {max} opdrachtfragmenten."
           },
           "modal": {
             "createCommandSnippet": {
@@ -1236,12 +1236,12 @@
         },
         "apiKeys": {
           "title": "API-sleutels",
-          "subtitle": "{current} of {max} maximum api keys created.",
+          "subtitle": "{current} van {max} maximale api-sleutels aangemaakt.",
           "button": {
             "apiDocumentation": "API-documentatie"
           },
           "tooltip": {
-            "limitReached": "You are limited to {max} api keys."
+            "limitReached": "U bent beperkt tot {max} api-sleutels."
           },
           "table": {
             "columns": {
@@ -1264,10 +1264,10 @@
               }
             },
             "recreateApiKey": {
-              "title": "Recreate API Key",
-              "content": "Recreating an API key will generate a new key and invalidate the old one. Are you sure you want to recreate the API key **{name}**?",
+              "title": "API-sleutel opnieuw aanmaken",
+              "content": "Het opnieuw aanmaken van een API-sleutel genereert een nieuwe sleutel en maakt de oude ongeldig. Weet u zeker dat u de API-sleutel **{name}** opnieuw wilt aanmaken?",
               "toast": {
-                "recreated": "API key recreated."
+                "recreated": "API-sleutel opnieuw aangemaakt."
               }
             },
             "deleteApiKey": {
@@ -1286,16 +1286,16 @@
             "adminPermissions": "Beheerdersrechten"
           },
           "create": {
-            "title": "Create API Key",
-            "subtitle": "An application is requesting an API key to be created for your account.",
+            "title": "API-sleutel aanmaken",
+            "subtitle": "Een applicatie vraagt om een API-sleutel voor uw account aan te maken.",
             "alert": {
-              "adminPermissions": "This API key requests **admin permissions**. Anyone in possession of this key will be able to perform administrative actions on this panel in your name. Only continue if you absolutely trust the requesting application.",
-              "callbackUrl": "After creation, the new API key will be sent to **{url}**."
+              "adminPermissions": "Deze API-sleutel vraagt om **beheerdersrechten**. Iedereen die deze sleutel bezit, kan namens u beheerdersacties uitvoeren op dit panel. Ga alleen verder als u de aanvragende applicatie volledig vertrouwt.",
+              "callbackUrl": "Na het aanmaken wordt de nieuwe API-sleutel verzonden naar **{url}**."
             },
-            "noPermissions": "This API key will not have any permissions.",
-            "keyCreated": "Your new API key has been created. Make sure to copy it now, as it will not be shown again.",
+            "noPermissions": "Deze API-sleutel zal geen rechten hebben.",
+            "keyCreated": "Uw nieuwe API-sleutel is aangemaakt. Zorg dat u deze nu kopieert, want hij wordt niet nogmaals getoond.",
             "button": {
-              "goToApiKeys": "Go to API Keys"
+              "goToApiKeys": "Naar API-sleutels"
             }
           }
         },
@@ -1307,68 +1307,68 @@
         "home": {
           "title": "Home",
           "alert": {
-            "newPanelVersion": "A new version is available for the panel! You are currently on {current} and the latest version is {latest}. You may want to consider upgrading. [Click here]({upgradeUrl}) to view upgrade instructions."
+            "newPanelVersion": "Er is een nieuwe versie beschikbaar voor het panel! U gebruikt momenteel {current} en de laatste versie is {latest}. Wellicht wilt u overwegen te updaten. [Klik hier]({upgradeUrl}) voor upgrade-instructies."
           },
           "tabs": {
             "overview": {
-              "title": "Overview",
+              "title": "Overzicht",
               "page": {
-                "permissionDenied": "You do not have permission to read the statistics that would have been here otherwise. For now, enjoy this bird.",
+                "permissionDenied": "U heeft geen toestemming om de statistieken te bekijken die hier anders zouden staan. Geniet voor nu van deze vogel.",
                 "card": {
-                  "systemOverview": "System Overview",
-                  "generalStatistics": "General Statistics",
-                  "backupStatistics": "Backup Statistics"
+                  "systemOverview": "Systeemoverzicht",
+                  "generalStatistics": "Algemene Statistieken",
+                  "backupStatistics": "Back-upstatistieken"
                 },
                 "system": {
                   "cpu": "CPU",
-                  "memoryUsage": "Memory Usage ({process} used by Panel)",
+                  "memoryUsage": "Geheugengebruik ({process} gebruikt door Panel)",
                   "memoryValue": "{used} / {total} ({percent}%)",
-                  "kernelVersion": "Kernel Version ({architecture})",
-                  "containerType": "Container Type",
-                  "databaseVersion": "Database Version ({size})",
-                  "cacheVersion": "Cache Version",
-                  "cacheCalls": "Cache Calls",
+                  "kernelVersion": "Kernel-versie ({architecture})",
+                  "containerType": "Containertype",
+                  "databaseVersion": "Database-versie ({size})",
+                  "cacheVersion": "Cache-versie",
+                  "cacheCalls": "Cache-aanroepen",
                   "cacheHits": "Cache Hits ({percent}%)",
                   "cacheMisses": "Cache Misses ({percent}%)",
-                  "avgCachedCallLatency": "Avg. Cached Call Latency"
+                  "avgCachedCallLatency": "Gem. Gecachete Aanroeplatentie"
                 },
                 "containerType": {
-                  "none": "None detected",
-                  "official": "Official",
-                  "officialAio": "Official AIO",
-                  "officialHeavy": "Official Heavy"
+                  "none": "Niets gedetecteerd",
+                  "official": "Officieel",
+                  "officialAio": "Officieel AIO",
+                  "officialHeavy": "Officieel Heavy"
                 },
                 "stats": {
-                  "users": "Users",
+                  "users": "Gebruikers",
                   "servers": "Servers",
-                  "locations": "Locations",
+                  "locations": "Locaties",
                   "nodes": "Nodes",
                   "nestEggs": "Nest Eggs",
-                  "databaseHosts": "Database Hosts",
-                  "backupConfigurations": "Backup Configurations",
-                  "roles": "Roles"
+                  "databaseHosts": "Databasehosts",
+                  "backupConfigurations": "Back-upconfiguraties",
+                  "roles": "Rollen"
                 },
                 "backup": {
-                  "allTime": "All Time",
-                  "today": "Today",
-                  "week": "This Week",
-                  "month": "This Month",
-                  "totalAllTime": "Total backups all time",
-                  "successfulAllTime": "Successful backups all time",
-                  "failedAllTime": "Failed backups all time",
-                  "deletedAllTime": "Deleted backups all time",
-                  "totalToday": "Total backups today",
-                  "successfulToday": "Successful backups today",
-                  "failedToday": "Failed backups today",
-                  "deletedToday": "Deleted backups today",
-                  "totalWeek": "Total backups this week",
-                  "successfulWeek": "Successful backups this week",
-                  "failedWeek": "Failed backups this week",
-                  "deletedWeek": "Deleted backups this week",
-                  "totalMonth": "Total backups this month",
-                  "successfulMonth": "Successful backups this month",
-                  "failedMonth": "Failed backups this month",
-                  "deletedMonth": "Deleted backups this month",
+                  "allTime": "Altijd",
+                  "today": "Vandaag",
+                  "week": "Deze week",
+                  "month": "Deze maand",
+                  "totalAllTime": "Totaal aantal back-ups aller tijden",
+                  "successfulAllTime": "Geslaagde back-ups aller tijden",
+                  "failedAllTime": "Mislukte back-ups aller tijden",
+                  "deletedAllTime": "Verwijderde back-ups aller tijden",
+                  "totalToday": "Totaal aantal back-ups vandaag",
+                  "successfulToday": "Geslaagde back-ups vandaag",
+                  "failedToday": "Mislukte back-ups vandaag",
+                  "deletedToday": "Verwijderde back-ups vandaag",
+                  "totalWeek": "Totaal aantal back-ups deze week",
+                  "successfulWeek": "Geslaagde back-ups deze week",
+                  "failedWeek": "Mislukte back-ups deze week",
+                  "deletedWeek": "Verwijderde back-ups deze week",
+                  "totalMonth": "Totaal aantal back-ups deze maand",
+                  "successfulMonth": "Geslaagde back-ups deze maand",
+                  "failedMonth": "Mislukte back-ups deze maand",
+                  "deletedMonth": "Verwijderde back-ups deze maand",
                   "successfulValue": "{count} ({size})",
                   "deletedValue": "{count} ({size})"
                 }
@@ -1378,227 +1378,227 @@
               "title": "Updates",
               "page": {
                 "alert": {
-                  "extensionUpdateErrors": "There were errors checking for updates for some extensions."
+                  "extensionUpdateErrors": "Er zijn fouten opgetreden bij het controleren op updates voor sommige extensies."
                 },
                 "card": {
-                  "panelVersion": "Panel Version",
-                  "versionHistory": "Version History",
-                  "outdatedExtensions": "Outdated Extensions",
-                  "outdatedNodes": "Outdated Nodes"
+                  "panelVersion": "Panelversie",
+                  "versionHistory": "Versiegeschiedenis",
+                  "outdatedExtensions": "Verouderde Extensies",
+                  "outdatedNodes": "Verouderde Nodes"
                 },
-                "panelVersion": "Your panel is currently running version `{current}`. The latest available version is `{latest}`.",
-                "unknown": "unknown",
+                "panelVersion": "Uw panel draait momenteel versie `{current}`. De laatst beschikbare versie is `{latest}`.",
+                "unknown": "onbekend",
                 "button": {
-                  "recheck": "Recheck for Updates"
+                  "recheck": "Opnieuw controleren op updates"
                 },
                 "toast": {
-                  "recheckComplete": "Recheck complete."
+                  "recheckComplete": "Controle voltooid."
                 },
-                "selectHistory": "Select an update history to view.",
+                "selectHistory": "Selecteer een updategeschiedenis om te bekijken.",
                 "historyPanel": "Panel",
-                "historyExtension": "Extension: {name}",
-                "extensionsUpToDate": "All extensions are up to date.",
-                "extensionsOutdated": "Some extensions are outdated or had errors when checking for updates.",
-                "noChangelog": "No changelog",
-                "nodesUpToDate": "Seems like all nodes are up to date. ({failed} failed to check)",
-                "nodesOutdated": "Some nodes are outdated, the latest available version is `{latest}`. ({outdated} outdated, {failed} failed to check)",
+                "historyExtension": "Extensie: {name}",
+                "extensionsUpToDate": "Alle extensies zijn up-to-date.",
+                "extensionsOutdated": "Sommige extensies zijn verouderd of hadden fouten bij het controleren op updates.",
+                "noChangelog": "Geen changelog",
+                "nodesUpToDate": "Het lijkt erop dat alle nodes up-to-date zijn. ({failed} niet controleerbaar)",
+                "nodesOutdated": "Sommige nodes zijn verouderd, de laatst beschikbare versie is `{latest}`. ({outdated} verouderd, {failed} niet controleerbaar)",
                 "table": {
-                  "version": "Version",
-                  "installed": "Installed",
-                  "packageName": "Package Name",
-                  "latestVersion": "Latest Version",
-                  "changes": "Changes",
-                  "error": "Error"
+                  "version": "Versie",
+                  "installed": "Geïnstalleerd",
+                  "packageName": "Pakketnaam",
+                  "latestVersion": "Laatste Versie",
+                  "changes": "Wijzigingen",
+                  "error": "Fout"
                 }
               }
             },
             "health": {
-              "title": "Health",
+              "title": "Gezondheid",
               "page": {
                 "card": {
-                  "generalHealth": "General Health",
-                  "extensionMigrationHealth": "Extension Migration Health",
-                  "desyncNodes": "Desync Nodes",
-                  "debugMode": "Debug Mode"
+                  "generalHealth": "Algemene Gezondheid",
+                  "extensionMigrationHealth": "Extensiemigratiegezondheid",
+                  "desyncNodes": "Niet-gesynchroniseerde Nodes",
+                  "debugMode": "Debug-modus"
                 },
-                "appliedMigrations": "Applied Migrations ({percent}%)",
+                "appliedMigrations": "Toegepaste Migraties ({percent}%)",
                 "migrationsValue": "{applied} / {total}",
-                "avgNtpOffset": "Avg. NTP Offset",
-                "noExtensions": "No extensions found.",
-                "nodesSynced": "Seems like all nodes have a synced clock (within 5 seconds of panel clock). ({failed} failed to check)",
-                "nodesDesync": "Some nodes have desync clocks (over 5 seconds off of the panel's clock). This can cause file download/console issues. ({desync} desync, {failed} failed to check)",
-                "debugEnabled": "Debug mode is currently enabled.",
-                "debugDisabled": "Debug mode is currently disabled.",
-                "debugResetNote": "This setting will be reset to the default ({default}) when the application restarts.",
+                "avgNtpOffset": "Gem. NTP-afwijking",
+                "noExtensions": "Geen extensies gevonden.",
+                "nodesSynced": "Het lijkt erop dat alle nodes een gesynchroniseerde klok hebben (binnen 5 seconden van de panelklok). ({failed} niet controleerbaar)",
+                "nodesDesync": "Sommige nodes hebben niet-gesynchroniseerde klokken (meer dan 5 seconden afwijkend van de panelklok). Dit kan problemen veroorzaken met downloaden van bestanden/console. ({desync} niet-gesynchroniseerd, {failed} niet controleerbaar)",
+                "debugEnabled": "Debug-modus is momenteel ingeschakeld.",
+                "debugDisabled": "Debug-modus is momenteel uitgeschakeld.",
+                "debugResetNote": "Deze instelling wordt teruggezet naar de standaardwaarde ({default}) wanneer de applicatie opnieuw start.",
                 "table": {
-                  "packageName": "Package Name",
-                  "applied": "Applied",
-                  "total": "Total",
+                  "packageName": "Pakketnaam",
+                  "applied": "Toegepast",
+                  "total": "Totaal",
                   "id": "ID",
-                  "desync": "Desync",
+                  "desync": "Niet-gesynchroniseerd",
                   "appliedValue": "{applied} ({percent}%)"
                 },
                 "button": {
-                  "enableDebug": "Enable Debug Mode",
-                  "disableDebug": "Disable Debug Mode"
+                  "enableDebug": "Debug-modus inschakelen",
+                  "disableDebug": "Debug-modus uitschakelen"
                 },
                 "toast": {
-                  "debugEnabled": "Debug mode enabled.",
-                  "debugDisabled": "Debug mode disabled."
+                  "debugEnabled": "Debug-modus ingeschakeld.",
+                  "debugDisabled": "Debug-modus uitgeschakeld."
                 }
               }
             }
           }
         },
         "settings": {
-          "title": "Settings",
+          "title": "Instellingen",
           "tabs": {
             "application": {
-              "title": "Application",
+              "title": "Applicatie",
               "page": {
-                "title": "Application Settings",
+                "title": "Applicatie-instellingen",
                 "form": {
-                  "icon": "Icon",
-                  "iconLight": "Icon (Light Mode)",
+                  "icon": "Icoon",
+                  "iconLight": "Icoon (Lichte modus)",
                   "banner": "Banner",
-                  "bannerLight": "Banner (Light Mode)",
-                  "sessionCookie": "Session Cookie",
-                  "sessionDurationSeconds": "Session Duration (seconds)",
-                  "twoFactorRequirement": "Two-Factor Authentication Requirement",
-                  "telemetryEnabled": "Enable Telemetry",
-                  "telemetryEnabledDescription": "Allow Calagopus to collect limited and anonymous usage data to help improve the application.",
-                  "registrationEnabled": "Enable Registration"
+                  "bannerLight": "Banner (Lichte modus)",
+                  "sessionCookie": "Sessiecookie",
+                  "sessionDurationSeconds": "Sessieduur (seconden)",
+                  "twoFactorRequirement": "Vereiste voor Tweestapsverificatie",
+                  "telemetryEnabled": "Telemetrie inschakelen",
+                  "telemetryEnabledDescription": "Sta Calagopus toe om beperkte en anonieme gebruiksgegevens te verzamelen om de applicatie te helpen verbeteren.",
+                  "registrationEnabled": "Registratie inschakelen"
                 },
                 "enum": {
                   "twoFactorRequirement": {
-                    "admins": "Admins",
-                    "allUsers": "All Users",
-                    "none": "None"
+                    "admins": "Beheerders",
+                    "allUsers": "Alle gebruikers",
+                    "none": "Geen"
                   }
                 },
                 "button": {
-                  "previewTelemetry": "Preview Telemetry"
+                  "previewTelemetry": "Telemetrie bekijken"
                 },
                 "toast": {
-                  "updated": "Application settings updated."
+                  "updated": "Applicatie-instellingen bijgewerkt."
                 },
                 "modal": {
                   "disableTelemetry": {
-                    "title": "Confirm Disabling Telemetry",
-                    "content": "Are you sure you want to disable telemetry? Telemetry helps us improve Calagopus by providing anonymous usage data. Disabling telemetry will prevent any data from being sent."
+                    "title": "Uitschakelen van telemetrie bevestigen",
+                    "content": "Weet u zeker dat u telemetrie wilt uitschakelen? Telemetrie helpt ons Calagopus te verbeteren door anonieme gebruiksgegevens te verstrekken. Het uitschakelen van telemetrie voorkomt dat er gegevens worden verzonden."
                   },
                   "enableRegistration": {
-                    "title": "Confirm Enabling Registration",
-                    "content": "Are you sure you want to enable registration? Enabling registration allows anyone to create an account on this panel. If you do not have a captcha configured, this may be a mistake."
+                    "title": "Inschakelen van registratie bevestigen",
+                    "content": "Weet u zeker dat u registratie wilt inschakelen? Het inschakelen van registratie staat iedereen toe een account aan te maken op dit panel. Als u geen captcha heeft geconfigureerd, kan dit een vergissing zijn."
                   },
                   "telemetryPreview": {
-                    "title": "Telemetry Preview"
+                    "title": "Telemetrie-voorbeeld"
                   }
                 }
               }
             },
             "storage": {
-              "title": "Storage",
+              "title": "Opslag",
               "page": {
-                "title": "Storage Settings",
+                "title": "Opslaginstellingen",
                 "form": {
                   "driver": "Driver"
                 },
                 "enum": {
                   "driver": {
-                    "filesystem": "Filesystem",
+                    "filesystem": "Bestandssysteem",
                     "s3": "S3"
                   }
                 },
                 "toast": {
-                  "updated": "Storage settings updated."
+                  "updated": "Opslaginstellingen bijgewerkt."
                 },
                 "modal": {
                   "changeStorageType": {
-                    "title": "Confirm Changing Storage Type",
-                    "content": "Are you sure you want to change the storage type? Changing the storage type will cause the application to look for assets (e.g. profile pictures) in a different location, which may result in missing assets if they are not moved to the new location manually."
+                    "title": "Wijzigen van opslagtype bevestigen",
+                    "content": "Weet u zeker dat u het opslagtype wilt wijzigen? Het wijzigen van het opslagtype zorgt ervoor dat de applicatie op een andere locatie naar assets (bijv. profielfoto's) zoekt, wat kan resulteren in ontbrekende assets als ze niet handmatig naar de nieuwe locatie zijn verplaatst."
                   }
                 },
                 "s3": {
                   "alert": {
-                    "permissionsTitle": "Note on Permissions",
-                    "permissionsIntro": "To ensure that the storage backend works correctly, please make sure the following subdirectories are publicly accessible over the \"Public URL\" you provided:",
-                    "permissionsAssets": "This is where all admin assets (e.g., icons) will be stored.",
-                    "permissionsAvatars": "This is where all user avatars will be stored.",
-                    "permissionsPublicData": "This is where extensions can store public data (e.g., images)."
+                    "permissionsTitle": "Opmerking over Rechten",
+                    "permissionsIntro": "Zorg ervoor dat de volgende submappen openbaar toegankelijk zijn via de \"Openbare URL\" die u heeft opgegeven, om ervoor te zorgen dat de opslag-backend correct werkt:",
+                    "permissionsAssets": "Hier worden alle beheerdersassets (bijv. iconen) opgeslagen.",
+                    "permissionsAvatars": "Hier worden alle gebruikersavatars opgeslagen.",
+                    "permissionsPublicData": "Hier kunnen extensies openbare gegevens opslaan (bijv. afbeeldingen)."
                   },
                   "form": {
-                    "pathStyle": "Using path-style URLs"
+                    "pathStyle": "Path-style URL's gebruiken"
                   }
                 }
               }
             },
             "mail": {
-              "title": "Mail",
+              "title": "E-mail",
               "page": {
-                "title": "Email Settings",
+                "title": "E-mailinstellingen",
                 "enum": {
                   "provider": {
-                    "none": "None",
+                    "none": "Geen",
                     "smtp": "SMTP",
-                    "sendmail": "Sendmail Command",
-                    "filesystem": "Filesystem"
+                    "sendmail": "Sendmail-opdracht",
+                    "filesystem": "Bestandssysteem"
                   },
                   "tlsMode": {
-                    "none": "None",
+                    "none": "Geen",
                     "startTls": "STARTTLS",
-                    "implicitTls": "Implicit TLS"
+                    "implicitTls": "Impliciete TLS"
                   }
                 },
                 "toast": {
-                  "updated": "Email settings updated."
+                  "updated": "E-mailinstellingen bijgewerkt."
                 },
                 "modal": {
                   "sendTestEmail": {
-                    "title": "Send Test Email",
+                    "title": "Testmail verzenden",
                     "toast": {
-                      "sent": "Test email has been sent successfully."
+                      "sent": "Testmail is succesvol verzonden."
                     }
                   }
                 },
                 "smtp": {
                   "form": {
-                    "tlsMode": "TLS Mode",
-                    "skipCertValidation": "Skip Certificate Validation"
+                    "tlsMode": "TLS-modus",
+                    "skipCertValidation": "Certificaatvalidatie overslaan"
                   }
                 }
               }
             },
             "mailTemplates": {
-              "title": "Mail Templates",
+              "title": "E-mailsjablonen",
               "page": {
-                "title": "Email Template Settings",
+                "title": "E-mailsjabloon-instellingen",
                 "sidebar": {
-                  "templates": "Templates",
-                  "loading": "Loading...",
-                  "availableVariables": "Available Variables"
+                  "templates": "Sjablonen",
+                  "loading": "Laden...",
+                  "availableVariables": "Beschikbare Variabelen"
                 },
                 "alert": {
-                  "syntaxBefore": "Templates use the",
+                  "syntaxBefore": "Sjablonen gebruiken de",
                   "syntaxLink": "MiniJinja",
-                  "syntaxMiddle": "templating syntax. Variables are referenced with",
-                  "syntaxAnd": "and control structures like",
-                  "syntaxOr": "and",
-                  "syntaxAfter": "are supported."
+                  "syntaxMiddle": "sjabloonsyntax. Variabelen worden aangeduid met",
+                  "syntaxAnd": "en besturingsstructuren zoals",
+                  "syntaxOr": "en",
+                  "syntaxAfter": "worden ondersteund."
                 },
-                "empty": "Select a template from the sidebar to edit it.",
-                "loadingTemplate": "Loading template...",
+                "empty": "Selecteer een sjabloon in de zijbalk om het te bewerken.",
+                "loadingTemplate": "Sjabloon laden...",
                 "form": {
-                  "subject": "Subject"
+                  "subject": "Onderwerp"
                 },
                 "toast": {
-                  "saved": "Email template saved.",
-                  "reset": "Email template reset to default."
+                  "saved": "E-mailsjabloon opgeslagen.",
+                  "reset": "E-mailsjabloon hersteld naar standaard."
                 },
                 "modal": {
                   "reset": {
-                    "title": "Reset to default",
-                    "content": "This will discard your custom template for **{identifier}** and restore the built-in default. This cannot be undone."
+                    "title": "Herstellen naar standaard",
+                    "content": "Dit verwijdert uw aangepaste sjabloon voor **{identifier}** en herstelt de ingebouwde standaard. Dit kan niet ongedaan worden gemaakt."
                   }
                 }
               }
@@ -1606,9 +1606,9 @@
             "captcha": {
               "title": "Captcha",
               "page": {
-                "title": "Captcha Settings",
+                "title": "Captcha-instellingen",
                 "toast": {
-                  "updated": "Captcha settings updated."
+                  "updated": "Captcha-instellingen bijgewerkt."
                 },
                 "recaptcha": {
                   "form": {
@@ -1620,22 +1620,22 @@
             "webauthn": {
               "title": "Webauthn",
               "page": {
-                "title": "Webauthn Settings",
+                "title": "Webauthn-instellingen",
                 "form": {
                   "rpId": "RP Id",
                   "rpOrigin": "RP Origin"
                 },
                 "button": {
-                  "autofill": "Autofill"
+                  "autofill": "Automatisch invullen"
                 },
                 "toast": {
-                  "updated": "Webauthn settings updated.",
-                  "ipNotAllowed": "Cannot use WebAuthn on an IP address."
+                  "updated": "Webauthn-instellingen bijgewerkt.",
+                  "ipNotAllowed": "Kan WebAuthn niet gebruiken op een IP-adres."
                 },
                 "modal": {
                   "changeRpId": {
-                    "title": "Confirm Changing RP Id",
-                    "content": "Are you sure you want to change the RP Id? Changing the RP Id will break all existing Webauthn credentials and require users to re-register their devices. This can have significant consequences, so please make sure you understand the implications before proceeding."
+                    "title": "Wijzigen van RP Id bevestigen",
+                    "content": "Weet u zeker dat u de RP Id wilt wijzigen? Het wijzigen van de RP Id breekt alle bestaande Webauthn-referenties en vereist dat gebruikers hun apparaten opnieuw registreren. Dit kan aanzienlijke gevolgen hebben, zorg er dus voor dat u de implicaties begrijpt voordat u doorgaat."
                   }
                 }
               }
@@ -1643,358 +1643,358 @@
             "server": {
               "title": "Server",
               "page": {
-                "title": "Server Settings",
+                "title": "Serverinstellingen",
                 "form": {
-                  "maxFileManagerViewSize": "Max File Manager View Size",
-                  "maxScheduleStepCount": "Max Schedule Steps",
-                  "maxFileManagerContentSearchSize": "Max File Manager Content Search Size",
-                  "maxFileManagerSearchResults": "Max File Manager Search Results",
-                  "maxSubuserCount": "Max Subuser Count",
-                  "allowOverwritingCustomDockerImage": "Allow Overwriting Custom Docker Image",
-                  "allowOverwritingCustomDockerImageDescription": "If enabled, users will be able to overwrite the Docker image specified in the server configuration using the Eggs list, even if an admin has set a custom Docker image.",
-                  "allowViewingInstallationLogs": "Allow Viewing Installation Logs",
-                  "allowViewingInstallationLogsDescription": "If enabled, users with console read permissions will also be able to view installation logs via the websocket connection. If disabled, installation logs will only be available for admins.",
-                  "allowAcknowledgingInstallationFailure": "Allow Acknowledging Installation Failure",
-                  "allowAcknowledgingInstallationFailureDescription": "If enabled, users will be able to acknowledge installation failures for servers that are in the \"Install Failed\" state, allowing them to attempt to start the server instead of having to wait for an admin. If disabled, only admins will be able to acknowledge installation failures.",
-                  "allowViewingTransferProgress": "Allow Viewing Transfer Progress",
-                  "allowViewingTransferProgressDescription": "If enabled, users with console read permissions will also be able to view transfer progress logs via the websocket connection. If disabled, transfer progress logs will only be available for admins.",
-                  "containerPrelude": "Container Prelude",
-                  "containerPreludeDescription": "The terminal prelude used for some status-related messages in the server console."
+                  "maxFileManagerViewSize": "Max. Bestandsbeheer Weergavegrootte",
+                  "maxScheduleStepCount": "Max. Planningsstappen",
+                  "maxFileManagerContentSearchSize": "Max. Bestandsbeheer Inhoudszoekgrootte",
+                  "maxFileManagerSearchResults": "Max. Bestandsbeheer Zoekresultaten",
+                  "maxSubuserCount": "Max. Aantal Subgebruikers",
+                  "allowOverwritingCustomDockerImage": "Overschrijven van Aangepaste Docker-image Toestaan",
+                  "allowOverwritingCustomDockerImageDescription": "Indien ingeschakeld, kunnen gebruikers de Docker-image die in de serverconfiguratie is opgegeven overschrijven via de Eggs-lijst, zelfs als een beheerder een aangepaste Docker-image heeft ingesteld.",
+                  "allowViewingInstallationLogs": "Bekijken van Installatielogboeken Toestaan",
+                  "allowViewingInstallationLogsDescription": "Indien ingeschakeld, kunnen gebruikers met consoleleesrechten ook installatielogboeken bekijken via de websocket-verbinding. Indien uitgeschakeld, zijn installatielogboeken alleen beschikbaar voor beheerders.",
+                  "allowAcknowledgingInstallationFailure": "Bevestigen van Installatiefout Toestaan",
+                  "allowAcknowledgingInstallationFailureDescription": "Indien ingeschakeld, kunnen gebruikers installatiefouten bevestigen voor servers die zich in de status \"Installatie Mislukt\" bevinden, waardoor ze de server kunnen proberen te starten in plaats van te moeten wachten op een beheerder. Indien uitgeschakeld, kunnen alleen beheerders installatiefouten bevestigen.",
+                  "allowViewingTransferProgress": "Bekijken van Overdrachtsvoortgang Toestaan",
+                  "allowViewingTransferProgressDescription": "Indien ingeschakeld, kunnen gebruikers met consoleleesrechten ook overdrachtsvoortgangslogboeken bekijken via de websocket-verbinding. Indien uitgeschakeld, zijn overdrachtsvoortgangslogboeken alleen beschikbaar voor beheerders.",
+                  "containerPrelude": "Containervoorspel",
+                  "containerPreludeDescription": "Het terminalvoorspel dat wordt gebruikt voor sommige statusgerelateerde berichten in de serverconsole."
                 },
                 "toast": {
-                  "updated": "Server settings updated."
+                  "updated": "Serverinstellingen bijgewerkt."
                 }
               }
             },
             "user": {
-              "title": "User",
+              "title": "Gebruiker",
               "page": {
-                "title": "User Settings",
+                "title": "Gebruikersinstellingen",
                 "form": {
-                  "maxServerGroupCount": "Max Server Groups",
-                  "maxApiKeyCount": "Max API Keys",
-                  "maxCommandSnippetCount": "Max Command Snippets",
-                  "maxSecurityKeyCount": "Max Security Keys",
-                  "maxSshKeyCount": "Max SSH Keys",
-                  "allowChangingLanguage": "Allow Changing Language",
-                  "allowChangingLanguageDescription": "If enabled, users will be able to change their language preferences."
+                  "maxServerGroupCount": "Max. Aantal Servergroepen",
+                  "maxApiKeyCount": "Max. Aantal API-sleutels",
+                  "maxCommandSnippetCount": "Max. Aantal Opdrachtfragmenten",
+                  "maxSecurityKeyCount": "Max. Aantal Beveiligingssleutels",
+                  "maxSshKeyCount": "Max. Aantal SSH-sleutels",
+                  "allowChangingLanguage": "Wijzigen van Taal Toestaan",
+                  "allowChangingLanguageDescription": "Indien ingeschakeld, kunnen gebruikers hun taalvoorkeuren wijzigen."
                 },
                 "routeOrder": {
-                  "title": "Client Route Order"
+                  "title": "Client Route Volgorde"
                 },
                 "toast": {
-                  "updated": "User settings updated."
+                  "updated": "Gebruikersinstellingen bijgewerkt."
                 }
               }
             },
             "activity": {
-              "title": "Activity",
+              "title": "Activiteit",
               "page": {
-                "title": "Activity Settings",
+                "title": "Activiteitsinstellingen",
                 "form": {
-                  "adminLogRetentionDays": "Admin Activity Retention Days",
-                  "userLogRetentionDays": "User Activity Retention Days",
-                  "serverLogRetentionDays": "Server Activity Retention Days",
-                  "adminLogRetentionCount": "Admin Activity Retention Count",
-                  "userLogRetentionCount": "User Activity Retention Count",
-                  "serverLogRetentionCount": "Server Activity Retention Count",
-                  "serverLogAdminActivity": "Log Server Admin Activity",
-                  "serverLogAdminActivityDescription": "Enable or disable logging of admin activity on servers where the admin isn't an owner or subuser.",
-                  "serverLogScheduleActivity": "Log Server Schedule Activity",
-                  "serverLogScheduleActivityDescription": "Enable or disable logging of activity done by server schedules."
+                  "adminLogRetentionDays": "Bewaartermijn Beheerdersactiviteit (dagen)",
+                  "userLogRetentionDays": "Bewaartermijn Gebruikersactiviteit (dagen)",
+                  "serverLogRetentionDays": "Bewaartermijn Serveractiviteit (dagen)",
+                  "adminLogRetentionCount": "Bewaaraantal Beheerdersactiviteit",
+                  "userLogRetentionCount": "Bewaaraantal Gebruikersactiviteit",
+                  "serverLogRetentionCount": "Bewaaraantal Serveractiviteit",
+                  "serverLogAdminActivity": "Beheerdersactiviteit op Servers Loggen",
+                  "serverLogAdminActivityDescription": "Schakel het loggen van beheerdersactiviteit in of uit op servers waar de beheerder geen eigenaar of subgebruiker is.",
+                  "serverLogScheduleActivity": "Serverplanningsactiviteit Loggen",
+                  "serverLogScheduleActivityDescription": "Schakel het loggen van activiteit uitgevoerd door serverplanningen in of uit."
                 },
                 "toast": {
-                  "updated": "Activity settings updated."
+                  "updated": "Activiteitsinstellingen bijgewerkt."
                 }
               }
             },
             "ratelimits": {
               "title": "Ratelimits",
               "page": {
-                "title": "Ratelimit Settings",
+                "title": "Ratelimit-instellingen",
                 "form": {
                   "hits": "Hits",
-                  "hitsDescription": "Maximum number of requests allowed per window.",
-                  "windowSeconds": "Window",
-                  "windowSecondsDescription": "Window duration in seconds."
+                  "hitsDescription": "Maximaal aantal toegestane verzoeken per venster.",
+                  "windowSeconds": "Venster",
+                  "windowSecondsDescription": "Vensterduur in seconden."
                 },
                 "toast": {
-                  "updated": "Rate limit settings updated."
+                  "updated": "Ratelimit-instellingen bijgewerkt."
                 }
               }
             }
           }
         },
         "announcements": {
-          "title": "Announcements",
-          "resourceName": "Announcement",
+          "title": "Aankondigingen",
+          "resourceName": "Aankondiging",
           "tabs": {
             "general": {
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "Confirm Announcement Deletion",
-                    "content": "Are you sure you want to delete **{title}**?"
+                    "title": "Verwijderen van aankondiging bevestigen",
+                    "content": "Weet u zeker dat u **{title}** wilt verwijderen?"
                   }
                 },
                 "form": {
-                  "dismissibleEnd": "Dismissible End",
-                  "enabledStart": "Enabled Start",
-                  "enabledEnd": "Enabled End",
-                  "locations": "Locations",
-                  "locationsDescription": "Leave empty to apply to all locations.",
+                  "dismissibleEnd": "Sluitbaar Tot",
+                  "enabledStart": "Ingeschakeld Vanaf",
+                  "enabledEnd": "Ingeschakeld Tot",
+                  "locations": "Locaties",
+                  "locationsDescription": "Laat leeg om op alle locaties toe te passen.",
                   "nodes": "Nodes",
-                  "nodesDescription": "Leave empty to apply to all nodes.",
-                  "backupConfigurations": "Backup Configurations",
-                  "backupConfigurationsDescription": "Leave empty to apply to all backup configurations.",
-                  "eggsPlaceholder": "Select Eggs",
-                  "dismissible": "Dismissible"
+                  "nodesDescription": "Laat leeg om op alle nodes toe te passen.",
+                  "backupConfigurations": "Back-upconfiguraties",
+                  "backupConfigurationsDescription": "Laat leeg om op alle back-upconfiguraties toe te passen.",
+                  "eggsPlaceholder": "Selecteer Eggs",
+                  "dismissible": "Sluitbaar"
                 },
-                "titleCreate": "Create Announcement",
-                "titleUpdate": "Update Announcement"
+                "titleCreate": "Aankondiging aanmaken",
+                "titleUpdate": "Aankondiging bijwerken"
               }
             }
           },
           "enum": {
             "announcementType": {
               "info": "Info",
-              "success": "Success",
-              "warning": "Warning",
-              "error": "Error"
+              "success": "Geslaagd",
+              "warning": "Waarschuwing",
+              "error": "Fout"
             }
           }
         },
         "assets": {
           "title": "Assets",
           "button": {
-            "newDirectory": "New Directory",
-            "upload": "Upload",
-            "copyLink": "Copy Link"
+            "newDirectory": "Nieuwe Map",
+            "upload": "Uploaden",
+            "copyLink": "Link kopiëren"
           },
           "dropzone": {
-            "title": "Drop files here to upload",
-            "subtitle": "Release to start uploading"
+            "title": "Zet bestanden hier neer om te uploaden",
+            "subtitle": "Loslaten om te beginnen met uploaden"
           },
           "toast": {
-            "assetDeleted": "Asset deleted.",
-            "assetsDeleted": "{assets} deleted."
+            "assetDeleted": "Asset verwijderd.",
+            "assetsDeleted": "{assets} verwijderd."
           },
           "modal": {
             "createDirectory": {
-              "title": "New Directory",
-              "createdAs": "Will be created at "
+              "title": "Nieuwe Map",
+              "createdAs": "Wordt aangemaakt op "
             },
             "deleteAssets": {
-              "title": "Confirm Asset Deletion",
-              "content": "Are you sure you want to delete `{count}` assets?"
+              "title": "Verwijderen van assets bevestigen",
+              "content": "Weet u zeker dat u `{count}` assets wilt verwijderen?"
             },
             "deleteAsset": {
-              "title": "Delete Asset",
-              "content": "Are you sure you want to delete this asset? This action cannot be undone."
+              "title": "Asset verwijderen",
+              "content": "Weet u zeker dat u deze asset wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
             }
           }
         },
         "extensions": {
-          "title": "Extensions",
-          "unknownExtension": "Unknown Extension",
+          "title": "Extensies",
+          "unknownExtension": "Onbekende Extensie",
           "alert": {
-            "noExtensions": "No extensions installed.",
-            "heavyImageMissing": "You don't seem to be using the heavy image required to install extensions, see [here]({docsUrl}) on how to switch to it."
+            "noExtensions": "Geen extensies geïnstalleerd.",
+            "heavyImageMissing": "Het lijkt erop dat u niet de heavy-image gebruikt die vereist is om extensies te installeren, zie [hier]({docsUrl}) hoe u hiernaar kunt overstappen."
           },
           "button": {
-            "viewBuildLogs": "View build logs",
-            "install": "Install extension",
-            "rebuild": "Rebuild extensions",
-            "configure": "Configure",
-            "back": "Back to Extensions",
-            "accept": "Accept",
-            "decline": "Decline"
+            "viewBuildLogs": "Buildlogboeken bekijken",
+            "install": "Extensie installeren",
+            "rebuild": "Extensies opnieuw bouwen",
+            "configure": "Configureren",
+            "back": "Terug naar Extensies",
+            "accept": "Accepteren",
+            "decline": "Weigeren"
           },
           "tooltip": {
-            "building": "The panel is currently building extension code. Please wait.",
-            "noPendingBuild": "No pending extensions to build.",
-            "noBackend": "Backend extension is required to configure this extension.",
-            "noConfigurationPage": "This extension does not have a configuration page defined.",
-            "removeExtension": "Remove extension"
+            "building": "Het panel is momenteel bezig met het bouwen van extensiecode. Even geduld.",
+            "noPendingBuild": "Geen extensies in afwachting om te bouwen.",
+            "noBackend": "Backend-extensie is vereist om deze extensie te configureren.",
+            "noConfigurationPage": "Deze extensie heeft geen configuratiepagina gedefinieerd.",
+            "removeExtension": "Extensie verwijderen"
           },
           "badge": {
-            "frontendMissing": "Frontend missing",
-            "backendMissing": "Backend missing",
-            "pendingBuild": "Pending build",
-            "pendingRemoval": "Pending removal"
+            "frontendMissing": "Frontend ontbreekt",
+            "backendMissing": "Backend ontbreekt",
+            "pendingBuild": "Build in afwachting",
+            "pendingRemoval": "Verwijdering in afwachting"
           },
           "card": {
-            "version": "Version",
-            "authors": "Authors"
+            "version": "Versie",
+            "authors": "Auteurs"
           },
           "section": {
-            "pendingExtensions": "Pending extensions",
-            "noPendingExtensions": "No pending extensions."
+            "pendingExtensions": "Extensies in afwachting",
+            "noPendingExtensions": "Geen extensies in afwachting."
           },
           "dropzone": {
-            "title": "Drop some files here to install as Extensions",
-            "subtitle": "Release to start installing"
+            "title": "Zet bestanden hier neer om als Extensies te installeren",
+            "subtitle": "Loslaten om te beginnen met installeren"
           },
           "toast": {
-            "buildStarted": "Extension rebuild started successfully.",
-            "buildCompleted": "Extension build completed. You may need to refresh the page.",
-            "added": "Extension `{packageName}` added successfully.",
-            "removed": "Extension `{packageName}` removed successfully."
+            "buildStarted": "Opnieuw bouwen van extensie succesvol gestart.",
+            "buildCompleted": "Bouwen van extensie voltooid. Mogelijk moet u de pagina vernieuwen.",
+            "added": "Extensie `{packageName}` succesvol toegevoegd.",
+            "removed": "Extensie `{packageName}` succesvol verwijderd."
           },
           "notFound": {
-            "title": "Extension Not Found",
-            "content": "Extension with package name \"{packageName}\" not found."
+            "title": "Extensie Niet Gevonden",
+            "content": "Extensie met pakketnaam \"{packageName}\" niet gevonden."
           },
           "configure": {
-            "title": "Configure {packageName}",
-            "noConfigurationPage": "This extension does not have a configuration page."
+            "title": "{packageName} configureren",
+            "noConfigurationPage": "Deze extensie heeft geen configuratiepagina."
           },
           "modal": {
             "buildLogs": {
-              "title": "Build Logs",
-              "empty": "No logs found."
+              "title": "Buildlogboeken",
+              "empty": "Geen logboeken gevonden."
             },
             "license": {
-              "title": "License agreement",
-              "description": "The extension `{packageName}` requires you to accept the following license before it can be installed."
+              "title": "Licentieovereenkomst",
+              "description": "De extensie `{packageName}` vereist dat u akkoord gaat met de volgende licentie voordat deze kan worden geïnstalleerd."
             },
             "remove": {
-              "title": "Remove extension",
-              "content": "Are you sure you want to remove the extension `{packageName}`? This action cannot be undone.",
+              "title": "Extensie verwijderen",
+              "content": "Weet u zeker dat u de extensie `{packageName}` wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
               "form": {
-                "removeMigrations": "Do you want to remove & rollback the database migrations of this extension?"
+                "removeMigrations": "Wilt u de database-migraties van deze extensie verwijderen en terugdraaien?"
               }
             }
           }
         },
         "users": {
-          "title": "Users",
-          "resourceName": "User",
+          "title": "Gebruikers",
+          "resourceName": "Gebruiker",
           "tooltip": {
-            "admin": "Admin",
-            "twoFactorEnabled": "2FA Enabled",
-            "twoFactorDisabled": "2FA Disabled"
+            "admin": "Beheerder",
+            "twoFactorEnabled": "2FA Ingeschakeld",
+            "twoFactorDisabled": "2FA Uitgeschakeld"
           },
           "table": {
             "columns": {
-              "role": "Role"
+              "role": "Rol"
             }
           },
           "tabs": {
             "general": {
               "page": {
                 "tooltip": {
-                  "cannotImpersonateSelf": "You cannot impersonate yourself."
+                  "cannotImpersonateSelf": "U kunt uzelf niet nabootsen."
                 },
                 "button": {
-                  "disableTwoFactor": "Disable Two Factor",
-                  "sendPasswordResetEmail": "Send Password Reset Email",
-                  "impersonate": "Impersonate"
+                  "disableTwoFactor": "Tweestapsverificatie uitschakelen",
+                  "sendPasswordResetEmail": "Wachtwoordresetmail verzenden",
+                  "impersonate": "Nabootsen"
                 },
                 "form": {
-                  "admin": "Admin",
-                  "adminDescription": "Admin users have full, unrestricted access to everything on the panel.",
-                  "frozen": "Frozen",
-                  "frozenDescription": "Frozen users cannot make any changes to their account information.",
-                  "suspended": "Suspended",
-                  "suspendedDescription": "Suspended users cannot access the panel in any meaningful way.",
-                  "role": "Role"
+                  "admin": "Beheerder",
+                  "adminDescription": "Beheerdergebruikers hebben volledige, onbeperkte toegang tot alles op het panel.",
+                  "frozen": "Bevroren",
+                  "frozenDescription": "Bevroren gebruikers kunnen geen wijzigingen aanbrengen aan hun accountgegevens.",
+                  "suspended": "Opgeschort",
+                  "suspendedDescription": "Opgeschorte gebruikers kunnen op geen betekenisvolle manier toegang krijgen tot het panel.",
+                  "role": "Rol"
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm User Deletion",
-                    "content": "Are you sure you want to delete **{username}**?"
+                    "title": "Verwijderen van gebruiker bevestigen",
+                    "content": "Weet u zeker dat u **{username}** wilt verwijderen?"
                   },
                   "disableTwoFactor": {
-                    "title": "Disable User Two Factor",
-                    "content": "Are you sure you want to remove the two factor of **{username}**?",
+                    "title": "Tweestapsverificatie van gebruiker uitschakelen",
+                    "content": "Weet u zeker dat u de tweestapsverificatie van **{username}** wilt verwijderen?",
                     "toast": {
-                      "disabled": "User two factor disabled."
+                      "disabled": "Tweestapsverificatie van gebruiker uitgeschakeld."
                     }
                   },
                   "sendPasswordResetEmail": {
-                    "title": "Send Password Reset Email",
-                    "content": "Are you sure you want to send a password reset email to **{email}**?",
+                    "title": "Wachtwoordresetmail verzenden",
+                    "content": "Weet u zeker dat u een wachtwoordresetmail wilt verzenden naar **{email}**?",
                     "toast": {
-                      "sent": "Password reset email sent."
+                      "sent": "Wachtwoordresetmail verzonden."
                     }
                   }
                 },
-                "titleCreate": "Create User",
-                "titleUpdate": "Update User"
+                "titleCreate": "Gebruiker aanmaken",
+                "titleUpdate": "Gebruiker bijwerken"
               }
             },
             "servers": {
               "title": "Servers",
               "page": {
-                "title": "User Servers",
-                "showOwnedOnly": "Only show users' owned servers"
+                "title": "Servers van Gebruiker",
+                "showOwnedOnly": "Alleen door gebruikers beheerde servers weergeven"
               }
             },
             "oauthLinks": {
-              "title": "OAuth Links",
+              "title": "OAuth-koppelingen",
               "page": {
-                "title": "User OAuth Links",
+                "title": "OAuth-koppelingen van Gebruiker",
                 "toast": {
-                  "added": "OAuth Link added.",
-                  "removed": "OAuth Link removed."
+                  "added": "OAuth-koppeling toegevoegd.",
+                  "removed": "OAuth-koppeling verwijderd."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add OAuth Link",
+                    "title": "OAuth-koppeling toevoegen",
                     "form": {
-                      "oauthProvider": "OAuth Provider"
+                      "oauthProvider": "OAuth-provider"
                     }
                   },
                   "delete": {
-                    "title": "Confirm OAuth Link Deletion",
-                    "content": "Are you sure you want to delete the **{provider}** connection from **{username}**?"
+                    "title": "Verwijderen van OAuth-koppeling bevestigen",
+                    "content": "Weet u zeker dat u de **{provider}**-verbinding wilt verwijderen van **{username}**?"
                   }
                 }
               }
             },
             "activity": {
-              "title": "Activity",
+              "title": "Activiteit",
               "page": {
-                "title": "User Activity"
+                "title": "Gebruikersactiviteit"
               }
             }
           }
         },
         "locations": {
-          "title": "Locations",
-          "resourceName": "Location",
+          "title": "Locaties",
+          "resourceName": "Locatie",
           "tabs": {
             "general": {
               "page": {
                 "form": {
-                  "flag": "Flag"
+                  "flag": "Vlag"
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Location Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Verwijderen van locatie bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                   }
                 },
-                "titleCreate": "Create Location",
-                "titleUpdate": "Update Location"
+                "titleCreate": "Locatie aanmaken",
+                "titleUpdate": "Locatie bijwerken"
               }
             },
             "databaseHosts": {
-              "title": "Database Hosts",
+              "title": "Databasehosts",
               "page": {
-                "title": "Location Database Hosts",
+                "title": "Databasehosts van Locatie",
                 "toast": {
-                  "created": "Location database host created.",
-                  "deleted": "Location database host deleted."
+                  "created": "Databasehost van locatie aangemaakt.",
+                  "deleted": "Databasehost van locatie verwijderd."
                 },
                 "modal": {
                   "create": {
-                    "title": "Create Location Database Host"
+                    "title": "Databasehost van Locatie Aanmaken"
                   },
                   "delete": {
-                    "title": "Confirm Location Database Host Deletion",
-                    "content": "Are you sure you want to delete the database host **{name}** from **{location}**?"
+                    "title": "Verwijderen van databasehost van locatie bevestigen",
+                    "content": "Weet u zeker dat u de databasehost **{name}** wilt verwijderen van **{location}**?"
                   }
                 }
               }
@@ -2002,7 +2002,7 @@
             "nodes": {
               "title": "Nodes",
               "page": {
-                "title": "Location Nodes"
+                "title": "Nodes van Locatie"
               }
             }
           }
@@ -2014,179 +2014,179 @@
             "general": {
               "page": {
                 "tooltip": {
-                  "deploymentEnabled": "Deployment Enabled",
-                  "deploymentDisabled": "Deployment Disabled",
+                  "deploymentEnabled": "Deployment Ingeschakeld",
+                  "deploymentDisabled": "Deployment Uitgeschakeld",
                   "allInOneNode": "All-in-One Node",
-                  "errorWhileFetchingVersion": "Error while fetching version",
-                  "updateAvailable": "{version} (Update Available)",
-                  "useWingsProxyUrl": "Use Wings Proxy URL"
+                  "errorWhileFetchingVersion": "Fout bij ophalen van versie",
+                  "updateAvailable": "{version} (Update Beschikbaar)",
+                  "useWingsProxyUrl": "Wings Proxy URL Gebruiken"
                 },
                 "form": {
-                  "urlDescription": "Used for internal communication with the node.",
-                  "publicUrlDescription": "Used for websocket connections and downloads.",
-                  "backupConfigurationPlaceholder": "Inherit from Location"
+                  "urlDescription": "Gebruikt voor interne communicatie met de node.",
+                  "publicUrlDescription": "Gebruikt voor websocket-verbindingen en downloads.",
+                  "backupConfigurationPlaceholder": "Overnemen van Locatie"
                 },
                 "button": {
-                  "resetToken": "Reset Token",
-                  "updateConfig": "Update Config"
+                  "resetToken": "Token resetten",
+                  "updateConfig": "Configuratie bijwerken"
                 },
                 "toast": {
-                  "tokenReset": "Node token reset."
+                  "tokenReset": "Node-token gereset."
                 },
                 "alert": {
-                  "noLocations": "You need to create at least one location before you can create nodes. Locations help organize your nodes geographically or logically."
+                  "noLocations": "U moet ten minste één locatie aanmaken voordat u nodes kunt aanmaken. Locaties helpen bij het geografisch of logisch organiseren van uw nodes."
                 },
-                "titleCreate": "Create Node",
-                "titleUpdate": "Update Node"
+                "titleCreate": "Node aanmaken",
+                "titleUpdate": "Node bijwerken"
               }
             },
             "configuration": {
-              "title": "Configuration",
+              "title": "Configuratie",
               "page": {
-                "title": "Configuration",
+                "title": "Configuratie",
                 "section": {
-                  "initialSetup": "Initial Setup",
-                  "liveConfiguration": "Live Configuration"
+                  "initialSetup": "Initiële Installatie",
+                  "liveConfiguration": "Live Configuratie"
                 },
                 "description": {
-                  "placeFile": "Place this into the configuration file at `/etc/pterodactyl/config.yml` or run"
+                  "placeFile": "Plaats dit in het configuratiebestand op `/etc/pterodactyl/config.yml` of voer het volgende uit"
                 },
                 "tooltip": {
-                  "copyCommand": "Copy command"
+                  "copyCommand": "Opdracht kopiëren"
                 },
                 "form": {
-                  "panelUrl": "Panel URL",
-                  "apiPort": "API Port"
+                  "panelUrl": "Panel-URL",
+                  "apiPort": "API-poort"
                 },
                 "button": {
-                  "save": "Save Configuration",
-                  "reveal": "Reveal Configuration"
+                  "save": "Configuratie opslaan",
+                  "reveal": "Configuratie onthullen"
                 },
                 "alert": {
-                  "couldNotReach": "Could not reach the node: {error}",
-                  "tokenWarning": "The configuration below contains the node token. Reveal it only when needed."
+                  "couldNotReach": "Kon de node niet bereiken: {error}",
+                  "tokenWarning": "De onderstaande configuratie bevat de node-token. Onthul deze alleen indien nodig."
                 },
                 "toast": {
-                  "applied": "Configuration applied successfully.",
-                  "submittedNotApplied": "Configuration was submitted but not applied.",
-                  "invalidYaml": "Invalid YAML: {error}"
+                  "applied": "Configuratie succesvol toegepast.",
+                  "submittedNotApplied": "Configuratie is verzonden maar niet toegepast.",
+                  "invalidYaml": "Ongeldige YAML: {error}"
                 }
               }
             },
             "statistics": {
-              "title": "Statistics",
+              "title": "Statistieken",
               "page": {
-                "title": "Node Statistics",
+                "title": "Nodestatistieken",
                 "card": {
                   "resources": "Resources",
-                  "graphs": "Graphs"
+                  "graphs": "Grafieken"
                 },
                 "toast": {
-                  "connectionLost": "Lost connection to the node statistics stream."
+                  "connectionLost": "Verbinding met de nodestatistiekenstream verloren."
                 },
                 "label": {
                   "cpu": "CPU",
-                  "memory": "Memory",
-                  "disk": "Disk",
-                  "network": "Network",
+                  "memory": "Geheugen",
+                  "disk": "Schijf",
+                  "network": "Netwerk",
                   "cpuThreads": "{model} ({threads} threads)",
-                  "usedByWings": "{size} used by Wings",
+                  "usedByWings": "{size} gebruikt door Wings",
                   "networkIn": "In: {in}",
-                  "networkOut": "Out: {out}"
+                  "networkOut": "Uit: {out}"
                 },
                 "chart": {
-                  "cpuLoad": "CPU Load",
-                  "memoryUsage": "Memory Usage",
-                  "diskIo": "Disk I/O",
-                  "networkTraffic": "Network Traffic",
-                  "diskRead": "Disk Read",
-                  "diskWrite": "Disk Write",
-                  "inbound": "Inbound",
-                  "outbound": "Outbound",
-                  "networkInLabel": "Network In",
-                  "networkOutLabel": "Network Out"
+                  "cpuLoad": "CPU-belasting",
+                  "memoryUsage": "Geheugengebruik",
+                  "diskIo": "Schijf-I/O",
+                  "networkTraffic": "Netwerkverkeer",
+                  "diskRead": "Schijf Lezen",
+                  "diskWrite": "Schijf Schrijven",
+                  "inbound": "Inkomend",
+                  "outbound": "Uitgaand",
+                  "networkInLabel": "Netwerk In",
+                  "networkOutLabel": "Netwerk Uit"
                 }
               }
             },
             "capacity": {
-              "title": "Capacity",
+              "title": "Capaciteit",
               "page": {
-                "title": "Deployment Capacity",
-                "subtitle": "Resources allocated to servers on this node, measured against the limits configured in node settings, not the physical machine capacity. Deployment only checks memory and disk.",
+                "title": "Deploymentcapaciteit",
+                "subtitle": "Resources toegewezen aan servers op deze node, gemeten tegen de limieten die in de node-instellingen zijn geconfigureerd, niet de fysieke machinecapaciteit. Deployment controleert alleen geheugen en schijf.",
                 "card": {
-                  "resources": "Allocated Resources"
+                  "resources": "Toegewezen Resources"
                 },
                 "status": {
-                  "deploymentEnabled": "Deployment Enabled",
-                  "deploymentDisabled": "Deployment Disabled",
-                  "maintenanceEnabled": "Under Maintenance",
-                  "maintenanceDisabled": "Not Under Maintenance"
+                  "deploymentEnabled": "Deployment Ingeschakeld",
+                  "deploymentDisabled": "Deployment Uitgeschakeld",
+                  "maintenanceEnabled": "In Onderhoud",
+                  "maintenanceDisabled": "Niet in Onderhoud"
                 },
                 "label": {
                   "cpu": "CPU",
-                  "memory": "Memory",
-                  "disk": "Disk",
-                  "memoryOverhead": "Memory Overhead",
+                  "memory": "Geheugen",
+                  "disk": "Schijf",
+                  "memoryOverhead": "Geheugenoverhead",
                   "servers": "Servers",
-                  "noLimit": "No node limit",
-                  "free": "{size} free",
-                  "overhead": "+ {size} reserved overhead",
-                  "cores": "{cores} cores allocated"
+                  "noLimit": "Geen nodelimiet",
+                  "free": "{size} vrij",
+                  "overhead": "+ {size} gereserveerde overhead",
+                  "cores": "{cores} cores toegewezen"
                 }
               }
             },
             "logs": {
-              "title": "Logs",
+              "title": "Logboeken",
               "page": {
-                "title": "Node Logs",
+                "title": "Nodelogboeken",
                 "form": {
-                  "logFile": "Log File",
-                  "follow": "Follow"
+                  "logFile": "Logbestand",
+                  "follow": "Volgen"
                 },
                 "button": {
-                  "download": "Download Full Log"
+                  "download": "Volledig logboek downloaden"
                 },
                 "toast": {
-                  "connectionLost": "Lost connection to the node log stream."
+                  "connectionLost": "Verbinding met de nodelogboekstream verloren."
                 }
               }
             },
             "allocations": {
-              "title": "Allocations",
+              "title": "Allocaties",
               "page": {
-                "title": "Node Allocations",
+                "title": "Node-allocaties",
                 "tooltip": {
-                  "clearSelection": "Clear Selection"
+                  "clearSelection": "Selectie wissen"
                 },
                 "form": {
-                  "ipAlias": "IP Alias"
+                  "ipAlias": "IP-alias"
                 },
                 "table": {
                   "columns": {
-                    "ipAlias": "IP Alias"
+                    "ipAlias": "IP-alias"
                   }
                 },
                 "modal": {
                   "create": {
-                    "title": "Create Node Allocations",
+                    "title": "Node-allocaties aanmaken",
                     "button": {
-                      "create": "Create {count}"
+                      "create": "{count} aanmaken"
                     },
                     "toast": {
-                      "created": "{allocations} created."
+                      "created": "{allocations} aangemaakt."
                     }
                   },
                   "update": {
-                    "title": "Update Node Allocations",
+                    "title": "Node-allocaties bijwerken",
                     "toast": {
-                      "updated": "{allocations} updated."
+                      "updated": "{allocations} bijgewerkt."
                     }
                   },
                   "delete": {
-                    "title": "Confirm Node Allocations Deletion",
-                    "content": "Are you sure you want to delete `{count}` allocations from **{name}**?",
+                    "title": "Verwijderen van node-allocaties bevestigen",
+                    "content": "Weet u zeker dat u `{count}` allocaties wilt verwijderen van **{name}**?",
                     "toast": {
-                      "deleted": "{allocations} deleted."
+                      "deleted": "{allocations} verwijderd."
                     }
                   }
                 }
@@ -2195,56 +2195,56 @@
             "mounts": {
               "title": "Mounts",
               "page": {
-                "title": "Node Mounts",
+                "title": "Node-mounts",
                 "toast": {
-                  "added": "Node Mount added.",
-                  "removed": "Node Mount removed."
+                  "added": "Node-mount toegevoegd.",
+                  "removed": "Node-mount verwijderd."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Node Mount"
+                    "title": "Node-mount toevoegen"
                   },
                   "remove": {
-                    "title": "Confirm Node Mount Removal",
-                    "content": "Are you sure you want to remove the mount **{mount}** from **{name}**?"
+                    "title": "Verwijderen van node-mount bevestigen",
+                    "content": "Weet u zeker dat u de mount **{mount}** wilt verwijderen van **{name}**?"
                   }
                 }
               }
             },
             "backups": {
-              "title": "Backups",
+              "title": "Back-ups",
               "page": {
-                "title": "Node Backups",
+                "title": "Node-back-ups",
                 "input": {
-                  "detachedOnly": "Only show detached backups"
+                  "detachedOnly": "Alleen losgekoppelde back-ups weergeven"
                 },
                 "tooltip": {
-                  "backupNotOnSameNode": "This backup is not on the same node as the server. It is not viewable from the Client API."
+                  "backupNotOnSameNode": "Deze back-up bevindt zich niet op dezelfde node als de server. Hij is niet zichtbaar via de Client API."
                 },
                 "toast": {
-                  "downloadStarted": "Download started.",
-                  "detached": "Backup detached successfully.",
-                  "reattached": "Reattached backup to {name} successfully.",
-                  "restoring": "Restoring backup to {name}...",
-                  "deleted": "Node backup deleted."
+                  "downloadStarted": "Download gestart.",
+                  "detached": "Back-up succesvol losgekoppeld.",
+                  "reattached": "Back-up succesvol opnieuw gekoppeld aan {name}.",
+                  "restoring": "Back-up herstellen naar {name}...",
+                  "deleted": "Node-back-up verwijderd."
                 },
                 "modal": {
                   "detach": {
-                    "title": "Confirm Backup Detachment",
-                    "content": "Are you sure you want to detach this backup from its server? It will not be deleted and can be reattached later."
+                    "title": "Loskoppelen van back-up bevestigen",
+                    "content": "Weet u zeker dat u deze back-up wilt loskoppelen van de server? Hij wordt niet verwijderd en kan later opnieuw worden gekoppeld."
                   },
                   "reattach": {
-                    "title": "Reattach Node Backup",
-                    "description": "Reattaching a node backup will link it to a server. This is useful if the backup is detached or you want to link it to a different server. Do note that this is not a transfer tool, unless the backup is considered remote (can be accessed by multiple nodes), the server must belong to the same node as the backup."
+                    "title": "Node-back-up opnieuw koppelen",
+                    "description": "Het opnieuw koppelen van een node-back-up koppelt deze aan een server. Dit is handig als de back-up losgekoppeld is of als u hem aan een andere server wilt koppelen. Let op: dit is geen overdrachtstool; tenzij de back-up als extern wordt beschouwd (toegankelijk voor meerdere nodes), moet de server tot dezelfde node behoren als de back-up."
                   },
                   "restore": {
-                    "title": "Restore Node Backup",
+                    "title": "Node-back-up herstellen",
                     "form": {
-                      "truncateDirectory": "Do you want to empty the filesystem of this server before restoring the backup?"
+                      "truncateDirectory": "Wilt u het bestandssysteem van deze server leegmaken voordat de back-up wordt hersteld?"
                     }
                   },
                   "delete": {
-                    "title": "Confirm Node Backup Deletion"
+                    "title": "Verwijderen van node-back-up bevestigen"
                   }
                 }
               }
@@ -2252,48 +2252,48 @@
             "servers": {
               "title": "Servers",
               "page": {
-                "title": "Node Servers",
+                "title": "Servers van Node",
                 "modal": {
                   "transfer": {
-                    "title": "Transfer Servers",
+                    "title": "Servers overdragen",
                     "form": {
-                      "allocationMode": "Allocation Mode",
-                      "transferBackups": "Transfer backups",
-                      "transferBackupsDescription": "Whether to transfer backups along with the servers."
+                      "allocationMode": "Allocatiemodus",
+                      "transferBackups": "Back-ups overdragen",
+                      "transferBackupsDescription": "Of back-ups samen met de servers moeten worden overgedragen."
                     },
                     "toast": {
-                      "started": "{servers} transfer started."
+                      "started": "Overdracht van {servers} gestart."
                     },
                     "confirm": {
-                      "title": "Confirm Server Transfers",
-                      "content": "Are you sure you want to transfer `{count}` servers from **{from}** to **{to}**? This action cannot be undone."
+                      "title": "Overdracht van servers bevestigen",
+                      "content": "Weet u zeker dat u `{count}` servers wilt overdragen van **{from}** naar **{to}**? Deze actie kan niet ongedaan worden gemaakt."
                     },
                     "enum": {
                       "allocationMode": {
-                        "none": "None (scrap all allocations, server will not be automatically assigned new allocations on the destination node)",
-                        "randomPrimary": "Randomize primary allocation (removes additional allocations)",
-                        "randomAll": "Randomize all allocations (recommended to avoid incompatibility issues with destination node)",
-                        "eggConfigDeployment": "Assign allocations based on Egg deployment configuration (only works if the Egg has a deployment configuration and the destination node has compatible allocations)",
-                        "eggConfigSelfAssignRange": "Self-assign new allocations based on Egg port range (only works if the Egg has a port range and the destination node has compatible allocations)"
+                        "none": "Geen (alle allocaties schrappen, server krijgt op de bestemmingsnode niet automatisch nieuwe allocaties toegewezen)",
+                        "randomPrimary": "Primaire allocatie randomiseren (verwijdert aanvullende allocaties)",
+                        "randomAll": "Alle allocaties randomiseren (aanbevolen om compatibiliteitsproblemen met de bestemmingsnode te voorkomen)",
+                        "eggConfigDeployment": "Allocaties toewijzen op basis van Egg-deploymentconfiguratie (werkt alleen als de Egg een deploymentconfiguratie heeft en de bestemmingsnode compatibele allocaties heeft)",
+                        "eggConfigSelfAssignRange": "Nieuwe allocaties zelf toewijzen op basis van Egg-poortbereik (werkt alleen als de Egg een poortbereik heeft en de bestemmingsnode compatibele allocaties heeft)"
                       }
                     }
                   },
                   "powerAction": {
-                    "title": "Confirm Power Action",
-                    "content": "Are you sure you want to **{action}** {servers}?"
+                    "title": "Stroomactie bevestigen",
+                    "content": "Weet u zeker dat u **{action}** wilt uitvoeren op {servers}?"
                   }
                 }
               }
             },
             "transfers": {
-              "title": "Outgoing Transfers",
+              "title": "Uitgaande Overdrachten",
               "page": {
-                "title": "Node Transfers",
+                "title": "Nodeoverdrachten",
                 "table": {
                   "columns": {
-                    "progress": "Progress",
-                    "archiveRate": "Archive Rate",
-                    "networkRate": "Network Rate"
+                    "progress": "Voortgang",
+                    "archiveRate": "Archiefsnelheid",
+                    "networkRate": "Netwerksnelheid"
                   }
                 }
               }
@@ -2301,19 +2301,19 @@
           },
           "modal": {
             "delete": {
-              "title": "Confirm Node Deletion",
-              "content": "Are you sure you want to delete **{name}**?"
+              "title": "Verwijderen van node bevestigen",
+              "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
             },
             "bulkConfig": {
-              "title": "Update Configuration - {nodes}",
+              "title": "Configuratie bijwerken - {nodes}",
               "button": {
-                "apply": "Apply to {nodes}"
+                "apply": "Toepassen op {nodes}"
               },
               "toast": {
-                "applied": "Configuration applied to {nodes}."
+                "applied": "Configuratie toegepast op {nodes}."
               },
               "error": {
-                "invalidYaml": "Invalid YAML: {error}"
+                "invalidYaml": "Ongeldige YAML: {error}"
               }
             }
           }
@@ -2324,245 +2324,245 @@
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create Server",
-                "titleUpdate": "Update Server",
+                "titleCreate": "Server aanmaken",
+                "titleUpdate": "Server bijwerken",
                 "card": {
-                  "basicInformation": "Basic Information",
-                  "serverAssignment": "Server Assignment",
-                  "resourceLimits": "Resource Limits",
-                  "serverConfiguration": "Server Configuration",
-                  "featureLimits": "Feature Limits",
-                  "allocations": "Allocations",
-                  "variables": "Variables"
+                  "basicInformation": "Basisinformatie",
+                  "serverAssignment": "Servertoewijzing",
+                  "resourceLimits": "Resourcelimieten",
+                  "serverConfiguration": "Serverconfiguratie",
+                  "featureLimits": "Functielimieten",
+                  "allocations": "Allocaties",
+                  "variables": "Variabelen"
                 },
                 "alert": {
-                  "suspended": "This server is suspended.",
-                  "selectEggForVariables": "Please select an egg before you can configure variables."
+                  "suspended": "Deze server is opgeschort.",
+                  "selectEggForVariables": "Selecteer een egg voordat u variabelen kunt configureren."
                 },
                 "badge": {
-                  "serverSuspended": "Server Suspended"
+                  "serverSuspended": "Server Opgeschort"
                 },
                 "form": {
-                  "serverNamePlaceholder": "My Game Server",
-                  "externalIdPlaceholder": "Optional external identifier",
-                  "descriptionPlaceholder": "Server description",
-                  "owner": "Owner",
+                  "serverNamePlaceholder": "Mijn Gameserver",
+                  "externalIdPlaceholder": "Optionele externe identifier",
+                  "descriptionPlaceholder": "Serverbeschrijving",
+                  "owner": "Eigenaar",
                   "egg": "Egg",
-                  "backupConfigurationPlaceholder": "Inherit from Node/Location",
-                  "cpuLimit": "CPU Limit (%)",
-                  "cpuLimitDescription": "The CPU limit in % that the server can use.",
+                  "backupConfigurationPlaceholder": "Overnemen van Node/Locatie",
+                  "cpuLimit": "CPU-limiet (%)",
+                  "cpuLimitDescription": "De CPU-limiet in % die de server mag gebruiken.",
                   "swap": "Swap",
-                  "swapDescription": "The amount of swap to give this server.",
-                  "memoryDescription": "The Memory limit of the server container.",
-                  "memoryOverhead": "Memory Overhead",
-                  "memoryOverheadDescription": "Hidden Memory that will be added to the container.",
-                  "diskSpace": "Disk Space",
-                  "diskSpaceDescription": "The disk limit of the server.",
-                  "ioWeight": "IO Weight",
-                  "ioWeightDescription": "The relative IO Weight of the server container compared to other containers.",
-                  "pinnedCpus": "Pinned CPUs",
-                  "pinnedCpusDescription": "The CPU cores this server is pinned to.",
+                  "swapDescription": "De hoeveelheid swap die aan deze server wordt gegeven.",
+                  "memoryDescription": "De geheugenlimiet van de servercontainer.",
+                  "memoryOverhead": "Geheugenoverhead",
+                  "memoryOverheadDescription": "Verborgen geheugen dat aan de container wordt toegevoegd.",
+                  "diskSpace": "Schijfruimte",
+                  "diskSpaceDescription": "De schijflimiet van de server.",
+                  "ioWeight": "IO-gewicht",
+                  "ioWeightDescription": "Het relatieve IO-gewicht van de servercontainer vergeleken met andere containers.",
+                  "pinnedCpus": "Vastgezette CPU's",
+                  "pinnedCpusDescription": "De CPU-cores waaraan deze server is vastgezet.",
                   "dockerImagePlaceholder": "ghcr.io/...",
-                  "predefinedDockerImages": "Predefined Docker Images",
-                  "predefinedDockerImagesPlaceholder": "No predefined image selected",
+                  "predefinedDockerImages": "Vooraf gedefinieerde Docker-images",
+                  "predefinedDockerImagesPlaceholder": "Geen vooraf gedefinieerde image geselecteerd",
                   "timezonePlaceholder": "Europe/Amsterdam",
                   "startupCommandPlaceholder": "npm start",
-                  "startupCommandCustom": "Custom",
-                  "startOnCompletion": "Start on Completion",
-                  "startOnCompletionDescription": "Start server after installation completes.",
-                  "skipInstaller": "Skip Installer",
-                  "skipInstallerDescription": "Skip running the install script.",
-                  "hugepagesPassthroughEnabled": "Enable Hugepages Passthrough",
-                  "hugepagesPassthroughEnabledDescription": "Enable hugepages passthrough for the server (mounts /dev/hugepages into the container).",
-                  "kvmPassthroughEnabled": "Enable KVM Passthrough",
-                  "kvmPassthroughEnabledDescription": "Enable KVM passthrough for the server (allows access to /dev/kvm inside the container).",
-                  "allocationsLimit": "Allocations",
+                  "startupCommandCustom": "Aangepast",
+                  "startOnCompletion": "Starten na Voltooiing",
+                  "startOnCompletionDescription": "Server starten na voltooiing van de installatie.",
+                  "skipInstaller": "Installatie overslaan",
+                  "skipInstallerDescription": "Sla het uitvoeren van het installatiescript over.",
+                  "hugepagesPassthroughEnabled": "Hugepages Passthrough Inschakelen",
+                  "hugepagesPassthroughEnabledDescription": "Schakel hugepages passthrough in voor de server (mount /dev/hugepages in de container).",
+                  "kvmPassthroughEnabled": "KVM Passthrough Inschakelen",
+                  "kvmPassthroughEnabledDescription": "Schakel KVM passthrough in voor de server (geeft toegang tot /dev/kvm binnen de container).",
+                  "allocationsLimit": "Allocaties",
                   "databasesLimit": "Databases",
-                  "backupsLimit": "Backups",
-                  "schedulesLimit": "Schedules"
+                  "backupsLimit": "Back-ups",
+                  "schedulesLimit": "Planningen"
                 },
                 "modal": {
                   "confirmNoAllocation": {
-                    "title": "No Primary Allocation Assigned",
-                    "content": "You are creating a server without assigning any primary allocation. Are you sure you want to continue?",
+                    "title": "Geen Primaire Allocatie Toegewezen",
+                    "content": "U maakt een server aan zonder een primaire allocatie toe te wijzen. Weet u zeker dat u wilt doorgaan?",
                     "button": {
-                      "confirm": "Create Anyway"
+                      "confirm": "Toch aanmaken"
                     }
                   }
                 }
               }
             },
             "allocations": {
-              "title": "Allocations",
+              "title": "Allocaties",
               "page": {
-                "title": "Server Allocations",
+                "title": "Serverallocaties",
                 "table": {
                   "columns": {
-                    "ipAlias": "IP Alias"
+                    "ipAlias": "IP-alias"
                   }
                 },
                 "form": {
-                  "notesPlaceholder": "Notes"
+                  "notesPlaceholder": "Notities"
                 },
                 "toast": {
-                  "updated": "Allocation updated.",
-                  "setPrimary": "Allocation set as primary.",
-                  "unsetPrimary": "Allocation unset as primary.",
-                  "removed": "Allocation removed.",
-                  "added": "{count} allocations added."
+                  "updated": "Allocatie bijgewerkt.",
+                  "setPrimary": "Allocatie ingesteld als primair.",
+                  "unsetPrimary": "Primaire instelling van allocatie verwijderd.",
+                  "removed": "Allocatie verwijderd.",
+                  "added": "{count} allocaties toegevoegd."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Server Allocations",
+                    "title": "Serverallocaties toevoegen",
                     "form": {
-                      "allocations": "Allocations"
+                      "allocations": "Allocaties"
                     },
                     "button": {
-                      "add": "Add {count}"
+                      "add": "{count} toevoegen"
                     }
                   },
                   "remove": {
-                    "title": "Confirm Allocation Removal",
-                    "content": "Are you sure you want to remove **{allocation}**?"
+                    "title": "Verwijderen van allocatie bevestigen",
+                    "content": "Weet u zeker dat u **{allocation}** wilt verwijderen?"
                   }
                 }
               }
             },
             "variables": {
-              "title": "Variables",
+              "title": "Variabelen",
               "page": {
-                "title": "Server Variables",
+                "title": "Servervariabelen",
                 "toast": {
-                  "updated": "Server variables updated."
+                  "updated": "Servervariabelen bijgewerkt."
                 }
               }
             },
             "mounts": {
               "title": "Mounts",
               "page": {
-                "title": "Server Mounts",
+                "title": "Servermounts",
                 "toast": {
-                  "added": "Server Mount added.",
-                  "deleted": "Server Mount deleted."
+                  "added": "Servermount toegevoegd.",
+                  "deleted": "Servermount verwijderd."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Server Mount"
+                    "title": "Servermount toevoegen"
                   },
                   "remove": {
-                    "title": "Confirm Server Mount Removal",
-                    "content": "Are you sure you want to remove the mount **{mount}** from **{name}**?"
+                    "title": "Verwijderen van servermount bevestigen",
+                    "content": "Weet u zeker dat u de mount **{mount}** wilt verwijderen van **{name}**?"
                   }
                 }
               }
             },
             "backups": {
-              "title": "Backups",
+              "title": "Back-ups",
               "page": {
-                "title": "Server Backups",
+                "title": "Serverback-ups",
                 "input": {
-                  "partiallyDetachedOnly": "Only show partially detached backups"
+                  "partiallyDetachedOnly": "Alleen gedeeltelijk losgekoppelde back-ups weergeven"
                 }
               }
             },
             "logs": {
-              "title": "Logs",
+              "title": "Logboeken",
               "page": {
-                "title": "Server Logs",
+                "title": "Serverlogboeken",
                 "form": {
-                  "logType": "Log Type"
+                  "logType": "Logtype"
                 },
                 "enum": {
                   "logType": {
                     "console": "Console",
-                    "install": "Install"
+                    "install": "Installatie"
                   }
                 }
               }
             },
             "management": {
-              "title": "Management",
+              "title": "Beheer",
               "page": {
-                "title": "Server Management",
+                "title": "Serverbeheer",
                 "transfer": {
-                  "title": "Transfer",
-                  "content": "Transfer this server and it's data to another node within this system.",
+                  "title": "Overdragen",
+                  "content": "Draag deze server en zijn gegevens over naar een andere node binnen dit systeem.",
                   "toast": {
-                    "started": "Server transfer started."
+                    "started": "Serveroverdracht gestart."
                   },
                   "modal": {
-                    "title": "Server Transfer",
+                    "title": "Serveroverdracht",
                     "form": {
-                      "backupsToTransfer": "Backups to transfer"
+                      "backupsToTransfer": "Over te dragen back-ups"
                     },
                     "tooltip": {
-                      "aioNotSupported": "Transfers to the All-In-One node are not supported."
+                      "aioNotSupported": "Overdrachten naar de All-In-One node worden niet ondersteund."
                     },
                     "confirm": {
-                      "title": "Confirm Server Transfer",
-                      "content": "Are you sure you want to transfer **{name}** from **{from}** to **{to}**?",
+                      "title": "Serveroverdracht bevestigen",
+                      "content": "Weet u zeker dat u **{name}** wilt overdragen van **{from}** naar **{to}**?",
                       "alert": {
-                        "notAllBackupsSelected": "You have not selected all backups to transfer, the remaining backups will become partially detached if the transfer completes successfully."
+                        "notAllBackupsSelected": "U heeft niet alle back-ups geselecteerd om over te dragen, de overige back-ups worden gedeeltelijk losgekoppeld als de overdracht succesvol voltooid wordt."
                       }
                     }
                   }
                 },
                 "suspend": {
-                  "title": "Suspend",
-                  "content": "This will suspend the server, stop any running processes, and immediately block the user from being able to access their files or otherwise manage the server through the panel or API.",
-                  "button": "Suspend",
+                  "title": "Opschorten",
+                  "content": "Dit schort de server op, stopt alle lopende processen en blokkeert de gebruiker onmiddellijk om toegang te krijgen tot zijn bestanden of de server anderszins te beheren via het panel of de API.",
+                  "button": "Opschorten",
                   "toast": {
-                    "suspended": "Server suspended."
+                    "suspended": "Server opgeschort."
                   },
                   "modal": {
-                    "title": "Confirm Server Suspension",
-                    "content": "Are you sure you want to suspend **{name}**? This will stop the server and prevent it from starting. All running processes will be stopped and the user will not be able to access their files or otherwise manage the server through the panel or API."
+                    "title": "Opschorten van server bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt opschorten? Dit stopt de server en voorkomt dat deze kan starten. Alle lopende processen worden gestopt en de gebruiker kan niet meer bij zijn bestanden of de server anderszins beheren via het panel of de API."
                   }
                 },
                 "unsuspend": {
-                  "title": "Unsuspend",
-                  "content": "This will unsuspend the server, allowing it to start again. The user will be able to access their files and otherwise manage the server through the panel or API.",
-                  "button": "Unsuspend",
+                  "title": "Opschorting opheffen",
+                  "content": "Dit heft de opschorting van de server op, waardoor deze weer kan starten. De gebruiker kan weer bij zijn bestanden en de server anderszins beheren via het panel of de API.",
+                  "button": "Opschorting opheffen",
                   "toast": {
-                    "unsuspended": "Server unsuspended."
+                    "unsuspended": "Opschorting van server opgeheven."
                   },
                   "modal": {
-                    "title": "Confirm Server Unsuspension",
-                    "content": "Are you sure you want to unsuspend **{name}**? This will allow the server to start again. The user will be able to access their files and otherwise manage the server through the panel or API."
+                    "title": "Opheffen van opschorting bevestigen",
+                    "content": "Weet u zeker dat u de opschorting van **{name}** wilt opheffen? Dit staat toe dat de server weer kan starten. De gebruiker kan weer bij zijn bestanden en de server anderszins beheren via het panel of de API."
                   }
                 },
                 "clearState": {
-                  "title": "Clear State",
-                  "content": "This will clear the server state known by the panel.",
-                  "button": "Clear State",
+                  "title": "Status wissen",
+                  "content": "Dit wist de serverstatus die bij het panel bekend is.",
+                  "button": "Status wissen",
                   "toast": {
-                    "cleared": "Server state cleared."
+                    "cleared": "Serverstatus gewist."
                   },
                   "modal": {
-                    "title": "Confirm Server State Clear",
-                    "content": "Are you sure you want to clear the state of **{name}**? This will clear any known pending transfers and status failures, please make sure it is safe to do this before clicking without reason."
+                    "title": "Wissen van serverstatus bevestigen",
+                    "content": "Weet u zeker dat u de status van **{name}** wilt wissen? Dit wist eventuele bekende openstaande overdrachten en statusfouten; zorg ervoor dat het veilig is om dit te doen voordat u zonder reden klikt."
                   }
                 },
                 "delete": {
-                  "title": "Delete",
-                  "content": "This will delete the server and all of its data. This action cannot be undone.",
+                  "title": "Verwijderen",
+                  "content": "Dit verwijdert de server en alle bijbehorende gegevens. Deze actie kan niet ongedaan worden gemaakt.",
                   "toast": {
-                    "deleted": "Server deleted."
+                    "deleted": "Server verwijderd."
                   },
                   "modal": {
-                    "title": "Confirm Server Deletion",
-                    "description": "You are about to delete **{name}**. Are you sure?",
+                    "title": "Verwijderen van server bevestigen",
+                    "description": "U staat op het punt om **{name}** te verwijderen. Weet u het zeker?",
                     "form": {
-                      "deleteBackups": "Do you want to delete backups of this server?",
-                      "confirmServerName": "Confirm Server Name",
-                      "confirmServerNamePlaceholder": "Server Name"
+                      "deleteBackups": "Wilt u de back-ups van deze server verwijderen?",
+                      "confirmServerName": "Servernaam bevestigen",
+                      "confirmServerNamePlaceholder": "Servernaam"
                     }
                   }
                 }
               }
             },
             "viewClient": {
-              "title": "View in Client Area"
+              "title": "Bekijk als beheerder"
             }
           }
         },
@@ -2572,14 +2572,14 @@
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create Nest",
-                "titleUpdate": "Update Nest",
+                "titleCreate": "Nest aanmaken",
+                "titleUpdate": "Nest bijwerken",
                 "modal": {
                   "delete": {
-                    "title": "Confirm Nest Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
+                    "title": "Verwijderen van nest bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?",
                     "form": {
-                      "deleteEggs": "Do you want to delete all eggs in this nest?"
+                      "deleteEggs": "Wilt u alle eggs in dit nest verwijderen?"
                     }
                   }
                 }
@@ -2591,136 +2591,136 @@
                 "title": "Eggs",
                 "resourceName": "Egg",
                 "dropzone": {
-                  "title": "Drop some files here to import as Eggs",
-                  "subtitle": "Release to start importing"
+                  "title": "Zet bestanden hier neer om als Eggs te importeren",
+                  "subtitle": "Loslaten om te beginnen met importeren"
                 },
                 "button": {
-                  "updateFromRepository": "Update from Repository"
+                  "updateFromRepository": "Bijwerken vanuit Opslagplaats"
                 },
                 "toast": {
-                  "imported": "Egg imported.",
-                  "moved": "Egg moved.",
-                  "movedBulk": "{eggs} moved.",
-                  "deletedBulk": "{eggs} deleted.",
-                  "updatedFromRepository": "{eggs} updated using their respective repository egg successfully.",
-                  "parseFailed": "Failed to parse egg: {error}"
+                  "imported": "Egg geïmporteerd.",
+                  "moved": "Egg verplaatst.",
+                  "movedBulk": "{eggs} verplaatst.",
+                  "deletedBulk": "{eggs} verwijderd.",
+                  "updatedFromRepository": "{eggs} succesvol bijgewerkt aan de hand van de bijbehorende opslagplaats-egg.",
+                  "parseFailed": "Verwerken van egg mislukt: {error}"
                 },
                 "modal": {
                   "move": {
-                    "title": "Move Egg"
+                    "title": "Egg verplaatsen"
                   },
                   "moveBulk": {
-                    "title": "Move Eggs",
-                    "confirm": "Move {eggs}"
+                    "title": "Eggs verplaatsen",
+                    "confirm": "{eggs} verplaatsen"
                   },
                   "deleteBulk": {
-                    "title": "Confirm Egg Deletion",
-                    "content": "Are you sure you want to delete `{count}` eggs?"
+                    "title": "Verwijderen van eggs bevestigen",
+                    "content": "Weet u zeker dat u `{count}` eggs wilt verwijderen?"
                   }
                 },
                 "tabs": {
                   "general": {
                     "page": {
-                      "titleCreate": "Create Egg",
-                      "titleUpdate": "Update Egg",
+                      "titleCreate": "Egg aanmaken",
+                      "titleUpdate": "Egg bijwerken",
                       "card": {
-                        "startupConfiguration": "Startup Configuration",
-                        "stopConfiguration": "Stop Configuration",
-                        "configFiles": "Config Files Configuration"
+                        "startupConfiguration": "Opstartconfiguratie",
+                        "stopConfiguration": "Stopconfiguratie",
+                        "configFiles": "Configuratiebestanden Configuratie"
                       },
                       "form": {
-                        "eggRepository": "Egg Repository",
-                        "eggRepositoryEgg": "Egg Repository Egg",
-                        "startupDone": "Startup Done",
-                        "startupDoneDescription": "Console message indicating startup completion.",
-                        "stripAnsi": "Strip ANSI from startup messages",
-                        "stripAnsiDescription": "Removes ANSI control characters from the console output before matching startup completion.",
-                        "stopType": "Stop Type",
-                        "stopCommand": "Stop Command",
-                        "stopSignal": "Stop Signal",
+                        "eggRepository": "Egg-opslagplaats",
+                        "eggRepositoryEgg": "Egg-opslagplaats Egg",
+                        "startupDone": "Opstarten Voltooid",
+                        "startupDoneDescription": "Consolebericht dat aangeeft dat het opstarten is voltooid.",
+                        "stripAnsi": "ANSI verwijderen uit opstartberichten",
+                        "stripAnsiDescription": "Verwijdert ANSI-besturingstekens uit de console-uitvoer voordat het opstarten als voltooid wordt herkend.",
+                        "stopType": "Stoptype",
+                        "stopCommand": "Stopopdracht",
+                        "stopSignal": "Stopsignaal",
                         "parser": "Parser",
-                        "createNewFile": "Create New File",
-                        "createNewFileDescription": "If enabled, the file will be created if it does not exist. If disabled, the file must already exist or the replacement will fail.",
-                        "match": "Match",
-                        "ifValue": "If Value",
-                        "replaceWith": "Replace With",
-                        "insertNew": "Insert New",
-                        "insertNewDescription": "If enabled, if no existing value matches the \"Match\" field, the \"Replace With\" value will be inserted into the file. If disabled, if no match is found, no changes will be made to the file.",
-                        "updateExisting": "Update Existing",
-                        "updateExistingDescription": "If enabled, if a match is found, it will be replaced with the \"Replace With\" value. If disabled, the replacement will only insert new values and will fail if a match is found.",
-                        "startupCommands": "Startup Commands",
-                        "forceOutgoingIp": "Force Outgoing IP",
-                        "separatePort": "Separate IP and Port",
-                        "separatePortDescription": "Separates the primary IP and port on the Console page instead of joining them with \":\".",
-                        "features": "Features",
-                        "featurePlaceholder": "Feature",
-                        "fileDenylist": "File Deny List",
-                        "dockerImages": "Docker Images"
+                        "createNewFile": "Nieuw Bestand Aanmaken",
+                        "createNewFileDescription": "Indien ingeschakeld, wordt het bestand aangemaakt als het niet bestaat. Indien uitgeschakeld, moet het bestand al bestaan of mislukt de vervanging.",
+                        "match": "Overeenkomst",
+                        "ifValue": "Als Waarde",
+                        "replaceWith": "Vervangen door",
+                        "insertNew": "Nieuw Invoegen",
+                        "insertNewDescription": "Indien ingeschakeld, wordt de waarde van \"Vervangen door\" ingevoegd in het bestand als geen bestaande waarde overeenkomt met het \"Overeenkomst\"-veld. Indien uitgeschakeld, worden er geen wijzigingen aangebracht in het bestand als er geen overeenkomst wordt gevonden.",
+                        "updateExisting": "Bestaande Bijwerken",
+                        "updateExistingDescription": "Indien ingeschakeld, wordt een gevonden overeenkomst vervangen door de waarde van \"Vervangen door\". Indien uitgeschakeld, worden alleen nieuwe waarden ingevoegd en mislukt de vervanging als er een overeenkomst wordt gevonden.",
+                        "startupCommands": "Opstartopdrachten",
+                        "forceOutgoingIp": "Uitgaand IP Forceren",
+                        "separatePort": "IP en Poort Scheiden",
+                        "separatePortDescription": "Scheidt het primaire IP en de poort op de Console-pagina in plaats van ze te combineren met \":\".",
+                        "features": "Functies",
+                        "featurePlaceholder": "Functie",
+                        "fileDenylist": "Bestandsweigerlijst",
+                        "dockerImages": "Docker-images"
                       },
                       "enum": {
                         "stopType": {
-                          "command": "Send Command",
-                          "signal": "Send Signal",
+                          "command": "Opdracht Verzenden",
+                          "signal": "Signaal Verzenden",
                           "docker": "Docker Stop"
                         }
                       },
-                      "emptyConfigFiles": "No config files defined.",
-                      "emptyReplacements": "No replacements defined.",
+                      "emptyConfigFiles": "Geen configuratiebestanden gedefinieerd.",
+                      "emptyReplacements": "Geen vervangingen gedefinieerd.",
                       "button": {
-                        "addReplacement": "Add Replacement",
-                        "addConfigFile": "Add Config File",
-                        "fromFile": "from File",
-                        "fromRepository": "from Repository"
+                        "addReplacement": "Vervanging toevoegen",
+                        "addConfigFile": "Configuratiebestand toevoegen",
+                        "fromFile": "vanuit Bestand",
+                        "fromRepository": "vanuit Opslagplaats"
                       },
                       "toast": {
-                        "exported": "Egg exported.",
-                        "updated": "Egg updated."
+                        "exported": "Egg geëxporteerd.",
+                        "updated": "Egg bijgewerkt."
                       },
                       "modal": {
                         "delete": {
-                          "title": "Confirm Egg Deletion",
-                          "content": "Are you sure you want to delete **{name}**?"
+                          "title": "Verwijderen van egg bevestigen",
+                          "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                         }
                       }
                     }
                   },
                   "installationScript": {
-                    "title": "Installation Script",
+                    "title": "Installatiescript",
                     "page": {
-                      "title": "Egg Installation Script",
+                      "title": "Installatiescript van Egg",
                       "form": {
-                        "container": "Installation Container",
+                        "container": "Installatiecontainer",
                         "entrypoint": "Container Entrypoint"
                       },
                       "toast": {
-                        "updated": "Egg script updated."
+                        "updated": "Egg-script bijgewerkt."
                       }
                     }
                   },
                   "variables": {
-                    "title": "Variables",
+                    "title": "Variabelen",
                     "page": {
-                      "title": "Egg Variables",
+                      "title": "Egg-variabelen",
                       "form": {
-                        "supportsMarkdown": "Supports Markdown formatting.",
-                        "defaultValue": "Default Value",
+                        "supportsMarkdown": "Ondersteunt Markdown-opmaak.",
+                        "defaultValue": "Standaardwaarde",
                         "defaultValuePlaceholder": "server.jar",
-                        "userViewable": "User Viewable",
-                        "userEditable": "User Editable",
-                        "secret": "Secret",
-                        "rules": "Rules",
-                        "rulesDescription": "See https://laravel.com/docs/12.x/validation#available-validation-rules for the available validation rules."
+                        "userViewable": "Zichtbaar voor Gebruiker",
+                        "userEditable": "Bewerkbaar door Gebruiker",
+                        "secret": "Geheim",
+                        "rules": "Regels",
+                        "rulesDescription": "Zie https://laravel.com/docs/12.x/validation#available-validation-rules voor de beschikbare validatieregels."
                       },
                       "toast": {
-                        "created": "Egg variable created.",
-                        "updated": "Egg variable updated.",
-                        "deleted": "Egg variable deleted."
+                        "created": "Egg-variabele aangemaakt.",
+                        "updated": "Egg-variabele bijgewerkt.",
+                        "deleted": "Egg-variabele verwijderd."
                       },
                       "modal": {
                         "delete": {
-                          "title": "Confirm Egg Variable Removal",
-                          "content": "Are you sure you want to remove **{variable}**?",
-                          "emptyVariable": "this empty variable"
+                          "title": "Verwijderen van egg-variabele bevestigen",
+                          "content": "Weet u zeker dat u **{variable}** wilt verwijderen?",
+                          "emptyVariable": "deze lege variabele"
                         }
                       }
                     }
@@ -2728,18 +2728,18 @@
                   "mounts": {
                     "title": "Mounts",
                     "page": {
-                      "title": "Egg Mounts",
+                      "title": "Egg-mounts",
                       "toast": {
-                        "added": "Egg Mount added.",
-                        "deleted": "Egg Mount deleted."
+                        "added": "Egg-mount toegevoegd.",
+                        "deleted": "Egg-mount verwijderd."
                       },
                       "modal": {
                         "add": {
-                          "title": "Add Egg Mount"
+                          "title": "Egg-mount toevoegen"
                         },
                         "delete": {
-                          "title": "Confirm Egg Mount Removal",
-                          "content": "Are you sure you want to remove the mount **{mount}** from **{egg}**?"
+                          "title": "Verwijderen van egg-mount bevestigen",
+                          "content": "Weet u zeker dat u de mount **{mount}** wilt verwijderen van **{egg}**?"
                         }
                       }
                     }
@@ -2747,7 +2747,7 @@
                   "servers": {
                     "title": "Servers",
                     "page": {
-                      "title": "Egg Servers"
+                      "title": "Servers van Egg"
                     }
                   }
                 }
@@ -2756,82 +2756,82 @@
           }
         },
         "eggConfigurations": {
-          "title": "Egg Configurations",
-          "resourceName": "Egg Configuration",
+          "title": "Egg-configuraties",
+          "resourceName": "Egg-configuratie",
           "table": {
             "columns": {
-              "order": "Order"
+              "order": "Volgorde"
             }
           },
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create Egg Configuration",
-                "titleUpdate": "Update Egg Configuration",
+                "titleCreate": "Egg-configuratie aanmaken",
+                "titleUpdate": "Egg-configuratie bijwerken",
                 "form": {
-                  "order": "Order",
+                  "order": "Volgorde",
                   "eggs": "Eggs",
-                  "eggsPlaceholder": "Select Eggs"
+                  "eggsPlaceholder": "Selecteer Eggs"
                 },
                 "enum": {
                   "deploymentType": {
-                    "random": "Random",
-                    "range": "Port Range",
-                    "addPrimary": "Add to Primary",
-                    "subtractPrimary": "Subtract from Primary",
-                    "multiplyPrimary": "Multiply Primary",
-                    "dividePrimary": "Divide Primary"
+                    "random": "Willekeurig",
+                    "range": "Poortbereik",
+                    "addPrimary": "Toevoegen aan Primair",
+                    "subtractPrimary": "Aftrekken van Primair",
+                    "multiplyPrimary": "Primair Vermenigvuldigen",
+                    "dividePrimary": "Primair Delen"
                   }
                 },
                 "allocation": {
-                  "title": "Allocation Configuration",
+                  "title": "Allocatieconfiguratie",
                   "form": {
-                    "userSelfAssign": "User Self Assign",
-                    "userSelfAssignDescription": "Allow users to create their own allocations from a specified port range.",
-                    "requirePrimaryAllocation": "Require Primary Allocation",
-                    "requirePrimaryAllocationDescription": "Whether users must always have a primary allocation.",
-                    "automaticAllocationStart": "Automatic Allocation Start",
-                    "automaticAllocationEnd": "Automatic Allocation End",
-                    "dedicatedIp": "Dedicated IP",
-                    "dedicatedIpDescription": "Assign a dedicated ip address for servers using this egg configuration.",
-                    "primaryAllocation": "Primary Allocation",
-                    "primaryAllocationDescription": "Configure a primary port assignment for deployment.",
-                    "primaryStartPort": "Primary Start Port",
-                    "primaryEndPort": "Primary End Port",
-                    "assignToVariable": "Assign to Variable",
-                    "assignToVariablePlaceholder": "e.g. SERVER_PORT",
-                    "assignToVariableDescription": "Optional environment variable to receive the assigned primary port."
+                    "userSelfAssign": "Zelftoewijzing door Gebruiker",
+                    "userSelfAssignDescription": "Sta gebruikers toe om hun eigen allocaties aan te maken uit een opgegeven poortbereik.",
+                    "requirePrimaryAllocation": "Primaire Allocatie Vereisen",
+                    "requirePrimaryAllocationDescription": "Of gebruikers altijd een primaire allocatie moeten hebben.",
+                    "automaticAllocationStart": "Automatische Allocatie Start",
+                    "automaticAllocationEnd": "Automatische Allocatie Einde",
+                    "dedicatedIp": "Toegewijd IP",
+                    "dedicatedIpDescription": "Wijs een toegewijd IP-adres toe voor servers die deze egg-configuratie gebruiken.",
+                    "primaryAllocation": "Primaire Allocatie",
+                    "primaryAllocationDescription": "Configureer een primaire poorttoewijzing voor deployment.",
+                    "primaryStartPort": "Primaire Startpoort",
+                    "primaryEndPort": "Primaire Eindpoort",
+                    "assignToVariable": "Toewijzen aan Variabele",
+                    "assignToVariablePlaceholder": "bijv. SERVER_PORT",
+                    "assignToVariableDescription": "Optionele omgevingsvariabele om de toegewezen primaire poort te ontvangen."
                   },
                   "divider": {
                     "deployment": "Deployment"
                   },
                   "additionalPorts": {
-                    "title": "Additional Ports",
-                    "button": "Add Rule",
-                    "empty": "No additional port rules configured."
+                    "title": "Aanvullende Poorten",
+                    "button": "Regel toevoegen",
+                    "empty": "Geen aanvullende poortregels geconfigureerd."
                   },
                   "deployment": {
                     "form": {
-                      "startPort": "Start Port",
-                      "endPort": "End Port",
-                      "assignToVariable": "Assign to Variable",
-                      "assignToVariableDescription": "Optional environment variable to receive the assigned port from this rule.",
-                      "assignToVariablePlaceholder": "e.g. SERVER_PORT"
+                      "startPort": "Startpoort",
+                      "endPort": "Eindpoort",
+                      "assignToVariable": "Toewijzen aan Variabele",
+                      "assignToVariableDescription": "Optionele omgevingsvariabele om de toegewezen poort van deze regel te ontvangen.",
+                      "assignToVariablePlaceholder": "bijv. SERVER_PORT"
                     },
-                    "removeRule": "Remove deployment rule"
+                    "removeRule": "Deploymentregel verwijderen"
                   }
                 },
                 "startup": {
-                  "title": "Startup Configuration",
+                  "title": "Opstartconfiguratie",
                   "form": {
-                    "allowCustomStartupCommand": "Allow Custom Startup Command",
-                    "allowCustomStartupCommandDescription": "Allow users to set their own, non-predefined startup commands."
+                    "allowCustomStartupCommand": "Aangepast Opstartcommando Toestaan",
+                    "allowCustomStartupCommandDescription": "Sta gebruikers toe hun eigen, niet-vooraf gedefinieerde opstartcommando's in te stellen."
                   }
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Egg Configuration Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Verwijderen van egg-configuratie bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                   }
                 }
               }
@@ -2839,31 +2839,31 @@
           }
         },
         "eggRepositories": {
-          "title": "Egg Repositories",
-          "resourceName": "Egg Repository",
+          "title": "Egg-opslagplaatsen",
+          "resourceName": "Egg-opslagplaats",
           "table": {
             "columns": {
-              "gitRepository": "Git Repository"
+              "gitRepository": "Git-opslagplaats"
             }
           },
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create Egg Repository",
-                "titleUpdate": "Update Egg Repository",
+                "titleCreate": "Egg-opslagplaats aanmaken",
+                "titleUpdate": "Egg-opslagplaats bijwerken",
                 "form": {
-                  "gitRepository": "Git Repository"
+                  "gitRepository": "Git-opslagplaats"
                 },
                 "button": {
-                  "sync": "Sync"
+                  "sync": "Synchroniseren"
                 },
                 "toast": {
-                  "synced": "Egg repository synchronised, found {eggs}."
+                  "synced": "Egg-opslagplaats gesynchroniseerd, {eggs} gevonden."
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Egg Repository Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Verwijderen van egg-opslagplaats bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                   }
                 }
               }
@@ -2871,64 +2871,64 @@
             "eggs": {
               "title": "Eggs",
               "page": {
-                "title": "Egg Repository Eggs",
+                "title": "Eggs van Egg-opslagplaats",
                 "table": {
                   "columns": {
-                    "path": "Path"
+                    "path": "Pad"
                   }
                 },
                 "toast": {
-                  "installed": "Egg installed.",
-                  "installedBulk": "{eggs} installed."
+                  "installed": "Egg geïnstalleerd.",
+                  "installedBulk": "{eggs} geïnstalleerd."
                 },
                 "modal": {
                   "install": {
-                    "title": "Install Egg Repository Egg"
+                    "title": "Egg-opslagplaats Egg Installeren"
                   },
                   "installBulk": {
-                    "title": "Install Egg Repository Eggs",
-                    "button": "Install {eggs}"
+                    "title": "Egg-opslagplaats Eggs Installeren",
+                    "button": "{eggs} installeren"
                   }
                 },
                 "drawer": {
-                  "noReadme": "This egg does not have a README."
+                  "noReadme": "Deze egg heeft geen README."
                 }
               }
             }
           }
         },
         "databaseHosts": {
-          "title": "Database Hosts",
-          "resourceName": "Database host",
+          "title": "Databasehosts",
+          "resourceName": "Databasehost",
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create Database Host",
-                "titleUpdate": "Update Database Host",
+                "titleCreate": "Databasehost aanmaken",
+                "titleUpdate": "Databasehost bijwerken",
                 "form": {
-                  "publicHost": "Public Host",
-                  "publicPort": "Public Port",
-                  "connectionCredentials": "Connection Credentials",
-                  "credentialType": "Credential Type",
-                  "connectionString": "Connection String",
-                  "connectionStringPlaceholder": "mysql://username:password@host:port"
+                  "publicHost": "Openbare Host",
+                  "publicPort": "Openbare Poort",
+                  "connectionCredentials": "Verbindingsgegevens",
+                  "credentialType": "Type Gegevens",
+                  "connectionString": "Verbindingsreeks",
+                  "connectionStringPlaceholder": "mysql://gebruikersnaam:wachtwoord@host:poort"
                 },
                 "enum": {
                   "credentialType": {
-                    "connectionString": "Connection String",
+                    "connectionString": "Verbindingsreeks",
                     "details": "Details"
                   }
                 },
                 "button": {
-                  "testConnection": "Test Connection"
+                  "testConnection": "Verbinding testen"
                 },
                 "toast": {
-                  "tested": "Test successfully completed."
+                  "tested": "Test succesvol voltooid."
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Database Host Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Verwijderen van databasehost bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                   }
                 }
               }
@@ -2936,122 +2936,122 @@
             "databases": {
               "title": "Databases",
               "page": {
-                "title": "Database Host Databases"
+                "title": "Databases van Databasehost"
               }
             }
           }
         },
         "oAuthProviders": {
-          "title": "OAuth Providers",
-          "resourceName": "OAuth Provider",
+          "title": "OAuth-providers",
+          "resourceName": "OAuth-provider",
           "dropzone": {
-            "title": "Drop some files here to import as OAuth Providers",
-            "subtitle": "Release to start importing"
+            "title": "Zet bestanden hier neer om als OAuth-providers te importeren",
+            "subtitle": "Loslaten om te beginnen met importeren"
           },
           "table": {
             "columns": {
-              "loginOnly": "Login Only",
-              "linkViewable": "Link Viewable",
-              "userManageable": "User Manageable"
+              "loginOnly": "Alleen Inloggen",
+              "linkViewable": "Koppeling Zichtbaar",
+              "userManageable": "Beheerbaar door Gebruiker"
             }
           },
           "toast": {
-            "imported": "OAuth Provider imported.",
-            "parseFailed": "Failed to parse OAuth provider: {error}"
+            "imported": "OAuth-provider geïmporteerd.",
+            "parseFailed": "Verwerken van OAuth-provider mislukt: {error}"
           },
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create OAuth Provider",
-                "titleUpdate": "Update OAuth Provider",
+                "titleCreate": "OAuth-provider aanmaken",
+                "titleUpdate": "OAuth-provider bijwerken",
                 "card": {
                   "redirectUrl": {
-                    "title": "Redirect URL",
-                    "unavailable": "Available after creation"
+                    "title": "Doorverwijzings-URL",
+                    "unavailable": "Beschikbaar na aanmaken"
                   }
                 },
                 "form": {
                   "clientId": "Client Id",
                   "clientSecret": "Client Secret",
-                  "authUrl": "Auth URL",
-                  "tokenUrl": "Token URL",
-                  "infoUrl": "Info URL",
+                  "authUrl": "Auth-URL",
+                  "tokenUrl": "Token-URL",
+                  "infoUrl": "Info-URL",
                   "basicAuth": "Basic Auth",
-                  "basicAuthDescription": "Uses HTTP Basic Authentication to transmit the client id and secret, not common anymore.",
+                  "basicAuthDescription": "Gebruikt HTTP Basic Authentication om de client-id en secret te verzenden, niet meer gebruikelijk.",
                   "scopes": "Scopes",
-                  "scopesDescription": "The OAuth2 scopes to request, make sure to include scopes for email and profile info when needed.",
-                  "identifierPath": "Identifier Path",
-                  "identifierPathDescription": "The path used to extract the unique user identifier from the Info URL response (https://serdejsonpath.live).",
-                  "emailPath": "Email Path",
-                  "emailPathDescription": "The path used to extract the email from the Info URL response (https://serdejsonpath.live).",
-                  "usernamePath": "Username Path",
-                  "usernamePathDescription": "The path used to extract the username from the Info URL response (https://serdejsonpath.live).",
-                  "nameFirstPath": "First Name Path",
-                  "nameFirstPathPlaceholder": "First Name URL",
-                  "nameFirstPathDescription": "The path used to extract the first name from the Info URL response (https://serdejsonpath.live).",
-                  "nameLastPath": "Last Name Path",
-                  "nameLastPathDescription": "The path used to extract the last name from the Info URL response (https://serdejsonpath.live).",
-                  "loginOnly": "Only allow Login",
-                  "loginBypass2fa": "Bypass 2FA on Login",
-                  "loginBypass2faDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
-                  "linkViewable": "Link Viewable to User",
-                  "linkViewableDescription": "Allows the user to see the connection and its identifier in the client UI.",
-                  "userManageable": "Link Manageable by User",
-                  "userManageableDescription": "Allows the user to connect and disconnect with this provider."
+                  "scopesDescription": "De aan te vragen OAuth2-scopes, zorg ervoor dat scopes voor e-mail en profielinfo zijn opgenomen indien nodig.",
+                  "identifierPath": "Identifier-pad",
+                  "identifierPathDescription": "Het pad dat wordt gebruikt om de unieke gebruikersidentifier te extraheren uit het antwoord van de Info-URL (https://serdejsonpath.live).",
+                  "emailPath": "E-mailpad",
+                  "emailPathDescription": "Het pad dat wordt gebruikt om het e-mailadres te extraheren uit het antwoord van de Info-URL (https://serdejsonpath.live).",
+                  "usernamePath": "Gebruikersnaampad",
+                  "usernamePathDescription": "Het pad dat wordt gebruikt om de gebruikersnaam te extraheren uit het antwoord van de Info-URL (https://serdejsonpath.live).",
+                  "nameFirstPath": "Voornaampad",
+                  "nameFirstPathPlaceholder": "Voornaam-URL",
+                  "nameFirstPathDescription": "Het pad dat wordt gebruikt om de voornaam te extraheren uit het antwoord van de Info-URL (https://serdejsonpath.live).",
+                  "nameLastPath": "Achternaampad",
+                  "nameLastPathDescription": "Het pad dat wordt gebruikt om de achternaam te extraheren uit het antwoord van de Info-URL (https://serdejsonpath.live).",
+                  "loginOnly": "Alleen Inloggen Toestaan",
+                  "loginBypass2fa": "2FA Omzeilen bij Inloggen",
+                  "loginBypass2faDescription": "Staat gebruikers die met deze provider inloggen toe hun paneel-2FA te omzeilen.",
+                  "linkViewable": "Koppeling Zichtbaar voor Gebruiker",
+                  "linkViewableDescription": "Staat de gebruiker toe de verbinding en de bijbehorende identifier te zien in de client-UI.",
+                  "userManageable": "Koppeling Beheerbaar door Gebruiker",
+                  "userManageableDescription": "Staat de gebruiker toe te verbinden en te ontkoppelen met deze provider."
                 },
                 "toast": {
-                  "exported": "OAuth Provider exported."
+                  "exported": "OAuth-provider geëxporteerd."
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm OAuth Provider Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Verwijderen van OAuth-provider bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                   }
                 }
               }
             },
             "mappings": {
-              "title": "Mappings",
+              "title": "Koppelingen",
               "page": {
-                "title": "OAuth Provider Mappings",
+                "title": "Koppelingen van OAuth-provider",
                 "enum": {
                   "mappingType": {
-                    "role": "Role",
-                    "serverSubuser": "Server Subuser"
+                    "role": "Rol",
+                    "serverSubuser": "Serversubgebruiker"
                   }
                 },
                 "toast": {
-                  "created": "OAuth provider mapping created.",
-                  "updated": "OAuth provider mapping updated.",
-                  "deleted": "OAuth provider mapping deleted."
+                  "created": "OAuth-providerkoppeling aangemaakt.",
+                  "updated": "OAuth-providerkoppeling bijgewerkt.",
+                  "deleted": "OAuth-providerkoppeling verwijderd."
                 },
                 "form": {
-                  "scopesDescription": "OAuth scopes required for this mapping to apply.",
-                  "mappingType": "Mapping Type",
-                  "role": "Role",
-                  "permissions": "Permissions"
+                  "scopesDescription": "OAuth-scopes vereist om deze koppeling toe te passen.",
+                  "mappingType": "Type Koppeling",
+                  "role": "Rol",
+                  "permissions": "Rechten"
                 },
                 "modal": {
                   "add": {
-                    "title": "Add OAuth Provider Mapping"
+                    "title": "OAuth-providerkoppeling toevoegen"
                   },
                   "edit": {
-                    "title": "Edit OAuth Provider Mapping"
+                    "title": "OAuth-providerkoppeling bewerken"
                   },
                   "delete": {
-                    "title": "Delete OAuth Provider Mapping",
-                    "content": "Are you sure you want to delete this mapping? This action cannot be undone."
+                    "title": "OAuth-providerkoppeling verwijderen",
+                    "content": "Weet u zeker dat u deze koppeling wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
                   }
                 }
               }
             },
             "users": {
-              "title": "Users",
+              "title": "Gebruikers",
               "page": {
-                "title": "OAuth Provider Users",
+                "title": "Gebruikers van OAuth-provider",
                 "table": {
                   "columns": {
-                    "user": "User"
+                    "user": "Gebruiker"
                   }
                 }
               }
@@ -3059,137 +3059,137 @@
           }
         },
         "backupConfigurations": {
-          "title": "Backup Configurations",
-          "resourceName": "Backup configuration",
+          "title": "Back-upconfiguraties",
+          "resourceName": "Back-upconfiguratie",
           "table": {
             "columns": {
-              "disk": "Disk"
+              "disk": "Schijf"
             }
           },
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create Backup Configuration",
-                "titleUpdate": "Update Backup Configuration",
+                "titleCreate": "Back-upconfiguratie aanmaken",
+                "titleUpdate": "Back-upconfiguratie bijwerken",
                 "alert": {
-                  "ddupBak": "Ddup-Bak is Technology Preview software, it is technically not recommended for production use. If you acknowledge, sail ahead as you wish.",
-                  "btrfs": "Btrfs requires additional setup on the node to work, please [see the documentation]({docsUrl}) for more details.",
-                  "zfs": "ZFS requires additional setup on the node to work, please [see the documentation]({docsUrl}) for more details.",
-                  "pbs": "The provided API token needs the following datastore ACLs: **DatastoreAudit** for usage and listing, **DatastoreBackup** for writing backups, and **DatastoreAdmin** (or equivalent prune/delete permissions) if backup deletion or pruning is enabled."
+                  "ddupBak": "Ddup-Bak is Technology Preview-software, het wordt technisch gezien niet aanbevolen voor productiegebruik. Als u dit erkent, ga dan gerust verder zoals u wenst.",
+                  "btrfs": "Btrfs vereist aanvullende configuratie op de node om te werken, zie [de documentatie]({docsUrl}) voor meer details.",
+                  "zfs": "ZFS vereist aanvullende configuratie op de node om te werken, zie [de documentatie]({docsUrl}) voor meer details.",
+                  "pbs": "Het opgegeven API-token heeft de volgende datastore-ACL's nodig: **DatastoreAudit** voor gebruik en weergave, **DatastoreBackup** voor het schrijven van back-ups, en **DatastoreAdmin** (of gelijkwaardige prune/delete-rechten) als het verwijderen of prunen van back-ups is ingeschakeld."
                 },
                 "form": {
-                  "backupDisk": "Backup Disk",
-                  "maintenanceEnabledDescription": "If enabled, any server using this backup configuration will not be able to create new backups, or manage existing ones.",
-                  "shared": "Shared",
-                  "sharedDescription": "If enabled, backups on this backup configuration will not be transferred between nodes, they will be assumed to be accessible by all nodes."
+                  "backupDisk": "Back-upschijf",
+                  "maintenanceEnabledDescription": "Indien ingeschakeld, kan geen enkele server die deze back-upconfiguratie gebruikt nieuwe back-ups aanmaken of bestaande beheren.",
+                  "shared": "Gedeeld",
+                  "sharedDescription": "Indien ingeschakeld, worden back-ups op deze back-upconfiguratie niet overgedragen tussen nodes; ze worden verondersteld toegankelijk te zijn voor alle nodes."
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Backup Configuration Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Verwijderen van back-upconfiguratie bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                   }
                 },
                 "s3": {
-                  "title": "S3 Settings",
+                  "title": "S3-instellingen",
                   "form": {
-                    "partSize": "Part Size",
-                    "compressionType": "Compression Type",
-                    "pathStyle": "Using path-style URLs"
+                    "partSize": "Deelgrootte",
+                    "compressionType": "Compressietype",
+                    "pathStyle": "Path-style URL's gebruiken"
                   }
                 },
                 "restic": {
-                  "title": "Restic Settings",
+                  "title": "Restic-instellingen",
                   "form": {
-                    "repository": "Repository",
-                    "retryLockSeconds": "Retry Lock Seconds",
-                    "environmentVariables": "Environment Variables",
-                    "cronSchedule": "Cron Schedule",
-                    "cronScheduleDescription": "Format: second minute hour day month weekday.",
+                    "repository": "Opslagplaats",
+                    "retryLockSeconds": "Retry Lock-seconden",
+                    "environmentVariables": "Omgevingsvariabelen",
+                    "cronSchedule": "Cron-planning",
+                    "cronScheduleDescription": "Formaat: seconde minuut uur dag maand weekdag.",
                     "nodes": "Nodes",
-                    "nodesPlaceholder": "Select nodes"
+                    "nodesPlaceholder": "Selecteer nodes"
                   },
                   "pruneJobs": {
-                    "title": "Prune Jobs",
-                    "description": "Scheduled restic prune runs. Each job runs on the configured nodes following its cron schedule.",
+                    "title": "Prune-taken",
+                    "description": "Geplande restic prune-runs. Elke taak draait op de geconfigureerde nodes volgens de eigen cron-planning.",
                     "button": {
-                      "add": "Add Prune Job"
+                      "add": "Prune-taak toevoegen"
                     }
                   }
                 },
                 "pbs": {
-                  "title": "Proxmox Backup Server Settings",
+                  "title": "Proxmox Backup Server-instellingen",
                   "form": {
-                    "url": "Server URL",
+                    "url": "Server-URL",
                     "datastore": "Datastore",
                     "namespace": "Namespace",
-                    "tokenId": "Token ID",
+                    "tokenId": "Token-ID",
                     "tokenSecret": "Token Secret",
-                    "fingerprint": "TLS Certificate Fingerprint",
-                    "backupIdPrefix": "Backup ID Prefix"
+                    "fingerprint": "TLS-certificaatvingerafdruk",
+                    "backupIdPrefix": "Back-up-ID-voorvoegsel"
                   }
                 },
                 "kopia": {
-                  "title": "Kopia Settings",
+                  "title": "Kopia-instellingen",
                   "form": {
-                    "url": "Kopia Server URL",
-                    "fingerprint": "TLS Certificate Fingerprint",
-                    "tags": "Backup Tags"
+                    "url": "Kopia Server-URL",
+                    "fingerprint": "TLS-certificaatvingerafdruk",
+                    "tags": "Back-uptags"
                   }
                 }
               }
             },
             "stats": {
-              "title": "Stats",
+              "title": "Statistieken",
               "page": {
-                "title": "Backup Configuration Stats",
+                "title": "Statistieken van Back-upconfiguratie",
                 "card": {
-                  "title": "Backup Statistics"
+                  "title": "Back-upstatistieken"
                 },
                 "period": {
-                  "allTime": "All Time",
-                  "today": "Today",
-                  "week": "This Week",
-                  "month": "This Month"
+                  "allTime": "Altijd",
+                  "today": "Vandaag",
+                  "week": "Deze week",
+                  "month": "Deze maand"
                 },
                 "periodLabel": {
-                  "allTime": "all time",
-                  "today": "today",
-                  "week": "this week",
-                  "month": "this month"
+                  "allTime": "aller tijden",
+                  "today": "vandaag",
+                  "week": "deze week",
+                  "month": "deze maand"
                 },
                 "stat": {
-                  "total": "Total backups {period}",
-                  "successful": "Successful backups {period}",
-                  "failed": "Failed backups {period}",
-                  "deleted": "Deleted backups {period}"
+                  "total": "Totaal aantal back-ups {period}",
+                  "successful": "Geslaagde back-ups {period}",
+                  "failed": "Mislukte back-ups {period}",
+                  "deleted": "Verwijderde back-ups {period}"
                 }
               }
             },
             "backups": {
-              "title": "Backups",
+              "title": "Back-ups",
               "page": {
-                "title": "Backup Configuration Backups",
+                "title": "Back-ups van Back-upconfiguratie",
                 "toast": {
-                  "downloadStarted": "Download started."
+                  "downloadStarted": "Download gestart."
                 }
               }
             },
             "locations": {
-              "title": "Locations",
+              "title": "Locaties",
               "page": {
-                "title": "Backup Configuration Locations"
+                "title": "Locaties van Back-upconfiguratie"
               }
             },
             "nodes": {
               "title": "Nodes",
               "page": {
-                "title": "Backup Configuration Nodes"
+                "title": "Nodes van Back-upconfiguratie"
               }
             },
             "servers": {
               "title": "Servers",
               "page": {
-                "title": "Backup Configuration Servers"
+                "title": "Servers van Back-upconfiguratie"
               }
             }
           }
@@ -3200,19 +3200,19 @@
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create Mount",
-                "titleUpdate": "Update Mount",
-                "alert": "Mounts are a powerful and potentially dangerous feature. Improper use can lead to data loss or security vulnerabilities (including container escapes). Make sure you understand the implications of using mounts before creating or updating them.",
+                "titleCreate": "Mount aanmaken",
+                "titleUpdate": "Mount bijwerken",
+                "alert": "Mounts zijn een krachtige en potentieel gevaarlijke functie. Onjuist gebruik kan leiden tot gegevensverlies of beveiligingsproblemen (waaronder container-ontsnappingen). Zorg ervoor dat u de implicaties van het gebruik van mounts begrijpt voordat u ze aanmaakt of bijwerkt.",
                 "form": {
-                  "source": "Source",
-                  "target": "Target",
-                  "readOnly": "Read Only",
-                  "userMountable": "User Mountable"
+                  "source": "Bron",
+                  "target": "Doel",
+                  "readOnly": "Alleen-lezen",
+                  "userMountable": "Koppelbaar door Gebruiker"
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Mount Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Verwijderen van mount bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                   }
                 }
               }
@@ -3220,21 +3220,21 @@
             "eggs": {
               "title": "Eggs",
               "page": {
-                "title": "Mount Eggs",
+                "title": "Eggs van Mount",
                 "toast": {
-                  "added": "Mount Egg added.",
-                  "removed": "Mount Egg deleted."
+                  "added": "Mount-egg toegevoegd.",
+                  "removed": "Mount-egg verwijderd."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Mount Egg",
+                    "title": "Mount-egg toevoegen",
                     "form": {
                       "egg": "Egg"
                     }
                   },
                   "remove": {
-                    "title": "Confirm Mount Egg Removal",
-                    "content": "Are you sure you want to remove the mount **{mount}** from **{name}**?"
+                    "title": "Verwijderen van mount-egg bevestigen",
+                    "content": "Weet u zeker dat u de mount **{mount}** wilt verwijderen van **{name}**?"
                   }
                 }
               }
@@ -3242,18 +3242,18 @@
             "nodes": {
               "title": "Nodes",
               "page": {
-                "title": "Mount Nodes",
+                "title": "Nodes van Mount",
                 "toast": {
-                  "added": "Mount Node added.",
-                  "removed": "Mount Node deleted."
+                  "added": "Mount-node toegevoegd.",
+                  "removed": "Mount-node verwijderd."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Mount Node"
+                    "title": "Mount-node toevoegen"
                   },
                   "remove": {
-                    "title": "Confirm Mount Node Removal",
-                    "content": "Are you sure you want to remove the mount **{mount}** from **{name}**?"
+                    "title": "Verwijderen van mount-node bevestigen",
+                    "content": "Weet u zeker dat u de mount **{mount}** wilt verwijderen van **{name}**?"
                   }
                 }
               }
@@ -3261,52 +3261,52 @@
             "servers": {
               "title": "Servers",
               "page": {
-                "title": "Mount Servers"
+                "title": "Servers van Mount"
               }
             }
           }
         },
         "roles": {
-          "title": "Roles",
-          "resourceName": "Role",
+          "title": "Rollen",
+          "resourceName": "Rol",
           "table": {
             "columns": {
-              "serverPermissions": "Server Permissions",
-              "adminPermissions": "Admin Permissions"
+              "serverPermissions": "Serverrechten",
+              "adminPermissions": "Beheerdersrechten"
             }
           },
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create Role",
-                "titleUpdate": "Update Role",
+                "titleCreate": "Rol aanmaken",
+                "titleUpdate": "Rol bijwerken",
                 "alert": {
-                  "impersonate": "This role has the `users.impersonate` permission, which allows users with this role to impersonate any other user, including administrators. Be cautious when assigning this permission to roles with less trusted users."
+                  "impersonate": "Deze rol heeft het recht `users.impersonate`, waarmee gebruikers met deze rol elke andere gebruiker kunnen nabootsen, inclusief beheerders. Wees voorzichtig bij het toewijzen van dit recht aan rollen met minder vertrouwde gebruikers."
                 },
                 "form": {
-                  "requireTwoFactor": "Require Two Factor",
-                  "requireTwoFactorDescription": "Require users with this role to use two factor authentication.",
-                  "serverPermissions": "Server Permissions",
-                  "adminPermissions": "Admin Permissions"
+                  "requireTwoFactor": "Tweestapsverificatie Vereisen",
+                  "requireTwoFactorDescription": "Vereis dat gebruikers met deze rol tweestapsverificatie gebruiken.",
+                  "serverPermissions": "Serverrechten",
+                  "adminPermissions": "Beheerdersrechten"
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Role Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Verwijderen van rol bevestigen",
+                    "content": "Weet u zeker dat u **{name}** wilt verwijderen?"
                   }
                 }
               }
             },
             "users": {
-              "title": "Users",
+              "title": "Gebruikers",
               "page": {
-                "title": "Role Users"
+                "title": "Gebruikers van Rol"
               }
             }
           }
         },
         "activity": {
-          "title": "Activity"
+          "title": "Activiteit"
         }
       },
       "server": {
@@ -3321,7 +3321,7 @@
           },
           "toast": {
             "installCancelled": "Serverinstallatie geannuleerd.",
-            "transferCancelled": "Server transfer cancelled."
+            "transferCancelled": "Serveroverdracht geannuleerd."
           },
           "modal": {
             "sshDetails": {
@@ -3333,13 +3333,13 @@
             }
           },
           "notification": {
-            "suspended": "Your Server is currently suspended. No actions can be performed until the suspension is lifted.",
-            "suspendedAdmin": "This server is currently suspended. Since you are an administrator, you can still access the server, but actions are limited.",
+            "suspended": "Uw server is momenteel opgeschort. Er kunnen geen acties worden uitgevoerd totdat de opschorting is opgeheven.",
+            "suspendedAdmin": "Deze server is momenteel opgeschort. Aangezien u beheerder bent, heeft u nog steeds toegang tot de server, maar acties zijn beperkt.",
             "nodeMaintenance": "Uw server bevindt zich op een node die momenteel in onderhoud is.",
             "transferring": "Uw server wordt momenteel overgedragen naar een andere node.",
             "restoringBackup": "Uw server herstelt momenteel een back-up. Een moment geduld...",
             "installing": "Uw server wordt momenteel geïnstalleerd. Een moment geduld...",
-            "pendingRestart": "Your Server has pending changes that require a restart. Please restart your server to apply these changes."
+            "pendingRestart": "Uw server heeft openstaande wijzigingen die een herstart vereisen. Herstart uw server om deze wijzigingen toe te passen."
           },
           "message": {
             "serverMarkedAs": "Server gemarkeerd als {state}...",
@@ -3381,14 +3381,14 @@
               }
             },
             "javaVersion": {
-              "title": "Unsupported Java Version",
-              "content": "This server is currently running an unsupported version of Java and cannot be started.",
-              "contentDetails": "Please select a supported Docker image from the list below to continue starting the server.",
+              "title": "Niet-ondersteunde Java-versie",
+              "content": "Deze server draait momenteel op een niet-ondersteunde versie van Java en kan niet worden gestart.",
+              "contentDetails": "Selecteer een ondersteunde Docker-image uit onderstaande lijst om het starten van de server te vervolgen.",
               "toast": {
-                "updated": "Docker image updated successfully."
+                "updated": "Docker-image succesvol bijgewerkt."
               },
               "button": {
-                "update": "Update Docker Image"
+                "update": "Docker-image bijwerken"
               }
             }
           },
@@ -3424,11 +3424,11 @@
         "files": {
           "title": "Bestanden",
           "titleEditorViewing": "{file} bekijken",
-          "titleEditorPlaying": "Playing {file}",
+          "titleEditorPlaying": "{file} afspelen",
           "titleEditorEditing": "{file} bewerken",
           "titleEditorNew": "Nieuw bestand",
-          "titleDiffRevisionVsCurrent": "{file} - Revision #{revision} vs Current",
-          "titleDiffRevisionVsRevision": "{file} - Revision #{previousRevision} vs #{revision}",
+          "titleDiffRevisionVsCurrent": "{file} - Revisie #{revision} vs Huidig",
+          "titleDiffRevisionVsRevision": "{file} - Revisie #{previousRevision} vs #{revision}",
           "table": {
             "columns": {
               "modified": "Gewijzigd"
@@ -3436,7 +3436,7 @@
           },
           "button": {
             "new": "Nieuw",
-            "connect": "Connect",
+            "connect": "Verbinden",
             "connectSftp": "via SFTP",
             "connectVscode": "via VS Code",
             "openInNewWindow": "Openen in nieuw venster",
@@ -3476,7 +3476,7 @@
             "copyingMany": "{files} kopiëren",
             "receivingRemote": "{files} ontvangen van externe server",
             "sendingRemote": "{files} verzenden naar externe server",
-            "cancelAllOperations": "Cancel all operations"
+            "cancelAllOperations": "Alle bewerkingen annuleren"
           },
           "dropzone": {
             "title": "Bestanden hier neerzetten om te uploaden",
@@ -3492,7 +3492,7 @@
           },
           "toast": {
             "operationCancelled": "Bewerking geannuleerd",
-            "allOperationsCancelled": "All operations have been cancelled.",
+            "allOperationsCancelled": "Alle bewerkingen zijn geannuleerd.",
             "copyingStarted": "{files} begint met kopiëren.",
             "filesCouldNotBeMoved": "Bestanden konden niet worden verplaatst.",
             "filesMoved": "{files} verplaatst.",
@@ -3504,39 +3504,39 @@
             "filePullingStarted": "Ophalen van bestand gestart.",
             "fileRenamed": "Bestand is hernoemd.",
             "fileCouldNotBeRenamed": "Bestand kon niet worden hernoemd.",
-            "filesRenamed": "{files} renamed.",
+            "filesRenamed": "{files} hernoemd.",
             "permissionsUpdated": "Rechten zijn bijgewerkt.",
-            "permissionsUpdatedMany": "Permissions have been updated for {files}.",
-            "permissionsCouldNotBeUpdated": "Permissions could not be updated.",
+            "permissionsUpdatedMany": "Rechten zijn bijgewerkt voor {files}.",
+            "permissionsCouldNotBeUpdated": "Rechten konden niet worden bijgewerkt.",
             "fileSaved": "Bestand is opgeslagen."
           },
           "tooltip": {
-            "fileHistory": "File History",
-            "largestDirectories": "Analyze directory sizes",
-            "dragToMove": "Drag to move",
-            "back": "Back {seconds} seconds",
-            "forward": "Forward {seconds} seconds",
-            "play": "Play",
-            "pause": "Pause",
-            "mute": "Mute",
-            "unmute": "Unmute"
+            "fileHistory": "Bestandsgeschiedenis",
+            "largestDirectories": "Mapgroottes analyseren",
+            "dragToMove": "Sleep om te verplaatsen",
+            "back": "{seconds} seconden terug",
+            "forward": "{seconds} seconden vooruit",
+            "play": "Afspelen",
+            "pause": "Pauzeren",
+            "mute": "Dempen",
+            "unmute": "Dempen opheffen"
           },
           "drawer": {
             "revisions": {
-              "title": "File History",
-              "noRevisions": "No revisions found for this file.",
-              "restored": "Revision restored into editor.",
+              "title": "Bestandsgeschiedenis",
+              "noRevisions": "Geen revisies gevonden voor dit bestand.",
+              "restored": "Revisie hersteld in de editor.",
               "badge": {
-                "fullSnapshot": "Full Snapshot"
+                "fullSnapshot": "Volledige Snapshot"
               },
               "tooltip": {
-                "restore": "Restore this revision into the editor",
-                "viewDiff": "View diff against current file",
-                "compareToPrevious": "Compare to previous revision"
+                "restore": "Herstel deze revisie in de editor",
+                "viewDiff": "Vergelijk met huidig bestand",
+                "compareToPrevious": "Vergelijk met vorige revisie"
               },
               "diff": {
-                "original": "Revision",
-                "current": "Current"
+                "original": "Revisie",
+                "current": "Huidig"
               }
             }
           },
@@ -3546,9 +3546,9 @@
               "content": "U heeft niet-opgeslagen wijzigingen in de bestandseditor. Weet u zeker dat u deze pagina wilt verlaten? Als u de pagina verlaat, gaan uw wijzigingen verloren."
             },
             "draftRestore": {
-              "title": "Restore Draft",
-              "content": "A draft of this file was found in your browser. Would you like to restore it?",
-              "contentHashMismatch": "The file has been modified on the server since this draft was saved. Restoring the draft may overwrite those changes."
+              "title": "Concept Herstellen",
+              "content": "Er is een concept van dit bestand gevonden in uw browser. Wilt u dit herstellen?",
+              "contentHashMismatch": "Het bestand is op de server gewijzigd sinds dit concept is opgeslagen. Het herstellen van het concept kan die wijzigingen overschrijven."
             },
             "createArchive": {
               "title": "Archief aanmaken",
@@ -3603,7 +3603,7 @@
             "filePermissions": {
               "title": "Bestandsrechten",
               "form": {
-                "recursive": "Apply changes recursively to all files and subdirectories within this directory"
+                "recursive": "Wijzigingen recursief toepassen op alle bestanden en submappen binnen deze map"
               },
               "symbolic": "Symbolisch:",
               "octal": "Octaal:",
@@ -3619,64 +3619,64 @@
               "title": "Bestand hernoemen"
             },
             "massRename": {
-              "title": "Rename Files",
-              "find": "Find",
-              "findPlaceholder": "Text to find",
-              "replace": "Replace with",
-              "replacePlaceholder": "Replacement text",
-              "scope": "Apply to",
-              "scopeName": "Name",
-              "scopeExtension": "Extension",
-              "scopeFull": "Full name",
+              "title": "Bestanden hernoemen",
+              "find": "Zoeken",
+              "findPlaceholder": "Te zoeken tekst",
+              "replace": "Vervangen door",
+              "replacePlaceholder": "Vervangende tekst",
+              "scope": "Toepassen op",
+              "scopeName": "Naam",
+              "scopeExtension": "Extensie",
+              "scopeFull": "Volledige naam",
               "section": {
-                "matchOptions": "Match options",
-                "affixes": "Prefix & suffix",
-                "caseConversion": "Case conversion",
-                "numbering": "Numbering"
+                "matchOptions": "Overeenkomstopties",
+                "affixes": "Voor- en achtervoegsel",
+                "caseConversion": "Hoofdlettergebruik omzetten",
+                "numbering": "Nummering"
               },
               "affix": {
-                "prefix": "Prefix",
-                "suffix": "Suffix",
-                "help": "Both may include {token} for the number; a suffix appends a count to every name."
+                "prefix": "Voorvoegsel",
+                "suffix": "Achtervoegsel",
+                "help": "Beide kunnen {token} bevatten voor het getal; een achtervoegsel voegt een telling toe aan elke naam."
               },
               "option": {
-                "regex": "Use regular expression",
-                "regexDescription": "Treat the find text as a regex; reference groups with $1, $2 in the replacement.",
-                "caseSensitive": "Case sensitive",
-                "allOccurrences": "Replace all occurrences"
+                "regex": "Reguliere expressie gebruiken",
+                "regexDescription": "Behandel de zoektekst als een regex; verwijs naar groepen met $1, $2 in de vervanging.",
+                "caseSensitive": "Hoofdlettergevoelig",
+                "allOccurrences": "Alle voorkomens vervangen"
               },
               "case": {
-                "label": "Convert case",
-                "none": "No change",
-                "lower": "lowercase",
-                "upper": "UPPERCASE",
-                "title": "Title Case",
-                "capitalize": "Capitalize"
+                "label": "Hoofdlettergebruik omzetten",
+                "none": "Geen wijziging",
+                "lower": "kleine letters",
+                "upper": "HOOFDLETTERS",
+                "title": "Titel Stijl",
+                "capitalize": "Beginhoofdletter"
               },
               "numbering": {
-                "enable": "Enable numbering",
-                "help": "Insert {token} in the find, replace, prefix, or suffix text where the number should appear.",
-                "start": "Start at",
-                "step": "Step",
-                "padding": "Minimum digits"
+                "enable": "Nummering inschakelen",
+                "help": "Voeg {token} toe in de zoek-, vervang-, voorvoegsel- of achtervoegseltekst waar het getal moet verschijnen.",
+                "start": "Start bij",
+                "step": "Stap",
+                "padding": "Minimum aantal cijfers"
               },
               "preview": {
-                "title": "Preview",
-                "original": "Original",
-                "newName": "New name",
-                "unchanged": "Unchanged",
-                "conflict": "Name already in use",
-                "duplicate": "Duplicate target",
-                "invalid": "Invalid name",
-                "invalidRegex": "Invalid regular expression",
-                "empty": "No files selected."
+                "title": "Voorbeeld",
+                "original": "Origineel",
+                "newName": "Nieuwe naam",
+                "unchanged": "Ongewijzigd",
+                "conflict": "Naam al in gebruik",
+                "duplicate": "Dubbele bestemming",
+                "invalid": "Ongeldige naam",
+                "invalidRegex": "Ongeldige reguliere expressie",
+                "empty": "Geen bestanden geselecteerd."
               },
-              "summary": "{changed} of {total} will be renamed",
-              "conflictWarning": "Resolve the highlighted name conflicts before renaming."
+              "summary": "{changed} van {total} worden hernoemd",
+              "conflictWarning": "Los de gemarkeerde naamconflicten op voordat u hernoemt."
             },
             "largestDirectories": {
-              "title": "Largest Directories",
-              "empty": "No directories found."
+              "title": "Grootste Mappen",
+              "empty": "Geen mappen gevonden."
             },
             "searchFiles": {
               "title": "Bestanden zoeken",
@@ -3907,7 +3907,7 @@
               "card": {
                 "content": "Op cron-interval {schedule}, volgende uitvoering is {timestamp} - laatste uitvoering was {lastTimestamp}."
               },
-              "invalidCron": "Invalid cron expression"
+              "invalidCron": "Ongeldige cron-expressie"
             },
             "powerAction": {
               "title": "Stroomactie",
@@ -4161,9 +4161,9 @@
         },
         "subusers": {
           "title": "Subgebruikers",
-          "subtitle": "{current} of {max} maximum subusers created.",
+          "subtitle": "{current} van {max} maximale subgebruikers aangemaakt.",
           "tooltip": {
-            "limitReached": "This server is limited to {max} subusers."
+            "limitReached": "Deze server is beperkt tot {max} subgebruikers."
           },
           "table": {
             "columns": {
@@ -4181,7 +4181,7 @@
               "form": {
                 "emailPlaceholder": "Voer het e-mailadres in waaronder deze subgebruiker moet worden opgeslagen.",
                 "permissions": "Rechten",
-                "ignoredFilesDescription": "Files and directories matching these patterns will be hidden from this subuser. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`). Prefix a pattern with `!` to un-hide a path that a broader pattern would otherwise exclude."
+                "ignoredFilesDescription": "Bestanden en mappen die overeenkomen met deze patronen worden verborgen voor deze subgebruiker. Gebruikt gitignore-stijl glob-patronen (bijv. `*.env`, `secrets/`). Zet een `!` voor een patroon om een pad zichtbaar te maken dat door een breder patroon anders zou worden uitgesloten."
               }
             },
             "updateSubuser": {
@@ -4243,7 +4243,7 @@
               }
             },
             "viewMetadata": {
-              "title": "Backup Metadata"
+              "title": "Back-upmetadata"
             }
           }
         },
@@ -4288,8 +4288,8 @@
           },
           "modal": {
             "unsavedChanges": {
-              "title": "Unsaved Changes",
-              "content": "You have unsaved changes to your startup variables. Are you sure you want to leave this page? If you leave, your changes will be lost."
+              "title": "Niet-opgeslagen wijzigingen",
+              "content": "U heeft niet-opgeslagen wijzigingen aan uw opstartvariabelen. Weet u zeker dat u deze pagina wilt verlaten? Als u de pagina verlaat, gaan uw wijzigingen verloren."
             }
           },
           "noVariables": "Geen opstartvarabelen gevonden voor deze server."
@@ -4380,7 +4380,7 @@
         "activity": {
           "title": "Activiteit",
           "button": {
-            "clearUserFilter": "Clear User Filter"
+            "clearUserFilter": "Verwijder gebruikersfilter"
           }
         }
       }
