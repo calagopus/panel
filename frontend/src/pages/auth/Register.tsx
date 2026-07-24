@@ -31,6 +31,7 @@ export default function Register() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
   const captchaRef = useRef<CaptchaRef>(null);
 
   const form = useForm<z.infer<typeof authRegisterSchema>>({
@@ -101,9 +102,14 @@ export default function Register() {
             <TextInput placeholder={t('common.form.firstName', {})} {...form.getInputProps('nameFirst')} />
             <TextInput placeholder={t('common.form.lastName', {})} {...form.getInputProps('nameLast')} />
             <PasswordInput placeholder={t('common.form.password', {})} {...form.getInputProps('password')} />
-            <Captcha ref={captchaRef} />
 
-            <Button onClick={submit} loading={loading} disabled={!form.isValid()} size='md' fullWidth>
+            <Button
+              onClick={submit}
+              loading={loading}
+              disabled={!form.isValid() || !isCaptchaValid}
+              size='md'
+              fullWidth
+            >
               {t('pages.auth.register.button.register', {})}
             </Button>
 
@@ -114,6 +120,7 @@ export default function Register() {
             </Button>
           </Stack>
         </Card>
+        <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
       </Stack>
     </AuthWrapper>
   );

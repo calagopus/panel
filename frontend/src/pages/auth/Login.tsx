@@ -42,6 +42,7 @@ export default function Login() {
   const [oAuthProviders, setOAuthProviders] = useState<z.infer<typeof oAuthProviderSchema>[]>([]);
   const [passkeyUuid, setPasskeyUuid] = useState('');
   const [passkeyOptions, setPasskeyOptions] = useState<CredentialRequestOptions>();
+  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
   const captchaRef = useRef<CaptchaRef>(null);
 
   const usernameForm = useForm({
@@ -375,7 +376,7 @@ export default function Login() {
                 />
                 <Button
                   onClick={doSubmitPassword}
-                  disabled={!passwordForm.isValid()}
+                  disabled={!passwordForm.isValid() || !isCaptchaValid}
                   loading={loading}
                   size='md'
                   fullWidth
@@ -395,7 +396,7 @@ export default function Login() {
             </Card>
           </>
         ) : null}
-        <Captcha ref={captchaRef} />
+        <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
       </Stack>
     </AuthWrapper>
   );

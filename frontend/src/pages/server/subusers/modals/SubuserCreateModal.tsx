@@ -1,7 +1,7 @@
 import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { z } from 'zod';
 import createSubuser from '@/api/server/subusers/createSubuser.ts';
 import Button from '@/elements/Button.tsx';
@@ -28,6 +28,7 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
   const queryClient = useQueryClient();
 
   const captchaRef = useRef<CaptchaRef>(null);
+  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverSubuserCreateSchema>>(
     {
@@ -46,7 +47,9 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
           ignoredFiles: values.ignoredFiles,
           captcha,
         });
-        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).subusers.all() });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.server(server.uuid).subusers.all(),
+        });
         addToast(t('pages.server.subusers.modal.createSubuser.toast.created', {}), 'success');
       },
     },
@@ -86,10 +89,12 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
           onChange={(value) => form.setFieldValue('ignoredFiles', value)}
         />
 
-        <Captcha ref={captchaRef} />
-
         <ModalFooter>
-          <Button type='submit' loading={loading} disabled={!form.isValid()}>
+          <div className='mr-auto w-full sm:w-auto'>
+            <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
+          </div>
+
+          <Button type='submit' loading={loading} disabled={!form.isValid() || !isCaptchaValid}>
             {t('common.button.create', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
