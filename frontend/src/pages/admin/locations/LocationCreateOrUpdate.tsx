@@ -1,4 +1,4 @@
-import { basename } from 'pathe';
+import { countryFlagCodes } from 'virtual:country-flags';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
@@ -20,8 +20,6 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-
-const flags = import.meta.glob('/node_modules/svg-country-flags/svg/*.svg', { import: 'metadata' });
 
 type LocationFormValues = z.infer<typeof adminLocationUpdateSchema>;
 
@@ -107,16 +105,13 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
               <span className='truncate'>{option.label}</span>
             </div>
           )}
-          data={Object.keys(flags)
-            .filter((flag) => basename(flag, '.svg').length === 2)
-            .map((flag) => {
-              const countryCode = basename(flag, '.svg');
-              const regionNames = new Intl.DisplayNames([language], { type: 'region' });
-              return {
-                label: regionNames.of(countryCode.toUpperCase()) || countryCode,
-                value: countryCode,
-              };
-            })}
+          data={countryFlagCodes.map((countryCode) => {
+            const regionNames = new Intl.DisplayNames([language], { type: 'region' });
+            return {
+              label: regionNames.of(countryCode.toUpperCase()) || countryCode,
+              value: countryCode,
+            };
+          })}
           clearable
           searchable
           key={f.key('flag')}

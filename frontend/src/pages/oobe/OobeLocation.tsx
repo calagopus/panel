@@ -1,8 +1,8 @@
+import { countryFlagCodes } from 'virtual:country-flags';
 import { faAddressCard, faChevronLeft, faFloppyDisk, faRainbow } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { basename } from 'pathe';
 import { useState } from 'react';
 import { z } from 'zod';
 import createBackupConfiguration from '@/api/admin/backup-configurations/createBackupConfiguration.ts';
@@ -31,8 +31,6 @@ import BackupKopia from '../admin/backupConfigurations/forms/BackupKopia.tsx';
 import BackupPBS from '../admin/backupConfigurations/forms/BackupPBS.tsx';
 import BackupRestic from '../admin/backupConfigurations/forms/BackupRestic.tsx';
 import BackupS3 from '../admin/backupConfigurations/forms/BackupS3.tsx';
-
-const flags = import.meta.glob('/node_modules/svg-country-flags/svg/*.svg', { import: 'metadata' });
 
 export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data }: OobeComponentProps) {
   const { t, language } = useTranslations();
@@ -210,17 +208,14 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
                     <span className='truncate'>{option.label}</span>
                   </div>
                 )}
-                data={Object.keys(flags)
-                  .filter((flag) => basename(flag, '.svg').length === 2)
-                  .map((flag) => {
-                    const countryCode = basename(flag, '.svg');
-                    const regionNames = new Intl.DisplayNames([language], { type: 'region' });
+                data={countryFlagCodes.map((countryCode) => {
+                  const regionNames = new Intl.DisplayNames([language], { type: 'region' });
 
-                    return {
-                      label: regionNames.of(countryCode.toUpperCase()) || countryCode,
-                      value: countryCode,
-                    };
-                  })}
+                  return {
+                    label: regionNames.of(countryCode.toUpperCase()) || countryCode,
+                    value: countryCode,
+                  };
+                })}
                 clearable
                 searchable
                 {...form.getInputProps('locationFlag')}

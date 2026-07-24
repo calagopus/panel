@@ -11,8 +11,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
+    "typecheck": "tsc",
     "build": "pnpm build:translations && vite build",
-    "build:ci": "tsc && vite build",
+    "build:ci": "pnpm typecheck && cross-env PRECOMPRESS=true vite build",
     "build:fast": "cross-env FAST_REACT_COMPILER=true pnpm build",
     "build:docs": "typedoc --options typedoc.json --skipErrorChecking",
     "build:translations": "tsx build-translations.mts",

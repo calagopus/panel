@@ -864,10 +864,33 @@ pub async fn handle_startup() -> Result<
                         },
                     };
 
+                    let gzip_file = if is_index {
+                        None
+                    } else if parts
+                        .headers
+                        .get(axum::http::header::ACCEPT_ENCODING)
+                        .and_then(|value| value.to_str().ok())
+                        .is_some_and(|value| {
+                            value.split(',').any(|encoding| {
+                                encoding
+                                    .split(';')
+                                    .next()
+                                    .unwrap_or_default()
+                                    .trim()
+                                    .eq_ignore_ascii_case("gzip")
+                            })
+                        }) {
+                        FRONTEND_ASSETS.get_file(format!("{}.gz", file.path().display()))
+                    } else {
+                        None
+                    };
+
                     return ApiResponse::new(if is_index {
                         Body::from(axum::body::Bytes::from_owner(
                             state.settings.get_rendered_index_html(),
                         ))
+                    } else if let Some(gzip_file) = gzip_file {
+                        Body::from(gzip_file.contents())
                     } else {
                         Body::from(file.contents())
                     })
@@ -888,6 +911,8 @@ pub async fn handle_startup() -> Result<
                             },
                         },
                     )
+                    .with_optional_header("Content-Encoding", gzip_file.map(|_| "gzip"))
+                    .with_header("Vary", "Accept-Encoding")
                     .with_optional_header(
                         "Content-Security-Policy",
                         if is_index {
