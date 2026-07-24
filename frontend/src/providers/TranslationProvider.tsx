@@ -18,6 +18,8 @@ const monacoNlsModules = import.meta.glob('/node_modules/monaco-editor/esm/nls.m
 const monacoLocaleAliases: Record<string, string> = { zh: 'zh-cn', pt: 'pt-br' };
 const monacoNlsCache: Record<string, string[] | undefined> = {};
 
+const LANGUAGE_STORAGE_KEY = 'last_language';
+
 type LanguageData = {
   items: TranslationItemRecord;
   translations: Record<string, string>;
@@ -50,6 +52,19 @@ const SafeMarkdownLink = ({ href, children }: { href?: string; children?: ReactN
 const Header =
   ({ order }: { order: TitleOrder }) =>
   (props: React.ComponentProps<typeof Title>) => <Title order={order} {...props} />;
+
+const getInitialLanguage = (): string => {
+  const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  if (storedLanguage) return storedLanguage;
+
+  const { languages, settings } = getGlobalStore();
+  const browserLanguage = navigator.language.split('-')[0];
+  const language = languages.includes(browserLanguage) ? browserLanguage : settings.app.language || 'en';
+
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+
+  return language;
+};
 
 String.prototype.md = function (options?: MarkdownOptions): ReactNode {
   return (
@@ -107,9 +122,7 @@ String.prototype.md = function (options?: MarkdownOptions): ReactNode {
 };
 
 const TranslationProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState(
-    localStorage.getItem('last_language') || getGlobalStore().settings.app.language || 'en',
-  );
+  const [language, setLanguage] = useState(getInitialLanguage);
   const [languageData, setLanguageData] = useState<LanguageData | null>(null);
 
   const loadZod = async (lang: string) => {
@@ -200,7 +213,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
       loadMonaco(language);
     });
 
-    localStorage.setItem('last_language', language);
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
 
     return () => {
       cancelled = true;
