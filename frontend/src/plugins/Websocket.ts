@@ -265,7 +265,8 @@ export class Websocket extends EventEmitter {
    * frames on its own and never surfaces them to JavaScript, so a connection
    * that a middlebox drops without a FIN stays readyState === OPEN here for as
    * long as TCP keeps retransmitting. This sends an application-level "ping"
-   * that wings replies to with "pong", giving us traffic we can actually see.
+   * that wings replies to with "pong", but only once the socket has gone quiet,
+   * so a busy connection carries no extra traffic.
    */
   private startHeartbeat(): void {
     this.stopHeartbeat();
@@ -299,13 +300,20 @@ export class Websocket extends EventEmitter {
       return;
     }
 
-    if (Date.now() - this.lastMessageAt > this.livenessTimeoutMs) {
+    const quietFor = Date.now() - this.lastMessageAt;
+
+    if (quietFor > this.livenessTimeoutMs) {
       console.warn('Websocket went silent; assuming the connection is dead and reconnecting.');
       this.forceReconnect();
       return;
     }
 
-    this.send('ping');
+    // Only probe when the socket has actually gone quiet. A running server
+    // pushes stats every second, so this stays silent in the common case and
+    // leaves the console's own ping/pong latency sampling alone.
+    if (quietFor >= this.heartbeatIntervalMs) {
+      this.send('ping');
+    }
   }
 
   /**
