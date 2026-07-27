@@ -47,9 +47,15 @@ export class Websocket extends EventEmitter {
   private hadSuccessfulConnection = false;
   private nextRetryMs: number | null = null;
 
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+  private visibilityHandler: (() => void) | null = null;
+  private lastMessageAt = 0;
+
   private readonly minBackoff = 1000;
   private readonly maxBackoff = 20000;
   private readonly maxReconnectAttempts = Infinity;
+  private readonly heartbeatIntervalMs = 15000;
+  private readonly livenessTimeoutMs = 45000;
 
   /**
    * Returns the current connection state.
@@ -153,6 +159,8 @@ export class Websocket extends EventEmitter {
       this.clearReconnectTimer();
       this.state = SocketState.CONNECTED;
       this.hadSuccessfulConnection = true;
+      this.lastMessageAt = Date.now();
+      this.startHeartbeat();
 
       this.emit('SOCKET_ERROR_CLEAR');
       this.emit('SOCKET_OPEN');
@@ -160,6 +168,7 @@ export class Websocket extends EventEmitter {
     };
 
     this.socket.onmessage = (e: MessageEvent) => {
+      this.lastMessageAt = Date.now();
       try {
         this.emit('SOCKET_MESSAGE', e);
 
@@ -176,6 +185,7 @@ export class Websocket extends EventEmitter {
     };
 
     this.socket.onclose = (e: CloseEvent) => {
+      this.stopHeartbeat();
       const wasConnected = this.state === SocketState.CONNECTED;
       this.state = SocketState.CLOSED;
 
@@ -228,6 +238,8 @@ export class Websocket extends EventEmitter {
   }
 
   private destroySocket(code?: number, reason?: string): void {
+    this.stopHeartbeat();
+
     if (!this.socket) {
       return;
     }
@@ -246,6 +258,66 @@ export class Websocket extends EventEmitter {
     }
 
     this.socket = null;
+  }
+
+  /**
+   * Starts the liveness heartbeat. The browser answers protocol-level ping
+   * frames on its own and never surfaces them to JavaScript, so a connection
+   * that a middlebox drops without a FIN stays readyState === OPEN here for as
+   * long as TCP keeps retransmitting. This sends an application-level "ping"
+   * that wings replies to with "pong", giving us traffic we can actually see.
+   */
+  private startHeartbeat(): void {
+    this.stopHeartbeat();
+
+    this.heartbeatTimer = setInterval(() => this.checkLiveness(), this.heartbeatIntervalMs);
+
+    if (typeof document !== 'undefined') {
+      this.visibilityHandler = () => {
+        if (!document.hidden) {
+          this.checkLiveness();
+        }
+      };
+      document.addEventListener('visibilitychange', this.visibilityHandler);
+    }
+  }
+
+  private stopHeartbeat(): void {
+    if (this.heartbeatTimer !== null) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+
+    if (this.visibilityHandler !== null && typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+      this.visibilityHandler = null;
+    }
+  }
+
+  private checkLiveness(): void {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      return;
+    }
+
+    if (Date.now() - this.lastMessageAt > this.livenessTimeoutMs) {
+      console.warn('Websocket went silent; assuming the connection is dead and reconnecting.');
+      this.forceReconnect();
+      return;
+    }
+
+    this.send('ping');
+  }
+
+  /**
+   * Tears down a socket the browser still believes is open and schedules a
+   * reconnect. destroySocket() detaches the handlers first, so onclose will
+   * not fire and cannot queue a second reconnect.
+   */
+  private forceReconnect(): void {
+    this.destroySocket(4000, 'stale connection');
+    this.state = SocketState.CLOSED;
+    this.emit('SOCKET_RECONNECT');
+    this.scheduleReconnect();
   }
 
   private scheduleReconnect(): void {
