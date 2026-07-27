@@ -9,6 +9,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
 
 const MAX_TOKEN_REFRESH_FAILURES = 3;
+const TOKEN_REFRESH_TIMEOUT = 15000;
 
 export default function WebsocketHandler() {
   const serverStoreApi = useServerStoreApi();
@@ -43,21 +44,24 @@ export default function WebsocketHandler() {
     }
 
     if (tokenRefreshFailuresRef.current >= MAX_TOKEN_REFRESH_FAILURES) {
-      console.error(
-        `Websocket token refresh failed ${MAX_TOKEN_REFRESH_FAILURES} times consecutively. Aborting to prevent an infinite loop.`,
-      );
-      setSocketConnectionState(false);
-      setSocketError({
-        type: SocketErrorType.AUTH_FAILED,
-        message: t('elements.serverWebsocket.error.tokenRefreshLoop', {}),
-        recoverable: false,
-        reconnectAttempt: 0,
-        nextRetryMs: null,
-      });
+      // Wings does not close the socket when the token expires, it only revokes
+      // console permissions and keeps streaming stats, so giving up here leaves
+      // a connection that looks alive but never prints console output again.
+      // Rebuild it instead, which fetches a fresh token.
+      console.warn('Websocket token refresh kept failing; rebuilding the connection.');
+      tokenRefreshFailuresRef.current = 0;
+      rebuildSocket();
       return;
     }
 
     updatingTokenRef.current = true;
+
+    // This guard is otherwise only cleared in finally(), so a request that never
+    // settles would block every later refresh for the rest of the session.
+    const guard = setTimeout(() => {
+      updatingTokenRef.current = false;
+    }, TOKEN_REFRESH_TIMEOUT);
+
     getWebsocketToken(currentUuid)
       .then((data) => {
         if (socketRef.current === socket) {
@@ -69,8 +73,28 @@ export default function WebsocketHandler() {
         tokenRefreshFailuresRef.current += 1;
       })
       .finally(() => {
+        clearTimeout(guard);
         updatingTokenRef.current = false;
       });
+  };
+
+  const rebuildSocket = () => {
+    const currentUuid = uuidRef.current;
+
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+      setSocketInstance(null);
+      setSocketConnectionState(false);
+      setSocketError(null);
+    }
+
+    connectingRef.current = false;
+    updatingTokenRef.current = false;
+
+    if (currentUuid && !nodeMaintenanceEnabled) {
+      connect(currentUuid);
+    }
   };
 
   const connect = (uuid: string) => {
