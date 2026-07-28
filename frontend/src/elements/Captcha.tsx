@@ -78,20 +78,24 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
         }
       },
       resetCaptcha: () => {
-        handleError();
-
         switch (captchaProvider.type) {
           case 'turnstile':
+            handleError();
             turnstileRef.current?.reset();
             break;
           case 'hcaptcha':
+            handleError();
             hcaptchaRef.current?.resetCaptcha();
             break;
           case 'friendly_captcha':
+            handleError();
             friendlyCaptchaRef.current?.reset();
             break;
           case 'recaptcha':
-            if (!captchaProvider.v3) recaptchaRef.current?.reset();
+            if (!captchaProvider.v3) {
+              handleError();
+              recaptchaRef.current?.reset();
+            }
             break;
         }
       },
