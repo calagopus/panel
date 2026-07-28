@@ -50,11 +50,13 @@ export class Websocket extends EventEmitter {
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private visibilityHandler: (() => void) | null = null;
   private lastMessageAt = 0;
+  private pingedSinceLastMessage = false;
 
   private readonly minBackoff = 1000;
   private readonly maxBackoff = 20000;
   private readonly maxReconnectAttempts = Infinity;
   private readonly heartbeatIntervalMs = 15000;
+  private readonly livenessCheckIntervalMs = 5000;
   private readonly livenessTimeoutMs = 45000;
 
   /**
@@ -160,6 +162,7 @@ export class Websocket extends EventEmitter {
       this.state = SocketState.CONNECTED;
       this.hadSuccessfulConnection = true;
       this.lastMessageAt = Date.now();
+      this.pingedSinceLastMessage = false;
       this.startHeartbeat();
 
       this.emit('SOCKET_ERROR_CLEAR');
@@ -263,7 +266,7 @@ export class Websocket extends EventEmitter {
   private startHeartbeat(): void {
     this.stopHeartbeat();
 
-    this.heartbeatTimer = setInterval(() => this.checkLiveness(), this.heartbeatIntervalMs);
+    this.heartbeatTimer = setInterval(() => this.checkLiveness(), this.livenessCheckIntervalMs);
 
     if (typeof document !== 'undefined') {
       this.visibilityHandler = () => {
@@ -294,13 +297,14 @@ export class Websocket extends EventEmitter {
 
     const quietFor = Date.now() - this.lastMessageAt;
 
-    if (quietFor > this.livenessTimeoutMs) {
+    if (quietFor >= this.livenessTimeoutMs) {
       console.warn('Websocket went silent; assuming the connection is dead and reconnecting.');
       this.forceReconnect();
       return;
     }
 
-    if (quietFor >= this.heartbeatIntervalMs) {
+    if (quietFor >= this.heartbeatIntervalMs && !this.pingedSinceLastMessage) {
+      this.pingedSinceLastMessage = true;
       this.send('ping');
     }
   }
@@ -310,6 +314,14 @@ export class Websocket extends EventEmitter {
     this.state = SocketState.CLOSED;
     this.emit('SOCKET_RECONNECT');
     this.scheduleReconnect();
+
+    this.emitError({
+      type: SocketErrorType.CONNECTION_LOST,
+      message: getTranslations().t('elements.serverWebsocket.error.connectionClosed', {}),
+      recoverable: true,
+      closeCode: 4000,
+      closeReason: 'stale connection',
+    });
   }
 
   private scheduleReconnect(): void {
