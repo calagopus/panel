@@ -153,7 +153,7 @@
         "delete": "Verwijderen",
         "remove": "Verwijderen",
         "primary": "Primair",
-        "backupOnDifferentNode": "Deze back-up bevindt zich op een andere node dan de server. Hij is niet zichtbaar via de Client API."
+        "backupOnDifferentNode": "Deze back-up bevindt zich op een andere node dan de server. Deze is niet zichtbaar via de Client API."
       },
       "form": {
         "name": "Naam",
@@ -171,7 +171,7 @@
         "port": "Poort",
         "provider": "Provider",
         "command": "Opdracht",
-        "fromAddress": "Afzenderadres",
+        "fromAddress": "Adres afzender",
         "fromName": "Naam afzender",
         "siteKey": "Site Key",
         "secretKey": "Secret Key",
@@ -199,7 +199,7 @@
         "startupCommand": "Opstartcommando",
         "archiveName": "Archiefnaam",
         "archiveFormat": "Archiefformaat",
-        "compressionLevel": "Compressie level",
+        "compressionLevel": "Compressie niveau",
         "multiplexChannels": "Multiplex-kanalen",
         "multiplexChannelsDescription": "Voeg extra HTTP-verbindingen (en daarmee ook threads) toe voor het overdragen van gesplitste archieven; het totaal aantal streams is 1 + multiplex-kanalen.",
         "deleteSourceBackups": "Bronback-ups verwijderen",
@@ -1293,7 +1293,7 @@
               "callbackUrl": "Na het aanmaken wordt de nieuwe API-sleutel verzonden naar **{url}**."
             },
             "noPermissions": "Deze API-sleutel zal geen rechten hebben.",
-            "keyCreated": "Uw nieuwe API-sleutel is aangemaakt. Zorg dat u deze nu kopieert, want hij wordt niet nogmaals getoond.",
+            "keyCreated": "Uw nieuwe API-sleutel is aangemaakt. Zorg dat u deze nu kopieert, want deze wordt niet nogmaals getoond.",
             "button": {
               "goToApiKeys": "Naar API-sleutels"
             }
@@ -2219,7 +2219,7 @@
                   "detachedOnly": "Alleen losgekoppelde back-ups weergeven"
                 },
                 "tooltip": {
-                  "backupNotOnSameNode": "Deze back-up bevindt zich niet op dezelfde node als de server. Hij is niet zichtbaar via de Client API."
+                  "backupNotOnSameNode": "Deze back-up bevindt zich niet op dezelfde node als de server. Deze is niet zichtbaar via de Client API."
                 },
                 "toast": {
                   "downloadStarted": "Download gestart.",
@@ -2231,7 +2231,7 @@
                 "modal": {
                   "detach": {
                     "title": "Loskoppelen van back-up bevestigen",
-                    "content": "Weet u zeker dat u deze back-up wilt loskoppelen van de server? Hij wordt niet verwijderd en kan later opnieuw worden gekoppeld."
+                    "content": "Weet u zeker dat u deze back-up wilt loskoppelen van de server? Deze wordt niet verwijderd en kan later opnieuw worden gekoppeld."
                   },
                   "reattach": {
                     "title": "Node-back-up opnieuw koppelen",
