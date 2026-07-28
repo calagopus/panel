@@ -260,14 +260,6 @@ export class Websocket extends EventEmitter {
     this.socket = null;
   }
 
-  /**
-   * Starts the liveness heartbeat. The browser answers protocol-level ping
-   * frames on its own and never surfaces them to JavaScript, so a connection
-   * that a middlebox drops without a FIN stays readyState === OPEN here for as
-   * long as TCP keeps retransmitting. This sends an application-level "ping"
-   * that wings replies to with "pong", but only once the socket has gone quiet,
-   * so a busy connection carries no extra traffic.
-   */
   private startHeartbeat(): void {
     this.stopHeartbeat();
 
@@ -308,19 +300,11 @@ export class Websocket extends EventEmitter {
       return;
     }
 
-    // Only probe when the socket has actually gone quiet. A running server
-    // pushes stats every second, so this stays silent in the common case and
-    // leaves the console's own ping/pong latency sampling alone.
     if (quietFor >= this.heartbeatIntervalMs) {
       this.send('ping');
     }
   }
 
-  /**
-   * Tears down a socket the browser still believes is open and schedules a
-   * reconnect. destroySocket() detaches the handlers first, so onclose will
-   * not fire and cannot queue a second reconnect.
-   */
   private forceReconnect(): void {
     this.destroySocket(4000, 'stale connection');
     this.state = SocketState.CLOSED;
