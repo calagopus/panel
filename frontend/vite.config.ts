@@ -15,7 +15,7 @@ const useFastReactCompiler = process.env.FAST_REACT_COMPILER === 'true';
 const usePrecompress = process.env.PRECOMPRESS === 'true';
 
 const monacoVsDir = normalizePath(
-  path.join(path.dirname(fileURLToPath(import.meta.resolve('monaco-editor/package.json'))), 'min/vs'),
+  path.join(path.dirname(fileURLToPath(import.meta.resolve('monaco-editor/package.json'))), '../../min/vs'),
 );
 const svgCountryFlagsDir = normalizePath(
   path.join(path.dirname(fileURLToPath(import.meta.resolve('svg-country-flags/package.json'))), 'svg'),

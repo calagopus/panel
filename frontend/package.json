@@ -96,7 +96,7 @@
     "zustand-utils": "^2.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.1",
+    "@biomejs/biome": "2.5.6",
     "@rolldown/plugin-babel": "^0.2.3",
     "@types/events": "^3.0.3",
     "@types/grecaptcha": "^3.0.9",
@@ -111,8 +111,8 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "cross-env": "^10.1.0",
     "globals": "^17.9.0",
-    "monaco-editor": "^0.55.1",
-    "tsx": "^4.23.4",
+    "monaco-editor": "^0.56.0",
+    "tsx": "^4.23.5",
     "typedoc": "^0.28.20",
     "typedoc-plugin-rename-defaults": "^0.7.3",
     "typedoc-plugin-zod": "^1.4.3",

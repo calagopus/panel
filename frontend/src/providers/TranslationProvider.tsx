@@ -126,7 +126,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
 
   const loadMonaco = async (lang: string) => {
     const locale = monacoLocaleAliases[lang] ?? lang;
-    const path = `/node_modules/monaco-editor/esm/nls.messages.${locale}.js`;
+    const path = `/node_modules/monaco-editor/esm/vs/nls/lang/${locale}.js`;
 
     if (lang === 'en' || !monacoNlsModules[path]) {
       globalThis._VSCODE_NLS_MESSAGES = undefined;
