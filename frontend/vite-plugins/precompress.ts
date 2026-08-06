@@ -15,7 +15,7 @@ export function precompressGzip(): Plugin {
     name: 'precompress-gzip',
 
     closeBundle() {
-      const outDir = path.resolve(__dirname, '..', 'dist');
+      const outDir = path.resolve(import.meta.dirname, '..', 'dist');
       if (!fs.existsSync(outDir)) return;
 
       let files = 0;

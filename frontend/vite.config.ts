@@ -133,7 +133,7 @@ export default defineConfig({
     alias: [
       {
         find: 'monaco-editor/esm/vs/editor/editor.api.js',
-        replacement: path.resolve(__dirname, 'src/lib/monacoApiShim.ts'),
+        replacement: path.resolve(import.meta.dirname, 'src/lib/monacoApiShim.ts'),
       },
     ],
   },

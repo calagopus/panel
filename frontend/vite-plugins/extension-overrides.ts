@@ -3,7 +3,7 @@ import path from 'node:path';
 import type { Plugin } from 'vite';
 import { parseSync } from 'vite';
 
-const FRONTEND_ROOT = path.resolve(__dirname, '..');
+const FRONTEND_ROOT = path.resolve(import.meta.dirname, '..');
 const CORE_SRC = path.join(FRONTEND_ROOT, 'src');
 const EXTENSIONS_DIR = path.join(FRONTEND_ROOT, 'extensions');
 const BACKEND_EXTENSIONS_DIR = path.resolve(FRONTEND_ROOT, '..', 'backend-extensions');

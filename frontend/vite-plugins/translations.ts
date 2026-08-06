@@ -48,10 +48,10 @@ function discoverLanguages(translationsDir: string): string[] {
 function discoverTranslationDirs(): string[] {
   const dirs: string[] = [];
 
-  const mainDir = path.resolve(__dirname, '..', 'public/translations');
+  const mainDir = path.resolve(import.meta.dirname, '..', 'public/translations');
   if (fs.existsSync(mainDir)) dirs.push(mainDir);
 
-  const extensionsDir = path.resolve(__dirname, '..', 'extensions');
+  const extensionsDir = path.resolve(import.meta.dirname, '..', 'extensions');
   if (fs.existsSync(extensionsDir)) {
     for (const ext of fs.readdirSync(extensionsDir)) {
       const extTransDir = path.join(extensionsDir, ext, 'public/translations');
@@ -126,7 +126,7 @@ export function translationsPlugin(): Plugin {
     },
 
     closeBundle() {
-      const outDir = path.resolve(__dirname, '..', 'dist/translations');
+      const outDir = path.resolve(import.meta.dirname, '..', 'dist/translations');
       const dirs = discoverTranslationDirs();
       const languages = discoverAllLanguages(dirs);
 
