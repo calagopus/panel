@@ -152,6 +152,7 @@ const admin = {
 
 const server = (serverUuid: string) => ({
   detail: () => ['server', serverUuid, 'detail'] as const,
+  gamedig: () => ['server', serverUuid, 'gamedig'] as const,
   activity: {
     all: (userUuid: string | null) => ['server', serverUuid, 'activity', { uuid: userUuid }] as const,
   },

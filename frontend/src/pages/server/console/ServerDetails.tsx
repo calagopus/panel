@@ -6,13 +6,15 @@ import {
   faHardDrive,
   faMemory,
   faMicrochip,
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import StatCard from '@/elements/StatCard.tsx';
 import { formatAllocation } from '@/lib/server.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { formatMilliseconds } from '@/lib/time.ts';
+import { useServerGameDig } from '@/plugins/useServerGameDig.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -21,6 +23,8 @@ export default function ServerDetails() {
   const server = useServerStore((state) => state.server);
   const stats = useServerStore((state) => state.stats);
   const state = useServerStore((state) => state.state);
+
+  const { data: gameDig } = useServerGameDig(server.uuid, state === 'running', 15000);
 
   const [doNormalizeCpuLoad, setDoNormalizeCpuLoad] = useState(localStorage.getItem('normalize_cpu_load') === 'true');
 
@@ -73,6 +77,17 @@ export default function ServerDetails() {
     }
   }, [stats]);
 
+  const playersOnline = gameDig?.playersOnline ?? null;
+  const playersMaximum = gameDig?.playersMaximum ?? null;
+  const showPlayers = !!gameDig?.enabled && !!gameDig.online && playersOnline != null && playersMaximum != null;
+
+  const playersValue = useMemo(() => {
+    if (state === 'offline' && server.status !== 'installing') {
+      return t('common.enum.serverState.offline', {});
+    }
+    return `${playersOnline} / ${playersMaximum}`;
+  }, [state, server.status, playersOnline, playersMaximum, t]);
+
   return (
     <div className='flex flex-col space-y-4'>
       <StatCard
@@ -89,6 +104,15 @@ export default function ServerDetails() {
           order={20}
           copyOnClick={!!server.allocation}
           value={server.allocation.port.toString()}
+        />
+      )}
+      {showPlayers && (
+        <StatCard
+          icon={faUsers}
+          label={t('pages.server.console.details.players', {})}
+          order={25}
+          value={playersValue}
+          details={gameDig.map || gameDig.version ? [gameDig.map, gameDig.version].filter(Boolean).join(' · ') : null}
         />
       )}
       <StatCard
