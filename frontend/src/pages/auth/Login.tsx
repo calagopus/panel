@@ -13,7 +13,6 @@ import postDiscoverableSecurityKeyChallenge from '@/api/auth/postDiscoverableSec
 import postSecurityKeyChallenge from '@/api/auth/postSecurityKeyChallenge.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
-import Anchor from '@/elements/Anchor.tsx';
 import Button from '@/elements/Button.tsx';
 import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
 import Card from '@/elements/Card.tsx';
@@ -337,13 +336,19 @@ export default function Login() {
                   oAuthProviders.length > 0 && (
                     <>
                       {oAuthProviders.map((oAuthProvider) => (
-                        <Anchor key={oAuthProvider.uuid} href={`/api/auth/oauth/redirect/${oAuthProvider.uuid}`}>
-                          <Button leftSection={<FontAwesomeIcon icon={faFingerprint} />} size='md' fullWidth>
-                            {t('pages.auth.button.loginWith', {
-                              name: oAuthProvider.name,
-                            })}
-                          </Button>
-                        </Anchor>
+                        <Button
+                          key={oAuthProvider.uuid}
+                          leftSection={<FontAwesomeIcon icon={faFingerprint} />}
+                          size='md'
+                          fullWidth
+                          onClick={() => {
+                            window.location.href = `/api/auth/oauth/redirect/${oAuthProvider.uuid}`;
+                          }}
+                        >
+                          {t('pages.auth.button.loginWith', {
+                            name: oAuthProvider.name,
+                          })}
+                        </Button>
                       ))}
                     </>
                   )
