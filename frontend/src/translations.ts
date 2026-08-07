@@ -944,6 +944,7 @@ const baseTranslations = defineTranslations({
             noGroups: 'No groups available to add server to',
             noGroup: 'This server is not in any group',
             foreign: 'This server is owned by another user, you have access to it as a subuser or administrator',
+            players: '{online} / {maximum} players',
           },
           badge: {
             foreign: 'Foreign',
@@ -4267,6 +4268,7 @@ const baseTranslations = defineTranslations({
             diskUsage: 'Disk Usage',
             networkIn: 'Network (In)',
             networkOut: 'Network (Out)',
+            players: 'Players',
             normalizeCpuLoad: 'Normalize CPU Load (shifted to max 100%)',
           },
           power: {
