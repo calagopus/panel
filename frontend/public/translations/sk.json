@@ -104,6 +104,14 @@
       "many": "{count} riadkov",
       "other": "{count} riadkov"
     },
+    "header": {
+      "zero": "{count} Headers",
+      "one": "{count} Header",
+      "two": "{count} Headers",
+      "few": "{count} Headers",
+      "many": "{count} Headers",
+      "other": "{count} Headers"
+    },
     "backup": {
       "zero": "{count} Backups",
       "one": "{count} Backup",
@@ -197,6 +205,18 @@
           "textMode": "Text",
           "jsonMode": "JSON",
           "invalidJson": "Invalid JSON"
+        },
+        "tagsInput": {
+          "copyAll": "Copy All",
+          "pasteReplace": "Paste (Replace)"
+        },
+        "ignoredFilesInput": {
+          "onePatternPerLine": "One pattern per line.",
+          "countMatches": "Count Matches",
+          "matches": "{count} matched",
+          "noMatches": "No matches",
+          "exception": "Exception",
+          "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
         }
       },
       "modal": {
@@ -451,6 +471,24 @@
       "impersonatedBy": "Zastúpený používateľom {username}"
     },
     "elements": {
+      "chartLegend": {
+        "hide": "Hide {series}",
+        "show": "Show {series}"
+      },
+      "dragAndDrop": {
+        "item": {
+          "labelled": "{label} (position {position})",
+          "unlabelled": "item at position {position}"
+        },
+        "announcement": {
+          "pickedUp": "Picked up {item}.",
+          "movedOver": "{item} was moved over {target}.",
+          "leftTarget": "{item} is no longer over a drop target.",
+          "droppedOn": "{item} was dropped on {target}.",
+          "dropped": "{item} was dropped.",
+          "cancelled": "Dragging {item} was cancelled."
+        }
+      },
       "routeOrderEditor": {
         "title": "Konfigurácia trasy",
         "label": {
@@ -592,6 +630,7 @@
         "none": "žiadne",
         "variable": "Premenná",
         "enterVariable": "Zadajte názov premennej na vyhodnotenie.",
+        "writeVariable": "The result is stored in this variable.",
         "useVariable": "Use a variable instead of plain text",
         "usePlainText": "Use plain text instead of a variable",
         "optionalPlaceholder": "None (optional)"
@@ -645,6 +684,10 @@
                 "completedTo": "{files} bolo skopírované na vzdialený server v {time}.",
                 "failedFrom": "Nepodarilo sa skopírovať {files} zo vzdialeného servera:\n{error}",
                 "failedTo": "Nepodarilo sa skopírovať {files} na vzdialený server:\n{error}"
+              },
+              "exportingBackup": {
+                "completed": "Exported backup to `{destination}` in {time}.",
+                "failed": "Failed to export backup to `{destination}`:\n{error}"
               }
             }
           }
@@ -797,7 +840,9 @@
             "applicationUrl": "Adresa URL aplikácie",
             "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Povoliť registráciu",
-            "registrationDescription": "Umožní novým používateľom zaregistrovať si vlastný účet."
+            "registrationDescription": "Umožní novým používateľom zaregistrovať si vlastný účet.",
+            "securityKeys": "Enable Security Keys",
+            "securityKeysDescription": "Allow users to sign in with passkeys and hardware security keys, scoped to {rpId}. You can change this later in the admin settings."
           },
           "button": {
             "submit": "Aktualizovať nastavenia a pokračovať"
@@ -888,7 +933,8 @@
               "notSupportedType": "Váš prehliadač alebo zariadenie nepodporuje tento typ prístupového kľúča.",
               "securityError": "Prístupové kľúče možno použiť iba cez HTTPS a s platnou doménou.",
               "authenticatorError": "Vyskytol sa problém s autentifikátorom.",
-              "constraintError": "Autentifikátor nemohol splniť požadované obmedzenia."
+              "constraintError": "Autentifikátor nemohol splniť požadované obmedzenia.",
+              "noUsernamelessKey": "No passkey that can be used without a username was found on this device. If you have one that was set up without \"Allow signing in without a username\", enter your username first and it will work as usual."
             }
           },
           "step": {
@@ -904,6 +950,7 @@
                 "createAccount": "Vytvoriť účet"
               },
               "button": {
+                "passkeyLogin": "Sign in with a Passkey",
                 "oauthLogin": "Prihlásenie OAuth"
               }
             },
@@ -984,7 +1031,8 @@
             "addServerToGroup": "Pridať server do skupiny",
             "groupActions": "Skupinové akcie",
             "noGroups": "Nie sú dostupné žiadne skupiny na pridanie servera",
-            "noGroup": "Tento server nie je v žiadnej skupine"
+            "noGroup": "Tento server nie je v žiadnej skupine",
+            "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
           },
           "badge": {
             "foreign": "Zahraničné"
@@ -1157,11 +1205,17 @@
           },
           "tooltip": {
             "secureContextRequired": "Na používanie bezpečnostných kľúčov sa vyžaduje zabezpečený kontext (HTTPS).",
-            "limitReached": "Limit je {max} bezpečnostných kľúčov."
+            "limitReached": "Limit je {max} bezpečnostných kľúčov.",
+            "disabled": "Security keys have been disabled by an administrator."
+          },
+          "alert": {
+            "disabled": "Security keys have been disabled by an administrator. Your existing keys are listed below and can still be removed, but they cannot be used to sign in and no new keys can be created."
           },
           "modal": {
             "createSecurityKey": {
               "title": "Vytvoriť bezpečnostný kľúč",
+              "allowUsernamelessLogin": "Allow signing in without a username",
+              "allowUsernamelessLoginDescription": "Saves the passkey onto the device so you can pick it from a list instead of typing your username. Hardware security keys have limited storage and may refuse it - if setup fails, turn this off and try again.",
               "toast": {
                 "created": "Bezpečnostný kľúč bol úspešne vytvorený.",
                 "aborted": "Vytvorenie bezpečnostného kľúča bolo prerušené."
@@ -1222,6 +1276,10 @@
             "importedNone": "Neboli zmenené žiadne skratky.",
             "importErrors": "Ignorované: {unknown} a {invalid}.",
             "resetAll": "Všetky skratky boli obnovené na predvolené hodnoty."
+          },
+          "general": {
+            "title": "General",
+            "undo": "Undo the last action"
           },
           "fileManager": {
             "title": "Správca súborov",
@@ -1428,6 +1486,21 @@
             "button": {
               "goToApiKeys": "Prejsť na kľúče API"
             }
+          },
+          "update": {
+            "title": "Update API Key",
+            "subtitle": "An application is requesting changes to the permissions of one of your API keys.",
+            "alert": {
+              "replaceMode": "This request **replaces** the permissions of this API key. Permissions marked as removed will be revoked.",
+              "callbackUrl": "After updating, you will be returned to **{url}**."
+            },
+            "badge": {
+              "added": "Added",
+              "existing": "Granted",
+              "removed": "Removed"
+            },
+            "noChanges": "This request does not change the permissions of this API key.",
+            "keyUpdated": "The permissions of your API key have been updated."
           }
         },
         "activity": {
@@ -1764,8 +1837,14 @@
               "page": {
                 "title": "Nastavenia WebAuthn",
                 "form": {
+                  "enabled": "Enable Security Keys",
+                  "enabledDescription": "Allow users to register and sign in with security keys. Existing keys are kept and remain visible, but cannot be used to sign in while this is off.",
+                  "allowDiscoverable": "Allow Usernameless Login",
+                  "allowDiscoverableDescription": "Let users store passkeys on their device and pick one from a list instead of typing a username.",
                   "rpId": "ID RP",
-                  "rpOrigin": "Pôvod RP"
+                  "rpOrigin": "Pôvod RP",
+                  "authenticationTimeoutSeconds": "Authentication Timeout (seconds)",
+                  "registrationTimeoutSeconds": "Registration Timeout (seconds)"
                 },
                 "button": {
                   "autofill": "Automatické dopĺňanie"
@@ -1947,12 +2026,22 @@
           "unknownExtension": "Neznáme rozšírenie",
           "alert": {
             "noExtensions": "Nie sú nainštalované žiadne rozšírenia.",
-            "heavyImageMissing": "Zdá sa, že nepoužívate heavy obraz Docker potrebný na inštaláciu rozšírení. Postup prepnutia nájdete [tu]({docsUrl})."
+            "heavyImageMissing": "Zdá sa, že nepoužívate heavy obraz Docker potrebný na inštaláciu rozšírení. Postup prepnutia nájdete [tu]({docsUrl}).",
+            "supervisorUnreachable": {
+              "title": "The extension supervisor is not answering",
+              "content": "Extensions cannot be built until it does, and the panel is serving whichever binary it started with. Check the container logs."
+            },
+            "buildFailed": {
+              "title": "The last extension build failed",
+              "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            }
           },
           "button": {
             "viewBuildLogs": "Zobraziť denníky zostavovania",
             "install": "Nainštalovať rozšírenie",
             "rebuild": "Obnoviť rozšírenia",
+            "retryBuild": "Retry build",
+            "cancelBuild": "Cancel build",
             "configure": "Konfigurovať",
             "back": "Späť na rozšírenia",
             "accept": "Prijať",
@@ -1961,9 +2050,22 @@
           "tooltip": {
             "building": "Panel momentálne zostavuje kód rozšírení. Počkajte, prosím.",
             "noPendingBuild": "Žiadne čakajúce rozšírenia na zostavenie.",
+            "cancelling": "The build stops once its current step ends.",
             "noBackend": "Na konfiguráciu tohto rozšírenia je potrebné backendové rozšírenie.",
             "noConfigurationPage": "Toto rozšírenie nemá definovanú konfiguračnú stránku.",
             "removeExtension": "Odstrániť rozšírenie"
+          },
+          "phase": {
+            "queued": "Queued…",
+            "preparing": "Preparing…",
+            "clearing": "Clearing extensions…",
+            "adding": "Adding extensions ({done}/{total})…",
+            "resync": "Resolving dependencies…",
+            "stagingTranslations": "Staging translations…",
+            "compiling": "Compiling…",
+            "verifying": "Verifying…",
+            "installing": "Installing…",
+            "restarting": "Restarting the panel…"
           },
           "badge": {
             "frontendMissing": "Chýba frontend",
@@ -1986,6 +2088,8 @@
           "toast": {
             "buildStarted": "Zostavenie rozšírení sa úspešne spustilo.",
             "buildCompleted": "Zostavenie rozšírenia je dokončené. Možno budete musieť obnoviť stránku.",
+            "buildFailed": "Extension build failed: {reason}",
+            "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Rozšírenie `{packageName}` bolo úspešne pridané.",
             "removed": "Rozšírenie `{packageName}` bolo úspešne odstránené."
           },
@@ -2456,6 +2560,44 @@
                 }
               }
             },
+            "databaseHosts": {
+              "title": "Database Hosts",
+              "page": {
+                "title": "Node Database Hosts",
+                "toast": {
+                  "created": "Node database host created.",
+                  "deleted": "Node database host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Database Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Node Database Host Deletion",
+                    "content": "Are you sure you want to delete the database host **{name}** from **{node}**?"
+                  }
+                }
+              }
+            },
+            "databaseAgentHosts": {
+              "title": "Database Agent Hosts",
+              "page": {
+                "title": "Node Database Agent Hosts",
+                "toast": {
+                  "created": "Node database agent host created.",
+                  "deleted": "Node database agent host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Database Agent Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Node Database Agent Host Deletion",
+                    "content": "Are you sure you want to delete the database agent host **{name}** from **{node}**?"
+                  }
+                }
+              }
+            },
             "backups": {
               "title": "Zálohy",
               "page": {
@@ -2542,6 +2684,9 @@
               "title": "Odchádzajúce prenosy",
               "page": {
                 "title": "Prenosy uzlov",
+                "toast": {
+                  "connectionLost": "Lost connection to the node transfers stream."
+                },
                 "table": {
                   "columns": {
                     "progress": "Pokrok",
@@ -3203,7 +3348,20 @@
                 "titleCreate": "Vytvoriť repozitár eggov",
                 "titleUpdate": "Aktualizovať repozitár eggov",
                 "form": {
-                  "gitRepository": "Git repozitár"
+                  "gitRepository": "Git repozitár",
+                  "credentials": "Repository Credentials",
+                  "credentialType": "Credential Type",
+                  "password": "Password or Access Token",
+                  "privateKey": "Private Key",
+                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
+                  "passphrase": "Passphrase"
+                },
+                "enum": {
+                  "credentialType": {
+                    "none": "None",
+                    "password": "Password",
+                    "privateKey": "Private Key"
+                  }
                 },
                 "button": {
                   "sync": "Synchronizovať"
@@ -3821,6 +3979,7 @@
                     "tokenId": "Token ID",
                     "tokenSecret": "Token Secret",
                     "fingerprint": "TLS Certificate Fingerprint",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "backupIdPrefix": "Backup ID Prefix"
                   }
                 },
@@ -3829,6 +3988,7 @@
                   "form": {
                     "url": "Kopia Server URL",
                     "fingerprint": "TLS Certificate Fingerprint",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "tags": "Backup Tags"
                   }
                 }
@@ -4118,7 +4278,8 @@
             "memoryLoad": "Zaťaženie pamäte",
             "network": "Sieť",
             "inbound": "Prichádzajúce",
-            "outbound": "Odchádzajúce"
+            "outbound": "Odchádzajúce",
+            "offline": "Server is offline"
           },
           "socketConnected": "Pripojené ({ping}ms ping)",
           "socketDisconnected": "Odpojené"
@@ -4232,7 +4393,8 @@
             "permissionsRestored": "Permissions restored.",
             "permissionsCouldNotBeRestored": "Permissions could not be restored.",
             "fileSaved": "Súbor bol uložený.",
-            "collabSaveTimeout": "The file could not be saved, the daemon did not respond in time."
+            "collabSaveTimeout": "The file could not be saved, the daemon did not respond in time.",
+            "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
             "fileHistory": "História súborov",
@@ -4508,7 +4670,8 @@
                 "uptime": "Uptime",
                 "cpuLoad": "CPU Load",
                 "memoryLoad": "Memory Load",
-                "diskUsage": "Disk Usage"
+                "diskUsage": "Disk Usage",
+                "offline": "Instance is offline"
               }
             },
             "databases": {
@@ -4717,7 +4880,9 @@
             "addElse": "Add Else",
             "createFirstStep": "Vytvoriť prvý krok",
             "addOutput": "Pridať výstup",
-            "addFile": "Pridať súbor"
+            "addFile": "Pridať súbor",
+            "addHeader": "Add Header",
+            "viewCalendar": "View Calendar"
           },
           "toast": {
             "imported": "Plán bol importovaný.",
@@ -4774,6 +4939,10 @@
             "duplicateSchedule": {
               "title": "Duplicate Schedule"
             },
+            "calendar": {
+              "title": "Upcoming Runs Calendar",
+              "truncatedWarning": "Some upcoming runs have been left out to keep the calendar responsive."
+            },
             "deleteSchedule": {
               "title": "Potvrdiť odstránenie plánu",
               "content": "Naozaj chcete odstrániť {name} z tohto servera?"
@@ -4786,7 +4955,7 @@
             },
             "deleteStep": {
               "title": "Potvrdiť odstránenie kroku plánu",
-              "content": "Naozaj chcete odstrániť tento krok plánu?"
+              "content": "Are you sure you want to delete this \"{step}\" step?"
             },
             "unsavedChanges": {
               "title": "Unsaved Changes",
@@ -4815,6 +4984,14 @@
               "noTriggers": "Pre tento plán nie sú nakonfigurované žiadne spúšťače"
             }
           },
+          "step": {
+            "aria": {
+              "reorder": "Reorder {step} step",
+              "expand": "Show {step} details",
+              "collapse": "Hide {step} details",
+              "actions": "{step} step actions"
+            }
+          },
           "form": {
             "scheduleName": "Názov plánu",
             "triggersList": "Spúšťače",
@@ -4838,7 +5015,20 @@
             "metric": "Metric",
             "allMustBeTrue": "Všetky podmienky musia byť splnené:",
             "anyMustBeTrue": "Aspoň jedna podmienka musí byť splnená:",
-            "mustNotBeTrue": "Podmienka nesmie byť splnená:"
+            "mustNotBeTrue": "Podmienka nesmie byť splnená:",
+            "renderer": {
+              "none": "No condition — this always matches.",
+              "empty": "No conditions added yet.",
+              "serverState": "Server state is {state}",
+              "uptime": "Uptime {comparator} {value}",
+              "resourceUsage": "{metric} {comparator} {value}",
+              "fileExists": "File {file} exists",
+              "variableExists": "Variable {variable} is set",
+              "equals": "Variable {variable} equals {value}",
+              "contains": "Variable {variable} contains {value}",
+              "startsWith": "Variable {variable} starts with {value}",
+              "endsWith": "Variable {variable} ends with {value}"
+            }
           },
           "preCondition": {
             "valueSeconds": "Hodnota (sekundy)",
@@ -4953,7 +5143,7 @@
                 "duration": "Trvanie (milisekundy)"
               },
               "renderer": {
-                "compact": "Počkať {duration}"
+                "compact": "Sleep for {duration}"
               }
             },
             "ensure": {
@@ -5074,7 +5264,8 @@
               "title": "Vytvoriť zálohu",
               "description": "Create a backup of the server files.",
               "form": {
-                "backupName": "Názov zálohy"
+                "backupName": "Názov zálohy",
+                "outputInto": "Output Backup UUID Into"
               },
               "renderer": {
                 "compact": "Vytvoriť {name}",
@@ -5082,6 +5273,7 @@
                 "detail": {
                   "backupName": "Názov zálohy: {name}",
                   "backupNameAuto": "Backup Name: Auto-generated",
+                  "outputInto": "Backup UUID into: {variable}",
                   "ignoredFiles": "Ignorované súbory: {files}"
                 }
               }
@@ -5122,6 +5314,7 @@
               "title": "Delete Backup",
               "description": "Delete a backup selected by the backup selector.",
               "form": {
+                "backupSelector": "Backup to Delete",
                 "warning": "This permanently deletes the selected backup, including its files on the node. Locked backups are skipped."
               }
             },
@@ -5129,6 +5322,7 @@
               "title": "Move Backup",
               "description": "Move a backup selected by the backup selector into a backup group.",
               "form": {
+                "backupSelector": "Backup to Move",
                 "targetGroup": "Target Backup Group"
               },
               "renderer": {
@@ -5266,6 +5460,34 @@
                 "compact": "Nastaviť na {image}",
                 "detail": {
                   "image": "Obraz: {image}"
+                }
+              }
+            },
+            "httpRequest": {
+              "title": "HTTP Request",
+              "description": "Send an HTTP request, for example to a webhook.",
+              "form": {
+                "method": "Method",
+                "url": "URL",
+                "headers": "Headers",
+                "headerName": "Header Name",
+                "headerValue": "Header Value",
+                "body": "Body",
+                "timeout": "Timeout (milliseconds)",
+                "ignoreErrorStatus": "Ignore Error Status Codes",
+                "outputStatusInto": "Output Status Code Into",
+                "outputBodyInto": "Output Response Body Into"
+              },
+              "renderer": {
+                "compact": "Send {method} to {url}",
+                "detail": {
+                  "request": "Request: {method} {url}",
+                  "headers": "Headers: {headers}",
+                  "body": "Body: {body}",
+                  "timeout": "Timeout: {timeout}",
+                  "outputStatusInto": "Status code into: {variable}",
+                  "outputBodyInto": "Response body into: {variable}",
+                  "ignoreErrorStatus": "Ignore error status codes: {value}"
                 }
               }
             }

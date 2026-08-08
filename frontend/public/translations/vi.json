@@ -104,6 +104,14 @@
       "many": "{count} Dòng",
       "other": "{count} Dòng"
     },
+    "header": {
+      "zero": "{count} Headers",
+      "one": "{count} Header",
+      "two": "{count} Headers",
+      "few": "{count} Headers",
+      "many": "{count} Headers",
+      "other": "{count} Headers"
+    },
     "backup": {
       "zero": "{count} Bản Sao Lưu",
       "one": "{count} Bản Sao Lưu",
@@ -197,6 +205,18 @@
           "textMode": "Văn bản",
           "jsonMode": "JSON",
           "invalidJson": "JSON không hợp lệ"
+        },
+        "tagsInput": {
+          "copyAll": "Copy All",
+          "pasteReplace": "Paste (Replace)"
+        },
+        "ignoredFilesInput": {
+          "onePatternPerLine": "One pattern per line.",
+          "countMatches": "Count Matches",
+          "matches": "{count} matched",
+          "noMatches": "No matches",
+          "exception": "Exception",
+          "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
         }
       },
       "modal": {
@@ -451,6 +471,24 @@
       "impersonatedBy": "Mạo danh bởi {username}"
     },
     "elements": {
+      "chartLegend": {
+        "hide": "Hide {series}",
+        "show": "Show {series}"
+      },
+      "dragAndDrop": {
+        "item": {
+          "labelled": "{label} (position {position})",
+          "unlabelled": "item at position {position}"
+        },
+        "announcement": {
+          "pickedUp": "Picked up {item}.",
+          "movedOver": "{item} was moved over {target}.",
+          "leftTarget": "{item} is no longer over a drop target.",
+          "droppedOn": "{item} was dropped on {target}.",
+          "dropped": "{item} was dropped.",
+          "cancelled": "Dragging {item} was cancelled."
+        }
+      },
       "routeOrderEditor": {
         "title": "Cấu Hình Tuyến Đường",
         "label": {
@@ -592,6 +630,7 @@
         "none": "Không có",
         "variable": "Biến",
         "enterVariable": "Vui lòng nhập tên biến để đánh giá.",
+        "writeVariable": "The result is stored in this variable.",
         "useVariable": "Sử dụng một biến thay vì văn bản thuần túy",
         "usePlainText": "Sử dụng văn bản thuần túy thay vì một biến",
         "optionalPlaceholder": "Không có (tùy chọn)"
@@ -645,6 +684,10 @@
                 "completedTo": "Đã sao chép {files}  tới máy chủ điều khiển trong {time}.",
                 "failedFrom": "Sao chép thất bại tệp {files} Từ máy chủ điều khiển:\n{error}",
                 "failedTo": "Sao chép thất bại tệp {files}  tới máy chủ điều khiển:\n{error}"
+              },
+              "exportingBackup": {
+                "completed": "Exported backup to `{destination}` in {time}.",
+                "failed": "Failed to export backup to `{destination}`:\n{error}"
               }
             }
           }
@@ -797,7 +840,9 @@
             "applicationUrl": "URL Ứng dụng",
             "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Kích hoạt Đăng ký",
-            "registrationDescription": "Cho phép người dùng mới đăng ký tài khoản của họ."
+            "registrationDescription": "Cho phép người dùng mới đăng ký tài khoản của họ.",
+            "securityKeys": "Enable Security Keys",
+            "securityKeysDescription": "Allow users to sign in with passkeys and hardware security keys, scoped to {rpId}. You can change this later in the admin settings."
           },
           "button": {
             "submit": "Lưu và tiếp tục"
@@ -888,7 +933,8 @@
               "notSupportedType": "Trình duyệt hoặc thiết bị của bạn không hỗ trợ loại passkey này.",
               "securityError": "Passkeys yêu cầu một kết nối an toàn (HTTPS) và có thể không hoạt động nếu bạn đang truy cập qua HTTP hoặc trong một môi trường không an toàn.",
               "authenticatorError": "Đã xảy ra lỗi với thiết bị xác thực.",
-              "constraintError": "Thiết bị xác thực không thể đáp ứng các ràng buộc cần thiết."
+              "constraintError": "Thiết bị xác thực không thể đáp ứng các ràng buộc cần thiết.",
+              "noUsernamelessKey": "No passkey that can be used without a username was found on this device. If you have one that was set up without \"Allow signing in without a username\", enter your username first and it will work as usual."
             }
           },
           "step": {
@@ -904,6 +950,7 @@
                 "createAccount": "Tạo tài khoản"
               },
               "button": {
+                "passkeyLogin": "Sign in with a Passkey",
                 "oauthLogin": "Đăng nhập với OAuth"
               }
             },
@@ -984,7 +1031,8 @@
             "addServerToGroup": "Thêm Máy Chủ vào Nhóm",
             "groupActions": "Hành động Nhóm",
             "noGroups": "Không có nhóm nào khả dụng để thêm máy chủ vào",
-            "noGroup": "Máy chủ này không thuộc bất kỳ nhóm nào"
+            "noGroup": "Máy chủ này không thuộc bất kỳ nhóm nào",
+            "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
           },
           "badge": {
             "foreign": "Bên Ngoài"
@@ -1157,11 +1205,17 @@
           },
           "tooltip": {
             "secureContextRequired": "Cần có ngữ cảnh bảo mật (HTTPS) để sử dụng khóa bảo mật.",
-            "limitReached": "Bạn được giới hạn ở {max} khóa bảo mật."
+            "limitReached": "Bạn được giới hạn ở {max} khóa bảo mật.",
+            "disabled": "Security keys have been disabled by an administrator."
+          },
+          "alert": {
+            "disabled": "Security keys have been disabled by an administrator. Your existing keys are listed below and can still be removed, but they cannot be used to sign in and no new keys can be created."
           },
           "modal": {
             "createSecurityKey": {
               "title": "Tạo Khóa Bảo Mật",
+              "allowUsernamelessLogin": "Allow signing in without a username",
+              "allowUsernamelessLoginDescription": "Saves the passkey onto the device so you can pick it from a list instead of typing your username. Hardware security keys have limited storage and may refuse it - if setup fails, turn this off and try again.",
               "toast": {
                 "created": "Khóa bảo mật đã được tạo thành công.",
                 "aborted": "Tạo khóa bảo mật đã bị hủy."
@@ -1222,6 +1276,10 @@
             "importedNone": "Không có phím tắt nào bị thay đổi.",
             "importErrors": "Đã bỏ qua {unknown} và {invalid}.",
             "resetAll": "Tất cả phím tắt đã được đặt lại về mặc định."
+          },
+          "general": {
+            "title": "General",
+            "undo": "Undo the last action"
           },
           "fileManager": {
             "title": "Trình Quản Lý Tệp",
@@ -1428,6 +1486,21 @@
             "button": {
               "goToApiKeys": "Đi đến Khóa API"
             }
+          },
+          "update": {
+            "title": "Update API Key",
+            "subtitle": "An application is requesting changes to the permissions of one of your API keys.",
+            "alert": {
+              "replaceMode": "This request **replaces** the permissions of this API key. Permissions marked as removed will be revoked.",
+              "callbackUrl": "After updating, you will be returned to **{url}**."
+            },
+            "badge": {
+              "added": "Added",
+              "existing": "Granted",
+              "removed": "Removed"
+            },
+            "noChanges": "This request does not change the permissions of this API key.",
+            "keyUpdated": "The permissions of your API key have been updated."
           }
         },
         "activity": {
@@ -1764,8 +1837,14 @@
               "page": {
                 "title": "Cài Đặt Webauthn",
                 "form": {
+                  "enabled": "Enable Security Keys",
+                  "enabledDescription": "Allow users to register and sign in with security keys. Existing keys are kept and remain visible, but cannot be used to sign in while this is off.",
+                  "allowDiscoverable": "Allow Usernameless Login",
+                  "allowDiscoverableDescription": "Let users store passkeys on their device and pick one from a list instead of typing a username.",
                   "rpId": "RP Id",
-                  "rpOrigin": "RP Origin"
+                  "rpOrigin": "RP Origin",
+                  "authenticationTimeoutSeconds": "Authentication Timeout (seconds)",
+                  "registrationTimeoutSeconds": "Registration Timeout (seconds)"
                 },
                 "button": {
                   "autofill": "Tự Động Điền"
@@ -1947,12 +2026,22 @@
           "unknownExtension": "Tiện Ích Không Xác Định",
           "alert": {
             "noExtensions": "Chưa cài đặt tiện ích mở rộng nào.",
-            "heavyImageMissing": "Bạn dường như không sử dụng hình ảnh heavy cần thiết để cài đặt tiện ích mở rộng, xem [tại đây]({docsUrl}) để biết cách chuyển đổi."
+            "heavyImageMissing": "Bạn dường như không sử dụng hình ảnh heavy cần thiết để cài đặt tiện ích mở rộng, xem [tại đây]({docsUrl}) để biết cách chuyển đổi.",
+            "supervisorUnreachable": {
+              "title": "The extension supervisor is not answering",
+              "content": "Extensions cannot be built until it does, and the panel is serving whichever binary it started with. Check the container logs."
+            },
+            "buildFailed": {
+              "title": "The last extension build failed",
+              "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            }
           },
           "button": {
             "viewBuildLogs": "Xem nhật ký build",
             "install": "Cài đặt tiện ích",
             "rebuild": "Build lại tiện ích",
+            "retryBuild": "Retry build",
+            "cancelBuild": "Cancel build",
             "configure": "Cấu Hình",
             "back": "Quay Lại Tiện Ích",
             "accept": "Chấp Nhận",
@@ -1961,9 +2050,22 @@
           "tooltip": {
             "building": "Panel đang build mã tiện ích. Vui lòng chờ.",
             "noPendingBuild": "Không có tiện ích nào đang chờ build.",
+            "cancelling": "The build stops once its current step ends.",
             "noBackend": "Cần tiện ích backend để cấu hình tiện ích này.",
             "noConfigurationPage": "Tiện ích này không có trang cấu hình.",
             "removeExtension": "Xóa tiện ích"
+          },
+          "phase": {
+            "queued": "Queued…",
+            "preparing": "Preparing…",
+            "clearing": "Clearing extensions…",
+            "adding": "Adding extensions ({done}/{total})…",
+            "resync": "Resolving dependencies…",
+            "stagingTranslations": "Staging translations…",
+            "compiling": "Compiling…",
+            "verifying": "Verifying…",
+            "installing": "Installing…",
+            "restarting": "Restarting the panel…"
           },
           "badge": {
             "frontendMissing": "Thiếu frontend",
@@ -1986,6 +2088,8 @@
           "toast": {
             "buildStarted": "Build lại tiện ích đã bắt đầu thành công.",
             "buildCompleted": "Build tiện ích hoàn tất. Bạn có thể cần tải lại trang.",
+            "buildFailed": "Extension build failed: {reason}",
+            "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Tiện ích `{packageName}` đã được thêm thành công.",
             "removed": "Tiện ích `{packageName}` đã được xóa thành công."
           },
@@ -2456,6 +2560,44 @@
                 }
               }
             },
+            "databaseHosts": {
+              "title": "Database Hosts",
+              "page": {
+                "title": "Node Database Hosts",
+                "toast": {
+                  "created": "Node database host created.",
+                  "deleted": "Node database host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Database Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Node Database Host Deletion",
+                    "content": "Are you sure you want to delete the database host **{name}** from **{node}**?"
+                  }
+                }
+              }
+            },
+            "databaseAgentHosts": {
+              "title": "Database Agent Hosts",
+              "page": {
+                "title": "Node Database Agent Hosts",
+                "toast": {
+                  "created": "Node database agent host created.",
+                  "deleted": "Node database agent host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Database Agent Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Node Database Agent Host Deletion",
+                    "content": "Are you sure you want to delete the database agent host **{name}** from **{node}**?"
+                  }
+                }
+              }
+            },
             "backups": {
               "title": "Sao Lưu",
               "page": {
@@ -2542,6 +2684,9 @@
               "title": "Chuyển Đi",
               "page": {
                 "title": "Chuyển Node",
+                "toast": {
+                  "connectionLost": "Lost connection to the node transfers stream."
+                },
                 "table": {
                   "columns": {
                     "progress": "Tiến Trình",
@@ -3203,7 +3348,20 @@
                 "titleCreate": "Tạo Kho Lưu Trữ Egg",
                 "titleUpdate": "Cập Nhật Kho Lưu Trữ Egg",
                 "form": {
-                  "gitRepository": "Kho Git"
+                  "gitRepository": "Kho Git",
+                  "credentials": "Repository Credentials",
+                  "credentialType": "Credential Type",
+                  "password": "Password or Access Token",
+                  "privateKey": "Private Key",
+                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
+                  "passphrase": "Passphrase"
+                },
+                "enum": {
+                  "credentialType": {
+                    "none": "None",
+                    "password": "Password",
+                    "privateKey": "Private Key"
+                  }
                 },
                 "button": {
                   "sync": "Đồng Bộ"
@@ -3821,6 +3979,7 @@
                     "tokenId": "Token ID",
                     "tokenSecret": "Token Secret",
                     "fingerprint": "Dấu Vân Tay Chứng Chỉ TLS",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "backupIdPrefix": "Tiền Tố ID Sao Lưu"
                   }
                 },
@@ -3829,6 +3988,7 @@
                   "form": {
                     "url": "URL Máy Chủ Kopia",
                     "fingerprint": "Dấu Vân Tay Chứng Chỉ TLS",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "tags": "Thẻ Sao Lưu"
                   }
                 }
@@ -4118,7 +4278,8 @@
             "memoryLoad": "Tải Bộ Nhớ",
             "network": "Mạng",
             "inbound": "Đến",
-            "outbound": "Đi"
+            "outbound": "Đi",
+            "offline": "Server is offline"
           },
           "socketConnected": "Đã Kết Nối ({ping}ms ping)",
           "socketDisconnected": "Ngắt Kết Nối"
@@ -4232,7 +4393,8 @@
             "permissionsRestored": "Permissions restored.",
             "permissionsCouldNotBeRestored": "Permissions could not be restored.",
             "fileSaved": "Tệp đã được lưu.",
-            "collabSaveTimeout": "Không thể lưu tệp, daemon không phản hồi kịp thời."
+            "collabSaveTimeout": "Không thể lưu tệp, daemon không phản hồi kịp thời.",
+            "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
             "fileHistory": "Lịch Sử Tệp",
@@ -4508,7 +4670,8 @@
                 "uptime": "Thời gian hoạt động",
                 "cpuLoad": "Tải CPU",
                 "memoryLoad": "Tải Bộ Nhớ",
-                "diskUsage": "Dung Lượng Đĩa"
+                "diskUsage": "Dung Lượng Đĩa",
+                "offline": "Instance is offline"
               }
             },
             "databases": {
@@ -4717,7 +4880,9 @@
             "addElse": "Thêm Else",
             "createFirstStep": "Tạo Bước Đầu Tiên",
             "addOutput": "Thêm Đầu Ra",
-            "addFile": "Thêm Tệp"
+            "addFile": "Thêm Tệp",
+            "addHeader": "Add Header",
+            "viewCalendar": "View Calendar"
           },
           "toast": {
             "imported": "Lịch trình đã được nhập.",
@@ -4774,6 +4939,10 @@
             "duplicateSchedule": {
               "title": "Nhân Bản Lịch Trình"
             },
+            "calendar": {
+              "title": "Upcoming Runs Calendar",
+              "truncatedWarning": "Some upcoming runs have been left out to keep the calendar responsive."
+            },
             "deleteSchedule": {
               "title": "Xác Nhận Xóa Lịch Trình",
               "content": "Bạn có chắc muốn xóa {name} khỏi máy chủ này không?"
@@ -4786,7 +4955,7 @@
             },
             "deleteStep": {
               "title": "Xác Nhận Xóa Bước Lịch Trình",
-              "content": "Bạn có chắc muốn xóa bước lịch trình này không?"
+              "content": "Are you sure you want to delete this \"{step}\" step?"
             },
             "unsavedChanges": {
               "title": "Thay Đổi Chưa Lưu",
@@ -4815,6 +4984,14 @@
               "noTriggers": "Không có trình kích hoạt nào được cấu hình cho lịch trình này"
             }
           },
+          "step": {
+            "aria": {
+              "reorder": "Reorder {step} step",
+              "expand": "Show {step} details",
+              "collapse": "Hide {step} details",
+              "actions": "{step} step actions"
+            }
+          },
           "form": {
             "scheduleName": "Tên Lịch Trình",
             "triggersList": "Trình Kích Hoạt",
@@ -4838,7 +5015,20 @@
             "metric": "Chỉ số",
             "allMustBeTrue": "Tất cả điều kiện phải đúng:",
             "anyMustBeTrue": "Bất kỳ điều kiện nào phải đúng:",
-            "mustNotBeTrue": "Điều kiện phải không đúng:"
+            "mustNotBeTrue": "Điều kiện phải không đúng:",
+            "renderer": {
+              "none": "No condition — this always matches.",
+              "empty": "No conditions added yet.",
+              "serverState": "Server state is {state}",
+              "uptime": "Uptime {comparator} {value}",
+              "resourceUsage": "{metric} {comparator} {value}",
+              "fileExists": "File {file} exists",
+              "variableExists": "Variable {variable} is set",
+              "equals": "Variable {variable} equals {value}",
+              "contains": "Variable {variable} contains {value}",
+              "startsWith": "Variable {variable} starts with {value}",
+              "endsWith": "Variable {variable} ends with {value}"
+            }
           },
           "preCondition": {
             "valueSeconds": "Giá Trị (giây)",
@@ -4953,7 +5143,7 @@
                 "duration": "Thời lượng (miligiây)"
               },
               "renderer": {
-                "compact": "Ngủ trong {duration}"
+                "compact": "Sleep for {duration}"
               }
             },
             "ensure": {
@@ -5074,7 +5264,8 @@
               "title": "Tạo Sao Lưu",
               "description": "Tạo một bản sao lưu các tệp máy chủ.",
               "form": {
-                "backupName": "Tên Sao Lưu"
+                "backupName": "Tên Sao Lưu",
+                "outputInto": "Output Backup UUID Into"
               },
               "renderer": {
                 "compact": "Tạo {name}",
@@ -5082,6 +5273,7 @@
                 "detail": {
                   "backupName": "Tên Sao Lưu: {name}",
                   "backupNameAuto": "Tên Sao Lưu: Tự động tạo",
+                  "outputInto": "Backup UUID into: {variable}",
                   "ignoredFiles": "Tệp Bị Bỏ Qua: {files}"
                 }
               }
@@ -5122,6 +5314,7 @@
               "title": "Delete Backup",
               "description": "Delete a backup selected by the backup selector.",
               "form": {
+                "backupSelector": "Backup to Delete",
                 "warning": "This permanently deletes the selected backup, including its files on the node. Locked backups are skipped."
               }
             },
@@ -5129,6 +5322,7 @@
               "title": "Move Backup",
               "description": "Move a backup selected by the backup selector into a backup group.",
               "form": {
+                "backupSelector": "Backup to Move",
                 "targetGroup": "Target Backup Group"
               },
               "renderer": {
@@ -5266,6 +5460,34 @@
                 "compact": "Đặt thành {image}",
                 "detail": {
                   "image": "Hình Ảnh: {image}"
+                }
+              }
+            },
+            "httpRequest": {
+              "title": "HTTP Request",
+              "description": "Send an HTTP request, for example to a webhook.",
+              "form": {
+                "method": "Method",
+                "url": "URL",
+                "headers": "Headers",
+                "headerName": "Header Name",
+                "headerValue": "Header Value",
+                "body": "Body",
+                "timeout": "Timeout (milliseconds)",
+                "ignoreErrorStatus": "Ignore Error Status Codes",
+                "outputStatusInto": "Output Status Code Into",
+                "outputBodyInto": "Output Response Body Into"
+              },
+              "renderer": {
+                "compact": "Send {method} to {url}",
+                "detail": {
+                  "request": "Request: {method} {url}",
+                  "headers": "Headers: {headers}",
+                  "body": "Body: {body}",
+                  "timeout": "Timeout: {timeout}",
+                  "outputStatusInto": "Status code into: {variable}",
+                  "outputBodyInto": "Response body into: {variable}",
+                  "ignoreErrorStatus": "Ignore error status codes: {value}"
                 }
               }
             }
