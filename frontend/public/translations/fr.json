@@ -104,6 +104,14 @@
       "many": "{count} Lignes",
       "other": "{count} Lignes"
     },
+    "header": {
+      "zero": "{count} Headers",
+      "one": "{count} Header",
+      "two": "{count} Headers",
+      "few": "{count} Headers",
+      "many": "{count} Headers",
+      "other": "{count} Headers"
+    },
     "backup": {
       "zero": "{count} Backups",
       "one": "{count} Backup",
@@ -197,6 +205,18 @@
           "textMode": "Text",
           "jsonMode": "JSON",
           "invalidJson": "Invalid JSON"
+        },
+        "tagsInput": {
+          "copyAll": "Copy All",
+          "pasteReplace": "Paste (Replace)"
+        },
+        "ignoredFilesInput": {
+          "onePatternPerLine": "One pattern per line.",
+          "countMatches": "Count Matches",
+          "matches": "{count} matched",
+          "noMatches": "No matches",
+          "exception": "Exception",
+          "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
         }
       },
       "modal": {
@@ -451,6 +471,24 @@
       "impersonatedBy": "Usurpé par {username}"
     },
     "elements": {
+      "chartLegend": {
+        "hide": "Hide {series}",
+        "show": "Show {series}"
+      },
+      "dragAndDrop": {
+        "item": {
+          "labelled": "{label} (position {position})",
+          "unlabelled": "item at position {position}"
+        },
+        "announcement": {
+          "pickedUp": "Picked up {item}.",
+          "movedOver": "{item} was moved over {target}.",
+          "leftTarget": "{item} is no longer over a drop target.",
+          "droppedOn": "{item} was dropped on {target}.",
+          "dropped": "{item} was dropped.",
+          "cancelled": "Dragging {item} was cancelled."
+        }
+      },
       "routeOrderEditor": {
         "title": "Configuration des routes",
         "label": {
@@ -592,6 +630,7 @@
         "none": "Aucun",
         "variable": "Variable",
         "enterVariable": "Veuillez entrer le nom de la variable à évaluer.",
+        "writeVariable": "The result is stored in this variable.",
         "useVariable": "Use a variable instead of plain text",
         "usePlainText": "Use plain text instead of a variable",
         "optionalPlaceholder": "None (optional)"
@@ -645,6 +684,10 @@
                 "completedTo": "{files} copiés vers le serveur distant en {time}.",
                 "failedFrom": "Échec de la copie de {files} depuis le serveur distant :\n{error}",
                 "failedTo": "Échec de la copie de {files} vers le serveur distant :\n{error}"
+              },
+              "exportingBackup": {
+                "completed": "Exported backup to `{destination}` in {time}.",
+                "failed": "Failed to export backup to `{destination}`:\n{error}"
               }
             }
           }
@@ -797,7 +840,9 @@
             "applicationUrl": "URL d'application",
             "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Activer l'inscription",
-            "registrationDescription": "Autoriser de nouveaux utilisateurs à créer leur propre compte."
+            "registrationDescription": "Autoriser de nouveaux utilisateurs à créer leur propre compte.",
+            "securityKeys": "Enable Security Keys",
+            "securityKeysDescription": "Allow users to sign in with passkeys and hardware security keys, scoped to {rpId}. You can change this later in the admin settings."
           },
           "button": {
             "submit": "Mettre à jour les paramètres & continuer"
@@ -888,7 +933,8 @@
               "notSupportedType": "Votre navigateur ou appareil ne prend pas en charge ce type de clé d'accès.",
               "securityError": "Les clés d'accès ne peuvent être utilisées qu'en HTTPS et avec un domaine valide.",
               "authenticatorError": "Une erreur s'est produite avec l'authentificateur.",
-              "constraintError": "L'authentificateur n'a pas pu satisfaire les contraintes requises."
+              "constraintError": "L'authentificateur n'a pas pu satisfaire les contraintes requises.",
+              "noUsernamelessKey": "No passkey that can be used without a username was found on this device. If you have one that was set up without \"Allow signing in without a username\", enter your username first and it will work as usual."
             }
           },
           "step": {
@@ -904,6 +950,7 @@
                 "createAccount": "Créer un compte"
               },
               "button": {
+                "passkeyLogin": "Sign in with a Passkey",
                 "oauthLogin": "Connexion OAuth"
               }
             },
@@ -984,7 +1031,8 @@
             "addServerToGroup": "Ajouter le serveur au groupe",
             "groupActions": "Actions de groupe",
             "noGroups": "Pas de groupes disponibles auxquels ajouter le serveur",
-            "noGroup": "Ce serveur n'est dans aucun groupe"
+            "noGroup": "Ce serveur n'est dans aucun groupe",
+            "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
           },
           "badge": {
             "foreign": "Externe"
@@ -1157,11 +1205,17 @@
           },
           "tooltip": {
             "secureContextRequired": "Un contexte sécurisé (HTTPS) est requis pour utiliser les clés de sécurité.",
-            "limitReached": "Vous êtes limité à {max} clés de sécurité."
+            "limitReached": "Vous êtes limité à {max} clés de sécurité.",
+            "disabled": "Security keys have been disabled by an administrator."
+          },
+          "alert": {
+            "disabled": "Security keys have been disabled by an administrator. Your existing keys are listed below and can still be removed, but they cannot be used to sign in and no new keys can be created."
           },
           "modal": {
             "createSecurityKey": {
               "title": "Créer une clé de sécurité",
+              "allowUsernamelessLogin": "Allow signing in without a username",
+              "allowUsernamelessLoginDescription": "Saves the passkey onto the device so you can pick it from a list instead of typing your username. Hardware security keys have limited storage and may refuse it - if setup fails, turn this off and try again.",
               "toast": {
                 "created": "Clé de sécurité créée avec succès.",
                 "aborted": "Création de la clé de sécurité annulée."
@@ -1222,6 +1276,10 @@
             "importedNone": "Aucun raccourci n'a été modifié.",
             "importErrors": "{unknown} et {invalid} ignorés.",
             "resetAll": "Tous les raccourcis réinitialisés par défaut."
+          },
+          "general": {
+            "title": "General",
+            "undo": "Undo the last action"
           },
           "fileManager": {
             "title": "Gestionnaire de fichiers",
@@ -1428,6 +1486,21 @@
             "button": {
               "goToApiKeys": "Aller aux clés API"
             }
+          },
+          "update": {
+            "title": "Update API Key",
+            "subtitle": "An application is requesting changes to the permissions of one of your API keys.",
+            "alert": {
+              "replaceMode": "This request **replaces** the permissions of this API key. Permissions marked as removed will be revoked.",
+              "callbackUrl": "After updating, you will be returned to **{url}**."
+            },
+            "badge": {
+              "added": "Added",
+              "existing": "Granted",
+              "removed": "Removed"
+            },
+            "noChanges": "This request does not change the permissions of this API key.",
+            "keyUpdated": "The permissions of your API key have been updated."
           }
         },
         "activity": {
@@ -1764,8 +1837,14 @@
               "page": {
                 "title": "Paramètres Webauthn",
                 "form": {
+                  "enabled": "Enable Security Keys",
+                  "enabledDescription": "Allow users to register and sign in with security keys. Existing keys are kept and remain visible, but cannot be used to sign in while this is off.",
+                  "allowDiscoverable": "Allow Usernameless Login",
+                  "allowDiscoverableDescription": "Let users store passkeys on their device and pick one from a list instead of typing a username.",
                   "rpId": "RP Id",
-                  "rpOrigin": "RP Origin"
+                  "rpOrigin": "RP Origin",
+                  "authenticationTimeoutSeconds": "Authentication Timeout (seconds)",
+                  "registrationTimeoutSeconds": "Registration Timeout (seconds)"
                 },
                 "button": {
                   "autofill": "Remplissage automatique"
@@ -1947,12 +2026,22 @@
           "unknownExtension": "Extension inconnue",
           "alert": {
             "noExtensions": "Aucune extension installée.",
-            "heavyImageMissing": "Il semble que vous n'utilisiez pas l'image heavy requise pour installer des extensions, consultez [ici]({docsUrl}) comment basculer dessus."
+            "heavyImageMissing": "Il semble que vous n'utilisiez pas l'image heavy requise pour installer des extensions, consultez [ici]({docsUrl}) comment basculer dessus.",
+            "supervisorUnreachable": {
+              "title": "The extension supervisor is not answering",
+              "content": "Extensions cannot be built until it does, and the panel is serving whichever binary it started with. Check the container logs."
+            },
+            "buildFailed": {
+              "title": "The last extension build failed",
+              "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            }
           },
           "button": {
             "viewBuildLogs": "Voir les journaux de compilation",
             "install": "Installer une extension",
             "rebuild": "Recompiler les extensions",
+            "retryBuild": "Retry build",
+            "cancelBuild": "Cancel build",
             "configure": "Configurer",
             "back": "Retour aux extensions",
             "accept": "Accepter",
@@ -1961,9 +2050,22 @@
           "tooltip": {
             "building": "Le panel est en train de compiler le code des extensions. Veuillez patienter.",
             "noPendingBuild": "Aucune extension en attente de compilation.",
+            "cancelling": "The build stops once its current step ends.",
             "noBackend": "Une extension backend est requise pour configurer cette extension.",
             "noConfigurationPage": "Cette extension n'a pas de page de configuration définie.",
             "removeExtension": "Retirer l'extension"
+          },
+          "phase": {
+            "queued": "Queued…",
+            "preparing": "Preparing…",
+            "clearing": "Clearing extensions…",
+            "adding": "Adding extensions ({done}/{total})…",
+            "resync": "Resolving dependencies…",
+            "stagingTranslations": "Staging translations…",
+            "compiling": "Compiling…",
+            "verifying": "Verifying…",
+            "installing": "Installing…",
+            "restarting": "Restarting the panel…"
           },
           "badge": {
             "frontendMissing": "Frontend manquant",
@@ -1986,6 +2088,8 @@
           "toast": {
             "buildStarted": "Recompilation des extensions démarrée avec succès.",
             "buildCompleted": "Compilation des extensions terminée. Vous devrez peut-être actualiser la page.",
+            "buildFailed": "Extension build failed: {reason}",
+            "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Extension `{packageName}` ajoutée avec succès.",
             "removed": "Extension `{packageName}` supprimée avec succès."
           },
@@ -2456,6 +2560,44 @@
                 }
               }
             },
+            "databaseHosts": {
+              "title": "Database Hosts",
+              "page": {
+                "title": "Node Database Hosts",
+                "toast": {
+                  "created": "Node database host created.",
+                  "deleted": "Node database host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Database Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Node Database Host Deletion",
+                    "content": "Are you sure you want to delete the database host **{name}** from **{node}**?"
+                  }
+                }
+              }
+            },
+            "databaseAgentHosts": {
+              "title": "Database Agent Hosts",
+              "page": {
+                "title": "Node Database Agent Hosts",
+                "toast": {
+                  "created": "Node database agent host created.",
+                  "deleted": "Node database agent host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Database Agent Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Node Database Agent Host Deletion",
+                    "content": "Are you sure you want to delete the database agent host **{name}** from **{node}**?"
+                  }
+                }
+              }
+            },
             "backups": {
               "title": "Sauvegardes",
               "page": {
@@ -2542,6 +2684,9 @@
               "title": "Transferts sortants",
               "page": {
                 "title": "Transferts du nœud",
+                "toast": {
+                  "connectionLost": "Lost connection to the node transfers stream."
+                },
                 "table": {
                   "columns": {
                     "progress": "Progression",
@@ -3203,7 +3348,20 @@
                 "titleCreate": "Créer un dépôt d'Eggs",
                 "titleUpdate": "Modifier le dépôt d'Eggs",
                 "form": {
-                  "gitRepository": "Dépôt Git"
+                  "gitRepository": "Dépôt Git",
+                  "credentials": "Repository Credentials",
+                  "credentialType": "Credential Type",
+                  "password": "Password or Access Token",
+                  "privateKey": "Private Key",
+                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
+                  "passphrase": "Passphrase"
+                },
+                "enum": {
+                  "credentialType": {
+                    "none": "None",
+                    "password": "Password",
+                    "privateKey": "Private Key"
+                  }
                 },
                 "button": {
                   "sync": "Synchroniser"
@@ -3821,6 +3979,7 @@
                     "tokenId": "ID du token",
                     "tokenSecret": "Secret du token",
                     "fingerprint": "Empreinte du certificat TLS",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "backupIdPrefix": "Préfixe d'ID de sauvegarde"
                   }
                 },
@@ -3829,6 +3988,7 @@
                   "form": {
                     "url": "URL du serveur Kopia",
                     "fingerprint": "Empreinte du certificat TLS",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "tags": "Tags de sauvegarde"
                   }
                 }
@@ -4118,7 +4278,8 @@
             "memoryLoad": "Charge mémoire",
             "network": "Réseau",
             "inbound": "Entrant",
-            "outbound": "Sortant"
+            "outbound": "Sortant",
+            "offline": "Server is offline"
           },
           "socketConnected": "Connecté (ping {ping}ms)",
           "socketDisconnected": "Déconnecté"
@@ -4232,7 +4393,8 @@
             "permissionsRestored": "Permissions restored.",
             "permissionsCouldNotBeRestored": "Permissions could not be restored.",
             "fileSaved": "Le fichier a été sauvegardé.",
-            "collabSaveTimeout": "The file could not be saved, the daemon did not respond in time."
+            "collabSaveTimeout": "The file could not be saved, the daemon did not respond in time.",
+            "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
             "fileHistory": "Historique du fichier",
@@ -4508,7 +4670,8 @@
                 "uptime": "Uptime",
                 "cpuLoad": "CPU Load",
                 "memoryLoad": "Memory Load",
-                "diskUsage": "Disk Usage"
+                "diskUsage": "Disk Usage",
+                "offline": "Instance is offline"
               }
             },
             "databases": {
@@ -4717,7 +4880,9 @@
             "addElse": "Add Else",
             "createFirstStep": "Créer la première étape",
             "addOutput": "Ajouter une sortie",
-            "addFile": "Ajouter un fichier"
+            "addFile": "Ajouter un fichier",
+            "addHeader": "Add Header",
+            "viewCalendar": "View Calendar"
           },
           "toast": {
             "imported": "Planification importée.",
@@ -4774,6 +4939,10 @@
             "duplicateSchedule": {
               "title": "Duplicate Schedule"
             },
+            "calendar": {
+              "title": "Upcoming Runs Calendar",
+              "truncatedWarning": "Some upcoming runs have been left out to keep the calendar responsive."
+            },
             "deleteSchedule": {
               "title": "Confirmer la suppression de la planification",
               "content": "Êtes-vous sûr de vouloir supprimer {name} de ce serveur ?"
@@ -4786,7 +4955,7 @@
             },
             "deleteStep": {
               "title": "Confirmer la suppression de l'étape de planification",
-              "content": "Êtes-vous sûr de vouloir supprimer cette étape de planification ?"
+              "content": "Are you sure you want to delete this \"{step}\" step?"
             },
             "unsavedChanges": {
               "title": "Unsaved Changes",
@@ -4815,6 +4984,14 @@
               "noTriggers": "Aucun déclencheur configuré pour cette planification"
             }
           },
+          "step": {
+            "aria": {
+              "reorder": "Reorder {step} step",
+              "expand": "Show {step} details",
+              "collapse": "Hide {step} details",
+              "actions": "{step} step actions"
+            }
+          },
           "form": {
             "scheduleName": "Nom de la planification",
             "triggersList": "Déclencheurs",
@@ -4838,7 +5015,20 @@
             "metric": "Metric",
             "allMustBeTrue": "Toutes les conditions doivent être vraies :",
             "anyMustBeTrue": "Au moins une condition doit être vraie :",
-            "mustNotBeTrue": "La condition ne doit pas être vraie :"
+            "mustNotBeTrue": "La condition ne doit pas être vraie :",
+            "renderer": {
+              "none": "No condition — this always matches.",
+              "empty": "No conditions added yet.",
+              "serverState": "Server state is {state}",
+              "uptime": "Uptime {comparator} {value}",
+              "resourceUsage": "{metric} {comparator} {value}",
+              "fileExists": "File {file} exists",
+              "variableExists": "Variable {variable} is set",
+              "equals": "Variable {variable} equals {value}",
+              "contains": "Variable {variable} contains {value}",
+              "startsWith": "Variable {variable} starts with {value}",
+              "endsWith": "Variable {variable} ends with {value}"
+            }
           },
           "preCondition": {
             "valueSeconds": "Valeur (secondes)",
@@ -4953,7 +5143,7 @@
                 "duration": "Durée (millisecondes)"
               },
               "renderer": {
-                "compact": "Attendre {duration}"
+                "compact": "Sleep for {duration}"
               }
             },
             "ensure": {
@@ -5074,7 +5264,8 @@
               "title": "Créer une sauvegarde",
               "description": "Create a backup of the server files.",
               "form": {
-                "backupName": "Nom de la sauvegarde"
+                "backupName": "Nom de la sauvegarde",
+                "outputInto": "Output Backup UUID Into"
               },
               "renderer": {
                 "compact": "Créer {name}",
@@ -5082,6 +5273,7 @@
                 "detail": {
                   "backupName": "Nom de la sauvegarde : {name}",
                   "backupNameAuto": "Backup Name: Auto-generated",
+                  "outputInto": "Backup UUID into: {variable}",
                   "ignoredFiles": "Fichiers ignorés : {files}"
                 }
               }
@@ -5122,6 +5314,7 @@
               "title": "Delete Backup",
               "description": "Delete a backup selected by the backup selector.",
               "form": {
+                "backupSelector": "Backup to Delete",
                 "warning": "This permanently deletes the selected backup, including its files on the node. Locked backups are skipped."
               }
             },
@@ -5129,6 +5322,7 @@
               "title": "Move Backup",
               "description": "Move a backup selected by the backup selector into a backup group.",
               "form": {
+                "backupSelector": "Backup to Move",
                 "targetGroup": "Target Backup Group"
               },
               "renderer": {
@@ -5266,6 +5460,34 @@
                 "compact": "Définir sur {image}",
                 "detail": {
                   "image": "Image : {image}"
+                }
+              }
+            },
+            "httpRequest": {
+              "title": "HTTP Request",
+              "description": "Send an HTTP request, for example to a webhook.",
+              "form": {
+                "method": "Method",
+                "url": "URL",
+                "headers": "Headers",
+                "headerName": "Header Name",
+                "headerValue": "Header Value",
+                "body": "Body",
+                "timeout": "Timeout (milliseconds)",
+                "ignoreErrorStatus": "Ignore Error Status Codes",
+                "outputStatusInto": "Output Status Code Into",
+                "outputBodyInto": "Output Response Body Into"
+              },
+              "renderer": {
+                "compact": "Send {method} to {url}",
+                "detail": {
+                  "request": "Request: {method} {url}",
+                  "headers": "Headers: {headers}",
+                  "body": "Body: {body}",
+                  "timeout": "Timeout: {timeout}",
+                  "outputStatusInto": "Status code into: {variable}",
+                  "outputBodyInto": "Response body into: {variable}",
+                  "ignoreErrorStatus": "Ignore error status codes: {value}"
                 }
               }
             }

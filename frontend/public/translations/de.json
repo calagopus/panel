@@ -105,12 +105,12 @@
       "other": "{count} Zeilen"
     },
     "header": {
-      "zero": "{count} Header",
+      "zero": "{count} Headers",
       "one": "{count} Header",
-      "two": "{count} Header",
-      "few": "{count} Header",
-      "many": "{count} Header",
-      "other": "{count} Header"
+      "two": "{count} Headers",
+      "few": "{count} Headers",
+      "many": "{count} Headers",
+      "other": "{count} Headers"
     },
     "backup": {
       "zero": "{count} Backups",
@@ -207,16 +207,16 @@
           "invalidJson": "Ungültiges JSON"
         },
         "tagsInput": {
-          "copyAll": "Alle kopieren",
-          "pasteReplace": "Einfügen (ersetzen)"
+          "copyAll": "Copy All",
+          "pasteReplace": "Paste (Replace)"
         },
         "ignoredFilesInput": {
-          "onePatternPerLine": "Ein Muster pro Zeile.",
-          "countMatches": "Treffer zählen",
-          "matches": "{count} Treffer",
-          "noMatches": "Keine Treffer",
-          "exception": "Ausnahme",
-          "tooManyPatterns": "Bei mehr als {max} Mustern werden Treffer nicht automatisch gezählt."
+          "onePatternPerLine": "One pattern per line.",
+          "countMatches": "Count Matches",
+          "matches": "{count} matched",
+          "noMatches": "No matches",
+          "exception": "Exception",
+          "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
         }
       },
       "modal": {
@@ -472,21 +472,21 @@
     },
     "elements": {
       "chartLegend": {
-        "hide": "{series} ausblenden",
-        "show": "{series} einblenden"
+        "hide": "Hide {series}",
+        "show": "Show {series}"
       },
       "dragAndDrop": {
         "item": {
-          "labelled": "{label} (Position {position})",
-          "unlabelled": "Element an Position {position}"
+          "labelled": "{label} (position {position})",
+          "unlabelled": "item at position {position}"
         },
         "announcement": {
-          "pickedUp": "{item} aufgenommen.",
-          "movedOver": "{item} wurde über {target} bewegt.",
-          "leftTarget": "{item} befindet sich nicht mehr über einem Ablageziel.",
-          "droppedOn": "{item} wurde auf {target} abgelegt.",
-          "dropped": "{item} wurde abgelegt.",
-          "cancelled": "Das Ziehen von {item} wurde abgebrochen."
+          "pickedUp": "Picked up {item}.",
+          "movedOver": "{item} was moved over {target}.",
+          "leftTarget": "{item} is no longer over a drop target.",
+          "droppedOn": "{item} was dropped on {target}.",
+          "dropped": "{item} was dropped.",
+          "cancelled": "Dragging {item} was cancelled."
         }
       },
       "routeOrderEditor": {
@@ -630,7 +630,7 @@
         "none": "Keine",
         "variable": "Variable",
         "enterVariable": "Liest aus einer Variable.",
-        "writeVariable": "Das Ergebnis wird in dieser Variable gespeichert.",
+        "writeVariable": "The result is stored in this variable.",
         "useVariable": "Eine Variable anstelle von Text verwenden",
         "usePlainText": "Text anstelle einer Variable verwenden",
         "optionalPlaceholder": "Keine (optional)"
@@ -686,8 +686,8 @@
                 "failedTo": "Kopieren von {files} zum Remote-Server fehlgeschlagen:\n{error}"
               },
               "exportingBackup": {
-                "completed": "Backup nach `{destination}` exportiert in {time}.",
-                "failed": "Exportieren des Backups nach `{destination}` fehlgeschlagen:\n{error}"
+                "completed": "Exported backup to `{destination}` in {time}.",
+                "failed": "Failed to export backup to `{destination}`:\n{error}"
               }
             }
           }
@@ -841,8 +841,8 @@
             "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Registrierung aktivieren",
             "registrationDescription": "Erlaube neuen Benutzern, ihren eigenen Account zu registrieren.",
-            "securityKeys": "Sicherheitsschlüssel aktivieren",
-            "securityKeysDescription": "Erlaube Benutzern, sich mit Passkeys und Hardware-Sicherheitsschlüsseln anzumelden, beschränkt auf {rpId}. Du kannst dies später in den Admin-Einstellungen ändern."
+            "securityKeys": "Enable Security Keys",
+            "securityKeysDescription": "Allow users to sign in with passkeys and hardware security keys, scoped to {rpId}. You can change this later in the admin settings."
           },
           "button": {
             "submit": "Einstellungen aktualisieren & Weiter"
@@ -934,7 +934,7 @@
               "securityError": "Passkeys können nur über HTTPS und mit einer gültigen Domain verwendet werden.",
               "authenticatorError": "Mit dem Authenticator ist etwas schiefgelaufen.",
               "constraintError": "Der Authenticator konnte die erforderlichen Bedingungen nicht erfüllen.",
-              "noUsernamelessKey": "Auf diesem Gerät wurde kein Passkey gefunden, der ohne Benutzernamen verwendet werden kann. Falls du einen hast, der ohne \"Anmeldung ohne Benutzernamen erlauben\" eingerichtet wurde, gib zuerst deinen Benutzernamen ein - dann funktioniert er wie gewohnt."
+              "noUsernamelessKey": "No passkey that can be used without a username was found on this device. If you have one that was set up without \"Allow signing in without a username\", enter your username first and it will work as usual."
             }
           },
           "step": {
@@ -950,7 +950,7 @@
                 "createAccount": "Account erstellen"
               },
               "button": {
-                "passkeyLogin": "Mit Passkey anmelden",
+                "passkeyLogin": "Sign in with a Passkey",
                 "oauthLogin": "OAuth-Anmeldung"
               }
             },
@@ -1032,7 +1032,7 @@
             "groupActions": "Gruppen-Aktionen",
             "noGroups": "Keine Gruppen zum Hinzufügen verfügbar",
             "noGroup": "Dieser Server ist noch in keiner Gruppe",
-            "foreign": "Dieser Server gehört einem anderen Benutzer, du hast als Unterbenutzer oder Administrator Zugriff darauf"
+            "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
           },
           "badge": {
             "foreign": "Fremd"
@@ -1206,16 +1206,16 @@
           "tooltip": {
             "secureContextRequired": "Ein sicherer Kontext (HTTPS) ist erforderlich, um Sicherheitsschlüssel zu verwenden.",
             "limitReached": "Du bist auf {max} Sicherheitsschlüssel limitiert.",
-            "disabled": "Sicherheitsschlüssel wurden von einem Administrator deaktiviert."
+            "disabled": "Security keys have been disabled by an administrator."
           },
           "alert": {
-            "disabled": "Sicherheitsschlüssel wurden von einem Administrator deaktiviert. Deine bestehenden Schlüssel werden unten aufgelistet und können weiterhin entfernt werden, sie können jedoch nicht zur Anmeldung verwendet werden und es können keine neuen Schlüssel erstellt werden."
+            "disabled": "Security keys have been disabled by an administrator. Your existing keys are listed below and can still be removed, but they cannot be used to sign in and no new keys can be created."
           },
           "modal": {
             "createSecurityKey": {
               "title": "Sicherheitsschlüssel erstellen",
-              "allowUsernamelessLogin": "Anmeldung ohne Benutzernamen erlauben",
-              "allowUsernamelessLoginDescription": "Speichert den Passkey auf dem Gerät, sodass du ihn aus einer Liste auswählen kannst, statt deinen Benutzernamen einzugeben. Hardware-Sicherheitsschlüssel haben begrenzten Speicher und lehnen es möglicherweise ab - schalte es in dem Fall aus und versuche es erneut.",
+              "allowUsernamelessLogin": "Allow signing in without a username",
+              "allowUsernamelessLoginDescription": "Saves the passkey onto the device so you can pick it from a list instead of typing your username. Hardware security keys have limited storage and may refuse it - if setup fails, turn this off and try again.",
               "toast": {
                 "created": "Sicherheitsschlüssel erfolgreich erstellt.",
                 "aborted": "Erstellung des Sicherheitsschlüssels abgebrochen."
@@ -1278,8 +1278,8 @@
             "resetAll": "Alle Tastenkürzel auf Standard zurückgesetzt."
           },
           "general": {
-            "title": "Allgemein",
-            "undo": "Letzte Aktion rückgängig machen"
+            "title": "General",
+            "undo": "Undo the last action"
           },
           "fileManager": {
             "title": "Dateimanager",
@@ -1488,19 +1488,19 @@
             }
           },
           "update": {
-            "title": "API-Schlüssel aktualisieren",
-            "subtitle": "Eine Anwendung fordert Änderungen an den Berechtigungen eines deiner API-Schlüssel an.",
+            "title": "Update API Key",
+            "subtitle": "An application is requesting changes to the permissions of one of your API keys.",
             "alert": {
-              "replaceMode": "Diese Anfrage **ersetzt** die Berechtigungen dieses API-Schlüssels. Als entfernt markierte Berechtigungen werden entzogen.",
-              "callbackUrl": "Nach der Aktualisierung wirst du zurück zu **{url}** geleitet."
+              "replaceMode": "This request **replaces** the permissions of this API key. Permissions marked as removed will be revoked.",
+              "callbackUrl": "After updating, you will be returned to **{url}**."
             },
             "badge": {
-              "added": "Hinzugefügt",
-              "existing": "Erteilt",
-              "removed": "Entfernt"
+              "added": "Added",
+              "existing": "Granted",
+              "removed": "Removed"
             },
-            "noChanges": "Diese Anfrage ändert die Berechtigungen dieses API-Schlüssels nicht.",
-            "keyUpdated": "Die Berechtigungen deines API-Schlüssels wurden aktualisiert."
+            "noChanges": "This request does not change the permissions of this API key.",
+            "keyUpdated": "The permissions of your API key have been updated."
           }
         },
         "activity": {
@@ -1837,14 +1837,14 @@
               "page": {
                 "title": "Webauthn-Einstellungen",
                 "form": {
-                  "enabled": "Sicherheitsschlüssel aktivieren",
-                  "enabledDescription": "Erlaube Benutzern, sich mit Sicherheitsschlüsseln zu registrieren und anzumelden. Bestehende Schlüssel bleiben erhalten und sichtbar, können aber zur Anmeldung nicht verwendet werden, solange dies deaktiviert ist.",
-                  "allowDiscoverable": "Anmeldung ohne Benutzernamen erlauben",
-                  "allowDiscoverableDescription": "Erlaube Benutzern, Passkeys auf ihrem Gerät zu speichern und einen aus einer Liste auszuwählen, statt einen Benutzernamen einzugeben.",
+                  "enabled": "Enable Security Keys",
+                  "enabledDescription": "Allow users to register and sign in with security keys. Existing keys are kept and remain visible, but cannot be used to sign in while this is off.",
+                  "allowDiscoverable": "Allow Usernameless Login",
+                  "allowDiscoverableDescription": "Let users store passkeys on their device and pick one from a list instead of typing a username.",
                   "rpId": "RP-Id",
                   "rpOrigin": "RP-Origin",
-                  "authenticationTimeoutSeconds": "Zeitüberschreitung der Authentifizierung (Sekunden)",
-                  "registrationTimeoutSeconds": "Zeitüberschreitung der Registrierung (Sekunden)"
+                  "authenticationTimeoutSeconds": "Authentication Timeout (seconds)",
+                  "registrationTimeoutSeconds": "Registration Timeout (seconds)"
                 },
                 "button": {
                   "autofill": "Automatisch ausfüllen"
@@ -2028,20 +2028,20 @@
             "noExtensions": "Keine Erweiterungen installiert.",
             "heavyImageMissing": "Du scheinst nicht das Heavy-Image zu verwenden, das zum Installieren von Erweiterungen benötigt wird. Siehe [hier]({docsUrl}), wie du dazu wechselst.",
             "supervisorUnreachable": {
-              "title": "Der Erweiterungs-Supervisor antwortet nicht",
-              "content": "Erweiterungen können nicht erstellt werden, bis er das tut, und das Panel führt weiterhin die Binary aus, mit der es gestartet ist. Prüfe die Container-Logs."
+              "title": "The extension supervisor is not answering",
+              "content": "Extensions cannot be built until it does, and the panel is serving whichever binary it started with. Check the container logs."
             },
             "buildFailed": {
-              "title": "Der letzte Erweiterungs-Build ist fehlgeschlagen",
-              "content": "Diese Erweiterungen werden erst wieder erstellt, wenn sie sich ändern oder du den Build ausdrücklich erneut startest."
+              "title": "The last extension build failed",
+              "content": "These extensions are not built again until they change, or until you retry the build explicitly."
             }
           },
           "button": {
             "viewBuildLogs": "Build-Logs anzeigen",
             "install": "Erweiterung installieren",
             "rebuild": "Erweiterungen neu erstellen",
-            "retryBuild": "Build wiederholen",
-            "cancelBuild": "Build abbrechen",
+            "retryBuild": "Retry build",
+            "cancelBuild": "Cancel build",
             "configure": "Konfigurieren",
             "back": "Zurück zu Erweiterungen",
             "accept": "Akzeptieren",
@@ -2050,22 +2050,22 @@
           "tooltip": {
             "building": "Das Panel erstellt gerade Erweiterungs-Code. Bitte warte.",
             "noPendingBuild": "Keine ausstehenden Erweiterungen zum Erstellen.",
-            "cancelling": "Der Build stoppt, sobald der aktuelle Schritt beendet ist.",
+            "cancelling": "The build stops once its current step ends.",
             "noBackend": "Eine Backend-Erweiterung ist erforderlich, um diese Erweiterung zu konfigurieren.",
             "noConfigurationPage": "Diese Erweiterung hat keine Konfigurationsseite definiert.",
             "removeExtension": "Erweiterung entfernen"
           },
           "phase": {
-            "queued": "In der Warteschlange…",
-            "preparing": "Wird vorbereitet…",
-            "clearing": "Erweiterungen werden entfernt…",
-            "adding": "Erweiterungen werden hinzugefügt ({done}/{total})…",
-            "resync": "Abhängigkeiten werden aufgelöst…",
-            "stagingTranslations": "Übersetzungen werden vorbereitet…",
-            "compiling": "Wird kompiliert…",
-            "verifying": "Wird überprüft…",
-            "installing": "Wird installiert…",
-            "restarting": "Panel wird neu gestartet…"
+            "queued": "Queued…",
+            "preparing": "Preparing…",
+            "clearing": "Clearing extensions…",
+            "adding": "Adding extensions ({done}/{total})…",
+            "resync": "Resolving dependencies…",
+            "stagingTranslations": "Staging translations…",
+            "compiling": "Compiling…",
+            "verifying": "Verifying…",
+            "installing": "Installing…",
+            "restarting": "Restarting the panel…"
           },
           "badge": {
             "frontendMissing": "Frontend fehlt",
@@ -2088,8 +2088,8 @@
           "toast": {
             "buildStarted": "Erweiterungs-Build erfolgreich gestartet.",
             "buildCompleted": "Erweiterungs-Build abgeschlossen. Möglicherweise musst du die Seite neu laden.",
-            "buildFailed": "Erweiterungs-Build fehlgeschlagen: {reason}",
-            "cancelRequested": "Abbruch angefordert. Der Build stoppt, sobald der aktuelle Schritt beendet ist.",
+            "buildFailed": "Extension build failed: {reason}",
+            "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Erweiterung `{packageName}` erfolgreich hinzugefügt.",
             "removed": "Erweiterung `{packageName}` erfolgreich entfernt."
           },
@@ -2561,39 +2561,39 @@
               }
             },
             "databaseHosts": {
-              "title": "Datenbank-Hosts",
+              "title": "Database Hosts",
               "page": {
-                "title": "Node Datenbank-Hosts",
+                "title": "Node Database Hosts",
                 "toast": {
-                  "created": "Node Datenbank-Host erstellt.",
-                  "deleted": "Node Datenbank-Host gelöscht."
+                  "created": "Node database host created.",
+                  "deleted": "Node database host deleted."
                 },
                 "modal": {
                   "create": {
-                    "title": "Node Datenbank-Host erstellen"
+                    "title": "Create Node Database Host"
                   },
                   "delete": {
-                    "title": "Löschen des Node Datenbank-Hosts bestätigen",
-                    "content": "Bist du sicher, dass du den Datenbank-Host **{name}** von **{node}** entfernen möchtest?"
+                    "title": "Confirm Node Database Host Deletion",
+                    "content": "Are you sure you want to delete the database host **{name}** from **{node}**?"
                   }
                 }
               }
             },
             "databaseAgentHosts": {
-              "title": "Datenbank-Agent-Hosts",
+              "title": "Database Agent Hosts",
               "page": {
-                "title": "Node Datenbank-Agent-Hosts",
+                "title": "Node Database Agent Hosts",
                 "toast": {
-                  "created": "Node Datenbank-Agent-Host erstellt.",
-                  "deleted": "Node Datenbank-Agent-Host gelöscht."
+                  "created": "Node database agent host created.",
+                  "deleted": "Node database agent host deleted."
                 },
                 "modal": {
                   "create": {
-                    "title": "Node Datenbank-Agent-Host erstellen"
+                    "title": "Create Node Database Agent Host"
                   },
                   "delete": {
-                    "title": "Löschen des Node Datenbank-Agent-Hosts bestätigen",
-                    "content": "Bist du sicher, dass du den Datenbank-Agent-Host **{name}** von **{node}** entfernen möchtest?"
+                    "title": "Confirm Node Database Agent Host Deletion",
+                    "content": "Are you sure you want to delete the database agent host **{name}** from **{node}**?"
                   }
                 }
               }
@@ -2685,7 +2685,7 @@
               "page": {
                 "title": "Node Transfers",
                 "toast": {
-                  "connectionLost": "Verbindung zum Node-Transfer-Stream verloren."
+                  "connectionLost": "Lost connection to the node transfers stream."
                 },
                 "table": {
                   "columns": {
@@ -3349,18 +3349,18 @@
                 "titleUpdate": "Egg Repository aktualisieren",
                 "form": {
                   "gitRepository": "Git Repository",
-                  "credentials": "Repository-Zugangsdaten",
-                  "credentialType": "Art der Zugangsdaten",
-                  "password": "Passwort oder Zugriffstoken",
-                  "privateKey": "Privater Schlüssel",
+                  "credentials": "Repository Credentials",
+                  "credentialType": "Credential Type",
+                  "password": "Password or Access Token",
+                  "privateKey": "Private Key",
                   "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
                   "passphrase": "Passphrase"
                 },
                 "enum": {
                   "credentialType": {
-                    "none": "Keine",
-                    "password": "Passwort",
-                    "privateKey": "Privater Schlüssel"
+                    "none": "None",
+                    "password": "Password",
+                    "privateKey": "Private Key"
                   }
                 },
                 "button": {
@@ -3979,7 +3979,7 @@
                     "tokenId": "Token-ID",
                     "tokenSecret": "Token-Geheimnis",
                     "fingerprint": "TLS-Zertifikat-Fingerabdruck",
-                    "fingerprintDescription": "Bindet die Verbindung an dieses Zertifikat. Leer lassen, um das Zertifikat stattdessen gegen den System-Zertifikatsspeicher zu prüfen.",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "backupIdPrefix": "Backup-ID-Präfix"
                   }
                 },
@@ -3988,7 +3988,7 @@
                   "form": {
                     "url": "Kopia-Server-URL",
                     "fingerprint": "TLS-Zertifikat-Fingerabdruck",
-                    "fingerprintDescription": "Bindet die Verbindung an dieses Zertifikat. Leer lassen, um das Zertifikat stattdessen gegen den System-Zertifikatsspeicher zu prüfen.",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "tags": "Backup-Tags"
                   }
                 }
@@ -4279,7 +4279,7 @@
             "network": "Netzwerk",
             "inbound": "Eingehend",
             "outbound": "Ausgehend",
-            "offline": "Server ist offline"
+            "offline": "Server is offline"
           },
           "socketConnected": "Verbunden ({ping}ms ping)",
           "socketDisconnected": "Getrennt"
@@ -4393,7 +4393,8 @@
             "permissionsRestored": "Berechtigungen wiederhergestellt.",
             "permissionsCouldNotBeRestored": "Berechtigungen konnten nicht wiederhergestellt werden.",
             "fileSaved": "Datei wurde gespeichert.",
-            "collabSaveTimeout": "Die Datei konnte nicht gespeichert werden, der Daemon hat nicht rechtzeitig geantwortet."
+            "collabSaveTimeout": "Die Datei konnte nicht gespeichert werden, der Daemon hat nicht rechtzeitig geantwortet.",
+            "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
             "fileHistory": "Dateiverlauf",
@@ -4670,7 +4671,7 @@
                 "cpuLoad": "CPU-Auslastung",
                 "memoryLoad": "Speicherauslastung",
                 "diskUsage": "Festplattennutzung",
-                "offline": "Instanz ist offline"
+                "offline": "Instance is offline"
               }
             },
             "databases": {
@@ -4880,8 +4881,8 @@
             "createFirstStep": "Ersten Schritt erstellen",
             "addOutput": "Ausgabe hinzufügen",
             "addFile": "Datei hinzufügen",
-            "addHeader": "Header hinzufügen",
-            "viewCalendar": "Kalender anzeigen"
+            "addHeader": "Add Header",
+            "viewCalendar": "View Calendar"
           },
           "toast": {
             "imported": "Zeitplan importiert.",
@@ -4939,8 +4940,8 @@
               "title": "Zeitplan duplizieren"
             },
             "calendar": {
-              "title": "Kalender der anstehenden Ausführungen",
-              "truncatedWarning": "Einige anstehende Ausführungen wurden weggelassen, damit der Kalender reaktionsfähig bleibt."
+              "title": "Upcoming Runs Calendar",
+              "truncatedWarning": "Some upcoming runs have been left out to keep the calendar responsive."
             },
             "deleteSchedule": {
               "title": "Löschen des Zeitplans bestätigen",
@@ -4954,7 +4955,7 @@
             },
             "deleteStep": {
               "title": "Löschen des Zeitplan-Schritts bestätigen",
-              "content": "Bist du sicher, dass du diesen Schritt \"{step}\" löschen möchtest?"
+              "content": "Are you sure you want to delete this \"{step}\" step?"
             },
             "unsavedChanges": {
               "title": "Ungespeicherte Änderungen",
@@ -4985,10 +4986,10 @@
           },
           "step": {
             "aria": {
-              "reorder": "Schritt {step} neu anordnen",
-              "expand": "Details zu {step} anzeigen",
-              "collapse": "Details zu {step} ausblenden",
-              "actions": "Aktionen für Schritt {step}"
+              "reorder": "Reorder {step} step",
+              "expand": "Show {step} details",
+              "collapse": "Hide {step} details",
+              "actions": "{step} step actions"
             }
           },
           "form": {
@@ -5016,17 +5017,17 @@
             "anyMustBeTrue": "Mindestens eine Bedingung muss wahr sein:",
             "mustNotBeTrue": "Bedingung darf nicht wahr sein:",
             "renderer": {
-              "none": "Keine Bedingung – trifft immer zu.",
-              "empty": "Noch keine Bedingungen hinzugefügt.",
-              "serverState": "Serverstatus ist {state}",
-              "uptime": "Betriebszeit {comparator} {value}",
+              "none": "No condition — this always matches.",
+              "empty": "No conditions added yet.",
+              "serverState": "Server state is {state}",
+              "uptime": "Uptime {comparator} {value}",
               "resourceUsage": "{metric} {comparator} {value}",
-              "fileExists": "Datei {file} existiert",
-              "variableExists": "Variable {variable} ist gesetzt",
-              "equals": "Variable {variable} ist gleich {value}",
-              "contains": "Variable {variable} enthält {value}",
-              "startsWith": "Variable {variable} beginnt mit {value}",
-              "endsWith": "Variable {variable} endet mit {value}"
+              "fileExists": "File {file} exists",
+              "variableExists": "Variable {variable} is set",
+              "equals": "Variable {variable} equals {value}",
+              "contains": "Variable {variable} contains {value}",
+              "startsWith": "Variable {variable} starts with {value}",
+              "endsWith": "Variable {variable} ends with {value}"
             }
           },
           "preCondition": {
@@ -5142,7 +5143,7 @@
                 "duration": "Dauer (Millisekunden)"
               },
               "renderer": {
-                "compact": "Pausieren für {duration}"
+                "compact": "Sleep for {duration}"
               }
             },
             "ensure": {
@@ -5264,7 +5265,7 @@
               "description": "Erstellt ein Backup der Server-Dateien.",
               "form": {
                 "backupName": "Backup-Name",
-                "outputInto": "Backup-UUID ausgeben in"
+                "outputInto": "Output Backup UUID Into"
               },
               "renderer": {
                 "compact": "Erstelle {name}",
@@ -5272,7 +5273,7 @@
                 "detail": {
                   "backupName": "Backup-Name: {name}",
                   "backupNameAuto": "Backup-Name: Automatisch generiert",
-                  "outputInto": "Backup-UUID in: {variable}",
+                  "outputInto": "Backup UUID into: {variable}",
                   "ignoredFiles": "Ignorierte Dateien: {files}"
                 }
               }
@@ -5313,7 +5314,7 @@
               "title": "Backup löschen",
               "description": "Lösche ein durch die Backup-Auswahl ausgewähltes Backup.",
               "form": {
-                "backupSelector": "Zu löschendes Backup",
+                "backupSelector": "Backup to Delete",
                 "warning": "Dadurch wird das ausgewählte Backup einschließlich seiner Dateien auf dem Node dauerhaft gelöscht. Gesperrte Backups werden übersprungen."
               }
             },
@@ -5321,7 +5322,7 @@
               "title": "Backup verschieben",
               "description": "Verschiebe ein durch die Backup-Auswahl ausgewähltes Backup in eine Backup-Gruppe.",
               "form": {
-                "backupSelector": "Zu verschiebendes Backup",
+                "backupSelector": "Backup to Move",
                 "targetGroup": "Ziel-Backup-Gruppe"
               },
               "renderer": {
@@ -5463,30 +5464,30 @@
               }
             },
             "httpRequest": {
-              "title": "HTTP-Anfrage",
-              "description": "Sendet eine HTTP-Anfrage, zum Beispiel an einen Webhook.",
+              "title": "HTTP Request",
+              "description": "Send an HTTP request, for example to a webhook.",
               "form": {
-                "method": "Methode",
+                "method": "Method",
                 "url": "URL",
-                "headers": "Header",
-                "headerName": "Header-Name",
-                "headerValue": "Header-Wert",
+                "headers": "Headers",
+                "headerName": "Header Name",
+                "headerValue": "Header Value",
                 "body": "Body",
-                "timeout": "Zeitüberschreitung (Millisekunden)",
-                "ignoreErrorStatus": "Fehler-Statuscodes ignorieren",
-                "outputStatusInto": "Statuscode ausgeben in",
-                "outputBodyInto": "Antwort-Body ausgeben in"
+                "timeout": "Timeout (milliseconds)",
+                "ignoreErrorStatus": "Ignore Error Status Codes",
+                "outputStatusInto": "Output Status Code Into",
+                "outputBodyInto": "Output Response Body Into"
               },
               "renderer": {
-                "compact": "Sende {method} an {url}",
+                "compact": "Send {method} to {url}",
                 "detail": {
-                  "request": "Anfrage: {method} {url}",
-                  "headers": "Header: {headers}",
+                  "request": "Request: {method} {url}",
+                  "headers": "Headers: {headers}",
                   "body": "Body: {body}",
-                  "timeout": "Zeitüberschreitung: {timeout}",
-                  "outputStatusInto": "Statuscode in: {variable}",
-                  "outputBodyInto": "Antwort-Body in: {variable}",
-                  "ignoreErrorStatus": "Fehler-Statuscodes ignorieren: {value}"
+                  "timeout": "Timeout: {timeout}",
+                  "outputStatusInto": "Status code into: {variable}",
+                  "outputBodyInto": "Response body into: {variable}",
+                  "ignoreErrorStatus": "Ignore error status codes: {value}"
                 }
               }
             }
