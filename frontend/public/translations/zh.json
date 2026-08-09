@@ -104,6 +104,14 @@
       "many": "{count} 行",
       "other": "{count} 行"
     },
+    "header": {
+      "zero": "{count} Headers",
+      "one": "{count} Header",
+      "two": "{count} Headers",
+      "few": "{count} Headers",
+      "many": "{count} Headers",
+      "other": "{count} Headers"
+    },
     "backup": {
       "zero": "{count} Backups",
       "one": "{count} Backup",
@@ -197,6 +205,18 @@
           "textMode": "Text",
           "jsonMode": "JSON",
           "invalidJson": "Invalid JSON"
+        },
+        "tagsInput": {
+          "copyAll": "Copy All",
+          "pasteReplace": "Paste (Replace)"
+        },
+        "ignoredFilesInput": {
+          "onePatternPerLine": "One pattern per line.",
+          "countMatches": "Count Matches",
+          "matches": "{count} matched",
+          "noMatches": "No matches",
+          "exception": "Exception",
+          "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
         }
       },
       "modal": {
@@ -451,6 +471,24 @@
       "impersonatedBy": "由 {username} 模擬身分"
     },
     "elements": {
+      "chartLegend": {
+        "hide": "Hide {series}",
+        "show": "Show {series}"
+      },
+      "dragAndDrop": {
+        "item": {
+          "labelled": "{label} (position {position})",
+          "unlabelled": "item at position {position}"
+        },
+        "announcement": {
+          "pickedUp": "Picked up {item}.",
+          "movedOver": "{item} was moved over {target}.",
+          "leftTarget": "{item} is no longer over a drop target.",
+          "droppedOn": "{item} was dropped on {target}.",
+          "dropped": "{item} was dropped.",
+          "cancelled": "Dragging {item} was cancelled."
+        }
+      },
       "routeOrderEditor": {
         "title": "路由設定",
         "label": {
@@ -592,6 +630,7 @@
         "none": "無",
         "variable": "變數",
         "enterVariable": "請輸入要評估的變數名稱。",
+        "writeVariable": "The result is stored in this variable.",
         "useVariable": "Use a variable instead of plain text",
         "usePlainText": "Use plain text instead of a variable",
         "optionalPlaceholder": "None (optional)"
@@ -645,6 +684,10 @@
                 "completedTo": "已在 {time} 內將 {files} 複製到遠端伺服器。",
                 "failedFrom": "無法從遠端伺服器複製 {files}：\n{error}",
                 "failedTo": "無法將 {files} 複製到遠端伺服器：\n{error}"
+              },
+              "exportingBackup": {
+                "completed": "Exported backup to `{destination}` in {time}.",
+                "failed": "Failed to export backup to `{destination}`:\n{error}"
               }
             }
           }
@@ -797,7 +840,9 @@
             "applicationUrl": "應用程式 URL",
             "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "啟用註冊",
-            "registrationDescription": "允許新使用者自行註冊帳戶。"
+            "registrationDescription": "允許新使用者自行註冊帳戶。",
+            "securityKeys": "Enable Security Keys",
+            "securityKeysDescription": "Allow users to sign in with passkeys and hardware security keys, scoped to {rpId}. You can change this later in the admin settings."
           },
           "button": {
             "submit": "更新設定並繼續"
@@ -888,7 +933,8 @@
               "notSupportedType": "你的瀏覽器或裝置不支援此類型的通行密鑰。",
               "securityError": "通行密鑰只能透過 HTTPS 且使用有效網域。",
               "authenticatorError": "驗證器發生錯誤。",
-              "constraintError": "驗證器無法符合必要限制。"
+              "constraintError": "驗證器無法符合必要限制。",
+              "noUsernamelessKey": "No passkey that can be used without a username was found on this device. If you have one that was set up without \"Allow signing in without a username\", enter your username first and it will work as usual."
             }
           },
           "step": {
@@ -904,6 +950,7 @@
                 "createAccount": "建立帳戶"
               },
               "button": {
+                "passkeyLogin": "Sign in with a Passkey",
                 "oauthLogin": "OAuth 登入"
               }
             },
@@ -984,7 +1031,8 @@
             "addServerToGroup": "將伺服器加入群組",
             "groupActions": "群組動作",
             "noGroups": "沒有可加入伺服器的群組",
-            "noGroup": "此伺服器不在任何群組中"
+            "noGroup": "此伺服器不在任何群組中",
+            "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
           },
           "badge": {
             "foreign": "外部"
@@ -1157,11 +1205,17 @@
           },
           "tooltip": {
             "secureContextRequired": "使用安全性金鑰需要安全內容（HTTPS）。",
-            "limitReached": "你最多只能使用 {max} 個安全性金鑰。"
+            "limitReached": "你最多只能使用 {max} 個安全性金鑰。",
+            "disabled": "Security keys have been disabled by an administrator."
+          },
+          "alert": {
+            "disabled": "Security keys have been disabled by an administrator. Your existing keys are listed below and can still be removed, but they cannot be used to sign in and no new keys can be created."
           },
           "modal": {
             "createSecurityKey": {
               "title": "建立安全性金鑰",
+              "allowUsernamelessLogin": "Allow signing in without a username",
+              "allowUsernamelessLoginDescription": "Saves the passkey onto the device so you can pick it from a list instead of typing your username. Hardware security keys have limited storage and may refuse it - if setup fails, turn this off and try again.",
               "toast": {
                 "created": "安全性金鑰已成功建立。",
                 "aborted": "安全性金鑰建立已中止。"
@@ -1222,6 +1276,10 @@
             "importedNone": "沒有快捷鍵被變更。",
             "importErrors": "已忽略 {unknown} 和 {invalid}。",
             "resetAll": "所有快捷鍵已重設為預設值。"
+          },
+          "general": {
+            "title": "General",
+            "undo": "Undo the last action"
           },
           "fileManager": {
             "title": "檔案管理器",
@@ -1428,6 +1486,21 @@
             "button": {
               "goToApiKeys": "前往 API 金鑰"
             }
+          },
+          "update": {
+            "title": "Update API Key",
+            "subtitle": "An application is requesting changes to the permissions of one of your API keys.",
+            "alert": {
+              "replaceMode": "This request **replaces** the permissions of this API key. Permissions marked as removed will be revoked.",
+              "callbackUrl": "After updating, you will be returned to **{url}**."
+            },
+            "badge": {
+              "added": "Added",
+              "existing": "Granted",
+              "removed": "Removed"
+            },
+            "noChanges": "This request does not change the permissions of this API key.",
+            "keyUpdated": "The permissions of your API key have been updated."
           }
         },
         "activity": {
@@ -1764,8 +1837,14 @@
               "page": {
                 "title": "Webauthn 設定",
                 "form": {
+                  "enabled": "Enable Security Keys",
+                  "enabledDescription": "Allow users to register and sign in with security keys. Existing keys are kept and remain visible, but cannot be used to sign in while this is off.",
+                  "allowDiscoverable": "Allow Usernameless Login",
+                  "allowDiscoverableDescription": "Let users store passkeys on their device and pick one from a list instead of typing a username.",
                   "rpId": "RP ID",
-                  "rpOrigin": "RP 來源"
+                  "rpOrigin": "RP 來源",
+                  "authenticationTimeoutSeconds": "Authentication Timeout (seconds)",
+                  "registrationTimeoutSeconds": "Registration Timeout (seconds)"
                 },
                 "button": {
                   "autofill": "自動填入"
@@ -1947,12 +2026,22 @@
           "unknownExtension": "未知的擴充功能",
           "alert": {
             "noExtensions": "尚未安裝任何擴充功能。",
-            "heavyImageMissing": "你似乎未使用安裝擴充功能所需的 heavy 映像檔，請參閱[此處]({docsUrl})了解如何切換。"
+            "heavyImageMissing": "你似乎未使用安裝擴充功能所需的 heavy 映像檔，請參閱[此處]({docsUrl})了解如何切換。",
+            "supervisorUnreachable": {
+              "title": "The extension supervisor is not answering",
+              "content": "Extensions cannot be built until it does, and the panel is serving whichever binary it started with. Check the container logs."
+            },
+            "buildFailed": {
+              "title": "The last extension build failed",
+              "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            }
           },
           "button": {
             "viewBuildLogs": "檢視建置紀錄",
             "install": "安裝擴充功能",
             "rebuild": "重新建置擴充功能",
+            "retryBuild": "Retry build",
+            "cancelBuild": "Cancel build",
             "configure": "設定",
             "back": "返回擴充功能",
             "accept": "接受",
@@ -1961,9 +2050,22 @@
           "tooltip": {
             "building": "面板目前正在建置擴充功能程式碼，請稍候。",
             "noPendingBuild": "沒有待建置的擴充功能。",
+            "cancelling": "The build stops once its current step ends.",
             "noBackend": "設定此擴充功能需要後端擴充功能。",
             "noConfigurationPage": "此擴充功能未定義設定頁面。",
             "removeExtension": "移除擴充功能"
+          },
+          "phase": {
+            "queued": "Queued…",
+            "preparing": "Preparing…",
+            "clearing": "Clearing extensions…",
+            "adding": "Adding extensions ({done}/{total})…",
+            "resync": "Resolving dependencies…",
+            "stagingTranslations": "Staging translations…",
+            "compiling": "Compiling…",
+            "verifying": "Verifying…",
+            "installing": "Installing…",
+            "restarting": "Restarting the panel…"
           },
           "badge": {
             "frontendMissing": "前端遺失",
@@ -1986,6 +2088,8 @@
           "toast": {
             "buildStarted": "擴充功能重新建置已成功啟動。",
             "buildCompleted": "擴充功能建置已完成。你可能需要重新整理頁面。",
+            "buildFailed": "Extension build failed: {reason}",
+            "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "擴充功能 `{packageName}` 已成功新增。",
             "removed": "擴充功能 `{packageName}` 已成功移除。"
           },
@@ -2456,6 +2560,44 @@
                 }
               }
             },
+            "databaseHosts": {
+              "title": "Database Hosts",
+              "page": {
+                "title": "Node Database Hosts",
+                "toast": {
+                  "created": "Node database host created.",
+                  "deleted": "Node database host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Database Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Node Database Host Deletion",
+                    "content": "Are you sure you want to delete the database host **{name}** from **{node}**?"
+                  }
+                }
+              }
+            },
+            "databaseAgentHosts": {
+              "title": "Database Agent Hosts",
+              "page": {
+                "title": "Node Database Agent Hosts",
+                "toast": {
+                  "created": "Node database agent host created.",
+                  "deleted": "Node database agent host deleted."
+                },
+                "modal": {
+                  "create": {
+                    "title": "Create Node Database Agent Host"
+                  },
+                  "delete": {
+                    "title": "Confirm Node Database Agent Host Deletion",
+                    "content": "Are you sure you want to delete the database agent host **{name}** from **{node}**?"
+                  }
+                }
+              }
+            },
             "backups": {
               "title": "備份",
               "page": {
@@ -2542,6 +2684,9 @@
               "title": "對外轉移",
               "page": {
                 "title": "節點轉移",
+                "toast": {
+                  "connectionLost": "Lost connection to the node transfers stream."
+                },
                 "table": {
                   "columns": {
                     "progress": "進度",
@@ -3203,7 +3348,20 @@
                 "titleCreate": "建立 Egg 儲存庫",
                 "titleUpdate": "更新 Egg 儲存庫",
                 "form": {
-                  "gitRepository": "Git 儲存庫"
+                  "gitRepository": "Git 儲存庫",
+                  "credentials": "Repository Credentials",
+                  "credentialType": "Credential Type",
+                  "password": "Password or Access Token",
+                  "privateKey": "Private Key",
+                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
+                  "passphrase": "Passphrase"
+                },
+                "enum": {
+                  "credentialType": {
+                    "none": "None",
+                    "password": "Password",
+                    "privateKey": "Private Key"
+                  }
                 },
                 "button": {
                   "sync": "同步"
@@ -3821,6 +3979,7 @@
                     "tokenId": "權杖 ID",
                     "tokenSecret": "權杖密鑰",
                     "fingerprint": "TLS 憑證指紋",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "backupIdPrefix": "備份 ID 前綴"
                   }
                 },
@@ -3829,6 +3988,7 @@
                   "form": {
                     "url": "Kopia 伺服器 URL",
                     "fingerprint": "TLS 憑證指紋",
+                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
                     "tags": "備份標籤"
                   }
                 }
@@ -4118,7 +4278,8 @@
             "memoryLoad": "記憶體負載",
             "network": "網路",
             "inbound": "傳入",
-            "outbound": "傳出"
+            "outbound": "傳出",
+            "offline": "Server is offline"
           },
           "socketConnected": "已連線（{ping}ms ping）",
           "socketDisconnected": "已中斷連線"
@@ -4232,7 +4393,8 @@
             "permissionsRestored": "Permissions restored.",
             "permissionsCouldNotBeRestored": "Permissions could not be restored.",
             "fileSaved": "檔案已儲存。",
-            "collabSaveTimeout": "The file could not be saved, the daemon did not respond in time."
+            "collabSaveTimeout": "The file could not be saved, the daemon did not respond in time.",
+            "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
             "fileHistory": "檔案歷史",
@@ -4508,7 +4670,8 @@
                 "uptime": "Uptime",
                 "cpuLoad": "CPU Load",
                 "memoryLoad": "Memory Load",
-                "diskUsage": "Disk Usage"
+                "diskUsage": "Disk Usage",
+                "offline": "Instance is offline"
               }
             },
             "databases": {
@@ -4521,7 +4684,8 @@
               },
               "button": {
                 "export": "Export",
-                "import": "Import"
+                "import": "Import",
+                "remoteImport": "Import from Remote"
               },
               "modal": {
                 "createDatabase": {
@@ -4541,7 +4705,19 @@
                   "content": "Upload a dump to import into this database. Large imports may take a while to complete.",
                   "form": {
                     "file": "Dump File",
+                    "sourceDb": "Source Database",
+                    "sourceDbDescription": "The name this database had when the dump was taken.",
                     "wipe": "Wipe existing data before importing"
+                  }
+                },
+                "remoteImportDatabase": {
+                  "title": "Import Database from Remote",
+                  "content": "Dumps another database server and imports the result into **{database}**. The connection string is only used to take the dump, it is never stored.",
+                  "form": {
+                    "url": "Connection String",
+                    "urlDescription": "Private and link-local addresses may be blocked by the database agent.",
+                    "sourceDb": "Source Database",
+                    "sourceDbDescription": "Overrides the database named in the connection string."
                   }
                 },
                 "recreateDatabase": {
@@ -4558,6 +4734,7 @@
                 "created": "Database created.",
                 "deleted": "Database deleted.",
                 "imported": "Database import completed.",
+                "remoteImportStarted": "Remote import started.",
                 "passwordRotated": "Password has been rotated.",
                 "recreated": "Database recreated."
               }
@@ -4599,6 +4776,25 @@
                 "forceKill": {
                   "title": "Forcibly Kill Database",
                   "content": "Forcibly killing a database can lead to data corruption."
+                }
+              }
+            },
+            "message": {
+              "databaseMarkedAs": "Database marked as {state}...",
+              "pulling": "Pulling",
+              "extracting": "Extracting"
+            },
+            "operations": {
+              "remoteImport": "Importing {database} from {source}",
+              "cancelAllOperations": "Cancel all operations"
+            },
+            "toast": {
+              "operationCancelled": "Operation cancelled",
+              "allOperationsCancelled": "All operations have been cancelled.",
+              "operations": {
+                "remoteImport": {
+                  "completed": "Imported `{database}` from `{source}` in {time}.",
+                  "failed": "Failed to import `{database}` from `{source}`:\n{error}"
                 }
               }
             },
@@ -4644,6 +4840,17 @@
               "exportInstance": {
                 "title": "Export Instance",
                 "content": "Download a dump of this managed database instance. Large instances may take a while to prepare."
+              },
+              "importInstance": {
+                "title": "Import Instance",
+                "content": "Upload a dump to import into this managed database instance. Large imports may take a while to complete.",
+                "form": {
+                  "wipe": "Wipe all existing data before importing"
+                }
+              },
+              "cancelAllOperations": {
+                "title": "Cancel All Operations",
+                "content": "Are you sure you want to cancel all running database operations? Their progress will be lost."
               }
             }
           },
@@ -4717,7 +4924,9 @@
             "addElse": "Add Else",
             "createFirstStep": "建立第一個步驟",
             "addOutput": "新增輸出",
-            "addFile": "新增檔案"
+            "addFile": "新增檔案",
+            "addHeader": "Add Header",
+            "viewCalendar": "View Calendar"
           },
           "toast": {
             "imported": "排程已匯入。",
@@ -4774,6 +4983,10 @@
             "duplicateSchedule": {
               "title": "Duplicate Schedule"
             },
+            "calendar": {
+              "title": "Upcoming Runs Calendar",
+              "truncatedWarning": "Some upcoming runs have been left out to keep the calendar responsive."
+            },
             "deleteSchedule": {
               "title": "確認刪除排程",
               "content": "你確定要從此伺服器刪除 {name} 嗎？"
@@ -4786,7 +4999,7 @@
             },
             "deleteStep": {
               "title": "確認刪除排程步驟",
-              "content": "你確定要刪除此排程步驟嗎？"
+              "content": "Are you sure you want to delete this \"{step}\" step?"
             },
             "unsavedChanges": {
               "title": "Unsaved Changes",
@@ -4815,6 +5028,14 @@
               "noTriggers": "此排程未設定任何觸發器"
             }
           },
+          "step": {
+            "aria": {
+              "reorder": "Reorder {step} step",
+              "expand": "Show {step} details",
+              "collapse": "Hide {step} details",
+              "actions": "{step} step actions"
+            }
+          },
           "form": {
             "scheduleName": "排程名稱",
             "triggersList": "觸發器",
@@ -4838,7 +5059,20 @@
             "metric": "Metric",
             "allMustBeTrue": "所有條件都必須為真：",
             "anyMustBeTrue": "任一條件必須為真：",
-            "mustNotBeTrue": "條件不得為真："
+            "mustNotBeTrue": "條件不得為真：",
+            "renderer": {
+              "none": "No condition — this always matches.",
+              "empty": "No conditions added yet.",
+              "serverState": "Server state is {state}",
+              "uptime": "Uptime {comparator} {value}",
+              "resourceUsage": "{metric} {comparator} {value}",
+              "fileExists": "File {file} exists",
+              "variableExists": "Variable {variable} is set",
+              "equals": "Variable {variable} equals {value}",
+              "contains": "Variable {variable} contains {value}",
+              "startsWith": "Variable {variable} starts with {value}",
+              "endsWith": "Variable {variable} ends with {value}"
+            }
           },
           "preCondition": {
             "valueSeconds": "值（秒）",
@@ -4953,7 +5187,7 @@
                 "duration": "持續時間（毫秒）"
               },
               "renderer": {
-                "compact": "等待 {duration}"
+                "compact": "Sleep for {duration}"
               }
             },
             "ensure": {
@@ -5074,7 +5308,8 @@
               "title": "建立備份",
               "description": "Create a backup of the server files.",
               "form": {
-                "backupName": "備份名稱"
+                "backupName": "備份名稱",
+                "outputInto": "Output Backup UUID Into"
               },
               "renderer": {
                 "compact": "建立 {name}",
@@ -5082,6 +5317,7 @@
                 "detail": {
                   "backupName": "備份名稱：{name}",
                   "backupNameAuto": "Backup Name: Auto-generated",
+                  "outputInto": "Backup UUID into: {variable}",
                   "ignoredFiles": "忽略的檔案：{files}"
                 }
               }
@@ -5122,6 +5358,7 @@
               "title": "Delete Backup",
               "description": "Delete a backup selected by the backup selector.",
               "form": {
+                "backupSelector": "Backup to Delete",
                 "warning": "This permanently deletes the selected backup, including its files on the node. Locked backups are skipped."
               }
             },
@@ -5129,6 +5366,7 @@
               "title": "Move Backup",
               "description": "Move a backup selected by the backup selector into a backup group.",
               "form": {
+                "backupSelector": "Backup to Move",
                 "targetGroup": "Target Backup Group"
               },
               "renderer": {
@@ -5266,6 +5504,34 @@
                 "compact": "設為 {image}",
                 "detail": {
                   "image": "映像檔：{image}"
+                }
+              }
+            },
+            "httpRequest": {
+              "title": "HTTP Request",
+              "description": "Send an HTTP request, for example to a webhook.",
+              "form": {
+                "method": "Method",
+                "url": "URL",
+                "headers": "Headers",
+                "headerName": "Header Name",
+                "headerValue": "Header Value",
+                "body": "Body",
+                "timeout": "Timeout (milliseconds)",
+                "ignoreErrorStatus": "Ignore Error Status Codes",
+                "outputStatusInto": "Output Status Code Into",
+                "outputBodyInto": "Output Response Body Into"
+              },
+              "renderer": {
+                "compact": "Send {method} to {url}",
+                "detail": {
+                  "request": "Request: {method} {url}",
+                  "headers": "Headers: {headers}",
+                  "body": "Body: {body}",
+                  "timeout": "Timeout: {timeout}",
+                  "outputStatusInto": "Status code into: {variable}",
+                  "outputBodyInto": "Response body into: {variable}",
+                  "ignoreErrorStatus": "Ignore error status codes: {value}"
                 }
               }
             }
