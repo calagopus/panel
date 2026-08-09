@@ -2,39 +2,41 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="darkreader-lock" />
-  <link class="app-icon" rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link class="app-icon" rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-  <link class="app-icon" rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+    <meta charset="UTF-8"/>
+    <meta name="darkreader-lock"/>
+    <link class="app-icon" rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+    <link class="app-icon" rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+    <link class="app-icon" rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
+    <link rel="manifest" href="/site.webmanifest"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"/>
 
-  <!-- Primary & Social Embed Meta Tags (Discord, Twitter, OpenGraph) -->
-  <title>{{ settings.app.name }}</title>
-  <meta name="title" content="{{ settings.app.name }}" />
-  <meta name="description" content="Manage your game servers and services with {{ settings.app.name }}." />
-  <meta name="theme-color" content="#6c5ce7" id="meta-theme-color" />
+    <!-- Primary & Social Embed Meta Tags (Discord, Twitter, OpenGraph) -->
+    <title>{{ settings.app.name }}</title>
+    <meta name="title" content="{{ settings.app.name }}"/>
+    <meta name="description" content="Manage your game servers and services with {{ settings.app.name }}."/>
+    <meta name="theme-color" content="#6c5ce7" id="meta-theme-color"/>
 
-  <!-- Open Graph / Facebook / Discord -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="{{ settings.app.url }}" />
-  <meta property="og:title" content="{{ settings.app.name }}" id="meta-og-title" />
-  <meta property="og:description" content="Manage your game servers and services with {{ settings.app.name }}." id="meta-og-desc" />
-  <meta property="og:image" content="{{ settings.app.url }}/icon.svg" id="meta-og-image" />
-  <meta property="og:site_name" content="{{ settings.app.name }}" />
+    <!-- Open Graph / Facebook / Discord -->
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="{{ settings.app.url }}"/>
+    <meta property="og:title" content="{{ settings.app.name }}" id="meta-og-title"/>
+    <meta property="og:description" content="Manage your game servers and services with {{ settings.app.name }}."
+          id="meta-og-desc"/>
+    <meta property="og:image" content="{{ settings.app.url }}/icon.svg" id="meta-og-image"/>
+    <meta property="og:site_name" content="{{ settings.app.name }}"/>
 
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="{{ settings.app.url }}" />
-  <meta property="twitter:title" content="{{ settings.app.name }}" id="meta-tw-title" />
-  <meta property="twitter:description" content="Manage your game servers and services with {{ settings.app.name }}." id="meta-tw-desc" />
-  <meta property="twitter:image" content="{{ settings.app.url }}/icon.svg" id="meta-tw-image" />
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image"/>
+    <meta property="twitter:url" content="{{ settings.app.url }}"/>
+    <meta property="twitter:title" content="{{ settings.app.name }}" id="meta-tw-title"/>
+    <meta property="twitter:description" content="Manage your game servers and services with {{ settings.app.name }}."
+          id="meta-tw-desc"/>
+    <meta property="twitter:image" content="{{ settings.app.url }}/icon.svg" id="meta-tw-image"/>
 </head>
 
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
 </body>
 
 </html>
