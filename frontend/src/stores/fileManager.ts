@@ -91,6 +91,8 @@ export interface FileManagerStore {
   setEditorLineOverflow: (state: boolean) => void;
   editorFontSize: number;
   setEditorFontSize: (size: number) => void;
+  editorEngine: 'monaco' | 'pierre';
+  setEditorEngine: (engine: 'monaco' | 'pierre') => void;
   vscodeUriScheme: string;
   setVscodeUriScheme: (scheme: string) => void;
   imageViewerSmoothing: boolean;
@@ -213,6 +215,11 @@ export const createFileManagerStore = (
       setEditorFontSize: (size) => {
         localStorage.setItem('file_editor_font_size', size.toString());
         set({ editorFontSize: size });
+      },
+      editorEngine: localStorage.getItem('file_editor_engine') === 'pierre' ? 'pierre' : 'monaco',
+      setEditorEngine: (engine) => {
+        localStorage.setItem('file_editor_engine', engine);
+        set({ editorEngine: engine });
       },
       vscodeUriScheme: localStorage.getItem('file_vscode_uri_scheme') || 'vscode',
       setVscodeUriScheme: (scheme) => {

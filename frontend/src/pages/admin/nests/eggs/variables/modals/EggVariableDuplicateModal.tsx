@@ -1,5 +1,5 @@
 import { ModalProps } from '@mantine/core';
-import { FormEvent, useEffect, useState } from 'react';
+import { SubmitEvent, useEffect, useState } from 'react';
 import { z } from 'zod';
 import duplicateEggVariable from '@/api/admin/nests/eggs/variables/duplicateEggVariable.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -37,7 +37,7 @@ export default function EggVariableDuplicateModal({
     setEnvVariable(variable.envVariable);
   }, [variable, props.opened]);
 
-  const doDuplicate = (e: FormEvent<HTMLFormElement>) => {
+  const doDuplicate = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 

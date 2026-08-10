@@ -4,6 +4,7 @@ import { useShallow } from 'zustand/react/shallow';
 import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
+import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Popover from '@/elements/Popover.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
@@ -15,20 +16,24 @@ export default function FileEditorSettings() {
     editorMinimap,
     editorLineOverflow,
     editorFontSize,
+    editorEngine,
     vscodeUriScheme,
     setEditorMinimap,
     setEditorLineOverflow,
     setEditorFontSize,
+    setEditorEngine,
     setVscodeUriScheme,
   } = useFileManager(
     useShallow((state) => ({
       editorMinimap: state.editorMinimap,
       editorLineOverflow: state.editorLineOverflow,
       editorFontSize: state.editorFontSize,
+      editorEngine: state.editorEngine,
       vscodeUriScheme: state.vscodeUriScheme,
       setEditorMinimap: state.setEditorMinimap,
       setEditorLineOverflow: state.setEditorLineOverflow,
       setEditorFontSize: state.setEditorFontSize,
+      setEditorEngine: state.setEditorEngine,
       setVscodeUriScheme: state.setVscodeUriScheme,
     })),
   );
@@ -67,6 +72,16 @@ export default function FileEditorSettings() {
             max={72}
             value={editorFontSize}
             onChange={(value) => setEditorFontSize(Number(value) || 14)}
+          />
+          <Select
+            label={t('pages.server.files.settings.editorEngine', {})}
+            className='order-27'
+            value={editorEngine}
+            onChange={(value) => setEditorEngine(value === 'pierre' ? 'pierre' : 'monaco')}
+            data={[
+              { value: 'monaco', label: 'Monaco' },
+              { value: 'pierre', label: 'Pierre' },
+            ]}
           />
           <TextInput
             label={t('pages.server.files.settings.vscodeUriScheme', {})}

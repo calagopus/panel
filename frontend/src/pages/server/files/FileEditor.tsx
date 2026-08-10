@@ -1,4 +1,9 @@
-import { faArrowsRotate, faClockRotateLeft, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowsRotate,
+  faClockRotateLeft,
+  faEllipsisVertical,
+  faTriangleExclamation,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Audio } from '@gfazioli/mantine-audio';
 import { AvatarGroup } from '@mantine/core';
@@ -16,12 +21,14 @@ import Alert from '@/elements/Alert.tsx';
 import Avatar from '@/elements/Avatar.tsx';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
+import ContextMenu from '@/elements/ContextMenu.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import MonacoEditor, { MonacoDiffEditor } from '@/elements/MonacoEditor.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import PierreEditor, { type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Title from '@/elements/Title.tsx';
@@ -101,6 +108,7 @@ function FileEditorComponent() {
     editorMinimap,
     editorLineOverflow,
     editorFontSize,
+    editorEngine,
     imageViewerSmoothing,
     audioPlayerVolume,
     audioPlayerPlaybackRate,
@@ -115,6 +123,7 @@ function FileEditorComponent() {
       editorMinimap: state.editorMinimap,
       editorLineOverflow: state.editorLineOverflow,
       editorFontSize: state.editorFontSize,
+      editorEngine: state.editorEngine,
       imageViewerSmoothing: state.imageViewerSmoothing,
       audioPlayerVolume: state.audioPlayerVolume,
       audioPlayerPlaybackRate: state.audioPlayerPlaybackRate,
@@ -131,6 +140,7 @@ function FileEditorComponent() {
 
   const canCreate = useServerCan('files.create');
   const canUpdate = useServerCan('files.update');
+  const canReadContent = useServerCan('files.read-content');
 
   const [loading, setLoading] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -146,6 +156,7 @@ function FileEditorComponent() {
   const [conflictDiskContent, setConflictDiskContent] = useState<string | null>(null);
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
+  const pierreEditorRef = useRef<PierreEditorHandle | null>(null);
   const contentRef = useRef(content);
   const savedContentRef = useRef('');
   const originalHashRef = useRef('');
@@ -164,7 +175,13 @@ function FileEditorComponent() {
   const contentWrapRef = useRef<HTMLDivElement>(null);
 
   const collab = useFileCollab({
-    enabled: params.action === 'edit' && !!fileName && !!browsingDirectory && browsingPrimaryFilesystem && !loading,
+    enabled:
+      editorEngine === 'monaco' &&
+      params.action === 'edit' &&
+      !!fileName &&
+      !!browsingDirectory &&
+      browsingPrimaryFilesystem &&
+      !loading,
     filePath: fileName && browsingDirectory ? join(browsingDirectory, fileName) : '',
     onActivated: (dirty) => {
       collabActiveRef.current = true;
@@ -370,6 +387,22 @@ function FileEditorComponent() {
 
   const saveShortcutRef = useRef(() => void 0);
 
+  // PierreEditor has no built-in save keybinding (unlike Monaco's editor.addCommand),
+  // so bind it at the window level while it's the active engine on an editable action.
+  useEffect(() => {
+    if (editorEngine !== 'pierre' || (params.action !== 'new' && params.action !== 'edit')) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        saveShortcutRef.current();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [editorEngine, params.action]);
+
   useEffect(() => {
     saveShortcutRef.current = () => {
       if (params.action === 'new') {
@@ -398,6 +431,34 @@ function FileEditorComponent() {
     }
   };
 
+  const hasEditor = () => (editorEngine === 'pierre' ? !!pierreEditorRef.current : !!editorRef.current);
+  const getEditorValue = (): string =>
+    (editorEngine === 'pierre' ? pierreEditorRef.current?.getValue() : editorRef.current?.getValue()) ?? '';
+  const setEditorValue = (value: string) => {
+    if (editorEngine === 'pierre') pierreEditorRef.current?.setValue(value);
+    else editorRef.current?.setValue(value);
+  };
+
+  const handleContentChange = (value: string) => {
+    contentRef.current = value;
+
+    const changed = value !== savedContentRef.current;
+    setDirty(collabActiveRef.current ? true : changed);
+
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    if (changed && draftPathRef.current) {
+      const path = draftPathRef.current;
+      draftTimerRef.current = setTimeout(() => {
+        const draft: FileDraft = {
+          content: value,
+          originalHash: originalHashRef.current,
+          savedAt: Date.now(),
+        };
+        localStorage.setItem(draftKey(server.uuid, path), JSON.stringify(draft));
+      }, 1000);
+    }
+  };
+
   const revertToDisk = async () => {
     const path = join(browsingDirectory, fileName);
 
@@ -409,16 +470,16 @@ function FileEditorComponent() {
       return;
     }
 
-    if (!editorRef.current) return;
+    if (!hasEditor()) return;
 
     await getFileContent(server.uuid, path)
       .then((content) => content.text())
       .then((text) => {
-        if (draftPathRef.current !== path || !editorRef.current) return;
+        if (draftPathRef.current !== path || !hasEditor()) return;
 
         savedContentRef.current = text;
         originalHashRef.current = hashContent(text);
-        editorRef.current.setValue(text);
+        setEditorValue(text);
         setDirty(false);
       })
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'));
@@ -438,7 +499,7 @@ function FileEditorComponent() {
   };
 
   const saveFile = (name?: string) => {
-    if (!editorRef.current || !browsingWritableDirectory) return;
+    if (!hasEditor() || !browsingWritableDirectory) return;
 
     if (!name && collabActiveRef.current) {
       if (collab.save()) {
@@ -462,7 +523,7 @@ function FileEditorComponent() {
 
     setDirty(false);
 
-    const currentContent = editorRef.current.getValue();
+    const currentContent = getEditorValue();
     setSaving(true);
 
     saveFileContent(server.uuid, join(browsingDirectory, name ?? fileName), currentContent)
@@ -511,6 +572,15 @@ function FileEditorComponent() {
           : t('pages.server.files.titleEditorEditing', { file: fileName })
       : t('pages.server.files.titleEditorNew', {});
 
+  const showRevertAction =
+    (collab.active ? canUpdate : canReadContent) &&
+    dirty &&
+    params.action === 'edit' &&
+    !!fileName &&
+    browsingWritableDirectory &&
+    !collab.conflict?.deleted;
+  const showHistoryAction = canReadContent && params.action === 'edit' && !!fileName && browsingPrimaryFilesystem;
+
   return (
     <ServerContentContainer
       hideTitleComponent
@@ -518,9 +588,9 @@ function FileEditorComponent() {
       title={title}
       registry={window.extensionContext.extensionRegistry.pages.server.files.editorContainer}
     >
-      <div className='flex justify-between items-center lg:pt-6 px-4 lg:px-6 lg:pb-0'>
-        <Group>
-          <Title>{title}</Title>
+      <div className='flex justify-between items-center gap-2 lg:pt-6 px-4 lg:px-6 lg:pb-0'>
+        <Group wrap='nowrap' gap='xs' className='min-w-0 flex-1'>
+          <Title className='truncate! min-w-0 flex-1 text-lg! sm:text-[2.125rem]!'>{title}</Title>
 
           {matchedFileEditorAction?.header.settings ? (
             <matchedFileEditorAction.header.settings />
@@ -533,7 +603,7 @@ function FileEditorComponent() {
         {matchedFileEditorAction?.header.rightSection ? (
           <matchedFileEditorAction.header.rightSection />
         ) : (
-          <Group>
+          <Group wrap='nowrap' gap='xs' className='shrink-0'>
             {collab.active && collab.participants.length > 1 && (
               <AvatarGroup>
                 {collab.participants.map((participant) => (
@@ -546,35 +616,66 @@ function FileEditorComponent() {
                 ))}
               </AvatarGroup>
             )}
-            <ServerCan action={collab.active ? 'files.update' : 'files.read-content'}>
-              {dirty &&
-                params.action === 'edit' &&
-                fileName &&
-                browsingWritableDirectory &&
-                !collab.conflict?.deleted && (
-                  <Tooltip label={t('pages.server.files.tooltip.revertToDisk', {})}>
-                    <ActionIcon size='sm' variant='subtle' color='gray' onClick={() => setRevertConfirm(true)}>
-                      <FontAwesomeIcon icon={faArrowsRotate} />
-                    </ActionIcon>
-                  </Tooltip>
-                )}
-            </ServerCan>
-            <ServerCan action='files.read-content'>
-              {params.action === 'edit' && fileName && browsingPrimaryFilesystem && (
+
+            {showRevertAction && (
+              <div className='hidden sm:block'>
+                <Tooltip label={t('pages.server.files.tooltip.revertToDisk', {})}>
+                  <ActionIcon size='sm' variant='subtle' color='gray' onClick={() => setRevertConfirm(true)}>
+                    <FontAwesomeIcon icon={faArrowsRotate} />
+                  </ActionIcon>
+                </Tooltip>
+              </div>
+            )}
+            {showHistoryAction && (
+              <div className='hidden sm:block'>
                 <Tooltip label={t('pages.server.files.tooltip.fileHistory', {})}>
+                  <ActionIcon size='sm' variant='subtle' color='gray' onClick={() => setRevisionsOpen(true)}>
+                    <FontAwesomeIcon icon={faClockRotateLeft} />
+                  </ActionIcon>
+                </Tooltip>
+              </div>
+            )}
+            {(showRevertAction || showHistoryAction) && (
+              <ContextMenu
+                items={[
+                  {
+                    type: 'action',
+                    icon: faArrowsRotate,
+                    label: t('pages.server.files.tooltip.revertToDisk', {}),
+                    hidden: !showRevertAction,
+                    color: 'gray',
+                    onClick: () => setRevertConfirm(true),
+                  },
+                  {
+                    type: 'action',
+                    icon: faClockRotateLeft,
+                    label: t('pages.server.files.tooltip.fileHistory', {}),
+                    hidden: !showHistoryAction,
+                    color: 'gray',
+                    onClick: () => setRevisionsOpen(true),
+                  },
+                ]}
+              >
+                {({ openMenu }) => (
                   <ActionIcon
                     size='sm'
                     variant='subtle'
                     color='gray'
-                    onClick={() => setRevisionsOpen(true)}
-                    className='mr-2'
+                    className='sm:hidden'
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      openMenu(rect.left, rect.bottom);
+                    }}
                   >
-                    <FontAwesomeIcon icon={faClockRotateLeft} />
+                    <FontAwesomeIcon icon={faEllipsisVertical} />
                   </ActionIcon>
-                </Tooltip>
-              )}
-            </ServerCan>
-            <FileConnectButton file={fileName ? join(browsingDirectory, fileName) : undefined} />
+                )}
+              </ContextMenu>
+            )}
+
+            <div className='hidden sm:block'>
+              <FileConnectButton file={fileName ? join(browsingDirectory, fileName) : undefined} />
+            </div>
             <div hidden={!browsingWritableDirectory || params.action === 'image' || params.action === 'audio'}>
               {params.action === 'edit' ? (
                 <ServerCan action={collab.active ? 'files.update' : 'files.create'}>
@@ -614,7 +715,7 @@ function FileEditorComponent() {
           <Button
             onClick={() => {
               if (pendingDraft) {
-                editorRef.current?.setValue(pendingDraft.content);
+                setEditorValue(pendingDraft.content);
                 setDirty(true);
               }
               setPendingDraft(null);
@@ -728,9 +829,9 @@ function FileEditorComponent() {
         filePath={join(browsingDirectory, fileName)}
         opened={revisionsOpen}
         onClose={() => setRevisionsOpen(false)}
-        getContent={() => editorRef.current?.getValue()}
+        getContent={() => getEditorValue()}
         onRestore={(newContent) => {
-          editorRef.current?.setValue(newContent);
+          setEditorValue(newContent);
           setDirty(true);
         }}
       />
@@ -747,7 +848,7 @@ function FileEditorComponent() {
             onClose={() => setNameModalOpen(false)}
           />
 
-          <div className='flex justify-between w-full py-4'>
+          <div className='flex justify-between w-full py-2 lg:py-4'>
             <FileBreadcrumbs inFileEditor path={join(browsingDirectory, fileName)} />
           </div>
           {collab.active && collab.conflict && (
@@ -855,6 +956,20 @@ function FileEditorComponent() {
                     </Audio.Controls>
                   </Audio>
                 </div>
+              ) : editorEngine === 'pierre' ? (
+                <PierreEditor
+                  height='100%'
+                  width='100%'
+                  path={fileName}
+                  defaultValue={content}
+                  readOnly={!browsingWritableDirectory}
+                  wordWrap={editorLineOverflow}
+                  fontSize={editorFontSize}
+                  onChange={handleContentChange}
+                  onMount={(editor) => {
+                    pierreEditorRef.current = editor;
+                  }}
+                />
               ) : (
                 <MonacoEditor
                   height='100%'
@@ -878,24 +993,7 @@ function FileEditorComponent() {
                     editorRef.current = editor;
                     collab.attachEditor(editor);
                     editor.onDidChangeModelContent(() => {
-                      const value = editor.getValue();
-                      contentRef.current = value;
-
-                      const changed = value !== savedContentRef.current;
-                      setDirty(collabActiveRef.current ? true : changed);
-
-                      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
-                      if (changed && draftPathRef.current) {
-                        const path = draftPathRef.current;
-                        draftTimerRef.current = setTimeout(() => {
-                          const draft: FileDraft = {
-                            content: value,
-                            originalHash: originalHashRef.current,
-                            savedAt: Date.now(),
-                          };
-                          localStorage.setItem(draftKey(server.uuid, path), JSON.stringify(draft));
-                        }, 1000);
-                      }
+                      handleContentChange(editor.getValue());
                     });
                     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
                       saveShortcutRef.current();

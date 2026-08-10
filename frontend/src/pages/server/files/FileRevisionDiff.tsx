@@ -14,6 +14,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
 import { MonacoDiffEditor } from '@/elements/MonacoEditor.tsx';
+import { PierreDiffEditor, type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Title from '@/elements/Title.tsx';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
@@ -32,6 +33,7 @@ function FileRevisionDiffComponent() {
   const location = useLocation();
   const editorMinimap = useFileManager((state) => state.editorMinimap);
   const editorLineOverflow = useFileManager((state) => state.editorLineOverflow);
+  const editorEngine = useFileManager((state) => state.editorEngine);
 
   const filePath = searchParams.get('file') || '';
   const revisionId = parseInt(searchParams.get('revision') || '0', 10);
@@ -43,6 +45,7 @@ function FileRevisionDiffComponent() {
   const [modifiedContent, setModifiedContent] = useState('');
 
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
+  const pierreDiffRef = useRef<PierreEditorHandle | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -109,7 +112,10 @@ function FileRevisionDiffComponent() {
   }, [loading, getParent]);
 
   const handleSave = () => {
-    const content = diffEditorRef.current?.getModifiedEditor().getValue() ?? modifiedContent;
+    const content =
+      (editorEngine === 'pierre'
+        ? pierreDiffRef.current?.getValue()
+        : diffEditorRef.current?.getModifiedEditor().getValue()) ?? modifiedContent;
     setSaving(true);
     saveFileContent(server.uuid, filePath, content)
       .then(() => addToast(t('pages.server.files.toast.fileSaved', {}), 'success'))
@@ -203,37 +209,53 @@ function FileRevisionDiffComponent() {
         <div className='flex flex-col relative mt-4'>
           <div className='relative'>
             <div ref={editorContainerRef} className='flex max-w-full w-full z-1 absolute'>
-              <MonacoDiffEditor
-                height='100%'
-                width='100%'
-                options={{
-                  readOnly: !!previousRevisionId,
-                  stickyScroll: { enabled: false },
-                  minimap: { enabled: editorMinimap },
-                  wordWrap: editorLineOverflow ? 'on' : 'off',
-                  codeLens: false,
-                  scrollBeyondLastLine: false,
-                  smoothScrolling: false,
-                  // @ts-expect-error this is valid
-                  touchScrollEnabled: true,
-                  fixedOverflowWidgets: true,
-                }}
-                onMount={(diffEditor, monaco) => {
-                  diffEditorRef.current = diffEditor;
+              {editorEngine === 'pierre' ? (
+                <PierreDiffEditor
+                  height='100%'
+                  width='100%'
+                  originalPath={originalModelPath}
+                  originalValue={originalContent}
+                  modifiedPath={modifiedModelPath}
+                  modifiedValue={modifiedContent}
+                  readOnly={!!previousRevisionId}
+                  wordWrap={editorLineOverflow}
+                  onMount={(editor) => {
+                    pierreDiffRef.current = editor;
+                  }}
+                />
+              ) : (
+                <MonacoDiffEditor
+                  height='100%'
+                  width='100%'
+                  options={{
+                    readOnly: !!previousRevisionId,
+                    stickyScroll: { enabled: false },
+                    minimap: { enabled: editorMinimap },
+                    wordWrap: editorLineOverflow ? 'on' : 'off',
+                    codeLens: false,
+                    scrollBeyondLastLine: false,
+                    smoothScrolling: false,
+                    // @ts-expect-error this is valid
+                    touchScrollEnabled: true,
+                    fixedOverflowWidgets: true,
+                  }}
+                  onMount={(diffEditor, monaco) => {
+                    diffEditorRef.current = diffEditor;
 
-                  const originalUri = monaco.Uri.parse(originalModelPath);
-                  const modifiedUri = monaco.Uri.parse(modifiedModelPath);
+                    const originalUri = monaco.Uri.parse(originalModelPath);
+                    const modifiedUri = monaco.Uri.parse(modifiedModelPath);
 
-                  const originalModel =
-                    monaco.editor.getModel(originalUri) ??
-                    monaco.editor.createModel(originalContent, null, originalUri);
-                  const modifiedModel =
-                    monaco.editor.getModel(modifiedUri) ??
-                    monaco.editor.createModel(modifiedContent, null, modifiedUri);
+                    const originalModel =
+                      monaco.editor.getModel(originalUri) ??
+                      monaco.editor.createModel(originalContent, null, originalUri);
+                    const modifiedModel =
+                      monaco.editor.getModel(modifiedUri) ??
+                      monaco.editor.createModel(modifiedContent, null, modifiedUri);
 
-                  diffEditor.setModel({ original: originalModel, modified: modifiedModel });
-                }}
-              />
+                    diffEditor.setModel({ original: originalModel, modified: modifiedModel });
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>

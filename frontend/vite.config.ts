@@ -105,6 +105,11 @@ export default defineConfig({
               priority: 12,
             },
             {
+              name: 'pierre-diffs',
+              test: /node_modules\/(@pierre\/(diffs|theme|theming)|diff|lru_map)\//,
+              priority: 12,
+            },
+            {
               name: 'common',
               minShareCount: 5,
               minSize: 10240,
