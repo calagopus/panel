@@ -25,6 +25,7 @@ import Card from '@/elements/Card.tsx';
 import CloseButton from '@/elements/CloseButton.tsx';
 import MantineDivider from '@/elements/Divider.tsx';
 import Drawer from '@/elements/Drawer.tsx';
+import ScrollArea from '@/elements/ScrollArea.tsx';
 import { isAdmin } from '@/lib/permissions.ts';
 import { openUrl } from '@/lib/url.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -67,7 +68,9 @@ function Sidebar({ children, header, footer }: SidebarProps) {
 
         <div id='sidebar-content' className='h-full flex flex-col'>
           {header && <div className='shrink-0'>{header}</div>}
-          <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+          <ScrollArea className='flex-1 min-h-0' type='never'>
+            {children}
+          </ScrollArea>
           {footer && <div className='shrink-0 pt-2'>{footer}</div>}
         </div>
       </Drawer>
@@ -79,7 +82,9 @@ function Sidebar({ children, header, footer }: SidebarProps) {
       >
         <div id='sidebar-content' className='h-full flex flex-col'>
           {header && <div className='shrink-0'>{header}</div>}
-          <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+          <ScrollArea className='flex-1 min-h-0' type='never'>
+            {children}
+          </ScrollArea>
           {footer && <div className='shrink-0 pt-2'>{footer}</div>}
         </div>
       </Card>
