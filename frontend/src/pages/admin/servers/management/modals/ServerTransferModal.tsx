@@ -104,6 +104,8 @@ export default function ServerTransferModal({
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
+        availablePrimaryAllocations.refetch();
+        availableAllocations.refetch();
       });
   };
 
@@ -158,7 +160,7 @@ export default function ServerTransferModal({
             value={selectedPrimaryAllocationUuid}
             disabled={!selectedNodeUuid}
             onChange={(value) => setSelectedPrimaryAllocationUuid(value)}
-            data={availableAllocations.items
+            data={availablePrimaryAllocations.items
               .filter((alloc) => !selectedAllocationUuids.includes(alloc.uuid))
               .map((alloc) => ({
                 label: formatAllocation(alloc),
@@ -167,6 +169,7 @@ export default function ServerTransferModal({
             searchable
             searchValue={availablePrimaryAllocations.search}
             onSearchChange={availablePrimaryAllocations.setSearch}
+            onDropdownOpen={() => availablePrimaryAllocations.refetch()}
             allowDeselect
             loading={availablePrimaryAllocations.loading}
           />
@@ -186,6 +189,7 @@ export default function ServerTransferModal({
             searchable
             searchValue={availableAllocations.search}
             onSearchChange={availableAllocations.setSearch}
+            onDropdownOpen={() => availableAllocations.refetch()}
             loading={availableAllocations.loading}
           />
 
