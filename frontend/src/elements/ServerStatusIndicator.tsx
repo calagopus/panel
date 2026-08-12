@@ -138,10 +138,8 @@ export default function ServerStatusIndicator() {
 
         <div className='h-4 flex items-center gap-2 min-w-0'>
           <span className='size-3 shrink-0 flex items-center justify-center'>{indicator}</span>
-          <span className='text-xs leading-none truncate text-(--mantine-color-dimmed)'>{label}</span>
-          {uptime && (
-            <span className='text-xs leading-none ml-auto shrink-0 text-(--mantine-color-dimmed)'>{uptime}</span>
-          )}
+          <span className='text-xs leading-4 truncate text-(--mantine-color-dimmed)'>{label}</span>
+          {uptime && <span className='text-xs leading-4 ml-auto shrink-0 text-(--mantine-color-dimmed)'>{uptime}</span>}
         </div>
 
         {(canPower || canRestart) && (
