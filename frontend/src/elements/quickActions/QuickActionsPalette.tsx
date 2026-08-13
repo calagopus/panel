@@ -25,6 +25,7 @@ import { SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import accountRoutesBase from '@/routers/routes/accountRoutes.ts';
+import adminRoutesBase from '@/routers/routes/adminRoutes.ts';
 import serverRoutesBase from '@/routers/routes/serverRoutes.ts';
 import { useQuickActionsStore } from '@/stores/quickActions.ts';
 import { useServerStore } from '@/stores/server.ts';
@@ -57,6 +58,7 @@ export default function QuickActionsPalette() {
 
   const combobox = useCombobox();
   const comboboxRef = useRef(combobox);
+  comboboxRef.current = combobox;
 
   const [query, setQuery] = useState('');
   const [killConfirmOpen, setKillConfirmOpen] = useState(false);
@@ -67,7 +69,7 @@ export default function QuickActionsPalette() {
 
   const rawServerId = location.pathname.match(/^\/server\/([^/]+)/)?.[1];
   const serverId = rawServerId && rawServerId !== ':id' ? rawServerId : undefined;
-  const scope: QuickActionScope = serverId ? 'server' : 'dashboard';
+  const scope: QuickActionScope = serverId ? 'server' : location.pathname.startsWith('/admin') ? 'admin' : 'dashboard';
 
   useEffect(() => {
     if (open) {
@@ -96,6 +98,12 @@ export default function QuickActionsPalette() {
     if (serverPermissions.includes('*')) return true;
     const matrix = checkPermissions(serverPermissions, action);
     return matchAny ? matrix.some(Boolean) : matrix.every(Boolean);
+  };
+
+  const canAdminRoute = (permission?: string | string[] | null) => {
+    if (!permission) return true;
+    if (user?.admin) return true;
+    return checkPermissions(user?.role?.adminPermissions ?? [], permission).some(Boolean);
   };
 
   const actionContext: QuickActionContext = {
@@ -170,6 +178,25 @@ export default function QuickActionsPalette() {
         onSelect: () => {
           close();
           navigate(to(route.path, `/server/${serverId}`));
+        },
+      }));
+  } else if (scope === 'admin') {
+    const routes = [...adminRoutesBase, ...window.extensionContext.extensionRegistry.routes.adminRoutes];
+    for (const interceptor of window.extensionContext.extensionRegistry.routes.adminRouteInterceptors) {
+      interceptor(routes);
+    }
+
+    navItems = routes
+      .filter((route) => route.name && (!route.filter || route.filter()))
+      .filter((route) => canAdminRoute(route.permission))
+      .map((route) => ({
+        key: `nav:${route.path}`,
+        categoryId: 'navigation',
+        label: resolveString(route.name)!,
+        icon: route.icon,
+        onSelect: () => {
+          close();
+          navigate(to(route.path, '/admin'));
         },
       }));
   }

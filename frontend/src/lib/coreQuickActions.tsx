@@ -4,6 +4,7 @@ import {
   faGraduationCap,
   faPlay,
   faPowerOff,
+  faReply,
   faRotateRight,
   faServer,
   faSkull,
@@ -57,6 +58,7 @@ function buildCoreQuickActionDefinitions(): QuickActionDefinition[] {
       category: navigation,
       label: () => getTranslations().t('pages.account.home.title', {}),
       icon: faServer,
+      scopes: ['dashboard', 'server'],
       perform: (ctx) => ctx.navigate('/'),
     },
     {
@@ -64,8 +66,17 @@ function buildCoreQuickActionDefinitions(): QuickActionDefinition[] {
       category: navigation,
       label: () => getTranslations().t('pages.account.admin.title', {}),
       icon: faGraduationCap,
+      scopes: ['dashboard', 'server'],
       adminPermission: true,
       perform: (ctx) => ctx.navigate('/admin'),
+    },
+    {
+      id: 'general.goBack',
+      category: navigation,
+      label: () => getTranslations().t('common.button.back', {}),
+      icon: faReply,
+      scopes: ['admin'],
+      perform: (ctx) => ctx.navigate('/'),
     },
     {
       id: 'server.start',

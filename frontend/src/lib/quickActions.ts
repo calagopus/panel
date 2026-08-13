@@ -7,7 +7,7 @@ import type { serverPowerState, serverSchema } from '@/lib/schemas/server/server
 import type { fullUserSchema } from '@/lib/schemas/user.ts';
 import type { Websocket } from '@/plugins/Websocket.ts';
 
-export type QuickActionScope = 'dashboard' | 'server';
+export type QuickActionScope = 'dashboard' | 'server' | 'admin';
 
 export interface QuickActionCategory {
   id: string;
