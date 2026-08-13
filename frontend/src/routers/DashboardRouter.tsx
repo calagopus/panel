@@ -4,6 +4,7 @@ import { NavLink, Route, Routes } from 'react-router';
 import AppIcon from '@/elements/AppIcon.tsx';
 import Container from '@/elements/Container.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
+import QuickActionsTrigger from '@/elements/quickActions/QuickActionsTrigger.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
 import Sidebar from '@/elements/Sidebar.tsx';
@@ -79,6 +80,8 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
               </NavLink>
               {!user?.suspended && (
                 <>
+                  <Sidebar.Divider />
+                  <QuickActionsTrigger />
                   <Sidebar.Divider />
                   <Sidebar.Link
                     to='/'

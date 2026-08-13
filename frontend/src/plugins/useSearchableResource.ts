@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import debounce from 'debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -39,6 +39,7 @@ export function useSearchableResource<T>({
     queryKey: [...queryKey, ...deps, { search: debouncedSearch }],
     queryFn: () => fetcher(debouncedSearch),
     enabled: canRequest && (!deps.length || deps.every(Boolean)),
+    placeholderData: keepPreviousData,
   });
 
   useEffect(() => {

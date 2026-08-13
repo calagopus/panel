@@ -462,6 +462,21 @@ const baseTranslations = defineTranslations({
           themeLight: 'Light',
         },
       },
+      quickActions: {
+        trigger: 'Quick actions...',
+        placeholder: 'Search for actions and pages...',
+        category: {
+          navigation: 'Navigation',
+          power: 'Power',
+          account: 'Account',
+          servers: 'Servers',
+        },
+        hint: {
+          navigate: 'to navigate',
+          select: 'to select',
+          close: 'to close',
+        },
+      },
       permissionSelector: {
         button: {
           copyPermissions: 'Copy Permissions',
@@ -1216,6 +1231,7 @@ const baseTranslations = defineTranslations({
           general: {
             title: 'General',
             undo: 'Undo the last action',
+            quickActions: 'Open quick actions',
           },
           fileManager: {
             title: 'File Manager',

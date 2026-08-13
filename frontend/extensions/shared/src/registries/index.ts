@@ -3,6 +3,7 @@ import { ElementsRegistry } from './elements/index.ts';
 import { FormRegistry } from './forms/index.ts';
 import { PageRegistry } from './pages/index.ts';
 import { PermissionIconRegistry } from './permission-icons.ts';
+import { QuickActionRegistry } from './quickActions.ts';
 import { RouteRegistry } from './routes.ts';
 import { ShortcutRegistry } from './shortcuts.ts';
 
@@ -19,6 +20,7 @@ export class ExtensionRegistry implements Registry {
     this.global.mergeFrom(other.global);
     this.shortcuts.mergeFrom(other.shortcuts);
     this.forms.mergeFrom(other.forms);
+    this.quickActions.mergeFrom(other.quickActions);
 
     return this;
   }
@@ -30,6 +32,7 @@ export class ExtensionRegistry implements Registry {
   public global: ComponentListRegistry = new ComponentListRegistry();
   public shortcuts: ShortcutRegistry = new ShortcutRegistry();
   public forms: FormRegistry = new FormRegistry();
+  public quickActions: QuickActionRegistry = new QuickActionRegistry();
 
   public enterPages(callback: (registry: PageRegistry) => unknown): this {
     callback(this.pages);
@@ -63,6 +66,11 @@ export class ExtensionRegistry implements Registry {
 
   public enterForms(callback: (registry: FormRegistry) => unknown): this {
     callback(this.forms);
+    return this;
+  }
+
+  public enterQuickActions(callback: (registry: QuickActionRegistry) => unknown): this {
+    callback(this.quickActions);
     return this;
   }
 }

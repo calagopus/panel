@@ -64,6 +64,13 @@ function buildCoreShortcutDefinitions(): ShortcutDefinition[] {
       defaultBinding: binding('z', ['ctrlOrMeta']),
     },
     {
+      id: 'general.quickActions',
+      category: general,
+      description: () => getTranslations().t('pages.account.shortcuts.general.quickActions', {}),
+      defaultBinding: binding(' ', ['ctrlOrMeta']),
+      allowWhenInputFocused: true,
+    },
+    {
       id: 'files.selectAll',
       category: fileManager,
       description: () => getTranslations().t('pages.account.shortcuts.fileManager.selectAll', {}),
