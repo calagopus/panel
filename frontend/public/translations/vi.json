@@ -6,7 +6,7 @@
       "two": "{count} Bytes",
       "few": "{count} Bytes",
       "many": "{count} Bytes",
-      "other": "{count} Bytes"
+      "other": "{count} Egg"
     },
     "user": {
       "zero": "{count} Người Dùng",
@@ -82,11 +82,11 @@
     },
     "instance": {
       "zero": "{count} Instances",
-      "one": "{count} Instance",
-      "two": "{count} Instances",
-      "few": "{count} Instances",
-      "many": "{count} Instances",
-      "other": "{count} Instances"
+      "one": "{count} phiên bản",
+      "two": "{count} phiên bản",
+      "few": "{count} phiên bản",
+      "many": "{count} phiên bản",
+      "other": "{count} phiên bản"
     },
     "shortcut": {
       "zero": "{count} Phím Tắt",
@@ -105,12 +105,12 @@
       "other": "{count} Dòng"
     },
     "header": {
-      "zero": "{count} Headers",
-      "one": "{count} Header",
-      "two": "{count} Headers",
-      "few": "{count} Headers",
-      "many": "{count} Headers",
-      "other": "{count} Headers"
+      "zero": "{count} tiêu đề",
+      "one": "{count} tiêu đề",
+      "two": "{count} tiêu đề",
+      "few": "{count} Tiêu đề",
+      "many": "{count} Tiêu đề",
+      "other": "{count} Tiêu đề"
     },
     "backup": {
       "zero": "{count} Bản Sao Lưu",
@@ -127,6 +127,22 @@
       "few": "{count} Ngày",
       "many": "{count} Ngày",
       "other": "{count} Ngày"
+    },
+    "row": {
+      "zero": "{count} Hàng",
+      "one": "{count} Hàng",
+      "two": "{count} Hàng",
+      "few": "{count} Hàng",
+      "many": "{count} Hàng",
+      "other": "{count} Hàng"
+    },
+    "change": {
+      "zero": "{count} Thay đổi",
+      "one": "{count} Thay đổi",
+      "two": "{count} Thay đổi",
+      "few": "{count} Thay đổi",
+      "many": "{count} Thay đổi",
+      "other": "{count} Thay đổi"
     }
   },
   "translations": {
@@ -134,7 +150,7 @@
       "button": {
         "create": "Tạo",
         "add": "Thêm",
-        "addDefaultPort": "Add :{port}",
+        "addDefaultPort": "{count} Hàng",
         "save": "Lưu",
         "saveAndStay": "Lưu &Ở lại",
         "edit": "Chỉnh sửa",
@@ -176,7 +192,7 @@
         "unsetPrimary": "Bỏ Chính",
         "leavePage": "Rời Khỏi Trang",
         "viewDocumentation": "Xem Tài Liệu",
-        "undo": "Undo"
+        "undo": "Hoàn tác"
       },
       "alert": {
         "error": "Lỗi",
@@ -207,16 +223,16 @@
           "invalidJson": "JSON không hợp lệ"
         },
         "tagsInput": {
-          "copyAll": "Copy All",
-          "pasteReplace": "Paste (Replace)"
+          "copyAll": "Sao chép tất cả",
+          "pasteReplace": "Dán (Thay thế)"
         },
         "ignoredFilesInput": {
-          "onePatternPerLine": "One pattern per line.",
-          "countMatches": "Count Matches",
-          "matches": "{count} matched",
-          "noMatches": "No matches",
-          "exception": "Exception",
-          "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
+          "onePatternPerLine": "Mỗi dòng một pattern.",
+          "countMatches": "Đếm số khớp",
+          "matches": "{count} khớp",
+          "noMatches": "Không có kết quả khớp",
+          "exception": "Ngoại lệ",
+          "tooManyPatterns": "Không tự động đếm số khớp khi có hơn {max} pattern."
         }
       },
       "modal": {
@@ -236,7 +252,7 @@
         "backupOnDifferentNode": "Bản sao lưu này nằm trên một node khác với máy chủ. Không thể xem từ API Client."
       },
       "form": {
-        "force": "Do you want to execute this deletion forcefully?",
+        "force": "Bạn có muốn buộc thực hiện việc xóa này không?",
         "name": "Tên",
         "newName": "Tên mới",
         "description": "Mô tả",
@@ -268,7 +284,7 @@
         "language": "Ngôn ngữ",
         "identifier": "Mã Định Danh",
         "enabled": "Bật",
-        "disabled": "Disabled",
+        "disabled": "Đã tắt",
         "title": "Tiêu đề",
         "content": "Nội dung",
         "backupConfiguration": "Cấu Hình Sao Lưu",
@@ -288,6 +304,7 @@
         "deleteSourceBackups": "Xóa bản sao lưu nguồn",
         "deleteSourceBackupsDescription": "Xóa các bản sao lưu đã chuyển trên node nguồn sau khi quá trình chuyển hoàn tất.",
         "node": "Node",
+        "location": "Location",
         "primaryAllocation": "Phân Bổ Chính",
         "additionalAllocations": "Phân Bổ Bổ Sung",
         "externalId": "ID Bên Ngoài",
@@ -316,7 +333,7 @@
         "value": "Giá trị",
         "eggs": "Eggs",
         "ignoredFiles": "Tệp Bị Bỏ Qua",
-        "previewIgnoredFiles": "Preview ignored files",
+        "previewIgnoredFiles": "Xem trước các file bị bỏ qua",
         "yourControlPanelPassword": "Mật Khẩu Bảng Điều Khiển Của Bạn",
         "deploymentEnabled": "Bật Triển Khai",
         "maintenanceEnabled": "Bật Bảo Trì",
@@ -361,8 +378,8 @@
           "address": "Địa chỉ",
           "eggs": "Egg",
           "template": "Mẫu",
-          "version": "Version",
-          "host": "Host"
+          "version": "Phiên bản",
+          "host": "Máy chủ"
         }
       },
       "tabs": {
@@ -375,14 +392,15 @@
         "disabled": "Đã tắt",
         "successful": "Thành công",
         "failed": "Thất bại",
-        "installed": "Đã cài đặt"
+        "installed": "Đã cài đặt",
+        "systemBackup": "System"
       },
       "label": {
         "noSubdirectories": "Không có thư mục con",
-        "page": "Page {page}",
-        "emptyDirectory": "This directory is empty",
-        "ignored": "Ignored",
-        "showingFirstEntries": "Showing the first {count} entries"
+        "page": "Trang {page}",
+        "emptyDirectory": "Thư mục này trống",
+        "ignored": "Đã bỏ qua",
+        "showingFirstEntries": "Hiển thị {count} mục đầu tiên"
       },
       "server": {
         "noAllocation": "Không có địa chỉ ip.",
@@ -392,7 +410,8 @@
           "nodeMaintenance": "Node đang bảo trì",
           "restoringBackup": "Khôi phục Backup",
           "installing": "Đang cài đặt",
-          "installFailed": "Lỗi cài đặt máy chủ"
+          "installFailed": "Lỗi cài đặt máy chủ",
+          "backupRestoreFailed": "{count} Egg"
         }
       },
       "enum": {
@@ -406,7 +425,7 @@
         },
         "serverState": {
           "unknown": "Không xác định",
-          "offline": "Offline",
+          "offline": "Ngoại tuyến",
           "running": "Đang chạy",
           "starting": "Đang khởi động",
           "stopping": "Đang dừng"
@@ -424,7 +443,7 @@
         },
         "connectionStatus": {
           "connected": "Đã kết nối",
-          "offline": "Offline"
+          "offline": "Ngoại tuyến"
         },
         "serverAutoStartBehavior": {
           "always": "Luôn luôn",
@@ -472,21 +491,21 @@
     },
     "elements": {
       "chartLegend": {
-        "hide": "Hide {series}",
-        "show": "Show {series}"
+        "hide": "Ẩn {series}",
+        "show": "Hiện {series}"
       },
       "dragAndDrop": {
         "item": {
-          "labelled": "{label} (position {position})",
-          "unlabelled": "item at position {position}"
+          "labelled": "{label} (vị trí {position})",
+          "unlabelled": "mục ở vị trí {position}"
         },
         "announcement": {
-          "pickedUp": "Picked up {item}.",
-          "movedOver": "{item} was moved over {target}.",
-          "leftTarget": "{item} is no longer over a drop target.",
-          "droppedOn": "{item} was dropped on {target}.",
-          "dropped": "{item} was dropped.",
-          "cancelled": "Dragging {item} was cancelled."
+          "pickedUp": "Đã chọn {item}.",
+          "movedOver": "{item} đã được di chuyển đè lên {target}.",
+          "leftTarget": "{item} không còn nằm trên mục tiêu thả.",
+          "droppedOn": "{item} đã được thả vào {target}.",
+          "dropped": "{item} đã được thả.",
+          "cancelled": "Đã hủy kéo {item}."
         }
       },
       "routeOrderEditor": {
@@ -550,10 +569,10 @@
           "openInVirtualWindow": "Mở trong cửa sổ ảo",
           "openInPopup": "Mở trong cửa sổ pop-up",
           "openInNewTab": "Mở trong tab mới",
-          "theme": "Theme",
-          "themeAuto": "Auto",
-          "themeDark": "Dark",
-          "themeLight": "Light"
+          "theme": "Giao diện",
+          "themeAuto": "Tự động",
+          "themeDark": "Tối",
+          "themeLight": "Sáng"
         }
       },
       "permissionSelector": {
@@ -568,7 +587,7 @@
         "noResults": "Không tìm thấy kết quả."
       },
       "serverSelect": {
-        "showOtherUsersServers": "Show other user's servers"
+        "showOtherUsersServers": "Hiển thị máy chủ của người dùng khác"
       },
       "can": {
         "tooltip": {
@@ -614,14 +633,19 @@
           "contentInstallFailed": "Máy chủ này không thể cài đặt và không thể truy cập cho đến khi được xác nhận.",
           "contentInstalling": "Máy chủ này đang được cài đặt và không thể truy cập cho đến khi hoàn tất.",
           "contentRestoringBackup": "Máy chủ này đang được khôi phục từ một bản sao lưu và không thể truy cập cho đến khi hoàn tất.",
+          "contentBackupRestoreFailed": "Máy chủ này gặp lỗi khi khôi phục bản sao lưu và không thể truy cập cho đến khi xác nhận. Các tệp của máy chủ có thể chưa hoàn chỉnh.",
           "button": {
             "viewInstallLogs": "Xem nhật ký cài đặt",
             "acknowledgeFailure": "Xác nhận lỗi cài đặt"
           },
           "modal": {
-            "acknowledgeFailure": {
-              "title": "Xác nhận Lỗi Cài Đặt",
-              "content": "Bằng việc xác nhận lỗi cài đặt này, bạn đang xác nhận rằng bạn đã biết về việc cài đặt thất bại và đã thực hiện các bước cần thiết để giải quyết vấn đề. Điều này sẽ cho phép bạn lấy lại quyền kiểm soát đối với máy chủ."
+            "acknowledgeInstallFailure": {
+              "title": "Xác nhận lỗi cài đặt",
+              "content": "Bằng việc xác nhận lỗi cài đặt này, bạn xác nhận rằng bạn đã biết về quá trình cài đặt bị lỗi và đã thực hiện các bước cần thiết để giải quyết sự cố. Điều này sẽ cho phép bạn giành lại quyền điều khiển máy chủ."
+            },
+            "acknowledgeBackupRestoreFailure": {
+              "title": "Xác nhận lỗi khôi phục sao lưu",
+              "content": "Bằng việc xác nhận lỗi khôi phục sao lưu này, bạn xác nhận rằng bạn đã biết về quá trình khôi phục bị lỗi và các tệp máy chủ có thể chưa hoàn chỉnh. Điều này sẽ cho phép bạn giành lại quyền điều khiển máy chủ."
             }
           }
         }
@@ -630,7 +654,7 @@
         "none": "Không có",
         "variable": "Biến",
         "enterVariable": "Vui lòng nhập tên biến để đánh giá.",
-        "writeVariable": "The result is stored in this variable.",
+        "writeVariable": "Kết quả được lưu trong biến này.",
         "useVariable": "Sử dụng một biến thay vì văn bản thuần túy",
         "usePlainText": "Sử dụng văn bản thuần túy thay vì một biến",
         "optionalPlaceholder": "Không có (tùy chọn)"
@@ -652,11 +676,12 @@
           "toast": {
             "backupCompleted": "Sao lưu hoàn tất",
             "backupFailed": "Sao lưu thất bại.",
-            "backupDeleteFailed": "Backup deletion failed.",
+            "backupDeleteFailed": "Xóa sao lưu thất bại.",
             "backupRestoreCompleted": "Khôi phục sao lưu hoàn tất.",
+            "backupRestoreFailed": "Khôi phục sao lưu thất bại.",
             "installCompleted": "Cài đặt máy chủ hoàn tất.",
             "installFailed": "Cài đặt máy chủ thất bại.",
-            "transferFailed": "Server transfer failed, the server remains on this node.",
+            "transferFailed": "Chuyển máy chủ thất bại, máy chủ vẫn ở trên node này.",
             "operations": {
               "compressing": {
                 "completed": "Đã nén {files} tới `{path}` trong {time}.",
@@ -686,50 +711,50 @@
                 "failedTo": "Sao chép thất bại tệp {files}  tới máy chủ điều khiển:\n{error}"
               },
               "exportingBackup": {
-                "completed": "Exported backup to `{destination}` in {time}.",
-                "failed": "Failed to export backup to `{destination}`:\n{error}"
+                "completed": "Đã xuất bản sao lưu sang `{destination}` trong {time}.",
+                "failed": "Không thể xuất bản sao lưu sang `{destination}`:\n{error}"
               }
             }
           }
         }
       },
       "fileUpload": {
-        "title": "Uploading {files}",
-        "adminAssets": "Admin Assets",
+        "title": "Đang tải lên {files}",
+        "adminAssets": "Tài nguyên Quản trị",
         "waiting": "Đang Chờ: {file}",
         "uploading": "Đang Tải Lên: {file}",
         "uploadingFolder": "Đang Tải Lên Thư Mục: {folder} ({files})",
-        "failed": "Failed: {file}",
-        "failedFolder": "Upload failed: {folder} ({files})",
-        "paused": "Paused: {file}",
-        "pause": "Pause upload",
-        "resume": "Resume upload",
-        "cancel": "Cancel upload",
-        "reselect": "Re-select file to resume",
+        "failed": "Thất bại: {file}",
+        "failedFolder": "Tải lên thất bại: {folder} ({files})",
+        "paused": "Đã tạm dừng: {file}",
+        "pause": "Tạm dừng tải lên",
+        "resume": "Tiếp tục tải lên",
+        "cancel": "Hủy tải lên",
+        "reselect": "Chọn lại tệp để tiếp tục",
         "badge": {
-          "uploading": "Uploading",
-          "waiting": "Waiting",
-          "paused": "Paused",
-          "failed": "Failed"
+          "uploading": "Đang tải lên",
+          "waiting": "Đang chờ",
+          "paused": "Đã tạm dừng",
+          "failed": "Thất bại"
         },
         "rateLimited": "Tải lên của bạn đã bị giới hạn tốc độ. Đang chờ...",
         "cancelAllUploads": "Hủy tất cả tải lên",
         "modal": {
           "cancelAllUploads": {
-            "title": "Cancel All Uploads",
-            "content": "Are you sure you want to cancel all active uploads? Partially uploaded files will be discarded."
+            "title": "Hủy tất cả lượt tải lên",
+            "content": "Bạn có chắc chắn muốn hủy tất cả các lượt tải lên đang hoạt động không? Các tệp đang tải lên dở dang sẽ bị hủy bỏ."
           }
         },
         "toast": {
           "uploading": "Đang tải lên {files}...",
-          "failed": "Upload failed: {error}",
+          "failed": "Tải lên thất bại: {error}",
           "cancelledFile": "Đã hủy `{file}`.",
           "cancelledFolder": "Đã hủy tải lên `{folder}` ({files}).",
-          "wrongFile": "Selected file does not match `{file}`; pick the same file to resume.",
+          "wrongFile": "Đã chọn tệp không khớp `{file}`; hãy chọn lại cùng tệp để tiếp tục.",
           "cancelledAll": "Tất cả các tải lên đã bị hủy.",
-          "completedServer": "Finished uploading {files} to `{server}`.",
-          "completedAssets": "Finished uploading {files} to the admin assets.",
-          "showFiles": "Show files"
+          "completedServer": "Đã tải xong {files} lên `{server}`.",
+          "completedAssets": "Hoàn thành tải lên {files} vào admin assets.",
+          "showFiles": "Hiển thị tệp"
         }
       }
     },
@@ -757,9 +782,9 @@
             "description": "Chọn một mật khẩu mạnh. Tài khoản này sẽ có quyền quản trị hoàn toàn đối với tất cả các máy chủ và cài đặt."
           },
           "form": {
-            "usernamePlaceholder": "admin",
+            "usernamePlaceholder": "quản trị viên",
             "email": "Địa chỉ email",
-            "emailPlaceholder": "admin@example.com",
+            "emailPlaceholder": "admin@example.vn",
             "firstNamePlaceholder": "Van A",
             "lastNamePlaceholder": "Nguyen",
             "passwordPlaceholder": "Nhập mật khẩu mạnh",
@@ -773,7 +798,7 @@
           "title": "Trở lại Đăng nhập",
           "alert": "Nếu bạn đã có tài khoản quản trị viên, hãy đăng nhập để tiếp tục thiết lập.",
           "form": {
-            "usernamePlaceholder": "admin",
+            "usernamePlaceholder": "quản trị viên",
             "passwordPlaceholder": "Nhập mật khẩu mạnh"
           },
           "button": {
@@ -784,11 +809,11 @@
           "title": "Cấu hình Vị trí và Sao lưu",
           "form": {
             "locationName": "Tên Vị trí",
-            "locationNamePlaceholder": "My home",
+            "locationNamePlaceholder": "Nhà của tôi",
             "locationFlag": "Cờ Vị Trí",
             "locationFlagPlaceholder": "Quốc gia tốt nhất",
             "backupName": "Tên Cấu hình Sao lưu",
-            "backupNamePlaceholder": "Unicorn Cloud",
+            "backupNamePlaceholder": "My Cloud",
             "backupDisk": "Đĩa Sao lưu",
             "backupDiskPlaceholder": "Đĩa Sao lưu"
           },
@@ -801,7 +826,7 @@
           "allocationsTitle": "Cấu hình Phân bổ",
           "form": {
             "name": "Tên Node",
-            "namePlaceholder": "My Server",
+            "namePlaceholder": "Máy chủ của tôi",
             "urlPlaceholder": "URL",
             "urlDescription": "Được sử dụng để kết nối với API của node và phải bao gồm giao thức (http:// hoặc https://)",
             "publicUrl": "URL Công Khai",
@@ -823,7 +848,7 @@
           "error": {
             "noNodes": "Đã xảy ra lỗi. Không tìm thấy node nào.",
             "connectionError": "Đã xảy ra lỗi. Lỗi kết nối.",
-            "frontendConnectionError": "Your browser could not reach the node. Check the (public) URL, TLS certificate and firewall. Websockets and downloads depend on this connection."
+            "frontendConnectionError": "Trình duyệt của bạn không thể kết nối tới node. Hãy kiểm tra URL (công khai), chứng chỉ TLS và tường lửa. Websocket và các tác vụ tải xuống đều phụ thuộc vào kết nối này."
           },
           "successMessage": "Kết nối với node đã hoàn thành xác minh. Bạn có thể tiếp tục.",
           "configurationDescription": "Thêm đoạn mã này vào tệp cấu hình tại `{file}` hoặc chạy lệnh sau:",
@@ -841,8 +866,8 @@
             "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Kích hoạt Đăng ký",
             "registrationDescription": "Cho phép người dùng mới đăng ký tài khoản của họ.",
-            "securityKeys": "Enable Security Keys",
-            "securityKeysDescription": "Allow users to sign in with passkeys and hardware security keys, scoped to {rpId}. You can change this later in the admin settings."
+            "securityKeys": "Bật khóa bảo mật (passkey)",
+            "securityKeysDescription": "Cho phép người dùng đăng nhập bằng passkey và khóa bảo mật phần cứng, giới hạn trong phạm vi {rpId}. Bạn có thể thay đổi tùy chọn này sau trong phần cài đặt quản trị."
           },
           "button": {
             "submit": "Lưu và tiếp tục"
@@ -934,7 +959,7 @@
               "securityError": "Passkeys yêu cầu một kết nối an toàn (HTTPS) và có thể không hoạt động nếu bạn đang truy cập qua HTTP hoặc trong một môi trường không an toàn.",
               "authenticatorError": "Đã xảy ra lỗi với thiết bị xác thực.",
               "constraintError": "Thiết bị xác thực không thể đáp ứng các ràng buộc cần thiết.",
-              "noUsernamelessKey": "No passkey that can be used without a username was found on this device. If you have one that was set up without \"Allow signing in without a username\", enter your username first and it will work as usual."
+              "noUsernamelessKey": "Không tìm thấy passkey nào có thể dùng mà không cần tên người dùng trên thiết bị này. Nếu bạn có passkey được thiết lập mà không bật \"Cho phép đăng nhập không cần tên người dùng\", hãy nhập tên người dùng trước và nó sẽ hoạt động như bình thường."
             }
           },
           "step": {
@@ -950,7 +975,7 @@
                 "createAccount": "Tạo tài khoản"
               },
               "button": {
-                "passkeyLogin": "Sign in with a Passkey",
+                "passkeyLogin": "Đăng nhập bằng Passkey",
                 "oauthLogin": "Đăng nhập với OAuth"
               }
             },
@@ -1032,7 +1057,7 @@
             "groupActions": "Hành động Nhóm",
             "noGroups": "Không có nhóm nào khả dụng để thêm máy chủ vào",
             "noGroup": "Máy chủ này không thuộc bất kỳ nhóm nào",
-            "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
+            "foreign": "Máy chủ này thuộc sở hữu của người dùng khác, bạn có quyền truy cập với vai trò subuser hoặc quản trị viên"
           },
           "badge": {
             "foreign": "Bên Ngoài"
@@ -1110,7 +1135,7 @@
           "noServers": "Không tìm thấy máy chủ nào, đến lúc thêm một cái?"
         },
         "admin": {
-          "title": "Admin"
+          "title": "Quản trị viên"
         },
         "account": {
           "title": "Tài khoản",
@@ -1206,16 +1231,16 @@
           "tooltip": {
             "secureContextRequired": "Cần có ngữ cảnh bảo mật (HTTPS) để sử dụng khóa bảo mật.",
             "limitReached": "Bạn được giới hạn ở {max} khóa bảo mật.",
-            "disabled": "Security keys have been disabled by an administrator."
+            "disabled": "Khóa bảo mật đã bị quản trị viên vô hiệu hóa."
           },
           "alert": {
-            "disabled": "Security keys have been disabled by an administrator. Your existing keys are listed below and can still be removed, but they cannot be used to sign in and no new keys can be created."
+            "disabled": "Khóa bảo mật đã bị quản trị viên vô hiệu hóa. Các khóa hiện có của bạn được liệt kê bên dưới và vẫn có thể xóa, nhưng không thể dùng để đăng nhập và không thể tạo khóa mới."
           },
           "modal": {
             "createSecurityKey": {
               "title": "Tạo Khóa Bảo Mật",
-              "allowUsernamelessLogin": "Allow signing in without a username",
-              "allowUsernamelessLoginDescription": "Saves the passkey onto the device so you can pick it from a list instead of typing your username. Hardware security keys have limited storage and may refuse it - if setup fails, turn this off and try again.",
+              "allowUsernamelessLogin": "Cho phép đăng nhập không cần tên người dùng",
+              "allowUsernamelessLoginDescription": "Lưu passkey vào thiết bị để bạn có thể chọn từ danh sách thay vì gõ tên người dùng. Khóa bảo mật phần cứng có bộ nhớ giới hạn và có thể từ chối — nếu thiết lập thất bại, hãy tắt tùy chọn này và thử lại.",
               "toast": {
                 "created": "Khóa bảo mật đã được tạo thành công.",
                 "aborted": "Tạo khóa bảo mật đã bị hủy."
@@ -1278,8 +1303,8 @@
             "resetAll": "Tất cả phím tắt đã được đặt lại về mặc định."
           },
           "general": {
-            "title": "General",
-            "undo": "Undo the last action"
+            "title": "Chung",
+            "undo": "Hoàn tác hành động cuối cùng"
           },
           "fileManager": {
             "title": "Trình Quản Lý Tệp",
@@ -1389,9 +1414,9 @@
               }
             },
             "duplicateCommandSnippet": {
-              "title": "Duplicate Command Snippet",
+              "title": "Nhân bản đoạn lệnh",
               "toast": {
-                "duplicated": "Command snippet duplicated."
+                "duplicated": "Đã nhân bản đoạn lệnh."
               }
             }
           }
@@ -1488,19 +1513,19 @@
             }
           },
           "update": {
-            "title": "Update API Key",
-            "subtitle": "An application is requesting changes to the permissions of one of your API keys.",
+            "title": "Cập nhật API Key",
+            "subtitle": "Một ứng dụng đang yêu cầu thay đổi quyền hạn của một trong các API key của bạn.",
             "alert": {
-              "replaceMode": "This request **replaces** the permissions of this API key. Permissions marked as removed will be revoked.",
-              "callbackUrl": "After updating, you will be returned to **{url}**."
+              "replaceMode": "Yêu cầu này **thay thế** quyền hạn của API key này. Các quyền được đánh dấu là loại bỏ sẽ bị thu hồi.",
+              "callbackUrl": "Sau khi cập nhật, bạn sẽ được đưa trở lại **{url}**."
             },
             "badge": {
-              "added": "Added",
-              "existing": "Granted",
-              "removed": "Removed"
+              "added": "Đã thêm",
+              "existing": "Đã cấp",
+              "removed": "Đã loại bỏ"
             },
-            "noChanges": "This request does not change the permissions of this API key.",
-            "keyUpdated": "The permissions of your API key have been updated."
+            "noChanges": "Yêu cầu này không thay đổi quyền hạn của API key này.",
+            "keyUpdated": "Quyền hạn của API key của bạn đã được cập nhật."
           }
         },
         "activity": {
@@ -1509,12 +1534,12 @@
       },
       "admin": {
         "categories": {
-          "infrastructure": "Infrastructure",
+          "infrastructure": "Hạ tầng",
           "eggs": "Nests & Eggs",
-          "databases": "Databases",
-          "storage": "Storage",
-          "access": "Users & Access",
-          "system": "System"
+          "databases": "Cơ sở dữ liệu",
+          "storage": "Lưu trữ",
+          "access": "Người dùng & Quyền truy cập",
+          "system": "Hệ thống"
         },
         "home": {
           "title": "Trang chủ",
@@ -1608,7 +1633,7 @@
                   "recheckComplete": "Kiểm tra lại hoàn tất."
                 },
                 "selectHistory": "Chọn lịch sử cập nhật để xem.",
-                "historyPanel": "Panel",
+                "historyPanel": "Bảng điều khiển",
                 "historyExtension": "Tiện Ích: {name}",
                 "extensionsUpToDate": "Tất cả tiện ích mở rộng đều đã cập nhật.",
                 "extensionsOutdated": "Một số tiện ích mở rộng đã lỗi thời hoặc gặp lỗi khi kiểm tra cập nhật.",
@@ -1675,7 +1700,7 @@
                 "form": {
                   "icon": "Biểu Tượng",
                   "iconLight": "Biểu Tượng (Chế Độ Sáng)",
-                  "banner": "Banner",
+                  "banner": "Biểu ngữ",
                   "bannerLight": "Banner (Chế Độ Sáng)",
                   "sessionCookie": "Cookie Phiên",
                   "sessionDurationSeconds": "Thời Lượng Phiên (giây)",
@@ -1760,7 +1785,7 @@
                     "filesystem": "Hệ Thống Tệp"
                   },
                   "tlsMode": {
-                    "none": "None",
+                    "none": "Không",
                     "startTls": "STARTTLS",
                     "implicitTls": "Implicit TLS"
                   }
@@ -1837,14 +1862,14 @@
               "page": {
                 "title": "Cài Đặt Webauthn",
                 "form": {
-                  "enabled": "Enable Security Keys",
-                  "enabledDescription": "Allow users to register and sign in with security keys. Existing keys are kept and remain visible, but cannot be used to sign in while this is off.",
-                  "allowDiscoverable": "Allow Usernameless Login",
-                  "allowDiscoverableDescription": "Let users store passkeys on their device and pick one from a list instead of typing a username.",
+                  "enabled": "Bật khóa bảo mật",
+                  "enabledDescription": "Cho phép người dùng đăng ký và đăng nhập bằng khóa bảo mật. Các khóa hiện có vẫn được lưu giữ và hiển thị, nhưng không thể dùng để đăng nhập khi tính năng này đang tắt.",
+                  "allowDiscoverable": "Cho phép đăng nhập không cần tên người dùng",
+                  "allowDiscoverableDescription": "Cho phép người dùng lưu trữ passkey trên thiết bị và chọn một passkey từ danh sách thay vì phải nhập tên người dùng.",
                   "rpId": "RP Id",
                   "rpOrigin": "RP Origin",
-                  "authenticationTimeoutSeconds": "Authentication Timeout (seconds)",
-                  "registrationTimeoutSeconds": "Registration Timeout (seconds)"
+                  "authenticationTimeoutSeconds": "Thời gian xác thực",
+                  "registrationTimeoutSeconds": "Thời gian đăng ký"
                 },
                 "button": {
                   "autofill": "Tự Động Điền"
@@ -2028,20 +2053,20 @@
             "noExtensions": "Chưa cài đặt tiện ích mở rộng nào.",
             "heavyImageMissing": "Bạn dường như không sử dụng hình ảnh heavy cần thiết để cài đặt tiện ích mở rộng, xem [tại đây]({docsUrl}) để biết cách chuyển đổi.",
             "supervisorUnreachable": {
-              "title": "The extension supervisor is not answering",
-              "content": "Extensions cannot be built until it does, and the panel is serving whichever binary it started with. Check the container logs."
+              "title": "Không thể kết nối với trình quản lý tiện ích",
+              "content": "Không thể biên dịch tiện ích mở rộng cho đến khi tiến trình này phản hồi, và bảng điều khiển vẫn đang chạy tệp thực thi (binary) ban đầu. Vui lòng kiểm tra nhật ký (log) của container"
             },
             "buildFailed": {
-              "title": "The last extension build failed",
-              "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+              "title": "Lần cuối biên dịch tiện ích mở rộng thất bại",
+              "content": "Các tiện ích này sẽ không được biên dịch lại cho đến khi có sự thay đổi, hoặc cho đến khi bạn chủ động thực hiện lại quá trình biên dịch."
             }
           },
           "button": {
             "viewBuildLogs": "Xem nhật ký build",
             "install": "Cài đặt tiện ích",
             "rebuild": "Build lại tiện ích",
-            "retryBuild": "Retry build",
-            "cancelBuild": "Cancel build",
+            "retryBuild": "Thử lại quá trình build",
+            "cancelBuild": "Hủy quá trình build",
             "configure": "Cấu Hình",
             "back": "Quay Lại Tiện Ích",
             "accept": "Chấp Nhận",
@@ -2050,22 +2075,22 @@
           "tooltip": {
             "building": "Panel đang build mã tiện ích. Vui lòng chờ.",
             "noPendingBuild": "Không có tiện ích nào đang chờ build.",
-            "cancelling": "The build stops once its current step ends.",
+            "cancelling": "Quá trình build sẽ dừng lại ngay khi bước hiện tại kết thúc.",
             "noBackend": "Cần tiện ích backend để cấu hình tiện ích này.",
             "noConfigurationPage": "Tiện ích này không có trang cấu hình.",
             "removeExtension": "Xóa tiện ích"
           },
           "phase": {
-            "queued": "Queued…",
-            "preparing": "Preparing…",
-            "clearing": "Clearing extensions…",
-            "adding": "Adding extensions ({done}/{total})…",
-            "resync": "Resolving dependencies…",
-            "stagingTranslations": "Staging translations…",
-            "compiling": "Compiling…",
-            "verifying": "Verifying…",
-            "installing": "Installing…",
-            "restarting": "Restarting the panel…"
+            "queued": "Đang trong hàng đợi…",
+            "preparing": "Đang chuẩn bị…",
+            "clearing": "Đang xóa tiện ích mở rộng…",
+            "adding": "Đang thêm tiện ích mở rộng ({done}/{total})…",
+            "resync": "Đang giải quyết phụ thuộc…",
+            "stagingTranslations": "Đang chuẩn bị bản dịch…",
+            "compiling": "Đang biên dịch…",
+            "verifying": "Đang xác minh…",
+            "installing": "Đang cài đặt…",
+            "restarting": "Đang khởi động lại panel…"
           },
           "badge": {
             "frontendMissing": "Thiếu frontend",
@@ -2088,8 +2113,8 @@
           "toast": {
             "buildStarted": "Build lại tiện ích đã bắt đầu thành công.",
             "buildCompleted": "Build tiện ích hoàn tất. Bạn có thể cần tải lại trang.",
-            "buildFailed": "Extension build failed: {reason}",
-            "cancelRequested": "Cancel requested. The build stops once its current step ends.",
+            "buildFailed": "Build tiện ích mở rộng thất bại: {reason}",
+            "cancelRequested": "Đã yêu cầu hủy. Quá trình build sẽ dừng lại ngay khi bước hiện tại kết thúc.",
             "added": "Tiện ích `{packageName}` đã được thêm thành công.",
             "removed": "Tiện ích `{packageName}` đã được xóa thành công."
           },
@@ -2347,14 +2372,14 @@
                   "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Được sử dụng cho kết nối websocket và tải xuống.",
                   "backupConfigurationPlaceholder": "Kế Thừa Từ Vị Trí",
-                  "memoryDescription": "The total memory available for servers on this node.",
-                  "diskDescription": "The total disk available for servers on this node.",
-                  "unlimitedTooltip": "0 will not set a limit."
+                  "memoryDescription": "Tổng dung lượng bộ nhớ khả dụng cho các máy chủ trên node này.",
+                  "diskDescription": "Tổng dung lượng ổ đĩa khả dụng cho các máy chủ trên node này.",
+                  "unlimitedTooltip": "0 sẽ không đặt giới hạn."
                 },
                 "section": {
-                  "connection": "Connection",
-                  "resources": "Resources",
-                  "options": "Options"
+                  "connection": "Kết nối",
+                  "resources": "Tài nguyên",
+                  "options": "Tùy chọn"
                 },
                 "button": {
                   "resetToken": "Đặt Lại Token",
@@ -2365,7 +2390,7 @@
                 },
                 "alert": {
                   "noLocations": "Bạn cần tạo ít nhất một vị trí trước khi có thể tạo node. Vị trí giúp tổ chức node theo địa lý hoặc logic.",
-                  "urlMissingPort": "No port specified. The panel will connect to this node on port {port}. Wings listens on port {wingsPort} by default, so add it to the URL unless a reverse proxy on port {port} forwards to wings."
+                  "urlMissingPort": "Chưa chỉ định cổng. Panel sẽ kết nối tới node này qua cổng {port}. Mặc định Wings lắng nghe trên cổng {wingsPort}, hãy thêm cổng vào URL trừ khi có reverse proxy trên cổng {port} chuyển tiếp tới wings."
                 },
                 "titleCreate": "Tạo Node",
                 "titleUpdate": "Cập Nhật Node"
@@ -2380,40 +2405,40 @@
                   "liveConfiguration": "Cấu Hình Trực Tiếp"
                 },
                 "step": {
-                  "settings": "Settings",
-                  "install": "Apply Configuration",
-                  "verify": "Verify Connection"
+                  "settings": "Cài đặt",
+                  "install": "Áp dụng cấu hình",
+                  "verify": "Xác minh kết nối"
                 },
                 "description": {
                   "placeFile": "Đặt nội dung này vào tệp cấu hình tại `/etc/pterodactyl/config.yml` hoặc chạy",
-                  "settings": "These values are used to generate the wings configuration below.",
-                  "verify": "Checks that both the panel (backend) and your browser (frontend) can reach wings."
+                  "settings": "Các giá trị này được dùng để tạo cấu hình wings bên dưới.",
+                  "verify": "Kiểm tra cả panel (backend) và trình duyệt của bạn (frontend) đều có thể kết nối tới wings."
                 },
                 "tooltip": {
                   "copyCommand": "Sao chép lệnh"
                 },
                 "form": {
                   "panelUrl": "URL Panel",
-                  "panelUrlDescription": "The URL wings uses to reach this panel.",
+                  "panelUrlDescription": "URL mà wings sử dụng để kết nối tới panel này.",
                   "apiPort": "Cổng API",
-                  "apiPortDescription": "The port wings listens on.",
-                  "sftpPortDescription": "The port the wings SFTP server listens on."
+                  "apiPortDescription": "Cổng mà wings lắng nghe.",
+                  "sftpPortDescription": "Cổng mà máy chủ SFTP của wings lắng nghe."
                 },
                 "button": {
                   "save": "Lưu Cấu Hình",
                   "reveal": "Hiển thị Cấu Hình",
-                  "verify": "Verify Connection"
+                  "verify": "Xác minh kết nối"
                 },
                 "alert": {
                   "couldNotReach": "Không thể kết nối với node: {error}",
                   "tokenWarning": "Cấu hình dưới đây chứa token của node. Chỉ hiển thị nó khi cần thiết.",
-                  "portMismatch": "The node URL points at port {connectPort}, but this configuration makes wings listen on port {apiPort}. Unless a reverse proxy forwards port {connectPort} to wings, the panel will not be able to reach the node.",
-                  "verifyBackend": "Backend to Wings",
-                  "verifyFrontend": "Frontend to Wings",
-                  "verifyNotTested": "Not tested yet.",
-                  "verifySuccess": "Connection established. Wings {version} responded.",
-                  "verifyFailed": "The panel could not reach the node: {error}",
-                  "verifyFrontendFailed": "Your browser could not reach the node: {error}. The console, downloads and uploads depend on this connection. Check the (public) URL, TLS certificate and firewall."
+                  "portMismatch": "URL của node trỏ tới cổng {connectPort}, nhưng cấu hình này khiến wings lắng nghe trên cổng {apiPort}. Trừ khi reverse proxy chuyển tiếp cổng {connectPort} tới wings, panel sẽ không thể kết nối tới node.",
+                  "verifyBackend": "Backend tới Wings",
+                  "verifyFrontend": "Frontend tới Wings",
+                  "verifyNotTested": "Chưa kiểm tra.",
+                  "verifySuccess": "Đã thiết lập kết nối. Wings {version} đã phản hồi.",
+                  "verifyFailed": "Panel không thể kết nối tới node: {error}",
+                  "verifyFrontendFailed": "Trình duyệt của bạn không thể kết nối tới node: {error}. Console, tải xuống và tải lên phụ thuộc vào kết nối này. Hãy kiểm tra URL (công khai), chứng chỉ TLS và tường lửa."
                 },
                 "toast": {
                   "applied": "Cấu hình đã được áp dụng thành công.",
@@ -2508,11 +2533,11 @@
                   "clearSelection": "Xóa Lựa Chọn"
                 },
                 "form": {
-                  "ipAlias": "IP Alias"
+                  "ipAlias": "Bí danh IP"
                 },
                 "table": {
                   "columns": {
-                    "ipAlias": "IP Alias"
+                    "ipAlias": "Bí danh IP"
                   }
                 },
                 "modal": {
@@ -2561,39 +2586,39 @@
               }
             },
             "databaseHosts": {
-              "title": "Database Hosts",
+              "title": "Máy chủ cơ sở dữ liệu",
               "page": {
-                "title": "Node Database Hosts",
+                "title": "Máy chủ cơ sở dữ liệu của Node",
                 "toast": {
-                  "created": "Node database host created.",
-                  "deleted": "Node database host deleted."
+                  "created": "Đã tạo máy chủ cơ sở dữ liệu của node.",
+                  "deleted": "Đã xóa máy chủ cơ sở dữ liệu của node."
                 },
                 "modal": {
                   "create": {
-                    "title": "Create Node Database Host"
+                    "title": "Tạo node máy chủ cơ sở dữ liệu"
                   },
                   "delete": {
-                    "title": "Confirm Node Database Host Deletion",
-                    "content": "Are you sure you want to delete the database host **{name}** from **{node}**?"
+                    "title": "Xác nhận Xóa Node Máy Chủ Agent Cơ Sở Dữ Liệu",
+                    "content": "Bạn có chắc chắn muốn xóa máy chủ agent cơ sở dữ liệu **{name}** khỏi **{node}** không?"
                   }
                 }
               }
             },
             "databaseAgentHosts": {
-              "title": "Database Agent Hosts",
+              "title": "Máy Chủ Agent Cơ Sở Dữ Liệu",
               "page": {
-                "title": "Node Database Agent Hosts",
+                "title": "Máy Chủ Agent Cơ Sở Dữ Liệu",
                 "toast": {
-                  "created": "Node database agent host created.",
-                  "deleted": "Node database agent host deleted."
+                  "created": "Đã tạo máy chủ cơ sở dữ liệu của node.",
+                  "deleted": "Đã xóa máy chủ cơ sở dữ liệu của node."
                 },
                 "modal": {
                   "create": {
-                    "title": "Create Node Database Agent Host"
+                    "title": "Tạo Máy Chủ Agent Cơ Sở Dữ Liệu"
                   },
                   "delete": {
-                    "title": "Confirm Node Database Agent Host Deletion",
-                    "content": "Are you sure you want to delete the database agent host **{name}** from **{node}**?"
+                    "title": "Xác nhận Xóa Máy Chủ Agent Cơ Sở Dữ Liệu",
+                    "content": "Bạn có chắc chắn muốn xóa máy chủ agent cơ sở dữ liệu **{name}** khỏi **{node}** không?"
                   }
                 }
               }
@@ -2637,7 +2662,7 @@
                   "delete": {
                     "title": "Xác Nhận Xóa Sao Lưu Node",
                     "alert": {
-                      "forceWarning": "Force deletion removes the backup even if its configuration is missing or the remote storage cannot be reached. The backup files themselves may not be fully cleaned up, leaving orphaned data behind."
+                      "forceWarning": "Tính năng xóa cưỡng bức sẽ loại bỏ bản sao lưu ngay cả khi tệp cấu hình bị thiếu hoặc không thể kết nối với bộ lưu trữ từ xa. Tuy nhiên, bản thân các tệp sao lưu có thể không được dọn dẹp hoàn toàn, dẫn đến việc còn sót lại dữ liệu dư thừa (dữ liệu mồ côi)."
                     }
                   }
                 }
@@ -2685,7 +2710,7 @@
               "page": {
                 "title": "Chuyển Node",
                 "toast": {
-                  "connectionLost": "Lost connection to the node transfers stream."
+                  "connectionLost": "Mất kết nối với luồng thống kê node."
                 },
                 "table": {
                   "columns": {
@@ -2784,10 +2809,7 @@
                 "badge": {
                   "suspended": "Bị tạm đình chỉ",
                   "transferring": "Đang chuyển",
-                  "admin": "Quản trị",
-                  "installing": "Đang cài đặt",
-                  "installFailed": "Cài đặt thất bại",
-                  "restoringBackup": "Đang khôi phục sao lưu"
+                  "admin": "Quản trị"
                 }
               }
             },
@@ -2840,7 +2862,7 @@
                   "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Hình Ảnh Docker Được Định Nghĩa Trước",
                   "predefinedDockerImagesPlaceholder": "Chưa chọn hình ảnh định nghĩa trước",
-                  "timezonePlaceholder": "Europe/Amsterdam",
+                  "timezonePlaceholder": "Asia/Saigon",
                   "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Tùy Chỉnh",
                   "predefinedStartupCommands": "Lệnh Khởi Động Được Định Nghĩa Trước",
@@ -2875,7 +2897,7 @@
                 "title": "Phân Bổ Máy Chủ",
                 "table": {
                   "columns": {
-                    "ipAlias": "IP Alias"
+                    "ipAlias": "Biệt Danh IP"
                   }
                 },
                 "form": {
@@ -2943,13 +2965,13 @@
               }
             },
             "databases": {
-              "title": "Databases",
+              "title": "Cơ sở dữ liệu",
               "page": {
                 "databases": {
-                  "title": "Classic Databases"
+                  "title": "Cơ sở dữ liệu cổ điển"
                 },
                 "instances": {
-                  "title": "Managed Databases"
+                  "title": "Chỉnh Sửa Cơ Sở Dữ Liệu Được Quản Lý"
                 }
               }
             },
@@ -3046,7 +3068,7 @@
                       "confirmServerNamePlaceholder": "Tên Máy Chủ"
                     },
                     "alert": {
-                      "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind."
+                      "forceWarning": "Buộc xóa sẽ bỏ qua trình tự tắt máy thông thường. Các tệp máy chủ trên node có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác."
                     }
                   }
                 }
@@ -3152,7 +3174,7 @@
                         "stopType": {
                           "command": "Gửi Lệnh",
                           "signal": "Gửi Tín Hiệu",
-                          "docker": "Docker Stop"
+                          "docker": "Dừng Docker"
                         }
                       },
                       "emptyConfigFiles": "Chưa định nghĩa tệp config.",
@@ -3206,7 +3228,7 @@
                         "created": "Biến egg đã được tạo.",
                         "updated": "Biến egg đã được cập nhật.",
                         "deleted": "Biến egg đã được xóa.",
-                        "duplicated": "Egg variable duplicated."
+                        "duplicated": "Biến egg đã được cập nhật."
                       },
                       "modal": {
                         "delete": {
@@ -3215,7 +3237,7 @@
                           "emptyVariable": "biến trống này"
                         },
                         "duplicate": {
-                          "title": "Duplicate Egg Variable"
+                          "title": "Nhân bản Biến Egg"
                         }
                       }
                     }
@@ -3295,7 +3317,7 @@
                     "primaryStartPort": "Cổng Bắt Đầu Chính",
                     "primaryEndPort": "Cổng Kết Thúc Chính",
                     "assignToVariable": "Gán Cho Biến",
-                    "assignToVariablePlaceholder": "e.g. SERVER_PORT",
+                    "assignToVariablePlaceholder": "vd. SERVER_PORT",
                     "assignToVariableDescription": "Biến môi trường tùy chọn để nhận cổng chính được gán."
                   },
                   "divider": {
@@ -3312,7 +3334,7 @@
                       "endPort": "Cổng Kết Thúc",
                       "assignToVariable": "Gán Cho Biến",
                       "assignToVariableDescription": "Biến môi trường tùy chọn để nhận cổng được gán từ quy tắc này.",
-                      "assignToVariablePlaceholder": "e.g. SERVER_PORT"
+                      "assignToVariablePlaceholder": "vd. SERVER_PORT"
                     },
                     "removeRule": "Xóa quy tắc triển khai"
                   }
@@ -3350,17 +3372,17 @@
                 "form": {
                   "gitRepository": "Kho Git",
                   "credentials": "Repository Credentials",
-                  "credentialType": "Credential Type",
-                  "password": "Password or Access Token",
-                  "privateKey": "Private Key",
+                  "credentialType": "Loại Thông Tin",
+                  "password": "Mật khẩu và Token Access",
+                  "privateKey": "Khóa bí mật",
                   "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
-                  "passphrase": "Passphrase"
+                  "passphrase": "Mã truy cập"
                 },
                 "enum": {
                   "credentialType": {
-                    "none": "None",
-                    "password": "Password",
-                    "privateKey": "Private Key"
+                    "none": "Không",
+                    "password": "Mật khẩu",
+                    "privateKey": "Khóa bí mật"
                   }
                 },
                 "button": {
@@ -3439,7 +3461,7 @@
                     "title": "Xác Nhận Xóa Máy Chủ CSDL",
                     "content": "Bạn có chắc muốn xóa **{name}** không?",
                     "alert": {
-                      "forceWarning": "Force deletion removes all databases on this host. The databases on the host itself may not be fully cleaned up, leaving orphaned data behind."
+                      "forceWarning": "Buộc xóa sẽ xóa tất cả cơ sở dữ liệu trên máy chủ này. Các cơ sở dữ liệu trên chính máy chủ có thể không được dọn dẹp hoàn toàn, để lại dữ liệu mồ côi."
                     }
                   }
                 }
@@ -3451,13 +3473,13 @@
                 "title": "Cơ Sở Dữ Liệu Máy Chủ",
                 "modal": {
                   "delete": {
-                    "title": "Confirm Database Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
+                    "title": "Xác nhận xóa cơ sở dữ liệu",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
                     "toast": {
-                      "deleted": "Database has been deleted."
+                      "deleted": "Cơ sở dữ liệu đã được xóa."
                     },
                     "alert": {
-                      "forceWarning": "Force deletion ignores the database lock and the host maintenance state. The database on the host itself may not be fully cleaned up, leaving orphaned data behind."
+                      "forceWarning": "Buộc xóa sẽ bỏ qua khóa cơ sở dữ liệu và trạng thái bảo trì của máy chủ. Cơ sở dữ liệu trên chính máy chủ có thể không được dọn dẹp hoàn toàn, để lại dữ liệu mồ côi."
                     }
                   }
                 }
@@ -3480,7 +3502,7 @@
                   "typePublicPort": "Cổng Công Khai"
                 },
                 "alert": {
-                  "urlMissingPort": "No port specified. The panel will connect to this host on port {port}. The database agent listens on port {agentPort} by default, so add it to the URL unless a reverse proxy on port {port} forwards to the agent."
+                  "urlMissingPort": "Chưa chỉ định cổng. Panel sẽ kết nối tới máy chủ này qua cổng {port}. Mặc định agent cơ sở dữ liệu lắng nghe trên cổng {agentPort}, hãy thêm cổng vào URL trừ khi có reverse proxy trên cổng {port} chuyển tiếp tới agent."
                 },
                 "button": {
                   "resetToken": "Đặt Lại Token",
@@ -3496,7 +3518,7 @@
                     "title": "Xác nhận Xóa Máy Chủ Agent Cơ Sở Dữ Liệu",
                     "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
                     "alert": {
-                      "forceWarning": "Force deletion removes all instances on this host. Instances the agent cannot be reached for may not be fully cleaned up, leaving orphaned data behind."
+                      "forceWarning": "Buộc xóa sẽ xóa tất cả phiên bản trên máy chủ này. Các phiên bản mà agent không thể kết nối tới có thể không được dọn dẹp hoàn toàn, để lại dữ liệu mồ côi."
                     }
                   }
                 }
@@ -3508,25 +3530,25 @@
                 "title": "Các Phiên Bản",
                 "modal": {
                   "editInstance": {
-                    "title": "Edit {name}",
+                    "title": "Chỉnh sửa {name}",
                     "toast": {
-                      "updated": "Instance has been updated."
+                      "updated": "Phiên bản đã được cập nhật."
                     },
                     "form": {
                       "image": "Docker Image",
-                      "imageDescription": "Pins the instance to a specific docker image. Leave empty to follow the template image, including future template updates.",
-                      "env": "Environment Overrides",
-                      "override": "Override {field}"
+                      "imageDescription": "Ghim phiên bản vào một docker image cụ thể. Để trống để làm theo image mẫu, bao gồm các bản cập nhật mẫu trong tương lai.",
+                      "env": "Ghi đè biến môi trường",
+                      "override": "Ghi đè {field}"
                     }
                   },
                   "deleteInstance": {
-                    "title": "Confirm Managed Database Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
+                    "title": "Xác nhận xóa cơ sở dữ liệu được quản lý",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
                     "toast": {
-                      "deleted": "Managed database deleted."
+                      "deleted": "Đã xóa cơ sở dữ liệu được quản lý."
                     },
                     "alert": {
-                      "forceWarning": "Force deletion removes the instance even if the agent cannot be reached. The instance and its data on the host itself may not be fully cleaned up, leaving orphaned data behind."
+                      "forceWarning": "Buộc xóa sẽ xóa phiên bản ngay cả khi không thể kết nối tới agent. Phiên bản và dữ liệu của nó trên chính máy chủ có thể không được dọn dẹp hoàn toàn, để lại dữ liệu mồ côi."
                     }
                   }
                 }
@@ -3541,35 +3563,35 @@
                   "liveConfiguration": "Cấu Hình Trực Tiếp"
                 },
                 "step": {
-                  "settings": "Settings",
-                  "install": "Apply Configuration",
-                  "verify": "Verify Connection"
+                  "settings": "Cài đặt",
+                  "install": "Áp dụng cấu hình",
+                  "verify": "Xác minh kết nối"
                 },
                 "description": {
                   "placeFile": "Đặt mã này vào tệp cấu hình tại `/etc/calagopus-db-agent/config.yml` hoặc chạy",
-                  "settings": "These values are used to generate the agent configuration below.",
-                  "verify": "Checks that the panel can reach the database agent at the host URL."
+                  "settings": "Các giá trị này được dùng để tạo cấu hình agent bên dưới.",
+                  "verify": "Kiểm tra panel có thể kết nối tới agent cơ sở dữ liệu tại URL máy chủ hay không."
                 },
                 "tooltip": {
                   "copyCommand": "Sao chép lệnh"
                 },
                 "form": {
                   "apiPort": "Cổng API",
-                  "apiPortDescription": "The port the database agent listens on."
+                  "apiPortDescription": "Cổng mà agent cơ sở dữ liệu lắng nghe."
                 },
                 "button": {
                   "save": "Lưu Cấu Hình",
                   "reveal": "Hiển thị Cấu Hình",
-                  "verify": "Verify Connection"
+                  "verify": "Xác minh kết nối"
                 },
                 "alert": {
                   "couldNotReach": "Không thể kết nối tới máy chủ agent cơ sở dữ liệu: {error}",
                   "tokenWarning": "Cấu hình dưới đây chứa token của host. Chỉ hiển thị nó khi cần thiết.",
-                  "portMismatch": "The host URL points at port {connectPort}, but this configuration makes the agent listen on port {apiPort}. Unless a reverse proxy forwards port {connectPort} to the agent, the panel will not be able to reach the host.",
-                  "verifyTitle": "Backend to DB Agent",
-                  "verifyNotTested": "Not tested yet.",
-                  "verifySuccess": "Connection established. The agent responded.",
-                  "verifyFailed": "The panel could not reach the host: {error}"
+                  "portMismatch": "URL máy chủ trỏ tới cổng {connectPort}, nhưng cấu hình này khiến agent lắng nghe trên cổng {apiPort}. Trừ khi reverse proxy chuyển tiếp cổng {connectPort} tới agent, panel sẽ không thể kết nối tới máy chủ.",
+                  "verifyTitle": "Backend tới DB Agent",
+                  "verifyNotTested": "Chưa kiểm tra.",
+                  "verifySuccess": "Đã thiết lập kết nối. Agent đã phản hồi.",
+                  "verifyFailed": "Panel không thể kết nối tới máy chủ: {error}"
                 },
                 "toast": {
                   "applied": "Đã áp dụng cấu hình thành công.",
@@ -3684,7 +3706,7 @@
                 "toast": {
                   "exported": "Đã xuất Mẫu Agent Cơ Sở Dữ Liệu."
                 },
-                "version": "Version {version}",
+                "version": "Phiên bản {version}",
                 "form": {
                   "dockerImages": "Hình Ảnh Docker",
                   "env": "Biến Môi Trường",
@@ -3720,19 +3742,19 @@
               "title": "Các Phiên Bản",
               "page": {
                 "title": "Các Phiên Bản",
-                "outdated": "Outdated",
+                "outdated": "Đã cũ",
                 "button": {
-                  "applyUpdates": "Apply Updates",
-                  "applyAllUpdates": "Update All Outdated"
+                  "applyUpdates": "Áp dụng cập nhật",
+                  "applyAllUpdates": "Cập nhật tất cả đã cũ"
                 },
                 "toast": {
-                  "updated": "Applied template updates to {instances}."
+                  "updated": "Đã áp dụng các bản cập nhật mẫu cho {instances}."
                 },
                 "modal": {
                   "applyUpdates": {
-                    "title": "Apply Template Updates",
-                    "content": "This will push the current configuration of **{name}** to the {count} selected instances. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped.",
-                    "contentAll": "This will push the current configuration of **{name}** to every outdated instance, including instances not shown by the current search. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped."
+                    "title": "Áp dụng cập nhật mẫu",
+                    "content": "Thao tác này sẽ đẩy cấu hình hiện tại của **{name}** tới {count} phiên bản đã chọn. Các phiên bản sẽ được khởi động lại để áp dụng cấu hình mới. Các phiên bản bị khóa và các phiên bản trên máy chủ ở chế độ bảo trì sẽ bị bỏ qua.",
+                    "contentAll": "Thao tác này sẽ đẩy cấu hình hiện tại của **{name}** tới mọi phiên bản đã cũ, bao gồm cả các phiên bản không hiển thị trong tìm kiếm hiện tại. Các phiên bản sẽ được khởi động lại để áp dụng cấu hình mới. Các phiên bản bị khóa và các phiên bản trên máy chủ ở chế độ bảo trì sẽ bị bỏ qua."
                   }
                 }
               }
@@ -3814,7 +3836,7 @@
                 "title": "Ánh Xạ Nhà Cung Cấp OAuth",
                 "table": {
                   "columns": {
-                    "matcher": "Matcher"
+                    "matcher": "Bộ khớp"
                   }
                 },
                 "enum": {
@@ -3823,16 +3845,16 @@
                     "serverSubuser": "Người Dùng Phụ Máy Chủ"
                   },
                   "matcherType": {
-                    "none": "None (Always applies)",
-                    "and": "AND (All must match)",
-                    "or": "OR (Any must match)",
-                    "not": "NOT (Must not match)",
-                    "scopes": "Granted Scopes",
-                    "fieldExists": "Field Exists",
-                    "fieldEquals": "Field Equals",
-                    "fieldContains": "Field Contains",
-                    "fieldStartsWith": "Field Starts With",
-                    "fieldEndsWith": "Field Ends With"
+                    "none": "Không (Luôn áp dụng)",
+                    "and": "VÀ (Tất cả phải khớp)",
+                    "or": "HOẶC (Bất kỳ phải khớp)",
+                    "not": "KHÔNG (Phải không khớp)",
+                    "scopes": "Phạm vi đã cấp",
+                    "fieldExists": "Đã Tồn Tại",
+                    "fieldEquals": "Trường tồn tại",
+                    "fieldContains": "Trường bằng với",
+                    "fieldStartsWith": "Trường chứa",
+                    "fieldEndsWith": "Trường bắt đầu bằng"
                   }
                 },
                 "toast": {
@@ -3841,27 +3863,27 @@
                   "deleted": "Ánh xạ nhà cung cấp OAuth đã được xóa."
                 },
                 "button": {
-                  "addMatcher": "Add Matcher"
+                  "addMatcher": "Thêm Điểm chung"
                 },
                 "matcher": {
-                  "allMustMatch": "All matchers must match:",
-                  "anyMustMatch": "Any matcher must match:",
-                  "mustNotMatch": "Matcher must not match:"
+                  "allMustMatch": "Tất cả điểm chung đều phải cùng:",
+                  "anyMustMatch": "Bất kì điểm chung đều phải cùng:",
+                  "mustNotMatch": "Tất cả điểm chung không cùng cùng:"
                 },
                 "form": {
-                  "matcher": "Matcher",
-                  "matcherDescription": "Decides whether this mapping applies to a user logging in with this provider.",
-                  "matcherType": "Matcher Type",
-                  "scopes": "Scopes",
+                  "matcher": "Bộ khớp",
+                  "matcherDescription": "Xác định xem ánh xạ này có áp dụng cho người dùng đăng nhập bằng nhà cung cấp này hay không.",
+                  "matcherType": "Khớp với Loại",
+                  "scopes": "Phạm Vi",
                   "scopesDescription": "Phạm vi OAuth cần thiết để ánh xạ này áp dụng.",
-                  "path": "Field Path",
-                  "pathDescription": "The path used to extract the compared field from the Info URL response (https://serdejsonpath.live).",
-                  "equals": "Equals",
+                  "path": "Đường dẫn trường dữ liệu",
+                  "pathDescription": "Đường dẫn dùng để trích xuất email từ phản hồi URL Thông Tin (https://serdejsonpath.live).",
+                  "equals": "Bằng",
                   "contains": "Contains",
-                  "startsWith": "Starts With",
-                  "endsWith": "Ends With",
-                  "revokeUnmatched": "Revoke when not matched",
-                  "revokeUnmatchedDescription": "Removes the assigned role or server subuser again when the matcher no longer matches on a later login.",
+                  "startsWith": "Bắt đầu với",
+                  "endsWith": "Kết thúc với",
+                  "revokeUnmatched": "Gỡ bỏ nếu không khớp",
+                  "revokeUnmatchedDescription": "Loại bỏ vai trò hoặc người dùng phụ trên máy chủ đã được gán khi điều kiện khớp không còn thỏa mãn trong lần đăng nhập sau đó.",
                   "mappingType": "Loại Ánh Xạ",
                   "role": "Vai Trò",
                   "permissions": "Quyền"
@@ -3883,22 +3905,22 @@
             "users": {
               "title": "Người Dùng",
               "identifierLookup": {
-                "button": "Find by Identifier",
+                "button": "Tìm bởi Identifier",
                 "modal": {
                   "title": "Look Up by Identifier",
                   "form": {
                     "identifier": "Identifier",
-                    "identifierPlaceholder": "e.g. email or username",
-                    "search": "Search"
+                    "identifierPlaceholder": "vd. địa chỉ email hoặc tên người dùng",
+                    "search": "Tìm Kiếm"
                   },
                   "result": {
-                    "title": "User Found",
-                    "username": "Username",
+                    "title": "Đã tìm thấy người dùng",
+                    "username": "Tên người dùng",
                     "email": "Email",
-                    "identifier": "Identifier",
-                    "viewUser": "View User"
+                    "identifier": "Định danh",
+                    "viewUser": "Xem người dùng"
                   },
-                  "notFound": "No user found with that identifier."
+                  "notFound": "Không tìm thấy người dùng nào với ID bên ngoài đó."
                 }
               },
               "page": {
@@ -3977,9 +3999,9 @@
                     "datastore": "Kho Dữ Liệu",
                     "namespace": "Không Gian Tên",
                     "tokenId": "Token ID",
-                    "tokenSecret": "Token Secret",
+                    "tokenSecret": "Mật khẩu Token",
                     "fingerprint": "Dấu Vân Tay Chứng Chỉ TLS",
-                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
+                    "fingerprintDescription": "Ghim kết nối vào chứng chỉ này. Để trống nếu muốn xác thực chứng chỉ dựa trên kho lưu trữ tin cậy của hệ thống.",
                     "backupIdPrefix": "Tiền Tố ID Sao Lưu"
                   }
                 },
@@ -3988,7 +4010,7 @@
                   "form": {
                     "url": "URL Máy Chủ Kopia",
                     "fingerprint": "Dấu Vân Tay Chứng Chỉ TLS",
-                    "fingerprintDescription": "Pins the connection to this certificate. Leave empty to validate the certificate against the system trust store instead.",
+                    "fingerprintDescription": "Ghim kết nối vào chứng chỉ này. Để trống nếu muốn xác thực chứng chỉ dựa trên kho lưu trữ tin cậy của hệ thống.",
                     "tags": "Thẻ Sao Lưu"
                   }
                 }
@@ -4046,6 +4068,129 @@
               "title": "Máy Chủ",
               "page": {
                 "title": "Máy Chủ Cấu Hình Sao Lưu"
+              }
+            }
+          }
+        },
+        "systemBackupPolicies": {
+          "title": "System Backup Policies",
+          "resourceName": "System backup policy",
+          "badge": {
+            "disabled": "Disabled",
+            "runPending": "Run pending"
+          },
+          "table": {
+            "columns": {
+              "cron": "Schedule",
+              "backups": "Backups"
+            }
+          },
+          "form": {
+            "backupConfigurationPlaceholder": "Inherit from Server",
+            "cron": "Schedule",
+            "cronDescription": "Cron expression (with seconds) that determines when backups are taken, in UTC.",
+            "retentionCount": "Keep count",
+            "retentionCountDescription": "Maximum number of successful backups to keep per server. Leave empty for no limit.",
+            "retentionDays": "Keep days",
+            "retentionDaysDescription": "Delete backups older than this many days. Leave empty for no limit.",
+            "parallelism": "Parallelism",
+            "parallelismDescription": "Maximum number of backups this policy runs at the same time on a single node.",
+            "enabledDescription": "Disabled policies keep their backups but do not take new ones."
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create System Backup Policy",
+                "titleUpdate": "Update System Backup Policy",
+                "button": {
+                  "runNow": "Run Now"
+                },
+                "toast": {
+                  "triggered": "Run requested. Backups will be taken shortly."
+                },
+                "modal": {
+                  "trigger": {
+                    "title": "Confirm Manual Run",
+                    "content": "Are you sure you want to run **{name}** now? Every covered server without a backup from this run yet will be backed up."
+                  },
+                  "delete": {
+                    "title": "Confirm System Backup Policy Deletion",
+                    "content": "Are you sure you want to delete **{name}**?",
+                    "form": {
+                      "deleteBackups": "Do you want to delete backups created by this policy?"
+                    },
+                    "alert": {
+                      "deleteBackupsWarning": "All backups created by this policy will be permanently deleted from their storage backends.",
+                      "releaseWarning": "Backups created by this policy will become regular server backups. They will count towards each server backup limit and follow standard rotation."
+                    }
+                  }
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "page": {
+                "title": "System Backup Policy Backups",
+                "toast": {
+                  "downloadStarted": "Download started."
+                }
+              }
+            },
+            "locations": {
+              "title": "Locations",
+              "page": {
+                "title": "System Backup Policy Locations",
+                "toast": {
+                  "added": "Location added.",
+                  "removed": "Location removed."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add Location"
+                  },
+                  "remove": {
+                    "title": "Confirm Location Removal",
+                    "content": "Are you sure you want to remove **{name}** from **{policy}**?"
+                  }
+                }
+              }
+            },
+            "nodes": {
+              "title": "Nodes",
+              "page": {
+                "title": "System Backup Policy Nodes",
+                "toast": {
+                  "added": "Node added.",
+                  "removed": "Node removed."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add Node"
+                  },
+                  "remove": {
+                    "title": "Confirm Node Removal",
+                    "content": "Are you sure you want to remove **{name}** from **{policy}**?"
+                  }
+                }
+              }
+            },
+            "servers": {
+              "title": "Servers",
+              "page": {
+                "title": "System Backup Policy Servers",
+                "toast": {
+                  "added": "Server added.",
+                  "removed": "Server removed."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Add Server"
+                  },
+                  "remove": {
+                    "title": "Confirm Server Removal",
+                    "content": "Are you sure you want to remove **{name}** from **{policy}**?"
+                  }
+                }
               }
             }
           }
@@ -4218,7 +4363,7 @@
             "commandHistory": "Lịch Sử Lệnh",
             "decreaseFontSize": "Giảm Kích Thước Font",
             "increaseFontSize": "Tăng Kích Thước Font",
-            "copySelection": "Copy Selection"
+            "copySelection": "Sao Chép vùng chọn"
           },
           "drawer": {
             "commandHistory": {
@@ -4279,7 +4424,7 @@
             "network": "Mạng",
             "inbound": "Đến",
             "outbound": "Đi",
-            "offline": "Server is offline"
+            "offline": "Máy chủ đang ngoại tuyến."
           },
           "socketConnected": "Đã Kết Nối ({ping}ms ping)",
           "socketDisconnected": "Ngắt Kết Nối"
@@ -4311,7 +4456,7 @@
             "copy": "Sao Chép",
             "fingerprint": "Dấu Vân Tay",
             "permissions": "Quyền",
-            "extract": "Extract",
+            "extract": "Giải nén",
             "archive": "Nén",
             "more": "Thêm",
             "remoteCopy": "Sao Chép Máy Chủ Điều Khiển",
@@ -4322,9 +4467,9 @@
             "fileFromPull": "Tệp Từ Kéo",
             "fileFromUpload": "Tệp Từ Tải Lên",
             "directoryFromUpload": "Thư Mục Từ Tải Lên",
-            "viewDiff": "View Diff",
-            "loadDisk": "Load Disk Version",
-            "keepEditor": "Keep Editor Version"
+            "viewDiff": "Xem khác biệt",
+            "loadDisk": "Load Phiên Bản Ổ đĩa",
+            "keepEditor": "Giữ bản Chỉnh sửa"
           },
           "actionBar": {
             "copyHere": "Sao Chép {files} ở đây",
@@ -4364,8 +4509,8 @@
             "imageViewerSmoothing": "Làm Mịn Hình Ảnh (Anti-Aliasing)"
           },
           "alert": {
-            "collabConflictChanged": "This file has been changed on disk outside of the editor (e.g. via SFTP).",
-            "collabConflictDeleted": "This file has been deleted on disk outside of the editor."
+            "collabConflictChanged": "Tệp này đã được chỉnh sửa ngoài trình chỉnh sửa của panel (vd. từ SFTP).",
+            "collabConflictDeleted": "Tệp này đã được xóa trên ổ đĩa và bên ngoài panel."
           },
           "toast": {
             "operationCancelled": "Hoạt động đã bị hủy",
@@ -4373,36 +4518,36 @@
             "copyingStarted": "{files} bắt đầu sao chép.",
             "filesCouldNotBeMoved": "Tệp không thể được di chuyển.",
             "filesMoved": "{files} đã được di chuyển.",
-            "moveUndone": "Move of {files} undone.",
-            "moveCouldNotBeUndone": "Move could not be undone.",
+            "moveUndone": "Di chuyển {files} không thành công.",
+            "moveCouldNotBeUndone": "Không thể hoàn tác thao tác này.",
             "downloadStarted": "Tải xuống đã bắt đầu.",
             "filesDeleted": "Tệp đã được xóa.",
             "archiveCreationStarted": "Tạo kho lưu trữ đã bắt đầu.",
-            "decompressionStarted": "Archive extraction has started.",
+            "decompressionStarted": "Đã bắt đầu giải nén.",
             "fileCopyingStarted": "Sao chép tệp đã bắt đầu.",
             "fileInfoRetrieved": "Thông tin tệp được truy xuất thành công.",
             "filePullingStarted": "Kéo tệp đã bắt đầu.",
             "fileRenamed": "Tệp đã được đổi tên.",
             "fileCouldNotBeRenamed": "Tệp không thể được đổi tên.",
             "filesRenamed": "{files} đã được đổi tên.",
-            "renameUndone": "Rename undone.",
-            "renameCouldNotBeUndone": "Rename could not be undone.",
+            "renameUndone": "Đã hoàn tác đổi tên.",
+            "renameCouldNotBeUndone": "Permissions restored.",
             "permissionsUpdated": "Quyền đã được cập nhật.",
             "permissionsUpdatedMany": "Quyền đã được cập nhật cho {files}.",
             "permissionsCouldNotBeUpdated": "Không thể cập nhật quyền.",
-            "permissionsRestored": "Permissions restored.",
-            "permissionsCouldNotBeRestored": "Permissions could not be restored.",
+            "permissionsRestored": "Đã khôi phục quyền hạn.",
+            "permissionsCouldNotBeRestored": "Đã khôi phục quyền hạn.",
             "fileSaved": "Tệp đã được lưu.",
             "collabSaveTimeout": "Không thể lưu tệp, daemon không phản hồi kịp thời.",
-            "fileTooLargeToOpen": "This file is too large to open in the file manager."
+            "fileTooLargeToOpen": "Tệp này quá lớn để mở trong trình quản lý tệp."
           },
           "tooltip": {
             "fileHistory": "Lịch Sử Tệp",
-            "revertToDisk": "Discard changes and load the file from disk",
+            "revertToDisk": "Bỏ qua",
             "collabEditing": "{user} đang chỉnh sửa tệp này",
             "largestDirectories": "Phân tích kích thước thư mục",
             "dragToMove": "Kéo để di chuyển",
-            "virtual": "This item is virtual and does not exist on disk",
+            "virtual": "Sao chép {files}",
             "back": "Lùi {seconds} giây",
             "forward": "Tiến {seconds} giây",
             "play": "Phát",
@@ -4431,20 +4576,20 @@
           },
           "modal": {
             "cancelAllOperations": {
-              "title": "Cancel All Operations",
-              "content": "Are you sure you want to cancel all running file operations? Their progress will be lost."
+              "title": "Tiếp",
+              "content": "Bạn có chắc chắn muốn hủy tất cả các thao tác xử lý tệp đang chạy không? Tiến trình của chúng sẽ bị mất."
             },
             "unsavedChanges": {
               "title": "Thay Đổi Chưa Lưu",
               "content": "Bạn có thay đổi chưa lưu trong trình soạn thảo tệp. Bạn có chắc muốn rời khỏi trang này không? Nếu bạn rời khỏi, thay đổi của bạn sẽ bị mất."
             },
             "collabConflictDiff": {
-              "title": "File Changed on Disk"
+              "title": "Các tệp đã thay đổi trên đĩa"
             },
             "revertToDisk": {
-              "title": "Load Disk Version",
-              "content": "This will replace the editor contents with the file currently on disk. Unsaved changes will be lost.",
-              "contentMultiple": "This will replace the editor contents for all {participants} people in this session with the file currently on disk. Unsaved changes will be lost."
+              "title": "Load Phiên Bản Ổ đĩa",
+              "content": "Thao tác này sẽ thay thế nội dung trong trình soạn thảo bằng nội dung của tệp tin hiện có trên đĩa. Các thay đổi chưa được lưu sẽ bị mất.",
+              "contentMultiple": "Thao tác này sẽ thay thế nội dung trình soạn thảo của tất cả {participants} người trong phiên làm việc này bằng tệp tin hiện có trên đĩa. Các thay đổi chưa được lưu sẽ bị mất."
             },
             "draftRestore": {
               "title": "Khôi Phục Bản Nháp",
@@ -4452,8 +4597,8 @@
               "contentHashMismatch": "Tệp đã bị sửa đổi trên máy chủ kể từ khi bản nháp này được lưu. Khôi phục bản nháp có thể ghi đè các thay đổi đó."
             },
             "extractFile": {
-              "title": "Extract Archive",
-              "extractedTo": "The contents of {file} will be extracted into "
+              "title": "Giải nén tệp",
+              "extractedTo": "Nội dung của tệp {file} sẽ được trích xuất thành "
             },
             "createArchive": {
               "title": "Tạo Kho Lưu Trữ",
@@ -4469,20 +4614,20 @@
             "copyFile": {
               "title": "Sao Chép Tệp",
               "createdAs": "Tệp này sẽ được tạo dưới dạng ",
-              "conflict": "A file with that name already exists at the destination."
+              "conflict": "Đã có tệp cùng tên tại đích đến."
             },
             "copyConflict": {
-              "title": "Resolve Copy Conflicts",
-              "description": "The following {files} already exist at the destination.",
-              "source": "Source",
-              "destination": "Destination",
-              "skip": "Skip",
-              "overwrite": "Overwrite",
-              "rename": "Rename",
-              "skipAll": "Skip all",
-              "overwriteAll": "Overwrite all",
-              "newName": "New name",
-              "confirm": "Copy {files}"
+              "title": "Giải quyết xung đột sao chép",
+              "description": "Các {files} sau đây đã tồn tại tại đích.",
+              "source": "Nguồn",
+              "destination": "Đích",
+              "skip": "Bỏ qua",
+              "overwrite": "Ghi đè",
+              "rename": "Đổi Tên",
+              "skipAll": "Bỏ qua tất cả",
+              "overwriteAll": "Ghi đè tất cả",
+              "newName": "Tên mới",
+              "confirm": "Sao Chép {files} ở đây"
             },
             "copyRemote": {
               "title": "Sao Chép Tệp Máy Chủ Điều Khiển",
@@ -4650,12 +4795,170 @@
           "form": {
             "databaseName": "Tên Cơ Sở Dữ Liệu"
           },
+          "explorer": {
+            "title": "Trình Khám phá dữ liệu",
+            "button": {
+              "open": "Khám phá dữ liệu",
+              "run": "Chạy",
+              "previous": "Trang trước",
+              "next": "Tiếp",
+              "hideTables": "Ẩn Bảng",
+              "showTables": "Hiển thị các phần bảng",
+              "save": "Lưu {changes}",
+              "newRow": "Dòng mới",
+              "deleteRows": "Xóa {rows}",
+              "newTable": "Bảng mới",
+              "addColumn": "Thêm cột",
+              "rename": "Đổi Tên",
+              "renameTable": "Đổi Tên bảng",
+              "deleteTable": "Xóa Bảng"
+            },
+            "form": {
+              "tableName": "Tên bảng",
+              "columnsList": "Các cột",
+              "columnName": "Tên cột",
+              "columnType": "Loại",
+              "nullable": "Có thể bỏ trống",
+              "primaryKey": "Khoá chính",
+              "autoIncrement": "Tự Tăng"
+            },
+            "unsupported": {
+              "title": "Không được hỗ trợ",
+              "content": "Không thể duyệt các cơ sở dữ liệu MongoDB từ bảng điều khiển.",
+              "instanceContent": "Không thể khám phá các instance cơ sở dữ liệu MongoDB và Redis từ bảng điều khiển."
+            },
+            "notFound": "Cơ sở dữ liệu này không tồn tại trên instance.",
+            "tabs": {
+              "rows": "Hàng",
+              "structure": "Cấu trúc",
+              "query": "Truy Vấn"
+            },
+            "modal": {
+              "deleteRows": {
+                "title": "Xác Nhận Xóa Hàng",
+                "content": "Bạn có chắc chắn muốn xóa người dùng **{rows}** không? Hành động này không thể hoàn tác."
+              },
+              "createTable": {
+                "title": "Tạo bảng",
+                "toast": {
+                  "created": "Bảng {table} đã được xóa."
+                }
+              },
+              "createColumn": {
+                "title": "Thêm cột",
+                "form": {
+                  "nullableHint": "Việc thêm một cột không cho phép giá trị null vào một bảng đã có dữ liệu sẽ thất bại."
+                },
+                "toast": {
+                  "created": "Cột {column} đã được đổi tên."
+                }
+              },
+              "renameTable": {
+                "title": "Đổi Tên Bảng",
+                "toast": {
+                  "renamed": "Bảng {table} đã được đổi tên."
+                }
+              },
+              "deleteTable": {
+                "title": "Xác Nhận Xóa Bảng",
+                "content": "Bạn có chắc chắn muốn xóa **{table}** không? Hành động này sẽ xóa vĩnh viễn tất cả các hàng của bảng và không thể hoàn tác.",
+                "toast": {
+                  "deleted": "Bảng {table} đã được xóa"
+                }
+              },
+              "renameColumn": {
+                "title": "Đổi tên cột",
+                "toast": {
+                  "renamed": "Cội  {column} đã được đổi tên"
+                }
+              },
+              "deleteColumn": {
+                "title": "Xác Nhận Xóa Cột",
+                "content": "Bạn có chắc chắn muốn xóa **{column}** khỏi **{table}** không? Dữ liệu của nó sẽ bị xóa vĩnh viễn và không thể khôi phục.",
+                "toast": {
+                  "deleted": "Cột {column} đã được xóa."
+                }
+              }
+            },
+            "schema": {
+              "title": "Bảng",
+              "empty": "Phiên bản này chưa bảng nào.",
+              "noMatches": "Không có bảng nào khớp với tìm kiếm của bạn.",
+              "rowEstimate": "~{rows}",
+              "badge": {
+                "view": "Hiển thị"
+              }
+            },
+            "rows": {
+              "noTable": "Chọn một bảng để xem các hàng của bảng đó.",
+              "range": "Hiển thị các hàng từ {start} đến {end}.",
+              "saved": "Đã áp dụng các thay đổi cho {rows}.",
+              "insert": {
+                "default": "Cơ sở dữ liệu mặc định"
+              }
+            },
+            "filter": {
+              "add": "Bộ lọc",
+              "column": "Cột",
+              "operator": "Điều phối viên",
+              "value": "Giá trị",
+              "apply": "Áp dụng"
+            },
+            "enum": {
+              "filterOperator": {
+                "eq": "bằng",
+                "ne": "không bằng",
+                "lt": "ít hơn",
+                "lte": "Ít hơn hoặc bằng",
+                "gt": "lớn hơn",
+                "gte": "lớn hơn hoặc bằng",
+                "contains": "chứa",
+                "startsWith": "bắt đầu bằng",
+                "endsWith": "kết thúc bằng",
+                "isNull": "là vô giá trị",
+                "notNull": "không phải là rỗng"
+              }
+            },
+            "table": {
+              "columns": {
+                "nullable": "Có thể rỗng",
+                "key": "Khóa",
+                "default": "Mặc định",
+                "attributes": "Thuộc tính"
+              }
+            },
+            "badge": {
+              "primaryKey": "Chính",
+              "autoIncrement": "auto_increment",
+              "generated": "Đã tạo",
+              "binary": "Tệp nhị phân"
+            },
+            "query": {
+              "placeholder": "Chạy một câu lệnh để xem kết quả tại đây.",
+              "statement": "Tuyên bố {index}",
+              "form": {
+                "rowLimit": "Giới hạn dòng",
+                "readOnly": "Chỉ đọc",
+                "readOnlyDescription": "Từ chối các câu lệnh làm thay đổi dữ liệu hoặc cấu trúc."
+              }
+            },
+            "result": {
+              "rowsAffected": "{rows} hàng bị ảnh hưởng.",
+              "truncated": "Tập kết quả này đã bị cắt bớt. Hãy thu hẹp phạm vi câu lệnh hoặc giảm giới hạn số hàng để xem toàn bộ dữ liệu."
+            },
+            "cell": {
+              "setNull": "Set thành NULL",
+              "null": "NULL",
+              "empty": "rỗng",
+              "editorHint": "{enter} áp dụng giá trị, {shiftEnter} chèn một dòng mới."
+            }
+          },
           "instance": {
             "title": "Cơ Sở Dữ Liệu Được Quản Lý",
             "subtitle": "Đã tạo {current} cơ sở dữ liệu được quản lý.",
-            "updateAvailable": "Update Available",
+            "updateAvailable": "Có Bản Cập Nhật",
             "button": {
-              "applyUpdate": "Apply Update"
+              "applyUpdate": "Áp dụng cập nhật"
             },
             "tooltip": {
               "limitReached": "Máy chủ này bị giới hạn ở {max} cơ sở dữ liệu được quản lý."
@@ -4671,7 +4974,7 @@
                 "cpuLoad": "Tải CPU",
                 "memoryLoad": "Tải Bộ Nhớ",
                 "diskUsage": "Dung Lượng Đĩa",
-                "offline": "Instance is offline"
+                "offline": "Instance đã ngoại tuyến"
               }
             },
             "databases": {
@@ -4685,7 +4988,7 @@
               "button": {
                 "export": "Xuất",
                 "import": "Nhập",
-                "remoteImport": "Import from Remote"
+                "remoteImport": "Nhập từ xa"
               },
               "modal": {
                 "createDatabase": {
@@ -4705,24 +5008,24 @@
                   "content": "Tải lên tệp sao lưu để nhập vào cơ sở dữ liệu này. Quá trình nhập dữ liệu lớn có thể mất một lúc để hoàn thành.",
                   "form": {
                     "file": "Tệp Sao Lưu (Dump File)",
-                    "sourceDb": "Source Database",
-                    "sourceDbDescription": "The name this database had when the dump was taken.",
+                    "sourceDb": "Nguồn Cơ Sở Dữ Liệu",
+                    "sourceDbDescription": "Tên của cơ sở dữ liệu này tại thời điểm thực hiện sao lưu.",
                     "wipe": "Xóa dữ liệu hiện có trước khi nhập"
                   }
                 },
                 "remoteImportDatabase": {
-                  "title": "Import Database from Remote",
-                  "content": "Dumps another database server and imports the result into **{database}**. The connection string is only used to take the dump, it is never stored.",
+                  "title": "Nhập Cơ Sở Dữ liệu từ xa",
+                  "content": "Trích xuất dữ liệu từ một máy chủ cơ sở dữ liệu khác và nhập kết quả vào **{database}**. Chuỗi kết nối chỉ được sử dụng để thực hiện việc trích xuất dữ liệu và không bao giờ được lưu lại.",
                   "form": {
-                    "url": "Connection String",
-                    "urlDescription": "Private and link-local addresses may be blocked by the database agent.",
-                    "sourceDb": "Source Database",
-                    "sourceDbDescription": "Overrides the database named in the connection string."
+                    "url": "Chuỗi Kết Nối",
+                    "urlDescription": "Các địa chỉ riêng và địa chỉ link-local có thể bị chặn bởi tác nhân cơ sở dữ liệu.",
+                    "sourceDb": "Nguồn Cơ Sở Dữ Liệu",
+                    "sourceDbDescription": "Ghi đè cơ sở dữ liệu được chỉ định trong chuỗi kết nối."
                   }
                 },
                 "recreateDatabase": {
-                  "title": "Confirm Database Recreation",
-                  "content": "Recreating a database will permanently delete all data in the **{name}** database and create a new empty one with the same name and user access."
+                  "title": "Xác Nhận Tạo Lại Cơ Sở Dữ Liệu",
+                  "content": "Tạo lại cơ sở dữ liệu sẽ xóa vĩnh viễn tất cả dữ liệu trong cơ sở dữ liệu **{name}** và tạo cơ sở dữ liệu mới với cùng thông tin kết nối."
                 }
               },
               "table": {
@@ -4734,9 +5037,9 @@
                 "created": "Đã tạo cơ sở dữ liệu.",
                 "deleted": "Đã xóa cơ sở dữ liệu.",
                 "imported": "Đã hoàn thành nhập cơ sở dữ liệu.",
-                "remoteImportStarted": "Remote import started.",
+                "remoteImportStarted": "Nhập từ xa bắt đầu.",
                 "passwordRotated": "Mật khẩu đã được xoay vòng.",
-                "recreated": "Database recreated."
+                "recreated": "Cơ sở dữ liệu đã được tạo lại."
               }
             },
             "users": {
@@ -4780,21 +5083,21 @@
               }
             },
             "message": {
-              "databaseMarkedAs": "Database marked as {state}...",
-              "pulling": "Pulling",
-              "extracting": "Extracting"
+              "databaseMarkedAs": "Máy chủ được đánh dấu là {state}...",
+              "pulling": "Đang Kéo",
+              "extracting": "Đang giải nén"
             },
             "operations": {
-              "remoteImport": "Importing {database} from {source}",
-              "cancelAllOperations": "Cancel all operations"
+              "remoteImport": "Đang nhập {database} từ {source}",
+              "cancelAllOperations": "Hủy tất cả hoạt động"
             },
             "toast": {
-              "operationCancelled": "Operation cancelled",
-              "allOperationsCancelled": "All operations have been cancelled.",
+              "operationCancelled": "Hoạt động đã bị hủy",
+              "allOperationsCancelled": "Tất cả hoạt động đã bị hủy.",
               "operations": {
                 "remoteImport": {
-                  "completed": "Imported `{database}` from `{source}` in {time}.",
-                  "failed": "Failed to import `{database}` from `{source}`:\n{error}"
+                  "completed": "Đã nhập `{database}` từ `{source}` trong `{time}.`.",
+                  "failed": "Nhập thất bại `{database}` từ `{source}`: {error}"
                 }
               }
             },
@@ -4817,10 +5120,10 @@
                 }
               },
               "applyDatabaseInstanceUpdate": {
-                "title": "Apply Template Update",
-                "content": "This will update **{name}** to the latest template configuration. The database will be restarted to apply the new configuration.",
+                "title": "Áp dụng cập nhật mẫu",
+                "content": "Thao tác này sẽ cập nhật **{name}** lên cấu hình mẫu mới nhất. Cơ sở dữ liệu sẽ được khởi động lại để áp dụng cấu hình mới.",
                 "toast": {
-                  "applied": "Template update applied."
+                  "applied": "Đã áp dụng bản cập nhật mẫu."
                 }
               },
               "deleteDatabaseInstance": {
@@ -4834,23 +5137,23 @@
                 "title": "Thông Tin Đăng Nhập Cơ Sở Dữ Liệu",
                 "form": {
                   "database": "Cơ sở dữ liệu",
-                  "jdbcConnectionString": "JDBC Connection String"
+                  "jdbcConnectionString": "Chuỗi Kết Nối JDBC"
                 }
               },
               "exportInstance": {
-                "title": "Export Instance",
-                "content": "Download a dump of this managed database instance. Large instances may take a while to prepare."
+                "title": "Xuất Instance",
+                "content": "Tải xuống bản sao của cơ sở dữ liệu này. Cơ sở dữ liệu lớn có thể mất một lúc để chuẩn bị."
               },
               "importInstance": {
-                "title": "Import Instance",
-                "content": "Upload a dump to import into this managed database instance. Large imports may take a while to complete.",
+                "title": "Nhập Instance",
+                "content": "Tải lên tệp sao lưu để nhập vào cơ sở dữ liệu này. Quá trình nhập dữ liệu lớn có thể mất một lúc để hoàn thành.",
                 "form": {
-                  "wipe": "Wipe all existing data before importing"
+                  "wipe": "Xóa dữ liệu hiện có trước khi nhập"
                 }
               },
               "cancelAllOperations": {
-                "title": "Cancel All Operations",
-                "content": "Are you sure you want to cancel all running database operations? Their progress will be lost."
+                "title": "Hủy tất cả hoạt động",
+                "content": "Bạn có chắc chắn muốn hủy tất cả các thao tác xử lý tệp đang chạy không? Tiến trình của chúng sẽ bị mất."
               }
             }
           },
@@ -4862,7 +5165,7 @@
               },
               "form": {
                 "noHostsFound": "Không tìm thấy máy chủ nào",
-                "hostInMaintenance": "Under Maintenance"
+                "hostInMaintenance": "Bảo trì"
               }
             },
             "editDatabase": {
@@ -4925,8 +5228,8 @@
             "createFirstStep": "Tạo Bước Đầu Tiên",
             "addOutput": "Thêm Đầu Ra",
             "addFile": "Thêm Tệp",
-            "addHeader": "Add Header",
-            "viewCalendar": "View Calendar"
+            "addHeader": "Thêm tiêu đề",
+            "viewCalendar": "Xem Lịch"
           },
           "toast": {
             "imported": "Lịch trình đã được nhập.",
@@ -4984,8 +5287,8 @@
               "title": "Nhân Bản Lịch Trình"
             },
             "calendar": {
-              "title": "Upcoming Runs Calendar",
-              "truncatedWarning": "Some upcoming runs have been left out to keep the calendar responsive."
+              "title": "Lịch các đợt chạy sắp tới",
+              "truncatedWarning": "Một số đợt chạy sắp tới đã được lược bỏ để đảm bảo lịch trình luôn linh hoạt và phản hồi nhanh."
             },
             "deleteSchedule": {
               "title": "Xác Nhận Xóa Lịch Trình",
@@ -4999,7 +5302,7 @@
             },
             "deleteStep": {
               "title": "Xác Nhận Xóa Bước Lịch Trình",
-              "content": "Are you sure you want to delete this \"{step}\" step?"
+              "content": "Bạn có chắc muốn xóa `{step}` egg không?"
             },
             "unsavedChanges": {
               "title": "Thay Đổi Chưa Lưu",
@@ -5030,10 +5333,10 @@
           },
           "step": {
             "aria": {
-              "reorder": "Reorder {step} step",
-              "expand": "Show {step} details",
-              "collapse": "Hide {step} details",
-              "actions": "{step} step actions"
+              "reorder": "Sắp xếp lại bước {step}",
+              "expand": "Hiển thị {step} chi tiết",
+              "collapse": "Ẩn {step} chi tiết",
+              "actions": "{step} bước hành động"
             }
           },
           "form": {
@@ -5061,17 +5364,17 @@
             "anyMustBeTrue": "Bất kỳ điều kiện nào phải đúng:",
             "mustNotBeTrue": "Điều kiện phải không đúng:",
             "renderer": {
-              "none": "No condition — this always matches.",
-              "empty": "No conditions added yet.",
-              "serverState": "Server state is {state}",
-              "uptime": "Uptime {comparator} {value}",
-              "resourceUsage": "{metric} {comparator} {value}",
-              "fileExists": "File {file} exists",
-              "variableExists": "Variable {variable} is set",
-              "equals": "Variable {variable} equals {value}",
-              "contains": "Variable {variable} contains {value}",
-              "startsWith": "Variable {variable} starts with {value}",
-              "endsWith": "Variable {variable} ends with {value}"
+              "none": "Không có điều kiện — cái này luôn khớp.",
+              "empty": "Chưa có điều kiện nào được thêm vào.",
+              "serverState": "Trạng thái máy chủ là {state}",
+              "uptime": "Thời gian hoạt động {comparator} `{value}",
+              "resourceUsage": "{metric} {comparator} `{value}",
+              "fileExists": "Tệp {file} đã tồn tại",
+              "variableExists": "Biến {variable} đã được thiết lập",
+              "equals": "Biến {variable} bằng {value}",
+              "contains": "Biến {variable} chứa {value}",
+              "startsWith": "Biến {variable} bắt đầu bằng {value}",
+              "endsWith": "Biến {variable} kết thúc bằng {value}"
             }
           },
           "preCondition": {
@@ -5187,7 +5490,7 @@
                 "duration": "Thời lượng (miligiây)"
               },
               "renderer": {
-                "compact": "Sleep for {duration}"
+                "compact": "Ngủ trong {duration}ms"
               }
             },
             "ensure": {
@@ -5198,7 +5501,7 @@
               }
             },
             "if": {
-              "title": "If",
+              "title": "Else",
               "description": "Chỉ chạy các bước sau khi một điều kiện là đúng, cho đến khi gặp Else/End If. Một bước End If phù hợp sẽ được thêm tự động.",
               "renderer": {
                 "compact": "Nếu một điều kiện khớp"
@@ -5309,7 +5612,7 @@
               "description": "Tạo một bản sao lưu các tệp máy chủ.",
               "form": {
                 "backupName": "Tên Sao Lưu",
-                "outputInto": "Output Backup UUID Into"
+                "outputInto": "Xuất UUID sao lưu vào"
               },
               "renderer": {
                 "compact": "Tạo {name}",
@@ -5317,7 +5620,7 @@
                 "detail": {
                   "backupName": "Tên Sao Lưu: {name}",
                   "backupNameAuto": "Tên Sao Lưu: Tự động tạo",
-                  "outputInto": "Backup UUID into: {variable}",
+                  "outputInto": "Sao lưu UUID vào: {variable}",
                   "ignoredFiles": "Tệp Bị Bỏ Qua: {files}"
                 }
               }
@@ -5329,10 +5632,10 @@
                 "backupSelector": "Bản Sao Lưu Cần Khôi Phục",
                 "selector": {
                   "latest": "Bản Sao Lưu Mới Nhất",
-                  "oldest": "Oldest Backup",
+                  "oldest": "Bản sao lưu cũ nhất",
                   "uuid": "Bản Sao Lưu Cụ Thể (UUID)",
                   "name": "Theo Tên (khớp mới nhất)",
-                  "oldestFirst": "Match the oldest backup instead of the newest"
+                  "oldestFirst": "Khớp với bản sao lưu cũ nhất thay vì bản mới nhất"
                 },
                 "backupUuid": "UUID Sao Lưu",
                 "backupName": "Tên Bản Sao Lưu",
@@ -5343,10 +5646,10 @@
               "renderer": {
                 "compact": "Khôi phục bản sao lưu {backup}",
                 "compactLatest": "Khôi phục bản sao lưu mới nhất",
-                "compactOldest": "Restore the oldest backup",
+                "compactOldest": "Khôi phục bản sao lưu cũ nhất",
                 "detail": {
                   "backupLatest": "Bản sao lưu: Bản sao lưu thành công mới nhất",
-                  "backupOldest": "Backup: Oldest successful backup",
+                  "backupOldest": "Sao lưu: Bản sao lưu thành công cũ nhất",
                   "backupUuid": "UUID Sao Lưu: {uuid}",
                   "backupName": "Tên Bản Sao Lưu: {name}",
                   "truncateDirectory": "Xóa tất cả tệp trước: {value}",
@@ -5355,24 +5658,24 @@
               }
             },
             "deleteBackup": {
-              "title": "Delete Backup",
-              "description": "Delete a backup selected by the backup selector.",
+              "title": "Xóa bản sao lưu",
+              "description": "Xóa bản sao lưu được chọn bởi bộ chọn bản sao lưu.",
               "form": {
-                "backupSelector": "Backup to Delete",
-                "warning": "This permanently deletes the selected backup, including its files on the node. Locked backups are skipped."
+                "backupSelector": "Bản Sao Lưu cần xóa",
+                "warning": "Thao tác này xóa vĩnh viễn bản sao lưu đã chọn, bao gồm cả các tệp tin của nó trên nút. Các bản sao lưu bị khóa sẽ được bỏ qua."
               }
             },
             "moveBackup": {
-              "title": "Move Backup",
-              "description": "Move a backup selected by the backup selector into a backup group.",
+              "title": "Di chuyển Sao lưu",
+              "description": "Di chuyển bản sao lưu được chọn bởi bộ chọn bản sao lưu vào một nhóm bản sao lưu.",
               "form": {
-                "backupSelector": "Backup to Move",
-                "targetGroup": "Target Backup Group"
+                "backupSelector": "Sao lưu để di chuyển",
+                "targetGroup": "Nhóm Sao lưu Đích"
               },
               "renderer": {
                 "detail": {
-                  "targetGroup": "Target Group: {uuid}",
-                  "targetGroupNone": "Target Group: None (ungrouped)"
+                  "targetGroup": "Nhóm mục tiêu: {uuid}",
+                  "targetGroupNone": "Nhóm mục tiêu: Không có (không được nhóm)"
                 }
               }
             },
@@ -5508,30 +5811,30 @@
               }
             },
             "httpRequest": {
-              "title": "HTTP Request",
-              "description": "Send an HTTP request, for example to a webhook.",
+              "title": "Yêu cầu HTTP",
+              "description": "Gửi một yêu cầu HTTP, chẳng hạn như đến một webhook.",
               "form": {
-                "method": "Method",
+                "method": "Phương thức",
                 "url": "URL",
                 "headers": "Headers",
-                "headerName": "Header Name",
-                "headerValue": "Header Value",
-                "body": "Body",
-                "timeout": "Timeout (milliseconds)",
-                "ignoreErrorStatus": "Ignore Error Status Codes",
-                "outputStatusInto": "Output Status Code Into",
-                "outputBodyInto": "Output Response Body Into"
+                "headerName": "Tên tiêu đề",
+                "headerValue": "Giá trị tiêu đề",
+                "body": "Nội dung",
+                "timeout": "Thời gian chờ (mili giây)",
+                "ignoreErrorStatus": "Bỏ qua các mã trạng thái lỗi",
+                "outputStatusInto": "Xuất mã trạng thái vào",
+                "outputBodyInto": "Xuất nội dung phản hồi vào"
               },
               "renderer": {
-                "compact": "Send {method} to {url}",
+                "compact": "Gửi {method} tới {url}",
                 "detail": {
-                  "request": "Request: {method} {url}",
-                  "headers": "Headers: {headers}",
-                  "body": "Body: {body}",
-                  "timeout": "Timeout: {timeout}",
-                  "outputStatusInto": "Status code into: {variable}",
-                  "outputBodyInto": "Response body into: {variable}",
-                  "ignoreErrorStatus": "Ignore error status codes: {value}"
+                  "request": "Yêu cầu: {method} {url}",
+                  "headers": "Tiêu đề: {headers}",
+                  "body": "Nội dung: {body}",
+                  "timeout": "Thời gian chờ: {timeout}",
+                  "outputStatusInto": "Mã trạng thái vào: {variable}",
+                  "outputBodyInto": "Nội dung phản hồi vào: {variable}",
+                  "ignoreErrorStatus": "Bỏ qua các mã trạng thái lỗi: {value}"
                 }
               }
             }
@@ -5591,8 +5894,8 @@
             }
           },
           "badge": {
-            "deleting": "Deleting…",
-            "deleteFailed": "Deletion failed"
+            "deleting": "Đang xóa…",
+            "deleteFailed": "Xóa thất bại"
           },
           "button": {
             "browse": "Duyệt",
@@ -5629,7 +5932,7 @@
               "title": "Xác Nhận Xóa Sao Lưu",
               "content": "Bạn có chắc muốn xóa **{name}** khỏi máy chủ này không?",
               "toast": {
-                "started": "Backup deletion started.",
+                "started": "Đã bắt đầu xóa bản sao lưu.",
                 "deleted": "Sao lưu đã được xóa."
               }
             },
@@ -5650,7 +5953,7 @@
             "keepCount": "Giữ {count}",
             "keepDays": "Giữ {days} ngày",
             "noRetention": "Không tự động xóa",
-            "allLocked": "All locked"
+            "allLocked": "Tất cả đã khóa"
           },
           "form": {
             "retentionCount": "Số lượng giữ lại",
@@ -5678,6 +5981,10 @@
             "updated": "Đã cập nhật nhóm sao lưu.",
             "deleted": "Đã xóa nhóm sao lưu."
           }
+        },
+        "systemBackups": {
+          "title": "System Backups",
+          "subtitle": "Backups taken automatically by the panel. They cannot be modified or deleted."
         },
         "network": {
           "title": "Mạng",
