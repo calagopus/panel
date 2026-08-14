@@ -106,11 +106,13 @@ export default defineConfig({
             },
             {
               name: 'pierre-diffs',
-              test: /node_modules\/(@pierre\/(diffs|theme|theming)|diff|lru_map)\//,
+              test: /node_modules\/(@pierre\/(diffs|theme|theming)|@shikijs\/(core|engine-javascript|engine-oniguruma|primitive|transformers|types|vscode-textmate)|shiki|hast-util-to-html|diff|lru_map)\//,
               priority: 12,
+              includeDependenciesRecursively: false,
             },
             {
               name: 'common',
+              test: (id: string) => !/node_modules\/@shikijs\/(langs|themes)\//.test(id),
               minShareCount: 5,
               minSize: 10240,
               priority: 5,
