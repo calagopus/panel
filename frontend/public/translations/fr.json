@@ -685,34 +685,42 @@
             "operations": {
               "compressing": {
                 "completed": "{files} compressés vers `{path}` en {time}.",
-                "failed": "Échec de la compression de {files} vers `{path}` :\n{error}"
+                "failed": "Échec de la compression de {files} vers `{path}` :\n{error}",
+                "aborted": "Compression de {files} vers `{path}` annulée."
               },
               "decompressing": {
                 "completed": "`{path}` décompressé vers `{destination}` en {time}.",
-                "failed": "Échec de la décompression de `{path}` vers `{destination}` :\n{error}"
+                "failed": "Échec de la décompression de `{path}` vers `{destination}` :\n{error}",
+                "aborted": "Décompression de `{path}` vers `{destination}` annulée."
               },
               "pulling": {
                 "completed": "`{destination}` récupéré en {time}.",
-                "failed": "Échec de la récupération de `{destination}` :\n{error}"
+                "failed": "Échec de la récupération de `{destination}` :\n{error}",
+                "aborted": "Récupération de `{destination}` annulée."
               },
               "copying": {
                 "completed": "`{path}` copié vers `{destination}` en {time}.",
                 "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
-                "failed": "Échec de la copie de `{path}` vers `{destination}` :\n{error}"
+                "failed": "Échec de la copie de `{path}` vers `{destination}` :\n{error}",
+                "aborted": "Copie de `{path}` vers `{destination}` annulée."
               },
               "copyingMany": {
                 "completed": "{files} copiés en {time}.",
-                "failed": "Échec de la copie de {files} :\n{error}"
+                "failed": "Échec de la copie de {files} :\n{error}",
+                "aborted": "Copie de {files} annulée."
               },
               "copyingRemote": {
                 "completedFrom": "{files} copiés depuis le serveur distant en {time}.",
                 "completedTo": "{files} copiés vers le serveur distant en {time}.",
                 "failedFrom": "Échec de la copie de {files} depuis le serveur distant :\n{error}",
-                "failedTo": "Échec de la copie de {files} vers le serveur distant :\n{error}"
+                "failedTo": "Échec de la copie de {files} vers le serveur distant :\n{error}",
+                "abortedFrom": "Copie de {files} depuis le serveur distant annulée.",
+                "abortedTo": "Copie de {files} vers le serveur distant annulée."
               },
               "exportingBackup": {
                 "completed": "Exported backup to `{destination}` in {time}.",
-                "failed": "Failed to export backup to `{destination}`:\n{error}"
+                "failed": "Failed to export backup to `{destination}`:\n{error}",
+                "aborted": "Export de la sauvegarde vers `{destination}` annulé."
               }
             }
           }
@@ -5097,7 +5105,8 @@
               "operations": {
                 "remoteImport": {
                   "completed": "Imported `{database}` from `{source}` in {time}.",
-                  "failed": "Failed to import `{database}` from `{source}`:\n{error}"
+                  "failed": "Failed to import `{database}` from `{source}`:\n{error}",
+                  "aborted": "Import de `{database}` depuis `{source}` annulé."
                 }
               }
             },
