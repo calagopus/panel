@@ -6,6 +6,7 @@ mod put {
     use shared::{
         ApiError, GetState,
         models::{
+            UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
             user::GetPermissionManager,
         },
@@ -41,17 +42,15 @@ mod put {
     ) -> ApiResponseResult {
         permissions.has_server_permission("settings.auto-start")?;
 
-        server.auto_start_behavior = data.behavior;
-
-        sqlx::query!(
-            "UPDATE servers
-            SET auto_start_behavior = $1
-            WHERE servers.uuid = $2",
-            server.auto_start_behavior as shared::models::server::ServerAutoStartBehavior,
-            server.uuid
-        )
-        .execute(state.database.write())
-        .await?;
+        server
+            .update(
+                &state,
+                shared::models::server::UpdateServerOptions {
+                    auto_start_behavior: Some(data.behavior),
+                    ..Default::default()
+                },
+            )
+            .await?;
 
         activity_logger
             .log(

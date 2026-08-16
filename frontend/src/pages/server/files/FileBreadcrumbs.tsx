@@ -82,7 +82,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
           key={item.path}
           to={`/server/${server?.uuidShort}/files?${createSearchParams({ directory: join('/', item.path) })}`}
           className={breadcrumbClassName(join('/', item.path))}
-          onClick={() => setBrowsingDirectory(join('/', item.path))}
+          onClick={inFileEditor ? undefined : () => setBrowsingDirectory(join('/', item.path))}
           {...getDropHandlers(join('/', item.path))}
         >
           {item.name}

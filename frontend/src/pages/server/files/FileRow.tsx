@@ -44,7 +44,7 @@ function FileRowCheckbox({
   );
 }
 
-interface FileRowProps {
+export interface FileRowProps {
   file: z.infer<typeof serverDirectoryEntrySchema>;
   handleOpen: (openMode: FileOpenMode) => void;
   openMassMenu: (x: number, y: number) => void;
@@ -52,10 +52,11 @@ interface FileRowProps {
   isActing: boolean;
   clickOnce: boolean;
   preferPhysicalSize: boolean;
+  dataIndex?: number;
 }
 
 const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
-  { file, handleOpen, openMassMenu, isSelected, isActing, clickOnce, preferPhysicalSize },
+  { file, handleOpen, openMassMenu, isSelected, isActing, clickOnce, preferPhysicalSize, dataIndex },
   ref,
 ) {
   const { t } = useTranslations();
@@ -158,6 +159,7 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
       {({ items, openMenu }) => (
         <TableRow
           ref={ref}
+          data-index={dataIndex}
           className={classNames(
             'group',
             isDraggingSource && 'opacity-60',

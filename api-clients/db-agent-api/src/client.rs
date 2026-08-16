@@ -1,22 +1,15 @@
 // This file is auto-generated from OpenAPI spec. Do not edit manually.
 use super::*;
 use futures_util::TryStreamExt;
-use reqwest::{Client, Method, StatusCode};
+use http_client::CLIENT;
+use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use std::{
     pin::Pin,
-    sync::LazyLock,
     task::{Context, Poll},
 };
 use tokio::io::AsyncRead;
 use tokio_tungstenite::tungstenite::{Error, client::IntoClientRequest, http::HeaderValue};
-
-static CLIENT: LazyLock<Client> = LazyLock::new(|| {
-    Client::builder()
-        .user_agent("Calagopus Panel")
-        .build()
-        .expect("Failed to create reqwest client")
-});
 
 #[derive(Debug)]
 pub enum ApiHttpError {
@@ -369,6 +362,255 @@ impl DbAgentClient {
         .await
     }
 
+    pub async fn post_instances_instance_databases_database_explorer_query(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_query::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_query::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/query"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_rows(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_rows::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_rows::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/rows"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_rows_delete(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_rows_delete::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_rows_delete::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/rows/delete"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_rows_insert(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_rows_insert::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_rows_insert::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/rows/insert"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_rows_update(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_rows_update::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_rows_update::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/rows/update"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_instances_instance_databases_database_explorer_schema(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_schema::get::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/instances/{instance}/databases/{database}/explorer/schema"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_tables(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_tables::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_tables::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/tables"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_tables_columns(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_tables_columns::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_tables_columns::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/tables/columns"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_tables_columns_delete(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_tables_columns_delete::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_tables_columns_delete::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!(
+                "/api/instances/{instance}/databases/{database}/explorer/tables/columns/delete"
+            ),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_tables_columns_rename(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_tables_columns_rename::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_tables_columns_rename::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!(
+                "/api/instances/{instance}/databases/{database}/explorer/tables/columns/rename"
+            ),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_tables_delete(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_tables_delete::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_tables_delete::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/tables/delete"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_instances_instance_databases_database_explorer_tables_rename(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_databases_database_explorer_tables_rename::post::RequestBody,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_tables_rename::post::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/instances/{instance}/databases/{database}/explorer/tables/rename"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_instances_instance_databases_database_explorer_tables_types(
+        &self,
+        instance: uuid::Uuid,
+        database: uuid::Uuid,
+    ) -> Result<
+        super::instances_instance_databases_database_explorer_tables_types::get::Response,
+        ApiHttpError,
+    > {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/instances/{instance}/databases/{database}/explorer/tables/types"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn post_instances_instance_databases_database_recreate(
         &self,
         instance: uuid::Uuid,
@@ -663,6 +905,34 @@ impl DbAgentClient {
         data: &super::system_config::patch::RequestBody,
     ) -> Result<super::system_config::patch::Response, ApiHttpError> {
         request_impl(self, Method::PATCH, "/api/system/config", Some(data), None).await
+    }
+
+    pub async fn get_system_logs(&self) -> Result<super::system_logs::get::Response, ApiHttpError> {
+        request_impl(self, Method::GET, "/api/system/logs", None::<&()>, None).await
+    }
+
+    pub async fn get_system_logs_file(
+        &self,
+        file: &str,
+        query: &super::system_logs_file::get::Query,
+    ) -> Result<super::system_logs_file::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.lines {
+            query_parts.push(format!("lines={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/system/logs/{file}{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
     }
 
     pub async fn get_system_overview(

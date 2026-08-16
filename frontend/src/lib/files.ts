@@ -26,6 +26,13 @@ export function isArchiveType(file: z.infer<typeof serverDirectoryEntrySchema>) 
   );
 }
 
+export function isSqliteDatabase(file: z.infer<typeof serverDirectoryEntrySchema>) {
+  return (
+    ['application/vnd.sqlite3', 'application/x-sqlite3'].includes(file.mime) ||
+    ['.db', '.db3', '.sqlite', '.sqlite3'].some((suffix) => file.name.endsWith(suffix))
+  );
+}
+
 export function isViewableArchive(
   file: z.infer<typeof serverDirectoryEntrySchema>,
   fileManagerContext: FileManagerContextType,
@@ -79,6 +86,15 @@ export function isOpenableFile(
     if (result.openable) {
       return result;
     }
+  }
+
+  if (isSqliteDatabase(file)) {
+    return {
+      openable: true,
+      handleOpen: ({ handleFileOpen }) => {
+        handleFileOpen(file.name, 'sqlite', {});
+      },
+    };
   }
 
   if (file.size > getGlobalStore().settings.server.maxFileManagerViewSize) {

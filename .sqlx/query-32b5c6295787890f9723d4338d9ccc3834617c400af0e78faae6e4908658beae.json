@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM system_backup_policies\n            WHERE system_backup_policies.uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "32b5c6295787890f9723d4338d9ccc3834617c400af0e78faae6e4908658beae"
+}

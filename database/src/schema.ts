@@ -48,7 +48,12 @@ export const bytea = customType<{
 
 export const databaseTypeEnum = pgEnum('database_type', ['MYSQL', 'POSTGRES', 'MONGODB']);
 export const databaseAgentTypeEnum = pgEnum('database_agent_type', ['POSTGRES', 'MARIADB', 'MONGODB', 'REDIS']);
-export const serverStatusEnum = pgEnum('server_status', ['INSTALLING', 'INSTALL_FAILED', 'RESTORING_BACKUP']);
+export const serverStatusEnum = pgEnum('server_status', [
+  'INSTALLING',
+  'INSTALL_FAILED',
+  'RESTORING_BACKUP',
+  'BACKUP_RESTORE_FAILED',
+]);
 export const serverAutoStartBehaviorEnum = pgEnum('server_auto_start_behavior', ['ALWAYS', 'UNLESS_STOPPED', 'NEVER']);
 export const backupDiskEnum = pgEnum('backup_disk', [
   'LOCAL',
@@ -459,6 +464,90 @@ export const backupConfigurationsTable = pgTable(
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [uniqueIndex('backup_configurations_name_idx').on(cols.name)],
+);
+
+export const systemBackupPoliciesTable = pgTable(
+  'system_backup_policies',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    backup_configuration_uuid: uuid().references(() => backupConfigurationsTable.uuid, { onDelete: 'set null' }),
+    name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    description: text(),
+    enabled: boolean().default(true).notNull(),
+    cron: varchar({ length: 255 }).notNull(),
+    retention_count: integer(),
+    retention_days: integer(),
+    parallelism: integer().default(2).notNull(),
+    triggered: timestamp(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('system_backup_policies_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
+    uniqueIndex('system_backup_policies_name_idx').on(cols.name),
+  ],
+);
+
+export const systemBackupPolicyNodesTable = pgTable(
+  'system_backup_policy_nodes',
+  {
+    system_backup_policy_uuid: uuid()
+      .references(() => systemBackupPoliciesTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    node_uuid: uuid()
+      .references(() => nodesTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    primaryKey({
+      name: 'system_backup_policy_nodes_pk',
+      columns: [cols.system_backup_policy_uuid, cols.node_uuid],
+    }),
+    index('system_backup_policy_nodes_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
+    index('system_backup_policy_nodes_node_uuid_idx').on(cols.node_uuid),
+  ],
+);
+
+export const systemBackupPolicyLocationsTable = pgTable(
+  'system_backup_policy_locations',
+  {
+    system_backup_policy_uuid: uuid()
+      .references(() => systemBackupPoliciesTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    location_uuid: uuid()
+      .references(() => locationsTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    primaryKey({
+      name: 'system_backup_policy_locations_pk',
+      columns: [cols.system_backup_policy_uuid, cols.location_uuid],
+    }),
+    index('system_backup_policy_locations_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
+    index('system_backup_policy_locations_location_uuid_idx').on(cols.location_uuid),
+  ],
+);
+
+export const systemBackupPolicyServersTable = pgTable(
+  'system_backup_policy_servers',
+  {
+    system_backup_policy_uuid: uuid()
+      .references(() => systemBackupPoliciesTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    server_uuid: uuid()
+      .references(() => serversTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    primaryKey({
+      name: 'system_backup_policy_servers_pk',
+      columns: [cols.system_backup_policy_uuid, cols.server_uuid],
+    }),
+    index('system_backup_policy_servers_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
+    index('system_backup_policy_servers_server_uuid_idx').on(cols.server_uuid),
+  ],
 );
 
 export const locationsTable = pgTable(
@@ -917,7 +1006,7 @@ export const serverSubusersTable = pgTable(
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
-    permissions: varchar({ length: 32 }).array().notNull(),
+    permissions: varchar({ length: 64 }).array().notNull(),
     ignored_files: text().array().notNull(),
     created: timestamp().defaultNow().notNull(),
   },
@@ -1018,6 +1107,7 @@ export const serverBackupsTable = pgTable(
       .notNull(),
     backup_configuration_uuid: uuid().references(() => backupConfigurationsTable.uuid, { onDelete: 'set null' }),
     backup_group_uuid: uuid().references(() => serverBackupGroupsTable.uuid, { onDelete: 'set null' }),
+    system_backup_policy_uuid: uuid().references(() => systemBackupPoliciesTable.uuid, { onDelete: 'set null' }),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     successful: boolean().default(false).notNull(),
     browsable: boolean().default(false).notNull(),
@@ -1043,6 +1133,7 @@ export const serverBackupsTable = pgTable(
     index('server_backups_node_uuid_idx').on(cols.node_uuid),
     index('server_backups_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
     index('server_backups_backup_group_uuid_idx').on(cols.backup_group_uuid),
+    index('server_backups_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
     index('server_backups_successful_idx').on(cols.successful),
     index('server_backups_deleting_idx').on(cols.deleting),
   ],

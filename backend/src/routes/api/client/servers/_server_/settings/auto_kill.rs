@@ -8,6 +8,7 @@ mod put {
     use shared::{
         ApiError, GetState,
         models::{
+            UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
             user::GetPermissionManager,
         },
@@ -54,20 +55,21 @@ mod put {
 
         permissions.has_server_permission("settings.auto-kill")?;
 
-        server.auto_kill.enabled = data.enabled;
+        let mut auto_kill = server.auto_kill.clone();
+        auto_kill.enabled = data.enabled;
         if let Some(seconds) = data.seconds {
-            server.auto_kill.seconds = seconds;
+            auto_kill.seconds = seconds;
         }
 
-        sqlx::query!(
-            "UPDATE servers
-            SET auto_kill = $1
-            WHERE servers.uuid = $2",
-            serde_json::to_value(&server.auto_kill)?,
-            server.uuid
-        )
-        .execute(state.database.write())
-        .await?;
+        server
+            .update(
+                &state,
+                shared::models::server::UpdateServerOptions {
+                    auto_kill: Some(auto_kill),
+                    ..Default::default()
+                },
+            )
+            .await?;
 
         activity_logger
             .log(

@@ -222,3 +222,10 @@ export const serverFileRevisionSchema = z.object({
   isSnapshot: z.boolean(),
   created: z.coerce.date(),
 });
+
+export const serverFileSqliteQuerySchema = z.object({
+  file: z.string().min(1),
+  query: z.string().min(1).max(65535),
+  rows: z.number().min(1).max(1000),
+  readOnly: z.boolean(),
+});

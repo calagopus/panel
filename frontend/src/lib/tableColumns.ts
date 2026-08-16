@@ -32,6 +32,17 @@ export const backupConfigurationTableColumns = (): string[] => {
   ];
 };
 
+export const systemBackupPolicyTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.id', {}),
+    t('common.table.columns.name', {}),
+    t('pages.admin.systemBackupPolicies.table.columns.cron', {}),
+    t('pages.admin.systemBackupPolicies.table.columns.backups', {}),
+    t('common.table.columns.created', {}),
+  ];
+};
+
 export const databaseHostTableColumns = (): string[] => {
   const { t } = getTranslations();
   return [

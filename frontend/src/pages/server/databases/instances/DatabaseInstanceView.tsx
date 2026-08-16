@@ -217,6 +217,26 @@ export default function DatabaseInstanceView() {
           removeDatabaseInstanceOperation(first);
           break;
         }
+        case SocketEvent.OPERATION_ABORTED: {
+          const { databaseInstance, databaseInstanceOperations } = serverStoreApi.getState();
+          const operation = databaseInstanceOperations.get(first);
+          if (!operation) break;
+
+          switch (operation.type) {
+            case 'remote_import':
+              addToast(
+                t('pages.server.databases.instance.toast.operations.remoteImport.aborted', {
+                  database: operation.db ?? databaseInstance?.name ?? '',
+                  source: operation.sourceDb ? `${operation.sourceHost}/${operation.sourceDb}` : operation.sourceHost,
+                }).md(),
+                'error',
+              );
+              break;
+          }
+
+          failDatabaseInstanceOperation(first);
+          break;
+        }
         case SocketEvent.OPERATION_ERROR: {
           const { databaseInstance, databaseInstanceOperations } = serverStoreApi.getState();
           const operation = databaseInstanceOperations.get(first);
@@ -320,7 +340,7 @@ export default function DatabaseInstanceView() {
               instance={instance}
               opened={openModal === 'delete'}
               onClose={() => setOpenModal(null)}
-              onDeleted={() => navigate(`/server/${server.uuidShort}/databases`)}
+              onDeleted={() => navigate(`/server/${server.uuidShort}/databases/instances`)}
             />
             {instance.type === 'redis' && (
               <>

@@ -1,0 +1,1 @@
+ALTER TABLE "system_backup_policies" ADD COLUMN "triggered" timestamp;

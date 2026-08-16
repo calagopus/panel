@@ -4,6 +4,14 @@ use utoipa::ToSchema;
 
 pub type Config = super::system_config::get::Response200;
 
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum QueryValue {
+    Null,
+    Text { value: String },
+    Binary { value: String },
+}
+
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
 pub enum WebsocketEvent {
     #[serde(rename = "send stats")]
@@ -36,6 +44,8 @@ pub enum WebsocketEvent {
     OperationCompleted,
     #[serde(rename = "operation error")]
     OperationError,
+    #[serde(rename = "operation aborted")]
+    OperationAborted,
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)]

@@ -5,6 +5,7 @@ import {
   Group,
   GroupProps,
   Pagination as MantinePagination,
+  MantineSpacing,
   Table as MantineTable,
   Stack,
   TableTdProps,
@@ -189,6 +190,7 @@ interface TableProps {
   onPageSelect?: (page: number) => void;
   allowSelect?: boolean;
   flush?: boolean;
+  verticalSpacing?: MantineSpacing;
   children: ReactNode;
 }
 
@@ -200,6 +202,7 @@ export default function Table({
   onPageSelect,
   allowSelect = true,
   flush = false,
+  verticalSpacing,
   children,
 }: TableProps) {
   return (
@@ -211,6 +214,7 @@ export default function Table({
               borderRadius: 'var(--mantine-radius-md)',
               border: '1px solid var(--mantine-color-default-border)',
               background: 'var(--mantine-color-default)',
+              overflow: 'hidden',
             }
       }
     >
@@ -222,6 +226,7 @@ export default function Table({
         <div style={{ position: 'relative', ...(loading ? { minHeight: '10rem' } : {}) }}>
           <MantineTable
             stickyHeader
+            verticalSpacing={verticalSpacing}
             highlightOnHover={(pagination?.total ?? 0) > 0 && !loading}
             className={classNames(
               allowSelect ? undefined : 'select-none',

@@ -9,7 +9,7 @@ mod post {
         ApiError, GetState,
         models::{
             CreatableModel, EventEmittingModel,
-            server::GetServer,
+            server::{GetServer, ServerStatus},
             server_activity::ServerActivity,
             server_backup::{ServerBackup, ServerBackupEvent},
         },
@@ -144,17 +144,10 @@ mod post {
         let mut server = server.0;
         let mut transaction = state.database.write().begin().await?;
 
-        let rows_affected = sqlx::query!(
-            "UPDATE servers
-            SET status = 'RESTORING_BACKUP'
-            WHERE servers.uuid = $1 AND servers.status IS NULL",
-            server.uuid
-        )
-        .execute(&mut *transaction)
-        .await?
-        .rows_affected();
-
-        if rows_affected == 0 {
+        if !server
+            .try_set_status(&mut *transaction, None, Some(ServerStatus::RestoringBackup))
+            .await?
+        {
             transaction.rollback().await?;
 
             return ApiResponse::error("server is not in a valid state to restore backup.")

@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE system_backup_policies\n            SET triggered = NOW()\n            WHERE system_backup_policies.uuid = $1\n            RETURNING system_backup_policies.triggered",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "triggered",
+        "type_info": "Timestamp",
+        "origin": {
+          "Table": {
+            "table": "system_backup_policies",
+            "name": "triggered"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "1cf5a36b33fafbfdc62a9c78453a309bad7f3d1ffd571a1f2bc91f1332eb672e"
+}

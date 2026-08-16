@@ -10,6 +10,7 @@ import { lazy } from 'react';
 import OobeGuard from '@/routers/guards/OobeGuard.tsx';
 import { ContextMenuProvider } from './elements/ContextMenu.tsx';
 import ContentContainer from './elements/containers/ContentContainer.tsx';
+import QuickActionsPalette from './elements/quickActions/QuickActionsPalette.tsx';
 import ScreenBlock from './elements/ScreenBlock.tsx';
 import UploadsCard from './elements/UploadsCard.tsx';
 import { useCurrentWindow } from './providers/CurrentWindowProvider.tsx';
@@ -109,6 +110,7 @@ export default function RouterRoutes({ isNormal }: { isNormal: boolean }) {
               </Suspense>
 
               {isNormal && <UploadsCard />}
+              {isNormal && <QuickActionsPalette />}
 
               {window.extensionContext.extensionRegistry.pages.global.appendedComponents.map((Component, index) => (
                 <Component key={`pagesGlobal-appended-${index}`} />

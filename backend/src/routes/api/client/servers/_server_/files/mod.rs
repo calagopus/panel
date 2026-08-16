@@ -19,6 +19,7 @@ mod pull;
 mod rename;
 mod revisions;
 mod search;
+mod sqlite_query;
 mod upload;
 mod write;
 
@@ -41,6 +42,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/largest-directories", largest_directories::router(state))
         .nest("/chmod", chmod::router(state))
         .nest("/search", search::router(state))
+        .nest("/sqlite-query", sqlite_query::router(state))
         .nest("/pull", pull::router(state))
         .nest("/operations", operations::router(state))
         .nest("/revisions", revisions::router(state))

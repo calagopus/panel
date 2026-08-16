@@ -42,7 +42,13 @@ import BackupEditModal from './modals/BackupEditModal.tsx';
 import BackupExportModal from './modals/BackupExportModal.tsx';
 import BackupRestoreModal from './modals/BackupRestoreModal.tsx';
 
-export default function BackupRow({ backup }: { backup: z.infer<typeof serverBackupSchema> }) {
+export default function BackupRow({
+  backup,
+  readOnly,
+}: {
+  backup: z.infer<typeof serverBackupSchema>;
+  readOnly?: boolean;
+}) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
 
@@ -163,7 +169,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             type: 'action',
             icon: faPencil,
             label: t('common.button.edit', {}),
-            hidden: isDeleting || isDeleteFailed,
+            hidden: readOnly || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('edit'),
             color: 'gray',
             canAccess: useServerCan('backups.update'),
@@ -230,7 +236,7 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
             type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
-            hidden: !backup.completed || isDeleting,
+            hidden: readOnly || !backup.completed || isDeleting,
             disabled: backup.isLocked,
             onClick: () => setOpenModal('delete'),
             color: 'red',
@@ -290,13 +296,15 @@ export default function BackupRow({ backup }: { backup: z.infer<typeof serverBac
               <FormattedTimestamp timestamp={backup.created} />
             </TableData>
 
-            <TableData>
-              {backup.isLocked ? (
-                <FontAwesomeIcon className='text-green-500' icon={faLock} />
-              ) : (
-                <FontAwesomeIcon className='text-red-500' icon={faLockOpen} />
-              )}
-            </TableData>
+            {!readOnly && (
+              <TableData>
+                {backup.isLocked ? (
+                  <FontAwesomeIcon className='text-green-500' icon={faLock} />
+                ) : (
+                  <FontAwesomeIcon className='text-red-500' icon={faLockOpen} />
+                )}
+              </TableData>
+            )}
 
             <ContextMenuToggle items={items} openMenu={openMenu} />
           </TableRow>

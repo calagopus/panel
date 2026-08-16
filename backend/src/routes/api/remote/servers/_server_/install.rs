@@ -58,24 +58,19 @@ mod post {
     ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
-        server: GetServer,
+        mut server: GetServer,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
-        let status = if !data.successful {
-            Some(ServerStatus::InstallFailed)
-        } else {
-            None
-        };
-
-        sqlx::query!(
-            "UPDATE servers
-            SET status = $1
-            WHERE servers.uuid = $2",
-            status as Option<ServerStatus>,
-            server.0.uuid
-        )
-        .execute(state.database.write())
-        .await?;
+        server
+            .set_status(
+                state.database.write(),
+                if !data.successful {
+                    Some(ServerStatus::InstallFailed)
+                } else {
+                    None
+                },
+            )
+            .await?;
 
         let settings = state.settings.get().await?;
         state

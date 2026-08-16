@@ -33,7 +33,7 @@ mod post {
         state: GetState,
         user: GetUser,
         permissions: GetPermissionManager,
-        server: GetServer,
+        mut server: GetServer,
         activity_logger: GetServerActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_server_permission("settings.cancel-install")?;
@@ -70,14 +70,7 @@ mod post {
         {
             Ok(_) => {}
             Err(wings_api::client::ApiHttpError::Http(StatusCode::CONFLICT, _)) => {
-                sqlx::query!(
-                    "UPDATE servers
-                    SET status = NULL
-                    WHERE servers.uuid = $1",
-                    server.uuid
-                )
-                .execute(state.database.write())
-                .await?;
+                server.set_status(state.database.write(), None).await?;
 
                 return ApiResponse::new_serialized(Response {}).ok();
             }

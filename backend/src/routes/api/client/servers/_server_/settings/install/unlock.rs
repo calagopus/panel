@@ -7,7 +7,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            server::{GetServer, GetServerActivityLogger},
+            server::{GetServer, GetServerActivityLogger, ServerStatus},
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -31,25 +31,23 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        server: GetServer,
+        mut server: GetServer,
         activity_logger: GetServerActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_server_permission("settings.install")?;
 
-        if server.status != Some(shared::models::server::ServerStatus::InstallFailed) {
+        if !server
+            .try_set_status(
+                state.database.write(),
+                Some(ServerStatus::InstallFailed),
+                None,
+            )
+            .await?
+        {
             return ApiResponse::error("server has not failed an install")
                 .with_status(StatusCode::CONFLICT)
                 .ok();
         }
-
-        sqlx::query!(
-            "UPDATE servers
-            SET status = NULL
-            WHERE servers.uuid = $1",
-            server.uuid
-        )
-        .execute(state.database.write())
-        .await?;
 
         activity_logger
             .log("server:settings.unlock-install", serde_json::json!({}))

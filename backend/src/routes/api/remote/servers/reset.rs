@@ -8,6 +8,7 @@ mod post {
         models::{
             ByUuid, EventEmittingModel,
             node::{GetNode, Node},
+            server::ServerStatus,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -23,9 +24,10 @@ mod post {
         let (_, backups, server_transfers) = tokio::try_join!(
             sqlx::query!(
                 "UPDATE servers
-                SET status = NULL
+                SET status = $2
                 WHERE servers.node_uuid = $1 AND servers.status = 'RESTORING_BACKUP'",
-                node.uuid
+                node.uuid,
+                ServerStatus::BackupRestoreFailed as ServerStatus
             )
             .execute(state.database.write()),
             sqlx::query!(

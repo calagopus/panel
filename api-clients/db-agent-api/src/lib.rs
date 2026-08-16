@@ -87,6 +87,40 @@ pub enum AppContainerType {
 }
 
 nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct BrowseFilter {
+        #[schema(inline)]
+        pub column: compact_str::CompactString,
+        #[schema(inline)]
+        pub operator: FilterOperator,
+        #[schema(inline)]
+        pub value: Option<compact_str::CompactString>,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ColumnDefinition {
+        #[schema(inline)]
+        pub name: compact_str::CompactString,
+        #[schema(inline)]
+        pub r#type: compact_str::CompactString,
+        #[schema(inline)]
+        pub nullable: bool,
+        #[schema(inline)]
+        pub primary_key: bool,
+        #[schema(inline)]
+        pub auto_increment: bool,
+    }
+}
+
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum CompressionType {
+    #[serde(rename = "none")]
+    None,
+    #[serde(rename = "gz")]
+    Gz,
+}
+
+nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Connections {
         #[schema(inline)]
         pub total: u64,
@@ -127,6 +161,32 @@ pub enum DatabaseAgentType {
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum FilterOperator {
+    #[serde(rename = "eq")]
+    Eq,
+    #[serde(rename = "ne")]
+    Ne,
+    #[serde(rename = "lt")]
+    Lt,
+    #[serde(rename = "lte")]
+    Lte,
+    #[serde(rename = "gt")]
+    Gt,
+    #[serde(rename = "gte")]
+    Gte,
+    #[serde(rename = "contains")]
+    Contains,
+    #[serde(rename = "starts_with")]
+    StartsWith,
+    #[serde(rename = "ends_with")]
+    EndsWith,
+    #[serde(rename = "is_null")]
+    IsNull,
+    #[serde(rename = "not_null")]
+    NotNull,
+}
+
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
 pub enum PowerAction {
     #[serde(rename = "start")]
     Start,
@@ -139,6 +199,17 @@ pub enum PowerAction {
 }
 
 nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct QueryColumn {
+        #[schema(inline)]
+        pub name: compact_str::CompactString,
+        #[schema(inline)]
+        pub type_name: compact_str::CompactString,
+        #[schema(inline)]
+        pub binary: bool,
+    }
+}
+
+nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct QueryResult {
         #[schema(inline)]
         pub columns: Vec<compact_str::CompactString>,
@@ -146,6 +217,19 @@ nestify::nest! {
         pub rows: Vec<Vec<serde_json::Value>>,
         #[schema(inline)]
         pub rows_affected: u64,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct QueryResultSet {
+        #[schema(inline)]
+        pub columns: Vec<QueryColumn>,
+        #[schema(inline)]
+        pub rows: Vec<Vec<QueryValue>>,
+        #[schema(inline)]
+        pub rows_affected: u64,
+        #[schema(inline)]
+        pub truncated: bool,
     }
 }
 
@@ -163,6 +247,74 @@ nestify::nest! {
         pub cpu_absolute: f64,
         #[schema(inline)]
         pub uptime: u64,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RowDelete {
+        #[schema(inline)]
+        pub keys: Vec<RowValue>,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RowInsert {
+        #[schema(inline)]
+        pub values: Vec<RowValue>,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RowUpdate {
+        #[schema(inline)]
+        pub keys: Vec<RowValue>,
+        #[schema(inline)]
+        pub values: Vec<RowValue>,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RowValue {
+        #[schema(inline)]
+        pub column: compact_str::CompactString,
+        #[schema(inline)]
+        pub value: Option<compact_str::CompactString>,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct SchemaColumn {
+        #[schema(inline)]
+        pub name: compact_str::CompactString,
+        #[schema(inline)]
+        pub type_name: compact_str::CompactString,
+        #[schema(inline)]
+        pub nullable: bool,
+        #[schema(inline)]
+        pub default: Option<compact_str::CompactString>,
+        #[schema(inline)]
+        pub primary_key: bool,
+        #[schema(inline)]
+        pub auto_increment: bool,
+        #[schema(inline)]
+        pub generated: bool,
+        #[schema(inline)]
+        pub binary: bool,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct SchemaTable {
+        #[schema(inline)]
+        pub schema: Option<compact_str::CompactString>,
+        #[schema(inline)]
+        pub name: compact_str::CompactString,
+        #[schema(inline)]
+        pub view: bool,
+        #[schema(inline)]
+        pub row_estimate: Option<i64>,
+        #[schema(inline)]
+        pub columns: Vec<SchemaColumn>,
     }
 }
 
@@ -543,6 +695,445 @@ pub mod instances_instance_databases_database {
         }
 
         pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_query {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub query: compact_str::CompactString,
+                #[schema(inline)]
+                pub rows: u32,
+                #[schema(inline)]
+                pub read_only: bool,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub results: Vec<QueryResultSet>,
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response408 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_rows {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub order_by: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub descending: bool,
+                #[schema(inline)]
+                pub limit: u32,
+                #[schema(inline)]
+                pub offset: u64,
+                #[schema(inline)]
+                pub filters: Vec<BrowseFilter>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub result: QueryResultSet,
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_rows_delete {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub rows: Vec<RowDelete>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub affected: u64,
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_rows_insert {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub rows: Vec<RowInsert>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub affected: u64,
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_rows_update {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub rows: Vec<RowUpdate>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub affected: u64,
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_schema {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub tables: Vec<SchemaTable>,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_tables {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub columns: Vec<ColumnDefinition>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response408 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_tables_columns {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub column: ColumnDefinition,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response408 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_tables_columns_delete {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub column: compact_str::CompactString,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response408 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_tables_columns_rename {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub column: compact_str::CompactString,
+                #[schema(inline)]
+                pub name: compact_str::CompactString,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response408 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_tables_delete {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response408 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_tables_rename {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub schema: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub table: compact_str::CompactString,
+                #[schema(inline)]
+                pub name: compact_str::CompactString,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response408 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_databases_database_explorer_tables_types {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub types: Vec<compact_str::CompactString>,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
 
         pub type Response = Response200;
     }
@@ -1088,6 +1679,52 @@ pub mod system_config {
         }
 
         pub type Response = Response200;
+    }
+}
+pub mod system_logs {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub log_files: Vec<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200LogFiles {
+                    #[schema(inline)]
+                    pub name: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub compression_type: CompressionType,
+                    #[schema(inline)]
+                    pub size: u64,
+                    #[schema(inline)]
+                    pub last_modified: chrono::DateTime<chrono::Local>,
+                }>,
+            }
+        }
+
+        pub type Response = Response200;
+    }
+}
+pub mod system_logs_file {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        pub type Response200 = AsyncResponseReader;
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+
+        #[derive(Debug, Clone, Default)]
+        #[allow(clippy::manual_non_exhaustive)]
+        pub struct Query {
+            pub lines: Option<u64>,
+            #[doc(hidden)]
+            pub __priv: (),
+        }
     }
 }
 pub mod system_overview {

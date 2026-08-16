@@ -33,6 +33,8 @@ export default function AdminBackupConfigurationLocations({
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.view.locations.subContainer}
+      registryProps={{ backupConfiguration }}
     >
       <Table
         columns={locationTableColumns()}

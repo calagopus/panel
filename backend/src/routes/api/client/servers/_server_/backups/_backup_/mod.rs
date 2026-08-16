@@ -146,6 +146,12 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_server_permission("backups.delete")?;
 
+        if backup.system_backup_policy_uuid.is_some() {
+            return ApiResponse::error("system backups cannot be deleted")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         if backup.completed.is_none() {
             return ApiResponse::error("backup has not been completed yet")
                 .with_status(StatusCode::EXPECTATION_FAILED)
@@ -244,6 +250,12 @@ mod patch {
         }
 
         permissions.has_server_permission("backups.update")?;
+
+        if backup.system_backup_policy_uuid.is_some() {
+            return ApiResponse::error("system backups cannot be modified")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
 
         if let Some(Some(group_uuid)) = data.backup_group_uuid
             && ServerBackupGroup::by_server_uuid_uuid(&state.database, server.uuid, group_uuid)

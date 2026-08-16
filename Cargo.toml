@@ -14,12 +14,13 @@ exclude = ["backend-extensions/node_modules"]
 default-members = ["bins/base", "bins/all-in-one", "bins/heavy-supervisor"]
 package.rust-version = "1.97.0"
 package.license = "MIT"
-package.version = "1.1.3"
+package.version = "1.1.4"
 package.edition = "2024"
 
 [workspace.dependencies]
 wings-api = { path = "api-clients/wings-api" }
 db-agent-api = { path = "api-clients/db-agent-api" }
+http-client = { path = "api-clients/http-client" }
 rule-validator = { path = "rule-validator" }
 shared = { path = "shared" }
 backend = { path = "backend" }

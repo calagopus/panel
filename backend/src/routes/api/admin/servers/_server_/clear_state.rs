@@ -28,7 +28,7 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        server: GetServer,
+        mut server: GetServer,
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("servers.update")?;
@@ -74,14 +74,7 @@ mod post {
             }
         }
 
-        sqlx::query!(
-            "UPDATE servers
-            SET status = NULL
-            WHERE servers.uuid = $1",
-            server.uuid
-        )
-        .execute(&mut *transaction)
-        .await?;
+        server.set_status(&mut *transaction, None).await?;
 
         transaction.commit().await?;
 

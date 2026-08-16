@@ -1,0 +1,1 @@
+ALTER TABLE "server_subusers" ALTER COLUMN "permissions" SET DATA TYPE varchar(64)[] USING "permissions"::varchar(64)[];

@@ -21,6 +21,7 @@ import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { canMoveFilesToDirectory } from '@/pages/server/files/fileMove.ts';
 import FileCopyConflictModal, {
   ConflictResolutions,
   FileConflict,
@@ -71,6 +72,8 @@ function FileActionBar() {
   const [loading, setLoading] = useState(false);
   const [conflicts, setConflicts] = useState<FileConflict[] | null>(null);
   const [conflictLoading, setConflictLoading] = useState(false);
+
+  const actingFilesItemKey = actingFiles.values().every((f) => f.directory) ? 'directory' : 'file';
 
   const doCopy = () => {
     setLoading(true);
@@ -215,7 +218,8 @@ function FileActionBar() {
             !loading &&
             browsingWritableDirectory &&
             (actingMode === 'copy' ? canCreate : canUpdate) &&
-            (actingMode === 'copy' || browsingDirectory !== actingFilesSource)
+            (actingMode === 'copy' ||
+              canMoveFilesToDirectory(actingFiles.values(), actingFilesSource, browsingDirectory))
           ) {
             if (actingMode === 'copy') {
               doCopy();
@@ -269,7 +273,11 @@ function FileActionBar() {
           <>
             {actingMode === 'copy' ? (
               <ServerCan action='files.create'>
-                <Tooltip label={t('pages.server.files.actionBar.copyHere', { files: tItem('file', actingFiles.size) })}>
+                <Tooltip
+                  label={t('pages.server.files.actionBar.copyHere', {
+                    files: tItem(actingFilesItemKey, actingFiles.size),
+                  })}
+                >
                   <Button onClick={doCopy} loading={loading} disabled={!browsingWritableDirectory}>
                     <FontAwesomeIcon icon={faAnglesDown} />
                   </Button>
@@ -277,11 +285,18 @@ function FileActionBar() {
               </ServerCan>
             ) : (
               <ServerCan action='files.update'>
-                <Tooltip label={t('pages.server.files.actionBar.moveHere', { files: tItem('file', actingFiles.size) })}>
+                <Tooltip
+                  label={t('pages.server.files.actionBar.moveHere', {
+                    files: tItem(actingFilesItemKey, actingFiles.size),
+                  })}
+                >
                   <Button
                     onClick={doMove}
                     loading={loading}
-                    disabled={!browsingWritableDirectory || browsingDirectory === actingFilesSource}
+                    disabled={
+                      !browsingWritableDirectory ||
+                      !canMoveFilesToDirectory(actingFiles.values(), actingFilesSource, browsingDirectory)
+                    }
                   >
                     <FontAwesomeIcon icon={faAnglesDown} />
                   </Button>

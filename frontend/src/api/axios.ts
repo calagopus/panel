@@ -1,4 +1,5 @@
-import axios, { AxiosInstance, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios';
+import { decode, encode } from '@msgpack/msgpack';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios';
 import { getGlobalStore } from '@/stores/global.ts';
 
 function captureServerName(headers: RawAxiosResponseHeaders | AxiosResponseHeaders | undefined) {
@@ -13,6 +14,40 @@ export const axiosInstance: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+/**
+ * Content-negotiated MessagePack transport for endpoints that move large result sets.
+ * The backend can still answer with JSON (its msgpack serialization fallback, proxy error
+ * pages), so the transform sniffs the content type before decoding.
+ */
+export const msgpackResponseConfig: AxiosRequestConfig = {
+  responseType: 'arraybuffer',
+  headers: {
+    Accept: 'application/msgpack',
+  },
+  transformResponse: [
+    (data: ArrayBuffer | null, headers) => {
+      if (!data || data.byteLength === 0) return null;
+      if (String(headers['content-type']).includes('application/msgpack')) return decode(data);
+
+      const text = new TextDecoder().decode(data);
+      try {
+        return JSON.parse(text);
+      } catch {
+        return text;
+      }
+    },
+  ],
+};
+
+export const msgpackConfig: AxiosRequestConfig = {
+  ...msgpackResponseConfig,
+  headers: {
+    ...msgpackResponseConfig.headers,
+    'Content-Type': 'application/msgpack',
+  },
+  transformRequest: [(data) => encode(data)],
+};
 
 axiosInstance.interceptors.response.use(
   (response) => {

@@ -154,6 +154,8 @@ mod post {
             server: &server,
             name: data.name.unwrap_or_else(ServerBackup::default_name),
             backup_group_uuid: backup_group.as_ref().map(|group| group.uuid),
+            system_backup_policy_uuid: None,
+            backup_configuration: None,
             ignored_files: data.ignored_files,
             metadata: ServerBackup::generate_metadata(&state, &server).await?,
         };
@@ -294,6 +296,12 @@ mod delete {
                     .ok();
             }
         };
+
+        if backup.system_backup_policy_uuid.is_some() {
+            return ApiResponse::error("system backups cannot be deleted")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
 
         if backup.locked {
             return ApiResponse::error("backup is locked and cannot be deleted")
@@ -473,6 +481,12 @@ mod patch {
                     .ok();
             }
         };
+
+        if backup.system_backup_policy_uuid.is_some() {
+            return ApiResponse::error("system backups cannot be modified")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
 
         if let Some(group) = &target_group {
             ServerBackup::rotate_group_for_create(&state, group).await?;

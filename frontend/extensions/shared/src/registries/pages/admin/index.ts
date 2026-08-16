@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { Registry } from 'shared';
 import { ActivityRegistry } from './activity.ts';
 import { AnnouncementsRegistry } from './announcements/index.ts';
+import { BackupConfigurationsRegistry } from './backupConfigurations/index.ts';
 import { DatabaseAgentHostsRegistry } from './databaseAgentHosts/index.ts';
 import { DatabaseAgentTemplatesRegistry } from './databaseAgentTemplates/index.ts';
 import { DatabaseHostsRegistry } from './databaseHosts/index.ts';
@@ -13,6 +14,7 @@ import { NodesRegistry } from './nodes/index.ts';
 import { OAuthProvidersRegistry } from './oAuthProviders/index.ts';
 import { RolesRegistry } from './roles/index.ts';
 import { ServersRegistry } from './servers/index.ts';
+import { SystemBackupPoliciesRegistry } from './systemBackupPolicies/index.ts';
 import { UsersRegistry } from './users/index.ts';
 
 export class AdminRegistry implements Registry {
@@ -31,6 +33,8 @@ export class AdminRegistry implements Registry {
     this.oauthProviders.mergeFrom(other.oauthProviders);
     this.databaseAgentHosts.mergeFrom(other.databaseAgentHosts);
     this.databaseAgentTemplates.mergeFrom(other.databaseAgentTemplates);
+    this.backupConfigurations.mergeFrom(other.backupConfigurations);
+    this.systemBackupPolicies.mergeFrom(other.systemBackupPolicies);
 
     this.prependedComponents.push(...other.prependedComponents);
     this.appendedComponents.push(...other.appendedComponents);
@@ -52,6 +56,8 @@ export class AdminRegistry implements Registry {
   public oauthProviders: OAuthProvidersRegistry = new OAuthProvidersRegistry();
   public databaseAgentHosts: DatabaseAgentHostsRegistry = new DatabaseAgentHostsRegistry();
   public databaseAgentTemplates: DatabaseAgentTemplatesRegistry = new DatabaseAgentTemplatesRegistry();
+  public backupConfigurations: BackupConfigurationsRegistry = new BackupConfigurationsRegistry();
+  public systemBackupPolicies: SystemBackupPoliciesRegistry = new SystemBackupPoliciesRegistry();
 
   public prependedComponents: FC[] = [];
   public appendedComponents: FC[] = [];
@@ -113,6 +119,16 @@ export class AdminRegistry implements Registry {
 
   public enterDatabaseAgentTemplates(callback: (registry: DatabaseAgentTemplatesRegistry) => unknown): this {
     callback(this.databaseAgentTemplates);
+    return this;
+  }
+
+  public enterBackupConfigurations(callback: (registry: BackupConfigurationsRegistry) => unknown): this {
+    callback(this.backupConfigurations);
+    return this;
+  }
+
+  public enterSystemBackupPolicies(callback: (registry: SystemBackupPoliciesRegistry) => unknown): this {
+    callback(this.systemBackupPolicies);
     return this;
   }
 

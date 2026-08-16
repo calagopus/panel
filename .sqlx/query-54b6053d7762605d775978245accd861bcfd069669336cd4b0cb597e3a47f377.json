@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE system_backup_policies\n            SET triggered = NULL\n            WHERE system_backup_policies.uuid = $1 AND system_backup_policies.triggered = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "54b6053d7762605d775978245accd861bcfd069669336cd4b0cb597e3a47f377"
+}

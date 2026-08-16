@@ -1,4 +1,5 @@
 import {
+  faDatabase,
   faFile,
   faFileAudio,
   faFilePen,
@@ -13,7 +14,13 @@ import classNames from 'classnames';
 import { memo } from 'react';
 import { z } from 'zod';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { isListenableAudio, isOpenableFile, isViewableArchive, isViewableImage } from '@/lib/files.ts';
+import {
+  isListenableAudio,
+  isOpenableFile,
+  isSqliteDatabase,
+  isViewableArchive,
+  isViewableImage,
+} from '@/lib/files.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { FileManagerStore, useFileManagerApi } from '@/stores/fileManager.ts';
@@ -43,6 +50,8 @@ function getFileIcon(
     return faFileAudio;
   } else if (isViewableArchive(file, fileManagerContext)) {
     return faFolderTree;
+  } else if (isSqliteDatabase(file)) {
+    return faDatabase;
   } else if (isOpenableFile(file, fileManagerContext).openable) {
     return faFilePen;
   }

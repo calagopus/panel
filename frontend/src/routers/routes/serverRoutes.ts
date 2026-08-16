@@ -15,8 +15,13 @@ import { lazy } from 'react';
 import type { ServerRouteDefinition } from 'shared';
 import ServerActivity from '@/pages/server/activity/ServerActivity.tsx';
 import ServerBackups from '@/pages/server/backups/ServerBackups.tsx';
+import ServerSystemBackups from '@/pages/server/backups/system/ServerSystemBackups.tsx';
+import DatabaseExplorerView from '@/pages/server/databases/explorer/DatabaseExplorerView.tsx';
+import DatabaseInstanceExplorerView from '@/pages/server/databases/instances/DatabaseInstanceExplorerView.tsx';
 import DatabaseInstanceView from '@/pages/server/databases/instances/DatabaseInstanceView.tsx';
+import ServerDatabaseInstances from '@/pages/server/databases/instances/ServerDatabaseInstances.tsx';
 import ServerDatabases from '@/pages/server/databases/ServerDatabases.tsx';
+import FileSqliteQuery from '@/pages/server/files/FileSqliteQuery.tsx';
 import ServerFiles from '@/pages/server/files/ServerFiles.tsx';
 import ServerMounts from '@/pages/server/mounts/ServerMounts.tsx';
 import ServerNetwork from '@/pages/server/network/ServerNetwork.tsx';
@@ -28,8 +33,6 @@ import ServerSubusers from '@/pages/server/subusers/ServerSubusers.tsx';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
 const ServerConsole = lazy(() => import('@/pages/server/console/ServerConsole.tsx'));
-// Split out from the main server chunk: these pull in @pierre/diffs (and shiki), which should
-// only load when a user actually opens the file editor or a diff view.
 const ServerFilesEditor = lazy(() => import('@/pages/server/files/FileEditor.tsx'));
 const FileRevisionDiff = lazy(() => import('@/pages/server/files/FileRevisionDiff.tsx'));
 
@@ -57,6 +60,12 @@ const routes: ServerRouteDefinition[] = [
   },
   {
     name: undefined,
+    path: '/files/sqlite',
+    element: FileSqliteQuery,
+    permission: 'files.query-raw',
+  },
+  {
+    name: undefined,
     path: '/files/:action',
     element: ServerFilesEditor,
     permission: ['files.read-content', 'files.create'],
@@ -70,9 +79,27 @@ const routes: ServerRouteDefinition[] = [
   },
   {
     name: undefined,
+    path: '/databases/instances',
+    element: ServerDatabaseInstances,
+    permission: 'database-instances.read',
+  },
+  {
+    name: undefined,
     path: '/databases/instances/:id',
     element: DatabaseInstanceView,
     permission: 'database-instances.read',
+  },
+  {
+    name: undefined,
+    path: '/databases/instances/:id/databases/:databaseId/explore',
+    element: DatabaseInstanceExplorerView,
+    permission: 'database-instances.query',
+  },
+  {
+    name: undefined,
+    path: '/databases/:id/explore',
+    element: DatabaseExplorerView,
+    permission: 'databases.query',
   },
   {
     name: () => getTranslations().t('pages.server.schedules.title', {}),
@@ -99,6 +126,12 @@ const routes: ServerRouteDefinition[] = [
     icon: faBoxArchive,
     path: '/backups',
     element: ServerBackups,
+    permission: 'backups.read',
+  },
+  {
+    name: undefined,
+    path: '/backups/system',
+    element: ServerSystemBackups,
     permission: 'backups.read',
   },
   {

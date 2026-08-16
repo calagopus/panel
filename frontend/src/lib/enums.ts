@@ -68,6 +68,7 @@ import {
   streamingArchiveFormat,
   transferArchiveFormat,
 } from '@/lib/schemas/generic.ts';
+import { serverDatabaseFilterOperator } from '@/lib/schemas/server/databases.ts';
 import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
 import {
   serverScheduleComparator,
@@ -367,6 +368,37 @@ export const scheduleComparatorOperatorMapping: Record<z.infer<typeof serverSche
   equal: '==',
   greater_than: '>',
   greater_than_or_equals: '>=',
+};
+
+export const databaseFilterOperatorLabelMapping: Record<z.infer<typeof serverDatabaseFilterOperator>, () => string> = {
+  eq: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.eq', {}),
+  ne: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.ne', {}),
+  lt: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.lt', {}),
+  lte: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.lte', {}),
+  gt: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.gt', {}),
+  gte: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.gte', {}),
+  contains: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.contains', {}),
+  starts_with: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.startsWith', {}),
+  ends_with: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.endsWith', {}),
+  is_null: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.isNull', {}),
+  not_null: () => getTranslations().t('pages.server.databases.explorer.enum.filterOperator.notNull', {}),
+};
+
+export const databaseFilterOperatorSymbolMapping: Record<
+  z.infer<typeof serverDatabaseFilterOperator>,
+  string | null
+> = {
+  eq: '=',
+  ne: '≠',
+  lt: '<',
+  lte: '≤',
+  gt: '>',
+  gte: '≥',
+  contains: null,
+  starts_with: null,
+  ends_with: null,
+  is_null: null,
+  not_null: null,
 };
 
 export const serverPowerStateLabelMapping: Record<z.infer<typeof serverPowerState>, () => string> = {
@@ -724,9 +756,11 @@ export const permissionCategoryIconMapping: Record<string, IconDefinition> = {
   activity: faBriefcase,
   allocations: faNetworkWired,
   'api-keys': faCloud,
+  'command-snippets': faTerminal,
   'backup-configurations': faFileZipper,
   backups: faBoxArchive,
   'backup-groups': faBoxArchive,
+  'system-backup-policies': faClockRotateLeft,
   control: faTerminal,
   announcements: faBullhorn,
   'database-hosts': faDatabase,

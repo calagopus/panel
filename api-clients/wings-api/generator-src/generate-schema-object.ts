@@ -15,6 +15,8 @@ export default function generateSchemaObject(output: fs.WriteStream, _spaces: nu
         }
 
         output.write(`}\n\n`)
+    } else if (!parent && !object.properties && !object.additionalProperties && object.type && object.type !== 'object') {
+        output.write(`${spaces}pub type ${pascalCase(name)} = ${convertType(object)};\n\n`)
     } else {
         if (object.additionalProperties) {
             if (object.propertyNames && !object.propertyNames.$ref && (object.propertyNames as oas31.SchemaObject).format === 'uuid') {

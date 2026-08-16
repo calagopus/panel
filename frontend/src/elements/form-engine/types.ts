@@ -195,6 +195,7 @@ export interface RegisteredFormIds {
   'admin.backupConfigurations.s3': true;
   'admin.backupConfigurations.restic': true;
   'admin.backupConfigurations.kopia': true;
+  'admin.systemBackupPolicies.createOrUpdate': true;
   'admin.servers.create': true;
   'admin.servers.update': true;
   'admin.locations.createOrUpdate': true;

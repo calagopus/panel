@@ -6,6 +6,7 @@ import getUpdates from '@/api/admin/system/updates/getUpdates.ts';
 import AppIcon from '@/elements/AppIcon.tsx';
 import Container from '@/elements/Container.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import QuickActionsTrigger from '@/elements/quickActions/QuickActionsTrigger.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import Sidebar from '@/elements/Sidebar.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -83,6 +84,8 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
               </NavLink>
               {!user?.suspended && (
                 <>
+                  <Sidebar.Divider />
+                  <QuickActionsTrigger />
                   <Sidebar.Divider />
                   <Sidebar.Link to='/' end icon={faReply} name={t('common.button.back', {})} />
                   <Sidebar.Divider />

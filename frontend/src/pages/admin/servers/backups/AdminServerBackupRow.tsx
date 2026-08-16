@@ -164,7 +164,16 @@ export default function AdminServerBackupRow({
               openMenu(e.clientX, e.clientY);
             }}
           >
-            <TableData>{backup.name}</TableData>
+            <TableData>
+              {backup.name}
+              {backup.systemBackupPolicyUuid && (
+                <TableLink className='ml-2' to={`/admin/system-backup-policies/${backup.systemBackupPolicyUuid}`}>
+                  <Badge className='cursor-pointer!' color='blue'>
+                    {t('common.badge.systemBackup', {})}
+                  </Badge>
+                </TableLink>
+              )}
+            </TableData>
 
             <TableData className='flex flex-row items-center'>
               <Code>

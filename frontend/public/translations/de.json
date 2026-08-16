@@ -127,6 +127,22 @@
       "few": "{count} Tage",
       "many": "{count} Tage",
       "other": "{count} Tage"
+    },
+    "row": {
+      "zero": "{count} Zeilen",
+      "one": "{count} Zeile",
+      "two": "{count} Zeilen",
+      "few": "{count} Zeilen",
+      "many": "{count} Zeilen",
+      "other": "{count} Zeilen"
+    },
+    "change": {
+      "zero": "{count} Änderungen",
+      "one": "{count} Änderung",
+      "two": "{count} Änderungen",
+      "few": "{count} Änderungen",
+      "many": "{count} Änderungen",
+      "other": "{count} Änderungen"
     }
   },
   "translations": {
@@ -288,6 +304,7 @@
         "deleteSourceBackups": "Quell-Backups löschen",
         "deleteSourceBackupsDescription": "Löscht die übertragenen Backups auf der Quell-Node, sobald die Übertragung abgeschlossen ist",
         "node": "Node",
+        "location": "Standort",
         "primaryAllocation": "Primäre Allocation",
         "additionalAllocations": "Zusätzliche Allocations",
         "externalId": "Externe ID",
@@ -375,7 +392,8 @@
         "disabled": "Deaktiviert",
         "successful": "Erfolgreich",
         "failed": "Fehlgeschlagen",
-        "installed": "Installiert"
+        "installed": "Installiert",
+        "systemBackup": "System"
       },
       "label": {
         "noSubdirectories": "Keine Unterverzeichnisse",
@@ -392,7 +410,8 @@
           "nodeMaintenance": "Node in Wartung",
           "restoringBackup": "Backup wird wiederhergestellt",
           "installing": "Wird installiert",
-          "installFailed": "Installation fehlgeschlagen"
+          "installFailed": "Installation fehlgeschlagen",
+          "backupRestoreFailed": "Backup-Wiederherstellung fehlgeschlagen"
         }
       },
       "enum": {
@@ -614,14 +633,19 @@
           "contentInstallFailed": "Die Installation dieses Servers ist fehlgeschlagen und er kann erst nach Bestätigung aufgerufen werden.",
           "contentInstalling": "Dieser Server wird derzeit installiert und kann erst nach Abschluss aufgerufen werden.",
           "contentRestoringBackup": "Dieser Server stellt derzeit ein Backup wieder her und kann erst nach Abschluss aufgerufen werden.",
+          "contentBackupRestoreFailed": "Die Wiederherstellung eines Backups auf diesem Server ist fehlgeschlagen und er kann erst nach Bestätigung aufgerufen werden. Seine Dateien könnten unvollständig sein.",
           "button": {
             "viewInstallLogs": "Installationsprotokolle ansehen",
             "acknowledgeFailure": "Fehlschlag bestätigen"
           },
           "modal": {
-            "acknowledgeFailure": {
+            "acknowledgeInstallFailure": {
               "title": "Installationsfehlschlag bestätigen",
               "content": "Durch die Bestätigung dieses Installationsfehlschlags bestätigst du, dass du über die fehlgeschlagene Installation informiert bist und alle notwendigen Schritte zur Behebung unternommen hast. Dadurch erhältst du wieder die Kontrolle über den Server."
+            },
+            "acknowledgeBackupRestoreFailure": {
+              "title": "Fehlgeschlagene Backup-Wiederherstellung bestätigen",
+              "content": "Durch die Bestätigung dieser fehlgeschlagenen Backup-Wiederherstellung bestätigst du, dass du über die fehlgeschlagene Wiederherstellung informiert bist und dass die Dateien des Servers unvollständig sein könnten. Dadurch erhältst du wieder die Kontrolle über den Server."
             }
           }
         }
@@ -654,40 +678,49 @@
             "backupFailed": "Backup fehlgeschlagen.",
             "backupDeleteFailed": "Backup-Löschung fehlgeschlagen.",
             "backupRestoreCompleted": "Backup-Wiederherstellung erfolgreich abgeschlossen.",
+            "backupRestoreFailed": "Backup-Wiederherstellung fehlgeschlagen.",
             "installCompleted": "Server-Installation erfolgreich abgeschlossen.",
             "installFailed": "Server-Installation fehlgeschlagen.",
             "transferFailed": "Server transfer failed, the server remains on this node.",
             "operations": {
               "compressing": {
                 "completed": "{files} nach `{path}` komprimiert in {time}.",
-                "failed": "Komprimierung von {files} nach `{path}` fehlgeschlagen:\n{error}"
+                "failed": "Komprimierung von {files} nach `{path}` fehlgeschlagen:\n{error}",
+                "aborted": "Komprimierung von {files} nach `{path}` wurde abgebrochen."
               },
               "decompressing": {
                 "completed": "`{path}` nach `{destination}` entpackt in {time}.",
-                "failed": "Entpacken von `{path}` nach `{destination}` fehlgeschlagen:\n{error}"
+                "failed": "Entpacken von `{path}` nach `{destination}` fehlgeschlagen:\n{error}",
+                "aborted": "Entpacken von `{path}` nach `{destination}` wurde abgebrochen."
               },
               "pulling": {
                 "completed": "`{destination}` heruntergeladen in {time}.",
-                "failed": "Herunterladen von `{destination}` fehlgeschlagen:\n{error}"
+                "failed": "Herunterladen von `{destination}` fehlgeschlagen:\n{error}",
+                "aborted": "Herunterladen von `{destination}` wurde abgebrochen."
               },
               "copying": {
                 "completed": "`{path}` nach `{destination}` kopiert in {time}.",
                 "completedMany": "`{path}` nach `{destination}` kopiert ({files}) in {time}.",
-                "failed": "Kopieren von `{path}` nach `{destination}` fehlgeschlagen:\n{error}"
+                "failed": "Kopieren von `{path}` nach `{destination}` fehlgeschlagen:\n{error}",
+                "aborted": "Kopieren von `{path}` nach `{destination}` wurde abgebrochen."
               },
               "copyingMany": {
                 "completed": "{files} kopiert in {time}.",
-                "failed": "Kopieren von {files} fehlgeschlagen:\n{error}"
+                "failed": "Kopieren von {files} fehlgeschlagen:\n{error}",
+                "aborted": "Kopieren von {files} wurde abgebrochen."
               },
               "copyingRemote": {
                 "completedFrom": "{files} vom Remote-Server kopiert in {time}.",
                 "completedTo": "{files} zum Remote-Server kopiert in {time}.",
                 "failedFrom": "Kopieren von {files} vom Remote-Server fehlgeschlagen:\n{error}",
-                "failedTo": "Kopieren von {files} zum Remote-Server fehlgeschlagen:\n{error}"
+                "failedTo": "Kopieren von {files} zum Remote-Server fehlgeschlagen:\n{error}",
+                "abortedFrom": "Kopieren von {files} vom Remote-Server wurde abgebrochen.",
+                "abortedTo": "Kopieren von {files} zum Remote-Server wurde abgebrochen."
               },
               "exportingBackup": {
                 "completed": "Backup nach `{destination}` exportiert in {time}.",
-                "failed": "Exportieren des Backups nach `{destination}` fehlgeschlagen:\n{error}"
+                "failed": "Exportieren des Backups nach `{destination}` fehlgeschlagen:\n{error}",
+                "aborted": "Exportieren des Backups nach `{destination}` wurde abgebrochen."
               }
             }
           }
@@ -2784,9 +2817,6 @@
                 "badge": {
                   "suspended": "Suspendiert",
                   "transferring": "Server wird übertragen",
-                  "installing": "Wird installiert",
-                  "installFailed": "Installation fehlgeschlagen",
-                  "restoringBackup": "Backup wird wiederhergestellt",
                   "admin": "Admin"
                 }
               }
@@ -4050,6 +4080,129 @@
             }
           }
         },
+        "systemBackupPolicies": {
+          "title": "System-Backup-Richtlinien",
+          "resourceName": "System-Backup-Richtlinie",
+          "badge": {
+            "disabled": "Deaktiviert",
+            "runPending": "Ausführung ausstehend"
+          },
+          "table": {
+            "columns": {
+              "cron": "Zeitplan",
+              "backups": "Backups"
+            }
+          },
+          "form": {
+            "backupConfigurationPlaceholder": "Vom Server erben",
+            "cron": "Zeitplan",
+            "cronDescription": "Cron-Ausdruck (mit Sekunden), der bestimmt, wann Backups erstellt werden, in UTC.",
+            "retentionCount": "Anzahl behalten",
+            "retentionCountDescription": "Maximale Anzahl erfolgreicher Backups, die pro Server behalten werden. Leer lassen für kein Limit.",
+            "retentionDays": "Tage behalten",
+            "retentionDaysDescription": "Backups löschen, die älter als diese Anzahl an Tagen sind. Leer lassen für kein Limit.",
+            "parallelism": "Parallelität",
+            "parallelismDescription": "Maximale Anzahl an Backups, die diese Richtlinie gleichzeitig auf einem einzelnen Node ausführt.",
+            "enabledDescription": "Deaktivierte Richtlinien behalten ihre Backups, erstellen aber keine neuen."
+          },
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "System-Backup-Richtlinie erstellen",
+                "titleUpdate": "System-Backup-Richtlinie bearbeiten",
+                "button": {
+                  "runNow": "Jetzt ausführen"
+                },
+                "toast": {
+                  "triggered": "Ausführung angefordert. Backups werden in Kürze erstellt."
+                },
+                "modal": {
+                  "trigger": {
+                    "title": "Manuelle Ausführung bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** jetzt ausführen möchtest? Jeder abgedeckte Server ohne Backup aus dieser Ausführung wird gesichert."
+                  },
+                  "delete": {
+                    "title": "Löschen der System-Backup-Richtlinie bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
+                    "form": {
+                      "deleteBackups": "Möchtest du die von dieser Richtlinie erstellten Backups löschen?"
+                    },
+                    "alert": {
+                      "deleteBackupsWarning": "Alle von dieser Richtlinie erstellten Backups werden dauerhaft von ihren Speicher-Backends gelöscht.",
+                      "releaseWarning": "Von dieser Richtlinie erstellte Backups werden zu regulären Server-Backups. Sie zählen zum Backup-Limit jedes Servers und folgen der normalen Rotation."
+                    }
+                  }
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "page": {
+                "title": "Backups der System-Backup-Richtlinie",
+                "toast": {
+                  "downloadStarted": "Download gestartet."
+                }
+              }
+            },
+            "locations": {
+              "title": "Standorte",
+              "page": {
+                "title": "Standorte der System-Backup-Richtlinie",
+                "toast": {
+                  "added": "Standort hinzugefügt.",
+                  "removed": "Standort entfernt."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Standort hinzufügen"
+                  },
+                  "remove": {
+                    "title": "Entfernen des Standorts bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** aus **{policy}** entfernen möchtest?"
+                  }
+                }
+              }
+            },
+            "nodes": {
+              "title": "Nodes",
+              "page": {
+                "title": "Nodes der System-Backup-Richtlinie",
+                "toast": {
+                  "added": "Node hinzugefügt.",
+                  "removed": "Node entfernt."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Node hinzufügen"
+                  },
+                  "remove": {
+                    "title": "Entfernen des Nodes bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** aus **{policy}** entfernen möchtest?"
+                  }
+                }
+              }
+            },
+            "servers": {
+              "title": "Server",
+              "page": {
+                "title": "Server der System-Backup-Richtlinie",
+                "toast": {
+                  "added": "Server hinzugefügt.",
+                  "removed": "Server entfernt."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Server hinzufügen"
+                  },
+                  "remove": {
+                    "title": "Entfernen des Servers bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** aus **{policy}** entfernen möchtest?"
+                  }
+                }
+              }
+            }
+          }
+        },
         "mounts": {
           "title": "Mounts",
           "resourceName": "Mount",
@@ -4393,7 +4546,8 @@
             "permissionsRestored": "Berechtigungen wiederhergestellt.",
             "permissionsCouldNotBeRestored": "Berechtigungen konnten nicht wiederhergestellt werden.",
             "fileSaved": "Datei wurde gespeichert.",
-            "collabSaveTimeout": "Die Datei konnte nicht gespeichert werden, der Daemon hat nicht rechtzeitig geantwortet."
+            "collabSaveTimeout": "Die Datei konnte nicht gespeichert werden, der Daemon hat nicht rechtzeitig geantwortet.",
+            "fileTooLargeToOpen": "Diese Datei ist zu groß, um sie im Dateimanager zu öffnen."
           },
           "tooltip": {
             "fileHistory": "Dateiverlauf",
@@ -4632,8 +4786,7 @@
           "title": "Datenbanken",
           "subtitle": "{current} von maximal {max} Datenbanken erstellt.",
           "classic": {
-            "title": "Klassische Datenbanken",
-            "subtitle": "{current} Datenbanken erstellt."
+            "title": "Klassische Datenbanken"
           },
           "tooltip": {
             "limitReached": "Dieser Server ist auf {max} Datenbanken limitiert."
@@ -4649,9 +4802,166 @@
           "form": {
             "databaseName": "Datenbank Name"
           },
+          "explorer": {
+            "title": "Daten-Explorer",
+            "button": {
+              "open": "Daten erkunden",
+              "run": "Ausführen",
+              "previous": "Zurück",
+              "next": "Weiter",
+              "hideTables": "Tabellen ausblenden",
+              "showTables": "Tabellen anzeigen",
+              "save": "{changes} speichern",
+              "newRow": "Neue Zeile",
+              "deleteRows": "{rows} löschen",
+              "newTable": "Neue Tabelle",
+              "addColumn": "Spalte hinzufügen",
+              "rename": "Umbenennen",
+              "renameTable": "Tabelle umbenennen",
+              "deleteTable": "Tabelle löschen"
+            },
+            "form": {
+              "tableName": "Tabellenname",
+              "columnsList": "Spalten",
+              "columnName": "Spaltenname",
+              "columnType": "Typ",
+              "nullable": "Nullable",
+              "primaryKey": "Primärschlüssel",
+              "autoIncrement": "Auto Increment"
+            },
+            "unsupported": {
+              "title": "Nicht unterstützt",
+              "content": "MongoDB-Datenbanken können nicht über das Panel erkundet werden.",
+              "instanceContent": "MongoDB- und Redis-Datenbank-Instanzen können nicht über das Panel erkundet werden."
+            },
+            "notFound": "Diese Datenbank existiert auf der Instanz nicht.",
+            "tabs": {
+              "rows": "Zeilen",
+              "structure": "Struktur",
+              "query": "Abfrage"
+            },
+            "modal": {
+              "deleteRows": {
+                "title": "Zeilenlöschung bestätigen",
+                "content": "Möchtest du wirklich {rows} aus **{table}** löschen? Dies kann nicht rückgängig gemacht werden."
+              },
+              "createTable": {
+                "title": "Tabelle erstellen",
+                "toast": {
+                  "created": "Tabelle {table} wurde erstellt."
+                }
+              },
+              "createColumn": {
+                "title": "Spalte hinzufügen",
+                "form": {
+                  "nullableHint": "Das Hinzufügen einer nicht-nullable Spalte zu einer Tabelle, die bereits Zeilen enthält, schlägt fehl."
+                },
+                "toast": {
+                  "created": "Spalte {column} wurde hinzugefügt."
+                }
+              },
+              "renameTable": {
+                "title": "Tabelle umbenennen",
+                "toast": {
+                  "renamed": "Tabelle {table} wurde umbenannt."
+                }
+              },
+              "deleteTable": {
+                "title": "Tabellenlöschung bestätigen",
+                "content": "Möchtest du **{table}** wirklich löschen? Dadurch werden alle enthaltenen Zeilen dauerhaft zerstört und dies kann nicht rückgängig gemacht werden.",
+                "toast": {
+                  "deleted": "Tabelle {table} wurde gelöscht."
+                }
+              },
+              "renameColumn": {
+                "title": "Spalte umbenennen",
+                "toast": {
+                  "renamed": "Spalte {column} wurde umbenannt."
+                }
+              },
+              "deleteColumn": {
+                "title": "Spaltenlöschung bestätigen",
+                "content": "Möchtest du **{column}** wirklich aus **{table}** löschen? Die enthaltenen Daten werden dauerhaft zerstört und können nicht wiederhergestellt werden.",
+                "toast": {
+                  "deleted": "Spalte {column} wurde gelöscht."
+                }
+              }
+            },
+            "schema": {
+              "title": "Tabellen",
+              "empty": "Diese Datenbank hat noch keine Tabellen.",
+              "noMatches": "Keine Tabellen passen zu deiner Suche.",
+              "rowEstimate": "~{rows}",
+              "badge": {
+                "view": "View"
+              }
+            },
+            "rows": {
+              "noTable": "Wähle eine Tabelle, um ihre Zeilen zu durchsuchen.",
+              "range": "Zeigt Zeilen {start} bis {end}.",
+              "saved": "Änderungen an {rows} angewendet.",
+              "insert": {
+                "default": "Datenbank-Standardwert"
+              }
+            },
+            "filter": {
+              "add": "Filter",
+              "column": "Spalte",
+              "operator": "Operator",
+              "value": "Wert",
+              "apply": "Anwenden"
+            },
+            "enum": {
+              "filterOperator": {
+                "eq": "ist gleich",
+                "ne": "ist ungleich",
+                "lt": "kleiner als",
+                "lte": "kleiner oder gleich",
+                "gt": "größer als",
+                "gte": "größer oder gleich",
+                "contains": "enthält",
+                "startsWith": "beginnt mit",
+                "endsWith": "endet mit",
+                "isNull": "ist NULL",
+                "notNull": "ist nicht NULL"
+              }
+            },
+            "table": {
+              "columns": {
+                "nullable": "Nullable",
+                "key": "Schlüssel",
+                "default": "Standardwert",
+                "attributes": "Attribute"
+              }
+            },
+            "badge": {
+              "primaryKey": "Primär",
+              "autoIncrement": "auto_increment",
+              "generated": "Generiert",
+              "binary": "Binär"
+            },
+            "query": {
+              "placeholder": "Führe eine Anweisung aus, um hier ihre Ergebnisse zu sehen.",
+              "statement": "Anweisung {index}",
+              "form": {
+                "rowLimit": "Zeilenlimit",
+                "readOnly": "Schreibgeschützt",
+                "readOnlyDescription": "Lehnt Anweisungen ab, die Daten oder Struktur verändern."
+              }
+            },
+            "result": {
+              "rowsAffected": "{rows} betroffen.",
+              "truncated": "Diese Ergebnismenge wurde gekürzt. Schränke die Anweisung ein oder senke das Zeilenlimit, um alles zu sehen."
+            },
+            "cell": {
+              "setNull": "Auf NULL setzen",
+              "null": "NULL",
+              "empty": "leer",
+              "editorHint": "{enter} übernimmt den Wert, {shiftEnter} fügt eine neue Zeile ein."
+            }
+          },
           "instance": {
             "title": "Verwaltete Datenbanken",
-            "subtitle": "{current} verwaltete Datenbanken erstellt.",
             "updateAvailable": "Update verfügbar",
             "button": {
               "applyUpdate": "Update anwenden"
@@ -4793,7 +5103,8 @@
               "operations": {
                 "remoteImport": {
                   "completed": "`{database}` in {time} von `{source}` importiert.",
-                  "failed": "`{database}` konnte nicht von `{source}` importiert werden:\n{error}"
+                  "failed": "`{database}` konnte nicht von `{source}` importiert werden:\n{error}",
+                  "aborted": "Import von `{database}` von `{source}` wurde abgebrochen."
                 }
               }
             },
@@ -5677,6 +5988,10 @@
             "updated": "Backup-Gruppe aktualisiert.",
             "deleted": "Backup-Gruppe gelöscht."
           }
+        },
+        "systemBackups": {
+          "title": "System-Backups",
+          "subtitle": "Backups, die automatisch vom Panel erstellt werden. Sie können nicht verändert oder gelöscht werden."
         },
         "network": {
           "title": "Netzwerk",

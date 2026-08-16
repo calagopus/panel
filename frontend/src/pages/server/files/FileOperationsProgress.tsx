@@ -77,17 +77,18 @@ function FileOperationsProgress() {
   const cancelAllOperations = useCallback(() => {
     const cancellations: Promise<unknown>[] = [];
     fileOperations.forEach((_, uuid) => {
-      const failed = failedFileOperations.has(uuid);
-      removeFileOperation(uuid);
-      if (!failed) cancellations.push(cancelOperation(server.uuid, uuid).catch(console.error));
+      if (failedFileOperations.has(uuid)) {
+        removeFileOperation(uuid);
+        return;
+      }
+
+      cancellations.push(cancelOperation(server.uuid, uuid).catch(console.error));
     });
     Promise.allSettled(cancellations).then(() => invalidateFilemanager());
     addToast(t('pages.server.files.toast.allOperationsCancelled', {}), 'success');
   }, [fileOperations, failedFileOperations, server.uuid, removeFileOperation, invalidateFilemanager, addToast, t]);
 
   const doCancelOperation = (uuid: string) => {
-    removeFileOperation(uuid);
-
     cancelOperation(server.uuid, uuid)
       .then(() => {
         invalidateFilemanager();

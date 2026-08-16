@@ -108,6 +108,7 @@ export const adminServerUpdateSchema = z.lazy(() =>
 export const adminServerBackupSchema = z.looseObject({
   uuid: z.string(),
   server: z.lazy(() => adminServerSchema).nullable(),
+  systemBackupPolicyUuid: z.string().nullable(),
   name: z.string(),
   ignoredFiles: z.array(z.string()),
   isSuccessful: z.boolean(),

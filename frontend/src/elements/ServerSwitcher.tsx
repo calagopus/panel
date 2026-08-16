@@ -8,6 +8,7 @@ import getServers from '@/api/server/getServers.ts';
 import Select from '@/elements/input/Select.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerState, serverSchema, serverStatus } from '@/lib/schemas/server/server.ts';
+import { serverStatusInfo } from '@/lib/server.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useServerStats } from '@/plugins/useServerStats.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -19,8 +20,9 @@ const getStatusColor = (
   suspended?: boolean,
 ) => {
   if (suspended) return 'bg-server-status-offline';
-  if (status === 'installing' || status === 'restoring_backup') return 'bg-server-status-starting';
-  if (status === 'install_failed') return 'bg-server-status-offline';
+  if (status) {
+    return serverStatusInfo[status].failed ? 'bg-server-status-offline' : 'bg-server-status-starting';
+  }
 
   switch (powerState) {
     case 'running':

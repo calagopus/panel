@@ -37,7 +37,12 @@ export default function AdminBackupConfigurationStats({
   }, []);
 
   return (
-    <AdminSubContentContainer title={t('pages.admin.backupConfigurations.tabs.stats.page.title', {})} titleOrder={2}>
+    <AdminSubContentContainer
+      title={t('pages.admin.backupConfigurations.tabs.stats.page.title', {})}
+      titleOrder={2}
+      registry={window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.view.stats.subContainer}
+      registryProps={{ backupConfiguration }}
+    >
       {!stats ? (
         <Spinner.Centered />
       ) : (

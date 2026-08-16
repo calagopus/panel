@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                servers.uuid AS server_uuid,\n                servers.node_uuid AS node_uuid,\n                (\n                    SELECT MAX(server_backups.created)\n                    FROM server_backups\n                    WHERE\n                        server_backups.server_uuid = servers.uuid\n                        AND server_backups.system_backup_policy_uuid = $1\n                ) AS \"last_attempt?\"\n            FROM servers\n            WHERE\n                servers.destination_node_uuid IS NULL\n                AND servers.status IS NULL\n                AND (\n                    EXISTS (\n                        SELECT 1\n                        FROM system_backup_policy_nodes\n                        WHERE\n                            system_backup_policy_nodes.system_backup_policy_uuid = $1\n                            AND system_backup_policy_nodes.node_uuid = servers.node_uuid\n                    )\n                    OR EXISTS (\n                        SELECT 1\n                        FROM system_backup_policy_locations\n                        JOIN nodes ON nodes.uuid = servers.node_uuid\n                        WHERE\n                            system_backup_policy_locations.system_backup_policy_uuid = $1\n                            AND system_backup_policy_locations.location_uuid = nodes.location_uuid\n                    )\n                    OR EXISTS (\n                        SELECT 1\n                        FROM system_backup_policy_servers\n                        WHERE\n                            system_backup_policy_servers.system_backup_policy_uuid = $1\n                            AND system_backup_policy_servers.server_uuid = servers.uuid\n                    )\n                )\n            ORDER BY 3 ASC NULLS FIRST\n            LIMIT $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "server_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "servers",
+            "name": "uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "node_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "servers",
+            "name": "node_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "last_attempt?",
+        "type_info": "Timestamp",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "32be51b9b657094d5190dc572134cec6c4aac6e5e3118c5b0d0d7cf2f122ccd8"
+}

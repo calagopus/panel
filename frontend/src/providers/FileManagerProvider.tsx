@@ -1,10 +1,10 @@
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { useStore } from 'zustand';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getBackup from '@/api/server/backups/getBackup.ts';
-import loadDirectory from '@/api/server/files/loadDirectory.ts';
+import loadDirectory, { DirectoryResponse } from '@/api/server/files/loadDirectory.ts';
 import { registerUploadRefresh } from '@/lib/uploadManager.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useUploader } from '@/plugins/useUploader.ts';
@@ -26,25 +26,50 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const [store] = useState(() =>
     createFileManagerStore(() => externalsRef.current, {
       browsingDirectory: searchParams.get('directory') || '/',
-      page: Number(searchParams.get('page')) || 1,
     }),
   );
 
   const browsingDirectory = useStore(store, (state) => state.browsingDirectory);
-  const page = useStore(store, (state) => state.page);
   const sortMode = useStore(store, (state) => state.sortMode);
 
   const {
-    data,
+    data: infiniteData,
     error: directoryError,
     isFetching,
-  } = useQuery({
-    queryKey: ['server', server.uuid, 'files', { browsingDirectory, page, sortMode }],
-    queryFn: () => loadDirectory(server.uuid, browsingDirectory, page, sortMode),
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['server', server.uuid, 'files', { browsingDirectory, sortMode }],
+    queryFn: ({ pageParam }) => loadDirectory(server.uuid, browsingDirectory, pageParam, sortMode),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const loaded = allPages.reduce((sum, p) => sum + p.entries.data.length, 0);
+      return loaded < lastPage.entries.total ? allPages.length + 1 : undefined;
+    },
     enabled: canReadFiles,
     staleTime: 30_000,
     placeholderData: keepPreviousData,
   });
+
+  const data = useMemo<DirectoryResponse | null>(() => {
+    if (!infiniteData || infiniteData.pages.length === 0) return null;
+
+    const [firstPage] = infiniteData.pages;
+    const entries = infiniteData.pages.flatMap((p) => p.entries.data);
+
+    return {
+      isFilesystemPrimary: firstPage.isFilesystemPrimary,
+      isFilesystemWritable: firstPage.isFilesystemWritable,
+      isFilesystemFast: firstPage.isFilesystemFast,
+      entries: {
+        total: firstPage.entries.total,
+        perPage: firstPage.entries.perPage,
+        page: infiniteData.pages.length,
+        data: entries,
+      },
+    };
+  }, [infiniteData]);
 
   externalsRef.current = { serverUuid: server.uuid, queryClient, directoryData: data ?? null };
 
@@ -98,8 +123,18 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   );
 
   useEffect(() => {
-    store.setState({ isLoading: isFetching });
-  }, [isFetching]);
+    store.setState({ isLoading: isFetching && !isFetchingNextPage });
+  }, [isFetching, isFetchingNextPage]);
+
+  useEffect(() => {
+    store.setState({
+      hasNextPage: !!hasNextPage,
+      isFetchingNextPage,
+      fetchNextPage: () => {
+        fetchNextPage().catch((e) => console.error(e));
+      },
+    });
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   useEffect(() => {
     store.setState({ fileUploader });
@@ -110,6 +145,8 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   }, [browsingBackup]);
 
   useEffect(() => {
+    if (store.getState().searchInfo) return;
+
     if (!data) {
       if (directoryError) {
         store.setState({
@@ -127,12 +164,10 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
       browsingWritableDirectory: data.isFilesystemWritable,
       browsingFastDirectory: data.isFilesystemFast,
     });
-  }, [data, directoryError]);
+  }, [data, directoryError, store]);
 
   useEffect(() => {
-    const state = store.getState();
-    state.setBrowsingDirectory(searchParams.get('directory') || '/');
-    state.setPage(Number(searchParams.get('page')) || 1);
+    store.getState().setBrowsingDirectory(searchParams.get('directory') || '/');
   }, [searchParams]);
 
   return <FileManagerStoreContextProvider createStore={() => store}>{children}</FileManagerStoreContextProvider>;

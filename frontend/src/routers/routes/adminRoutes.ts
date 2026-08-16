@@ -2,6 +2,7 @@ import {
   faBriefcase,
   faBuilding,
   faBullhorn,
+  faClockRotateLeft,
   faCogs,
   faCrow,
   faCubes,
@@ -41,6 +42,7 @@ import AdminOAuthProviders from '@/pages/admin/oAuthProviders/AdminOAuthProvider
 import AdminRoles from '@/pages/admin/roles/AdminRoles.tsx';
 import AdminServers from '@/pages/admin/servers/AdminServers.tsx';
 import AdminSettings from '@/pages/admin/settings/AdminSettings.tsx';
+import AdminSystemBackupPolicies from '@/pages/admin/systemBackupPolicies/AdminSystemBackupPolicies.tsx';
 import AdminUsers from '@/pages/admin/users/AdminUsers.tsx';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -152,6 +154,14 @@ const routes: AdminRouteDefinition[] = [
     path: '/backup-configurations/*',
     element: AdminBackupConfigurations,
     permission: ['backup-configurations.*'],
+    category: 'storage',
+  },
+  {
+    name: () => getTranslations().t('pages.admin.systemBackupPolicies.title', {}),
+    icon: faClockRotateLeft,
+    path: '/system-backup-policies/*',
+    element: AdminSystemBackupPolicies,
+    permission: ['system-backup-policies.*'],
     category: 'storage',
   },
 

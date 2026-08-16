@@ -9,6 +9,7 @@ utoipa = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 reqwest = { workspace = true }
+http-client = { workspace = true }
 chrono = { workspace = true }
 uuid = { workspace = true }
 indexmap = { workspace = true }

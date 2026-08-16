@@ -21,6 +21,7 @@ import Stack from '@/elements/Stack.tsx';
 import TableLink from '@/elements/TableLink.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { serverStatusInfo } from '@/lib/server.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { formatDateTime } from '@/lib/time.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -74,24 +75,10 @@ export default function ServerOverview({ server }: { server: Server }) {
       </Badge>,
     );
   }
-  if (server.status === 'installing') {
+  if (server.status) {
     statusBadges.push(
-      <Badge key='installing' color='blue' variant='light'>
-        {t('pages.admin.servers.tabs.overview.page.badge.installing', {})}
-      </Badge>,
-    );
-  }
-  if (server.status === 'install_failed') {
-    statusBadges.push(
-      <Badge key='install_failed' color='red' variant='light'>
-        {t('pages.admin.servers.tabs.overview.page.badge.installFailed', {})}
-      </Badge>,
-    );
-  }
-  if (server.status === 'restoring_backup') {
-    statusBadges.push(
-      <Badge key='restoring' color='orange' variant='light'>
-        {t('pages.admin.servers.tabs.overview.page.badge.restoringBackup', {})}
+      <Badge key={server.status} color={serverStatusInfo[server.status].badgeColor} variant='light'>
+        {serverStatusInfo[server.status].label()}
       </Badge>,
     );
   }

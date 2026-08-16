@@ -38,41 +38,41 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy target/doc --project-name=cratedocs-calagopus-com
-
-  deploy-frontend:
-    name: Build and Deploy Frontend Docs
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: 11
-          run_install: false
-
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          pnpm install
-
-      - name: Build Frontend Docs
-        run: |
-          cd frontend
-          pnpm build:docs
-
-      - name: Deploy Frontend Docs
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy frontend/docs --project-name=typedocs-calagopus-com
+# https://github.com/TypeStrong/typedoc/issues/3098 TypeScript 7 (TS-Go) support · Issue #3098 · TypeStrong/typedoc
+#  deploy-frontend:
+#    name: Build and Deploy Frontend Docs
+#    runs-on: ubuntu-24.04
+#    permissions:
+#      contents: read
+#
+#    steps:
+#      - name: Checkout sources
+#        uses: actions/checkout@v6
+#
+#      - name: Setup Node.js
+#        uses: actions/setup-node@v6
+#        with:
+#          node-version: "24"
+#
+#      - name: Setup pnpm
+#        uses: pnpm/action-setup@v5
+#        with:
+#          version: 11
+#          run_install: false
+#
+#      - name: Install frontend dependencies
+#        run: |
+#          cd frontend
+#          pnpm install
+#
+#      - name: Build Frontend Docs
+#        run: |
+#          cd frontend
+#          pnpm build:docs
+#
+#      - name: Deploy Frontend Docs
+#        uses: cloudflare/wrangler-action@v3
+#        with:
+#          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+#          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+#          command: pages deploy frontend/docs --project-name=typedocs-calagopus-com

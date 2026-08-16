@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { isAdmin } from '@/lib/permissions.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
-import { serverPowerState, serverSchema } from '@/lib/schemas/server/server.ts';
+import { serverPowerState, serverSchema, serverStatus } from '@/lib/schemas/server/server.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -11,6 +11,40 @@ export function isConflictingState(
   user: z.infer<typeof fullUserSchema> | null = null,
 ): boolean {
   return (server.isSuspended && !isAdmin(user)) || server.status !== null || server.isTransferring;
+}
+
+export const serverStatusInfo: Record<
+  z.infer<typeof serverStatus>,
+  { failed: boolean; badgeColor: string; label: () => string; blockContent: () => string }
+> = {
+  installing: {
+    failed: false,
+    badgeColor: 'blue',
+    label: () => getTranslations().t('common.server.state.installing', {}),
+    blockContent: () => getTranslations().t('elements.screenBlock.serverConflict.contentInstalling', {}),
+  },
+  install_failed: {
+    failed: true,
+    badgeColor: 'red',
+    label: () => getTranslations().t('common.server.state.installFailed', {}),
+    blockContent: () => getTranslations().t('elements.screenBlock.serverConflict.contentInstallFailed', {}),
+  },
+  restoring_backup: {
+    failed: false,
+    badgeColor: 'orange',
+    label: () => getTranslations().t('common.server.state.restoringBackup', {}),
+    blockContent: () => getTranslations().t('elements.screenBlock.serverConflict.contentRestoringBackup', {}),
+  },
+  backup_restore_failed: {
+    failed: true,
+    badgeColor: 'red',
+    label: () => getTranslations().t('common.server.state.backupRestoreFailed', {}),
+    blockContent: () => getTranslations().t('elements.screenBlock.serverConflict.contentBackupRestoreFailed', {}),
+  },
+};
+
+export function isTransientStatus(status: z.infer<typeof serverStatus> | null | undefined): boolean {
+  return !!status && !serverStatusInfo[status].failed;
 }
 
 export function formatAllocation(

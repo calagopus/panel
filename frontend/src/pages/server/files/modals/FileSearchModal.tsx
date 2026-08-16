@@ -42,6 +42,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
   const {
     browsingDirectory,
     browsingFastDirectory,
+    searchInfo,
     setBrowsingEntries,
     setSearchInfo,
     doSelectFiles,
@@ -50,6 +51,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
     useShallow((state) => ({
       browsingDirectory: state.browsingDirectory,
       browsingFastDirectory: state.browsingFastDirectory,
+      searchInfo: state.searchInfo,
       setBrowsingEntries: state.setBrowsingEntries,
       setSearchInfo: state.setSearchInfo,
       doSelectFiles: state.doSelectFiles,
@@ -100,10 +102,30 @@ export default function FileSearchModal({ ...props }: ModalProps) {
 
   useEffect(() => {
     if (!props.opened) {
+      return;
+    }
+
+    if (!searchInfo) {
       setQuery('');
       setShowAdvanced(false);
       form.reset();
+      return;
     }
+
+    const query = searchInfo.query ?? '';
+    const queryPattern = query ? `**/*${query}*` : null;
+    const pathFilter = searchInfo.filters.pathFilter;
+    const rawInclude = pathFilter?.include ?? [];
+    const include = queryPattern ? rawInclude.filter((pattern) => pattern !== queryPattern) : rawInclude;
+    const exclude = pathFilter?.exclude ?? [];
+    const hasRealPathFilter = pathFilter !== null && (include.length > 0 || exclude.length > 0);
+
+    setQuery(query);
+    form.setValues({
+      pathFilter: hasRealPathFilter ? { ...pathFilter, include, exclude } : null,
+      sizeFilter: searchInfo.filters.sizeFilter,
+      contentFilter: searchInfo.filters.contentFilter,
+    });
   }, [props.opened]);
 
   const activeFiltersCount = [form.values.pathFilter, form.values.contentFilter, form.values.sizeFilter].filter(

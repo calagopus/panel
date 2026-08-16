@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE servers\n            SET status = $2\n            WHERE servers.uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "server_status",
+            "kind": {
+              "Enum": [
+                "INSTALLING",
+                "INSTALL_FAILED",
+                "RESTORING_BACKUP",
+                "BACKUP_RESTORE_FAILED"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0d016c4604b1ec7bc69a861db7952ee75c063d538e21cf0ec7a4df3e9f7da026"
+}

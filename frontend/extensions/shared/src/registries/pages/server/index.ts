@@ -1,9 +1,9 @@
 import type { FC } from 'react';
 import { Registry } from 'shared';
 import { ActivityRegistry } from './activity.ts';
-import { BackupsRegistry } from './backups.ts';
+import { BackupsRegistry } from './backups/index.ts';
 import { ConsoleRegistry } from './console.ts';
-import { DatabasesRegistry } from './databases.ts';
+import { DatabasesRegistry } from './databases/index.ts';
 import { FilesRegistry } from './files.ts';
 import { MountsRegistry } from './mounts.ts';
 import { NetworkRegistry } from './network.ts';

@@ -37,22 +37,15 @@ const clientOutput = fs.createWriteStream('../src/client.rs', { flags: 'w' })
 clientOutput.write(`// This file is auto-generated from OpenAPI spec. Do not edit manually.
 use super::*;
 use futures_util::TryStreamExt;
-use reqwest::{Client, Method, StatusCode};
+use http_client::CLIENT;
+use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use std::{
     pin::Pin,
-    sync::LazyLock,
     task::{Context, Poll},
 };
 use tokio::io::AsyncRead;
 use tokio_tungstenite::tungstenite::{Error, client::IntoClientRequest, http::HeaderValue};
-
-static CLIENT: LazyLock<Client> = LazyLock::new(|| {
-    Client::builder()
-        .user_agent("Calagopus Panel")
-        .build()
-        .expect("Failed to create reqwest client")
-});
 
 #[derive(Debug)]
 pub enum ApiHttpError {
@@ -284,10 +277,8 @@ impl DbAgentClient {
 for (const [name, schema] of Object.entries(openapi.components?.schemas || {})) {
     if (schema.$ref || name === 'CompactString') continue
 
-    if (name === 'MiB') {
-        output.write('pub type MiB = u64;\n\n')
-        continue
-    }
+    // internally tagged enum the generator cannot represent, hand-written in extra.rs
+    if (name === 'QueryValue') continue
 
     generateSchemaObject(output, 0, null, name, schema as oas31.SchemaObject)
 }

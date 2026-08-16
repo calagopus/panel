@@ -1,11 +1,13 @@
-use crate::prelude::*;
+use crate::{models::UpdateQueryBuilder, prelude::*};
 use axum::http::StatusCode;
+use garde::Validate;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
 use std::{
     collections::BTreeMap,
     sync::{Arc, LazyLock},
 };
+use utoipa::ToSchema;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ServerAllocation {
     pub uuid: uuid::Uuid,
@@ -363,6 +365,58 @@ impl IntoApiObject for ServerAllocation {
         )?;
 
         Ok(api_object)
+    }
+}
+
+#[derive(ToSchema, Serialize, Deserialize, Validate, Default)]
+pub struct UpdateServerAllocationOptions {
+    #[garde(length(min = 1, max = 1024))]
+    #[schema(min_length = 1, max_length = 1024)]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub notes: Option<Option<compact_str::CompactString>>,
+}
+
+#[async_trait::async_trait]
+impl UpdatableModel for ServerAllocation {
+    type UpdateOptions = UpdateServerAllocationOptions;
+
+    fn get_update_handlers() -> &'static LazyLock<UpdateHandlerList<Self>> {
+        static UPDATE_LISTENERS: LazyLock<UpdateHandlerList<ServerAllocation>> =
+            LazyLock::new(|| Arc::new(ModelHandlerList::default()));
+
+        &UPDATE_LISTENERS
+    }
+
+    async fn update_with_transaction(
+        &mut self,
+        state: &crate::State,
+        mut options: Self::UpdateOptions,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), crate::database::DatabaseError> {
+        options.validate()?;
+
+        let mut query_builder = UpdateQueryBuilder::new("server_allocations");
+
+        self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
+            .await?;
+
+        query_builder
+            .set("notes", options.notes.as_ref().map(|n| n.as_ref()))
+            .where_eq("uuid", self.uuid);
+
+        query_builder.execute(&mut **transaction).await?;
+
+        if let Some(notes) = options.notes {
+            self.notes = notes;
+        }
+
+        self.run_after_update_handlers(state, transaction).await?;
+
+        Ok(())
     }
 }
 

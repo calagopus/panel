@@ -3,7 +3,7 @@ import { adminServerFeatureLimitsSchema } from '@/lib/schemas/admin/servers.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { eggConfigurationRouteItemSchema } from '../generic.ts';
 
-export const serverStatus = z.enum(['installing', 'install_failed', 'restoring_backup']);
+export const serverStatus = z.enum(['installing', 'install_failed', 'restoring_backup', 'backup_restore_failed']);
 
 export const serverAutostartBehavior = z.enum(['always', 'unless_stopped', 'never']);
 

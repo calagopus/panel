@@ -7,7 +7,7 @@ import { HookableComponentBase, makeComponentHookable } from 'shared';
 import { SubNavigationRegistry } from 'shared/src/registries/slices/subNavigation.ts';
 import { type LazyString, resolveString } from '@/lib/lazy.ts';
 import { to } from '@/lib/routes.ts';
-import { useAdminPermissions, useCan } from '@/plugins/usePermissions.ts';
+import { useAdminPermissions } from '@/plugins/usePermissions.ts';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 
 interface BaseItemProp {
@@ -35,15 +35,22 @@ export type ItemProp = RouteItem | LinkItem;
 type SubNavigationProps<P = unknown> = {
   baseUrl: string;
   items: ItemProp[];
+  hideWhenSingle?: boolean;
 } & ({ registry: SubNavigationRegistry<P>; registryProps: P } | { registry?: never; registryProps?: never });
 
+function useVisibleItems(items: ItemProp[]): ItemProp[] {
+  const permissionMatrix = useAdminPermissions(items.flatMap((item) => item.permission ?? []));
+
+  let permissionIndex = 0;
+
+  return items.filter((item) => {
+    const canAccess = item.permission === undefined || permissionMatrix[permissionIndex++];
+
+    return canAccess && !item.hidden;
+  });
+}
+
 function SubNavigationItem({ baseUrl, item }: { baseUrl: string; item: ItemProp }) {
-  const permissionMatrix = useAdminPermissions(item.permission ?? []);
-  const canAccess = useCan(permissionMatrix, true);
-
-  if (item.permission && !canAccess) return null;
-  if (item.hidden) return null;
-
   return (
     <NavLink key={resolveString(item.name)} to={item.link ?? to(item.path, baseUrl)} end={item.end ?? true}>
       <Tabs.Tab
@@ -57,7 +64,13 @@ function SubNavigationItem({ baseUrl, item }: { baseUrl: string; item: ItemProp 
   );
 }
 
-function SubNavigation<P>({ baseUrl, items: baseItems, registry, registryProps }: SubNavigationProps<P>) {
+function SubNavigation<P>({
+  baseUrl,
+  items: baseItems,
+  hideWhenSingle,
+  registry,
+  registryProps,
+}: SubNavigationProps<P>) {
   const location = useLocation();
 
   const items = useMemo(() => {
@@ -71,6 +84,8 @@ function SubNavigation<P>({ baseUrl, items: baseItems, registry, registryProps }
 
     return items;
   }, [baseItems, registry, registryProps]);
+
+  const visibleItems = useVisibleItems(items);
 
   const activeItem =
     items
@@ -95,13 +110,15 @@ function SubNavigation<P>({ baseUrl, items: baseItems, registry, registryProps }
 
   return (
     <>
-      <Tabs my='xs' value={resolveString(activeItem?.name) ?? resolveString(items[0].name)}>
-        <Tabs.List>
-          {items.map((item) => (
-            <SubNavigationItem key={resolveString(item.name)} baseUrl={baseUrl} item={item} />
-          ))}
-        </Tabs.List>
-      </Tabs>
+      {(!hideWhenSingle || visibleItems.length > 1) && (
+        <Tabs my='xs' value={resolveString(activeItem?.name) ?? resolveString(items[0].name)}>
+          <Tabs.List>
+            {visibleItems.map((item) => (
+              <SubNavigationItem key={resolveString(item.name)} baseUrl={baseUrl} item={item} />
+            ))}
+          </Tabs.List>
+        </Tabs>
+      )}
       <Routes>
         {items
           .filter((item) => item.path)

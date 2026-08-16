@@ -6,7 +6,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import AdminBackupConfigurationBackupRow from './AdminBackupConfigurationBackupRow.tsx';
+import NodeServerBackupRow from '../../nodes/backups/NodeServerBackupRow.tsx';
 
 export default function AdminBackupConfigurationBackups({
   backupConfiguration,
@@ -32,6 +32,8 @@ export default function AdminBackupConfigurationBackups({
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.view.backups.subContainer}
+      registryProps={{ backupConfiguration }}
     >
       <Table
         columns={[
@@ -50,7 +52,15 @@ export default function AdminBackupConfigurationBackups({
         onPageSelect={setPage}
       >
         {backupConfigurationBackups?.data.map((backup) => (
-          <AdminBackupConfigurationBackupRow key={backup.uuid} backup={backup} />
+          <NodeServerBackupRow
+            key={backup.uuid}
+            backup={backup}
+            downloadStartedMessage={t('pages.admin.backupConfigurations.tabs.backups.page.toast.downloadStarted', {})}
+            registry={
+              window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.view.backups.contextMenu
+            }
+            registryProps={{ backupConfiguration, backup }}
+          />
         ))}
       </Table>
     </AdminSubContentContainer>

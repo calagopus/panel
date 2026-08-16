@@ -1,0 +1,8 @@
+[package]
+name = "http-client"
+license = { workspace = true }
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+reqwest = { workspace = true }

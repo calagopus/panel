@@ -20,6 +20,7 @@ import { useServerStore } from '@/stores/server.ts';
 import BackupGroupCard from './BackupGroupCard.tsx';
 import BackupGroupItem from './BackupGroupItem.tsx';
 import BackupRow from './BackupRow.tsx';
+import BackupsSubNavigation from './BackupsSubNavigation.tsx';
 import BackupCreateModal from './modals/BackupCreateModal.tsx';
 import BackupGroupCreateModal from './modals/BackupGroupCreateModal.tsx';
 
@@ -149,6 +150,8 @@ export default function ServerBackups() {
     >
       <BackupCreateModal opened={openModal === 'createBackup'} onClose={() => setOpenModal(null)} />
       <BackupGroupCreateModal opened={openModal === 'createGroup'} onClose={() => setOpenModal(null)} />
+
+      <BackupsSubNavigation />
 
       <Stack>
         {(groups ?? []).map((group) => (

@@ -132,7 +132,7 @@ pub struct NestEggConfigScript {
 
 #[derive(ToSchema, Serialize, Deserialize, Clone)]
 pub struct ExportedNestEggConfigsFilesFile {
-    #[serde(default = "true_fn")]
+    #[serde(default = "true_fn", alias = "create_file")]
     pub create_new: bool,
     #[schema(inline)]
     pub parser: ServerConfigurationFileParser,

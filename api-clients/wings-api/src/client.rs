@@ -1,22 +1,15 @@
 // This file is auto-generated from OpenAPI spec. Do not edit manually.
 use super::*;
 use futures_util::TryStreamExt;
-use reqwest::{Client, Method, StatusCode};
+use http_client::CLIENT;
+use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use std::{
     pin::Pin,
-    sync::LazyLock,
     task::{Context, Poll},
 };
 use tokio::io::AsyncRead;
 use tokio_tungstenite::tungstenite::{Error, client::IntoClientRequest, http::HeaderValue};
-
-static CLIENT: LazyLock<Client> = LazyLock::new(|| {
-    Client::builder()
-        .user_agent("Calagopus Panel")
-        .build()
-        .expect("Failed to create reqwest client")
-});
 
 #[derive(Debug)]
 pub enum ApiHttpError {
@@ -888,6 +881,21 @@ impl WingsClient {
             self,
             Method::POST,
             format!("/api/servers/{server}/files/search"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_sqlite_query(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_sqlite_query::post::RequestBody,
+    ) -> Result<super::servers_server_files_sqlite_query::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/sqlite-query"),
             Some(data),
             None,
         )

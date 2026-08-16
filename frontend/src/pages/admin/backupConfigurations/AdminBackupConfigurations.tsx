@@ -36,6 +36,7 @@ function BackupConfigurationsContainer() {
       title={t('pages.admin.backupConfigurations.title', {})}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.container}
       contentRight={
         <AdminCan action='backup-configurations.create'>
           <Button

@@ -1,8 +1,10 @@
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useIntersection, useMergedRef } from '@mantine/hooks';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
 import { join } from 'pathe';
-import { type Ref, useCallback, useEffect, useMemo, useRef } from 'react';
+import { type Ref, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { z } from 'zod';
@@ -12,7 +14,8 @@ import Card from '@/elements/Card.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
-import Table, { TableHeaderProps } from '@/elements/Table.tsx';
+import Spinner from '@/elements/Spinner.tsx';
+import Table, { TableData, TableHeaderProps, TableRow } from '@/elements/Table.tsx';
 import Title from '@/elements/Title.tsx';
 import { isOpenableFile } from '@/lib/files.ts';
 import { serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
@@ -23,7 +26,7 @@ import FileMassContextMenu from '@/pages/server/files/FileMassContextMenu.tsx';
 import FileModals from '@/pages/server/files/FileModals.tsx';
 import FileOperationsProgress from '@/pages/server/files/FileOperationsProgress.tsx';
 import FileParentDirectoryRow from '@/pages/server/files/FileParentDirectoryRow.tsx';
-import FileRow from '@/pages/server/files/FileRow.tsx';
+import FileRow, { FileRowProps } from '@/pages/server/files/FileRow.tsx';
 import FileSearchBanner from '@/pages/server/files/FileSearchBanner.tsx';
 import FileSettings from '@/pages/server/files/FileSettings.tsx';
 import FileToolbar from '@/pages/server/files/FileToolbar.tsx';
@@ -83,6 +86,46 @@ function ServerFilesColumnRightSection({ name }: { name: ServerFilesColumn }) {
   );
 }
 
+function FileInfiniteScrollSentinel({ colSpan }: { colSpan: number }) {
+  const store = useFileManagerApi();
+  const hasNextPage = useFileManagerStore((state) => state.hasNextPage);
+  const isFetchingNextPage = useFileManagerStore((state) => state.isFetchingNextPage);
+  const { ref, entry } = useIntersection<HTMLTableRowElement>({ threshold: 0, rootMargin: '600px' });
+
+  useEffect(() => {
+    if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+      store.getState().fetchNextPage();
+    }
+  }, [entry?.isIntersecting, hasNextPage, isFetchingNextPage, store]);
+
+  if (!hasNextPage) return null;
+
+  return (
+    <TableRow ref={ref}>
+      <TableData colSpan={colSpan} className='py-3'>
+        <div className='flex items-center justify-center'>
+          <Spinner size={20} />
+        </div>
+      </TableData>
+    </TableRow>
+  );
+}
+
+const ESTIMATED_ROW_HEIGHT = 41;
+const VIRTUALIZER_OVERSCAN = 15;
+
+interface VirtualFileRowProps extends Omit<FileRowProps, 'dataIndex'> {
+  innerRef: Ref<HTMLElement>;
+  measureElement: (node: HTMLTableRowElement | null) => void;
+  dataIndex: number;
+}
+
+function VirtualFileRow({ innerRef, measureElement, dataIndex, ...rowProps }: VirtualFileRowProps) {
+  const mergedRef = useMergedRef<HTMLTableRowElement>(innerRef as Ref<HTMLTableRowElement>, measureElement);
+
+  return <FileRow ref={mergedRef} dataIndex={dataIndex} {...rowProps} />;
+}
+
 function ServerFilesComponent() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
@@ -115,8 +158,6 @@ function ServerFilesComponent() {
     getSelected: () => store.getState().selectedFiles.values(),
     setSelected: doSelectFiles,
   });
-
-  const onPageSelect = (page: number) => setSearchParams({ directory: browsingDirectory, page: page.toString() });
 
   const handleOpen = useCallback(
     (openMode: FileOpenMode) => {
@@ -308,6 +349,43 @@ function ServerFilesComponent() {
   const showParentDirectoryRow =
     normalizedBrowsingDirectory !== '/' && normalizedBrowsingDirectory !== backupRootDirectory && !searchInfo;
 
+  const tableAnchorRef = useRef<HTMLDivElement>(null);
+  const [scrollMargin, setScrollMargin] = useState(0);
+
+  useLayoutEffect(() => {
+    const updateScrollMargin = () => {
+      if (tableAnchorRef.current) {
+        setScrollMargin(tableAnchorRef.current.getBoundingClientRect().top + window.scrollY);
+      }
+    };
+
+    updateScrollMargin();
+
+    window.addEventListener('resize', updateScrollMargin);
+    const resizeObserver = new ResizeObserver(updateScrollMargin);
+    resizeObserver.observe(document.body);
+
+    return () => {
+      window.removeEventListener('resize', updateScrollMargin);
+      resizeObserver.disconnect();
+    };
+  }, [browsingDirectory, searchInfo, browsingError, showParentDirectoryRow]);
+
+  const rowVirtualizer = useWindowVirtualizer<HTMLTableRowElement>({
+    count: browsingEntries.data.length,
+    estimateSize: () => ESTIMATED_ROW_HEIGHT,
+    overscan: VIRTUALIZER_OVERSCAN,
+    scrollMargin,
+    getItemKey: (index) => browsingEntries.data[index]?.name ?? index,
+  });
+
+  const virtualRows = rowVirtualizer.getVirtualItems();
+  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start - scrollMargin : 0;
+  const paddingBottom =
+    virtualRows.length > 0
+      ? rowVirtualizer.getTotalSize() - (virtualRows[virtualRows.length - 1].end - scrollMargin)
+      : 0;
+
   return (
     <div className='h-fit relative'>
       <FileModals />
@@ -343,33 +421,55 @@ function ServerFilesComponent() {
             className='h-full'
             disabled={actingFiles.size > 0}
           >
-            <Table
-              columns={columns}
-              loading={isLoading}
-              pagination={browsingEntries}
-              error={browsingError}
-              onPageSelect={onPageSelect}
-              allowSelect={false}
-            >
-              {showParentDirectoryRow && <FileParentDirectoryRow />}
+            <div ref={tableAnchorRef}>
+              <Table
+                columns={columns}
+                loading={isLoading}
+                pagination={browsingEntries}
+                error={browsingError}
+                allowSelect={false}
+              >
+                {showParentDirectoryRow && <FileParentDirectoryRow />}
 
-              {browsingEntries.data.map((entry) => (
-                <SelectionArea.Selectable key={entry.name} item={entry}>
-                  {(innerRef: Ref<HTMLElement>) => (
-                    <FileRow
-                      ref={innerRef as Ref<HTMLTableRowElement>}
-                      file={entry}
-                      handleOpen={handleOpen}
-                      openMassMenu={openMassMenu}
-                      isSelected={selectedFiles.has(entry)}
-                      isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
-                      clickOnce={clickOnce}
-                      preferPhysicalSize={preferPhysicalSize}
-                    />
-                  )}
-                </SelectionArea.Selectable>
-              ))}
-            </Table>
+                {paddingTop > 0 && (
+                  <TableRow>
+                    <TableData colSpan={columns.length} style={{ height: paddingTop, padding: 0, border: 'none' }} />
+                  </TableRow>
+                )}
+
+                {virtualRows.map((virtualRow) => {
+                  const entry = browsingEntries.data[virtualRow.index];
+                  if (!entry) return null;
+
+                  return (
+                    <SelectionArea.Selectable key={virtualRow.key} item={entry}>
+                      {(innerRef: Ref<HTMLElement>) => (
+                        <VirtualFileRow
+                          innerRef={innerRef}
+                          measureElement={rowVirtualizer.measureElement}
+                          dataIndex={virtualRow.index}
+                          file={entry}
+                          handleOpen={handleOpen}
+                          openMassMenu={openMassMenu}
+                          isSelected={selectedFiles.has(entry)}
+                          isActing={actingFiles.has(entry) && actingFilesSource === browsingDirectory}
+                          clickOnce={clickOnce}
+                          preferPhysicalSize={preferPhysicalSize}
+                        />
+                      )}
+                    </SelectionArea.Selectable>
+                  );
+                })}
+
+                {paddingBottom > 0 && (
+                  <TableRow>
+                    <TableData colSpan={columns.length} style={{ height: paddingBottom, padding: 0, border: 'none' }} />
+                  </TableRow>
+                )}
+
+                {!searchInfo && <FileInfiniteScrollSentinel colSpan={columns.length} />}
+              </Table>
+            </div>
           </SelectionArea>
         )}
       </FileMassContextMenu>

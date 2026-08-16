@@ -4,6 +4,7 @@ import getBackupConfiguration from '@/api/admin/backup-configurations/getBackupC
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminBackupConfigurationLocations from '@/pages/admin/backupConfigurations/locations/AdminBackupConfigurationLocations.tsx';
 import AdminBackupConfigurationNodes from '@/pages/admin/backupConfigurations/nodes/AdminBackupConfigurationNodes.tsx';
 import AdminBackupConfigurationServers from '@/pages/admin/backupConfigurations/servers/AdminBackupConfigurationServers.tsx';
@@ -18,16 +19,21 @@ export default function BackupConfigurationView() {
   const params = useParams<'id'>();
 
   const resource = useResource({
-    queryKey: ['admin', 'backupConfigurations', { uuid: params.id }],
+    queryKey: queryKeys.admin.backupConfigurations.detail(params.id!),
     queryFn: () => getBackupConfiguration(params.id!),
   });
 
   return (
     <ResourceView resource={resource}>
       {(backupConfiguration) => (
-        <AdminContentContainer title={backupConfiguration.name}>
+        <AdminContentContainer
+          title={backupConfiguration.name}
+          registry={window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.container}
+        >
           <SubNavigation
             baseUrl={`/admin/backup-configurations/${params.id}`}
+            registry={window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.view.subNavigation}
+            registryProps={{ backupConfiguration }}
             items={[
               {
                 name: t('common.tabs.general', {}),

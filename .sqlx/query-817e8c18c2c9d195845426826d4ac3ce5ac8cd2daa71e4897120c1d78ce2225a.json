@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE servers\n            SET status = $2\n            WHERE servers.uuid = $1 AND servers.status IS NOT DISTINCT FROM $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "server_status",
+            "kind": {
+              "Enum": [
+                "INSTALLING",
+                "INSTALL_FAILED",
+                "RESTORING_BACKUP",
+                "BACKUP_RESTORE_FAILED"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "server_status",
+            "kind": {
+              "Enum": [
+                "INSTALLING",
+                "INSTALL_FAILED",
+                "RESTORING_BACKUP",
+                "BACKUP_RESTORE_FAILED"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "817e8c18c2c9d195845426826d4ac3ce5ac8cd2daa71e4897120c1d78ce2225a"
+}

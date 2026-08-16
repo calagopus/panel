@@ -1,6 +1,15 @@
-import { faEye, faLock, faLockOpen, faPencil, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEye,
+  faLock,
+  faLockOpen,
+  faPencil,
+  faRefresh,
+  faTableList,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getDatabaseSize from '@/api/server/databases/getDatabaseSize.ts';
 import Code from '@/elements/Code.tsx';
@@ -23,6 +32,7 @@ import DatabaseRecreateModal from './modals/DatabaseRecreateModal.tsx';
 
 export default function DatabaseRow({ database }: { database: z.infer<typeof serverDatabaseSchema> }) {
   const { t } = useTranslations();
+  const navigate = useNavigate();
   const [openModal, setOpenModal] = useState<'edit' | 'details' | 'recreate' | 'delete' | null>(null);
   const server = useServerStore((state) => state.server);
   const host = `${database.host}:${database.port}`;
@@ -65,6 +75,15 @@ export default function DatabaseRow({ database }: { database: z.infer<typeof ser
             onClick: () => setOpenModal('details'),
             color: 'gray',
             canAccess: useServerCan('databases.read'),
+          },
+          {
+            type: 'action',
+            icon: faTableList,
+            label: t('pages.server.databases.explorer.button.open', {}),
+            hidden: database.type === 'mongodb',
+            onClick: () => navigate(`/server/${server.uuidShort}/databases/${database.uuid}/explore`),
+            color: 'gray',
+            canAccess: useServerCan(['databases.read', 'databases.query'], false),
           },
           {
             type: 'action',

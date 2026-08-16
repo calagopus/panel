@@ -2,6 +2,7 @@ import {
   faCloudArrowDown,
   faDownload,
   faRefresh,
+  faTableList,
   faTrash,
   faUpload,
   faWarning,
@@ -9,6 +10,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteDatabaseInstanceDatabase from '@/api/server/databases/instances/deleteDatabaseInstanceDatabase.ts';
@@ -51,6 +53,7 @@ export default function DatabaseInstanceDatabaseRow({
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const [openModal, setOpenModal] = useState<'export' | 'import' | 'remoteImport' | 'recreate' | 'delete' | null>(null);
 
@@ -124,6 +127,18 @@ export default function DatabaseInstanceDatabaseRow({
 
       <ContextMenu
         items={[
+          {
+            type: 'action',
+            icon: faTableList,
+            label: t('pages.server.databases.explorer.button.open', {}),
+            hidden: instance.type === 'mongodb' || instance.type === 'redis',
+            onClick: () =>
+              navigate(
+                `/server/${server.uuidShort}/databases/instances/${instance.uuid}/databases/${database.uuid}/explore`,
+              ),
+            color: 'gray',
+            canAccess: useServerCan(['database-instances.databases', 'database-instances.query'], false),
+          },
           {
             type: 'action',
             icon: faDownload,

@@ -3,6 +3,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _backup_;
 mod groups;
+mod system;
+mod unlock;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
@@ -236,6 +238,8 @@ mod post {
             server: &server,
             name: data.name.unwrap_or_else(ServerBackup::default_name),
             backup_group_uuid: backup_group.as_ref().map(|group| group.uuid),
+            system_backup_policy_uuid: None,
+            backup_configuration: None,
             ignored_files: data.ignored_files,
             metadata: ServerBackup::generate_metadata(&state, &server).await?,
         };
@@ -267,6 +271,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(post::route))
         .nest("/groups", groups::router(state))
+        .nest("/system", system::router(state))
+        .nest("/unlock", unlock::router(state))
         .nest("/{backup}", _backup_::router(state))
         .with_state(state.clone())
 }

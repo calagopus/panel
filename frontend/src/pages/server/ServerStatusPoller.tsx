@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import getServer from '@/api/server/getServer.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { isTransientStatus } from '@/lib/server.ts';
 import { usePollingResource } from '@/plugins/usePollingResource.ts';
 import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
-
-const isTransient = (status: string | null | undefined) => !!status && status !== 'install_failed';
 
 export default function ServerStatusPoller() {
   const serverStoreApi = useServerStoreApi();
@@ -16,16 +15,16 @@ export default function ServerStatusPoller() {
     queryKey: queryKeys.server(uuid).detail(),
     queryFn: () => getServer(uuid),
     interval: 15000,
-    enabled: !!uuid && isTransient(status),
+    enabled: !!uuid && isTransientStatus(status),
     silent: true,
-    stopWhen: (server) => !isTransient(server.status),
+    stopWhen: (server) => !isTransientStatus(server.status),
   });
 
   useEffect(() => {
     if (!data) return;
 
     const current = serverStoreApi.getState().server;
-    if (current.uuid !== data.uuid || !isTransient(current.status)) return;
+    if (current.uuid !== data.uuid || !isTransientStatus(current.status)) return;
 
     updateServer(data);
   }, [data]);

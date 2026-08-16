@@ -104,6 +104,15 @@ const admin = {
     stats: (uuid: string) => ['admin', 'backup-configurations', uuid, 'stats'] as const,
   },
 
+  systemBackupPolicies: {
+    all: () => ['admin', 'system-backup-policies'] as const,
+    detail: (uuid: string) => ['admin', 'system-backup-policies', { uuid }] as const,
+    backups: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'backups'] as const,
+    nodes: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'nodes'] as const,
+    locations: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'locations'] as const,
+    servers: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'servers'] as const,
+  },
+
   oAuthProviders: {
     all: () => ['admin', 'oauth-providers'] as const,
     detail: (uuid: string) => ['admin', 'oauth-providers', { uuid }] as const,
@@ -168,11 +177,16 @@ const server = (serverUuid: string) => ({
       all: () => ['server', serverUuid, 'backups', 'groups'] as const,
       detail: (groupUuid: string) => ['server', serverUuid, 'backups', 'groups', { uuid: groupUuid }] as const,
     },
+    system: () => ['server', serverUuid, 'backups', 'system'] as const,
   },
   databases: {
     all: () => ['server', serverUuid, 'databases'] as const,
     hosts: () => ['server', serverUuid, 'databases', 'hosts'] as const,
+    detail: (databaseUuid: string) => ['server', serverUuid, 'databases', { uuid: databaseUuid }] as const,
     size: (databaseUuid: string) => ['server', serverUuid, 'databases', databaseUuid, 'size'] as const,
+    schema: (databaseUuid: string) => ['server', serverUuid, 'databases', databaseUuid, 'schema'] as const,
+    rows: (databaseUuid: string) => ['server', serverUuid, 'databases', databaseUuid, 'rows'] as const,
+    columnTypes: (databaseUuid: string) => ['server', serverUuid, 'databases', databaseUuid, 'column-types'] as const,
     instances: {
       all: () => ['server', serverUuid, 'databases', 'instances'] as const,
       templates: () => ['server', serverUuid, 'databases', 'instances', 'templates'] as const,
@@ -182,6 +196,21 @@ const server = (serverUuid: string) => ({
         ['server', serverUuid, 'databases', 'instances', instanceUuid, 'databases'] as const,
       databaseSize: (instanceUuid: string, databaseUuid: string) =>
         ['server', serverUuid, 'databases', 'instances', instanceUuid, 'databases', databaseUuid, 'size'] as const,
+      databaseSchema: (instanceUuid: string, databaseUuid: string) =>
+        ['server', serverUuid, 'databases', 'instances', instanceUuid, 'databases', databaseUuid, 'schema'] as const,
+      databaseRows: (instanceUuid: string, databaseUuid: string) =>
+        ['server', serverUuid, 'databases', 'instances', instanceUuid, 'databases', databaseUuid, 'rows'] as const,
+      databaseColumnTypes: (instanceUuid: string, databaseUuid: string) =>
+        [
+          'server',
+          serverUuid,
+          'databases',
+          'instances',
+          instanceUuid,
+          'databases',
+          databaseUuid,
+          'column-types',
+        ] as const,
       users: (instanceUuid: string) => ['server', serverUuid, 'databases', 'instances', instanceUuid, 'users'] as const,
     },
   },

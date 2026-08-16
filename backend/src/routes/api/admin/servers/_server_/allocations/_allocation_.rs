@@ -81,8 +81,11 @@ mod patch {
     use shared::{
         ApiError, GetState,
         models::{
-            admin_activity::GetAdminActivityLogger, server::GetServer,
-            server_allocation::ServerAllocation, user::GetPermissionManager,
+            UpdatableModel,
+            admin_activity::GetAdminActivityLogger,
+            server::GetServer,
+            server_allocation::{ServerAllocation, UpdateServerAllocationOptions},
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -149,18 +152,13 @@ mod patch {
 
         let mut transaction = state.database.write().begin().await?;
 
-        if let Some(notes) = data.notes {
-            sqlx::query!(
-                "UPDATE server_allocations
-                SET notes = $1
-                WHERE server_allocations.uuid = $2",
-                notes.as_deref(),
-                allocation.uuid,
+        allocation
+            .update_with_transaction(
+                &state,
+                UpdateServerAllocationOptions { notes: data.notes },
+                &mut transaction,
             )
-            .execute(&mut *transaction)
             .await?;
-            allocation.notes = notes;
-        }
         if let Some(primary) = data.primary {
             if server
                 .allocation

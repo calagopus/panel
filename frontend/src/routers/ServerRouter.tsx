@@ -10,6 +10,7 @@ import AppIcon from '@/elements/AppIcon.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import Container from '@/elements/Container.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
+import QuickActionsTrigger from '@/elements/quickActions/QuickActionsTrigger.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import ServerStatusIndicator from '@/elements/ServerStatusIndicator.tsx';
 import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
@@ -160,7 +161,12 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
               <NavLink to='/' className='w-full'>
                 <AppIcon />
               </NavLink>
-              {!user?.suspended && <ServerStatusIndicator />}
+              {!user?.suspended && (
+                <>
+                  <QuickActionsTrigger />
+                  <ServerStatusIndicator />
+                </>
+              )}
             </>
           }
           footer={

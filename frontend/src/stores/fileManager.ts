@@ -64,8 +64,9 @@ export interface FileManagerStore {
   setBrowsingEntries: (entries: Pagination<z.infer<typeof serverDirectoryEntrySchema>>) => void;
   browsingError: string | null;
   setBrowsingError: (error: string | null) => void;
-  page: number;
-  setPage: (page: number) => void;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  fetchNextPage: () => void;
   browsingPrimaryFilesystem: boolean;
   setBrowsingPrimaryFilesystem: (state: boolean) => void;
   browsingWritableDirectory: boolean;
@@ -138,7 +139,7 @@ const { Provider, useStore, useStoreApi } = createContext<StoreApi<FileManagerSt
 
 export const createFileManagerStore = (
   getExternals: () => FileManagerExternals,
-  initial: { browsingDirectory: string; page: number },
+  initial: { browsingDirectory: string },
 ) =>
   create<FileManagerStore>()((set, get) => {
     let selectionAnchor: z.infer<typeof serverDirectoryEntrySchema> | null = null;
@@ -168,8 +169,9 @@ export const createFileManagerStore = (
       setBrowsingEntries: (entries) => set({ browsingEntries: entries }),
       browsingError: null,
       setBrowsingError: (error) => set({ browsingError: error }),
-      page: initial.page,
-      setPage: (page) => set((state) => (state.page === page ? state : { page })),
+      hasNextPage: false,
+      isFetchingNextPage: false,
+      fetchNextPage: () => undefined,
       browsingPrimaryFilesystem: true,
       setBrowsingPrimaryFilesystem: (state) => set({ browsingPrimaryFilesystem: state }),
       browsingWritableDirectory: true,

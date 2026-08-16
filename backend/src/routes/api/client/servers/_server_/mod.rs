@@ -61,6 +61,7 @@ pub async fn auth(
         "/api/client/servers/{server}",
         "/api/client/servers/{server}/websocket",
         "/api/client/servers/{server}/settings/install/cancel",
+        "/api/client/servers/{server}/backups/unlock",
     ];
 
     if !IGNORED_STATUS_PATHS.contains(&matched_path.as_str()) {
@@ -79,6 +80,7 @@ pub async fn auth(
                 ServerStatus::Installing => "server is currently installing",
                 ServerStatus::InstallFailed => "your server has failed its installation process",
                 ServerStatus::RestoringBackup => "server is restoring from a backup",
+                ServerStatus::BackupRestoreFailed => "your server has failed to restore a backup",
             };
 
             return Ok(ApiResponse::error(message)

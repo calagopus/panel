@@ -52,8 +52,6 @@ export default function DatabaseInstanceOperations() {
   };
 
   const doCancelOperation = (uuid: string) => {
-    removeOperation(uuid);
-
     deleteDatabaseInstanceOperation(server.uuid, instance.uuid, uuid)
       .then(() => {
         invalidateDatabases();
@@ -66,11 +64,12 @@ export default function DatabaseInstanceOperations() {
     const cancellations: Promise<unknown>[] = [];
 
     operations.forEach((_, uuid) => {
-      const failed = failedOperations.has(uuid);
-      removeOperation(uuid);
-      if (!failed) {
-        cancellations.push(deleteDatabaseInstanceOperation(server.uuid, instance.uuid, uuid).catch(console.error));
+      if (failedOperations.has(uuid)) {
+        removeOperation(uuid);
+        return;
       }
+
+      cancellations.push(deleteDatabaseInstanceOperation(server.uuid, instance.uuid, uuid).catch(console.error));
     });
 
     Promise.allSettled(cancellations).then(() => invalidateDatabases());

@@ -33,6 +33,8 @@ export default function AdminBackupConfigurationNodes({
       titleOrder={2}
       search={search}
       setSearch={setSearch}
+      registry={window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.view.nodes.subContainer}
+      registryProps={{ backupConfiguration }}
     >
       <Table
         columns={nodeTableColumns()}

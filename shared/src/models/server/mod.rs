@@ -79,6 +79,7 @@ pub enum ServerStatus {
     Installing,
     InstallFailed,
     RestoringBackup,
+    BackupRestoreFailed,
 }
 
 #[derive(ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
@@ -1047,6 +1048,67 @@ impl Server {
         Ok(status)
     }
 
+    /// Atomically moves the server from the `from` status to the `to` status, returning `false`
+    /// if the server was not in the `from` status and nothing was changed.
+    pub async fn try_set_status_by_uuid(
+        executor: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        uuid: uuid::Uuid,
+        from: Option<ServerStatus>,
+        to: Option<ServerStatus>,
+    ) -> Result<bool, sqlx::Error> {
+        let rows_affected = sqlx::query!(
+            "UPDATE servers
+            SET status = $2
+            WHERE servers.uuid = $1 AND servers.status IS NOT DISTINCT FROM $3",
+            uuid,
+            to as Option<ServerStatus>,
+            from as Option<ServerStatus>
+        )
+        .execute(executor)
+        .await?
+        .rows_affected();
+
+        Ok(rows_affected > 0)
+    }
+
+    /// Sets the status of the server, regardless of the status it is currently in.
+    pub async fn set_status(
+        &mut self,
+        executor: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        status: Option<ServerStatus>,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            "UPDATE servers
+            SET status = $2
+            WHERE servers.uuid = $1",
+            self.uuid,
+            status as Option<ServerStatus>
+        )
+        .execute(executor)
+        .await?;
+
+        self.status = status;
+
+        Ok(())
+    }
+
+    /// Same as [`try_set_status_by_uuid`](Self::try_set_status_by_uuid), keeping the status on the
+    /// struct in sync.
+    pub async fn try_set_status(
+        &mut self,
+        executor: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        from: Option<ServerStatus>,
+        to: Option<ServerStatus>,
+    ) -> Result<bool, sqlx::Error> {
+        if !Self::try_set_status_by_uuid(executor, self.uuid, from, to).await? {
+            return Ok(false);
+        }
+
+        self.status = to;
+
+        Ok(true)
+    }
+
     /// Syncs the server with the node. This will update server resources, schedules, name, etc.
     pub async fn sync(self, database: &crate::database::Database) -> Result<(), anyhow::Error> {
         self.node
@@ -1089,17 +1151,14 @@ impl Server {
     ) -> Result<(), anyhow::Error> {
         let mut transaction = state.database.write().begin().await?;
 
-        let rows_affected = sqlx::query!(
-            "UPDATE servers
-            SET status = 'INSTALLING'
-            WHERE servers.uuid = $1 AND servers.status IS NULL",
-            self.uuid
+        if !Self::try_set_status_by_uuid(
+            &mut *transaction,
+            self.uuid,
+            None,
+            Some(ServerStatus::Installing),
         )
-        .execute(&mut *transaction)
         .await?
-        .rows_affected();
-
-        if rows_affected == 0 {
+        {
             transaction.rollback().await?;
 
             return Err(DisplayError::new(
@@ -2230,6 +2289,18 @@ impl CreatableModel for Server {
     }
 }
 
+fn validate_auto_kill(
+    value: &Option<wings_api::ServerConfigurationAutoKill>,
+    _context: &(),
+) -> garde::Result {
+    match value {
+        Some(auto_kill) if !(1..=3600).contains(&auto_kill.seconds) => Err(garde::Error::new(
+            "auto kill seconds must be between 1 and 3600",
+        )),
+        _ => Ok(()),
+    }
+}
+
 #[derive(ToSchema, Serialize, Deserialize, Validate, Clone, Default)]
 pub struct UpdateServerOptions {
     #[garde(skip)]
@@ -2278,6 +2349,11 @@ pub struct UpdateServerOptions {
     #[garde(length(chars, min = 2, max = 255))]
     #[schema(min_length = 2, max_length = 255)]
     pub image: Option<compact_str::CompactString>,
+    #[garde(custom(validate_auto_kill))]
+    #[schema(inline)]
+    pub auto_kill: Option<wings_api::ServerConfigurationAutoKill>,
+    #[garde(skip)]
+    pub auto_start_behavior: Option<ServerAutoStartBehavior>,
     #[garde(skip)]
     #[schema(value_type = Option<Option<String>>)]
     #[serde(
@@ -2387,6 +2463,15 @@ impl UpdatableModel for Server {
             .set("startup", options.startup.as_ref())
             .set("image", options.image.as_ref())
             .set(
+                "auto_kill",
+                options
+                    .auto_kill
+                    .as_ref()
+                    .map(serde_json::to_value)
+                    .transpose()?,
+            )
+            .set("auto_start_behavior", options.auto_start_behavior)
+            .set(
                 "timezone",
                 options
                     .timezone
@@ -2458,6 +2543,12 @@ impl UpdatableModel for Server {
         }
         if let Some(image) = options.image {
             self.image = image;
+        }
+        if let Some(auto_kill) = options.auto_kill {
+            self.auto_kill = auto_kill;
+        }
+        if let Some(auto_start_behavior) = options.auto_start_behavior {
+            self.auto_start_behavior = auto_start_behavior;
         }
         if let Some(timezone) = options.timezone {
             self.timezone = timezone.map(|t| t.name().into());

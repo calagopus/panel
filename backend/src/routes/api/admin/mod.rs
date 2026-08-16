@@ -36,6 +36,7 @@ mod servers;
 mod settings;
 mod stats;
 mod system;
+mod system_backup_policies;
 mod users;
 
 pub async fn auth(
@@ -96,6 +97,10 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest(
             "/backup-configurations",
             backup_configurations::router(state),
+        )
+        .nest(
+            "/system-backup-policies",
+            system_backup_policies::router(state),
         )
         .nest("/oauth-providers", oauth_providers::router(state))
         .nest("/mounts", mounts::router(state))

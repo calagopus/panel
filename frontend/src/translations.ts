@@ -12,6 +12,7 @@ const baseTranslations = defineTranslations({
     byte: defineEnglishItem('Byte', 'Bytes'),
     user: defineEnglishItem('User', 'Users'),
     file: defineEnglishItem('File', 'Files'),
+    directory: defineEnglishItem('Directory', 'Directories'),
     server: defineEnglishItem('Server', 'Servers'),
     sshKey: defineEnglishItem('SSH Key', 'SSH Keys'),
     asset: defineEnglishItem('Asset', 'Assets'),
@@ -25,6 +26,8 @@ const baseTranslations = defineTranslations({
     header: defineEnglishItem('Header', 'Headers'),
     backup: defineEnglishItem('Backup', 'Backups'),
     day: defineEnglishItem('Day', 'Days'),
+    row: defineEnglishItem('Row', 'Rows'),
+    change: defineEnglishItem('Change', 'Changes'),
   },
   translations: {
     common: {
@@ -188,6 +191,7 @@ const baseTranslations = defineTranslations({
         deleteSourceBackups: 'Delete source backups',
         deleteSourceBackupsDescription: 'Deletes the transferred backups on the source node once transfer finishes.',
         node: 'Node',
+        location: 'Location',
         primaryAllocation: 'Primary Allocation',
         additionalAllocations: 'Additional Allocations',
         externalId: 'External ID',
@@ -277,6 +281,7 @@ const baseTranslations = defineTranslations({
         successful: 'Successful',
         failed: 'Failed',
         installed: 'Installed',
+        systemBackup: 'System',
       },
       label: {
         noSubdirectories: 'No subdirectories',
@@ -294,6 +299,7 @@ const baseTranslations = defineTranslations({
           restoringBackup: 'Restoring Backup',
           installing: 'Installing',
           installFailed: 'Install Failed',
+          backupRestoreFailed: 'Backup Restore Failed',
         },
       },
       enum: {
@@ -459,6 +465,21 @@ const baseTranslations = defineTranslations({
           themeLight: 'Light',
         },
       },
+      quickActions: {
+        trigger: 'Quick actions...',
+        placeholder: 'Search for actions and pages...',
+        category: {
+          navigation: 'Navigation',
+          power: 'Power',
+          account: 'Account',
+          servers: 'Servers',
+        },
+        hint: {
+          navigate: 'to navigate',
+          select: 'to select',
+          close: 'to close',
+        },
+      },
       permissionSelector: {
         button: {
           copyPermissions: 'Copy Permissions',
@@ -521,15 +542,22 @@ const baseTranslations = defineTranslations({
           contentInstalling: 'This server is currently installing and cannot be accessed until completed.',
           contentRestoringBackup:
             'This server is currently restoring from a backup and cannot be accessed until completed.',
+          contentBackupRestoreFailed:
+            'This server failed to restore a backup and cannot be accessed until acknowledged. Its files may be incomplete.',
           button: {
             viewInstallLogs: 'View Installation Logs',
             acknowledgeFailure: 'Acknowledge Failure',
           },
           modal: {
-            acknowledgeFailure: {
+            acknowledgeInstallFailure: {
               title: 'Acknowledge Installation Failure',
               content:
                 'By acknowledging this installation failure, you are confirming that you are aware of the failed installation and have taken any necessary steps to resolve the issue. This will allow you to regain control over the server.',
+            },
+            acknowledgeBackupRestoreFailure: {
+              title: 'Acknowledge Backup Restore Failure',
+              content:
+                'By acknowledging this backup restore failure, you are confirming that you are aware of the failed restore and that the server files may be incomplete. This will allow you to regain control over the server.',
             },
           },
         },
@@ -562,6 +590,7 @@ const baseTranslations = defineTranslations({
             backupFailed: 'Backup failed.',
             backupDeleteFailed: 'Backup deletion failed.',
             backupRestoreCompleted: 'Backup restore completed successfully.',
+            backupRestoreFailed: 'Backup restore failed.',
             installCompleted: 'Server Installation completed successfully.',
             installFailed: 'Server Installation failed.',
             transferFailed: 'Server transfer failed, the server remains on this node.',
@@ -569,33 +598,41 @@ const baseTranslations = defineTranslations({
               compressing: {
                 completed: 'Compressed {files} to `{path}` in {time}.',
                 failed: 'Failed to compress {files} to `{path}`:\n{error}',
+                aborted: 'Compression of {files} to `{path}` was cancelled.',
               },
               decompressing: {
                 completed: 'Decompressed `{path}` to `{destination}` in {time}.',
                 failed: 'Failed to decompress `{path}` to `{destination}`:\n{error}',
+                aborted: 'Decompression of `{path}` to `{destination}` was cancelled.',
               },
               pulling: {
                 completed: 'Pulled `{destination}` in {time}.',
                 failed: 'Failed to pull `{destination}`:\n{error}',
+                aborted: 'Pull of `{destination}` was cancelled.',
               },
               copying: {
                 completed: 'Copied `{path}` to `{destination}` in {time}.',
                 completedMany: 'Copied `{path}` to `{destination}` ({files}) in {time}.',
                 failed: 'Failed to copy `{path}` to `{destination}`:\n{error}',
+                aborted: 'Copy of `{path}` to `{destination}` was cancelled.',
               },
               copyingMany: {
                 completed: 'Copied {files} in {time}.',
                 failed: 'Failed to copy {files}:\n{error}',
+                aborted: 'Copy of {files} was cancelled.',
               },
               copyingRemote: {
                 completedFrom: 'Copied {files} from remote server in {time}.',
                 completedTo: 'Copied {files} to remote server in {time}.',
                 failedFrom: 'Failed to copy {files} from remote server:\n{error}',
                 failedTo: 'Failed to copy {files} to remote server:\n{error}',
+                abortedFrom: 'Copy of {files} from remote server was cancelled.',
+                abortedTo: 'Copy of {files} to remote server was cancelled.',
               },
               exportingBackup: {
                 completed: 'Exported backup to `{destination}` in {time}.',
                 failed: 'Failed to export backup to `{destination}`:\n{error}',
+                aborted: 'Backup export to `{destination}` was cancelled.',
               },
             },
           },
@@ -1205,6 +1242,7 @@ const baseTranslations = defineTranslations({
           general: {
             title: 'General',
             undo: 'Undo the last action',
+            quickActions: 'Open quick actions',
           },
           fileManager: {
             title: 'File Manager',
@@ -2755,9 +2793,6 @@ const baseTranslations = defineTranslations({
                 badge: {
                   suspended: 'Suspended',
                   transferring: 'Transferring',
-                  installing: 'Installing',
-                  installFailed: 'Install Failed',
-                  restoringBackup: 'Restoring Backup',
                   admin: 'Admin',
                 },
               },
@@ -4068,6 +4103,133 @@ const baseTranslations = defineTranslations({
             },
           },
         },
+        systemBackupPolicies: {
+          title: 'System Backup Policies',
+          resourceName: 'System backup policy',
+          badge: {
+            disabled: 'Disabled',
+            runPending: 'Run pending',
+          },
+          table: {
+            columns: {
+              cron: 'Schedule',
+              backups: 'Backups',
+            },
+          },
+          form: {
+            backupConfigurationPlaceholder: 'Inherit from Server',
+            cron: 'Schedule',
+            cronDescription: 'Cron expression (with seconds) that determines when backups are taken, in UTC.',
+            retentionCount: 'Keep count',
+            retentionCountDescription:
+              'Maximum number of successful backups to keep per server. Leave empty for no limit.',
+            retentionDays: 'Keep days',
+            retentionDaysDescription: 'Delete backups older than this many days. Leave empty for no limit.',
+            parallelism: 'Parallelism',
+            parallelismDescription: 'Maximum number of backups this policy runs at the same time on a single node.',
+            enabledDescription: 'Disabled policies keep their backups but do not take new ones.',
+          },
+          tabs: {
+            general: {
+              page: {
+                titleCreate: 'Create System Backup Policy',
+                titleUpdate: 'Update System Backup Policy',
+                button: {
+                  runNow: 'Run Now',
+                },
+                toast: {
+                  triggered: 'Run requested. Backups will be taken shortly.',
+                },
+                modal: {
+                  trigger: {
+                    title: 'Confirm Manual Run',
+                    content:
+                      'Are you sure you want to run **{name}** now? Every covered server without a backup from this run yet will be backed up.',
+                  },
+                  delete: {
+                    title: 'Confirm System Backup Policy Deletion',
+                    content: 'Are you sure you want to delete **{name}**?',
+                    form: {
+                      deleteBackups: 'Do you want to delete backups created by this policy?',
+                    },
+                    alert: {
+                      deleteBackupsWarning:
+                        'All backups created by this policy will be permanently deleted from their storage backends.',
+                      releaseWarning:
+                        'Backups created by this policy will become regular server backups. They will count towards each server backup limit and follow standard rotation.',
+                    },
+                  },
+                },
+              },
+            },
+            backups: {
+              title: 'Backups',
+              page: {
+                title: 'System Backup Policy Backups',
+                toast: {
+                  downloadStarted: 'Download started.',
+                },
+              },
+            },
+            locations: {
+              title: 'Locations',
+              page: {
+                title: 'System Backup Policy Locations',
+                toast: {
+                  added: 'Location added.',
+                  removed: 'Location removed.',
+                },
+                modal: {
+                  add: {
+                    title: 'Add Location',
+                  },
+                  remove: {
+                    title: 'Confirm Location Removal',
+                    content: 'Are you sure you want to remove **{name}** from **{policy}**?',
+                  },
+                },
+              },
+            },
+            nodes: {
+              title: 'Nodes',
+              page: {
+                title: 'System Backup Policy Nodes',
+                toast: {
+                  added: 'Node added.',
+                  removed: 'Node removed.',
+                },
+                modal: {
+                  add: {
+                    title: 'Add Node',
+                  },
+                  remove: {
+                    title: 'Confirm Node Removal',
+                    content: 'Are you sure you want to remove **{name}** from **{policy}**?',
+                  },
+                },
+              },
+            },
+            servers: {
+              title: 'Servers',
+              page: {
+                title: 'System Backup Policy Servers',
+                toast: {
+                  added: 'Server added.',
+                  removed: 'Server removed.',
+                },
+                modal: {
+                  add: {
+                    title: 'Add Server',
+                  },
+                  remove: {
+                    title: 'Confirm Server Removal',
+                    content: 'Are you sure you want to remove **{name}** from **{policy}**?',
+                  },
+                },
+              },
+            },
+          },
+        },
         mounts: {
           title: 'Mounts',
           resourceName: 'Mount',
@@ -4663,10 +4825,6 @@ const baseTranslations = defineTranslations({
         databases: {
           title: 'Databases',
           subtitle: '{current} of {max} maximum databases created.',
-          classic: {
-            title: 'Classic Databases',
-            subtitle: '{current} databases created.',
-          },
           tooltip: {
             limitReached: 'This server is limited to {max} databases.',
           },
@@ -4681,9 +4839,169 @@ const baseTranslations = defineTranslations({
           form: {
             databaseName: 'Database Name',
           },
+          explorer: {
+            title: 'Data Explorer',
+            button: {
+              open: 'Explore Data',
+              run: 'Run',
+              previous: 'Previous',
+              next: 'Next',
+              hideTables: 'Hide Tables',
+              showTables: 'Show Tables',
+              save: 'Save {changes}',
+              newRow: 'New Row',
+              deleteRows: 'Delete {rows}',
+              newTable: 'New Table',
+              addColumn: 'Add Column',
+              rename: 'Rename',
+              renameTable: 'Rename Table',
+              deleteTable: 'Delete Table',
+            },
+            form: {
+              tableName: 'Table Name',
+              columnsList: 'Columns',
+              columnName: 'Column Name',
+              columnType: 'Type',
+              nullable: 'Nullable',
+              primaryKey: 'Primary Key',
+              autoIncrement: 'Auto Increment',
+            },
+            unsupported: {
+              title: 'Not Supported',
+              content: 'MongoDB databases cannot be explored from the panel.',
+              instanceContent: 'MongoDB and Redis database instances cannot be explored from the panel.',
+            },
+            notFound: 'This database does not exist on the instance.',
+            tabs: {
+              rows: 'Rows',
+              structure: 'Structure',
+              query: 'Query',
+            },
+            modal: {
+              deleteRows: {
+                title: 'Confirm Row Deletion',
+                content: 'Are you sure you want to delete {rows} from **{table}**? This cannot be undone.',
+              },
+              createTable: {
+                title: 'Create Table',
+                toast: {
+                  created: 'Table {table} has been created.',
+                },
+              },
+              createColumn: {
+                title: 'Add Column',
+                form: {
+                  nullableHint: 'Adding a non-nullable column to a table that already has rows will fail.',
+                },
+                toast: {
+                  created: 'Column {column} has been added.',
+                },
+              },
+              renameTable: {
+                title: 'Rename Table',
+                toast: {
+                  renamed: 'Table {table} has been renamed.',
+                },
+              },
+              deleteTable: {
+                title: 'Confirm Table Deletion',
+                content:
+                  'Are you sure you want to delete **{table}**? This permanently destroys all of its rows and cannot be undone.',
+                toast: {
+                  deleted: 'Table {table} has been deleted.',
+                },
+              },
+              renameColumn: {
+                title: 'Rename Column',
+                toast: {
+                  renamed: 'Column {column} has been renamed.',
+                },
+              },
+              deleteColumn: {
+                title: 'Confirm Column Deletion',
+                content:
+                  'Are you sure you want to delete **{column}** from **{table}**? Its data is permanently destroyed and cannot be recovered.',
+                toast: {
+                  deleted: 'Column {column} has been deleted.',
+                },
+              },
+            },
+            schema: {
+              title: 'Tables',
+              empty: 'This database has no tables yet.',
+              noMatches: 'No tables match your search.',
+              rowEstimate: '~{rows}',
+              badge: {
+                view: 'View',
+              },
+            },
+            rows: {
+              noTable: 'Select a table to browse its rows.',
+              range: 'Showing rows {start} to {end}.',
+              saved: 'Applied changes to {rows}.',
+              insert: {
+                default: 'Database default',
+              },
+            },
+            filter: {
+              add: 'Filter',
+              column: 'Column',
+              operator: 'Operator',
+              value: 'Value',
+              apply: 'Apply',
+            },
+            enum: {
+              filterOperator: {
+                eq: 'equals',
+                ne: 'does not equal',
+                lt: 'less than',
+                lte: 'less than or equal',
+                gt: 'greater than',
+                gte: 'greater than or equal',
+                contains: 'contains',
+                startsWith: 'starts with',
+                endsWith: 'ends with',
+                isNull: 'is null',
+                notNull: 'is not null',
+              },
+            },
+            table: {
+              columns: {
+                nullable: 'Nullable',
+                key: 'Key',
+                default: 'Default',
+                attributes: 'Attributes',
+              },
+            },
+            badge: {
+              primaryKey: 'Primary',
+              autoIncrement: 'auto_increment',
+              generated: 'Generated',
+              binary: 'Binary',
+            },
+            query: {
+              placeholder: 'Run a statement to see its results here.',
+              statement: 'Statement {index}',
+              form: {
+                rowLimit: 'Row Limit',
+                readOnly: 'Read-only',
+                readOnlyDescription: 'Rejects statements that change data or structure.',
+              },
+            },
+            result: {
+              rowsAffected: '{rows} affected.',
+              truncated:
+                'This result set was truncated. Narrow the statement or lower the row limit to see everything.',
+            },
+            cell: {
+              setNull: 'Set to NULL',
+              null: 'NULL',
+              empty: 'empty',
+              editorHint: '{enter} applies the value, {shiftEnter} inserts a new line.',
+            },
+          },
           instance: {
             title: 'Managed Databases',
-            subtitle: '{current} managed databases created.',
             updateAvailable: 'Update Available',
             button: {
               applyUpdate: 'Apply Update',
@@ -4831,6 +5149,7 @@ const baseTranslations = defineTranslations({
                 remoteImport: {
                   completed: 'Imported `{database}` from `{source}` in {time}.',
                   failed: 'Failed to import `{database}` from `{source}`:\n{error}',
+                  aborted: 'Import of `{database}` from `{source}` was cancelled.',
                 },
               },
             },
@@ -5732,6 +6051,10 @@ const baseTranslations = defineTranslations({
             updated: 'Backup group updated.',
             deleted: 'Backup group deleted.',
           },
+        },
+        systemBackups: {
+          title: 'System Backups',
+          subtitle: 'Backups taken automatically by the panel. They cannot be modified or deleted.',
         },
         network: {
           title: 'Network',

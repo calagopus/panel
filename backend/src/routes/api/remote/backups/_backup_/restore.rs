@@ -8,9 +8,9 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            ByUuid, CreatableModel, EventEmittingModel,
+            CreatableModel, EventEmittingModel,
             node::GetNode,
-            server::Server,
+            server::{Server, ServerStatus},
             server_activity::ServerActivity,
             server_backup::{ServerBackup, ServerBackupEvent},
         },
@@ -57,17 +57,27 @@ mod post {
             }
         };
 
-        if sqlx::query!(
-            "UPDATE servers
-            SET status = NULL
-            WHERE servers.uuid = $1 AND servers.node_uuid = $2 AND servers.status = 'RESTORING_BACKUP'",
-            server_uuid,
-            node.uuid
-        )
-        .execute(state.database.write())
-        .await?
-        .rows_affected()
-            == 0
+        let mut server =
+            match Server::by_node_uuid_uuid(&state.database, node.uuid, server_uuid).await? {
+                Some(server) => server,
+                None => {
+                    return ApiResponse::error("server not found")
+                        .with_status(StatusCode::NOT_FOUND)
+                        .ok();
+                }
+            };
+
+        if !server
+            .try_set_status(
+                state.database.write(),
+                Some(ServerStatus::RestoringBackup),
+                if data.successful {
+                    None
+                } else {
+                    Some(ServerStatus::BackupRestoreFailed)
+                },
+            )
+            .await?
         {
             return ApiResponse::error("server is not restoring a backup")
                 .with_status(StatusCode::EXPECTATION_FAILED)
@@ -105,41 +115,36 @@ mod post {
             );
         }
 
-        match Server::by_uuid(&state.database, server_uuid).await {
-            Ok(server) => {
-                let settings = state.settings.get().await?;
-                state
-                    .mail
-                    .send_template(
-                        &state,
-                        "server_restored",
-                        server.owner.email.clone(),
-                        minijinja::context! {
-                            user => server.owner,
-                            server => server,
-                            server_link => format!(
-                                "{}/server/{:08x}",
-                                settings.app.url,
-                                server.uuid_short,
-                            )
-                        },
-                    )
-                    .await;
-                drop(settings);
-
-                ServerBackup::get_event_emitter().emit(
-                    state.0.clone(),
-                    ServerBackupEvent::RestoreCompleted {
-                        backup: Box::new(backup.0),
-                        server: Box::new(server),
-                        successful: data.successful,
+        if data.successful {
+            let settings = state.settings.get().await?;
+            state
+                .mail
+                .send_template(
+                    &state,
+                    "server_restored",
+                    server.owner.email.clone(),
+                    minijinja::context! {
+                        user => server.owner,
+                        server => server,
+                        server_link => format!(
+                            "{}/server/{:08x}",
+                            settings.app.url,
+                            server.uuid_short,
+                        )
                     },
-                );
-            }
-            Err(err) => {
-                tracing::warn!(backup = %backup.uuid, "failed to fetch server for RestoreCompleted event: {:#?}", err);
-            }
+                )
+                .await;
+            drop(settings);
         }
+
+        ServerBackup::get_event_emitter().emit(
+            state.0.clone(),
+            ServerBackupEvent::RestoreCompleted {
+                backup: Box::new(backup.0),
+                server: Box::new(server),
+                successful: data.successful,
+            },
+        );
 
         ApiResponse::new_serialized(Response {}).ok()
     }

@@ -30,7 +30,7 @@ import ScrollingText from '@/elements/ScrollingText.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
-import { formatAllocation, statusToColor } from '@/lib/server.ts';
+import { formatAllocation, serverStatusInfo, statusToColor } from '@/lib/server.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
 import { useServerStats } from '@/plugins/useServerStats.ts';
@@ -324,20 +324,14 @@ export default function ServerItem({
                         <FontAwesomeIcon size='1x' icon={faBan} color='red' />
                         <p className='ml-2 text-sm'>{t('common.server.state.nodeMaintenance', {})}</p>
                       </div>
-                    ) : server.status === 'installing' ? (
+                    ) : server.status ? (
                       <div className='col-span-3 flex flex-row items-center justify-center'>
-                        <Spinner size={16} />
-                        <p className='ml-2 text-sm'>{t('common.server.state.installing', {})}</p>
-                      </div>
-                    ) : server.status === 'restoring_backup' ? (
-                      <div className='col-span-3 flex flex-row items-center justify-center'>
-                        <Spinner size={16} />
-                        <p className='ml-2 text-sm'>{t('common.server.state.restoringBackup', {})}</p>
-                      </div>
-                    ) : server.status === 'install_failed' ? (
-                      <div className='col-span-3 flex flex-row items-center justify-center'>
-                        <FontAwesomeIcon size='1x' icon={faTriangleExclamation} color='yellow' />
-                        <p className='ml-2 text-sm'>{t('common.server.state.installFailed', {})}</p>
+                        {serverStatusInfo[server.status].failed ? (
+                          <FontAwesomeIcon size='1x' icon={faTriangleExclamation} color='yellow' />
+                        ) : (
+                          <Spinner size={16} />
+                        )}
+                        <p className='ml-2 text-sm'>{serverStatusInfo[server.status].label()}</p>
                       </div>
                     ) : !stats ? (
                       <div className='col-span-3 flex flex-row items-center justify-center'>

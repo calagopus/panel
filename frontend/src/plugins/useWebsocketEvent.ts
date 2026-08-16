@@ -31,6 +31,7 @@ export enum SocketEvent {
   OPERATION_PROGRESS = 'operation progress',
   OPERATION_COMPLETED = 'operation completed',
   OPERATION_ERROR = 'operation error',
+  OPERATION_ABORTED = 'operation aborted',
   FILE_COLLAB_SYNC = 'file collab sync',
   FILE_COLLAB_UPDATE = 'file collab update',
   FILE_COLLAB_AWARENESS = 'file collab awareness',

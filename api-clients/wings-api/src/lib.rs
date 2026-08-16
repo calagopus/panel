@@ -206,6 +206,30 @@ nestify::nest! {
 }
 
 nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct QueryColumn {
+        #[schema(inline)]
+        pub name: compact_str::CompactString,
+        #[schema(inline)]
+        pub type_name: compact_str::CompactString,
+        #[schema(inline)]
+        pub binary: bool,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct QueryResultSet {
+        #[schema(inline)]
+        pub columns: Vec<QueryColumn>,
+        #[schema(inline)]
+        pub rows: Vec<Vec<QueryValue>>,
+        #[schema(inline)]
+        pub rows_affected: u64,
+        #[schema(inline)]
+        pub truncated: bool,
+    }
+}
+
+nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ResourceUsage {
         #[schema(inline)]
         pub memory_bytes: u64,
@@ -506,6 +530,8 @@ pub enum SystemBackupsDdupBakCompressionFormat {
     Brotli,
 }
 
+pub type SystemPath = compact_str::CompactString;
+
 nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct SystemStats {
         #[schema(inline)]
@@ -718,6 +744,8 @@ pub enum WebsocketEvent {
     OperationError,
     #[serde(rename = "operation completed")]
     OperationCompleted,
+    #[serde(rename = "operation aborted")]
+    OperationAborted,
     #[serde(rename = "file collab subscribe")]
     FileCollabSubscribe,
     #[serde(rename = "file collab unsubscribe")]
@@ -1837,6 +1865,43 @@ pub mod servers_server_files_search {
         pub type Response = Response200;
     }
 }
+pub mod servers_server_files_sqlite_query {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub file: compact_str::CompactString,
+                #[schema(inline)]
+                pub query: compact_str::CompactString,
+                #[schema(inline)]
+                pub read_only: bool,
+                #[schema(inline)]
+                pub rows: u32,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub results: Vec<QueryResultSet>,
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response408 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
 pub mod servers_server_files_write {
     use super::*;
 
@@ -2319,24 +2384,48 @@ pub mod system_config {
                     pub max_jwt_uses: u64,
                     #[schema(inline)]
                     pub trusted_proxies: Vec<compact_str::CompactString>,
+                    #[schema(inline)]
+                    pub schedule: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200ApiSchedule {
+                        #[schema(inline)]
+                        pub steps: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200ApiScheduleSteps {
+                            #[schema(inline)]
+                            pub http_request: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200ApiScheduleStepsHttpRequest {
+                                #[schema(inline)]
+                                pub enabled: bool,
+                                #[schema(inline)]
+                                pub requests: u32,
+                                #[schema(inline)]
+                                pub window_seconds: u64,
+                                #[schema(inline)]
+                                pub max_response_size: u64,
+                                #[schema(inline)]
+                                pub blocked_cidrs: Vec<compact_str::CompactString>,
+                            },
+
+                        },
+
+                    },
+
                 },
 
                 #[schema(inline)]
                 pub system: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200System {
                     #[schema(inline)]
-                    pub root_directory: compact_str::CompactString,
+                    pub root_directory: SystemPath,
                     #[schema(inline)]
-                    pub log_directory: compact_str::CompactString,
+                    pub log_directory: SystemPath,
                     #[schema(inline)]
-                    pub vmount_directory: compact_str::CompactString,
+                    pub data: SystemPath,
                     #[schema(inline)]
-                    pub data: compact_str::CompactString,
+                    pub diffs_directory: SystemPath,
                     #[schema(inline)]
-                    pub archive_directory: compact_str::CompactString,
+                    pub vmount_directory: SystemPath,
                     #[schema(inline)]
-                    pub backup_directory: compact_str::CompactString,
+                    pub archive_directory: SystemPath,
                     #[schema(inline)]
-                    pub tmp_directory: compact_str::CompactString,
+                    pub backup_directory: SystemPath,
+                    #[schema(inline)]
+                    pub tmp_directory: SystemPath,
                     #[schema(inline)]
                     pub username: compact_str::CompactString,
                     #[schema(inline)]
@@ -2364,7 +2453,7 @@ pub mod system_config {
                         #[schema(inline)]
                         pub enabled: bool,
                         #[schema(inline)]
-                        pub directory: compact_str::CompactString,
+                        pub directory: SystemPath,
                     },
 
                     #[schema(inline)]
@@ -2492,6 +2581,10 @@ pub mod system_config {
                         #[schema(inline)]
                         pub max_sessions_per_connection: u64,
                         #[schema(inline)]
+                        pub max_editors_per_session: u64,
+                        #[schema(inline)]
+                        pub max_cursors_per_connection: u64,
+                        #[schema(inline)]
                         pub session_grace_period: u64,
                     },
 
@@ -2542,9 +2635,9 @@ pub mod system_config {
                         #[schema(inline)]
                         pub restic: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemBackupsRestic {
                             #[schema(inline)]
-                            pub repository: compact_str::CompactString,
+                            pub repository: SystemPath,
                             #[schema(inline)]
-                            pub password_file: compact_str::CompactString,
+                            pub password_file: SystemPath,
                             #[schema(inline)]
                             pub retry_lock_seconds: u64,
                             #[schema(inline)]
@@ -2620,6 +2713,8 @@ pub mod system_config {
                             #[schema(inline)]
                             pub v4: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerNetworkInterfacesV4 {
                                 #[schema(inline)]
+                                pub enabled: bool,
+                                #[schema(inline)]
                                 pub subnet: compact_str::CompactString,
                                 #[schema(inline)]
                                 pub gateway: compact_str::CompactString,
@@ -2627,6 +2722,8 @@ pub mod system_config {
 
                             #[schema(inline)]
                             pub v6: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerNetworkInterfacesV6 {
+                                #[schema(inline)]
+                                pub enabled: bool,
                                 #[schema(inline)]
                                 pub subnet: compact_str::CompactString,
                                 #[schema(inline)]

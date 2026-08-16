@@ -349,6 +349,25 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                 },
             ),
             (
+                "system-backup-policies",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage system backup policies for the panel.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new system backup policies."),
+                        ("read", "Allows viewing system backup policies."),
+                        (
+                            "update",
+                            "Allows modifying system backup policies and their attached nodes, locations and servers.",
+                        ),
+                        ("delete", "Allows deleting system backup policies."),
+                        (
+                            "backups",
+                            "Allows viewing backups associated with a system backup policy.",
+                        ),
+                    ]),
+                },
+            ),
+            (
                 "nodes",
                 PermissionGroup {
                     description: "Permissions that control the ability to manage nodes for the panel.",
@@ -619,6 +638,10 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                             "Allows archiving the contents of a directory and decompressing files.",
                         ),
                         ("sftp", "Allows connecting via SFTP to manage files."),
+                        (
+                            "query-raw",
+                            "Allows running arbitrary SQL against a SQLite database file on this server. This grants full read and write access to that file's contents, equivalent to reading and updating it directly.",
+                        ),
                     ]),
                 },
             ),
@@ -728,6 +751,26 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                             "delete",
                             "Allows removing database instances from this server.",
                         ),
+                        (
+                            "query",
+                            "Allows browsing a database's tables and reading their rows through the panel.",
+                        ),
+                        (
+                            "query-raw",
+                            "Allows running arbitrary SQL against a database. This grants full read and write access to its contents and structure, equivalent to the database's own credentials.",
+                        ),
+                        (
+                            "edit-rows",
+                            "Allows inserting, updating and deleting individual table rows through the panel. Statements are built by the panel, so this cannot alter a database's structure.",
+                        ),
+                        (
+                            "edit-structure",
+                            "Allows creating and renaming tables and columns through the panel. Statements are built by the panel from validated names and types, so this cannot read or destroy stored data.",
+                        ),
+                        (
+                            "delete-structure",
+                            "Allows deleting tables and columns through the panel, permanently destroying any data they contain.",
+                        ),
                     ]),
                 },
             ),
@@ -772,6 +815,26 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                         ),
                         ("import", "Allows importing data into database instances."),
                         ("export", "Allows exporting data from database instances."),
+                        (
+                            "query",
+                            "Allows browsing an instance database's tables and reading their rows through the panel.",
+                        ),
+                        (
+                            "query-raw",
+                            "Allows running arbitrary SQL against an instance database. The agent connects as the instance administrator, so this grants full access to every database of the instance.",
+                        ),
+                        (
+                            "edit-rows",
+                            "Allows inserting, updating and deleting individual table rows through the panel. Statements are built by the panel, so this cannot alter a database's structure.",
+                        ),
+                        (
+                            "edit-structure",
+                            "Allows creating and renaming tables and columns through the panel. Statements are built by the panel from validated names and types, so this cannot read or destroy stored data.",
+                        ),
+                        (
+                            "delete-structure",
+                            "Allows deleting tables and columns through the panel, permanently destroying any data they contain.",
+                        ),
                     ]),
                 },
             ),

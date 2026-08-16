@@ -12,6 +12,7 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod explorer;
 mod recreate;
 mod rotate_password;
 mod size;
@@ -276,6 +277,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/size", size::router(state))
         .nest("/rotate-password", rotate_password::router(state))
         .nest("/recreate", recreate::router(state))
+        .nest("/explorer", explorer::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }

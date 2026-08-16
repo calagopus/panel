@@ -20,7 +20,7 @@ import ScrollingText from '@/elements/ScrollingText.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
-import { statusToColor } from '@/lib/server.ts';
+import { serverStatusInfo, statusToColor } from '@/lib/server.ts';
 import { formatMilliseconds } from '@/lib/time.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { SocketRequest } from '@/plugins/useWebsocketEvent.ts';
@@ -79,16 +79,12 @@ export default function ServerStatusIndicator() {
         label: t('common.server.state.nodeMaintenance', {}),
       };
     }
-    if (server.status === 'installing') {
-      return { indicator: spinner, label: t('common.server.state.installing', {}) };
-    }
-    if (server.status === 'restoring_backup') {
-      return { indicator: spinner, label: t('common.server.state.restoringBackup', {}) };
-    }
-    if (server.status === 'install_failed') {
+    if (server.status) {
+      const status = serverStatusInfo[server.status];
+
       return {
-        indicator: icon(faTriangleExclamation, 'text-server-status-starting'),
-        label: t('common.server.state.installFailed', {}),
+        indicator: status.failed ? icon(faTriangleExclamation, 'text-server-status-starting') : spinner,
+        label: status.label(),
       };
     }
 
@@ -142,10 +138,8 @@ export default function ServerStatusIndicator() {
 
         <div className='h-4 flex items-center gap-2 min-w-0'>
           <span className='size-3 shrink-0 flex items-center justify-center'>{indicator}</span>
-          <span className='text-xs leading-none truncate text-(--mantine-color-dimmed)'>{label}</span>
-          {uptime && (
-            <span className='text-xs leading-none ml-auto shrink-0 text-(--mantine-color-dimmed)'>{uptime}</span>
-          )}
+          <span className='text-xs leading-4 truncate text-(--mantine-color-dimmed)'>{label}</span>
+          {uptime && <span className='text-xs leading-4 ml-auto shrink-0 text-(--mantine-color-dimmed)'>{uptime}</span>}
         </div>
 
         {(canPower || canRestart) && (
