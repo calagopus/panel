@@ -131,7 +131,7 @@ export default function ServerStatusIndicator() {
     <>
       <Card p='xs' className='min-h-fit'>
         <div className='h-5 flex items-center min-w-0'>
-          <span className='text-sm font-medium min-w-0 flex-1' title={server.name}>
+          <span className='text-sm font-medium min-w-0 flex-1'>
             <ScrollingText>{server.name}</ScrollingText>
           </span>
         </div>
