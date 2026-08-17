@@ -202,7 +202,6 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
                   'flex w-full min-w-0 items-center gap-4 overflow-hidden rounded-sm py-0.5 leading-5',
                   canDragFile && 'cursor-grab active:cursor-grabbing',
                 )}
-                title={file.name}
                 onMouseDown={(e) => {
                   if (canDragFile) e.stopPropagation();
                 }}
