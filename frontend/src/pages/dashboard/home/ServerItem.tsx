@@ -194,7 +194,7 @@ export default function ServerItem({
                           </ActionIcon>
                         </Tooltip>
                       )}
-                      <span className='text-xl font-medium flex items-center gap-2 min-w-0 flex-1' title={server.name}>
+                      <span className='text-xl font-medium flex items-center gap-2 min-w-0 flex-1'>
                         <ScrollingText className='flex-1'>{server.name}</ScrollingText>
                         {showForeignServerBadge && !server.isOwner && (
                           <Tooltip label={t('pages.account.home.tooltip.foreign', {})}>
