@@ -4651,6 +4651,7 @@ const baseTranslations = defineTranslations({
             fileTooLargeToOpen: 'This file is too large to open in the file manager.',
           },
           tooltip: {
+            settings: 'Settings',
             fileHistory: 'File History',
             revertToDisk: 'Discard changes and load the file from disk',
             collabEditing: '{user} is editing this file',
