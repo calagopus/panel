@@ -635,7 +635,7 @@ function FileEditorComponent() {
     >
       <div className='flex justify-between items-center gap-2 lg:pt-6 px-4 lg:px-6 lg:pb-0'>
         <Group wrap='nowrap' gap='xs' className='min-w-0 flex-1'>
-          <Title className='truncate! min-w-0 flex-1 text-lg! sm:text-[2.125rem]!'>{title}</Title>
+          <Title className='truncate! min-w-0 text-lg! sm:text-[2.125rem]!'>{title}</Title>
 
           {matchedFileEditorAction?.header.settings ? (
             <matchedFileEditorAction.header.settings />
@@ -667,7 +667,7 @@ function FileEditorComponent() {
             {showRevertAction && (
               <div className='hidden sm:block'>
                 <Tooltip label={t('pages.server.files.tooltip.revertToDisk', {})}>
-                  <ActionIcon size='sm' variant='subtle' color='gray' onClick={() => setRevertConfirm(true)}>
+                  <ActionIcon size='md' variant='subtle' color='gray' onClick={() => setRevertConfirm(true)}>
                     <FontAwesomeIcon icon={faArrowsRotate} />
                   </ActionIcon>
                 </Tooltip>
@@ -676,7 +676,7 @@ function FileEditorComponent() {
             {showHistoryAction && (
               <div className='hidden sm:block'>
                 <Tooltip label={t('pages.server.files.tooltip.fileHistory', {})}>
-                  <ActionIcon size='sm' variant='subtle' color='gray' onClick={() => setRevisionsOpen(true)}>
+                  <ActionIcon size='md' variant='subtle' color='gray' onClick={() => setRevisionsOpen(true)}>
                     <FontAwesomeIcon icon={faClockRotateLeft} />
                   </ActionIcon>
                 </Tooltip>
