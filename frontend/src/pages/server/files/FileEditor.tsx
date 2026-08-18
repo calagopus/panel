@@ -30,7 +30,7 @@ import Select from '@/elements/input/Select.tsx';
 import MonacoEditor, { MonacoDiffEditor } from '@/elements/MonacoEditor.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import PierreEditor, { type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
+import PierreEditor, { PierreDiffEditor, type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Title from '@/elements/Title.tsx';
@@ -801,29 +801,42 @@ function FileEditorComponent() {
           </div>
         ) : (
           <div className='h-[70vh] flex'>
-            <MonacoDiffEditor
-              height='100%'
-              width='100%'
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                codeLens: false,
-                scrollBeyondLastLine: false,
-                originalEditable: false,
-              }}
-              onMount={(diffEditor, monaco) => {
-                conflictModelsRef.current.forEach((model) => model.dispose());
+            {editorEngine === 'pierre' ? (
+              <PierreDiffEditor
+                height='100%'
+                width='100%'
+                originalPath={`${fileName} (Disk)`}
+                originalValue={conflictDiskContent ?? ''}
+                modifiedPath={`${fileName} (Editor)`}
+                modifiedValue={getEditorValue()}
+                readOnly
+                wordWrap={editorLineOverflow}
+              />
+            ) : (
+              <MonacoDiffEditor
+                height='100%'
+                width='100%'
+                options={{
+                  readOnly: true,
+                  minimap: { enabled: false },
+                  codeLens: false,
+                  scrollBeyondLastLine: false,
+                  originalEditable: false,
+                }}
+                onMount={(diffEditor, monaco) => {
+                  conflictModelsRef.current.forEach((model) => model.dispose());
 
-                const originalModel = monaco.editor.createModel(conflictDiskContent, undefined);
-                const modifiedModel = monaco.editor.createModel(editorRef.current?.getValue() ?? '', undefined);
-                conflictModelsRef.current = [originalModel, modifiedModel];
+                  const originalModel = monaco.editor.createModel(conflictDiskContent, undefined);
+                  const modifiedModel = monaco.editor.createModel(getEditorValue(), undefined);
+                  conflictModelsRef.current = [originalModel, modifiedModel];
 
-                diffEditor.setModel({
-                  original: originalModel,
-                  modified: modifiedModel,
-                });
-              }}
-            />
+                  diffEditor.setModel({
+                    original: originalModel,
+                    modified: modifiedModel,
+                  });
+                }}
+              />
+            )}
           </div>
         )}
 
