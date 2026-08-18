@@ -5,6 +5,7 @@ import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Popover from '@/elements/Popover.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -25,9 +26,11 @@ export default function FileSettings() {
   return (
     <Popover position='bottom' withArrow shadow='md'>
       <Popover.Target>
-        <Button variant='transparent' size='compact-xs'>
-          <FontAwesomeIcon size='lg' icon={faCog} />
-        </Button>
+        <Tooltip label={t('pages.server.files.tooltip.settings', {})}>
+          <Button variant='transparent' size='compact-xs'>
+            <FontAwesomeIcon size='lg' icon={faCog} />
+          </Button>
+        </Tooltip>
       </Popover.Target>
       <Popover.Dropdown>
         <div className='flex flex-col space-y-2'>
