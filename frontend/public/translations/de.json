@@ -4636,6 +4636,7 @@
             "fileTooLargeToOpen": "Diese Datei ist zu groß, um sie im Dateimanager zu öffnen."
           },
           "tooltip": {
+            "settings": "Einstellungen",
             "fileHistory": "Dateiverlauf",
             "revertToDisk": "Änderungen verwerfen und Datei von der Festplatte laden",
             "collabEditing": "{user} bearbeitet diese Datei",
