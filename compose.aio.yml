@@ -19,6 +19,7 @@ services:
       - APP_USE_INTERNAL_CACHE=true # caches short-lived values in app memory and redis instead of just redis, improves performance at the cost of higher memory usage
     dns:
       - 1.1.1.1
+      - 8.8.8.8
       - 9.9.9.9
     volumes:
       # --- panel
