@@ -1,8 +1,10 @@
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFileUpload, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ChangeEvent, RefObject, useRef } from 'react';
 import Button from '@/elements/Button.tsx';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
+import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AssetDropOverlay from './AssetDropOverlay.tsx';
 
@@ -21,6 +23,17 @@ export default function AssetUpload({
   });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useQuickActions([
+    {
+      id: 'assets.uploadFiles',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.admin.assets.quickAction.uploadFiles', {}),
+      icon: <FontAwesomeIcon icon={faFileUpload} />,
+      adminPermission: 'assets.upload',
+      perform: () => fileInputRef.current?.click(),
+    },
+  ]);
 
   return (
     <>

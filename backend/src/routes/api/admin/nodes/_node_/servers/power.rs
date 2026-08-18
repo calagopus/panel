@@ -10,12 +10,11 @@ mod post {
         },
         response::{ApiResponse, ApiResponseResult},
     };
-    use std::collections::HashSet;
     use utoipa::ToSchema;
 
     #[derive(ToSchema, Deserialize)]
     pub struct Payload {
-        servers: HashSet<uuid::Uuid>,
+        servers: wings_api::ServerSelector,
         action: wings_api::ServerPowerAction,
     }
 
@@ -47,7 +46,7 @@ mod post {
             .api_client(&state.database)
             .await?
             .post_servers_power(&wings_api::servers_power::post::RequestBody {
-                servers: data.servers.iter().copied().collect(),
+                servers: data.servers.clone(),
                 action: data.action,
                 wait_seconds: None,
             })
@@ -58,7 +57,7 @@ mod post {
                 "node:servers.power",
                 serde_json::json!({
                     "node_uuid": node.uuid,
-                    "servers": if data.servers.is_empty() { None } else { Some(&data.servers) },
+                    "servers": data.servers,
                     "action": data.action,
                 }),
             )

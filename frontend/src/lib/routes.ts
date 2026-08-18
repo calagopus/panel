@@ -19,6 +19,17 @@ const isUnderPath = (path: string, parent: string) => {
 };
 
 /**
+ * Whether a *named* route's path survives a custom `routeOrder`. Named routes are accessible
+ * exactly when the order lists them, so unlike `getAccessibleRoutePaths` this needs no route
+ * definitions - which keeps callers from importing a route module purely to ask about one path.
+ */
+export const isNamedRoutePathAccessible = (routeOrder: RouteOrderLike[] | null | undefined, path: string) => {
+  if (!routeOrder) return true;
+
+  return routeOrder.some((item) => item.type === 'route' && item.path === path);
+};
+
+/**
  * Computes the set of route paths that remain reachable once a custom sidebar
  * `routeOrder` is applied. Named routes (the ones an admin can reorder/remove)
  * are only accessible when present in the order; unnamed sub-routes inherit

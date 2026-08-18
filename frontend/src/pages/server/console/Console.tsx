@@ -29,9 +29,11 @@ import Progress from '@/elements/Progress.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { handleRawCopyToClipboard } from '@/lib/copy.ts';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
 import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { getXtermTheme } from '@/lib/xterm.ts';
 import { matchesShortcut, useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
+import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -670,6 +672,73 @@ export default function Terminal() {
       deps: [openModal],
     },
   );
+
+  const consoleAvailable = server.status === null && !server.isSuspended && !server.isTransferring;
+
+  useQuickActions([
+    {
+      id: 'console.search',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.console.quickAction.search', {}),
+      keywords: ['find'],
+      icon: <FontAwesomeIcon icon={faMagnifyingGlass} />,
+      perform: () => setOpenModal('search'),
+    },
+    {
+      id: 'console.sshDetails',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.console.tooltip.sshDetails', {}),
+      keywords: ['ssh', 'connect'],
+      icon: <FontAwesomeIcon icon={faServer} />,
+      isVisible: () => consoleAvailable,
+      perform: () => setOpenModal('sshDetails'),
+    },
+    {
+      id: 'console.commandHistory',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.console.tooltip.commandHistory', {}),
+      keywords: ['commands', 'previous'],
+      icon: <FontAwesomeIcon icon={faClockRotateLeft} />,
+      isVisible: () => consoleAvailable,
+      perform: () => setOpenModal('commandHistory'),
+    },
+    {
+      id: 'console.copySelection',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.console.tooltip.copySelection', {}),
+      keywords: ['clipboard'],
+      icon: <FontAwesomeIcon icon={faCopy} />,
+      isVisible: () => xtermInstance.current?.hasSelection() ?? false,
+      perform: copySelection,
+    },
+    {
+      id: 'console.scrollToBottom',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.console.quickAction.scrollToBottom', {}),
+      keywords: ['bottom', 'latest'],
+      icon: <FontAwesomeIcon icon={faArrowDown} />,
+      isVisible: () => !isAtBottom,
+      perform: scrollToBottom,
+    },
+    {
+      id: 'console.decreaseFontSize',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.console.tooltip.decreaseFontSize', {}),
+      keywords: ['zoom', 'smaller'],
+      icon: <FontAwesomeIcon icon={faMinus} />,
+      isVisible: () => consoleFontSize > 10,
+      perform: () => setConsoleFontSize((size) => Math.max(10, size - 1)),
+    },
+    {
+      id: 'console.increaseFontSize',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.console.tooltip.increaseFontSize', {}),
+      keywords: ['zoom', 'larger'],
+      icon: <FontAwesomeIcon icon={faPlus} />,
+      isVisible: () => consoleFontSize < 24,
+      perform: () => setConsoleFontSize((size) => Math.min(24, size + 1)),
+    },
+  ]);
 
   return (
     <>

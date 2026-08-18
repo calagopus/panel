@@ -89,18 +89,18 @@ export function isValidPort(port: string): boolean {
 }
 
 export function resolvePorts(ports: string[]): ResolvedPorts {
-  const resolved: number[] = [];
+  const resolved = new Set<number>();
   const toRemove: string[] = [];
 
   for (const range of ports) {
     if (isValidPort(range)) {
-      resolved.push(Number(range));
+      resolved.add(Number(range));
     } else if (range.includes('-')) {
       const [start, end] = range.split('-');
 
       if (isValidPort(start) && isValidPort(end)) {
         for (let i = Number(start); i <= Number(end); i++) {
-          resolved.push(i);
+          resolved.add(i);
         }
       }
     } else {
@@ -108,5 +108,5 @@ export function resolvePorts(ports: string[]): ResolvedPorts {
     }
   }
 
-  return { resolved, toRemove };
+  return { resolved: Array.from(resolved), toRemove };
 }

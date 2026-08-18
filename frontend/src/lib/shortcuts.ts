@@ -126,32 +126,6 @@ export function bindingFromEvent(event: KeyboardEvent): ShortcutBinding | null {
   return { key: layoutSafeKey(event), modifiers };
 }
 
-function keyCode(key: string): string {
-  if (key === ' ') return 'Space';
-  if (/^[a-zA-Z]$/.test(key)) return `Key${key.toUpperCase()}`;
-  if (/^[0-9]$/.test(key)) return `Digit${key}`;
-  return key;
-}
-
-export const isMacPlatform = () => navigator.platform.toUpperCase().includes('MAC');
-
-export function dispatchBinding(binding: ShortcutBinding) {
-  const usesMeta = binding.modifiers.includes('meta') || (binding.modifiers.includes('ctrlOrMeta') && isMacPlatform());
-
-  window.dispatchEvent(
-    new KeyboardEvent('keydown', {
-      key: binding.key,
-      code: keyCode(binding.key),
-      ctrlKey: binding.modifiers.includes('ctrl') || (binding.modifiers.includes('ctrlOrMeta') && !usesMeta),
-      metaKey: usesMeta,
-      shiftKey: binding.modifiers.includes('shift'),
-      altKey: binding.modifiers.includes('alt'),
-      bubbles: true,
-      cancelable: true,
-    }),
-  );
-}
-
 export function eventKeyMatches(event: KeyboardEvent, key: string): boolean {
   const target = key.toLowerCase();
   return layoutSafeKey(event).toLowerCase() === target || eventKey(event).toLowerCase() === target;

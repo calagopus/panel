@@ -168,14 +168,16 @@ export default function AdminServerBackupRow({
             }}
           >
             <TableData>
-              {backup.name}
-              {backup.systemBackupPolicyUuid && (
-                <TableLink className='ml-2' to={`/admin/system-backup-policies/${backup.systemBackupPolicyUuid}`}>
-                  <Badge className='cursor-pointer!' color='blue'>
-                    {t('common.badge.systemBackup', {})}
-                  </Badge>
-                </TableLink>
-              )}
+              <div className='flex flex-row flex-wrap items-center gap-x-2 gap-y-1 whitespace-normal'>
+                <span className='whitespace-nowrap'>{backup.name}</span>
+                {backup.systemBackupPolicyUuid && (
+                  <TableLink to={`/admin/system-backup-policies/${backup.systemBackupPolicyUuid}`}>
+                    <Badge className='cursor-pointer!' color='blue'>
+                      {t('common.badge.systemBackup', {})}
+                    </Badge>
+                  </TableLink>
+                )}
+              </div>
             </TableData>
 
             <TableData className='flex flex-row items-center'>

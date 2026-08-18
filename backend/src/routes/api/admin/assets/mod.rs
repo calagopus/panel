@@ -10,11 +10,10 @@ mod search;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
-    use garde::Validate;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{Pagination, user::GetPermissionManager},
+        models::{Pagination, PaginationParams, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -25,15 +24,8 @@ mod get {
         assets: Pagination<shared::storage::StorageAsset>,
     }
 
-    #[derive(ToSchema, Validate, Deserialize)]
+    #[derive(ToSchema, Deserialize)]
     pub struct Params {
-        #[garde(range(min = 1))]
-        #[serde(default = "Pagination::default_page")]
-        page: i64,
-        #[garde(range(min = 1, max = 100))]
-        #[serde(default = "Pagination::default_per_page")]
-        per_page: i64,
-        #[garde(skip)]
         #[serde(default)]
         directory: compact_str::CompactString,
     }
@@ -61,9 +53,10 @@ mod get {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        Query(pagination): Query<PaginationParams>,
         Query(params): Query<Params>,
     ) -> ApiResponseResult {
-        if let Err(errors) = shared::utils::validate_data(&params) {
+        if let Err(errors) = shared::utils::validate_data(&pagination) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -83,8 +76,8 @@ mod get {
             .list(
                 "assets",
                 directory,
-                params.page as usize,
-                params.per_page as usize,
+                pagination.page as usize,
+                pagination.per_page as usize,
             )
             .await?;
 

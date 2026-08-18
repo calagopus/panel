@@ -54,6 +54,39 @@ function resolveShortcut(shortcut: ShortcutConfig): ResolvedShortcut {
   };
 }
 
+type ShortcutProvider = () => ShortcutConfig[];
+
+const activeProviders: ShortcutProvider[] = [];
+
+function registerActiveShortcuts(provider: ShortcutProvider) {
+  activeProviders.push(provider);
+
+  return () => {
+    const index = activeProviders.indexOf(provider);
+    if (index !== -1) activeProviders.splice(index, 1);
+  };
+}
+
+export interface ActiveShortcutMatch {
+  preventDefault: boolean;
+  callback: (event: KeyboardEvent) => void;
+}
+
+export function matchActiveInputShortcut(event: KeyboardEvent): ActiveShortcutMatch | null {
+  for (const provider of activeProviders) {
+    for (const shortcut of provider()) {
+      const { binding, allowWhenInputFocused, preventDefault } = resolveShortcut(shortcut);
+
+      if (!binding || !allowWhenInputFocused) continue;
+      if (!eventMatchesBinding(event, binding)) continue;
+
+      return { preventDefault, callback: shortcut.callback };
+    }
+  }
+
+  return null;
+}
+
 function isInputFocused(): boolean {
   const target = document.activeElement as HTMLElement | null;
   return target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable === true;
@@ -83,7 +116,12 @@ export function useKeyboardShortcuts({ shortcuts, enabled = true, deps = [] }: U
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    const unregister = registerActiveShortcuts(() => shortcutsRef.current);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      unregister();
+    };
   }, [enabled, ...deps]);
 }
 

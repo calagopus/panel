@@ -6,33 +6,16 @@ mod templates;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
-    use garde::Validate;
-    use serde::{Deserialize, Serialize};
+    use serde::Serialize;
     use shared::{
         ApiError, GetState,
         models::{
-            IntoApiObject, Pagination, server::GetServer,
+            IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
             server_database_instance::ServerDatabaseInstance, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
-
-    #[derive(ToSchema, Validate, Deserialize)]
-    pub struct Params {
-        #[garde(range(min = 1))]
-        #[serde(default = "Pagination::default_page")]
-        page: i64,
-        #[garde(range(min = 1, max = 100))]
-        #[serde(default = "Pagination::default_per_page")]
-        per_page: i64,
-        #[garde(length(chars, min = 1, max = 100))]
-        #[serde(
-            default,
-            deserialize_with = "shared::deserialize::deserialize_string_option"
-        )]
-        search: Option<compact_str::CompactString>,
-    }
 
     #[derive(ToSchema, Serialize)]
     struct Response {
@@ -68,7 +51,7 @@ mod get {
         state: GetState,
         permissions: GetPermissionManager,
         server: GetServer,
-        Query(params): Query<Params>,
+        Query(params): Query<PaginationParamsWithSearch>,
     ) -> ApiResponseResult {
         if let Err(errors) = shared::utils::validate_data(&params) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))

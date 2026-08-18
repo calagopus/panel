@@ -479,6 +479,7 @@ const baseTranslations = defineTranslations({
           power: 'Power',
           account: 'Account',
           servers: 'Servers',
+          users: 'Users',
           page: 'This Page',
           math: 'Calculator',
         },
@@ -493,6 +494,8 @@ const baseTranslations = defineTranslations({
           close: 'to close',
           calculate: 'to calculate',
           pages: 'for pages only',
+          servers: 'for servers only',
+          users: 'for users only',
         },
       },
       permissionSelector: {
@@ -1996,6 +1999,11 @@ const baseTranslations = defineTranslations({
             upload: 'Upload',
             copyLink: 'Copy Link',
           },
+          quickAction: {
+            uploadFiles: 'Upload Assets',
+            parentDirectory: 'Go to Parent Directory',
+            deleteSelection: 'Delete Selection',
+          },
           dropzone: {
             title: 'Drop files here to upload',
             subtitle: 'Release to start uploading',
@@ -2512,9 +2520,15 @@ const baseTranslations = defineTranslations({
                 title: 'Node Allocations',
                 tooltip: {
                   clearSelection: 'Clear Selection',
+                  selectAllMatching: 'Select all {count} matching',
                 },
                 form: {
                   ipAlias: 'IP Alias',
+                  portFrom: 'Port from',
+                  portTo: 'Port to',
+                  assigned: 'Assignment',
+                  assignedOnly: 'Assigned only',
+                  unassignedOnly: 'Unassigned only',
                 },
                 table: {
                   columns: {
@@ -2533,15 +2547,26 @@ const baseTranslations = defineTranslations({
                   },
                   update: {
                     title: 'Update Node Allocations',
+                    button: {
+                      update: 'Update {count}',
+                    },
                     toast: {
                       updated: '{allocations} updated.',
+                      updatedPartial:
+                        '{allocations} updated. {skipped} skipped, because that port is already taken on the target IP.',
                     },
                   },
                   delete: {
                     title: 'Confirm Node Allocations Deletion',
-                    content: 'Are you sure you want to delete `{count}` allocations from **{name}**?',
+                    content: 'Are you sure you want to delete {allocations} from **{name}**?',
+                    alert: {
+                      forceWarning:
+                        'Force deletion removes allocations that are assigned to a server, including servers being transferred. Affected servers lose the allocation immediately and will not start correctly after their next restart.',
+                    },
                     toast: {
                       deleted: '{allocations} deleted.',
+                      deletedPartial:
+                        '{allocations} deleted. {skipped} skipped, because they are assigned to a server.',
                     },
                   },
                 },
@@ -2735,6 +2760,14 @@ const baseTranslations = defineTranslations({
         servers: {
           title: 'Servers',
           resourceName: 'Server',
+          quickAction: {
+            viewClient: 'View Server in Client Area',
+            transfer: 'Transfer Server',
+            suspend: 'Suspend Server',
+            unsuspend: 'Unsuspend Server',
+            clearState: 'Clear Server State',
+            delete: 'Delete Server',
+          },
           externalIdLookup: {
             button: 'Find by External ID',
             modal: {
@@ -4404,6 +4437,10 @@ const baseTranslations = defineTranslations({
             decreaseFontSize: 'Decrease Font Size',
             increaseFontSize: 'Increase Font Size',
             copySelection: 'Copy Selection',
+          },
+          quickAction: {
+            search: 'Search Console',
+            scrollToBottom: 'Scroll to Bottom',
           },
           drawer: {
             commandHistory: {

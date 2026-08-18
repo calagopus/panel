@@ -1,19 +1,22 @@
+import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { serializeForApi } from '@/lib/api-transform.ts';
+import { adminNodeAllocationSelectorSchema } from '@/lib/schemas/admin/nodes.ts';
 
-interface Data {
-  ip?: string;
-  ipAlias?: string | null;
-}
+const updateNodeAllocationsSchema = z.object({
+  selector: adminNodeAllocationSelectorSchema,
+  ip: z.string(),
+  ipAlias: z.string().nullable(),
+});
 
 export default async (
   nodeUuid: string,
-  allocationUuids: string[],
-  allocationData: Data,
-): Promise<{ updated: number }> => {
-  const { data } = await axiosInstance.patch(`/api/admin/nodes/${nodeUuid}/allocations`, {
-    uuids: allocationUuids,
-    ip: allocationData.ip,
-    ip_alias: allocationData.ipAlias,
-  });
+  selector: z.infer<typeof adminNodeAllocationSelectorSchema>,
+  allocationData: { ip: string; ipAlias: string | null },
+): Promise<{ updated: number; skipped: number }> => {
+  const { data } = await axiosInstance.patch(
+    `/api/admin/nodes/${nodeUuid}/allocations`,
+    serializeForApi(updateNodeAllocationsSchema, { selector, ...allocationData }),
+  );
   return data;
 };

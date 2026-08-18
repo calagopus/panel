@@ -6,6 +6,104 @@ use std::{
     collections::{BTreeMap, HashMap},
     sync::LazyLock,
 };
+use utoipa::ToSchema;
+
+pub const CREATE_MAX_PORTS: usize = 65535;
+
+fn validate_filter_criteria(filter: &AllocationFilter, _context: &()) -> Result<(), garde::Error> {
+    if filter.is_empty() {
+        return Err(garde::Error::new(
+            "filter must narrow the selection by at least one criterion, use the all selector to target every allocation",
+        ));
+    }
+
+    Ok(())
+}
+
+#[derive(ToSchema, garde::Validate, Deserialize, Serialize, Default, Clone)]
+pub struct AllocationFilter {
+    #[garde(length(chars, min = 1, max = 128))]
+    #[schema(min_length = 1, max_length = 128)]
+    #[serde(
+        default,
+        deserialize_with = "crate::deserialize::deserialize_string_option"
+    )]
+    pub search: Option<compact_str::CompactString>,
+
+    #[garde(skip)]
+    #[schema(value_type = Option<String>)]
+    #[serde(default)]
+    pub ip: Option<std::net::IpAddr>,
+    #[garde(inner(range(min = 1, max = 65535)))]
+    #[schema(minimum = 1, maximum = 65535)]
+    #[serde(default)]
+    pub port_from: Option<i32>,
+    #[garde(inner(range(min = 1, max = 65535)))]
+    #[schema(minimum = 1, maximum = 65535)]
+    #[serde(default)]
+    pub port_to: Option<i32>,
+    #[garde(skip)]
+    #[serde(default)]
+    pub assigned: Option<bool>,
+}
+
+impl AllocationFilter {
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.search.is_none()
+            && self.ip.is_none()
+            && self.port_from.is_none()
+            && self.port_to.is_none()
+            && self.assigned.is_none()
+    }
+
+    #[inline]
+    pub fn bind<'q>(
+        &'q self,
+        query: sqlx::query::Query<'q, sqlx::Postgres, sqlx::postgres::PgArguments>,
+    ) -> sqlx::query::Query<'q, sqlx::Postgres, sqlx::postgres::PgArguments> {
+        query
+            .bind(self.search.as_deref())
+            .bind(self.ip.map(sqlx::types::ipnetwork::IpNetwork::from))
+            .bind(self.port_from)
+            .bind(self.port_to)
+            .bind(self.assigned)
+    }
+}
+
+#[derive(ToSchema, garde::Validate, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case", tag = "type")]
+#[non_exhaustive]
+pub enum AllocationSelector {
+    Uuids {
+        #[garde(skip)]
+        uuids: Vec<uuid::Uuid>,
+    },
+    All,
+    Filter {
+        #[garde(dive, custom(validate_filter_criteria))]
+        filter: AllocationFilter,
+    },
+}
+
+impl AllocationSelector {
+    #[inline]
+    pub fn uuids(&self) -> Option<&[uuid::Uuid]> {
+        match self {
+            Self::Uuids { uuids } => Some(uuids),
+            _ => None,
+        }
+    }
+
+    #[inline]
+    pub fn filter(&self) -> Option<&AllocationFilter> {
+        match self {
+            Self::Filter { filter } => Some(filter),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct NodeAllocation {
     pub uuid: uuid::Uuid,
@@ -104,6 +202,32 @@ impl NodeAllocation {
         .await?;
 
         Ok(())
+    }
+
+    pub async fn create_many(
+        database: &crate::database::Database,
+        node_uuid: uuid::Uuid,
+        ip: &sqlx::types::ipnetwork::IpNetwork,
+        ip_alias: Option<&str>,
+        ports: &[i32],
+    ) -> Result<u64, crate::database::DatabaseError> {
+        let created = sqlx::query(
+            r#"
+            INSERT INTO node_allocations (node_uuid, ip, ip_alias, port)
+            SELECT DISTINCT $1, $2, $3, port
+            FROM UNNEST($4::int[]) AS port
+            ON CONFLICT (node_uuid, host(ip), port) DO NOTHING
+            "#,
+        )
+        .bind(node_uuid)
+        .bind(ip)
+        .bind(ip_alias)
+        .bind(ports)
+        .execute(database.write())
+        .await?
+        .rows_affected();
+
+        Ok(created)
     }
 
     pub async fn used_by_node(
@@ -733,34 +857,39 @@ impl NodeAllocation {
     pub async fn by_node_uuid_with_pagination(
         database: &crate::database::Database,
         node_uuid: uuid::Uuid,
+        filter: &AllocationFilter,
         page: i64,
         per_page: i64,
-        search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
-        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+        let query = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT {}, server_allocations.server_uuid, COUNT(*) OVER() AS total_count
             FROM node_allocations
             LEFT JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
             WHERE node_allocations.node_uuid = $1
-                AND (
-                    $2 IS NULL OR host(node_allocations.ip) || ':' || node_allocations.port ILIKE '%' || $2 || '%'
+                AND ($2::text IS NULL
+                    OR host(node_allocations.ip) || ':' || node_allocations.port ILIKE '%' || $2 || '%'
                     OR (node_allocations.ip_alias IS NOT NULL AND node_allocations.ip_alias || ':' || node_allocations.port ILIKE '%' || $2 || '%')
-                    OR server_allocations.notes ILIKE '%' || $2 || '%'
-                )
+                    OR server_allocations.notes ILIKE '%' || $2 || '%')
+                AND ($3::inet IS NULL OR host(node_allocations.ip) = host($3))
+                AND ($4::int IS NULL OR node_allocations.port >= $4)
+                AND ($5::int IS NULL OR node_allocations.port <= $5)
+                AND ($6::bool IS NULL OR (server_allocations.uuid IS NOT NULL) = $6)
             ORDER BY node_allocations.ip, node_allocations.port
-            LIMIT $3 OFFSET $4
+            LIMIT $7 OFFSET $8
             "#,
             Self::columns_sql(None)
         )))
-        .bind(node_uuid)
-        .bind(search)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(database.read())
-        .await?;
+        .bind(node_uuid);
+
+        let rows = filter
+            .bind(query)
+            .bind(per_page)
+            .bind(offset)
+            .fetch_all(database.read())
+            .await?;
 
         Ok(super::Pagination {
             total: rows
@@ -775,24 +904,135 @@ impl NodeAllocation {
         })
     }
 
-    pub async fn delete_by_uuids(
+    pub async fn distinct_ips_by_node_uuid(
         database: &crate::database::Database,
         node_uuid: uuid::Uuid,
-        uuids: &[uuid::Uuid],
-    ) -> Result<u64, crate::database::DatabaseError> {
-        let deleted = sqlx::query(
+    ) -> Result<Vec<compact_str::CompactString>, crate::database::DatabaseError> {
+        let rows = sqlx::query(
             r#"
-            DELETE FROM node_allocations
-            WHERE node_allocations.node_uuid = $1 AND node_allocations.uuid = ANY($2)
+            SELECT host(node_allocations.ip) AS ip
+            FROM node_allocations
+            WHERE node_allocations.node_uuid = $1
+            GROUP BY host(node_allocations.ip)
+            ORDER BY MIN(node_allocations.ip)
             "#,
         )
         .bind(node_uuid)
-        .bind(uuids)
-        .execute(database.write())
-        .await?
-        .rows_affected();
+        .fetch_all(database.read())
+        .await?;
 
-        Ok(deleted)
+        rows.into_iter()
+            .map(|row| Ok(row.try_get::<String, _>("ip")?.into()))
+            .try_collect_vec()
+    }
+
+    pub async fn delete_by_selector(
+        database: &crate::database::Database,
+        node_uuid: uuid::Uuid,
+        selector: &AllocationSelector,
+        force: bool,
+    ) -> Result<(i64, i64), crate::database::DatabaseError> {
+        let filter = selector.filter().cloned().unwrap_or_default();
+
+        let query = sqlx::query(
+            r#"
+            WITH matched AS (
+                SELECT node_allocations.uuid, server_allocations.uuid IS NOT NULL AS in_use
+                FROM node_allocations
+                LEFT JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
+                WHERE node_allocations.node_uuid = $1
+                    AND ($7::uuid[] IS NULL OR node_allocations.uuid = ANY($7))
+                    AND ($2::text IS NULL
+                        OR host(node_allocations.ip) || ':' || node_allocations.port ILIKE '%' || $2 || '%'
+                        OR (node_allocations.ip_alias IS NOT NULL AND node_allocations.ip_alias || ':' || node_allocations.port ILIKE '%' || $2 || '%')
+                        OR server_allocations.notes ILIKE '%' || $2 || '%')
+                    AND ($3::inet IS NULL OR host(node_allocations.ip) = host($3))
+                    AND ($4::int IS NULL OR node_allocations.port >= $4)
+                    AND ($5::int IS NULL OR node_allocations.port <= $5)
+                    AND ($6::bool IS NULL OR (server_allocations.uuid IS NOT NULL) = $6)
+            ), deleted AS (
+                DELETE FROM node_allocations
+                WHERE node_allocations.uuid IN (SELECT uuid FROM matched WHERE $8 OR NOT in_use)
+                RETURNING 1
+            )
+            SELECT (SELECT COUNT(*) FROM matched) AS matched_count,
+                   (SELECT COUNT(*) FROM deleted) AS deleted_count
+            "#,
+        )
+        .bind(node_uuid);
+
+        let row = filter
+            .bind(query)
+            .bind(selector.uuids())
+            .bind(force)
+            .fetch_one(database.write())
+            .await?;
+
+        Ok((row.try_get("matched_count")?, row.try_get("deleted_count")?))
+    }
+
+    pub async fn update_by_selector(
+        database: &crate::database::Database,
+        node_uuid: uuid::Uuid,
+        selector: &AllocationSelector,
+        ip: &sqlx::types::ipnetwork::IpNetwork,
+        ip_alias: Option<Option<&str>>,
+    ) -> Result<(i64, i64), crate::database::DatabaseError> {
+        let filter = selector.filter().cloned().unwrap_or_default();
+
+        let query = sqlx::query(
+            r#"
+            WITH matched AS (
+                SELECT node_allocations.uuid, node_allocations.port
+                FROM node_allocations
+                LEFT JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
+                WHERE node_allocations.node_uuid = $1
+                    AND ($7::uuid[] IS NULL OR node_allocations.uuid = ANY($7))
+                    AND ($2::text IS NULL
+                        OR host(node_allocations.ip) || ':' || node_allocations.port ILIKE '%' || $2 || '%'
+                        OR (node_allocations.ip_alias IS NOT NULL AND node_allocations.ip_alias || ':' || node_allocations.port ILIKE '%' || $2 || '%')
+                        OR server_allocations.notes ILIKE '%' || $2 || '%')
+                    AND ($3::inet IS NULL OR host(node_allocations.ip) = host($3))
+                    AND ($4::int IS NULL OR node_allocations.port >= $4)
+                    AND ($5::int IS NULL OR node_allocations.port <= $5)
+                    AND ($6::bool IS NULL OR (server_allocations.uuid IS NOT NULL) = $6)
+            ), winners AS (
+                SELECT DISTINCT ON (matched.port) matched.uuid, matched.port
+                FROM matched
+                ORDER BY matched.port, matched.uuid
+            ), eligible AS (
+                SELECT winners.uuid
+                FROM winners
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM node_allocations existing
+                    WHERE existing.node_uuid = $1
+                        AND host(existing.ip) = host($8::inet)
+                        AND existing.port = winners.port
+                        AND existing.uuid <> winners.uuid
+                )
+            ), updated AS (
+                UPDATE node_allocations
+                SET ip = $8,
+                    ip_alias = CASE WHEN $9 THEN $10::varchar ELSE node_allocations.ip_alias END
+                WHERE node_allocations.uuid IN (SELECT uuid FROM eligible)
+                RETURNING 1
+            )
+            SELECT (SELECT COUNT(*) FROM matched) AS matched_count,
+                   (SELECT COUNT(*) FROM updated) AS updated_count
+            "#,
+        )
+        .bind(node_uuid);
+
+        let row = filter
+            .bind(query)
+            .bind(selector.uuids())
+            .bind(ip)
+            .bind(ip_alias.is_some())
+            .bind(ip_alias.flatten())
+            .fetch_one(database.write())
+            .await?;
+
+        Ok((row.try_get("matched_count")?, row.try_get("updated_count")?))
     }
 }
 

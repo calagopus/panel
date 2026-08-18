@@ -2,20 +2,27 @@ import { faCheckDouble, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Ref, useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
+import getNodeAllocationIps from '@/api/admin/nodes/allocations/getNodeAllocationIps.ts';
 import getNodeAllocations from '@/api/admin/nodes/allocations/getNodeAllocations.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
+import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import {
+  adminNodeAllocationFilterSchema,
+  adminNodeAllocationSchema,
+  adminNodeSchema,
+} from '@/lib/schemas/admin/nodes.ts';
 import { nodeAllocationTableColumns } from '@/lib/tableColumns.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import { useResource } from '@/plugins/useResource.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -51,53 +58,51 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
   }, []);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
-  const [ipFilter, setIpFilter] = useState('');
-  const [portFilter, setPortFilter] = useState('');
+  const [ipFilter, setIpFilter] = useState<string | null>(null);
+  const [portFrom, setPortFrom] = useState<string | number>('');
+  const [portTo, setPortTo] = useState<string | number>('');
+  const [assignedFilter, setAssignedFilter] = useState<string | null>(null);
+  const [selectedAllMatching, setSelectedAllMatching] = useState(false);
 
-  const buildSearch = useCallback((generalSearch: string, ip: string, port: string) => {
-    const parts: string[] = [];
-    if (generalSearch) parts.push(generalSearch);
-    if (ip) parts.push(ip);
-    if (port) parts.push(port);
-    return parts.length > 0 ? parts.join(':') : undefined;
-  }, []);
+  const buildFilter = useCallback(
+    (search: string): z.infer<typeof adminNodeAllocationFilterSchema> => ({
+      search: search || null,
+      ip: ipFilter,
+      portFrom: portFrom === '' ? null : Number(portFrom),
+      portTo: portTo === '' ? null : Number(portTo),
+      assigned: assignedFilter === null ? null : assignedFilter === 'assigned',
+    }),
+    [ipFilter, portFrom, portTo, assignedFilter],
+  );
 
   const {
     data: nodeAllocations,
     loading,
     error,
     search,
+    debouncedSearch,
     setSearch,
     setPage,
     refetch,
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.nodes.allocations(node.uuid),
-    fetcher: (page, generalSearch) => {
-      const finalSearch = buildSearch(generalSearch || '', ipFilter, portFilter);
-      return getNodeAllocations(node.uuid, page, finalSearch);
-    },
-    deps: [ipFilter, portFilter, node.uuid],
+    fetcher: (page, search) => getNodeAllocations(node.uuid, page, buildFilter(search)),
+    deps: [node.uuid, ipFilter, portFrom, portTo, assignedFilter],
   });
 
-  const uniqueIps = useMemo(() => {
-    const ips = new Set<string>();
-    nodeAllocations?.data.forEach((alloc) => ips.add(alloc.ip));
-    return Array.from(ips)
-      .sort()
-      .map((ip) => ({ label: ip, value: ip }));
-  }, [nodeAllocations?.data]);
+  const filter = useMemo(() => buildFilter(debouncedSearch), [buildFilter, debouncedSearch]);
 
-  const uniquePorts = useMemo(() => {
-    const ports = new Set<string>();
-    nodeAllocations?.data.forEach((alloc) => ports.add(alloc.port.toString()));
-    return Array.from(ports)
-      .sort((a, b) => Number(a) - Number(b))
-      .map((port) => ({ label: port, value: port }));
-  }, [nodeAllocations?.data]);
+  const filterIsEmpty = useMemo(() => Object.values(filter).every((value) => value === null), [filter]);
 
-  useEffect(() => {
-    refetch();
-  }, [ipFilter, portFilter]);
+  const { data: nodeAllocationIps } = useResource({
+    queryKey: queryKeys.admin.nodes.allocationIps(node.uuid),
+    queryFn: () => getNodeAllocationIps(node.uuid),
+  });
+
+  const ipOptions = useMemo(
+    () => (nodeAllocationIps ?? []).map((ip) => ({ label: ip, value: ip })),
+    [nodeAllocationIps],
+  );
 
   const { onSelectedStart, onSelected } = useSelectionArea({
     identify: (allocation) => allocation.uuid,
@@ -105,8 +110,22 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
     setSelected: setSelectedNodeAllocations,
   });
 
-  useEffect(() => {
+  const handleClearSelection = useCallback(() => {
     setSelectedNodeAllocations([]);
+    setSelectedAllMatching(false);
+  }, []);
+
+  useEffect(() => {
+    handleClearSelection();
+  }, []);
+
+  useEffect(() => {
+    setSelectedAllMatching(false);
+  }, [filter]);
+
+  const handleSelectAll = useCallback(() => {
+    setSelectedNodeAllocations([]);
+    setSelectedAllMatching(true);
   }, []);
 
   useKeyboardShortcuts({
@@ -114,24 +133,15 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
       {
         key: 'a',
         modifiers: ['ctrlOrMeta'],
-        callback: () => setSelectedNodeAllocations(nodeAllocations?.data ?? []),
+        callback: handleSelectAll,
       },
       {
         key: 'Escape',
-        callback: () => setSelectedNodeAllocations([]),
+        callback: handleClearSelection,
       },
     ],
     deps: [nodeAllocations?.data],
   });
-
-  const handleSelectAll = useCallback(() => {
-    if (!nodeAllocations?.data) return;
-    setSelectedNodeAllocations(nodeAllocations.data);
-  }, [nodeAllocations?.data]);
-
-  const handleClearSelection = useCallback(() => {
-    setSelectedNodeAllocations([]);
-  }, []);
 
   return (
     <AdminSubContentContainer
@@ -145,26 +155,53 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
         <Group gap='xs'>
           <Select
             placeholder={t('common.table.columns.ip', {})}
-            value={ipFilter || null}
-            onChange={(value) => setIpFilter(value || '')}
-            data={uniqueIps}
+            value={ipFilter}
+            onChange={setIpFilter}
+            data={ipOptions}
             searchable
             clearable
             allowDeselect
-            w={120}
+            w={140}
           />
-          <Select
-            placeholder={t('common.form.port', {})}
-            value={portFilter || null}
-            onChange={(value) => setPortFilter(value || '')}
-            data={uniquePorts}
-            searchable
-            clearable
-            allowDeselect
+          <NumberInput
+            placeholder={t('pages.admin.nodes.tabs.allocations.page.form.portFrom', {})}
+            value={portFrom}
+            onChange={setPortFrom}
+            min={1}
+            max={65535}
             w={100}
           />
-          <Tooltip label={t('common.button.selectAll', {})}>
-            <ActionIcon variant='subtle' onClick={handleSelectAll} color='gray'>
+          <NumberInput
+            placeholder={t('pages.admin.nodes.tabs.allocations.page.form.portTo', {})}
+            value={portTo}
+            onChange={setPortTo}
+            min={1}
+            max={65535}
+            w={100}
+          />
+          <Select
+            placeholder={t('pages.admin.nodes.tabs.allocations.page.form.assigned', {})}
+            value={assignedFilter}
+            onChange={setAssignedFilter}
+            data={[
+              { label: t('pages.admin.nodes.tabs.allocations.page.form.assignedOnly', {}), value: 'assigned' },
+              { label: t('pages.admin.nodes.tabs.allocations.page.form.unassignedOnly', {}), value: 'unassigned' },
+            ]}
+            clearable
+            allowDeselect
+            w={140}
+          />
+          <Tooltip
+            label={t('pages.admin.nodes.tabs.allocations.page.tooltip.selectAllMatching', {
+              count: nodeAllocations?.total ?? 0,
+            })}
+          >
+            <ActionIcon
+              variant='subtle'
+              onClick={handleSelectAll}
+              disabled={selectedAllMatching || !nodeAllocations?.total}
+              color='gray'
+            >
               <FontAwesomeIcon icon={faCheckDouble} />
             </ActionIcon>
           </Tooltip>
@@ -172,7 +209,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
             <ActionIcon
               variant='subtle'
               onClick={handleClearSelection}
-              disabled={selectedNodeAllocations.size === 0}
+              disabled={selectedNodeAllocations.size === 0 && !selectedAllMatching}
               color='gray'
             >
               <FontAwesomeIcon icon={faX} />
@@ -200,7 +237,11 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
         node={node}
         loadAllocations={refetch}
         selectedNodeAllocations={selectedNodeAllocations}
-        setSelectedNodeAllocations={setSelectedNodeAllocations}
+        clearSelection={handleClearSelection}
+        filter={filter}
+        filterIsEmpty={filterIsEmpty}
+        matchingTotal={nodeAllocations?.total ?? 0}
+        selectedAllMatching={selectedAllMatching}
       />
 
       <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected} disabled={!!openModal}>
@@ -220,6 +261,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
                   allocation={allocation}
                   ref={innerRef as Ref<HTMLTableRowElement>}
                   selectedNodeAllocations={selectedNodeAllocations}
+                  selectedAllMatching={selectedAllMatching}
                   addSelectedNodeAllocation={addSelectedNodeAllocation}
                   removeSelectedNodeAllocation={removeSelectedNodeAllocation}
                 />

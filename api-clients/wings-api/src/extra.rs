@@ -12,6 +12,16 @@ pub enum QueryValue {
     Binary { value: String },
 }
 
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
+#[non_exhaustive]
+pub enum ServerSelector {
+    Uuids {
+        uuids: std::collections::HashSet<uuid::Uuid>,
+    },
+    All,
+}
+
 impl std::fmt::Display for super::StreamableArchiveFormat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(

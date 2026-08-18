@@ -11,6 +11,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import Container from '@/elements/Container.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import QuickActionsTrigger from '@/elements/quickActions/QuickActionsTrigger.tsx';
+import ServerQuickActions from '@/elements/quickActions/ServerQuickActions.tsx';
 import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import ServerStatusIndicator from '@/elements/ServerStatusIndicator.tsx';
 import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
@@ -154,6 +155,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
 
   return (
     <div className='lg:flex h-full'>
+      <ServerQuickActions />
       {isNormal && (
         <Sidebar
           header={

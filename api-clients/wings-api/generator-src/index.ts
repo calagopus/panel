@@ -277,8 +277,8 @@ impl WingsClient {
 for (const [name, schema] of Object.entries(openapi.components?.schemas || {})) {
     if (schema.$ref || name === 'CompactString') continue
 
-    // internally tagged enum the generator cannot represent, hand-written in extra.rs
-    if (name === 'QueryValue') continue
+    // internally tagged enums the generator cannot represent, hand-written in extra.rs
+    if (name === 'QueryValue' || name === 'ServerSelector') continue
 
     generateSchemaObject(output, 0, null, name, schema as oas31.SchemaObject)
 }

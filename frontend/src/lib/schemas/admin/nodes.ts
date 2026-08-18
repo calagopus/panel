@@ -83,6 +83,20 @@ export const adminNodeAllocationSchema = z.looseObject({
   created: z.string(),
 });
 
+export const adminNodeAllocationFilterSchema = z.object({
+  search: z.string().nullable().optional(),
+  ip: z.string().nullable().optional(),
+  portFrom: z.number().nullable().optional(),
+  portTo: z.number().nullable().optional(),
+  assigned: z.boolean().nullable().optional(),
+});
+
+export const adminNodeAllocationSelectorSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('uuids'), uuids: z.array(z.string()) }),
+  z.object({ type: z.literal('all') }),
+  z.object({ type: z.literal('filter'), filter: adminNodeAllocationFilterSchema }),
+]);
+
 export const adminNodeAllocationsSchema = z.object({
   ip: z.string().min(1),
   ipAlias: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),

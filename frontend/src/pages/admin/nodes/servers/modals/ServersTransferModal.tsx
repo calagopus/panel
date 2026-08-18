@@ -66,7 +66,7 @@ export default function ServersTransferModal({
 
   const doTransfer = async () => {
     await postTransfers(contextNode.uuid, {
-      servers: servers.keys(),
+      servers: { type: 'uuids', uuids: servers.keys() },
       nodeUuid: selectedNodeUuid!,
       allocationMode,
       transferBackups,

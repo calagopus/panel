@@ -8,7 +8,7 @@ import {
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { zones } from 'tzdata';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
@@ -69,6 +69,7 @@ export default function ServerCreate() {
 
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'confirm-no-allocation' | null>(null);
+  const confirmStayRef = useRef(false);
 
   const form = useFormEngine<ServerCreateFormValues>('admin.servers.create', {
     schema: adminServerCreateSchema.unwrap(),
@@ -119,6 +120,15 @@ export default function ServerCreate() {
     resourceName: t('pages.admin.servers.resourceName', {}),
     toResetOnStay: ['allocationUuid', 'allocationUuids'],
   });
+
+  const doSave = (stay: boolean) => {
+    if (!form.getValues().allocationUuid) {
+      confirmStayRef.current = stay;
+      setOpenModal('confirm-no-allocation');
+    } else {
+      doCreateOrUpdate(stay);
+    }
+  };
 
   const [eggVariablesLoading, setEggVariablesLoading] = useState(false);
   const [selectedNestUuid, setSelectedNestUuid] = useState<string | null>('');
@@ -523,16 +533,15 @@ export default function ServerCreate() {
         onClose={() => setOpenModal(null)}
         title={t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.title', {})}
         confirm={t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.button.confirm', {})}
-        onConfirmed={() => doCreateOrUpdate(false)}
+        onConfirmed={() => {
+          setOpenModal(null);
+          doCreateOrUpdate(confirmStayRef.current);
+        }}
       >
         {t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.content', {})}
       </ConfirmationModal>
 
-      <form
-        onSubmit={form.onSubmit((values) =>
-          !values.allocationUuid ? setOpenModal('confirm-no-allocation') : doCreateOrUpdate(false),
-        )}
-      >
+      <form onSubmit={form.onSubmit(() => doSave(false))}>
         <Stack mt='16'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <TitleCard
@@ -657,7 +666,7 @@ export default function ServerCreate() {
               <Button type='submit' disabled={!isValid} loading={loading}>
                 {t('common.button.save', {})}
               </Button>
-              <Button onClick={() => doCreateOrUpdate(true)} disabled={!isValid} loading={loading}>
+              <Button onClick={() => doSave(true)} disabled={!isValid} loading={loading}>
                 {t('common.button.saveAndStay', {})}
               </Button>
             </AdminCan>

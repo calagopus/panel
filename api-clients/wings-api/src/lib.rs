@@ -991,7 +991,7 @@ pub mod servers_power {
         nestify::nest! {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
                 #[schema(inline)]
-                pub servers: Vec<uuid::Uuid>,
+                pub servers: ServerSelector,
                 #[schema(inline)]
                 pub action: ServerPowerAction,
                 #[schema(inline)]

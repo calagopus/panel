@@ -8,10 +8,12 @@ import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
+import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -40,6 +42,19 @@ export default function AssetActionBar({
         addToast(httpErrorToHuman(msg), 'error');
       });
   };
+
+  useQuickActions([
+    {
+      id: 'assets.deleteSelection',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.admin.assets.quickAction.deleteSelection', {}),
+      icon: <FontAwesomeIcon icon={faTrash} />,
+      danger: true,
+      adminPermission: 'assets.delete',
+      isVisible: () => selectedAssets.size > 0,
+      perform: () => setOpenModal('delete'),
+    },
+  ]);
 
   useKeyboardShortcuts({
     shortcuts: [

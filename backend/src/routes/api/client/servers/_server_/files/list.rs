@@ -3,29 +3,18 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
-    use garde::Validate;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{Pagination, server::GetServer, user::GetPermissionManager},
+        models::{Pagination, PaginationParams, server::GetServer, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
 
-    #[derive(ToSchema, Validate, Deserialize)]
+    #[derive(ToSchema, Deserialize)]
     pub struct Params {
-        #[garde(range(min = 1))]
-        #[serde(default = "Pagination::default_page")]
-        page: i64,
-        #[garde(range(min = 1, max = 100))]
-        #[serde(default = "Pagination::default_per_page")]
-        per_page: i64,
-
-        #[garde(skip)]
         #[serde(default)]
         directory: compact_str::CompactString,
-
-        #[garde(skip)]
         #[serde(default)]
         sort: wings_api::DirectorySortingMode,
     }
@@ -76,9 +65,10 @@ mod get {
         state: GetState,
         permissions: GetPermissionManager,
         mut server: GetServer,
+        Query(pagination): Query<PaginationParams>,
         Query(params): Query<Params>,
     ) -> ApiResponseResult {
-        if let Err(errors) = shared::utils::validate_data(&params) {
+        if let Err(errors) = shared::utils::validate_data(&pagination) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -103,8 +93,8 @@ mod get {
                 &wings_api::servers_server_files_list::get::Query {
                     directory: Some(params.directory),
                     ignored: server.0.subuser_ignored_files,
-                    per_page: Some(params.per_page as u64),
-                    page: Some(params.page as u64),
+                    per_page: Some(pagination.per_page as u64),
+                    page: Some(pagination.page as u64),
                     sort: Some(params.sort),
                     ..Default::default()
                 },
@@ -126,8 +116,8 @@ mod get {
             is_filesystem_fast: entries.filesystem_fast,
             entries: Pagination {
                 total: entries.total as i64,
-                per_page: params.per_page,
-                page: params.page,
+                per_page: pagination.per_page,
+                page: pagination.page,
                 data: entries.entries,
             },
         })

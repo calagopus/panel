@@ -9,7 +9,11 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
-import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import {
+  adminNodeAllocationSchema,
+  adminNodeAllocationSelectorSchema,
+  adminNodeSchema,
+} from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -17,13 +21,17 @@ export default function NodeAllocationsUpdateModal({
   node,
   loadAllocations,
   selectedNodeAllocations,
-  setSelectedNodeAllocations,
+  clearSelection,
+  selector,
+  affectedCount,
   ...props
 }: ModalProps & {
   node: z.infer<typeof adminNodeSchema>;
   loadAllocations: () => void;
   selectedNodeAllocations: ObjectSet<z.infer<typeof adminNodeAllocationSchema>, 'uuid'>;
-  setSelectedNodeAllocations: (allocations: z.infer<typeof adminNodeAllocationSchema>[]) => void;
+  clearSelection: () => void;
+  selector: z.infer<typeof adminNodeAllocationSelectorSchema>;
+  affectedCount: number;
 }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
@@ -96,18 +104,28 @@ export default function NodeAllocationsUpdateModal({
     e.preventDefault();
     setLoading(true);
 
-    updateNodeAllocations(node.uuid, [...selectedNodeAllocations.values().map((a) => a.uuid)], {
+    updateNodeAllocations(node.uuid, selector, {
       ip,
       ipAlias: ipAlias || null,
     })
-      .then(({ updated }) => {
-        addToast(
-          t('pages.admin.nodes.tabs.allocations.page.modal.update.toast.updated', {
-            allocations: tItem('allocation', updated),
-          }),
-          'success',
-        );
-        setSelectedNodeAllocations([]);
+      .then(({ updated, skipped }) => {
+        if (skipped > 0) {
+          addToast(
+            t('pages.admin.nodes.tabs.allocations.page.modal.update.toast.updatedPartial', {
+              allocations: tItem('allocation', updated),
+              skipped,
+            }),
+            'warning',
+          );
+        } else {
+          addToast(
+            t('pages.admin.nodes.tabs.allocations.page.modal.update.toast.updated', {
+              allocations: tItem('allocation', updated),
+            }),
+            'success',
+          );
+        }
+        clearSelection();
 
         props.onClose();
         loadAllocations();
@@ -141,7 +159,7 @@ export default function NodeAllocationsUpdateModal({
 
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!ip}>
-            {t('common.button.update', {})}
+            {t('pages.admin.nodes.tabs.allocations.page.modal.update.button.update', { count: affectedCount })}
           </Button>
           <Button variant='default' onClick={props.onClose}>
             {t('common.button.close', {})}

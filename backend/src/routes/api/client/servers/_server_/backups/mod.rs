@@ -8,34 +8,19 @@ mod unlock;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
-    use garde::Validate;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
-            IntoApiObject, Pagination, server::GetServer, server_backup::ServerBackup,
-            user::GetPermissionManager,
+            IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
+            server_backup::ServerBackup, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
 
-    #[derive(ToSchema, Validate, Deserialize)]
+    #[derive(ToSchema, Deserialize)]
     pub struct Params {
-        #[garde(range(min = 1))]
-        #[serde(default = "Pagination::default_page")]
-        page: i64,
-        #[garde(range(min = 1, max = 100))]
-        #[serde(default = "Pagination::default_per_page")]
-        per_page: i64,
-        #[garde(length(chars, min = 1, max = 100))]
-        #[serde(
-            default,
-            deserialize_with = "shared::deserialize::deserialize_string_option"
-        )]
-        search: Option<compact_str::CompactString>,
-
-        #[garde(skip)]
         #[serde(default)]
         ungrouped: bool,
     }
@@ -79,9 +64,10 @@ mod get {
         state: GetState,
         permissions: GetPermissionManager,
         server: GetServer,
+        Query(pagination): Query<PaginationParamsWithSearch>,
         Query(params): Query<Params>,
     ) -> ApiResponseResult {
-        if let Err(errors) = shared::utils::validate_data(&params) {
+        if let Err(errors) = shared::utils::validate_data(&pagination) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -94,9 +80,9 @@ mod get {
                 &state.database,
                 server.uuid,
                 server.node.uuid,
-                params.page,
-                params.per_page,
-                params.search.as_deref(),
+                pagination.page,
+                pagination.per_page,
+                pagination.search.as_deref(),
             )
             .await
         } else {
@@ -104,9 +90,9 @@ mod get {
                 &state.database,
                 server.uuid,
                 server.node.uuid,
-                params.page,
-                params.per_page,
-                params.search.as_deref(),
+                pagination.page,
+                pagination.per_page,
+                pagination.search.as_deref(),
             )
             .await
         }?;

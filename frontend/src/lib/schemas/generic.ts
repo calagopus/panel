@@ -34,6 +34,11 @@ export const apiPermissionsSchema = z.object({
   adminPermissions: permissionMapSchema,
 });
 
+export const serverSelectorSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('uuids'), uuids: z.array(z.string()) }),
+  z.object({ type: z.literal('all') }),
+]);
+
 export const eggConfigurationRouteItemSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('route'), path: z.string() }),
   z.object({

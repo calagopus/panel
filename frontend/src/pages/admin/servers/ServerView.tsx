@@ -16,6 +16,7 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import AdminServerActions from '@/pages/admin/servers/AdminServerActions.tsx';
 import AdminServerAllocations from '@/pages/admin/servers/allocations/AdminServerAllocations.tsx';
 import AdminServerBackups from '@/pages/admin/servers/backups/AdminServerBackups.tsx';
 import AdminServerDatabases from '@/pages/admin/servers/databases/AdminServerDatabases.tsx';
@@ -44,6 +45,8 @@ export default function ServerView() {
           title={server.name}
           registry={window.extensionContext.extensionRegistry.pages.admin.servers.container}
         >
+          <AdminServerActions server={server} />
+
           <SubNavigation
             baseUrl={`/admin/servers/${params.id}`}
             items={[

@@ -1,4 +1,4 @@
-import { faFolderPlus } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFolderPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
@@ -13,6 +13,7 @@ import Card from '@/elements/Card.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
@@ -20,6 +21,7 @@ import { assetTableColumns } from '@/lib/tableColumns.ts';
 import AssetUpload from '@/pages/admin/assets/AssetUpload.tsx';
 import AssetUploadProgress from '@/pages/admin/assets/AssetUploadProgress.tsx';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { useUploader } from '@/plugins/useUploader.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -135,6 +137,27 @@ export default function AdminAssets() {
       next.delete(asset);
       return next;
     });
+
+  useQuickActions([
+    {
+      id: 'assets.newDirectory',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.admin.assets.button.newDirectory', {}),
+      keywords: ['folder', 'mkdir'],
+      icon: <FontAwesomeIcon icon={faFolderPlus} />,
+      adminPermission: 'assets.upload',
+      perform: () => setOpenModal('newDirectory'),
+    },
+    {
+      id: 'assets.parentDirectory',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.admin.assets.quickAction.parentDirectory', {}),
+      keywords: ['up', 'back'],
+      icon: <FontAwesomeIcon icon={faArrowUp} />,
+      isVisible: () => currentDirectory !== '',
+      perform: () => navigateToDirectory(currentDirectory.split('/').filter(Boolean).slice(0, -1).join('/')),
+    },
+  ]);
 
   useKeyboardShortcuts({
     shortcuts: [

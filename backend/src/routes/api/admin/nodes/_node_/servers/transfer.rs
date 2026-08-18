@@ -19,7 +19,7 @@ mod post {
         },
         response::{ApiResponse, ApiResponseResult},
     };
-    use std::collections::{HashMap, HashSet};
+    use std::collections::HashMap;
     use utoipa::ToSchema;
 
     #[derive(ToSchema, Deserialize, Clone, Copy)]
@@ -35,7 +35,7 @@ mod post {
 
     #[derive(ToSchema, Deserialize)]
     pub struct Payload {
-        servers: HashSet<uuid::Uuid>,
+        servers: wings_api::ServerSelector,
         node_uuid: uuid::Uuid,
 
         allocation_mode: MassTransferAllocationMode,
@@ -361,40 +361,45 @@ mod post {
             Ok::<_, anyhow::Error>(())
         };
 
-        if data.servers.is_empty() {
-            let mut server_page = 1;
-            loop {
-                let servers = Server::by_node_uuid_with_pagination(
-                    &state.database,
-                    node.uuid,
-                    server_page,
-                    50,
-                    None,
-                )
-                .await?;
-                if servers.data.is_empty() {
-                    break;
-                }
+        match &data.servers {
+            wings_api::ServerSelector::All => {
+                let mut server_page = 1;
+                loop {
+                    let servers = Server::by_node_uuid_with_pagination(
+                        &state.database,
+                        node.uuid,
+                        server_page,
+                        50,
+                        None,
+                    )
+                    .await?;
+                    if servers.data.is_empty() {
+                        break;
+                    }
 
-                for server in servers.data {
+                    for server in servers.data {
+                        transfer_server(server).await?;
+                    }
+
+                    server_page += 1;
+                }
+            }
+            wings_api::ServerSelector::Uuids { uuids } => {
+                for server_uuid in uuids.iter() {
+                    let server =
+                        match Server::by_uuid_optional(&state.database, *server_uuid).await? {
+                            Some(server) => server,
+                            None => continue,
+                        };
+
+                    if server.node.uuid != node.uuid {
+                        continue;
+                    }
+
                     transfer_server(server).await?;
                 }
-
-                server_page += 1;
             }
-        } else {
-            for server_uuid in data.servers.iter() {
-                let server = match Server::by_uuid_optional(&state.database, *server_uuid).await? {
-                    Some(server) => server,
-                    None => continue,
-                };
-
-                if server.node.uuid != node.uuid {
-                    continue;
-                }
-
-                transfer_server(server).await?;
-            }
+            _ => {}
         }
 
         activity_logger
@@ -402,7 +407,7 @@ mod post {
                 "node:servers.transfer",
                 serde_json::json!({
                     "node_uuid": node.uuid,
-                    "servers": if data.servers.is_empty() { None } else { Some(&data.servers) },
+                    "servers": data.servers,
                     "destination_node_uuid": data.node_uuid,
                 }),
             )

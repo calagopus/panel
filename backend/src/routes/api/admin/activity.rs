@@ -3,35 +3,19 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
-    use garde::Validate;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
-            IntoAdminApiObject, Pagination, admin_activity::AdminActivity,
-            user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParamsWithSearch,
+            admin_activity::AdminActivity, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
 
-    #[derive(ToSchema, Validate, Deserialize)]
+    #[derive(ToSchema, Deserialize)]
     pub struct Params {
-        #[garde(range(min = 1))]
-        #[serde(default = "Pagination::default_page")]
-        page: i64,
-        #[garde(range(min = 1, max = 100))]
-        #[serde(default = "Pagination::default_per_page")]
-        per_page: i64,
-        #[garde(length(chars, min = 1, max = 128))]
-        #[schema(min_length = 1, max_length = 128)]
-        #[serde(
-            default,
-            deserialize_with = "shared::deserialize::deserialize_string_option"
-        )]
-        search: Option<compact_str::CompactString>,
-
-        #[garde(skip)]
         user: Option<uuid::Uuid>,
     }
 
@@ -67,9 +51,10 @@ mod get {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        Query(pagination): Query<PaginationParamsWithSearch>,
         Query(params): Query<Params>,
     ) -> ApiResponseResult {
-        if let Err(errors) = shared::utils::validate_data(&params) {
+        if let Err(errors) = shared::utils::validate_data(&pagination) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -81,17 +66,17 @@ mod get {
             AdminActivity::by_user_uuid_with_pagination(
                 &state.database,
                 user_uuid,
-                params.page,
-                params.per_page,
-                params.search.as_deref(),
+                pagination.page,
+                pagination.per_page,
+                pagination.search.as_deref(),
             )
             .await?
         } else {
             AdminActivity::all_with_pagination(
                 &state.database,
-                params.page,
-                params.per_page,
-                params.search.as_deref(),
+                pagination.page,
+                pagination.per_page,
+                pagination.search.as_deref(),
             )
             .await?
         };

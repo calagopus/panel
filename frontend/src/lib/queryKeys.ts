@@ -25,6 +25,7 @@ const admin = {
     systemOverview: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'system', 'overview'] as const,
     allocations: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'allocations'] as const,
     availableAllocations: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'allocations', 'available'] as const,
+    allocationIps: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'allocations', 'ips'] as const,
     databaseHosts: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'database-hosts'] as const,
     databaseAgentHosts: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'database-agent-hosts'] as const,
     servers: (nodeUuid: string) => ['admin', 'nodes', nodeUuid, 'servers'] as const,

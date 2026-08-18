@@ -137,6 +137,7 @@ export function useSearchablePaginatedTable<T>({
     loading: isFetching && (refetchInterval === false || isPlaceholderData || data === undefined),
     error: error ? httpErrorToHuman(error) : null,
     search,
+    debouncedSearch,
     setSearch,
     page,
     setPage,

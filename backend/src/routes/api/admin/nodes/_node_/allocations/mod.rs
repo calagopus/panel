@@ -2,6 +2,7 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod available;
+mod ips;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
@@ -9,8 +10,10 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            IntoAdminApiObject, Pagination, PaginationParamsWithSearch, node::GetNode,
-            node_allocation::NodeAllocation, user::GetPermissionManager,
+            IntoAdminApiObject, Pagination, PaginationParams,
+            node::GetNode,
+            node_allocation::{AllocationFilter, NodeAllocation},
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -45,14 +48,39 @@ mod get {
             "search" = Option<String>, Query,
             description = "Search term for items",
         ),
+        (
+            "ip" = Option<String>, Query,
+            description = "Only include allocations on this IP",
+            example = "10.0.0.5",
+        ),
+        (
+            "port_from" = Option<i32>, Query,
+            description = "Only include allocations with a port at or above this",
+            example = "25565",
+        ),
+        (
+            "port_to" = Option<i32>, Query,
+            description = "Only include allocations with a port at or below this",
+            example = "25600",
+        ),
+        (
+            "assigned" = Option<bool>, Query,
+            description = "Only include allocations that are assigned to a server, or only those that are not",
+        ),
     ))]
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
         node: GetNode,
-        Query(params): Query<PaginationParamsWithSearch>,
+        Query(params): Query<PaginationParams>,
+        Query(filter): Query<AllocationFilter>,
     ) -> ApiResponseResult {
         if let Err(errors) = shared::utils::validate_data(&params) {
+            return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+        if let Err(errors) = shared::utils::validate_data(&filter) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -63,9 +91,9 @@ mod get {
         let allocations = NodeAllocation::by_node_uuid_with_pagination(
             &state.database,
             node.uuid,
+            &filter,
             params.page,
             params.per_page,
-            params.search.as_deref(),
         )
         .await?;
 
@@ -83,29 +111,39 @@ mod get {
 }
 
 mod delete {
+    use axum::http::StatusCode;
+    use garde::Validate;
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
         models::{
-            admin_activity::GetAdminActivityLogger, node::GetNode, node_allocation::NodeAllocation,
+            admin_activity::GetAdminActivityLogger,
+            node::GetNode,
+            node_allocation::{AllocationSelector, NodeAllocation},
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
 
-    #[derive(ToSchema, Deserialize)]
+    #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
-        uuids: Vec<uuid::Uuid>,
+        #[garde(dive)]
+        selector: AllocationSelector,
+        #[garde(skip)]
+        #[serde(default)]
+        force: bool,
     }
 
     #[derive(ToSchema, Serialize)]
     struct Response {
-        deleted: u64,
+        deleted: i64,
+        skipped: i64,
     }
 
     #[utoipa::path(delete, path = "/", responses(
         (status = OK, body = inline(Response)),
+        (status = CONFLICT, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
     ), params(
         (
@@ -121,10 +159,31 @@ mod delete {
         activity_logger: GetAdminActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
+        if let Err(errors) = shared::utils::validate_data(&data) {
+            return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         permissions.has_admin_permission("nodes.allocations")?;
 
-        let deleted =
-            NodeAllocation::delete_by_uuids(&state.database, node.uuid, &data.uuids).await?;
+        let (matched, deleted) = NodeAllocation::delete_by_selector(
+            &state.database,
+            node.uuid,
+            &data.selector,
+            data.force,
+        )
+        .await?;
+
+        if deleted == 0 && matched > 0 {
+            return ApiResponse::error(
+                "every matched allocation is assigned to a server, force deletion to remove them anyway",
+            )
+            .with_status(StatusCode::CONFLICT)
+            .ok();
+        }
+
+        let skipped = matched - deleted;
 
         activity_logger
             .log(
@@ -132,12 +191,15 @@ mod delete {
                 serde_json::json!({
                     "node_uuid": node.uuid,
 
-                    "uuids": data.uuids
+                    "selector": data.selector,
+                    "force": data.force,
+                    "deleted": deleted,
+                    "skipped": skipped,
                 }),
             )
             .await;
 
-        ApiResponse::new_serialized(Response { deleted }).ok()
+        ApiResponse::new_serialized(Response { deleted, skipped }).ok()
     }
 }
 
@@ -148,7 +210,9 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            admin_activity::GetAdminActivityLogger, node::GetNode, node_allocation::NodeAllocation,
+            admin_activity::GetAdminActivityLogger,
+            node::GetNode,
+            node_allocation::{CREATE_MAX_PORTS, NodeAllocation},
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -163,13 +227,14 @@ mod post {
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
         ip_alias: Option<String>,
-        #[garde(skip)]
+        #[garde(length(min = 1, max = CREATE_MAX_PORTS))]
+        #[schema(min_items = 1, max_items = 65535)]
         ports: Vec<u16>,
     }
 
     #[derive(ToSchema, Serialize)]
     struct Response {
-        created: usize,
+        created: u64,
     }
 
     #[utoipa::path(post, path = "/", responses(
@@ -198,25 +263,22 @@ mod post {
         permissions.has_admin_permission("nodes.allocations")?;
 
         let allocation_ip = data.ip.into();
-        let mut futures = Vec::new();
-        futures.reserve_exact(data.ports.len());
+        let ports: Vec<i32> = data
+            .ports
+            .iter()
+            .copied()
+            .filter(|port| *port != 0)
+            .map(i32::from)
+            .collect();
 
-        for port in data.ports.iter().copied() {
-            if port < 1 {
-                continue;
-            }
-
-            futures.push(NodeAllocation::create(
-                &state.database,
-                node.uuid,
-                &allocation_ip,
-                data.ip_alias.as_deref(),
-                port as i32,
-            ));
-        }
-
-        let results = futures_util::future::join_all(futures).await;
-        let created = results.iter().filter(|r| r.is_ok()).count();
+        let created = NodeAllocation::create_many(
+            &state.database,
+            node.uuid,
+            &allocation_ip,
+            data.ip_alias.as_deref(),
+            &ports,
+        )
+        .await?;
 
         activity_logger
             .log(
@@ -242,7 +304,10 @@ mod patch {
     use shared::{
         ApiError, GetState,
         models::{
-            admin_activity::GetAdminActivityLogger, node::GetNode, user::GetPermissionManager,
+            admin_activity::GetAdminActivityLogger,
+            node::GetNode,
+            node_allocation::{AllocationSelector, NodeAllocation},
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -250,8 +315,8 @@ mod patch {
 
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
-        #[garde(skip)]
-        uuids: Vec<uuid::Uuid>,
+        #[garde(dive)]
+        selector: AllocationSelector,
 
         #[garde(skip)]
         #[schema(value_type = String)]
@@ -264,7 +329,8 @@ mod patch {
 
     #[derive(ToSchema, Serialize)]
     struct Response {
-        updated: u64,
+        updated: i64,
+        skipped: i64,
     }
 
     #[utoipa::path(patch, path = "/", responses(
@@ -293,32 +359,16 @@ mod patch {
         permissions.has_admin_permission("nodes.allocations")?;
 
         let allocation_ip: sqlx::types::ipnetwork::IpNetwork = data.ip.into();
-        let updated = if let Some(ip_alias) = &data.ip_alias {
-            sqlx::query!(
-                "UPDATE node_allocations
-                SET ip = $3, ip_alias = $4
-                WHERE node_allocations.node_uuid = $1 AND node_allocations.uuid = ANY($2)",
-                node.uuid,
-                &data.uuids,
-                allocation_ip,
-                ip_alias.as_deref()
-            )
-            .execute(state.database.write())
-            .await?
-            .rows_affected()
-        } else {
-            sqlx::query!(
-                "UPDATE node_allocations
-                SET ip = $3
-                WHERE node_allocations.node_uuid = $1 AND node_allocations.uuid = ANY($2)",
-                node.uuid,
-                &data.uuids,
-                allocation_ip
-            )
-            .execute(state.database.write())
-            .await?
-            .rows_affected()
-        };
+        let (matched, updated) = NodeAllocation::update_by_selector(
+            &state.database,
+            node.uuid,
+            &data.selector,
+            &allocation_ip,
+            data.ip_alias.as_ref().map(Option::as_deref),
+        )
+        .await?;
+
+        let skipped = matched - updated;
 
         activity_logger
             .log(
@@ -328,12 +378,14 @@ mod patch {
 
                     "ip": allocation_ip,
                     "ip_alias": data.ip_alias,
-                    "uuids": data.uuids
+                    "selector": data.selector,
+                    "updated": updated,
+                    "skipped": skipped,
                 }),
             )
             .await;
 
-        ApiResponse::new_serialized(Response { updated }).ok()
+        ApiResponse::new_serialized(Response { updated, skipped }).ok()
     }
 }
 
@@ -344,5 +396,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(post::route))
         .routes(routes!(patch::route))
         .nest("/available", available::router(state))
+        .nest("/ips", ips::router(state))
         .with_state(state.clone())
 }

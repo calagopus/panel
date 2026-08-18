@@ -14,7 +14,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import classNames from 'classnames';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
 import { makeComponentHookable } from 'shared';
@@ -27,13 +27,12 @@ import MantineDivider from '@/elements/Divider.tsx';
 import Drawer from '@/elements/Drawer.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { isAdmin } from '@/lib/permissions.ts';
-import { getAccessibleRoutePaths } from '@/lib/routes.ts';
+import { isNamedRoutePathAccessible } from '@/lib/routes.ts';
 import { openUrl } from '@/lib/url.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useWindows } from '@/providers/WindowProvider.tsx';
 import RouterRoutes from '@/RouterRoutes.tsx';
-import accountRoutes from '@/routers/routes/accountRoutes.ts';
 import { useGlobalStore } from '@/stores/global.ts';
 import ContextMenu from './ContextMenu.tsx';
 
@@ -192,17 +191,7 @@ function Footer() {
 
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
-  const accountRouteDisabled = useMemo(() => {
-    const routes = [...accountRoutes, ...window.extensionContext.extensionRegistry.routes.accountRoutes];
-
-    for (const interceptor of window.extensionContext.extensionRegistry.routes.accountRouteInterceptors) {
-      interceptor(routes);
-    }
-
-    const accessible = getAccessibleRoutePaths(routes, routeOrder);
-
-    return !!accessible && !accessible.has('/');
-  }, [routeOrder]);
+  const accountRouteDisabled = !isNamedRoutePathAccessible(routeOrder, '/');
 
   if (!user) {
     return null;

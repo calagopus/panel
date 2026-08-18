@@ -107,7 +107,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
   const handleBulkPowerAction = async (action: z.infer<typeof serverPowerAction>) => {
     setBulkActionLoading(action);
 
-    sendNodeServersPowerAction(node.uuid, selectedServers.keys(), action)
+    sendNodeServersPowerAction(node.uuid, { type: 'uuids', uuids: selectedServers.keys() }, action)
       .then((successful) => {
         const failed = selectedServers.size - successful;
 
@@ -153,7 +153,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
   const handleAllPowerAction = async (action: z.infer<typeof serverPowerAction>) => {
     setAllActionLoading(action);
 
-    sendNodeServersPowerAction(node.uuid, [], action)
+    sendNodeServersPowerAction(node.uuid, { type: 'all' }, action)
       .then((successful) => {
         const failed = (nodeServers?.total ?? 0) - successful;
 

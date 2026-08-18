@@ -17,10 +17,18 @@ mod post {
     use std::collections::HashSet;
     use utoipa::ToSchema;
 
+    #[derive(ToSchema, Deserialize)]
+    #[serde(rename_all = "snake_case", tag = "type")]
+    #[non_exhaustive]
+    pub enum InstanceSelector {
+        Uuids { uuids: HashSet<uuid::Uuid> },
+        Outdated,
+    }
+
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
         #[garde(skip)]
-        instance_uuids: HashSet<uuid::Uuid>,
+        instances: InstanceSelector,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -144,31 +152,34 @@ mod post {
             Ok::<_, anyhow::Error>(true)
         };
 
-        let mut instance_uuids: Vec<uuid::Uuid> = data.instance_uuids.into_iter().collect();
+        let mut instance_uuids = Vec::new();
 
-        if instance_uuids.is_empty() {
-            let mut page = 1;
-            loop {
-                let instances =
-                    ServerDatabaseInstance::by_database_agent_template_uuid_with_pagination(
-                        &state.database,
-                        database_agent_template.uuid,
-                        page,
-                        50,
-                        None,
-                    )
-                    .await?;
-                if instances.data.is_empty() {
-                    break;
-                }
-
-                for instance in instances.data {
-                    if instance.template_version.is_some_and(|v| v < version) {
-                        instance_uuids.push(instance.uuid);
+        match &data.instances {
+            InstanceSelector::Uuids { uuids } => instance_uuids.extend(uuids.iter().copied()),
+            InstanceSelector::Outdated => {
+                let mut page = 1;
+                loop {
+                    let instances =
+                        ServerDatabaseInstance::by_database_agent_template_uuid_with_pagination(
+                            &state.database,
+                            database_agent_template.uuid,
+                            page,
+                            50,
+                            None,
+                        )
+                        .await?;
+                    if instances.data.is_empty() {
+                        break;
                     }
-                }
 
-                page += 1;
+                    for instance in instances.data {
+                        if instance.template_version.is_some_and(|v| v < version) {
+                            instance_uuids.push(instance.uuid);
+                        }
+                    }
+
+                    page += 1;
+                }
             }
         }
 

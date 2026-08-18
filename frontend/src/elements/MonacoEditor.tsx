@@ -209,7 +209,7 @@ export default function MonacoEditor(props: ComponentProps<typeof Editor>) {
               options={{ ...props.options, contextmenu: false }}
               onMount={(e, m) => {
                 attach(e);
-                forwardGlobalShortcuts(e, m);
+                forwardGlobalShortcuts(e);
 
                 for (const handler of window.extensionContext.extensionRegistry.elements.monacoEditor.onMountHandlers) {
                   handler(e, m);
@@ -243,8 +243,8 @@ export function MonacoDiffEditor(props: ComponentProps<typeof DiffEditor>) {
               onMount={(e, m) => {
                 attach(e.getModifiedEditor());
                 attach(e.getOriginalEditor());
-                forwardGlobalShortcuts(e.getModifiedEditor(), m);
-                forwardGlobalShortcuts(e.getOriginalEditor(), m);
+                forwardGlobalShortcuts(e.getModifiedEditor());
+                forwardGlobalShortcuts(e.getOriginalEditor());
 
                 for (const handler of window.extensionContext.extensionRegistry.elements.monacoEditor
                   .diffOnMountHandlers) {

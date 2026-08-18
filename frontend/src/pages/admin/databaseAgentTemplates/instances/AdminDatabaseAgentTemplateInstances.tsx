@@ -90,7 +90,10 @@ export default function AdminDatabaseAgentTemplateInstances({
       setApplyingAll(true);
     }
 
-    await updateDatabaseAgentTemplateInstances(databaseAgentTemplate.uuid, all ? [] : selectedInstances.keys())
+    await updateDatabaseAgentTemplateInstances(
+      databaseAgentTemplate.uuid,
+      all ? { type: 'outdated' } : { type: 'uuids', uuids: selectedInstances.keys() },
+    )
       .then(({ updated }) => {
         setSelectedInstances(new ObjectSet('uuid'));
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.databaseInstances.all() });

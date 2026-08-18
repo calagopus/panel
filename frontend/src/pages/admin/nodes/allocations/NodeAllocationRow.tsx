@@ -12,18 +12,25 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 interface NodeAllocationRowProps {
   allocation: z.infer<typeof adminNodeAllocationSchema>;
   selectedNodeAllocations: ObjectSet<z.infer<typeof adminNodeAllocationSchema>, 'uuid'>;
+  selectedAllMatching: boolean;
   addSelectedNodeAllocation: (allocation: z.infer<typeof adminNodeAllocationSchema>) => void;
   removeSelectedNodeAllocation: (allocation: z.infer<typeof adminNodeAllocationSchema>) => void;
 }
 
 const NodeAllocationRow = memo(
   forwardRef<HTMLTableRowElement, NodeAllocationRowProps>(function FileRow(
-    { allocation, selectedNodeAllocations, addSelectedNodeAllocation, removeSelectedNodeAllocation },
+    {
+      allocation,
+      selectedNodeAllocations,
+      selectedAllMatching,
+      addSelectedNodeAllocation,
+      removeSelectedNodeAllocation,
+    },
     ref,
   ) {
     const { t } = useTranslations();
 
-    const isNodeAllocationSelected = selectedNodeAllocations.has(allocation);
+    const isNodeAllocationSelected = selectedAllMatching || selectedNodeAllocations.has(allocation);
 
     return (
       <TableRow
@@ -42,6 +49,7 @@ const NodeAllocationRow = memo(
           <Checkbox
             id={allocation.uuid}
             checked={isNodeAllocationSelected}
+            disabled={selectedAllMatching}
             onChange={() => {
               if (isNodeAllocationSelected) {
                 removeSelectedNodeAllocation(allocation);

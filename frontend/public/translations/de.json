@@ -597,6 +597,7 @@
           "power": "Energie",
           "account": "Konto",
           "servers": "Server",
+          "users": "Benutzer",
           "page": "Diese Seite",
           "math": "Rechner"
         },
@@ -610,7 +611,9 @@
           "select": "zum Auswählen",
           "close": "zum Schließen",
           "calculate": "zum Berechnen",
-          "pages": "nur für Seiten"
+          "pages": "nur für Seiten",
+          "servers": "nur für Server",
+          "users": "nur für Benutzer"
         }
       },
       "permissionSelector": {
@@ -2063,6 +2066,11 @@
             "upload": "Hochladen",
             "copyLink": "Link kopieren"
           },
+          "quickAction": {
+            "uploadFiles": "Assets hochladen",
+            "parentDirectory": "Zum übergeordneten Verzeichnis",
+            "deleteSelection": "Auswahl löschen"
+          },
           "dropzone": {
             "title": "Dateien hier ablegen zum Hochladen",
             "subtitle": "Loslassen um den Upload zu starten"
@@ -2569,10 +2577,16 @@
               "page": {
                 "title": "Node Allocations",
                 "tooltip": {
-                  "clearSelection": "Auswahl löschen"
+                  "clearSelection": "Auswahl löschen",
+                  "selectAllMatching": "Alle {count} passenden auswählen"
                 },
                 "form": {
-                  "ipAlias": "IP Alias"
+                  "ipAlias": "IP Alias",
+                  "portFrom": "Port von",
+                  "portTo": "Port bis",
+                  "assigned": "Zuweisung",
+                  "assignedOnly": "Nur zugewiesene",
+                  "unassignedOnly": "Nur nicht zugewiesene"
                 },
                 "table": {
                   "columns": {
@@ -2591,15 +2605,23 @@
                   },
                   "update": {
                     "title": "Node Allocations aktualisieren",
+                    "button": {
+                      "update": "{count} aktualisieren"
+                    },
                     "toast": {
-                      "updated": "{allocations} aktualisiert."
+                      "updated": "{allocations} aktualisiert.",
+                      "updatedPartial": "{allocations} aktualisiert. {skipped} übersprungen, da dieser Port auf der Ziel-IP bereits vergeben ist."
                     }
                   },
                   "delete": {
                     "title": "Löschen der Node Allocations bestätigen",
-                    "content": "Bist du sicher, dass du `{count}` Allocations von **{name}** löschen möchtest?",
+                    "content": "Bist du sicher, dass du {allocations} von **{name}** löschen möchtest?",
+                    "alert": {
+                      "forceWarning": "Erzwungenes Löschen entfernt auch Allocations, die einem Server zugewiesen sind, einschließlich Servern, die gerade übertragen werden. Betroffene Server verlieren die Allocation sofort und starten nach ihrem nächsten Neustart nicht mehr korrekt."
+                    },
                     "toast": {
-                      "deleted": "{allocations} gelöscht."
+                      "deleted": "{allocations} gelöscht.",
+                      "deletedPartial": "{allocations} gelöscht. {skipped} übersprungen, da sie einem Server zugewiesen sind."
                     }
                   }
                 }
@@ -2783,6 +2805,14 @@
         "servers": {
           "title": "Server",
           "resourceName": "Server",
+          "quickAction": {
+            "viewClient": "Server im Client-Bereich ansehen",
+            "transfer": "Server transferieren",
+            "suspend": "Server suspendieren",
+            "unsuspend": "Server entsuspendieren",
+            "clearState": "Serverstatus zurücksetzen",
+            "delete": "Server löschen"
+          },
           "externalIdLookup": {
             "button": "Über externe ID suchen",
             "modal": {
@@ -4396,6 +4426,10 @@
             "decreaseFontSize": "Schriftgröße verringern",
             "increaseFontSize": "Schriftgröße erhöhen",
             "copySelection": "Auswahl kopieren"
+          },
+          "quickAction": {
+            "search": "Konsole durchsuchen",
+            "scrollToBottom": "Nach unten scrollen"
           },
           "drawer": {
             "commandHistory": {
