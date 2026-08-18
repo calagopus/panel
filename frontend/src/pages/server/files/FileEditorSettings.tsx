@@ -53,14 +53,14 @@ export default function FileEditorSettings() {
             ),
           )}
 
-          {editorEngine === 'monaco' ? (
+          {editorEngine === 'monaco' && (
             <Checkbox
               label={t('pages.server.files.settings.editorMinimap', {})}
               className='order-10'
               checked={editorMinimap}
               onChange={(e) => setEditorMinimap(e.target.checked)}
             />
-          ) : null}
+          )}
           <Checkbox
             label={t('pages.server.files.settings.editorLineOverflow', {})}
             className='order-20'
