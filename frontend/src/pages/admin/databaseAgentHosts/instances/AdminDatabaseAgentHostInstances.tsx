@@ -23,7 +23,7 @@ export default function AdminDatabaseAgentHostInstances({
     setSearch,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.databaseAgentHosts.instances(databaseAgentHost.uuid),
+    queryKey: queryKeys.admin.databaseInstances.byHost(databaseAgentHost.uuid),
     fetcher: (page, search) => getDatabaseAgentHostInstances(databaseAgentHost.uuid, page, search),
   });
 

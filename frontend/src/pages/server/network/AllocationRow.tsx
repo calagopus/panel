@@ -42,7 +42,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
       updateAllocation(server.uuid, allocation.uuid, { notes: notes || null })
         .then(() => {
           addToast(t('pages.server.network.toast.updated', {}), 'success');
-          allocation.notes = notes;
+          queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
         })
         .catch((msg) => {
           addToast(httpErrorToHuman(msg), 'error');

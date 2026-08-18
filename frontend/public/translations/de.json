@@ -24,6 +24,14 @@
       "many": "{count} Dateien",
       "other": "{count} Dateien"
     },
+    "directory": {
+      "zero": "{count} Verzeichnisse",
+      "one": "{count} Verzeichnis",
+      "two": "{count} Verzeichnisse",
+      "few": "{count} Verzeichnisse",
+      "many": "{count} Verzeichnisse",
+      "other": "{count} Verzeichnisse"
+    },
     "server": {
       "zero": "{count} Server",
       "one": "{count} Server",
@@ -573,6 +581,36 @@
           "themeAuto": "Automatisch",
           "themeDark": "Dunkel",
           "themeLight": "Hell"
+        },
+        "modal": {
+          "logout": {
+            "title": "Abmelden",
+            "content": "Bist du sicher, dass du dich abmelden möchtest?"
+          }
+        }
+      },
+      "quickActions": {
+        "trigger": "Schnellaktionen...",
+        "placeholder": "Nach Aktionen und Seiten suchen...",
+        "category": {
+          "navigation": "Navigation",
+          "power": "Energie",
+          "account": "Konto",
+          "servers": "Server",
+          "page": "Diese Seite",
+          "math": "Rechner"
+        },
+        "math": {
+          "calculating": "Berechne...",
+          "unsolvable": "Dieser Ausdruck kann nicht gelöst werden",
+          "copyResult": "Ergebnis kopieren"
+        },
+        "hint": {
+          "navigate": "zum Navigieren",
+          "select": "zum Auswählen",
+          "close": "zum Schließen",
+          "calculate": "zum Berechnen",
+          "pages": "nur für Seiten"
         }
       },
       "permissionSelector": {
@@ -835,10 +873,8 @@
           "form": {
             "name": "Name",
             "namePlaceholder": "Mein Server",
-            "urlPlaceholder": "https://node.example.com:8080",
             "urlDescription": "wird für die interne Kommunikation mit der Node verwendet",
             "publicUrl": "Öffentliche URL",
-            "publicUrlPlaceholder": "https://node.example.com:8080",
             "publicUrlDescription": "wird für Websocket/Downloads verwendet",
             "sftpHostPlaceholder": "SFTP Host",
             "sftpPortPlaceholder": "SFTP Port",
@@ -871,7 +907,6 @@
             "applicationNamePlaceholder": "Calagopus",
             "languagePlaceholder": "Sprache",
             "applicationUrl": "Anwendungs-URL",
-            "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Registrierung aktivieren",
             "registrationDescription": "Erlaube neuen Benutzern, ihren eigenen Account zu registrieren.",
             "securityKeys": "Sicherheitsschlüssel aktivieren",
@@ -1066,9 +1101,6 @@
             "noGroups": "Keine Gruppen zum Hinzufügen verfügbar",
             "noGroup": "Dieser Server ist noch in keiner Gruppe",
             "foreign": "Dieser Server gehört einem anderen Benutzer, du hast als Unterbenutzer oder Administrator Zugriff darauf"
-          },
-          "badge": {
-            "foreign": "Fremd"
           },
           "tabs": {
             "groupedServers": {
@@ -1312,7 +1344,8 @@
           },
           "general": {
             "title": "Allgemein",
-            "undo": "Letzte Aktion rückgängig machen"
+            "undo": "Letzte Aktion rückgängig machen",
+            "quickActions": "Schnellaktionen öffnen"
           },
           "fileManager": {
             "title": "Dateimanager",
@@ -1502,7 +1535,6 @@
           },
           "form": {
             "allowedIps": "Erlaubte IPs",
-            "allowedIpsPlaceholder": "z.B. 192.168.1.1, 2001:db8::1",
             "userPermissions": "Benutzer-Berechtigungen",
             "serverPermissions": "Server-Berechtigungen",
             "adminPermissions": "Admin-Berechtigungen"
@@ -2377,7 +2409,6 @@
                 },
                 "form": {
                   "urlDescription": "Wird für die interne Kommunikation mit dem Node verwendet.",
-                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Wird für WebSocket-Verbindungen und Downloads verwendet.",
                   "backupConfigurationPlaceholder": "Vom Standort übernehmen",
                   "memoryDescription": "Der gesamte für Server auf diesem Node verfügbare Arbeitsspeicher.",
@@ -2647,7 +2678,7 @@
                   "reattached": "Backup erfolgreich an {name} wieder angehängt.",
                   "restoring": "Backup wird auf {name} wiederhergestellt...",
                   "exporting": "Backup wird in Dateien von {name} exportiert...",
-                  "deleted": "Node-Backup gelöscht."
+                  "deletionStarted": "Node-Backup-Löschung gestartet."
                 },
                 "modal": {
                   "export": {
@@ -2867,11 +2898,8 @@
                   "pinnedCpus": "Angeheftete CPUs",
                   "pinnedCpusDescription": "Die CPU-Kerne, an die dieser Server angeheftet ist.",
                   "pinnedCpusTooltip": "Nach Index, z. B. 0, 1, 2. Leer lassen, um alle Kerne zuzulassen.",
-                  "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Vordefinierte Docker-Images",
                   "predefinedDockerImagesPlaceholder": "Kein vordefiniertes Image ausgewählt",
-                  "timezonePlaceholder": "Europe/Berlin",
-                  "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Benutzerdefiniert",
                   "predefinedStartupCommands": "Vordefinierte Startbefehle",
                   "startOnCompletion": "Nach Abschluss starten",
@@ -3225,7 +3253,6 @@
                       "form": {
                         "supportsMarkdown": "Unterstützt Markdown-Formatierung.",
                         "defaultValue": "Standardwert",
-                        "defaultValuePlaceholder": "server.jar",
                         "userViewable": "Für Benutzer sichtbar",
                         "userEditable": "Für Benutzer bearbeitbar",
                         "secret": "Geheim",
@@ -3383,7 +3410,6 @@
                   "credentialType": "Art der Zugangsdaten",
                   "password": "Passwort oder Zugriffstoken",
                   "privateKey": "Privater Schlüssel",
-                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
                   "passphrase": "Passphrase"
                 },
                 "enum": {
@@ -3449,8 +3475,7 @@
                   "publicPort": "Öffentlicher Port",
                   "connectionCredentials": "Verbindungs-Anmeldedaten",
                   "credentialType": "Anmeldedaten-Typ",
-                  "connectionString": "Verbindungszeichenfolge",
-                  "connectionStringPlaceholder": "mysql://username:password@host:port"
+                  "connectionString": "Verbindungszeichenfolge"
                 },
                 "enum": {
                   "credentialType": {
@@ -3504,7 +3529,6 @@
                 "titleCreate": "Datenbank-Agent-Host erstellen",
                 "titleUpdate": "Datenbank-Agent-Host aktualisieren",
                 "form": {
-                  "urlPlaceholder": "https://agent.example.com:8080",
                   "typeEnabled": "Aktiviert",
                   "typePublicHost": "Öffentlicher Host",
                   "typePublicPort": "Öffentlicher Port"
@@ -4479,6 +4503,33 @@
             "loadDisk": "Festplattenversion laden",
             "keepEditor": "Editor-Version behalten"
           },
+          "quickAction": {
+            "newFile": "Neue Datei",
+            "newDirectory": "Neues Verzeichnis",
+            "pullFile": "Datei von URL laden",
+            "uploadFiles": "Dateien hochladen",
+            "uploadDirectory": "Verzeichnis hochladen",
+            "search": "Dateien suchen",
+            "largestDirectories": "Verzeichnisgrößen analysieren",
+            "parentDirectory": "Zum übergeordneten Verzeichnis",
+            "copyPath": "Aktuellen Pfad kopieren",
+            "exitBackup": "Backup-Ansicht verlassen",
+            "connectSftp": "Über SFTP verbinden",
+            "connectVscode": "In VS Code öffnen",
+            "cancelPaste": "Ausstehendes Kopieren oder Verschieben abbrechen",
+            "downloadSelection": "Auswahl herunterladen",
+            "copySelection": "Auswahl kopieren",
+            "moveSelection": "Auswahl verschieben",
+            "remoteCopySelection": "Auswahl auf anderen Server kopieren",
+            "archiveSelection": "Auswahl archivieren",
+            "extractSelection": "Archiv entpacken",
+            "renameSelection": "Auswahl umbenennen",
+            "permissionsSelection": "Berechtigungen ändern",
+            "fingerprintSelection": "Dateifingerabdruck anzeigen",
+            "deleteSelection": "Auswahl löschen",
+            "saveFile": "Datei speichern",
+            "createFile": "Datei erstellen"
+          },
           "actionBar": {
             "copyHere": "Kopiere {files} hierhin",
             "moveHere": "Verschiebe {files} hierhin"
@@ -4785,9 +4836,6 @@
         "databases": {
           "title": "Datenbanken",
           "subtitle": "{current} von maximal {max} Datenbanken erstellt.",
-          "classic": {
-            "title": "Klassische Datenbanken"
-          },
           "tooltip": {
             "limitReached": "Dieser Server ist auf {max} Datenbanken limitiert."
           },

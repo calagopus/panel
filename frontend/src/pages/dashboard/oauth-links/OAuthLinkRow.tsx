@@ -24,6 +24,7 @@ export default function OAuthLinkRow({ oauthLink }: { oauthLink: z.infer<typeof 
   const doDelete = async () => {
     await deleteOAuthLink(oauthLink.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.user.oauthLinks.all() });
         addToast(t('pages.account.oauthLinks.modal.deleteOAuthLink.toast.removed', {}), 'success');
       })

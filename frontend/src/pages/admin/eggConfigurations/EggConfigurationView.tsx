@@ -4,6 +4,7 @@ import getEggConfiguration from '@/api/admin/egg-configurations/getEggConfigurat
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggConfigurationCreateOrUpdate from './EggConfigurationCreateOrUpdate.tsx';
@@ -13,7 +14,7 @@ export default function EggConfigurationView() {
   const { t } = useTranslations();
 
   const resource = useResource({
-    queryKey: ['admin', 'eggConfigurations', { uuid: params.id }],
+    queryKey: queryKeys.admin.eggConfigurations.detail(params.id!),
     queryFn: () => getEggConfiguration(params.id!),
   });
 

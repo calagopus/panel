@@ -19,7 +19,7 @@ export default function AdminServerDatabaseInstances({ server }: { server: z.inf
     setSearch,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.servers.databaseInstances(server.uuid),
+    queryKey: queryKeys.admin.databaseInstances.byServer(server.uuid),
     fetcher: (page, search) => getServerDatabaseInstances(server.uuid, page, search),
   });
 

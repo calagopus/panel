@@ -31,6 +31,7 @@ export default function LocationDatabaseAgentHostRow({
   const doDelete = async () => {
     await deleteLocationDatabaseAgentHost(location.uuid, databaseAgentHost.databaseAgentHost.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.locations.databaseAgentHosts(location.uuid) });
         addToast(t('pages.admin.locations.tabs.databaseAgentHosts.page.toast.deleted', {}), 'success');
       })

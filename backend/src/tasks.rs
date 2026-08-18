@@ -509,14 +509,16 @@ pub async fn define_background_tasks(
 
                     for candidate in candidates {
                         let cron_due = policy.enabled
-                            && match candidate.last_attempt {
-                                Some(last_attempt) => policy
-                                    .cron
-                                    .iter_after(last_attempt.and_utc())
-                                    .next()
-                                    .is_some_and(|next| next <= now),
-                                None => true,
-                            };
+                            && policy
+                                .cron
+                                .iter_after(
+                                    candidate
+                                        .last_attempt
+                                        .unwrap_or(candidate.coverage_start)
+                                        .and_utc(),
+                                )
+                                .next()
+                                .is_some_and(|next| next <= now);
                         let trigger_due = policy.triggered.is_some_and(|triggered| {
                             candidate
                                 .last_attempt

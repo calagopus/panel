@@ -30,7 +30,6 @@ export default function DatabaseAgentRow({
     <>
       <DatabaseAgentHostInstanceEditModal
         hostUuid={databaseAgentHost.uuid}
-        serverUuid={databaseAgent.server.uuid}
         instance={databaseAgent}
         opened={openModal === 'edit'}
         onClose={() => setOpenModal(null)}
@@ -38,7 +37,6 @@ export default function DatabaseAgentRow({
 
       <DatabaseAgentHostInstanceDeleteModal
         hostUuid={databaseAgentHost.uuid}
-        serverUuid={databaseAgent.server.uuid}
         instance={databaseAgent}
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}

@@ -164,6 +164,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
               {!user?.suspended && (
                 <>
                   <QuickActionsTrigger />
+                  <div className='mt-2' />
                   <ServerStatusIndicator />
                 </>
               )}
@@ -178,6 +179,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
         >
           {!user?.suspended && (
             <>
+              <div className='mt-2' />
               <Sidebar.Link to='/' end icon={faServer} name={t('pages.account.home.title', {})} />
               {isAdmin(user) && (
                 <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />

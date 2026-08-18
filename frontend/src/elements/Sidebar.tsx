@@ -14,7 +14,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import classNames from 'classnames';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
 import { makeComponentHookable } from 'shared';
@@ -25,12 +25,16 @@ import Card from '@/elements/Card.tsx';
 import CloseButton from '@/elements/CloseButton.tsx';
 import MantineDivider from '@/elements/Divider.tsx';
 import Drawer from '@/elements/Drawer.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { isAdmin } from '@/lib/permissions.ts';
+import { getAccessibleRoutePaths } from '@/lib/routes.ts';
 import { openUrl } from '@/lib/url.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useWindows } from '@/providers/WindowProvider.tsx';
 import RouterRoutes from '@/RouterRoutes.tsx';
+import accountRoutes from '@/routers/routes/accountRoutes.ts';
+import { useGlobalStore } from '@/stores/global.ts';
 import ContextMenu from './ContextMenu.tsx';
 
 type SidebarProps = {
@@ -184,12 +188,29 @@ function Footer() {
   const navigate = useNavigate();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('dark');
+  const routeOrder = useGlobalStore((state) => state.settings.user?.routeOrder);
+
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+
+  const accountRouteDisabled = useMemo(() => {
+    const routes = [...accountRoutes, ...window.extensionContext.extensionRegistry.routes.accountRoutes];
+
+    for (const interceptor of window.extensionContext.extensionRegistry.routes.accountRouteInterceptors) {
+      interceptor(routes);
+    }
+
+    const accessible = getAccessibleRoutePaths(routes, routeOrder);
+
+    return !!accessible && !accessible.has('/');
+  }, [routeOrder]);
 
   if (!user) {
     return null;
   }
 
   const suspended = Boolean(user.suspended);
+  const accountHidden = suspended || accountRouteDisabled;
+  const adminHidden = suspended || !isAdmin(user);
 
   const changeTheme = async (event: React.MouseEvent, nextTheme: 'auto' | 'dark' | 'light') => {
     if (nextTheme === colorScheme) {
@@ -230,110 +251,134 @@ function Footer() {
   };
 
   return (
-    <ContextMenu
-      items={[
-        {
-          type: 'action',
-          icon: faUserCog,
-          label: t('pages.account.account.title', {}),
-          hidden: suspended,
-          onClick: () => navigate('/account'),
-        },
-        {
-          type: 'divider',
-          hidden: suspended || !isAdmin(user),
-        },
-        {
-          type: 'action',
-          icon: faGraduationCap,
-          label: t('pages.account.admin.title', {}),
-          hidden: suspended || !isAdmin(user),
-          onClick: () => navigate('/admin'),
-        },
-        {
-          type: 'divider',
-          hidden: suspended,
-        },
-        {
-          type: 'action',
-          icon: faCircleHalfStroke,
-          label: t('elements.sidebar.button.theme', {}),
-          items: [
-            {
-              type: 'action',
-              icon: faCircleHalfStroke,
-              label: t('elements.sidebar.button.themeAuto', {}),
-              rightSection: colorScheme === 'auto' && <FontAwesomeIcon icon={faCheck} size='sm' />,
-              onClick: (e) => changeTheme(e, 'auto'),
-            },
-            {
-              type: 'action',
-              icon: faMoon,
-              label: t('elements.sidebar.button.themeDark', {}),
-              rightSection: colorScheme === 'dark' && <FontAwesomeIcon icon={faCheck} size='sm' />,
-              onClick: (e) => changeTheme(e, 'dark'),
-            },
-            {
-              type: 'action',
-              icon: faSun,
-              label: t('elements.sidebar.button.themeLight', {}),
-              rightSection: colorScheme === 'light' && <FontAwesomeIcon icon={faCheck} size='sm' />,
-              onClick: (e) => changeTheme(e, 'light'),
-            },
-          ],
-        },
-        {
-          type: 'divider',
-        },
-        {
-          type: 'action',
-          icon: faArrowRightFromBracket,
-          label: impersonating
-            ? t('elements.sidebar.button.stopImpersonating', {})
-            : t('elements.sidebar.button.logout', {}),
-          color: 'red',
-          onClick: doLogout,
-        },
-      ]}
-    >
-      {({ openMenu }) => (
-        <Card
-          className='flex flex-row! justify-between items-center min-h-fit'
-          p='xs'
-          hoverable
-          id='sidebar-account-card'
-          onContextMenu={(e) => {
-            e.preventDefault();
-            openMenu(e.clientX, e.clientY);
-          }}
-        >
-          <NavLink
-            to='/account'
-            className='flex items-center flex-1 min-w-0'
-            onClick={(e) => {
-              e.preventDefault();
-              navigate('/account');
-            }}
-          >
-            <Avatar size={40} className='select-none shrink-0' src={user.avatar} name={user.username} />
-            <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
-              {user.username}
-            </span>
-          </NavLink>
-
-          <ActionIcon
-            variant='subtle'
-            className='shrink-0'
-            onClick={(e) => {
+    <>
+      <ContextMenu
+        items={[
+          {
+            type: 'action',
+            icon: faUserCog,
+            label: t('pages.account.account.title', {}),
+            hidden: accountHidden,
+            onClick: () => navigate('/account'),
+          },
+          {
+            type: 'divider',
+            hidden: accountHidden || adminHidden,
+          },
+          {
+            type: 'action',
+            icon: faGraduationCap,
+            label: t('pages.account.admin.title', {}),
+            hidden: adminHidden,
+            onClick: () => navigate('/admin'),
+          },
+          {
+            type: 'divider',
+            hidden: accountHidden && adminHidden,
+          },
+          {
+            type: 'action',
+            icon: faCircleHalfStroke,
+            label: t('elements.sidebar.button.theme', {}),
+            items: [
+              {
+                type: 'action',
+                icon: faCircleHalfStroke,
+                label: t('elements.sidebar.button.themeAuto', {}),
+                rightSection: colorScheme === 'auto' && <FontAwesomeIcon icon={faCheck} size='sm' />,
+                onClick: (e) => changeTheme(e, 'auto'),
+              },
+              {
+                type: 'action',
+                icon: faMoon,
+                label: t('elements.sidebar.button.themeDark', {}),
+                rightSection: colorScheme === 'dark' && <FontAwesomeIcon icon={faCheck} size='sm' />,
+                onClick: (e) => changeTheme(e, 'dark'),
+              },
+              {
+                type: 'action',
+                icon: faSun,
+                label: t('elements.sidebar.button.themeLight', {}),
+                rightSection: colorScheme === 'light' && <FontAwesomeIcon icon={faCheck} size='sm' />,
+                onClick: (e) => changeTheme(e, 'light'),
+              },
+            ],
+          },
+          {
+            type: 'divider',
+          },
+          {
+            type: 'action',
+            icon: faArrowRightFromBracket,
+            label: impersonating
+              ? t('elements.sidebar.button.stopImpersonating', {})
+              : t('elements.sidebar.button.logout', {}),
+            color: 'red',
+            onClick: () => (impersonating ? doLogout() : setLogoutConfirmOpen(true)),
+          },
+        ]}
+      >
+        {({ openMenu }) => (
+          <Card
+            className='flex flex-row! justify-between items-center min-h-fit'
+            p='xs'
+            hoverable={!accountHidden}
+            id='sidebar-account-card'
+            onContextMenu={(e) => {
               e.preventDefault();
               openMenu(e.clientX, e.clientY);
             }}
           >
-            <FontAwesomeIcon icon={faEllipsisVertical} />
-          </ActionIcon>
-        </Card>
-      )}
-    </ContextMenu>
+            {accountHidden ? (
+              <div className='flex items-center flex-1 min-w-0'>
+                <Avatar size={40} className='select-none shrink-0' src={user.avatar} name={user.username} />
+                <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
+                  {user.username}
+                </span>
+              </div>
+            ) : (
+              <NavLink
+                to='/account'
+                className='flex items-center flex-1 min-w-0'
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/account');
+                }}
+              >
+                <Avatar size={40} className='select-none shrink-0' src={user.avatar} name={user.username} />
+                <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
+                  {user.username}
+                </span>
+              </NavLink>
+            )}
+
+            <ActionIcon
+              variant='subtle'
+              className='shrink-0'
+              onClick={(e) => {
+                e.preventDefault();
+                openMenu(e.clientX, e.clientY);
+              }}
+            >
+              <FontAwesomeIcon icon={faEllipsisVertical} />
+            </ActionIcon>
+          </Card>
+        )}
+      </ContextMenu>
+
+      <ConfirmationModal
+        opened={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
+        title={t('elements.sidebar.modal.logout.title', {})}
+        confirm={t('elements.sidebar.button.logout', {})}
+        onConfirmed={() => {
+          setLogoutConfirmOpen(false);
+          doLogout();
+        }}
+      >
+        {t('elements.sidebar.modal.logout.content', {})}
+      </ConfirmationModal>
+    </>
   );
 }
 

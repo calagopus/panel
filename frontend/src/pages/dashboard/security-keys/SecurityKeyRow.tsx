@@ -25,6 +25,7 @@ export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<t
   const doDelete = async () => {
     await deleteSecurityKey(securityKey.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.user.securityKeys.all() });
         addToast(t('pages.account.securityKeys.modal.deleteSecurityKey.toast.deleted', {}), 'success');
       })

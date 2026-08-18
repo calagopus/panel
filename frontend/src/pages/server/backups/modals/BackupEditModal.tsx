@@ -59,14 +59,11 @@ export default function BackupEditModal({ backup, ...props }: Props) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.server(server.uuid).backups.groups.all(),
         });
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.server(server.uuid).backups.all(),
-        });
       }
 
-      backup.name = values.name;
-      backup.isLocked = values.locked;
-      backup.backupGroupUuid = values.backupGroupUuid;
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.server(server.uuid).backups.all(),
+      });
       addToast(t('pages.server.backups.modal.editBackup.toast.updated', {}), 'success');
     },
   });

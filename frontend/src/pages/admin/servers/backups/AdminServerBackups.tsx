@@ -22,9 +22,10 @@ export default function AdminServerBackups({ server }: { server: z.infer<typeof 
     setSearch,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.servers.backups(server.uuid),
+    queryKey: queryKeys.admin.backups.byServer(server.uuid),
     fetcher: (page, search) => getServerBackups(server.uuid, page, search, showPartiallyDetachedServerBackups),
     deps: [showPartiallyDetachedServerBackups],
+    refetchInterval: (data) => (data?.data.some((backup) => backup.deletionStatus === 'deleting') ? 5000 : false),
   });
 
   return (

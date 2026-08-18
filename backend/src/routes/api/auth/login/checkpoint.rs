@@ -97,32 +97,15 @@ mod post {
                     }
                 };
 
-                let totp = totp_rs::TOTP::new(
-                    totp_rs::Algorithm::SHA1,
-                    6,
-                    1,
-                    30,
-                    totp_rs::Secret::Encoded(user_totp_secret).to_bytes()?,
-                )?;
+                let totp = totp_rs::Builder::new()
+                    .with_algorithm(totp_rs::Algorithm::SHA1)
+                    .with_digits(6)
+                    .with_skew(1)
+                    .with_step_duration(30)
+                    .with_secret(totp_rs::Secret::try_from_base32(user_totp_secret)?)
+                    .build()?;
 
-                let now = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap_or_default()
-                    .as_secs();
-                let current_step_idx = now / totp.step;
-                let mut matched_step_idx = None;
-
-                for offset in -(totp.skew as i64)..=(totp.skew as i64) {
-                    let check_step_idx = (current_step_idx as i64 + offset) as u64;
-                    let check_time = check_step_idx * totp.step;
-
-                    if totp.generate(check_time) == data.code {
-                        matched_step_idx = Some(check_step_idx);
-                        break;
-                    }
-                }
-
-                let matched_step_idx = match matched_step_idx {
+                let matched_step_idx = match totp.check_current(&data.code) {
                     Some(idx) => idx,
                     None => {
                         return ApiResponse::error("invalid confirmation code")
@@ -133,7 +116,7 @@ mod post {
 
                 if let Some(totp_last_used) = &user.totp_last_used {
                     let last_used_step_idx =
-                        totp_last_used.and_utc().timestamp() as u64 / totp.step;
+                        totp_last_used.and_utc().timestamp() as u64 / totp.step();
 
                     if matched_step_idx <= last_used_step_idx {
                         return ApiResponse::error("this code has already been used")

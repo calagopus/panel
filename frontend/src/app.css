@@ -278,6 +278,10 @@ strong {
   box-sizing: content-box;
 }
 
+.monaco-editor .findOptionsWidget {
+  top: 10px !important;
+}
+
 .workbench-hover-container {
   width: max-content;
 }

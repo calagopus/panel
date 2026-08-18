@@ -27,7 +27,7 @@ export default function CredentialConnectionString({
       <PasswordInput
         withAsterisk
         label={t('pages.admin.databaseHosts.tabs.general.page.form.connectionString', {})}
-        placeholder={t('pages.admin.databaseHosts.tabs.general.page.form.connectionStringPlaceholder', {})}
+        placeholder='mysql://username:password@host:port'
         key={form.key('credentials.connectionString')}
         {...form.getInputProps('credentials.connectionString')}
       />

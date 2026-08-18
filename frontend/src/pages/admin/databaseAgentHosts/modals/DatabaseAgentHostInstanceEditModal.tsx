@@ -20,7 +20,6 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type Props = ModalProps & {
   hostUuid: string;
-  serverUuid: string;
   instance: z.infer<typeof adminDatabaseAgentBaseSchema>;
 };
 
@@ -34,7 +33,7 @@ type FormValues = {
   cpu: number | null;
 };
 
-export default function DatabaseAgentHostInstanceEditModal({ hostUuid, serverUuid, instance, ...props }: Props) {
+export default function DatabaseAgentHostInstanceEditModal({ hostUuid, instance, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
@@ -61,8 +60,7 @@ export default function DatabaseAgentHostInstanceEditModal({ hostUuid, serverUui
         cpu: values.cpu,
       });
       addToast(t('pages.admin.databaseAgentHosts.tabs.instances.page.modal.editInstance.toast.updated', {}), 'success');
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.databaseAgentHosts.instances(hostUuid) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.databaseInstances(serverUuid) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.databaseInstances.all() });
     },
   });
 

@@ -1,19 +1,17 @@
 import { faArchive } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment } from 'react';
 import { z } from 'zod';
-import getBackupConfigurationStats, {
-  type BackupStats,
-} from '@/api/admin/backup-configurations/getBackupConfigurationStats.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
+import getBackupConfigurationStats from '@/api/admin/backup-configurations/getBackupConfigurationStats.ts';
 import Card from '@/elements/Card.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Title from '@/elements/Title.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { bytesToString } from '@/lib/size.ts';
-import { useToast } from '@/providers/ToastProvider.tsx';
+import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminBackupConfigurationStats({
@@ -22,19 +20,11 @@ export default function AdminBackupConfigurationStats({
   backupConfiguration: z.infer<typeof adminBackupConfigurationSchema>;
 }) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
 
-  const [stats, setStats] = useState<Record<'allTime' | 'today' | 'week' | 'month', BackupStats> | null>(null);
-
-  useEffect(() => {
-    getBackupConfigurationStats(backupConfiguration.uuid)
-      .then((data) => {
-        setStats(data);
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      });
-  }, []);
+  const { data: stats } = useResource({
+    queryKey: queryKeys.admin.backupConfigurations.stats(backupConfiguration.uuid),
+    queryFn: () => getBackupConfigurationStats(backupConfiguration.uuid),
+  });
 
   return (
     <AdminSubContentContainer

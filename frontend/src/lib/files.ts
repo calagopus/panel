@@ -26,6 +26,13 @@ export function isArchiveType(file: z.infer<typeof serverDirectoryEntrySchema>) 
   );
 }
 
+export function vscodeConnectUrl(scheme: string, serverUuid: string, file?: string) {
+  return (
+    `${scheme}://calagopus.calagopus/open?origin=${encodeURIComponent(window.location.origin)}&server=${serverUuid}&console=1` +
+    (file ? `&file=${encodeURIComponent(file)}` : '')
+  );
+}
+
 export function isSqliteDatabase(file: z.infer<typeof serverDirectoryEntrySchema>) {
   return (
     ['application/vnd.sqlite3', 'application/x-sqlite3'].includes(file.mime) ||

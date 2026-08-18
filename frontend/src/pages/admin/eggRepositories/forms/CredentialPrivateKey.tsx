@@ -59,7 +59,7 @@ export default function CredentialPrivateKey({ form }: { form: CredentialsForm }
           withAsterisk
           rows={8}
           label={t('pages.admin.eggRepositories.tabs.general.page.form.privateKey', {})}
-          placeholder={t('pages.admin.eggRepositories.tabs.general.page.form.privateKeyPlaceholder', {})}
+          placeholder='-----BEGIN OPENSSH PRIVATE KEY-----'
           key={f.key('credentials.privateKey')}
           {...f.getInputProps('credentials.privateKey')}
         />

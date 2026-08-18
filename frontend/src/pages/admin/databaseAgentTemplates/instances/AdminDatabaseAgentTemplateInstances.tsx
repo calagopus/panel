@@ -1,5 +1,6 @@
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { Ref, useState } from 'react';
 import { z } from 'zod';
 import getDatabaseAgentTemplateInstances from '@/api/admin/database-agent-templates/getDatabaseAgentTemplateInstances.ts';
@@ -31,6 +32,7 @@ export default function AdminDatabaseAgentTemplateInstances({
 }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
 
   const [applyUpdatesScope, setApplyUpdatesScope] = useState<'selected' | 'all' | null>(null);
   const [applyingAll, setApplyingAll] = useState(false);
@@ -42,12 +44,11 @@ export default function AdminDatabaseAgentTemplateInstances({
     data: instances,
     loading,
     error,
-    refetch,
     search,
     setSearch,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.databaseAgentTemplates.instances(databaseAgentTemplate.uuid),
+    queryKey: queryKeys.admin.databaseInstances.byTemplate(databaseAgentTemplate.uuid),
     fetcher: (page, search) => getDatabaseAgentTemplateInstances(databaseAgentTemplate.uuid, page, search),
   });
 
@@ -92,7 +93,7 @@ export default function AdminDatabaseAgentTemplateInstances({
     await updateDatabaseAgentTemplateInstances(databaseAgentTemplate.uuid, all ? [] : selectedInstances.keys())
       .then(({ updated }) => {
         setSelectedInstances(new ObjectSet('uuid'));
-        refetch();
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.databaseInstances.all() });
 
         addToast(
           t('pages.admin.databaseAgentTemplates.tabs.instances.page.toast.updated', {

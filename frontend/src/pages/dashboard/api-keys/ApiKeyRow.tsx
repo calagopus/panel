@@ -42,6 +42,7 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
   const doDelete = async () => {
     await deleteApiKey(apiKey.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.user.apiKeys.all() });
         addToast(t('pages.account.apiKeys.modal.deleteApiKey.toast.removed', {}), 'success');
       })

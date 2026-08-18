@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
@@ -8,6 +9,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseEditSchema, serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -21,6 +23,7 @@ type Props = ModalProps & {
 export default function DatabaseEditModal({ database, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
   const server = useServerStore((state) => state.server);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverDatabaseEditSchema>>({
@@ -31,7 +34,7 @@ export default function DatabaseEditModal({ database, ...props }: Props) {
     onClose: props.onClose,
     onSubmit: async (values) => {
       await updateDatabase(server.uuid, database.uuid, values);
-      database.isLocked = values.locked;
+      queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).databases.all() });
       addToast(t('pages.server.databases.modal.editDatabase.toast.updated', {}), 'success');
     },
   });

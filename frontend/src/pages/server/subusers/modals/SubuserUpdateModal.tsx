@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
@@ -9,6 +10,7 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserSchema, serverSubuserUpdateSchema } from '@/lib/schemas/server/subusers.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -23,6 +25,7 @@ type Props = ModalProps & {
 export default function SubuserUpdateModal({ subuser, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
   const server = useServerStore((state) => state.server);
   const availablePermissions = useGlobalStore((state) => state.availablePermissions);
 
@@ -41,8 +44,7 @@ export default function SubuserUpdateModal({ subuser, ...props }: Props) {
           permissions: Array.from(values.permissions),
           ignoredFiles: values.ignoredFiles,
         });
-        subuser.permissions = Array.from(values.permissions);
-        subuser.ignoredFiles = values.ignoredFiles;
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).subusers.all() });
         addToast(t('pages.server.subusers.modal.updateSubuser.toast.updated', {}), 'success');
       },
     },

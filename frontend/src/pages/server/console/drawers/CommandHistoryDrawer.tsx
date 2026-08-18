@@ -54,11 +54,10 @@ export default function CommandHistoryDrawer({ opened, onClose, ...props }: Draw
     loading,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.server(server.uuid).activity.all(null),
+    queryKey: queryKeys.server(server.uuid).activity.byEvent(null, 'server:console.command'),
     fetcher: (page) => getServerActivity(server.uuid, null, page, 'server:console.command'),
     modifyParams: false,
     canRequest: useServerCan('activity.read') && !isConflictingState(server, user),
-    deps: [server.uuid],
   });
 
   const handleRowClick = (activity: z.infer<typeof serverActivitySchema>) => {

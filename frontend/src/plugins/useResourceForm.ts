@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import { QueryKey } from '@/lib/queryKeys.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -10,11 +11,11 @@ interface HasUuid {
   uuid: string;
 }
 
-interface UseResourceFormOptions<T, U extends HasUuid, CArgs = unknown, UArgs = unknown, DArgs = unknown> {
+interface UseResourceFormOptions<T, U extends HasUuid> {
   form: UseFormReturnType<T>;
-  createFn?: (args: CArgs) => Promise<U>;
-  updateFn?: (args: UArgs) => Promise<void>;
-  deleteFn?: (args: DArgs) => Promise<void>;
+  createFn?: () => Promise<U>;
+  updateFn?: () => Promise<void>;
+  deleteFn?: () => Promise<void>;
   doUpdate: boolean;
   toResetOnStay?: string[];
   basePath: string;
@@ -24,13 +25,11 @@ interface UseResourceFormOptions<T, U extends HasUuid, CArgs = unknown, UArgs = 
 interface UseResourceFormReturn {
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  doCreateOrUpdate: (stay: boolean, bustCacheKey?: readonly unknown[]) => void;
+  doCreateOrUpdate: (stay: boolean, ...bustCacheKeys: QueryKey[]) => void;
   doDelete: () => void;
 }
 
-export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = unknown, DArgs = unknown>(
-  options: UseResourceFormOptions<T, U, CArgs, UArgs, DArgs>,
-): UseResourceFormReturn => {
+export const useResourceForm = <T, U extends HasUuid>(options: UseResourceFormOptions<T, U>): UseResourceFormReturn => {
   const { t } = useTranslations();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -39,21 +38,17 @@ export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = u
 
   const [loading, setLoading] = useState(false);
 
-  const doCreateOrUpdate = (stay: boolean, bustCacheKey?: readonly unknown[], args?: CArgs | UArgs) => {
+  const doCreateOrUpdate = (stay: boolean, ...bustCacheKeys: QueryKey[]) => {
     setLoading(true);
 
     const doBustCache = () => {
-      if (!bustCacheKey) return;
-
-      queryClient
-        .invalidateQueries({
-          queryKey: bustCacheKey,
-        })
-        .catch((e) => console.error(e));
+      for (const queryKey of bustCacheKeys) {
+        queryClient.invalidateQueries({ queryKey }).catch((e) => console.error(e));
+      }
     };
 
     if (doUpdate && updateFn) {
-      updateFn(args as UArgs)
+      updateFn()
         .then(() => {
           addToast(t('elements.resource.tooltip.updated', { resource: resourceName }), 'success');
           doBustCache();
@@ -61,7 +56,7 @@ export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = u
         .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
         .finally(() => setLoading(false));
     } else if (createFn) {
-      createFn(args as CArgs)
+      createFn()
         .then((result: U) => {
           addToast(t('elements.resource.tooltip.created', { resource: resourceName }), 'success');
           doBustCache();
@@ -76,12 +71,12 @@ export const useResourceForm = <T, U extends HasUuid, CArgs = unknown, UArgs = u
     }
   };
 
-  const doDelete = (args?: DArgs) => {
+  const doDelete = () => {
     if (!deleteFn) {
       return;
     }
 
-    return deleteFn(args as DArgs)
+    return deleteFn()
       .then(() => {
         addToast(t('elements.resource.tooltip.deleted', { resource: resourceName }), 'success');
         navigate(basePath);

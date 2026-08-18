@@ -4,6 +4,7 @@ import getEggRepository from '@/api/admin/egg-repositories/getEggRepository.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggRepositoryCreateOrUpdate from './EggRepositoryCreateOrUpdate.tsx';
@@ -14,7 +15,7 @@ export default function EggRepositoryView() {
   const params = useParams<'eggRepositoryId'>();
 
   const resource = useResource({
-    queryKey: ['admin', 'eggRepositories', { uuid: params.eggRepositoryId }],
+    queryKey: queryKeys.admin.eggRepositories.detail(params.eggRepositoryId!),
     queryFn: () => getEggRepository(params.eggRepositoryId!),
   });
 

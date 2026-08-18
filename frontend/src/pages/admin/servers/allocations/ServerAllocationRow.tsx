@@ -48,7 +48,7 @@ export default function ServerAllocationRow({
       })
         .then(() => {
           addToast(t('pages.admin.servers.tabs.allocations.page.toast.updated', {}), 'success');
-          allocation.notes = notes;
+          queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
         })
         .catch((msg) => {
           addToast(httpErrorToHuman(msg), 'error');
@@ -83,6 +83,7 @@ export default function ServerAllocationRow({
     await deleteServerAllocation(server.uuid, allocation.uuid)
       .then(async () => {
         await queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.allocations(server.node.uuid) });
         setOpenModal(null);
         addToast(t('pages.admin.servers.tabs.allocations.page.toast.removed', {}), 'success');
       })

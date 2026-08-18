@@ -47,6 +47,7 @@ const AssetRow = forwardRef<HTMLTableRowElement, AssetRowProps>(function AssetRo
   const doDelete = async () => {
     await deleteAssets([asset.name])
       .then(() => {
+        setOpenModal(null);
         removeSelectedAsset(asset);
         addToast(t('pages.admin.assets.toast.assetDeleted', {}), 'success');
         invalidateAssets();

@@ -29,15 +29,20 @@ export default function NodeBackupsDeleteModal({ node, backup, ...props }: Props
   const [loading, setLoading] = useState(false);
   const [deleteDoForce, setDeleteDoForce] = useState(false);
 
+  const doClose = () => {
+    setDeleteDoForce(false);
+    props.onClose();
+  };
+
   const doDelete = () => {
     setLoading(true);
     deleteNodeBackup(node.uuid, backup.uuid, {
       force: deleteDoForce,
     })
       .then(() => {
-        addToast(t('pages.admin.nodes.tabs.backups.page.toast.deleted', {}), 'success');
-        props.onClose();
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.backups(node.uuid) });
+        addToast(t('pages.admin.nodes.tabs.backups.page.toast.deletionStarted', {}), 'success');
+        doClose();
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.backups.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -47,7 +52,7 @@ export default function NodeBackupsDeleteModal({ node, backup, ...props }: Props
 
   return (
     <>
-      <Modal title={t('pages.admin.nodes.tabs.backups.page.modal.delete.title', {})} {...props}>
+      <Modal title={t('pages.admin.nodes.tabs.backups.page.modal.delete.title', {})} {...props} onClose={doClose}>
         <Stack>
           <Switch
             label={t('common.form.force', {})}
@@ -68,7 +73,7 @@ export default function NodeBackupsDeleteModal({ node, backup, ...props }: Props
           <Button color='red' loading={loading} onClick={doDelete}>
             {t('common.button.okay', {})}
           </Button>
-          <Button variant='default' onClick={() => props.onClose()}>
+          <Button variant='default' onClick={doClose}>
             {t('common.button.cancel', {})}
           </Button>
         </ModalFooter>

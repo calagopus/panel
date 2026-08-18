@@ -30,7 +30,7 @@ export default function CommandSnippetEditModal({ commandSnippet, ...props }: Pr
   const queryClient = useQueryClient();
 
   const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
-    queryKey: [...queryKeys.user.servers.all(), 'eggs'],
+    queryKey: queryKeys.user.eggs.all(),
     fetcher: (search) => getUserEggs(1, search),
   });
 

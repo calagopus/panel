@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import updateEggScript from '@/api/admin/nests/eggs/updateEggScript.ts';
@@ -9,6 +10,7 @@ import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine
 import Group from '@/elements/Group.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import Stack from '@/elements/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggConfigScriptSchema, adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -25,6 +27,7 @@ export default function EggInstallationScriptContainer({
 }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +57,7 @@ export default function EggInstallationScriptContainer({
     updateEggScript(contextNest.uuid, contextEgg.uuid, adminEggConfigScriptSchema.parse(form.values))
       .then(() => {
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.installationScript.page.toast.updated', {}), 'success');
-        contextEgg.configScript = form.values;
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.eggs.detail(contextEgg.uuid) });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

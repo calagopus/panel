@@ -26,7 +26,7 @@ export default function AdminServerMounts({ server }: { server: z.infer<typeof a
     setSearch,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.servers.mounts(server.uuid),
+    queryKey: queryKeys.admin.mountAssignments.mountsByServer(server.uuid),
     fetcher: (page, search) => getServerMounts(server.uuid, page, search),
   });
 

@@ -1,5 +1,6 @@
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import getMountNodes from '@/api/admin/mounts/nodes/getMountNodes.ts';
@@ -25,22 +26,22 @@ import MountAddNodeModal from './modals/MountAddNodeModal.tsx';
 function MountNodeRow({
   node,
   mount,
-  refetch,
 }: {
   node: z.infer<typeof adminNodeSchema>;
   mount: z.infer<typeof adminMountSchema>;
-  refetch: () => void;
 }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
 
   const doRemove = async () => {
     await deleteNodeMount(node.uuid, mount.uuid)
       .then(() => {
+        setOpenModal(null);
         addToast(t('pages.admin.mounts.tabs.nodes.page.toast.removed', {}), 'success');
-        refetch();
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.mountAssignments.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -90,9 +91,8 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
     search,
     setSearch,
     setPage,
-    refetch,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.mounts.nodes(mount.uuid),
+    queryKey: queryKeys.admin.mountAssignments.nodesByMount(mount.uuid),
     fetcher: (page, search) => getMountNodes(mount.uuid, page, search),
   });
 
@@ -113,12 +113,7 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
       }
     >
       <AdminCan action='nodes.mounts'>
-        <MountAddNodeModal
-          mount={mount}
-          refetch={refetch}
-          opened={openModal === 'add'}
-          onClose={() => setOpenModal(null)}
-        />
+        <MountAddNodeModal mount={mount} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
       </AdminCan>
 
       <Table
@@ -129,7 +124,7 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
         error={error}
       >
         {mountNodes?.data.map((nodeMount) => (
-          <MountNodeRow key={nodeMount.node.uuid} node={nodeMount.node} mount={mount} refetch={refetch} />
+          <MountNodeRow key={nodeMount.node.uuid} node={nodeMount.node} mount={mount} />
         ))}
       </Table>
     </AdminSubContentContainer>

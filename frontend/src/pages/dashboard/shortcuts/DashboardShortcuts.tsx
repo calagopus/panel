@@ -10,6 +10,7 @@ import Text from '@/elements/Text.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import { handleRawCopyToClipboard } from '@/lib/copy.ts';
 import { buildCoreShortcutCategories, getShortcutDefinitions } from '@/lib/coreShortcuts.tsx';
+import { resolveString } from '@/lib/lazy.ts';
 import { handleRawPasteFromClipboard } from '@/lib/paste.ts';
 import {
   effectiveBinding,
@@ -39,7 +40,7 @@ export default function DashboardShortcuts() {
     ...window.extensionContext.extensionRegistry.shortcuts.categories,
   };
 
-  const categoryLabel = (id: string) => categories[id]?.label() ?? id;
+  const categoryLabel = (id: string) => resolveString(categories[id]?.label) ?? id;
   const categoryIcon = (id: string): ReactNode =>
     categories[id]?.icon ?? <FontAwesomeIcon icon={faKeyboard} size='sm' />;
 

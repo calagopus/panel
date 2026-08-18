@@ -14,13 +14,13 @@ import {
   faSkull,
   faStop,
   faTriangleExclamation,
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router';
 import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
-import Badge from '@/elements/Badge.tsx';
 import Card from '@/elements/Card.tsx';
 import ContextMenu from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
@@ -197,10 +197,12 @@ export default function ServerItem({
                       <span className='text-xl font-medium flex items-center gap-2 min-w-0 flex-1' title={server.name}>
                         <ScrollingText className='flex-1'>{server.name}</ScrollingText>
                         {showForeignServerBadge && !server.isOwner && (
-                          <Tooltip label={t('pages.account.home.tooltip.foreign', {})} className='shrink-0'>
-                            <Badge color='yellow' variant='light'>
-                              {t('pages.account.home.badge.foreign', {})}
-                            </Badge>
+                          <Tooltip label={t('pages.account.home.tooltip.foreign', {})}>
+                            <FontAwesomeIcon
+                              size='sm'
+                              icon={faUsers}
+                              className='shrink-0 text-(--mantine-color-yellow-filled)'
+                            />
                           </Tooltip>
                         )}
                         {!serverListShowOthers && serverGroups.every((g) => !g.serverOrder.includes(server.uuid)) && (

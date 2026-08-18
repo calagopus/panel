@@ -161,7 +161,7 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
             </div>
             <TextInput
               label={t('pages.oobe.configuration.form.applicationUrl', {})}
-              placeholder={t('pages.oobe.configuration.form.applicationUrlPlaceholder', {})}
+              placeholder='https://calagop.us'
               leftSection={<FontAwesomeIcon icon={faGlobe} size='sm' />}
               required
               {...form.getInputProps('applicationUrl')}

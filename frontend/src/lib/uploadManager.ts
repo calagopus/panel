@@ -10,6 +10,7 @@ import {
   patchUploadChunk,
   withFileParam,
 } from '@/api/server/files/resumableUpload.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { ToastAction, ToastType } from '@/providers/contexts/toastContext.ts';
 import { getTranslations } from '@/providers/contexts/translationContext.ts';
 import {
@@ -79,7 +80,7 @@ const handlers: {
       }
 
       externals?.queryClient
-        .invalidateQueries({ queryKey: ['server', destination.serverUuid, 'files'] })
+        .invalidateQueries({ queryKey: queryKeys.server(destination.serverUuid).files.all() })
         .catch((e) => console.error(e));
     },
   },
@@ -89,7 +90,9 @@ const handlers: {
       return undefined;
     },
     onBatchComplete: () => {
-      externals?.queryClient.invalidateQueries({ queryKey: ['admin', 'assets'] }).catch((e) => console.error(e));
+      externals?.queryClient
+        .invalidateQueries({ queryKey: queryKeys.admin.assets.all() })
+        .catch((e) => console.error(e));
     },
   },
 };

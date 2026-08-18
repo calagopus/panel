@@ -15,7 +15,6 @@ import { Pagination } from '@/elements/Table.tsx';
 import { resolveString } from '@/lib/lazy.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
-import { userServerGroupSchema } from '@/lib/schemas/user.ts';
 import ServerGroupItem from '@/pages/dashboard/home/ServerGroupItem.tsx';
 import ServerItem from '@/pages/dashboard/home/ServerItem.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
@@ -23,6 +22,7 @@ import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import serverRoutes from '@/routers/routes/serverRoutes.ts';
+import { useUserStore } from '@/stores/user.ts';
 
 const DUMMY_S_KEY_REF = { current: false } as React.RefObject<boolean>;
 
@@ -77,7 +77,8 @@ function AllServersView({ getServerTo }: { getServerTo: (server: z.infer<typeof 
 function GroupedServersView({ getServerTo }: { getServerTo: (server: z.infer<typeof serverSchema>) => string }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const [serverGroups, setServerGroups] = useState<z.infer<typeof userServerGroupSchema>[]>([]);
+  const serverGroups = useUserStore((state) => state.serverGroups);
+  const setServerGroups = useUserStore((state) => state.setServerGroups);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -85,7 +86,7 @@ function GroupedServersView({ getServerTo }: { getServerTo: (server: z.infer<typ
       .then(setServerGroups)
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [addToast, setServerGroups]);
 
   const sortedServerGroups = useMemo(() => [...serverGroups].sort((a, b) => a.order - b.order), [serverGroups]);
 

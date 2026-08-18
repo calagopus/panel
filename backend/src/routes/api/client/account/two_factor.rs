@@ -40,10 +40,7 @@ mod get {
                 .ok();
         }
 
-        let secret = match totp_rs::Secret::generate_secret().to_encoded() {
-            totp_rs::Secret::Encoded(secret) => secret,
-            _ => unreachable!(),
-        };
+        let secret = totp_rs::Secret::generate().to_base32();
 
         sqlx::query!(
             "UPDATE users
@@ -151,15 +148,15 @@ mod post {
                 .ok();
         }
 
-        let totp = totp_rs::TOTP::new(
-            totp_rs::Algorithm::SHA1,
-            6,
-            1,
-            30,
-            totp_rs::Secret::Encoded(totp_secret.clone()).to_bytes()?,
-        )?;
+        let totp = totp_rs::Builder::new()
+            .with_algorithm(totp_rs::Algorithm::SHA1)
+            .with_digits(6)
+            .with_skew(1)
+            .with_step_duration(30)
+            .with_secret(totp_rs::Secret::try_from_base32(totp_secret)?)
+            .build()?;
 
-        if !totp.check_current(&data.code).is_ok_and(|valid| valid) {
+        if totp.check_current(&data.code).is_none() {
             return ApiResponse::error("invalid confirmation code")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
@@ -250,15 +247,17 @@ mod delete {
 
         match data.code.len() {
             6 => {
-                let totp = totp_rs::TOTP::new(
-                    totp_rs::Algorithm::SHA1,
-                    6,
-                    1,
-                    30,
-                    totp_rs::Secret::Encoded(user.0.totp_secret.take().unwrap()).to_bytes()?,
-                )?;
+                let totp = totp_rs::Builder::new()
+                    .with_algorithm(totp_rs::Algorithm::SHA1)
+                    .with_digits(6)
+                    .with_skew(1)
+                    .with_step_duration(30)
+                    .with_secret(totp_rs::Secret::try_from_base32(
+                        user.0.totp_secret.take().unwrap(),
+                    )?)
+                    .build()?;
 
-                if !totp.check_current(&data.code).is_ok_and(|valid| valid) {
+                if totp.check_current(&data.code).is_none() {
                     return ApiResponse::error("invalid confirmation code")
                         .with_status(StatusCode::BAD_REQUEST)
                         .ok();

@@ -22,8 +22,7 @@ export default function ServerClearStateModal({
       .then(() => {
         addToast(t('pages.admin.servers.tabs.management.page.clearState.toast.cleared', {}), 'success');
         props.onClose();
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.detail(server.uuid) });
-        server.status = null;
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

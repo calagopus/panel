@@ -300,7 +300,11 @@ export default function EggCreateOrUpdate({
         }).md()}
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.nests.eggs(contextNest.uuid)))}>
+      <form
+        onSubmit={form.onSubmit(() =>
+          doCreateOrUpdate(false, queryKeys.admin.nests.eggs(contextNest.uuid), queryKeys.admin.eggs.all()),
+        )}
+      >
         <Stack>
           <Group grow>
             <TextInput

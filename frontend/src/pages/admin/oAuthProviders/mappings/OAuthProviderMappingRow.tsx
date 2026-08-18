@@ -35,6 +35,7 @@ export default function OAuthProviderMappingRow({
   const doDelete = async () => {
     await deleteOAuthProviderMapping(oauthProvider.uuid, mapping.uuid)
       .then(() => {
+        setOpenModal(null);
         addToast(t('pages.admin.oAuthProviders.tabs.mappings.page.toast.deleted', {}), 'success');
         onChanged();
       })

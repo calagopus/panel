@@ -1,8 +1,85 @@
 import { type Monaco } from '@monaco-editor/react';
+import { getShortcutDefinitions } from '@/lib/coreShortcuts.tsx';
+import {
+  dispatchBinding,
+  effectiveBinding,
+  isMacPlatform,
+  type ModifierKey,
+  type ShortcutBinding,
+} from '@/lib/shortcuts.ts';
+import { getGlobalStore } from '@/stores/global.ts';
 
 type IMonarchLanguageRule = import('monaco-editor').languages.IMonarchLanguageRule;
 type ITextModel = import('monaco-editor').editor.ITextModel;
 type IPosition = import('monaco-editor').IPosition;
+type IStandaloneCodeEditor = import('monaco-editor').editor.IStandaloneCodeEditor;
+
+const NAMED_KEY_CODES: Record<string, string> = {
+  ' ': 'Space',
+  arrowup: 'UpArrow',
+  arrowdown: 'DownArrow',
+  arrowleft: 'LeftArrow',
+  arrowright: 'RightArrow',
+  enter: 'Enter',
+  escape: 'Escape',
+  tab: 'Tab',
+  backspace: 'Backspace',
+  delete: 'Delete',
+  insert: 'Insert',
+  home: 'Home',
+  end: 'End',
+  pageup: 'PageUp',
+  pagedown: 'PageDown',
+};
+
+function monacoKeyCode(monaco: Monaco, key: string): number | null {
+  const name = /^[a-zA-Z]$/.test(key)
+    ? `Key${key.toUpperCase()}`
+    : /^[0-9]$/.test(key)
+      ? `Digit${key}`
+      : /^[fF](\d{1,2})$/.test(key)
+        ? key.toUpperCase()
+        : NAMED_KEY_CODES[key.toLowerCase()];
+
+  const code = name ? (monaco.KeyCode as unknown as Record<string, number>)[name] : undefined;
+  return typeof code === 'number' ? code : null;
+}
+
+function monacoKeyMod(monaco: Monaco, modifier: ModifierKey): number {
+  switch (modifier) {
+    case 'ctrlOrMeta':
+      return monaco.KeyMod.CtrlCmd;
+    case 'ctrl':
+      return isMacPlatform() ? monaco.KeyMod.WinCtrl : monaco.KeyMod.CtrlCmd;
+    case 'meta':
+      return isMacPlatform() ? monaco.KeyMod.CtrlCmd : monaco.KeyMod.WinCtrl;
+    case 'shift':
+      return monaco.KeyMod.Shift;
+    case 'alt':
+      return monaco.KeyMod.Alt;
+  }
+}
+
+function monacoKeybinding(monaco: Monaco, binding: ShortcutBinding): number | null {
+  const code = monacoKeyCode(monaco, binding.key);
+  if (code === null) return null;
+
+  return binding.modifiers.reduce((keybinding, modifier) => keybinding | monacoKeyMod(monaco, modifier), code);
+}
+
+export function forwardGlobalShortcuts(editor: IStandaloneCodeEditor, monaco: Monaco) {
+  for (const definition of getShortcutDefinitions()) {
+    if (!definition.allowWhenInputFocused) continue;
+
+    const binding = effectiveBinding(definition, getGlobalStore().shortcutOverrides);
+    if (!binding) continue;
+
+    const keybinding = monacoKeybinding(monaco, binding);
+    if (keybinding === null) continue;
+
+    editor.addCommand(keybinding, () => dispatchBinding(binding));
+  }
+}
 
 let hoconRegistered = false;
 let tomlRegistered = false;

@@ -48,7 +48,7 @@ export default function NodeMountAddModal({ node, ...props }: ModalProps & { nod
         addToast(t('pages.admin.nodes.tabs.mounts.page.toast.added', {}), 'success');
 
         props.onClose();
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.mounts(node.uuid) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.mountAssignments.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

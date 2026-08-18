@@ -55,7 +55,7 @@ export default function ServerTransferModal({
   });
   const availablePrimaryAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: selectedNodeUuid
-      ? queryKeys.admin.nodes.allocations(selectedNodeUuid)
+      ? queryKeys.admin.nodes.availableAllocations(selectedNodeUuid)
       : ['admin', 'nodes', 'primary-allocations'],
     fetcher: (search) =>
       selectedNodeUuid
@@ -66,7 +66,7 @@ export default function ServerTransferModal({
   });
   const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: selectedNodeUuid
-      ? queryKeys.admin.nodes.allocations(selectedNodeUuid)
+      ? queryKeys.admin.nodes.availableAllocations(selectedNodeUuid)
       : ['admin', 'nodes', 'allocations'],
     fetcher: (search) =>
       selectedNodeUuid
@@ -76,7 +76,7 @@ export default function ServerTransferModal({
     canRequest: canReadNodeAllocations,
   });
   const backups = useSearchableResource<z.infer<typeof adminServerBackupSchema>>({
-    queryKey: queryKeys.admin.servers.backups(server.uuid),
+    queryKey: queryKeys.admin.backups.byServer(server.uuid),
     fetcher: (search) => getServerBackups(server.uuid, 1, search),
     canRequest: props.opened,
   });

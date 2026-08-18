@@ -25,7 +25,7 @@ export default function CommandSnippetCreateModal({ ...props }: ModalProps) {
   const queryClient = useQueryClient();
 
   const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
-    queryKey: [...queryKeys.user.servers.all(), 'eggs'],
+    queryKey: queryKeys.user.eggs.all(),
     fetcher: (search) => getUserEggs(1, search),
   });
 

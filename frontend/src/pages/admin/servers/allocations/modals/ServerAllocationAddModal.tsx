@@ -29,7 +29,7 @@ export default function ServerAllocationAddModal({
   const [selectedAllocationUuids, setSelectedAllocationUuids] = useState<string[]>([]);
 
   const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
-    queryKey: queryKeys.admin.nodes.allocations(server.node.uuid),
+    queryKey: queryKeys.admin.nodes.availableAllocations(server.node.uuid),
     fetcher: (search) => getAvailableNodeAllocations(server.node.uuid, 1, search),
   });
 
@@ -48,6 +48,7 @@ export default function ServerAllocationAddModal({
         selectedAllocationUuids.map((allocationUuid) => createServerAllocation(server.uuid, { allocationUuid })),
       );
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.allocations(server.node.uuid) });
       addToast(
         t('pages.admin.servers.tabs.allocations.page.toast.added', { count: selectedAllocationUuids.length }),
         'success',

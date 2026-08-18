@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import reattachNodeBackup from '@/api/admin/nodes/backups/reattachNodeBackup.ts';
@@ -23,6 +24,7 @@ type Props = ModalProps & {
 export default function NodeBackupsReattachModal({ node, backup, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
 
   const [selectedServer, setSelectedServer] = useState<z.infer<typeof adminServerSchema> | null>(backup.server ?? null);
   const [loading, setLoading] = useState(false);
@@ -42,9 +44,9 @@ export default function NodeBackupsReattachModal({ node, backup, ...props }: Pro
 
     reattachNodeBackup(node.uuid, backup.uuid, { serverUuid: selectedServer.uuid })
       .then(() => {
-        backup.server = selectedServer;
         props.onClose();
         addToast(t('pages.admin.nodes.tabs.backups.page.toast.reattached', { name: selectedServer.name }), 'success');
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.backups.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

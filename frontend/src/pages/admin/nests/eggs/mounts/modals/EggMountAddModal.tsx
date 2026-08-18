@@ -46,7 +46,7 @@ export default function EggMountAddModal({
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.toast.added', {}), 'success');
 
         props.onClose();
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.eggs.mounts(egg.uuid) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.mountAssignments.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

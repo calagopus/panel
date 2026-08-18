@@ -194,6 +194,7 @@ export default function WebsocketListener() {
     }
 
     invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.groups.all());
+    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.system());
   });
 
   useWebsocketEvent(SocketEvent.BACKUP_RESTORE_STARTED, () => {
@@ -319,6 +320,7 @@ export default function WebsocketListener() {
 
   useWebsocketEvent(SocketEvent.SCHEDULE_COMPLETED, (uuid) => {
     setRunningScheduleStep(uuid, null);
+    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).schedules.all());
   });
 
   useWebsocketEvent(SocketEvent.OPERATION_PROGRESS, (uuid, data) => {

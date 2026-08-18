@@ -44,8 +44,8 @@ pub async fn auth(
 
     let backup = ServerBackup::by_node_uuid_uuid(&state.database, node.uuid, backup).await;
     let backup = match backup {
-        Ok(Some(backup)) => backup,
-        Ok(None) => {
+        Ok(Some(backup)) if backup.deleted.is_none() => backup,
+        Ok(_) => {
             return Ok(ApiResponse::error("backup not found")
                 .with_status(StatusCode::NOT_FOUND)
                 .into_response());
@@ -155,6 +155,15 @@ mod delete {
 
         if backup.completed.is_none() {
             return ApiResponse::error("backup has not been completed yet")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
+        if matches!(
+            backup.deletion_status(),
+            Some(shared::models::server_backup::ServerBackupDeletionStatus::Deleting)
+        ) {
+            return ApiResponse::error("backup is already being deleted")
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
         }

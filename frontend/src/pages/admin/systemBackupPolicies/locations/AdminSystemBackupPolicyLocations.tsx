@@ -42,6 +42,7 @@ function SystemBackupPolicyLocationRow({
   const doRemove = async () => {
     await deleteSystemBackupPolicyLocation(systemBackupPolicy.uuid, location.uuid)
       .then(() => {
+        setOpenModal(null);
         addToast(t('pages.admin.systemBackupPolicies.tabs.locations.page.toast.removed', {}), 'success');
         refetch();
       })

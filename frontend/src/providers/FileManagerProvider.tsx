@@ -5,6 +5,7 @@ import { useStore } from 'zustand';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getBackup from '@/api/server/backups/getBackup.ts';
 import loadDirectory, { DirectoryResponse } from '@/api/server/files/loadDirectory.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { registerUploadRefresh } from '@/lib/uploadManager.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useUploader } from '@/plugins/useUploader.ts';
@@ -40,7 +41,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ['server', server.uuid, 'files', { browsingDirectory, sortMode }],
+    queryKey: queryKeys.server(server.uuid).files.directory(browsingDirectory, sortMode),
     queryFn: ({ pageParam }) => loadDirectory(server.uuid, browsingDirectory, pageParam, sortMode),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
@@ -82,7 +83,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   }, [browsingDirectory]);
 
   const { data: browsingBackup = null, error: browsingBackupError } = useQuery({
-    queryKey: ['server', server.uuid, 'backup', backupUuid],
+    queryKey: queryKeys.server(server.uuid).backups.detail(backupUuid!),
     queryFn: () => getBackup(server.uuid, backupUuid!),
     enabled: !!backupUuid && canReadBackups,
     staleTime: Infinity,

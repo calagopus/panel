@@ -22,9 +22,10 @@ export default function AdminNodeBackups({ node }: { node: z.infer<typeof adminN
     setSearch,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.nodes.backups(node.uuid),
+    queryKey: queryKeys.admin.backups.byNode(node.uuid),
     fetcher: (page, search) => getNodeBackups(node.uuid, page, search, showDetachedNodeBackups),
     deps: [showDetachedNodeBackups],
+    refetchInterval: (data) => (data?.data.some((backup) => backup.deletionStatus === 'deleting') ? 5000 : false),
   });
 
   return (

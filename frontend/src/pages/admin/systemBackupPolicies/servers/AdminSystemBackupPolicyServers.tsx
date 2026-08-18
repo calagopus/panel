@@ -42,6 +42,7 @@ function SystemBackupPolicyServerRow({
   const doRemove = async () => {
     await deleteSystemBackupPolicyServer(systemBackupPolicy.uuid, server.uuid)
       .then(() => {
+        setOpenModal(null);
         addToast(t('pages.admin.systemBackupPolicies.tabs.servers.page.toast.removed', {}), 'success');
         refetch();
       })

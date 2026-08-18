@@ -194,6 +194,7 @@ export default function StepCard({
   const doDelete = async () => {
     await deleteScheduleStep(server.uuid, schedule.uuid, step.uuid)
       .then(() => {
+        handleOpenModal(null);
         addToast(t('pages.server.schedules.toast.step.deleted', {}), 'success');
         onStepDelete?.(step.uuid);
       })

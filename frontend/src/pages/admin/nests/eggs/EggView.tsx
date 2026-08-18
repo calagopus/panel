@@ -5,6 +5,7 @@ import getEgg from '@/api/admin/nests/eggs/getEgg.ts';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
 import Title from '@/elements/Title.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import EggCreateOrUpdate from '@/pages/admin/nests/eggs/EggCreateOrUpdate.tsx';
 import AdminEggMounts from '@/pages/admin/nests/eggs/mounts/AdminEggMounts.tsx';
@@ -19,7 +20,7 @@ export default function EggView({ contextNest }: { contextNest: z.infer<typeof a
   const { t } = useTranslations();
 
   const resource = useResource({
-    queryKey: ['admin', 'eggs', { uuid: params.eggId }],
+    queryKey: queryKeys.admin.eggs.detail(params.eggId!),
     queryFn: () => getEgg(contextNest.uuid, params.eggId!),
   });
 

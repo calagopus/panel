@@ -163,7 +163,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
             withAsterisk
             label={t('common.form.url', {})}
             description={t('pages.admin.nodes.tabs.general.page.form.urlDescription', {})}
-            placeholder={t('pages.admin.nodes.tabs.general.page.form.urlPlaceholder', {})}
+            placeholder='https://node.example.com:8080'
             key={f.key('url')}
             {...f.getInputProps('url')}
             disabled={isAIO}
@@ -198,7 +198,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
         <TextInput
           label={t('common.form.publicUrl', {})}
           description={t('pages.admin.nodes.tabs.general.page.form.publicUrlDescription', {})}
-          placeholder={t('pages.admin.nodes.tabs.general.page.form.urlPlaceholder', {})}
+          placeholder='https://node.example.com:8080'
           key={f.key('publicUrl')}
           rightSection={
             <Tooltip label={t('pages.admin.nodes.tabs.general.page.tooltip.useWingsProxyUrl', {})}>

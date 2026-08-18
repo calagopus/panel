@@ -175,7 +175,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
                 label={t('common.form.url', {})}
                 description={t('pages.oobe.node.form.urlDescription', {})}
                 leftSection={<FontAwesomeIcon icon={faGlobe} size='sm' />}
-                placeholder={t('pages.oobe.node.form.urlPlaceholder', {})}
+                placeholder='https://node.example.com:8080'
                 {...form.getInputProps('url')}
                 disabled={isEdit && isNodeAIO(existingNode)}
               />
@@ -184,7 +184,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
                 label={t('pages.oobe.node.form.publicUrl', {})}
                 description={t('pages.oobe.node.form.publicUrlDescription', {})}
                 leftSection={<FontAwesomeIcon icon={faGlobeAmericas} size='sm' />}
-                placeholder={t('pages.oobe.node.form.publicUrlPlaceholder', {})}
+                placeholder='https://node.example.com:8080'
                 {...form.getInputProps('publicUrl')}
                 disabled={isEdit && isNodeAIO(existingNode)}
               />

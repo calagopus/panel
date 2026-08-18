@@ -28,6 +28,7 @@ export default function SubuserRow({ subuser }: { subuser: z.infer<typeof server
   const doRemove = async () => {
     await deleteSubuser(server.uuid, subuser.user.uuid)
       .then(() => {
+        setOpenModal(null);
         addToast(t('pages.server.subusers.modal.removeSubuser.toast.removed', {}), 'success');
         queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).subusers.all() });
       })

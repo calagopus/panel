@@ -4,6 +4,7 @@ import getUser from '@/api/admin/users/getUser.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminUserServers from '@/pages/admin/users/servers/AdminUserServers.tsx';
 import UserCreateOrUpdate from '@/pages/admin/users/UserCreateOrUpdate.tsx';
 import { useResource } from '@/plugins/useResource.ts';
@@ -16,7 +17,7 @@ export default function UserView() {
   const { t } = useTranslations();
 
   const resource = useResource({
-    queryKey: ['admin', 'users', { uuid: params.id }],
+    queryKey: queryKeys.admin.users.detail(params.id!),
     queryFn: () => getUser(params.id!),
   });
 

@@ -354,7 +354,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
       name: 'image',
       label: t('common.form.dockerImage', {}),
       required: true,
-      props: { placeholder: t('pages.admin.servers.tabs.general.page.form.dockerImagePlaceholder', {}) },
+      props: { placeholder: 'ghcr.io/...' },
     },
     {
       type: 'select',
@@ -401,7 +401,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: z.infer
           )}
           <TextArea
             label={t('common.form.startupCommand', {})}
-            placeholder={t('pages.admin.servers.tabs.general.page.form.startupCommandPlaceholder', {})}
+            placeholder='npm start'
             className='col-span-full'
             required
             rows={2}

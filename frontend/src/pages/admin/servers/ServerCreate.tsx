@@ -153,7 +153,7 @@ export default function ServerCreate() {
   });
   const availablePrimaryAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: selectedNodeUuid
-      ? queryKeys.admin.nodes.allocations(selectedNodeUuid)
+      ? queryKeys.admin.nodes.availableAllocations(selectedNodeUuid)
       : ['admin', 'nodes', 'primary-allocations'],
     fetcher: (search) =>
       selectedNodeUuid
@@ -164,7 +164,7 @@ export default function ServerCreate() {
   });
   const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: selectedNodeUuid
-      ? queryKeys.admin.nodes.allocations(selectedNodeUuid)
+      ? queryKeys.admin.nodes.availableAllocations(selectedNodeUuid)
       : ['admin', 'nodes', 'allocations'],
     fetcher: (search) =>
       selectedNodeUuid
@@ -395,7 +395,7 @@ export default function ServerCreate() {
         }),
       ),
       props: {
-        placeholder: t('pages.admin.servers.tabs.general.page.form.dockerImagePlaceholder', {}),
+        placeholder: 'ghcr.io/...',
         searchable: true,
       },
     },
@@ -405,7 +405,7 @@ export default function ServerCreate() {
       label: t('common.form.timezone', {}),
       options: [{ label: t('common.form.timezoneSystem', {}), value: '' }, ...timezones],
       props: {
-        placeholder: t('pages.admin.servers.tabs.general.page.form.timezonePlaceholder', {}),
+        placeholder: 'Europe/Amsterdam',
         searchable: true,
       },
     },
@@ -442,7 +442,7 @@ export default function ServerCreate() {
           )}
           <TextArea
             label={t('common.form.startupCommand', {})}
-            placeholder={t('pages.admin.servers.tabs.general.page.form.startupCommandPlaceholder', {})}
+            placeholder='npm start'
             className='col-span-full'
             required
             rows={2}

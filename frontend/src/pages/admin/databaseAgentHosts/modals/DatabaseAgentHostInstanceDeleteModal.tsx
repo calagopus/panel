@@ -17,11 +17,10 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type Props = ModalProps & {
   hostUuid: string;
-  serverUuid: string;
   instance: z.infer<typeof adminDatabaseAgentBaseSchema>;
 };
 
-export default function DatabaseAgentHostInstanceDeleteModal({ hostUuid, serverUuid, instance, ...props }: Props) {
+export default function DatabaseAgentHostInstanceDeleteModal({ hostUuid, instance, ...props }: Props) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
@@ -36,8 +35,7 @@ export default function DatabaseAgentHostInstanceDeleteModal({ hostUuid, serverU
           'success',
         );
         props.onClose();
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.databaseAgentHosts.instances(hostUuid) });
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.databaseInstances(serverUuid) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.databaseInstances.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

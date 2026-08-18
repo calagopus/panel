@@ -4,6 +4,7 @@ import getDatabaseHost from '@/api/admin/database-hosts/getDatabaseHost.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminDatabaseHostDatabases from '@/pages/admin/databaseHosts/databases/AdminDatabaseHostDatabases.tsx';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -14,7 +15,7 @@ export default function DatabaseHostView() {
   const params = useParams<'id'>();
 
   const resource = useResource({
-    queryKey: ['admin', 'databaseHosts', { uuid: params.id }],
+    queryKey: queryKeys.admin.databaseHosts.detail(params.id!),
     queryFn: () => getDatabaseHost(params.id!),
   });
 

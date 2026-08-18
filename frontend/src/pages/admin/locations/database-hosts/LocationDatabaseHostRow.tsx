@@ -32,6 +32,7 @@ export default function LocationDatabaseHostRow({
   const doDelete = async () => {
     await deleteLocationDatabaseHost(location.uuid, databaseHost.databaseHost.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.locations.databaseHosts(location.uuid) });
         addToast(t('pages.admin.locations.tabs.databaseHosts.page.toast.deleted', {}), 'success');
       })

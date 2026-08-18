@@ -21,7 +21,7 @@ export interface Toast {
   actions?: ToastAction[];
 }
 
-interface AddToast {
+export interface AddToast {
   (message: ReactNode, type?: ToastType, actions?: ToastAction[]): number;
   (message: ReactNode, actions: ToastAction[]): number;
 }

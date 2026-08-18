@@ -98,6 +98,7 @@ export default function ServerGroupItem({
   const doDelete = async () => {
     await deleteServerGroup(serverGroup.uuid)
       .then(() => {
+        setOpenModal(null);
         removeServerGroup(serverGroup);
         addToast(t('pages.account.home.tabs.groupedServers.page.modal.deleteServerGroup.toast.deleted', {}), 'success');
       })
@@ -117,12 +118,19 @@ export default function ServerGroupItem({
 
     const { server } = serverToRemove;
 
+    const previousServers = servers;
     const serverOrder = serverGroup.serverOrder.filter((uuid) => uuid !== server.uuid);
     updateStateServerGroup(serverGroup.uuid, { serverOrder });
-    setServers((prev) => ({ ...prev, data: prev.data.filter((s) => s.uuid !== server.uuid) }));
+    setServers((prev) => ({
+      ...prev,
+      total: Math.max(0, prev.total - 1),
+      data: prev.data.filter((s) => s.uuid !== server.uuid),
+    }));
 
     await updateServerGroup(serverGroup.uuid, { serverOrder })
       .then(() => {
+        setOpenModal(null);
+        refetch();
         addToast(
           t('pages.account.home.tabs.groupedServers.page.modal.removeServerFromGroup.toast.removed', {}),
           'success',
@@ -130,6 +138,8 @@ export default function ServerGroupItem({
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
+        updateStateServerGroup(serverGroup.uuid, { serverOrder: serverGroup.serverOrder });
+        setServers(previousServers);
       });
   };
 
@@ -142,7 +152,7 @@ export default function ServerGroupItem({
     [servers.data, serverGroup.uuid],
   );
 
-  const serverCount = servers?.total ?? serverGroup.serverOrder.length;
+  const serverCount = servers.total;
 
   return (
     <>

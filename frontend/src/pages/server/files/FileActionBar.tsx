@@ -22,6 +22,7 @@ import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { canMoveFilesToDirectory } from '@/pages/server/files/fileMove.ts';
+import { useFileSelectionQuickActions } from '@/pages/server/files/hooks/useFileSelectionQuickActions.tsx';
 import FileCopyConflictModal, {
   ConflictResolutions,
   FileConflict,
@@ -182,6 +183,8 @@ function FileActionBar() {
       })
       .finally(() => setLoading(false));
   };
+
+  useFileSelectionQuickActions({ doCopy, doMove, doDownload, loading });
 
   useKeyboardShortcuts({
     shortcuts: [

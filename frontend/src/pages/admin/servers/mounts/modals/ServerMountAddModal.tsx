@@ -27,7 +27,7 @@ export default function ServerMountAddModal({
   const [selectedMount, setSelectedMount] = useState<z.infer<typeof adminServerMountSchema> | null>(null);
 
   const mounts = useSearchableResource<z.infer<typeof adminServerMountSchema>>({
-    queryKey: queryKeys.admin.servers.mounts(server.uuid),
+    queryKey: queryKeys.admin.mountAssignments.availableMountsByServer(server.uuid),
     fetcher: (search) => getAvailableServerMounts(server.uuid, 1, search),
   });
 
@@ -48,7 +48,7 @@ export default function ServerMountAddModal({
         addToast(t('pages.admin.servers.tabs.mounts.page.toast.added', {}), 'success');
 
         props.onClose();
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.mounts(server.uuid) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.mountAssignments.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

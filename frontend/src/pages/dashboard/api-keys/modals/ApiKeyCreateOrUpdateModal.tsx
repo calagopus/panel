@@ -120,7 +120,7 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, onCreated, ..
 
         <TagsInput
           label={t('pages.account.apiKeys.form.allowedIps', {})}
-          placeholder={t('pages.account.apiKeys.form.allowedIpsPlaceholder', {})}
+          placeholder='e.g. 192.168.1.1, 2001:db8::1'
           {...form.getInputProps('allowedIps')}
         />
 

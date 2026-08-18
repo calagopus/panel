@@ -8,10 +8,16 @@ export const openUrl = (url: string, target = '_blank') => {
   document.body.removeChild(anchor);
 };
 
+const getExplicitUrlPort = (url: string) => {
+  const authority = url.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').split(/[/?#]/, 1)[0];
+  const match = /:(\d+)$/.exec(authority.slice(authority.lastIndexOf('@') + 1));
+  return match ? parseInt(match[1]) : null;
+};
+
 export const urlIsMissingPort = (url: string) => {
   try {
     const parsed = new URL(url);
-    return /^https?:$/.test(parsed.protocol) && !parsed.port;
+    return /^https?:$/.test(parsed.protocol) && getExplicitUrlPort(url) === null;
   } catch {
     return false;
   }
@@ -38,10 +44,4 @@ export const getUrlConnectPort = (url: string) => {
   }
 };
 
-export const getUrlPortOr = (url: string, fallback: number) => {
-  try {
-    return parseInt(new URL(url).port) || fallback;
-  } catch {
-    return fallback;
-  }
-};
+export const getUrlPortOr = (url: string, fallback: number) => getExplicitUrlPort(url) ?? fallback;

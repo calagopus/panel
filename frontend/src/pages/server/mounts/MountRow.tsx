@@ -1,5 +1,6 @@
 import { faCheck, faMinus, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -12,6 +13,7 @@ import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverMountSchema } from '@/lib/schemas/server/mounts.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/contexts/translationContext.ts';
@@ -21,6 +23,7 @@ export const MountRow = ({ contextMount }: { contextMount: z.infer<typeof server
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'attach' | 'detach' | null>(null);
 
@@ -33,7 +36,7 @@ export const MountRow = ({ contextMount }: { contextMount: z.infer<typeof server
           }),
           'success',
         );
-        contextMount.created = new Date();
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).mounts.all() });
         setOpenModal(null);
       })
       .catch((msg) => {
@@ -50,7 +53,7 @@ export const MountRow = ({ contextMount }: { contextMount: z.infer<typeof server
           }),
           'success',
         );
-        contextMount.created = null;
+        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).mounts.all() });
         setOpenModal(null);
       })
       .catch((msg) => {

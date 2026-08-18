@@ -4,6 +4,7 @@ import getNest from '@/api/admin/nests/getNest.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminEggs from './eggs/AdminEggs.tsx';
@@ -14,7 +15,7 @@ export default function NestView() {
   const { t } = useTranslations();
 
   const resource = useResource({
-    queryKey: ['admin', 'nests', { uuid: params.nestId }],
+    queryKey: queryKeys.admin.nests.detail(params.nestId!),
     queryFn: () => getNest(params.nestId!),
   });
 

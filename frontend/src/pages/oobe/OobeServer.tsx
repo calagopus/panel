@@ -63,13 +63,13 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
     deps: [selectedEggRepositoryUuid],
   });
   const availablePrimaryAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
-    queryKey: node ? queryKeys.admin.nodes.allocations(node.uuid) : ['oobe', 'primary-allocations'],
+    queryKey: node ? queryKeys.admin.nodes.availableAllocations(node.uuid) : ['oobe', 'primary-allocations'],
     fetcher: (search) =>
       node ? getAvailableNodeAllocations(node.uuid, 1, search) : Promise.resolve(getEmptyPaginationSet()),
     deps: [node?.uuid],
   });
   const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
-    queryKey: node ? queryKeys.admin.nodes.allocations(node.uuid) : ['oobe', 'allocations'],
+    queryKey: node ? queryKeys.admin.nodes.availableAllocations(node.uuid) : ['oobe', 'allocations'],
     fetcher: (search) =>
       node ? getAvailableNodeAllocations(node.uuid, 1, search) : Promise.resolve(getEmptyPaginationSet()),
     deps: [node?.uuid],

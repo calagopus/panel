@@ -47,6 +47,8 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
   };
 
   const isFailed = !backup.isSuccessful && !!backup.completed;
+  const isDeleting = backup.deletionStatus === 'deleting';
+  const isDeleteFailed = backup.deletionStatus === 'failed';
 
   return (
     <>
@@ -75,7 +77,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
             type: 'action',
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: !backup.isStreaming ? () => doDownload('tar_gz') : undefined,
             color: 'gray',
             items: backup.isStreaming
@@ -93,7 +95,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
             type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('restore'),
             color: 'gray',
             canAccess: useAdminCan('nodes.backups'),
@@ -102,7 +104,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
             type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: useAdminCan('nodes.backups'),
@@ -111,7 +113,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
             type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
-            hidden: !backup.completed,
+            hidden: !backup.completed || isDeleting,
             onClick: () => setOpenModal('delete'),
             color: 'red',
             canAccess: useAdminCan('nodes.backups'),
@@ -121,6 +123,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
       >
         {({ items, openMenu }) => (
           <TableRow
+            className={isDeleting ? 'opacity-50' : undefined}
             onContextMenu={(e) => {
               e.preventDefault();
               openMenu(e.clientX, e.clientY);
@@ -158,7 +161,15 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
               )}
             </TableData>
 
-            {!isFailed ? (
+            {isDeleting || isDeleteFailed ? (
+              <TableData colSpan={3}>
+                {isDeleting ? (
+                  <Badge color='yellow'>{t('pages.server.backups.badge.deleting', {})}</Badge>
+                ) : (
+                  <Badge color='red'>{t('pages.server.backups.badge.deleteFailed', {})}</Badge>
+                )}
+              </TableData>
+            ) : !isFailed ? (
               <>
                 <TableData>{backup.checksum && <Code>{backup.checksum}</Code>}</TableData>
 

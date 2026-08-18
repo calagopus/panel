@@ -4,6 +4,7 @@ import getOAuthProvider from '@/api/admin/oauth-providers/getOAuthProvider.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminOAuthProviderMappings from '@/pages/admin/oAuthProviders/mappings/AdminOAuthProviderMappings.tsx';
 import AdminOAuthProviderUsers from '@/pages/admin/oAuthProviders/users/AdminOAuthProviderUsers.tsx';
 import { useResource } from '@/plugins/useResource.ts';
@@ -15,7 +16,7 @@ export default function OAuthProviderView() {
   const { t } = useTranslations();
 
   const resource = useResource({
-    queryKey: ['admin', 'oauthProviders', { uuid: params.id }],
+    queryKey: queryKeys.admin.oAuthProviders.detail(params.id!),
     queryFn: () => getOAuthProvider(params.id!),
   });
 

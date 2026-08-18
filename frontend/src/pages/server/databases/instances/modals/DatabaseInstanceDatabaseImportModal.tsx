@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -10,6 +11,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   serverDatabaseInstanceDatabaseSchema,
   serverDatabaseInstanceSchema,
@@ -27,6 +29,7 @@ export default function DatabaseInstanceDatabaseImportModal({ instance, database
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
+  const queryClient = useQueryClient();
 
   const [file, setFile] = useState<File | null>(null);
   const [sourceDb, setSourceDb] = useState('');
@@ -60,6 +63,9 @@ export default function DatabaseInstanceDatabaseImportModal({ instance, database
         setSourceDb('');
         setWipe(false);
         props.onClose();
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.server(server.uuid).databases.instances.databases(instance.uuid),
+        });
       })
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
       .finally(() => setLoading(false));

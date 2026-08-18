@@ -31,6 +31,7 @@ export default function UserOAuthLinkRow({
   const doDelete = async () => {
     await deleteUserOAuthLink(user.uuid, userOAuthLink.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.oauthLinks(user.uuid) });
         addToast(t('pages.admin.users.tabs.oauthLinks.page.toast.removed', {}), 'success');
       })

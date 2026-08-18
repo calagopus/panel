@@ -165,7 +165,7 @@ export default function EggVariableContainer({
       name: 'defaultValue',
       label: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.defaultValue', {}),
       props: {
-        placeholder: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.defaultValuePlaceholder', {}),
+        placeholder: 'server.jar',
       },
     },
     {

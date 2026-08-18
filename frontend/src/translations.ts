@@ -464,6 +464,12 @@ const baseTranslations = defineTranslations({
           themeDark: 'Dark',
           themeLight: 'Light',
         },
+        modal: {
+          logout: {
+            title: 'Logout',
+            content: 'Are you sure you want to log out?',
+          },
+        },
       },
       quickActions: {
         trigger: 'Quick actions...',
@@ -473,11 +479,20 @@ const baseTranslations = defineTranslations({
           power: 'Power',
           account: 'Account',
           servers: 'Servers',
+          page: 'This Page',
+          math: 'Calculator',
+        },
+        math: {
+          calculating: 'Calculating...',
+          unsolvable: 'This expression cannot be solved',
+          copyResult: 'Copy result',
         },
         hint: {
           navigate: 'to navigate',
           select: 'to select',
           close: 'to close',
+          calculate: 'to calculate',
+          pages: 'for pages only',
         },
       },
       permissionSelector: {
@@ -748,10 +763,8 @@ const baseTranslations = defineTranslations({
           form: {
             name: 'Name',
             namePlaceholder: 'My Server',
-            urlPlaceholder: 'https://node.example.com:8080',
             urlDescription: 'used for internal communication with the node',
             publicUrl: 'Public URL',
-            publicUrlPlaceholder: 'https://node.example.com:8080',
             publicUrlDescription: 'used for websocket/downloads',
             sftpHostPlaceholder: 'SFTP Host',
             sftpPortPlaceholder: 'SFTP Port',
@@ -786,7 +799,6 @@ const baseTranslations = defineTranslations({
             applicationNamePlaceholder: 'Calagopus',
             languagePlaceholder: 'Language',
             applicationUrl: 'Application URL',
-            applicationUrlPlaceholder: 'https://calagop.us',
             registration: 'Enable Registration',
             registrationDescription: 'Allow new users to register their own account.',
             securityKeys: 'Enable Security Keys',
@@ -987,9 +999,6 @@ const baseTranslations = defineTranslations({
             noGroups: 'No groups available to add server to',
             noGroup: 'This server is not in any group',
             foreign: 'This server is owned by another user, you have access to it as a subuser or administrator',
-          },
-          badge: {
-            foreign: 'Foreign',
           },
           tabs: {
             groupedServers: {
@@ -1435,7 +1444,6 @@ const baseTranslations = defineTranslations({
           },
           form: {
             allowedIps: 'Allowed IPs',
-            allowedIpsPlaceholder: 'e.g. 192.168.1.1, 2001:db8::1',
             userPermissions: 'User Permissions',
             serverPermissions: 'Server Permissions',
             adminPermissions: 'Admin Permissions',
@@ -2338,7 +2346,6 @@ const baseTranslations = defineTranslations({
                 },
                 form: {
                   urlDescription: 'Used for internal communication with the node.',
-                  urlPlaceholder: 'https://node.example.com:8080',
                   publicUrlDescription: 'Used for websocket connections and downloads.',
                   backupConfigurationPlaceholder: 'Inherit from Location',
                   memoryDescription: 'The total memory available for servers on this node.',
@@ -2614,7 +2621,7 @@ const baseTranslations = defineTranslations({
                   reattached: 'Reattached backup to {name} successfully.',
                   restoring: 'Restoring backup to {name}...',
                   exporting: 'Exporting backup to files of {name}...',
-                  deleted: 'Node backup deleted.',
+                  deletionStarted: 'Node backup deletion started.',
                 },
                 modal: {
                   export: {
@@ -2844,11 +2851,8 @@ const baseTranslations = defineTranslations({
                   pinnedCpus: 'Pinned CPUs',
                   pinnedCpusDescription: 'The CPU cores this server is pinned to.',
                   pinnedCpusTooltip: 'By index, e.g. 0, 1, 2. Leave empty to allow all cores.',
-                  dockerImagePlaceholder: 'ghcr.io/...',
                   predefinedDockerImages: 'Predefined Docker Images',
                   predefinedDockerImagesPlaceholder: 'No predefined image selected',
-                  timezonePlaceholder: 'Europe/Amsterdam',
-                  startupCommandPlaceholder: 'npm start',
                   startupCommandCustom: 'Custom',
                   predefinedStartupCommands: 'Predefined Startup Commands',
                   startOnCompletion: 'Start on Completion',
@@ -3217,7 +3221,6 @@ const baseTranslations = defineTranslations({
                       form: {
                         supportsMarkdown: 'Supports Markdown formatting.',
                         defaultValue: 'Default Value',
-                        defaultValuePlaceholder: 'server.jar',
                         userViewable: 'User Viewable',
                         userEditable: 'User Editable',
                         secret: 'Secret',
@@ -3379,7 +3382,6 @@ const baseTranslations = defineTranslations({
                   credentialType: 'Credential Type',
                   password: 'Password or Access Token',
                   privateKey: 'Private Key',
-                  privateKeyPlaceholder: '-----BEGIN OPENSSH PRIVATE KEY-----',
                   passphrase: 'Passphrase',
                 },
                 enum: {
@@ -3446,7 +3448,6 @@ const baseTranslations = defineTranslations({
                   connectionCredentials: 'Connection Credentials',
                   credentialType: 'Credential Type',
                   connectionString: 'Connection String',
-                  connectionStringPlaceholder: 'mysql://username:password@host:port',
                 },
                 enum: {
                   credentialType: {
@@ -3502,7 +3503,6 @@ const baseTranslations = defineTranslations({
                 titleCreate: 'Create Database Agent Host',
                 titleUpdate: 'Update Database Agent Host',
                 form: {
-                  urlPlaceholder: 'https://agent.example.com:8080',
                   typeEnabled: 'Enabled',
                   typePublicHost: 'Public Host',
                   typePublicPort: 'Public Port',
@@ -4513,6 +4513,33 @@ const baseTranslations = defineTranslations({
             viewDiff: 'View Diff',
             loadDisk: 'Load Disk Version',
             keepEditor: 'Keep Editor Version',
+          },
+          quickAction: {
+            newFile: 'New File',
+            newDirectory: 'New Directory',
+            pullFile: 'Pull File from URL',
+            uploadFiles: 'Upload Files',
+            uploadDirectory: 'Upload Directory',
+            search: 'Search Files',
+            largestDirectories: 'Analyze Directory Sizes',
+            parentDirectory: 'Go to Parent Directory',
+            copyPath: 'Copy Current Path',
+            exitBackup: 'Exit Backup Browsing',
+            connectSftp: 'Connect via SFTP',
+            connectVscode: 'Open in VS Code',
+            cancelPaste: 'Cancel Pending Copy or Move',
+            downloadSelection: 'Download Selection',
+            copySelection: 'Copy Selection',
+            moveSelection: 'Move Selection',
+            remoteCopySelection: 'Copy Selection to another Server',
+            archiveSelection: 'Archive Selection',
+            extractSelection: 'Extract Archive',
+            renameSelection: 'Rename Selection',
+            permissionsSelection: 'Change Permissions',
+            fingerprintSelection: 'Show File Fingerprint',
+            deleteSelection: 'Delete Selection',
+            saveFile: 'Save File',
+            createFile: 'Create File',
           },
           actionBar: {
             copyHere: 'Copy {files} here',

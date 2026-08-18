@@ -1,8 +1,7 @@
-import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { faMagnifyingGlass, faServer } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Combobox, useCombobox } from '@mantine/core';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useReducer, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 import getServers from '@/api/server/getServers.ts';
@@ -12,45 +11,51 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Text from '@/elements/Text.tsx';
-import { buildCoreQuickActionCategories, getQuickActionDefinitions } from '@/lib/coreQuickActions.tsx';
+import {
+  buildCoreQuickActionCategories,
+  CORE_QUICK_ACTION_CATEGORIES,
+  getQuickActionDefinitions,
+  getQuickActionModes,
+} from '@/lib/coreQuickActions.tsx';
 import { resolveString } from '@/lib/lazy.ts';
 import { isAdmin } from '@/lib/permissions.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import type { QuickActionCategory, QuickActionContext, QuickActionScope } from '@/lib/quickActions.ts';
-import { to } from '@/lib/routes.ts';
+import type {
+  QuickActionCategory,
+  QuickActionContext,
+  QuickActionItem,
+  QuickActionModeContext,
+  QuickActionScope,
+} from '@/lib/quickActions.ts';
+import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { checkPermissions } from '@/plugins/usePermissions.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
+import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import accountRoutesBase from '@/routers/routes/accountRoutes.ts';
 import adminRoutesBase from '@/routers/routes/adminRoutes.ts';
 import serverRoutesBase from '@/routers/routes/serverRoutes.ts';
+import { useGlobalStore } from '@/stores/global.ts';
 import { useQuickActionsStore } from '@/stores/quickActions.ts';
 import { useServerStore } from '@/stores/server.ts';
 
 const SERVERS_CATEGORY_ID = 'servers';
-const CATEGORY_ORDER = ['power', 'servers', 'navigation', 'account'];
-
-interface PaletteItem {
-  key: string;
-  categoryId: string;
-  label: string;
-  keywords?: string[];
-  icon?: IconDefinition;
-  danger?: boolean;
-  onSelect: () => void;
-}
+const DEFAULT_CATEGORY_ORDER = 100;
 
 export default function QuickActionsPalette() {
   const { t } = useTranslations();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, doLogout } = useAuth();
+  const { user, impersonating, doLogout } = useAuth();
+  const { addToast } = useToast();
 
   const open = useQuickActionsStore((state) => state.open);
   const setOpen = useQuickActionsStore((state) => state.setOpen);
+  const pageActions = useQuickActionsStore((state) => state.pageActions);
+  const userRouteOrder = useGlobalStore((state) => state.settings.user?.routeOrder);
 
   useKeyboardShortcuts({
     shortcuts: [{ id: 'general.quickActions', callback: () => setOpen(true) }],
@@ -62,9 +67,15 @@ export default function QuickActionsPalette() {
 
   const [query, setQuery] = useState('');
   const [killConfirmOpen, setKillConfirmOpen] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [, refresh] = useReducer((count: number) => count + 1, 0);
 
   const { server, socketInstance, serverState } = useServerStore(
-    useShallow((state) => ({ server: state.server, socketInstance: state.socketInstance, serverState: state.state })),
+    useShallow((state) => ({
+      server: state.server,
+      socketInstance: state.socketInstance,
+      serverState: state.state,
+    })),
   );
 
   const rawServerId = location.pathname.match(/^\/server\/([^/]+)/)?.[1];
@@ -85,11 +96,30 @@ export default function QuickActionsPalette() {
     canRequest: open && scope === 'dashboard',
   });
 
+  const close = () => setOpen(false);
+
+  const modes = getQuickActionModes();
+  const mode = modes.find((m) => query.startsWith(m.prefix));
+
+  const modeContext: QuickActionModeContext | null = mode
+    ? { term: query.slice(mode.prefix.length).trim(), close, addToast, refresh }
+    : null;
+
+  const modeContextRef = useRef(modeContext);
+  modeContextRef.current = modeContext;
+
   useEffect(() => {
-    servers.setSearch(query);
+    if (!mode) {
+      servers.setSearch(query);
+      return;
+    }
+
+    if (modeContextRef.current) {
+      mode.prepare?.(modeContextRef.current);
+    }
   }, [query]);
 
-  const close = () => setOpen(false);
+  const normalizedQuery = query.trim().toLowerCase();
 
   const serverPermissions =
     scope === 'server' ? [...(server?.permissions || []), ...(user?.role?.serverPermissions || [])] : [];
@@ -117,9 +147,13 @@ export default function QuickActionsPalette() {
     doLogout,
     canServer,
     requestServerKill: () => setKillConfirmOpen(true),
+    requestLogout: () => (impersonating ? doLogout() : setLogoutConfirmOpen(true)),
   };
 
-  const registryItems: PaletteItem[] = getQuickActionDefinitions()
+  const registryItems: QuickActionItem[] = [
+    ...getQuickActionDefinitions(),
+    ...pageActions.flatMap((provider) => provider()),
+  ]
     .filter((definition) => !definition.scopes || definition.scopes.includes(scope))
     .filter((definition) => !definition.permission || canServer(definition.permission))
     .filter(
@@ -130,8 +164,9 @@ export default function QuickActionsPalette() {
     .filter((definition) => !definition.isVisible || definition.isVisible(actionContext))
     .map((definition) => ({
       key: `action:${definition.id}`,
-      categoryId: definition.category,
+      category: definition.category,
       label: resolveString(definition.label),
+      description: resolveString(definition.description),
       keywords: definition.keywords,
       icon: definition.icon,
       danger: definition.danger,
@@ -141,7 +176,7 @@ export default function QuickActionsPalette() {
       },
     }));
 
-  let navItems: PaletteItem[] = [];
+  let navItems: QuickActionItem[] = [];
 
   if (scope === 'dashboard') {
     const routes = [...accountRoutesBase, ...window.extensionContext.extensionRegistry.routes.accountRoutes];
@@ -149,37 +184,53 @@ export default function QuickActionsPalette() {
       interceptor(routes);
     }
 
+    const accessibleRoutePaths = getAccessibleRoutePaths(routes, userRouteOrder);
+
     navItems = routes
       .filter((route) => route.name && (!route.filter || route.filter()))
-      .map((route) => ({
-        key: `nav:${route.path}`,
-        categoryId: 'navigation',
-        label: resolveString(route.name)!,
-        icon: route.icon,
-        onSelect: () => {
-          close();
-          navigate(to(route.path, '/account'));
-        },
-      }));
+      .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
+      .map((route) => {
+        const path = to(route.path, '/account');
+
+        return {
+          key: `nav:${route.path}`,
+          category: CORE_QUICK_ACTION_CATEGORIES.navigation,
+          label: resolveString(route.name)!,
+          path,
+          icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+          onSelect: () => {
+            close();
+            navigate(path);
+          },
+        };
+      });
   } else if (serverId) {
     const routes = [...serverRoutesBase, ...window.extensionContext.extensionRegistry.routes.serverRoutes];
     for (const interceptor of window.extensionContext.extensionRegistry.routes.serverRouteInterceptors) {
       interceptor(routes);
     }
 
+    const accessibleRoutePaths = getAccessibleRoutePaths(routes, server?.eggConfiguration?.routeOrder);
+
     navItems = routes
       .filter((route) => route.name && (!route.filter || route.filter()))
       .filter((route) => !route.permission || canServer(route.permission))
-      .map((route) => ({
-        key: `nav:${route.path}`,
-        categoryId: 'navigation',
-        label: resolveString(route.name)!,
-        icon: route.icon,
-        onSelect: () => {
-          close();
-          navigate(to(route.path, `/server/${serverId}`));
-        },
-      }));
+      .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
+      .map((route) => {
+        const path = to(route.path, `/server/${serverId}`);
+
+        return {
+          key: `nav:${route.path}`,
+          category: CORE_QUICK_ACTION_CATEGORIES.navigation,
+          label: resolveString(route.name)!,
+          path,
+          icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+          onSelect: () => {
+            close();
+            navigate(path);
+          },
+        };
+      });
   } else if (scope === 'admin') {
     const routes = [...adminRoutesBase, ...window.extensionContext.extensionRegistry.routes.adminRoutes];
     for (const interceptor of window.extensionContext.extensionRegistry.routes.adminRouteInterceptors) {
@@ -189,35 +240,39 @@ export default function QuickActionsPalette() {
     navItems = routes
       .filter((route) => route.name && (!route.filter || route.filter()))
       .filter((route) => canAdminRoute(route.permission))
-      .map((route) => ({
-        key: `nav:${route.path}`,
-        categoryId: 'navigation',
-        label: resolveString(route.name)!,
-        icon: route.icon,
-        onSelect: () => {
-          close();
-          navigate(to(route.path, '/admin'));
-        },
-      }));
+      .map((route) => {
+        const path = to(route.path, '/admin');
+
+        return {
+          key: `nav:${route.path}`,
+          category: CORE_QUICK_ACTION_CATEGORIES.navigation,
+          label: resolveString(route.name)!,
+          path,
+          icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+          onSelect: () => {
+            close();
+            navigate(path);
+          },
+        };
+      });
   }
 
-  const normalizedQuery = query.trim().toLowerCase();
-  const matchesQuery = (item: PaletteItem) => {
+  const matchesQuery = (item: QuickActionItem) => {
     if (!normalizedQuery) return true;
     if (item.label.toLowerCase().includes(normalizedQuery)) return true;
     return item.keywords?.some((keyword) => keyword.toLowerCase().includes(normalizedQuery)) ?? false;
   };
 
-  const serverItems: PaletteItem[] =
-    scope === 'dashboard'
+  const serverItems: QuickActionItem[] =
+    scope === 'dashboard' && !mode
       ? servers.items
           .filter((s) => !normalizedQuery || s.name.toLowerCase().includes(normalizedQuery))
           .slice(0, 6)
           .map((s) => ({
             key: `server:${s.uuid}`,
-            categoryId: SERVERS_CATEGORY_ID,
+            category: SERVERS_CATEGORY_ID,
             label: s.name,
-            icon: faServer,
+            icon: <FontAwesomeIcon icon={faServer} />,
             onSelect: () => {
               close();
               navigate(`/server/${s.uuid.slice(0, 8)}`);
@@ -225,7 +280,15 @@ export default function QuickActionsPalette() {
           }))
       : [];
 
-  const allItems = [...registryItems, ...navItems].filter(matchesQuery).concat(serverItems);
+  const allItems =
+    mode && modeContext
+      ? [
+          ...(mode.items?.(modeContext) ?? []),
+          ...[...registryItems, ...navItems]
+            .map((item) => mode.map?.(item, modeContext) ?? null)
+            .filter((item) => item !== null),
+        ]
+      : [...registryItems, ...navItems].filter(matchesQuery).concat(serverItems);
 
   const categories: Record<string, QuickActionCategory> = {
     ...buildCoreQuickActionCategories(),
@@ -233,26 +296,26 @@ export default function QuickActionsPalette() {
       id: SERVERS_CATEGORY_ID,
       label: () => t('elements.quickActions.category.servers', {}),
       icon: <FontAwesomeIcon icon={faServer} size='sm' />,
+      order: 40,
     },
     ...window.extensionContext.extensionRegistry.quickActions.categories,
   };
 
-  const categoryLabel = (id: string) => categories[id]?.label() ?? id;
+  const categoryLabel = (id: string) => resolveString(categories[id]?.label) ?? id;
   const categoryIconOf = (id: string): ReactNode => categories[id]?.icon;
 
-  const byCategory = new Map<string, PaletteItem[]>();
+  const byCategory = new Map<string, QuickActionItem[]>();
   for (const item of allItems) {
-    const list = byCategory.get(item.categoryId) ?? [];
+    const list = byCategory.get(item.category) ?? [];
     list.push(item);
-    byCategory.set(item.categoryId, list);
+    byCategory.set(item.category, list);
   }
 
-  const orderedCategoryIds = [
-    ...CATEGORY_ORDER.filter((id) => byCategory.has(id)),
-    ...Array.from(byCategory.keys())
-      .filter((id) => !CATEGORY_ORDER.includes(id))
-      .sort((a, b) => categoryLabel(a).localeCompare(categoryLabel(b))),
-  ];
+  const categoryOrder = (id: string) => categories[id]?.order ?? DEFAULT_CATEGORY_ORDER;
+
+  const orderedCategoryIds = Array.from(byCategory.keys()).sort(
+    (a, b) => categoryOrder(a) - categoryOrder(b) || categoryLabel(a).localeCompare(categoryLabel(b)),
+  );
 
   const grouped = orderedCategoryIds.map((id) => ({
     id,
@@ -280,7 +343,11 @@ export default function QuickActionsPalette() {
         withCloseButton={false}
         padding={0}
         size='lg'
-        transitionProps={{ transition: 'pop', duration: 150, onEntered: () => combobox.selectFirstOption() }}
+        transitionProps={{
+          transition: 'pop',
+          duration: 150,
+          onEntered: () => combobox.selectFirstOption(),
+        }}
       >
         <Combobox store={combobox} onOptionSubmit={handleOptionSubmit} size='lg' withinPortal={false}>
           <style>{`
@@ -311,7 +378,7 @@ export default function QuickActionsPalette() {
             />
           </div>
 
-          <div className='max-h-[480px] overflow-y-auto p-2'>
+          <div className='max-h-120 overflow-y-auto p-2'>
             <Combobox.Options>
               {flatItems.length === 0 && <Combobox.Empty>{t('elements.selectInput.noResults', {})}</Combobox.Empty>}
 
@@ -339,10 +406,15 @@ export default function QuickActionsPalette() {
                         mod={item.danger ? { danger: true } : undefined}
                       >
                         <Group gap='sm' wrap='nowrap'>
-                          {item.icon && <FontAwesomeIcon icon={item.icon} fixedWidth />}
+                          {item.icon}
                           <Text size='sm' c='inherit'>
                             {item.label}
                           </Text>
+                          {item.description && (
+                            <Text size='xs' c='inherit' opacity={0.6} ml='auto'>
+                              {item.description}
+                            </Text>
+                          )}
                         </Group>
                       </Combobox.Option>
                     );
@@ -352,7 +424,7 @@ export default function QuickActionsPalette() {
             </Combobox.Options>
           </div>
 
-          <div className='flex items-center gap-5 border-t border-(--mantine-color-default-border) px-4 py-3'>
+          <div className='flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-(--mantine-color-default-border) px-4 py-3'>
             <Group gap={4}>
               <Kbd size='xs'>↑</Kbd>
               <Kbd size='xs'>↓</Kbd>
@@ -372,6 +444,14 @@ export default function QuickActionsPalette() {
                 {t('elements.quickActions.hint.close', {})}
               </Text>
             </Group>
+            {modes.map((m) => (
+              <Group key={m.id} gap={4}>
+                <Kbd size='xs'>{m.prefix}</Kbd>
+                <Text size='xs' c='dimmed'>
+                  {resolveString(m.hint)}
+                </Text>
+              </Group>
+            ))}
           </div>
         </Combobox>
       </Modal>
@@ -387,6 +467,19 @@ export default function QuickActionsPalette() {
         }}
       >
         {t('pages.server.console.power.modal.forceStop.content', {})}
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        opened={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
+        title={t('elements.sidebar.modal.logout.title', {})}
+        confirm={t('elements.sidebar.button.logout', {})}
+        onConfirmed={() => {
+          setLogoutConfirmOpen(false);
+          doLogout();
+        }}
+      >
+        {t('elements.sidebar.modal.logout.content', {})}
       </ConfirmationModal>
     </>
   );

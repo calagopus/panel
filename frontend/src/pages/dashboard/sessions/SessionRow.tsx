@@ -25,6 +25,7 @@ export default function SessionRow({ session }: { session: z.infer<typeof userSe
   const doDelete = async () => {
     await deleteSession(session.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.user.sessions.all() });
         addToast(t('pages.account.sessions.modal.deleteSession.toast.deleted', {}), 'success');
       })

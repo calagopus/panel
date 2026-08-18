@@ -29,6 +29,7 @@ export default function CommandSnippetRow({
   const doDelete = async () => {
     await deleteCommandSnippet(commandSnippet.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.user.commandSnippets.all() });
         addToast(t('pages.account.commandSnippets.modal.deleteCommandSnippet.toast.removed', {}), 'success');
       })

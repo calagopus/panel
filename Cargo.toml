@@ -14,7 +14,7 @@ exclude = ["backend-extensions/node_modules"]
 default-members = ["bins/base", "bins/all-in-one", "bins/heavy-supervisor"]
 package.rust-version = "1.97.0"
 package.license = "MIT"
-package.version = "1.1.4"
+package.version = "1.2.0"
 package.edition = "2024"
 
 [workspace.dependencies]
@@ -75,7 +75,7 @@ futures-util = "0.3.31"
 clap = { version = "4.5.37", features = ["derive", "string"] }
 aws-sdk-s3 = "1.132.0"
 rand = "0.10.0"
-rustis = "0.23.0"
+rustis = "0.24.0"
 dotenvy = "0.15.7"
 oauth2 = { version = "5.0.0", default-features = false }
 semver = { version = "1.0.27", features = ["serde"] }

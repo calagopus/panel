@@ -26,7 +26,7 @@ export default function AdminNodeMounts({ node }: { node: z.infer<typeof adminNo
     setSearch,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.nodes.mounts(node.uuid),
+    queryKey: queryKeys.admin.mountAssignments.mountsByNode(node.uuid),
     fetcher: (page, search) => getNodeMounts(node.uuid, page, search),
   });
 

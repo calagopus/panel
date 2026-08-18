@@ -42,8 +42,8 @@ pub async fn auth(
 
     let backup = ServerBackup::by_server_uuid_uuid(&state.database, server.uuid, backup).await;
     let backup = match backup {
-        Ok(Some(backup)) => backup,
-        Ok(None) => {
+        Ok(Some(backup)) if backup.deleted.is_none() => backup,
+        Ok(_) => {
             return Ok(ApiResponse::error("backup not found")
                 .with_status(StatusCode::NOT_FOUND)
                 .into_response());

@@ -1,0 +1,55 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                candidates.server_uuid AS server_uuid,\n                candidates.node_uuid AS node_uuid,\n                candidates.last_attempt AS \"last_attempt?\",\n                candidates.coverage_start AS \"coverage_start!\"\n            FROM (\n                SELECT\n                    servers.uuid AS server_uuid,\n                    servers.node_uuid AS node_uuid,\n                    (\n                        SELECT MAX(server_backups.created)\n                        FROM server_backups\n                        WHERE\n                            server_backups.server_uuid = servers.uuid\n                            AND server_backups.system_backup_policy_uuid = $1\n                    ) AS last_attempt,\n                    GREATEST(servers.created, coverage.attached) AS coverage_start\n                FROM servers\n                JOIN nodes ON nodes.uuid = servers.node_uuid\n                LEFT JOIN LATERAL (\n                    SELECT MIN(scopes.created) AS attached\n                    FROM (\n                        SELECT system_backup_policy_nodes.created\n                        FROM system_backup_policy_nodes\n                        WHERE\n                            system_backup_policy_nodes.system_backup_policy_uuid = $1\n                            AND system_backup_policy_nodes.node_uuid = servers.node_uuid\n                        UNION ALL\n                        SELECT system_backup_policy_locations.created\n                        FROM system_backup_policy_locations\n                        WHERE\n                            system_backup_policy_locations.system_backup_policy_uuid = $1\n                            AND system_backup_policy_locations.location_uuid = nodes.location_uuid\n                        UNION ALL\n                        SELECT system_backup_policy_servers.created\n                        FROM system_backup_policy_servers\n                        WHERE\n                            system_backup_policy_servers.system_backup_policy_uuid = $1\n                            AND system_backup_policy_servers.server_uuid = servers.uuid\n                    ) AS scopes\n                ) AS coverage ON TRUE\n                WHERE\n                    servers.destination_node_uuid IS NULL\n                    AND servers.status IS NULL\n                    AND coverage.attached IS NOT NULL\n            ) AS candidates\n            ORDER BY COALESCE(candidates.last_attempt, candidates.coverage_start) ASC\n            LIMIT $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "server_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "servers",
+            "name": "uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "node_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "servers",
+            "name": "node_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "last_attempt?",
+        "type_info": "Timestamp",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "coverage_start!",
+        "type_info": "Timestamp",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "ca55f91cf0e1ffe70cb29f13d2c28835dd385dd7296846574b0f3124773c8426"
+}

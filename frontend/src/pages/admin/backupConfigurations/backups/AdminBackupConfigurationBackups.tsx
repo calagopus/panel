@@ -22,8 +22,9 @@ export default function AdminBackupConfigurationBackups({
     setSearch,
     setPage,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.backupConfigurations.backups(backupConfiguration.uuid),
+    queryKey: queryKeys.admin.backups.byBackupConfiguration(backupConfiguration.uuid),
     fetcher: (page, search) => getBackupConfigurationBackups(backupConfiguration.uuid, page, search),
+    refetchInterval: (data) => (data?.data.some((backup) => backup.deletionStatus === 'deleting') ? 5000 : false),
   });
 
   return (

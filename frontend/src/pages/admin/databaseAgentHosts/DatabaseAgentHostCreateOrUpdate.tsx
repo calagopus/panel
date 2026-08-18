@@ -150,7 +150,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
           <TextInput
             withAsterisk
             label={t('common.form.url', {})}
-            placeholder={t('pages.admin.databaseAgentHosts.tabs.general.page.form.urlPlaceholder', {})}
+            placeholder='https://agent.example.com:8090'
             key={f.key('url')}
             {...f.getInputProps('url')}
           />

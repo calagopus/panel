@@ -4,6 +4,7 @@ import getMount from '@/api/admin/mounts/getMount.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import SubNavigation from '@/elements/SubNavigation.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import MountCreateOrUpdate from '@/pages/admin/mounts/MountCreateOrUpdate.tsx';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -16,7 +17,7 @@ export default function MountView() {
   const params = useParams<'id'>();
 
   const resource = useResource({
-    queryKey: ['admin', 'mounts', { uuid: params.id }],
+    queryKey: queryKeys.admin.mounts.detail(params.id!),
     queryFn: () => getMount(params.id!),
   });
 

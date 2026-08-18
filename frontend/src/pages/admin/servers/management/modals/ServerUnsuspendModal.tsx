@@ -24,8 +24,7 @@ export default function ServerUnsuspendModal({
       .then(() => {
         addToast(t('pages.admin.servers.tabs.management.page.unsuspend.toast.unsuspended', {}), 'success');
         props.onClose();
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.detail(server.uuid) });
-        server.isSuspended = false;
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

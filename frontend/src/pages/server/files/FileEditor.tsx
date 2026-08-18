@@ -2,6 +2,8 @@ import {
   faArrowsRotate,
   faClockRotateLeft,
   faEllipsisVertical,
+  faFileCirclePlus,
+  faFloppyDisk,
   faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -33,9 +35,11 @@ import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Title from '@/elements/Title.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/monaco.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
+import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { visualViewportBottomInset } from '@/plugins/useVisualViewport.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { FileManagerProvider, useFileManager } from '@/providers/FileManagerProvider.tsx';
@@ -150,7 +154,10 @@ function FileEditorComponent() {
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
   const [blobContent, setBlobContent] = useState(new Blob());
-  const [pendingDraft, setPendingDraft] = useState<{ content: string; hashMismatch: boolean } | null>(null);
+  const [pendingDraft, setPendingDraft] = useState<{
+    content: string;
+    hashMismatch: boolean;
+  } | null>(null);
   const [conflictDiffOpen, setConflictDiffOpen] = useState(false);
   const [revertConfirm, setRevertConfirm] = useState(false);
   const [conflictDiskContent, setConflictDiskContent] = useState<string | null>(null);
@@ -289,7 +296,10 @@ function FileEditorComponent() {
                   if (draft.content === content) {
                     localStorage.removeItem(key);
                   } else {
-                    setPendingDraft({ content: draft.content, hashMismatch: draft.originalHash !== hash });
+                    setPendingDraft({
+                      content: draft.content,
+                      hashMismatch: draft.originalHash !== hash,
+                    });
                   }
                 } catch {
                   localStorage.removeItem(key);
@@ -554,6 +564,48 @@ function FileEditorComponent() {
       });
   };
 
+  useQuickActions([
+    {
+      id: 'files.editor.save',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.files.quickAction.saveFile', {}),
+      icon: <FontAwesomeIcon icon={faFloppyDisk} />,
+      permission: collab.active ? 'files.update' : 'files.create',
+      isVisible: () => params.action === 'edit' && !!fileName && browsingWritableDirectory && !saving,
+      perform: () => saveFile(),
+    },
+    {
+      id: 'files.editor.create',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.files.quickAction.createFile', {}),
+      icon: <FontAwesomeIcon icon={faFileCirclePlus} />,
+      permission: 'files.create',
+      isVisible: () => params.action === 'new' && browsingWritableDirectory && !saving,
+      perform: () => setNameModalOpen(true),
+    },
+    {
+      id: 'files.editor.revisions',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.files.tooltip.fileHistory', {}),
+      keywords: ['revisions', 'versions'],
+      icon: <FontAwesomeIcon icon={faClockRotateLeft} />,
+      permission: 'files.read-content',
+      isVisible: () => params.action === 'edit' && !!fileName && browsingPrimaryFilesystem,
+      perform: () => setRevisionsOpen(true),
+    },
+    {
+      id: 'files.editor.revertToDisk',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.files.tooltip.revertToDisk', {}),
+      keywords: ['revert', 'discard'],
+      icon: <FontAwesomeIcon icon={faArrowsRotate} />,
+      permission: collab.active ? 'files.update' : 'files.read-content',
+      isVisible: () =>
+        dirty && params.action === 'edit' && !!fileName && browsingWritableDirectory && !collab.conflict?.deleted,
+      perform: () => setRevertConfirm(true),
+    },
+  ]);
+
   if (!matchedFileEditorAction && !['new', 'edit', 'image', 'audio'].includes(params.action!)) {
     return (
       <ServerContentContainer title='Not found' hideTitleComponent>
@@ -609,7 +661,9 @@ function FileEditorComponent() {
                 {collab.participants.map((participant) => (
                   <Tooltip
                     key={participant.user}
-                    label={t('pages.server.files.tooltip.collabEditing', { user: participant.name })}
+                    label={t('pages.server.files.tooltip.collabEditing', {
+                      user: participant.name,
+                    })}
                   >
                     <Avatar size='sm' src={participant.avatar} name={participant.name} />
                   </Tooltip>
@@ -764,7 +818,10 @@ function FileEditorComponent() {
                 const modifiedModel = monaco.editor.createModel(editorRef.current?.getValue() ?? '', undefined);
                 conflictModelsRef.current = [originalModel, modifiedModel];
 
-                diffEditor.setModel({ original: originalModel, modified: modifiedModel });
+                diffEditor.setModel({
+                  original: originalModel,
+                  modified: modifiedModel,
+                });
               }}
             />
           </div>
@@ -927,12 +984,22 @@ function FileEditorComponent() {
                   >
                     <Audio.Waveform height={120} mirrorGap={2} />
                     <Audio.Controls>
-                      <Audio.SkipButton seconds={-15} label={t('pages.server.files.tooltip.back', { seconds: 15 })} />
+                      <Audio.SkipButton
+                        seconds={-15}
+                        label={t('pages.server.files.tooltip.back', {
+                          seconds: 15,
+                        })}
+                      />
                       <Audio.PlayButton
                         playLabel={t('pages.server.files.tooltip.play', {})}
                         pauseLabel={t('pages.server.files.tooltip.pause', {})}
                       />
-                      <Audio.SkipButton seconds={15} label={t('pages.server.files.tooltip.forward', { seconds: 15 })} />
+                      <Audio.SkipButton
+                        seconds={15}
+                        label={t('pages.server.files.tooltip.forward', {
+                          seconds: 15,
+                        })}
+                      />
                       <Audio.Timeline />
                       <Audio.TimeDisplay />
                       <Audio.MuteButton

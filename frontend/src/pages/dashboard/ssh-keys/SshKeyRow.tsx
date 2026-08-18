@@ -26,6 +26,7 @@ export default function SshKeyRow({ sshKey }: { sshKey: z.infer<typeof userSshKe
   const doDelete = async () => {
     await deleteSshKey(sshKey.uuid)
       .then(() => {
+        setOpenModal(null);
         queryClient.invalidateQueries({ queryKey: queryKeys.user.sshKeys.all() });
         addToast(t('pages.account.sshKeys.modal.deleteSshKey.toast.removed', {}), 'success');
       })

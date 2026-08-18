@@ -307,7 +307,10 @@ export default function Login() {
                   {t('common.button.continue', {})}
                 </Button>
 
-                <Divider label={t('common.divider.or', {})} labelPosition='center' />
+                {(oAuthProviders.length > 0 ||
+                  (settings.webauthn?.enabled !== false && settings.webauthn?.allowDiscoverable !== false)) && (
+                  <Divider label={t('common.divider.or', {})} labelPosition='center' />
+                )}
 
                 {settings.webauthn?.enabled !== false && settings.webauthn?.allowDiscoverable !== false && (
                   <Button

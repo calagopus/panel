@@ -84,9 +84,8 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
               </NavLink>
               {!user?.suspended && (
                 <>
-                  <Sidebar.Divider />
                   <QuickActionsTrigger />
-                  <Sidebar.Divider />
+                  <div className='mt-2' />
                   <Sidebar.Link to='/' end icon={faReply} name={t('common.button.back', {})} />
                   <Sidebar.Divider />
                 </>

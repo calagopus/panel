@@ -135,6 +135,9 @@ pub struct SystemBackupPolicyDueCandidate {
     pub server_uuid: uuid::Uuid,
     pub node_uuid: uuid::Uuid,
     pub last_attempt: Option<chrono::NaiveDateTime>,
+    /// The point from which the policy started covering this server, used as the cron anchor
+    /// when the server has no `last_attempt` yet.
+    pub coverage_start: chrono::NaiveDateTime,
 }
 
 impl SystemBackupPolicy {
@@ -240,44 +243,52 @@ impl SystemBackupPolicy {
         let rows = sqlx::query!(
             r#"
             SELECT
-                servers.uuid AS server_uuid,
-                servers.node_uuid AS node_uuid,
-                (
-                    SELECT MAX(server_backups.created)
-                    FROM server_backups
-                    WHERE
-                        server_backups.server_uuid = servers.uuid
-                        AND server_backups.system_backup_policy_uuid = $1
-                ) AS "last_attempt?"
-            FROM servers
-            WHERE
-                servers.destination_node_uuid IS NULL
-                AND servers.status IS NULL
-                AND (
-                    EXISTS (
-                        SELECT 1
+                candidates.server_uuid AS server_uuid,
+                candidates.node_uuid AS node_uuid,
+                candidates.last_attempt AS "last_attempt?",
+                candidates.coverage_start AS "coverage_start!"
+            FROM (
+                SELECT
+                    servers.uuid AS server_uuid,
+                    servers.node_uuid AS node_uuid,
+                    (
+                        SELECT MAX(server_backups.created)
+                        FROM server_backups
+                        WHERE
+                            server_backups.server_uuid = servers.uuid
+                            AND server_backups.system_backup_policy_uuid = $1
+                    ) AS last_attempt,
+                    GREATEST(servers.created, coverage.attached) AS coverage_start
+                FROM servers
+                JOIN nodes ON nodes.uuid = servers.node_uuid
+                LEFT JOIN LATERAL (
+                    SELECT MIN(scopes.created) AS attached
+                    FROM (
+                        SELECT system_backup_policy_nodes.created
                         FROM system_backup_policy_nodes
                         WHERE
                             system_backup_policy_nodes.system_backup_policy_uuid = $1
                             AND system_backup_policy_nodes.node_uuid = servers.node_uuid
-                    )
-                    OR EXISTS (
-                        SELECT 1
+                        UNION ALL
+                        SELECT system_backup_policy_locations.created
                         FROM system_backup_policy_locations
-                        JOIN nodes ON nodes.uuid = servers.node_uuid
                         WHERE
                             system_backup_policy_locations.system_backup_policy_uuid = $1
                             AND system_backup_policy_locations.location_uuid = nodes.location_uuid
-                    )
-                    OR EXISTS (
-                        SELECT 1
+                        UNION ALL
+                        SELECT system_backup_policy_servers.created
                         FROM system_backup_policy_servers
                         WHERE
                             system_backup_policy_servers.system_backup_policy_uuid = $1
                             AND system_backup_policy_servers.server_uuid = servers.uuid
-                    )
-                )
-            ORDER BY 3 ASC NULLS FIRST
+                    ) AS scopes
+                ) AS coverage ON TRUE
+                WHERE
+                    servers.destination_node_uuid IS NULL
+                    AND servers.status IS NULL
+                    AND coverage.attached IS NOT NULL
+            ) AS candidates
+            ORDER BY COALESCE(candidates.last_attempt, candidates.coverage_start) ASC
             LIMIT $2
             "#,
             self.uuid,
@@ -292,6 +303,7 @@ impl SystemBackupPolicy {
                 server_uuid: row.server_uuid,
                 node_uuid: row.node_uuid,
                 last_attempt: row.last_attempt,
+                coverage_start: row.coverage_start,
             })
             .collect())
     }

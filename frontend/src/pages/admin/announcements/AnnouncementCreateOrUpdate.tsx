@@ -297,7 +297,7 @@ export default function AnnouncementCreateOrUpdate({
         }).md()}
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, [queryKeys.admin.announcements.all()]))}>
+      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.announcements.all()))}>
         <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>

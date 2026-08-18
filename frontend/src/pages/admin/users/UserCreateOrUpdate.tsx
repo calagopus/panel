@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getRoles from '@/api/admin/roles/getRoles.ts';
@@ -33,6 +34,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
   const languages = useGlobalStore((state) => state.languages);
   const { addToast } = useToast();
   const { t } = useTranslations();
+  const queryClient = useQueryClient();
   const canReadRoles = useAdminCan('roles.read');
   const isRootAdmin = !!user?.admin;
   const editingOtherUser = !!contextUser && contextUser.uuid !== user?.uuid;
@@ -103,7 +105,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
     await disableUserTwoFactor(contextUser.uuid)
       .then(() => {
         addToast(t('pages.admin.users.tabs.general.page.modal.disableTwoFactor.toast.disabled', {}), 'success');
-        contextUser!.totpEnabled = false;
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
 
         setOpenModal(null);
       })

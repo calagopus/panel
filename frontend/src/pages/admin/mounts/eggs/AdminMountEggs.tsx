@@ -1,5 +1,6 @@
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import getMountNestEggs from '@/api/admin/mounts/nest-eggs/getMountNestEggs.ts';
@@ -27,23 +28,23 @@ function MountEggRow({
   nest,
   egg,
   mount,
-  refetch,
 }: {
   nest: z.infer<typeof adminNestSchema>;
   egg: z.infer<typeof adminEggSchema>;
   mount: z.infer<typeof adminMountSchema>;
-  refetch: () => void;
 }) {
   const { addToast } = useToast();
   const { t } = useTranslations();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
 
   const doRemove = async () => {
     await deleteEggMount(nest.uuid, egg.uuid, mount.uuid)
       .then(() => {
+        setOpenModal(null);
         addToast(t('pages.admin.mounts.tabs.eggs.page.toast.removed', {}), 'success');
-        refetch();
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.mountAssignments.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -93,9 +94,8 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
     search,
     setSearch,
     setPage,
-    refetch,
   } = useSearchablePaginatedTable({
-    queryKey: queryKeys.admin.mounts.eggs(mount.uuid),
+    queryKey: queryKeys.admin.mountAssignments.eggsByMount(mount.uuid),
     fetcher: (page, search) => getMountNestEggs(mount.uuid, page, search),
   });
 
@@ -116,12 +116,7 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
       }
     >
       <AdminCan action='eggs.mounts'>
-        <MountAddEggModal
-          mount={mount}
-          refetch={refetch}
-          opened={openModal === 'add'}
-          onClose={() => setOpenModal(null)}
-        />
+        <MountAddEggModal mount={mount} opened={openModal === 'add'} onClose={() => setOpenModal(null)} />
       </AdminCan>
 
       <Table
@@ -137,7 +132,6 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
             nest={nestEggMount.nest}
             egg={nestEggMount.nestEgg}
             mount={mount}
-            refetch={refetch}
           />
         ))}
       </Table>

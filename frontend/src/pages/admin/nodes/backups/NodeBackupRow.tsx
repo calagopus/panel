@@ -8,6 +8,7 @@ import {
   faWarning,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
 import detachNodeBackup from '@/api/admin/nodes/backups/detachNodeBackup.ts';
@@ -26,6 +27,7 @@ import TableLink from '@/elements/TableLink.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
@@ -47,6 +49,7 @@ export default function NodeBackupRow({
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<
     'restore' | 'export' | 'reattach' | 'detach' | 'delete' | 'metadata' | null
@@ -68,9 +71,9 @@ export default function NodeBackupRow({
   const doDetach = async () => {
     await detachNodeBackup(node.uuid, backup.uuid)
       .then(() => {
-        backup.server = null;
         setOpenModal(null);
         addToast(t('pages.admin.nodes.tabs.backups.page.toast.detached', {}), 'success');
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.backups.all() });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -78,6 +81,8 @@ export default function NodeBackupRow({
   };
 
   const isFailed = !backup.isSuccessful && !!backup.completed;
+  const isDeleting = backup.deletionStatus === 'deleting';
+  const isDeleteFailed = backup.deletionStatus === 'failed';
 
   return (
     <>
@@ -137,7 +142,7 @@ export default function NodeBackupRow({
             type: 'action',
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: !backup.isStreaming ? () => doDownload('tar_gz') : undefined,
             color: 'gray',
             items: backup.isStreaming
@@ -155,7 +160,7 @@ export default function NodeBackupRow({
             type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('restore'),
             color: 'gray',
             canAccess: useAdminCan('nodes.backups'),
@@ -164,7 +169,7 @@ export default function NodeBackupRow({
             type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: useAdminCan('nodes.backups'),
@@ -173,7 +178,7 @@ export default function NodeBackupRow({
             type: 'action',
             icon: faLink,
             label: t('common.button.reattach', {}),
-            hidden: !backup.completed || isFailed,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('reattach'),
             color: 'gray',
             canAccess: useAdminCan('nodes.backups'),
@@ -182,7 +187,7 @@ export default function NodeBackupRow({
             type: 'action',
             icon: faLink,
             label: t('common.button.detach', {}),
-            hidden: !backup.completed || isFailed || !backup.server,
+            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed || !backup.server,
             onClick: () => setOpenModal('detach'),
             color: 'gray',
             canAccess: useAdminCan('nodes.backups'),
@@ -198,7 +203,7 @@ export default function NodeBackupRow({
           {
             type: 'action',
             icon: faTrash,
-            hidden: !backup.completed,
+            hidden: !backup.completed || isDeleting,
             label: t('common.button.delete', {}),
             onClick: () => setOpenModal('delete'),
             color: 'red',
@@ -210,6 +215,7 @@ export default function NodeBackupRow({
       >
         {({ items, openMenu }) => (
           <TableRow
+            className={isDeleting ? 'opacity-50' : undefined}
             onContextMenu={(e) => {
               e.preventDefault();
               openMenu(e.clientX, e.clientY);
@@ -232,7 +238,15 @@ export default function NodeBackupRow({
               )}
             </TableData>
 
-            {!isFailed ? (
+            {isDeleting || isDeleteFailed ? (
+              <TableData colSpan={3}>
+                {isDeleting ? (
+                  <Badge color='yellow'>{t('pages.server.backups.badge.deleting', {})}</Badge>
+                ) : (
+                  <Badge color='red'>{t('pages.server.backups.badge.deleteFailed', {})}</Badge>
+                )}
+              </TableData>
+            ) : !isFailed ? (
               <>
                 <TableData>{backup.checksum && <Code>{backup.checksum}</Code>}</TableData>
 
