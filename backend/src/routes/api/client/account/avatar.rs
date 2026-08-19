@@ -46,13 +46,6 @@ mod put {
                 .ok();
         }
 
-        const MAX_AVATAR_BYTES: usize = 10 * 1024 * 1024; // 10MB
-        if image.len() > MAX_AVATAR_BYTES {
-            return ApiResponse::error("image: payload exceeds 10MB limit")
-                .with_status(StatusCode::PAYLOAD_TOO_LARGE)
-                .ok();
-        }
-
         let mut image = match ImageReader::new(std::io::Cursor::new(image)).with_guessed_format() {
             Ok(reader) => reader,
             Err(_) => {
@@ -144,6 +137,7 @@ mod put {
 }
 
 mod delete {
+    use axum::http::StatusCode;
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
@@ -170,22 +164,29 @@ mod delete {
     ) -> ApiResponseResult {
         permissions.has_user_permission("account.avatar")?;
 
-        if let Some(avatar) = &user.avatar {
-            state.storage.remove(Some(avatar)).await?;
+        let avatar = match &user.avatar {
+            Some(avatar) => avatar,
+            None => {
+                return ApiResponse::error("no avatar to delete")
+                    .with_status(StatusCode::BAD_REQUEST)
+                    .ok();
+            }
+        };
 
-            sqlx::query!(
-                "UPDATE users
+        state.storage.remove(Some(avatar)).await?;
+
+        sqlx::query!(
+            "UPDATE users
             SET avatar = NULL
             WHERE users.uuid = $1",
-                user.uuid
-            )
-            .execute(state.database.write())
-            .await?;
+            user.uuid
+        )
+        .execute(state.database.write())
+        .await?;
 
-            activity_logger
-                .log("user:account.delete-avatar", serde_json::json!({}))
-                .await;
-        }
+        activity_logger
+            .log("account:delete-avatar", serde_json::json!({}))
+            .await;
 
         ApiResponse::new_serialized(Response {}).ok()
     }

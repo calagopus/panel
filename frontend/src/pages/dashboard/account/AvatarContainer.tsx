@@ -17,10 +17,6 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { AccountCardProps } from './DashboardAccount.tsx';
 
-const ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
-const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
-const MAX_AVATAR_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-
 export default function AvatarContainer({ requireTwoFactorActivation }: AccountCardProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
@@ -28,78 +24,41 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
   const [file, setFile] = useState<File | null>(null);
   const editor = useRef<AvatarEditorRef>(null);
 
+  const onError = (err: unknown) => addToast(httpErrorToHuman(err), 'error');
+
+  const onMutationSuccess = (avatar: string | null, message: string) => {
+    addToast(message, 'success');
+    setUser({ ...user!, avatar });
+    setFile(null);
+  };
+
   const updateMutation = useMutation({
-    mutationFn: async (blob: Blob) => updateAvatar(blob),
-    onSuccess: (avatar) => {
-      addToast(t('pages.account.account.containers.avatar.toast.updated', {}), 'success');
-      setUser({ ...user!, avatar });
-      setFile(null);
-    },
-    onError: (err) => {
-      console.error(err);
-      addToast(httpErrorToHuman(err), 'error');
-    },
+    mutationFn: updateAvatar,
+    onSuccess: (avatar) => onMutationSuccess(avatar, t('pages.account.account.containers.avatar.toast.updated', {})),
+    onError,
   });
 
   const removeMutation = useMutation({
     mutationFn: removeAvatar,
-    onSuccess: () => {
-      addToast(t('pages.account.account.containers.avatar.toast.removed', {}), 'success');
-      setUser({ ...user!, avatar: null });
-      setFile(null);
-    },
-    onError: (err) => {
-      console.error(err);
-      addToast(httpErrorToHuman(err), 'error');
-    },
+    onSuccess: () => onMutationSuccess(null, t('pages.account.account.containers.avatar.toast.removed', {})),
+    onError,
   });
 
-  const handleFileChange = (selectedFile: File | null) => {
-    if (!selectedFile) {
-      setFile(null);
-      return;
-    }
-
-    const extension = selectedFile.name.split('.').pop()?.toLowerCase();
-    const isAllowedExt = !!extension && ALLOWED_EXTENSIONS.includes(extension);
-    const isAllowedMime = !!selectedFile.type && ALLOWED_MIME_TYPES.includes(selectedFile.type);
-
-    if (!isAllowedExt && !isAllowedMime) {
-      addToast(t('pages.account.account.containers.avatar.toast.invalidImage', {}), 'error');
-      setFile(null);
-      return;
-    }
-
-    if (selectedFile.size > MAX_AVATAR_FILE_SIZE) {
-      addToast(t('pages.account.account.containers.avatar.toast.sizeExceeded', {}), 'error');
-      setFile(null);
-      return;
-    }
-
-    setFile(selectedFile);
-  };
-
-  const doUpdate = async () => {
-    if (!file) return;
-
-    const canvas = editor.current?.getImageScaledToCanvas();
-    if (!canvas) {
-      addToast(t('pages.account.account.containers.avatar.toast.processFailed', {}), 'error');
-      return;
-    }
-
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', 0.9));
-    if (!blob) {
-      addToast(t('pages.account.account.containers.avatar.toast.processFailed', {}), 'error');
-      return;
-    }
-
-    updateMutation.mutate(blob);
-  };
-
   const isPending = updateMutation.isPending || removeMutation.isPending;
-  const avatarSource = file ?? (user?.avatar ? user.avatar : undefined);
-  const editorKey = file ? `file-${file.name}-${file.lastModified}` : (user?.avatar ?? 'empty');
+
+  const doUpdate = () => {
+    if (!file || isPending) return;
+
+    editor.current?.getImageScaledToCanvas().toBlob(
+      (blob) => {
+        if (blob) {
+          updateMutation.mutate(blob);
+        }
+      },
+      'image/webp',
+      0.9,
+    );
+  };
 
   return (
     <TitleCard
@@ -112,15 +71,17 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
     >
       <Group className='h-full'>
         <AvatarEditor
-          key={editorKey}
+          key={file ? `${file.name}-${file.lastModified}` : (user?.avatar ?? 'empty')}
           ref={editor}
-          image={avatarSource}
+          image={file ?? user?.avatar ?? undefined}
           height={512}
           width={512}
           showGrid
           onLoadFailure={() => {
-            addToast(t('pages.account.account.containers.avatar.toast.loadFailed', {}), 'error');
-            setFile(null);
+            if (file) {
+              addToast(t('pages.account.account.containers.avatar.toast.loadFailed', {}), 'error');
+              setFile(null);
+            }
           }}
           style={{ width: 256, height: 256, borderRadius: '0.25rem' }}
         />
@@ -129,8 +90,9 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
           <FileInput
             label={t('pages.account.account.containers.avatar.form.avatar', {})}
             value={file}
-            onChange={handleFileChange}
+            onChange={setFile}
             accept='image/png,image/jpeg,image/webp,image/gif,.png,.jpg,.jpeg,.webp,.gif'
+            disabled={isPending}
             clearable
           />
 
@@ -141,7 +103,7 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
             <Button
               color='red'
               loading={removeMutation.isPending}
-              disabled={!user!.avatar || isPending}
+              disabled={!user?.avatar || isPending}
               onClick={() => removeMutation.mutate()}
             >
               {t('common.button.remove', {})}
