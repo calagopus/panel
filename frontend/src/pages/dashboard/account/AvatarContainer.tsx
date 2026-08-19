@@ -49,11 +49,7 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
   const doUpdate = () => {
     if (!file || isPending) return;
 
-    editor.current?.getImageScaledToCanvas().toBlob(
-      (blob) => blob && updateMutation.mutate(blob),
-      'image/webp',
-      0.9,
-    );
+    editor.current?.getImageScaledToCanvas().toBlob((blob) => blob && updateMutation.mutate(blob), 'image/webp', 0.9);
   };
 
   return (
