@@ -9,5 +9,10 @@ export const storageAssetSchema = z.object({
 });
 
 export const assetDirectoryCreateSchema = z.object({
-  name: z.string().min(1).max(255),
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(255)
+    .refine((val) => !val.includes('..') && !val.includes('/') && !val.includes('\\')),
 });
