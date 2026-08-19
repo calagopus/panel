@@ -1,10 +1,11 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { useComputedColorScheme } from '@mantine/core';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
-import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 import { useGlobalStore } from '@/stores/global.ts';
-import FriendlyCaptcha, { type Ref as FriendlyCaptchaRef } from './FriendlyCaptcha.tsx';
+import FriendlyCaptcha, { type FriendlyCaptchaRef } from './FriendlyCaptcha.tsx';
 
 export interface CaptchaRef {
   getToken: () => Promise<string | null>;
@@ -16,116 +17,136 @@ interface CaptchaProps {
   ref?: React.Ref<CaptchaRef>;
 }
 
+export function useCaptcha() {
+  const [isValid, setIsValid] = useState(false);
+  const ref = useRef<CaptchaRef>(null);
+  const getToken = useCallback(async () => (await ref.current?.getToken()) ?? null, []);
+  const props = useMemo<CaptchaProps>(() => ({ ref, onValidChange: setIsValid }), []);
+
+  return { isValid, getToken, props } as const;
+}
+
 const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
+  const colorScheme = useComputedColorScheme('dark');
   const captchaProvider = useGlobalStore((state) => state.settings.captchaProvider);
+  const isRecaptchaV3 = captchaProvider.type === 'recaptcha' && captchaProvider.v3;
+  const hasWidget = captchaProvider.type !== 'none' && !isRecaptchaV3;
 
   const turnstileRef = useRef<TurnstileInstance>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const hcaptchaRef = useRef<HCaptcha>(null);
   const friendlyCaptchaRef = useRef<FriendlyCaptchaRef>(null);
 
-  const handleSuccess = useCallback(() => onValidChange?.(true), [onValidChange]);
-  const handleError = useCallback(() => onValidChange?.(false), [onValidChange]);
-  const handleRecaptcha = useCallback((token: string | null) => onValidChange?.(!!token), [onValidChange]);
+  const setValid = useCallback(() => onValidChange?.(true), [onValidChange]);
+  const setInvalid = useCallback(() => onValidChange?.(false), [onValidChange]);
 
   useEffect(() => {
-    if (captchaProvider.type === 'none') {
-      handleSuccess();
-      return;
-    }
+    if (!hasWidget) setValid();
 
-    if (captchaProvider.type === 'recaptcha' && captchaProvider.v3) {
-      handleSuccess();
-
-      const scriptId = 'recaptcha-v3-script';
-      if (!document.getElementById(scriptId)) {
-        const script = document.createElement('script');
-        script.id = scriptId;
-        script.src = `https://www.google.com/recaptcha/api.js?render=${captchaProvider.siteKey}`;
-        script.async = true;
-        document.head.appendChild(script);
-      }
+    if (isRecaptchaV3 && !document.getElementById('recaptcha-v3-script')) {
+      const script = document.createElement('script');
+      script.id = 'recaptcha-v3-script';
+      script.src = `https://www.google.com/recaptcha/api.js?render=${captchaProvider.siteKey}`;
+      script.async = true;
+      document.head.appendChild(script);
     }
-  }, [captchaProvider, handleSuccess]);
+  }, [captchaProvider, hasWidget, isRecaptchaV3, setValid]);
+
+  const resetWidget = useCallback(() => {
+    switch (captchaProvider.type) {
+      case 'turnstile':
+        turnstileRef.current?.reset();
+        break;
+      case 'hcaptcha':
+        hcaptchaRef.current?.resetCaptcha();
+        break;
+      case 'friendly_captcha':
+        friendlyCaptchaRef.current?.reset();
+        break;
+      case 'recaptcha':
+        recaptchaRef.current?.reset();
+        break;
+    }
+  }, [captchaProvider.type]);
 
   useImperativeHandle(
     ref,
     () => ({
       getToken: async () => {
         try {
+          let token: string | null = null;
+
           switch (captchaProvider.type) {
             case 'turnstile':
-              return turnstileRef.current?.getResponse() ?? null;
+              token = turnstileRef.current?.getResponse() || null;
+              break;
             case 'hcaptcha':
-              return hcaptchaRef.current?.getResponse() ?? null;
+              token = hcaptchaRef.current?.getResponse() || null;
+              break;
             case 'friendly_captcha':
-              return friendlyCaptchaRef.current?.getResponse() ?? null;
+              token = friendlyCaptchaRef.current?.getResponse() || null;
+              break;
             case 'recaptcha':
-              if (captchaProvider.v3) {
-                return window.grecaptcha
-                  ? await window.grecaptcha.execute(captchaProvider.siteKey, {
-                      action: 'submit',
-                    })
-                  : null;
+              if (isRecaptchaV3) {
+                if (!window.grecaptcha) return null;
+                return new Promise<string | null>((resolve) => {
+                  window.grecaptcha.ready(() => {
+                    window.grecaptcha
+                      .execute(captchaProvider.siteKey, { action: 'submit' })
+                      .then((t: string) => resolve(t || null))
+                      .catch(() => resolve(null));
+                  });
+                });
               }
-              return recaptchaRef.current?.getValue() ?? null;
+              token = recaptchaRef.current?.getValue() || null;
+              break;
             case 'none':
             default:
               return null;
           }
+
+          if (token) {
+            setInvalid();
+            resetWidget();
+          }
+
+          return token;
         } catch {
           return null;
         }
       },
       resetCaptcha: () => {
-        switch (captchaProvider.type) {
-          case 'turnstile':
-            handleError();
-            turnstileRef.current?.reset();
-            break;
-          case 'hcaptcha':
-            handleError();
-            hcaptchaRef.current?.resetCaptcha();
-            break;
-          case 'friendly_captcha':
-            handleError();
-            friendlyCaptchaRef.current?.reset();
-            break;
-          case 'recaptcha':
-            if (!captchaProvider.v3) {
-              handleError();
-              recaptchaRef.current?.reset();
-            }
-            break;
-        }
+        if (!hasWidget) return;
+        setInvalid();
+        resetWidget();
       },
     }),
-    [captchaProvider, handleError],
+    [captchaProvider, hasWidget, isRecaptchaV3, setInvalid, resetWidget],
   );
 
-  if (captchaProvider.type === 'none' || (captchaProvider.type === 'recaptcha' && captchaProvider.v3)) {
-    return null;
-  }
+  if (!hasWidget) return null;
 
   return (
-    <div className='flex w-full items-center justify-center'>
+    <div key={`${captchaProvider.type}-${colorScheme}`} className='flex w-full items-center justify-center'>
       {captchaProvider.type === 'turnstile' && (
         <Turnstile
           ref={turnstileRef}
           siteKey={captchaProvider.siteKey}
-          options={{ size: 'flexible' }}
-          onSuccess={handleSuccess}
-          onExpire={handleError}
-          onError={handleError}
+          options={{ size: 'flexible', theme: colorScheme }}
+          onSuccess={setValid}
+          onExpire={setInvalid}
+          onError={setInvalid}
         />
       )}
 
-      {captchaProvider.type === 'recaptcha' && !captchaProvider.v3 && (
+      {captchaProvider.type === 'recaptcha' && (
         <ReCAPTCHA
           ref={recaptchaRef}
           sitekey={captchaProvider.siteKey}
-          onChange={handleRecaptcha}
-          onExpired={handleError}
+          theme={colorScheme}
+          onChange={setValid}
+          onExpired={setInvalid}
+          onErrored={setInvalid}
         />
       )}
 
@@ -133,9 +154,11 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
         <HCaptcha
           ref={hcaptchaRef}
           sitekey={captchaProvider.siteKey}
-          onVerify={handleSuccess}
-          onExpire={handleError}
-          onError={handleError}
+          theme={colorScheme}
+          onVerify={setValid}
+          onExpire={setInvalid}
+          onError={setInvalid}
+          onChalExpired={setInvalid}
         />
       )}
 
@@ -143,9 +166,10 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
         <FriendlyCaptcha
           ref={friendlyCaptchaRef}
           sitekey={captchaProvider.siteKey}
-          onComplete={handleSuccess}
-          onExpire={handleError}
-          onError={handleError}
+          theme={colorScheme}
+          onComplete={setValid}
+          onExpire={setInvalid}
+          onError={setInvalid}
         />
       )}
     </div>
