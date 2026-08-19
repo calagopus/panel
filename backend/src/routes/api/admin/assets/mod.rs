@@ -56,6 +56,8 @@ mod get {
         Query(pagination): Query<PaginationParams>,
         Query(params): Query<Params>,
     ) -> ApiResponseResult {
+        permissions.has_admin_permission("assets.read")?;
+
         if let Err(errors) = shared::utils::validate_data(&pagination) {
             return ApiResponse::new_serialized(ApiError::new_strings_value(errors))
                 .with_status(StatusCode::BAD_REQUEST)
@@ -68,8 +70,6 @@ mod get {
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }
-
-        permissions.has_admin_permission("assets.read")?;
 
         let assets = state
             .storage
@@ -135,16 +135,29 @@ mod put {
         }
 
         let mut assets = Vec::new();
+        let url_retriever = state.storage.retrieve_urls().await?;
 
         while let Some(field) = multipart.next_field().await? {
-            let filename = match field.file_name() {
-                Some(name) => name.to_compact_string(),
+            let raw_name = match field.file_name() {
+                Some(name) => name,
                 None => {
                     return ApiResponse::error("file name not found")
                         .with_status(StatusCode::EXPECTATION_FAILED)
                         .ok();
                 }
             };
+
+            let filename = std::path::Path::new(raw_name)
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or(raw_name)
+                .to_compact_string();
+
+            if filename.is_empty() || filename.contains("..") {
+                return ApiResponse::error("invalid file name")
+                    .with_status(StatusCode::BAD_REQUEST)
+                    .ok();
+            }
             let content_type = field
                 .content_type()
                 .unwrap_or("application/octet-stream")
@@ -160,9 +173,11 @@ mod put {
                 format!("{directory}/{filename}").to_compact_string()
             };
 
+            let asset_path = format!("assets/{asset_name}");
+
             let size = state
                 .storage
-                .store(format!("assets/{asset_name}"), reader, &content_type)
+                .store(&asset_path, reader, &content_type)
                 .await?;
 
             activity_logger
@@ -176,11 +191,7 @@ mod put {
                 .await;
 
             assets.push(shared::storage::StorageAsset {
-                url: state
-                    .storage
-                    .retrieve_urls()
-                    .await?
-                    .get_url(format!("assets/{asset_name}")),
+                url: url_retriever.get_url(&asset_path),
                 name: asset_name,
                 size,
                 is_directory: false,
