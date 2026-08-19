@@ -134,7 +134,7 @@ mod patch {
 
         activity_logger
             .log(
-                "user:account.update",
+                "account:update",
                 serde_json::json!({
                     "username": user.username,
                     "name_first": user.name_first,
