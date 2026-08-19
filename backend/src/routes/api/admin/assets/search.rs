@@ -40,14 +40,14 @@ mod post {
         permissions: GetPermissionManager,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
+        permissions.has_admin_permission("assets.read")?;
+
         let directory = data.directory.trim_matches('/');
         if directory.contains("..") {
             return ApiResponse::error("invalid directory path")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }
-
-        permissions.has_admin_permission("assets.read")?;
 
         let assets = state
             .storage
