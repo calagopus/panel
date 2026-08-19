@@ -40,6 +40,19 @@ mod put {
                 .ok();
         }
 
+        if image.is_empty() {
+            return ApiResponse::error("image: payload cannot be empty")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
+        const MAX_AVATAR_BYTES: usize = 10 * 1024 * 1024; // 10MB
+        if image.len() > MAX_AVATAR_BYTES {
+            return ApiResponse::error("image: payload exceeds 10MB limit")
+                .with_status(StatusCode::PAYLOAD_TOO_LARGE)
+                .ok();
+        }
+
         let mut image = match ImageReader::new(std::io::Cursor::new(image)).with_guessed_format() {
             Ok(reader) => reader,
             Err(_) => {
@@ -49,10 +62,28 @@ mod put {
             }
         };
 
+        let Some(format) = image.format() else {
+            return ApiResponse::error("image: unrecognized image format")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        };
+
+        if !matches!(
+            format,
+            image::ImageFormat::Png
+                | image::ImageFormat::Jpeg
+                | image::ImageFormat::WebP
+                | image::ImageFormat::Gif
+        ) {
+            return ApiResponse::error("image: only PNG, JPEG, WebP, and GIF formats are allowed")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         let mut limits = image::Limits::default();
         limits.max_alloc = Some(64 * 1024 * 1024);
-        limits.max_image_width = Some(16384);
-        limits.max_image_height = Some(16384);
+        limits.max_image_width = Some(4096);
+        limits.max_image_height = Some(4096);
         image.limits(limits);
 
         let image = match tokio::task::spawn_blocking(move || image.decode()).await? {
@@ -64,8 +95,8 @@ mod put {
             }
         };
 
-        if !(64..=16384).contains(&image.width()) || !(64..=16384).contains(&image.height()) {
-            return ApiResponse::error("image: invalid resolution, dimensions must not be smaller than 64px and must not exceed 16384px")
+        if !(64..=4096).contains(&image.width()) || !(64..=4096).contains(&image.height()) {
+            return ApiResponse::error("image: invalid resolution, dimensions must not be smaller than 64px and must not exceed 4096px")
                     .with_status(StatusCode::BAD_REQUEST)
                     .ok();
         }
@@ -113,7 +144,6 @@ mod put {
 }
 
 mod delete {
-    use axum::http::StatusCode;
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
@@ -138,31 +168,24 @@ mod delete {
         user: GetUser,
         activity_logger: GetUserActivityLogger,
     ) -> ApiResponseResult {
-        let avatar = match &user.avatar {
-            Some(avatar) => avatar,
-            None => {
-                return ApiResponse::error("no avatar to delete")
-                    .with_status(StatusCode::BAD_REQUEST)
-                    .ok();
-            }
-        };
-
         permissions.has_user_permission("account.avatar")?;
 
-        state.storage.remove(Some(avatar)).await?;
+        if let Some(avatar) = &user.avatar {
+            state.storage.remove(Some(avatar)).await?;
 
-        sqlx::query!(
-            "UPDATE users
+            sqlx::query!(
+                "UPDATE users
             SET avatar = NULL
             WHERE users.uuid = $1",
-            user.uuid
-        )
-        .execute(state.database.write())
-        .await?;
+                user.uuid
+            )
+            .execute(state.database.write())
+            .await?;
 
-        activity_logger
-            .log("user:account.delete-avatar", serde_json::json!({}))
-            .await;
+            activity_logger
+                .log("user:account.delete-avatar", serde_json::json!({}))
+                .await;
+        }
 
         ApiResponse::new_serialized(Response {}).ok()
     }
