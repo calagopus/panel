@@ -24,6 +24,14 @@
       "many": "{count} Dosya",
       "other": "{count} Dosya"
     },
+    "directory": {
+      "zero": "{count} Directories",
+      "one": "{count} Directory",
+      "two": "{count} Directories",
+      "few": "{count} Directories",
+      "many": "{count} Directories",
+      "other": "{count} Directories"
+    },
     "server": {
       "zero": "{count} Sunucu",
       "one": "{count} Sunucu",
@@ -230,7 +238,7 @@
           "onePatternPerLine": "One pattern per line.",
           "countMatches": "Count Matches",
           "matches": "{count} matched",
-          "noMatches": "No matches",
+          "noMatches": "Eşleşme yok",
           "exception": "Exception",
           "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
         }
@@ -247,37 +255,37 @@
         "resetToDefault": "Varsayılana sıfırla",
         "edit": "Düzenle",
         "delete": "Sil",
-        "remove": "Remove",
+        "remove": "Kaldır",
         "primary": "Birincil",
         "backupOnDifferentNode": "This backup is on a different node than the server. It is not viewable from the Client API."
       },
       "form": {
         "force": "Do you want to execute this deletion forcefully?",
         "name": "İsim",
-        "newName": "New Name",
+        "newName": "Yeni İsim",
         "description": "Açıklama",
-        "author": "Author",
-        "type": "Type",
+        "author": "Yazar",
+        "type": "Türü",
         "password": "Şifre",
         "host": "Host",
         "username": "Kullanıcı Adı",
-        "usernameOrEmail": "Username/Email",
+        "usernameOrEmail": "Kullanıcı Adı/E-posta",
         "server": "Sunucu",
         "url": "URL",
         "email": "E-posta",
         "path": "Path",
-        "port": "Port",
-        "provider": "Provider",
+        "port": "Bağlantı Noktası (Port)",
+        "provider": "Sağlayıcı",
         "command": "Komut",
         "fromAddress": "From Address",
         "fromName": "From Name",
         "siteKey": "Site Key",
         "secretKey": "Secret Key",
-        "apiKey": "API Key",
+        "apiKey": "API Anahtarı",
         "accessKey": "Access Key",
         "bucket": "Bucket",
-        "region": "Region",
-        "endpoint": "Endpoint",
+        "region": "Bölge",
+        "endpoint": "Uç Nokta (Endpoint)",
         "publicUrl": "Public URL",
         "firstName": "Ad",
         "lastName": "Soyad",
@@ -293,7 +301,7 @@
         "sftpHost": "SFTP Host",
         "dockerImage": "Docker İmajı",
         "memory": "Bellek (RAM)",
-        "disk": "Disk",
+        "disk": "Depolama",
         "serverName": "Sunucu Adı",
         "startupCommand": "Başlangıç Komutu",
         "archiveName": "Arşiv Adı",
@@ -304,7 +312,7 @@
         "deleteSourceBackups": "Delete source backups",
         "deleteSourceBackupsDescription": "Deletes the transferred backups on the source node once transfer finishes.",
         "node": "Node",
-        "location": "Location",
+        "location": "Lokasyon",
         "primaryAllocation": "Primary Allocation",
         "additionalAllocations": "Additional Allocations",
         "externalId": "External ID",
@@ -325,6 +333,7 @@
         "portRangesPlaceholder": "Port Aralıkları (ör. 3000-4000)",
         "currentPassword": "Mevcut Şifre",
         "confirmPassword": "Şifreyi Onayla",
+        "passwordRequired": "Password is required",
         "authenticationCode": "Doğrulama Kodu",
         "restoreStartup": "Restore the startup command, image, and variables from this backup.",
         "lineContains": "Satır şunu içerir",
@@ -366,19 +375,19 @@
           "node": "Node",
           "owner": "Owner",
           "added": "Added",
-          "backupConfiguration": "Backup Configuration",
-          "status": "Status",
+          "backupConfiguration": "Yedekleme yapılandırması",
+          "status": "Durum",
           "allocation": "Allocation",
           "notes": "Notlar",
-          "source": "Source",
+          "source": "Kaynak",
           "target": "Target",
           "checksum": "Checksum",
-          "files": "Files",
-          "server": "Server",
-          "address": "Address",
+          "files": "Dosyalar",
+          "server": "Sunucu",
+          "address": "Adres",
           "eggs": "Eggs",
           "template": "Template",
-          "version": "Version",
+          "version": "Sürüm",
           "host": "Host"
         }
       },
@@ -393,7 +402,7 @@
         "successful": "Başarılı",
         "failed": "Hata",
         "installed": "Installed",
-        "systemBackup": "System"
+        "systemBackup": "Sistem"
       },
       "label": {
         "noSubdirectories": "No subdirectories",
@@ -573,6 +582,40 @@
           "themeAuto": "Auto",
           "themeDark": "Dark",
           "themeLight": "Light"
+        },
+        "modal": {
+          "logout": {
+            "title": "Logout",
+            "content": "Are you sure you want to log out?"
+          }
+        }
+      },
+      "quickActions": {
+        "trigger": "Quick actions...",
+        "placeholder": "Search for actions and pages...",
+        "category": {
+          "navigation": "Navigation",
+          "power": "Power",
+          "account": "Account",
+          "servers": "Servers",
+          "users": "Users",
+          "page": "This Page",
+          "pageNavigation": "Page Navigation",
+          "math": "Calculator"
+        },
+        "math": {
+          "calculating": "Calculating...",
+          "unsolvable": "This expression cannot be solved",
+          "copyResult": "Copy result"
+        },
+        "hint": {
+          "navigate": "to navigate",
+          "select": "to select",
+          "close": "to close",
+          "calculate": "to calculate",
+          "pages": "for pages only",
+          "servers": "for servers only",
+          "users": "for users only"
         }
       },
       "permissionSelector": {
@@ -685,34 +728,42 @@
             "operations": {
               "compressing": {
                 "completed": "{files} dosyası `{path}` konumuna {time} içinde sıkıştırıldı.",
-                "failed": "{files} dosyası `{path}` konumuna sıkıştırılamadı:\n{error}"
+                "failed": "{files} dosyası `{path}` konumuna sıkıştırılamadı:\n{error}",
+                "aborted": "Compression of {files} to `{path}` was cancelled."
               },
               "decompressing": {
                 "completed": "`{path}` dosyası `{destination}` konumuna {time} içinde çıkartıldı.",
-                "failed": "`{path}` dosyası `{destination}` konumuna çıkartılamadı:\n{error}"
+                "failed": "`{path}` dosyası `{destination}` konumuna çıkartılamadı:\n{error}",
+                "aborted": "Decompression of `{path}` to `{destination}` was cancelled."
               },
               "pulling": {
                 "completed": "`{destination}` başarıyla çekildi ({time}).",
-                "failed": "`{destination}` çekilemedi:\n{error}"
+                "failed": "`{destination}` çekilemedi:\n{error}",
+                "aborted": "Pull of `{destination}` was cancelled."
               },
               "copying": {
                 "completed": "`{path}` dosyası `{destination}` konumuna {time} içinde kopyalandı.",
                 "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
-                "failed": "`{path}` dosyası `{destination}` konumuna kopyalanamadı:\n{error}"
+                "failed": "`{path}` dosyası `{destination}` konumuna kopyalanamadı:\n{error}",
+                "aborted": "Copy of `{path}` to `{destination}` was cancelled."
               },
               "copyingMany": {
                 "completed": "{files} dosyası {time} içinde kopyalandı.",
-                "failed": "{files} kopyalanamadı:\n{error}"
+                "failed": "{files} kopyalanamadı:\n{error}",
+                "aborted": "Copy of {files} was cancelled."
               },
               "copyingRemote": {
                 "completedFrom": "{files} uzak sunucudan {time} içinde kopyalandı.",
                 "completedTo": "{files} uzak sunucuya {time} içinde kopyalandı.",
                 "failedFrom": "{files} uzak sunucudan kopyalanamadı:\n{error}",
-                "failedTo": "{files} uzak sunucuya kopyalanamadı:\n{error}"
+                "failedTo": "{files} uzak sunucuya kopyalanamadı:\n{error}",
+                "abortedFrom": "Copy of {files} from remote server was cancelled.",
+                "abortedTo": "Copy of {files} to remote server was cancelled."
               },
               "exportingBackup": {
                 "completed": "Exported backup to `{destination}` in {time}.",
-                "failed": "Failed to export backup to `{destination}`:\n{error}"
+                "failed": "Failed to export backup to `{destination}`:\n{error}",
+                "aborted": "Backup export to `{destination}` was cancelled."
               }
             }
           }
@@ -827,10 +878,8 @@
           "form": {
             "name": "İsim",
             "namePlaceholder": "Sunucum",
-            "urlPlaceholder": "URL",
             "urlDescription": "Node ile dahili iletişim için kullanılır",
             "publicUrl": "Genel URL",
-            "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "Websocket ve indirmeler için kullanılır",
             "sftpHostPlaceholder": "SFTP Host",
             "sftpPortPlaceholder": "SFTP Port",
@@ -863,7 +912,6 @@
             "applicationNamePlaceholder": "Calagopus",
             "languagePlaceholder": "Dil",
             "applicationUrl": "Uygulama URL'si",
-            "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Kaydı Etkinleştir",
             "registrationDescription": "Yeni kullanıcıların kendi hesaplarını kaydetmelerine izin verin.",
             "securityKeys": "Enable Security Keys",
@@ -1020,6 +1068,13 @@
         "register": {
           "title": "Kayıt Ol",
           "subtitle": "Kayıt olmak için lütfen bilgilerinizi girin",
+          "form": {
+            "usernamePlaceholder": "Your username",
+            "emailPlaceholder": "you@example.com",
+            "firstNamePlaceholder": "Your first name",
+            "lastNamePlaceholder": "Your last name",
+            "passwordPlaceholder": "Enter a strong password"
+          },
           "button": {
             "register": "Kayıt Ol"
           }
@@ -1027,6 +1082,9 @@
         "forgotPassword": {
           "title": "Şifremi Unuttum",
           "subtitle": "Şifrenizi nasıl sıfırlayacağınıza dair talimatları almak için e-postanızı girin",
+          "form": {
+            "emailPlaceholder": "you@example.com"
+          },
           "button": {
             "request": "Şifre Sıfırlama İste"
           },
@@ -1035,6 +1093,10 @@
         "resetPassword": {
           "title": "Şifreyi Sıfırla",
           "subtitle": "Lütfen yeni şifrenizi girin",
+          "form": {
+            "passwordPlaceholder": "Enter a strong password",
+            "confirmPasswordPlaceholder": "Re-enter your password"
+          },
           "button": {
             "reset": "Şifreyi Sıfırla"
           },
@@ -1058,9 +1120,6 @@
             "noGroups": "Sunucu eklenecek grup bulunmuyor",
             "noGroup": "Bu sunucu herhangi bir grupta değil",
             "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
-          },
-          "badge": {
-            "foreign": "Foreign"
           },
           "tabs": {
             "groupedServers": {
@@ -1304,7 +1363,8 @@
           },
           "general": {
             "title": "General",
-            "undo": "Undo the last action"
+            "undo": "Undo the last action",
+            "quickActions": "Open quick actions"
           },
           "fileManager": {
             "title": "Dosya Yöneticisi",
@@ -1494,7 +1554,6 @@
           },
           "form": {
             "allowedIps": "İzin Verilen IP'ler",
-            "allowedIpsPlaceholder": "ör. 192.168.1.1, 2001:db8::1",
             "userPermissions": "Kullanıcı Yetkileri",
             "serverPermissions": "Sunucu Yetkileri",
             "adminPermissions": "Yönetici Yetkileri"
@@ -2023,6 +2082,11 @@
             "upload": "Upload",
             "copyLink": "Copy Link"
           },
+          "quickAction": {
+            "uploadFiles": "Upload Assets",
+            "parentDirectory": "Go to Parent Directory",
+            "deleteSelection": "Delete Selection"
+          },
           "dropzone": {
             "title": "Drop files here to upload",
             "subtitle": "Release to start uploading"
@@ -2369,7 +2433,6 @@
                 },
                 "form": {
                   "urlDescription": "Used for internal communication with the node.",
-                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Used for websocket connections and downloads.",
                   "backupConfigurationPlaceholder": "Inherit from Location",
                   "memoryDescription": "The total memory available for servers on this node.",
@@ -2530,10 +2593,16 @@
               "page": {
                 "title": "Node Allocations",
                 "tooltip": {
-                  "clearSelection": "Clear Selection"
+                  "clearSelection": "Clear Selection",
+                  "selectAllMatching": "Select all {count} matching"
                 },
                 "form": {
-                  "ipAlias": "IP Alias"
+                  "ipAlias": "IP Alias",
+                  "portFrom": "Port from",
+                  "portTo": "Port to",
+                  "assigned": "Assignment",
+                  "assignedOnly": "Assigned only",
+                  "unassignedOnly": "Unassigned only"
                 },
                 "table": {
                   "columns": {
@@ -2552,15 +2621,23 @@
                   },
                   "update": {
                     "title": "Update Node Allocations",
+                    "button": {
+                      "update": "Update {count}"
+                    },
                     "toast": {
-                      "updated": "{allocations} updated."
+                      "updated": "{allocations} updated.",
+                      "updatedPartial": "{allocations} updated. {skipped} skipped, because that port is already taken on the target IP."
                     }
                   },
                   "delete": {
                     "title": "Confirm Node Allocations Deletion",
-                    "content": "Are you sure you want to delete `{count}` allocations from **{name}**?",
+                    "content": "Are you sure you want to delete {allocations} from **{name}**?",
+                    "alert": {
+                      "forceWarning": "Force deletion removes allocations that are assigned to a server, including servers being transferred. Affected servers lose the allocation immediately and will not start correctly after their next restart."
+                    },
                     "toast": {
-                      "deleted": "{allocations} deleted."
+                      "deleted": "{allocations} deleted.",
+                      "deletedPartial": "{allocations} deleted. {skipped} skipped, because they are assigned to a server."
                     }
                   }
                 }
@@ -2639,7 +2716,7 @@
                   "reattached": "Reattached backup to {name} successfully.",
                   "restoring": "Restoring backup to {name}...",
                   "exporting": "Exporting backup to files of {name}...",
-                  "deleted": "Node backup deleted."
+                  "deletionStarted": "Node backup deletion started."
                 },
                 "modal": {
                   "export": {
@@ -2744,6 +2821,14 @@
         "servers": {
           "title": "Servers",
           "resourceName": "Server",
+          "quickAction": {
+            "viewClient": "View Server in Client Area",
+            "transfer": "Transfer Server",
+            "suspend": "Suspend Server",
+            "unsuspend": "Unsuspend Server",
+            "clearState": "Clear Server State",
+            "delete": "Delete Server"
+          },
           "externalIdLookup": {
             "button": "Find by External ID",
             "modal": {
@@ -2859,11 +2944,8 @@
                   "pinnedCpus": "Pinned CPUs",
                   "pinnedCpusDescription": "The CPU cores this server is pinned to.",
                   "pinnedCpusTooltip": "By index, e.g. 0, 1, 2. Leave empty to allow all cores.",
-                  "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Predefined Docker Images",
                   "predefinedDockerImagesPlaceholder": "No predefined image selected",
-                  "timezonePlaceholder": "Europe/Amsterdam",
-                  "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Custom",
                   "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Start on Completion",
@@ -3214,10 +3296,12 @@
                     "title": "Variables",
                     "page": {
                       "title": "Egg Variables",
+                      "aria": {
+                        "reorder": "Reorder variable"
+                      },
                       "form": {
                         "supportsMarkdown": "Supports Markdown formatting.",
                         "defaultValue": "Default Value",
-                        "defaultValuePlaceholder": "server.jar",
                         "userViewable": "User Viewable",
                         "userEditable": "User Editable",
                         "secret": "Secret",
@@ -3375,7 +3459,6 @@
                   "credentialType": "Credential Type",
                   "password": "Password or Access Token",
                   "privateKey": "Private Key",
-                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
                   "passphrase": "Passphrase"
                 },
                 "enum": {
@@ -3441,8 +3524,7 @@
                   "publicPort": "Public Port",
                   "connectionCredentials": "Connection Credentials",
                   "credentialType": "Credential Type",
-                  "connectionString": "Connection String",
-                  "connectionStringPlaceholder": "mysql://username:password@host:port"
+                  "connectionString": "Connection String"
                 },
                 "enum": {
                   "credentialType": {
@@ -3496,7 +3578,6 @@
                 "titleCreate": "Create Database Agent Host",
                 "titleUpdate": "Update Database Agent Host",
                 "form": {
-                  "urlPlaceholder": "https://agent.example.com:8080",
                   "typeEnabled": "Enabled",
                   "typePublicHost": "Public Host",
                   "typePublicPort": "Public Port"
@@ -4365,6 +4446,10 @@
             "increaseFontSize": "Yazı Boyutunu Artır",
             "copySelection": "Copy Selection"
           },
+          "quickAction": {
+            "search": "Search Console",
+            "scrollToBottom": "Scroll to Bottom"
+          },
           "drawer": {
             "commandHistory": {
               "title": "Komut Geçmişi",
@@ -4471,6 +4556,33 @@
             "loadDisk": "Load Disk Version",
             "keepEditor": "Keep Editor Version"
           },
+          "quickAction": {
+            "newFile": "New File",
+            "newDirectory": "New Directory",
+            "pullFile": "Pull File from URL",
+            "uploadFiles": "Upload Files",
+            "uploadDirectory": "Upload Directory",
+            "search": "Search Files",
+            "largestDirectories": "Analyze Directory Sizes",
+            "parentDirectory": "Go to Parent Directory",
+            "copyPath": "Copy Current Path",
+            "exitBackup": "Exit Backup Browsing",
+            "connectSftp": "Connect via SFTP",
+            "connectVscode": "Open in VS Code",
+            "cancelPaste": "Cancel Pending Copy or Move",
+            "downloadSelection": "Download Selection",
+            "copySelection": "Copy Selection",
+            "moveSelection": "Move Selection",
+            "remoteCopySelection": "Copy Selection to another Server",
+            "archiveSelection": "Archive Selection",
+            "extractSelection": "Extract Archive",
+            "renameSelection": "Rename Selection",
+            "permissionsSelection": "Change Permissions",
+            "fingerprintSelection": "Show File Fingerprint",
+            "deleteSelection": "Delete Selection",
+            "saveFile": "Save File",
+            "createFile": "Create File"
+          },
           "actionBar": {
             "copyHere": "{files} buraya kopyala",
             "moveHere": "{files} buraya taşı"
@@ -4505,6 +4617,7 @@
             "editorMinimap": "Dosya Minimap'ini Göster",
             "editorLineOverflow": "Satır Taşmasını Kaydır",
             "editorFontSize": "Editor Font Size",
+            "editorEngine": "Editor Engine",
             "vscodeUriScheme": "VS Code URI Scheme",
             "imageViewerSmoothing": "Görüntü Yumuşatma (Anti-Aliasing)"
           },
@@ -4542,6 +4655,7 @@
             "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
+            "settings": "Settings",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4777,10 +4891,6 @@
         "databases": {
           "title": "Veritabanları",
           "subtitle": "Maksimum {max} veritabanından {current} tanesi oluşturuldu.",
-          "classic": {
-            "title": "Classic Databases",
-            "subtitle": "{current} databases created."
-          },
           "tooltip": {
             "limitReached": "Bu sunucu {max} veritabanı ile sınırlıdır."
           },
@@ -4955,7 +5065,6 @@
           },
           "instance": {
             "title": "Managed Databases",
-            "subtitle": "{current} managed databases created.",
             "updateAvailable": "Update Available",
             "button": {
               "applyUpdate": "Apply Update"
@@ -5097,7 +5206,8 @@
               "operations": {
                 "remoteImport": {
                   "completed": "Imported `{database}` from `{source}` in {time}.",
-                  "failed": "Failed to import `{database}` from `{source}`:\n{error}"
+                  "failed": "Failed to import `{database}` from `{source}`:\n{error}",
+                  "aborted": "Import of `{database}` from `{source}` was cancelled."
                 }
               }
             },

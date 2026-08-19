@@ -24,6 +24,14 @@
       "many": "{count} Bestanden",
       "other": "{count} Bestanden"
     },
+    "directory": {
+      "zero": "{count} Directories",
+      "one": "{count} Directory",
+      "two": "{count} Directories",
+      "few": "{count} Directories",
+      "many": "{count} Directories",
+      "other": "{count} Directories"
+    },
     "server": {
       "zero": "{count} Servers",
       "one": "{count} Server",
@@ -198,7 +206,7 @@
         "error": "Fout",
         "warning": "Waarschuwing",
         "success": "Geslaagd",
-        "clockOffset": "Uw systeemklok wijkt meer dan 5 seconden af van de server. Dit kan problemen veroorzaken met wachtwoordsleutel- en tweestapsverificatie. Synchroniseer uw klok als er problemen optreden. Huidige afwijking: {offset} seconde(n)."
+        "clockOffset": "Uw systeemklok wijkt meer dan 5 seconden af van de server. Dit kan problemen veroorzaken met wachtwoordsleutels en tweestapsverificatie. Synchroniseer uw klok als er problemen optreden. Huidige afwijking: {offset} seconde(n)."
       },
       "divider": {
         "or": "OF"
@@ -321,10 +329,11 @@
         "destinationDirectory": "Destination Directory",
         "directoryName": "Mapnaam",
         "locked": "Vergrendeld",
-        "portRanges": "Poortbereiken",
-        "portRangesPlaceholder": "Poortbereiken (bijv. 3000-4000)",
+        "portRanges": "Poortbereik",
+        "portRangesPlaceholder": "Poortbereik (bijv. 3000-4000)",
         "currentPassword": "Huidig wachtwoord",
         "confirmPassword": "Wachtwoord bevestigen",
+        "passwordRequired": "Password is required",
         "authenticationCode": "Authenticatiecode",
         "restoreStartup": "Herstel het opstartcommando, de image en de variabelen vanuit deze back-up.",
         "lineContains": "Regel bevat",
@@ -334,7 +343,7 @@
         "eggs": "Eggs",
         "ignoredFiles": "Genegeerde bestanden",
         "previewIgnoredFiles": "Preview ignored files",
-        "yourControlPanelPassword": "Uw configuratiepanelwachtwoord",
+        "yourControlPanelPassword": "Uw controlepaneelwachtwoord",
         "deploymentEnabled": "Deployment Ingeschakeld",
         "maintenanceEnabled": "Onderhoud Ingeschakeld",
         "truncateDirectory": "Wilt u alle bestanden van deze server verwijderen voordat u deze actie uitvoert? Dit kan niet ongedaan worden gemaakt."
@@ -342,7 +351,7 @@
       "table": {
         "pagination": {
           "results": "{start} tot {end} van {total} resultaten weergegeven.",
-          "empty": "Er zijn geen items gevonden, ze lijken zich te verstoppen."
+          "empty": "Er zijn geen items gevonden."
         },
         "columns": {
           "id": "ID",
@@ -573,6 +582,40 @@
           "themeAuto": "Auto",
           "themeDark": "Dark",
           "themeLight": "Light"
+        },
+        "modal": {
+          "logout": {
+            "title": "Logout",
+            "content": "Are you sure you want to log out?"
+          }
+        }
+      },
+      "quickActions": {
+        "trigger": "Quick actions...",
+        "placeholder": "Search for actions and pages...",
+        "category": {
+          "navigation": "Navigation",
+          "power": "Power",
+          "account": "Account",
+          "servers": "Servers",
+          "users": "Users",
+          "page": "This Page",
+          "pageNavigation": "Page Navigation",
+          "math": "Calculator"
+        },
+        "math": {
+          "calculating": "Calculating...",
+          "unsolvable": "This expression cannot be solved",
+          "copyResult": "Copy result"
+        },
+        "hint": {
+          "navigate": "to navigate",
+          "select": "to select",
+          "close": "to close",
+          "calculate": "to calculate",
+          "pages": "for pages only",
+          "servers": "for servers only",
+          "users": "for users only"
         }
       },
       "permissionSelector": {
@@ -685,34 +728,42 @@
             "operations": {
               "compressing": {
                 "completed": "{files} gecomprimeerd naar `{path}` in {time}.",
-                "failed": "Comprimeren van {files} naar `{path}` mislukt:\n{error}"
+                "failed": "Comprimeren van {files} naar `{path}` mislukt:\n{error}",
+                "aborted": "Compression of {files} to `{path}` was cancelled."
               },
               "decompressing": {
                 "completed": "`{path}` gedecomprimeerd naar `{destination}` in {time}.",
-                "failed": "Decomprimeren van `{path}` naar `{destination}` mislukt:\n{error}"
+                "failed": "Decomprimeren van `{path}` naar `{destination}` mislukt:\n{error}",
+                "aborted": "Decompression of `{path}` to `{destination}` was cancelled."
               },
               "pulling": {
                 "completed": "`{destination}` opgehaald in {time}.",
-                "failed": "Ophalen van `{destination}` mislukt:\n{error}"
+                "failed": "Ophalen van `{destination}` mislukt:\n{error}",
+                "aborted": "Pull of `{destination}` was cancelled."
               },
               "copying": {
                 "completed": "`{path}` gekopieerd naar `{destination}` in {time}.",
                 "completedMany": "{path} gekopieerd naar `{destination}` ({files}) in {time}.",
-                "failed": "Kopiëren van `{path}` naar `{destination}` mislukt:\n{error}"
+                "failed": "Kopiëren van `{path}` naar `{destination}` mislukt:\n{error}",
+                "aborted": "Copy of `{path}` to `{destination}` was cancelled."
               },
               "copyingMany": {
                 "completed": "{files} gekopieerd in {time}.",
-                "failed": "Kopiëren van {files} mislukt:\n{error}"
+                "failed": "Kopiëren van {files} mislukt:\n{error}",
+                "aborted": "Copy of {files} was cancelled."
               },
               "copyingRemote": {
                 "completedFrom": "{files} van externe server gekopieerd in {time}.",
                 "completedTo": "{files} naar externe server gekopieerd in {time}.",
                 "failedFrom": "Kopiëren van {files} van externe server mislukt:\n{error}",
-                "failedTo": "Kopiëren van {files} naar externe server mislukt:\n{error}"
+                "failedTo": "Kopiëren van {files} naar externe server mislukt:\n{error}",
+                "abortedFrom": "Copy of {files} from remote server was cancelled.",
+                "abortedTo": "Copy of {files} to remote server was cancelled."
               },
               "exportingBackup": {
                 "completed": "Exported backup to `{destination}` in {time}.",
-                "failed": "Failed to export backup to `{destination}`:\n{error}"
+                "failed": "Failed to export backup to `{destination}`:\n{error}",
+                "aborted": "Backup export to `{destination}` was cancelled."
               }
             }
           }
@@ -827,10 +878,8 @@
           "form": {
             "name": "Naam",
             "namePlaceholder": "Mijn server",
-            "urlPlaceholder": "URL",
             "urlDescription": "gebruikt voor interne communicatie met de node",
             "publicUrl": "Openbare URL",
-            "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "gebruikt voor websocket/downloads",
             "sftpHostPlaceholder": "SFTP-host",
             "sftpPortPlaceholder": "SFTP-poort",
@@ -863,7 +912,6 @@
             "applicationNamePlaceholder": "Calagopus",
             "languagePlaceholder": "Taal",
             "applicationUrl": "Applicatie-URL",
-            "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Registratie inschakelen",
             "registrationDescription": "Sta nieuwe gebruikers toe een eigen account te registreren.",
             "securityKeys": "Enable Security Keys",
@@ -1020,6 +1068,13 @@
         "register": {
           "title": "Registreren",
           "subtitle": "Voer uw gegevens in om te registreren",
+          "form": {
+            "usernamePlaceholder": "Your username",
+            "emailPlaceholder": "you@example.com",
+            "firstNamePlaceholder": "Your first name",
+            "lastNamePlaceholder": "Your last name",
+            "passwordPlaceholder": "Enter a strong password"
+          },
           "button": {
             "register": "Registreren"
           }
@@ -1027,6 +1082,9 @@
         "forgotPassword": {
           "title": "Wachtwoord vergeten",
           "subtitle": "Voer uw e-mailadres in om instructies te ontvangen voor het opnieuw instellen van uw wachtwoord",
+          "form": {
+            "emailPlaceholder": "you@example.com"
+          },
           "button": {
             "request": "Wachtwoordreset aanvragen"
           },
@@ -1035,6 +1093,10 @@
         "resetPassword": {
           "title": "Wachtwoord opnieuw instellen",
           "subtitle": "Voer uw nieuwe wachtwoord in",
+          "form": {
+            "passwordPlaceholder": "Enter a strong password",
+            "confirmPasswordPlaceholder": "Re-enter your password"
+          },
           "button": {
             "reset": "Wachtwoord opnieuw instellen"
           },
@@ -1058,9 +1120,6 @@
             "noGroups": "Geen groepen beschikbaar om server aan toe te voegen",
             "noGroup": "Deze server behoort niet tot een groep",
             "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
-          },
-          "badge": {
-            "foreign": "Extern"
           },
           "tabs": {
             "groupedServers": {
@@ -1304,7 +1363,8 @@
           },
           "general": {
             "title": "General",
-            "undo": "Undo the last action"
+            "undo": "Undo the last action",
+            "quickActions": "Open quick actions"
           },
           "fileManager": {
             "title": "Bestandsbeheer",
@@ -1494,7 +1554,6 @@
           },
           "form": {
             "allowedIps": "Toegestane IP-adressen",
-            "allowedIpsPlaceholder": "bijv. 192.168.1.1, 2001:db8::1",
             "userPermissions": "Gebruikersrechten",
             "serverPermissions": "Serverrechten",
             "adminPermissions": "Beheerdersrechten"
@@ -2023,6 +2082,11 @@
             "upload": "Uploaden",
             "copyLink": "Link kopiëren"
           },
+          "quickAction": {
+            "uploadFiles": "Upload Assets",
+            "parentDirectory": "Go to Parent Directory",
+            "deleteSelection": "Delete Selection"
+          },
           "dropzone": {
             "title": "Zet bestanden hier neer om te uploaden",
             "subtitle": "Loslaten om te beginnen met uploaden"
@@ -2369,7 +2433,6 @@
                 },
                 "form": {
                   "urlDescription": "Gebruikt voor interne communicatie met de node.",
-                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Gebruikt voor websocket-verbindingen en downloads.",
                   "backupConfigurationPlaceholder": "Overnemen van Locatie",
                   "memoryDescription": "The total memory available for servers on this node.",
@@ -2530,10 +2593,16 @@
               "page": {
                 "title": "Node-allocaties",
                 "tooltip": {
-                  "clearSelection": "Selectie wissen"
+                  "clearSelection": "Selectie wissen",
+                  "selectAllMatching": "Select all {count} matching"
                 },
                 "form": {
-                  "ipAlias": "IP-alias"
+                  "ipAlias": "IP-alias",
+                  "portFrom": "Port from",
+                  "portTo": "Port to",
+                  "assigned": "Assignment",
+                  "assignedOnly": "Assigned only",
+                  "unassignedOnly": "Unassigned only"
                 },
                 "table": {
                   "columns": {
@@ -2552,15 +2621,23 @@
                   },
                   "update": {
                     "title": "Node-allocaties bijwerken",
+                    "button": {
+                      "update": "Update {count}"
+                    },
                     "toast": {
-                      "updated": "{allocations} bijgewerkt."
+                      "updated": "{allocations} bijgewerkt.",
+                      "updatedPartial": "{allocations} updated. {skipped} skipped, because that port is already taken on the target IP."
                     }
                   },
                   "delete": {
                     "title": "Verwijderen van node-allocaties bevestigen",
-                    "content": "Weet u zeker dat u `{count}` allocaties wilt verwijderen van **{name}**?",
+                    "content": "Are you sure you want to delete {allocations} from **{name}**?",
+                    "alert": {
+                      "forceWarning": "Force deletion removes allocations that are assigned to a server, including servers being transferred. Affected servers lose the allocation immediately and will not start correctly after their next restart."
+                    },
                     "toast": {
-                      "deleted": "{allocations} verwijderd."
+                      "deleted": "{allocations} verwijderd.",
+                      "deletedPartial": "{allocations} deleted. {skipped} skipped, because they are assigned to a server."
                     }
                   }
                 }
@@ -2639,7 +2716,7 @@
                   "reattached": "Back-up succesvol opnieuw gekoppeld aan {name}.",
                   "restoring": "Back-up herstellen naar {name}...",
                   "exporting": "Exporting backup to files of {name}...",
-                  "deleted": "Node-back-up verwijderd."
+                  "deletionStarted": "Node backup deletion started."
                 },
                 "modal": {
                   "export": {
@@ -2744,6 +2821,14 @@
         "servers": {
           "title": "Servers",
           "resourceName": "Server",
+          "quickAction": {
+            "viewClient": "View Server in Client Area",
+            "transfer": "Transfer Server",
+            "suspend": "Suspend Server",
+            "unsuspend": "Unsuspend Server",
+            "clearState": "Clear Server State",
+            "delete": "Delete Server"
+          },
           "externalIdLookup": {
             "button": "Find by External ID",
             "modal": {
@@ -2859,11 +2944,8 @@
                   "pinnedCpus": "Vastgezette CPU's",
                   "pinnedCpusDescription": "De CPU-cores waaraan deze server is vastgezet.",
                   "pinnedCpusTooltip": "By index, e.g. 0, 1, 2. Leave empty to allow all cores.",
-                  "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Vooraf gedefinieerde Docker-images",
                   "predefinedDockerImagesPlaceholder": "Geen vooraf gedefinieerde image geselecteerd",
-                  "timezonePlaceholder": "Europe/Amsterdam",
-                  "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Aangepast",
                   "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Starten na Voltooiing",
@@ -3214,10 +3296,12 @@
                     "title": "Variabelen",
                     "page": {
                       "title": "Egg-variabelen",
+                      "aria": {
+                        "reorder": "Reorder variable"
+                      },
                       "form": {
                         "supportsMarkdown": "Ondersteunt Markdown-opmaak.",
                         "defaultValue": "Standaardwaarde",
-                        "defaultValuePlaceholder": "server.jar",
                         "userViewable": "Zichtbaar voor Gebruiker",
                         "userEditable": "Bewerkbaar door Gebruiker",
                         "secret": "Geheim",
@@ -3375,7 +3459,6 @@
                   "credentialType": "Credential Type",
                   "password": "Password or Access Token",
                   "privateKey": "Private Key",
-                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
                   "passphrase": "Passphrase"
                 },
                 "enum": {
@@ -3441,8 +3524,7 @@
                   "publicPort": "Openbare Poort",
                   "connectionCredentials": "Verbindingsgegevens",
                   "credentialType": "Type Gegevens",
-                  "connectionString": "Verbindingsreeks",
-                  "connectionStringPlaceholder": "mysql://gebruikersnaam:wachtwoord@host:poort"
+                  "connectionString": "Verbindingsreeks"
                 },
                 "enum": {
                   "credentialType": {
@@ -3496,7 +3578,6 @@
                 "titleCreate": "Create Database Agent Host",
                 "titleUpdate": "Update Database Agent Host",
                 "form": {
-                  "urlPlaceholder": "https://agent.example.com:8080",
                   "typeEnabled": "Enabled",
                   "typePublicHost": "Public Host",
                   "typePublicPort": "Public Port"
@@ -4365,6 +4446,10 @@
             "increaseFontSize": "Lettergrootte vergroten",
             "copySelection": "Copy Selection"
           },
+          "quickAction": {
+            "search": "Search Console",
+            "scrollToBottom": "Scroll to Bottom"
+          },
           "drawer": {
             "commandHistory": {
               "title": "Opdrachtgeschiedenis",
@@ -4471,6 +4556,33 @@
             "loadDisk": "Load Disk Version",
             "keepEditor": "Keep Editor Version"
           },
+          "quickAction": {
+            "newFile": "New File",
+            "newDirectory": "New Directory",
+            "pullFile": "Pull File from URL",
+            "uploadFiles": "Upload Files",
+            "uploadDirectory": "Upload Directory",
+            "search": "Search Files",
+            "largestDirectories": "Analyze Directory Sizes",
+            "parentDirectory": "Go to Parent Directory",
+            "copyPath": "Copy Current Path",
+            "exitBackup": "Exit Backup Browsing",
+            "connectSftp": "Connect via SFTP",
+            "connectVscode": "Open in VS Code",
+            "cancelPaste": "Cancel Pending Copy or Move",
+            "downloadSelection": "Download Selection",
+            "copySelection": "Copy Selection",
+            "moveSelection": "Move Selection",
+            "remoteCopySelection": "Copy Selection to another Server",
+            "archiveSelection": "Archive Selection",
+            "extractSelection": "Extract Archive",
+            "renameSelection": "Rename Selection",
+            "permissionsSelection": "Change Permissions",
+            "fingerprintSelection": "Show File Fingerprint",
+            "deleteSelection": "Delete Selection",
+            "saveFile": "Save File",
+            "createFile": "Create File"
+          },
           "actionBar": {
             "copyHere": "{files} hier kopiëren",
             "moveHere": "{files} hier verplaatsen"
@@ -4505,6 +4617,7 @@
             "editorMinimap": "Bestandsminimap weergeven",
             "editorLineOverflow": "Regeloverloop inpakken",
             "editorFontSize": "Editor Font Size",
+            "editorEngine": "Editor Engine",
             "vscodeUriScheme": "VS Code URI Scheme",
             "imageViewerSmoothing": "Afbeelding vloeiend maken (anti-aliasing)"
           },
@@ -4542,6 +4655,7 @@
             "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
+            "settings": "Settings",
             "fileHistory": "Bestandsgeschiedenis",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4777,10 +4891,6 @@
         "databases": {
           "title": "Databases",
           "subtitle": "{current} van {max} maximale databases aangemaakt.",
-          "classic": {
-            "title": "Classic Databases",
-            "subtitle": "{current} databases created."
-          },
           "tooltip": {
             "limitReached": "Deze server is beperkt tot {max} databases."
           },
@@ -4955,7 +5065,6 @@
           },
           "instance": {
             "title": "Managed Databases",
-            "subtitle": "{current} managed databases created.",
             "updateAvailable": "Update Available",
             "button": {
               "applyUpdate": "Apply Update"
@@ -5097,7 +5206,8 @@
               "operations": {
                 "remoteImport": {
                   "completed": "Imported `{database}` from `{source}` in {time}.",
-                  "failed": "Failed to import `{database}` from `{source}`:\n{error}"
+                  "failed": "Failed to import `{database}` from `{source}`:\n{error}",
+                  "aborted": "Import of `{database}` from `{source}` was cancelled."
                 }
               }
             },

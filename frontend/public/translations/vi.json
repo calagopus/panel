@@ -24,6 +24,14 @@
       "many": "{count} Tệp",
       "other": "{count} Tệp"
     },
+    "directory": {
+      "zero": "{count} Thư mục",
+      "one": "{count} Thư mục",
+      "two": "{count} Thư mục",
+      "few": "{count} Thư mục",
+      "many": "{count} Thư mục",
+      "other": "{count} Thư mục"
+    },
     "server": {
       "zero": "{count} Máy Chủ",
       "one": "{count} Máy Chủ",
@@ -304,7 +312,7 @@
         "deleteSourceBackups": "Xóa bản sao lưu nguồn",
         "deleteSourceBackupsDescription": "Xóa các bản sao lưu đã chuyển trên node nguồn sau khi quá trình chuyển hoàn tất.",
         "node": "Node",
-        "location": "Location",
+        "location": "Vị trí",
         "primaryAllocation": "Phân Bổ Chính",
         "additionalAllocations": "Phân Bổ Bổ Sung",
         "externalId": "ID Bên Ngoài",
@@ -325,6 +333,7 @@
         "portRangesPlaceholder": "Dãi cổng (vd. 3000-4000)",
         "currentPassword": "Mật khẩu Hiện tại",
         "confirmPassword": "Xác nhận Mật khẩu",
+        "passwordRequired": "Password is required",
         "authenticationCode": "Mã Xác thực",
         "restoreStartup": "Khôi phục lệnh khởi động, hình ảnh và các biến từ bản sao lưu này.",
         "lineContains": "Dòng chứa",
@@ -393,7 +402,7 @@
         "successful": "Thành công",
         "failed": "Thất bại",
         "installed": "Đã cài đặt",
-        "systemBackup": "System"
+        "systemBackup": "Hệ thống"
       },
       "label": {
         "noSubdirectories": "Không có thư mục con",
@@ -573,6 +582,40 @@
           "themeAuto": "Tự động",
           "themeDark": "Tối",
           "themeLight": "Sáng"
+        },
+        "modal": {
+          "logout": {
+            "title": "Đăng xuất",
+            "content": "Bạn có chắc bạn muốn đăng xuất không?"
+          }
+        }
+      },
+      "quickActions": {
+        "trigger": "Thao tác nhanh...",
+        "placeholder": "Tìm kiếm về hành động và trang...",
+        "category": {
+          "navigation": "Điều hướng",
+          "power": "Nguồn",
+          "account": "Tài khoản",
+          "servers": "Máy chủ",
+          "users": "Người dùng",
+          "page": "Trang này",
+          "pageNavigation": "Điều hướng Trang",
+          "math": "Máy tính"
+        },
+        "math": {
+          "calculating": "Đang tính...",
+          "unsolvable": "Biểu thức này không thể giải được",
+          "copyResult": "Sao chép kết quả"
+        },
+        "hint": {
+          "navigate": "to navigate",
+          "select": "chọn",
+          "close": "đóng",
+          "calculate": "tính toán",
+          "pages": "chỉ trang này",
+          "servers": "chỉ máy chủ",
+          "users": "chỉ người dùng"
         }
       },
       "permissionSelector": {
@@ -685,34 +728,42 @@
             "operations": {
               "compressing": {
                 "completed": "Đã nén {files} tới `{path}` trong {time}.",
-                "failed": "Đã nén thất bại {files} tới `{path}`:\n{error}"
+                "failed": "Đã nén thất bại {files} tới `{path}`:\n{error}",
+                "aborted": "Việc nén {files} vào `{path}` đã bị hủy."
               },
               "decompressing": {
                 "completed": "Đã giải nén `{path}` tới `{destination}` trong {time}.",
-                "failed": "Đã giải nén thất bại `{path}` tới `{destination}`:\n{error}"
+                "failed": "Đã giải nén thất bại `{path}` tới `{destination}`:\n{error}",
+                "aborted": "Việc giải nén `{path}` vào `{destination}` đã bị hủy."
               },
               "pulling": {
                 "completed": "Đã kéo `{destination}` trong {time}.",
-                "failed": "Kéo thất bại `{destination}`:\\n{error}"
+                "failed": "Kéo thất bại `{destination}`:\\n{error}",
+                "aborted": "Việc pull `{destination}` đã bị hủy."
               },
               "copying": {
                 "completed": "Đã sao chép `{path}` tới `{destination}` trong {time}.",
                 "completedMany": "Đã sao chép `{path}` tới `{destination}` ({files}) trong {time}.",
-                "failed": "Sao chép thất bại `{path}` tới `{destination}`:\n{error}"
+                "failed": "Sao chép thất bại `{path}` tới `{destination}`:\n{error}",
+                "aborted": "Việc sao chép `{path}` sang `{destination}` đã bị hủy."
               },
               "copyingMany": {
                 "completed": "Đã sao chép {files} trong {time}.",
-                "failed": "Sao chép thất bại {files}:\n{error}"
+                "failed": "Sao chép thất bại {files}:\n{error}",
+                "aborted": "Việc sao chép {files} đã bị hủy."
               },
               "copyingRemote": {
                 "completedFrom": "Đã sao chép {files} Từ máy chủ điều khiển trong {time}.",
                 "completedTo": "Đã sao chép {files}  tới máy chủ điều khiển trong {time}.",
                 "failedFrom": "Sao chép thất bại tệp {files} Từ máy chủ điều khiển:\n{error}",
-                "failedTo": "Sao chép thất bại tệp {files}  tới máy chủ điều khiển:\n{error}"
+                "failedTo": "Sao chép thất bại tệp {files}  tới máy chủ điều khiển:\n{error}",
+                "abortedFrom": "Việc sao chép {files} từ máy chủ từ xa đã bị hủy.",
+                "abortedTo": "Việc sao chép {files} sang máy chủ từ xa đã bị hủy."
               },
               "exportingBackup": {
                 "completed": "Đã xuất bản sao lưu sang `{destination}` trong {time}.",
-                "failed": "Không thể xuất bản sao lưu sang `{destination}`:\n{error}"
+                "failed": "Không thể xuất bản sao lưu sang `{destination}`:\n{error}",
+                "aborted": "Việc xuất bản sao lưu sang `{destination}` đã bị hủy."
               }
             }
           }
@@ -827,10 +878,8 @@
           "form": {
             "name": "Tên Node",
             "namePlaceholder": "Máy chủ của tôi",
-            "urlPlaceholder": "URL",
             "urlDescription": "Được sử dụng để kết nối với API của node và phải bao gồm giao thức (http:// hoặc https://)",
             "publicUrl": "URL Công Khai",
-            "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "Được sử dụng cho websocket/downloads",
             "sftpHostPlaceholder": "Máy chủ SFTP",
             "sftpPortPlaceholder": " Cổng SFTP",
@@ -863,7 +912,6 @@
             "applicationNamePlaceholder": "Calagopus",
             "languagePlaceholder": "Ngôn ngữ",
             "applicationUrl": "URL Ứng dụng",
-            "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Kích hoạt Đăng ký",
             "registrationDescription": "Cho phép người dùng mới đăng ký tài khoản của họ.",
             "securityKeys": "Bật khóa bảo mật (passkey)",
@@ -1020,6 +1068,13 @@
         "register": {
           "title": "Đăng ký",
           "subtitle": "Vui lòng nhập thông tin của bạn để đăng ký một tài khoản mới.",
+          "form": {
+            "usernamePlaceholder": "Your username",
+            "emailPlaceholder": "you@example.com",
+            "firstNamePlaceholder": "Your first name",
+            "lastNamePlaceholder": "Your last name",
+            "passwordPlaceholder": "Enter a strong password"
+          },
           "button": {
             "register": "Đăng ký"
           }
@@ -1027,6 +1082,9 @@
         "forgotPassword": {
           "title": "Quên Mật khẩu",
           "subtitle": "Nhập địa chỉ email của bạn để nhận hướng dẫn đặt lại mật khẩu",
+          "form": {
+            "emailPlaceholder": "you@example.com"
+          },
           "button": {
             "request": "Yêu cầu Đặt Lại Mật khẩu"
           },
@@ -1035,6 +1093,10 @@
         "resetPassword": {
           "title": "Đặt Lại Mật khẩu",
           "subtitle": "Vui lòng nhập mật khẩu mới của bạn",
+          "form": {
+            "passwordPlaceholder": "Enter a strong password",
+            "confirmPasswordPlaceholder": "Re-enter your password"
+          },
           "button": {
             "reset": "Đặt Lại Mật khẩu"
           },
@@ -1058,9 +1120,6 @@
             "noGroups": "Không có nhóm nào khả dụng để thêm máy chủ vào",
             "noGroup": "Máy chủ này không thuộc bất kỳ nhóm nào",
             "foreign": "Máy chủ này thuộc sở hữu của người dùng khác, bạn có quyền truy cập với vai trò subuser hoặc quản trị viên"
-          },
-          "badge": {
-            "foreign": "Bên Ngoài"
           },
           "tabs": {
             "groupedServers": {
@@ -1304,7 +1363,8 @@
           },
           "general": {
             "title": "Chung",
-            "undo": "Hoàn tác hành động cuối cùng"
+            "undo": "Hoàn tác hành động cuối cùng",
+            "quickActions": "Mở các thao tác nhanh"
           },
           "fileManager": {
             "title": "Trình Quản Lý Tệp",
@@ -1494,7 +1554,6 @@
           },
           "form": {
             "allowedIps": "IP Được Phép",
-            "allowedIpsPlaceholder": "vd. 192.168.1.1, 2001:db8::1",
             "userPermissions": "Quyền Người Dùng",
             "serverPermissions": "Quyền Máy Chủ",
             "adminPermissions": "Quyền Admin"
@@ -2023,6 +2082,11 @@
             "upload": "Tải Lên",
             "copyLink": "Sao Chép Liên Kết"
           },
+          "quickAction": {
+            "uploadFiles": "Tải lên tài nguyên",
+            "parentDirectory": "Đi tới thư mục chính",
+            "deleteSelection": "Xóa đã chọn"
+          },
           "dropzone": {
             "title": "Thả tệp ở đây để tải lên",
             "subtitle": "Thả để bắt đầu tải lên"
@@ -2369,7 +2433,6 @@
                 },
                 "form": {
                   "urlDescription": "Được sử dụng để liên lạc nội bộ với node.",
-                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Được sử dụng cho kết nối websocket và tải xuống.",
                   "backupConfigurationPlaceholder": "Kế Thừa Từ Vị Trí",
                   "memoryDescription": "Tổng dung lượng bộ nhớ khả dụng cho các máy chủ trên node này.",
@@ -2530,10 +2593,16 @@
               "page": {
                 "title": "Phân Bổ Node",
                 "tooltip": {
-                  "clearSelection": "Xóa Lựa Chọn"
+                  "clearSelection": "Xóa Lựa Chọn",
+                  "selectAllMatching": "Chọn tất cả {count} trùng khớp"
                 },
                 "form": {
-                  "ipAlias": "Bí danh IP"
+                  "ipAlias": "Bí danh IP",
+                  "portFrom": "Từ Port",
+                  "portTo": "Đến Port",
+                  "assigned": "Assignment",
+                  "assignedOnly": "Assigned only",
+                  "unassignedOnly": "Unassigned only"
                 },
                 "table": {
                   "columns": {
@@ -2552,15 +2621,23 @@
                   },
                   "update": {
                     "title": "Cập Nhật Phân Bổ Node",
+                    "button": {
+                      "update": "Cập nhật {count}"
+                    },
                     "toast": {
-                      "updated": "{allocations} đã được cập nhật."
+                      "updated": "{allocations} đã được cập nhật.",
+                      "updatedPartial": "Đã cập nhật {allocations}. Đã bỏ qua {skipped} vì cổng đó đã được sử dụng trên IP đích."
                     }
                   },
                   "delete": {
                     "title": "Xác Nhận Xóa Phân Bổ Node",
-                    "content": "Bạn có chắc muốn xóa `{count}` phân bổ từ **{name}** không?",
+                    "content": "Bạn có chắc muốn xóa **{allocations}** khỏi **{name}** không?",
+                    "alert": {
+                      "forceWarning": "Thao tác xóa cưỡng bức sẽ loại bỏ các phân bổ được gán cho máy chủ, bao gồm cả các máy chủ đang trong quá trình chuyển giao. Các máy chủ bị ảnh hưởng sẽ mất ngay phân bổ này và sẽ không khởi động đúng cách trong lần khởi động lại tiếp theo."
+                    },
                     "toast": {
-                      "deleted": "{allocations} đã được xóa."
+                      "deleted": "{allocations} đã được xóa.",
+                      "deletedPartial": "Đã xóa {allocations}. Đã bỏ qua {skipped} vì chúng đã được gán cho một máy chủ."
                     }
                   }
                 }
@@ -2639,7 +2716,7 @@
                   "reattached": "Đã gắn lại sao lưu vào {name} thành công.",
                   "restoring": "Đang khôi phục sao lưu vào {name}...",
                   "exporting": "Đang xuất bản sao lưu sang các tệp của {name}...",
-                  "deleted": "Sao lưu node đã được xóa."
+                  "deletionStarted": "Đã bắt đầu xóa bản sao lưu trên node."
                 },
                 "modal": {
                   "export": {
@@ -2744,6 +2821,14 @@
         "servers": {
           "title": "Máy Chủ",
           "resourceName": "Máy Chủ",
+          "quickAction": {
+            "viewClient": "Xem Trong Khu Vực Client",
+            "transfer": "Chuyển Máy Chủ",
+            "suspend": "Đình chỉ máy chủ",
+            "unsuspend": "Hủy Đình chỉ máy chủ",
+            "clearState": "Dọn dẹp trạng thái máy chủ",
+            "delete": "Xóa máy chủ"
+          },
           "externalIdLookup": {
             "button": "Tìm bằng ID Bên Ngoài",
             "modal": {
@@ -2859,11 +2944,8 @@
                   "pinnedCpus": "CPU Được Ghim",
                   "pinnedCpusDescription": "Các nhân CPU mà máy chủ này được ghim vào.",
                   "pinnedCpusTooltip": "Theo chỉ mục, ví dụ: 0, 1, 2. Để trống để cho phép tất cả các lõi.",
-                  "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Hình Ảnh Docker Được Định Nghĩa Trước",
                   "predefinedDockerImagesPlaceholder": "Chưa chọn hình ảnh định nghĩa trước",
-                  "timezonePlaceholder": "Asia/Saigon",
-                  "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Tùy Chỉnh",
                   "predefinedStartupCommands": "Lệnh Khởi Động Được Định Nghĩa Trước",
                   "startOnCompletion": "Khởi Động Khi Hoàn Tất",
@@ -3214,10 +3296,12 @@
                     "title": "Biến",
                     "page": {
                       "title": "Biến Egg",
+                      "aria": {
+                        "reorder": "Reorder variable"
+                      },
                       "form": {
                         "supportsMarkdown": "Hỗ trợ định dạng Markdown.",
                         "defaultValue": "Giá Trị Mặc Định",
-                        "defaultValuePlaceholder": "server.jar",
                         "userViewable": "Người Dùng Có Thể Xem",
                         "userEditable": "Người Dùng Có Thể Sửa",
                         "secret": "Bí Mật",
@@ -3375,7 +3459,6 @@
                   "credentialType": "Loại Thông Tin",
                   "password": "Mật khẩu và Token Access",
                   "privateKey": "Khóa bí mật",
-                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
                   "passphrase": "Mã truy cập"
                 },
                 "enum": {
@@ -3441,8 +3524,7 @@
                   "publicPort": "Cổng Công Khai",
                   "connectionCredentials": "Thông Tin Kết Nối",
                   "credentialType": "Loại Thông Tin",
-                  "connectionString": "Chuỗi Kết Nối",
-                  "connectionStringPlaceholder": "mysql://username:password@host:port"
+                  "connectionString": "Chuỗi Kết Nối"
                 },
                 "enum": {
                   "credentialType": {
@@ -3496,7 +3578,6 @@
                 "titleCreate": "Tạo Máy Chủ Agent Cơ Sở Dữ Liệu",
                 "titleUpdate": "Cập Nhật Máy Chủ Agent Cơ Sở Dữ Liệu",
                 "form": {
-                  "urlPlaceholder": "https://agent.example.com:8080",
                   "typeEnabled": "Đã bật",
                   "typePublicHost": "Host Công Khai",
                   "typePublicPort": "Cổng Công Khai"
@@ -4073,84 +4154,84 @@
           }
         },
         "systemBackupPolicies": {
-          "title": "System Backup Policies",
-          "resourceName": "System backup policy",
+          "title": "Các chính sách sao lưu hệ thống",
+          "resourceName": "Chính sách sao lưu hệ thống",
           "badge": {
-            "disabled": "Disabled",
-            "runPending": "Run pending"
+            "disabled": "Đã tắt",
+            "runPending": "Đang chờ chạy"
           },
           "table": {
             "columns": {
-              "cron": "Schedule",
-              "backups": "Backups"
+              "cron": "Lịch trình",
+              "backups": "Sao lưu"
             }
           },
           "form": {
-            "backupConfigurationPlaceholder": "Inherit from Server",
-            "cron": "Schedule",
-            "cronDescription": "Cron expression (with seconds) that determines when backups are taken, in UTC.",
-            "retentionCount": "Keep count",
-            "retentionCountDescription": "Maximum number of successful backups to keep per server. Leave empty for no limit.",
-            "retentionDays": "Keep days",
-            "retentionDaysDescription": "Delete backups older than this many days. Leave empty for no limit.",
-            "parallelism": "Parallelism",
-            "parallelismDescription": "Maximum number of backups this policy runs at the same time on a single node.",
-            "enabledDescription": "Disabled policies keep their backups but do not take new ones."
+            "backupConfigurationPlaceholder": "Kế thừa từ Server",
+            "cron": "Lịch trình",
+            "cronDescription": "Biểu thức Cron (bao gồm cả giây) xác định thời điểm thực hiện sao lưu, theo giờ UTC.",
+            "retentionCount": "Số lượng giữ lại",
+            "retentionCountDescription": "Số lượng bản sao lưu thành công tối đa được giữ lại trên mỗi máy chủ. Để trống nếu không giới hạn.",
+            "retentionDays": "Số ngày giữ lại",
+            "retentionDaysDescription": "Xóa các bản sao lưu cũ hơn số ngày này. Để trống nếu không giới hạn.",
+            "parallelism": "Tính song song",
+            "parallelismDescription": "Số lượng bản sao lưu tối đa mà chính sách này thực hiện đồng thời trên một node duy nhất.",
+            "enabledDescription": "Các chính sách bị vô hiệu hóa vẫn giữ lại các bản sao lưu hiện có nhưng không thực hiện các bản sao lưu mới."
           },
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Create System Backup Policy",
-                "titleUpdate": "Update System Backup Policy",
+                "titleCreate": "Tạo chính sách sao lưu hệ thống",
+                "titleUpdate": "Cập nhật chính sách sao lưu hệ thống",
                 "button": {
-                  "runNow": "Run Now"
+                  "runNow": "Chạy Ngay"
                 },
                 "toast": {
-                  "triggered": "Run requested. Backups will be taken shortly."
+                  "triggered": "Đã có yêu cầu thực thi. Các bản sao lưu sẽ sớm được thực hiện."
                 },
                 "modal": {
                   "trigger": {
-                    "title": "Confirm Manual Run",
-                    "content": "Are you sure you want to run **{name}** now? Every covered server without a backup from this run yet will be backed up."
+                    "title": "Xác nhận chạy thủ công",
+                    "content": "Bạn có chắc chắn muốn chạy **{name}** ngay bây giờ không? Mọi máy chủ được đưa vào phạm vi bảo vệ mà chưa có bản sao lưu từ lần chạy này sẽ được sao lưu."
                   },
                   "delete": {
-                    "title": "Confirm System Backup Policy Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
+                    "title": "Xác nhận xóa chính sách sao lưu hệ thống",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
                     "form": {
-                      "deleteBackups": "Do you want to delete backups created by this policy?"
+                      "deleteBackups": "Bạn có muốn xóa các bản sao lưu được tạo bởi chính sách này không?"
                     },
                     "alert": {
-                      "deleteBackupsWarning": "All backups created by this policy will be permanently deleted from their storage backends.",
-                      "releaseWarning": "Backups created by this policy will become regular server backups. They will count towards each server backup limit and follow standard rotation."
+                      "deleteBackupsWarning": "Tất cả các bản sao lưu được tạo bởi chính sách này sẽ bị xóa vĩnh viễn khỏi hệ thống lưu trữ của chúng.",
+                      "releaseWarning": "Các bản sao lưu được tạo bởi chính sách này sẽ trở thành các bản sao lưu máy chủ thông thường. Chúng sẽ được tính vào hạn mức sao lưu của từng máy chủ và tuân theo quy trình luân phiên tiêu chuẩn."
                     }
                   }
                 }
               }
             },
             "backups": {
-              "title": "Backups",
+              "title": "Sao lưu",
               "page": {
-                "title": "System Backup Policy Backups",
+                "title": "Các chính sách sao lưu hệ thống",
                 "toast": {
-                  "downloadStarted": "Download started."
+                  "downloadStarted": "Đã bắt đầu tải xuống."
                 }
               }
             },
             "locations": {
-              "title": "Locations",
+              "title": "Vị Trí",
               "page": {
-                "title": "System Backup Policy Locations",
+                "title": "Các chính sách sao lưu hệ thống",
                 "toast": {
-                  "added": "Location added.",
-                  "removed": "Location removed."
+                  "added": "Đã thêm địa điểm.",
+                  "removed": "Đã xóa địa điểm."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Location"
+                    "title": "Thêm địa điểm"
                   },
                   "remove": {
-                    "title": "Confirm Location Removal",
-                    "content": "Are you sure you want to remove **{name}** from **{policy}**?"
+                    "title": "Xác nhận xóa địa điểm",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** khỏi **{policy}** không?"
                   }
                 }
               }
@@ -4158,37 +4239,37 @@
             "nodes": {
               "title": "Nodes",
               "page": {
-                "title": "System Backup Policy Nodes",
+                "title": "Các chính sách sao lưu Node",
                 "toast": {
-                  "added": "Node added.",
-                  "removed": "Node removed."
+                  "added": "Đã thêm Node.",
+                  "removed": "Đã xóa Node."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Node"
+                    "title": "Thêm Node"
                   },
                   "remove": {
-                    "title": "Confirm Node Removal",
-                    "content": "Are you sure you want to remove **{name}** from **{policy}**?"
+                    "title": "Xác nhận xóa Node",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** khỏi **{policy}** không?"
                   }
                 }
               }
             },
             "servers": {
-              "title": "Servers",
+              "title": "Máy chủ",
               "page": {
-                "title": "System Backup Policy Servers",
+                "title": "Các chính sách sao lưu Máy chủ",
                 "toast": {
-                  "added": "Server added.",
-                  "removed": "Server removed."
+                  "added": "Đã thêm máy chủ.",
+                  "removed": "Đã xóa máy chủ."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Server"
+                    "title": "Thêm máy chủ"
                   },
                   "remove": {
-                    "title": "Confirm Server Removal",
-                    "content": "Are you sure you want to remove **{name}** from **{policy}**?"
+                    "title": "Xác Nhận Xóa Máy Chủ",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** khỏi **{policy}** không?"
                   }
                 }
               }
@@ -4365,6 +4446,10 @@
             "increaseFontSize": "Tăng Kích Thước Font",
             "copySelection": "Sao Chép vùng chọn"
           },
+          "quickAction": {
+            "search": "Tìm trong Console",
+            "scrollToBottom": "Cuộn xuống cuối"
+          },
           "drawer": {
             "commandHistory": {
               "title": "Lịch Sử Lệnh",
@@ -4471,6 +4556,33 @@
             "loadDisk": "Load Phiên Bản Ổ đĩa",
             "keepEditor": "Giữ bản Chỉnh sửa"
           },
+          "quickAction": {
+            "newFile": "Tệp Mới",
+            "newDirectory": "Thư Mục Mới",
+            "pullFile": "Tải file từ URL",
+            "uploadFiles": "Tải Tệp lên",
+            "uploadDirectory": "Tải thư mục lên",
+            "search": "Tìm kiếm tệp",
+            "largestDirectories": "Phân tích kích thước thư mục",
+            "parentDirectory": "Đi tới thư mục chính",
+            "copyPath": "Sao chép đường dẫn hiện tại",
+            "exitBackup": "Thoát chế độ duyệt sao lưu",
+            "connectSftp": "Kết nối qua SFTP",
+            "connectVscode": "Mở bằng VS Code",
+            "cancelPaste": "Hủy tác vụ sao chép hoặc di chuyển đang chờ xử lý",
+            "downloadSelection": "Tải xuống đã chọn",
+            "copySelection": "Sao Chép vùng chọn",
+            "moveSelection": "Di chuyển vùng chọn",
+            "remoteCopySelection": "Sao chép vùng chọn tới Máy chủ khác",
+            "archiveSelection": "Nén vùng chọn",
+            "extractSelection": "Giải nén",
+            "renameSelection": "Đổi tên đã chọn",
+            "permissionsSelection": "Thay đổi quyền",
+            "fingerprintSelection": "Hiển thị Dấu Vân Tay Tệp",
+            "deleteSelection": "Xóa đã chọn",
+            "saveFile": "Lưu tệp",
+            "createFile": "Tạo Tệp"
+          },
           "actionBar": {
             "copyHere": "Sao Chép {files} ở đây",
             "moveHere": "Di Chuyển {files} ở đây"
@@ -4505,6 +4617,7 @@
             "editorMinimap": "Hiển thị Minimap Tệp",
             "editorLineOverflow": "Bao Ngoặc Dòng Tràn",
             "editorFontSize": "Cỡ Chữ Trình Biên Tập",
+            "editorEngine": "Công cụ biên tập",
             "vscodeUriScheme": "Lược Đồ URI VS Code",
             "imageViewerSmoothing": "Làm Mịn Hình Ảnh (Anti-Aliasing)"
           },
@@ -4542,6 +4655,7 @@
             "fileTooLargeToOpen": "Tệp này quá lớn để mở trong trình quản lý tệp."
           },
           "tooltip": {
+            "settings": "Settings",
             "fileHistory": "Lịch Sử Tệp",
             "revertToDisk": "Bỏ qua",
             "collabEditing": "{user} đang chỉnh sửa tệp này",
@@ -4777,10 +4891,6 @@
         "databases": {
           "title": "Cơ Sở Dữ Liệu",
           "subtitle": "{current} của {max} cơ sở dữ liệu tối đa được tạo.",
-          "classic": {
-            "title": "Cơ Sở Dữ Liệu Cổ Điển",
-            "subtitle": "Đã tạo {current} cơ sở dữ liệu."
-          },
           "tooltip": {
             "limitReached": "Máy chủ này được giới hạn ở {max} cơ sở dữ liệu."
           },
@@ -4955,7 +5065,6 @@
           },
           "instance": {
             "title": "Cơ Sở Dữ Liệu Được Quản Lý",
-            "subtitle": "Đã tạo {current} cơ sở dữ liệu được quản lý.",
             "updateAvailable": "Có Bản Cập Nhật",
             "button": {
               "applyUpdate": "Áp dụng cập nhật"
@@ -5097,7 +5206,8 @@
               "operations": {
                 "remoteImport": {
                   "completed": "Đã nhập `{database}` từ `{source}` trong `{time}.`.",
-                  "failed": "Nhập thất bại `{database}` từ `{source}`: {error}"
+                  "failed": "Nhập thất bại `{database}` từ `{source}`: {error}",
+                  "aborted": "Việc nhập `{database}` từ `{source}` đã bị hủy."
                 }
               }
             },
@@ -5983,8 +6093,8 @@
           }
         },
         "systemBackups": {
-          "title": "System Backups",
-          "subtitle": "Backups taken automatically by the panel. They cannot be modified or deleted."
+          "title": "Sao lưu hệ thống",
+          "subtitle": "Các bản sao lưu được hệ thống quản trị tự động thực hiện. Chúng không thể bị chỉnh sửa hay xóa bỏ."
         },
         "network": {
           "title": "Mạng",

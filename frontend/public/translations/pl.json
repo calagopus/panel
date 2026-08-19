@@ -24,6 +24,14 @@
       "many": "{count} plików",
       "other": "{count} plików"
     },
+    "directory": {
+      "zero": "{count} Directories",
+      "one": "{count} Directory",
+      "two": "{count} Directories",
+      "few": "{count} Directories",
+      "many": "{count} Directories",
+      "other": "{count} Directories"
+    },
     "server": {
       "zero": "{count} serwerów",
       "one": "{count} serwer",
@@ -305,8 +313,8 @@
         "deleteSourceBackupsDescription": "Usuwa przetransferowane kopie zapasowe na źródłowym węźle po zakończeniu transferu.",
         "node": "Węzeł",
         "location": "Lokalizacja",
-        "primaryAllocation": "Główna alokacja",
-        "additionalAllocations": "Dodatkowe alokacje",
+        "primaryAllocation": "Główny przydział",
+        "additionalAllocations": "Dodatkowe przydziały",
         "externalId": "Zewnętrzne ID",
         "mount": "Mount",
         "nest": "Nest",
@@ -325,6 +333,7 @@
         "portRangesPlaceholder": "Zakresy portów (np. 3000–4000)",
         "currentPassword": "Aktualne hasło",
         "confirmPassword": "Potwierdź hasło",
+        "passwordRequired": "Password is required",
         "authenticationCode": "Kod weryfikacyjny",
         "restoreStartup": "Przywróć polecenie startowe, obraz i zmienne z tej kopii zapasowej.",
         "lineContains": "Linia zawiera",
@@ -403,7 +412,7 @@
         "showingFirstEntries": "Showing the first {count} entries"
       },
       "server": {
-        "noAllocation": "Brak alokacji",
+        "noAllocation": "Brak przydziałów",
         "state": {
           "suspended": "Zawieszony",
           "transferring": "Serwer jest przenoszony",
@@ -428,7 +437,7 @@
           "offline": "Offline",
           "running": "Uruchomiony",
           "starting": "Uruchamianie",
-          "stopping": "Stopping"
+          "stopping": "Zatrzymywanie"
         },
         "serverPowerAction": {
           "start": "Start",
@@ -573,6 +582,40 @@
           "themeAuto": "Auto",
           "themeDark": "Ciemny",
           "themeLight": "Jasny"
+        },
+        "modal": {
+          "logout": {
+            "title": "Logout",
+            "content": "Are you sure you want to log out?"
+          }
+        }
+      },
+      "quickActions": {
+        "trigger": "Quick actions...",
+        "placeholder": "Search for actions and pages...",
+        "category": {
+          "navigation": "Navigation",
+          "power": "Power",
+          "account": "Account",
+          "servers": "Servers",
+          "users": "Users",
+          "page": "This Page",
+          "pageNavigation": "Page Navigation",
+          "math": "Calculator"
+        },
+        "math": {
+          "calculating": "Calculating...",
+          "unsolvable": "This expression cannot be solved",
+          "copyResult": "Copy result"
+        },
+        "hint": {
+          "navigate": "to navigate",
+          "select": "to select",
+          "close": "to close",
+          "calculate": "to calculate",
+          "pages": "for pages only",
+          "servers": "for servers only",
+          "users": "for users only"
         }
       },
       "permissionSelector": {
@@ -685,34 +728,42 @@
             "operations": {
               "compressing": {
                 "completed": "Skompresowano {files} do `{path}` w {time}.",
-                "failed": "Nie udało się skompresować {files} do `{path}`:\n{error}"
+                "failed": "Nie udało się skompresować {files} do `{path}`:\n{error}",
+                "aborted": "Compression of {files} to `{path}` was cancelled."
               },
               "decompressing": {
                 "completed": "Zdekompresowano `{path}` do `{destination}` w {time}.",
-                "failed": "Nie udało się zdekompresować `{path}` do `{destination}`:\n{error}"
+                "failed": "Nie udało się zdekompresować `{path}` do `{destination}`:\n{error}",
+                "aborted": "Decompression of `{path}` to `{destination}` was cancelled."
               },
               "pulling": {
                 "completed": "Pobrano `{destination}` w {time}.",
-                "failed": "Nie udało się pobrać `{destination}`:\n{error}"
+                "failed": "Nie udało się pobrać `{destination}`:\n{error}",
+                "aborted": "Pull of `{destination}` was cancelled."
               },
               "copying": {
                 "completed": "Skopiowano `{path}` do `{destination}` w {time}.",
                 "completedMany": "Skopiowano `{path}` do `{destination}` ({files}) w {time}.",
-                "failed": "Nie udało się skopiować `{path}` do `{destination}`:\n{error}"
+                "failed": "Nie udało się skopiować `{path}` do `{destination}`:\n{error}",
+                "aborted": "Copy of `{path}` to `{destination}` was cancelled."
               },
               "copyingMany": {
                 "completed": "Skopiowano {files} w {time}.",
-                "failed": "Nie udało się skopiować {files}:\n{error}"
+                "failed": "Nie udało się skopiować {files}:\n{error}",
+                "aborted": "Copy of {files} was cancelled."
               },
               "copyingRemote": {
                 "completedFrom": "Skopiowano {files} ze zdalnego serwera w {time}.",
                 "completedTo": "Skopiowano {files} do zdalnego serwera w {time}.",
                 "failedFrom": "Nie udało się skopiować {files} ze zdalnego serwera:\n{error}",
-                "failedTo": "Nie udało się skopiować {files} na zdalny serwer:\n{error}"
+                "failedTo": "Nie udało się skopiować {files} na zdalny serwer:\n{error}",
+                "abortedFrom": "Copy of {files} from remote server was cancelled.",
+                "abortedTo": "Copy of {files} to remote server was cancelled."
               },
               "exportingBackup": {
                 "completed": "Eksportowano kopię zapasową do `{destination}` w {time}.",
-                "failed": "Nie udało się wyeksportować kopii zapasowej do `{destination}`:\n{error}"
+                "failed": "Nie udało się wyeksportować kopii zapasowej do `{destination}`:\n{error}",
+                "aborted": "Backup export to `{destination}` was cancelled."
               }
             }
           }
@@ -823,14 +874,12 @@
         },
         "node": {
           "title": "Konfiguracja węzła",
-          "allocationsTitle": "Konfiguracja alokacji",
+          "allocationsTitle": "Konfiguracja przydziałów",
           "form": {
             "name": "Nazwa",
             "namePlaceholder": "Mój serwer",
-            "urlPlaceholder": "https://node.example.com:8080",
             "urlDescription": "używany do wewnętrznej komunikacji z węzłem",
             "publicUrl": "Publiczny URL",
-            "publicUrlPlaceholder": "https://node.example.com:8080",
             "publicUrlDescription": "używany do websocket/pobierania",
             "sftpHostPlaceholder": "Host SFTP",
             "sftpPortPlaceholder": "Port SFTP",
@@ -863,7 +912,6 @@
             "applicationNamePlaceholder": "Calagopus",
             "languagePlaceholder": "Język",
             "applicationUrl": "Adres URL aplikacji",
-            "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Włącz rejestrację",
             "registrationDescription": "Zezwalaj nowym użytkownikom na rejestrację własnego konta.",
             "securityKeys": "Włącz klucze bezpieczeństwa",
@@ -1020,6 +1068,13 @@
         "register": {
           "title": "Zarejestruj się",
           "subtitle": "Wprowadź swoje dane do rejestracji",
+          "form": {
+            "usernamePlaceholder": "Your username",
+            "emailPlaceholder": "you@example.com",
+            "firstNamePlaceholder": "Your first name",
+            "lastNamePlaceholder": "Your last name",
+            "passwordPlaceholder": "Enter a strong password"
+          },
           "button": {
             "register": "Zarejestruj się"
           }
@@ -1027,6 +1082,9 @@
         "forgotPassword": {
           "title": "Nie pamiętam hasła",
           "subtitle": "Wprowadź swój adres e-mail, aby otrzymać instrukcje, w jaki sposób zresetować hasło",
+          "form": {
+            "emailPlaceholder": "you@example.com"
+          },
           "button": {
             "request": "Poproś o zresetowanie hasła"
           },
@@ -1035,6 +1093,10 @@
         "resetPassword": {
           "title": "Resetuj hasło",
           "subtitle": "Wprowadź nowe hasło",
+          "form": {
+            "passwordPlaceholder": "Enter a strong password",
+            "confirmPasswordPlaceholder": "Re-enter your password"
+          },
           "button": {
             "reset": "Resetuj hasło"
           },
@@ -1058,9 +1120,6 @@
             "noGroups": "Brak dostępnych grup do dodania serwera",
             "noGroup": "Ten serwer nie jest w żadnej grupie",
             "foreign": "Ten serwer jest własnością innego użytkownika, masz do niego dostęp jako podużytkownik lub administrator"
-          },
-          "badge": {
-            "foreign": "Foreign"
           },
           "tabs": {
             "groupedServers": {
@@ -1304,7 +1363,8 @@
           },
           "general": {
             "title": "Ogólne",
-            "undo": "Cofa ostatnią akcję"
+            "undo": "Cofa ostatnią akcję",
+            "quickActions": "Open quick actions"
           },
           "fileManager": {
             "title": "Menadżer plików",
@@ -1335,8 +1395,8 @@
             "nextCommand": "Next command in history"
           },
           "serverList": {
-            "title": "Server List",
-            "selectServer": "Hold S and click to select/deselect server"
+            "title": "Lista serwerów",
+            "selectServer": "Przytrzymaj S i kliknij aby zaznaczyć/odznaczyć serwer"
           }
         },
         "sshKeys": {
@@ -1352,35 +1412,35 @@
           },
           "modal": {
             "createSshKey": {
-              "title": "Create SSH Key",
+              "title": "Utwórz klucz SSH",
               "toast": {
-                "created": "SSH key created."
+                "created": "Utworzono klucz SSH."
               },
               "button": {
-                "uploadKeyFile": "Upload Key File"
+                "uploadKeyFile": "Prześlij plik z kluczem"
               },
               "form": {
-                "publicKey": "Public Key"
+                "publicKey": "Klucz publiczny"
               }
             },
             "editSshKey": {
-              "title": "Edit SSH Key",
+              "title": "Edytuj klucz SSH",
               "toast": {
-                "updated": "SSH Key updated."
+                "updated": "Klucz SSH zaktualizowany."
               }
             },
             "importSshKeys": {
-              "title": "Import SSH Keys",
+              "title": "Importuj klucze SSH",
               "toast": {
-                "created": "{sshKeys} created."
+                "created": "Utworzono {sshKeys}."
               },
               "form": {
                 "provider": "Dostawca"
               }
             },
             "deleteSshKey": {
-              "title": "Confirm SSH Key Deletion",
-              "content": "Are you sure you want to delete **{name}** from your account?",
+              "title": "Potwierdź usunięcie klucza SSH",
+              "content": "Czy na pewno chcesz usunąć **{name}** ze swojego konta?",
               "toast": {
                 "removed": "Usunięto klucz SSH."
               }
@@ -1422,22 +1482,22 @@
           }
         },
         "oauthLinks": {
-          "title": "OAuth Links",
+          "title": "Połączenia OAuth",
           "button": {
-            "connect": "Connect",
-            "connectTo": "Connect to {provider}"
+            "connect": "Połącz",
+            "connectTo": "Połącz z {provider}"
           },
           "table": {
             "columns": {
-              "providerName": "Provider Name"
+              "providerName": "Nazwa dostawcy"
             }
           },
           "modal": {
             "deleteOAuthLink": {
-              "title": "Confirm OAuth Link Deletion",
-              "content": "Are you sure you want to delete the **{provider}** connection from your account?",
+              "title": "Potwierdź usunięcie połączenia OAuth",
+              "content": "Czy na pewno chcesz usunąć połączenie **{provider}** ze swojego konta?",
               "toast": {
-                "removed": "OAuth Link removed."
+                "removed": "Usunięto połączenie OAuth."
               }
             }
           }
@@ -1494,7 +1554,6 @@
           },
           "form": {
             "allowedIps": "Dozwolone adresy IP",
-            "allowedIpsPlaceholder": "np. 192.168.1.1, 2001:db8::1",
             "userPermissions": "Uprawnienia użytkownika",
             "serverPermissions": "Uprawnienia Serwera",
             "adminPermissions": "Uprawnienia administracyjne"
@@ -1504,24 +1563,24 @@
             "subtitle": "Aplikacja prosi o utworzenie klucza API dla Twojego konta.",
             "alert": {
               "adminPermissions": "Ten klucz API wymaga **uprawnień administratora**. Każdy posiadający ten klucz będzie mógł wykonywać działania administracyjne na tym panelu w Twoim imieniu. Kontynuuj tylko jeśli całkowicie ufasz wnioskującej aplikacji.",
-              "callbackUrl": "After creation, the new API key will be sent to **{url}**."
+              "callbackUrl": "Po utworzeniu, nowy klucz API zostanie wysłany na **{url}**."
             },
-            "noPermissions": "This API key will not have any permissions.",
-            "keyCreated": "Your new API key has been created. Make sure to copy it now, as it will not be shown again.",
+            "noPermissions": "Ten klucz API nie będzie miał żadnych uprawnień.",
+            "keyCreated": "Twój nowy klucz API został utworzony. Upewnij się, że skopiujesz go teraz, ponieważ nie zostanie wyświetlony ponownie.",
             "button": {
-              "goToApiKeys": "Go to API Keys"
+              "goToApiKeys": "Przejdź do kluczy API"
             }
           },
           "update": {
-            "title": "Update API Key",
-            "subtitle": "An application is requesting changes to the permissions of one of your API keys.",
+            "title": "Zaktualizuj klucz API",
+            "subtitle": "Aplikacja żąda zmian w uprawnieniach jednego z Twoich kluczy API.",
             "alert": {
-              "replaceMode": "This request **replaces** the permissions of this API key. Permissions marked as removed will be revoked.",
-              "callbackUrl": "After updating, you will be returned to **{url}**."
+              "replaceMode": "To żądanie **zastępuje** uprawnienia tego klucza API. Uprawnienia oznaczone jako usunięte zostaną odwołane.",
+              "callbackUrl": "Po aktualizacji nastąpi przekierowanie na **{url}**."
             },
             "badge": {
-              "added": "Added",
-              "existing": "Granted",
+              "added": "Dodano",
+              "existing": "Przyznano",
               "removed": "Removed"
             },
             "noChanges": "This request does not change the permissions of this API key.",
@@ -1724,15 +1783,15 @@
                 },
                 "modal": {
                   "disableTelemetry": {
-                    "title": "Confirm Disabling Telemetry",
-                    "content": "Are you sure you want to disable telemetry? Telemetry helps us improve Calagopus by providing anonymous usage data. Disabling telemetry will prevent any data from being sent."
+                    "title": "Potwierdź wyłączenie telemetrii",
+                    "content": "Czy na pewno chcesz wyłączyć telemetrię? Telemetria pomaga nam ulepszyć Calagopus dostarczając anonimowe dane użytkowania. Wyłączenie telemetrii uniemożliwi wysyłanie jakichkolwiek danych."
                   },
                   "enableRegistration": {
-                    "title": "Confirm Enabling Registration",
-                    "content": "Are you sure you want to enable registration? Enabling registration allows anyone to create an account on this panel. If you do not have a captcha configured, this may be a mistake."
+                    "title": "Potwierdź włączenie rejestracji",
+                    "content": "Czy na pewno chcesz włączyć rejestrację? Włączenie rejestracji pozwala każdemu utworzyć konto w tym panelu. Jeśli nie masz skonfigurowanej captchy, to może być błąd."
                   },
                   "telemetryPreview": {
-                    "title": "Telemetry Preview"
+                    "title": "Podgląd telemetrii"
                   }
                 }
               }
@@ -1742,7 +1801,7 @@
               "page": {
                 "title": "Storage Settings",
                 "form": {
-                  "driver": "Driver"
+                  "driver": "Sterownik"
                 },
                 "enum": {
                   "driver": {
@@ -1872,7 +1931,7 @@
                   "registrationTimeoutSeconds": "Registration Timeout (seconds)"
                 },
                 "button": {
-                  "autofill": "Autofill"
+                  "autofill": "Autouzupełnianie"
                 },
                 "toast": {
                   "updated": "Webauthn settings updated.",
@@ -1892,20 +1951,20 @@
                 "title": "Ustawienia serwera",
                 "form": {
                   "maxFileManagerViewSize": "Max File Manager View Size",
-                  "maxScheduleStepCount": "Max Schedule Steps",
+                  "maxScheduleStepCount": "Maks. ilość kroków harmonogramu",
                   "maxFileManagerContentSearchSize": "Max File Manager Content Search Size",
                   "maxFileManagerSearchResults": "Max File Manager Search Results",
-                  "maxSubuserCount": "Max Subuser Count",
-                  "maxBackupGroupCount": "Max Backup Groups per Server",
-                  "maxDatabaseInstanceDatabaseCount": "Max Databases per Database Instance",
-                  "maxDatabaseInstanceUserCount": "Max Users per Database Instance",
-                  "allowOverwritingCustomDockerImage": "Allow Overwriting Custom Docker Image",
-                  "allowOverwritingCustomDockerImageDescription": "If enabled, users will be able to overwrite the Docker image specified in the server configuration using the Eggs list, even if an admin has set a custom Docker image.",
-                  "allowViewingInstallationLogs": "Allow Viewing Installation Logs",
-                  "allowViewingInstallationLogsDescription": "If enabled, users with console read permissions will also be able to view installation logs via the websocket connection. If disabled, installation logs will only be available for admins.",
-                  "allowAcknowledgingInstallationFailure": "Allow Acknowledging Installation Failure",
-                  "allowAcknowledgingInstallationFailureDescription": "If enabled, users will be able to acknowledge installation failures for servers that are in the \"Install Failed\" state, allowing them to attempt to start the server instead of having to wait for an admin. If disabled, only admins will be able to acknowledge installation failures.",
-                  "allowViewingTransferProgress": "Allow Viewing Transfer Progress",
+                  "maxSubuserCount": "Maksymalna liczba podużytkowników",
+                  "maxBackupGroupCount": "Maksymalna liczba grup kopii zapasowych na serwer",
+                  "maxDatabaseInstanceDatabaseCount": "Maksymalna liczba baz danych na instancję bazy danych",
+                  "maxDatabaseInstanceUserCount": "Maksymalna ilość użytkowników na instancję bazy danych",
+                  "allowOverwritingCustomDockerImage": "Zezwalaj na nadpisywanie niestandardowego obrazu dockera",
+                  "allowOverwritingCustomDockerImageDescription": "Jeśli włączone, użytkownicy będą mogli nadpisać obraz docker określony w konfiguracji serwera za pomocą listy Jajek, nawet jeśli administrator ustawił niestandardowy obraz dockera.",
+                  "allowViewingInstallationLogs": "Zezwalaj na przeglądanie dzienników instalacji",
+                  "allowViewingInstallationLogsDescription": "Jeśli opcja jest włączona, użytkownicy z uprawnieniami do odczytu konsoli będą również mogli przeglądać dzienniki instalacyjne poprzez połączenie websocket. Jeśli wyłączone, dzienniki instalacyjne będą dostępne tylko dla administratorów.",
+                  "allowAcknowledgingInstallationFailure": "Zezwalaj na potwierdzanie awarii instalacji",
+                  "allowAcknowledgingInstallationFailureDescription": "Jeśli opcja jest włączona, użytkownicy będą mogli potwierdzić błędy instalacji serwerów, które są w stanie \"Instalacja nieudana\", pozwalając im na próbę uruchomienia serwera zamiast czekać na administratora. Jeśli wyłączone, tylko administratorzy będą mogli potwierdzić błędy instalacji.",
+                  "allowViewingTransferProgress": "Pozwól na wyświetlanie postępu transferu",
                   "allowViewingTransferProgressDescription": "If enabled, users with console read permissions will also be able to view transfer progress logs via the websocket connection. If disabled, transfer progress logs will only be available for admins.",
                   "containerPrelude": "Container Prelude",
                   "containerPreludeDescription": "The terminal prelude used for some status-related messages in the server console."
@@ -2022,6 +2081,11 @@
             "newDirectory": "Nowy Katalog",
             "upload": "Prześlij",
             "copyLink": "Kopiuj link"
+          },
+          "quickAction": {
+            "uploadFiles": "Upload Assets",
+            "parentDirectory": "Go to Parent Directory",
+            "deleteSelection": "Delete Selection"
           },
           "dropzone": {
             "title": "Upuść pliki tutaj, aby przesłać",
@@ -2369,7 +2433,6 @@
                 },
                 "form": {
                   "urlDescription": "Używany do wewnętrznej komunikacji z węzłem.",
-                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Używane do połączeń websocket i pobierania danych.",
                   "backupConfigurationPlaceholder": "Dziedzicz z lokalizacji",
                   "memoryDescription": "Całkowita pamięć dostępna dla serwerów w tym węźle.",
@@ -2530,10 +2593,16 @@
               "page": {
                 "title": "Przydziały węzłów",
                 "tooltip": {
-                  "clearSelection": "Wyczyść zaznaczenie"
+                  "clearSelection": "Wyczyść zaznaczenie",
+                  "selectAllMatching": "Select all {count} matching"
                 },
                 "form": {
-                  "ipAlias": "Alias IP"
+                  "ipAlias": "Alias IP",
+                  "portFrom": "Port from",
+                  "portTo": "Port to",
+                  "assigned": "Assignment",
+                  "assignedOnly": "Assigned only",
+                  "unassignedOnly": "Unassigned only"
                 },
                 "table": {
                   "columns": {
@@ -2552,15 +2621,23 @@
                   },
                   "update": {
                     "title": "Utwórz przydziały węzła",
+                    "button": {
+                      "update": "Update {count}"
+                    },
                     "toast": {
-                      "updated": "Zaktualizowano {allocations}."
+                      "updated": "Zaktualizowano {allocations}.",
+                      "updatedPartial": "{allocations} updated. {skipped} skipped, because that port is already taken on the target IP."
                     }
                   },
                   "delete": {
-                    "title": "Potwierdź usunięcie alokacji węzła",
-                    "content": "Czy na pewno chcesz usunąć `{count}` przydziałów z **{name}**?",
+                    "title": "Potwierdź usunięcie przydziału węzła",
+                    "content": "Are you sure you want to delete {allocations} from **{name}**?",
+                    "alert": {
+                      "forceWarning": "Force deletion removes allocations that are assigned to a server, including servers being transferred. Affected servers lose the allocation immediately and will not start correctly after their next restart."
+                    },
                     "toast": {
-                      "deleted": "Usunięto {allocations}."
+                      "deleted": "Usunięto {allocations}.",
+                      "deletedPartial": "{allocations} deleted. {skipped} skipped, because they are assigned to a server."
                     }
                   }
                 }
@@ -2639,7 +2716,7 @@
                   "reattached": "Reattached backup to {name} successfully.",
                   "restoring": "Restoring backup to {name}...",
                   "exporting": "Exporting backup to files of {name}...",
-                  "deleted": "Node backup deleted."
+                  "deletionStarted": "Node backup deletion started."
                 },
                 "modal": {
                   "export": {
@@ -2744,6 +2821,14 @@
         "servers": {
           "title": "Serwery",
           "resourceName": "Serwer",
+          "quickAction": {
+            "viewClient": "View Server in Client Area",
+            "transfer": "Transfer Server",
+            "suspend": "Suspend Server",
+            "unsuspend": "Unsuspend Server",
+            "clearState": "Clear Server State",
+            "delete": "Delete Server"
+          },
           "externalIdLookup": {
             "button": "Szukaj według zewnętrznego ID",
             "modal": {
@@ -2859,11 +2944,8 @@
                   "pinnedCpus": "Przypięte rdzenie",
                   "pinnedCpusDescription": "Rdzenie, do których jest przypięty ten serwer.",
                   "pinnedCpusTooltip": "Według indeksu, np. 0, 1, 2. Pozostaw puste, aby serwer mógł używać wszystkich rdzeni.",
-                  "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Wstępnie zdefiniowane obrazy dockera",
                   "predefinedDockerImagesPlaceholder": "Nie wybrano predefiniowanego obrazu",
-                  "timezonePlaceholder": "Europe/Warsaw",
-                  "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Własne",
                   "predefinedStartupCommands": "Predefiniowane polecenia startowe",
                   "startOnCompletion": "Rozpocznij po zakończeniu",
@@ -2874,7 +2956,7 @@
                   "hugepagesPassthroughEnabledDescription": "Enable hugepages passthrough for the server (mounts /dev/hugepages into the container).",
                   "kvmPassthroughEnabled": "Enable KVM Passthrough",
                   "kvmPassthroughEnabledDescription": "Enable KVM passthrough for the server (allows access to /dev/kvm inside the container).",
-                  "allocationsLimit": "Alokacje",
+                  "allocationsLimit": "Przydziały",
                   "databasesLimit": "Bazy danych",
                   "databaseAgentsLimit": "Agent Databases",
                   "backupsLimit": "Kopie zapasowe",
@@ -2892,7 +2974,7 @@
               }
             },
             "allocations": {
-              "title": "Alokacje",
+              "title": "Przydziały",
               "page": {
                 "title": "Server Allocations",
                 "table": {
@@ -2904,24 +2986,24 @@
                   "notesPlaceholder": "Notatki"
                 },
                 "toast": {
-                  "updated": "Alokacja zaktualizowana.",
-                  "setPrimary": "Alokacja ustawiona jako główna.",
+                  "updated": "Przydział zaktualizowany.",
+                  "setPrimary": "Przydział ustawiony jako główny.",
                   "unsetPrimary": "Allocation unset as primary.",
-                  "removed": "Alokacja usunięta.",
-                  "added": "Dodano {count} alokacji."
+                  "removed": "Przydział usunięty.",
+                  "added": "Dodano {count} przydziałów."
                 },
                 "modal": {
                   "add": {
                     "title": "Add Server Allocations",
                     "form": {
-                      "allocations": "Alokacje"
+                      "allocations": "Przydziały"
                     },
                     "button": {
                       "add": "Dodaj {count}"
                     }
                   },
                   "remove": {
-                    "title": "Potwierdź usunięcie alokacji",
+                    "title": "Potwierdź usunięcie przydziału",
                     "content": "Czy na pewno chcesz usunąć **{allocation}**?"
                   }
                 }
@@ -3214,10 +3296,12 @@
                     "title": "Variables",
                     "page": {
                       "title": "Egg Variables",
+                      "aria": {
+                        "reorder": "Reorder variable"
+                      },
                       "form": {
                         "supportsMarkdown": "Supports Markdown formatting.",
                         "defaultValue": "Domyślna wartość",
-                        "defaultValuePlaceholder": "server.jar",
                         "userViewable": "User Viewable",
                         "userEditable": "User Editable",
                         "secret": "Secret",
@@ -3375,7 +3459,6 @@
                   "credentialType": "Credential Type",
                   "password": "Password or Access Token",
                   "privateKey": "Private Key",
-                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
                   "passphrase": "Passphrase"
                 },
                 "enum": {
@@ -3441,8 +3524,7 @@
                   "publicPort": "Public Port",
                   "connectionCredentials": "Connection Credentials",
                   "credentialType": "Credential Type",
-                  "connectionString": "Connection String",
-                  "connectionStringPlaceholder": "mysql://username:password@host:port"
+                  "connectionString": "Connection String"
                 },
                 "enum": {
                   "credentialType": {
@@ -3496,7 +3578,6 @@
                 "titleCreate": "Create Database Agent Host",
                 "titleUpdate": "Update Database Agent Host",
                 "form": {
-                  "urlPlaceholder": "https://agent.example.com:8080",
                   "typeEnabled": "Enabled",
                   "typePublicHost": "Public Host",
                   "typePublicPort": "Public Port"
@@ -4087,13 +4168,13 @@
           },
           "form": {
             "backupConfigurationPlaceholder": "Inherit from Server",
-            "cron": "Schedule",
-            "cronDescription": "Cron expression (with seconds) that determines when backups are taken, in UTC.",
-            "retentionCount": "Keep count",
-            "retentionCountDescription": "Maximum number of successful backups to keep per server. Leave empty for no limit.",
+            "cron": "Harmonogram",
+            "cronDescription": "Wyrażenie Cron (w sekundach), które określa kiedy wykonywane są kopie zapasowe, w UTC.",
+            "retentionCount": "Zachowaj ilość",
+            "retentionCountDescription": "Maksymalna liczba udanych kopii zapasowych do utrzymania na serwer. Pozostaw puste dla braku limitu.",
             "retentionDays": "Keep days",
             "retentionDaysDescription": "Delete backups older than this many days. Leave empty for no limit.",
-            "parallelism": "Parallelism",
+            "parallelism": "Równoległość",
             "parallelismDescription": "Maximum number of backups this policy runs at the same time on a single node.",
             "enabledDescription": "Disabled policies keep their backups but do not take new ones."
           },
@@ -4103,14 +4184,14 @@
                 "titleCreate": "Create System Backup Policy",
                 "titleUpdate": "Update System Backup Policy",
                 "button": {
-                  "runNow": "Run Now"
+                  "runNow": "Uruchom teraz"
                 },
                 "toast": {
-                  "triggered": "Run requested. Backups will be taken shortly."
+                  "triggered": "Zarządzono uruchomienie. Kopie zapasowe zostaną wkrótce wykonane."
                 },
                 "modal": {
                   "trigger": {
-                    "title": "Confirm Manual Run",
+                    "title": "Potwierdź ręczne uruchomienie",
                     "content": "Are you sure you want to run **{name}** now? Every covered server without a backup from this run yet will be backed up."
                   },
                   "delete": {
@@ -4128,47 +4209,47 @@
               }
             },
             "backups": {
-              "title": "Backups",
+              "title": "Kopie zapasowe",
               "page": {
                 "title": "System Backup Policy Backups",
                 "toast": {
-                  "downloadStarted": "Download started."
+                  "downloadStarted": "Rozpoczęto pobieranie."
                 }
               }
             },
             "locations": {
-              "title": "Locations",
+              "title": "Lokalizacje",
               "page": {
                 "title": "System Backup Policy Locations",
                 "toast": {
-                  "added": "Location added.",
-                  "removed": "Location removed."
+                  "added": "Dodano lokalizację.",
+                  "removed": "Usunięto lokalizację."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Location"
+                    "title": "Dodaj lokalizację"
                   },
                   "remove": {
-                    "title": "Confirm Location Removal",
-                    "content": "Are you sure you want to remove **{name}** from **{policy}**?"
+                    "title": "Potwierdź usunięcie lokalizacji",
+                    "content": "Czy na pewno chcesz usunąć **{name}** z **{policy}**?"
                   }
                 }
               }
             },
             "nodes": {
-              "title": "Nodes",
+              "title": "Węzły",
               "page": {
                 "title": "System Backup Policy Nodes",
                 "toast": {
-                  "added": "Node added.",
-                  "removed": "Node removed."
+                  "added": "Węzeł dodany.",
+                  "removed": "Węzeł usunięty."
                 },
                 "modal": {
                   "add": {
-                    "title": "Add Node"
+                    "title": "Dodaj węzeł"
                   },
                   "remove": {
-                    "title": "Confirm Node Removal",
+                    "title": "Potwierdź usunięcie węzła",
                     "content": "Are you sure you want to remove **{name}** from **{policy}**?"
                   }
                 }
@@ -4207,7 +4288,7 @@
                 "form": {
                   "source": "Source",
                   "target": "Target",
-                  "readOnly": "Read Only",
+                  "readOnly": "Tylko do odczytu",
                   "userMountable": "User Mountable"
                 },
                 "modal": {
@@ -4354,42 +4435,46 @@
             "transferFailed": "Transfer has failed.",
             "transferCompleted": "Transfer has completed successfully. Reconnecting to server...",
             "pullingImage": "Your Server is currently pulling it's docker image. Please wait...",
-            "pulling": "Pulling",
-            "extracting": "Extracting"
+            "pulling": "Ściąganie",
+            "extracting": "Wypakowywanie"
           },
           "tooltip": {
-            "search": "Search",
-            "sshDetails": "SSH Details",
-            "commandHistory": "Command History",
-            "decreaseFontSize": "Decrease Font Size",
-            "increaseFontSize": "Increase Font Size",
-            "copySelection": "Copy Selection"
+            "search": "Wyszukaj",
+            "sshDetails": "Dane SSH",
+            "commandHistory": "Historia komend",
+            "decreaseFontSize": "Zmniejsz rozmiar czcionki",
+            "increaseFontSize": "Zwiększ rozmiar czcionki",
+            "copySelection": "Kopiuj zaznaczenie"
+          },
+          "quickAction": {
+            "search": "Search Console",
+            "scrollToBottom": "Scroll to Bottom"
           },
           "drawer": {
             "commandHistory": {
-              "title": "Command History",
-              "detailTitle": "Command Details",
-              "noCommands": "No commands found.",
-              "copyButton": "Copy Command",
-              "sendButton": "Send Command",
-              "commandSent": "Command sent successfully."
+              "title": "Historia komend",
+              "detailTitle": "Szczegóły komendy",
+              "noCommands": "Nie znaleziono komend.",
+              "copyButton": "Kopiuj komendę",
+              "sendButton": "Wyślij komendę",
+              "commandSent": "Komenda wysłana pomyślnie."
             }
           },
           "feature": {
             "eula": {
-              "title": "Minecraft EULA Agreement",
-              "content": "The Minecraft server requires you to accept the [Minecraft End User License Agreement](https://minecraft.net/eula) before it can start.",
-              "contentDetails": "By clicking \"Accept EULA\", you agree to the terms of the Minecraft EULA and the **eula.txt** file will be updated to **eula=true**.",
+              "title": "Umowa EULA Minecraft",
+              "content": "Serwer Minecraft wymaga zaakceptowania [Umowy licencyjnej użytkownika Minecrafta](https://minecraft.net/eula) zanim będzie mógł się uruchomić.",
+              "contentDetails": "Klikając przycisk \"Akceptuj EULA\", zgadzasz się na warunki EULA Minecraft, a plik **eula.txt** zostanie zaktualizowany na **eula=true**.",
               "toast": {
-                "accepted": "EULA accepted successfully."
+                "accepted": "Umowa EULA została zaakceptowana."
               },
               "button": {
-                "accept": "Accept EULA"
+                "accept": "Akceptuj EULA"
               }
             },
             "javaVersion": {
-              "title": "Unsupported Java Version",
-              "content": "This server is currently running an unsupported version of Java and cannot be started.",
+              "title": "Nieobsługiwana wersja Java",
+              "content": "Serwer działa w niewspieranej wersji Java i nie można go uruchomić.",
               "contentDetails": "Please select a supported Docker image from the list below to continue starting the server.",
               "toast": {
                 "updated": "Docker image updated successfully."
@@ -4455,44 +4540,71 @@
             "rename": "Rename",
             "copy": "Copy",
             "fingerprint": "Fingerprint",
-            "permissions": "Permissions",
-            "extract": "Extract",
-            "archive": "Archive",
-            "more": "More",
+            "permissions": "Uprawnienia",
+            "extract": "Wypakuj",
+            "archive": "Archiwizuj",
+            "more": "Więcej",
             "remoteCopy": "Remote Copy",
-            "search": "Search",
+            "search": "Wyszukaj",
             "exitBackup": "Exit Backup",
             "fileFromEditor": "File from Editor",
-            "directory": "Directory",
+            "directory": "Katalog",
             "fileFromPull": "File from Pull",
             "fileFromUpload": "File from Upload",
             "directoryFromUpload": "Directory from Upload",
-            "viewDiff": "View Diff",
-            "loadDisk": "Load Disk Version",
-            "keepEditor": "Keep Editor Version"
+            "viewDiff": "Pokaż różnice",
+            "loadDisk": "Wczytaj wersję z dysku",
+            "keepEditor": "Zachowaj wersję z edytora"
+          },
+          "quickAction": {
+            "newFile": "New File",
+            "newDirectory": "New Directory",
+            "pullFile": "Pull File from URL",
+            "uploadFiles": "Upload Files",
+            "uploadDirectory": "Upload Directory",
+            "search": "Search Files",
+            "largestDirectories": "Analyze Directory Sizes",
+            "parentDirectory": "Go to Parent Directory",
+            "copyPath": "Copy Current Path",
+            "exitBackup": "Exit Backup Browsing",
+            "connectSftp": "Connect via SFTP",
+            "connectVscode": "Open in VS Code",
+            "cancelPaste": "Cancel Pending Copy or Move",
+            "downloadSelection": "Download Selection",
+            "copySelection": "Copy Selection",
+            "moveSelection": "Move Selection",
+            "remoteCopySelection": "Copy Selection to another Server",
+            "archiveSelection": "Archive Selection",
+            "extractSelection": "Extract Archive",
+            "renameSelection": "Rename Selection",
+            "permissionsSelection": "Change Permissions",
+            "fingerprintSelection": "Show File Fingerprint",
+            "deleteSelection": "Delete Selection",
+            "saveFile": "Save File",
+            "createFile": "Create File"
           },
           "actionBar": {
-            "copyHere": "Copy {files} here",
-            "moveHere": "Move {files} here"
+            "copyHere": "Skopiuj {files} tutaj",
+            "moveHere": "Przenieś {files} tutaj"
           },
           "searchBanner": {
-            "resultsTitle": "Search Results ({files} found)",
-            "query": "Query:",
-            "excluded": "Excluded:",
-            "content": "Content:",
-            "size": "Size:",
+            "resultsTitle": "Wyniki wyszukiwania (znaleziono {files})",
+            "query": "Zapytanie:",
+            "excluded": "Wykluczono:",
+            "content": "Zawartość:",
+            "size": "Rozmiar:",
             "min": "Min:",
             "max": "Max:"
           },
           "operations": {
-            "compressing": "Compressing {files} from {path}",
-            "decompressing": "Decompressing {path}",
-            "pulling": "Pulling {destination}",
-            "copying": "Copying {path} to {destination}",
-            "copyingMany": "Copying {files}",
-            "receivingRemote": "Receiving {files} from remote server",
-            "sendingRemote": "Sending {files} to remote server",
-            "exportingBackup": "Exporting backup to {destination}",
+            "compressing": "Kompresowanie {files} z {path}",
+            "decompressing": "Dekompresowanie {path}",
+            "pulling": "Ściąganie {destination}",
+            "copying": "Kopiowanie {path} do {destination}",
+            "copyingMany": "Kopiowanie {files}",
+            "receivingRemote": "Odbieranie {files} ze zdalnego serwera",
+            "sendingRemote": "Wysyłanie {files} do zdalnego serwera",
+            "exportingBackup": "Eksportowanie kopii zapasowej do {destination}",
             "cancelAllOperations": "Anuluj wszystkie operacje"
           },
           "dropzone": {
@@ -4505,30 +4617,31 @@
             "editorMinimap": "Pokaż minimapę pliku",
             "editorLineOverflow": "Zawijaj linie",
             "editorFontSize": "Rozmiar czcionki edytora",
-            "vscodeUriScheme": "VS Code URI Scheme",
-            "imageViewerSmoothing": "Smoothen Image (Anti-Aliasing)"
+            "editorEngine": "Editor Engine",
+            "vscodeUriScheme": "Schemat URI VS Code",
+            "imageViewerSmoothing": "Wygładzanie obrazu (antyaliasing)"
           },
           "alert": {
-            "collabConflictChanged": "This file has been changed on disk outside of the editor (e.g. via SFTP).",
-            "collabConflictDeleted": "This file has been deleted on disk outside of the editor."
+            "collabConflictChanged": "Ten plik został zmieniony na dysku poza edytorem (np. poprzez SFTP).",
+            "collabConflictDeleted": "Ten plik został usunięty na dysku poza edytorem."
           },
           "toast": {
             "operationCancelled": "Operacja anulowana",
             "allOperationsCancelled": "Anulowano wszystkie operacje.",
-            "copyingStarted": "{files} started copying.",
-            "filesCouldNotBeMoved": "Files could not be moved.",
-            "filesMoved": "{files} moved.",
-            "moveUndone": "Move of {files} undone.",
-            "moveCouldNotBeUndone": "Move could not be undone.",
-            "downloadStarted": "Download started.",
-            "filesDeleted": "Files have been deleted.",
-            "archiveCreationStarted": "Archive creation has begun.",
-            "decompressionStarted": "Archive extraction has started.",
-            "fileCopyingStarted": "File copying has started.",
-            "fileInfoRetrieved": "File information retrieved successfully.",
-            "filePullingStarted": "File pulling has started.",
-            "fileRenamed": "File has been renamed.",
-            "fileCouldNotBeRenamed": "File could not be renamed.",
+            "copyingStarted": "Rozpoczęto kopiowanie {files}.",
+            "filesCouldNotBeMoved": "Nie można było przenieść plików.",
+            "filesMoved": "Przeniesiono {files}.",
+            "moveUndone": "Cofnięto przeniesienie {files}.",
+            "moveCouldNotBeUndone": "Przenoszenie nie mogło zostać cofnięte.",
+            "downloadStarted": "Rozpoczęto pobieranie.",
+            "filesDeleted": "Usunięto pliki.",
+            "archiveCreationStarted": "Rozpoczęto tworzenie archiwum.",
+            "decompressionStarted": "Rozpoczęto ekstrakcję archiwum.",
+            "fileCopyingStarted": "Rozpoczęto kopiowanie plików.",
+            "fileInfoRetrieved": "Pomyślnie pobrano informacje o pliku.",
+            "filePullingStarted": "Rozpoczęto pobieranie plików.",
+            "fileRenamed": "Zmieniono nazwę pliku.",
+            "fileCouldNotBeRenamed": "Nie można było zmienić nazwy pliku.",
             "filesRenamed": "{files} renamed.",
             "renameUndone": "Rename undone.",
             "renameCouldNotBeUndone": "Rename could not be undone.",
@@ -4542,6 +4655,7 @@
             "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
+            "settings": "Settings",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4601,45 +4715,45 @@
               "extractedTo": "The contents of {file} will be extracted into "
             },
             "createArchive": {
-              "title": "Create Archive",
+              "title": "Utwórz archiwum",
               "form": {
                 "format": "Format"
               },
-              "createdAs": "This archive will be created as "
+              "createdAs": "To archiwum zostanie utworzone jako "
             },
             "createDirectory": {
-              "title": "Create Directory",
-              "createdAs": "This directory will be created as "
+              "title": "Utwórz katalog",
+              "createdAs": "Ten katalog zostanie utworzony jako "
             },
             "copyFile": {
-              "title": "Copy File",
-              "createdAs": "This file will be created as ",
-              "conflict": "A file with that name already exists at the destination."
+              "title": "Kopiuj plik",
+              "createdAs": "Ten plik zostanie utworzony jako ",
+              "conflict": "Plik o takiej nazwie już istnieje w miejscu docelowym."
             },
             "copyConflict": {
-              "title": "Resolve Copy Conflicts",
-              "description": "The following {files} already exist at the destination.",
-              "source": "Source",
-              "destination": "Destination",
-              "skip": "Skip",
-              "overwrite": "Overwrite",
-              "rename": "Rename",
-              "skipAll": "Skip all",
-              "overwriteAll": "Overwrite all",
-              "newName": "New name",
-              "confirm": "Copy {files}"
+              "title": "Rozwiąż konflikty kopiowania",
+              "description": "Poniższe {files} już istnieje w miejscu docelowym.",
+              "source": "Źródło",
+              "destination": "Cel",
+              "skip": "Pomiń",
+              "overwrite": "Zastąp",
+              "rename": "Zmień nazwę",
+              "skipAll": "Pomiń wszystkie",
+              "overwriteAll": "Zastąp wszystko",
+              "newName": "Nowa nazwa",
+              "confirm": "Kopiuj {files}"
             },
             "copyRemote": {
               "title": "Remote Copy Files",
               "form": {
-                "server": "Server"
+                "server": "Serwer"
               },
-              "createdAs": "These files will be created on the remote server under "
+              "createdAs": "Te pliki zostaną utworzone na zdalnym serwerze pod "
             },
             "fileFingerprints": {
               "title": "File Fingerprint",
               "form": {
-                "algorithm": "Algorithm",
+                "algorithm": "Algorytm",
                 "fingerprint": "Fingerprint"
               },
               "button": {
@@ -4647,21 +4761,21 @@
               }
             },
             "deleteFile": {
-              "title": "Delete File",
-              "singleFileWarning": "You will not be able to recover the contents of {file} once deleted.",
-              "multipleFilesWarning": "You will not be able to recover the contents of the following files once deleted."
+              "title": "Usuń Plik",
+              "singleFileWarning": "Nie będziesz w stanie odzyskać zawartości {file} po usunięciu.",
+              "multipleFilesWarning": "Nie będziesz w stanie odzyskać zawartości następujących plików po usunięciu."
             },
             "createFile": {
-              "title": "Create File"
+              "title": "Utwórz plik"
             },
             "details": {
-              "title": "File Details",
-              "path": "Path",
-              "mode": "Mode",
-              "logicalSize": "Logical Size",
-              "physicalSize": "Physical Size",
+              "title": "Szczegóły pliku",
+              "path": "Ścieżka",
+              "mode": "Tryb",
+              "logicalSize": "Rozmiar logiczny",
+              "physicalSize": "Rozmiar fizyczny",
               "mimeType": "Typ MIME",
-              "lastModifiedAt": "Last Modified At",
+              "lastModifiedAt": "Ostatnia modyfikacja",
               "createdAt": "Data utworzenia"
             },
             "filePermissions": {
@@ -4728,18 +4842,18 @@
                 "title": "Preview",
                 "original": "Original",
                 "newName": "New name",
-                "unchanged": "Unchanged",
-                "conflict": "Name already in use",
-                "duplicate": "Duplicate target",
-                "invalid": "Invalid name",
+                "unchanged": "Bez zmian",
+                "conflict": "Nazwa już w użyciu",
+                "duplicate": "Duplikat celu",
+                "invalid": "Nieprawidłowa nazwa",
                 "invalidRegex": "Invalid regular expression",
-                "empty": "No files selected."
+                "empty": "Brak wybranych plików."
               },
               "summary": "{changed} of {total} will be renamed",
               "conflictWarning": "Resolve the highlighted name conflicts before renaming."
             },
             "largestDirectories": {
-              "title": "Largest Directories",
+              "title": "Największe katalogi",
               "empty": "No directories found."
             },
             "searchFiles": {
@@ -4747,69 +4861,65 @@
               "placeholder": "Szukaj plików...",
               "advancedFilters": "Filtry zaawansowane",
               "pathPatterns": "Path Patterns",
-              "include": "Include",
-              "exclude": "Exclude",
+              "include": "Uwzględnij",
+              "exclude": "Wyklucz",
               "caseInsensitive": "Case insensitive",
-              "fileContent": "File Content",
+              "fileContent": "Zawartość pliku",
               "searchText": "Search text",
-              "maxFileSize": "Max file size",
-              "includeOversized": "Include oversized files",
-              "includeOversizedDescription": "Includes files that match other filters but are too large to search.",
-              "fileSize": "File Size",
+              "maxFileSize": "Maksymalny rozmiar pliku",
+              "includeOversized": "Uwzględnij nadwymiarowe pliki",
+              "includeOversizedDescription": "Uwzględnia pliki, które pasują do innych filtrów, ale są zbyt duże, aby je przeszukać.",
+              "fileSize": "Rozmiar pliku",
               "minimum": "Minimum",
-              "maximum": "Maximum"
+              "maximum": "Maksimum"
             },
             "pullFile": {
-              "title": "Pull File",
+              "title": "Pobierz Plik",
               "form": {
-                "fileUrl": "File URL",
+                "fileUrl": "Adres URL pliku",
                 "query": "Query"
               },
-              "createdAs": "This file will be created as ",
-              "pull": "Pull"
+              "createdAs": "Ten plik zostanie utworzony jako ",
+              "pull": "Ściągnij"
             },
             "sftpDetails": {
-              "title": "SFTP Details",
-              "launch": "Launch"
+              "title": "Dane SFTP",
+              "launch": "Uruchom"
             }
           }
         },
         "databases": {
-          "title": "Databases",
+          "title": "Bazy danych",
           "subtitle": "{current} of {max} maximum databases created.",
-          "classic": {
-            "title": "Classic Databases",
-            "subtitle": "{current} databases created."
-          },
           "tooltip": {
-            "limitReached": "This server is limited to {max} databases."
+            "limitReached": "Ten serwer jest ograniczony do {max} baz danych."
           },
           "table": {
             "columns": {
-              "locked": "Locked?"
+              "locked": "Zablokowane?"
             }
           },
           "button": {
-            "rotatePassword": "Rotate Password"
+            "rotatePassword": "Obróć hasło"
           },
           "form": {
-            "databaseName": "Database Name"
+            "databaseName": "Nazwa bazy danych"
           },
           "explorer": {
-            "title": "Data Explorer",
+            "title": "Eksplorator danych",
             "button": {
-              "open": "Explore Data",
-              "run": "Run",
+              "open": "Przeglądaj dane",
+              "run": "Uruchom",
               "previous": "Previous",
               "next": "Next",
-              "hideTables": "Hide Tables",
-              "showTables": "Show Tables",
-              "save": "Save {changes}",
-              "newRow": "New Row",
-              "deleteRows": "Delete {rows}",
-              "newTable": "New Table",
-              "addColumn": "Add Column",
-              "rename": "Rename",
+              "hideTables": "Ukryj tabele",
+              "showTables": "Pokaż tabele",
+              "save": "Zapisz {changes}",
+              "newRow": "Nowy wiersz",
+              "deleteRows": "Usuń {rows}",
+              "newTable": "Nowa Tabela",
+              "addColumn": "Dodaj kolumnę",
+              "rename": "Zmień nazwę",
               "renameTable": "Rename Table",
               "deleteTable": "Delete Table"
             },
@@ -4892,17 +5002,17 @@
             "rows": {
               "noTable": "Select a table to browse its rows.",
               "range": "Showing rows {start} to {end}.",
-              "saved": "Applied changes to {rows}.",
+              "saved": "Zastosowano zmiany w {rows}.",
               "insert": {
                 "default": "Database default"
               }
             },
             "filter": {
-              "add": "Filter",
-              "column": "Column",
+              "add": "Filtr",
+              "column": "Kolumna",
               "operator": "Operator",
-              "value": "Value",
-              "apply": "Apply"
+              "value": "Wartość",
+              "apply": "Zastosuj"
             },
             "enum": {
               "filterOperator": {
@@ -4930,50 +5040,49 @@
             "badge": {
               "primaryKey": "Primary",
               "autoIncrement": "auto_increment",
-              "generated": "Generated",
-              "binary": "Binary"
+              "generated": "Generowane",
+              "binary": "Plik binarny"
             },
             "query": {
-              "placeholder": "Run a statement to see its results here.",
-              "statement": "Statement {index}",
+              "placeholder": "Uruchom instrukcję, aby zobaczyć tutaj jej wyniki.",
+              "statement": "Instrukcja {index}",
               "form": {
-                "rowLimit": "Row Limit",
-                "readOnly": "Read-only",
+                "rowLimit": "Limit wierszy",
+                "readOnly": "Tylko do odczytu",
                 "readOnlyDescription": "Rejects statements that change data or structure."
               }
             },
             "result": {
-              "rowsAffected": "{rows} affected.",
-              "truncated": "This result set was truncated. Narrow the statement or lower the row limit to see everything."
+              "rowsAffected": "Zmieniono {rows}.",
+              "truncated": "Ten zestaw wyników został skrócony. Wciśnij instrukcję lub zmniejsz limit wierszy, aby zobaczyć wszystko."
             },
             "cell": {
-              "setNull": "Set to NULL",
+              "setNull": "Ustaw na NULL",
               "null": "NULL",
               "empty": "empty",
               "editorHint": "{enter} applies the value, {shiftEnter} inserts a new line."
             }
           },
           "instance": {
-            "title": "Managed Databases",
-            "subtitle": "{current} managed databases created.",
-            "updateAvailable": "Update Available",
+            "title": "Zarządzane bazy danych",
+            "updateAvailable": "Dostępna aktualizacja",
             "button": {
-              "applyUpdate": "Apply Update"
+              "applyUpdate": "Zastosuj aktualizację"
             },
             "tooltip": {
-              "limitReached": "This server is limited to {max} managed databases."
+              "limitReached": "Ten serwer jest ograniczony do {max} zarządzanych baz danych."
             },
             "view": {
               "tabs": {
-                "databases": "Databases",
-                "users": "Users",
-                "logs": "Logs"
+                "databases": "Bazy danych",
+                "users": "Użytkownicy",
+                "logs": "Logi"
               },
               "stats": {
-                "uptime": "Uptime",
-                "cpuLoad": "CPU Load",
-                "memoryLoad": "Memory Load",
-                "diskUsage": "Disk Usage",
+                "uptime": "Czas działania",
+                "cpuLoad": "Obciążenie CPU",
+                "memoryLoad": "Obciążenie pamięci",
+                "diskUsage": "Użycie dysku",
                 "offline": "Instance is offline"
               }
             },
@@ -5030,30 +5139,30 @@
               },
               "table": {
                 "columns": {
-                  "database": "Database"
+                  "database": "Baza danych"
                 }
               },
               "toast": {
-                "created": "Database created.",
-                "deleted": "Database deleted.",
-                "imported": "Database import completed.",
-                "remoteImportStarted": "Remote import started.",
-                "passwordRotated": "Password has been rotated.",
-                "recreated": "Database recreated."
+                "created": "Utworzono bazę danych.",
+                "deleted": "Usunięto bazę danych.",
+                "imported": "Import bazy danych zakończony.",
+                "remoteImportStarted": "Zdalny import rozpoczęty.",
+                "passwordRotated": "Hasło zostało obrócone.",
+                "recreated": "Odtworzono bazę danych."
               }
             },
             "users": {
-              "title": "Users",
-              "subtitle": "{current} of {max} maximum users created.",
+              "title": "Użytkownicy",
+              "subtitle": "{current} z {max} maksimum utworzonych użytkowników.",
               "tooltip": {
-                "limitReached": "This instance is limited to {max} users."
+                "limitReached": "Ta instancja jest ograniczona do {max} użytkowników."
               },
               "modal": {
                 "createUser": {
-                  "title": "Create User",
+                  "title": "Utwórz użytkownika",
                   "content": "Creates a new user inside this managed database instance. The credentials will be shown in the table afterwards.",
                   "form": {
-                    "database": "Database",
+                    "database": "Baza danych",
                     "databaseHint": "The database this user will be granted access to.",
                     "databaseRequired": "Please select a database."
                   }
@@ -5064,8 +5173,8 @@
                 }
               },
               "toast": {
-                "created": "User created.",
-                "deleted": "User deleted."
+                "created": "Utworzono użytkownika.",
+                "deleted": "Usunięto użytkownika."
               }
             },
             "power": {
@@ -5084,20 +5193,21 @@
             },
             "message": {
               "databaseMarkedAs": "Database marked as {state}...",
-              "pulling": "Pulling",
-              "extracting": "Extracting"
+              "pulling": "Ściąganie",
+              "extracting": "Wypakowywanie"
             },
             "operations": {
-              "remoteImport": "Importing {database} from {source}",
-              "cancelAllOperations": "Cancel all operations"
+              "remoteImport": "Importowanie {database} z {source}",
+              "cancelAllOperations": "Anuluj wszystkie operacje"
             },
             "toast": {
-              "operationCancelled": "Operation cancelled",
-              "allOperationsCancelled": "All operations have been cancelled.",
+              "operationCancelled": "Operacja anulowana",
+              "allOperationsCancelled": "Anulowano wszystkie operacje.",
               "operations": {
                 "remoteImport": {
                   "completed": "Imported `{database}` from `{source}` in {time}.",
-                  "failed": "Failed to import `{database}` from `{source}`:\n{error}"
+                  "failed": "Failed to import `{database}` from `{source}`:\n{error}",
+                  "aborted": "Import of `{database}` from `{source}` was cancelled."
                 }
               }
             },
@@ -5108,15 +5218,15 @@
                   "created": "Managed database created."
                 },
                 "form": {
-                  "template": "Template",
-                  "noTemplatesFound": "No templates available",
-                  "image": "Docker Image"
+                  "template": "Szablon",
+                  "noTemplatesFound": "Brak dostępnych szablonów",
+                  "image": "Obraz dockera"
                 }
               },
               "editDatabaseInstance": {
-                "title": "Edit Managed Database",
+                "title": "Edytuj zarządzaną bazę danych",
                 "toast": {
-                  "updated": "Managed database updated."
+                  "updated": "Zaktualizowano zarządzaną bazę danych."
                 }
               },
               "applyDatabaseInstanceUpdate": {
@@ -5211,34 +5321,34 @@
           },
           "table": {
             "columns": {
-              "lastRun": "Last Run",
-              "lastFailure": "Last Failure",
+              "lastRun": "Ostatni Start",
+              "lastFailure": "Ostatnie niepowodzenie",
               "status": "Status"
             }
           },
           "button": {
-            "runNow": "Run Now",
-            "runNowWithConditions": "Run now (check conditions first)",
-            "runNowIgnoreConditions": "Run now (ignore conditions)",
-            "addTrigger": "Add Trigger",
-            "addCondition": "Add Condition",
-            "addStep": "Add Step",
+            "runNow": "Uruchom teraz",
+            "runNowWithConditions": "Uruchom teraz (najpierw sprawdź warunki)",
+            "runNowIgnoreConditions": "Uruchom teraz (ignoruj warunki)",
+            "addTrigger": "Dodaj wyzwalacz",
+            "addCondition": "Dodaj warunek",
+            "addStep": "Dodaj krok",
             "addElseIf": "Add Else If",
             "addElse": "Add Else",
             "createFirstStep": "Create First Step",
             "addOutput": "Add Output",
-            "addFile": "Add File",
-            "addHeader": "Add Header",
-            "viewCalendar": "View Calendar"
+            "addFile": "Dodaj plik",
+            "addHeader": "Dodaj nagłówek",
+            "viewCalendar": "Pokaż Kalendarz"
           },
           "toast": {
-            "imported": "Schedule imported.",
-            "created": "Schedule created.",
-            "updated": "Schedule updated.",
-            "duplicated": "Schedule duplicated.",
-            "deleted": "Schedule deleted.",
-            "triggered": "Schedule triggered.",
-            "exported": "Schedule exported.",
+            "imported": "Harmonogram zaimportowany.",
+            "created": "Harmonogram utworzony.",
+            "updated": "Harmonogram zaktualizowany.",
+            "duplicated": "Harmonogram zduplikowany.",
+            "deleted": "Harmonogram usunięty.",
+            "triggered": "Harmonogram uruchomiony.",
+            "exported": "Harmonogram wyeksportowany.",
             "parseError": "Failed to parse schedule: {error}",
             "step": {
               "created": "Schedule step created.",
@@ -5253,24 +5363,24 @@
               "and": "AND (All must be true)",
               "or": "OR (Any must be true)",
               "not": "NOT (Must not be true)",
-              "serverState": "Server State",
-              "uptime": "Uptime",
-              "resourceUsage": "Resource Usage",
-              "fileExists": "File Exists",
-              "variableExists": "Variable Exists",
-              "variableContains": "Variable Contains",
-              "variableEquals": "Variable Equals",
-              "variableStartsWith": "Variable Starts With",
-              "variableEndsWith": "Variable Ends With"
+              "serverState": "Status serwera",
+              "uptime": "Czas działania",
+              "resourceUsage": "Zużycie zasobów",
+              "fileExists": "Plik istnieje",
+              "variableExists": "Zmienna istnieje",
+              "variableContains": "Zmienna zawiera",
+              "variableEquals": "Zmienna jest równa",
+              "variableStartsWith": "Zmienna zaczyna się od",
+              "variableEndsWith": "Zmienna kończy się"
             },
             "scheduleResourceMetric": {
-              "cpu": "CPU Usage",
-              "memory": "Memory Usage",
-              "disk": "Disk Usage"
+              "cpu": "Użycie procesora",
+              "memory": "Użycie pamięci",
+              "disk": "Użycie dysku"
             },
             "scheduleComparator": {
-              "smallerThan": "Smaller than",
-              "smallerThanOrEqual": "Smaller than or equal to",
+              "smallerThan": "Mniejsze niż",
+              "smallerThanOrEqual": "Mniejsze lub równe",
               "equal": "Equal to",
               "greaterThanOrEqual": "Greater than or equal to",
               "greaterThan": "Greater than"
@@ -5350,63 +5460,63 @@
             "rootPath": "Root Path",
             "outputInto": "Output into",
             "caseInsensitive": "Case Insensitive",
-            "ignoreFailure": "Ignore Failure",
+            "ignoreFailure": "Ignoruj błędy",
             "runInForeground": "Run in Foreground"
           },
           "condition": {
-            "variable": "Variable",
-            "equals": "Equals",
-            "contains": "Contains",
-            "startsWith": "Starts With",
-            "endsWith": "Ends With",
+            "variable": "Zmienna",
+            "equals": "Równa się",
+            "contains": "Zawiera",
+            "startsWith": "Zaczyna się od",
+            "endsWith": "Kończy się na",
             "metric": "Metric",
-            "allMustBeTrue": "All conditions must be true:",
-            "anyMustBeTrue": "Any condition must be true:",
-            "mustNotBeTrue": "Condition must not be true:",
+            "allMustBeTrue": "Wszystkie warunki muszą być prawdą:",
+            "anyMustBeTrue": "Jakikolwiek warunek musi być prawdą:",
+            "mustNotBeTrue": "Warunek nie może być prawdą:",
             "renderer": {
-              "none": "No condition — this always matches.",
-              "empty": "No conditions added yet.",
-              "serverState": "Server state is {state}",
-              "uptime": "Uptime {comparator} {value}",
+              "none": "Brak warunku — zawsze pasuje.",
+              "empty": "Brak dodanych warunków.",
+              "serverState": "Stan serwera to {state}",
+              "uptime": "Czas pracy {comparator} {value}",
               "resourceUsage": "{metric} {comparator} {value}",
-              "fileExists": "File {file} exists",
-              "variableExists": "Variable {variable} is set",
-              "equals": "Variable {variable} equals {value}",
-              "contains": "Variable {variable} contains {value}",
-              "startsWith": "Variable {variable} starts with {value}",
-              "endsWith": "Variable {variable} ends with {value}"
+              "fileExists": "Plik {file} istnieje",
+              "variableExists": "Zmienna {variable} jest ustawiona",
+              "equals": "Zmienna {variable} równa się {value}",
+              "contains": "Zmienna {variable} zawiera {value}",
+              "startsWith": "Zmienna {variable} zaczyna się od {value}",
+              "endsWith": "Zmienna {variable} kończy się {value}"
             }
           },
           "preCondition": {
-            "valueSeconds": "Value (seconds)",
-            "valuePercent": "Value (%)",
-            "value": "Value"
+            "valueSeconds": "Wartość (sekundy)",
+            "valuePercent": "Wartość (%)",
+            "value": "Wartość"
           },
           "triggers": {
             "cron": {
               "title": "Time Interval (Cron)",
               "form": {
-                "cronSchedule": "Cron Schedule",
+                "cronSchedule": "Harmonogram crona",
                 "frequency": "Runs",
-                "intervalMinutes": "Every (minutes)",
-                "intervalHours": "Every (hours)",
+                "intervalMinutes": "Co (minut)",
+                "intervalHours": "Co (godzin)",
                 "time": "At",
                 "weekday": "On",
                 "dayOfMonth": "On day",
-                "advanced": "Edit as cron expression"
+                "advanced": "Edytuj jako wyrażenie cron"
               },
               "frequency": {
-                "everyMinutes": "Every few minutes",
-                "everyHours": "Every few hours",
-                "daily": "Daily",
-                "weekly": "Weekly",
-                "monthly": "Monthly"
+                "everyMinutes": "Co kilka minut",
+                "everyHours": "Co kilka godzin",
+                "daily": "Codziennie",
+                "weekly": "Cotygodniowo",
+                "monthly": "Co miesiąc"
               },
-              "timezoneHint": "Times use the server timezone ({timezone}).",
+              "timezoneHint": "Czasy używają strefy czasowej serwera ({timezone}).",
               "card": {
                 "content": "On Cron Interval {schedule}, Next run is {timestamp} - Last run was {lastTimestamp}."
               },
-              "invalidCron": "Invalid cron expression"
+              "invalidCron": "Nieprawidłowe wyrażenie cron"
             },
             "powerAction": {
               "title": "Akcja zasilania",
@@ -5415,18 +5525,18 @@
               }
             },
             "serverState": {
-              "title": "Server State",
+              "title": "Status serwera",
               "card": {
                 "content": "When Server State `{state}` is reached."
               }
             },
             "backupStatus": {
-              "title": "Backup Status",
+              "title": "Status kopii zapasowej",
               "form": {
-                "backupStatus": "Backup Status"
+                "backupStatus": "Status kopii zapasowej"
               },
               "card": {
-                "content": "When Backup reaches Status `{status}`."
+                "content": "Kiedy kopia zapasowa osiągnie status `{status}`."
               }
             },
             "scheduleCompletion": {
@@ -5564,7 +5674,7 @@
               "description": "Extract parts of a text value using a regular expression.",
               "form": {
                 "input": "Input",
-                "regex": "Regex",
+                "regex": "Wyrażenie regularne (regex)",
                 "outputs": "Outputs",
                 "outputNumber": "Output {number}"
               },
@@ -5598,43 +5708,43 @@
               }
             },
             "sendPower": {
-              "title": "Send Power Signal",
-              "description": "Start, restart, stop or kill the server.",
+              "title": "Wyślij sygnał zasilania",
+              "description": "Uruchom, uruchom ponownie, zatrzymaj lub zabij serwer.",
               "renderer": {
-                "compact": "Do {action}",
+                "compact": "Wykonaj {action}",
                 "detail": {
-                  "powerAction": "Power Action: {action}"
+                  "powerAction": "Akcja zasilania: {action}"
                 }
               }
             },
             "createBackup": {
-              "title": "Create Backup",
-              "description": "Create a backup of the server files.",
+              "title": "Utwórz kopię zapasową",
+              "description": "Utwórz kopię zapasową plików serwera.",
               "form": {
-                "backupName": "Backup Name",
+                "backupName": "Nazwa kopii zapasowej",
                 "outputInto": "Output Backup UUID Into"
               },
               "renderer": {
-                "compact": "Create {name}",
-                "compactAuto": "Create a backup with an auto-generated name",
+                "compact": "Utwórz {name}",
+                "compactAuto": "Utwórz kopię zapasową z automatycznie wygenerowaną nazwą",
                 "detail": {
-                  "backupName": "Backup Name: {name}",
+                  "backupName": "Nazwa kopii zapasowej: {name}",
                   "backupNameAuto": "Backup Name: Auto-generated",
                   "outputInto": "Backup UUID into: {variable}",
-                  "ignoredFiles": "Ignored Files: {files}"
+                  "ignoredFiles": "Ignorowane pliki: {files}"
                 }
               }
             },
             "restoreBackup": {
-              "title": "Restore Backup",
-              "description": "Stop the server and restore a backup of the server files.",
+              "title": "Przywróć kopię zapasową",
+              "description": "Zatrzymaj serwer i przywróć kopię zapasową plików serwera.",
               "form": {
-                "backupSelector": "Backup to Restore",
+                "backupSelector": "Kopia zapasowa do przywrócenia",
                 "selector": {
-                  "latest": "Latest Backup",
-                  "oldest": "Oldest Backup",
-                  "uuid": "Specific Backup (UUID)",
-                  "name": "By Name",
+                  "latest": "Ostatnia kopia zapasowa",
+                  "oldest": "Najstarsza kopia zapasowa",
+                  "uuid": "Konkretna kopia zapasowa (UUID)",
+                  "name": "Według nazwy",
                   "oldestFirst": "Match the oldest backup instead of the newest"
                 },
                 "backupUuid": "UUID kopii zapasowej",
@@ -5753,7 +5863,7 @@
               "title": "Kompresuj pliki",
               "description": "Skompresuj pliki do archiwum.",
               "form": {
-                "filesToCompress": "Files to Compress"
+                "filesToCompress": "Pliki do skompresowania"
               },
               "renderer": {
                 "compact": "Compress {files} in {root} to {name}",
@@ -5811,16 +5921,16 @@
               }
             },
             "httpRequest": {
-              "title": "HTTP Request",
-              "description": "Send an HTTP request, for example to a webhook.",
+              "title": "Żądanie HTTP",
+              "description": "Wyślij żądanie HTTP, na przykład do webhooka.",
               "form": {
-                "method": "Method",
+                "method": "Metoda",
                 "url": "URL",
-                "headers": "Headers",
-                "headerName": "Header Name",
-                "headerValue": "Header Value",
-                "body": "Body",
-                "timeout": "Timeout (milliseconds)",
+                "headers": "Nagłówki",
+                "headerName": "Nazwa nagłówka",
+                "headerValue": "Wartość nagłówka",
+                "body": "Treść",
+                "timeout": "Limit czasu (milisekundy)",
                 "ignoreErrorStatus": "Ignore Error Status Codes",
                 "outputStatusInto": "Output Status Code Into",
                 "outputBodyInto": "Output Response Body Into"
@@ -5830,18 +5940,18 @@
                 "detail": {
                   "request": "Request: {method} {url}",
                   "headers": "Headers: {headers}",
-                  "body": "Body: {body}",
-                  "timeout": "Timeout: {timeout}",
+                  "body": "Treść: {body}",
+                  "timeout": "Limit czasu: {timeout}",
                   "outputStatusInto": "Status code into: {variable}",
                   "outputBodyInto": "Response body into: {variable}",
-                  "ignoreErrorStatus": "Ignore error status codes: {value}"
+                  "ignoreErrorStatus": "Ignoruj kody statusu błędu: {value}"
                 }
               }
             }
           }
         },
         "subusers": {
-          "title": "Subusers",
+          "title": "Podużytkownicy",
           "subtitle": "{current} of {max} maximum subusers created.",
           "tooltip": {
             "limitReached": "Ten serwer jest ograniczony do {max} podużytkowników."
@@ -5861,7 +5971,7 @@
               },
               "form": {
                 "emailPlaceholder": "Enter the email that this subuser should be saved as.",
-                "permissions": "Permissions",
+                "permissions": "Uprawnienia",
                 "ignoredFilesDescription": "Files and directories matching these patterns will be hidden from this subuser. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`). Prefix a pattern with `!` to un-hide a path that a broader pattern would otherwise exclude."
               }
             },
@@ -5881,7 +5991,7 @@
           }
         },
         "backups": {
-          "title": "Backups",
+          "title": "Kopie zapasowe",
           "subtitle": "{current} of {max} maximum backups created.",
           "tooltip": {
             "limitReached": "This server is limited to {max} backups."
@@ -5889,35 +5999,35 @@
           "table": {
             "columns": {
               "checksum": "Checksum",
-              "files": "Files",
-              "locked": "Locked?"
+              "files": "Pliki",
+              "locked": "Zablokowane?"
             }
           },
           "badge": {
-            "deleting": "Deleting…",
-            "deleteFailed": "Deletion failed"
+            "deleting": "Usuwanie…",
+            "deleteFailed": "Usuwanie nie powiodło się"
           },
           "button": {
-            "browse": "Browse",
+            "browse": "Przeglądaj",
             "exportToFiles": "Export to Files",
-            "createBackup": "Create Backup",
-            "createGroup": "Create Backup Group"
+            "createBackup": "Utwórz kopię zapasową",
+            "createGroup": "Utwórz grupę kopii zapasowych"
           },
           "toast": {
-            "downloadStarted": "Download started.",
-            "restoringBackup": "Restoring backup...",
-            "exportStarted": "Backup export started."
+            "downloadStarted": "Rozpoczęto pobieranie.",
+            "restoringBackup": "Przywracanie kopii zapasowej...",
+            "exportStarted": "Rozpoczęto eksport kopii zapasowej."
           },
           "modal": {
             "createBackup": {
-              "title": "Create Backup",
-              "noGroup": "No group",
+              "title": "Utwórz kopię zapasową",
+              "noGroup": "Brak grupy",
               "toast": {
-                "created": "Backup created."
+                "created": "Utworzono kopię zapasową."
               }
             },
             "editBackup": {
-              "title": "Edit Backup",
+              "title": "Edytuj kopię zapasową",
               "toast": {
                 "updated": "Backup updated."
               }
@@ -6040,7 +6150,7 @@
             "columns": {
               "target": "Target",
               "mounted": "Mounted",
-              "readOnly": "Read Only"
+              "readOnly": "Tylko do odczytu"
             }
           },
           "button": {
@@ -6075,19 +6185,19 @@
             }
           },
           "rename": {
-            "title": "Rename Server",
+            "title": "Zmień nazwę serwera",
             "toast": {
-              "renamed": "Server renamed."
+              "renamed": "Zmieniono nazwę serwera."
             }
           },
           "timezone": {
-            "title": "Timezone",
+            "title": "Strefa czasowa",
             "toast": {
-              "updated": "Server timezone updated."
+              "updated": "Strefa czasowa serwera zaktualizowana."
             }
           },
           "autokill": {
-            "title": "Auto-Kill",
+            "title": "Auto-zabijanie",
             "form": {
               "secondsUntilAutoKill": "Seconds until auto-kill"
             },
@@ -6096,31 +6206,31 @@
             }
           },
           "autostart": {
-            "title": "Auto-Start",
+            "title": "Autouruchamianie",
             "form": {
-              "behavior": "Behavior"
+              "behavior": "Zachowanie"
             },
             "toast": {
-              "updated": "Server auto-start behavior updated."
+              "updated": "Zaktualizowano zachowanie automatycznego uruchamiania serwera."
             }
           },
           "reinstall": {
-            "title": "Reinstall Server",
-            "button": "Reinstall Server",
-            "content": "Reinstalling your server will stop it, and then re-run the installation script that initially set it up. **Some files may be deleted or modified during this process, please back up your data before continuing.**",
+            "title": "Zainstaluj serwer ponownie",
+            "button": "Zainstaluj serwer ponownie",
+            "content": "Ponowna instalacja serwera zatrzyma go, a następnie uruchom skrypt instalacyjny, który początkowo go utworzył. **Niektóre pliki mogą zostać usunięte lub zmodyfikowane podczas tego procesu, wykonaj kopię zapasową swoich danych przed kontynuowaniem.**",
             "modal": {
-              "title": "Reinstall Server",
-              "button": "Reinstall",
+              "title": "Zainstaluj serwer ponownie",
+              "button": "Zainstaluj ponownie",
               "toast": {
-                "reinstalling": "Reinstalling server..."
+                "reinstalling": "Ponowna instalacja serwera..."
               }
             }
           }
         },
         "activity": {
-          "title": "Activity",
+          "title": "Aktywność",
           "button": {
-            "clearUserFilter": "Clear User Filter"
+            "clearUserFilter": "Wyczyść filtr użytkownika"
           }
         }
       }

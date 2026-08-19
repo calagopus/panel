@@ -24,6 +24,14 @@
       "many": "{count} súboru",
       "other": "{count} súborov"
     },
+    "directory": {
+      "zero": "{count} Directories",
+      "one": "{count} Directory",
+      "two": "{count} Directories",
+      "few": "{count} Directories",
+      "many": "{count} Directories",
+      "other": "{count} Directories"
+    },
     "server": {
       "zero": "{count} serverov",
       "one": "{count} server",
@@ -325,6 +333,7 @@
         "portRangesPlaceholder": "Rozsahy portov (napr. 3000-4000)",
         "currentPassword": "Aktuálne heslo",
         "confirmPassword": "Potvrdiť heslo",
+        "passwordRequired": "Password is required",
         "authenticationCode": "Autentifikačný kód",
         "restoreStartup": "Obnoviť z tejto zálohy spúšťací príkaz, obraz Docker a premenné.",
         "lineContains": "Riadok obsahuje",
@@ -573,6 +582,40 @@
           "themeAuto": "Auto",
           "themeDark": "Dark",
           "themeLight": "Light"
+        },
+        "modal": {
+          "logout": {
+            "title": "Logout",
+            "content": "Are you sure you want to log out?"
+          }
+        }
+      },
+      "quickActions": {
+        "trigger": "Quick actions...",
+        "placeholder": "Search for actions and pages...",
+        "category": {
+          "navigation": "Navigation",
+          "power": "Power",
+          "account": "Account",
+          "servers": "Servers",
+          "users": "Users",
+          "page": "This Page",
+          "pageNavigation": "Page Navigation",
+          "math": "Calculator"
+        },
+        "math": {
+          "calculating": "Calculating...",
+          "unsolvable": "This expression cannot be solved",
+          "copyResult": "Copy result"
+        },
+        "hint": {
+          "navigate": "to navigate",
+          "select": "to select",
+          "close": "to close",
+          "calculate": "to calculate",
+          "pages": "for pages only",
+          "servers": "for servers only",
+          "users": "for users only"
         }
       },
       "permissionSelector": {
@@ -685,34 +728,42 @@
             "operations": {
               "compressing": {
                 "completed": "Komprimované {files} na `{path}` v {time}.",
-                "failed": "Nepodarilo sa komprimovať {files} na `{path}`:\n{error}"
+                "failed": "Nepodarilo sa komprimovať {files} na `{path}`:\n{error}",
+                "aborted": "Compression of {files} to `{path}` was cancelled."
               },
               "decompressing": {
                 "completed": "Dekomprimované `{path}` na `{destination}` v {time}.",
-                "failed": "Nepodarilo sa dekomprimovať `{path}` na `{destination}`:\n{error}"
+                "failed": "Nepodarilo sa dekomprimovať `{path}` na `{destination}`:\n{error}",
+                "aborted": "Decompression of `{path}` to `{destination}` was cancelled."
               },
               "pulling": {
                 "completed": "Stiahnuté `{destination}` za {time}.",
-                "failed": "Nepodarilo sa stiahnuť `{destination}`:\n{error}"
+                "failed": "Nepodarilo sa stiahnuť `{destination}`:\n{error}",
+                "aborted": "Pull of `{destination}` was cancelled."
               },
               "copying": {
                 "completed": "Skopírované `{path}` do `{destination}` v {time}.",
                 "completedMany": "Copied `{path}` to `{destination}` ({files}) in {time}.",
-                "failed": "Nepodarilo sa skopírovať `{path}` do `{destination}`:\n{error}"
+                "failed": "Nepodarilo sa skopírovať `{path}` do `{destination}`:\n{error}",
+                "aborted": "Copy of `{path}` to `{destination}` was cancelled."
               },
               "copyingMany": {
                 "completed": "Skopírované {files} za {time}.",
-                "failed": "Nepodarilo sa skopírovať {files}:\n{error}"
+                "failed": "Nepodarilo sa skopírovať {files}:\n{error}",
+                "aborted": "Copy of {files} was cancelled."
               },
               "copyingRemote": {
                 "completedFrom": "Skopírované {files} zo vzdialeného servera v {time}.",
                 "completedTo": "{files} bolo skopírované na vzdialený server v {time}.",
                 "failedFrom": "Nepodarilo sa skopírovať {files} zo vzdialeného servera:\n{error}",
-                "failedTo": "Nepodarilo sa skopírovať {files} na vzdialený server:\n{error}"
+                "failedTo": "Nepodarilo sa skopírovať {files} na vzdialený server:\n{error}",
+                "abortedFrom": "Copy of {files} from remote server was cancelled.",
+                "abortedTo": "Copy of {files} to remote server was cancelled."
               },
               "exportingBackup": {
                 "completed": "Exported backup to `{destination}` in {time}.",
-                "failed": "Failed to export backup to `{destination}`:\n{error}"
+                "failed": "Failed to export backup to `{destination}`:\n{error}",
+                "aborted": "Backup export to `{destination}` was cancelled."
               }
             }
           }
@@ -827,10 +878,8 @@
           "form": {
             "name": "Názov",
             "namePlaceholder": "Môj server",
-            "urlPlaceholder": "URL",
             "urlDescription": "slúži na internú komunikáciu s uzlom",
             "publicUrl": "Verejná adresa URL",
-            "publicUrlPlaceholder": "URL",
             "publicUrlDescription": "používa sa na websocket/sťahovanie",
             "sftpHostPlaceholder": "Hostiteľ SFTP",
             "sftpPortPlaceholder": "Port SFTP",
@@ -863,7 +912,6 @@
             "applicationNamePlaceholder": "Calagopus",
             "languagePlaceholder": "Jazyk",
             "applicationUrl": "Adresa URL aplikácie",
-            "applicationUrlPlaceholder": "https://calagop.us",
             "registration": "Povoliť registráciu",
             "registrationDescription": "Umožní novým používateľom zaregistrovať si vlastný účet.",
             "securityKeys": "Enable Security Keys",
@@ -1020,6 +1068,13 @@
         "register": {
           "title": "Registrácia",
           "subtitle": "Na registráciu zadajte svoje údaje",
+          "form": {
+            "usernamePlaceholder": "Your username",
+            "emailPlaceholder": "you@example.com",
+            "firstNamePlaceholder": "Your first name",
+            "lastNamePlaceholder": "Your last name",
+            "passwordPlaceholder": "Enter a strong password"
+          },
           "button": {
             "register": "Registrovať sa"
           }
@@ -1027,6 +1082,9 @@
         "forgotPassword": {
           "title": "Zabudnuté heslo",
           "subtitle": "Zadajte svoj e-mail a pošleme vám pokyny na obnovenie hesla",
+          "form": {
+            "emailPlaceholder": "you@example.com"
+          },
           "button": {
             "request": "Požiadať o obnovenie hesla"
           },
@@ -1035,6 +1093,10 @@
         "resetPassword": {
           "title": "Obnoviť heslo",
           "subtitle": "Zadajte svoje nové heslo",
+          "form": {
+            "passwordPlaceholder": "Enter a strong password",
+            "confirmPasswordPlaceholder": "Re-enter your password"
+          },
           "button": {
             "reset": "Obnoviť heslo"
           },
@@ -1058,9 +1120,6 @@
             "noGroups": "Nie sú dostupné žiadne skupiny na pridanie servera",
             "noGroup": "Tento server nie je v žiadnej skupine",
             "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
-          },
-          "badge": {
-            "foreign": "Zahraničné"
           },
           "tabs": {
             "groupedServers": {
@@ -1304,7 +1363,8 @@
           },
           "general": {
             "title": "General",
-            "undo": "Undo the last action"
+            "undo": "Undo the last action",
+            "quickActions": "Open quick actions"
           },
           "fileManager": {
             "title": "Správca súborov",
@@ -1494,7 +1554,6 @@
           },
           "form": {
             "allowedIps": "Povolené adresy IP",
-            "allowedIpsPlaceholder": "napr. 192.168.1.1, 2001:db8::1",
             "userPermissions": "Používateľské povolenia",
             "serverPermissions": "Povolenia servera",
             "adminPermissions": "Povolenia správcu"
@@ -2023,6 +2082,11 @@
             "upload": "Nahrať",
             "copyLink": "Kopírovať odkaz"
           },
+          "quickAction": {
+            "uploadFiles": "Upload Assets",
+            "parentDirectory": "Go to Parent Directory",
+            "deleteSelection": "Delete Selection"
+          },
           "dropzone": {
             "title": "Sem presuňte súbory na nahranie",
             "subtitle": "Uvoľnením spustíte nahrávanie"
@@ -2369,7 +2433,6 @@
                 },
                 "form": {
                   "urlDescription": "Používa sa na internú komunikáciu s uzlom.",
-                  "urlPlaceholder": "https://node.example.com:8080",
                   "publicUrlDescription": "Používa sa na pripojenie cez websocket a sťahovanie.",
                   "backupConfigurationPlaceholder": "Zdediť z lokality",
                   "memoryDescription": "The total memory available for servers on this node.",
@@ -2530,10 +2593,16 @@
               "page": {
                 "title": "Alokácie uzla",
                 "tooltip": {
-                  "clearSelection": "Vymazať výber"
+                  "clearSelection": "Vymazať výber",
+                  "selectAllMatching": "Select all {count} matching"
                 },
                 "form": {
-                  "ipAlias": "IP alias"
+                  "ipAlias": "IP alias",
+                  "portFrom": "Port from",
+                  "portTo": "Port to",
+                  "assigned": "Assignment",
+                  "assignedOnly": "Assigned only",
+                  "unassignedOnly": "Unassigned only"
                 },
                 "table": {
                   "columns": {
@@ -2552,15 +2621,23 @@
                   },
                   "update": {
                     "title": "Aktualizovať alokáciu uzla",
+                    "button": {
+                      "update": "Update {count}"
+                    },
                     "toast": {
-                      "updated": "Aktualizované {allocations}."
+                      "updated": "Aktualizované {allocations}.",
+                      "updatedPartial": "{allocations} updated. {skipped} skipped, because that port is already taken on the target IP."
                     }
                   },
                   "delete": {
                     "title": "Potvrdiť odstránenie alokácií uzlov",
-                    "content": "Naozaj chcete odstrániť `{count}` alokácií z **{name}**?",
+                    "content": "Are you sure you want to delete {allocations} from **{name}**?",
+                    "alert": {
+                      "forceWarning": "Force deletion removes allocations that are assigned to a server, including servers being transferred. Affected servers lose the allocation immediately and will not start correctly after their next restart."
+                    },
                     "toast": {
-                      "deleted": "{allocations} odstránené."
+                      "deleted": "{allocations} odstránené.",
+                      "deletedPartial": "{allocations} deleted. {skipped} skipped, because they are assigned to a server."
                     }
                   }
                 }
@@ -2639,7 +2716,7 @@
                   "reattached": "Záloha bola úspešne znovu pripojená k {name}.",
                   "restoring": "Obnovuje sa záloha na {name}...",
                   "exporting": "Exporting backup to files of {name}...",
-                  "deleted": "Záloha uzla bola odstránená."
+                  "deletionStarted": "Node backup deletion started."
                 },
                 "modal": {
                   "export": {
@@ -2744,6 +2821,14 @@
         "servers": {
           "title": "Servery",
           "resourceName": "Server",
+          "quickAction": {
+            "viewClient": "View Server in Client Area",
+            "transfer": "Transfer Server",
+            "suspend": "Suspend Server",
+            "unsuspend": "Unsuspend Server",
+            "clearState": "Clear Server State",
+            "delete": "Delete Server"
+          },
           "externalIdLookup": {
             "button": "Find by External ID",
             "modal": {
@@ -2859,11 +2944,8 @@
                   "pinnedCpus": "Pripnuté CPU",
                   "pinnedCpusDescription": "Jadrá CPU, ku ktorým je tento server pripnutý.",
                   "pinnedCpusTooltip": "By index, e.g. 0, 1, 2. Leave empty to allow all cores.",
-                  "dockerImagePlaceholder": "ghcr.io/...",
                   "predefinedDockerImages": "Preddefinované obrazy Docker",
                   "predefinedDockerImagesPlaceholder": "Nie je vybratý žiadny preddefinovaný obraz",
-                  "timezonePlaceholder": "Európa/Amsterdam",
-                  "startupCommandPlaceholder": "npm start",
                   "startupCommandCustom": "Vlastné",
                   "predefinedStartupCommands": "Predefined Startup Commands",
                   "startOnCompletion": "Spustiť po dokončení",
@@ -3214,10 +3296,12 @@
                     "title": "Premenné",
                     "page": {
                       "title": "Premenné tohto eggu",
+                      "aria": {
+                        "reorder": "Reorder variable"
+                      },
                       "form": {
                         "supportsMarkdown": "Podporuje formátovanie Markdown.",
                         "defaultValue": "Predvolená hodnota",
-                        "defaultValuePlaceholder": "server.jar",
                         "userViewable": "Viditeľné používateľom",
                         "userEditable": "Upraviteľné používateľom",
                         "secret": "Tajná premenná",
@@ -3375,7 +3459,6 @@
                   "credentialType": "Credential Type",
                   "password": "Password or Access Token",
                   "privateKey": "Private Key",
-                  "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----",
                   "passphrase": "Passphrase"
                 },
                 "enum": {
@@ -3441,8 +3524,7 @@
                   "publicPort": "Verejný port",
                   "connectionCredentials": "Prihlasovacie údaje",
                   "credentialType": "Typ poverenia",
-                  "connectionString": "Pripojovací reťazec",
-                  "connectionStringPlaceholder": "mysql://username:password@host:port"
+                  "connectionString": "Pripojovací reťazec"
                 },
                 "enum": {
                   "credentialType": {
@@ -3496,7 +3578,6 @@
                 "titleCreate": "Create Database Agent Host",
                 "titleUpdate": "Update Database Agent Host",
                 "form": {
-                  "urlPlaceholder": "https://agent.example.com:8080",
                   "typeEnabled": "Enabled",
                   "typePublicHost": "Public Host",
                   "typePublicPort": "Public Port"
@@ -4365,6 +4446,10 @@
             "increaseFontSize": "Zväčšiť veľkosť písma",
             "copySelection": "Copy Selection"
           },
+          "quickAction": {
+            "search": "Search Console",
+            "scrollToBottom": "Scroll to Bottom"
+          },
           "drawer": {
             "commandHistory": {
               "title": "História príkazov",
@@ -4471,6 +4556,33 @@
             "loadDisk": "Load Disk Version",
             "keepEditor": "Keep Editor Version"
           },
+          "quickAction": {
+            "newFile": "New File",
+            "newDirectory": "New Directory",
+            "pullFile": "Pull File from URL",
+            "uploadFiles": "Upload Files",
+            "uploadDirectory": "Upload Directory",
+            "search": "Search Files",
+            "largestDirectories": "Analyze Directory Sizes",
+            "parentDirectory": "Go to Parent Directory",
+            "copyPath": "Copy Current Path",
+            "exitBackup": "Exit Backup Browsing",
+            "connectSftp": "Connect via SFTP",
+            "connectVscode": "Open in VS Code",
+            "cancelPaste": "Cancel Pending Copy or Move",
+            "downloadSelection": "Download Selection",
+            "copySelection": "Copy Selection",
+            "moveSelection": "Move Selection",
+            "remoteCopySelection": "Copy Selection to another Server",
+            "archiveSelection": "Archive Selection",
+            "extractSelection": "Extract Archive",
+            "renameSelection": "Rename Selection",
+            "permissionsSelection": "Change Permissions",
+            "fingerprintSelection": "Show File Fingerprint",
+            "deleteSelection": "Delete Selection",
+            "saveFile": "Save File",
+            "createFile": "Create File"
+          },
           "actionBar": {
             "copyHere": "Kopírovať sem {files}",
             "moveHere": "Presunúť {files} sem"
@@ -4505,6 +4617,7 @@
             "editorMinimap": "Zobraziť minimapu súboru",
             "editorLineOverflow": "Zalamovať príliš dlhé riadky",
             "editorFontSize": "Editor Font Size",
+            "editorEngine": "Editor Engine",
             "vscodeUriScheme": "Schéma URI pre VS Code",
             "imageViewerSmoothing": "Vyhladzovanie obrázkov (anti-aliasing)"
           },
@@ -4542,6 +4655,7 @@
             "fileTooLargeToOpen": "This file is too large to open in the file manager."
           },
           "tooltip": {
+            "settings": "Settings",
             "fileHistory": "História súborov",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4777,10 +4891,6 @@
         "databases": {
           "title": "Databázy",
           "subtitle": "Vytvorené databázy: {current} z {max}.",
-          "classic": {
-            "title": "Classic Databases",
-            "subtitle": "{current} databases created."
-          },
           "tooltip": {
             "limitReached": "Tento server má limit {max} databáz."
           },
@@ -4955,7 +5065,6 @@
           },
           "instance": {
             "title": "Managed Databases",
-            "subtitle": "{current} managed databases created.",
             "updateAvailable": "Update Available",
             "button": {
               "applyUpdate": "Apply Update"
@@ -5097,7 +5206,8 @@
               "operations": {
                 "remoteImport": {
                   "completed": "Imported `{database}` from `{source}` in {time}.",
-                  "failed": "Failed to import `{database}` from `{source}`:\n{error}"
+                  "failed": "Failed to import `{database}` from `{source}`:\n{error}",
+                  "aborted": "Import of `{database}` from `{source}` was cancelled."
                 }
               }
             },
