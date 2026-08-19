@@ -2,14 +2,14 @@ import { faEnvelope, faExclamationTriangle, faInfoCircle } from '@fortawesome/fr
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import forgotPassword from '@/api/auth/forgotPassword.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
-import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
+import Captcha, { useCaptcha } from '@/elements/Captcha.tsx';
 import Card from '@/elements/Card.tsx';
 import Divider from '@/elements/Divider.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -30,8 +30,7 @@ export default function ForgotPassword() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [requested, setRequested] = useState(false);
-  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
-  const captchaRef = useRef<CaptchaRef>(null);
+  const captcha = useCaptcha();
 
   const form = useForm<z.infer<typeof authForgotPasswordSchema>>({
     initialValues: {
@@ -41,20 +40,18 @@ export default function ForgotPassword() {
     validate: zod4Resolver(authForgotPasswordSchema),
   });
 
-  const submit = () => {
+  const submit = async () => {
     setLoading(true);
-
-    captchaRef.current?.getToken().then((token) => {
-      forgotPassword(form.values, token)
-        .then(() => {
-          setSuccess(t('pages.auth.forgotPassword.success', {}));
-          setRequested(true);
-        })
-        .catch((msg) => {
-          setError(httpErrorToHuman(msg));
-        })
-        .finally(() => setLoading(false));
-    });
+    try {
+      const token = await captcha.getToken();
+      await forgotPassword(form.values, token);
+      setSuccess(t('pages.auth.forgotPassword.success', {}));
+      setRequested(true);
+    } catch (err) {
+      setError(httpErrorToHuman(err));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -108,6 +105,7 @@ export default function ForgotPassword() {
               label={t('common.form.email', {})}
               placeholder={t('pages.auth.forgotPassword.form.emailPlaceholder', {})}
               autoComplete='email'
+              onKeyDown={(e) => e.key === 'Enter' && form.isValid() && captcha.isValid && !requested && submit()}
               leftSection={<FontAwesomeIcon icon={faEnvelope} />}
               size='md'
               autoFocus
@@ -117,7 +115,7 @@ export default function ForgotPassword() {
             <Button
               onClick={submit}
               loading={loading}
-              disabled={requested || !form.isValid() || !isCaptchaValid}
+              disabled={requested || !form.isValid() || !captcha.isValid}
               size='md'
               fullWidth
             >
@@ -131,7 +129,7 @@ export default function ForgotPassword() {
             </Button>
           </Stack>
         </Card>
-        <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
+        <Captcha {...captcha.props} />
       </Stack>
     </AuthWrapper>
   );
