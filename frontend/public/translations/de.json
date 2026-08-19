@@ -1256,7 +1256,11 @@
               "title": "Avatar",
               "toast": {
                 "updated": "Avatar erfolgreich aktualisiert.",
-                "removed": "Avatar erfolgreich entfernt."
+                "removed": "Avatar erfolgreich entfernt.",
+                "invalidImage": "Bitte wählen Sie eine gültige Bilddatei (PNG, JPEG, WebP, GIF) aus.",
+                "sizeExceeded": "Die Bilddateigröße darf 10 MB nicht überschreiten.",
+                "loadFailed": "Bildvorschau konnte nicht geladen werden. Bitte stellen Sie sicher, dass die Datei ein gültiges Bild ist.",
+                "processFailed": "Avatar-Bild konnte nicht verarbeitet werden."
               },
               "form": {
                 "avatar": "Avatar"
