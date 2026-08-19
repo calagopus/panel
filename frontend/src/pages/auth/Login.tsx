@@ -2,7 +2,7 @@ import { faExclamationTriangle, faFingerprint, faLock, faUser } from '@fortaweso
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { startTransition, useEffect, useRef, useState } from 'react';
+import { startTransition, useEffect, useState } from 'react';
 import { NavLink, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import getDiscoverableSecurityKeyChallenge from '@/api/auth/getDiscoverableSecurityKeyChallenge.ts';
@@ -14,7 +14,7 @@ import postSecurityKeyChallenge from '@/api/auth/postSecurityKeyChallenge.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
-import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
+import Captcha, { useCaptcha } from '@/elements/Captcha.tsx';
 import Card from '@/elements/Card.tsx';
 import Divider from '@/elements/Divider.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
@@ -43,8 +43,7 @@ export default function Login() {
   const [oAuthProviders, setOAuthProviders] = useState<z.infer<typeof oAuthProviderSchema>[]>([]);
   const [passkeyUuid, setPasskeyUuid] = useState('');
   const [passkeyOptions, setPasskeyOptions] = useState<CredentialRequestOptions>();
-  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
-  const captchaRef = useRef<CaptchaRef>(null);
+  const captcha = useCaptcha();
 
   const usernameForm = useForm({
     initialValues: {
@@ -192,46 +191,36 @@ export default function Login() {
       t('pages.auth.login.passkey.error.noUsernamelessKey', {}),
     );
 
-  const doSubmitPassword = () => {
+  const doSubmitPassword = async () => {
     setLoading(true);
-
-    const tokenPromise = captchaRef.current?.getToken() ?? Promise.resolve(null);
-    tokenPromise
-      .then((token) => {
-        login({
-          user: usernameForm.values.username,
-          password: passwordForm.values.password,
-          captcha: token,
-        })
-          .then((response) => {
-            if (response.type === 'two_factor_required') {
-              const authInfo = btoa(
-                JSON.stringify({
-                  user: response.user,
-                  token: response.token,
-                }),
-              )
-                .replaceAll('+', '-')
-                .replaceAll('/', '_');
-
-              navigate(`/auth/login/checkpoint?data=${authInfo}`);
-
-              return;
-            }
-
-            doLogin(response.user);
-          })
-          .catch((msg) => {
-            setError(httpErrorToHuman(msg));
-            captchaRef.current?.resetCaptcha();
-          })
-          .finally(() => setLoading(false));
-      })
-      .catch((err) => {
-        setError(httpErrorToHuman(err));
-        captchaRef.current?.resetCaptcha();
-        setLoading(false);
+    try {
+      const token = await captcha.getToken();
+      const response = await login({
+        user: usernameForm.values.username,
+        password: passwordForm.values.password,
+        captcha: token,
       });
+
+      if (response.type === 'two_factor_required') {
+        const authInfo = btoa(
+          JSON.stringify({
+            user: response.user,
+            token: response.token,
+          }),
+        )
+          .replaceAll('+', '-')
+          .replaceAll('/', '_');
+
+        navigate(`/auth/login/checkpoint?data=${authInfo}`);
+        return;
+      }
+
+      doLogin(response.user);
+    } catch (err) {
+      setError(httpErrorToHuman(err));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -422,7 +411,7 @@ export default function Login() {
                 />
                 <Button
                   onClick={doSubmitPassword}
-                  disabled={!passwordForm.isValid() || !isCaptchaValid}
+                  disabled={!passwordForm.isValid() || !captcha.isValid}
                   loading={loading}
                   size='md'
                   fullWidth
@@ -442,7 +431,7 @@ export default function Login() {
             </Card>
           </>
         ) : null}
-        <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
+        <Captcha {...captcha.props} />
       </Stack>
     </AuthWrapper>
   );
