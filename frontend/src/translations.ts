@@ -1176,6 +1176,10 @@ const baseTranslations = defineTranslations({
               toast: {
                 updated: 'Avatar updated successfully.',
                 removed: 'Avatar removed successfully.',
+                invalidImage: 'Please select a valid image file (PNG, JPEG, WebP, GIF).',
+                sizeExceeded: 'Image file size must not exceed 10MB.',
+                loadFailed: 'Failed to load image preview. Please ensure the file is a valid image.',
+                processFailed: 'Failed to process avatar image.',
               },
               form: {
                 avatar: 'Avatar',
