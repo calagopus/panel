@@ -1,11 +1,10 @@
 import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useRef, useState } from 'react';
 import { z } from 'zod';
 import createSubuser from '@/api/server/subusers/createSubuser.ts';
 import Button from '@/elements/Button.tsx';
-import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
+import Captcha, { useCaptcha } from '@/elements/Captcha.tsx';
 import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
@@ -29,8 +28,7 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
 
   const grantablePermissions = server.permissions.includes('*') ? undefined : server.permissions;
 
-  const captchaRef = useRef<CaptchaRef>(null);
-  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
+  const captcha = useCaptcha();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverSubuserCreateSchema>>(
     {
@@ -42,12 +40,12 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
       validate: zod4Resolver(serverSubuserCreateSchema),
       onClose: props.onClose,
       onSubmit: async (values) => {
-        const captcha = (await captchaRef.current?.getToken()) ?? null;
+        const captchaToken = await captcha.getToken();
         await createSubuser(server.uuid, {
           email: values.email,
           permissions: Array.from(values.permissions),
           ignoredFiles: values.ignoredFiles,
-          captcha,
+          captcha: captchaToken,
         });
         queryClient.invalidateQueries({
           queryKey: queryKeys.server(server.uuid).subusers.all(),
@@ -94,10 +92,10 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
 
         <ModalFooter>
           <div className='mr-auto w-full sm:w-auto'>
-            <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
+            <Captcha {...captcha.props} />
           </div>
 
-          <Button type='submit' loading={loading} disabled={!form.isValid() || !isCaptchaValid}>
+          <Button type='submit' loading={loading} disabled={!form.isValid() || !captcha.isValid}>
             {t('common.button.create', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
