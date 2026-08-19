@@ -1,82 +1,75 @@
 import {
-  type CreateWidgetOptions,
   type FRCWidgetCompleteEvent,
   type FRCWidgetErrorEventData,
   FriendlyCaptchaSDK,
   type WidgetErrorData,
   type WidgetHandle,
 } from '@friendlycaptcha/sdk';
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { useEffect, useImperativeHandle, useRef } from 'react';
 
 const sdk = new FriendlyCaptchaSDK({
   apiEndpoint: 'global',
   disableEvalPatching: false,
 });
 
-type Props = Omit<CreateWidgetOptions, 'element'> & {
+export interface FriendlyCaptchaRef {
+  getResponse: () => string | undefined;
+  reset: () => void;
+}
+
+interface FriendlyCaptchaProps {
+  sitekey: string;
+  theme?: 'dark' | 'light' | 'auto';
   onComplete?: (response: string) => void;
   onError?: (error: WidgetErrorData) => void;
   onExpire?: () => void;
-};
+  ref?: React.Ref<FriendlyCaptchaRef>;
+}
 
-export type Ref = {
-  getResponse: () => string | undefined;
-  reset: () => void;
-};
-
-const FriendlyCaptcha = forwardRef<Ref, Props>((props, ref) => {
-  const captchaRef = useRef<HTMLDivElement>(null);
+const FriendlyCaptcha = ({ sitekey, theme = 'dark', onComplete, onError, onExpire, ref }: FriendlyCaptchaProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<WidgetHandle | null>(null);
 
-  const { onComplete, onError, onExpire, ...widgetOptions } = props;
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const widget = sdk.createWidget({
+      element: containerRef.current,
+      sitekey,
+      theme,
+    });
+    widgetRef.current = widget;
+
+    return () => {
+      widget.destroy();
+      widgetRef.current = null;
+    };
+  }, [sitekey, theme]);
 
   useEffect(() => {
-    if (captchaRef.current && sdk) {
-      widgetRef.current = sdk.createWidget({
-        element: captchaRef.current,
-        ...widgetOptions,
-      });
-
-      return () => widgetRef.current?.destroy();
-    }
-  }, Object.values(widgetOptions));
-
-  useEffect(() => {
-    const element = captchaRef.current;
+    const element = containerRef.current;
     if (!element) return;
 
     const handleComplete = (e: Event) => {
-      if (onComplete) {
-        onComplete((e as FRCWidgetCompleteEvent).detail.response);
-      }
+      onComplete?.((e as FRCWidgetCompleteEvent).detail.response);
     };
 
     const handleError = (e: Event) => {
-      if (onError) {
-        onError((e as CustomEvent<FRCWidgetErrorEventData>).detail.error);
-      }
+      onError?.((e as CustomEvent<FRCWidgetErrorEventData>).detail.error);
     };
 
-    if (onComplete) {
-      element.addEventListener('frc:widget.complete', handleComplete);
-    }
-    if (onError) {
-      element.addEventListener('frc:widget.error', handleError);
-    }
-    if (onExpire) {
-      element.addEventListener('frc:widget.expire', onExpire);
-    }
+    const handleExpire = () => {
+      onExpire?.();
+    };
+
+    element.addEventListener('frc:widget.complete', handleComplete);
+    element.addEventListener('frc:widget.error', handleError);
+    element.addEventListener('frc:widget.expire', handleExpire);
 
     return () => {
-      if (onComplete) {
-        element.removeEventListener('frc:widget.complete', handleComplete);
-      }
-      if (onError) {
-        element.removeEventListener('frc:widget.error', handleError);
-      }
-      if (onExpire) {
-        element.removeEventListener('frc:widget.expire', onExpire);
-      }
+      element.removeEventListener('frc:widget.complete', handleComplete);
+      element.removeEventListener('frc:widget.error', handleError);
+      element.removeEventListener('frc:widget.expire', handleExpire);
     };
   }, [onComplete, onError, onExpire]);
 
@@ -85,7 +78,7 @@ const FriendlyCaptcha = forwardRef<Ref, Props>((props, ref) => {
     reset: () => widgetRef.current?.reset(),
   }));
 
-  return <div ref={captchaRef} />;
-});
+  return <div ref={containerRef} />;
+};
 
 export default FriendlyCaptcha;
