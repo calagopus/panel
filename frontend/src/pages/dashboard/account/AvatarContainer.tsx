@@ -50,11 +50,7 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
     if (!file || isPending) return;
 
     editor.current?.getImageScaledToCanvas().toBlob(
-      (blob) => {
-        if (blob) {
-          updateMutation.mutate(blob);
-        }
-      },
+      (blob) => blob && updateMutation.mutate(blob),
       'image/webp',
       0.9,
     );
@@ -78,10 +74,11 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
           width={512}
           showGrid
           onLoadFailure={() => {
-            if (file) {
+            setFile((current) => {
+              if (!current) return null;
               addToast(t('pages.account.account.containers.avatar.toast.loadFailed', {}), 'error');
-              setFile(null);
-            }
+              return null;
+            });
           }}
           style={{ width: 256, height: 256, borderRadius: '0.25rem' }}
         />
@@ -91,7 +88,7 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
             label={t('pages.account.account.containers.avatar.form.avatar', {})}
             value={file}
             onChange={setFile}
-            accept='image/png,image/jpeg,image/webp,image/gif,.png,.jpg,.jpeg,.webp,.gif'
+            accept='image/*'
             disabled={isPending}
             clearable
           />
