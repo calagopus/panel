@@ -2,14 +2,14 @@ import { faEnvelope, faExclamationTriangle, faLock, faUser } from '@fortawesome/
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import register from '@/api/auth/register.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
-import Captcha, { CaptchaRef } from '@/elements/Captcha.tsx';
+import Captcha, { useCaptcha } from '@/elements/Captcha.tsx';
 import Card from '@/elements/Card.tsx';
 import Divider from '@/elements/Divider.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
@@ -31,8 +31,7 @@ export default function Register() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
-  const captchaRef = useRef<CaptchaRef>(null);
+  const captcha = useCaptcha();
 
   const form = useForm<z.infer<typeof authRegisterSchema>>({
     initialValues: {
@@ -46,19 +45,17 @@ export default function Register() {
     validate: zod4Resolver(authRegisterSchema),
   });
 
-  const submit = () => {
+  const submit = async () => {
     setLoading(true);
-
-    captchaRef.current?.getToken().then((token) => {
-      register({ ...form.values, captcha: token })
-        .then((response) => {
-          doLogin(response.user!);
-        })
-        .catch((msg) => {
-          setError(httpErrorToHuman(msg));
-        })
-        .finally(() => setLoading(false));
-    });
+    try {
+      const token = await captcha.getToken();
+      const response = await register({ ...form.values, captcha: token });
+      doLogin(response.user!);
+    } catch (err) {
+      setError(httpErrorToHuman(err));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -134,6 +131,7 @@ export default function Register() {
               label={t('common.form.password', {})}
               placeholder={t('pages.auth.register.form.passwordPlaceholder', {})}
               autoComplete='new-password'
+              onKeyDown={(e) => e.key === 'Enter' && form.isValid() && captcha.isValid && submit()}
               leftSection={<FontAwesomeIcon icon={faLock} />}
               size='md'
               {...form.getInputProps('password')}
@@ -142,7 +140,7 @@ export default function Register() {
             <Button
               onClick={submit}
               loading={loading}
-              disabled={!form.isValid() || !isCaptchaValid}
+              disabled={!form.isValid() || !captcha.isValid}
               size='md'
               fullWidth
             >
@@ -156,7 +154,7 @@ export default function Register() {
             </Button>
           </Stack>
         </Card>
-        <Captcha ref={captchaRef} onValidChange={setIsCaptchaValid} />
+        <Captcha {...captcha.props} />
       </Stack>
     </AuthWrapper>
   );
