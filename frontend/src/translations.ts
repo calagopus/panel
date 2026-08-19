@@ -119,6 +119,17 @@ const baseTranslations = defineTranslations({
           exception: 'Exception',
           tooManyPatterns: 'Matching is not counted automatically for more than {max} patterns.',
         },
+        cronInput: {
+          segments: {
+            second: 'Second',
+            minute: 'Minute',
+            hour: 'Hour',
+            day: 'Day',
+            month: 'Month',
+            weekday: 'Weekday',
+          },
+          nextRun: 'Next run is {timestamp}.',
+        },
       },
       modal: {
         duplicate: {

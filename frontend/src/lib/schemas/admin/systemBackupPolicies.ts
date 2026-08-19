@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { nullableNumber, nullableString } from '@/lib/transformers.ts';
+import { isValidCronExpression } from '../server/schedules.ts';
 import { adminBackupConfigurationSchema } from './backupConfigurations.ts';
 import { adminLocationSchema } from './locations.ts';
 import { adminNodeSchema } from './nodes.ts';
@@ -37,6 +38,7 @@ export const adminSystemBackupPolicyUpdateSchema = z.lazy(() =>
     })
     .extend({
       backupConfigurationUuid: z.uuid().nullable(),
+      cron: z.string().refine(isValidCronExpression, { message: 'Invalid cron expression' }),
     }),
 );
 
