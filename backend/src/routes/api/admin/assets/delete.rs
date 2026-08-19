@@ -36,11 +36,12 @@ mod post {
         let mut futures = Vec::new();
 
         for name in &data.names {
-            if name.contains("..") {
+            let clean_name = name.trim_matches('/');
+            if clean_name.is_empty() || clean_name.contains("..") {
                 continue;
             }
 
-            futures.push(state.storage.remove(Some(format!("assets/{name}"))));
+            futures.push(state.storage.remove(Some(format!("assets/{clean_name}"))));
         }
 
         let mut results_stream = futures_util::stream::iter(futures).buffer_unordered(5);
