@@ -3265,15 +3265,26 @@ const baseTranslations = defineTranslations({
                       button: {
                         addReplacement: 'Add Replacement',
                         addConfigFile: 'Add Config File',
+                        syncStartup: 'Sync to Servers',
                       },
                       toast: {
                         exported: 'Egg exported.',
                         updated: 'Egg updated.',
+                        startupSynced: 'Startup command applied to {servers}.',
                       },
                       modal: {
                         delete: {
                           title: 'Confirm Egg Deletion',
                           content: 'Are you sure you want to delete **{name}**?',
+                        },
+                        syncStartup: {
+                          title: 'Sync Startup Command to Servers',
+                          alert: {
+                            unsavedChanges:
+                              'The startup commands have unsaved changes. Save the egg first, otherwise the old command would be synced.',
+                            overwritesEverything:
+                              'This applies the selected command to every server using this egg. Servers running a different command of this egg, as well as individually customized startup commands, will be replaced and cannot be restored.',
+                          },
                         },
                       },
                     },

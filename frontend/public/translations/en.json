@@ -336,6 +336,8 @@
         "destination": "Destination",
         "destinationDirectory": "Destination Directory",
         "directoryName": "Directory Name",
+        "symlinkName": "Symlink Name",
+        "symlinkTarget": "Symlink Target",
         "locked": "Locked",
         "portRanges": "Port Ranges",
         "portRangesPlaceholder": "Port Ranges (eg. 3000-4000)",
@@ -3297,16 +3299,25 @@
                       "emptyReplacements": "No replacements defined.",
                       "button": {
                         "addReplacement": "Add Replacement",
-                        "addConfigFile": "Add Config File"
+                        "addConfigFile": "Add Config File",
+                        "syncStartup": "Sync to Servers"
                       },
                       "toast": {
                         "exported": "Egg exported.",
-                        "updated": "Egg updated."
+                        "updated": "Egg updated.",
+                        "startupSynced": "Startup command applied to {servers}."
                       },
                       "modal": {
                         "delete": {
                           "title": "Confirm Egg Deletion",
                           "content": "Are you sure you want to delete **{name}**?"
+                        },
+                        "syncStartup": {
+                          "title": "Sync Startup Command to Servers",
+                          "alert": {
+                            "unsavedChanges": "The startup commands have unsaved changes. Save the egg first, otherwise the old command would be synced.",
+                            "overwritesEverything": "This applies the selected command to every server using this egg. Servers running a different command of this egg, as well as individually customized startup commands, will be replaced and cannot be restored."
+                          }
                         }
                       }
                     }
@@ -4581,6 +4592,7 @@
             "exitBackup": "Exit Backup",
             "fileFromEditor": "File from Editor",
             "directory": "Directory",
+            "symlink": "Symlink",
             "fileFromPull": "File from Pull",
             "fileFromUpload": "File from Upload",
             "directoryFromUpload": "Directory from Upload",
@@ -4756,6 +4768,12 @@
             "createDirectory": {
               "title": "Create Directory",
               "createdAs": "This directory will be created as "
+            },
+            "createSymlink": {
+              "title": "Create Symlink",
+              "targetDescription": "Relative to the directory the symlink is created in.",
+              "createdAs": "This symlink will be created as ",
+              "pointsTo": "It will point to "
             },
             "copyFile": {
               "title": "Copy File",
