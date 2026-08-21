@@ -142,8 +142,9 @@ impl ServerVariable {
                 &'a crate::models::server::Server,
                 &'a str,
                 &'a mut Vec<compact_str::CompactString>,
-            ) -> Pin<Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>>
-            + Send
+            ) -> Pin<
+                Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>,
+            > + Send
             + Sync
             + 'static,
     >(
