@@ -7,6 +7,7 @@ use std::{
     pin::Pin,
     sync::{Arc, LazyLock},
 };
+
 #[derive(Serialize, Deserialize)]
 pub struct ServerVariable {
     pub variable: super::nest_egg_variable::NestEggVariable,
