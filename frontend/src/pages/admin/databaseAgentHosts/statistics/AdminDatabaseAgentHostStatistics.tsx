@@ -32,7 +32,7 @@ export default function AdminDatabaseAgentHostStatistics({
   const [stats, setStats] = useState<z.infer<typeof adminSystemStatisticsSchema> | null>(null);
 
   const cpu = useStreamChart({
-    series: useMemo(() => [t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.cpu', {})], [t]),
+    series: useMemo(() => [t('common.stat.cpu', {})], [t]),
     format: formatPercent,
     min: 10,
   });
@@ -54,13 +54,7 @@ export default function AdminDatabaseAgentHostStatistics({
     scale: 'binary',
   });
   const network = useStreamChart({
-    series: useMemo(
-      () => [
-        t('pages.admin.databaseAgentHosts.tabs.statistics.page.chart.networkInLabel', {}),
-        t('pages.admin.databaseAgentHosts.tabs.statistics.page.chart.networkOutLabel', {}),
-      ],
-      [t],
-    ),
+    series: useMemo(() => [t('common.stat.inbound', {}), t('common.stat.outbound', {})], [t]),
     format: formatBytesRate,
     scale: 'binary',
   });
@@ -99,10 +93,7 @@ export default function AdminDatabaseAgentHostStatistics({
       ) : (
         <>
           <div className='mt-4'>
-            <TitleCard
-              title={t('pages.admin.databaseAgentHosts.tabs.statistics.page.card.resources', {})}
-              icon={<FontAwesomeIcon icon={faUserLarge} />}
-            >
+            <TitleCard title={t('common.stat.resources', {})} icon={<FontAwesomeIcon icon={faUserLarge} />}>
               <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
                 <Card>
                   <Group grow>
@@ -114,7 +105,7 @@ export default function AdminDatabaseAgentHostStatistics({
                       />
                     </div>
                     <div className='flex flex-col text-right flex-1'>
-                      <Title order={2}>{t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.cpu', {})}</Title>
+                      <Title order={2}>{t('common.stat.cpu', {})}</Title>
                       <h2>
                         {t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.cpuThreads', {
                           model: stats.cpu.model,
@@ -171,9 +162,7 @@ export default function AdminDatabaseAgentHostStatistics({
                       <SemiCircleProgress value={100} label='--' filledSegmentColor='gray' />
                     </div>
                     <div className='flex flex-col text-right flex-1'>
-                      <Title order={2}>
-                        {t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.network', {})}
-                      </Title>
+                      <Title order={2}>{t('common.stat.network', {})}</Title>
                       <h2>
                         {t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.networkIn', {
                           in: bytesToString(stats.network.received),
@@ -197,14 +186,14 @@ export default function AdminDatabaseAgentHostStatistics({
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <ChartBlock
                   icon={<FontAwesomeIcon icon={faMicrochip} />}
-                  title={t('pages.admin.databaseAgentHosts.tabs.statistics.page.chart.cpuLoad', {})}
+                  title={t('common.stat.cpuLoad', {})}
                   value={cpu.value}
                 >
                   <StreamChart {...cpu.props} />
                 </ChartBlock>
                 <ChartBlock
                   icon={<FontAwesomeIcon icon={faMemory} />}
-                  title={t('pages.admin.databaseAgentHosts.tabs.statistics.page.chart.memoryUsage', {})}
+                  title={t('common.stat.memoryUsage', {})}
                   value={memory.value}
                 >
                   <StreamChart {...memory.props} />

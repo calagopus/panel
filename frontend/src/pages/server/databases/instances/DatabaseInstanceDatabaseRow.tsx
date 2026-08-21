@@ -132,6 +132,7 @@ export default function DatabaseInstanceDatabaseRow({
             icon: faTableList,
             label: t('pages.server.databases.explorer.button.open', {}),
             hidden: instance.type === 'mongodb' || instance.type === 'redis',
+            disabled: offline,
             onClick: () =>
               navigate(
                 `/server/${server.uuidShort}/databases/instances/${instance.uuid}/databases/${database.uuid}/explore`,
@@ -142,7 +143,8 @@ export default function DatabaseInstanceDatabaseRow({
           {
             type: 'action',
             icon: faDownload,
-            label: t('pages.server.databases.instance.databases.button.export', {}),
+            label: t('common.button.export', {}),
+            disabled: offline,
             onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: canExport,
@@ -150,7 +152,8 @@ export default function DatabaseInstanceDatabaseRow({
           {
             type: 'action',
             icon: faUpload,
-            label: t('pages.server.databases.instance.databases.button.import', {}),
+            label: t('common.button.import', {}),
+            disabled: offline,
             onClick: () => setOpenModal('import'),
             color: 'gray',
             canAccess: canImport,
@@ -180,6 +183,7 @@ export default function DatabaseInstanceDatabaseRow({
             type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
+            disabled: offline,
             onClick: () => setOpenModal('delete'),
             color: 'red',
           },

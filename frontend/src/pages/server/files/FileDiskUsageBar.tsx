@@ -19,7 +19,7 @@ export default function FileDiskUsageBar() {
     <Card mb='sm'>
       <div className='flex flex-col sm:flex-row sm:items-center w-full text-sm gap-1 sm:gap-0'>
         <div className='flex items-center justify-between sm:contents'>
-          <span>{t('pages.server.files.diskUsage.title', {})}</span>
+          <span>{t('common.stat.diskUsage', {})}</span>
           <span className='text-(--mantine-color-dimmed) sm:hidden'>
             {t('pages.server.files.diskUsage.details', {
               used: bytesToString(diskBytes),

@@ -1,16 +1,21 @@
-import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faShieldHalved, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteDatabaseInstanceUser from '@/api/server/databases/instances/deleteDatabaseInstanceUser.ts';
+import Badge from '@/elements/Badge.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
+import { serverDatabaseInstanceUserPermissionLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
+  serverDatabaseInstanceDatabaseSchema,
   serverDatabaseInstanceSchema,
   serverDatabaseInstanceUserSchema,
 } from '@/lib/schemas/server/databaseInstances.ts';
@@ -18,22 +23,34 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import DatabaseInstanceCredentialsModal from './modals/DatabaseInstanceCredentialsModal.tsx';
+import DatabaseInstanceUserPermissionsModal from './modals/DatabaseInstanceUserPermissionsModal.tsx';
 
 export default function DatabaseInstanceUserRow({
   instance,
   user,
-  databaseName,
+  databases,
+  offline,
 }: {
   instance: z.infer<typeof serverDatabaseInstanceSchema>;
   user: z.infer<typeof serverDatabaseInstanceUserSchema>;
-  databaseName: string | null;
+  databases: z.infer<typeof serverDatabaseInstanceDatabaseSchema>[];
+  offline: boolean;
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const queryClient = useQueryClient();
 
-  const [openModal, setOpenModal] = useState<'details' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'details' | 'permissions' | 'delete' | null>(null);
+
+  const hasDatabases = instance.type !== 'redis';
+  const aclOffline = offline && hasDatabases;
+
+  const grantedDatabases = databases.flatMap((database) => {
+    const permission = user.databases.find((entry) => entry.databaseUuid === database.uuid)?.permission;
+
+    return permission && permission !== 'none' ? [{ database, permission }] : [];
+  });
 
   const doDelete = async () => {
     await deleteDatabaseInstanceUser(server.uuid, instance.uuid, user.uuid)
@@ -54,8 +71,16 @@ export default function DatabaseInstanceUserRow({
       <DatabaseInstanceCredentialsModal
         instance={instance}
         user={user}
-        databaseName={databaseName}
+        databases={grantedDatabases.map((entry) => entry.database)}
+        offline={offline}
         opened={openModal === 'details'}
+        onClose={() => setOpenModal(null)}
+      />
+      <DatabaseInstanceUserPermissionsModal
+        instance={instance}
+        user={user}
+        databases={databases}
+        opened={openModal === 'permissions'}
         onClose={() => setOpenModal(null)}
       />
       <ConfirmationModal
@@ -80,12 +105,22 @@ export default function DatabaseInstanceUserRow({
             color: 'gray',
           },
           {
+            type: 'action',
+            icon: faShieldHalved,
+            label: t('pages.server.databases.instance.users.button.permissions', {}),
+            hidden: !hasDatabases || databases.length === 0,
+            disabled: aclOffline,
+            onClick: () => setOpenModal('permissions'),
+            color: 'gray',
+          },
+          {
             type: 'divider',
           },
           {
             type: 'action',
             icon: faTrash,
             label: t('common.button.delete', {}),
+            disabled: aclOffline,
             onClick: () => setOpenModal('delete'),
             color: 'red',
           },
@@ -105,7 +140,13 @@ export default function DatabaseInstanceUserRow({
             </TableData>
 
             <TableData>
-              <Code>{databaseName ? databaseName : t('common.na', {})}</Code>
+              <Group gap='xs'>
+                {grantedDatabases.map(({ database, permission }) => (
+                  <Tooltip key={database.uuid} label={serverDatabaseInstanceUserPermissionLabelMapping[permission]()}>
+                    <Badge color={permission === 'read_write' ? 'blue' : 'gray'}>{database.name}</Badge>
+                  </Tooltip>
+                ))}
+              </Group>
             </TableData>
 
             <ContextMenuToggle items={items} openMenu={openMenu} />

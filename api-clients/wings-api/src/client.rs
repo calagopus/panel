@@ -569,6 +569,21 @@ impl WingsClient {
         .await
     }
 
+    pub async fn post_servers_server_files_create_symlink(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_create_symlink::post::RequestBody,
+    ) -> Result<super::servers_server_files_create_symlink::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/create-symlink"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
     pub async fn post_servers_server_files_decompress(
         &self,
         server: uuid::Uuid,

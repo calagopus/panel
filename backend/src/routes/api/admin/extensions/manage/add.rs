@@ -8,7 +8,7 @@ mod put {
     use serde::{Deserialize, Serialize};
     use shared::{
         GetState,
-        models::user::GetPermissionManager,
+        models::{admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -37,6 +37,7 @@ mod put {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        activity_logger: GetAdminActivityLogger,
         Query(params): Query<Params>,
         body: axum::body::Body,
     ) -> ApiResponseResult {
@@ -95,6 +96,18 @@ mod put {
             })
             .ok();
         }
+
+        activity_logger
+            .log(
+                "extension:upload",
+                serde_json::json!({
+                    "package_name": distr.metadata_toml.package_name,
+                    "name": distr.metadata_toml.name,
+                    "version": distr.cargo_toml.package.version,
+                    "authors": distr.cargo_toml.package.authors,
+                }),
+            )
+            .await;
 
         ApiResponse::new_serialized(Response {
             extension: shared::extensions::PendingExtension {

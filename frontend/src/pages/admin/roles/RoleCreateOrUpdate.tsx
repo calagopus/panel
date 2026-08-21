@@ -146,7 +146,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.roles.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
+        {t('common.modal.delete.content', { name: form.getValues().name }).md()}
       </ConfirmationModal>
 
       {contextRole && (

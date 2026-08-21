@@ -26,8 +26,8 @@ export default function StepWriteFile({
       />
       <ScheduleDynamicParameterInput
         withAsterisk
-        label={t('pages.server.schedules.steps.writeFile.form.content', {})}
-        placeholder={t('pages.server.schedules.steps.writeFile.form.content', {})}
+        label={t('common.form.content', {})}
+        placeholder={t('common.form.content', {})}
         textArea
         value={form.getInputProps('action.content').value}
         error={form.getInputProps('action.content').error}

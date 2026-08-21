@@ -69,7 +69,7 @@ export default function ExternalIdLookupModal({ ...props }: ModalProps) {
       <Stack>
         <Group align='flex-end'>
           <TextInput
-            label={t('pages.admin.users.externalIdLookup.modal.form.externalId', {})}
+            label={t('common.form.externalId', {})}
             placeholder={t('pages.admin.users.externalIdLookup.modal.form.externalIdPlaceholder', {})}
             value={externalId}
             onChange={(e) => {

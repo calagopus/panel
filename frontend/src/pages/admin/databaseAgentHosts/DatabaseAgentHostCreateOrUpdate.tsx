@@ -187,7 +187,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
           name: `types.${type}.divider`,
           label,
           switchName: `types.${type}.enabled`,
-          switchLabel: t('pages.admin.databaseAgentHosts.tabs.general.page.form.typeEnabled', {}),
+          switchLabel: t('common.form.enabled', {}),
         },
         {
           type: 'text',
@@ -234,7 +234,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
       >
         <Stack>
           <Text size='sm'>
-            {t('pages.admin.databaseAgentHosts.tabs.general.page.modal.delete.content', {
+            {t('common.modal.delete.content', {
               name: form.getValues().name ?? '',
             }).md()}
           </Text>

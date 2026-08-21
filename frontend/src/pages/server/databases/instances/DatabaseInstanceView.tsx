@@ -316,7 +316,7 @@ export default function DatabaseInstanceView() {
         const offline = !powerState || powerState === 'offline';
 
         return (
-          <ServerContentContainer title={t('pages.server.databases.instance.title', {})} hideTitleComponent>
+          <ServerContentContainer title={instance.name} hideTitleComponent>
             <ConfirmationModal
               opened={openModal === 'kill'}
               onClose={() => setOpenModal(null)}
@@ -415,7 +415,7 @@ export default function DatabaseInstanceView() {
                           disabled={offline}
                           leftSection={<FontAwesomeIcon icon={faDownload} />}
                         >
-                          {t('pages.server.databases.instance.databases.button.export', {})}
+                          {t('common.button.export', {})}
                         </Button>
                       </ServerCan>
                       <ServerCan action='database-instances.import'>
@@ -425,7 +425,7 @@ export default function DatabaseInstanceView() {
                           disabled={offline}
                           leftSection={<FontAwesomeIcon icon={faUpload} />}
                         >
-                          {t('pages.server.databases.instance.databases.button.import', {})}
+                          {t('common.button.import', {})}
                         </Button>
                       </ServerCan>
                     </>

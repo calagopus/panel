@@ -260,7 +260,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
                   />
                 </Group>
                 <Switch
-                  label={t('pages.server.files.modal.searchFiles.caseInsensitive', {})}
+                  label={t('common.form.caseInsensitive', {})}
                   checked={form.values.pathFilter?.caseInsensitive ?? true}
                   onChange={(e) =>
                     form.setFieldValue('pathFilter', {
@@ -315,7 +315,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
                       {...form.getInputProps('contentFilter.includeUnmatched', { type: 'checkbox' })}
                     />
                     <Switch
-                      label={t('pages.server.files.modal.searchFiles.caseInsensitive', {})}
+                      label={t('common.form.caseInsensitive', {})}
                       {...form.getInputProps('contentFilter.caseInsensitive', { type: 'checkbox' })}
                     />
                   </Group>

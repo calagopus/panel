@@ -65,7 +65,7 @@ export default function AssetUploadProgress({
                   color={file.status === 'error' ? 'red' : file.status === 'pending' ? 'gray' : 'blue'}
                 >
                   {file.status === 'error'
-                    ? t('elements.fileUpload.badge.failed', {})
+                    ? t('common.badge.failed', {})
                     : file.status === 'pending'
                       ? t('elements.fileUpload.badge.waiting', {})
                       : t('elements.fileUpload.badge.uploading', {})}

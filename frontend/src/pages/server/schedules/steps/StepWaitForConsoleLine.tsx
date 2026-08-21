@@ -23,7 +23,7 @@ export default function StepWaitForConsoleLine({
         onChange={(v) => form.setFieldValue('action.contains', v)}
       />
       <Switch
-        label={t('pages.server.schedules.form.caseInsensitive', {})}
+        label={t('common.form.caseInsensitive', {})}
         {...form.getInputProps('action.caseInsensitive', { type: 'checkbox' })}
       />
       <NumberInput

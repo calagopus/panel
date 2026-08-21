@@ -149,6 +149,16 @@ nestify::nest! {
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum DatabasePermission {
+    #[serde(rename = "none")]
+    None,
+    #[serde(rename = "read_only")]
+    ReadOnly,
+    #[serde(rename = "read_write")]
+    ReadWrite,
+}
+
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
 pub enum DatabaseAgentType {
     #[serde(rename = "postgres")]
     Postgres,
@@ -185,6 +195,8 @@ pub enum FilterOperator {
     #[serde(rename = "not_null")]
     NotNull,
 }
+
+pub type MiB = u64;
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
 pub enum PowerAction {
@@ -381,11 +393,22 @@ nestify::nest! {
         #[schema(inline)]
         pub instance_uuid: uuid::Uuid,
         #[schema(inline)]
-        pub database_uuid: Option<uuid::Uuid>,
-        #[schema(inline)]
         pub username: compact_str::CompactString,
         #[schema(inline)]
         pub password: compact_str::CompactString,
+        #[schema(inline)]
+        pub databases: Vec<StoredUserDatabase>,
+        #[schema(inline)]
+        pub created: chrono::DateTime<chrono::Local>,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct StoredUserDatabase {
+        #[schema(inline)]
+        pub database_uuid: uuid::Uuid,
+        #[schema(inline)]
+        pub permission: DatabasePermission,
         #[schema(inline)]
         pub created: chrono::DateTime<chrono::Local>,
     }
@@ -471,6 +494,15 @@ nestify::nest! {
         pub cert: compact_str::CompactString,
         #[schema(inline)]
         pub key: compact_str::CompactString,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct UserDatabase {
+        #[schema(inline)]
+        pub database_uuid: uuid::Uuid,
+        #[schema(inline)]
+        pub permission: DatabasePermission,
     }
 }
 
@@ -1397,7 +1429,7 @@ pub mod instances_instance_users {
                 #[schema(inline)]
                 pub username: compact_str::CompactString,
                 #[schema(inline)]
-                pub database_uuid: Option<uuid::Uuid>,
+                pub databases: Vec<UserDatabase>,
             }
         }
 
@@ -1444,6 +1476,62 @@ pub mod instances_instance_users_user {
         }
 
         pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_users_user_databases {
+    use super::*;
+
+    pub mod put {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub databases: Vec<UserDatabase>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub databases: Vec<StoredUserDatabase>,
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod instances_instance_users_user_databases_database {
+    use super::*;
+
+    pub mod put {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub permission: DatabasePermission,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub database: Option<StoredUserDatabase>,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
 
         pub type Response = Response200;
     }
@@ -1553,6 +1641,8 @@ pub mod system_config {
                 #[schema(inline)]
                 pub websocket_log_count: u64,
                 #[schema(inline)]
+                pub tcp_congestion_control: compact_str::CompactString,
+                #[schema(inline)]
                 pub postgres: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200Postgres {
                     #[schema(inline)]
                     pub enabled: bool,
@@ -1607,19 +1697,46 @@ pub mod system_config {
                     #[schema(inline)]
                     pub registries: IndexMap<compact_str::CompactString, serde_json::Value>,
                     #[schema(inline)]
-                    pub tmpfs_size: u64,
+                    pub tmpfs_size: MiB,
+                    #[schema(inline)]
+                    pub shm_size: MiB,
                     #[schema(inline)]
                     pub container_pid_limit: u64,
+                    #[schema(inline)]
+                    pub container_apparmor_profile: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub container_ulimits: Vec<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerContainerUlimits {
+                        #[schema(inline)]
+                        pub name: compact_str::CompactString,
+                        #[schema(inline)]
+                        pub soft: i64,
+                        #[schema(inline)]
+                        pub hard: i64,
+                    }>,
+                    #[schema(inline)]
+                    pub container_sysctls: IndexMap<compact_str::CompactString, compact_str::CompactString>,
                     #[schema(inline)]
                     pub timezone: compact_str::CompactString,
                     #[schema(inline)]
                     pub userns_mode: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub cpu_period: u64,
+                    #[schema(inline)]
+                    pub cfs_burst: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerCfsBurst {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                        #[schema(inline)]
+                        pub multiple: f64,
+                    },
+
                     #[schema(inline)]
                     pub registry_image_fetch_cache: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerRegistryImageFetchCache {
                         #[schema(inline)]
                         pub enabled: bool,
                         #[schema(inline)]
                         pub duration: u64,
+                        #[schema(inline)]
+                        pub background_refresh: bool,
                     },
 
                     #[schema(inline)]

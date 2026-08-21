@@ -64,7 +64,7 @@ export default function DatabaseQueryConsole({ draftRef }: { draftRef: RefObject
         rightSection={
           <Group gap='sm' className='ml-auto'>
             <Switch
-              label={t('pages.server.databases.explorer.query.form.readOnly', {})}
+              label={t('common.readOnly', {})}
               description={t('pages.server.databases.explorer.query.form.readOnlyDescription', {})}
               checked={readOnly}
               onChange={(e) => setReadOnly(e.target.checked)}

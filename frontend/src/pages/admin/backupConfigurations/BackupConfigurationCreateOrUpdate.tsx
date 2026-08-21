@@ -233,7 +233,7 @@ export default function BackupConfigurationCreateOrUpdate({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.backupConfigurations.tabs.general.page.modal.delete.content', {
+        {t('common.modal.delete.content', {
           name: form.getValues().name ?? '',
         }).md()}
       </ConfirmationModal>

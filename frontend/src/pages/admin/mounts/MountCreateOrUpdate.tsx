@@ -65,9 +65,9 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
   const fields: FieldDef<MountFormValues>[] = [
     { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
     { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
-    { type: 'text', name: 'source', label: t('pages.admin.mounts.tabs.general.page.form.source', {}), required: true },
-    { type: 'text', name: 'target', label: t('pages.admin.mounts.tabs.general.page.form.target', {}), required: true },
-    { type: 'switch', name: 'readOnly', label: t('pages.admin.mounts.tabs.general.page.form.readOnly', {}) },
+    { type: 'text', name: 'source', label: t('common.form.source', {}), required: true },
+    { type: 'text', name: 'target', label: t('common.form.target', {}), required: true },
+    { type: 'switch', name: 'readOnly', label: t('common.readOnly', {}) },
     { type: 'switch', name: 'userMountable', label: t('pages.admin.mounts.tabs.general.page.form.userMountable', {}) },
   ];
 
@@ -89,7 +89,7 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.mounts.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
+        {t('common.modal.delete.content', { name: form.getValues().name }).md()}
       </ConfirmationModal>
 
       {contextMount && (

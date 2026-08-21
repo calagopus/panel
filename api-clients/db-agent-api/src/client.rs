@@ -856,6 +856,40 @@ impl DbAgentClient {
         .await
     }
 
+    pub async fn put_instances_instance_users_user_databases(
+        &self,
+        instance: uuid::Uuid,
+        user: uuid::Uuid,
+        data: &super::instances_instance_users_user_databases::put::RequestBody,
+    ) -> Result<super::instances_instance_users_user_databases::put::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::PUT,
+            format!("/api/instances/{instance}/users/{user}/databases"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn put_instances_instance_users_user_databases_database(
+        &self,
+        instance: uuid::Uuid,
+        user: uuid::Uuid,
+        database: uuid::Uuid,
+        data: &super::instances_instance_users_user_databases_database::put::RequestBody,
+    ) -> Result<super::instances_instance_users_user_databases_database::put::Response, ApiHttpError>
+    {
+        request_impl(
+            self,
+            Method::PUT,
+            format!("/api/instances/{instance}/users/{user}/databases/{database}"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
     pub async fn post_instances_instance_users_user_rotate_password(
         &self,
         instance: uuid::Uuid,

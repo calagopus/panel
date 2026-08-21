@@ -540,7 +540,7 @@ function ConsoleLineExtraForm({ form, index }: TriggerFormProps) {
         onChange={(v) => form.setFieldValue(`triggers.${index}.outputInto`, v)}
       />
       <Switch
-        label={t('pages.server.schedules.form.caseInsensitive', {})}
+        label={t('common.form.caseInsensitive', {})}
         checked={form.values.triggers[index].caseInsensitive}
         onChange={(e) => form.setFieldValue(`triggers.${index}.caseInsensitive`, e.currentTarget.checked)}
       />

@@ -26,7 +26,7 @@ export default function SystemBackupPolicyRow({
         {systemBackupPolicy.name}
         {!systemBackupPolicy.enabled && (
           <Badge color='gray' className='ml-2'>
-            {t('pages.admin.systemBackupPolicies.badge.disabled', {})}
+            {t('common.badge.disabled', {})}
           </Badge>
         )}
         {systemBackupPolicy.triggered && (

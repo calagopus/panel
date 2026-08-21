@@ -209,7 +209,7 @@ export default function DatabaseHostCreateOrUpdate({
       >
         <Stack>
           <Text size='sm'>
-            {t('pages.admin.databaseHosts.tabs.general.page.modal.delete.content', {
+            {t('common.modal.delete.content', {
               name: form.getValues().name ?? '',
             }).md()}
           </Text>

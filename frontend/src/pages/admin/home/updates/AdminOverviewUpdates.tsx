@@ -115,7 +115,7 @@ export default function AdminOverviewUpdates() {
       .finally(() => setRecheckLoading(false));
   };
 
-  const unknownLabel = t('pages.admin.home.tabs.updates.page.unknown', {});
+  const unknownLabel = t('common.unknown', {});
 
   return (
     <>

@@ -161,7 +161,7 @@ export default function FileCopyConflictModal({ conflicts, loading, onResolve, .
                   {resolutions[conflict.to] === 'rename' && (
                     <TextInput
                       size='xs'
-                      label={t('pages.server.files.modal.copyConflict.newName', {})}
+                      label={t('common.form.newName', {})}
                       value={renames[conflict.to] ?? ''}
                       onChange={(e) => setRenames((prev) => ({ ...prev, [conflict.to]: e.target.value }))}
                     />

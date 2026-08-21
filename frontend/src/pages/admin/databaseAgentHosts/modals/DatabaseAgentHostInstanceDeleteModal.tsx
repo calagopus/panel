@@ -49,7 +49,7 @@ export default function DatabaseAgentHostInstanceDeleteModal({ hostUuid, instanc
     >
       <Stack>
         <Text size='sm'>
-          {t('pages.admin.databaseAgentHosts.tabs.instances.page.modal.deleteInstance.content', {
+          {t('common.modal.delete.content', {
             name: instance.name,
           }).md()}
         </Text>

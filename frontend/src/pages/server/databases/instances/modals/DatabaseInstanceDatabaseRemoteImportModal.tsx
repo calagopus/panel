@@ -85,7 +85,7 @@ export default function DatabaseInstanceDatabaseRemoteImportModal({ instance, da
 
         <ModalFooter>
           <Button type='submit' color={form.values.wipe ? 'red' : undefined} loading={loading}>
-            {t('pages.server.databases.instance.databases.button.import', {})}
+            {t('common.button.import', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}

@@ -21,12 +21,12 @@ export default function DatabaseInstanceStats({
   const wasOffline = useRef(false);
 
   const cpu = useStreamChart({
-    series: useMemo(() => [t('pages.server.databases.instance.view.stats.cpuLoad', {})], [t]),
+    series: useMemo(() => [t('common.stat.cpuLoad', {})], [t]),
     format: formatPercent,
     min: 10,
   });
   const memory = useStreamChart({
-    series: useMemo(() => [t('pages.server.databases.instance.view.stats.memoryLoad', {})], [t]),
+    series: useMemo(() => [t('common.stat.memoryLoad', {})], [t]),
     format: formatBytes,
     scale: 'binary',
     min: mbToBytes(64),
@@ -56,7 +56,7 @@ export default function DatabaseInstanceStats({
     <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0'>
       <ChartBlock
         icon={<FontAwesomeIcon icon={faMicrochip} />}
-        title={t('pages.server.databases.instance.view.stats.cpuLoad', {})}
+        title={t('common.stat.cpuLoad', {})}
         value={cpu.value}
         overlayIcon={overlayIcon}
         overlayLabel={overlayLabel}
@@ -65,7 +65,7 @@ export default function DatabaseInstanceStats({
       </ChartBlock>
       <ChartBlock
         icon={<FontAwesomeIcon icon={faMemory} />}
-        title={t('pages.server.databases.instance.view.stats.memoryLoad', {})}
+        title={t('common.stat.memoryLoad', {})}
         value={memory.value}
         overlayIcon={overlayIcon}
         overlayLabel={overlayLabel}

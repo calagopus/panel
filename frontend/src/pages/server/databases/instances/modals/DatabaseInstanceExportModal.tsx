@@ -52,7 +52,7 @@ export default function DatabaseInstanceExportModal({ instance, ...props }: Prop
 
         <ModalFooter>
           <Button onClick={doExport} loading={loading}>
-            {t('pages.server.databases.instance.databases.button.export', {})}
+            {t('common.button.export', {})}
           </Button>
           <Button variant='default' onClick={props.onClose} disabled={loading}>
             {t('common.button.close', {})}

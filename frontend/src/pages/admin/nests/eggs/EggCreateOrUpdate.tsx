@@ -305,7 +305,7 @@ export default function EggCreateOrUpdate({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.modal.delete.content', {
+        {t('common.modal.delete.content', {
           name: form.getValues().name,
         }).md()}
       </ConfirmationModal>
@@ -525,7 +525,7 @@ export default function EggCreateOrUpdate({
                                 />
                                 <JsonInput
                                   withAsterisk
-                                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.replaceWith', {})}
+                                  label={t('common.form.replaceWith', {})}
                                   key={form.key(`configFiles.${index}.replace.${replaceIndex}.replaceWith`)}
                                   {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.replaceWith`)}
                                 />

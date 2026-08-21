@@ -93,7 +93,7 @@ export default function ServerDetails() {
       )}
       <StatCard
         icon={faClock}
-        label={t('pages.server.console.details.uptime', {})}
+        label={t('common.stat.uptime', {})}
         order={30}
         value={
           state === 'offline' && server.status !== 'installing'
@@ -103,7 +103,7 @@ export default function ServerDetails() {
       />
       <StatCard
         icon={faMicrochip}
-        label={t('pages.server.console.details.cpuLoad', {})}
+        label={t('common.stat.cpuLoad', {})}
         order={40}
         value={
           state === 'offline' && server.status !== 'installing'
@@ -127,7 +127,7 @@ export default function ServerDetails() {
       />
       <StatCard
         icon={faMemory}
-        label={t('pages.server.console.details.memoryLoad', {})}
+        label={t('common.stat.memoryLoad', {})}
         order={50}
         value={
           state === 'offline' && server.status !== 'installing'
@@ -140,7 +140,7 @@ export default function ServerDetails() {
       />
       <StatCard
         icon={faHardDrive}
-        label={t('pages.server.console.details.diskUsage', {})}
+        label={t('common.stat.diskUsage', {})}
         order={60}
         value={bytesToString(stats?.diskBytes || 0)}
         limit={server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : t('common.unlimited', {})}

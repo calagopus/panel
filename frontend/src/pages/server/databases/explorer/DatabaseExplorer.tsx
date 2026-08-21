@@ -71,7 +71,7 @@ export default function DatabaseExplorer() {
   const draftRef = useRef('');
 
   return (
-    <ServerContentContainer title={t('pages.server.databases.explorer.title', {})} hideTitleComponent>
+    <ServerContentContainer title={name} hideTitleComponent>
       {canEditStructure && (
         <TableCreateModal
           opened={openModal === 'createTable'}

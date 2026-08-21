@@ -8,6 +8,7 @@ mod copy;
 mod copy_many;
 mod copy_remote;
 mod create_directory;
+mod create_symlink;
 mod decompress;
 mod delete;
 mod download;
@@ -39,6 +40,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/decompress", decompress::router(state))
         .nest("/delete", delete::router(state))
         .nest("/create-directory", create_directory::router(state))
+        .nest("/create-symlink", create_symlink::router(state))
         .nest("/largest-directories", largest_directories::router(state))
         .nest("/chmod", chmod::router(state))
         .nest("/search", search::router(state))

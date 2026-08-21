@@ -62,13 +62,13 @@ export default function MountDuplicateModal({
         />
         <TextInput
           withAsterisk
-          label={t('pages.admin.mounts.tabs.general.page.form.source', {})}
+          label={t('common.form.source', {})}
           value={source}
           onChange={(e) => setSource(e.target.value)}
         />
         <TextInput
           withAsterisk
-          label={t('pages.admin.mounts.tabs.general.page.form.target', {})}
+          label={t('common.form.target', {})}
           value={target}
           onChange={(e) => setTarget(e.target.value)}
         />

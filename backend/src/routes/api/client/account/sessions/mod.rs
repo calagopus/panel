@@ -74,9 +74,63 @@ mod get {
     }
 }
 
+mod delete {
+    use serde::Serialize;
+    use shared::{
+        GetState,
+        models::{
+            user::{AuthMethod, GetAuthMethod, GetPermissionManager, GetUser},
+            user_activity::GetUserActivityLogger,
+            user_session::UserSession,
+        },
+        response::{ApiResponse, ApiResponseResult},
+    };
+    use utoipa::ToSchema;
+
+    #[derive(ToSchema, Serialize)]
+    struct Response {
+        deleted: u64,
+    }
+
+    #[utoipa::path(delete, path = "/", responses(
+        (status = OK, body = inline(Response)),
+    ))]
+    pub async fn route(
+        state: GetState,
+        permissions: GetPermissionManager,
+        auth: GetAuthMethod,
+        user: GetUser,
+        activity_logger: GetUserActivityLogger,
+    ) -> ApiResponseResult {
+        permissions.has_user_permission("sessions.delete")?;
+
+        let deleted = UserSession::delete_by_user_uuid_except(
+            &state.database,
+            user.uuid,
+            match &**auth {
+                AuthMethod::Session(session) => Some(session.uuid),
+                _ => None,
+            },
+        )
+        .await?;
+
+        activity_logger
+            .log(
+                "session:delete-all",
+                serde_json::json!({
+                    "deleted": deleted,
+                }),
+            )
+            .await;
+
+        ApiResponse::new_serialized(Response { deleted }).ok()
+    }
+}
+
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
+        .routes(routes!(delete::route))
         .nest("/{session}", _session_::router(state))
         .with_state(state.clone())
 }

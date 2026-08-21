@@ -77,7 +77,7 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.nests.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
+        {t('common.modal.delete.content', { name: form.getValues().name }).md()}
 
         <Switch
           className='mt-4'

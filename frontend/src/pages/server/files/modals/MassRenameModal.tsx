@@ -192,7 +192,7 @@ export default function MassRenameModal({ files, ...props }: Props) {
             data-autofocus
           />
           <TextInput
-            label={t('pages.server.files.modal.massRename.replace', {})}
+            label={t('common.form.replaceWith', {})}
             placeholder={t('pages.server.files.modal.massRename.replacePlaceholder', {})}
             value={options.replace}
             onChange={(e) => setOptions((o) => ({ ...o, replace: e.target.value }))}
@@ -358,7 +358,7 @@ export default function MassRenameModal({ files, ...props }: Props) {
                 { name: '' },
                 { name: t('pages.server.files.modal.massRename.preview.original', {}) },
                 { name: '' },
-                { name: t('pages.server.files.modal.massRename.preview.newName', {}) },
+                { name: t('common.form.newName', {}) },
                 { name: '' },
               ]}
             >

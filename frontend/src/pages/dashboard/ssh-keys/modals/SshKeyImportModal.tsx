@@ -55,7 +55,7 @@ export default function SshKeyImportModal({ ...props }: ModalProps) {
         <div className='grid grid-cols-3 gap-2'>
           <Select
             withAsterisk
-            label={t('pages.account.sshKeys.modal.importSshKeys.form.provider', {})}
+            label={t('common.form.provider', {})}
             data={Object.entries(sshKeyProviderLabelMapping).map(([value, label]) => ({
               label,
               value,

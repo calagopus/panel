@@ -151,6 +151,14 @@
       "few": "{count} Änderungen",
       "many": "{count} Änderungen",
       "other": "{count} Änderungen"
+    },
+    "session": {
+      "zero": "{count} Sitzungen",
+      "one": "{count} Sitzung",
+      "two": "{count} Sitzungen",
+      "few": "{count} Sitzungen",
+      "many": "{count} Sitzungen",
+      "other": "{count} Sitzungen"
     }
   },
   "translations": {
@@ -167,6 +175,7 @@
         "remove": "Entfernen",
         "enable": "Aktivieren",
         "disable": "Deaktivieren",
+        "disableTwoFactor": "Zwei-Faktor deaktivieren",
         "update": "Aktualisieren",
         "close": "Schließen",
         "cancel": "Abbrechen",
@@ -246,6 +255,9 @@
       "modal": {
         "duplicate": {
           "title": "{resource} duplizieren"
+        },
+        "delete": {
+          "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
         }
       },
       "toast": {
@@ -328,6 +340,8 @@
         "destination": "Ziel",
         "destinationDirectory": "Zielverzeichnis",
         "directoryName": "Verzeichnisname",
+        "symlinkName": "Symlink-Name",
+        "symlinkTarget": "Symlink-Ziel",
         "locked": "Gesperrt",
         "portRanges": "Port-Bereiche",
         "portRangesPlaceholder": "Port-Bereiche (z.B. 3000-4000)",
@@ -345,6 +359,10 @@
         "yourControlPanelPassword": "Dein Control Panel Passwort",
         "deploymentEnabled": "Bereitstellung aktiviert",
         "maintenanceEnabled": "Wartung aktiviert",
+        "source": "Quelle",
+        "target": "Ziel",
+        "replaceWith": "Ersetzen durch",
+        "caseInsensitive": "Groß-/Kleinschreibung ignorieren",
         "truncateDirectory": "Möchtest du alle Dateien dieses Servers löschen, bevor diese Aktion ausgeführt wird? Dies kann nicht rückgängig gemacht werden."
       },
       "table": {
@@ -392,6 +410,18 @@
       },
       "tabs": {
         "general": "Allgemein"
+      },
+      "stat": {
+        "cpu": "CPU",
+        "cpuLoad": "CPU-Last",
+        "memoryUsage": "Arbeitsspeicher-Nutzung",
+        "memoryLoad": "RAM-Last",
+        "diskUsage": "Speicherplatz",
+        "network": "Netzwerk",
+        "inbound": "Eingehend",
+        "outbound": "Ausgehend",
+        "uptime": "Laufzeit",
+        "resources": "Ressourcen"
       },
       "badge": {
         "active": "Aktiv",
@@ -784,14 +814,12 @@
         "badge": {
           "uploading": "Wird hochgeladen",
           "waiting": "Wartend",
-          "paused": "Pausiert",
-          "failed": "Fehlgeschlagen"
+          "paused": "Pausiert"
         },
         "rateLimited": "Dein Upload unterliegt einer Ratenbegrenzung. Warten...",
         "cancelAllUploads": "Alle Uploads abbrechen",
         "modal": {
           "cancelAllUploads": {
-            "title": "Alle Uploads abbrechen",
             "content": "Bist du sicher, dass du alle aktiven Uploads abbrechen möchtest? Teilweise hochgeladene Dateien werden verworfen."
           }
         },
@@ -875,13 +903,9 @@
           "title": "Node-Konfiguration",
           "allocationsTitle": "Allocations-Konfiguration",
           "form": {
-            "name": "Name",
             "namePlaceholder": "Mein Server",
             "urlDescription": "wird für die interne Kommunikation mit der Node verwendet",
-            "publicUrl": "Öffentliche URL",
             "publicUrlDescription": "wird für Websocket/Downloads verwendet",
-            "sftpHostPlaceholder": "SFTP Host",
-            "sftpPortPlaceholder": "SFTP Port",
             "ip": "IP"
           },
           "error": {
@@ -909,7 +933,6 @@
           "form": {
             "applicationName": "Anwendungsname",
             "applicationNamePlaceholder": "Calagopus",
-            "languagePlaceholder": "Sprache",
             "applicationUrl": "Anwendungs-URL",
             "registration": "Registrierung aktivieren",
             "registrationDescription": "Erlaube neuen Benutzern, ihren eigenen Account zu registrieren.",
@@ -1235,7 +1258,6 @@
                 }
               },
               "button": {
-                "disableTwoFactor": "2FA deaktivieren",
                 "setupTwoFactor": "2FA einrichten"
               },
               "twoFactorEnabled": "Zwei-Faktor-Verifizierung ist derzeit aktiviert.",
@@ -1308,9 +1330,11 @@
         },
         "sessions": {
           "title": "Sitzungen",
+          "button": {
+            "deleteOthers": "Andere abmelden"
+          },
           "table": {
             "columns": {
-              "ip": "IP",
               "thisDevice": "Dieses Gerät?",
               "userAgent": "User Agent"
             }
@@ -1321,6 +1345,13 @@
               "content": "Bist du sicher, dass du die Sitzung **{ip}** von deinem Account löschen möchtest?",
               "toast": {
                 "deleted": "Sitzung gelöscht."
+              }
+            },
+            "deleteOtherSessions": {
+              "title": "Löschen der Sitzungen bestätigen",
+              "content": "Bist du sicher, dass du alle Sitzungen außer der aktuell genutzten abmelden möchtest? Jedes andere Gerät, das in deinem Account angemeldet ist, muss sich erneut anmelden.",
+              "toast": {
+                "deleted": "{sessions} gelöscht."
               }
             }
           }
@@ -1381,7 +1412,6 @@
             "nextCommand": "Nächster Befehl im Verlauf"
           },
           "serverList": {
-            "title": "Server Liste",
             "selectServer": "Halte S und klicke, um Server auszuwählen/abzuwählen"
           }
         },
@@ -1419,9 +1449,6 @@
               "title": "SSH-Schlüssel importieren",
               "toast": {
                 "created": "{sshKeys} erstellt."
-              },
-              "form": {
-                "provider": "Anbieter"
               }
             },
             "deleteSshKey": {
@@ -1602,7 +1629,6 @@
                   "backupStatistics": "Backup-Statistiken"
                 },
                 "system": {
-                  "cpu": "CPU",
                   "memoryUsage": "Arbeitsspeichernutzung ({process} vom Panel verwendet)",
                   "memoryValue": "{used} / {total} ({percent}%)",
                   "kernelVersion": "Kernel-Version ({architecture})",
@@ -1629,30 +1655,6 @@
                   "databaseHosts": "Datenbank-Hosts",
                   "backupConfigurations": "Backup-Konfigurationen",
                   "roles": "Rollen"
-                },
-                "backup": {
-                  "allTime": "Gesamtzeit",
-                  "today": "Heute",
-                  "week": "Diese Woche",
-                  "month": "Diesen Monat",
-                  "totalAllTime": "Backups insgesamt (Gesamtzeit)",
-                  "successfulAllTime": "Erfolgreiche Backups (Gesamtzeit)",
-                  "failedAllTime": "Fehlgeschlagene Backups (Gesamtzeit)",
-                  "deletedAllTime": "Gelöschte Backups (Gesamtzeit)",
-                  "totalToday": "Backups insgesamt (Heute)",
-                  "successfulToday": "Erfolgreiche Backups (Heute)",
-                  "failedToday": "Fehlgeschlagene Backups (Heute)",
-                  "deletedToday": "Gelöschte Backups (Heute)",
-                  "totalWeek": "Backups insgesamt (Diese Woche)",
-                  "successfulWeek": "Erfolgreiche Backups (Diese Woche)",
-                  "failedWeek": "Fehlgeschlagene Backups (Diese Woche)",
-                  "deletedWeek": "Gelöschte Backups (Diese Woche)",
-                  "totalMonth": "Backups insgesamt (Diesen Monat)",
-                  "successfulMonth": "Erfolgreiche Backups (Diesen Monat)",
-                  "failedMonth": "Fehlgeschlagene Backups (Diesen Monat)",
-                  "deletedMonth": "Gelöschte Backups (Diesen Monat)",
-                  "successfulValue": "{count} ({size})",
-                  "deletedValue": "{count} ({size})"
                 }
               }
             },
@@ -1670,7 +1672,6 @@
                   "outdatedDatabaseAgentHosts": "Veraltete Datenbank-Agent-Hosts"
                 },
                 "panelVersion": "Dein Panel läuft derzeit auf Version `{current}`. Die neueste verfügbare Version ist `{latest}`.",
-                "unknown": "unbekannt",
                 "button": {
                   "recheck": "Erneut auf Updates prüfen"
                 },
@@ -2202,7 +2203,6 @@
             "modal": {
               "title": "Über externe ID suchen",
               "form": {
-                "externalId": "Externe ID",
                 "externalIdPlaceholder": "z. B. my-user-001",
                 "search": "Suchen"
               },
@@ -2233,7 +2233,6 @@
                   "cannotImpersonateSelf": "Du kannst dich nicht selbst impersonieren."
                 },
                 "button": {
-                  "disableTwoFactor": "Zwei-Faktor deaktivieren",
                   "sendPasswordResetEmail": "Passwort-Zurücksetzungs-E-Mail senden",
                   "impersonate": "Impersonieren"
                 },
@@ -2318,8 +2317,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Löschen des Standorts bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "title": "Löschen des Standorts bestätigen"
                   }
                 },
                 "titleCreate": "Standort erstellen",
@@ -2385,17 +2383,12 @@
                   "systemInfo": "Systeminformationen"
                 },
                 "label": {
-                  "location": "Standort",
                   "url": "Interne URL",
-                  "publicUrl": "Öffentliche URL",
                   "sftpAddress": "SFTP-Adresse",
-                  "backupConfiguration": "Backup-Konfiguration",
-                  "description": "Beschreibung",
                   "createdAt": "Erstellt",
                   "inheritedFromLocation": "Vom Standort geerbt",
                   "none": "Keine",
                   "wingsVersion": "Wings-Version",
-                  "cpu": "CPU",
                   "memory": "Arbeitsspeicher",
                   "servers": "Server",
                   "architecture": "Architektur",
@@ -2427,7 +2420,6 @@
                 },
                 "section": {
                   "connection": "Verbindung",
-                  "resources": "Ressourcen",
                   "options": "Optionen"
                 },
                 "button": {
@@ -2501,38 +2493,30 @@
               "page": {
                 "title": "Node Statistiken",
                 "card": {
-                  "resources": "Ressourcen",
                   "graphs": "Diagramme"
                 },
                 "toast": {
                   "connectionLost": "Verbindung zum Node-Statistik-Stream verloren."
                 },
                 "label": {
-                  "cpu": "CPU",
                   "memory": "Arbeitsspeicher",
                   "disk": "Speicher",
-                  "network": "Netzwerk",
                   "cpuThreads": "{model} ({threads} Threads)",
                   "usedByWings": "{size} von Wings verwendet",
                   "networkIn": "Eingehend: {in}",
                   "networkOut": "Ausgehend: {out}"
                 },
                 "chart": {
-                  "cpuLoad": "CPU-Last",
-                  "memoryUsage": "Speichernutzung",
                   "diskIo": "Festplatten-I/O",
                   "networkTraffic": "Netzwerkverkehr",
                   "diskRead": "Festplatte Lesen",
                   "diskWrite": "Festplatte Schreiben",
-                  "inbound": "Eingehend",
-                  "outbound": "Ausgehend",
                   "networkInLabel": "Netzwerk Ein",
                   "networkOutLabel": "Netzwerk Aus"
                 }
               }
             },
             "capacity": {
-              "title": "Kapazität",
               "page": {
                 "title": "Deployment-Kapazität",
                 "subtitle": "Ressourcen, die Servern auf diesem Node zugewiesen sind, gemessen an den in den Node-Einstellungen konfigurierten Limits, nicht an der physischen Kapazität der Maschine. Das Deployment prüft nur Arbeitsspeicher und Festplatte.",
@@ -2546,7 +2530,6 @@
                   "maintenanceDisabled": "Nicht in Wartung"
                 },
                 "label": {
-                  "cpu": "CPU",
                   "memory": "Arbeitsspeicher",
                   "disk": "Festplatte",
                   "memoryOverhead": "Arbeitsspeicher-Overhead",
@@ -2787,8 +2770,7 @@
           },
           "modal": {
             "delete": {
-              "title": "Löschen der Node bestätigen",
-              "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+              "title": "Löschen der Node bestätigen"
             },
             "bulkConfig": {
               "title": "Konfiguration aktualisieren - {nodes}",
@@ -2820,7 +2802,6 @@
             "modal": {
               "title": "Über externe ID suchen",
               "form": {
-                "externalId": "Externe ID",
                 "externalIdPlaceholder": "z. B. my-server-001",
                 "search": "Suchen"
               },
@@ -2848,21 +2829,14 @@
                 },
                 "label": {
                   "user": "Benutzer",
-                  "language": "Sprache",
                   "createdAt": "Erstellt",
                   "node": "Knoten",
-                  "location": "Standort",
                   "memoryLimit": "Arbeitsspeicher-Limit",
                   "diskLimit": "Speicherplatz-Limit",
                   "sftpAddress": "SFTP-Adresse",
-                  "primaryAllocation": "Primäre Allocation",
                   "none": "Keine",
-                  "dockerImage": "Docker-Image",
-                  "nest": "Nest",
                   "egg": "Egg",
-                  "timezone": "Zeitzone",
                   "autoKill": "Auto-Kill",
-                  "cpu": "CPU",
                   "memory": "Arbeitsspeicher",
                   "disk": "Speicherplatz",
                   "swap": "Swap",
@@ -2874,7 +2848,6 @@
                   "unlimited": "Unendlich",
                   "autoKillSeconds": "{seconds}s",
                   "autoKillDisabled": "Deaktiviert",
-                  "externalId": "Externe ID",
                   "uuid": "UUID"
                 },
                 "badge": {
@@ -3132,8 +3105,7 @@
                     "description": "Du bist dabei, **{name}** zu löschen. Bist du sicher?",
                     "form": {
                       "deleteBackups": "Möchtest du die Backups dieses Servers löschen?",
-                      "confirmServerName": "Servername bestätigen",
-                      "confirmServerNamePlaceholder": "Servername"
+                      "confirmServerName": "Servername bestätigen"
                     },
                     "alert": {
                       "forceWarning": "Das erzwungene Löschen überspringt den normalen Herunterfahrvorgang. Die Serverdateien auf dem Node werden möglicherweise nicht vollständig bereinigt, wodurch verwaiste Daten zurückbleiben."
@@ -3158,7 +3130,6 @@
                 "modal": {
                   "delete": {
                     "title": "Löschen des Nests bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
                     "form": {
                       "deleteEggs": "Möchtest du alle Eggs in diesem Nest löschen?"
                     }
@@ -3239,7 +3210,6 @@
                         "createNewFileDescription": "Wenn aktiviert, wird die Datei erstellt, falls sie nicht existiert. Wenn deaktiviert, muss die Datei bereits existieren, andernfalls schlägt die Ersetzung fehl.",
                         "match": "Übereinstimmung",
                         "ifValue": "Wenn Wert",
-                        "replaceWith": "Ersetzen durch",
                         "insertNew": "Neu einfügen",
                         "insertNewDescription": "Wenn aktiviert und kein vorhandener Wert dem Feld \"Übereinstimmung\" entspricht, wird der Wert \"Ersetzen durch\" in die Datei eingefügt. Wenn deaktiviert und keine Übereinstimmung gefunden wird, werden keine Änderungen an der Datei vorgenommen.",
                         "updateExisting": "Vorhandene aktualisieren",
@@ -3272,8 +3242,7 @@
                       },
                       "modal": {
                         "delete": {
-                          "title": "Löschen des Eggs bestätigen",
-                          "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                          "title": "Löschen des Eggs bestätigen"
                         }
                       }
                     }
@@ -3367,7 +3336,6 @@
                 "titleUpdate": "Egg-Konfiguration aktualisieren",
                 "form": {
                   "order": "Reihenfolge",
-                  "eggs": "Eggs",
                   "eggsPlaceholder": "Eggs auswählen",
                   "eggsEmpty": "Es sind keine Eggs konfiguriert. Erstelle ein Nest und ein Egg, bevor du eine Egg-Konfiguration erstellst."
                 },
@@ -3428,8 +3396,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Löschen der Egg-Konfiguration bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "title": "Löschen der Egg-Konfiguration bestätigen"
                   }
                 }
               }
@@ -3472,8 +3439,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Egg Repository Löschung bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "title": "Egg Repository Löschung bestätigen"
                   }
                 }
               }
@@ -3537,7 +3503,6 @@
                 "modal": {
                   "delete": {
                     "title": "Datenbank-Host-Löschung bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
                     "alert": {
                       "forceWarning": "Das erzwungene Löschen entfernt alle Datenbanken auf diesem Host. Die Datenbanken auf dem Host selbst werden möglicherweise nicht vollständig bereinigt, wodurch verwaiste Daten zurückbleiben."
                     }
@@ -3552,7 +3517,6 @@
                 "modal": {
                   "delete": {
                     "title": "Löschen der Datenbank bestätigen",
-                    "content": "Möchtest du **{name}** wirklich löschen?",
                     "toast": {
                       "deleted": "Die Datenbank wurde gelöscht."
                     },
@@ -3574,7 +3538,6 @@
                 "titleCreate": "Datenbank-Agent-Host erstellen",
                 "titleUpdate": "Datenbank-Agent-Host aktualisieren",
                 "form": {
-                  "typeEnabled": "Aktiviert",
                   "typePublicHost": "Öffentlicher Host",
                   "typePublicPort": "Öffentlicher Port"
                 },
@@ -3593,7 +3556,6 @@
                 "modal": {
                   "delete": {
                     "title": "Löschen des Datenbank-Agent-Hosts bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
                     "alert": {
                       "forceWarning": "Erzwungenes Löschen entfernt alle Instanzen auf diesem Host. Instanzen, für die der Agent nicht erreichbar ist, werden möglicherweise nicht vollständig bereinigt, sodass verwaiste Daten zurückbleiben."
                     }
@@ -3612,7 +3574,6 @@
                       "updated": "Instanz wurde aktualisiert."
                     },
                     "form": {
-                      "image": "Docker-Image",
                       "imageDescription": "Fixiert die Instanz auf ein bestimmtes Docker-Image. Leer lassen, um dem Template-Image zu folgen, einschließlich zukünftiger Template-Updates.",
                       "env": "Umgebungs-Überschreibungen",
                       "override": "{field} überschreiben"
@@ -3620,7 +3581,6 @@
                   },
                   "deleteInstance": {
                     "title": "Löschen der verwalteten Datenbank bestätigen",
-                    "content": "Möchtest du **{name}** wirklich löschen?",
                     "toast": {
                       "deleted": "Verwaltete Datenbank gelöscht."
                     },
@@ -3693,11 +3653,8 @@
                   "resources": "Zugewiesene Ressourcen"
                 },
                 "label": {
-                  "url": "URL",
-                  "description": "Beschreibung",
                   "createdAt": "Erstellt",
                   "version": "Version",
-                  "cpu": "CPU",
                   "memory": "Arbeitsspeicher",
                   "disk": "Speicher",
                   "instances": "Instanzen",
@@ -3718,28 +3675,21 @@
               "page": {
                 "title": "Datenbank-Agent-Host-Statistiken",
                 "card": {
-                  "resources": "Ressourcen",
                   "graphs": "Diagramme"
                 },
                 "label": {
-                  "cpu": "CPU",
                   "cpuThreads": "{model} ({threads} Threads)",
                   "memory": "Arbeitsspeicher",
                   "usedByAgent": "{size} vom Agent verwendet",
                   "disk": "Festplatte",
-                  "network": "Netzwerk",
                   "networkIn": "Ein: {in}",
                   "networkOut": "Aus: {out}"
                 },
                 "chart": {
-                  "cpuLoad": "CPU-Auslastung",
-                  "memoryUsage": "Arbeitsspeicher-Nutzung",
                   "diskIo": "Festplatten-I/O",
                   "diskRead": "Festplatte lesen",
                   "diskWrite": "Festplatte schreiben",
                   "networkTraffic": "Netzwerkverkehr",
-                  "networkInLabel": "Eingehend",
-                  "networkOutLabel": "Ausgehend",
                   "inbound": "Eingehend",
                   "outbound": "Ausgehend"
                 },
@@ -3792,7 +3742,6 @@
                   "socketPathDescription": "Der Unix-Socket-Dateipfad innerhalb des Datenbank-Containers, muss mit dem Ort übereinstimmen, an dem das konfigurierte Image seinen Socket tatsächlich erstellt.",
                   "imageUid": "Image-UID",
                   "imageGid": "Image-GID",
-                  "cmd": "Befehl",
                   "memoryDescription": "Das Speicherlimit des Datenbank-Containers.",
                   "memoryTooltip": "0 setzt kein Limit.",
                   "swap": "Swap",
@@ -3809,8 +3758,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Löschen der Datenbank-Agent-Vorlage bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "title": "Löschen der Datenbank-Agent-Vorlage bestätigen"
                   }
                 }
               }
@@ -3901,8 +3849,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "OAuth-Anbieter-Löschung bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "title": "OAuth-Anbieter-Löschung bestätigen"
                   }
                 }
               }
@@ -4038,8 +3985,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Löschen der Backup-Konfiguration bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "title": "Löschen der Backup-Konfiguration bestätigen"
                   }
                 },
                 "s3": {
@@ -4153,7 +4099,6 @@
           "title": "System-Backup-Richtlinien",
           "resourceName": "System-Backup-Richtlinie",
           "badge": {
-            "disabled": "Deaktiviert",
             "runPending": "Ausführung ausstehend"
           },
           "table": {
@@ -4192,7 +4137,6 @@
                   },
                   "delete": {
                     "title": "Löschen der System-Backup-Richtlinie bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?",
                     "form": {
                       "deleteBackups": "Möchtest du die von dieser Richtlinie erstellten Backups löschen?"
                     },
@@ -4282,15 +4226,11 @@
                 "titleUpdate": "Mount aktualisieren",
                 "alert": "Mounts sind eine mächtige und potenziell gefährliche Funktion. Unsachgemäße Nutzung kann zu Datenverlust oder Sicherheitslücken führen (einschließlich Container-Ausbrüchen). Stelle sicher, dass du die Auswirkungen der Nutzung von Mounts verstehst, bevor du sie erstellst oder aktualisierst.",
                 "form": {
-                  "source": "Quelle",
-                  "target": "Ziel",
-                  "readOnly": "Schreibgeschützt",
                   "userMountable": "Vom Benutzer einbindbar"
                 },
                 "modal": {
                   "delete": {
-                    "title": "Mount-Löschung bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "title": "Mount-Löschung bestätigen"
                   }
                 }
               }
@@ -4369,8 +4309,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Rollenlöschung bestätigen",
-                    "content": "Bist du sicher, dass du **{name}** löschen möchtest?"
+                    "title": "Rollenlöschung bestätigen"
                   }
                 }
               }
@@ -4483,10 +4422,6 @@
           "details": {
             "address": "Adresse",
             "port": "Port",
-            "uptime": "Laufzeit",
-            "cpuLoad": "CPU-Last",
-            "memoryLoad": "RAM-Last",
-            "diskUsage": "Speichernutzung",
             "networkIn": "Netzwerk (Eingehend)",
             "networkOut": "Netzwerk (Ausgehend)",
             "normalizeCpuLoad": "Normalisiere CPU-Last (skaliert auf max. 100%)"
@@ -4500,11 +4435,6 @@
             }
           },
           "stats": {
-            "cpuLoad": "CPU-Last",
-            "memoryLoad": "RAM-Last",
-            "network": "Netzwerk",
-            "inbound": "Eingehend",
-            "outbound": "Ausgehend",
             "offline": "Server ist offline"
           },
           "socketConnected": "Verbunden ({ping}ms ping)",
@@ -4524,7 +4454,6 @@
             }
           },
           "diskUsage": {
-            "title": "Festplattennutzung",
             "details": "{used} von {total} belegt ({percentage}%)"
           },
           "button": {
@@ -4545,6 +4474,7 @@
             "exitBackup": "Backup verlassen",
             "fileFromEditor": "Datei aus Editor",
             "directory": "Verzeichnis",
+            "symlink": "Symlink",
             "fileFromPull": "Datei aus Pull",
             "fileFromUpload": "Datei aus Upload",
             "directoryFromUpload": "Verzeichnis aus Upload",
@@ -4685,7 +4615,6 @@
           },
           "modal": {
             "cancelAllOperations": {
-              "title": "Alle Vorgänge abbrechen",
               "content": "Bist du sicher, dass du alle laufenden Dateivorgänge abbrechen möchtest? Ihr Fortschritt geht verloren."
             },
             "unsavedChanges": {
@@ -4720,6 +4649,12 @@
               "title": "Verzeichnis erstellen",
               "createdAs": "Dieses Verzeichnis wird erstellt als "
             },
+            "createSymlink": {
+              "title": "Symlink erstellen",
+              "targetDescription": "Relativ zu dem Verzeichnis, in dem der Symlink erstellt wird.",
+              "createdAs": "Dieser Symlink wird erstellt als ",
+              "pointsTo": "Er wird zeigen auf "
+            },
             "copyFile": {
               "title": "Datei kopieren",
               "createdAs": "Diese Datei wird erstellt als ",
@@ -4735,14 +4670,10 @@
               "rename": "Umbenennen",
               "skipAll": "Alle überspringen",
               "overwriteAll": "Alle überschreiben",
-              "newName": "Neuer Name",
               "confirm": "{files} kopieren"
             },
             "copyRemote": {
               "title": "Remote kopieren",
-              "form": {
-                "server": "Server"
-              },
               "createdAs": "Diese Dateien werden auf dem Remote-Server erstellt unter "
             },
             "fileFingerprints": {
@@ -4795,7 +4726,6 @@
               "title": "Dateien umbenennen",
               "find": "Suchen",
               "findPlaceholder": "Zu suchender Text",
-              "replace": "Ersetzen durch",
               "replacePlaceholder": "Ersetzungstext",
               "scope": "Anwenden auf",
               "scopeName": "Name",
@@ -4836,7 +4766,6 @@
               "preview": {
                 "title": "Vorschau",
                 "original": "Original",
-                "newName": "Neuer Name",
                 "unchanged": "Unverändert",
                 "conflict": "Name bereits vergeben",
                 "duplicate": "Doppeltes Ziel",
@@ -4858,7 +4787,6 @@
               "pathPatterns": "Pfadmuster",
               "include": "Einschließen",
               "exclude": "Ausschließen",
-              "caseInsensitive": "Groß-/Kleinschreibung ignorieren",
               "fileContent": "Dateiinhalte",
               "searchText": "Suchtext",
               "maxFileSize": "Maximale Dateigröße",
@@ -4901,7 +4829,6 @@
             "databaseName": "Datenbank Name"
           },
           "explorer": {
-            "title": "Daten-Explorer",
             "button": {
               "open": "Daten erkunden",
               "run": "Ausführen",
@@ -4922,7 +4849,6 @@
               "tableName": "Tabellenname",
               "columnsList": "Spalten",
               "columnName": "Spaltenname",
-              "columnType": "Typ",
               "nullable": "Nullable",
               "primaryKey": "Primärschlüssel",
               "autoIncrement": "Auto Increment"
@@ -5043,7 +4969,6 @@
               "statement": "Anweisung {index}",
               "form": {
                 "rowLimit": "Zeilenlimit",
-                "readOnly": "Schreibgeschützt",
                 "readOnlyDescription": "Lehnt Anweisungen ab, die Daten oder Struktur verändern."
               }
             },
@@ -5074,10 +4999,6 @@
                 "logs": "Logs"
               },
               "stats": {
-                "uptime": "Laufzeit",
-                "cpuLoad": "CPU-Auslastung",
-                "memoryLoad": "Speicherauslastung",
-                "diskUsage": "Festplattennutzung",
                 "offline": "Instanz ist offline"
               }
             },
@@ -5090,14 +5011,16 @@
                 "limitReached": "Diese Instanz ist auf {max} Datenbanken limitiert."
               },
               "button": {
-                "export": "Exportieren",
-                "import": "Importieren",
                 "remoteImport": "Von Remote importieren"
               },
               "modal": {
                 "createDatabase": {
                   "title": "Datenbank erstellen",
-                  "content": "Erstellt eine neue Datenbank mit eigenem Benutzer innerhalb dieser verwalteten Datenbank-Instanz. Die Zugangsdaten werden anschließend in der Tabelle angezeigt."
+                  "content": "Erstellt eine neue Datenbank innerhalb dieser verwalteten Datenbank-Instanz.",
+                  "form": {
+                    "createUser": "Einen Benutzer für diese Datenbank erstellen",
+                    "createUserHint": "Erstellt einen nach der Datenbank benannten Benutzer, gewährt ihm Zugriff und zeigt seine Zugangsdaten an, sobald die Datenbank erstellt wurde."
+                  }
                 },
                 "deleteDatabase": {
                   "title": "Datenbanklöschung bestätigen",
@@ -5149,18 +5072,37 @@
             "users": {
               "title": "Benutzer",
               "subtitle": "{current} von {max} maximalen Benutzern erstellt.",
+              "button": {
+                "permissions": "Berechtigungen"
+              },
               "tooltip": {
+                "offline": "Die Instanz muss laufen, um Benutzer zu erstellen.",
                 "limitReached": "Diese Instanz ist auf {max} Benutzer limitiert."
+              },
+              "enum": {
+                "permission": {
+                  "none": "Kein Zugriff",
+                  "readOnly": "Nur Lesen",
+                  "readWrite": "Lesen & Schreiben"
+                }
+              },
+              "form": {
+                "databases": "Datenbankzugriff",
+                "noDatabases": "Diese Instanz hat noch keine Datenbanken."
+              },
+              "table": {
+                "columns": {
+                  "databases": "Datenbanken"
+                }
               },
               "modal": {
                 "createUser": {
                   "title": "Benutzer erstellen",
-                  "content": "Erstellt einen neuen Benutzer in dieser verwalteten Datenbank-Instanz. Die Zugangsdaten werden anschließend in der Tabelle angezeigt.",
-                  "form": {
-                    "database": "Datenbank",
-                    "databaseHint": "Die Datenbank, auf die dieser Benutzer Zugriff erhält.",
-                    "databaseRequired": "Bitte wähle eine Datenbank aus."
-                  }
+                  "content": "Erstellt einen neuen Benutzer in dieser verwalteten Datenbank-Instanz. Die Zugangsdaten werden anschließend in der Tabelle angezeigt."
+                },
+                "permissions": {
+                  "title": "Datenbankberechtigungen",
+                  "content": "Legt fest, auf welche Datenbanken **{username}** zugreifen darf und was dort erlaubt ist."
                 },
                 "deleteUser": {
                   "title": "Benutzerlöschung bestätigen",
@@ -5169,7 +5111,8 @@
               },
               "toast": {
                 "created": "Benutzer erstellt.",
-                "deleted": "Benutzer gelöscht."
+                "deleted": "Benutzer gelöscht.",
+                "permissionsUpdated": "Benutzerberechtigungen aktualisiert."
               }
             },
             "power": {
@@ -5214,8 +5157,7 @@
                 },
                 "form": {
                   "template": "Vorlage",
-                  "noTemplatesFound": "Keine Vorlagen verfügbar",
-                  "image": "Docker-Image"
+                  "noTemplatesFound": "Keine Vorlagen verfügbar"
                 }
               },
               "editDatabaseInstance": {
@@ -5242,6 +5184,7 @@
                 "title": "Datenbank-Zugangsdaten",
                 "form": {
                   "database": "Datenbank",
+                  "databaseHint": "Die Datenbank, auf die die untenstehende Verbindungszeichenfolge verweist.",
                   "jdbcConnectionString": "JDBC-Verbindungszeichenfolge"
                 }
               },
@@ -5257,7 +5200,6 @@
                 }
               },
               "cancelAllOperations": {
-                "title": "Alle Vorgänge abbrechen",
                 "content": "Möchtest du wirklich alle laufenden Datenbank-Vorgänge abbrechen? Ihr Fortschritt geht dabei verloren."
               }
             }
@@ -5317,8 +5259,7 @@
           "table": {
             "columns": {
               "lastRun": "Letzte Ausführung",
-              "lastFailure": "Letzter Fehlschlag",
-              "status": "Status"
+              "lastFailure": "Letzter Fehlschlag"
             }
           },
           "button": {
@@ -5359,7 +5300,6 @@
               "or": "ODER (Mindestens eine muss wahr sein)",
               "not": "NICHT (Darf nicht wahr sein)",
               "serverState": "Serverstatus",
-              "uptime": "Betriebszeit",
               "resourceUsage": "Ressourcennutzung",
               "fileExists": "Datei existiert",
               "variableExists": "Variable existiert",
@@ -5369,9 +5309,7 @@
               "variableEndsWith": "Variable endet mit"
             },
             "scheduleResourceMetric": {
-              "cpu": "CPU-Auslastung",
-              "memory": "Speichernutzung",
-              "disk": "Festplattennutzung"
+              "cpu": "CPU-Auslastung"
             },
             "scheduleComparator": {
               "smallerThan": "Kleiner als",
@@ -5454,7 +5392,6 @@
             "comparator": "Vergleichsoperator",
             "rootPath": "Root-Pfad",
             "outputInto": "Ausgabe in",
-            "caseInsensitive": "Groß-/Kleinschreibung ignorieren",
             "ignoreFailure": "Fehler ignorieren",
             "runInForeground": "Im Vordergrund ausführen"
           },
@@ -5799,7 +5736,6 @@
               "title": "Datei schreiben",
               "description": "Schreibt Text in eine Datei oder hängt ihn an.",
               "form": {
-                "content": "Inhalt",
                 "appendToFile": "An Datei anhängen"
               },
               "renderer": {
@@ -5920,7 +5856,6 @@
               "description": "Sendet eine HTTP-Anfrage, zum Beispiel an einen Webhook.",
               "form": {
                 "method": "Methode",
-                "url": "URL",
                 "headers": "Header",
                 "headerName": "Header-Name",
                 "headerValue": "Header-Wert",
@@ -5993,8 +5928,6 @@
           },
           "table": {
             "columns": {
-              "checksum": "Prüfsumme",
-              "files": "Dateien",
               "locked": "Gesperrt?"
             }
           },
@@ -6047,7 +5980,6 @@
           }
         },
         "backupGroups": {
-          "title": "Backup-Gruppen",
           "group": "Backup-Gruppe",
           "ungrouped": "Ohne Gruppe",
           "noBackups": "Diese Gruppe enthält noch keine Backups.",
@@ -6111,9 +6043,6 @@
             "unsetPrimary": "Allocation nicht mehr primär."
           },
           "modal": {
-            "editAllocation": {
-              "title": "Allocation bearbeiten"
-            },
             "removeAllocation": {
               "title": "Entfernen der Allocation bestätigen",
               "content": "Bist du sicher, dass du **{allocation}** von diesem Server entfernen möchtest?"
@@ -6143,9 +6072,7 @@
           "title": "Mounts",
           "table": {
             "columns": {
-              "target": "Ziel",
-              "mounted": "Eingebunden",
-              "readOnly": "Schreibgeschützt"
+              "mounted": "Eingebunden"
             }
           },
           "button": {

@@ -151,6 +151,14 @@
       "few": "{count} Changes",
       "many": "{count} Changes",
       "other": "{count} Changes"
+    },
+    "session": {
+      "zero": "{count} Sessions",
+      "one": "{count} Session",
+      "two": "{count} Sessions",
+      "few": "{count} Sessions",
+      "many": "{count} Sessions",
+      "other": "{count} Sessions"
     }
   },
   "translations": {
@@ -167,6 +175,7 @@
         "remove": "Kaldır",
         "enable": "Etkinleştir",
         "disable": "Devre Dışı Bırak",
+        "disableTwoFactor": "Disable Two-Factor",
         "update": "Güncelle",
         "close": "Kapat",
         "cancel": "İptal Et",
@@ -246,6 +255,9 @@
       "modal": {
         "duplicate": {
           "title": "Duplicate {resource}"
+        },
+        "delete": {
+          "content": "Are you sure you want to delete **{name}**?"
         }
       },
       "toast": {
@@ -328,6 +340,8 @@
         "destination": "Hedef",
         "destinationDirectory": "Destination Directory",
         "directoryName": "Dizin Adı",
+        "symlinkName": "Symlink Name",
+        "symlinkTarget": "Symlink Target",
         "locked": "Kilitli",
         "portRanges": "Port Aralıkları",
         "portRangesPlaceholder": "Port Aralıkları (ör. 3000-4000)",
@@ -346,6 +360,10 @@
         "yourControlPanelPassword": "Kontrol Paneli Şifreniz",
         "deploymentEnabled": "Deployment Enabled",
         "maintenanceEnabled": "Maintenance Enabled",
+        "source": "Source",
+        "target": "Target",
+        "replaceWith": "Replace With",
+        "caseInsensitive": "Case Insensitive",
         "truncateDirectory": "Bu işlemi yapmadan önce bu sunucudaki tüm dosyaları silmek istiyor musunuz? Bu işlem geri alınamaz."
       },
       "table": {
@@ -393,6 +411,18 @@
       },
       "tabs": {
         "general": "General"
+      },
+      "stat": {
+        "cpu": "CPU",
+        "cpuLoad": "CPU Load",
+        "memoryUsage": "Memory Usage",
+        "memoryLoad": "Memory Load",
+        "diskUsage": "Disk Usage",
+        "network": "Network",
+        "inbound": "Inbound",
+        "outbound": "Outbound",
+        "uptime": "Uptime",
+        "resources": "Resources"
       },
       "badge": {
         "active": "Aktif",
@@ -483,7 +513,7 @@
         }
       },
       "unlimited": "Sınırsız",
-      "readOnly": "Salt Okunur",
+      "readOnly": "Read Only",
       "na": "N/A",
       "never": "Asla",
       "none": "None",
@@ -785,14 +815,12 @@
         "badge": {
           "uploading": "Uploading",
           "waiting": "Waiting",
-          "paused": "Paused",
-          "failed": "Failed"
+          "paused": "Paused"
         },
         "rateLimited": "Your upload has been rate limited. Waiting...",
-        "cancelAllUploads": "Cancel all uploads",
+        "cancelAllUploads": "Cancel All Uploads",
         "modal": {
           "cancelAllUploads": {
-            "title": "Cancel All Uploads",
             "content": "Are you sure you want to cancel all active uploads? Partially uploaded files will be discarded."
           }
         },
@@ -876,13 +904,9 @@
           "title": "Node Yapılandırması",
           "allocationsTitle": "Tahsis (Allocations) Yapılandırması",
           "form": {
-            "name": "İsim",
             "namePlaceholder": "Sunucum",
-            "urlDescription": "Node ile dahili iletişim için kullanılır",
-            "publicUrl": "Genel URL",
+            "urlDescription": "Used for internal communication with the node.",
             "publicUrlDescription": "Websocket ve indirmeler için kullanılır",
-            "sftpHostPlaceholder": "SFTP Host",
-            "sftpPortPlaceholder": "SFTP Port",
             "ip": "IP"
           },
           "error": {
@@ -910,7 +934,6 @@
           "form": {
             "applicationName": "Uygulama Adı",
             "applicationNamePlaceholder": "Calagopus",
-            "languagePlaceholder": "Dil",
             "applicationUrl": "Uygulama URL'si",
             "registration": "Kaydı Etkinleştir",
             "registrationDescription": "Yeni kullanıcıların kendi hesaplarını kaydetmelerine izin verin.",
@@ -1250,7 +1273,6 @@
                 }
               },
               "button": {
-                "disableTwoFactor": "2FA'yı Devre Dışı Bırak",
                 "setupTwoFactor": "2FA'yı Kur"
               },
               "twoFactorEnabled": "İki Faktörlü Doğrulama şu anda etkin.",
@@ -1271,7 +1293,8 @@
               "title": "Avatar",
               "toast": {
                 "updated": "Avatar başarıyla güncellendi.",
-                "removed": "Avatar başarıyla kaldırıldı."
+                "removed": "Avatar başarıyla kaldırıldı.",
+                "loadFailed": "Failed to load image preview. Please ensure the file is a valid image."
               },
               "form": {
                 "avatar": "Avatar"
@@ -1322,9 +1345,11 @@
         },
         "sessions": {
           "title": "Oturumlar",
+          "button": {
+            "deleteOthers": "Log Out Others"
+          },
           "table": {
             "columns": {
-              "ip": "Oturumu Açan IP Adresi",
               "thisDevice": "Oturumu Açan Bu Cihaz mı?",
               "userAgent": "User Agent Bilgisi"
             }
@@ -1335,6 +1360,13 @@
               "content": "**{ip}** oturumunu hesabınızdan silmek istediğinize emin misiniz?",
               "toast": {
                 "deleted": "Oturum silindi."
+              }
+            },
+            "deleteOtherSessions": {
+              "title": "Confirm Session Deletion",
+              "content": "Are you sure you want to log out every session except the one you are currently using? Any other device signed into your account will have to log in again.",
+              "toast": {
+                "deleted": "{sessions} deleted."
               }
             }
           }
@@ -1395,7 +1427,6 @@
             "nextCommand": "Geçmişteki sonraki komut"
           },
           "serverList": {
-            "title": "Sunucu Listesi",
             "selectServer": "S tuşuna basılı tutun ve sunucu seçmek/kaldırmak için tıklayın"
           }
         },
@@ -1433,9 +1464,6 @@
               "title": "SSH Anahtarlarını İçe Aktar",
               "toast": {
                 "created": "{sshKeys} oluşturuldu."
-              },
-              "form": {
-                "provider": "Sağlayıcı"
               }
             },
             "deleteSshKey": {
@@ -1616,7 +1644,6 @@
                   "backupStatistics": "Backup Statistics"
                 },
                 "system": {
-                  "cpu": "CPU",
                   "memoryUsage": "Memory Usage ({process} used by Panel)",
                   "memoryValue": "{used} / {total} ({percent}%)",
                   "kernelVersion": "Kernel Version ({architecture})",
@@ -1643,30 +1670,6 @@
                   "databaseHosts": "Database Hosts",
                   "backupConfigurations": "Backup Configurations",
                   "roles": "Roles"
-                },
-                "backup": {
-                  "allTime": "All Time",
-                  "today": "Today",
-                  "week": "This Week",
-                  "month": "This Month",
-                  "totalAllTime": "Total backups all time",
-                  "successfulAllTime": "Successful backups all time",
-                  "failedAllTime": "Failed backups all time",
-                  "deletedAllTime": "Deleted backups all time",
-                  "totalToday": "Total backups today",
-                  "successfulToday": "Successful backups today",
-                  "failedToday": "Failed backups today",
-                  "deletedToday": "Deleted backups today",
-                  "totalWeek": "Total backups this week",
-                  "successfulWeek": "Successful backups this week",
-                  "failedWeek": "Failed backups this week",
-                  "deletedWeek": "Deleted backups this week",
-                  "totalMonth": "Total backups this month",
-                  "successfulMonth": "Successful backups this month",
-                  "failedMonth": "Failed backups this month",
-                  "deletedMonth": "Deleted backups this month",
-                  "successfulValue": "{count} ({size})",
-                  "deletedValue": "{count} ({size})"
                 }
               }
             },
@@ -1684,7 +1687,6 @@
                   "outdatedDatabaseAgentHosts": "Outdated Database Agent Hosts"
                 },
                 "panelVersion": "Your panel is currently running version `{current}`. The latest available version is `{latest}`.",
-                "unknown": "unknown",
                 "button": {
                   "recheck": "Recheck for Updates"
                 },
@@ -2216,7 +2218,6 @@
             "modal": {
               "title": "Look Up by External ID",
               "form": {
-                "externalId": "External ID",
                 "externalIdPlaceholder": "e.g. my-user-001",
                 "search": "Search"
               },
@@ -2247,7 +2248,6 @@
                   "cannotImpersonateSelf": "You cannot impersonate yourself."
                 },
                 "button": {
-                  "disableTwoFactor": "Disable Two Factor",
                   "sendPasswordResetEmail": "Send Password Reset Email",
                   "impersonate": "Impersonate"
                 },
@@ -2332,8 +2332,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Location Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Confirm Location Deletion"
                   }
                 },
                 "titleCreate": "Create Location",
@@ -2399,17 +2398,12 @@
                   "systemInfo": "System Information"
                 },
                 "label": {
-                  "location": "Location",
                   "url": "Internal URL",
-                  "publicUrl": "Public URL",
                   "sftpAddress": "SFTP Address",
-                  "backupConfiguration": "Backup Configuration",
-                  "description": "Description",
                   "createdAt": "Created",
                   "inheritedFromLocation": "Inherited from Location",
                   "none": "None",
                   "wingsVersion": "Wings Version",
-                  "cpu": "CPU",
                   "memory": "Memory",
                   "servers": "Servers",
                   "architecture": "Architecture",
@@ -2441,7 +2435,6 @@
                 },
                 "section": {
                   "connection": "Connection",
-                  "resources": "Resources",
                   "options": "Options"
                 },
                 "button": {
@@ -2515,38 +2508,30 @@
               "page": {
                 "title": "Node Statistics",
                 "card": {
-                  "resources": "Resources",
                   "graphs": "Graphs"
                 },
                 "toast": {
                   "connectionLost": "Lost connection to the node statistics stream."
                 },
                 "label": {
-                  "cpu": "CPU",
                   "memory": "Memory",
                   "disk": "Disk",
-                  "network": "Network",
                   "cpuThreads": "{model} ({threads} threads)",
                   "usedByWings": "{size} used by Wings",
                   "networkIn": "In: {in}",
                   "networkOut": "Out: {out}"
                 },
                 "chart": {
-                  "cpuLoad": "CPU Load",
-                  "memoryUsage": "Memory Usage",
                   "diskIo": "Disk I/O",
                   "networkTraffic": "Network Traffic",
                   "diskRead": "Disk Read",
                   "diskWrite": "Disk Write",
-                  "inbound": "Inbound",
-                  "outbound": "Outbound",
                   "networkInLabel": "Network In",
                   "networkOutLabel": "Network Out"
                 }
               }
             },
             "capacity": {
-              "title": "Capacity",
               "page": {
                 "title": "Deployment Capacity",
                 "subtitle": "Resources allocated to servers on this node, measured against the limits configured in node settings, not the physical machine capacity. Deployment only checks memory and disk.",
@@ -2560,7 +2545,6 @@
                   "maintenanceDisabled": "Not Under Maintenance"
                 },
                 "label": {
-                  "cpu": "CPU",
                   "memory": "Memory",
                   "disk": "Disk",
                   "memoryOverhead": "Memory Overhead",
@@ -2801,8 +2785,7 @@
           },
           "modal": {
             "delete": {
-              "title": "Confirm Node Deletion",
-              "content": "Are you sure you want to delete **{name}**?"
+              "title": "Confirm Node Deletion"
             },
             "bulkConfig": {
               "title": "Update Configuration - {nodes}",
@@ -2834,7 +2817,6 @@
             "modal": {
               "title": "Look Up by External ID",
               "form": {
-                "externalId": "External ID",
                 "externalIdPlaceholder": "e.g. my-server-001",
                 "search": "Search"
               },
@@ -2862,21 +2844,14 @@
                 },
                 "label": {
                   "user": "User",
-                  "language": "Language",
                   "createdAt": "Created",
                   "node": "Node",
-                  "location": "Location",
                   "memoryLimit": "Memory Limit",
                   "diskLimit": "Disk Limit",
                   "sftpAddress": "SFTP Address",
-                  "primaryAllocation": "Primary Allocation",
                   "none": "None",
-                  "dockerImage": "Docker Image",
-                  "nest": "Nest",
                   "egg": "Egg",
-                  "timezone": "Timezone",
                   "autoKill": "Auto-Kill",
-                  "cpu": "CPU",
                   "memory": "Memory",
                   "disk": "Disk",
                   "swap": "Swap",
@@ -2888,7 +2863,6 @@
                   "unlimited": "Unlimited",
                   "autoKillSeconds": "{seconds}s",
                   "autoKillDisabled": "Disabled",
-                  "externalId": "External ID",
                   "uuid": "UUID"
                 },
                 "badge": {
@@ -3146,8 +3120,7 @@
                     "description": "You are about to delete **{name}**. Are you sure?",
                     "form": {
                       "deleteBackups": "Do you want to delete backups of this server?",
-                      "confirmServerName": "Confirm Server Name",
-                      "confirmServerNamePlaceholder": "Server Name"
+                      "confirmServerName": "Confirm Server Name"
                     },
                     "alert": {
                       "forceWarning": "Force deletion skips the normal shutdown sequence. The server files on the node may not be fully cleaned up, leaving orphaned data behind."
@@ -3172,7 +3145,6 @@
                 "modal": {
                   "delete": {
                     "title": "Confirm Nest Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
                     "form": {
                       "deleteEggs": "Do you want to delete all eggs in this nest?"
                     }
@@ -3190,10 +3162,15 @@
                   "subtitle": "Release to start importing"
                 },
                 "button": {
-                  "updateFromRepository": "Update from Repository"
+                  "updateFromRepository": "Update from Repository",
+                  "fromFile": "from File",
+                  "fromUrl": "from URL",
+                  "fromRepository": "from Repository"
                 },
                 "toast": {
                   "imported": "Egg imported.",
+                  "importedBulk": "{eggs} imported.",
+                  "importFailed": "Failed to import {url}: {error}",
                   "moved": "Egg moved.",
                   "movedBulk": "{eggs} moved.",
                   "deletedBulk": "{eggs} deleted.",
@@ -3201,6 +3178,16 @@
                   "parseFailed": "Failed to parse egg: {error}"
                 },
                 "modal": {
+                  "importUrl": {
+                    "title": "Import Eggs from URL",
+                    "urls": "URLs",
+                    "urlsDescription": "Direct links to exported eggs in JSON or YAML format."
+                  },
+                  "updateUrl": {
+                    "title": "Update Egg from URL",
+                    "url": "URL",
+                    "urlDescription": "Direct link to an exported egg in JSON or YAML format."
+                  },
                   "move": {
                     "title": "Move Egg"
                   },
@@ -3238,7 +3225,6 @@
                         "createNewFileDescription": "If enabled, the file will be created if it does not exist. If disabled, the file must already exist or the replacement will fail.",
                         "match": "Match",
                         "ifValue": "If Value",
-                        "replaceWith": "Replace With",
                         "insertNew": "Insert New",
                         "insertNewDescription": "If enabled, if no existing value matches the \"Match\" field, the \"Replace With\" value will be inserted into the file. If disabled, if no match is found, no changes will be made to the file.",
                         "updateExisting": "Update Existing",
@@ -3263,9 +3249,7 @@
                       "emptyReplacements": "No replacements defined.",
                       "button": {
                         "addReplacement": "Add Replacement",
-                        "addConfigFile": "Add Config File",
-                        "fromFile": "from File",
-                        "fromRepository": "from Repository"
+                        "addConfigFile": "Add Config File"
                       },
                       "toast": {
                         "exported": "Egg exported.",
@@ -3273,8 +3257,7 @@
                       },
                       "modal": {
                         "delete": {
-                          "title": "Confirm Egg Deletion",
-                          "content": "Are you sure you want to delete **{name}**?"
+                          "title": "Confirm Egg Deletion"
                         }
                       }
                     }
@@ -3371,7 +3354,6 @@
                 "titleUpdate": "Update Egg Configuration",
                 "form": {
                   "order": "Order",
-                  "eggs": "Eggs",
                   "eggsPlaceholder": "Select Eggs",
                   "eggsEmpty": "No eggs are configured. Create a nest and egg before creating an egg configuration."
                 },
@@ -3432,8 +3414,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Egg Configuration Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Confirm Egg Configuration Deletion"
                   }
                 }
               }
@@ -3476,8 +3457,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Egg Repository Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Confirm Egg Repository Deletion"
                   }
                 }
               }
@@ -3513,7 +3493,7 @@
         },
         "databaseHosts": {
           "title": "Database Hosts",
-          "resourceName": "Database host",
+          "resourceName": "Database Host",
           "tabs": {
             "general": {
               "page": {
@@ -3541,7 +3521,6 @@
                 "modal": {
                   "delete": {
                     "title": "Confirm Database Host Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
                     "alert": {
                       "forceWarning": "Force deletion removes all databases on this host. The databases on the host itself may not be fully cleaned up, leaving orphaned data behind."
                     }
@@ -3556,7 +3535,6 @@
                 "modal": {
                   "delete": {
                     "title": "Confirm Database Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
                     "toast": {
                       "deleted": "Database has been deleted."
                     },
@@ -3571,14 +3549,13 @@
         },
         "databaseAgentHosts": {
           "title": "Database Agent Hosts",
-          "resourceName": "Database agent host",
+          "resourceName": "Database Agent Host",
           "tabs": {
             "general": {
               "page": {
                 "titleCreate": "Create Database Agent Host",
                 "titleUpdate": "Update Database Agent Host",
                 "form": {
-                  "typeEnabled": "Enabled",
                   "typePublicHost": "Public Host",
                   "typePublicPort": "Public Port"
                 },
@@ -3597,7 +3574,6 @@
                 "modal": {
                   "delete": {
                     "title": "Confirm Database Agent Host Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
                     "alert": {
                       "forceWarning": "Force deletion removes all instances on this host. Instances the agent cannot be reached for may not be fully cleaned up, leaving orphaned data behind."
                     }
@@ -3616,7 +3592,6 @@
                       "updated": "Instance has been updated."
                     },
                     "form": {
-                      "image": "Docker Image",
                       "imageDescription": "Pins the instance to a specific docker image. Leave empty to follow the template image, including future template updates.",
                       "env": "Environment Overrides",
                       "override": "Override {field}"
@@ -3624,7 +3599,6 @@
                   },
                   "deleteInstance": {
                     "title": "Confirm Managed Database Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
                     "toast": {
                       "deleted": "Managed database deleted."
                     },
@@ -3697,11 +3671,8 @@
                   "resources": "Allocated Resources"
                 },
                 "label": {
-                  "url": "URL",
-                  "description": "Description",
                   "createdAt": "Created",
                   "version": "Version",
-                  "cpu": "CPU",
                   "memory": "Memory",
                   "disk": "Disk",
                   "instances": "Instances",
@@ -3722,28 +3693,21 @@
               "page": {
                 "title": "Database Agent Host Statistics",
                 "card": {
-                  "resources": "Resources",
                   "graphs": "Graphs"
                 },
                 "label": {
-                  "cpu": "CPU",
                   "cpuThreads": "{model} ({threads} threads)",
                   "memory": "Memory",
                   "usedByAgent": "{size} used by the agent",
                   "disk": "Disk",
-                  "network": "Network",
                   "networkIn": "In: {in}",
                   "networkOut": "Out: {out}"
                 },
                 "chart": {
-                  "cpuLoad": "CPU Load",
-                  "memoryUsage": "Memory Usage",
                   "diskIo": "Disk I/O",
                   "diskRead": "Disk Read",
                   "diskWrite": "Disk Write",
                   "networkTraffic": "Network Traffic",
-                  "networkInLabel": "Inbound",
-                  "networkOutLabel": "Outbound",
                   "inbound": "Inbound",
                   "outbound": "Outbound"
                 },
@@ -3770,7 +3734,7 @@
         },
         "databaseAgentTemplates": {
           "title": "Database Agent Templates",
-          "resourceName": "Database agent template",
+          "resourceName": "Database Agent Template",
           "dropzone": {
             "title": "Drop some files here to import as Database Agent Templates",
             "subtitle": "Release to start importing"
@@ -3796,7 +3760,6 @@
                   "socketPathDescription": "The unix socket file path inside the database container, must match where the configured image actually creates its socket.",
                   "imageUid": "Image UID",
                   "imageGid": "Image GID",
-                  "cmd": "Command",
                   "memoryDescription": "The Memory limit of the database container.",
                   "memoryTooltip": "0 will not set a limit.",
                   "swap": "Swap",
@@ -3813,8 +3776,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Database Agent Template Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Confirm Database Agent Template Deletion"
                   }
                 }
               }
@@ -3905,8 +3867,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm OAuth Provider Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Confirm OAuth Provider Deletion"
                   }
                 }
               }
@@ -4017,7 +3978,7 @@
         },
         "backupConfigurations": {
           "title": "Backup Configurations",
-          "resourceName": "Backup configuration",
+          "resourceName": "Backup Configuration",
           "table": {
             "columns": {
               "disk": "Disk"
@@ -4042,8 +4003,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Backup Configuration Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Confirm Backup Configuration Deletion"
                   }
                 },
                 "s3": {
@@ -4155,9 +4115,8 @@
         },
         "systemBackupPolicies": {
           "title": "System Backup Policies",
-          "resourceName": "System backup policy",
+          "resourceName": "System Backup Policy",
           "badge": {
-            "disabled": "Disabled",
             "runPending": "Run pending"
           },
           "table": {
@@ -4196,7 +4155,6 @@
                   },
                   "delete": {
                     "title": "Confirm System Backup Policy Deletion",
-                    "content": "Are you sure you want to delete **{name}**?",
                     "form": {
                       "deleteBackups": "Do you want to delete backups created by this policy?"
                     },
@@ -4286,15 +4244,11 @@
                 "titleUpdate": "Update Mount",
                 "alert": "Mounts are a powerful and potentially dangerous feature. Improper use can lead to data loss or security vulnerabilities (including container escapes). Make sure you understand the implications of using mounts before creating or updating them.",
                 "form": {
-                  "source": "Source",
-                  "target": "Target",
-                  "readOnly": "Read Only",
                   "userMountable": "User Mountable"
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Mount Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Confirm Mount Deletion"
                   }
                 }
               }
@@ -4373,8 +4327,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirm Role Deletion",
-                    "content": "Are you sure you want to delete **{name}**?"
+                    "title": "Confirm Role Deletion"
                   }
                 }
               }
@@ -4487,10 +4440,6 @@
           "details": {
             "address": "Adres",
             "port": "Port",
-            "uptime": "Çalışma Süresi",
-            "cpuLoad": "İşlemci Kullanımı",
-            "memoryLoad": "Bellek Kullanımı",
-            "diskUsage": "Disk Kullanımı",
             "networkIn": "Ağ (Giriş)",
             "networkOut": "Ağ (Çıkış)",
             "normalizeCpuLoad": "İşlemci Kullanımını %100 Üzerinden Göster"
@@ -4504,11 +4453,6 @@
             }
           },
           "stats": {
-            "cpuLoad": "CPU Yükü",
-            "memoryLoad": "Bellek Yükü",
-            "network": "Ağ",
-            "inbound": "Gelen",
-            "outbound": "Giden",
             "offline": "Server is offline"
           },
           "socketConnected": "Bağlı ({ping}ms gecikme)",
@@ -4528,7 +4472,6 @@
             }
           },
           "diskUsage": {
-            "title": "Disk Usage",
             "details": "{used} of {total} used ({percentage}%)"
           },
           "button": {
@@ -4549,6 +4492,7 @@
             "exitBackup": "Yedekten Çık",
             "fileFromEditor": "Editörden Dosya",
             "directory": "Dizin",
+            "symlink": "Symlink",
             "fileFromPull": "URL'den Dosya Çek",
             "fileFromUpload": "Dosya Yükle",
             "directoryFromUpload": "Klasör Yükle",
@@ -4605,7 +4549,7 @@
             "receivingRemote": "Uzak sunucudan {files} alınıyor",
             "sendingRemote": "{files} uzak sunucuya gönderiliyor",
             "exportingBackup": "Exporting backup to {destination}",
-            "cancelAllOperations": "Cancel all operations"
+            "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
             "title": "Yüklemek için dosyaları buraya bırakın",
@@ -4690,7 +4634,6 @@
           },
           "modal": {
             "cancelAllOperations": {
-              "title": "Cancel All Operations",
               "content": "Are you sure you want to cancel all running file operations? Their progress will be lost."
             },
             "unsavedChanges": {
@@ -4725,6 +4668,12 @@
               "title": "Dizin Oluştur",
               "createdAs": "Bu dizin şu isimle oluşturulacak: "
             },
+            "createSymlink": {
+              "title": "Create Symlink",
+              "targetDescription": "Relative to the directory the symlink is created in.",
+              "createdAs": "This symlink will be created as ",
+              "pointsTo": "It will point to "
+            },
             "copyFile": {
               "title": "Dosyayı Kopyala",
               "createdAs": "Bu dosya şu isimle oluşturulacak: ",
@@ -4740,14 +4689,10 @@
               "rename": "Rename",
               "skipAll": "Skip all",
               "overwriteAll": "Overwrite all",
-              "newName": "New name",
               "confirm": "Copy {files}"
             },
             "copyRemote": {
               "title": "Dosyaları Uzaktan Kopyala",
-              "form": {
-                "server": "Sunucu"
-              },
               "createdAs": "Bu dosyalar uzak sunucuda şu dizin altında oluşturulacak: "
             },
             "fileFingerprints": {
@@ -4800,7 +4745,6 @@
               "title": "Rename Files",
               "find": "Find",
               "findPlaceholder": "Text to find",
-              "replace": "Replace with",
               "replacePlaceholder": "Replacement text",
               "scope": "Apply to",
               "scopeName": "Name",
@@ -4841,7 +4785,6 @@
               "preview": {
                 "title": "Preview",
                 "original": "Original",
-                "newName": "New name",
                 "unchanged": "Unchanged",
                 "conflict": "Name already in use",
                 "duplicate": "Duplicate target",
@@ -4863,7 +4806,6 @@
               "pathPatterns": "Yol Desenleri",
               "include": "Dahil Et",
               "exclude": "Hariç Tut",
-              "caseInsensitive": "Büyük/küçük harf duyarsız",
               "fileContent": "Dosya İçeriği",
               "searchText": "Metni ara",
               "maxFileSize": "Maksimum dosya boyutu",
@@ -4906,7 +4848,6 @@
             "databaseName": "Veritabanı Adı"
           },
           "explorer": {
-            "title": "Data Explorer",
             "button": {
               "open": "Explore Data",
               "run": "Run",
@@ -4927,7 +4868,6 @@
               "tableName": "Table Name",
               "columnsList": "Columns",
               "columnName": "Column Name",
-              "columnType": "Type",
               "nullable": "Nullable",
               "primaryKey": "Primary Key",
               "autoIncrement": "Auto Increment"
@@ -5048,7 +4988,6 @@
               "statement": "Statement {index}",
               "form": {
                 "rowLimit": "Row Limit",
-                "readOnly": "Read-only",
                 "readOnlyDescription": "Rejects statements that change data or structure."
               }
             },
@@ -5079,10 +5018,6 @@
                 "logs": "Logs"
               },
               "stats": {
-                "uptime": "Uptime",
-                "cpuLoad": "CPU Load",
-                "memoryLoad": "Memory Load",
-                "diskUsage": "Disk Usage",
                 "offline": "Instance is offline"
               }
             },
@@ -5095,14 +5030,16 @@
                 "limitReached": "This instance is limited to {max} databases."
               },
               "button": {
-                "export": "Export",
-                "import": "Import",
                 "remoteImport": "Import from Remote"
               },
               "modal": {
                 "createDatabase": {
                   "title": "Create Database",
-                  "content": "Creates a new database with its own user inside this managed database instance. The credentials will be shown in the table afterwards."
+                  "content": "Creates a new database inside this managed database instance.",
+                  "form": {
+                    "createUser": "Create a user for this database",
+                    "createUserHint": "Creates a user named after the database, grants it access and shows its credentials once the database is created."
+                  }
                 },
                 "deleteDatabase": {
                   "title": "Confirm Database Deletion",
@@ -5154,18 +5091,37 @@
             "users": {
               "title": "Users",
               "subtitle": "{current} of {max} maximum users created.",
+              "button": {
+                "permissions": "Permissions"
+              },
               "tooltip": {
+                "offline": "The instance must be running to create users.",
                 "limitReached": "This instance is limited to {max} users."
+              },
+              "enum": {
+                "permission": {
+                  "none": "No Access",
+                  "readOnly": "Read Only",
+                  "readWrite": "Read & Write"
+                }
+              },
+              "form": {
+                "databases": "Database Access",
+                "noDatabases": "This instance has no databases yet."
+              },
+              "table": {
+                "columns": {
+                  "databases": "Databases"
+                }
               },
               "modal": {
                 "createUser": {
                   "title": "Create User",
-                  "content": "Creates a new user inside this managed database instance. The credentials will be shown in the table afterwards.",
-                  "form": {
-                    "database": "Database",
-                    "databaseHint": "The database this user will be granted access to.",
-                    "databaseRequired": "Please select a database."
-                  }
+                  "content": "Creates a new user inside this managed database instance. The credentials will be shown in the table afterwards."
+                },
+                "permissions": {
+                  "title": "Database Permissions",
+                  "content": "Controls which databases **{username}** can access, and what it may do in them."
                 },
                 "deleteUser": {
                   "title": "Confirm User Deletion",
@@ -5174,7 +5130,8 @@
               },
               "toast": {
                 "created": "User created.",
-                "deleted": "User deleted."
+                "deleted": "User deleted.",
+                "permissionsUpdated": "User permissions updated."
               }
             },
             "power": {
@@ -5198,7 +5155,7 @@
             },
             "operations": {
               "remoteImport": "Importing {database} from {source}",
-              "cancelAllOperations": "Cancel all operations"
+              "cancelAllOperations": "Cancel All Operations"
             },
             "toast": {
               "operationCancelled": "Operation cancelled",
@@ -5219,8 +5176,7 @@
                 },
                 "form": {
                   "template": "Template",
-                  "noTemplatesFound": "No templates available",
-                  "image": "Docker Image"
+                  "noTemplatesFound": "No templates available"
                 }
               },
               "editDatabaseInstance": {
@@ -5247,6 +5203,7 @@
                 "title": "Database Credentials",
                 "form": {
                   "database": "Database",
+                  "databaseHint": "The database the connection string below points at.",
                   "jdbcConnectionString": "JDBC Connection String"
                 }
               },
@@ -5262,7 +5219,6 @@
                 }
               },
               "cancelAllOperations": {
-                "title": "Cancel All Operations",
                 "content": "Are you sure you want to cancel all running database operations? Their progress will be lost."
               }
             }
@@ -5322,8 +5278,7 @@
           "table": {
             "columns": {
               "lastRun": "Son Çalışma",
-              "lastFailure": "Son Hata",
-              "status": "Durum"
+              "lastFailure": "Son Hata"
             }
           },
           "button": {
@@ -5364,7 +5319,6 @@
               "or": "VEYA (Herhangi biri doğru olmalı)",
               "not": "DEĞİL (Doğru olmamalı)",
               "serverState": "Server State",
-              "uptime": "Uptime",
               "resourceUsage": "Resource Usage",
               "fileExists": "File Exists",
               "variableExists": "Değişken Mevcut",
@@ -5374,9 +5328,7 @@
               "variableEndsWith": "Değişken Şununla Bitiyor"
             },
             "scheduleResourceMetric": {
-              "cpu": "CPU Usage",
-              "memory": "Memory Usage",
-              "disk": "Disk Usage"
+              "cpu": "CPU Usage"
             },
             "scheduleComparator": {
               "smallerThan": "Küçüktür",
@@ -5402,7 +5354,7 @@
             },
             "deleteSchedule": {
               "title": "Zamanlayıcı Silme Onayı",
-              "content": "{name} zamanlayıcısını bu sunucudan silmek istediğinize emin misiniz?"
+              "content": "Are you sure you want to delete **{name}** from this server?"
             },
             "createStep": {
               "title": "Zamanlayıcı Adımı Oluştur"
@@ -5459,7 +5411,6 @@
             "comparator": "Karşılaştırıcı",
             "rootPath": "Kök Yol",
             "outputInto": "Çıktı konumu",
-            "caseInsensitive": "Büyük/Küçük Harf Duyarsız",
             "ignoreFailure": "Hatayı Yoksay",
             "runInForeground": "Ön Planda Çalıştır"
           },
@@ -5804,7 +5755,6 @@
               "title": "Dosya Yaz",
               "description": "Write or append text to a file.",
               "form": {
-                "content": "İçerik",
                 "appendToFile": "Dosyanın Sonuna Ekle"
               },
               "renderer": {
@@ -5925,7 +5875,6 @@
               "description": "Send an HTTP request, for example to a webhook.",
               "form": {
                 "method": "Method",
-                "url": "URL",
                 "headers": "Headers",
                 "headerName": "Header Name",
                 "headerValue": "Header Value",
@@ -5998,8 +5947,6 @@
           },
           "table": {
             "columns": {
-              "checksum": "Checksum (Sağlama)",
-              "files": "Dosyalar",
               "locked": "Kilitli?"
             }
           },
@@ -6052,7 +5999,6 @@
           }
         },
         "backupGroups": {
-          "title": "Backup Groups",
           "group": "Backup Group",
           "ungrouped": "Ungrouped",
           "noBackups": "This group has no backups yet.",
@@ -6116,9 +6062,6 @@
             "unsetPrimary": "Tahsis artık birincil değil."
           },
           "modal": {
-            "editAllocation": {
-              "title": "Tahsisi Düzenle"
-            },
             "removeAllocation": {
               "title": "Tahsis Kaldırma Onayı",
               "content": "**{allocation}** tahsisini bu sunucudan kaldırmak istediğinize emin misiniz?"
@@ -6148,9 +6091,7 @@
           "title": "Bağlama Noktaları (Mounts)",
           "table": {
             "columns": {
-              "target": "Hedef",
-              "mounted": "Bağlı",
-              "readOnly": "Salt Okunur"
+              "mounted": "Bağlı"
             }
           },
           "button": {

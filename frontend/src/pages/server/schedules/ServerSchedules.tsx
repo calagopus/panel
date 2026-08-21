@@ -150,7 +150,7 @@ export default function ServerSchedules() {
           t('common.table.columns.name', {}),
           t('pages.server.schedules.table.columns.lastRun', {}),
           t('pages.server.schedules.table.columns.lastFailure', {}),
-          t('pages.server.schedules.table.columns.status', {}),
+          t('common.table.columns.status', {}),
           t('common.table.columns.created', {}),
           '',
         ]}

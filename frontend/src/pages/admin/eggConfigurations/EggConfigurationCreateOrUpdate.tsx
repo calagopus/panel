@@ -324,7 +324,7 @@ export default function EggConfigurationCreateOrUpdate({
     {
       type: 'multiselectgroup',
       name: 'eggs',
-      label: t('pages.admin.eggConfigurations.tabs.general.page.form.eggs', {}),
+      label: t('common.form.eggs', {}),
       data: eggs,
       props: {
         placeholder: t('pages.admin.eggConfigurations.tabs.general.page.form.eggsPlaceholder', {}),
@@ -599,7 +599,7 @@ export default function EggConfigurationCreateOrUpdate({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.eggConfigurations.tabs.general.page.modal.delete.content', {
+        {t('common.modal.delete.content', {
           name: form.getValues().name,
         }).md()}
       </ConfirmationModal>

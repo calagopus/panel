@@ -79,7 +79,7 @@ export default function DatabaseInstanceImportModal({ instance, ...props }: Prop
 
         <ModalFooter>
           <Button color={wipe ? 'red' : undefined} onClick={doImport} loading={loading} disabled={!file}>
-            {t('pages.server.databases.instance.databases.button.import', {})}
+            {t('common.button.import', {})}
           </Button>
           <Button variant='default' onClick={handleClose} disabled={loading}>
             {t('common.button.close', {})}

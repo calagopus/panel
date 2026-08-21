@@ -48,7 +48,7 @@ export default function DatabaseHostDatabaseDeleteModal({ hostUuid, serverUuid, 
     >
       <Stack>
         <Text size='sm'>
-          {t('pages.admin.databaseHosts.tabs.databases.page.modal.delete.content', {
+          {t('common.modal.delete.content', {
             name: database.name,
           }).md()}
         </Text>

@@ -7,7 +7,7 @@ mod delete {
     use shared::{
         GetState,
         extensions::distr::MetadataToml,
-        models::user::GetPermissionManager,
+        models::{admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -26,6 +26,7 @@ mod delete {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        activity_logger: GetAdminActivityLogger,
         Path(package_name): Path<String>,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
@@ -75,6 +76,16 @@ mod delete {
                 .with_status(StatusCode::INTERNAL_SERVER_ERROR)
                 .ok();
         }
+
+        activity_logger
+            .log(
+                "extension:delete",
+                serde_json::json!({
+                    "package_name": package_name,
+                    "remove_migrations": data.remove_migrations,
+                }),
+            )
+            .await;
 
         ApiResponse::new_serialized(Response {}).ok()
     }

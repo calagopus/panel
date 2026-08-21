@@ -12,6 +12,7 @@ import FileSearchModal from '@/pages/server/files/modals/FileSearchModal.tsx';
 import LargestDirectoriesModal from '@/pages/server/files/modals/LargestDirectoriesModal.tsx';
 import MassRenameModal from '@/pages/server/files/modals/MassRenameModal.tsx';
 import PullFileModal from '@/pages/server/files/modals/PullFileModal.tsx';
+import SymlinkNameModal from '@/pages/server/files/modals/SymlinkNameModal.tsx';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import FileDetailsModal from './modals/FileDetailsModal.tsx';
 
@@ -46,6 +47,11 @@ export default function FileModals() {
       <FileDeleteModal files={modalDirectoryEntries} opened={openModal === 'delete'} onClose={doCloseModal} />
 
       <DirectoryNameModal opened={openModal === 'nameDirectory'} onClose={doCloseModal} />
+      <SymlinkNameModal
+        file={modalDirectoryEntries[0] ?? null}
+        opened={openModal === 'nameSymlink'}
+        onClose={doCloseModal}
+      />
       <PullFileModal opened={openModal === 'pullFile'} onClose={doCloseModal} />
 
       <FileSearchModal opened={openModal === 'search'} onClose={doCloseModal} />

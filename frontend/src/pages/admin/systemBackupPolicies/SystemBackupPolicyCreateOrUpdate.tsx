@@ -201,7 +201,7 @@ export default function SystemBackupPolicyCreateOrUpdate({
         onConfirmed={doDelete}
       >
         <Stack>
-          {t('pages.admin.systemBackupPolicies.tabs.general.page.modal.delete.content', {
+          {t('common.modal.delete.content', {
             name: form.getValues().name,
           }).md()}
 

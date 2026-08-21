@@ -12,6 +12,11 @@ export const serverFilesDirectoryCreateSchema = z.object({
   name: z.string().min(1).max(255),
 });
 
+export const serverFilesSymlinkCreateSchema = z.object({
+  link: z.string().min(1).max(255),
+  target: z.string().min(1).max(4095),
+});
+
 export const serverFilesCopySchema = z.object({
   name: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
 });

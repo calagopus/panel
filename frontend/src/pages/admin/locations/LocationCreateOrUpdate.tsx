@@ -139,7 +139,7 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.locations.tabs.general.page.modal.delete.content', { name: form.getValues().name }).md()}
+        {t('common.modal.delete.content', { name: form.getValues().name }).md()}
       </ConfirmationModal>
 
       {contextLocation && (

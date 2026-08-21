@@ -5,6 +5,7 @@ import {
   faFileUpload,
   faFolderOpen,
   faFolderPlus,
+  faLink,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { createSearchParams, useNavigate } from 'react-router';
@@ -59,6 +60,13 @@ export default function FileToolbar() {
                 icon: faFolderPlus,
                 label: t('pages.server.files.button.directory', {}),
                 onClick: () => doOpenModal('nameDirectory'),
+                color: 'gray',
+              },
+              {
+                type: 'action',
+                icon: faLink,
+                label: t('pages.server.files.button.symlink', {}),
+                onClick: () => doOpenModal('nameSymlink', []),
                 color: 'gray',
               },
               {

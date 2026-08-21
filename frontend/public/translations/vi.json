@@ -151,6 +151,14 @@
       "few": "{count} Thay đổi",
       "many": "{count} Thay đổi",
       "other": "{count} Thay đổi"
+    },
+    "session": {
+      "zero": "{count} Sessions",
+      "one": "{count} Session",
+      "two": "{count} Sessions",
+      "few": "{count} Sessions",
+      "many": "{count} Sessions",
+      "other": "{count} Sessions"
     }
   },
   "translations": {
@@ -158,7 +166,7 @@
       "button": {
         "create": "Tạo",
         "add": "Thêm",
-        "addDefaultPort": "Thêm :{port}",
+        "addDefaultPort": "{count} Hàng",
         "save": "Lưu",
         "saveAndStay": "Lưu &Ở lại",
         "edit": "Chỉnh sửa",
@@ -167,6 +175,7 @@
         "remove": "Gỡ bỏ",
         "enable": "Kích hoạt",
         "disable": "Vô hiệu hóa",
+        "disableTwoFactor": "Disable Two-Factor",
         "update": "Cập nhật",
         "close": "Đóng",
         "cancel": "Hủy",
@@ -246,6 +255,9 @@
       "modal": {
         "duplicate": {
           "title": "Nhân bản {resource}"
+        },
+        "delete": {
+          "content": "Are you sure you want to delete **{name}**?"
         }
       },
       "toast": {
@@ -328,6 +340,8 @@
         "destination": "Đích Đến",
         "destinationDirectory": "Thư mục đích",
         "directoryName": "Tên Thư Mục",
+        "symlinkName": "Symlink Name",
+        "symlinkTarget": "Symlink Target",
         "locked": "Khóa",
         "portRanges": "Dãi cổng",
         "portRangesPlaceholder": "Dãi cổng (vd. 3000-4000)",
@@ -346,6 +360,10 @@
         "yourControlPanelPassword": "Mật Khẩu Bảng Điều Khiển Của Bạn",
         "deploymentEnabled": "Bật Triển Khai",
         "maintenanceEnabled": "Bật Bảo Trì",
+        "source": "Source",
+        "target": "Target",
+        "replaceWith": "Replace With",
+        "caseInsensitive": "Case Insensitive",
         "truncateDirectory": "Bạn có chắc muốn xóa tất cả các tệp trong thư mục này không? Hành động này không thể hoàn tác."
       },
       "table": {
@@ -394,6 +412,18 @@
       "tabs": {
         "general": "Tổng Quan"
       },
+      "stat": {
+        "cpu": "CPU",
+        "cpuLoad": "CPU Load",
+        "memoryUsage": "Memory Usage",
+        "memoryLoad": "Memory Load",
+        "diskUsage": "Disk Usage",
+        "network": "Network",
+        "inbound": "Inbound",
+        "outbound": "Outbound",
+        "uptime": "Uptime",
+        "resources": "Resources"
+      },
       "badge": {
         "active": "Đang hoạt động",
         "inactive": "Không hoạt động",
@@ -420,7 +450,7 @@
           "restoringBackup": "Khôi phục Backup",
           "installing": "Đang cài đặt",
           "installFailed": "Lỗi cài đặt máy chủ",
-          "backupRestoreFailed": "Backup Restore Failed"
+          "backupRestoreFailed": "{count} Egg"
         }
       },
       "enum": {
@@ -483,7 +513,7 @@
         }
       },
       "unlimited": "Không giới hạn",
-      "readOnly": "Chỉ đọc",
+      "readOnly": "Read Only",
       "na": "N/A",
       "never": "Không bao giờ",
       "none": "Không có",
@@ -785,14 +815,12 @@
         "badge": {
           "uploading": "Đang tải lên",
           "waiting": "Đang chờ",
-          "paused": "Đã tạm dừng",
-          "failed": "Thất bại"
+          "paused": "Đã tạm dừng"
         },
         "rateLimited": "Tải lên của bạn đã bị giới hạn tốc độ. Đang chờ...",
-        "cancelAllUploads": "Hủy tất cả tải lên",
+        "cancelAllUploads": "Cancel All Uploads",
         "modal": {
           "cancelAllUploads": {
-            "title": "Hủy tất cả lượt tải lên",
             "content": "Bạn có chắc chắn muốn hủy tất cả các lượt tải lên đang hoạt động không? Các tệp đang tải lên dở dang sẽ bị hủy bỏ."
           }
         },
@@ -876,13 +904,9 @@
           "title": "Cấu hình Node",
           "allocationsTitle": "Cấu hình Phân bổ",
           "form": {
-            "name": "Tên Node",
             "namePlaceholder": "Máy chủ của tôi",
-            "urlDescription": "Được sử dụng để kết nối với API của node và phải bao gồm giao thức (http:// hoặc https://)",
-            "publicUrl": "URL Công Khai",
+            "urlDescription": "Used for internal communication with the node.",
             "publicUrlDescription": "Được sử dụng cho websocket/downloads",
-            "sftpHostPlaceholder": "Máy chủ SFTP",
-            "sftpPortPlaceholder": " Cổng SFTP",
             "ip": "IP"
           },
           "error": {
@@ -910,7 +934,6 @@
           "form": {
             "applicationName": "Tên Ứng dụng",
             "applicationNamePlaceholder": "Calagopus",
-            "languagePlaceholder": "Ngôn ngữ",
             "applicationUrl": "URL Ứng dụng",
             "registration": "Kích hoạt Đăng ký",
             "registrationDescription": "Cho phép người dùng mới đăng ký tài khoản của họ.",
@@ -1250,7 +1273,6 @@
                 }
               },
               "button": {
-                "disableTwoFactor": "Tắt Xác thực Hai Lớp",
                 "setupTwoFactor": "Thiết lập Xác thực Hai Lớp"
               },
               "twoFactorEnabled": "Xác thực Hai Lớp hiện đang được bật.",
@@ -1271,7 +1293,8 @@
               "title": "Hình Đại Diện",
               "toast": {
                 "updated": "Hình đại diện đã được cập nhật thành công.",
-                "removed": "Hình đại diện đã được xóa thành công."
+                "removed": "Hình đại diện đã được xóa thành công.",
+                "loadFailed": "Failed to load image preview. Please ensure the file is a valid image."
               },
               "form": {
                 "avatar": "Hình Đại Diện"
@@ -1322,9 +1345,11 @@
         },
         "sessions": {
           "title": "Phiên Làm Việc",
+          "button": {
+            "deleteOthers": "Log Out Others"
+          },
           "table": {
             "columns": {
-              "ip": "IP",
               "thisDevice": "Thiết bị Này?",
               "userAgent": "User Agent"
             }
@@ -1335,6 +1360,13 @@
               "content": "Bạn có chắc muốn xóa phiên làm việc **{ip}** khỏi tài khoản của bạn không?",
               "toast": {
                 "deleted": "Phiên làm việc đã được xóa."
+              }
+            },
+            "deleteOtherSessions": {
+              "title": "Confirm Session Deletion",
+              "content": "Are you sure you want to log out every session except the one you are currently using? Any other device signed into your account will have to log in again.",
+              "toast": {
+                "deleted": "{sessions} deleted."
               }
             }
           }
@@ -1395,7 +1427,6 @@
             "nextCommand": "Lệnh tiếp theo trong lịch sử"
           },
           "serverList": {
-            "title": "Danh Sách Máy chủ",
             "selectServer": "Giữ S và nhấp để chọn/bỏ chọn máy chủ"
           }
         },
@@ -1433,9 +1464,6 @@
               "title": "Nhập Khóa SSH",
               "toast": {
                 "created": "{sshKeys} đã được tạo."
-              },
-              "form": {
-                "provider": "Nhà Cung Cấp"
               }
             },
             "deleteSshKey": {
@@ -1616,7 +1644,6 @@
                   "backupStatistics": "Thống Kê Sao Lưu"
                 },
                 "system": {
-                  "cpu": "CPU",
                   "memoryUsage": "Sử Dụng Bộ Nhớ ({process} được sử dụng bởi Panel)",
                   "memoryValue": "{used} / {total} ({percent}%)",
                   "kernelVersion": "Phiên Bản Kernel ({architecture})",
@@ -1643,30 +1670,6 @@
                   "databaseHosts": "Máy Chủ Cơ Sở Dữ Liệu",
                   "backupConfigurations": "Cấu Hình Sao Lưu",
                   "roles": "Vai Trò"
-                },
-                "backup": {
-                  "allTime": "Tất Cả Thời Gian",
-                  "today": "Hôm Nay",
-                  "week": "Tuần Này",
-                  "month": "Tháng Này",
-                  "totalAllTime": "Tổng sao lưu tất cả thời gian",
-                  "successfulAllTime": "Sao lưu thành công tất cả thời gian",
-                  "failedAllTime": "Sao lưu thất bại tất cả thời gian",
-                  "deletedAllTime": "Sao lưu đã xóa tất cả thời gian",
-                  "totalToday": "Tổng sao lưu hôm nay",
-                  "successfulToday": "Sao lưu thành công hôm nay",
-                  "failedToday": "Sao lưu thất bại hôm nay",
-                  "deletedToday": "Sao lưu đã xóa hôm nay",
-                  "totalWeek": "Tổng sao lưu tuần này",
-                  "successfulWeek": "Sao lưu thành công tuần này",
-                  "failedWeek": "Sao lưu thất bại tuần này",
-                  "deletedWeek": "Sao lưu đã xóa tuần này",
-                  "totalMonth": "Tổng sao lưu tháng này",
-                  "successfulMonth": "Sao lưu thành công tháng này",
-                  "failedMonth": "Sao lưu thất bại tháng này",
-                  "deletedMonth": "Sao lưu đã xóa tháng này",
-                  "successfulValue": "{count} ({size})",
-                  "deletedValue": "{count} ({size})"
                 }
               }
             },
@@ -1684,7 +1687,6 @@
                   "outdatedDatabaseAgentHosts": "Máy Chủ Agent Cơ Sở Dữ Liệu Lỗi Thời"
                 },
                 "panelVersion": "Panel đang chạy phiên bản `{current}`. Phiên bản mới nhất là `{latest}`.",
-                "unknown": "không rõ",
                 "button": {
                   "recheck": "Kiểm Tra Lại Cập Nhật"
                 },
@@ -2216,7 +2218,6 @@
             "modal": {
               "title": "Tra cứu bằng ID Bên Ngoài",
               "form": {
-                "externalId": "ID Bên Ngoài",
                 "externalIdPlaceholder": "ví dụ: my-user-001",
                 "search": "Tìm kiếm"
               },
@@ -2247,7 +2248,6 @@
                   "cannotImpersonateSelf": "Bạn không thể mạo danh chính mình."
                 },
                 "button": {
-                  "disableTwoFactor": "Tắt Xác Thực Hai Lớp",
                   "sendPasswordResetEmail": "Gửi Email Đặt Lại Mật Khẩu",
                   "impersonate": "Mạo Danh"
                 },
@@ -2332,8 +2332,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Xác Nhận Xóa Vị Trí",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?"
+                    "title": "Xác Nhận Xóa Vị Trí"
                   }
                 },
                 "titleCreate": "Tạo Vị Trí",
@@ -2399,17 +2398,12 @@
                   "systemInfo": "Thông Tin Hệ Thống"
                 },
                 "label": {
-                  "location": "Vị trí",
                   "url": "URL Nội Bộ",
-                  "publicUrl": "URL Công Khai",
                   "sftpAddress": "Địa chỉ SFTP",
-                  "backupConfiguration": "Cấu Hinh Sao Lưu",
-                  "description": "Mô tả",
                   "createdAt": "Đã tạo",
                   "inheritedFromLocation": "Kế thừa từ Vị Trí",
                   "none": "Không có",
                   "wingsVersion": "Phiên bản Wings",
-                  "cpu": "CPU",
                   "memory": "Bộ nhớ",
                   "servers": "Máy chủ",
                   "architecture": "Kiến trúc",
@@ -2441,7 +2435,6 @@
                 },
                 "section": {
                   "connection": "Kết nối",
-                  "resources": "Tài nguyên",
                   "options": "Tùy chọn"
                 },
                 "button": {
@@ -2515,38 +2508,30 @@
               "page": {
                 "title": "Thống Kê Node",
                 "card": {
-                  "resources": "Tài Nguyên",
                   "graphs": "Biểu Đồ"
                 },
                 "toast": {
                   "connectionLost": "Mất kết nối với luồng thống kê node."
                 },
                 "label": {
-                  "cpu": "CPU",
                   "memory": "Bộ Nhớ",
                   "disk": "Đĩa",
-                  "network": "Mạng",
                   "cpuThreads": "{model} ({threads} luồng)",
                   "usedByWings": "{size} được sử dụng bởi Wings",
                   "networkIn": "Vào: {in}",
                   "networkOut": "Ra: {out}"
                 },
                 "chart": {
-                  "cpuLoad": "Tải CPU",
-                  "memoryUsage": "Sử Dụng Bộ Nhớ",
                   "diskIo": "I/O Đĩa",
                   "networkTraffic": "Lưu Lượng Mạng",
                   "diskRead": "Đọc Đĩa",
                   "diskWrite": "Ghi Đĩa",
-                  "inbound": "Đến",
-                  "outbound": "Đi",
                   "networkInLabel": "Mạng Vào",
                   "networkOutLabel": "Mạng Ra"
                 }
               }
             },
             "capacity": {
-              "title": "Năng Lực",
               "page": {
                 "title": "Năng Lực Triển Khai",
                 "subtitle": "Tài nguyên được phân bổ cho các máy chủ trên node này, đo lường so với các giới hạn được cấu hình trong cài đặt node, không phải năng lực máy vật lý. Triển khai chỉ kiểm tra bộ nhớ và đĩa.",
@@ -2560,7 +2545,6 @@
                   "maintenanceDisabled": "Không Bảo Trì"
                 },
                 "label": {
-                  "cpu": "CPU",
                   "memory": "Bộ Nhớ",
                   "disk": "Đĩa",
                   "memoryOverhead": "Phí Tổn Bộ Nhớ",
@@ -2801,8 +2785,7 @@
           },
           "modal": {
             "delete": {
-              "title": "Xác Nhận Xóa Node",
-              "content": "Bạn có chắc muốn xóa **{name}** không?"
+              "title": "Xác Nhận Xóa Node"
             },
             "bulkConfig": {
               "title": "Cập Nhật Cấu Hình - {nodes}",
@@ -2834,7 +2817,6 @@
             "modal": {
               "title": "Tra cứu bằng ID Bên Ngoài",
               "form": {
-                "externalId": "ID Bên Ngoài",
                 "externalIdPlaceholder": "ví dụ: my-server-001",
                 "search": "Tìm kiếm"
               },
@@ -2862,21 +2844,14 @@
                 },
                 "label": {
                   "user": "Người dùng",
-                  "language": "Ngôn ngữ",
                   "createdAt": "Đã tạo",
                   "node": "Node",
-                  "location": "Vị trí",
                   "memoryLimit": "Giới hạn Bộ nhớ",
                   "diskLimit": "Giới hạn Đĩa",
                   "sftpAddress": "Địa chỉ SFTP",
-                  "primaryAllocation": "Phân Bổ Chính",
                   "none": "Không có",
-                  "dockerImage": "Hình Ảnh Docker",
-                  "nest": "Nest",
                   "egg": "Egg",
-                  "timezone": "Múi giờ",
                   "autoKill": "Tự Động Buộc Dừng",
-                  "cpu": "CPU",
                   "memory": "Bộ nhớ",
                   "disk": "Đĩa",
                   "swap": "Swap",
@@ -2888,7 +2863,6 @@
                   "unlimited": "Không giới hạn",
                   "autoKillSeconds": "{seconds} giây",
                   "autoKillDisabled": "Đã vô hiệu hóa",
-                  "externalId": "ID Bên Ngoài",
                   "uuid": "UUID"
                 },
                 "badge": {
@@ -3146,8 +3120,7 @@
                     "description": "Bạn sắp xóa **{name}**. Bạn có chắc không?",
                     "form": {
                       "deleteBackups": "Bạn có muốn xóa sao lưu của máy chủ này?",
-                      "confirmServerName": "Xác Nhận Tên Máy Chủ",
-                      "confirmServerNamePlaceholder": "Tên Máy Chủ"
+                      "confirmServerName": "Xác Nhận Tên Máy Chủ"
                     },
                     "alert": {
                       "forceWarning": "Buộc xóa sẽ bỏ qua trình tự tắt máy thông thường. Các tệp máy chủ trên node có thể không được dọn dẹp hoàn toàn, để lại dữ liệu rác."
@@ -3172,7 +3145,6 @@
                 "modal": {
                   "delete": {
                     "title": "Xác Nhận Xóa Nest",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?",
                     "form": {
                       "deleteEggs": "Bạn có muốn xóa tất cả egg trong nest này?"
                     }
@@ -3190,10 +3162,15 @@
                   "subtitle": "Thả để bắt đầu nhập"
                 },
                 "button": {
-                  "updateFromRepository": "Cập Nhật Từ Kho Lưu Trữ"
+                  "updateFromRepository": "Cập Nhật Từ Kho Lưu Trữ",
+                  "fromFile": "from File",
+                  "fromUrl": "from URL",
+                  "fromRepository": "from Repository"
                 },
                 "toast": {
                   "imported": "Egg đã được nhập.",
+                  "importedBulk": "{eggs} imported.",
+                  "importFailed": "Failed to import {url}: {error}",
                   "moved": "Egg đã được di chuyển.",
                   "movedBulk": "{eggs} đã được di chuyển.",
                   "deletedBulk": "{eggs} đã được xóa.",
@@ -3201,6 +3178,16 @@
                   "parseFailed": "Phân tích egg thất bại: {error}"
                 },
                 "modal": {
+                  "importUrl": {
+                    "title": "Import Eggs from URL",
+                    "urls": "URLs",
+                    "urlsDescription": "Direct links to exported eggs in JSON or YAML format."
+                  },
+                  "updateUrl": {
+                    "title": "Update Egg from URL",
+                    "url": "URL",
+                    "urlDescription": "Direct link to an exported egg in JSON or YAML format."
+                  },
                   "move": {
                     "title": "Di Chuyển Egg"
                   },
@@ -3238,7 +3225,6 @@
                         "createNewFileDescription": "Nếu bật, tệp sẽ được tạo nếu không tồn tại. Nếu tắt, tệp phải đã tồn tại hoặc thay thế sẽ thất bại.",
                         "match": "Khớp",
                         "ifValue": "Nếu Giá Trị",
-                        "replaceWith": "Thay Thế Bằng",
                         "insertNew": "Chèn Mới",
                         "insertNewDescription": "Nếu bật, nếu không có giá trị hiện tại khớp với trường \\\"Khớp\\\", giá trị \\\"Thay Thế Bằng\\\" sẽ được chèn vào tệp.",
                         "updateExisting": "Cập Nhật Hiện Tại",
@@ -3263,9 +3249,7 @@
                       "emptyReplacements": "Chưa định nghĩa thay thế.",
                       "button": {
                         "addReplacement": "Thêm Thay Thế",
-                        "addConfigFile": "Thêm Tệp Config",
-                        "fromFile": "từ Tệp",
-                        "fromRepository": "từ Kho Lưu Trữ"
+                        "addConfigFile": "Thêm Tệp Config"
                       },
                       "toast": {
                         "exported": "Egg đã được xuất.",
@@ -3273,8 +3257,7 @@
                       },
                       "modal": {
                         "delete": {
-                          "title": "Xác Nhận Xóa Egg",
-                          "content": "Bạn có chắc muốn xóa **{name}** không?"
+                          "title": "Xác Nhận Xóa Egg"
                         }
                       }
                     }
@@ -3371,7 +3354,6 @@
                 "titleUpdate": "Cập Nhật Cấu Hình Egg",
                 "form": {
                   "order": "Thứ Tự",
-                  "eggs": "Eggs",
                   "eggsPlaceholder": "Chọn Egg",
                   "eggsEmpty": "Chưa cấu hình egg nào. Hãy tạo một nest và egg trước khi tạo cấu hình egg."
                 },
@@ -3432,8 +3414,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Xác Nhận Xóa Cấu Hình Egg",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?"
+                    "title": "Xác Nhận Xóa Cấu Hình Egg"
                   }
                 }
               }
@@ -3476,8 +3457,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Xác Nhận Xóa Kho Lưu Trữ Egg",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?"
+                    "title": "Xác Nhận Xóa Kho Lưu Trữ Egg"
                   }
                 }
               }
@@ -3513,7 +3493,7 @@
         },
         "databaseHosts": {
           "title": "Máy Chủ Cơ Sở Dữ Liệu",
-          "resourceName": "Máy chủ cơ sở dữ liệu",
+          "resourceName": "Database Host",
           "tabs": {
             "general": {
               "page": {
@@ -3541,7 +3521,6 @@
                 "modal": {
                   "delete": {
                     "title": "Xác Nhận Xóa Máy Chủ CSDL",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?",
                     "alert": {
                       "forceWarning": "Buộc xóa sẽ xóa tất cả cơ sở dữ liệu trên máy chủ này. Các cơ sở dữ liệu trên chính máy chủ có thể không được dọn dẹp hoàn toàn, để lại dữ liệu mồ côi."
                     }
@@ -3556,7 +3535,6 @@
                 "modal": {
                   "delete": {
                     "title": "Xác nhận xóa cơ sở dữ liệu",
-                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
                     "toast": {
                       "deleted": "Cơ sở dữ liệu đã được xóa."
                     },
@@ -3571,14 +3549,13 @@
         },
         "databaseAgentHosts": {
           "title": "Máy Chủ Agent Cơ Sở Dữ Liệu",
-          "resourceName": "Máy chủ agent cơ sở dữ liệu",
+          "resourceName": "Database Agent Host",
           "tabs": {
             "general": {
               "page": {
                 "titleCreate": "Tạo Máy Chủ Agent Cơ Sở Dữ Liệu",
                 "titleUpdate": "Cập Nhật Máy Chủ Agent Cơ Sở Dữ Liệu",
                 "form": {
-                  "typeEnabled": "Đã bật",
                   "typePublicHost": "Host Công Khai",
                   "typePublicPort": "Cổng Công Khai"
                 },
@@ -3597,7 +3574,6 @@
                 "modal": {
                   "delete": {
                     "title": "Xác nhận Xóa Máy Chủ Agent Cơ Sở Dữ Liệu",
-                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
                     "alert": {
                       "forceWarning": "Buộc xóa sẽ xóa tất cả phiên bản trên máy chủ này. Các phiên bản mà agent không thể kết nối tới có thể không được dọn dẹp hoàn toàn, để lại dữ liệu mồ côi."
                     }
@@ -3616,7 +3592,6 @@
                       "updated": "Phiên bản đã được cập nhật."
                     },
                     "form": {
-                      "image": "Docker Image",
                       "imageDescription": "Ghim phiên bản vào một docker image cụ thể. Để trống để làm theo image mẫu, bao gồm các bản cập nhật mẫu trong tương lai.",
                       "env": "Ghi đè biến môi trường",
                       "override": "Ghi đè {field}"
@@ -3624,7 +3599,6 @@
                   },
                   "deleteInstance": {
                     "title": "Xác nhận xóa cơ sở dữ liệu được quản lý",
-                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
                     "toast": {
                       "deleted": "Đã xóa cơ sở dữ liệu được quản lý."
                     },
@@ -3697,11 +3671,8 @@
                   "resources": "Tài Nguyên Đã Phân Bổ"
                 },
                 "label": {
-                  "url": "URL",
-                  "description": "Mô tả",
                   "createdAt": "Đã tạo",
                   "version": "Phiên bản",
-                  "cpu": "CPU",
                   "memory": "Bộ nhớ",
                   "disk": "Đĩa",
                   "instances": "Các phiên bản",
@@ -3722,28 +3693,21 @@
               "page": {
                 "title": "Thống Kê Máy Chủ Agent Cơ Sở Dữ Liệu",
                 "card": {
-                  "resources": "Tài nguyên",
                   "graphs": "Biểu đồ"
                 },
                 "label": {
-                  "cpu": "CPU",
                   "cpuThreads": "{model} ({threads} luồng)",
                   "memory": "Bộ nhớ",
                   "usedByAgent": "{size} được sử dụng bởi agent",
                   "disk": "Đĩa",
-                  "network": "Mạng",
                   "networkIn": "Vào: {in}",
                   "networkOut": "Ra: {out}"
                 },
                 "chart": {
-                  "cpuLoad": "Tải CPU",
-                  "memoryUsage": "Sử Dụng Bộ Nhớ",
                   "diskIo": "I/O Đĩa",
                   "diskRead": "Đọc Đĩa",
                   "diskWrite": "Ghi Đĩa",
                   "networkTraffic": "Lưu Lượng Mạng",
-                  "networkInLabel": "Băng thông vào",
-                  "networkOutLabel": "Băng thông ra",
                   "inbound": "Băng thông vào",
                   "outbound": "Băng thông ra"
                 },
@@ -3770,7 +3734,7 @@
         },
         "databaseAgentTemplates": {
           "title": "Mẫu Agent Cơ Sở Dữ Liệu",
-          "resourceName": "Mẫu agent cơ sở dữ liệu",
+          "resourceName": "Database Agent Template",
           "dropzone": {
             "title": "Thả một số tệp vào đây để nhập làm Mẫu Agent Cơ Sở Dữ Liệu",
             "subtitle": "Thả ra để bắt đầu nhập"
@@ -3796,7 +3760,6 @@
                   "socketPathDescription": "Đường dẫn tệp unix socket bên trong container cơ sở dữ liệu, phải khớp với nơi hình ảnh được cấu hình thực sự tạo ra socket của nó.",
                   "imageUid": "UID Hình Ảnh",
                   "imageGid": "GID Hình Ảnh",
-                  "cmd": "Lệnh",
                   "memoryDescription": "Giới hạn bộ nhớ của container cơ sở dữ liệu.",
                   "memoryTooltip": "0 sẽ không đặt giới hạn.",
                   "swap": "Swap",
@@ -3813,8 +3776,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Xác nhận Xóa Mẫu Agent Cơ Sở Dữ Liệu",
-                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?"
+                    "title": "Xác nhận Xóa Mẫu Agent Cơ Sở Dữ Liệu"
                   }
                 }
               }
@@ -3905,8 +3867,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Xác Nhận Xóa Nhà Cung Cấp OAuth",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?"
+                    "title": "Xác Nhận Xóa Nhà Cung Cấp OAuth"
                   }
                 }
               }
@@ -4017,7 +3978,7 @@
         },
         "backupConfigurations": {
           "title": "Cấu Hình Sao Lưu",
-          "resourceName": "Cấu hình sao lưu",
+          "resourceName": "Backup Configuration",
           "table": {
             "columns": {
               "disk": "Đĩa"
@@ -4042,8 +4003,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Xác Nhận Xóa Cấu Hình Sao Lưu",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?"
+                    "title": "Xác Nhận Xóa Cấu Hình Sao Lưu"
                   }
                 },
                 "s3": {
@@ -4155,9 +4115,8 @@
         },
         "systemBackupPolicies": {
           "title": "Các chính sách sao lưu hệ thống",
-          "resourceName": "Chính sách sao lưu hệ thống",
+          "resourceName": "System Backup Policy",
           "badge": {
-            "disabled": "Đã tắt",
             "runPending": "Đang chờ chạy"
           },
           "table": {
@@ -4196,7 +4155,6 @@
                   },
                   "delete": {
                     "title": "Xác nhận xóa chính sách sao lưu hệ thống",
-                    "content": "Bạn có chắc chắn muốn xóa **{name}** không?",
                     "form": {
                       "deleteBackups": "Bạn có muốn xóa các bản sao lưu được tạo bởi chính sách này không?"
                     },
@@ -4286,15 +4244,11 @@
                 "titleUpdate": "Cập Nhật Điểm Gắn",
                 "alert": "Điểm gắn là tính năng mạnh mẽ và có thể nguy hiểm. Sử dụng không đúng có thể dẫn đến mất dữ liệu hoặc lỗ hổng bảo mật (bao gồm thoát container). Hãy đảm bảo bạn hiểu hệ quả trước khi tạo hoặc cập nhật.",
                 "form": {
-                  "source": "Nguồn",
-                  "target": "Đích",
-                  "readOnly": "Chỉ Đọc",
                   "userMountable": "Người Dùng Có Thể Gắn"
                 },
                 "modal": {
                   "delete": {
-                    "title": "Xác Nhận Xóa Điểm Gắn",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?"
+                    "title": "Xác Nhận Xóa Điểm Gắn"
                   }
                 }
               }
@@ -4373,8 +4327,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Xác Nhận Xóa Vai Trò",
-                    "content": "Bạn có chắc muốn xóa **{name}** không?"
+                    "title": "Xác Nhận Xóa Vai Trò"
                   }
                 }
               }
@@ -4487,10 +4440,6 @@
           "details": {
             "address": "Địa Chỉ",
             "port": "Cổng",
-            "uptime": "Thời Gian Hoạt Động",
-            "cpuLoad": "Tải CPU",
-            "memoryLoad": "Tải Bộ Nhớ",
-            "diskUsage": "Sử Dụng Đĩa",
             "networkIn": "Mạng (Vào)",
             "networkOut": "Mạng (Ra)",
             "normalizeCpuLoad": "Chuẩn Hóa Tải CPU (gom tất cả nhân thành chuẩn 100%)"
@@ -4504,11 +4453,6 @@
             }
           },
           "stats": {
-            "cpuLoad": "Tải CPU",
-            "memoryLoad": "Tải Bộ Nhớ",
-            "network": "Mạng",
-            "inbound": "Đến",
-            "outbound": "Đi",
             "offline": "Máy chủ đang ngoại tuyến."
           },
           "socketConnected": "Đã Kết Nối ({ping}ms ping)",
@@ -4528,7 +4472,6 @@
             }
           },
           "diskUsage": {
-            "title": "Dung Lượng Đĩa Đã Dùng",
             "details": "Đã dùng {used} trên {total} ({percentage}%)"
           },
           "button": {
@@ -4549,6 +4492,7 @@
             "exitBackup": "Thoát Sao Lưu",
             "fileFromEditor": "Tệp Từ Trình Soạn Thảo",
             "directory": "Thư Mục",
+            "symlink": "Symlink",
             "fileFromPull": "Tệp Từ Kéo",
             "fileFromUpload": "Tệp Từ Tải Lên",
             "directoryFromUpload": "Thư Mục Từ Tải Lên",
@@ -4605,7 +4549,7 @@
             "receivingRemote": "Đang Nhận {files} Từ máy chủ điều khiển",
             "sendingRemote": "Đang Gửi {files}  tới máy chủ điều khiển",
             "exportingBackup": "Đang xuất bản sao lưu tới {destination}",
-            "cancelAllOperations": "Hủy tất cả hoạt động"
+            "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
             "title": "Thả tệp ở đây để tải lên",
@@ -4661,7 +4605,7 @@
             "collabEditing": "{user} đang chỉnh sửa tệp này",
             "largestDirectories": "Phân tích kích thước thư mục",
             "dragToMove": "Kéo để di chuyển",
-            "virtual": "This item is virtual and does not exist on disk",
+            "virtual": "Sao chép {files}",
             "back": "Lùi {seconds} giây",
             "forward": "Tiến {seconds} giây",
             "play": "Phát",
@@ -4690,7 +4634,6 @@
           },
           "modal": {
             "cancelAllOperations": {
-              "title": "Tiếp",
               "content": "Bạn có chắc chắn muốn hủy tất cả các thao tác xử lý tệp đang chạy không? Tiến trình của chúng sẽ bị mất."
             },
             "unsavedChanges": {
@@ -4725,6 +4668,12 @@
               "title": "Tạo Thư Mục",
               "createdAs": "Thư mục này sẽ được tạo dưới dạng "
             },
+            "createSymlink": {
+              "title": "Create Symlink",
+              "targetDescription": "Relative to the directory the symlink is created in.",
+              "createdAs": "This symlink will be created as ",
+              "pointsTo": "It will point to "
+            },
             "copyFile": {
               "title": "Sao Chép Tệp",
               "createdAs": "Tệp này sẽ được tạo dưới dạng ",
@@ -4740,14 +4689,10 @@
               "rename": "Đổi Tên",
               "skipAll": "Bỏ qua tất cả",
               "overwriteAll": "Ghi đè tất cả",
-              "newName": "Tên mới",
               "confirm": "Sao Chép {files} ở đây"
             },
             "copyRemote": {
               "title": "Sao Chép Tệp Máy Chủ Điều Khiển",
-              "form": {
-                "server": "Máy Chủ"
-              },
               "createdAs": "Những tệp này sẽ được tạo trên máy chủ điều khiển dưới "
             },
             "fileFingerprints": {
@@ -4800,7 +4745,6 @@
               "title": "Đổi Tên Tệp",
               "find": "Tìm",
               "findPlaceholder": "Văn bản cần tìm",
-              "replace": "Thay thế bằng",
               "replacePlaceholder": "Văn bản thay thế",
               "scope": "Áp dụng cho",
               "scopeName": "Tên",
@@ -4841,7 +4785,6 @@
               "preview": {
                 "title": "Xem Trước",
                 "original": "Gốc",
-                "newName": "Tên mới",
                 "unchanged": "Không thay đổi",
                 "conflict": "Tên đã được sử dụng",
                 "duplicate": "Đích trùng lặp",
@@ -4863,7 +4806,6 @@
               "pathPatterns": "Mẫu Đường Dẫn",
               "include": "Bao Gồm",
               "exclude": "Loại Trừ",
-              "caseInsensitive": "Không Phân Biệt Hoa Thường",
               "fileContent": "Nội Dung Tệp",
               "searchText": "Văn Bản Tìm Kiếm",
               "maxFileSize": "Kích Thước Tệp Tối Đa",
@@ -4906,7 +4848,6 @@
             "databaseName": "Tên Cơ Sở Dữ Liệu"
           },
           "explorer": {
-            "title": "Trình Khám phá dữ liệu",
             "button": {
               "open": "Khám phá dữ liệu",
               "run": "Chạy",
@@ -4927,7 +4868,6 @@
               "tableName": "Tên bảng",
               "columnsList": "Các cột",
               "columnName": "Tên cột",
-              "columnType": "Loại",
               "nullable": "Có thể bỏ trống",
               "primaryKey": "Khoá chính",
               "autoIncrement": "Tự Tăng"
@@ -4946,7 +4886,7 @@
             "modal": {
               "deleteRows": {
                 "title": "Xác Nhận Xóa Hàng",
-                "content": "Bạn có chắc chắn muốn xóa {rows} khỏi **{table}** không? Thao tác này không thể hoàn tác được."
+                "content": "Bạn có chắc chắn muốn xóa người dùng **{rows}** không? Hành động này không thể hoàn tác."
               },
               "createTable": {
                 "title": "Tạo bảng",
@@ -5048,7 +4988,6 @@
               "statement": "Tuyên bố {index}",
               "form": {
                 "rowLimit": "Giới hạn dòng",
-                "readOnly": "Chỉ đọc",
                 "readOnlyDescription": "Từ chối các câu lệnh làm thay đổi dữ liệu hoặc cấu trúc."
               }
             },
@@ -5079,10 +5018,6 @@
                 "logs": "Nhật ký"
               },
               "stats": {
-                "uptime": "Thời gian hoạt động",
-                "cpuLoad": "Tải CPU",
-                "memoryLoad": "Tải Bộ Nhớ",
-                "diskUsage": "Dung Lượng Đĩa",
                 "offline": "Instance đã ngoại tuyến"
               }
             },
@@ -5095,14 +5030,16 @@
                 "limitReached": "Phiên bản này bị giới hạn ở {max} cơ sở dữ liệu."
               },
               "button": {
-                "export": "Xuất",
-                "import": "Nhập",
                 "remoteImport": "Nhập từ xa"
               },
               "modal": {
                 "createDatabase": {
                   "title": "Tạo Cơ Sở Dữ Liệu",
-                  "content": "Tạo một cơ sở dữ liệu mới với người dùng riêng bên trong phiên bản cơ sở dữ liệu được quản lý này. Thông tin đăng nhập sẽ được hiển thị trong bảng sau đó."
+                  "content": "Creates a new database inside this managed database instance.",
+                  "form": {
+                    "createUser": "Create a user for this database",
+                    "createUserHint": "Creates a user named after the database, grants it access and shows its credentials once the database is created."
+                  }
                 },
                 "deleteDatabase": {
                   "title": "Xác nhận Xóa Cơ Sở Dữ Liệu",
@@ -5154,18 +5091,37 @@
             "users": {
               "title": "Người dùng",
               "subtitle": "Đã tạo {current} trên tối đa {max} người dùng.",
+              "button": {
+                "permissions": "Permissions"
+              },
               "tooltip": {
+                "offline": "The instance must be running to create users.",
                 "limitReached": "Phiên bản này bị giới hạn ở {max} người dùng."
+              },
+              "enum": {
+                "permission": {
+                  "none": "No Access",
+                  "readOnly": "Read Only",
+                  "readWrite": "Read & Write"
+                }
+              },
+              "form": {
+                "databases": "Database Access",
+                "noDatabases": "This instance has no databases yet."
+              },
+              "table": {
+                "columns": {
+                  "databases": "Databases"
+                }
               },
               "modal": {
                 "createUser": {
                   "title": "Tạo Người Dùng",
-                  "content": "Tạo một người dùng mới bên trong phiên bản cơ sở dữ liệu được quản lý này. Thông tin đăng nhập sẽ được hiển thị trong bảng sau đó.",
-                  "form": {
-                    "database": "Cơ sở dữ liệu",
-                    "databaseHint": "Cơ sở dữ liệu mà người dùng này sẽ được cấp quyền truy cập.",
-                    "databaseRequired": "Vui lòng chọn cơ sở dữ liệu."
-                  }
+                  "content": "Tạo một người dùng mới bên trong phiên bản cơ sở dữ liệu được quản lý này. Thông tin đăng nhập sẽ được hiển thị trong bảng sau đó."
+                },
+                "permissions": {
+                  "title": "Database Permissions",
+                  "content": "Controls which databases **{username}** can access, and what it may do in them."
                 },
                 "deleteUser": {
                   "title": "Xác nhận Xóa Người Dùng",
@@ -5174,7 +5130,8 @@
               },
               "toast": {
                 "created": "Đã tạo người dùng.",
-                "deleted": "Đã xóa người dùng."
+                "deleted": "Đã xóa người dùng.",
+                "permissionsUpdated": "User permissions updated."
               }
             },
             "power": {
@@ -5198,7 +5155,7 @@
             },
             "operations": {
               "remoteImport": "Đang nhập {database} từ {source}",
-              "cancelAllOperations": "Hủy tất cả hoạt động"
+              "cancelAllOperations": "Cancel All Operations"
             },
             "toast": {
               "operationCancelled": "Hoạt động đã bị hủy",
@@ -5219,8 +5176,7 @@
                 },
                 "form": {
                   "template": "Mẫu",
-                  "noTemplatesFound": "Không có mẫu nào khả dụng",
-                  "image": "Hình Ảnh Docker"
+                  "noTemplatesFound": "Không có mẫu nào khả dụng"
                 }
               },
               "editDatabaseInstance": {
@@ -5247,6 +5203,7 @@
                 "title": "Thông Tin Đăng Nhập Cơ Sở Dữ Liệu",
                 "form": {
                   "database": "Cơ sở dữ liệu",
+                  "databaseHint": "The database the connection string below points at.",
                   "jdbcConnectionString": "Chuỗi Kết Nối JDBC"
                 }
               },
@@ -5262,7 +5219,6 @@
                 }
               },
               "cancelAllOperations": {
-                "title": "Hủy tất cả hoạt động",
                 "content": "Bạn có chắc chắn muốn hủy tất cả các thao tác xử lý tệp đang chạy không? Tiến trình của chúng sẽ bị mất."
               }
             }
@@ -5322,8 +5278,7 @@
           "table": {
             "columns": {
               "lastRun": "Lần Chạy Cuối",
-              "lastFailure": "Lần Thất Bại Cuối",
-              "status": "Trạng Thái"
+              "lastFailure": "Lần Thất Bại Cuối"
             }
           },
           "button": {
@@ -5364,7 +5319,6 @@
               "or": "OR (Bất kỳ cái nào phải đúng)",
               "not": "NOT (Phải không đúng)",
               "serverState": "Trạng Thái Máy Chủ",
-              "uptime": "Thời Gian Hoạt Động",
               "resourceUsage": "Sử Dụng Tài Nguyên",
               "fileExists": "Tệp Tồn Tại",
               "variableExists": "Biến Tồn Tại",
@@ -5374,9 +5328,7 @@
               "variableEndsWith": "Biến Kết Thúc Với"
             },
             "scheduleResourceMetric": {
-              "cpu": "Sử Dụng CPU",
-              "memory": "Sử Dụng Bộ Nhớ",
-              "disk": "Sử Dụng Đĩa"
+              "cpu": "Sử Dụng CPU"
             },
             "scheduleComparator": {
               "smallerThan": "Nhỏ hơn",
@@ -5402,7 +5354,7 @@
             },
             "deleteSchedule": {
               "title": "Xác Nhận Xóa Lịch Trình",
-              "content": "Bạn có chắc muốn xóa {name} khỏi máy chủ này không?"
+              "content": "Are you sure you want to delete **{name}** from this server?"
             },
             "createStep": {
               "title": "Tạo Bước Lịch Trình"
@@ -5459,7 +5411,6 @@
             "comparator": "Bộ So Sánh",
             "rootPath": "Đường Dẫn Root",
             "outputInto": "Đầu Ra Thành",
-            "caseInsensitive": "Không Phân Biệt Hoa Thường",
             "ignoreFailure": "Bỏ Qua Lỗi",
             "runInForeground": "Chạy Ở Nền Trước"
           },
@@ -5804,7 +5755,6 @@
               "title": "Ghi Tệp",
               "description": "Ghi hoặc nối thêm văn bản vào một tệp.",
               "form": {
-                "content": "Nội Dung",
                 "appendToFile": "Nối Vào Tệp"
               },
               "renderer": {
@@ -5925,7 +5875,6 @@
               "description": "Gửi một yêu cầu HTTP, chẳng hạn như đến một webhook.",
               "form": {
                 "method": "Phương thức",
-                "url": "URL",
                 "headers": "Headers",
                 "headerName": "Tên tiêu đề",
                 "headerValue": "Giá trị tiêu đề",
@@ -5998,8 +5947,6 @@
           },
           "table": {
             "columns": {
-              "checksum": "Tổng Kiểm Tra",
-              "files": "Tệp",
               "locked": "Khóa?"
             }
           },
@@ -6052,7 +5999,6 @@
           }
         },
         "backupGroups": {
-          "title": "Nhóm Sao Lưu",
           "group": "Nhóm Sao Lưu",
           "ungrouped": "Không nằm trong nhóm",
           "noBackups": "Nhóm này chưa có bản sao lưu nào.",
@@ -6116,9 +6062,6 @@
             "unsetPrimary": "Phân bổ được bỏ chính."
           },
           "modal": {
-            "editAllocation": {
-              "title": "Chỉnh Sửa Phân Bổ"
-            },
             "removeAllocation": {
               "title": "Xác Nhận Xóa Phân Bổ",
               "content": "Bạn có chắc muốn xóa **{allocation}** khỏi máy chủ này không?"
@@ -6148,9 +6091,7 @@
           "title": "Điểm Gắn",
           "table": {
             "columns": {
-              "target": "Đích Đến",
-              "mounted": "Đã Gắn",
-              "readOnly": "Chỉ Đọc"
+              "mounted": "Đã Gắn"
             }
           },
           "button": {

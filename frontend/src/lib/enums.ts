@@ -68,6 +68,7 @@ import {
   streamingArchiveFormat,
   transferArchiveFormat,
 } from '@/lib/schemas/generic.ts';
+import { serverDatabaseInstanceUserPermission } from '@/lib/schemas/server/databaseInstances.ts';
 import { serverDatabaseFilterOperator } from '@/lib/schemas/server/databases.ts';
 import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
 import {
@@ -127,6 +128,15 @@ export const databaseAgentTypeLabelMapping: Record<z.infer<typeof databaseAgentT
   mariadb: 'MariaDB',
   mongodb: 'MongoDB',
   redis: 'Redis',
+};
+
+export const serverDatabaseInstanceUserPermissionLabelMapping: Record<
+  z.infer<typeof serverDatabaseInstanceUserPermission>,
+  () => string
+> = {
+  none: () => getTranslations().t('pages.server.databases.instance.users.enum.permission.none', {}),
+  read_only: () => getTranslations().t('pages.server.databases.instance.users.enum.permission.readOnly', {}),
+  read_write: () => getTranslations().t('pages.server.databases.instance.users.enum.permission.readWrite', {}),
 };
 
 export const databaseAgentTypeDefaultPortMapping: Record<z.infer<typeof databaseAgentType>, number> = {
@@ -333,7 +343,7 @@ export const scheduleConditionLabelMapping: Record<
   or: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.or', {}),
   not: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.not', {}),
   server_state: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.serverState', {}),
-  uptime: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.uptime', {}),
+  uptime: () => getTranslations().t('common.stat.uptime', {}),
   resource_usage: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.resourceUsage', {}),
   file_exists: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.fileExists', {}),
   variable_exists: () => getTranslations().t('pages.server.schedules.enum.scheduleConditionType.variableExists', {}),
@@ -348,8 +358,8 @@ export const scheduleConditionLabelMapping: Record<
 
 export const scheduleResourceMetricLabelMapping: Record<z.infer<typeof serverScheduleResourceMetric>, () => string> = {
   cpu: () => getTranslations().t('pages.server.schedules.enum.scheduleResourceMetric.cpu', {}),
-  memory: () => getTranslations().t('pages.server.schedules.enum.scheduleResourceMetric.memory', {}),
-  disk: () => getTranslations().t('pages.server.schedules.enum.scheduleResourceMetric.disk', {}),
+  memory: () => getTranslations().t('common.stat.memoryUsage', {}),
+  disk: () => getTranslations().t('common.stat.diskUsage', {}),
 };
 
 export const scheduleComparatorLabelMapping: Record<z.infer<typeof serverScheduleComparator>, () => string> = {

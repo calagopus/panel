@@ -70,7 +70,10 @@ mod post {
         ApiError, GetState,
         models::{
             server::GetServerActivityLogger,
-            server_database_instance::ApiServerDatabaseInstanceUser, user::GetPermissionManager,
+            server_database_instance::{
+                ApiServerDatabaseInstanceUser, ServerDatabaseInstanceUserDatabaseGrant,
+            },
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -82,8 +85,9 @@ mod post {
         #[schema(min_length = 2, max_length = 23, pattern = "^[a-zA-Z0-9]+$")]
         username: compact_str::CompactString,
 
-        #[garde(skip)]
-        database_uuid: Option<uuid::Uuid>,
+        #[serde(default)]
+        #[garde(dive)]
+        databases: Vec<ServerDatabaseInstanceUserDatabaseGrant>,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -159,7 +163,11 @@ mod post {
                 database_instance.uuid,
                 &db_agent_api::instances_instance_users::post::RequestBody {
                     username: data.username,
-                    database_uuid: data.database_uuid,
+                    databases: data
+                        .databases
+                        .into_iter()
+                        .map(ServerDatabaseInstanceUserDatabaseGrant::into_api)
+                        .collect(),
                 },
             )
             .await?;

@@ -108,7 +108,7 @@ export default function DatabaseInstanceOperations() {
       </Popover.Target>
       <Popover.Dropdown className='md:min-w-xl max-w-screen max-h-96 overflow-y-auto'>
         <ConfirmationModal
-          title={t('pages.server.databases.instance.modal.cancelAllOperations.title', {})}
+          title={t('pages.server.databases.instance.operations.cancelAllOperations', {})}
           opened={cancelAllOpen}
           onClose={() => setCancelAllOpen(false)}
           onConfirmed={() => {

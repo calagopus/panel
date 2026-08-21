@@ -153,7 +153,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
             icon={<FontAwesomeIcon icon={faServer} />}
           >
             <Stack gap={0}>
-              <InfoRow label={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.url', {})}>
+              <InfoRow label={t('common.form.url', {})}>
                 <Text size='sm' ff='monospace' className='break-all'>
                   {databaseAgentHost.url}
                 </Text>
@@ -165,7 +165,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                 <Text size='sm'>{bytesToString(mbToBytes(databaseAgentHost.disk))}</Text>
               </InfoRow>
               {databaseAgentHost.description && (
-                <InfoRow label={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.description', {})}>
+                <InfoRow label={t('common.form.description', {})}>
                   <Text size='sm'>{databaseAgentHost.description}</Text>
                 </InfoRow>
               )}
@@ -203,7 +203,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                     )}
                   </Group>
                 </InfoRow>
-                <InfoRow label={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.cpu', {})}>
+                <InfoRow label={t('common.stat.cpu', {})}>
                   <Text size='sm'>
                     {overview.cpu.brand} ({overview.cpu.cpuCount})
                   </Text>
@@ -275,7 +275,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                 }
               />
               <CapacityResource
-                label={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.cpu', {})}
+                label={t('common.stat.cpu', {})}
                 icon={<FontAwesomeIcon icon={faMicrochip} />}
                 allocated={capacity.allocated.cpu}
                 limit={0}

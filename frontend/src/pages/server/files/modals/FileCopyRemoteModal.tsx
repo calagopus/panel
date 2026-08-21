@@ -84,7 +84,7 @@ export default function FileCopyRemoteModal({ files, ...props }: Props) {
       <Stack>
         <ServerSelect
           withAsterisk
-          label={t('pages.server.files.modal.copyRemote.form.server', {})}
+          label={t('common.form.server', {})}
           exclude={[server.uuid]}
           groupBy={(s) => s.nodeName}
           withOthersSwitch

@@ -230,7 +230,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
     {
       type: 'divider',
       name: 'resourcesDivider',
-      label: t('pages.admin.nodes.tabs.general.page.section.resources', {}),
+      label: t('common.stat.resources', {}),
     },
     {
       type: 'size',
@@ -293,7 +293,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.nodes.modal.delete.content', { name: form.getValues().name }).md()}
+        {t('common.modal.delete.content', { name: form.getValues().name }).md()}
       </ConfirmationModal>
 
       {contextNode && (

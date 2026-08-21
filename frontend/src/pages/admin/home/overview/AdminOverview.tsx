@@ -121,7 +121,7 @@ export default function AdminOverview() {
                   <Title order={3}>
                     <FontAwesomeIcon icon={faMicrochip} /> {systemOverview.cpu.brand}
                   </Title>
-                  {t('pages.admin.home.tabs.overview.page.system.cpu', {})}
+                  {t('common.stat.cpu', {})}
                 </Card>
                 <Card className='flex col-span-2'>
                   <Title order={3}>

@@ -163,7 +163,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
           <div className='flex flex-col gap-4'>
             <TextInput
               withAsterisk
-              label={t('pages.oobe.node.form.name', {})}
+              label={t('common.form.name', {})}
               placeholder={t('pages.oobe.node.form.namePlaceholder', {})}
               leftSection={<FontAwesomeIcon icon={faAddressCard} size='sm' />}
               {...form.getInputProps('name')}
@@ -181,7 +181,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
               />
               <TextInput
                 className='flex-1'
-                label={t('pages.oobe.node.form.publicUrl', {})}
+                label={t('common.form.publicUrl', {})}
                 description={t('pages.oobe.node.form.publicUrlDescription', {})}
                 leftSection={<FontAwesomeIcon icon={faGlobeAmericas} size='sm' />}
                 placeholder='https://node.example.com:8080'
@@ -213,7 +213,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
               <TextInput
                 className='flex-1'
                 label={t('common.form.sftpHost', {})}
-                placeholder={t('pages.oobe.node.form.sftpHostPlaceholder', {})}
+                placeholder={t('common.form.sftpHost', {})}
                 leftSection={<FontAwesomeIcon icon={faNetworkWired} size='sm' />}
                 {...form.getInputProps('sftpHost')}
               />
@@ -221,7 +221,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
                 withAsterisk
                 className='flex-1'
                 label={t('common.form.sftpPort', {})}
-                placeholder={t('pages.oobe.node.form.sftpPortPlaceholder', {})}
+                placeholder={t('common.form.sftpPort', {})}
                 leftSection={<FontAwesomeIcon icon={faNetworkWired} size='sm' />}
                 min={1}
                 max={65535}

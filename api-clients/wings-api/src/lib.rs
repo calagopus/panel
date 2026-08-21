@@ -1417,6 +1417,35 @@ pub mod servers_server_files_create_directory {
         pub type Response = Response200;
     }
 }
+pub mod servers_server_files_create_symlink {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub root: compact_str::CompactString,
+                #[schema(inline)]
+                pub link: compact_str::CompactString,
+                #[schema(inline)]
+                pub target: compact_str::CompactString,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
 pub mod servers_server_files_decompress {
     use super::*;
 
@@ -2483,6 +2512,8 @@ pub mod system_config {
                     #[schema(inline)]
                     pub websocket_log_count: u64,
                     #[schema(inline)]
+                    pub tcp_congestion_control: compact_str::CompactString,
+                    #[schema(inline)]
                     pub sftp: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemSftp {
                         #[schema(inline)]
                         pub enabled: bool,
@@ -2744,14 +2775,53 @@ pub mod system_config {
                         pub enabled: bool,
                         #[schema(inline)]
                         pub duration: u64,
+                        #[schema(inline)]
+                        pub background_refresh: bool,
                     },
 
                     #[schema(inline)]
-                    pub tmpfs_size: u64,
+                    pub tmpfs_size: MiB,
+                    #[schema(inline)]
+                    pub shm_size: MiB,
                     #[schema(inline)]
                     pub container_pid_limit: u64,
                     #[schema(inline)]
                     pub container_apply_seccomp: bool,
+                    #[schema(inline)]
+                    pub container_apparmor_profile: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub container_ulimits: Vec<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerContainerUlimits {
+                        #[schema(inline)]
+                        pub name: compact_str::CompactString,
+                        #[schema(inline)]
+                        pub soft: i64,
+                        #[schema(inline)]
+                        pub hard: i64,
+                    }>,
+                    #[schema(inline)]
+                    pub container_sysctls: IndexMap<compact_str::CompactString, compact_str::CompactString>,
+                    #[schema(inline)]
+                    pub numa_memory_binding: bool,
+                    #[schema(inline)]
+                    pub cpu_period: u64,
+                    #[schema(inline)]
+                    pub cfs_burst: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerCfsBurst {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                        #[schema(inline)]
+                        pub multiple: f64,
+                    },
+
+                    #[schema(inline)]
+                    pub startup_boost: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerStartupBoost {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                        #[schema(inline)]
+                        pub timeout: u64,
+                        #[schema(inline)]
+                        pub max_concurrent: u64,
+                    },
+
                     #[schema(inline)]
                     pub installer_limits: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerInstallerLimits {
                         #[schema(inline)]

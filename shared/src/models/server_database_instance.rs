@@ -1101,6 +1101,43 @@ impl From<db_agent_api::StoredDatabase> for ApiServerDatabaseInstanceDatabase {
     }
 }
 
+#[derive(ToSchema, Validate, Deserialize)]
+pub struct ServerDatabaseInstanceUserDatabaseGrant {
+    #[garde(skip)]
+    pub database_uuid: uuid::Uuid,
+    #[garde(skip)]
+    pub permission: db_agent_api::DatabasePermission,
+}
+
+impl ServerDatabaseInstanceUserDatabaseGrant {
+    #[inline]
+    pub fn into_api(self) -> db_agent_api::UserDatabase {
+        db_agent_api::UserDatabase {
+            database_uuid: self.database_uuid,
+            permission: self.permission,
+        }
+    }
+}
+
+#[derive(ToSchema, Serialize)]
+#[schema(title = "ServerDatabaseInstanceUserDatabase")]
+pub struct ApiServerDatabaseInstanceUserDatabase {
+    pub database_uuid: uuid::Uuid,
+
+    pub permission: db_agent_api::DatabasePermission,
+    pub created: chrono::DateTime<chrono::Local>,
+}
+
+impl From<db_agent_api::StoredUserDatabase> for ApiServerDatabaseInstanceUserDatabase {
+    fn from(database: db_agent_api::StoredUserDatabase) -> Self {
+        Self {
+            database_uuid: database.database_uuid,
+            permission: database.permission,
+            created: database.created,
+        }
+    }
+}
+
 #[derive(ToSchema, Serialize)]
 #[schema(title = "ServerDatabaseInstanceUser")]
 pub struct ApiServerDatabaseInstanceUser {
@@ -1108,7 +1145,7 @@ pub struct ApiServerDatabaseInstanceUser {
 
     pub username: compact_str::CompactString,
     pub password: compact_str::CompactString,
-    pub database_uuid: Option<uuid::Uuid>,
+    pub databases: Vec<ApiServerDatabaseInstanceUserDatabase>,
 }
 
 impl From<db_agent_api::StoredUser> for ApiServerDatabaseInstanceUser {
@@ -1120,7 +1157,11 @@ impl From<db_agent_api::StoredUser> for ApiServerDatabaseInstanceUser {
             uuid: user.uuid,
             username: compact_str::format_compact!("u{:08x}_{}", short, user.username),
             password: user.password,
-            database_uuid: user.database_uuid,
+            databases: user
+                .databases
+                .into_iter()
+                .map(ApiServerDatabaseInstanceUserDatabase::from)
+                .collect(),
         }
     }
 }

@@ -14,12 +14,18 @@ import Table from '@/elements/Table.tsx';
 import Text from '@/elements/Text.tsx';
 import Title from '@/elements/Title.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
+import {
+  serverDatabaseInstanceDatabaseSchema,
+  serverDatabaseInstanceSchema,
+  serverDatabaseInstanceUserSchema,
+} from '@/lib/schemas/server/databaseInstances.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
 import DatabaseInstanceDatabaseRow from './DatabaseInstanceDatabaseRow.tsx';
+import DatabaseInstanceCredentialsModal from './modals/DatabaseInstanceCredentialsModal.tsx';
 import DatabaseInstanceDatabaseCreateModal from './modals/DatabaseInstanceDatabaseCreateModal.tsx';
 
 export default function DatabaseInstanceDatabases({
@@ -32,8 +38,13 @@ export default function DatabaseInstanceDatabases({
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
   const maxDatabaseCount = useGlobalStore((state) => state.settings.server.maxDatabaseInstanceDatabaseCount);
+  const canReadUsers = useServerCan('database-instances.users');
 
   const [createDatabaseOpen, setCreateDatabaseOpen] = useState(false);
+  const [createdUser, setCreatedUser] = useState<{
+    user: z.infer<typeof serverDatabaseInstanceUserSchema>;
+    database: z.infer<typeof serverDatabaseInstanceDatabaseSchema>;
+  } | null>(null);
 
   const {
     data: databases,
@@ -47,6 +58,7 @@ export default function DatabaseInstanceDatabases({
   const { data: users } = useResource({
     queryKey: queryKeys.server(server.uuid).databases.instances.users(instance.uuid),
     queryFn: () => getDatabaseInstanceUsers(server.uuid, instance.uuid),
+    enabled: canReadUsers,
     silent: true,
   });
 
@@ -57,16 +69,30 @@ export default function DatabaseInstanceDatabases({
     data: databases ?? [],
   };
 
-  const databasesWithUser = new Set((users ?? []).map((user) => user.databaseUuid).filter(Boolean));
+  const databasesWithUser = new Set(
+    (users ?? []).flatMap((user) => user.databases.map((database) => database.databaseUuid)),
+  );
   const limitReached = pagination.total >= maxDatabaseCount;
 
   return (
     <Stack>
       <DatabaseInstanceDatabaseCreateModal
         instance={instance}
+        userCount={users?.length ?? 0}
+        onUserCreated={(user, database) => setCreatedUser({ user, database })}
         opened={createDatabaseOpen}
         onClose={() => setCreateDatabaseOpen(false)}
       />
+      {createdUser && (
+        <DatabaseInstanceCredentialsModal
+          instance={instance}
+          user={createdUser.user}
+          databases={[createdUser.database]}
+          offline={offline}
+          opened
+          onClose={() => setCreatedUser(null)}
+        />
+      )}
 
       <Group justify='space-between'>
         <div>

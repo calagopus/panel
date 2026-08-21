@@ -28,6 +28,7 @@ export type ModalType =
   | 'delete'
   | 'details'
   | 'nameDirectory'
+  | 'nameSymlink'
   | 'pullFile'
   | 'search'
   | 'largestDirectories'

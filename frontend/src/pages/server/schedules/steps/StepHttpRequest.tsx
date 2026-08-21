@@ -36,8 +36,8 @@ export default function StepHttpRequest({
 
       <TextInput
         withAsterisk
-        label={t('pages.server.schedules.steps.httpRequest.form.url', {})}
-        placeholder={t('pages.server.schedules.steps.httpRequest.form.url', {})}
+        label={t('common.form.url', {})}
+        placeholder={t('common.form.url', {})}
         {...form.getInputProps('action.url')}
       />
 

@@ -72,7 +72,7 @@ export default function ColumnCreateModal({
 
         <Autocomplete
           withAsterisk
-          label={t('pages.server.databases.explorer.form.columnType', {})}
+          label={t('common.form.type', {})}
           data={columnTypes}
           {...form.getInputProps('type')}
         />

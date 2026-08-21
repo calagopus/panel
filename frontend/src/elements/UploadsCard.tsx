@@ -328,7 +328,7 @@ export default function UploadsCard() {
                         }
                       >
                         {file.status === 'error'
-                          ? t('elements.fileUpload.badge.failed', {})
+                          ? t('common.badge.failed', {})
                           : file.status === 'pending'
                             ? t('elements.fileUpload.badge.waiting', {})
                             : t('elements.fileUpload.badge.uploading', {})}
@@ -363,7 +363,7 @@ export default function UploadsCard() {
         ))}
 
       <ConfirmationModal
-        title={t('elements.fileUpload.modal.cancelAllUploads.title', {})}
+        title={t('elements.fileUpload.cancelAllUploads', {})}
         opened={cancelAllScope !== null}
         onClose={() => setCancelAllScope(null)}
         onConfirmed={() => {

@@ -100,7 +100,7 @@ export default function DatabaseInstanceCreateModal(props: ModalProps) {
         {imageEntries.length > 1 && (
           <Select
             withAsterisk
-            label={t('pages.server.databases.instance.modal.createDatabaseInstance.form.image', {})}
+            label={t('common.form.dockerImage', {})}
             data={imageEntries.map(([label]) => ({ value: label, label }))}
             {...form.getInputProps('image')}
           />

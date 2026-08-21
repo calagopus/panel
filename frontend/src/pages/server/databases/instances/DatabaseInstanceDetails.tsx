@@ -28,24 +28,24 @@ export default function DatabaseInstanceDetails({
       />
       <StatCard
         icon={faClock}
-        label={t('pages.server.databases.instance.view.stats.uptime', {})}
+        label={t('common.stat.uptime', {})}
         value={offline ? t('common.enum.serverState.offline', {}) : formatMilliseconds(usage.uptime)}
       />
       <StatCard
         icon={faMicrochip}
-        label={t('pages.server.databases.instance.view.stats.cpuLoad', {})}
+        label={t('common.stat.cpuLoad', {})}
         value={offline ? t('common.enum.serverState.offline', {}) : `${usage.cpuAbsolute.toFixed(2)}%`}
         limit={instance.cpu !== 0 ? `${instance.cpu}%` : t('common.unlimited', {})}
       />
       <StatCard
         icon={faMemory}
-        label={t('pages.server.databases.instance.view.stats.memoryLoad', {})}
+        label={t('common.stat.memoryLoad', {})}
         value={offline ? t('common.enum.serverState.offline', {}) : bytesToString(usage.memoryBytes)}
         limit={instance.memory !== 0 ? bytesToString(mbToBytes(instance.memory)) : t('common.unlimited', {})}
       />
       <StatCard
         icon={faHardDrive}
-        label={t('pages.server.databases.instance.view.stats.diskUsage', {})}
+        label={t('common.stat.diskUsage', {})}
         value={bytesToString(usage?.diskBytes ?? 0)}
         limit={instance.disk !== 0 ? bytesToString(mbToBytes(instance.disk)) : t('common.unlimited', {})}
       />

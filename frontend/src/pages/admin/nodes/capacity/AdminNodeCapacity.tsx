@@ -185,7 +185,7 @@ export default function AdminNodeCapacity({ node }: { node: z.infer<typeof admin
                   />
                 )}
                 <UnlimitedResource
-                  label={t('pages.admin.nodes.tabs.capacity.page.label.cpu', {})}
+                  label={t('common.stat.cpu', {})}
                   icon={<FontAwesomeIcon icon={faMicrochip} />}
                   value={`${capacity.allocated.cpu}%`}
                   footer={t('pages.admin.nodes.tabs.capacity.page.label.cores', {

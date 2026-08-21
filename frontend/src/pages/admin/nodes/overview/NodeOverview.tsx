@@ -147,7 +147,7 @@ export default function NodeOverview({ node }: { node: Node }) {
             icon={<FontAwesomeIcon icon={faServer} />}
           >
             <Stack gap={0}>
-              <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.location', {})}>
+              <InfoRow label={t('common.form.location', {})}>
                 <TableLink to={`/admin/locations/${node.location.uuid}`} className='inline-flex items-center'>
                   {node.location.flag && (
                     <img
@@ -164,7 +164,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                   {node.url}
                 </Text>
               </InfoRow>
-              <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.publicUrl', {})}>
+              <InfoRow label={t('common.form.publicUrl', {})}>
                 <Text size='sm' ff='monospace' className='break-all'>
                   {node.publicUrl ?? (
                     <Text span c='dimmed' size='sm'>
@@ -178,7 +178,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                   {node.sftpHost ?? new URL(node.url).hostname}:{node.sftpPort}
                 </Text>
               </InfoRow>
-              <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.backupConfiguration', {})}>
+              <InfoRow label={t('common.form.backupConfiguration', {})}>
                 {node.backupConfiguration ? (
                   <TableLink to={`/admin/backup-configurations/${node.backupConfiguration.uuid}`}>
                     {node.backupConfiguration.name}
@@ -190,7 +190,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                 )}
               </InfoRow>
               {node.description && (
-                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.description', {})}>
+                <InfoRow label={t('common.form.description', {})}>
                   <Text size='sm'>{node.description}</Text>
                 </InfoRow>
               )}
@@ -233,7 +233,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                     )}
                   </Group>
                 </InfoRow>
-                <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.cpu', {})}>
+                <InfoRow label={t('common.stat.cpu', {})}>
                   <Text size='sm'>
                     {overview.cpu.brand} ({overview.cpu.cpuCount})
                   </Text>
@@ -325,7 +325,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                 }
               />
               <CapacityResource
-                label={t('pages.admin.nodes.tabs.capacity.page.label.cpu', {})}
+                label={t('common.stat.cpu', {})}
                 icon={<FontAwesomeIcon icon={faMicrochip} />}
                 allocated={capacity.allocated.cpu}
                 limit={0}

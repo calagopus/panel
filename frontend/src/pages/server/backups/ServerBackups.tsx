@@ -62,9 +62,9 @@ export default function ServerBackups() {
       flush={hasGroups}
       columns={[
         t('common.table.columns.name', {}),
-        t('pages.server.backups.table.columns.checksum', {}),
+        t('common.table.columns.checksum', {}),
         t('common.table.columns.size', {}),
-        t('pages.server.backups.table.columns.files', {}),
+        t('common.table.columns.files', {}),
         t('common.table.columns.created', {}),
         t('pages.server.backups.table.columns.locked', {}),
         '',

@@ -18,21 +18,18 @@ export default function ServerStats() {
   const wasOffline = useRef(false);
 
   const cpu = useStreamChart({
-    series: useMemo(() => [t('pages.server.console.stats.cpuLoad', {})], [t]),
+    series: useMemo(() => [t('common.stat.cpuLoad', {})], [t]),
     format: formatPercent,
     min: 10,
   });
   const memory = useStreamChart({
-    series: useMemo(() => [t('pages.server.console.stats.memoryLoad', {})], [t]),
+    series: useMemo(() => [t('common.stat.memoryLoad', {})], [t]),
     format: formatBytes,
     scale: 'binary',
     min: mbToBytes(64),
   });
   const network = useStreamChart({
-    series: useMemo(
-      () => [t('pages.server.console.stats.outbound', {}), t('pages.server.console.stats.inbound', {})],
-      [t],
-    ),
+    series: useMemo(() => [t('common.stat.outbound', {}), t('common.stat.inbound', {})], [t]),
     format: formatBytesRate,
     scale: 'binary',
   });
@@ -69,7 +66,7 @@ export default function ServerStats() {
     <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
       <ChartBlock
         icon={<FontAwesomeIcon icon={faMicrochip} />}
-        title={t('pages.server.console.stats.cpuLoad', {})}
+        title={t('common.stat.cpuLoad', {})}
         value={cpu.value}
         overlayIcon={overlayIcon}
         overlayLabel={overlayLabel}
@@ -78,7 +75,7 @@ export default function ServerStats() {
       </ChartBlock>
       <ChartBlock
         icon={<FontAwesomeIcon icon={faMemory} />}
-        title={t('pages.server.console.stats.memoryLoad', {})}
+        title={t('common.stat.memoryLoad', {})}
         value={memory.value}
         overlayIcon={overlayIcon}
         overlayLabel={overlayLabel}
@@ -87,7 +84,7 @@ export default function ServerStats() {
       </ChartBlock>
       <ChartBlock
         icon={<FontAwesomeIcon icon={faCloudDownload} />}
-        title={t('pages.server.console.stats.network', {})}
+        title={t('common.stat.network', {})}
         legend={<ChartLegend {...network.legend} />}
         overlayIcon={overlayIcon}
         overlayLabel={overlayLabel}

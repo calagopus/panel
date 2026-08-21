@@ -29,9 +29,9 @@ export default function ServerMounts() {
         columns={[
           t('common.table.columns.name', {}),
           t('common.table.columns.description', {}),
-          t('pages.server.mounts.table.columns.target', {}),
+          t('common.table.columns.target', {}),
           t('pages.server.mounts.table.columns.mounted', {}),
-          t('pages.server.mounts.table.columns.readOnly', {}),
+          t('common.readOnly', {}),
           '',
         ]}
         loading={loading}

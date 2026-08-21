@@ -117,7 +117,7 @@ export default function ServerOverview({ server }: { server: Server }) {
                   {server.owner.nameFirst} {server.owner.nameLast} ({server.owner.username})
                 </TableLink>
               </InfoRow>
-              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.language', {})}>
+              <InfoRow label={t('common.form.language', {})}>
                 <Text size='sm'>{server.owner.language}</Text>
               </InfoRow>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.createdAt', {})}>
@@ -139,7 +139,7 @@ export default function ServerOverview({ server }: { server: Server }) {
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.node', {})}>
                 <TableLink to={`/admin/nodes/${server.node.uuid}`}>{server.node.name}</TableLink>
               </InfoRow>
-              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.location', {})}>
+              <InfoRow label={t('common.form.location', {})}>
                 <TableLink to={`/admin/locations/${server.node.location.uuid}`} className='inline-flex items-center'>
                   {server.node.location.flag && (
                     <img
@@ -186,7 +186,7 @@ export default function ServerOverview({ server }: { server: Server }) {
                   {server.uuid}
                 </Text>
               </InfoRow>
-              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.externalId', {})}>
+              <InfoRow label={t('common.form.externalId', {})}>
                 <Text size='sm' ff='monospace'>
                   {server.externalId ?? (
                     <Text span c='dimmed' size='sm'>
@@ -195,12 +195,12 @@ export default function ServerOverview({ server }: { server: Server }) {
                   )}
                 </Text>
               </InfoRow>
-              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.primaryAllocation', {})}>
+              <InfoRow label={t('common.form.primaryAllocation', {})}>
                 <Text size='sm' ff='monospace'>
                   {allocationLabel}
                 </Text>
               </InfoRow>
-              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.nest', {})}>
+              <InfoRow label={t('common.form.nest', {})}>
                 <TableLink to={`/admin/nests/${server.nest.uuid}`}>{server.nest.name}</TableLink>
               </InfoRow>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.egg', {})}>
@@ -208,12 +208,12 @@ export default function ServerOverview({ server }: { server: Server }) {
               </InfoRow>
             </Stack>
             <Stack gap={0} className='md:pl-4'>
-              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.dockerImage', {})}>
+              <InfoRow label={t('common.form.dockerImage', {})}>
                 <Text size='sm' ff='monospace' className='break-all'>
                   {server.image}
                 </Text>
               </InfoRow>
-              <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.timezone', {})}>
+              <InfoRow label={t('common.form.timezone', {})}>
                 <Text size='sm'>
                   {server.timezone ?? (
                     <Text span c='dimmed' size='sm'>
@@ -249,7 +249,7 @@ export default function ServerOverview({ server }: { server: Server }) {
         >
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing='sm'>
             <StatBox
-              label={t('pages.admin.servers.tabs.overview.page.label.cpu', {})}
+              label={t('common.stat.cpu', {})}
               icon={<FontAwesomeIcon icon={faMicrochip} />}
               value={
                 server.limits.cpu === 0 ? (

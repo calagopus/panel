@@ -167,7 +167,7 @@ function FileOperationsProgress() {
         )}
 
         <ConfirmationModal
-          title={t('elements.fileUpload.modal.cancelAllUploads.title', {})}
+          title={t('elements.fileUpload.cancelAllUploads', {})}
           opened={openModal === 'cancelUploads'}
           onClose={() => setOpenModal(null)}
           onConfirmed={() => {
@@ -181,7 +181,7 @@ function FileOperationsProgress() {
         </ConfirmationModal>
 
         <ConfirmationModal
-          title={t('pages.server.files.modal.cancelAllOperations.title', {})}
+          title={t('pages.server.files.operations.cancelAllOperations', {})}
           opened={openModal === 'cancelOperations'}
           onClose={() => setOpenModal(null)}
           onConfirmed={() => {
@@ -314,7 +314,7 @@ function FileOperationsProgress() {
                     }
                   >
                     {file.status === 'error'
-                      ? t('elements.fileUpload.badge.failed', {})
+                      ? t('common.badge.failed', {})
                       : file.status === 'pending'
                         ? t('elements.fileUpload.badge.waiting', {})
                         : t('elements.fileUpload.badge.uploading', {})}

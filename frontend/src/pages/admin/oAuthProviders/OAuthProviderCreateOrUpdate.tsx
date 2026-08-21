@@ -255,7 +255,7 @@ export default function OAuthProviderCreateOrUpdate({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.oAuthProviders.tabs.general.page.modal.delete.content', {
+        {t('common.modal.delete.content', {
           name: form.getValues().name,
         }).md()}
       </ConfirmationModal>

@@ -407,12 +407,12 @@ impl EggRepository {
                     };
                     let exported_egg: super::nest_egg::ExportedNestEgg =
                         if entry.extension().and_then(|s| s.to_str()) == Some("json") {
-                            match serde_json::from_str(&file_content) {
+                            match serde_json::from_str(file_content.trim()) {
                                 Ok(egg) => egg,
                                 Err(_) => continue,
                             }
                         } else {
-                            match serde_norway::from_str(&file_content) {
+                            match serde_norway::from_str(file_content.trim()) {
                                 Ok(egg) => egg,
                                 Err(_) => continue,
                             }

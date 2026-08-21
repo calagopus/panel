@@ -4,6 +4,7 @@ use crate::{
     },
     prelude::*,
 };
+use futures_util::TryStreamExt;
 use garde::Validate;
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
@@ -230,8 +231,6 @@ pub struct ExportedNestEgg {
 
 impl ExportedNestEgg {
     pub async fn fetch(state: &crate::State, url: &reqwest::Url) -> Result<Self, anyhow::Error> {
-        use futures_util::StreamExt;
-
         let response = crate::net::outbound_client(&state.env)
             .get(url.clone())
             .send()
@@ -247,9 +246,7 @@ impl ExportedNestEgg {
         let mut content = Vec::new();
         let mut stream = response.bytes_stream();
 
-        while let Some(chunk) = stream.next().await {
-            let chunk = chunk?;
-
+        while let Some(chunk) = stream.try_next().await? {
             if content.len() + chunk.len() > NestEgg::MAX_EXPORTED_SIZE {
                 return Err(anyhow::anyhow!("egg is too large"));
             }
@@ -257,13 +254,12 @@ impl ExportedNestEgg {
             content.extend_from_slice(&chunk);
         }
 
-        let content = String::from_utf8(content)?;
-        let content = content.trim();
+        let content = content.trim_ascii();
 
-        Ok(if content.starts_with('{') {
-            serde_json::from_str(content)?
+        Ok(if content.starts_with(b"{") {
+            serde_json::from_slice(content)?
         } else {
-            serde_norway::from_str(content)?
+            serde_norway::from_slice(content)?
         })
     }
 }

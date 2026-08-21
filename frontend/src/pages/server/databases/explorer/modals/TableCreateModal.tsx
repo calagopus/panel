@@ -106,7 +106,7 @@ export default function TableCreateModal({
                 />
                 <Autocomplete
                   withAsterisk
-                  label={t('pages.server.databases.explorer.form.columnType', {})}
+                  label={t('common.form.type', {})}
                   className='w-44'
                   data={columnTypes}
                   {...form.getInputProps(`columns.${index}.type`)}

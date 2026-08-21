@@ -203,7 +203,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
     {
       type: 'tags',
       name: 'cmd',
-      label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cmd', {}),
+      label: t('common.form.command', {}),
       colSpan: 'full',
       advanced: true,
     },
@@ -285,7 +285,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.databaseAgentTemplates.tabs.general.page.modal.delete.content', {
+        {t('common.modal.delete.content', {
           name: form.getValues().name ?? '',
         }).md()}
       </ConfirmationModal>

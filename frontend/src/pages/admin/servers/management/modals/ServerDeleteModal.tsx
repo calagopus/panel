@@ -86,10 +86,7 @@ export default function ServerDeleteModal({
           <TextInput
             withAsterisk
             label={t('pages.admin.servers.tabs.management.page.delete.modal.form.confirmServerName', {})}
-            placeholder={t(
-              'pages.admin.servers.tabs.management.page.delete.modal.form.confirmServerNamePlaceholder',
-              {},
-            )}
+            placeholder={t('common.form.serverName', {})}
             value={deleteServerName}
             onChange={(e) => setDeleteServerName(e.target.value)}
           />

@@ -117,7 +117,7 @@ export default function DatabaseInstanceDatabaseImportModal({ instance, database
             loading={loading}
             disabled={!file || (requiresSourceDb && !sourceDb)}
           >
-            {t('pages.server.databases.instance.databases.button.import', {})}
+            {t('common.button.import', {})}
           </Button>
           <Button variant='default' onClick={handleClose} disabled={loading}>
             {t('common.button.close', {})}

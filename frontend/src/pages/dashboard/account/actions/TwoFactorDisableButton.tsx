@@ -106,7 +106,7 @@ export default function TwoFactorDisableButton() {
       </FormModal>
 
       <Button color='red' onClick={() => setOpenModal('disable')}>
-        {t('pages.account.account.containers.twoFactor.button.disableTwoFactor', {})}
+        {t('common.button.disableTwoFactor', {})}
       </Button>
     </>
   );

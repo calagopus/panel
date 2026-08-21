@@ -62,11 +62,19 @@ export const serverDatabaseInstanceDatabaseSchema = z.object({
   created: z.coerce.date(),
 });
 
+export const serverDatabaseInstanceUserPermission = z.enum(['none', 'read_only', 'read_write']);
+
+export const serverDatabaseInstanceUserDatabaseSchema = z.object({
+  databaseUuid: z.string(),
+  permission: serverDatabaseInstanceUserPermission,
+  created: z.coerce.date(),
+});
+
 export const serverDatabaseInstanceUserSchema = z.object({
   uuid: z.string(),
   username: z.string(),
   password: z.string(),
-  databaseUuid: z.preprocess(nullableString, z.string().nullable()),
+  databases: z.array(serverDatabaseInstanceUserDatabaseSchema),
 });
 
 export const serverDatabaseInstanceTemplateSchema = z.looseObject({
@@ -109,11 +117,20 @@ export const serverDatabaseInstanceRemoteImportSchema = z.object({
   wipe: z.boolean(),
 });
 
+export const serverDatabaseInstanceUserDatabaseGrantSchema = z.object({
+  databaseUuid: z.string(),
+  permission: serverDatabaseInstanceUserPermission,
+});
+
 export const serverDatabaseInstanceUserCreateSchema = z.object({
   username: z
     .string()
     .min(2)
     .max(23)
     .regex(/^[a-zA-Z0-9]+$/),
-  databaseUuid: z.string().nullable(),
+  databases: z.array(serverDatabaseInstanceUserDatabaseGrantSchema),
+});
+
+export const serverDatabaseInstanceUserDatabasesUpdateSchema = z.object({
+  databases: z.array(serverDatabaseInstanceUserDatabaseGrantSchema),
 });

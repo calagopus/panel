@@ -268,7 +268,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
                   loading={loading}
                   disabled={!contextUser.totpEnabled}
                 >
-                  {t('pages.admin.users.tabs.general.page.button.disableTwoFactor', {})}
+                  {t('common.button.disableTwoFactor', {})}
                 </Button>
               </AdminCan>
               <AdminCan action='users.email'>

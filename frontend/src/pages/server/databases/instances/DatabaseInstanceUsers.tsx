@@ -62,8 +62,6 @@ export default function DatabaseInstanceUsers({
     data: users ?? [],
   };
 
-  const databaseNameByUuid = new Map(databases.map((database) => [database.uuid, database.name]));
-
   const limitReached = pagination.total >= maxUserCount;
   const createDisabled = (offline && hasDatabases) || limitReached;
 
@@ -96,7 +94,7 @@ export default function DatabaseInstanceUsers({
             label={
               limitReached
                 ? t('pages.server.databases.instance.users.tooltip.limitReached', { max: maxUserCount })
-                : t('pages.server.databases.instance.databases.tooltip.offline', {})
+                : t('pages.server.databases.instance.users.tooltip.offline', {})
             }
           >
             <Button
@@ -113,7 +111,7 @@ export default function DatabaseInstanceUsers({
       <Table
         columns={[
           t('common.table.columns.username', {}),
-          t('pages.server.databases.instance.databases.table.columns.database', {}),
+          t('pages.server.databases.instance.users.table.columns.databases', {}),
           '',
         ]}
         loading={loading}
@@ -125,7 +123,8 @@ export default function DatabaseInstanceUsers({
             key={user.uuid}
             instance={instance}
             user={user}
-            databaseName={user.databaseUuid ? (databaseNameByUuid.get(user.databaseUuid) ?? null) : null}
+            databases={databases}
+            offline={offline}
           />
         ))}
       </Table>

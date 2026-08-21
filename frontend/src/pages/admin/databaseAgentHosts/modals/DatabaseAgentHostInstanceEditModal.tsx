@@ -114,7 +114,7 @@ export default function DatabaseAgentHostInstanceEditModal({ hostUuid, instance,
     >
       <Stack>
         <TextInput
-          label={t('pages.admin.databaseAgentHosts.tabs.instances.page.modal.editInstance.form.image', {})}
+          label={t('common.form.dockerImage', {})}
           description={t(
             'pages.admin.databaseAgentHosts.tabs.instances.page.modal.editInstance.form.imageDescription',
             {},

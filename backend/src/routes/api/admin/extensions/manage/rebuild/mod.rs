@@ -8,7 +8,7 @@ mod post {
     use serde::{Deserialize, Serialize};
     use shared::{
         GetState,
-        models::user::GetPermissionManager,
+        models::{admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -36,6 +36,7 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        activity_logger: GetAdminActivityLogger,
         Query(params): Query<Params>,
     ) -> ApiResponseResult {
         if !state.container_type.is_heavy() {
@@ -54,6 +55,16 @@ mod post {
         .await
         {
             Ok(shared::heavy::Response::RebuildAccepted { build_id }) => {
+                activity_logger
+                    .log(
+                        "extension:rebuild",
+                        serde_json::json!({
+                            "build_id": build_id,
+                            "force": params.force,
+                        }),
+                    )
+                    .await;
+
                 ApiResponse::new_serialized(Response { build_id }).ok()
             }
             Ok(shared::heavy::Response::RebuildAlreadyRunning { build_id }) => {

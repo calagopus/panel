@@ -4,7 +4,6 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import createDatabaseInstanceUser from '@/api/server/databases/instances/createDatabaseInstanceUser.ts';
 import Button from '@/elements/Button.tsx';
-import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -20,6 +19,7 @@ import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import DatabaseInstanceUserDatabasesInput from '../DatabaseInstanceUserDatabasesInput.tsx';
 
 type Props = ModalProps & {
   instance: z.infer<typeof serverDatabaseInstanceSchema>;
@@ -32,20 +32,13 @@ export default function DatabaseInstanceUserCreateModal({ instance, databases, .
   const server = useServerStore((state) => state.server);
   const queryClient = useQueryClient();
 
-  const requiresDatabase = instance.type !== 'redis';
+  const hasDatabases = instance.type !== 'redis';
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
     z.infer<typeof serverDatabaseInstanceUserCreateSchema>
   >({
-    initialValues: { username: '', databaseUuid: null },
-    validate: zod4Resolver(
-      requiresDatabase
-        ? serverDatabaseInstanceUserCreateSchema.refine((values) => !!values.databaseUuid, {
-            path: ['databaseUuid'],
-            message: t('pages.server.databases.instance.users.modal.createUser.form.databaseRequired', {}),
-          })
-        : serverDatabaseInstanceUserCreateSchema,
-    ),
+    initialValues: { username: '', databases: [] },
+    validate: zod4Resolver(serverDatabaseInstanceUserCreateSchema),
     onClose: props.onClose,
     onSubmit: async (values) => {
       await createDatabaseInstanceUser(server.uuid, instance.uuid, values);
@@ -72,14 +65,12 @@ export default function DatabaseInstanceUserCreateModal({ instance, databases, .
 
         <TextInput withAsterisk label={t('common.form.username', {})} {...form.getInputProps('username')} />
 
-        {requiresDatabase && (
-          <Select
-            withAsterisk
-            label={t('pages.server.databases.instance.users.modal.createUser.form.database', {})}
-            description={t('pages.server.databases.instance.users.modal.createUser.form.databaseHint', {})}
-            data={databases.map((database) => ({ value: database.uuid, label: database.name }))}
-            searchable
-            {...form.getInputProps('databaseUuid')}
+        {hasDatabases && (
+          <DatabaseInstanceUserDatabasesInput
+            label={t('pages.server.databases.instance.users.form.databases', {})}
+            databases={databases}
+            value={form.getValues().databases}
+            onChange={(value) => form.setFieldValue('databases', value)}
           />
         )}
 
