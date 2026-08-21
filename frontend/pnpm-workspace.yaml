@@ -4,7 +4,7 @@ packages:
 allowBuilds:
   "@tailwindcss/oxide": true
   esbuild: true
-minimumReleaseAge: 4320 # 3 days
+minimumReleaseAge: 0
 blockExoticSubdeps: true
 overrides:
   dompurify: ^3.4.13

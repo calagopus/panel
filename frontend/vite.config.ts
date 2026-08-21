@@ -1,17 +1,15 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
-import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react';
 import { defineConfig, normalizePath } from 'vite';
 import dynamicPublicDirectory from 'vite-multiple-assets';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { countryFlags } from './vite-plugins/country-flags.ts';
 import { extensionOverrides } from './vite-plugins/extension-overrides.ts';
-import { precompressGzip } from './vite-plugins/precompress.ts';
+import { precompressAssets } from './vite-plugins/precompress.ts';
 import { translationsPlugin } from './vite-plugins/translations.ts';
 
-const useFastReactCompiler = process.env.FAST_REACT_COMPILER === 'true';
 const usePrecompress = process.env.PRECOMPRESS === 'true';
 
 const monacoVsDir = normalizePath(
@@ -25,21 +23,11 @@ const svgCountryFlagsDir = normalizePath(
 export default defineConfig({
   plugins: [
     extensionOverrides(),
-    react(),
-    babel(
-      useFastReactCompiler
-        ? {
-            overrides: [
-              {
-                include: ['./src/elements/**/*.{ts,tsx}', './src/pages/**/*.{ts,tsx}'],
-                plugins: ['babel-plugin-react-compiler'],
-              },
-            ],
-          }
-        : {
-            presets: [reactCompilerPreset()],
-          },
-    ),
+    react({
+      compiler: {
+        target: '19',
+      },
+    }),
     tailwindcss(),
     dynamicPublicDirectory(['public/**', 'extensions/*/public/**'], {
       dst(path) {
@@ -70,16 +58,24 @@ export default defineConfig({
         },
       ],
     }),
-    usePrecompress && precompressGzip(),
+    usePrecompress && precompressAssets(),
   ],
   optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      'react/compiler-runtime',
+      '@mantine/core',
+      '@tanstack/react-query',
+    ],
     exclude: ['monaco-editor'],
   },
   build: {
     outDir: './dist',
     emptyOutDir: true,
     chunkSizeWarningLimit: 1024,
-    target: 'es2020',
+    target: 'es2022',
     cssCodeSplit: true,
     rolldownOptions: {
       external: ['monaco-editor'],
@@ -103,6 +99,16 @@ export default defineConfig({
               name: 'react',
               test: /node_modules\/react/,
               priority: 20,
+            },
+            {
+              name: 'tanstack',
+              test: /node_modules\/@tanstack\//,
+              priority: 16,
+            },
+            {
+              name: 'xterm',
+              test: /node_modules\/@xterm\//,
+              priority: 15,
             },
             {
               name: 'recharts',
