@@ -36,12 +36,21 @@ mod get {
     ) -> ApiResponseResult {
         permissions.has_server_permission("startup.read")?;
 
-        let variables = ServerVariable::all_by_server_uuid_egg_uuid(
+        let mut variables = ServerVariable::all_by_server_uuid_egg_uuid(
             &state.database,
             server.uuid,
             server.egg.uuid,
         )
         .await?;
+
+        for variable in variables.iter_mut() {
+            ServerVariable::run_rules_handlers(
+                &server,
+                &variable.variable.env_variable,
+                &mut variable.variable.rules,
+            )
+            .await?;
+        }
 
         ApiResponse::new_serialized(Response {
             variables: variables
@@ -141,14 +150,23 @@ mod put {
         )
         .await?;
 
+        let mut augmented_rules = Vec::with_capacity(variables.len());
+        for variable in variables.iter() {
+            let mut rules = variable.variable.rules.clone();
+            ServerVariable::run_rules_handlers(&server, &variable.variable.env_variable, &mut rules)
+                .await?;
+
+            augmented_rules.push(rules);
+        }
+
         let mut validator_variables = HashMap::new();
         validator_variables.reserve(variables.len());
 
-        for variable in variables.iter() {
+        for (variable, rules) in variables.iter().zip(augmented_rules.iter()) {
             validator_variables.insert(
                 variable.variable.env_variable.as_str(),
                 (
-                    variable.variable.rules.as_slice(),
+                    rules.as_slice(),
                     if let Some(value) = data
                         .variables
                         .iter()

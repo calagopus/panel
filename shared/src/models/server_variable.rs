@@ -1,7 +1,12 @@
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
-use std::{collections::BTreeMap, sync::LazyLock};
+use std::{
+    collections::BTreeMap,
+    future::Future,
+    pin::Pin,
+    sync::{Arc, LazyLock},
+};
 #[derive(Serialize, Deserialize)]
 pub struct ServerVariable {
     pub variable: super::nest_egg_variable::NestEggVariable,
@@ -74,6 +79,17 @@ impl BaseModel for ServerVariable {
     }
 }
 
+type RulesHandlerResult<'a> =
+    Pin<Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>>;
+type RulesHandler = dyn for<'a> Fn(
+        &'a crate::models::server::Server,
+        &'a str,
+        &'a mut Vec<compact_str::CompactString>,
+    ) -> RulesHandlerResult<'a>
+    + Send
+    + Sync;
+type RulesHandlerList = Arc<ModelHandlerList<Arc<RulesHandler>, Arc<RulesHandler>>>;
+
 impl ServerVariable {
     pub async fn create(
         database: &crate::database::Database,
@@ -115,6 +131,50 @@ impl ServerVariable {
         .bind(value)
         .execute(&mut **transaction)
         .await?;
+
+        Ok(())
+    }
+
+    // Lets extensions modify the rules a variable is shown and validated with
+    pub fn register_rules_handler<
+        F: for<'a> Fn(
+                &'a crate::models::server::Server,
+                &'a str,
+                &'a mut Vec<compact_str::CompactString>,
+            ) -> Pin<Box<dyn Future<Output = Result<(), crate::database::DatabaseError>> + Send + 'a>>
+            + Send
+            + Sync
+            + 'static,
+    >(
+        priority: ListenerPriority,
+        callback: F,
+    ) {
+        let erased = Arc::new(callback) as Arc<RulesHandler>;
+
+        Self::get_rules_handlers().register_handler(priority, erased);
+    }
+
+    fn get_rules_handlers() -> &'static LazyLock<RulesHandlerList> {
+        static HANDLERS: LazyLock<RulesHandlerList> = LazyLock::new(Default::default);
+
+        &HANDLERS
+    }
+
+    pub async fn run_rules_handlers(
+        server: &crate::models::server::Server,
+        env_variable: &str,
+        rules: &mut Vec<compact_str::CompactString>,
+    ) -> Result<(), crate::database::DatabaseError> {
+        let callbacks = Self::get_rules_handlers()
+            .before_handlers
+            .read()
+            .iter()
+            .map(|l| l.callback.clone())
+            .collect::<Vec<_>>();
+
+        for callback in callbacks.iter() {
+            (*callback)(server, env_variable, rules).await?;
+        }
 
         Ok(())
     }
