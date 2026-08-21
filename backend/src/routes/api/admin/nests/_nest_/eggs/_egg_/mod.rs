@@ -18,6 +18,7 @@ mod export;
 mod mounts;
 mod r#move;
 mod servers;
+mod sync_startup;
 mod update;
 mod variables;
 
@@ -265,6 +266,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
         .nest("/servers", servers::router(state))
+        .nest("/sync-startup", sync_startup::router(state))
         .nest("/update", update::router(state))
         .nest("/variables", variables::router(state))
         .nest("/move", r#move::router(state))

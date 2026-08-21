@@ -893,6 +893,36 @@ impl Server {
         })
     }
 
+    /// Fetches every server using the given egg. Unlike [`by_egg_uuid_with_pagination`](Self::by_egg_uuid_with_pagination)
+    /// this is not paginated, it is meant for bulk operations that have to touch all of an egg's servers.
+    pub async fn all_by_egg_uuid(
+        database: &crate::database::Database,
+        egg_uuid: uuid::Uuid,
+    ) -> Result<Vec<Self>, crate::database::DatabaseError> {
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM servers
+            LEFT JOIN server_allocations ON server_allocations.uuid = servers.allocation_uuid
+            LEFT JOIN node_allocations ON node_allocations.uuid = server_allocations.allocation_uuid
+            JOIN users ON users.uuid = servers.owner_uuid
+            LEFT JOIN roles ON roles.uuid = users.role_uuid
+            JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
+            JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            WHERE servers.egg_uuid = $1
+            ORDER BY servers.created
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(egg_uuid)
+        .fetch_all(database.read())
+        .await?;
+
+        rows.into_iter()
+            .map(|row| Self::map(None, &row))
+            .try_collect_vec()
+    }
+
     pub async fn by_backup_configuration_uuid_with_pagination(
         database: &crate::database::Database,
         backup_configuration_uuid: uuid::Uuid,

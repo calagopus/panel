@@ -7,6 +7,7 @@ import {
   faPlay,
   faPlus,
   faRefresh,
+  faRotate,
   faStop,
   faUpload,
 } from '@fortawesome/free-solid-svg-icons';
@@ -55,6 +56,7 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggDuplicateModal from './modals/EggDuplicateModal.tsx';
 import EggMoveModal from './modals/EggMoveModal.tsx';
+import EggSyncStartupModal from './modals/EggSyncStartupModal.tsx';
 import EggUpdateUrlModal from './modals/EggUpdateUrlModal.tsx';
 
 export default function EggCreateOrUpdate({
@@ -68,7 +70,10 @@ export default function EggCreateOrUpdate({
   const { t } = useTranslations();
 
   const [isValid, setIsValid] = useState(false);
-  const [openModal, setOpenModal] = useState<'move' | 'delete' | 'duplicate' | 'updateUrl' | null>(null);
+  const [openModal, setOpenModal] = useState<'move' | 'delete' | 'duplicate' | 'updateUrl' | 'syncStartup' | null>(
+    null,
+  );
+  const [startupCommandsDirty, setStartupCommandsDirty] = useState(false);
   const [selectedEggRepositoryUuid, setSelectedEggRepositoryUuid] = useState<string>(
     contextEgg?.eggRepositoryEgg?.eggRepository.uuid ?? '',
   );
@@ -287,6 +292,15 @@ export default function EggCreateOrUpdate({
           onClose={() => setOpenModal(null)}
           nest={contextNest}
           egg={contextEgg}
+        />
+      )}
+      {contextEgg && (
+        <EggSyncStartupModal
+          opened={openModal === 'syncStartup'}
+          onClose={() => setOpenModal(null)}
+          nest={contextNest}
+          egg={contextEgg}
+          hasUnsavedChanges={startupCommandsDirty}
         />
       )}
       {contextEgg && (
@@ -656,12 +670,32 @@ export default function EggCreateOrUpdate({
             </Button>
           </TitleCard>
 
-          <MultiKeyValueInput
-            label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.startupCommands', {})}
-            withAsterisk
-            options={form.getValues().startupCommands}
-            onChange={(e) => form.setFieldValue('startupCommands', e)}
-          />
+          <Stack gap='xs'>
+            <MultiKeyValueInput
+              label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.startupCommands', {})}
+              withAsterisk
+              options={form.getValues().startupCommands}
+              onChange={(e) => form.setFieldValue('startupCommands', e)}
+            />
+
+            {contextEgg && (
+              <AdminCan action='servers.update'>
+                <Button
+                  variant='light'
+                  className='w-fit!'
+                  leftSection={<FontAwesomeIcon icon={faRotate} />}
+                  onClick={() => {
+                    setStartupCommandsDirty(
+                      JSON.stringify(form.getValues().startupCommands) !== JSON.stringify(contextEgg.startupCommands),
+                    );
+                    setOpenModal('syncStartup');
+                  }}
+                >
+                  {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.syncStartup', {})}
+                </Button>
+              </AdminCan>
+            )}
+          </Stack>
 
           <Group grow>
             <Switch
