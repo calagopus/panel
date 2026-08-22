@@ -1,7 +1,7 @@
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
-import { RefObject, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import AlertError from '@/elements/alerts/AlertError.tsx';
@@ -55,7 +55,9 @@ export default function DatabaseQueryConsole({ draftRef }: { draftRef: RefObject
       .finally(() => setRunning(false));
   };
 
-  runRef.current = doRun;
+  useEffect(() => {
+    runRef.current = doRun;
+  });
 
   return (
     <Stack gap='md'>
@@ -88,7 +90,7 @@ export default function DatabaseQueryConsole({ draftRef }: { draftRef: RefObject
           <MonacoEditor
             height='100%'
             width='100%'
-            defaultValue={draftRef.current}
+            defaultValue=''
             language={engine === 'postgres' ? 'pgsql' : engine === 'sqlite' ? 'sql' : 'mysql'}
             options={{
               stickyScroll: { enabled: false },
@@ -96,11 +98,11 @@ export default function DatabaseQueryConsole({ draftRef }: { draftRef: RefObject
               codeLens: false,
               scrollBeyondLastLine: false,
               smoothScrolling: false,
-              // @ts-expect-error this is valid
-              touchScrollEnabled: true,
+              inertialScroll: true,
               fixedOverflowWidgets: true,
             }}
             onMount={(editor, monaco) => {
+              editor.setValue(draftRef.current);
               editor.onDidChangeModelContent(() => {
                 draftRef.current = editor.getValue();
               });

@@ -43,6 +43,8 @@ import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
+const loadYamlLanguage = () => import('highlight.js/lib/languages/yaml').then((mod) => mod.default);
+
 type VerifyResult = { ok: true; version: string } | { ok: false; error: string };
 
 function VerifyStatusAlert({
@@ -180,7 +182,9 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
       .finally(() => setSaving(false));
   };
 
-  doSaveRef.current = doSave;
+  useEffect(() => {
+    doSaveRef.current = doSave;
+  });
 
   return (
     <AdminSubContentContainer
@@ -262,11 +266,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
                     </Title>
                     {nodeConfiguration && command ? (
                       <>
-                        <HljsCode
-                          className='overflow-x-auto'
-                          languageName='yaml'
-                          language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
-                        >
+                        <HljsCode className='overflow-x-auto' languageName='yaml' language={loadYamlLanguage}>
                           {dump(nodeConfiguration)}
                         </HljsCode>
 
@@ -378,8 +378,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
                     codeLens: false,
                     scrollBeyondLastLine: false,
                     smoothScrolling: false,
-                    // @ts-expect-error this is valid
-                    touchScrollEnabled: true,
+                    inertialScroll: true,
                   }}
                 />
               </div>

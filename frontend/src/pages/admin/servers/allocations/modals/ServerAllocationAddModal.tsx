@@ -56,9 +56,8 @@ export default function ServerAllocationAddModal({
       props.onClose();
     } catch (msg) {
       addToast(httpErrorToHuman(msg), 'error');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

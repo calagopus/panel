@@ -69,9 +69,8 @@ export default function DirectoryBrowser({
       onNavigate(join(path, name));
     } catch (error) {
       addToast(httpErrorToHuman(error), 'error');
-    } finally {
-      setCreating(false);
     }
+    setCreating(false);
   };
 
   return (

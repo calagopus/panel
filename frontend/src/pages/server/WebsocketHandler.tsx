@@ -34,7 +34,10 @@ export default function WebsocketHandler() {
   const prevIsTransferringRef = useRef(isTransferring);
 
   const uuidRef = useRef(uuid);
-  uuidRef.current = uuid;
+
+  useEffect(() => {
+    uuidRef.current = uuid;
+  }, [uuid]);
 
   const updateToken = (socket: Websocket) => {
     const currentUuid = uuidRef.current;

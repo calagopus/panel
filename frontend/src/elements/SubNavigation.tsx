@@ -44,12 +44,14 @@ function useVisibleItems(items: ItemProp[]): ItemProp[] {
   const permissionMatrix = useAdminPermissions(items.flatMap((item) => item.permission ?? []));
 
   let permissionIndex = 0;
+  const result: ItemProp[] = [];
 
-  return items.filter((item) => {
+  for (const item of items) {
     const canAccess = item.permission === undefined || permissionMatrix[permissionIndex++];
+    if (canAccess && !item.hidden) result.push(item);
+  }
 
-    return canAccess && !item.hidden;
-  });
+  return result;
 }
 
 const itemPath = (baseUrl: string, item: ItemProp) => item.link ?? to(item.path, baseUrl);
@@ -115,6 +117,7 @@ function SubNavigation<P>({
 
   const visibleItems = useVisibleItems(items);
   const tabsShown = !hideWhenSingle || visibleItems.length > 1;
+  const pathItems = items.filter((item) => item.path);
 
   useSubNavigationQuickActions(baseUrl, visibleItems, tabsShown, depth);
 
@@ -150,15 +153,15 @@ function SubNavigation<P>({
           </Tabs.List>
         </Tabs>
       )}
-      <Routes>
-        {items
-          .filter((item) => item.path)
-          .map((item) => (
+      {pathItems.length > 0 && (
+        <Routes>
+          {pathItems.map((item) => (
             <Route key={item.path} element={<AdminPermissionGuard permission={item.permission ?? []} />}>
               <Route path={item.path} element={item.element} />
             </Route>
           ))}
-      </Routes>
+        </Routes>
+      )}
     </SubNavigationDepthContext.Provider>
   );
 }

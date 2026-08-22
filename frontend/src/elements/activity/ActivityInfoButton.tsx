@@ -1,6 +1,6 @@
 import { faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import { activitySchema } from '@/lib/schemas/activity.ts';
@@ -11,6 +11,8 @@ import Button from '../Button.tsx';
 import HljsCode from '../HljsCode.tsx';
 import { Modal, ModalFooter } from '../modals/Modal.tsx';
 
+const loadJsonLanguage = () => import('highlight.js/lib/languages/json').then((mod) => mod.default);
+
 export default function ActivityInfoButton({
   activity,
 }: {
@@ -19,7 +21,6 @@ export default function ActivityInfoButton({
   const { t } = useTranslations();
 
   const [openModal, setOpenModal] = useState<'view' | null>(null);
-  const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
 
   return (
     <>
@@ -29,7 +30,7 @@ export default function ActivityInfoButton({
         opened={openModal === 'view'}
         size='lg'
       >
-        <HljsCode languageName='json' language={jsonLanguage}>
+        <HljsCode languageName='json' language={loadJsonLanguage}>
           {JSON.stringify(activity.data, null, 2)}
         </HljsCode>
 

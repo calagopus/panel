@@ -343,13 +343,12 @@ export default function AdminExtensions() {
         </span>
       ) : (
         <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3'>
-          {window.extensionContext.extensions.map(
-            (
-              extension,
-              _,
-              __,
-              backendExtension = backendExtensions.find((e) => e.metadataToml.packageName === extension.packageName),
-            ) => (
+          {window.extensionContext.extensions.map((extension) => {
+            const backendExtension = backendExtensions.find(
+              (e) => e.metadataToml.packageName === extension.packageName,
+            );
+
+            return (
               <ExtensionCard
                 key={extension.packageName}
                 extension={extension}
@@ -359,8 +358,8 @@ export default function AdminExtensions() {
                 )}
                 onRemove={extensionStatus && backendExtension ? () => setRemovalExtension(backendExtension) : undefined}
               />
-            ),
-          )}
+            );
+          })}
           {backendExtensions
             .filter(
               (be) => !window.extensionContext.extensions.find((e) => e.packageName === be.metadataToml.packageName),

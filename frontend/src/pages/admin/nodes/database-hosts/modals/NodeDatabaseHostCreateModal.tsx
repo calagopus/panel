@@ -62,16 +62,16 @@ export default function NodeDatabaseHostCreateModal({
           value={databaseHost?.uuid}
           onChange={(value) => setDatabaseHost(databaseHosts.items.find((dh) => dh.uuid === value) ?? null)}
           data={Object.values(
-            databaseHosts.items.reduce(
-              (acc, { uuid, name, type }) => (
-                (acc[type] ??= { group: databaseTypeLabelMapping[type], items: [] }).items.push({
-                  value: uuid,
-                  label: name,
-                }),
-                acc
-              ),
-              {} as GroupedDatabaseHosts,
-            ),
+            databaseHosts.items.reduce((acc, { uuid, name, type }) => {
+              if (!acc[type]) {
+                acc[type] = { group: databaseTypeLabelMapping[type], items: [] };
+              }
+              acc[type].items.push({
+                value: uuid,
+                label: name,
+              });
+              return acc;
+            }, {} as GroupedDatabaseHosts),
           )}
           searchable
           searchValue={databaseHosts.search}

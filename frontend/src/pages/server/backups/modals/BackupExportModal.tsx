@@ -1,6 +1,6 @@
 import { ModalProps } from '@mantine/core';
 import { join } from 'pathe';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -80,11 +80,8 @@ export default function BackupExportModal({ backup, ...props }: Props) {
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'));
   }, [props.opened, backup.uuid, server.uuid]);
 
-  const extension = useMemo(
-    () =>
-      forcedFormat ? archiveFormatLabelMapping[forcedFormat] : streamingArchiveFormatLabelMapping[form.values.format],
-    [forcedFormat, form.values.format],
-  );
+  const format = form.values.format;
+  const extension = forcedFormat ? archiveFormatLabelMapping[forcedFormat] : streamingArchiveFormatLabelMapping[format];
 
   return (
     <FormModal

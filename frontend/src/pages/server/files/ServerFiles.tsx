@@ -4,7 +4,17 @@ import { useIntersection, useMergedRef } from '@mantine/hooks';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
 import { join } from 'pathe';
-import { memo, type Ref, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  memo,
+  type Ref,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { z } from 'zod';
@@ -176,38 +186,47 @@ function ServerFilesComponent() {
 
   const handleOpen = useCallback(
     (openMode: FileOpenMode) => {
-      if (openMode.openable) {
-        if (typeAheadTimeout.current) clearTimeout(typeAheadTimeout.current);
-        typeAheadBuffer.current = '';
+      if (!openMode.openable) return;
 
-        const fileManagerContext = store.getState();
+      if (typeAheadTimeout.current) clearTimeout(typeAheadTimeout.current);
+      typeAheadBuffer.current = '';
 
-        openMode.handleOpen({
-          server,
-          fileManagerContext,
-          navigate,
-          setSearchParams,
+      const fileManagerContext = store.getState();
 
-          handleDirectoryOpen: (path) => {
-            setSearchParams({
-              directory: join(fileManagerContext.browsingDirectory, path),
-            });
-          },
-          handleFileOpen: (file, action, params) => {
-            const searchParams = createSearchParams({
-              directory: fileManagerContext.browsingDirectory,
-              file,
-              ...params,
-            });
+      openMode.handleOpen({
+        server,
+        fileManagerContext,
+        navigate,
+        setSearchParams,
 
-            navigate(`/server/${server.uuidShort}/files/${action}?${searchParams}`);
-          },
-        });
-      } else if (openMode.reason === 'tooLarge') {
-        addToast(t('pages.server.files.toast.fileTooLargeToOpen', {}), 'warning');
-      }
+        handleDirectoryOpen: (path) => {
+          setSearchParams({
+            directory: join(fileManagerContext.browsingDirectory, path),
+          });
+        },
+        handleFileOpen: (file, action, params) => {
+          const searchParams = createSearchParams({
+            directory: fileManagerContext.browsingDirectory,
+            file,
+            ...params,
+          });
+
+          navigate(`/server/${server.uuidShort}/files/${action}?${searchParams}`);
+        },
+      });
     },
     [server, navigate, setSearchParams, store],
+  );
+
+  const openFile = useCallback(
+    (openMode: FileOpenMode) => {
+      if (!openMode.openable && openMode.reason === 'tooLarge') {
+        addToast(t('pages.server.files.toast.fileTooLargeToOpen', {}), 'warning');
+        return;
+      }
+      handleOpen(openMode);
+    },
+    [handleOpen, addToast, t],
   );
 
   useEffect(() => {
@@ -323,12 +342,12 @@ function ServerFilesComponent() {
         callback: () => {
           const state = store.getState();
           if (state.selectedFiles.size === 1 && state.openModal === null) {
-            handleOpen(isOpenableFile(state.selectedFiles.values()[0], state));
+            openFile(isOpenableFile(state.selectedFiles.values()[0], state));
           }
         },
       },
     ],
-    deps: [handleOpen, canCreate, canUpdate],
+    deps: [openFile, canCreate, canUpdate],
   });
 
   const columns = useMemo(() => {
@@ -394,7 +413,10 @@ function ServerFilesComponent() {
     getItemKey: (index) => browsingEntries.data[index]?.name ?? index,
   });
 
-  const virtualRows = rowVirtualizer.getVirtualItems();
+  const virtualRows = useSyncExternalStore(
+    () => () => undefined,
+    () => rowVirtualizer.getVirtualItems(),
+  );
   const paddingTop = virtualRows.length > 0 ? virtualRows[0].start - scrollMargin : 0;
   const paddingBottom =
     virtualRows.length > 0
@@ -462,7 +484,7 @@ function ServerFilesComponent() {
                       measureElement={rowVirtualizer.measureElement}
                       dataIndex={virtualRow.index}
                       file={entry}
-                      handleOpen={handleOpen}
+                      handleOpen={openFile}
                       openMassMenu={openMassMenu}
                       clickOnce={clickOnce}
                       preferPhysicalSize={preferPhysicalSize}

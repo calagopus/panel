@@ -7,7 +7,7 @@ import {
   faPen,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import downloadFiles from '@/api/server/files/downloadFiles.ts';
@@ -39,24 +39,27 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
   const canUpdate = useServerCan('files.update');
   const canDelete = useServerCan('files.delete');
 
-  const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
-    const { selectedFiles, browsingDirectory } = store.getState();
+  const doDownload = useCallback(
+    (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
+      const { selectedFiles, browsingDirectory } = store.getState();
 
-    downloadFiles(
-      server.uuid,
-      browsingDirectory,
-      selectedFiles.keys(),
-      selectedFiles.size === 1 ? selectedFiles.values()[0].directory : false,
-      archiveFormat,
-    )
-      .then(({ url }) => {
-        addToast(t('pages.server.files.toast.downloadStarted', {}), 'success');
-        window.location.href = url;
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      });
-  };
+      downloadFiles(
+        server.uuid,
+        browsingDirectory,
+        selectedFiles.keys(),
+        selectedFiles.size === 1 ? selectedFiles.values()[0].directory : false,
+        archiveFormat,
+      )
+        .then(({ url }) => {
+          addToast(t('pages.server.files.toast.downloadStarted', {}), 'success');
+          window.location.href = url;
+        })
+        .catch((msg) => {
+          addToast(httpErrorToHuman(msg), 'error');
+        });
+    },
+    [store, server.uuid, t, addToast],
+  );
 
   const items = useMemo<ContextMenuItem[]>(
     () => [
@@ -150,7 +153,18 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         canAccess: canDelete,
       },
     ],
-    [t, actingMode, browsingWritableDirectory, canReadContent, canCreate, canArchive, canUpdate, canDelete],
+    [
+      t,
+      actingMode,
+      browsingWritableDirectory,
+      canReadContent,
+      canCreate,
+      canArchive,
+      canUpdate,
+      canDelete,
+      store,
+      doDownload,
+    ],
   );
 
   return (

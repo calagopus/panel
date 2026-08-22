@@ -235,8 +235,7 @@ function FileRevisionDiffComponent() {
                     codeLens: false,
                     scrollBeyondLastLine: false,
                     smoothScrolling: false,
-                    // @ts-expect-error this is valid
-                    touchScrollEnabled: true,
+                    inertialScroll: true,
                     fixedOverflowWidgets: true,
                   }}
                   onMount={(diffEditor, monaco) => {

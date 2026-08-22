@@ -156,9 +156,8 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
       onNext();
     } catch (msg) {
       setError(httpErrorToHuman(msg));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

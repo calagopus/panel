@@ -1,7 +1,7 @@
 import { type OnMount } from '@monaco-editor/react';
 import classNames from 'classnames';
 import debounce from 'debounce';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import downloadNodeLog from '@/api/admin/nodes/system/downloadNodeLog.ts';
 import getNodeLog from '@/api/admin/nodes/system/getNodeLog.ts';
@@ -32,10 +32,14 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [following, setFollowing] = useState(false);
+  const [loadVersion, setLoadVersion] = useState(0);
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const linesRef = useRef(lines);
-  linesRef.current = lines;
+
+  useEffect(() => {
+    linesRef.current = lines;
+  });
 
   useEffect(() => {
     getNodeLogs(node.uuid)
@@ -113,26 +117,34 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
       .finally(() => setLoading(false));
   };
 
-  const loadLogs = (log: NodeLogFile, linesValue: number) => {
-    setLoading(true);
+  const loadLogs = useCallback(
+    (log: NodeLogFile, linesValue: number) => {
+      setLoading(true);
 
-    getNodeLog(node.uuid, log.name, linesValue)
-      .then((data) => {
-        setContent(stripAnsi(data));
-        setLoaded(true);
+      getNodeLog(node.uuid, log.name, linesValue)
+        .then((data) => {
+          setContent(stripAnsi(data));
+          setLoaded(true);
+          setLoadVersion((version) => version + 1);
+        })
+        .catch((msg) => {
+          addToast(httpErrorToHuman(msg), 'error');
+        })
+        .finally(() => setLoading(false));
+    },
+    [node.uuid, addToast],
+  );
 
-        requestAnimationFrame(() => {
-          const editor = editorRef.current;
-          if (editor) {
-            editor.setScrollTop(editor.getScrollHeight());
-          }
-        });
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
+  useEffect(() => {
+    if (loadVersion === 0) return;
+
+    requestAnimationFrame(() => {
+      const editor = editorRef.current;
+      if (editor) {
+        editor.setScrollTop(editor.getScrollHeight());
+      }
+    });
+  }, [loadVersion]);
 
   const doView = () => {
     if (!selectedLog) return;
@@ -140,7 +152,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
     loadLogs(selectedLog, lines);
   };
 
-  const debouncedLoadLogs = useCallback(debounce(loadLogs, 500), []);
+  const debouncedLoadLogs = useMemo(() => debounce(loadLogs, 500), [loadLogs]);
 
   useEffect(() => {
     if (!selectedLog || !loaded) return;
@@ -232,8 +244,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
                 codeLens: false,
                 scrollBeyondLastLine: false,
                 smoothScrolling: false,
-                // @ts-expect-error this is valid
-                touchScrollEnabled: true,
+                inertialScroll: true,
               }}
             />
           </div>

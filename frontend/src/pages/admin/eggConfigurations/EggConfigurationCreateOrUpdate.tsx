@@ -48,6 +48,8 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
+const loadServerRoutes = () => import('@/routers/routes/serverRoutes.ts');
+
 type DeploymentModeType = EggConfigurationDeployment['mode']['type'];
 
 interface DeploymentItemEditorProps {
@@ -254,9 +256,7 @@ export default function EggConfigurationCreateOrUpdate({
   }, []);
 
   useEffect(() => {
-    const serverRoutes = import('@/routers/routes/serverRoutes.ts');
-
-    serverRoutes
+    loadServerRoutes()
       .then((module) => {
         const entries = [...module.default, ...window.extensionContext.extensionRegistry.routes.serverRoutes];
 

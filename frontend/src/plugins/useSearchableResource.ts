@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import debounce from 'debounce';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 
@@ -26,10 +26,7 @@ export function useSearchableResource<T>({
   const [search, setSearch] = useState(defaultSearchValue);
   const [debouncedSearch, setDebouncedSearch] = useState(defaultSearchValue);
 
-  const updateDebouncedSearch = useCallback(
-    debounce((s: string) => setDebouncedSearch(s), debounceMs),
-    [],
-  );
+  const updateDebouncedSearch = useMemo(() => debounce((s: string) => setDebouncedSearch(s), debounceMs), [debounceMs]);
 
   useEffect(() => {
     updateDebouncedSearch(search);

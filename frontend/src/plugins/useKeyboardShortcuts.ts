@@ -94,7 +94,10 @@ function isInputFocused(): boolean {
 
 export function useKeyboardShortcuts({ shortcuts, enabled = true, deps = [] }: UseKeyboardShortcutsOptions) {
   const shortcutsRef = useRef(shortcuts);
-  shortcutsRef.current = shortcuts;
+
+  useEffect(() => {
+    shortcutsRef.current = shortcuts;
+  });
 
   useEffect(() => {
     if (!enabled) return;

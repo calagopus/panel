@@ -159,6 +159,7 @@ function FileEditorComponent() {
   const [conflictDiffOpen, setConflictDiffOpen] = useState(false);
   const [revertConfirm, setRevertConfirm] = useState(false);
   const [conflictDiskContent, setConflictDiskContent] = useState<string | null>(null);
+  const [conflictModifiedContent, setConflictModifiedContent] = useState('');
 
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const pierreEditorRef = useRef<PierreEditorHandle | null>(null);
@@ -406,16 +407,6 @@ function FileEditorComponent() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [editorEngine, params.action]);
 
-  useEffect(() => {
-    saveShortcutRef.current = () => {
-      if (params.action === 'new') {
-        if (canCreate) setNameModalOpen(true);
-      } else if (collab.active ? canUpdate : canCreate) {
-        saveFile();
-      }
-    };
-  });
-
   const forceCollabSave = () => {
     if (!collab.conflict) return;
 
@@ -489,6 +480,7 @@ function FileEditorComponent() {
   };
 
   const openConflictDiff = () => {
+    setConflictModifiedContent(getEditorValue());
     setConflictDiskContent(null);
     setConflictDiffOpen(true);
 
@@ -556,6 +548,16 @@ function FileEditorComponent() {
         addToast(httpErrorToHuman(msg), 'error');
       });
   };
+
+  useEffect(() => {
+    saveShortcutRef.current = () => {
+      if (params.action === 'new') {
+        if (canCreate) setNameModalOpen(true);
+      } else if (collab.active ? canUpdate : canCreate) {
+        saveFile();
+      }
+    };
+  });
 
   useQuickActions([
     {
@@ -764,7 +766,7 @@ function FileEditorComponent() {
                 originalPath={`${fileName} (Disk)`}
                 originalValue={conflictDiskContent ?? ''}
                 modifiedPath={`${fileName} (Editor)`}
-                modifiedValue={getEditorValue()}
+                modifiedValue={conflictModifiedContent}
                 readOnly
                 wordWrap={editorLineOverflow}
               />
@@ -1023,8 +1025,7 @@ function FileEditorComponent() {
                     codeLens: false,
                     scrollBeyondLastLine: false,
                     smoothScrolling: false,
-                    // @ts-expect-error this is valid
-                    touchScrollEnabled: true,
+                    inertialScroll: true,
                     fixedOverflowWidgets: true,
                   }}
                   onMount={(editor, monaco) => {

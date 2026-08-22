@@ -144,9 +144,8 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
       onNext(nodeIsAIO ? 1 : 0);
     } catch (msg) {
       setError(httpErrorToHuman(msg));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const showAllocationsForm = (!isEdit || (existingNode && isNodeAIO(existingNode))) && data.allocations.length === 0;

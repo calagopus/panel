@@ -1,4 +1,4 @@
-import { ChangeEvent, RefObject, useCallback, useMemo, useRef } from 'react';
+import { ChangeEvent, RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   cancelAllUploads,
   cancelFileUpload,
@@ -19,7 +19,10 @@ export function useUploader(scope: string, getDestination: () => UploadDestinati
   const uploads = useUploadsStore((state) => state.uploads);
 
   const getDestinationRef = useRef(getDestination);
-  getDestinationRef.current = getDestination;
+
+  useEffect(() => {
+    getDestinationRef.current = getDestination;
+  });
 
   const uploadingFiles = useMemo(() => {
     const map = new Map<string, UploadItem>();

@@ -8,7 +8,7 @@ import {
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zones } from 'tzdata';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
@@ -69,7 +69,7 @@ export default function ServerCreate() {
 
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'confirm-no-allocation' | null>(null);
-  const confirmStayRef = useRef(false);
+  const [confirmStay, setConfirmStay] = useState(false);
 
   const form = useFormEngine<ServerCreateFormValues>('admin.servers.create', {
     schema: adminServerCreateSchema.unwrap(),
@@ -123,7 +123,7 @@ export default function ServerCreate() {
 
   const doSave = (stay: boolean) => {
     if (!form.getValues().allocationUuid) {
-      confirmStayRef.current = stay;
+      setConfirmStay(stay);
       setOpenModal('confirm-no-allocation');
     } else {
       doCreateOrUpdate(stay);
@@ -535,7 +535,7 @@ export default function ServerCreate() {
         confirm={t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.button.confirm', {})}
         onConfirmed={() => {
           setOpenModal(null);
-          doCreateOrUpdate(confirmStayRef.current);
+          doCreateOrUpdate(confirmStay);
         }}
       >
         {t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.content', {})}

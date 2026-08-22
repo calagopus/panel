@@ -25,7 +25,10 @@ function useProviderRepaint() {
 
 export function useQuickActions(definitions: QuickActionDefinition[], enabled = true) {
   const definitionsRef = useRef(definitions);
-  definitionsRef.current = definitions;
+
+  useEffect(() => {
+    definitionsRef.current = definitions;
+  });
 
   const active = useRegistrationEnabled(enabled);
 
@@ -40,7 +43,10 @@ export function useQuickActions(definitions: QuickActionDefinition[], enabled = 
 
 export function useQuickActionModes(modes: QuickActionMode[], enabled = true) {
   const modesRef = useRef(modes);
-  modesRef.current = modes;
+
+  useEffect(() => {
+    modesRef.current = modes;
+  });
 
   const active = useRegistrationEnabled(enabled);
 

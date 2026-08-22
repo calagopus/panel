@@ -1,7 +1,7 @@
 import { faArrowUpRightFromSquare, faGripVertical, faMinus, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Group, Paper, Stack, Text, useComputedColorScheme } from '@mantine/core';
-import { ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
+import { ComponentProps, useCallback, useMemo, useState } from 'react';
 import { RouteDefinition } from 'shared';
 import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
@@ -56,28 +56,10 @@ export default function RouteOrderEditor({
 
   const [addType, setAddType] = useState<'route' | 'divider' | 'redirect'>('route');
 
-  const counterRef = useRef(0);
-  const idRegistryRef = useRef<Map<string, string>>(new Map());
-
-  const dndItems: DndRouteEntry[] = useMemo(() => {
-    const newRegistry = new Map<string, string>();
-    const result: DndRouteEntry[] = [];
-
-    for (let i = 0; i < value.length; i++) {
-      const item = value[i];
-      const contentKey = itemContentKey(item, i);
-
-      let id = idRegistryRef.current.get(contentKey);
-      if (!id) {
-        id = `dnd-${counterRef.current++}`;
-      }
-      newRegistry.set(contentKey, id);
-      result.push({ id, index: i, item });
-    }
-
-    idRegistryRef.current = newRegistry;
-    return result;
-  }, [value]);
+  const dndItems: DndRouteEntry[] = useMemo(
+    () => value.map((item, index) => ({ id: itemContentKey(item, index), index, item })),
+    [value],
+  );
 
   const usedPaths = useMemo(() => new Set(value.filter((i) => i.type === 'route').map((i) => i.path)), [value]);
 

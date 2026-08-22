@@ -1,57 +1,97 @@
-import fs from 'node:fs';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
+import { promisify } from 'node:util';
 import zlib from 'node:zlib';
-import type { Plugin } from 'vite';
+import type { Plugin, ResolvedConfig } from 'vite';
 
-const COMPRESSIBLE_EXTENSIONS = new Set(['.js', '.css', '.json', '.svg']);
-const MIN_SIZE = 1024;
+const COMPRESSIBLE_EXTENSIONS = new Set(['.css', '.html', '.ico', '.js', '.json', '.svg', '.webmanifest', '.woff']);
 
-function gzip(source: Buffer): Buffer {
-  return zlib.gzipSync(source, { level: zlib.constants.Z_BEST_COMPRESSION });
+const MIN_SIZE_BYTES = 1024;
+const CONCURRENCY = Math.max(1, Math.min(os.cpus().length || 4, 16));
+
+const gzipAsync = promisify(zlib.gzip);
+const GZIP_OPTIONS: zlib.ZlibOptions = {
+  level: zlib.constants.Z_BEST_COMPRESSION,
+};
+
+async function getCompressibleFiles(dir: string): Promise<string[]> {
+  const entries = await readdir(dir, { withFileTypes: true, recursive: true });
+  const filePaths: string[] = [];
+
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+
+    const fileName = entry.name;
+    if (fileName.endsWith('.gz')) continue;
+
+    const ext = path.extname(fileName).toLowerCase();
+    if (!COMPRESSIBLE_EXTENSIONS.has(ext)) continue;
+
+    const parentDir = entry.parentPath ?? (entry as { path?: string }).path ?? dir;
+    filePaths.push(path.join(parentDir, fileName));
+  }
+
+  return filePaths;
 }
 
-export function precompressGzip(): Plugin {
+export function precompressAssets(): Plugin {
+  let resolvedOutDir: string;
+
   return {
-    name: 'precompress-gzip',
+    name: 'precompress-assets',
+    apply: 'build',
+    enforce: 'post',
 
-    closeBundle() {
-      const outDir = path.resolve(import.meta.dirname, '..', 'dist');
-      if (!fs.existsSync(outDir)) return;
+    configResolved(config: ResolvedConfig) {
+      resolvedOutDir = path.resolve(config.root, config.build.outDir);
+    },
 
-      let files = 0;
-      let originalTotal = 0;
-      let compressedTotal = 0;
+    async writeBundle() {
+      const filePaths = await getCompressibleFiles(resolvedOutDir).catch(() => []);
+      if (filePaths.length === 0) return;
 
-      const walk = (dir: string) => {
-        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-          const full = path.join(dir, entry.name);
+      let compressedCount = 0;
+      let totalOriginalBytes = 0;
+      let totalCompressedBytes = 0;
 
-          if (entry.isDirectory()) {
-            walk(full);
-            continue;
+      let cursor = 0;
+      const workerCount = Math.min(CONCURRENCY, filePaths.length);
+
+      const worker = async () => {
+        while (cursor < filePaths.length) {
+          const currentPath = filePaths[cursor++];
+          if (!currentPath) break;
+
+          const sourceBuffer = await readFile(currentPath).catch(() => null);
+          if (!sourceBuffer || sourceBuffer.length < MIN_SIZE_BYTES) continue;
+
+          const originalSize = sourceBuffer.length;
+          const compressed = await gzipAsync(sourceBuffer, GZIP_OPTIONS).catch(() => null);
+
+          if (!compressed || compressed.length >= originalSize) continue;
+
+          const success = await writeFile(`${currentPath}.gz`, compressed)
+            .then(() => true)
+            .catch(() => false);
+
+          if (success) {
+            compressedCount++;
+            totalOriginalBytes += originalSize;
+            totalCompressedBytes += compressed.length;
           }
-
-          if (!entry.isFile() || entry.name.endsWith('.gz')) continue;
-          if (!COMPRESSIBLE_EXTENSIONS.has(path.extname(entry.name))) continue;
-
-          const source = fs.readFileSync(full);
-          if (source.length < MIN_SIZE) continue;
-
-          const compressed = gzip(source);
-          if (compressed.length >= source.length) continue;
-
-          fs.writeFileSync(`${full}.gz`, compressed);
-          files++;
-          originalTotal += source.length;
-          compressedTotal += compressed.length;
         }
       };
 
-      walk(outDir);
+      await Promise.all(Array.from({ length: workerCount }, () => worker()));
 
-      if (files > 0) {
-        console.log(`[precompress] Gzip-compressed ${files} files: ${originalTotal} bytes → ${compressedTotal} bytes`);
+      if (compressedCount > 0) {
+        console.log(
+          `[precompress] Compressed ${compressedCount} files: ${totalOriginalBytes} bytes → ${totalCompressedBytes} bytes`,
+        );
       }
     },
   };
 }
+
+export default precompressAssets;

@@ -65,7 +65,7 @@ function TreemapCell({
     <g onClick={onCellClick} style={{ cursor: 'pointer' }}>
       <defs>
         <clipPath id={clipId}>
-          <rect x={x + 4} y={y + 4} width={width - 8} height={height - 8} />
+          <rect x={x + 4} y={y + 4} width={Math.max(0, width - 8)} height={Math.max(0, height - 8)} />
         </clipPath>
       </defs>
       <rect
@@ -94,7 +94,7 @@ function TreemapCell({
   );
 }
 
-export default function LargestDirectoriesModal({ ...props }: ModalProps) {
+export default function LargestDirectoriesModal({ onClose, ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
@@ -119,10 +119,10 @@ export default function LargestDirectoriesModal({ ...props }: ModalProps) {
 
   const handleNavigate = useCallback(
     (name: string) => {
-      props.onClose();
+      onClose();
       setSearchParams({ directory: join(browsingDirectory, name) });
     },
-    [props.onClose, browsingDirectory, setSearchParams],
+    [onClose, browsingDirectory, setSearchParams],
   );
 
   const treemapData = entries.map((entry, i) => ({
@@ -133,7 +133,7 @@ export default function LargestDirectoriesModal({ ...props }: ModalProps) {
   }));
 
   return (
-    <Modal title={t('pages.server.files.modal.largestDirectories.title', {})} size='xl' {...props}>
+    <Modal title={t('pages.server.files.modal.largestDirectories.title', {})} size='xl' onClose={onClose} {...props}>
       <Stack gap='md'>
         {loading ? (
           <Spinner.Centered />
@@ -152,7 +152,7 @@ export default function LargestDirectoriesModal({ ...props }: ModalProps) {
       </Stack>
 
       <ModalFooter>
-        <Button variant='default' onClick={props.onClose}>
+        <Button variant='default' onClick={onClose}>
           {t('common.button.close', {})}
         </Button>
       </ModalFooter>
