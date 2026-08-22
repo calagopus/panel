@@ -2125,6 +2125,10 @@
             "buildFailed": {
               "title": "上一次擴充功能建置失敗",
               "content": "這些擴充功能在有變更之前不會重新建置，除非您手動重試建置。"
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2138,7 @@
             "retryBuild": "重試建置",
             "cancelBuild": "取消建置",
             "configure": "設定",
+            "restart": "Restart the panel",
             "back": "返回擴充功能",
             "accept": "接受",
             "decline": "拒絕"
@@ -2144,7 +2149,10 @@
             "cancelling": "建置將在目前步驟結束後停止。",
             "noBackend": "設定此擴充功能需要後端擴充功能。",
             "noConfigurationPage": "此擴充功能未定義設定頁面。",
-            "removeExtension": "移除擴充功能"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "移除擴充功能",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "排隊中…",
@@ -2162,7 +2170,9 @@
             "frontendMissing": "前端遺失",
             "backendMissing": "後端遺失",
             "pendingBuild": "待建置",
-            "pendingRemoval": "待移除"
+            "pendingRemoval": "待移除",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "版本",
@@ -2182,7 +2192,10 @@
             "buildFailed": "擴充套件建置失敗:{reason}",
             "cancelRequested": "已請求取消,建置將在目前步驟結束後停止。",
             "added": "擴充功能 `{packageName}` 已成功新增。",
-            "removed": "擴充功能 `{packageName}` 已成功移除。"
+            "removed": "擴充功能 `{packageName}` 已成功移除。",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "找不到擴充功能",

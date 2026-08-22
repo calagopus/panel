@@ -2125,6 +2125,10 @@
             "buildFailed": {
               "title": "The last extension build failed",
               "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2138,7 @@
             "retryBuild": "Ponów próbę budowy",
             "cancelBuild": "Anuluj budowę",
             "configure": "Konfiguruj",
+            "restart": "Restart the panel",
             "back": "Back to Extensions",
             "accept": "Akceptuj",
             "decline": "Odrzuć"
@@ -2144,7 +2149,10 @@
             "cancelling": "The build stops once its current step ends.",
             "noBackend": "Backend extension is required to configure this extension.",
             "noConfigurationPage": "This extension does not have a configuration page defined.",
-            "removeExtension": "Usuń rozszerzenie"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "Usuń rozszerzenie",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "Queued…",
@@ -2162,7 +2170,9 @@
             "frontendMissing": "Brak frontendu",
             "backendMissing": "Brak backendu",
             "pendingBuild": "Oczekuje na kompilację",
-            "pendingRemoval": "Oczekuje na usunięcie"
+            "pendingRemoval": "Oczekuje na usunięcie",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "Wersja",
@@ -2182,7 +2192,10 @@
             "buildFailed": "Kompilacja rozszerzenia nieudana: {reason}",
             "cancelRequested": "Zażądano anulowania. Kompilacja zatrzyma się po ukończeniu aktualnego kroku.",
             "added": "Rozszerzenie `{packageName}` dodane pomyślnie.",
-            "removed": "Rozszerzenie `{packageName}` pomyślnie usunięte."
+            "removed": "Rozszerzenie `{packageName}` pomyślnie usunięte.",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "Nie znaleziono rozszerzenia",
