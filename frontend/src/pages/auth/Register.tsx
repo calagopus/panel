@@ -53,9 +53,8 @@ export default function Register() {
       doLogin(response.user!);
     } catch (err) {
       setError(httpErrorToHuman(err));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

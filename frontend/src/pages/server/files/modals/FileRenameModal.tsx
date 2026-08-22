@@ -88,8 +88,7 @@ export default function FileRenameModal({ file, ...props }: Props) {
       invalidateFilemanager();
       if (store.getState().selectedFiles.has(file)) {
         removeSelectedFile(file);
-        file.name = newName;
-        addSelectedFile(file);
+        addSelectedFile({ ...file, name: newName });
       }
     },
   });

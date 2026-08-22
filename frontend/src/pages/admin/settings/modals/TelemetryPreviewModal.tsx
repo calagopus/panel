@@ -1,13 +1,13 @@
 import { ModalProps } from '@mantine/core';
-import { useMemo } from 'react';
 import Button from '@/elements/Button.tsx';
 import HljsCode from '@/elements/HljsCode.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
+const loadJsonLanguage = () => import('highlight.js/lib/languages/json').then((mod) => mod.default);
+
 export default function TelemetryPreviewModal({ telemetry, ...props }: ModalProps & { telemetry: object | null }) {
   const { t } = useTranslations();
-  const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
 
   return (
     <Modal
@@ -15,7 +15,7 @@ export default function TelemetryPreviewModal({ telemetry, ...props }: ModalProp
       size='lg'
       {...props}
     >
-      <HljsCode languageName='json' language={jsonLanguage}>
+      <HljsCode languageName='json' language={loadJsonLanguage}>
         {JSON.stringify(telemetry, null, 2)}
       </HljsCode>
 

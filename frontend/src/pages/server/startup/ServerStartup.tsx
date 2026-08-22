@@ -2,7 +2,7 @@ import { faDocker } from '@fortawesome/free-brands-svg-icons';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import debounce from 'debounce';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getVariables from '@/api/server/startup/getVariables.ts';
@@ -51,18 +51,19 @@ export default function ServerStartup() {
   const [variablesLoading, setVariablesLoading] = useState(true);
   const blocker = useBlocker(Object.keys(values).length > 0);
 
-  const setDebouncedCommand = useCallback(
-    debounce((command: string) => {
-      updateCommand(server.uuid, command)
-        .then(() => {
-          addToast(t('pages.server.startup.toast.startupCommandUpdated', {}), 'success');
-          updateServer({ startup: command });
-        })
-        .catch((msg) => {
-          addToast(httpErrorToHuman(msg), 'error');
-        });
-    }, 500),
-    [],
+  const setDebouncedCommand = useMemo(
+    () =>
+      debounce((command: string) => {
+        updateCommand(server.uuid, command)
+          .then(() => {
+            addToast(t('pages.server.startup.toast.startupCommandUpdated', {}), 'success');
+            updateServer({ startup: command });
+          })
+          .catch((msg) => {
+            addToast(httpErrorToHuman(msg), 'error');
+          });
+      }, 500),
+    [server.uuid, t, addToast, updateServer],
   );
 
   useEffect(() => {

@@ -121,10 +121,41 @@ export default defineConfig({
               priority: 12,
             },
             {
+              name: 'highlight',
+              test: /node_modules\/highlight\.js\//,
+              priority: 11,
+            },
+            {
+              name: 'markdown',
+              test: /node_modules\/(react-markdown|remark-gfm|rehype-raw|rehype-sanitize|unified|mdast-util-|micromark|hast-util-|html-void-elements|zwitch|bail|trough|vfile|property-information|space-separated-tokens|comma-separated-tokens)\//,
+              priority: 11,
+            },
+            {
+              name: 'motion',
+              test: /node_modules\/motion\//,
+              priority: 11,
+            },
+            {
+              name: 'zod',
+              test: /node_modules\/zod\//,
+              priority: 11,
+            },
+            {
               name: 'pierre-diffs',
-              test: /node_modules\/(@pierre\/(diffs|theme|theming)|@shikijs\/(core|engine-javascript|engine-oniguruma|primitive|transformers|types|vscode-textmate)|shiki|hast-util-to-html|diff|lru_map)\//,
+              test: /node_modules\/(@pierre\/(diffs|theme|theming)|hast-util-to-html|diff|lru_map)\//,
               priority: 12,
               includeDependenciesRecursively: false,
+            },
+            {
+              name: 'shiki',
+              test: /node_modules\/(@shikijs\/(core|engine-javascript|engine-oniguruma|primitive|transformers|types|vscode-textmate)|shiki)\//,
+              priority: 12,
+              includeDependenciesRecursively: false,
+            },
+            {
+              name: 'vendor',
+              test: /node_modules\/(axios|zustand|history|js-yaml|qrcode|cron-parser|cronstrue|semver|uuid|classnames|object-deep-merge|deepmerge-ts|yjs|y-protocols|y-monaco)\//,
+              priority: 10,
             },
             {
               name: 'common',

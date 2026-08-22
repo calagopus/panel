@@ -19,6 +19,8 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
+const loadAccountRoutes = () => import('@/routers/routes/accountRoutes.ts');
+
 type UserFormValues = z.infer<typeof adminSettingsUserSchema>;
 
 export default function UserContainer() {
@@ -54,7 +56,7 @@ export default function UserContainer() {
   }, [user]);
 
   useEffect(() => {
-    import('@/routers/routes/accountRoutes.ts')
+    loadAccountRoutes()
       .then((module) => {
         const entries = [...module.default, ...window.extensionContext.extensionRegistry.routes.accountRoutes];
 

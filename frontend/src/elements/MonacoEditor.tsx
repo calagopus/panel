@@ -92,7 +92,9 @@ function useMonacoContextMenu() {
   const [items, setItems] = useState<ContextMenuItem[]>([]);
 
   const attach = useCallback((editor: ICodeEditor) => {
-    editorRef.current ??= editor;
+    if (editorRef.current === null) {
+      editorRef.current = editor;
+    }
     editor.onContextMenu(() => {
       editorRef.current = editor;
     });

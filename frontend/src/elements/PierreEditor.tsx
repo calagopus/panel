@@ -133,11 +133,17 @@ export const PierreEditor = memo(
     const baseOptions = useBaseOptions(colorScheme, wordWrap);
 
     const callbacks = useRef({ onMount, onChange, onChangeEvent });
-    callbacks.current = { onMount, onChange, onChangeEvent };
+
+    useEffect(() => {
+      callbacks.current = { onMount, onChange, onChangeEvent };
+    });
 
     const instanceRef = useRef<Editor<undefined> | null>(null);
     const defaultValueRef = useRef(defaultValue);
-    defaultValueRef.current = defaultValue;
+
+    useEffect(() => {
+      defaultValueRef.current = defaultValue;
+    });
 
     const file = useMemo(() => toFile(path, defaultValue), [path, defaultValue]);
 
@@ -217,7 +223,10 @@ export const PierreDiffEditor = memo(
     const baseOptions = useBaseOptions(colorScheme, wordWrap);
 
     const modifiedRef = useRef(modifiedValue);
-    modifiedRef.current = modifiedValue;
+
+    useEffect(() => {
+      modifiedRef.current = modifiedValue;
+    });
 
     const handle = useMemo<PierreEditorHandle>(
       () => ({

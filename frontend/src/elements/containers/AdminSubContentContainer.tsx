@@ -20,16 +20,16 @@ export type Props<P = {}> = {
 } & ({ registry: ContainerRegistry<Props<P>, P>; registryProps: P } | { registry?: never; registryProps?: never });
 
 function AdminSubContentContainer<P>(props: Props<P>) {
-  props = useMemo(() => {
-    let modifiedProps = props;
+  const modifiedProps = useMemo(() => {
+    let currentProps = props;
 
     if (props.registry) {
       for (const interceptor of props.registry.propsInterceptors) {
-        modifiedProps = interceptor(modifiedProps);
+        currentProps = interceptor(currentProps);
       }
     }
 
-    return modifiedProps;
+    return currentProps;
   }, [props]);
 
   const {
@@ -43,7 +43,7 @@ function AdminSubContentContainer<P>(props: Props<P>) {
     registry,
     registryProps,
     children,
-  } = props;
+  } = modifiedProps;
 
   const { t } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
@@ -51,7 +51,7 @@ function AdminSubContentContainer<P>(props: Props<P>) {
   return (
     <ContentContainer title={`${title} | ${settings.app.name}`}>
       {registry?.prependedComponents.map((Component, index) => (
-        <Component key={`prepended-sub-${index}`} {...props} {...registryProps} />
+        <Component key={`prepended-sub-${index}`} {...modifiedProps} {...registryProps} />
       ))}
 
       {hideTitleComponent ? null : setSearch ? (
@@ -98,13 +98,13 @@ function AdminSubContentContainer<P>(props: Props<P>) {
         </div>
       )}
       {registry?.prependedContentComponents.map((Component, index) => (
-        <Component key={`prepended-sub-content-${index}`} {...props} {...registryProps} />
+        <Component key={`prepended-sub-content-${index}`} {...modifiedProps} {...registryProps} />
       ))}
 
       {children}
 
       {registry?.appendedContentComponents.map((Component, index) => (
-        <Component key={`appended-sub-content-${index}`} {...props} {...registryProps} />
+        <Component key={`appended-sub-content-${index}`} {...modifiedProps} {...registryProps} />
       ))}
     </ContentContainer>
   );

@@ -83,7 +83,7 @@ export default function ServerSwitcher({ className, isServer }: { className?: st
         else navigate(`/server/${uuidShort}`);
       }
     },
-    [location, isServer],
+    [location, isServer, navigate],
   );
 
   return (

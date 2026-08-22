@@ -2,7 +2,7 @@ import { faArrowUp, faFolderPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
-import { Dispatch, Ref, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { Dispatch, Ref, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createSearchParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import getAssets from '@/api/admin/assets/getAssets.ts';
@@ -51,10 +51,7 @@ export default function AdminAssets() {
   const [search, setSearchValue] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const updateDebouncedSearch = useCallback(
-    debounce((value: string) => setDebouncedSearch(value), 150),
-    [],
-  );
+  const updateDebouncedSearch = useMemo(() => debounce((value: string) => setDebouncedSearch(value), 150), []);
 
   useEffect(() => {
     if (!search) {
@@ -81,7 +78,10 @@ export default function AdminAssets() {
   }, [queryClient]);
 
   const currentDirectoryRef = useRef(currentDirectory);
-  currentDirectoryRef.current = currentDirectory;
+
+  useEffect(() => {
+    currentDirectoryRef.current = currentDirectory;
+  }, [currentDirectory]);
 
   const getDestination = useCallback(
     (): UploadDestination => ({ type: 'adminAsset', directory: currentDirectoryRef.current }),

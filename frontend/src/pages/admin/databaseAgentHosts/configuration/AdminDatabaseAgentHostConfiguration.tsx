@@ -38,6 +38,8 @@ import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
+const loadYamlLanguage = () => import('highlight.js/lib/languages/yaml').then((mod) => mod.default);
+
 export default function AdminDatabaseAgentHostConfiguration({
   databaseAgentHost,
 }: {
@@ -139,7 +141,9 @@ export default function AdminDatabaseAgentHostConfiguration({
       .finally(() => setSaving(false));
   };
 
-  doSaveRef.current = doSave;
+  useEffect(() => {
+    doSaveRef.current = doSave;
+  });
 
   return (
     <AdminSubContentContainer
@@ -209,11 +213,7 @@ export default function AdminDatabaseAgentHostConfiguration({
                   </Title>
                   {hostConfiguration && command ? (
                     <>
-                      <HljsCode
-                        className='overflow-x-auto'
-                        languageName='yaml'
-                        language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
-                      >
+                      <HljsCode className='overflow-x-auto' languageName='yaml' language={loadYamlLanguage}>
                         {dump(hostConfiguration)}
                       </HljsCode>
 
@@ -333,8 +333,8 @@ export default function AdminDatabaseAgentHostConfiguration({
                     codeLens: false,
                     scrollBeyondLastLine: false,
                     smoothScrolling: false,
-                    // @ts-expect-error this is valid
-                    touchScrollEnabled: true,
+
+                    inertialScroll: true,
                   }}
                 />
               </div>

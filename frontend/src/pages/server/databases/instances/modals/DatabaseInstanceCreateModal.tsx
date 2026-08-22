@@ -1,7 +1,6 @@
 import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useMemo } from 'react';
 import { z } from 'zod';
 import createDatabaseInstance from '@/api/server/databases/instances/createDatabaseInstance.ts';
 import getDatabaseInstanceTemplates from '@/api/server/databases/instances/getDatabaseInstanceTemplates.ts';
@@ -47,10 +46,7 @@ export default function DatabaseInstanceCreateModal(props: ModalProps) {
     },
   });
 
-  const selectedTemplate = useMemo(
-    () => templates.find((template) => template.uuid === form.getValues().templateUuid),
-    [templates, form.getValues().templateUuid],
-  );
+  const selectedTemplate = templates.find((template) => template.uuid === form.values.templateUuid);
   const imageEntries = Object.entries(selectedTemplate?.dockerImages ?? {});
 
   form.watch('templateUuid', ({ value }) => {
@@ -83,16 +79,16 @@ export default function DatabaseInstanceCreateModal(props: ModalProps) {
             {},
           )}
           data={Object.values(
-            templates.reduce(
-              (acc, { uuid, name, type }) => (
-                (acc[type] ??= { group: databaseAgentTypeLabelMapping[type], items: [] }).items.push({
-                  value: uuid,
-                  label: name,
-                }),
-                acc
-              ),
-              {} as GroupedTemplates,
-            ),
+            templates.reduce((acc, { uuid, name, type }) => {
+              if (!acc[type]) {
+                acc[type] = { group: databaseAgentTypeLabelMapping[type], items: [] };
+              }
+              acc[type].items.push({
+                value: uuid,
+                label: name,
+              });
+              return acc;
+            }, {} as GroupedTemplates),
           )}
           {...form.getInputProps('templateUuid')}
         />

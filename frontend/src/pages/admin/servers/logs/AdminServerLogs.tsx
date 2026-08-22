@@ -85,8 +85,8 @@ export default function AdminServerLogs({ server }: { server: z.infer<typeof adm
               codeLens: false,
               scrollBeyondLastLine: false,
               smoothScrolling: false,
-              // @ts-expect-error this is valid
-              touchScrollEnabled: true,
+
+              inertialScroll: true,
             }}
           />
         </div>

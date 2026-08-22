@@ -53,11 +53,13 @@ export default function PermissionSelector({
     }
 
     const filtered: z.infer<typeof permissionMapSchema> = {};
-    for (const [category, { description, permissions: perms }] of Object.entries(permissions)) {
-      const visible = Object.entries(perms).filter(([perm]) => grantablePermissions.includes(`${category}.${perm}`));
+    for (const [category, entry] of Object.entries(permissions)) {
+      const visible = Object.entries(entry.permissions).filter(([perm]) =>
+        grantablePermissions.includes(`${category}.${perm}`),
+      );
 
       if (visible.length > 0) {
-        filtered[category] = { description, permissions: Object.fromEntries(visible) };
+        filtered[category] = { description: entry.description, permissions: Object.fromEntries(visible) };
       }
     }
 

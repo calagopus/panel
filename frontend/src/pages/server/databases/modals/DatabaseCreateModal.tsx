@@ -69,19 +69,19 @@ export default function DatabaseCreateModal({ ...props }: ModalProps) {
           searchable
           nothingFoundMessage={t('pages.server.databases.modal.createDatabase.form.noHostsFound', {})}
           data={Object.values(
-            databaseHosts.reduce(
-              (acc, { uuid, name, type, maintenanceEnabled }) => (
-                (acc[type] ??= { group: databaseTypeLabelMapping[type], items: [] }).items.push({
-                  value: uuid,
-                  label: maintenanceEnabled
-                    ? `${name} (${t('pages.server.databases.modal.createDatabase.form.hostInMaintenance', {})})`
-                    : name,
-                  disabled: maintenanceEnabled,
-                }),
-                acc
-              ),
-              {} as GroupedDatabaseHosts,
-            ),
+            databaseHosts.reduce((acc, { uuid, name, type, maintenanceEnabled }) => {
+              if (!acc[type]) {
+                acc[type] = { group: databaseTypeLabelMapping[type], items: [] };
+              }
+              acc[type].items.push({
+                value: uuid,
+                label: maintenanceEnabled
+                  ? `${name} (${t('pages.server.databases.modal.createDatabase.form.hostInMaintenance', {})})`
+                  : name,
+                disabled: maintenanceEnabled,
+              });
+              return acc;
+            }, {} as GroupedDatabaseHosts),
           )}
           {...form.getInputProps('databaseHostUuid')}
         />

@@ -24,6 +24,13 @@ export default function ServerDetails() {
 
   const [doNormalizeCpuLoad, setDoNormalizeCpuLoad] = useState(localStorage.getItem('normalize_cpu_load') === 'true');
 
+  const [networkSpeeds, setNetworkSpeeds] = useState({
+    rxBytesSpeed: 0,
+    txBytesSpeed: 0,
+    rxPacketsSpeed: 0,
+    txPacketsSpeed: 0,
+  });
+
   const networkRef = useRef({
     rxBytes: -1,
     txBytes: -1,
@@ -70,6 +77,13 @@ export default function ServerDetails() {
       if (networkRef.current.txBytesSpeed < 0) networkRef.current.txBytesSpeed = 0;
       if (networkRef.current.rxPacketsSpeed < 0) networkRef.current.rxPacketsSpeed = 0;
       if (networkRef.current.txPacketsSpeed < 0) networkRef.current.txPacketsSpeed = 0;
+
+      setNetworkSpeeds({
+        rxBytesSpeed: networkRef.current.rxBytesSpeed,
+        txBytesSpeed: networkRef.current.txBytesSpeed,
+        rxPacketsSpeed: networkRef.current.rxPacketsSpeed,
+        txPacketsSpeed: networkRef.current.txPacketsSpeed,
+      });
     }
   }, [stats]);
 
@@ -159,7 +173,7 @@ export default function ServerDetails() {
         details={
           state === 'offline' && server.status !== 'installing'
             ? null
-            : `${bytesToString(Math.round(networkRef.current.rxBytesSpeed), undefined, true)}/s, ${Math.round(networkRef.current.rxPacketsSpeed)} pps`
+            : `${bytesToString(Math.round(networkSpeeds.rxBytesSpeed), undefined, true)}/s, ${Math.round(networkSpeeds.rxPacketsSpeed)} pps`
         }
       />
       <StatCard
@@ -174,7 +188,7 @@ export default function ServerDetails() {
         details={
           state === 'offline' && server.status !== 'installing'
             ? null
-            : `${bytesToString(Math.round(networkRef.current.txBytesSpeed), undefined, true)}/s, ${Math.round(networkRef.current.txPacketsSpeed)} pps`
+            : `${bytesToString(Math.round(networkSpeeds.txBytesSpeed), undefined, true)}/s, ${Math.round(networkSpeeds.txPacketsSpeed)} pps`
         }
       />
       {window.extensionContext.extensionRegistry.pages.server.console.statCards.map((StatCard, i) => (

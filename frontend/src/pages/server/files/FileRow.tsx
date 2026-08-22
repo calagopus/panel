@@ -76,7 +76,7 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
 
   const targetDirectory = file.directory ? join(browsingDirectory, file.name) : null;
   const { moving, isDropTarget, getDropHandlers } = useDraggedFileMove({ targetDirectory });
-  const openMode = useMemo(() => isOpenableFile(file, store.getState()), [file, browsingFastDirectory]);
+  const openMode = useMemo(() => isOpenableFile(file, store.getState()), [file, browsingFastDirectory, store]);
 
   const toggleSelected = () => {
     const state = store.getState();

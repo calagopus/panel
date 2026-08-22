@@ -44,11 +44,14 @@ export type ActingFileMode = 'copy' | 'move';
 
 export interface FileManagerExternals {
   serverUuid: string;
+  serverName: string;
+  routeId: string;
   queryClient: QueryClient;
   directoryData: DirectoryResponse | null;
 }
 
 export interface FileManagerStore {
+  externals: FileManagerExternals;
   isLoading: boolean;
   fileInputRef: RefObject<HTMLInputElement | null>;
   folderInputRef: RefObject<HTMLInputElement | null>;
@@ -141,13 +144,14 @@ const noopFileUploader: FileUploader = {
 const { Provider, useStore, useStoreApi } = createContext<StoreApi<FileManagerStore>>();
 
 export const createFileManagerStore = (
-  getExternals: () => FileManagerExternals,
+  initialExternals: FileManagerExternals,
   initial: { browsingDirectory: string },
 ) =>
   create<FileManagerStore>()((set, get) => {
     let selectionAnchor: z.infer<typeof serverDirectoryEntrySchema> | null = null;
 
     return {
+      externals: initialExternals,
       isLoading: true,
       fileInputRef: createRef<HTMLInputElement>(),
       folderInputRef: createRef<HTMLInputElement>(),
@@ -252,14 +256,14 @@ export const createFileManagerStore = (
       },
 
       resetEntries: () => {
-        const { directoryData } = getExternals();
+        const { directoryData } = get().externals;
         if (!directoryData) return;
 
         set({ browsingEntries: directoryData.entries });
       },
       invalidateFilemanager: () => {
         const { searchInfo, browsingDirectory, sortMode, doSelectFiles, clearActingFiles } = get();
-        const { serverUuid, queryClient } = getExternals();
+        const { serverUuid, queryClient } = get().externals;
 
         if (searchInfo) {
           searchFiles(serverUuid, { root: browsingDirectory, ...searchInfo.filters }).then((entries) => {

@@ -8,9 +8,10 @@
   font-family: "Helvetica";
   font-style: normal;
   font-weight: normal;
+  font-display: swap;
   src:
     local("Helvetica"),
-    url("/fonts/Helvetica.woff") format("woff");
+    url("./assets/fonts/Helvetica.woff") format("woff");
 }
 
 @theme {

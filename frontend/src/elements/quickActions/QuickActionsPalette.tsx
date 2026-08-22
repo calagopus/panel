@@ -38,6 +38,13 @@ import { useServerStore } from '@/stores/server.ts';
 
 const DEFAULT_CATEGORY_ORDER = 100;
 
+const loadScopeRoutes = (scope: QuickActionScope) =>
+  scope === 'admin'
+    ? import('@/routers/routes/adminRoutes.ts')
+    : scope === 'server'
+      ? import('@/routers/routes/serverRoutes.ts')
+      : import('@/routers/routes/accountRoutes.ts');
+
 /**
  * Route modules pull in every page component they route to, so importing them eagerly would drag
  * the whole admin and server areas into the palette's chunk. The router for the current scope has
@@ -50,14 +57,8 @@ function useScopeRoutes(scope: QuickActionScope, enabled: boolean) {
     if (!enabled) return;
 
     let cancelled = false;
-    const load =
-      scope === 'admin'
-        ? import('@/routers/routes/adminRoutes.ts')
-        : scope === 'server'
-          ? import('@/routers/routes/serverRoutes.ts')
-          : import('@/routers/routes/accountRoutes.ts');
 
-    load
+    loadScopeRoutes(scope)
       .then((module) => {
         if (!cancelled) setRoutes(module.default);
       })
@@ -108,7 +109,10 @@ function Palette() {
 
   const combobox = useCombobox();
   const comboboxRef = useRef(combobox);
-  comboboxRef.current = combobox;
+
+  useEffect(() => {
+    comboboxRef.current = combobox;
+  });
 
   const server = useServerStore((state) => state.server);
   const { scope, serverId } = useQuickActionLocation();

@@ -37,16 +37,16 @@ export interface Props {
 }
 
 function ServerContentContainer(props: Props) {
-  props = useMemo(() => {
-    let modifiedProps = props;
+  const modifiedProps = useMemo(() => {
+    let currentProps = props;
 
     if (props.registry) {
       for (const interceptor of props.registry.propsInterceptors) {
-        modifiedProps = interceptor(modifiedProps);
+        currentProps = interceptor(currentProps);
       }
     }
 
-    return modifiedProps;
+    return currentProps;
   }, [props]);
 
   const {
@@ -60,7 +60,7 @@ function ServerContentContainer(props: Props) {
     registry,
     children,
     fullscreen = false,
-  } = props;
+  } = modifiedProps;
 
   const { t, tItem } = useTranslations();
   const {
@@ -231,7 +231,7 @@ function ServerContentContainer(props: Props) {
 
       <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6 mt-2'}`}>
         {registry?.prependedComponents.map((Component, index) => (
-          <Component key={`prepended-${index}`} {...props} />
+          <Component key={`prepended-${index}`} {...modifiedProps} />
         ))}
 
         {hideTitleComponent ? null : setSearch ? (
@@ -278,13 +278,13 @@ function ServerContentContainer(props: Props) {
           </div>
         )}
         {registry?.prependedContentComponents.map((Component, index) => (
-          <Component key={`prepended-content-${index}`} {...props} />
+          <Component key={`prepended-content-${index}`} {...modifiedProps} />
         ))}
 
         {children}
 
         {registry?.appendedContentComponents.map((Component, index) => (
-          <Component key={`appended-content-${index}`} {...props} />
+          <Component key={`appended-content-${index}`} {...modifiedProps} />
         ))}
       </div>
     </ContentContainer>

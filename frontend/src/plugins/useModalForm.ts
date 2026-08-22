@@ -55,9 +55,8 @@ export function useModalForm<T extends Record<string, unknown>>({
       } else {
         addToast(httpErrorToHuman(e), 'error');
       }
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   });
 
   return { form, handleClose, handleSubmit, loading, isDirty: form.isDirty() };

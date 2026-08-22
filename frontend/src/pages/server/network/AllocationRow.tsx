@@ -2,7 +2,7 @@ import { faStar, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteAllocation from '@/api/server/allocations/deleteAllocation.ts';
@@ -31,25 +31,26 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
   const [notes, setNotes] = useState(allocation.notes ?? '');
   const canUpdate = useServerCan('allocations.update');
 
+  const setDebouncedNotes = useMemo(
+    () =>
+      debounce((notes: string) => {
+        updateAllocation(server.uuid, allocation.uuid, { notes: notes || null })
+          .then(() => {
+            addToast(t('pages.server.network.toast.updated', {}), 'success');
+            queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
+          })
+          .catch((msg) => {
+            addToast(httpErrorToHuman(msg), 'error');
+          });
+      }, 500),
+    [server.uuid, allocation.uuid, t, addToast, queryClient],
+  );
+
   useEffect(() => {
     if (notes !== (allocation.notes ?? '')) {
       setDebouncedNotes(notes);
     }
   }, [notes]);
-
-  const setDebouncedNotes = useCallback(
-    debounce((notes: string) => {
-      updateAllocation(server.uuid, allocation.uuid, { notes: notes || null })
-        .then(() => {
-          addToast(t('pages.server.network.toast.updated', {}), 'success');
-          queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
-        })
-        .catch((msg) => {
-          addToast(httpErrorToHuman(msg), 'error');
-        });
-    }, 500),
-    [],
-  );
 
   const doSetPrimary = () => {
     updateAllocation(server.uuid, allocation.uuid, { primary: true })

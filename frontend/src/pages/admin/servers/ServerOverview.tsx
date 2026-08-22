@@ -50,7 +50,7 @@ function StatBox({ label, value, icon }: { label: string; value: React.ReactNode
           {label}
         </Text>
       </Group>
-      <Text size='lg' fw={700}>
+      <Text component='div' size='lg' fw={700}>
         {value}
       </Text>
     </Card>

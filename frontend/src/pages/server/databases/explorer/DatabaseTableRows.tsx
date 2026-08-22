@@ -165,9 +165,8 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
       invalidate();
     } catch (err) {
       addToast(httpErrorToHuman(err), 'error');
-    } finally {
-      setSaving(false);
     }
+    setSaving(false);
   };
 
   const toPayload = (values: Record<string, z.infer<typeof serverDatabaseQueryValueSchema>>) =>

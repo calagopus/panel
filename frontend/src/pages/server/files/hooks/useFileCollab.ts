@@ -223,7 +223,8 @@ export default function useFileCollab({
 
     const socket = socketInstance;
     const path = filePath;
-    const editorId = String(++editorSequence);
+    editorSequence += 1;
+    const editorId = String(editorSequence);
 
     const sendUpdate = (update: Uint8Array) => {
       const encoded = toBase64(update);

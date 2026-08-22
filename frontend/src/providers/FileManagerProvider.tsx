@@ -1,5 +1,5 @@
 import { keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { useStore } from 'zustand';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
@@ -10,7 +10,7 @@ import { registerUploadRefresh } from '@/lib/uploadManager.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useUploader } from '@/plugins/useUploader.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
-import { createFileManagerStore, FileManagerExternals, FileManagerStoreContextProvider } from '@/stores/fileManager.ts';
+import { createFileManagerStore, FileManagerStoreContextProvider } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 import { UploadDestination } from '@/stores/uploads.ts';
 
@@ -23,11 +23,19 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   const canReadFiles = useServerCan('files.read');
   const canReadBackups = useServerCan('backups.read');
 
-  const externalsRef = useRef<FileManagerExternals>({ serverUuid: server.uuid, queryClient, directoryData: null });
   const [store] = useState(() =>
-    createFileManagerStore(() => externalsRef.current, {
-      browsingDirectory: searchParams.get('directory') || '/',
-    }),
+    createFileManagerStore(
+      {
+        serverUuid: server.uuid,
+        serverName: server.name,
+        routeId: params.id ?? server.uuid,
+        queryClient,
+        directoryData: null,
+      },
+      {
+        browsingDirectory: searchParams.get('directory') || '/',
+      },
+    ),
   );
 
   const browsingDirectory = useStore(store, (state) => state.browsingDirectory);
@@ -72,8 +80,6 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [infiniteData]);
 
-  externalsRef.current = { serverUuid: server.uuid, queryClient, directoryData: data ?? null };
-
   const backupUuid = useMemo(() => {
     if (!browsingDirectory.startsWith('/.backups/')) return null;
 
@@ -101,21 +107,28 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [directoryError]);
 
-  const serverRef = useRef(server);
-  serverRef.current = server;
-  const routeIdRef = useRef(params.id);
-  routeIdRef.current = params.id;
+  useEffect(() => {
+    store.setState({
+      externals: {
+        serverUuid: server.uuid,
+        serverName: server.name,
+        routeId: params.id ?? server.uuid,
+        queryClient,
+        directoryData: data ?? null,
+      },
+    });
+  }, [store, server, params.id, queryClient, data]);
 
-  const getDestination = useCallback(
-    (): UploadDestination => ({
+  const getDestination = useCallback((): UploadDestination => {
+    const { serverUuid, serverName, routeId } = store.getState().externals;
+    return {
       type: 'server',
-      serverUuid: externalsRef.current.serverUuid,
-      serverName: serverRef.current.name,
-      routeId: routeIdRef.current ?? externalsRef.current.serverUuid,
+      serverUuid,
+      serverName,
+      routeId,
       directory: store.getState().browsingDirectory,
-    }),
-    [store],
-  );
+    };
+  }, [store]);
   const fileUploader = useUploader(`server:${server.uuid}`, getDestination);
 
   useEffect(

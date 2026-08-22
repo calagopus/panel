@@ -60,7 +60,7 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
           <FontAwesomeIcon icon={scheduleTriggerIconMapping[trigger.type]} />
         </ThemeIcon>
         {trigger.type === 'cron' ? (
-          <Text className='mr-1!'>
+          <Text component='div' className='mr-1!'>
             {tReact('pages.server.schedules.triggers.cron.card.content', {
               schedule: (
                 <Tooltip label={cronTooltip(trigger.schedule)} className='inline-block'>

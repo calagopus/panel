@@ -31,6 +31,8 @@ import { useAdminStore } from '@/stores/admin.tsx';
 
 type DatabaseAgentHost = z.infer<typeof adminDatabaseAgentHostSchema>;
 
+const defaultFormatValue = (value: number) => bytesToString(mbToBytes(value));
+
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className='flex items-start justify-between gap-4 py-1.5 border-b border-(--mantine-color-default-border) last:border-b-0'>
@@ -48,7 +50,7 @@ function CapacityResource({
   allocated,
   limit,
   footer,
-  formatValue = (value) => bytesToString(mbToBytes(value)),
+  formatValue = defaultFormatValue,
 }: {
   label: string;
   icon: React.ReactNode;

@@ -34,7 +34,10 @@ export function useWebsocket<T extends z.ZodTypeAny>(
   const [connected, setConnected] = useState(false);
 
   const handlers = useRef(options);
-  handlers.current = options;
+
+  useEffect(() => {
+    handlers.current = options;
+  });
 
   const openSocket = useRef<WebSocket | null>(null);
 

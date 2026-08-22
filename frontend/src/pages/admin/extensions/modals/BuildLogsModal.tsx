@@ -14,6 +14,64 @@ const POLL_INTERVAL_MS = 2000;
 
 const FAILURES_BEFORE_TOAST = 5;
 
+interface BuildLogPollCallbacks {
+  onLogs: (chunk: string) => void;
+  onError: (error: unknown) => void;
+}
+
+function startBuildLogPolling(buildId: number | null, { onLogs, onError }: BuildLogPollCallbacks) {
+  let offset = 0;
+  let failures = 0;
+  let stopped = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  const drain = async (): Promise<unknown> => {
+    let buffered = '';
+
+    try {
+      for (;;) {
+        const chunk = await getExtensionBuildLogs(buildId, offset);
+        if (stopped) return null;
+
+        offset = chunk.offset;
+        buffered += chunk.data;
+        if (chunk.eof) break;
+      }
+    } catch (error) {
+      if (buffered && !stopped) onLogs(buffered);
+      return error;
+    }
+
+    if (buffered && !stopped) onLogs(buffered);
+    return null;
+  };
+
+  const poll = () => {
+    drain()
+      .then((error) => {
+        if (error === null) {
+          failures = 0;
+          return;
+        }
+
+        if (error instanceof AxiosError && error.response?.status === 404) return;
+
+        failures += 1;
+        if (failures === FAILURES_BEFORE_TOAST) onError(error);
+      })
+      .finally(() => {
+        if (!stopped) timer = setTimeout(poll, POLL_INTERVAL_MS);
+      });
+  };
+
+  poll();
+
+  return () => {
+    stopped = true;
+    clearTimeout(timer);
+  };
+}
+
 interface Props extends ModalProps {
   buildId: number | null;
 }
@@ -29,53 +87,13 @@ export default function BuildLogsModal({ buildId, ...props }: Props) {
   useEffect(() => {
     if (!props.opened) return;
 
-    let stopped = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let offset = 0;
-    let failures = 0;
-
     setLogs('');
 
-    const drain = async () => {
-      let buffered = '';
-
-      try {
-        for (;;) {
-          const chunk = await getExtensionBuildLogs(buildId, offset);
-          if (stopped) return;
-
-          offset = chunk.offset;
-          buffered += chunk.data;
-          if (chunk.eof) return;
-        }
-      } finally {
-        if (buffered && !stopped) setLogs((prev) => prev + buffered);
-      }
-    };
-
-    const poll = () => {
-      drain()
-        .then(() => {
-          failures = 0;
-        })
-        .catch((err) => {
-          if (err instanceof AxiosError && err.response?.status === 404) return;
-
-          failures += 1;
-          if (failures === FAILURES_BEFORE_TOAST) addToast(httpErrorToHuman(err), 'error');
-        })
-        .finally(() => {
-          if (!stopped) timer = setTimeout(poll, POLL_INTERVAL_MS);
-        });
-    };
-
-    poll();
-
-    return () => {
-      stopped = true;
-      clearTimeout(timer);
-    };
-  }, [props.opened, buildId]);
+    return startBuildLogPolling(buildId, {
+      onLogs: (chunk) => setLogs((prev) => prev + chunk),
+      onError: (error) => addToast(httpErrorToHuman(error), 'error'),
+    });
+  }, [props.opened, buildId, addToast]);
 
   useEffect(() => {
     const el = scrollRef.current;

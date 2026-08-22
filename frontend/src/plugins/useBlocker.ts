@@ -21,7 +21,10 @@ export function useBlocker(
   const txRef = useRef<Transition | null>(null);
   const unblockRef = useRef<(() => void) | null>(null);
   const shouldBlockRef = useRef(shouldBlock);
-  shouldBlockRef.current = shouldBlock;
+
+  useEffect(() => {
+    shouldBlockRef.current = shouldBlock;
+  });
 
   useEffect(() => {
     if (!when || !history) {

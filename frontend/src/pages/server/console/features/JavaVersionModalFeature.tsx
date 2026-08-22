@@ -90,9 +90,8 @@ export default function JavaVersionModal() {
       }
     } catch (error) {
       addToast(httpErrorToHuman(error as object), 'error');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

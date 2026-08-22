@@ -1,6 +1,6 @@
 import { ModalProps } from '@mantine/core';
 import { load } from 'js-yaml';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import updateDatabaseAgentHostsConfig from '@/api/admin/database-agent-hosts/updateDatabaseAgentHostsConfig.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -58,7 +58,9 @@ export default function DatabaseAgentHostsBulkConfigModal({
       .finally(() => setLoading(false));
   };
 
-  doApplyRef.current = doApply;
+  useEffect(() => {
+    doApplyRef.current = doApply;
+  });
 
   return (
     <Modal
@@ -88,8 +90,8 @@ export default function DatabaseAgentHostsBulkConfigModal({
               codeLens: false,
               scrollBeyondLastLine: false,
               smoothScrolling: false,
-              // @ts-expect-error this is valid
-              touchScrollEnabled: true,
+
+              inertialScroll: true,
             }}
           />
         </div>

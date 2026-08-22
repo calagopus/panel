@@ -161,9 +161,8 @@ export default function MassRenameModal({ files, ...props }: Props) {
       props.onClose();
     } catch (err) {
       addToast(err instanceof Error ? err.message : String(err), 'error');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const statusLabel: Partial<Record<RenameStatus, string>> = {
