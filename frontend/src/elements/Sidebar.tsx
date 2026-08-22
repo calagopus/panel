@@ -1,3 +1,19 @@
+import ActionIcon from '@/elements/ActionIcon.tsx';
+import Avatar from '@/elements/Avatar.tsx';
+import Button from '@/elements/Button.tsx';
+import Card from '@/elements/Card.tsx';
+import CloseButton from '@/elements/CloseButton.tsx';
+import MantineDivider from '@/elements/Divider.tsx';
+import Drawer from '@/elements/Drawer.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { isAdmin } from '@/lib/permissions.ts';
+import { isNamedRoutePathAccessible } from '@/lib/routes.ts';
+import { openUrl } from '@/lib/url.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useWindows } from '@/providers/WindowProvider.tsx';
+import RouterRoutes from '@/RouterRoutes.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import {
   faArrowRightFromBracket,
   faBars,
@@ -16,24 +32,8 @@ import { useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import classNames from 'classnames';
 import { ReactNode, useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
+import { matchPath, MemoryRouter, NavLink, useLocation, useNavigate } from 'react-router';
 import { makeComponentHookable } from 'shared';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Avatar from '@/elements/Avatar.tsx';
-import Button from '@/elements/Button.tsx';
-import Card from '@/elements/Card.tsx';
-import CloseButton from '@/elements/CloseButton.tsx';
-import MantineDivider from '@/elements/Divider.tsx';
-import Drawer from '@/elements/Drawer.tsx';
-import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { isAdmin } from '@/lib/permissions.ts';
-import { isNamedRoutePathAccessible } from '@/lib/routes.ts';
-import { openUrl } from '@/lib/url.ts';
-import { useAuth } from '@/providers/AuthProvider.tsx';
-import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useWindows } from '@/providers/WindowProvider.tsx';
-import RouterRoutes from '@/RouterRoutes.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 import ContextMenu from './ContextMenu.tsx';
 
 type SidebarProps = {
@@ -322,7 +322,9 @@ function Footer() {
               <div className='flex items-center flex-1 min-w-0'>
                 <Avatar size={40} className='select-none shrink-0' src={user.avatar} name={user.username} />
                 <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
-                  {user.username}
+                  {user.nameFirst && user.nameLast
+                    ? `${user.nameFirst} ${user.nameLast}`
+                    : user.username}
                 </span>
               </div>
             ) : (
@@ -336,7 +338,9 @@ function Footer() {
               >
                 <Avatar size={40} className='select-none shrink-0' src={user.avatar} name={user.username} />
                 <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
-                  {user.username}
+                  {user.nameFirst && user.nameLast
+                    ? `${user.nameFirst} ${user.nameLast}`
+                    : user.username}
                 </span>
               </NavLink>
             )}
