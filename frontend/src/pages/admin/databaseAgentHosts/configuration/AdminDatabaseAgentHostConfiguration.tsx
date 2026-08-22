@@ -333,7 +333,6 @@ export default function AdminDatabaseAgentHostConfiguration({
                     codeLens: false,
                     scrollBeyondLastLine: false,
                     smoothScrolling: false,
-
                     inertialScroll: true,
                   }}
                 />

@@ -85,7 +85,6 @@ export default function AdminServerLogs({ server }: { server: z.infer<typeof adm
               codeLens: false,
               scrollBeyondLastLine: false,
               smoothScrolling: false,
-
               inertialScroll: true,
             }}
           />

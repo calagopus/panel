@@ -103,7 +103,6 @@ export default function EggInstallationScriptContainer({
                   codeLens: false,
                   scrollBeyondLastLine: false,
                   smoothScrolling: false,
-
                   inertialScroll: true,
                 }}
                 onChange={(value) => form.setFieldValue('content', value || '')}

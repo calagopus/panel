@@ -90,7 +90,6 @@ export default function DatabaseAgentHostsBulkConfigModal({
               codeLens: false,
               scrollBeyondLastLine: false,
               smoothScrolling: false,
-
               inertialScroll: true,
             }}
           />

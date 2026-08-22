@@ -1025,7 +1025,6 @@ function FileEditorComponent() {
                     codeLens: false,
                     scrollBeyondLastLine: false,
                     smoothScrolling: false,
-
                     inertialScroll: true,
                     fixedOverflowWidgets: true,
                   }}

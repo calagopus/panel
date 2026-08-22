@@ -378,7 +378,6 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
                     codeLens: false,
                     scrollBeyondLastLine: false,
                     smoothScrolling: false,
-
                     inertialScroll: true,
                   }}
                 />

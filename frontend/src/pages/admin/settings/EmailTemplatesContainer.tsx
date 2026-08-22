@@ -294,7 +294,6 @@ export default function EmailTemplatesContainer() {
                   codeLens: false,
                   scrollBeyondLastLine: false,
                   smoothScrolling: false,
-
                   inertialScroll: true,
                   wordWrap: 'on',
                 }}

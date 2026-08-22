@@ -98,7 +98,6 @@ export default function DatabaseQueryConsole({ draftRef }: { draftRef: RefObject
               codeLens: false,
               scrollBeyondLastLine: false,
               smoothScrolling: false,
-
               inertialScroll: true,
               fixedOverflowWidgets: true,
             }}
