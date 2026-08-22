@@ -2125,6 +2125,10 @@
             "buildFailed": {
               "title": "The last extension build failed",
               "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2138,7 @@
             "retryBuild": "Retry build",
             "cancelBuild": "Cancel build",
             "configure": "Configurer",
+            "restart": "Restart the panel",
             "back": "Retour aux extensions",
             "accept": "Accepter",
             "decline": "Refuser"
@@ -2144,7 +2149,10 @@
             "cancelling": "The build stops once its current step ends.",
             "noBackend": "Une extension backend est requise pour configurer cette extension.",
             "noConfigurationPage": "Cette extension n'a pas de page de configuration définie.",
-            "removeExtension": "Retirer l'extension"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "Retirer l'extension",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "Queued…",
@@ -2162,7 +2170,9 @@
             "frontendMissing": "Frontend manquant",
             "backendMissing": "Backend manquant",
             "pendingBuild": "Compilation en attente",
-            "pendingRemoval": "Retrait en attente"
+            "pendingRemoval": "Retrait en attente",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "Version",
@@ -2182,7 +2192,10 @@
             "buildFailed": "Extension build failed: {reason}",
             "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Extension `{packageName}` ajoutée avec succès.",
-            "removed": "Extension `{packageName}` supprimée avec succès."
+            "removed": "Extension `{packageName}` supprimée avec succès.",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "Extension introuvable",

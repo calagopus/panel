@@ -2125,6 +2125,10 @@
             "buildFailed": {
               "title": "The last extension build failed",
               "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2138,7 @@
             "retryBuild": "Retry build",
             "cancelBuild": "Cancel build",
             "configure": "Konfigurovať",
+            "restart": "Restart the panel",
             "back": "Späť na rozšírenia",
             "accept": "Prijať",
             "decline": "Odmietnuť"
@@ -2144,7 +2149,10 @@
             "cancelling": "The build stops once its current step ends.",
             "noBackend": "Na konfiguráciu tohto rozšírenia je potrebné backendové rozšírenie.",
             "noConfigurationPage": "Toto rozšírenie nemá definovanú konfiguračnú stránku.",
-            "removeExtension": "Odstrániť rozšírenie"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "Odstrániť rozšírenie",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "Queued…",
@@ -2162,7 +2170,9 @@
             "frontendMissing": "Chýba frontend",
             "backendMissing": "Chýba backend",
             "pendingBuild": "Čaká sa na zostavenie",
-            "pendingRemoval": "Čaká sa na odstránenie"
+            "pendingRemoval": "Čaká sa na odstránenie",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "Verzia",
@@ -2182,7 +2192,10 @@
             "buildFailed": "Extension build failed: {reason}",
             "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Rozšírenie `{packageName}` bolo úspešne pridané.",
-            "removed": "Rozšírenie `{packageName}` bolo úspešne odstránené."
+            "removed": "Rozšírenie `{packageName}` bolo úspešne odstránené.",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "Rozšírenie sa nenašlo",
