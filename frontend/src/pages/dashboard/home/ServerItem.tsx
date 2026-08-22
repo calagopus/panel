@@ -33,6 +33,7 @@ import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts'
 import { formatAllocation, serverStatusInfo, statusToColor } from '@/lib/server.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
+import { useServerGameDig } from '@/plugins/useServerGameDig.ts';
 import { useServerStats } from '@/plugins/useServerStats.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -72,11 +73,21 @@ export default function ServerItem({
 
   const [openModal, setOpenModal] = useState<'add-group' | 'kill' | null>(null);
   const stats = useServerStats(server);
+  const { data: gameDig } = useServerGameDig(server.uuid, stats?.state === 'running');
 
   const { handleBulkPowerAction, bulkActionLoading } = useBulkPowerActions();
 
   const state = stats?.state;
   const powerBlocked = !!server.status || server.isSuspended || server.isTransferring || server.nodeMaintenanceEnabled;
+
+  const players =
+    state === 'running' &&
+    gameDig?.enabled &&
+    gameDig.online &&
+    gameDig.playersOnline != null &&
+    gameDig.playersMaximum != null
+      ? { online: gameDig.playersOnline, maximum: gameDig.playersMaximum }
+      : null;
 
   const permissionSet = useMemo(
     () => new Set([...server.permissions, ...(user?.role?.serverPermissions ?? [])]),
@@ -249,6 +260,22 @@ export default function ServerItem({
                             {t('common.server.noAllocation', {})}
                           </p>
                         </Card>
+                      )}
+                      {players && (
+                        <Tooltip
+                          label={t('pages.account.home.tooltip.players', {
+                            online: players.online,
+                            maximum: players.maximum,
+                          })}
+                          className='ml-2 shrink-0'
+                        >
+                          <Card p='xs' className='leading-[100%] shrink-0 rounded-lg!'>
+                            <p className='text-sm text-(--mantine-color-dimmed) text-nowrap'>
+                              <FontAwesomeIcon icon={faUsers} className='mr-1.5' size='sm' />
+                              {players.online}/{players.maximum}
+                            </p>
+                          </Card>
+                        </Tooltip>
                       )}
                       {showGroupAddButton && (
                         <Tooltip

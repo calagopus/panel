@@ -449,6 +449,20 @@ impl WingsClient {
         .await
     }
 
+    pub async fn get_servers_server_gamedig(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_gamedig::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/gamedig"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn post_servers_server_files_chmod(
         &self,
         server: uuid::Uuid,

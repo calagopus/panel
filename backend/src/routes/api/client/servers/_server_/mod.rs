@@ -23,6 +23,7 @@ mod backups;
 mod command;
 mod databases;
 mod files;
+mod gamedig;
 mod logs;
 mod mounts;
 mod power;
@@ -166,6 +167,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/databases", databases::router(state))
         .nest("/mounts", mounts::router(state))
         .nest("/schedules", schedules::router(state))
+        .nest("/gamedig", gamedig::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }

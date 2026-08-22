@@ -180,6 +180,25 @@ nestify::nest! {
 }
 
 nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct GameDigResponse {
+        #[schema(inline)]
+        pub enabled: bool,
+        #[schema(inline)]
+        pub game: Option<compact_str::CompactString>,
+        #[schema(inline)]
+        pub online: bool,
+        #[schema(inline)]
+        pub players_online: Option<u32>,
+        #[schema(inline)]
+        pub players_maximum: Option<u32>,
+        #[schema(inline)]
+        pub map: Option<compact_str::CompactString>,
+        #[schema(inline)]
+        pub version: Option<compact_str::CompactString>,
+    }
+}
+
+nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct InstallationScript {
         #[schema(inline)]
         pub container_image: compact_str::CompactString,
@@ -427,6 +446,8 @@ nestify::nest! {
             pub id: uuid::Uuid,
             #[schema(inline)]
             pub file_denylist: Vec<compact_str::CompactString>,
+            #[schema(inline)]
+            pub features: Vec<compact_str::CompactString>,
         },
 
         #[schema(inline)]
@@ -1132,6 +1153,17 @@ pub mod servers_server_commands {
         }
 
         pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod servers_server_gamedig {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        pub type Response200 = GameDigResponse;
 
         pub type Response = Response200;
     }

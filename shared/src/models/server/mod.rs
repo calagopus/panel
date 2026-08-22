@@ -1754,6 +1754,7 @@ impl Server {
                 egg: wings_api::ServerConfigurationEgg {
                     id: self.egg.uuid,
                     file_denylist: self.egg.file_denylist,
+                    features: self.egg.features,
                 },
                 container: wings_api::ServerConfigurationContainer {
                     image: self.image,
