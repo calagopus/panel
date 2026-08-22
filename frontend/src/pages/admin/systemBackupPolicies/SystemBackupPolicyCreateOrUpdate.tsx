@@ -15,6 +15,7 @@ import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
+import CronInput from '@/elements/input/CronInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Stack from '@/elements/Stack.tsx';
@@ -143,12 +144,24 @@ export default function SystemBackupPolicyCreateOrUpdate({
     },
     { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
     {
-      type: 'text',
+      type: 'custom',
       name: 'cron',
-      label: t('pages.admin.systemBackupPolicies.form.cron', {}),
-      description: t('pages.admin.systemBackupPolicies.form.cronDescription', {}),
-      required: true,
-      props: { placeholder: '0 0 0 * * *' },
+      render: (form) => {
+        const inputProps = form.getInputProps('cron');
+
+        return (
+          <CronInput
+            label={t('pages.admin.systemBackupPolicies.form.cron', {})}
+            description={t('pages.admin.systemBackupPolicies.form.cronDescription', {})}
+            required
+            placeholder='0 0 0 * * *'
+            value={form.values.cron}
+            onChange={inputProps.onChange}
+            onBlur={inputProps.onBlur}
+            error={inputProps.error}
+          />
+        );
+      },
     },
     {
       type: 'number',

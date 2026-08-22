@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import getSchedules from '@/api/server/schedules/getSchedules.ts';
 import Group from '@/elements/Group.tsx';
+import { CrontabEditor } from '@/elements/input/CronInput.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
@@ -29,7 +30,6 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import ScheduleDynamicParameterInput from '../ScheduleDynamicParameterInput.tsx';
 
-const CRON_SEGMENTS = ['Second', 'Minute', 'Hour', 'Day', 'Month', 'Weekday'] as const;
 const CRON_WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
 
 type SimpleSchedule =
@@ -102,52 +102,6 @@ function simpleScheduleToCron(schedule: SimpleSchedule): string {
     case 'monthly':
       return `0 ${schedule.minute} ${schedule.hour} ${schedule.day} * *`;
   }
-}
-
-interface CrontabEditorProps {
-  value: string;
-  setValue: (value: string) => void;
-}
-
-function CrontabEditor({ value, setValue }: CrontabEditorProps) {
-  const [segments, setSegments] = useState(['0', '*', '*', '*', '*', '*']);
-
-  useEffect(() => {
-    const newSegments = value.split(' ');
-    if (segments.every((s, i) => newSegments[i] === s)) {
-      return;
-    }
-
-    for (let i = 0; i < CRON_SEGMENTS.length; i++) {
-      if (!newSegments[i]) {
-        newSegments[i] = i === 0 ? '0' : '*';
-      }
-    }
-
-    setSegments(newSegments);
-  }, [segments, value]);
-
-  const setSegment = (index: number, value: string) => {
-    const newSegments = [...segments.slice(0, index), value, ...segments.slice(index + 1)];
-    setSegments(newSegments);
-
-    setValue(newSegments.join(' '));
-  };
-
-  return (
-    <div className='grid grid-cols-3 gap-2 w-64'>
-      {CRON_SEGMENTS.map((label, i) => (
-        <TextInput
-          key={label}
-          label={label}
-          placeholder={label}
-          value={segments[i]}
-          className='flex-1'
-          onChange={(e) => setSegment(i, e.target.value)}
-        />
-      ))}
-    </div>
-  );
 }
 
 interface TriggerFormProps {
