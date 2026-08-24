@@ -8,13 +8,19 @@ import {
   faMicrochip,
 } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import StatCard from '@/elements/StatCard.tsx';
+import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { formatAllocation } from '@/lib/server.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { formatMilliseconds } from '@/lib/time.ts';
+import { useUserSetting } from '@/lib/userSettings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+
+const NORMALIZE_CPU_LOAD_KEY = 'console::normalize_cpu_load';
+const normalizeCpuLoadSchema = z.boolean();
 
 export default function ServerDetails() {
   const { t } = useTranslations();
@@ -22,7 +28,11 @@ export default function ServerDetails() {
   const stats = useServerStore((state) => state.stats);
   const state = useServerStore((state) => state.state);
 
-  const [doNormalizeCpuLoad, setDoNormalizeCpuLoad] = useState(localStorage.getItem('normalize_cpu_load') === 'true');
+  const [doNormalizeCpuLoad, setDoNormalizeCpuLoad] = useUserSetting(
+    NORMALIZE_CPU_LOAD_KEY,
+    normalizeCpuLoadSchema,
+    false,
+  );
 
   const [networkSpeeds, setNetworkSpeeds] = useState({
     rxBytesSpeed: 0,
@@ -42,10 +52,6 @@ export default function ServerDetails() {
     rxPacketsSpeed: 0,
     txPacketsSpeed: 0,
   });
-
-  useEffect(() => {
-    localStorage.setItem('normalize_cpu_load', String(doNormalizeCpuLoad));
-  }, [doNormalizeCpuLoad]);
 
   useEffect(() => {
     if (!stats) return;
@@ -133,7 +139,16 @@ export default function ServerDetails() {
         total={server.limits.cpu}
         popover={
           <Checkbox
-            label={t('pages.server.console.details.normalizeCpuLoad', {})}
+            label={
+              <span className='inline-flex items-center gap-1'>
+                {t('pages.server.console.details.normalizeCpuLoad', {})}
+                <UserSettingScopeMenu
+                  settingKey={NORMALIZE_CPU_LOAD_KEY}
+                  value={doNormalizeCpuLoad}
+                  withinPortal={false}
+                />
+              </span>
+            }
             checked={doNormalizeCpuLoad}
             onChange={(e) => setDoNormalizeCpuLoad(e.target.checked)}
           />

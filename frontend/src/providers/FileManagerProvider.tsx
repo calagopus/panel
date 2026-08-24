@@ -10,7 +10,11 @@ import { registerUploadRefresh } from '@/lib/uploadManager.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useUploader } from '@/plugins/useUploader.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
-import { createFileManagerStore, FileManagerStoreContextProvider } from '@/stores/fileManager.ts';
+import {
+  bridgeFileManagerUserSettings,
+  createFileManagerStore,
+  FileManagerStoreContextProvider,
+} from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 import { UploadDestination } from '@/stores/uploads.ts';
 
@@ -135,6 +139,8 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     () => registerUploadRefresh(`server:${server.uuid}`, () => store.getState().invalidateFilemanager()),
     [server.uuid, store],
   );
+
+  useEffect(() => bridgeFileManagerUserSettings(store), [store]);
 
   useEffect(() => {
     store.setState({ isLoading: isFetching && !isFetchingNextPage });

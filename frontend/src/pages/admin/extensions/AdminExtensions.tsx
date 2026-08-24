@@ -1,9 +1,16 @@
-import { faBan, faExclamationTriangle, faFileText, faRefresh, faUpload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBan,
+  faExclamationTriangle,
+  faFileText,
+  faPowerOff,
+  faRefresh,
+  faUpload,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
-import getAdminExtensions from '@/api/admin/extensions/getAdminExtensions.ts';
+import getAdminExtensions, { AdminExtensionList } from '@/api/admin/extensions/getAdminExtensions.ts';
 import addExtension from '@/api/admin/extensions/manage/addExtension.ts';
 import cancelExtensionRebuild from '@/api/admin/extensions/manage/cancelExtensionRebuild.ts';
 import getExtensionStatus, {
@@ -12,6 +19,8 @@ import getExtensionStatus, {
 } from '@/api/admin/extensions/manage/getExtensionStatus.ts';
 import rebuildExtensions from '@/api/admin/extensions/manage/rebuildExtensions.ts';
 import removeExtension from '@/api/admin/extensions/manage/removeExtension.ts';
+import restartPanel from '@/api/admin/extensions/manage/restartPanel.ts';
+import setExtensionEnabled from '@/api/admin/extensions/setExtensionEnabled.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Alert from '@/elements/Alert.tsx';
 import Button from '@/elements/Button.tsx';
@@ -40,7 +49,7 @@ export default function AdminExtensions() {
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: backendExtensions, refetch: refetchExtensions } = useResource({
+  const { data: adminExtensions, refetch: refetchExtensions } = useResource({
     queryKey: queryKeys.admin.extensions.all(),
     queryFn: getAdminExtensions,
   });
@@ -191,7 +200,7 @@ export default function AdminExtensions() {
     setExtensionStatus((prev) => {
       if (!prev) return prev;
 
-      const appliedMatch = backendExtensions?.find(
+      const appliedMatch = adminExtensions?.extensions.find(
         (e) => e.metadataToml.packageName === extension.metadataToml.packageName && e.version === extension.version,
       );
 
@@ -214,6 +223,41 @@ export default function AdminExtensions() {
       t('pages.admin.extensions.toast.added', { packageName: extension.metadataToml.packageName }).md(),
       'success',
     );
+  };
+
+  const handleToggle = (packageName: string, enabled: boolean) => {
+    setExtensionEnabled(packageName, enabled)
+      .then(() => {
+        queryClient.setQueryData<AdminExtensionList>(queryKeys.admin.extensions.all(), (prev) =>
+          prev
+            ? {
+                ...prev,
+                pendingDisabled: enabled
+                  ? prev.pendingDisabled.filter((e) => e !== packageName)
+                  : [...prev.pendingDisabled, packageName],
+              }
+            : prev,
+        );
+        addToast(
+          enabled
+            ? t('pages.admin.extensions.toast.enabled', { packageName }).md()
+            : t('pages.admin.extensions.toast.disabled', { packageName }).md(),
+          'success',
+        );
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
+  };
+
+  const handleRestart = () => {
+    restartPanel()
+      .then(() => {
+        addToast(t('pages.admin.extensions.toast.restarting', {}), 'success');
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
   };
 
   const handleAdd = (file: File, acceptLicense = false) => {
@@ -251,9 +295,17 @@ export default function AdminExtensions() {
     handleAdd(file);
   };
 
+  const pendingRestart = adminExtensions
+    ? adminExtensions.extensions.some(
+        (extension) =>
+          adminExtensions.disabled.includes(extension.metadataToml.packageName) !==
+          adminExtensions.pendingDisabled.includes(extension.metadataToml.packageName),
+      )
+    : false;
+
   const installedCount =
     (window.extensionContext.extensions?.length || 0) +
-    (backendExtensions?.filter(
+    (adminExtensions?.extensions.filter(
       (be) => !window.extensionContext.extensions.find((e) => e.packageName === be.metadataToml.packageName),
     ).length || 0);
 
@@ -328,7 +380,32 @@ export default function AdminExtensions() {
         </Alert>
       )}
 
-      {!backendExtensions ? (
+      {pendingRestart && (
+        <Alert
+          color='yellow'
+          icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+          title={t('pages.admin.extensions.alert.pendingRestart.title', {})}
+          mb='md'
+        >
+          <div className='flex flex-col items-start gap-2'>
+            <span>{t('pages.admin.extensions.alert.pendingRestart.content', {})}</span>
+            {supervisor && (
+              <AdminCan action='extensions.manage'>
+                <Button
+                  variant='default'
+                  leftSection={<FontAwesomeIcon icon={faPowerOff} />}
+                  disabled={isBuilding}
+                  onClick={handleRestart}
+                >
+                  {t('pages.admin.extensions.button.restart', {})}
+                </Button>
+              </AdminCan>
+            )}
+          </div>
+        </Alert>
+      )}
+
+      {!adminExtensions ? (
         <Spinner.Centered />
       ) : installedCount === 0 ? (
         <span>
@@ -344,7 +421,7 @@ export default function AdminExtensions() {
       ) : (
         <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3'>
           {window.extensionContext.extensions.map((extension) => {
-            const backendExtension = backendExtensions.find(
+            const backendExtension = adminExtensions.extensions.find(
               (e) => e.metadataToml.packageName === extension.packageName,
             );
 
@@ -356,11 +433,14 @@ export default function AdminExtensions() {
                 isRemoved={extensionStatus?.removedExtensions.some(
                   (e) => e.metadataToml.packageName === extension.packageName,
                 )}
+                isDisabled={false}
+                isPendingDisabled={adminExtensions.pendingDisabled.includes(extension.packageName)}
                 onRemove={extensionStatus && backendExtension ? () => setRemovalExtension(backendExtension) : undefined}
+                onToggle={backendExtension ? (enabled) => handleToggle(extension.packageName, enabled) : undefined}
               />
             );
           })}
-          {backendExtensions
+          {adminExtensions.extensions
             .filter(
               (be) => !window.extensionContext.extensions.find((e) => e.packageName === be.metadataToml.packageName),
             )
@@ -371,7 +451,10 @@ export default function AdminExtensions() {
                 isRemoved={extensionStatus?.removedExtensions.some(
                   (e) => e.metadataToml.packageName === backendExtension.metadataToml.packageName,
                 )}
+                isDisabled={adminExtensions.disabled.includes(backendExtension.metadataToml.packageName)}
+                isPendingDisabled={adminExtensions.pendingDisabled.includes(backendExtension.metadataToml.packageName)}
                 onRemove={extensionStatus ? () => setRemovalExtension(backendExtension) : undefined}
+                onToggle={(enabled) => handleToggle(backendExtension.metadataToml.packageName, enabled)}
               />
             ))}
         </div>
