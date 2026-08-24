@@ -16,6 +16,24 @@ pub enum TwoFactorRequirement {
     None,
 }
 
+#[derive(ToSchema, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum TwoFactorMethod {
+    Totp,
+    SecurityKey,
+    Email,
+}
+
+impl TwoFactorMethod {
+    pub const ALL: &'static [TwoFactorMethod] = &[
+        TwoFactorMethod::Totp,
+        TwoFactorMethod::SecurityKey,
+        TwoFactorMethod::Email,
+    ];
+    pub const DEFAULT_ACCEPTED: &'static [TwoFactorMethod] =
+        &[TwoFactorMethod::Totp, TwoFactorMethod::SecurityKey];
+}
+
 #[derive(Clone, ToSchema, Serialize, Deserialize)]
 pub struct AppSettingsApp {
     pub name: compact_str::CompactString,
@@ -26,6 +44,10 @@ pub struct AppSettingsApp {
     pub url: compact_str::CompactString,
     pub language: compact_str::CompactString,
     pub two_factor_requirement: TwoFactorRequirement,
+    pub email_two_factor_enabled: bool,
+    pub two_factor_accepted_methods: Vec<TwoFactorMethod>,
+
+    pub email_verification_required: bool,
 
     pub session_cookie: compact_str::CompactString,
     pub session_duration_seconds: u64,
@@ -55,6 +77,18 @@ impl SettingsSerializeExt for AppSettingsApp {
                     TwoFactorRequirement::AllUsers => "all_users",
                     TwoFactorRequirement::None => "none",
                 },
+            )
+            .write_raw_setting(
+                "email_two_factor_enabled",
+                self.email_two_factor_enabled.to_compact_string(),
+            )
+            .write_serde_setting(
+                "two_factor_accepted_methods",
+                &self.two_factor_accepted_methods,
+            )?
+            .write_raw_setting(
+                "email_verification_required",
+                self.email_verification_required.to_compact_string(),
             )
             .write_raw_setting("session_cookie", &*self.session_cookie)
             .write_raw_setting(
@@ -110,6 +144,17 @@ impl SettingsDeserializeExt for AppSettingsAppDeserializer {
                 Some("all_users") => TwoFactorRequirement::AllUsers,
                 _ => TwoFactorRequirement::None,
             },
+            email_two_factor_enabled: deserializer
+                .take_raw_setting("email_two_factor_enabled")
+                .map(|s| s == "true")
+                .unwrap_or(false),
+            two_factor_accepted_methods: deserializer
+                .read_serde_setting("two_factor_accepted_methods")
+                .unwrap_or_else(|_| TwoFactorMethod::DEFAULT_ACCEPTED.to_vec()),
+            email_verification_required: deserializer
+                .take_raw_setting("email_verification_required")
+                .map(|s| s == "true")
+                .unwrap_or(false),
             session_cookie: deserializer
                 .take_raw_setting("session_cookie")
                 .unwrap_or_else(|| "calagopus_session".into()),

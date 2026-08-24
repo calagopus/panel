@@ -1,21 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { z } from 'zod';
+import { useUserSetting } from '@/lib/userSettings.ts';
 
-const STORAGE_KEY = 'form-engine:advanced-mode';
-const CHANGE_EVENT = 'form-engine:advanced-mode-change';
+const advancedModeSchema = z.boolean();
 
 export function useAdvancedMode(): [boolean, (value: boolean) => void] {
-  const [advanced, setAdvancedState] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
-
-  useEffect(() => {
-    const handler = (e: Event) => setAdvancedState((e as CustomEvent<boolean>).detail);
-    window.addEventListener(CHANGE_EVENT, handler);
-    return () => window.removeEventListener(CHANGE_EVENT, handler);
-  }, []);
-
-  const setAdvanced = useCallback((value: boolean) => {
-    localStorage.setItem(STORAGE_KEY, String(value));
-    window.dispatchEvent(new CustomEvent<boolean>(CHANGE_EVENT, { detail: value }));
-  }, []);
-
-  return [advanced, setAdvanced];
+  return useUserSetting('form_engine::advanced_mode', advancedModeSchema, false);
 }

@@ -6,6 +6,7 @@ import {
   faEllipsisVertical,
   faGraduationCap,
   faMoon,
+  faRotateLeft,
   faSun,
   faUserCog,
   faWindowRestore,
@@ -29,6 +30,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { isAdmin } from '@/lib/permissions.ts';
 import { isNamedRoutePathAccessible } from '@/lib/routes.ts';
 import { openUrl } from '@/lib/url.ts';
+import { resetAllDeviceOverrides, useDeviceOverrideCount } from '@/lib/userSettings.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useWindows } from '@/providers/WindowProvider.tsx';
@@ -187,6 +189,7 @@ function Footer() {
   const navigate = useNavigate();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('dark');
+  const deviceOverrideCount = useDeviceOverrideCount();
   const routeOrder = useGlobalStore((state) => state.settings.user?.routeOrder);
 
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
@@ -292,6 +295,13 @@ function Footer() {
                 onClick: (e) => changeTheme(e, 'light'),
               },
             ],
+          },
+          {
+            type: 'action',
+            icon: faRotateLeft,
+            label: t('elements.sidebar.button.resetDeviceOverrides', { count: deviceOverrideCount }),
+            hidden: deviceOverrideCount === 0,
+            onClick: () => resetAllDeviceOverrides(),
           },
           {
             type: 'divider',

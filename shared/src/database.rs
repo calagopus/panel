@@ -82,11 +82,15 @@ impl Database {
             let batch_actions = instance.batch_actions.clone();
 
             async move {
-                loop {
-                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                let mut interval = tokio::time::interval(std::time::Duration::from_secs(5));
+                interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
 
-                    let mut actions = batch_actions.lock().await;
-                    for (key, action) in actions.drain() {
+                loop {
+                    interval.tick().await;
+
+                    let actions = batch_actions.lock().await.drain().collect::<Vec<_>>();
+
+                    for (key, action) in actions {
                         tracing::debug!("executing batch action for {}:{}", key.0, key.1);
                         if let Err(err) = action.await {
                             tracing::error!(

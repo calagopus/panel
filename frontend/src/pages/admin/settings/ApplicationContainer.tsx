@@ -48,6 +48,9 @@ export default function ApplicationContainer() {
       url: '',
       language: 'en',
       twoFactorRequirement: 'none',
+      emailTwoFactorEnabled: false,
+      twoFactorAcceptedMethods: ['totp', 'security_key'],
+      emailVerificationRequired: false,
       sessionCookie: '',
       sessionDurationSeconds: 3600,
       telemetryEnabled: true,
@@ -172,6 +175,38 @@ export default function ApplicationContainer() {
           value: 'none',
         },
       ],
+    },
+    {
+      type: 'switch',
+      name: 'emailTwoFactorEnabled',
+      label: t('pages.admin.settings.tabs.application.page.form.emailTwoFactorEnabled', {}),
+      description: t('pages.admin.settings.tabs.application.page.form.emailTwoFactorEnabledDescription', {}),
+    },
+    {
+      type: 'multiselect',
+      name: 'twoFactorAcceptedMethods',
+      label: t('pages.admin.settings.tabs.application.page.form.twoFactorAcceptedMethods', {}),
+      description: t('pages.admin.settings.tabs.application.page.form.twoFactorAcceptedMethodsDescription', {}),
+      options: [
+        {
+          label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethod.totp', {}),
+          value: 'totp',
+        },
+        {
+          label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethod.securityKey', {}),
+          value: 'security_key',
+        },
+        {
+          label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethod.email', {}),
+          value: 'email',
+        },
+      ],
+    },
+    {
+      type: 'switch',
+      name: 'emailVerificationRequired',
+      label: t('pages.admin.settings.tabs.application.page.form.emailVerificationRequired', {}),
+      description: t('pages.admin.settings.tabs.application.page.form.emailVerificationRequiredDescription', {}),
     },
     {
       type: 'switch',

@@ -8,8 +8,10 @@ import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Popover from '@/elements/Popover.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { fileManagerSettingKey } from '@/stores/fileManager.ts';
 
 export default function FileEditorSettings() {
   const { t } = useTranslations();
@@ -58,7 +60,16 @@ export default function FileEditorSettings() {
 
           {editorEngine === 'monaco' && (
             <Checkbox
-              label={t('pages.server.files.settings.editorMinimap', {})}
+              label={
+                <span className='inline-flex items-center gap-1'>
+                  {t('pages.server.files.settings.editorMinimap', {})}
+                  <UserSettingScopeMenu
+                    settingKey={fileManagerSettingKey('editorMinimap')}
+                    value={editorMinimap}
+                    withinPortal={false}
+                  />
+                </span>
+              }
               className='order-10'
               checked={editorMinimap}
               onChange={(e) => setEditorMinimap(e.target.checked)}
@@ -71,7 +82,16 @@ export default function FileEditorSettings() {
             onChange={(e) => setEditorLineOverflow(e.target.checked)}
           />
           <NumberInput
-            label={t('pages.server.files.settings.editorFontSize', {})}
+            label={
+              <span className='inline-flex items-center gap-1'>
+                {t('pages.server.files.settings.editorFontSize', {})}
+                <UserSettingScopeMenu
+                  settingKey={fileManagerSettingKey('editorFontSize')}
+                  value={editorFontSize}
+                  withinPortal={false}
+                />
+              </span>
+            }
             className='order-25'
             min={6}
             max={72}

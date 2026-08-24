@@ -33,10 +33,10 @@ import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts'
 import { formatAllocation, serverStatusInfo, statusToColor } from '@/lib/server.ts';
 import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
+import { useServerListShowOthers } from '@/plugins/useServerListShowOthers.ts';
 import { useServerStats } from '@/plugins/useServerStats.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 import { useUserStore } from '@/stores/user.ts';
 import ServerAddGroupModal from './modals/ServerAddGroupModal.tsx';
 
@@ -68,7 +68,7 @@ export default function ServerItem({
   const { t } = useTranslations();
   const { user } = useAuth();
   const serverGroups = useUserStore((state) => state.serverGroups);
-  const serverListShowOthers = useGlobalStore((state) => state.serverListShowOthers);
+  const [serverListShowOthers] = useServerListShowOthers();
 
   const [openModal, setOpenModal] = useState<'add-group' | 'kill' | null>(null);
   const stats = useServerStats(server);

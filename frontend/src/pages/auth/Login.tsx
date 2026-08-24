@@ -206,6 +206,7 @@ export default function Login() {
           JSON.stringify({
             user: response.user,
             token: response.token,
+            methods: response.methods,
           }),
         )
           .replaceAll('+', '-')

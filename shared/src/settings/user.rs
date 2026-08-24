@@ -13,6 +13,8 @@ pub struct AppSettingsUser {
     pub max_command_snippet_count: u64,
     pub max_security_key_count: u64,
     pub max_ssh_key_count: u64,
+    pub max_settings_count: u64,
+    pub max_settings_value_bytes: u64,
 
     pub allow_changing_language: bool,
 
@@ -45,6 +47,14 @@ impl SettingsSerializeExt for AppSettingsUser {
             .write_raw_setting(
                 "max_ssh_key_count",
                 self.max_ssh_key_count.to_compact_string(),
+            )
+            .write_raw_setting(
+                "max_settings_count",
+                self.max_settings_count.to_compact_string(),
+            )
+            .write_raw_setting(
+                "max_settings_value_bytes",
+                self.max_settings_value_bytes.to_compact_string(),
             )
             .write_raw_setting(
                 "allow_changing_language",
@@ -83,6 +93,14 @@ impl SettingsDeserializeExt for AppSettingsUserDeserializer {
                 .take_raw_setting("max_ssh_key_count")
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(50),
+            max_settings_count: deserializer
+                .take_raw_setting("max_settings_count")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(512),
+            max_settings_value_bytes: deserializer
+                .take_raw_setting("max_settings_value_bytes")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(16384),
             allow_changing_language: deserializer
                 .take_raw_setting("allow_changing_language")
                 .map(|s| s == "true")

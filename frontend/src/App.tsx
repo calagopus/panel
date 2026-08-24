@@ -62,13 +62,18 @@ export default function App({
     let timer: ReturnType<typeof setTimeout>;
 
     const loadData = () => {
-      Promise.all([getSettings(), getLanguages()])
+      const loadSettings =
+        Object.keys(useGlobalStore.getState().settings).length > 0 ? Promise.resolve(null) : getSettings();
+
+      Promise.all([loadSettings, getLanguages()])
         .then(([settings, languages]) => {
           if (cancelled) return;
 
-          setSettings(settings);
+          if (settings) {
+            setSettings(settings);
+            setTimeOffset(Date.now() - new Date(settings.time).getTime());
+          }
           setLanguages(languages);
-          setTimeOffset(Date.now() - new Date(settings.time).getTime());
         })
         .catch((err) => {
           if (cancelled) return;

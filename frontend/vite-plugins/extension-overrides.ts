@@ -51,7 +51,7 @@ function resolveSpecifier(specifier: string, fromDir: string): string | null {
   return null;
 }
 
-function listExtensionIdentifiers(): string[] {
+export function listExtensionIdentifiers(): string[] {
   if (!fs.existsSync(EXTENSIONS_DIR)) return [];
   return fs.readdirSync(EXTENSIONS_DIR).filter((identifier) => identifier !== 'shared');
 }

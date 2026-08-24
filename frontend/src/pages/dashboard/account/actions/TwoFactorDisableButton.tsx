@@ -12,14 +12,17 @@ import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import { dashboardTwoFactorDisableSchema } from '@/lib/schemas/dashboard.ts';
+import { withTwoFactorMethod } from '@/lib/twoFactor.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 
 export default function TwoFactorDisableButton() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
+  const twoFactorAcceptedMethods = useGlobalStore((state) => state.settings.app.twoFactorAcceptedMethods);
 
   const [openModal, setOpenModal] = useState<'disable' | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,7 +60,7 @@ export default function TwoFactorDisableButton() {
       .then(() => {
         addToast(t('pages.account.account.containers.twoFactor.toast.disabled', {}), 'success');
         setOpenModal(null);
-        setUser({ ...user!, totpEnabled: false });
+        setUser({ ...withTwoFactorMethod(user!, twoFactorAcceptedMethods, 'totp', false), totpEnabled: false });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

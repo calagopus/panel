@@ -51,9 +51,11 @@ function OAuthProvidersContainer() {
     const text = await file.text().then((t) => t.trim());
     let data: z.infer<typeof adminOAuthProviderUpdateSchema>;
     try {
-      const raw: unknown = text.startsWith('{') ? JSON.parse(text) : load(text);
+      const raw = (text.startsWith('{') ? JSON.parse(text) : load(text)) as Record<string, unknown>;
+      // Exports and presets from before the login_bypass_two_factor rename only carry the old key.
+      raw.login_bypass_two_factor ??= raw.login_bypass_2fa;
       data = parseFromApi(adminOAuthProviderUpdateSchema, {
-        ...(raw as object),
+        ...raw,
         client_id: 'example',
         client_secret: 'example',
       });

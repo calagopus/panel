@@ -98,6 +98,15 @@ mod post {
             .update_password(&state.database, Some(&data.new_password))
             .await?;
 
+        sqlx::query!(
+            "UPDATE users
+            SET email_verified = true
+            WHERE users.uuid = $1",
+            token.user.uuid
+        )
+        .execute(state.database.write())
+        .await?;
+
         ApiResponse::new_serialized(Response {}).ok()
     }
 }

@@ -14,7 +14,9 @@ import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { userSecurityKeyCreateSchema } from '@/lib/schemas/user/securityKeys.ts';
+import { withTwoFactorMethod } from '@/lib/twoFactor.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -23,6 +25,7 @@ export default function SecurityKeyCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
+  const { user, setUser } = useAuth();
   const settings = useGlobalStore((state) => state.settings);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
@@ -74,6 +77,7 @@ export default function SecurityKeyCreateModal({ ...props }: ModalProps) {
         addToast(t('pages.account.securityKeys.modal.createSecurityKey.toast.created', {}), 'success');
 
         key.credentialId = credentialId;
+        setUser(withTwoFactorMethod(user!, settings.app.twoFactorAcceptedMethods, 'security_key', true));
         queryClient.invalidateQueries({ queryKey: queryKeys.user.securityKeys.all() });
       } catch (error) {
         console.error(error);

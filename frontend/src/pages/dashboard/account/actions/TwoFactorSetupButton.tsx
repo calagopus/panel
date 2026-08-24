@@ -21,6 +21,7 @@ import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import { dashboardTwoFactorEnableSchema } from '@/lib/schemas/dashboard.ts';
+import { withTwoFactorMethod } from '@/lib/twoFactor.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -36,6 +37,7 @@ export default function TwoFactorSetupButton() {
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
   const timeOffset = useGlobalStore((state) => state.timeOffset);
+  const twoFactorAcceptedMethods = useGlobalStore((state) => state.settings.app.twoFactorAcceptedMethods);
 
   const stageStack = useModalsStack(['setup', 'recovery']);
 
@@ -101,6 +103,10 @@ export default function TwoFactorSetupButton() {
         addToast(httpErrorToHuman(msg), 'error');
       })
       .finally(() => setLoading(false));
+  };
+
+  const markEnabled = () => {
+    setUser({ ...withTwoFactorMethod(user!, twoFactorAcceptedMethods, 'totp', true), totpEnabled: true });
   };
 
   return (
@@ -173,7 +179,7 @@ export default function TwoFactorSetupButton() {
         <Modal
           {...stageStack.register('recovery')}
           onClose={() => {
-            setUser({ ...user!, totpEnabled: true });
+            markEnabled();
             stageStack.close('recovery');
           }}
           title={t('pages.account.account.containers.twoFactor.modal.recoveryCodes.title', {})}
@@ -194,7 +200,7 @@ export default function TwoFactorSetupButton() {
               <Button
                 variant='default'
                 onClick={() => {
-                  setUser({ ...user!, totpEnabled: true });
+                  markEnabled();
                   stageStack.closeAll();
                 }}
               >

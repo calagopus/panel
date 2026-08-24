@@ -24,6 +24,7 @@ mod delete {
     #[utoipa::path(delete, path = "/", responses(
         (status = OK, body = inline(Response)),
         (status = NOT_FOUND, body = ApiError),
+        (status = CONFLICT, body = ApiError),
     ), params(
         (
             "security_key" = uuid::Uuid,
@@ -54,7 +55,25 @@ mod delete {
                 }
             };
 
-        security_key.delete(&state, ()).await?;
+        let mut transaction = state.database.write().begin().await?;
+
+        if user.password_login_disabled
+            && security_key.passkey.is_some()
+            && UserSecurityKey::count_usable_by_user_uuid_for_update(&mut transaction, user.uuid)
+                .await?
+                <= 1
+        {
+            return ApiResponse::error(
+                "re-enable password login before removing your last security key",
+            )
+            .with_status(StatusCode::CONFLICT)
+            .ok();
+        }
+
+        security_key
+            .delete_with_transaction(&state, (), &mut transaction)
+            .await?;
+        transaction.commit().await?;
 
         if security_key.registration.is_none() {
             activity_logger

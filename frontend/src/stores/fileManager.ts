@@ -14,6 +14,13 @@ import {
   serverDirectorySortingModeSchema,
   serverFilesSearchSchema,
 } from '@/lib/schemas/server/files.ts';
+import {
+  DEVICE_ONLY_SETTING_KEYS,
+  getUserSetting,
+  setUserSetting,
+  setUserSettingLocal,
+  subscribeUserSetting,
+} from '@/lib/userSettings.ts';
 import { FileUploader } from '@/stores/uploads.ts';
 
 export type ModalType =
@@ -143,6 +150,86 @@ const noopFileUploader: FileUploader = {
 
 const { Provider, useStore, useStoreApi } = createContext<StoreApi<FileManagerStore>>();
 
+const booleanSchema = z.boolean();
+const numberSchema = z.number();
+
+export type FileManagerSettingField =
+  | 'sortMode'
+  | 'clickOnce'
+  | 'preferPhysicalSize'
+  | 'editorMinimap'
+  | 'editorLineOverflow'
+  | 'editorFontSize'
+  | 'editorEngine'
+  | 'vscodeUriScheme'
+  | 'imageViewerSmoothing'
+  | 'audioPlayerVolume';
+
+const userSettingFields: {
+  [K in FileManagerSettingField]: {
+    key: string;
+    schema: z.ZodType<FileManagerStore[K]>;
+    fallback: () => FileManagerStore[K];
+  };
+} = {
+  sortMode: { key: 'file_manager::sorting_mode', schema: serverDirectorySortingModeSchema, fallback: () => 'name_asc' },
+  clickOnce: { key: 'file_manager::click_once', schema: booleanSchema, fallback: () => true },
+  preferPhysicalSize: { key: 'file_manager::prefer_physical_size', schema: booleanSchema, fallback: () => false },
+  editorMinimap: { key: 'file_manager::editor_minimap', schema: booleanSchema, fallback: () => false },
+  editorLineOverflow: {
+    key: 'file_manager::editor_line_overflow',
+    schema: booleanSchema,
+    fallback: () => window.matchMedia('(pointer: coarse)').matches,
+  },
+  editorFontSize: { key: 'file_manager::editor_font_size', schema: numberSchema, fallback: () => 14 },
+  editorEngine: {
+    key: 'file_manager::editor_engine',
+    schema: z.enum(['monaco', 'pierre']),
+    fallback: () => (window.matchMedia('(pointer: coarse)').matches ? 'pierre' : 'monaco'),
+  },
+  vscodeUriScheme: {
+    key: 'file_manager::vscode_uri_scheme',
+    schema: z.string(),
+    fallback: () => 'vscode',
+  },
+  imageViewerSmoothing: { key: 'file_manager::image_viewer_smoothing', schema: booleanSchema, fallback: () => true },
+  audioPlayerVolume: {
+    key: 'file_manager::audio_player_volume',
+    schema: numberSchema,
+    fallback: () => 0.5,
+  },
+};
+
+export function fileManagerSettingKey(field: FileManagerSettingField): string {
+  return userSettingFields[field].key;
+}
+
+function readUserSettingField<K extends FileManagerSettingField>(field: K): FileManagerStore[K] {
+  const { key, schema, fallback } = userSettingFields[field];
+  return getUserSetting(key, schema, fallback());
+}
+
+function writeUserSettingField<K extends FileManagerSettingField>(field: K, value: FileManagerStore[K]) {
+  const { key } = userSettingFields[field];
+  if (DEVICE_ONLY_SETTING_KEYS.has(key)) setUserSettingLocal(key, value);
+  else setUserSetting(key, value);
+}
+
+export function bridgeFileManagerUserSettings(store: StoreApi<FileManagerStore>): () => void {
+  const unsubscribers = (Object.keys(userSettingFields) as FileManagerSettingField[]).map((field) =>
+    subscribeUserSetting(userSettingFields[field].key, () => {
+      const value = readUserSettingField(field);
+      if (!Object.is(store.getState()[field], value)) {
+        store.setState({ [field]: value } as Partial<FileManagerStore>);
+      }
+    }),
+  );
+
+  return () => {
+    for (const unsubscribe of unsubscribers) unsubscribe();
+  };
+}
+
 export const createFileManagerStore = (
   initialExternals: FileManagerExternals,
   initial: { browsingDirectory: string },
@@ -192,66 +279,58 @@ export const createFileManagerStore = (
       searchInfo: null,
       setSearchInfo: (info) => set({ searchInfo: info }),
 
-      sortMode:
-        serverDirectorySortingModeSchema.safeParse(localStorage.getItem('file_sorting_mode')).data ?? 'name_asc',
+      sortMode: readUserSettingField('sortMode'),
       setSortMode: (sortMode) => {
-        localStorage.setItem('file_sorting_mode', sortMode);
+        writeUserSettingField('sortMode', sortMode);
         set({ sortMode });
       },
-      clickOnce: localStorage.getItem('file_click_once') !== 'false',
+      clickOnce: readUserSettingField('clickOnce'),
       setClickOnce: (state) => {
-        localStorage.setItem('file_click_once', state.toString());
+        writeUserSettingField('clickOnce', state);
         set({ clickOnce: state });
       },
-      preferPhysicalSize: localStorage.getItem('file_prefer_physical_size') === 'true',
+      preferPhysicalSize: readUserSettingField('preferPhysicalSize'),
       setPreferPhysicalSize: (state) => {
-        localStorage.setItem('file_prefer_physical_size', state.toString());
+        writeUserSettingField('preferPhysicalSize', state);
         set({ preferPhysicalSize: state });
       },
-      editorMinimap: localStorage.getItem('file_editor_minimap') === 'true',
+      editorMinimap: readUserSettingField('editorMinimap'),
       setEditorMinimap: (state) => {
-        localStorage.setItem('file_editor_minimap', state.toString());
+        writeUserSettingField('editorMinimap', state);
         set({ editorMinimap: state });
       },
-      editorLineOverflow:
-        (localStorage.getItem('file_editor_lineoverflow') ?? String(window.matchMedia('(pointer: coarse)').matches)) ===
-        'true',
+      editorLineOverflow: readUserSettingField('editorLineOverflow'),
       setEditorLineOverflow: (state) => {
-        localStorage.setItem('file_editor_lineoverflow', state.toString());
+        writeUserSettingField('editorLineOverflow', state);
         set({ editorLineOverflow: state });
       },
-      editorFontSize: Number(localStorage.getItem('file_editor_font_size')) || 14,
+      editorFontSize: readUserSettingField('editorFontSize'),
       setEditorFontSize: (size) => {
-        localStorage.setItem('file_editor_font_size', size.toString());
+        writeUserSettingField('editorFontSize', size);
         set({ editorFontSize: size });
       },
-      editorEngine:
-        (localStorage.getItem('file_editor_engine') ??
-          (window.matchMedia('(pointer: coarse)').matches ? 'pierre' : 'monaco')) === 'pierre'
-          ? 'pierre'
-          : 'monaco',
+      editorEngine: readUserSettingField('editorEngine'),
       setEditorEngine: (engine) => {
-        localStorage.setItem('file_editor_engine', engine);
+        writeUserSettingField('editorEngine', engine);
         set({ editorEngine: engine });
       },
-      vscodeUriScheme: localStorage.getItem('file_vscode_uri_scheme') || 'vscode',
+      vscodeUriScheme: readUserSettingField('vscodeUriScheme'),
       setVscodeUriScheme: (scheme) => {
-        localStorage.setItem('file_vscode_uri_scheme', scheme);
+        writeUserSettingField('vscodeUriScheme', scheme);
         set({ vscodeUriScheme: scheme });
       },
-      imageViewerSmoothing: localStorage.getItem('file_image_viewer_smoothing') !== 'false',
+      imageViewerSmoothing: readUserSettingField('imageViewerSmoothing'),
       setImageViewerSmoothing: (state) => {
-        localStorage.setItem('file_image_viewer_smoothing', state.toString());
+        writeUserSettingField('imageViewerSmoothing', state);
         set({ imageViewerSmoothing: state });
       },
-      audioPlayerVolume: Number(localStorage.getItem('file_audio_player_volume')) || 0.5,
+      audioPlayerVolume: readUserSettingField('audioPlayerVolume'),
       setAudioPlayerVolume: (volume) => {
-        localStorage.setItem('file_audio_player_volume', volume.toString());
+        writeUserSettingField('audioPlayerVolume', volume);
         set({ audioPlayerVolume: volume });
       },
-      audioPlayerPlaybackRate: Number(localStorage.getItem('file_audio_player_playback_rate')) || 1,
+      audioPlayerPlaybackRate: 1,
       setAudioPlayerPlaybackRate: (rate) => {
-        localStorage.setItem('file_audio_player_playback_rate', rate.toString());
         set({ audioPlayerPlaybackRate: rate });
       },
 

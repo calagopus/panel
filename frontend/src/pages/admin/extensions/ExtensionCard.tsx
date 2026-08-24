@@ -9,6 +9,7 @@ import Button from '@/elements/Button.tsx';
 import Card from '@/elements/Card.tsx';
 import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import Divider from '@/elements/Divider.tsx';
+import Switch from '@/elements/input/Switch.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { adminBackendExtensionSchema } from '@/lib/schemas/admin/backendExtension.ts';
@@ -19,15 +20,22 @@ export default function ExtensionCard({
   backendExtension,
   isPending,
   isRemoved,
+  isDisabled,
+  isPendingDisabled,
   onRemove,
+  onToggle,
 }: {
   extension?: Extension;
   backendExtension?: z.infer<typeof adminBackendExtensionSchema>;
   isPending?: boolean;
   isRemoved?: boolean;
+  isDisabled?: boolean;
+  isPendingDisabled?: boolean;
   onRemove?: () => void;
+  onToggle?: (enabled: boolean) => void;
 }) {
   const { t } = useTranslations();
+  const isPendingRestart = isDisabled !== isPendingDisabled;
   const name =
     backendExtension?.metadataToml.name || extension?.packageName || t('pages.admin.extensions.unknownExtension', {});
   const packageName = backendExtension?.metadataToml.packageName || extension?.packageName;
@@ -50,9 +58,19 @@ export default function ExtensionCard({
         </div>
       </div>
 
-      {(!extension || !backendExtension || isPending || isRemoved) && (
+      {(!extension || !backendExtension || isPending || isRemoved || isDisabled || isPendingRestart) && (
         <div className='mb-2.5 flex flex-wrap gap-1.5'>
-          {!extension && (
+          {isDisabled && (
+            <Badge color='gray' variant='light' size='sm'>
+              {t('pages.admin.extensions.badge.disabled', {})}
+            </Badge>
+          )}
+          {isPendingRestart && (
+            <Badge color='yellow' variant='light' size='sm'>
+              {t('pages.admin.extensions.badge.pendingRestart', {})}
+            </Badge>
+          )}
+          {!extension && !isDisabled && (
             <Badge color='red' variant='light' size='sm'>
               {t('pages.admin.extensions.badge.frontendMissing', {})}
             </Badge>
@@ -106,24 +124,37 @@ export default function ExtensionCard({
 
       <div className='mt-auto flex items-center gap-2'>
         <ConditionalTooltip
-          enabled={!backendExtension || !extension?.cardConfigurationPage}
+          enabled={!backendExtension || isDisabled || !extension?.cardConfigurationPage}
           label={
             !backendExtension
               ? t('pages.admin.extensions.tooltip.noBackend', {})
-              : t('pages.admin.extensions.tooltip.noConfigurationPage', {})
+              : isDisabled
+                ? t('pages.admin.extensions.tooltip.extensionDisabled', {})
+                : t('pages.admin.extensions.tooltip.noConfigurationPage', {})
           }
           className='flex-1'
         >
           <Link to={`/admin/extensions/${extension?.packageName}`} className='block w-full'>
             <Button
               leftSection={<FontAwesomeIcon icon={faWrench} />}
-              disabled={!backendExtension || !extension?.cardConfigurationPage}
+              disabled={!backendExtension || isDisabled || !extension?.cardConfigurationPage}
               className='w-full!'
             >
               {t('pages.admin.extensions.button.configure', {})}
             </Button>
           </Link>
         </ConditionalTooltip>
+        {backendExtension && onToggle && (
+          <Tooltip
+            label={
+              isPendingDisabled
+                ? t('pages.admin.extensions.tooltip.enableExtension', {})
+                : t('pages.admin.extensions.tooltip.disableExtension', {})
+            }
+          >
+            <Switch checked={!isPendingDisabled} disabled={isRemoved} onChange={(e) => onToggle(e.target.checked)} />
+          </Tooltip>
+        )}
         {backendExtension && onRemove && (
           <Tooltip label={t('pages.admin.extensions.tooltip.removeExtension', {})}>
             <ActionIcon color='red' variant='subtle' size='input-md' disabled={isRemoved} onClick={onRemove}>

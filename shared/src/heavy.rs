@@ -24,6 +24,7 @@ pub enum Request {
     Cancel {
         build_id: Option<u64>,
     },
+    RequestRestart,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -45,6 +46,7 @@ pub enum Response {
         build_id: u64,
     },
     CancelNotRunning,
+    RestartAccepted,
     Error {
         message: String,
     },

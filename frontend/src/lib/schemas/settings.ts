@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { eggConfigurationRouteItemSchema } from '@/lib/schemas/generic.ts';
 import { oobeStepKey } from '@/lib/schemas/oobe.ts';
+import { twoFactorMethod } from '@/lib/schemas/user.ts';
 
 export const publicSettingsCaptchaProviderNoneSchema = z.object({
   type: z.literal('none'),
@@ -38,6 +39,7 @@ export const publicSettingsCaptchaProviderSchema = z.discriminatedUnion('type', 
 export const publicSettingsSchema = z.object({
   time: z.string(),
   oobeStep: oobeStepKey.nullable(),
+  disabledExtensions: z.array(z.string()),
   captchaProvider: publicSettingsCaptchaProviderSchema,
   app: z.object({
     url: z.string(),
@@ -48,6 +50,9 @@ export const publicSettingsSchema = z.object({
     name: z.string(),
     language: z.string(),
     registrationEnabled: z.boolean(),
+    emailTwoFactorEnabled: z.boolean(),
+    emailVerificationRequired: z.boolean(),
+    twoFactorAcceptedMethods: z.array(twoFactorMethod),
     debug: z.boolean(),
   }),
   webauthn: z.object({

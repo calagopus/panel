@@ -78,6 +78,12 @@ export const serverImagePullProgressSchema = z.object({
   bytes_total: z.number(),
 });
 
+export const serverInstallProgressSchema = z.object({
+  progress: z.number(),
+  total: z.number(),
+  label: z.string().nullish(),
+});
+
 export const serverResourceUsageSchema = z.object({
   memoryBytes: z.number(),
   memoryLimitBytes: z.number(),

@@ -10,6 +10,7 @@ use shared::{
         ByUuid,
         user::{AuthMethod, PermissionManager, User, UserImpersonator},
         user_activity::UserActivityLogger,
+        user_api_key::UserApiKey,
         user_session::UserSession,
     },
     response::ApiResponse,
@@ -55,6 +56,72 @@ fn can_impersonate(impersonator: &User, target: &User) -> bool {
         && tgt_server.iter().all(|p| imp_server.contains(p))
 }
 
+fn check_account_gates(
+    user: &User,
+    api_key: Option<&UserApiKey>,
+    settings: &shared::settings::AppSettings,
+    matched_path: &str,
+) -> Option<Response> {
+    const IGNORED_SUSPENDED_PATHS: &[&str] = &[
+        "/api/client/account",
+        "/api/client/account/logout",
+        "/api/client/account/settings",
+    ];
+
+    const IGNORED_REMEDIABLE_PATHS: &[&str] = &[
+        "/api/client/account",
+        "/api/client/account/logout",
+        "/api/client/account/email",
+        "/api/client/account/email/resend-verification",
+        "/api/client/account/two-factor",
+        "/api/client/account/two-factor/email",
+        "/api/client/account/security-keys",
+        "/api/client/account/security-keys/{security_key}",
+        "/api/client/account/security-keys/{security_key}/challenge",
+        "/api/client/account/settings",
+    ];
+
+    if api_key.is_some_and(|api_key| !api_key.enabled) {
+        return Some(
+            ApiResponse::error("api key is disabled")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response(),
+        );
+    }
+
+    if !IGNORED_SUSPENDED_PATHS.contains(&matched_path) && user.suspended {
+        return Some(
+            ApiResponse::error("account is suspended")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response(),
+        );
+    }
+
+    if !IGNORED_REMEDIABLE_PATHS.contains(&matched_path)
+        && user.require_two_factor(settings)
+        && !user.satisfies_two_factor(settings)
+    {
+        return Some(
+            ApiResponse::error("two-factor authentication required")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response(),
+        );
+    }
+
+    if !IGNORED_REMEDIABLE_PATHS.contains(&matched_path)
+        && user.require_email_verification(settings)
+        && !user.email_verified
+    {
+        return Some(
+            ApiResponse::error("email verification required")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response(),
+        );
+    }
+
+    None
+}
+
 pub async fn auth(
     state: GetState,
     ip: shared::GetIp,
@@ -85,31 +152,20 @@ pub async fn auth(
         Err(err) => return Ok(ApiResponse::from(err).into_response()),
     };
 
-    const IGNORED_SUSPENDED_PATHS: &[&str] = &["/api/client/account", "/api/client/account/logout"];
-
-    const IGNORED_TWO_FACTOR_PATHS: &[&str] = &[
-        "/api/client/account",
-        "/api/client/account/two-factor",
-        "/api/client/account/logout",
-    ];
-
     if let Some((auth_user, auth_method)) = req.extensions_mut().remove::<(User, AuthMethod)>() {
-        let require_two_factor = auth_user.require_two_factor(&settings);
+        let gate = check_account_gates(
+            &auth_user,
+            match &auth_method {
+                AuthMethod::ApiKey(api_key) => Some(api_key),
+                AuthMethod::Session(_) => None,
+            },
+            &settings,
+            matched_path.as_str(),
+        );
         drop(settings);
 
-        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
-            return Ok(ApiResponse::error("account is suspended")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
-        }
-
-        if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
-            && !auth_user.totp_enabled
-            && require_two_factor
-        {
-            return Ok(ApiResponse::error("two-factor authentication required")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
+        if let Some(response) = gate {
+            return Ok(response);
         }
 
         match &auth_method {
@@ -221,7 +277,7 @@ pub async fn auth(
             Ok(settings) => settings,
             Err(err) => return Ok(ApiResponse::from(err).into_response()),
         };
-        let require_two_factor = auth_user.require_two_factor(&settings);
+        let gate = check_account_gates(&auth_user, None, &settings, matched_path.as_str());
         drop(settings);
 
         cookies.add(
@@ -231,19 +287,8 @@ pub async fn auth(
             },
         );
 
-        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
-            return Ok(ApiResponse::error("account is suspended")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
-        }
-
-        if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
-            && !auth_user.totp_enabled
-            && require_two_factor
-        {
-            return Ok(ApiResponse::error("two-factor authentication required")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
+        if let Some(response) = gate {
+            return Ok(response);
         }
 
         let auth_permission_manager = PermissionManager::new(&auth_user);
@@ -340,29 +385,19 @@ pub async fn auth(
             );
         }
 
-        api_key.update_last_used(&state.database).await;
-
         let settings = match state.settings.get().await {
             Ok(settings) => settings,
             Err(err) => return Ok(ApiResponse::from(err).into_response()),
         };
-        let require_two_factor = auth_user.require_two_factor(&settings);
+        let gate =
+            check_account_gates(&auth_user, Some(&api_key), &settings, matched_path.as_str());
         drop(settings);
 
-        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
-            return Ok(ApiResponse::error("account is suspended")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
+        if let Some(response) = gate {
+            return Ok(response);
         }
 
-        if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
-            && !auth_user.totp_enabled
-            && require_two_factor
-        {
-            return Ok(ApiResponse::error("two-factor authentication required")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
-        }
+        api_key.update_last_used(&state.database).await;
 
         let auth_permission_manager = PermissionManager::new(&auth_user).add_api_key(&api_key);
 

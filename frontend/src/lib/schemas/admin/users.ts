@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
-import { roleSchema, userToastPosition } from '@/lib/schemas/user.ts';
+import { roleSchema, twoFactorMethod, userToastPosition } from '@/lib/schemas/user.ts';
 import { nullableString } from '@/lib/transformers.ts';
 
 export const adminUserSchema = z.looseObject({
@@ -8,8 +8,8 @@ export const adminUserSchema = z.looseObject({
   externalId: z.preprocess(nullableString, z.string().nullable()),
   username: z.string(),
   email: z.email(),
-  nameFirst: z.string().min(1).max(255),
-  nameLast: z.string().min(1).max(255),
+  nameFirst: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+  nameLast: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   admin: z.boolean(),
   frozen: z.boolean(),
   suspended: z.boolean(),
@@ -23,7 +23,13 @@ export const adminFullUserSchema = z.lazy(() =>
     avatar: z.string().nullable(),
     totpEnabled: z.boolean(),
     totpLastUsed: z.coerce.date().nullable(),
+    emailTwoFactorEnabled: z.boolean(),
+    twoFactorMethods: z.array(z.lazy(() => twoFactorMethod)),
     requireTwoFactor: z.boolean(),
+    twoFactorSatisfied: z.boolean(),
+    emailVerified: z.boolean(),
+    requireEmailVerification: z.boolean(),
+    passwordLoginDisabled: z.boolean(),
     toastPosition: z.lazy(() => userToastPosition),
     startOnGroupedServers: z.boolean(),
     hasPassword: z.boolean(),

@@ -9,8 +9,10 @@ mod email;
 mod logout;
 mod oauth_links;
 mod password;
+mod password_login;
 mod security_keys;
 mod sessions;
+mod settings;
 mod ssh_keys;
 mod two_factor;
 
@@ -65,10 +67,20 @@ mod patch {
         username: Option<compact_str::CompactString>,
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
-        name_first: Option<compact_str::CompactString>,
+        #[serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            with = "::serde_with::rust::double_option"
+        )]
+        name_first: Option<Option<compact_str::CompactString>>,
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
-        name_last: Option<compact_str::CompactString>,
+        #[serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            with = "::serde_with::rust::double_option"
+        )]
+        name_last: Option<Option<compact_str::CompactString>>,
 
         #[garde(
             length(chars, min = 2, max = 15),
@@ -158,6 +170,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/avatar", avatar::router(state))
         .nest("/email", email::router(state))
         .nest("/password", password::router(state))
+        .nest("/password-login", password_login::router(state))
         .nest("/two-factor", two_factor::router(state))
         .nest("/security-keys", security_keys::router(state))
         .nest("/oauth-links", oauth_links::router(state))
@@ -165,6 +178,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/api-keys", api_keys::router(state))
         .nest("/ssh-keys", ssh_keys::router(state))
         .nest("/sessions", sessions::router(state))
+        .nest("/settings", settings::router(state))
         .nest("/activity", activity::router(state))
         .with_state(state.clone())
 }

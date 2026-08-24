@@ -7,6 +7,7 @@ export enum SocketEvent {
   DAEMON_ERROR = 'daemon error',
   INSTALL_STARTED = 'install started',
   INSTALL_OUTPUT = 'install output',
+  INSTALL_PROGRESS = 'install progress',
   INSTALL_COMPLETED = 'install completed',
   IMAGE_PULL_PROGRESS = 'image pull progress',
   IMAGE_PULL_COMPLETED = 'image pull completed',

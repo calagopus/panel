@@ -1,10 +1,12 @@
-import { faPencil, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faCheck, faPencil, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteApiKey from '@/api/me/api-keys/deleteApiKey.ts';
 import recreateApiKey from '@/api/me/api-keys/recreateApiKey.ts';
+import updateApiKey from '@/api/me/api-keys/updateApiKey.ts';
+import Badge from '@/elements/Badge.tsx';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
@@ -25,6 +27,20 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
 
   const [openModal, setOpenModal] = useState<'edit' | 'recreate' | 'delete' | null>(null);
   const [recreatedToken, setRecreatedToken] = useState<string | null>(null);
+
+  const doToggleEnabled = async () => {
+    await updateApiKey(apiKey.uuid, { enabled: !apiKey.enabled })
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.user.apiKeys.all() });
+        addToast(
+          apiKey.enabled ? t('pages.account.apiKeys.toast.disabled', {}) : t('pages.account.apiKeys.toast.enabled', {}),
+          'success',
+        );
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
+  };
 
   const doRecreate = async () => {
     await recreateApiKey(apiKey.uuid)
@@ -93,6 +109,13 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
           },
           {
             type: 'action',
+            icon: apiKey.enabled ? faBan : faCheck,
+            label: apiKey.enabled ? t('common.button.disable', {}) : t('common.button.enable', {}),
+            onClick: doToggleEnabled,
+            color: apiKey.enabled ? 'red' : 'gray',
+          },
+          {
+            type: 'action',
             icon: faRefresh,
             label: t('common.button.recreate', {}),
             onClick: () => setOpenModal('recreate'),
@@ -126,6 +149,12 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
 
             <TableData>
               {apiKey.userPermissions.length} / {apiKey.serverPermissions.length} / {apiKey.adminPermissions.length}
+            </TableData>
+
+            <TableData>
+              <Badge color={apiKey.enabled ? 'green' : 'red'}>
+                {apiKey.enabled ? t('common.badge.enabled', {}) : t('common.badge.disabled', {})}
+              </Badge>
             </TableData>
 
             <TableData>

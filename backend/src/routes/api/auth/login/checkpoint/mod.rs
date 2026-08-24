@@ -1,7 +1,9 @@
 use super::State;
 use serde::{Deserialize, Serialize};
-use shared::jwt::BasePayload;
+use shared::{jwt::BasePayload, models::user::User, settings::app::TwoFactorMethod};
 use utoipa_axum::{router::OpenApiRouter, routes};
+
+mod email;
 
 #[derive(Deserialize, Serialize)]
 pub struct TwoFactorRequiredJwt {
@@ -9,6 +11,16 @@ pub struct TwoFactorRequiredJwt {
     pub base: BasePayload,
 
     pub user_uuid: uuid::Uuid,
+}
+
+pub fn available_methods(
+    user: &User,
+    settings: &shared::settings::AppSettings,
+) -> Vec<TwoFactorMethod> {
+    user.two_factor_methods(settings)
+        .into_iter()
+        .filter(|method| matches!(method, TwoFactorMethod::Totp | TwoFactorMethod::Email))
+        .collect()
 }
 
 mod post {
@@ -20,19 +32,24 @@ mod post {
         models::{
             ByUuid, CreatableModel, user::User, user_activity::UserActivity,
             user_recovery_code::UserRecoveryCode, user_session::UserSession,
+            user_two_factor_code::UserTwoFactorCode,
         },
         response::{ApiResponse, ApiResponseResult},
+        settings::app::TwoFactorMethod,
     };
     use tower_cookies::Cookies;
     use utoipa::ToSchema;
 
-    use crate::routes::api::auth::login::checkpoint::TwoFactorRequiredJwt;
+    use crate::routes::api::auth::login::checkpoint::{TwoFactorRequiredJwt, available_methods};
 
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
         #[garde(length(chars, min = 6, max = 10))]
         #[schema(min_length = 6, max_length = 10)]
         code: String,
+
+        #[garde(skip)]
+        method: Option<TwoFactorMethod>,
 
         #[garde(skip)]
         confirmation_token: String,
@@ -86,8 +103,39 @@ mod post {
 
         let user = User::by_uuid(&state.database, payload.user_uuid).await?;
 
-        match data.code.len() {
-            6 => {
+        let settings = state.settings.get().await?;
+        let methods = available_methods(&user, &settings);
+        let any_two_factor = !user.two_factor_methods(&settings).is_empty();
+        drop(settings);
+
+        if !any_two_factor {
+            return ApiResponse::error("invalid confirmation code")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
+        let method = if data.code.len() == 10 {
+            None
+        } else {
+            Some(data.method.unwrap_or(TwoFactorMethod::Totp))
+        };
+
+        if let Some(method) = method
+            && !methods.contains(&method)
+        {
+            return ApiResponse::error("invalid confirmation code")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
+        let using = match method {
+            Some(TwoFactorMethod::Totp) => {
+                if data.code.len() != 6 {
+                    return ApiResponse::error("invalid confirmation code")
+                        .with_status(StatusCode::BAD_REQUEST)
+                        .ok();
+                }
+
                 let user_totp_secret = match &user.totp_secret {
                     Some(secret) => secret.clone(),
                     None => {
@@ -125,34 +173,6 @@ mod post {
                     }
                 }
 
-                if let Err(err) = UserActivity::create(
-                    &state,
-                    shared::models::user_activity::CreateUserActivityOptions {
-                        user_uuid: user.uuid,
-                        impersonator_uuid: None,
-                        api_key_uuid: None,
-                        event: "auth:success".into(),
-                        ip: Some(ip.0.into()),
-                        data: serde_json::json!({
-                            "using": "two-factor",
-
-                            "user_agent": headers
-                                .get("User-Agent")
-                                .map(|ua| shared::utils::slice_up_to(ua.to_str().unwrap_or("unknown"), 255))
-                                .unwrap_or("unknown"),
-                        }),
-                        created: None,
-                    },
-                )
-                .await
-                {
-                    tracing::warn!(
-                        user = %user.uuid,
-                        "failed to log user activity: {:#?}",
-                        err
-                    );
-                }
-
                 sqlx::query!(
                     "UPDATE users
                     SET totp_last_used = NOW()
@@ -161,54 +181,73 @@ mod post {
                 )
                 .execute(state.database.write())
                 .await?;
+
+                "two-factor"
             }
-            10 => {
+            Some(TwoFactorMethod::Email) => {
+                if data.code.len() != 6 {
+                    return ApiResponse::error("invalid confirmation code")
+                        .with_status(StatusCode::BAD_REQUEST)
+                        .ok();
+                }
+
+                if !UserTwoFactorCode::consume(&state.database, user.uuid, &data.code).await? {
+                    return ApiResponse::error("invalid confirmation code")
+                        .with_status(StatusCode::BAD_REQUEST)
+                        .ok();
+                }
+
+                "email"
+            }
+            Some(TwoFactorMethod::SecurityKey) => {
+                return ApiResponse::error("invalid confirmation code")
+                    .with_status(StatusCode::BAD_REQUEST)
+                    .ok();
+            }
+            None => {
                 if UserRecoveryCode::delete_by_user_uuid_code(
                     &state.database,
                     payload.user_uuid,
                     &data.code,
                 )
                 .await?
-                .is_some()
+                .is_none()
                 {
-                    if let Err(err) = UserActivity::create(
-                        &state,
-                        shared::models::user_activity::CreateUserActivityOptions {
-                            user_uuid: user.uuid,
-                            impersonator_uuid: None,
-                            api_key_uuid: None,
-                            event: "auth:success".into(),
-                            ip: Some(ip.0.into()),
-                            data: serde_json::json!({
-                                "using": "recovery-code",
-
-                                "user_agent": headers
-                                    .get("User-Agent")
-                                    .map(|ua| shared::utils::slice_up_to(ua.to_str().unwrap_or("unknown"), 255))
-                                    .unwrap_or("unknown"),
-                            }),
-                            created: None,
-                        },
-                    )
-                    .await
-                    {
-                        tracing::warn!(
-                            user = %user.uuid,
-                            "failed to log user activity: {:#?}",
-                            err
-                        );
-                    }
-                } else {
                     return ApiResponse::error("invalid recovery code")
                         .with_status(StatusCode::BAD_REQUEST)
                         .ok();
                 }
+
+                "recovery-code"
             }
-            _ => {
-                return ApiResponse::error("invalid confirmation code")
-                    .with_status(StatusCode::BAD_REQUEST)
-                    .ok();
-            }
+        };
+
+        if let Err(err) = UserActivity::create(
+            &state,
+            shared::models::user_activity::CreateUserActivityOptions {
+                user_uuid: user.uuid,
+                impersonator_uuid: None,
+                api_key_uuid: None,
+                event: "auth:success".into(),
+                ip: Some(ip.0.into()),
+                data: serde_json::json!({
+                    "using": using,
+
+                    "user_agent": headers
+                        .get("User-Agent")
+                        .map(|ua| shared::utils::slice_up_to(ua.to_str().unwrap_or("unknown"), 255))
+                        .unwrap_or("unknown"),
+                }),
+                created: None,
+            },
+        )
+        .await
+        {
+            tracing::warn!(
+                user = %user.uuid,
+                "failed to log user activity: {:#?}",
+                err
+            );
         }
 
         let key = UserSession::create(
@@ -239,5 +278,6 @@ mod post {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(post::route))
+        .nest("/email", email::router(state))
         .with_state(state.clone())
 }

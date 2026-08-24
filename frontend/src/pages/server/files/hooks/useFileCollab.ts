@@ -226,6 +226,14 @@ export default function useFileCollab({
     editorSequence += 1;
     const editorId = String(editorSequence);
 
+    let sessionKey: string | null = null;
+    const matchesSession = (eventPath: string) => {
+      const normalized = normalizePath(eventPath);
+      return normalized === normalizePath(path) || normalized === sessionKey;
+    };
+
+    let pendingUpdates: [string, string][] = [];
+
     const sendUpdate = (update: Uint8Array) => {
       const encoded = toBase64(update);
       for (let i = 0; i < encoded.length; i += UPDATE_CHUNK_SIZE) {
@@ -239,14 +247,17 @@ export default function useFileCollab({
       }
     };
 
-    const onSync = (syncPath: string, state: string, meta?: string) => {
-      if (normalizePath(syncPath) !== normalizePath(path)) return;
+    const onSync = (syncPath: string, state: string, meta?: string, rawPath?: string) => {
+      if (!(rawPath !== undefined && normalizePath(rawPath) === normalizePath(path)) && !matchesSession(syncPath)) {
+        return;
+      }
 
       const monacoEditor = engine === 'monaco' ? (editor as Parameters<OnMount>[0]) : null;
       const model = monacoEditor?.getModel() ?? null;
       if (engine === 'monaco' && !model) return;
 
       destroySession();
+      sessionKey = normalizePath(syncPath);
 
       const doc = new Y.Doc();
       Y.applyUpdate(doc, fromBase64(state), 'remote');
@@ -294,6 +305,12 @@ export default function useFileCollab({
       }
 
       docRef.current = doc;
+      for (const [updatePath, update] of pendingUpdates) {
+        if (matchesSession(updatePath)) {
+          Y.applyUpdate(doc, fromBase64(update), 'remote');
+        }
+      }
+      pendingUpdates = [];
       setActive(true);
 
       let dirty = false;
@@ -310,21 +327,26 @@ export default function useFileCollab({
     };
 
     const onUpdate = (updatePath: string, update: string) => {
-      if (normalizePath(updatePath) !== normalizePath(path)) return;
-      if (!docRef.current) return;
+      if (!docRef.current) {
+        if (pendingUpdates.length < 64) {
+          pendingUpdates.push([updatePath, update]);
+        }
+        return;
+      }
+      if (!matchesSession(updatePath)) return;
 
       Y.applyUpdate(docRef.current, fromBase64(update), 'remote');
     };
 
     const onAwareness = (awarenessPath: string, update: string) => {
-      if (normalizePath(awarenessPath) !== normalizePath(path)) return;
+      if (!matchesSession(awarenessPath)) return;
       if (!awarenessRef.current) return;
 
       applyAwarenessUpdate(awarenessRef.current, fromBase64(update), 'remote');
     };
 
     const onParticipants = (participantsPath: string, data: string) => {
-      if (normalizePath(participantsPath) !== normalizePath(path)) return;
+      if (!matchesSession(participantsPath)) return;
 
       try {
         setParticipants(JSON.parse(data));
@@ -334,7 +356,7 @@ export default function useFileCollab({
     };
 
     const onSavedEvent = (savedPath: string, data: string) => {
-      if (normalizePath(savedPath) !== normalizePath(path)) return;
+      if (!matchesSession(savedPath)) return;
 
       setConflict(null);
       try {
@@ -346,7 +368,7 @@ export default function useFileCollab({
     };
 
     const onConflictEvent = (conflictPath: string, data: string) => {
-      if (normalizePath(conflictPath) !== normalizePath(path)) return;
+      if (!matchesSession(conflictPath)) return;
 
       let parsed: CollabConflict | null = null;
       try {
@@ -359,9 +381,10 @@ export default function useFileCollab({
     };
 
     const onErrorEvent = (errorPath: string, message: string) => {
-      if (normalizePath(errorPath) !== normalizePath(path)) return;
+      if (!matchesSession(errorPath)) return;
 
       const wasActive = docRef.current !== null;
+      pendingUpdates = [];
       destroySession();
 
       if (message === 'resync' || wasActive) {

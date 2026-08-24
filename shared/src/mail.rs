@@ -130,6 +130,28 @@ impl Mail {
         Ok((settings, transport))
     }
 
+    /// Sending a disabled template is a silent no-op, so flows that depend on the mail arriving
+    /// must check this rather than trust the `Ok(())` from a send.
+    pub async fn template_deliverable(
+        &self,
+        state: &crate::State,
+        identifier: &str,
+    ) -> Result<bool, anyhow::Error> {
+        if matches!(
+            self.settings.get().await?.mail_mode,
+            super::settings::MailMode::None
+        ) {
+            return Ok(false);
+        }
+
+        Ok(self
+            .templates
+            .get_template(identifier)?
+            .get(state)
+            .await?
+            .enabled)
+    }
+
     pub async fn send_template_foreground(
         &self,
         state: &crate::State,

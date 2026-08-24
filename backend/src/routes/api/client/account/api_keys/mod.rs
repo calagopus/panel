@@ -90,6 +90,11 @@ mod post {
     };
     use utoipa::ToSchema;
 
+    #[inline]
+    fn default_true() -> bool {
+        true
+    }
+
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
         #[garde(length(chars, min = 3, max = 31))]
@@ -98,6 +103,10 @@ mod post {
         #[garde(skip)]
         #[schema(value_type = Vec<String>)]
         allowed_ips: Vec<sqlx::types::ipnetwork::IpNetwork>,
+
+        #[garde(skip)]
+        #[serde(default = "default_true")]
+        enabled: bool,
 
         #[garde(custom(shared::permissions::validate_user_permissions))]
         user_permissions: Vec<compact_str::CompactString>,
@@ -167,6 +176,7 @@ mod post {
             user_uuid: user.uuid,
             name: data.name,
             allowed_ips: data.allowed_ips,
+            enabled: data.enabled,
             user_permissions: data.user_permissions,
             admin_permissions: data.admin_permissions,
             server_permissions: data.server_permissions,
@@ -192,6 +202,7 @@ mod post {
                     "identifier": api_key.key_start,
                     "name": api_key.name,
                     "allowed_ips": api_key.allowed_ips,
+                    "enabled": api_key.enabled,
                     "user_permissions": api_key.user_permissions,
                     "admin_permissions": api_key.admin_permissions,
                     "server_permissions": api_key.server_permissions,

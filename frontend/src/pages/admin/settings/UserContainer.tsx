@@ -45,6 +45,8 @@ export default function UserContainer() {
       maxCommandSnippetCount: 0,
       maxSecurityKeyCount: 0,
       maxSshKeyCount: 0,
+      maxSettingsCount: 0,
+      maxSettingsValueBytes: 0,
       allowChangingLanguage: true,
       routeOrder: null,
     },
@@ -115,6 +117,18 @@ export default function UserContainer() {
       type: 'number',
       name: 'maxSshKeyCount',
       label: t('pages.admin.settings.tabs.user.page.form.maxSshKeyCount', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxSettingsCount',
+      label: t('pages.admin.settings.tabs.user.page.form.maxSettingsCount', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxSettingsValueBytes',
+      label: t('pages.admin.settings.tabs.user.page.form.maxSettingsValueBytes', {}),
       required: true,
     },
     {

@@ -1,9 +1,13 @@
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
+import { z } from 'zod';
 import Card from '@/elements/Card.tsx';
 import Collapse from '@/elements/Collapse.tsx';
+import { useUserSettingMapEntry } from '@/lib/userSettings.ts';
+
+const expandedSchema = z.boolean();
 
 export default function BackupGroupCard({
   storageKey,
@@ -16,11 +20,12 @@ export default function BackupGroupCard({
   actions?: ReactNode;
   children: ReactNode;
 }) {
-  const [isExpanded, setIsExpanded] = useState(localStorage.getItem(`backup-group-expanded-${storageKey}`) !== 'false');
-
-  useEffect(() => {
-    localStorage.setItem(`backup-group-expanded-${storageKey}`, String(isExpanded));
-  }, [isExpanded, storageKey]);
+  const [isExpanded, setIsExpanded] = useUserSettingMapEntry(
+    'server::backup_groups_expanded',
+    storageKey,
+    expandedSchema,
+    true,
+  );
 
   return (
     <Card p={0} className='overflow-hidden rounded-xl!'>

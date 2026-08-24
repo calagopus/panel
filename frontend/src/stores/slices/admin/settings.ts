@@ -33,6 +33,9 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     banner: null,
     bannerLight: null,
     twoFactorRequirement: 'none',
+    emailTwoFactorEnabled: false,
+    twoFactorAcceptedMethods: ['totp', 'security_key'],
+    emailVerificationRequired: false,
     sessionCookie: '',
     sessionDurationSeconds: 3600,
     telemetryEnabled: true,
@@ -59,6 +62,8 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     maxCommandSnippetCount: 100,
     maxSecurityKeyCount: 50,
     maxSshKeyCount: 50,
+    maxSettingsCount: 512,
+    maxSettingsValueBytes: 16384,
     allowChangingLanguage: true,
     routeOrder: null,
   },
@@ -93,6 +98,10 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
       hits: 0,
       windowSeconds: 0,
     },
+    authLoginCheckpointEmail: {
+      hits: 0,
+      windowSeconds: 0,
+    },
     authLoginSecurityKey: {
       hits: 0,
       windowSeconds: 0,
@@ -105,7 +114,15 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
       hits: 0,
       windowSeconds: 0,
     },
+    authEmailVerification: {
+      hits: 0,
+      windowSeconds: 0,
+    },
     client: {
+      hits: 0,
+      windowSeconds: 0,
+    },
+    clientAccountEmailResendVerification: {
       hits: 0,
       windowSeconds: 0,
     },

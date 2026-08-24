@@ -5,6 +5,7 @@ mod _extension_;
 mod add;
 mod logs;
 mod rebuild;
+mod restart;
 mod status;
 
 pub fn router(state: &State) -> OpenApiRouter<State> {
@@ -12,6 +13,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/{extension}", _extension_::router(state))
         .nest("/status", status::router(state))
         .nest("/rebuild", rebuild::router(state))
+        .nest("/restart", restart::router(state))
         .nest("/add", add::router(state))
         .nest("/logs", logs::router(state))
         .with_state(state.clone())

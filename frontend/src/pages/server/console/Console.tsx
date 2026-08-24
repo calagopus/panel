@@ -17,6 +17,7 @@ import { WebLinksAddon } from '@xterm/addon-web-links';
 import { ITerminalInitOnlyOptions, ITerminalOptions, Terminal as XTerm } from '@xterm/xterm';
 import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
@@ -28,9 +29,11 @@ import Popover from '@/elements/Popover.tsx';
 import Progress from '@/elements/Progress.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { handleRawCopyToClipboard } from '@/lib/copy.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
 import { eventKeyMatches } from '@/lib/shortcuts.ts';
+import { useUserSetting } from '@/lib/userSettings.ts';
 import { getXtermTheme } from '@/lib/xterm.ts';
 import { matchesShortcut, useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
 import { useQuickActions } from '@/plugins/useQuickActions.ts';
@@ -45,6 +48,9 @@ import SshDetailsModal from './modals/SshDetailsModal.tsx';
 
 import '@xterm/xterm/css/xterm.css';
 import '@/lib/xterm.css';
+
+const CONSOLE_FONT_SIZE_KEY = 'console::font_size';
+const consoleFontSizeSchema = z.number();
 
 const commandSnippetFilter: OptionsFilter = ({ options, search }) => {
   if (!search.startsWith('!')) {
@@ -94,7 +100,7 @@ export default function Terminal() {
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [selectionMenuTop, setSelectionMenuTop] = useState<number | null>(null);
   const [websocketPing, setWebsocketPing] = useState(0);
-  const [consoleFontSize, setConsoleFontSize] = useState(14);
+  const [consoleFontSize, setConsoleFontSize] = useUserSetting(CONSOLE_FONT_SIZE_KEY, consoleFontSizeSchema, 14);
   const [openModal, setOpenModal] = useState<'search' | 'commandHistory' | 'sshDetails' | null>(null);
 
   const inputValueRef = useRef(inputValue);
@@ -109,7 +115,6 @@ export default function Terminal() {
   const isFirstLine = useRef(true);
 
   const HISTORY_STORAGE_KEY = `terminal_command_history_${server.uuid}`;
-  const CONSOLE_FONT_SIZE_KEY = 'terminal_console_font_size';
 
   useEffect(() => {
     const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
@@ -121,19 +126,13 @@ export default function Terminal() {
         console.error('Failed to parse terminal history:', e);
       }
     }
-    const savedFontSize = localStorage.getItem(CONSOLE_FONT_SIZE_KEY);
-    if (savedFontSize) {
-      const size = parseInt(savedFontSize, 10);
-      if (!isNaN(size)) setConsoleFontSize(size);
-    }
-  }, [HISTORY_STORAGE_KEY, CONSOLE_FONT_SIZE_KEY]);
+  }, [HISTORY_STORAGE_KEY]);
 
   useEffect(() => {
     localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
   }, [history, HISTORY_STORAGE_KEY]);
 
   useEffect(() => {
-    localStorage.setItem(CONSOLE_FONT_SIZE_KEY, consoleFontSize.toString());
     if (xtermInstance.current) {
       xtermInstance.current.options.fontSize = consoleFontSize;
       requestAnimationFrame(() => {
@@ -141,7 +140,7 @@ export default function Terminal() {
         xtermInstance.current?.refresh(0, xtermInstance.current.rows - 1);
       });
     }
-  }, [consoleFontSize, CONSOLE_FONT_SIZE_KEY]);
+  }, [consoleFontSize]);
 
   useEffect(() => {
     if (!terminalRef.current) return;
@@ -861,7 +860,9 @@ export default function Terminal() {
                   <FontAwesomeIcon icon={faMinus} />
                 </ActionIcon>
               </Tooltip>
-              {consoleFontSize}px
+              <UserSettingScopeMenu settingKey={CONSOLE_FONT_SIZE_KEY} value={consoleFontSize}>
+                <span className='text-sm'>{consoleFontSize}px</span>
+              </UserSettingScopeMenu>
               <Tooltip label={t('pages.server.console.tooltip.increaseFontSize', {})}>
                 <ActionIcon
                   className='ml-2'

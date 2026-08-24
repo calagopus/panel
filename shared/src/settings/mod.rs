@@ -235,6 +235,13 @@ pub enum PublicCaptchaProvider<'a> {
     FriendlyCaptcha { site_key: &'a str },
 }
 
+#[derive(ToSchema, Serialize, Deserialize, Clone, Default, PartialEq)]
+pub struct ExtensionPermissions {
+    pub user: Vec<compact_str::CompactString>,
+    pub admin: Vec<compact_str::CompactString>,
+    pub server: Vec<compact_str::CompactString>,
+}
+
 #[derive(ToSchema, Serialize, Deserialize)]
 pub struct AppSettings {
     pub telemetry_uuid: Option<uuid::Uuid>,
@@ -258,6 +265,11 @@ pub struct AppSettings {
     pub activity: activity::AppSettingsActivity,
     #[schema(inline)]
     pub ratelimits: ratelimits::AppSettingsRatelimits,
+
+    #[serde(skip)]
+    pub disabled_extensions: Vec<compact_str::CompactString>,
+    #[serde(skip)]
+    pub extension_permissions: BTreeMap<compact_str::CompactString, ExtensionPermissions>,
 
     #[serde(skip)]
     pub extensions: HashMap<&'static str, ExtensionSettings>,
@@ -340,6 +352,8 @@ impl SettingsSerializeExt for AppSettings {
             );
         // Intentionally not writing oobe_step, persisting 'register' in a write will cause a lot of weird issues
         // The seperate settings set_oobe_step should be used to manage this setting instead
+        // disabled_extensions and extension_permissions are left out for the same reason, they are
+        // written by set_disabled_extensions/set_extension_permissions
 
         match &self.storage_driver {
             StorageDriver::Filesystem { path } => {
@@ -762,9 +776,41 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
             ratelimits: deserializer
                 .nest("ratelimits", &ratelimits::AppSettingsRatelimitsDeserializer)
                 .await?,
+            disabled_extensions: deserializer
+                .take_raw_setting("disabled_extensions")
+                .map(|s| parse_disabled_extensions(&s))
+                .unwrap_or_default(),
+            extension_permissions: deserializer
+                .take_raw_setting("extension_permissions")
+                .and_then(|s| serde_json::from_str(&s).ok())
+                .unwrap_or_default(),
             extensions,
         }))
     }
+}
+
+fn parse_disabled_extensions(raw: &str) -> Vec<compact_str::CompactString> {
+    raw.split(',')
+        .map(str::trim)
+        .filter(|entry| !entry.is_empty())
+        .map(Into::into)
+        .collect()
+}
+
+pub async fn fetch_disabled_extensions(
+    database: &crate::database::Database,
+) -> Vec<compact_str::CompactString> {
+    let value: Option<String> =
+        sqlx::query_scalar("SELECT value FROM settings WHERE key = '::disabled_extensions'")
+            .fetch_optional(database.read())
+            .await
+            .ok()
+            .flatten();
+
+    value
+        .as_deref()
+        .map(parse_disabled_extensions)
+        .unwrap_or_default()
 }
 
 pub struct SettingsReadGuard<'a> {
@@ -1079,6 +1125,40 @@ impl Settings {
             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
         )
         .bind(oobe_step.map(|s| s.to_string()).unwrap_or_default())
+        .execute(self.database.write())
+        .await?;
+
+        self.invalidate_cache().await;
+
+        Ok(())
+    }
+
+    pub async fn set_disabled_extensions(
+        &self,
+        disabled_extensions: &[compact_str::CompactString],
+    ) -> Result<(), crate::database::DatabaseError> {
+        sqlx::query(
+            "INSERT INTO settings (key, value) VALUES ('::disabled_extensions', $1)
+            ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+        )
+        .bind(disabled_extensions.join(","))
+        .execute(self.database.write())
+        .await?;
+
+        self.invalidate_cache().await;
+
+        Ok(())
+    }
+
+    pub async fn set_extension_permissions(
+        &self,
+        extension_permissions: &BTreeMap<compact_str::CompactString, ExtensionPermissions>,
+    ) -> Result<(), crate::database::DatabaseError> {
+        sqlx::query(
+            "INSERT INTO settings (key, value) VALUES ('::extension_permissions', $1)
+            ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+        )
+        .bind(serde_json::to_string(extension_permissions).map_err(anyhow::Error::new)?)
         .execute(self.database.write())
         .await?;
 

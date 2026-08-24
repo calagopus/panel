@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod resend_verification;
+
 mod put {
     use axum::http::StatusCode;
     use garde::Validate;
@@ -9,8 +11,10 @@ mod put {
         ApiError, GetState,
         models::{
             UpdatableModel,
-            user::{GetPermissionManager, GetUser},
+            user::{GetPermissionManager, GetUser, User},
             user_activity::GetUserActivityLogger,
+            user_email_verification::UserEmailVerification,
+            user_password_reset::UserPasswordReset,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -27,11 +31,14 @@ mod put {
     }
 
     #[derive(ToSchema, Serialize)]
-    struct Response {}
+    struct Response {
+        pending: bool,
+    }
 
     #[utoipa::path(put, path = "/", responses(
         (status = OK, body = inline(Response)),
-        (status = UNAUTHORIZED, body = ApiError),
+        (status = BAD_REQUEST, body = ApiError),
+        (status = FORBIDDEN, body = ApiError),
         (status = CONFLICT, body = ApiError),
     ), request_body = inline(Payload))]
     pub async fn route(
@@ -65,6 +72,76 @@ mod put {
         }
 
         if user.email != data.email {
+            let settings = state.settings.get().await?;
+            let require_verification = user.require_email_verification(&settings);
+            drop(settings);
+
+            if require_verification {
+                if User::by_email(&state.database, &data.email)
+                    .await?
+                    .is_some()
+                {
+                    return ApiResponse::error("email already in use")
+                        .with_status(StatusCode::CONFLICT)
+                        .ok();
+                }
+
+                if !state
+                    .mail
+                    .template_deliverable(&state, "email_verification")
+                    .await?
+                {
+                    return ApiResponse::error("email verification is not available")
+                        .with_status(StatusCode::BAD_REQUEST)
+                        .ok();
+                }
+
+                let token =
+                    match UserEmailVerification::create(&state.database, user.uuid, &data.email)
+                        .await
+                    {
+                        Ok(token) => token,
+                        Err(err) => {
+                            tracing::warn!(
+                                user = %user.uuid,
+                                "failed to create email verification: {:#?}",
+                                err
+                            );
+
+                            return ApiResponse::error(
+                                "a verification email was already sent recently",
+                            )
+                            .with_status(StatusCode::TOO_MANY_REQUESTS)
+                            .ok();
+                        }
+                    };
+
+                if let Err(err) =
+                    UserEmailVerification::send(&state, &user, &data.email, &token).await
+                {
+                    tracing::error!(
+                        user = %user.uuid,
+                        "failed to send email verification: {:#?}",
+                        err
+                    );
+
+                    return ApiResponse::error("failed to send the verification email")
+                        .with_status(StatusCode::INTERNAL_SERVER_ERROR)
+                        .ok();
+                }
+
+                activity_logger
+                    .log(
+                        "account:email-change-requested",
+                        serde_json::json!({
+                            "new": data.email,
+                        }),
+                    )
+                    .await;
+
+                return ApiResponse::new_serialized(Response { pending: true }).ok();
+            }
+
             let old_email = user.email.clone();
 
             match user
@@ -92,6 +169,9 @@ mod put {
                 }
             }
 
+            UserEmailVerification::delete_by_user_uuid(&state.database, user.uuid).await?;
+            UserPasswordReset::delete_by_user_uuid(&state.database, user.uuid).await?;
+
             activity_logger
                 .log(
                     "account:email-changed",
@@ -103,12 +183,13 @@ mod put {
                 .await;
         }
 
-        ApiResponse::new_serialized(Response {}).ok()
+        ApiResponse::new_serialized(Response { pending: false }).ok()
     }
 }
 
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(put::route))
+        .nest("/resend-verification", resend_verification::router(state))
         .with_state(state.clone())
 }

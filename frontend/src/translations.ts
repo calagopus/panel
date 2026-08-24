@@ -45,6 +45,7 @@ const baseTranslations = defineTranslations({
         enable: 'Enable',
         disable: 'Disable',
         disableTwoFactor: 'Disable Two-Factor',
+        verify: 'Verify',
         update: 'Update',
         close: 'Close',
         cancel: 'Cancel',
@@ -132,6 +133,22 @@ const baseTranslations = defineTranslations({
       },
       toast: {
         duplicated: '{resource} duplicated.',
+      },
+      settingScope: {
+        account: 'Sync With Account',
+        device: 'Only This Device',
+        useAccountValue: 'Use the Account Value',
+        saveToAccount: 'Save This Value to My Account',
+        stateAccount: 'Account',
+        stateDevice: 'This Device',
+        tooltip: {
+          account: 'This setting is synced with your account.',
+          device: 'This setting is overridden on this device only.',
+        },
+        toast: {
+          saved: 'Setting saved to your account.',
+          saveFailed: 'Failed to save this setting to your account.',
+        },
       },
       tooltip: {
         resetToDefault: 'Reset to default',
@@ -487,6 +504,7 @@ const baseTranslations = defineTranslations({
           themeAuto: 'Auto',
           themeDark: 'Dark',
           themeLight: 'Light',
+          resetDeviceOverrides: 'Reset Device Overrides ({count})',
         },
         modal: {
           logout: {
@@ -970,6 +988,16 @@ const baseTranslations = defineTranslations({
                 useTotp: 'Use TOTP',
               },
             },
+            email: {
+              subtitle: 'We can email you a one-time code to finish signing in.',
+              enterCode: 'Enter the 6-digit code we sent to your email address',
+              button: {
+                useEmail: 'Email me a code',
+                sendCode: 'Send Code',
+                resend: 'Resend Code',
+                resendIn: 'Resend Code ({seconds}s)',
+              },
+            },
             totpRecovery: {
               subtitle: 'Enter a recovery code',
               form: {
@@ -1003,6 +1031,14 @@ const baseTranslations = defineTranslations({
             request: 'Request Password Reset',
           },
           success: 'An email has been sent to you with instructions on how to reset your password.',
+        },
+        verifyEmail: {
+          title: 'Verify Email',
+          success: 'Your email address **{email}** has been verified.',
+          failed: 'This verification link is invalid or has expired. Request a new one and try again.',
+          button: {
+            continue: 'Continue',
+          },
         },
         resetPassword: {
           title: 'Reset Password',
@@ -1118,6 +1154,15 @@ const baseTranslations = defineTranslations({
               description:
                 'Two-Factor Authentication is required on your account. Please set it up below to continue using the panel.',
             },
+            verifyEmail: {
+              title: 'Email Verification Required',
+              description:
+                'Please verify **{email}** to continue using the panel. Check your inbox for the verification link.',
+              sent: 'Verification email sent to {email}.',
+              button: {
+                resend: 'Resend Verification Email',
+              },
+            },
             frozen: {
               title: 'Account Frozen',
               description:
@@ -1139,6 +1184,7 @@ const baseTranslations = defineTranslations({
               title: 'Email',
               toast: {
                 updated: 'Email updated successfully.',
+                pending: 'Confirmation link sent to {email}. Your address changes once you open it.',
               },
               form: {
                 newEmail: 'New Email',
@@ -1170,11 +1216,57 @@ const baseTranslations = defineTranslations({
               },
               button: {
                 setupTwoFactor: 'Setup Two-Factor',
+                enableEmail: 'Enable Email',
+                disableEmail: 'Disable Email',
+                securityKeys: 'Security Keys',
               },
-              twoFactorEnabled: 'Two-Factor Verification is currently enabled.',
-              twoFactorDisabled:
-                'You do not currently have two-factor verification enabled on your account. Click the button below to begin configuring it.',
               twoFactorLastUsed: 'Last used: {timestamp}',
+              none: 'No second factor is set up on your account yet.',
+              requirementMet: 'Your account meets the two-factor requirement.',
+              requirementUnmet: 'Your account does not meet the two-factor requirement yet.',
+              method: {
+                totp: 'Authenticator App',
+                securityKey: 'Security Key',
+                email: 'Email',
+              },
+            },
+            emailTwoFactor: {
+              toast: {
+                disabled: 'Email two-factor disabled successfully.',
+              },
+              modal: {
+                enable: {
+                  title: 'Enable Email Two-Factor',
+                  description:
+                    'A one-time code will be sent to **{email}** each time you sign in. Anyone with access to that mailbox can sign in as you.',
+                },
+                disable: {
+                  title: 'Disable Email Two-Factor',
+                  description: 'Disabling email two-factor will make your account less secure.',
+                },
+              },
+            },
+            passwordLogin: {
+              title: 'Password Login',
+              enabled: 'You can sign in with your password.',
+              disabled: 'Password login is turned off. Only your security keys can sign you in.',
+              toast: {
+                updated: 'Password login updated successfully.',
+              },
+              tooltip: {
+                needsSecurityKey: 'Add a security key before turning off password login.',
+              },
+              modal: {
+                disable: {
+                  title: 'Disable Password Login',
+                  description:
+                    'Your password will no longer sign you in anywhere, including SFTP. Only your security keys will work, so make sure you can use one before continuing.',
+                },
+                enable: {
+                  title: 'Enable Password Login',
+                  description: 'Your password will be able to sign you in again.',
+                },
+              },
             },
             account: {
               title: 'Account Details',
@@ -1446,6 +1538,10 @@ const baseTranslations = defineTranslations({
               expires: 'Expires',
             },
           },
+          toast: {
+            enabled: 'API key enabled.',
+            disabled: 'API key disabled.',
+          },
           modal: {
             createApiKey: {
               title: 'Create API Key',
@@ -1676,12 +1772,26 @@ const baseTranslations = defineTranslations({
                   sessionCookie: 'Session Cookie',
                   sessionDurationSeconds: 'Session Duration (seconds)',
                   twoFactorRequirement: 'Two-Factor Authentication Requirement',
+                  emailTwoFactorEnabled: 'Email Two-Factor',
+                  emailTwoFactorEnabledDescription:
+                    'Let users receive a one-time login code by email. Requires a configured mail transport.',
+                  twoFactorAcceptedMethods: 'Accepted Two-Factor Methods',
+                  twoFactorAcceptedMethodsDescription:
+                    'Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.',
+                  emailVerificationRequired: 'Require Email Verification',
+                  emailVerificationRequiredDescription:
+                    'New users must confirm their email address before they can use the panel. Requires a configured mail transport.',
                   telemetryEnabled: 'Enable Telemetry',
                   telemetryEnabledDescription:
                     'Allow Calagopus to collect limited and anonymous usage data to help improve the application.',
                   registrationEnabled: 'Enable Registration',
                 },
                 enum: {
+                  twoFactorMethod: {
+                    totp: 'Authenticator App (TOTP)',
+                    securityKey: 'Security Key',
+                    email: 'Email',
+                  },
                   twoFactorRequirement: {
                     admins: 'Admins',
                     allUsers: 'All Users',
@@ -1910,6 +2020,8 @@ const baseTranslations = defineTranslations({
                   maxCommandSnippetCount: 'Max Command Snippets',
                   maxSecurityKeyCount: 'Max Security Keys',
                   maxSshKeyCount: 'Max SSH Keys',
+                  maxSettingsCount: 'Max Synced Settings',
+                  maxSettingsValueBytes: 'Max Synced Setting Size (bytes)',
                   allowChangingLanguage: 'Allow Changing Language',
                   allowChangingLanguageDescription:
                     'If enabled, users will be able to change their language preferences.',
@@ -2056,6 +2168,10 @@ const baseTranslations = defineTranslations({
               content:
                 'These extensions are not built again until they change, or until you retry the build explicitly.',
             },
+            pendingRestart: {
+              title: 'Some extensions were enabled or disabled',
+              content: 'The panel picks up the change the next time it starts.',
+            },
           },
           button: {
             viewBuildLogs: 'View build logs',
@@ -2064,6 +2180,7 @@ const baseTranslations = defineTranslations({
             retryBuild: 'Retry build',
             cancelBuild: 'Cancel build',
             configure: 'Configure',
+            restart: 'Restart the panel',
             back: 'Back to Extensions',
             accept: 'Accept',
             decline: 'Decline',
@@ -2074,7 +2191,10 @@ const baseTranslations = defineTranslations({
             cancelling: 'The build stops once its current step ends.',
             noBackend: 'Backend extension is required to configure this extension.',
             noConfigurationPage: 'This extension does not have a configuration page defined.',
+            extensionDisabled: 'This extension is disabled, its frontend is not loaded.',
             removeExtension: 'Remove extension',
+            enableExtension: 'Enable extension',
+            disableExtension: 'Disable extension',
           },
           phase: {
             queued: 'Queued…',
@@ -2093,6 +2213,8 @@ const baseTranslations = defineTranslations({
             backendMissing: 'Backend missing',
             pendingBuild: 'Pending build',
             pendingRemoval: 'Pending removal',
+            pendingRestart: 'Pending restart',
+            disabled: 'Disabled',
           },
           card: {
             version: 'Version',
@@ -2113,6 +2235,9 @@ const baseTranslations = defineTranslations({
             cancelRequested: 'Cancel requested. The build stops once its current step ends.',
             added: 'Extension `{packageName}` added successfully.',
             removed: 'Extension `{packageName}` removed successfully.',
+            enabled: 'Extension `{packageName}` is enabled again once the panel restarts.',
+            disabled: 'Extension `{packageName}` is disabled once the panel restarts.',
+            restarting: 'The panel is restarting.',
           },
           notFound: {
             title: 'Extension Not Found',
@@ -2180,6 +2305,7 @@ const baseTranslations = defineTranslations({
                 },
                 button: {
                   sendPasswordResetEmail: 'Send Password Reset Email',
+                  verifyEmail: 'Mark Email Verified',
                   impersonate: 'Impersonate',
                 },
                 form: {
@@ -2195,6 +2321,13 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm User Deletion',
                     content: 'Are you sure you want to delete **{username}**?',
+                  },
+                  verifyEmail: {
+                    title: 'Mark Email Verified',
+                    content: 'Are you sure you want to mark **{email}** as verified without confirmation?',
+                    toast: {
+                      verified: 'Email marked as verified.',
+                    },
                   },
                   disableTwoFactor: {
                     title: 'Disable User Two Factor',
@@ -3842,8 +3975,9 @@ const baseTranslations = defineTranslations({
                   nameLastPathDescription:
                     'The path used to extract the last name from the Info URL response (https://serdejsonpath.live).',
                   loginOnly: 'Only allow Login',
-                  loginBypass2fa: 'Bypass 2FA on Login',
-                  loginBypass2faDescription: 'Allows users logging in with this provider to bypass their panel 2FA.',
+                  loginBypassTwoFactor: 'Bypass 2FA on Login',
+                  loginBypassTwoFactorDescription:
+                    'Allows users logging in with this provider to bypass their panel 2FA.',
                   linkViewable: 'Link Viewable to User',
                   linkViewableDescription: 'Allows the user to see the connection and its identifier in the client UI.',
                   userManageable: 'Link Manageable by User',

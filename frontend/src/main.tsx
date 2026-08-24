@@ -1,6 +1,8 @@
 import { createRoot } from 'react-dom/client';
 import { Extension, ExtensionContext } from 'shared';
 import App from '@/App.tsx';
+import getSettings from '@/api/getSettings.ts';
+import { useGlobalStore } from '@/stores/global.ts';
 
 import.meta.glob('../extensions/*/src/app.css', { eager: true });
 
@@ -21,8 +23,6 @@ for (const [path, module] of Object.entries({ ...extensionModulesTs, ...extensio
     console.error('Invalid frontend module', identifier, module);
   }
 }
-
-window.extensionContext = new ExtensionContext(extensions);
 
 window.addEventListener('vite:preloadError', (event) => {
   event.preventDefault();
@@ -47,9 +47,53 @@ if (!root) {
   throw new Error('Root element not found');
 }
 
-createRoot(root).render(
-  <App
-    theme={window.extensionContext.getMantineTheme()}
-    cssVariablesResolver={window.extensionContext.getMantineCssResolver()}
-  />,
-);
+function setExtensionStylesEnabled(isEnabled: (identifier: string) => boolean) {
+  for (const link of document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')) {
+    const identifier = link.href.match(/\/extension-([^./]+)\.[^./]+\.css$/)?.[1];
+
+    if (identifier) {
+      link.disabled = !isEnabled(identifier);
+    }
+  }
+
+  for (const style of document.querySelectorAll<HTMLStyleElement>('style[data-vite-dev-id]')) {
+    const identifier = style.dataset.viteDevId?.match(/(?:frontend\/extensions|backend-extensions)\/([^/]+)\//)?.[1];
+
+    if (identifier && style.sheet) {
+      style.sheet.disabled = !isEnabled(identifier);
+    }
+  }
+}
+
+setExtensionStylesEnabled(() => false);
+
+(async () => {
+  let disabled: string[] = [];
+
+  try {
+    const settings = await getSettings();
+
+    disabled = settings.disabledExtensions;
+    useGlobalStore.getState().setSettings(settings);
+    useGlobalStore.getState().setTimeOffset(Date.now() - new Date(settings.time).getTime());
+  } catch (err) {
+    console.error('Failed to load settings, assuming no extensions are disabled:', err);
+  }
+
+  const disabledIdentifiers = disabled.map((packageName) => packageName.replaceAll('.', '_'));
+  const isEnabled = (identifier: string) => !disabledIdentifiers.includes(identifier);
+
+  setExtensionStylesEnabled(isEnabled);
+  import.meta.hot?.on('vite:afterUpdate', () => setExtensionStylesEnabled(isEnabled));
+
+  window.extensionContext = new ExtensionContext(
+    extensions.filter((extension) => !disabled.includes(extension.packageName)),
+  );
+
+  createRoot(root!).render(
+    <App
+      theme={window.extensionContext.getMantineTheme()}
+      cssVariablesResolver={window.extensionContext.getMantineCssResolver()}
+    />,
+  );
+})();

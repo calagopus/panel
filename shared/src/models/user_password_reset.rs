@@ -195,6 +195,23 @@ impl UserPasswordReset {
         Ok(Some(Self::map(None, &row)?))
     }
 
+    pub async fn delete_by_user_uuid(
+        database: &crate::database::Database,
+        user_uuid: uuid::Uuid,
+    ) -> Result<(), crate::database::DatabaseError> {
+        sqlx::query(
+            r#"
+            DELETE FROM user_password_resets
+            WHERE user_password_resets.user_uuid = $1
+            "#,
+        )
+        .bind(user_uuid)
+        .execute(database.write())
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn delete_expired(database: &crate::database::Database) -> Result<u64, sqlx::Error> {
         Ok(sqlx::query(
             r#"

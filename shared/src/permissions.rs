@@ -15,10 +15,25 @@ impl PermissionGroup {
     }
 }
 
+pub(crate) fn flatten_permissions(
+    map: &IndexMap<&'static str, PermissionGroup>,
+) -> HashSet<String> {
+    map.iter()
+        .flat_map(|(key, group)| {
+            group
+                .permissions
+                .keys()
+                .map(move |permission| format!("{key}.{permission}"))
+        })
+        .collect()
+}
+
 #[derive(ToSchema, Serialize)]
 pub struct PermissionMap {
     #[serde(skip)]
     list: HashSet<String>,
+    #[serde(skip)]
+    inert: HashSet<String>,
     #[serde(flatten)]
     map: IndexMap<&'static str, PermissionGroup>,
 }
@@ -27,22 +42,21 @@ impl PermissionMap {
     pub(crate) fn new() -> Self {
         Self {
             list: HashSet::new(),
+            inert: HashSet::new(),
             map: IndexMap::new(),
         }
     }
 
     pub(crate) fn replace(&mut self, map: IndexMap<&'static str, PermissionGroup>) {
-        self.list = map
-            .iter()
-            .flat_map(|(key, group)| {
-                group
-                    .permissions
-                    .keys()
-                    .map(|permission| format!("{key}.{permission}"))
-                    .collect::<HashSet<_>>()
-            })
-            .collect();
+        self.list = flatten_permissions(&map);
         self.map = map;
+    }
+
+    /// Marks permissions as valid without listing them, used for permissions belonging to
+    /// disabled extensions. They stay grantable so re-enabling the extension restores them,
+    /// but they are not offered anywhere since nothing checks them while the extension is off.
+    pub(crate) fn set_inert(&mut self, inert: HashSet<String>) {
+        self.inert = inert;
     }
 
     #[inline]
@@ -55,7 +69,7 @@ impl PermissionMap {
         permissions: &[compact_str::CompactString],
     ) -> Result<(), garde::Error> {
         for permission in permissions {
-            if !self.list().contains(&**permission) {
+            if !self.list().contains(&**permission) && !self.inert.contains(&**permission) {
                 return Err(garde::Error::new(compact_str::format_compact!(
                     "invalid permission: {permission}"
                 )));
@@ -80,6 +94,10 @@ pub(crate) static BASE_USER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permiss
                         ),
                         ("email", "Allows changing the account's email address."),
                         ("password", "Allows changing the account's password."),
+                        (
+                            "password-login",
+                            "Allows enabling and disabling password login for the account.",
+                        ),
                         (
                             "two-factor",
                             "Allows adding and removing two-factor authentication.",
@@ -170,6 +188,19 @@ pub(crate) static BASE_USER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permiss
                     permissions: IndexMap::from([
                         ("read", "Allows viewing sessions and their IP addresses."),
                         ("delete", "Allows deleting sessions."),
+                    ]),
+                },
+            ),
+            (
+                "settings",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage synced user settings on an account.",
+                    permissions: IndexMap::from([
+                        ("read", "Allows viewing the account's synced user settings."),
+                        (
+                            "update",
+                            "Allows modifying the account's synced user settings.",
+                        ),
                     ]),
                 },
             ),
@@ -283,7 +314,7 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("delete", "Allows deleting users."),
                         (
                             "email",
-                            "Allows sending email actions to users, such as password resets.",
+                            "Allows sending email actions to users, such as password resets, and marking a user's email as verified.",
                         ),
                         ("activity", "Allows viewing a user's activity log."),
                         (

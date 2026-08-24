@@ -31,19 +31,6 @@ fn first_import_tag(raw_tags: Option<&str>, fallback: &str) -> compact_str::Comp
         .unwrap_or_else(|| fallback.to_compact_string())
 }
 
-#[inline]
-fn derive_name_parts(username: &str) -> (compact_str::CompactString, compact_str::CompactString) {
-    let mut parts = username
-        .split([' ', '_', '-', '.'])
-        .filter(|part| !part.is_empty())
-        .map(compact_str::CompactString::from);
-
-    let first = parts.next().unwrap_or_else(|| username.to_compact_string());
-    let last = parts.next().unwrap_or_else(|| username.to_compact_string());
-
-    (first, last)
-}
-
 #[derive(Args)]
 pub struct PelicanArgs {
     #[arg(
@@ -281,15 +268,14 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 let language: Option<String> = source_optional_text(&row, "language")?;
                                 let mfa_app_secret: Option<String> = source_optional_text(&row, "mfa_app_secret")?;
                                 let created = source_datetime(&row, "created_at")?;
-                                let (name_first, name_last) = derive_name_parts(&username);
                                 let admin = admin_user_ids.contains(&id);
                                 let totp_secret = mfa_app_secret.and_then(|s| decrypt_laravel_value(&s, &source_app_key).ok());
                                 let totp_enabled = totp_secret.is_some();
 
                                 sqlx::query(
                                     r#"
-                                    INSERT INTO users (uuid, external_id, username, email, name_first, name_last, password, admin, totp_enabled, totp_secret, language, created)
-                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                                    INSERT INTO users (uuid, external_id, username, email, password, admin, totp_enabled, totp_secret, language, created)
+                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                                     ON CONFLICT DO NOTHING
                                     "#
                                 )
@@ -297,8 +283,6 @@ impl shared::extensions::commands::CliCommand<PelicanArgs> for PelicanCommand {
                                 .bind(external_id)
                                 .bind(&username)
                                 .bind(&email)
-                                .bind(name_first)
-                                .bind(name_last)
                                 .bind(password.replace("$2y$", "$2a$"))
                                 .bind(admin)
                                 .bind(totp_enabled)

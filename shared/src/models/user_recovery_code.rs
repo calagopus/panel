@@ -87,6 +87,32 @@ impl UserRecoveryCode {
         Ok(codes)
     }
 
+    /// Enabling a second two factor method must not invalidate codes the user already wrote down.
+    pub async fn create_all_if_absent(
+        database: &crate::database::Database,
+        user_uuid: uuid::Uuid,
+    ) -> Result<Vec<String>, crate::database::DatabaseError> {
+        let existing: Vec<String> = sqlx::query(
+            r#"
+            SELECT user_recovery_codes.code
+            FROM user_recovery_codes
+            WHERE user_recovery_codes.user_uuid = $1
+            "#,
+        )
+        .bind(user_uuid)
+        .fetch_all(database.read())
+        .await?
+        .into_iter()
+        .map(|row| row.get::<String, _>("code"))
+        .collect();
+
+        if !existing.is_empty() {
+            return Ok(existing);
+        }
+
+        Self::create_all(database, user_uuid).await
+    }
+
     pub async fn delete_by_user_uuid_code(
         database: &crate::database::Database,
         user_uuid: uuid::Uuid,

@@ -59,7 +59,7 @@ impl shared::extensions::commands::CliCommand<Disable2FAArgs> for Disable2FAComm
                     return Ok(1);
                 };
 
-                if !user.totp_enabled {
+                if !user.totp_enabled && !user.email_two_factor_enabled {
                     eprintln!(
                         "{}",
                         "two-factor authentication is not enabled for this user".red()
@@ -73,9 +73,16 @@ impl shared::extensions::commands::CliCommand<Disable2FAArgs> for Disable2FAComm
                 )
                 .await?;
 
+                shared::models::user_two_factor_code::UserTwoFactorCode::delete_by_user_uuid(
+                    &state.database,
+                    user.uuid,
+                )
+                .await?;
+
                 sqlx::query!(
                     "UPDATE users
-                    SET totp_enabled = false, totp_last_used = NULL, totp_secret = NULL
+                    SET totp_enabled = false, totp_last_used = NULL, totp_secret = NULL,
+                        email_two_factor_enabled = false
                     WHERE users.uuid = $1",
                     user.uuid
                 )

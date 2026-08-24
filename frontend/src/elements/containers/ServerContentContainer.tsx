@@ -74,6 +74,7 @@ function ServerContentContainer(props: Props) {
     transferProgressTotal,
     transferProgressFiles,
     backupRestoreFiles,
+    installProgress,
   } = useServerStore(
     useShallow((state) => ({
       server: state.server,
@@ -86,6 +87,7 @@ function ServerContentContainer(props: Props) {
       transferProgressTotal: state.transferProgressTotal,
       transferProgressFiles: state.transferProgressFiles,
       backupRestoreFiles: state.backupRestoreFiles,
+      installProgress: state.installProgress,
     })),
   );
   const { user } = useAuth();
@@ -204,7 +206,15 @@ function ServerContentContainer(props: Props) {
         <div className='mt-2 px-4 lg:px-6 mb-4'>
           <Notification loading>
             <div className='flex flex-row items-center justify-between'>
-              {t('pages.server.console.notification.installing', {})}
+              <span className='flex flex-col md:flex-row md:items-center gap-1'>
+                {t('pages.server.console.notification.installing', {})}
+                {installProgress?.label ? (
+                  <Text size='sm' c='dimmed'>
+                    {installProgress.label}
+                  </Text>
+                ) : null}
+              </span>
+
               <ServerCan action='settings.cancel-install'>
                 <Button
                   className='ml-4 min-w-fit'
@@ -217,6 +227,17 @@ function ServerContentContainer(props: Props) {
                 </Button>
               </ServerCan>
             </div>
+
+            {installProgress === null ? null : installProgress.total === 100 ? (
+              <Progress value={installProgress.progress} />
+            ) : (
+              <Tooltip
+                label={bytesProgressString(installProgress.progress, installProgress.total)}
+                innerClassName='w-full'
+              >
+                <Progress value={(installProgress.progress / installProgress.total) * 100} />
+              </Tooltip>
+            )}
           </Notification>
         </div>
       ) : server.nodeMaintenanceEnabled ? (

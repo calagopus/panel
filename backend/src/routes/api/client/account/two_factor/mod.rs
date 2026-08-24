@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod email;
+
 mod get {
     use axum::http::StatusCode;
     use serde::Serialize;
@@ -162,7 +164,8 @@ mod post {
                 .ok();
         }
 
-        let recovery_codes = UserRecoveryCode::create_all(&state.database, user.uuid).await?;
+        let recovery_codes =
+            UserRecoveryCode::create_all_if_absent(&state.database, user.uuid).await?;
 
         sqlx::query!(
             "UPDATE users
@@ -284,7 +287,9 @@ mod delete {
             }
         }
 
-        UserRecoveryCode::delete_by_user_uuid(&state.database, user.uuid).await?;
+        if !user.email_two_factor_enabled {
+            UserRecoveryCode::delete_by_user_uuid(&state.database, user.uuid).await?;
+        }
 
         sqlx::query!(
             "UPDATE users
@@ -308,5 +313,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(post::route))
         .routes(routes!(delete::route))
+        .nest("/email", email::router(state))
         .with_state(state.clone())
 }

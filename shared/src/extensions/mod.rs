@@ -151,7 +151,54 @@ pub struct ExtensionPermissionsBuilder {
     pub server_permissions: RawPermissionMap,
 }
 
+pub struct PermissionsSnapshot {
+    user: std::collections::HashSet<String>,
+    admin: std::collections::HashSet<String>,
+    server: std::collections::HashSet<String>,
+}
+
 impl ExtensionPermissionsBuilder {
+    pub(crate) fn snapshot(&self) -> PermissionsSnapshot {
+        PermissionsSnapshot {
+            user: crate::permissions::flatten_permissions(&self.user_permissions),
+            admin: crate::permissions::flatten_permissions(&self.admin_permissions),
+            server: crate::permissions::flatten_permissions(&self.server_permissions),
+        }
+    }
+
+    pub(crate) fn contributions_since(
+        &self,
+        snapshot: &PermissionsSnapshot,
+    ) -> crate::settings::ExtensionPermissions {
+        fn added(
+            current: std::collections::HashSet<String>,
+            previous: &std::collections::HashSet<String>,
+        ) -> Vec<compact_str::CompactString> {
+            let mut added: Vec<compact_str::CompactString> = current
+                .difference(previous)
+                .map(|permission| permission.into())
+                .collect();
+            added.sort_unstable();
+
+            added
+        }
+
+        crate::settings::ExtensionPermissions {
+            user: added(
+                crate::permissions::flatten_permissions(&self.user_permissions),
+                &snapshot.user,
+            ),
+            admin: added(
+                crate::permissions::flatten_permissions(&self.admin_permissions),
+                &snapshot.admin,
+            ),
+            server: added(
+                crate::permissions::flatten_permissions(&self.server_permissions),
+                &snapshot.server,
+            ),
+        }
+    }
+
     pub fn new(
         user_permissions: RawPermissionMap,
         admin_permissions: RawPermissionMap,

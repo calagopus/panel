@@ -706,6 +706,8 @@ pub enum WebsocketEvent {
     ImagePullCompleted,
     #[serde(rename = "install started")]
     InstallStarted,
+    #[serde(rename = "install progress")]
+    InstallProgress,
     #[serde(rename = "install completed")]
     InstallCompleted,
     #[serde(rename = "daemon message")]

@@ -301,6 +301,8 @@ pub async fn handle_startup() -> Result<
     let cache = shared::cache::Cache::new(&env).await;
     let database = Arc::new(shared::database::Database::new(&env, cache.clone()).await);
 
+    extensions.set_disabled(shared::settings::fetch_disabled_extensions(&database).await);
+
     if env.database_migrate {
         tracing::info!("running database migrations...");
 
@@ -346,6 +348,10 @@ pub async fn handle_startup() -> Result<
 
             tracing::info!("collecting extension migrations...");
             for extension in extensions.extensions().await.iter() {
+                if extensions.is_disabled(extension.package_name) {
+                    continue;
+                }
+
                 let migrations = match database_migrator::collect_embedded_extension_migrations(
                     &extension.metadata_toml.get_package_identifier(),
                 ) {

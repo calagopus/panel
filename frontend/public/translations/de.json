@@ -209,7 +209,8 @@
         "unsetPrimary": "Als primär entfernen",
         "leavePage": "Seite verlassen",
         "viewDocumentation": "Dokumentation ansehen",
-        "undo": "Rückgängig"
+        "undo": "Rückgängig",
+        "verify": "Verifizieren"
       },
       "alert": {
         "error": "Fehler",
@@ -262,6 +263,22 @@
       },
       "toast": {
         "duplicated": "{resource} dupliziert."
+      },
+      "settingScope": {
+        "account": "Mit Konto synchronisieren",
+        "device": "Nur dieses Gerät",
+        "useAccountValue": "Kontowert verwenden",
+        "saveToAccount": "Diesen Wert in meinem Konto speichern",
+        "stateAccount": "Konto",
+        "stateDevice": "Dieses Gerät",
+        "tooltip": {
+          "account": "Diese Einstellung wird mit deinem Konto synchronisiert.",
+          "device": "Diese Einstellung wird nur auf diesem Gerät überschrieben."
+        },
+        "toast": {
+          "saved": "Einstellung in deinem Konto gespeichert.",
+          "saveFailed": "Einstellung konnte nicht in deinem Konto gespeichert werden."
+        }
       },
       "tooltip": {
         "resetToDefault": "Auf Standard zurücksetzen",
@@ -610,7 +627,8 @@
           "theme": "Design",
           "themeAuto": "Automatisch",
           "themeDark": "Dunkel",
-          "themeLight": "Hell"
+          "themeLight": "Hell",
+          "resetDeviceOverrides": "Geräte-Überschreibungen zurücksetzen ({count})"
         },
         "modal": {
           "logout": {
@@ -1084,6 +1102,16 @@
                 "label": "Wiederherstellungscode",
                 "placeholder": "Gib einen Wiederherstellungscode ein"
               }
+            },
+            "email": {
+              "subtitle": "Wir können dir einen Einmalcode per E-Mail senden, um die Anmeldung abzuschließen.",
+              "enterCode": "Gib den 6-stelligen Code ein, den wir an deine E-Mail-Adresse gesendet haben",
+              "button": {
+                "useEmail": "Code per E-Mail senden",
+                "sendCode": "Code senden",
+                "resend": "Code erneut senden",
+                "resendIn": "Code erneut senden ({seconds}s)"
+              }
             }
           }
         },
@@ -1115,6 +1143,14 @@
         "oauth": {
           "title": "Mit OAuth authentifizieren",
           "subtitle": "Wähle einen der unten stehenden Anbieter, um dich anzumelden"
+        },
+        "verifyEmail": {
+          "title": "E-Mail bestätigen",
+          "success": "Deine E-Mail-Adresse **{email}** wurde bestätigt.",
+          "failed": "Dieser Bestätigungslink ist ungültig oder abgelaufen. Fordere einen neuen an und versuche es erneut.",
+          "button": {
+            "continue": "Weiter"
+          }
         }
       },
       "account": {
@@ -1214,6 +1250,14 @@
             "frozen": {
               "title": "Account eingefroren",
               "description": "Dein Account wurde eingefroren. Du kannst keine Änderungen an deinem Account vornehmen, bis er wieder freigegeben wird. Bitte kontaktiere einen Administrator für weitere Informationen."
+            },
+            "verifyEmail": {
+              "title": "E-Mail-Bestätigung erforderlich",
+              "description": "Bitte bestätige **{email}**, um das Panel weiter zu nutzen. Der Bestätigungslink liegt in deinem Postfach.",
+              "sent": "Bestätigungs-E-Mail an {email} gesendet.",
+              "button": {
+                "resend": "Bestätigungs-E-Mail erneut senden"
+              }
             }
           },
           "containers": {
@@ -1230,7 +1274,8 @@
             "email": {
               "title": "E-Mail",
               "toast": {
-                "updated": "E-Mail erfolgreich aktualisiert."
+                "updated": "E-Mail erfolgreich aktualisiert.",
+                "pending": "Bestätigungslink an {email} gesendet. Deine Adresse ändert sich, sobald du ihn öffnest."
               },
               "form": {
                 "newEmail": "Neue E-Mail"
@@ -1258,11 +1303,20 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "2FA einrichten"
+                "setupTwoFactor": "2FA einrichten",
+                "enableEmail": "E-Mail aktivieren",
+                "disableEmail": "E-Mail deaktivieren",
+                "securityKeys": "Sicherheitsschlüssel"
               },
-              "twoFactorEnabled": "Zwei-Faktor-Verifizierung ist derzeit aktiviert.",
-              "twoFactorDisabled": "Du hast derzeit keine Zwei-Faktor-Verifizierung für deinen Account aktiviert. Klicke auf den Button unten, um mit der Konfiguration zu beginnen.",
-              "twoFactorLastUsed": "Zuletzt verwendet: {timestamp}"
+              "twoFactorLastUsed": "Zuletzt verwendet: {timestamp}",
+              "none": "Für dein Konto ist noch kein zweiter Faktor eingerichtet.",
+              "requirementMet": "Dein Konto erfüllt die Zwei-Faktor-Anforderung.",
+              "requirementUnmet": "Dein Konto erfüllt die Zwei-Faktor-Anforderung noch nicht.",
+              "method": {
+                "totp": "Authenticator-App",
+                "securityKey": "Sicherheitsschlüssel",
+                "email": "E-Mail"
+              }
             },
             "account": {
               "title": "Account-Details",
@@ -1283,6 +1337,42 @@
               },
               "form": {
                 "avatar": "Avatar"
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "E-Mail-Zwei-Faktor erfolgreich deaktiviert."
+              },
+              "modal": {
+                "enable": {
+                  "title": "E-Mail-Zwei-Faktor aktivieren",
+                  "description": "Bei jeder Anmeldung wird ein Einmalcode an **{email}** gesendet. Wer Zugriff auf dieses Postfach hat, kann sich als du anmelden."
+                },
+                "disable": {
+                  "title": "E-Mail-Zwei-Faktor deaktivieren",
+                  "description": "Das Deaktivieren von E-Mail-Zwei-Faktor macht dein Konto unsicherer."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Passwort-Anmeldung",
+              "enabled": "Du kannst dich mit deinem Passwort anmelden.",
+              "disabled": "Die Passwort-Anmeldung ist deaktiviert. Nur deine Sicherheitsschlüssel können dich anmelden.",
+              "toast": {
+                "updated": "Passwort-Anmeldung erfolgreich aktualisiert."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Füge einen Sicherheitsschlüssel hinzu, bevor du die Passwort-Anmeldung deaktivierst."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Passwort-Anmeldung deaktivieren",
+                  "description": "Dein Passwort meldet dich nirgends mehr an, auch nicht per SFTP. Nur deine Sicherheitsschlüssel funktionieren noch – stelle sicher, dass du einen davon nutzen kannst."
+                },
+                "enable": {
+                  "title": "Passwort-Anmeldung aktivieren",
+                  "description": "Dein Passwort kann dich wieder anmelden."
+                }
               }
             }
           }
@@ -1531,6 +1621,10 @@
               "expires": "Läuft ab"
             }
           },
+          "toast": {
+            "enabled": "API-Schlüssel aktiviert.",
+            "disabled": "API-Schlüssel deaktiviert."
+          },
           "modal": {
             "createApiKey": {
               "title": "API-Schlüssel erstellen",
@@ -1753,13 +1847,24 @@
                   "twoFactorRequirement": "Zwei-Faktor-Authentifizierung-Anforderung",
                   "telemetryEnabled": "Telemetrie aktivieren",
                   "telemetryEnabledDescription": "Erlaube Calagopus, begrenzte und anonyme Nutzungsdaten zu sammeln, um die Anwendung zu verbessern.",
-                  "registrationEnabled": "Registrierung aktivieren"
+                  "registrationEnabled": "Registrierung aktivieren",
+                  "emailTwoFactorEnabled": "E-Mail-Zwei-Faktor",
+                  "emailTwoFactorEnabledDescription": "Erlaubt Benutzern, einen einmaligen Anmeldecode per E-Mail zu erhalten. Erfordert einen konfigurierten Mail-Transport.",
+                  "emailVerificationRequired": "E-Mail-Bestätigung erforderlich",
+                  "emailVerificationRequiredDescription": "Neue Benutzer müssen ihre E-Mail-Adresse bestätigen, bevor sie das Panel nutzen können. Erfordert einen konfigurierten Mail-Transport.",
+                  "twoFactorAcceptedMethods": "Akzeptierte Zwei-Faktor-Methoden",
+                  "twoFactorAcceptedMethodsDescription": "Welche eingerichteten Faktoren zur Zwei-Faktor-Anforderung zählen. E-Mail ist standardmäßig aus: Passwort-Zurücksetzungen laufen ebenfalls über E-Mail, sie ist also nicht unabhängig vom Passwort."
                 },
                 "enum": {
                   "twoFactorRequirement": {
                     "admins": "Admins",
                     "allUsers": "Alle Benutzer",
                     "none": "Keine"
+                  },
+                  "twoFactorMethod": {
+                    "totp": "Authenticator-App (TOTP)",
+                    "securityKey": "Sicherheitsschlüssel",
+                    "email": "E-Mail"
                   }
                 },
                 "button": {
@@ -1971,6 +2076,8 @@
                   "maxCommandSnippetCount": "Max. Befehls-Snippets",
                   "maxSecurityKeyCount": "Max. Sicherheitsschlüssel",
                   "maxSshKeyCount": "Max. SSH-Schlüssel",
+                  "maxSettingsCount": "Max. synchronisierte Einstellungen",
+                  "maxSettingsValueBytes": "Max. Größe synchronisierter Einstellungen (Bytes)",
                   "allowChangingLanguage": "Sprache ändern erlauben",
                   "allowChangingLanguageDescription": "Wenn aktiviert, können Benutzer ihre Spracheinstellungen ändern."
                 },
@@ -2110,6 +2217,10 @@
             "buildFailed": {
               "title": "Der letzte Erweiterungs-Build ist fehlgeschlagen",
               "content": "Diese Erweiterungen werden erst wieder erstellt, wenn sie sich ändern oder du den Build ausdrücklich erneut startest."
+            },
+            "pendingRestart": {
+              "title": "Einige Erweiterungen wurden aktiviert oder deaktiviert",
+              "content": "Das Panel übernimmt die Änderung beim nächsten Start."
             }
           },
           "button": {
@@ -2119,6 +2230,7 @@
             "retryBuild": "Build wiederholen",
             "cancelBuild": "Build abbrechen",
             "configure": "Konfigurieren",
+            "restart": "Panel neu starten",
             "back": "Zurück zu Erweiterungen",
             "accept": "Akzeptieren",
             "decline": "Ablehnen"
@@ -2129,7 +2241,10 @@
             "cancelling": "Der Build stoppt, sobald der aktuelle Schritt beendet ist.",
             "noBackend": "Eine Backend-Erweiterung ist erforderlich, um diese Erweiterung zu konfigurieren.",
             "noConfigurationPage": "Diese Erweiterung hat keine Konfigurationsseite definiert.",
-            "removeExtension": "Erweiterung entfernen"
+            "extensionDisabled": "Diese Erweiterung ist deaktiviert, ihr Frontend wird nicht geladen.",
+            "removeExtension": "Erweiterung entfernen",
+            "enableExtension": "Erweiterung aktivieren",
+            "disableExtension": "Erweiterung deaktivieren"
           },
           "phase": {
             "queued": "In der Warteschlange…",
@@ -2147,7 +2262,9 @@
             "frontendMissing": "Frontend fehlt",
             "backendMissing": "Backend fehlt",
             "pendingBuild": "Build ausstehend",
-            "pendingRemoval": "Entfernung ausstehend"
+            "pendingRemoval": "Entfernung ausstehend",
+            "pendingRestart": "Neustart ausstehend",
+            "disabled": "Deaktiviert"
           },
           "card": {
             "version": "Version",
@@ -2167,7 +2284,10 @@
             "buildFailed": "Erweiterungs-Build fehlgeschlagen: {reason}",
             "cancelRequested": "Abbruch angefordert. Der Build stoppt, sobald der aktuelle Schritt beendet ist.",
             "added": "Erweiterung `{packageName}` erfolgreich hinzugefügt.",
-            "removed": "Erweiterung `{packageName}` erfolgreich entfernt."
+            "removed": "Erweiterung `{packageName}` erfolgreich entfernt.",
+            "enabled": "Erweiterung `{packageName}` ist nach dem Neustart des Panels wieder aktiv.",
+            "disabled": "Erweiterung `{packageName}` ist nach dem Neustart des Panels deaktiviert.",
+            "restarting": "Das Panel startet neu."
           },
           "notFound": {
             "title": "Erweiterung nicht gefunden",
@@ -2234,7 +2354,8 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "Passwort-Zurücksetzungs-E-Mail senden",
-                  "impersonate": "Impersonieren"
+                  "impersonate": "Impersonieren",
+                  "verifyEmail": "E-Mail als bestätigt markieren"
                 },
                 "form": {
                   "admin": "Administrator",
@@ -2262,6 +2383,13 @@
                     "content": "Bist du sicher, dass du eine Passwort-Zurücksetzungs-E-Mail an **{email}** senden möchtest?",
                     "toast": {
                       "sent": "Passwort-Zurücksetzungs-E-Mail gesendet."
+                    }
+                  },
+                  "verifyEmail": {
+                    "title": "E-Mail als bestätigt markieren",
+                    "content": "Möchtest du **{email}** wirklich ohne Bestätigung als verifiziert markieren?",
+                    "toast": {
+                      "verified": "E-Mail als bestätigt markiert."
                     }
                   }
                 },
@@ -3837,8 +3965,8 @@
                   "nameLastPath": "Nachname-Pfad",
                   "nameLastPathDescription": "Der Pfad, mit dem der Nachname aus der Antwort der Info-URL extrahiert wird (https://serdejsonpath.live).",
                   "loginOnly": "Nur Login erlauben",
-                  "loginBypass2fa": "2FA beim Login umgehen",
-                  "loginBypass2faDescription": "Erlaubt Benutzern, die sich mit diesem Anbieter anmelden, ihre Panel-2FA zu umgehen.",
+                  "loginBypassTwoFactor": "2FA beim Login umgehen",
+                  "loginBypassTwoFactorDescription": "Erlaubt Benutzern, die sich mit diesem Anbieter anmelden, ihre Panel-2FA zu umgehen.",
                   "linkViewable": "Verknüpfung für Benutzer sichtbar",
                   "linkViewableDescription": "Erlaubt dem Benutzer, die Verbindung und deren Identifier in der Client-Oberfläche zu sehen.",
                   "userManageable": "Verknüpfung vom Benutzer verwaltbar",

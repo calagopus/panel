@@ -3,8 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '@/elements/Button.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import Popover from '@/elements/Popover.tsx';
+import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { fileManagerSettingKey } from '@/stores/fileManager.ts';
 
 export default function FileImageViewerSettings() {
   const { t } = useTranslations();
@@ -27,7 +29,16 @@ export default function FileImageViewerSettings() {
           )}
 
           <Checkbox
-            label={t('pages.server.files.settings.imageViewerSmoothing', {})}
+            label={
+              <span className='inline-flex items-center gap-1'>
+                {t('pages.server.files.settings.imageViewerSmoothing', {})}
+                <UserSettingScopeMenu
+                  settingKey={fileManagerSettingKey('imageViewerSmoothing')}
+                  value={imageViewerSmoothing}
+                  withinPortal={false}
+                />
+              </span>
+            }
             className='order-10'
             checked={imageViewerSmoothing}
             onChange={(e) => setImageViewerSmoothing(e.target.checked)}

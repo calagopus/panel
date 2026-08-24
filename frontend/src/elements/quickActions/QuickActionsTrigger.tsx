@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '@/elements/Button.tsx';
 import Kbd from '@/elements/Kbd.tsx';
 import { getShortcutDefinition } from '@/lib/coreShortcuts.tsx';
+import { useShortcutOverrides } from '@/lib/shortcutOverrides.ts';
 import { effectiveBinding, ModifierKey, ShortcutBinding } from '@/lib/shortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 import { useQuickActionsStore } from '@/stores/quickActions.ts';
 
 const MODIFIER_ORDER: ModifierKey[] = ['ctrlOrMeta', 'ctrl', 'meta', 'alt', 'shift'];
@@ -34,7 +34,7 @@ function formatBindingCompact(binding: ShortcutBinding, isMac: boolean): string 
 export default function QuickActionsTrigger() {
   const { t } = useTranslations();
   const setOpen = useQuickActionsStore((state) => state.setOpen);
-  const overrides = useGlobalStore((state) => state.shortcutOverrides);
+  const overrides = useShortcutOverrides();
 
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
   const definition = getShortcutDefinition('general.quickActions');

@@ -59,11 +59,16 @@ export default function EmailContainer({ requireTwoFactorActivation }: AccountCa
       password: user.hasPassword ? form.values.password : 'aaa',
       email: form.values.email,
     })
-      .then(() => {
-        addToast(t('pages.account.account.containers.email.toast.updated', {}), 'success');
+      .then(({ pending }) => {
+        if (pending) {
+          addToast(t('pages.account.account.containers.email.toast.pending', { email: form.values.email }), 'success');
+          form.setValues({ email: user.email, password: '' });
+        } else {
+          addToast(t('pages.account.account.containers.email.toast.updated', {}), 'success');
 
-        setUser({ ...user!, email: form.values.email });
-        form.setFieldValue('password', '');
+          setUser({ ...user, email: form.values.email });
+          form.setFieldValue('password', '');
+        }
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

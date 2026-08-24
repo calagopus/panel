@@ -224,6 +224,28 @@ impl UserSecurityKey {
         .fetch_one(database.read())
         .await
     }
+
+    /// Keys that finished registration, so can actually be used to sign in. Locks the counted
+    /// rows, so two concurrent deletions cannot both pass a last-key check.
+    pub async fn count_usable_by_user_uuid_for_update(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        user_uuid: uuid::Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar(
+            r#"
+            SELECT COUNT(*)
+            FROM (
+                SELECT user_security_keys.uuid
+                FROM user_security_keys
+                WHERE user_security_keys.user_uuid = $1 AND user_security_keys.passkey IS NOT NULL
+                FOR UPDATE
+            ) AS usable_keys
+            "#,
+        )
+        .bind(user_uuid)
+        .fetch_one(&mut **transaction)
+        .await
+    }
 }
 
 #[async_trait::async_trait]

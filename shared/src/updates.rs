@@ -174,6 +174,10 @@ impl UpdateManager {
                         };
 
                         for extension in state.extensions.extensions().await.iter() {
+                            if state.extensions.is_disabled(extension.package_name) {
+                                continue;
+                            }
+
                             let update_information = match extension
                                 .check_for_updates(state.clone(), &extension.version)
                                 .await

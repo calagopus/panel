@@ -146,10 +146,15 @@ pub struct Control {
     bin_name: String,
     live: Mutex<Live>,
     wake: tokio::sync::Notify,
+    restart_requests: tokio::sync::mpsc::Sender<()>,
 }
 
 impl Control {
-    pub fn new(binaries: PathBuf, identity: Identity) -> anyhow::Result<Self> {
+    pub fn new(
+        binaries: PathBuf,
+        identity: Identity,
+        restart_requests: tokio::sync::mpsc::Sender<()>,
+    ) -> anyhow::Result<Self> {
         let next_id = crate::store::next_build_id(&binaries)?;
         let last =
             crate::store::read_failure_memo(&binaries, &identity.cache_key).map(|memo| Finished {
@@ -173,7 +178,14 @@ impl Control {
                 next_id,
             }),
             wake: tokio::sync::Notify::new(),
+            restart_requests,
         })
+    }
+
+    /// Asks the supervisor to stop the running panel and start it again from the same binary,
+    /// used to apply changes that only take effect at boot, such as toggling extensions.
+    pub fn request_restart(&self) -> bool {
+        self.restart_requests.try_send(()).is_ok()
     }
 
     pub fn bin_name(&self) -> &str {
@@ -535,6 +547,15 @@ fn respond(request: Request, control: &Control) -> Response {
             Some(build_id) => Response::CancelAccepted { build_id },
             None => Response::CancelNotRunning,
         },
+        Request::RequestRestart => {
+            if control.request_restart() {
+                Response::RestartAccepted
+            } else {
+                Response::Error {
+                    message: "a restart is already queued".to_string(),
+                }
+            }
+        }
     }
 }
 

@@ -75,33 +75,27 @@ impl shared::extensions::commands::CliCommand<CreateArgs> for CreateCommand {
                 };
 
                 let name_first = match args.name_first {
-                    Some(name_first) => name_first,
-                    None => {
-                        if std::io::stdout().is_terminal() {
-                            let name_first: String = Input::with_theme(&ColorfulTheme::default())
-                                .with_prompt("First Name")
-                                .interact_text()?;
-                            name_first
-                        } else {
-                            eprintln!("{}", "name-first arg is required when not running in an interactive terminal".red());
-                            return Ok(1);
-                        }
+                    Some(name_first) => Some(name_first),
+                    None if std::io::stdout().is_terminal() => {
+                        let name_first: String = Input::with_theme(&ColorfulTheme::default())
+                            .with_prompt("First Name (optional)")
+                            .allow_empty(true)
+                            .interact_text()?;
+                        (!name_first.is_empty()).then_some(name_first)
                     }
+                    None => None,
                 };
 
                 let name_last = match args.name_last {
-                    Some(name_last) => name_last,
-                    None => {
-                        if std::io::stdout().is_terminal() {
-                            let name_last: String = Input::with_theme(&ColorfulTheme::default())
-                                .with_prompt("Last Name")
-                                .interact_text()?;
-                            name_last
-                        } else {
-                            eprintln!("{}", "name-last arg is required when not running in an interactive terminal".red());
-                            return Ok(1);
-                        }
+                    Some(name_last) => Some(name_last),
+                    None if std::io::stdout().is_terminal() => {
+                        let name_last: String = Input::with_theme(&ColorfulTheme::default())
+                            .with_prompt("Last Name (optional)")
+                            .allow_empty(true)
+                            .interact_text()?;
+                        (!name_last.is_empty()).then_some(name_last)
                     }
+                    None => None,
                 };
 
                 let password = match args.password {
@@ -139,8 +133,8 @@ impl shared::extensions::commands::CliCommand<CreateArgs> for CreateCommand {
                     external_id: None,
                     username: username.into(),
                     email: email.into(),
-                    name_first: name_first.into(),
-                    name_last: name_last.into(),
+                    name_first: name_first.map(Into::into),
+                    name_last: name_last.map(Into::into),
                     password: Some(password),
                     admin,
                     frozen: false,

@@ -191,6 +191,8 @@ mod patch {
             UpdatableModel,
             admin_activity::GetAdminActivityLogger,
             user::{GetPermissionManager, GetUser, UpdateUserOptions},
+            user_email_verification::UserEmailVerification,
+            user_password_reset::UserPasswordReset,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -260,6 +262,8 @@ mod patch {
             }
         }
 
+        let old_email = user.email.clone();
+
         match user.update(&state, data).await {
             Ok(_) => {}
             Err(err) if err.is_unique_violation() => {
@@ -268,6 +272,11 @@ mod patch {
                     .ok();
             }
             Err(err) => return ApiResponse::from(err).ok(),
+        }
+
+        if user.email != old_email {
+            UserEmailVerification::delete_by_user_uuid(&state.database, user.uuid).await?;
+            UserPasswordReset::delete_by_user_uuid(&state.database, user.uuid).await?;
         }
 
         activity_logger

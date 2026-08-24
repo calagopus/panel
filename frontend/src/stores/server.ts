@@ -4,6 +4,7 @@ import { createServerAnnouncementsSlice, ServerAnnouncementsSlice } from '@/stor
 import { BackupsSlice, createBackupsSlice } from '@/stores/slices/server/backups.ts';
 import { createDatabaseInstancesSlice, DatabaseInstancesSlice } from '@/stores/slices/server/databaseInstances.ts';
 import { createFilesSlice, FilesSlice } from '@/stores/slices/server/files.ts';
+import { createInstallSlice, InstallSlice } from '@/stores/slices/server/install.ts';
 import { createSchedulesSlice, SchedulesSlice } from '@/stores/slices/server/schedules.ts';
 import { createServerSlice, ServerSlice } from '@/stores/slices/server/server.ts';
 import { createStartupSlice, StartupSlice } from '@/stores/slices/server/startup.ts';
@@ -18,6 +19,7 @@ export interface ServerStore
     TransferSlice,
     DatabaseInstancesSlice,
     FilesSlice,
+    InstallSlice,
     SchedulesSlice,
     ServerSlice,
     StatsSlice,
@@ -38,6 +40,7 @@ export const createServerStore = () =>
       ...createTransferSlice(...a),
       ...createDatabaseInstancesSlice(...a),
       ...createFilesSlice(...a),
+      ...createInstallSlice(...a),
       ...createSchedulesSlice(...a),
       ...createServerSlice(...a),
       ...createStateSlice(...a),

@@ -6,6 +6,7 @@ import { defineConfig, normalizePath } from 'vite';
 import dynamicPublicDirectory from 'vite-multiple-assets';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { countryFlags } from './vite-plugins/country-flags.ts';
+import { extensionChunkGroups } from './vite-plugins/extension-chunks.ts';
 import { extensionOverrides } from './vite-plugins/extension-overrides.ts';
 import { precompressAssets } from './vite-plugins/precompress.ts';
 import { translationsPlugin } from './vite-plugins/translations.ts';
@@ -95,6 +96,7 @@ export default defineConfig({
         assetFileNames: 'assets/[name].[hash].[ext]',
         codeSplitting: {
           groups: [
+            ...extensionChunkGroups(),
             {
               name: 'react',
               test: /node_modules\/react/,

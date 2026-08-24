@@ -11,14 +11,25 @@ import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
+import { withTwoFactorMethod } from '@/lib/twoFactor.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import SecurityKeyEditModal from './modals/SecurityKeyEditModal.tsx';
 
-export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<typeof userSecurityKeySchema> }) {
+export default function SecurityKeyRow({
+  securityKey,
+  total,
+}: {
+  securityKey: z.infer<typeof userSecurityKeySchema>;
+  total: number;
+}) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
+  const { user, setUser } = useAuth();
+  const twoFactorAcceptedMethods = useGlobalStore((state) => state.settings.app.twoFactorAcceptedMethods);
 
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
 
@@ -26,6 +37,9 @@ export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<t
     await deleteSecurityKey(securityKey.uuid)
       .then(() => {
         setOpenModal(null);
+        if (total <= 1) {
+          setUser(withTwoFactorMethod(user!, twoFactorAcceptedMethods, 'security_key', false));
+        }
         queryClient.invalidateQueries({ queryKey: queryKeys.user.securityKeys.all() });
         addToast(t('pages.account.securityKeys.modal.deleteSecurityKey.toast.deleted', {}), 'success');
       })

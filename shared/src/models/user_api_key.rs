@@ -20,6 +20,8 @@ pub struct UserApiKey {
     pub key_start: compact_str::CompactString,
     pub allowed_ips: Vec<sqlx::types::ipnetwork::IpNetwork>,
 
+    pub enabled: bool,
+
     pub user_permissions: Arc<Vec<compact_str::CompactString>>,
     pub admin_permissions: Arc<Vec<compact_str::CompactString>>,
     pub server_permissions: Arc<Vec<compact_str::CompactString>>,
@@ -67,6 +69,10 @@ impl BaseModel for UserApiKey {
                 compact_str::format_compact!("{prefix}allowed_ips"),
             ),
             (
+                "user_api_keys.enabled",
+                compact_str::format_compact!("{prefix}enabled"),
+            ),
+            (
                 "user_api_keys.user_permissions",
                 compact_str::format_compact!("{prefix}user_permissions"),
             ),
@@ -103,6 +109,7 @@ impl BaseModel for UserApiKey {
             key_start: row.try_get(compact_str::format_compact!("{prefix}key_start").as_str())?,
             allowed_ips: row
                 .try_get(compact_str::format_compact!("{prefix}allowed_ips").as_str())?,
+            enabled: row.try_get(compact_str::format_compact!("{prefix}enabled").as_str())?,
             user_permissions: Arc::new(
                 row.try_get(compact_str::format_compact!("{prefix}user_permissions").as_str())?,
             ),
@@ -302,6 +309,7 @@ impl IntoApiObject for UserApiKey {
                 name: self.name,
                 key_start: self.key_start,
                 allowed_ips: self.allowed_ips,
+                enabled: self.enabled,
                 user_permissions: self.user_permissions,
                 admin_permissions: self.admin_permissions,
                 server_permissions: self.server_permissions,
@@ -328,6 +336,9 @@ pub struct CreateUserApiKeyOptions {
     #[garde(skip)]
     #[schema(value_type = Vec<String>)]
     pub allowed_ips: Vec<sqlx::types::ipnetwork::IpNetwork>,
+
+    #[garde(skip)]
+    pub enabled: bool,
 
     #[garde(custom(crate::permissions::validate_user_permissions))]
     pub user_permissions: Vec<compact_str::CompactString>,
@@ -374,6 +385,7 @@ impl CreatableModel for UserApiKey {
             .set("key_start", &key[0..16])
             .set_expr("key", "crypt($1, gen_salt('bf', 12))", vec![&key])
             .set("allowed_ips", &options.allowed_ips)
+            .set("enabled", options.enabled)
             .set("user_permissions", &options.user_permissions)
             .set("admin_permissions", &options.admin_permissions)
             .set("server_permissions", &options.server_permissions)
@@ -401,6 +413,9 @@ pub struct UpdateUserApiKeyOptions {
     #[garde(skip)]
     #[schema(value_type = Vec<String>)]
     pub allowed_ips: Option<Vec<sqlx::types::ipnetwork::IpNetwork>>,
+
+    #[garde(skip)]
+    pub enabled: Option<bool>,
 
     #[garde(inner(custom(crate::permissions::validate_user_permissions)))]
     pub user_permissions: Option<Vec<compact_str::CompactString>>,
@@ -445,6 +460,7 @@ impl UpdatableModel for UserApiKey {
         query_builder
             .set("name", options.name.as_ref())
             .set("allowed_ips", options.allowed_ips.as_ref())
+            .set("enabled", options.enabled)
             .set("user_permissions", options.user_permissions.as_ref())
             .set("admin_permissions", options.admin_permissions.as_ref())
             .set("server_permissions", options.server_permissions.as_ref())
@@ -464,6 +480,9 @@ impl UpdatableModel for UserApiKey {
         }
         if let Some(allowed_ips) = options.allowed_ips {
             self.allowed_ips = allowed_ips;
+        }
+        if let Some(enabled) = options.enabled {
+            self.enabled = enabled;
         }
         if let Some(user_permissions) = options.user_permissions {
             self.user_permissions = Arc::new(user_permissions);
@@ -574,6 +593,8 @@ pub struct ApiUserApiKey {
     pub key_start: compact_str::CompactString,
     #[schema(value_type = Vec<String>)]
     pub allowed_ips: Vec<sqlx::types::ipnetwork::IpNetwork>,
+
+    pub enabled: bool,
 
     pub user_permissions: Arc<Vec<compact_str::CompactString>>,
     pub admin_permissions: Arc<Vec<compact_str::CompactString>>,

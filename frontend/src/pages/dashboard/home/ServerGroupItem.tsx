@@ -12,7 +12,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme } from '@mantine/core';
 import classNames from 'classnames';
-import { ComponentProps, memo, startTransition, useEffect, useMemo, useState } from 'react';
+import { ComponentProps, memo, startTransition, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import deleteServerGroup from '@/api/me/servers/groups/deleteServerGroup.ts';
@@ -35,6 +35,7 @@ import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
+import { useUserSettingMapEntry } from '@/lib/userSettings.ts';
 import ServerItem from '@/pages/dashboard/home/ServerItem.tsx';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
@@ -43,6 +44,8 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useUserStore } from '@/stores/user.ts';
 import GroupAddServerModal from './modals/GroupAddServerModal.tsx';
 import ServerGroupEditModal from './modals/ServerGroupEditModal.tsx';
+
+const expandedSchema = z.boolean();
 
 interface DndServer extends z.infer<typeof serverSchema>, DndItem {
   id: string;
@@ -73,8 +76,11 @@ export default function ServerGroupItem({
   const { addToast } = useToast();
   const isDark = useComputedColorScheme('dark') === 'dark';
 
-  const [isExpanded, setIsExpanded] = useState(
-    localStorage.getItem(`server-group-expanded-${serverGroup.uuid}`) !== 'false',
+  const [isExpanded, setIsExpanded] = useUserSettingMapEntry(
+    'dashboard::server_groups_expanded',
+    serverGroup.uuid,
+    expandedSchema,
+    true,
   );
   const [servers, setServers] = useState(getEmptyPaginationSet<z.infer<typeof serverSchema>>());
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | 'add-server' | 'remove-server' | null>(null);
@@ -90,10 +96,6 @@ export default function ServerGroupItem({
     setStoreData: setServers,
     modifyParams: false,
   });
-
-  useEffect(() => {
-    localStorage.setItem(`server-group-expanded-${serverGroup.uuid}`, String(isExpanded));
-  }, [isExpanded, serverGroup.uuid]);
 
   const doDelete = async () => {
     await deleteServerGroup(serverGroup.uuid)

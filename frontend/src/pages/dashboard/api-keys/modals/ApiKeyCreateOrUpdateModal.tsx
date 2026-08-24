@@ -10,6 +10,7 @@ import updateApiKey from '@/api/me/api-keys/updateApiKey.ts';
 import Button from '@/elements/Button.tsx';
 import Group from '@/elements/Group.tsx';
 import DateTimePicker from '@/elements/input/DateTimePicker.tsx';
+import Switch from '@/elements/input/Switch.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
@@ -40,6 +41,7 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, onCreated, ..
     initialValues: {
       name: '',
       allowedIps: [],
+      enabled: true,
       userPermissions: [],
       serverPermissions: [],
       adminPermissions: [],
@@ -69,6 +71,7 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, onCreated, ..
       const values = {
         name: contextApiKey.name,
         allowedIps: contextApiKey.allowedIps,
+        enabled: contextApiKey.enabled,
         userPermissions: contextApiKey.userPermissions,
         serverPermissions: contextApiKey.serverPermissions,
         adminPermissions: contextApiKey.adminPermissions,
@@ -117,6 +120,12 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, onCreated, ..
             onChange={(value) => form.setFieldValue('expires', value ? new Date(value) : null)}
           />
         </Group>
+
+        <Switch
+          label={t('common.form.enabled', {})}
+          name='enabled'
+          {...form.getInputProps('enabled', { type: 'checkbox' })}
+        />
 
         <TagsInput
           label={t('pages.account.apiKeys.form.allowedIps', {})}

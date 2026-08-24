@@ -6,8 +6,10 @@ import Checkbox from '@/elements/input/Checkbox.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Popover from '@/elements/Popover.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { fileManagerSettingKey } from '@/stores/fileManager.ts';
 
 export default function FileSettings() {
   const { t } = useTranslations();
@@ -41,12 +43,30 @@ export default function FileSettings() {
           )}
 
           <Checkbox
-            label={t('pages.server.files.settings.clickOnce', {})}
+            label={
+              <span className='inline-flex items-center gap-1'>
+                {t('pages.server.files.settings.clickOnce', {})}
+                <UserSettingScopeMenu
+                  settingKey={fileManagerSettingKey('clickOnce')}
+                  value={clickOnce}
+                  withinPortal={false}
+                />
+              </span>
+            }
             checked={clickOnce}
             onChange={(e) => setClickOnce(e.target.checked)}
           />
           <Checkbox
-            label={t('pages.server.files.settings.preferPhysicalSize', {})}
+            label={
+              <span className='inline-flex items-center gap-1'>
+                {t('pages.server.files.settings.preferPhysicalSize', {})}
+                <UserSettingScopeMenu
+                  settingKey={fileManagerSettingKey('preferPhysicalSize')}
+                  value={preferPhysicalSize}
+                  withinPortal={false}
+                />
+              </span>
+            }
             checked={preferPhysicalSize}
             onChange={(e) => setPreferPhysicalSize(e.target.checked)}
           />

@@ -5,7 +5,11 @@ import { useShallow } from 'zustand/react/shallow';
 import getServer from '@/api/server/getServer.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverFileOperationSchema } from '@/lib/schemas/server/files.ts';
-import { serverImagePullProgressSchema, serverResourceUsageSchema } from '@/lib/schemas/server/server.ts';
+import {
+  serverImagePullProgressSchema,
+  serverInstallProgressSchema,
+  serverResourceUsageSchema,
+} from '@/lib/schemas/server/server.ts';
 import { formatMilliseconds } from '@/lib/time.ts';
 import { transformKeysToCamelCase } from '@/lib/transformers.ts';
 import useWebsocketEvent, { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
@@ -35,6 +39,7 @@ export default function WebsocketListener() {
     clearBackupProgress,
     setBackupRestoreProgress,
     setTransferProgress,
+    setInstallProgress,
     updateBackup,
     removeBackup,
     setRunningScheduleStep,
@@ -56,6 +61,7 @@ export default function WebsocketListener() {
       clearBackupProgress: state.clearBackupProgress,
       setBackupRestoreProgress: state.setBackupRestoreProgress,
       setTransferProgress: state.setTransferProgress,
+      setInstallProgress: state.setInstallProgress,
       updateBackup: state.updateBackup,
       removeBackup: state.removeBackup,
       setRunningScheduleStep: state.setRunningScheduleStep,
@@ -287,10 +293,27 @@ export default function WebsocketListener() {
   });
 
   useWebsocketEvent(SocketEvent.INSTALL_STARTED, () => {
+    setInstallProgress(null);
     updateServer({ status: 'installing' });
   });
 
+  useWebsocketEvent(SocketEvent.INSTALL_PROGRESS, (data) => {
+    let wsData: z.infer<typeof serverInstallProgressSchema>;
+    try {
+      wsData = JSON.parse(data);
+    } catch {
+      return;
+    }
+
+    if (serverStoreApi.getState().server.status !== 'installing') {
+      updateServer({ status: 'installing' });
+    }
+
+    setInstallProgress(wsData);
+  });
+
   useWebsocketEvent(SocketEvent.INSTALL_COMPLETED, (successful) => {
+    setInstallProgress(null);
     updateServer({ status: successful === 'true' ? null : 'install_failed' });
 
     if (successful === 'true') {

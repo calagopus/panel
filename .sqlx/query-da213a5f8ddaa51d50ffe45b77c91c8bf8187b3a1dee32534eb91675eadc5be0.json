@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE users\n            SET password_login_disabled = $1\n            WHERE users.uuid = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "da213a5f8ddaa51d50ffe45b77c91c8bf8187b3a1dee32534eb91675eadc5be0"
+}

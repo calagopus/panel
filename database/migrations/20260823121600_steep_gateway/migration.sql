@@ -1,0 +1,2 @@
+ALTER TABLE "users" ALTER COLUMN "name_first" DROP NOT NULL;
+ALTER TABLE "users" ALTER COLUMN "name_last" DROP NOT NULL;

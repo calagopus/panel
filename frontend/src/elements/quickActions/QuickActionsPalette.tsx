@@ -30,6 +30,7 @@ import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
 import { checkPermissions } from '@/plugins/usePermissions.ts';
 import { useQuickActionLocation } from '@/plugins/useQuickActions.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
+import { useServerListShowOthers } from '@/plugins/useServerListShowOthers.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -99,7 +100,7 @@ function Palette() {
   // Subscribed purely to repaint when a provider's host re-renders; providers are read lazily below.
   useQuickActionsStore((state) => state.revision);
   const userRouteOrder = useGlobalStore((state) => state.settings.user?.routeOrder);
-  const showOthers = useGlobalStore((state) => state.serverListShowOthers);
+  const [showOthers] = useServerListShowOthers();
 
   useKeyboardShortcuts({
     shortcuts: [{ id: 'general.quickActions', callback: () => setOpen(true) }],
